@@ -1,0 +1,703 @@
+// Source: src/sat/sat_mus.cpp:28–229; src/sat/sat_mus.h; src/sat/sat_solver.cpp:1257–1261,2072–2083.
+// Licensed under the MIT license. Source author: Nikolaj Bjorner, 2014.
+package sat
+
+import (
+	"errors"
+	"reflect"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util"
+)
+
+var ErrSATMUSEmptyRecursion = errors.New("sat: empty MUS qx recursion has no finite source continuation")
+
+// A dynamic lexical frame names actual source local value owners. Its reflected
+// cold header is a Go ownership adapter, not an extra source vector allocation.
+// Borrowed qx arguments never own the same backing twice. Failed source bodies
+// retain interrupted destructors here, without restoring outputs or marks.
+type satMUSFrame struct {
+	appendActive       bool
+	appendOld          uint32
+	innerCoreCompleted bool
+	next               *satMUSFrame
+	sets               [3]satMUSLiteralSet
+	vector             RuntimeUintColumn
+	setsUsed           uint32
+	vectorUsed         bool
+	drain              uint32
+	cleanupStopped     bool
+	bytes              uint64
+}
+
+func (m *satSolverMUSMembers) frame(sets uint32, vector bool) (*satMUSFrame, error) {
+	s := m.solver
+	n := uint64(reflect.TypeOf(satMUSFrame{}).Size())
+	if e := s.runtime.budget.Reserve(n); e != nil {
+		return nil, e
+	}
+	f := &satMUSFrame{next: m.frames, setsUsed: sets, vectorUsed: vector, bytes: n}
+	for i := uint32(0); i < sets; i++ {
+		f.sets[i].bind(s.runtime.memory)
+	}
+	f.vector.Bind(s.runtime.memory)
+	m.frames = f
+	return f, nil
+}
+func (m *satSolverMUSMembers) drop(f *satMUSFrame, cause error) error {
+	if f.cleanupStopped {
+		return cause
+	}
+	if m.frames != f {
+		if cause != nil {
+			return cause
+		}
+		return ErrSATOwner
+	}
+	// Source locals unwind in reverse declaration order, interrupted at the
+	// actual reached release. A failed constructor's buffers are owning-aborted
+	// only after the older completed locals; current constructors are empty.
+	if f.vectorUsed {
+		if e := f.vector.Finalize(); e != nil {
+			return errors.Join(cause, e)
+		}
+		f.vectorUsed = false
+	}
+	if f.innerCoreCompleted {
+		if e := f.sets[0].close(); e != nil {
+			return errors.Join(cause, e)
+		}
+		f.innerCoreCompleted = false
+		f.setsUsed = 0
+	}
+	if f.appendActive {
+		if e := satMUSResize(&m.mus, f.appendOld); e != nil {
+			return errors.Join(cause, e)
+		}
+		f.appendActive = false
+	}
+	for f.drain < f.setsUsed {
+		i := f.setsUsed - 1 - f.drain
+		if e := f.sets[i].close(); e != nil {
+			return errors.Join(cause, e)
+		}
+		f.drain++
+	}
+	if m.frames != f {
+		return errors.Join(cause, ErrSATOwner)
+	}
+	m.frames = f.next
+	m.solver.runtime.budget.Release(f.bytes)
+	return cause
+}
+func (m *satSolverMUSMembers) cleanup() error {
+	for m.frames != nil {
+		m.frames.cleanupStopped = false
+		if e := m.drop(m.frames, nil); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+func satMUSAppend(dst, src *RuntimeUintColumn) error {
+	for i := uint32(0); ; i++ {
+		n, e := src.Size()
+		if e != nil {
+			return e
+		}
+		if i >= n {
+			return nil
+		}
+		v, e := src.Read(i)
+		if e != nil {
+			return e
+		}
+		if e = dst.Push(v); e != nil {
+			return e
+		}
+	}
+}
+func satMUSContains(v *RuntimeUintColumn, l uint32) (bool, error) {
+	for i := uint32(0); ; i++ {
+		n, e := v.Size()
+		if e != nil {
+			return false, e
+		}
+		if i >= n {
+			return false, nil
+		}
+		a, e := v.Read(i)
+		if e != nil {
+			return false, e
+		}
+		if a == l {
+			return true, nil
+		}
+	}
+}
+func (m *satSolverMUSMembers) reset() error {
+	if e := m.core.Shrink(0); e != nil {
+		return e
+	}
+	if e := m.mus.Shrink(0); e != nil {
+		return e
+	}
+	return m.model.Shrink(0)
+}
+func (m *satSolverMUSMembers) setCore() error {
+	if e := satMUSAppend(&m.mus, &m.core); e != nil {
+		return e
+	}
+	if e := m.solver.conflict.core.Shrink(0); e != nil {
+		return e
+	}
+	return satMUSAppend(&m.solver.conflict.core, &m.mus)
+}
+func (m *satSolverMUSMembers) updateModel() error {
+	n, e := m.model.Size()
+	if e != nil {
+		return e
+	}
+	if n == 0 {
+		return satMUSAppend(&m.model, &m.solver.model)
+	}
+	return nil
+}
+func (m *satSolverMUSMembers) getCore() error {
+	if e := m.core.Shrink(0); e != nil {
+		return e
+	}
+	if e := m.mus.Shrink(0); e != nil {
+		return e
+	}
+	if e := satMUSAppend(&m.core, &m.solver.conflict.core); e != nil {
+		return e
+	}
+	for i := uint32(0); ; i++ {
+		n, e := m.core.Size()
+		if e != nil {
+			return e
+		}
+		if i >= n {
+			return nil
+		}
+		v, e := m.core.Read(i)
+		if e != nil {
+			return e
+		}
+		yes, e := satMUSContains(&m.solver.conflict.userScopeLiterals, v)
+		if e != nil {
+			return e
+		}
+		if yes {
+			v, e = m.core.Read(i)
+			if e != nil {
+				return e
+			}
+			if e = m.mus.Push(v); e != nil {
+				return e
+			}
+			n, e = m.core.Size()
+			if e != nil {
+				return e
+			}
+			v, e = m.core.Read(n - 1)
+			if e != nil {
+				return e
+			}
+			if e = m.core.Write(i, v); e != nil {
+				return e
+			}
+			if e = m.core.Shrink(n - 1); e != nil {
+				return e
+			}
+			i--
+		}
+	}
+}
+func (m *satSolverMUSMembers) run() (util.LBool, error) {
+	if m == nil || m.solver == nil || m != &m.solver.mus {
+		return util.LUndef, ErrSATOwner
+	}
+	if e := m.solver.open(); e != nil {
+		return util.LUndef, e
+	}
+	if m.frames != nil || m.isActive {
+		return util.LUndef, arena.ErrClosed
+	}
+	cfg := &m.solver.config.state
+	if cfg.CoreMinimizePartial {
+		m.maxNumRestarts = m.solver.gc.restarts + 10
+	} else {
+		m.maxNumRestarts = ^uint32(0)
+	}
+	oldMin := cfg.CoreMinimize
+	cfg.CoreMinimize = false
+	oldActive := m.isActive
+	m.isActive = true
+	defer func() { m.isActive = oldActive; cfg.CoreMinimize = oldMin }()
+	if e := m.reset(); e != nil {
+		return util.LUndef, e
+	}
+	return m.mus1()
+}
+func (m *satSolverMUSMembers) scopedCheck(core *RuntimeUintColumn, lit Literal) (r util.LBool, e error) {
+	cfg := &m.solver.config.state
+	oldRestart := cfg.RestartMax
+	cfg.RestartMax = m.maxNumRestarts
+	defer func() { cfg.RestartMax = oldRestart }()
+	n, e := m.mus.Size()
+	if e != nil {
+		return util.LUndef, e
+	}
+	// Failed scoped_append construction has no source destructor. Completed
+	// append restores size only after its actual nested Check returns/unwinds.
+	if e = satMUSAppend(&m.mus, core); e != nil {
+		return util.LUndef, e
+	}
+	defer func() {
+		if cleanup := satMUSResize(&m.mus, n); cleanup != nil {
+			e = errors.Join(e, cleanup)
+		}
+	}()
+	if e = m.mus.Push(uint32(lit.Negated())); e != nil {
+		return util.LUndef, e
+	}
+	count, e := m.mus.Size()
+	if e != nil {
+		return util.LUndef, e
+	}
+	return m.solver.checkSpan(count, satConflictRuntimeSpan(&m.mus))
+}
+func (m *satSolverMUSMembers) mus1() (util.LBool, error) {
+	partial := m.solver.config.state.CoreMinimizePartial
+	if e := m.getCore(); e != nil {
+		return util.LUndef, e
+	}
+	n, e := m.core.Size()
+	if e != nil {
+		return util.LUndef, e
+	}
+	if !partial && n > 64 {
+		return m.mus2()
+	}
+	for {
+		n, e = m.core.Size()
+		if e != nil {
+			return util.LUndef, e
+		}
+		if n == 0 {
+			break
+		}
+		if !m.solver.Limit.Inc() {
+			if e = m.setCore(); e != nil {
+				return util.LUndef, e
+			}
+			return util.LUndef, nil
+		}
+		k, e := m.mus.Size()
+		if e != nil {
+			return util.LUndef, e
+		}
+		if n+k <= 2 {
+			break
+		}
+		v, e := m.core.Read(n - 1)
+		if e != nil {
+			return util.LUndef, e
+		}
+		if e = m.core.Shrink(n - 1); e != nil {
+			return util.LUndef, e
+		}
+		lit := Literal(v)
+		result, e := m.scopedCheck(&m.core, lit)
+		if e != nil {
+			return util.LUndef, e
+		}
+		switch result {
+		case util.LUndef:
+			if m.solver.Limit.Inc() {
+				if e = m.mus.Push(v); e != nil {
+					return util.LUndef, e
+				}
+			} else {
+				if e = m.core.Push(v); e != nil {
+					return util.LUndef, e
+				}
+				if e = m.setCore(); e != nil {
+					return util.LUndef, e
+				}
+				return util.LUndef, nil
+			}
+		case util.LTrue:
+			if satStorageSourceDebug {
+				a, e := m.solver.model.Read(uint32(lit.variable()))
+				if e != nil {
+					return util.LUndef, e
+				}
+				value := util.LBool(int32(a))
+				if lit.sign() {
+					value = value.Negated()
+				}
+				if value != util.LFalse {
+					return util.LUndef, ErrSATAssertion
+				}
+			}
+			if e = m.mus.Push(v); e != nil {
+				return util.LUndef, e
+			}
+			if e = m.updateModel(); e != nil {
+				return util.LUndef, e
+			}
+		case util.LFalse:
+			yes, e := satMUSContains(&m.solver.conflict.core, uint32(lit.Negated()))
+			if e != nil {
+				return util.LUndef, e
+			}
+			if !yes {
+				if e = m.core.Shrink(0); e != nil {
+					return util.LUndef, e
+				}
+				for i := uint32(0); ; i++ {
+					sz, e := m.solver.conflict.core.Size()
+					if e != nil {
+						return util.LUndef, e
+					}
+					if i >= sz {
+						break
+					}
+					v, e := m.solver.conflict.core.Read(i)
+					if e != nil {
+						return util.LUndef, e
+					}
+					yes, e := satMUSContains(&m.mus, v)
+					if e != nil {
+						return util.LUndef, e
+					}
+					if !yes {
+						if e = m.core.Push(v); e != nil {
+							return util.LUndef, e
+						}
+					}
+				}
+			}
+		}
+	}
+	if e = m.setCore(); e != nil {
+		return util.LUndef, e
+	}
+	return util.LTrue, nil
+}
+func (m *satSolverMUSMembers) setFromColumn(dst *satMUSLiteralSet, src *RuntimeUintColumn) error {
+	for i := uint32(0); ; i++ {
+		n, e := src.Size()
+		if e != nil {
+			return e
+		}
+		if i >= n {
+			return nil
+		}
+		v, e := src.Read(i)
+		if e != nil {
+			return e
+		}
+		if e = dst.insert(Literal(v)); e != nil {
+			return e
+		}
+	}
+}
+func (m *satSolverMUSMembers) toVector(set *satMUSLiteralSet, dst *RuntimeUintColumn) error {
+	// Named return-value move is explicit: one source result vector, whose
+	// lexical caller owns its destruction. Captured begin/end never rebind.
+	n, e := set.size()
+	if e != nil {
+		return e
+	}
+	span := satConflictRuntimeSpan(&set.values)
+	for i := uint32(0); i < n; i++ {
+		l, e := span.literal(i)
+		if e != nil {
+			return e
+		}
+		if e = dst.Push(uint32(l)); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+func (m *satSolverMUSMembers) mus2() (r util.LBool, e error) {
+	f, e := m.frame(2, true)
+	if e != nil {
+		return util.LUndef, e
+	}
+	defer func() { e = m.drop(f, e) }()
+	if e = m.getCore(); e != nil {
+		return util.LUndef, e
+	}
+	if e = m.setFromColumn(&f.sets[0], &m.core); e != nil {
+		return util.LUndef, e
+	}
+	r, e = m.qx(&f.sets[0], &f.sets[1], false)
+	if e != nil {
+		return util.LUndef, e
+	}
+	if e = m.solver.conflict.core.Shrink(0); e != nil {
+		return util.LUndef, e
+	}
+	if e = m.toVector(&f.sets[0], &f.vector); e != nil {
+		return util.LUndef, e
+	}
+	e = satMUSAppend(&m.solver.conflict.core, &f.vector)
+	return r, e
+}
+func (m *satSolverMUSMembers) split(a, b *satMUSLiteralSet) (e error) {
+	n, e := a.size()
+	if e != nil {
+		return e
+	}
+	half := n / 2
+	f, e := m.frame(1, false)
+	if e != nil {
+		return e
+	}
+	defer func() { e = m.drop(f, e) }()
+	span := satConflictRuntimeSpan(&a.values)
+	for i := uint32(0); i < n; i++ {
+		v, e := span.literal(i)
+		if e != nil {
+			return e
+		}
+		dst := b
+		if i < half {
+			dst = &f.sets[0]
+		}
+		if e = dst.insert(v); e != nil {
+			return e
+		}
+	}
+	return a.assign(&f.sets[0])
+}
+func (m *satSolverMUSMembers) unsplit(a, b *satMUSLiteralSet) (e error) {
+	f, e := m.frame(2, false)
+	if e != nil {
+		return e
+	}
+	defer func() { e = m.drop(f, e) }()
+	n, e := a.size()
+	if e != nil {
+		return e
+	}
+	span := satConflictRuntimeSpan(&a.values)
+	for i := uint32(0); i < n; i++ {
+		v, e := span.literal(i)
+		if e != nil {
+			return e
+		}
+		yes, e := b.contains(v)
+		if e != nil {
+			return e
+		}
+		idx := 0
+		if yes {
+			idx = 1
+		}
+		if e = f.sets[idx].insert(v); e != nil {
+			return e
+		}
+	}
+	if e = a.assign(&f.sets[0]); e != nil {
+		return e
+	}
+	return b.assign(&f.sets[1])
+}
+func (m *satSolverMUSMembers) qx(a, b *satMUSLiteralSet, support bool) (r util.LBool, e error) {
+	r = util.LTrue
+	if support {
+		r, e = m.qxCheck(a, b)
+		if e != nil {
+			return r, e
+		}
+		if r == util.LFalse {
+			return util.LTrue, nil
+		}
+		if r != util.LTrue {
+			return r, nil
+		}
+	}
+	n, e := a.size()
+	if e != nil {
+		return util.LUndef, e
+	}
+	if n == 1 {
+		return util.LTrue, nil
+	}
+	f, e := m.frame(1, false)
+	if e != nil {
+		return util.LUndef, e
+	}
+	defer func() { e = m.drop(f, e) }()
+	a2 := &f.sets[0]
+	if e = m.split(a, a2); e != nil {
+		return util.LUndef, e
+	}
+	if e = b.union(a); e != nil {
+		return util.LUndef, e
+	}
+	n, e = a.size()
+	if e != nil {
+		return util.LUndef, e
+	}
+	if n == 0 {
+		second, e := a2.size()
+		if e != nil {
+			return util.LUndef, e
+		}
+		// The first split and union have completed. The next identical empty
+		// recursive call has no finite source continuation; preserve that prefix.
+		if second == 0 {
+			return util.LUndef, ErrSATMUSEmptyRecursion
+		}
+	}
+	r, e = m.qx(a2, b, n != 0)
+	if e != nil {
+		return r, e
+	}
+	if e = m.unsplit(b, a); e != nil {
+		return util.LUndef, e
+	}
+	if r != util.LTrue {
+		return r, nil
+	}
+	if e = b.union(a2); e != nil {
+		return util.LUndef, e
+	}
+	n, e = a2.size()
+	if e != nil {
+		return util.LUndef, e
+	}
+	r, e = m.qx(a, b, n != 0)
+	if e != nil {
+		return r, e
+	}
+	if e = a.union(a2); e != nil {
+		return util.LUndef, e
+	}
+	if e = m.unsplit(b, a2); e != nil {
+		return util.LUndef, e
+	}
+	return r, nil
+}
+func (m *satSolverMUSMembers) qxCheck(a, b *satMUSLiteralSet) (r util.LBool, e error) {
+	f, e := m.frame(0, true)
+	if e != nil {
+		return util.LUndef, e
+	}
+	defer func() { e = m.drop(f, e) }()
+	if e = m.toVector(b, &f.vector); e != nil {
+		return util.LUndef, e
+	}
+	old, e := m.mus.Size()
+	if e != nil {
+		return util.LUndef, e
+	}
+	if e = satMUSAppend(&m.mus, &f.vector); e != nil {
+		return util.LUndef, e
+	}
+	f.appendActive = true
+	f.appendOld = old
+	// Full-expression temporary is destroyed BEFORE the following Check body.
+	if e = f.vector.Finalize(); e != nil {
+		f.cleanupStopped = true
+		return util.LUndef, e
+	}
+	f.vectorUsed = false
+	n, e := m.mus.Size()
+	if e != nil {
+		return util.LUndef, e
+	}
+	r, e = m.solver.checkSpan(n, satConflictRuntimeSpan(&m.mus))
+	if e != nil {
+		return r, e
+	}
+	switch r {
+	case util.LFalse:
+		f.setsUsed = 1
+		f.sets[0].bind(m.solver.runtime.memory)
+		if e = m.setFromColumn(&f.sets[0], &m.solver.conflict.core); e != nil {
+			return util.LUndef, e
+		}
+		f.innerCoreCompleted = true
+		if e = b.intersect(&f.sets[0]); e != nil {
+			return util.LUndef, e
+		}
+		if e = a.reset(); e != nil {
+			return util.LUndef, e
+		}
+		return util.LFalse, nil
+	case util.LTrue:
+		if e = m.updateModel(); e != nil {
+			return util.LUndef, e
+		}
+	}
+	return r, nil
+}
+
+func (s *Solver) setModel(src *RuntimeUintColumn) error {
+	if e := s.model.Shrink(0); e != nil {
+		return e
+	}
+	if e := satMUSAppend(&s.model, src); e != nil {
+		return e
+	}
+	n, e := s.model.Size()
+	if e != nil {
+		return e
+	}
+	s.Variables.modelIsCurrent = n != 0
+	return nil
+}
+
+func (m *satSolverMUSMembers) verifyCore(core *RuntimeUintColumn) error {
+	n, e := core.Size()
+	if e != nil {
+		return e
+	}
+	_, e = m.solver.checkSpan(n, satConflictRuntimeSpan(core))
+	return e
+}
+func (m *satSolverMUSMembers) isActiveSource() bool         { return m.isActive }
+func (m *satSolverMUSMembers) getModel() *RuntimeUintColumn { return &m.model }
+
+// Source vector resize publishes the new size before ascending value placement.
+// scoped_append uses this full operation, including growth if its borrower was
+// mutated; retained old bytes do not substitute for T() initialization.
+func satMUSResize(v *RuntimeUintColumn, n uint32) error {
+	old, e := v.Size()
+	if e != nil {
+		return e
+	}
+	if n <= old {
+		return v.Shrink(n)
+	}
+	for {
+		capacity, e := v.Capacity()
+		if e != nil {
+			return e
+		}
+		if capacity >= n {
+			break
+		}
+		if e = v.Raw.ExpandStride(4); e != nil {
+			return e
+		}
+	}
+	if e = WriteRuntimeWord(v.Raw.Runtime, v.Raw.Block, 4, n); e != nil {
+		return e
+	}
+	for i := old; i < n; i++ {
+		if e = WriteRuntimeWord(v.Raw.Runtime, v.Raw.Block, 8+4*uint64(i), 0); e != nil {
+			return e
+		}
+	}
+	return nil
+}

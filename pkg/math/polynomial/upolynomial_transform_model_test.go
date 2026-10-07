@@ -1,0 +1,145 @@
+// Licensed under the MIT license.
+package polynomial
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util"
+)
+
+func TestUPolynomialFullTransformFiniteOracles(t *testing.T) {
+	m, q, _ := upolySourceOwner(t)
+	p := upolySourceNew(t, m, []int32{1, 2, 3})
+	out := upolySourceNew(t, m, nil)
+	b := util.NewBinaryIntPower(1, 1)
+	r := util.NewRational()
+	if e := q.SetFraction(&r, 1, 3); e != nil {
+		t.Fatal(e)
+	}
+	defer q.Del(&r)
+	c := util.NewInt(2)
+	three := util.NewInt(3)
+	for _, f := range []struct {
+		name string
+		call func(UPolynomialView) error
+		want []int64
+	}{
+		{"one", m.TranslateOneViewInPlace, []int64{6, 8, 3}},
+		{"source_shadowed_k", func(v UPolynomialView) error { return m.TranslatePowerTwoViewInPlace(v, 7) }, []int64{9, 14, 3}},
+		{"integer", func(v UPolynomialView) error { return m.TranslateIntegerViewInPlace(v, &c) }, []int64{17, 14, 3}},
+		{"binary", func(v UPolynomialView) error { return m.TranslateBinaryViewInPlace(v, &b) }, []int64{11, 20, 12}},
+		{"rational", func(v UPolynomialView) error { return m.TranslateRationalViewInPlace(v, &r) }, []int64{18, 36, 27}},
+		{"two_degree_divide_x", m.ComposeTwoDegreeDivideXViewInPlace, []int64{4, 4, 3}},
+		{"two_power_degree_divide_x", func(v UPolynomialView) error { return m.ComposePowerTwoDegreeDivideXViewInPlace(v, 2) }, []int64{16, 8, 3}},
+		{"two_power_x", func(v UPolynomialView) error { return m.ComposePowerTwoXViewInPlace(v, 2) }, []int64{1, 8, 48}},
+		{"integer_degree_divide_x", func(v UPolynomialView) error { return m.ComposeIntegerDegreeDivideXViewInPlace(v, &three) }, []int64{9, 6, 3}},
+		{"integer_x", func(v UPolynomialView) error { return m.ComposeIntegerXViewInPlace(v, &three) }, []int64{1, 6, 27}},
+		{"binary_x", func(v UPolynomialView) error { return m.ComposeBinaryXViewInPlace(v, &b) }, []int64{4, 4, 3}},
+		{"rational_x", func(v UPolynomialView) error { return m.ComposeRationalXViewInPlace(v, &r) }, []int64{9, 6, 3}},
+		{"negative_x", m.PMinusXViewInPlace, []int64{1, -2, 3}},
+		{"reciprocal", m.ReciprocalViewInPlace, []int64{3, 2, 1}},
+	} {
+		if e := m.Copy(out, p); e != nil {
+			t.Fatal(e)
+		}
+		if e := f.call(mustUPolyView(t, m, out)); e != nil {
+			t.Fatal(f.name, e)
+		}
+		upolyGCDExpect(t, m, out, f.want)
+	}
+	// All five literal header Set-before-transform delegations execute.
+	for _, f := range []struct {
+		call func() error
+		want []int64
+	}{
+		{func() error { return m.TranslateOne(mustUPolyView(t, m, p), out) }, []int64{6, 8, 3}},
+		{func() error { return m.TranslatePowerTwo(mustUPolyView(t, m, p), 99, out) }, []int64{9, 14, 3}},
+		{func() error { return m.TranslateInteger(mustUPolyView(t, m, p), &c, out) }, []int64{17, 14, 3}},
+		{func() error { return m.TranslateBinary(mustUPolyView(t, m, p), &b, out) }, []int64{11, 20, 12}},
+		{func() error { return m.TranslateRational(mustUPolyView(t, m, p), &r, out) }, []int64{18, 36, 27}},
+	} {
+		if e := f.call(); e != nil {
+			t.Fatal(e)
+		}
+		upolyGCDExpect(t, m, out, f.want)
+	}
+}
+func TestUPolynomialRootCountBoundsSourceBranches(t *testing.T) {
+	m, q, b := upolySourceOwner(t)
+	p := upolySourceNew(t, m, []int32{-2, 0, 1})
+	out := upolySourceNew(t, m, nil)
+	changes, e := m.SignChanges(mustUPolyView(t, m, p))
+	if e != nil || changes != 1 {
+		t.Fatal(changes, e)
+	}
+	bound, e := m.DescartesBound(mustUPolyView(t, m, p))
+	if e != nil || bound != 1 {
+		t.Fatal(bound, e)
+	}
+	bound, e = m.DescartesBoundZeroOne(mustUPolyView(t, m, p))
+	if e != nil || bound != 0 {
+		t.Fatal(bound, e)
+	}
+	var upper util.Int
+	if e = m.RootUpperBound(mustUPolyView(t, m, p), &upper); e != nil {
+		t.Fatal(e)
+	}
+	n, e := m.IntegerManager().Int64(&upper)
+	if e != nil || n != 4 {
+		t.Fatal(n, e)
+	}
+	if e = m.IntegerManager().Del(&upper); e != nil {
+		t.Fatal(e)
+	}
+	positive, e := m.KnuthPositiveRootUpperBound(mustUPolyView(t, m, p))
+	if e != nil || positive != 2 {
+		t.Fatal(positive, e)
+	}
+	negative, e := m.KnuthNegativeRootUpperBound(mustUPolyView(t, m, p))
+	if e != nil || negative != 2 {
+		t.Fatal(negative, e)
+	}
+	lower, e := m.NonzeroRootLowerBound(mustUPolyView(t, m, p))
+	if e != nil || lower != 1 {
+		t.Fatal(lower, e)
+	}
+	upolyGCDExpect(t, m, p, []int64{-2, 0, 1})
+	z := upolySourceNew(t, m, []int32{0, 0, 6, -3})
+	zero, e := m.HasZeroRoots(mustUPolyView(t, m, z))
+	if e != nil || !zero {
+		t.Fatal(zero, e)
+	}
+	if e = m.RemoveZeroRoots(mustUPolyView(t, m, z), out); e != nil {
+		t.Fatal(e)
+	}
+	upolyGCDExpect(t, m, out, []int64{6, -3})
+	diagnostics, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}}})
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer func() {
+		if e := diagnostics.Close(); e != nil {
+			t.Error(e)
+		}
+	}()
+	bqm, e := util.NewBinaryRationalManager(q.Integers(), util.BinaryRationalConfig{Diagnostics: diagnostics})
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer bqm.Close() // actual borrowed numeric owner Close is void
+	for _, f := range []struct {
+		a, b int32
+		want uint32
+	}{{0, 1, 0}, {1, 2, 1}, {-2, -1, 1}, {-2, 2, 2}, {-1, 1, 0}} {
+		a, binaryB := util.NewBinaryInt(f.a), util.NewBinaryInt(f.b)
+		count, e := m.DescartesBoundInterval(mustUPolyView(t, m, p), bqm, &a, &binaryB)
+		if e != nil || count != f.want {
+			t.Fatal(f, count, e)
+		}
+	}
+	before := b.Used()
+	if before == 0 {
+		t.Fatal("real borrowed owner graph")
+	}
+}

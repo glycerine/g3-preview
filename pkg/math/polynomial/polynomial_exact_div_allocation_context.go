@@ -1,0 +1,109 @@
+// Source: src/math/polynomial/polynomial.cpp:5114-5156;
+// src/util/mpzzp.h:167-185; src/util/mpz.h:468-485.
+// Licensed under the MIT license. Source author: Leonardo de Moura.
+package polynomial
+
+import (
+	"github.com/glycerine/g3/pkg/util"
+)
+
+func numericIntegerManager_exactDivAllocationRoots(m *util.IntegerManager, r *polynomialExactDivInvocationReceipt) *polynomialNumericRoots {
+	if m == nil || !m.ValidOwner() || r == nil || r.core == nil || r.core.self != r.core || r.core.integer != m || !r.core.matchesExactDivInvocation(r) || !r.frame.executing || r.core.callbackDepth != 0 {
+		return nil
+	}
+	return &r.frame.numeric
+}
+func numericIntegerManager_exactDivContextRoots(m *util.IntegerManager, c integerAllocationInvocationContext) *polynomialNumericRoots {
+	if c.exactDiv == nil || c.exactDivInvocation == 0 || c.exactDivInvocation != c.exactDiv.invocation {
+		return nil
+	}
+	return numericIntegerManager_exactDivAllocationRoots(m, c.exactDiv)
+}
+func numericIntegerModularManager_exactDivAllocationContext(m *util.IntegerModularManager, r *polynomialExactDivInvocationReceipt) integerAllocationInvocationContext {
+	if m == nil || m.Integers() == nil || numericIntegerManager_exactDivAllocationRoots(m.Integers(), r) == nil || r.core.modular != m {
+		return integerAllocationInvocationContext{}
+	}
+	return integerAllocationInvocationContext{exactDiv: r, exactDivInvocation: r.invocation}
+}
+func numericIntegerModularManager_divWithExactDivReceipt(m *util.IntegerModularManager, a, b, out *util.Int, r *polynomialExactDivInvocationReceipt) error {
+	context := numericIntegerModularManager_exactDivAllocationContext(m, r)
+	e := m.WithAllocationContext((context).utility(m.Integers())).Div(a, b, out)
+	if m != nil && m.Integers() != nil && numericIntegerManager_exactDivContextRoots(m.Integers(), context) != nil && r.frame.sourceCause == nil {
+		r.frame.sourceCause = numericIntegerManager_exactDivNumericSourceCause(m.Integers(), r)
+	}
+	return e
+}
+func numericIntegerModularManager_negWithExactDivReceipt(m *util.IntegerModularManager, out *util.Int, r *polynomialExactDivInvocationReceipt) error {
+	if e := m.Check(); e != nil {
+		return e
+	}
+	context := numericIntegerModularManager_exactDivAllocationContext(m, r)
+	if e := m.Integers().WithAllocationContext((context).utility(m.Integers())).Neg(out); e != nil {
+		return e
+	}
+	return numericIntegerModularManager_normalizeWithSourceContext(m, out, context)
+}
+
+// Bind only the child returned by the actual guarded RAW declaration action.
+func numericIntegerManager_bindExactDivRaw(m *util.IntegerManager, c integerAllocationInvocationContext, child *util.IntegerRawInvocationReceipt, division bool) {
+	if numericIntegerManager_exactDivContextRoots(m, c) == nil || !m.MatchesRawInvocation(child) {
+		return
+	}
+
+	if division {
+		c.exactDiv.frame.divisionRaw = *child
+	} else {
+		c.exactDiv.frame.extendedRaw = *child
+	}
+}
+
+// History is read independently of the allocation/executing predicate.
+func numericIntegerManager_exactDivNumericSourceCause(m *util.IntegerManager, r *polynomialExactDivInvocationReceipt) error {
+	if r == nil || r.core == nil || r.core.self != r.core || r.core.integer != m || !r.core.matchesExactDivInvocation(r) {
+		return nil
+	}
+	s := r.frame
+	if e := r.core.modular.PNormalizeInvocationSourceCause(&s.normalize); e != nil {
+		return e
+	}
+	if e := m.RawInvocationSourceCause(&s.extendedRaw); e != nil {
+		return e
+	}
+	if e := m.RawInvocationSourceCause(&s.divisionRaw); e != nil {
+		return e
+	}
+	return m.Naturals().PnVerificationSourceCause(&s.verification)
+}
+
+// False completes reached younger source children. True drains unjoined
+// acquisitions only when the caller has completed its older lexical suffix.
+func numericIntegerManager_cleanupExactDivNumeric(m *util.IntegerManager, r *polynomialExactDivInvocationReceipt, abort bool) error {
+	if r == nil || r.core == nil || r.core.self != r.core || r.core.integer != m || !r.core.matchesExactDivInvocation(r) {
+		return nil
+	}
+	s := r.frame
+	if s.executing {
+		return ErrPolynomialPending
+	}
+	if e := r.core.modular.CleanupPNormalizeInvocation(&s.normalize, abort); e != nil {
+		return e
+	}
+	if e := m.CleanupRawInvocation(&s.extendedRaw, abort); e != nil {
+		return e
+	}
+	if e := m.CleanupRawInvocation(&s.divisionRaw, abort); e != nil {
+		return e
+	}
+	if e := m.Naturals().CleanupPNVerification(&s.verification, abort); e != nil {
+		return e
+	}
+	if abort {
+		for i := len(s.buffers) - 1; i >= 0; i-- {
+			if e := s.buffers[i].Cleanup(); e != nil {
+				return e
+			}
+		}
+		return s.numeric.cleanup(m)
+	}
+	return nil
+}

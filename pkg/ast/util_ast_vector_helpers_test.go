@@ -1,0 +1,72 @@
+// Licensed under the MIT license; see LICENSE.txt.
+package ast
+
+import (
+	"os"
+	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util"
+)
+
+func astUnsignedGrowthPrime(t *testing.T, r *util.Runtime) util.Block {
+	t.Helper()
+	astTestMust(t, r.SetMaxSize(0))
+	request := int64(99990) - r.State().LocalSize - 8
+	if request <= 0 {
+		t.Fatal("public bounded TLS priming", r.State())
+	}
+	h, e := r.Allocate(uint64(request))
+	astTestMust(t, e)
+	astTestMust(t, r.SetMaxSize(1))
+	return h
+}
+
+// The diagnostic fixture stays with the AST tests and borrows only public utilities.
+func astPermutationActionFixture(t *testing.T, text string) (*arena.Budget, *util.Runtime, *util.DebugContext, *util.NumericCharInput, *os.File) {
+	t.Helper()
+	b := arena.NewBudget(1 << 24)
+	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	astTestMust(t, e)
+	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
+	astTestMust(t, e)
+	d, e := util.NewDebugContext(region, b)
+	astTestMust(t, e)
+	p, e := util.NewRuntimePermutationWithAssertions(r, b, 2, d)
+	astTestMust(t, e)
+	t.Cleanup(func() {
+		b.FailAfter(-1)
+		astTestMust(t, p.Close())
+		astTestMust(t, d.Close())
+		astTestMust(t, region.Close())
+		astTestMust(t, r.Close())
+		if b.Used() != 0 {
+			t.Fatal("unnamed diagnostic owner", b.Used())
+		}
+	})
+	inputFile, e := os.CreateTemp(t.TempDir(), "permutation-action-input-*")
+	astTestMust(t, e)
+	_, e = inputFile.WriteString(text)
+	astTestMust(t, e)
+	_, e = inputFile.Seek(0, 0)
+	astTestMust(t, e)
+	out, e := os.CreateTemp(t.TempDir(), "permutation-action-output-*")
+	astTestMust(t, e)
+	streams, e := util.NewMemoryStandardStreams(util.MemoryStandardStreamsConfig{Budget: b, Stdout: out, Stderr: out})
+	astTestMust(t, e)
+	input, e := util.NewDebuggerCharInput(streams, inputFile)
+	astTestMust(t, e)
+	action, e := util.NewDebugActionContext(util.DebugActionConfig{Budget: b, Streams: streams, Input: input})
+	astTestMust(t, e)
+	astTestMust(t, d.BindAssertionStreams(streams))
+	astTestMust(t, d.BindAssertionActions(action))
+	t.Cleanup(func() {
+		b.FailAfter(-1)
+		astTestMust(t, action.Close())
+		astTestMust(t, input.Close())
+		astTestMust(t, streams.Close())
+		astTestMust(t, inputFile.Close())
+		astTestMust(t, out.Close())
+	})
+	return b, r, d, input, out
+}

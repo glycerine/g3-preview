@@ -1,0 +1,305 @@
+// Source: src/math/polynomial/polynomial.cpp:6436-6522; src/util/scoped_numeral.h;
+// src/util/mpq.cpp. Licensed under the MIT license. Author: Leonardo de Moura.
+package polynomial
+
+import (
+	"errors"
+	"fmt"
+	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util"
+)
+
+func polynomialEvaluationAudit(t *testing.T, m *MultivariatePolynomialManager, p Polynomial, values *polynomialEvalRationalMap, out *util.Rational) {
+	t.Helper()
+	inputs := []*util.Int{&(*out.BorrowNumerator()), &(*out.BorrowDenominator())}
+	for i := range values.values {
+		inputs = append(inputs, &(*values.values[i].BorrowNumerator()), &(*values.values[i].BorrowDenominator()))
+	}
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, inputs, 0)
+}
+func TestPolynomialEvaluationLiveAliasSource(t *testing.T) {
+	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{2, 0, 0}}, {1, [3]uint32{1, 0, 0}}, {1, [3]uint32{}}})
+	q := m.core.config.Rationals
+	v := polynomialEvalRationalMap{manager: q}
+	for i := range v.values {
+		v.values[i] = util.NewRational()
+	}
+	serviceMust(t, q.SetInt32(&v.values[0], 2))
+	serviceMust(t, m.EvaluateRational(p, &v, &v.values[0]))
+	want := util.NewRational()
+	serviceMust(t, q.SetInt32(&want, 5))
+	equal, e := q.Equal(&v.values[0], &want)
+	serviceMust(t, e)
+	if !equal {
+		t.Fatal("source borrowed x_value changes with aliased output: Horner prefixes 1→2→4→5")
+	}
+	polynomialEvaluationAudit(t, m, p, &v, &want)
+	for i := range v.values {
+		serviceMust(t, q.Del(&v.values[i]))
+	}
+	serviceMust(t, q.Del(&want))
+}
+func TestPolynomialEvaluationCancellationAndCachedFrames(t *testing.T) {
+	m, p, c := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{2, 1, 0}}, {2, [3]uint32{1, 0, 0}}, {7, [3]uint32{}}})
+	q := m.core.config.Rationals
+	v := polynomialEvalRationalMap{manager: q}
+	for i := range v.values {
+		v.values[i] = util.NewRational()
+		serviceMust(t, q.SetInt32(&v.values[i], 2))
+	}
+	out := util.NewRational()
+	serviceMust(t, m.LexSort(p))
+	c.limit = c.checkpoints
+	e := m.EvaluateRational(p, &v, &out)
+	if !errors.Is(e, ErrUPolynomialCanceled) {
+		t.Fatal("actual Horner checkpoint", e)
+	}
+	if m.evaluation.active || m.evaluation.depth != 0 {
+		t.Fatal("completed auxiliary dtors remain active")
+	}
+	polynomialEvaluationAudit(t, m, p, &v, &out)
+	c.limit = 100000
+	serviceMust(t, m.EvaluateRational(p, &v, &out))
+	count := len(m.evaluation.rationalFrames)
+	for i := 0; i < 10; i++ {
+		serviceMust(t, m.EvaluateRational(p, &v, &out))
+		if len(m.evaluation.rationalFrames) != count {
+			t.Fatal("successful source locals allocated a new cache object")
+		}
+		for _, f := range m.evaluation.rationalFrames {
+			if f.constructed || (*f.aux.BorrowNumerator()).Cell != 0 || (*f.aux.BorrowDenominator()).Cell != 0 {
+				t.Fatal("cached completed local owns a numeral")
+			}
+		}
+	}
+	polynomialEvaluationAudit(t, m, p, &v, &out)
+	for i := range v.values {
+		serviceMust(t, q.Del(&v.values[i]))
+	}
+	serviceMust(t, q.Del(&out))
+}
+func TestPolynomialEvaluationEveryReservationOwnedRaw(t *testing.T) {
+	for _, synch := range []bool{false, true} {
+		t.Run(fmt.Sprint("synch", synch), func(t *testing.T) { polynomialEvaluationEveryReservation(t, synch) })
+	}
+}
+func polynomialEvaluationEveryReservation(t *testing.T, synch bool) {
+	failures, raw := 0, 0
+	success := false
+	for ordinal := int64(0); ordinal < 100; ordinal++ {
+		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
+			q, _ := rationalManager(t, synch)
+			m, p, _ := polynomialEvalFixtureWithRationals(t, q, []polynomialEvalTerm{{1, [3]uint32{3, 2, 0}}, {2, [3]uint32{1, 0, 0}}, {7, [3]uint32{}}})
+			budget := q.Budget()
+			values := polynomialEvalRationalMap{manager: q}
+			for i := range values.values {
+				values.values[i] = util.NewRational()
+			}
+			serviceMust(t, q.SetString(&values.values[0], "184467440737095516170000000000000000000003"))
+			serviceMust(t, q.SetFraction(&values.values[1], 13, 7))
+			serviceMust(t, q.SetInt32(&values.values[2], 2))
+			out := util.NewRational()
+			budget.FailAfter(ordinal)
+			e := m.EvaluateRational(p, &values, &out)
+			polynomialEvaluationAudit(t, m, p, &values, &out)
+			if e == nil {
+				success = true
+			} else {
+				failures++
+				if !numericPhysicalReservationRefusal(e) {
+					t.Fatal("exact reservation category", e)
+				}
+				if m.evaluation.groups != ([3]uint64{}) {
+					raw++
+				}
+				if m.evaluation.active {
+					if !errors.Is(m.CloseChecked(), ErrPolynomialPending) {
+						t.Fatal("owning close bypassed retained lexical operation")
+					}
+				}
+			}
+			budget.FailAfter(-1)
+			// The operation-specific adapter alone must drain its exact dependent roots.
+			hadLex := m.lexPending
+			serviceMust(t, m.CleanupEvaluation())
+			if hadLex && m.lexPending {
+				t.Fatal("evaluator cleanup omitted its actually reached LexSort continuation")
+			}
+			polynomialEvaluationAudit(t, m, p, &values, &out)
+			if q.RawArithmetic.Pending() {
+				t.Fatal("operation returned successful cleanup with its actual RAW group retained")
+			}
+			for i := range values.values {
+				serviceMust(t, q.Del(&values.values[i]))
+			}
+			serviceMust(t, q.Del(&out))
+		})
+		if success {
+			break
+		}
+	}
+	if !success || failures == 0 || raw == 0 {
+		t.Fatal("every-prefix campaign must reach real RAW ownership and success", failures, raw, success)
+	}
+}
+func TestPolynomialEvaluationManagerGuardBeforeFrames(t *testing.T) {
+	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{1, 0, 0}}})
+	foreign, _ := rationalManager(t, false)
+	v := polynomialEvalRationalMap{manager: foreign}
+	out := util.NewRational()
+	before := m.originalBudget.Used()
+	e := m.EvaluateRational(p, &v, &out)
+	if !errors.Is(e, arena.ErrConfig) || v.managers != 1 || m.originalBudget.Used() != before || len(m.evaluation.rationalFrames) != 0 {
+		t.Fatal("actual VM cohort guard precedes charged frame construction", e)
+	}
+}
+
+func TestPolynomialEvaluationRawReceiptForeignReplacement(t *testing.T) {
+	found := false
+	for ordinal := int64(0); ordinal < 100 && !found; ordinal++ {
+		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
+			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{3, 0, 0}}, {7, [3]uint32{}}})
+			q := m.core.config.Rationals
+			v := polynomialEvalRationalMap{manager: q}
+			for i := range v.values {
+				v.values[i] = util.NewRational()
+			}
+			serviceMust(t, q.SetString(&v.values[0], "184467440737095516170000000000000000003"))
+			out := util.NewRational()
+			q.Budget().FailAfter(ordinal)
+			e := m.EvaluateRational(p, &v, &out)
+			polynomialEvaluationAudit(t, m, p, &v, &out)
+			receipt := m.evaluation.groups[2]
+			q.Budget().FailAfter(-1)
+			if e != nil && receipt != 0 && q.RawArithmetic.PowerActive {
+				found = true
+				serviceMust(t, q.CleanupRawGroup(util.RationalRawPower))
+				// A second actual Power call starts the SAME concrete raw group. Its
+				// physical failed-copy prefix is foreign to the stopped evaluation.
+				old := q.RawGeneration
+				q.Budget().FailAfter(0)
+				e = q.Power(&v.values[0], 3, &v.values[1])
+				q.Budget().FailAfter(-1)
+				if e == nil || (!numericPhysicalReservationRefusal(e) && !errors.Is(e, arena.ErrInvalidSlot)) || !q.RawArithmetic.PowerActive || q.RawArithmetic.PowerGeneration <= old {
+					t.Fatal("must reach actual same-group replacement", e)
+				}
+				generation := q.RawArithmetic.PowerGeneration
+				before := q.RawArithmetic.Power
+				polynomialEvaluationAudit(t, m, p, &v, &out)
+				serviceMust(t, m.CleanupEvaluation())
+				if !q.RawArithmetic.PowerActive || q.RawArithmetic.PowerGeneration != generation || q.RawArithmetic.Power != before {
+					t.Fatal("stale evaluation receipt cleaned foreign replacement")
+				}
+				polynomialEvaluationAudit(t, m, p, &v, &out)
+				serviceMust(t, q.CleanupRawGroup(util.RationalRawPower))
+			} else {
+				serviceMust(t, m.CleanupEvaluation())
+			}
+			for i := range v.values {
+				serviceMust(t, q.Del(&v.values[i]))
+			}
+			serviceMust(t, q.Del(&out))
+		})
+	}
+	if !found {
+		t.Fatal("no actual stopped Power group reached")
+	}
+}
+
+func TestPolynomialEvaluationWarmInlineSourceLocals(t *testing.T) {
+	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{2, 1, 0}}, {2, [3]uint32{1, 0, 0}}, {7, [3]uint32{}}})
+	q := m.core.config.Rationals
+	v := polynomialEvalRationalMap{manager: q}
+	for i := range v.values {
+		v.values[i] = util.NewRational()
+		serviceMust(t, q.SetInt32(&v.values[i], 2))
+	}
+	out := util.NewRational()
+	serviceMust(t, m.EvaluateRational(p, &v, &out))
+	before := q.Budget().Used()
+	source, e := q.Integers().RuntimeOwner().AllocationCount()
+	serviceMust(t, e)
+	allocations := testing.AllocsPerRun(100, func() {
+		if e := m.EvaluateRational(p, &v, &out); e != nil {
+			panic(e)
+		}
+	})
+	after, e := q.Integers().RuntimeOwner().AllocationCount()
+	serviceMust(t, e)
+	if allocations != 0 || q.Budget().Used() != before || after != source {
+		t.Fatal("inline lexical locals reuse real charged frame headers without allocations/events", allocations, before, q.Budget().Used())
+	}
+	polynomialEvaluationAudit(t, m, p, &v, &out)
+	for i := range v.values {
+		serviceMust(t, q.Del(&v.values[i]))
+	}
+	serviceMust(t, q.Del(&out))
+}
+
+func TestPolynomialEvaluationLexReceiptForeignReplacement(t *testing.T) {
+	found := false
+	for ordinal := int64(0); ordinal < 30 && !found; ordinal++ {
+		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
+			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{3, 0, 0}}, {2, [3]uint32{1, 0, 0}}, {7, [3]uint32{}}})
+			q := m.core.config.Rationals
+			v := polynomialEvalRationalMap{manager: q}
+			for i := range v.values {
+				v.values[i] = util.NewRational()
+				serviceMust(t, q.SetInt32(&v.values[i], 2))
+			}
+			out := util.NewRational()
+			q.Budget().FailAfter(ordinal)
+			e := m.EvaluateRational(p, &v, &out)
+			polynomialEvaluationAudit(t, m, p, &v, &out)
+			q.Budget().FailAfter(-1)
+			if m.evaluation.lexGeneration != 0 {
+				found = true
+				if e == nil || !numericPhysicalReservationRefusal(e) {
+					t.Fatal("expected actually reached first LexSort refusal", e)
+				}
+				old := m.evaluation.lexGeneration
+				serviceMust(t, m.CleanupLexSort())
+				first, e := m.core.monomials.MkVariable(0, 100)
+				serviceMust(t, e)
+				second, e := m.core.monomials.MkVariable(0, 1)
+				serviceMust(t, e)
+				unit, e := m.core.monomials.Unit()
+				serviceMust(t, e)
+				foreign, e := m.core.MkTerms([]util.Int{util.NewInt(3), util.NewInt(5), util.NewInt(11)}, []Monomial{first, second, unit})
+				serviceMust(t, e)
+				serviceMust(t, m.core.IncRef(foreign))
+				defer func() { serviceMust(t, m.core.DecRef(foreign)) }()
+				q.Budget().FailAfter(0)
+				e = m.LexSort(foreign)
+				q.Budget().FailAfter(-1)
+				if e == nil || !numericPhysicalReservationRefusal(e) || !m.lexPending || m.lexGeneration == old {
+					t.Fatal("expected actual later distinct LexSort", e)
+				}
+				generation, cause := m.lexGeneration, m.lexCause
+				raw, pending := m.lexBuckets.data.raw, m.lexBuckets.data.pending
+				inputs := []*util.Int{&(*out.BorrowNumerator()), &(*out.BorrowDenominator())}
+				for i := range v.values {
+					inputs = append(inputs, &(*v.values[i].BorrowNumerator()), &(*v.values[i].BorrowDenominator()))
+				}
+				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, foreign}, inputs, 0)
+				serviceMust(t, m.CleanupEvaluation())
+				if !m.lexPending || m.lexGeneration != generation || m.lexCause != cause || m.lexBuckets.data.raw != raw || m.lexBuckets.data.pending != pending {
+					t.Fatal("stale operation receipt aborted later foreign LexSort")
+				}
+				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, foreign}, inputs, 0)
+				serviceMust(t, m.CleanupLexSort())
+			} else {
+				serviceMust(t, m.CleanupEvaluation())
+			}
+			for i := range v.values {
+				serviceMust(t, q.Del(&v.values[i]))
+			}
+			serviceMust(t, q.Del(&out))
+		})
+	}
+	if !found {
+		t.Fatal("no reached original LexSort continuation")
+	}
+}

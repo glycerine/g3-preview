@@ -1,0 +1,120 @@
+// Source: src/ast/pp.cpp:22-132; src/ast/pp_params.pyg:1-23.
+// Source author: Leonardo de Moura.
+// Licensed under the MIT license; see LICENSE.txt.
+package ast
+
+import (
+	"errors"
+	"strings"
+	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util"
+)
+
+func TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine(t *testing.T) {
+	c, g, p, b := dynAckSourceFixture(t)
+	m, e := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: b})
+	paramsMust(t, e)
+	defer func() { paramsMust(t, m.Close()) }()
+	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	paramsMust(t, e)
+	defer func() { paramsMust(t, out.Close()) }()
+	a, e := m.FormatString("aa")
+	paramsMust(t, e)
+	z, e := m.FormatString("bb")
+	paramsMust(t, e)
+	line, e := m.FormatLineBreak()
+	paramsMust(t, e)
+	body, e := m.FormatCompose([]ASTHandle{a, line, z})
+	paramsMust(t, e)
+	indent, e := m.FormatIndent(3, body)
+	paramsMust(t, e)
+	group, e := m.FormatGroup(indent)
+	paramsMust(t, e)
+	paramsMust(t, m.PrintFormat(out, group, c, p, g))
+	got, e := out.String()
+	paramsMust(t, e)
+	if got != "aa bb" {
+		t.Fatal("wide choice", got)
+	}
+	paramsMust(t, out.ResetText())
+	paramsMust(t, c.SetUIntName(p, dynAckName("max_width"), 3))
+	paramsMust(t, m.PrintFormat(out, group, c, p, g))
+	got, e = out.String()
+	paramsMust(t, e)
+	if got != "aa\n   bb" {
+		t.Fatal("actual pp todo and indent", got)
+	}
+	paramsMust(t, out.ResetText())
+	paramsMust(t, c.SetBoolName(p, dynAckName("single_line"), true))
+	paramsMust(t, m.PrintFormat(out, group, c, p, g))
+	got, e = out.String()
+	paramsMust(t, e)
+	if got != "aa bb" {
+		t.Fatal("single line pushes actual space app", got)
+	}
+}
+
+func astFormatPrettyNamedCold(t *testing.T, m *ASTManager, g *util.GlobalParamsService, b *arena.Budget, out *util.NumericTextStream) {
+	t.Helper()
+	total := m.Stats().AllocatedBytes + g.OwnerBytes + catalogGraph(g.Config.Catalog)
+	if g.Current != nil {
+		total += gparamsGraph(g.Current)
+	}
+	for v := g.Superseded; v != nil; v = v.RetainedNext {
+		total += gparamsGraph(v)
+	}
+	for v := g.Failed; v != nil; v = v.RetainedNext {
+		total += gparamsGraph(v)
+	}
+	if out != nil {
+		st := out.Stats()
+		total += st.OwnerBytes + st.ScratchBytes + st.OutputOwnerBytes + st.OutputOverflowBytes
+	}
+	if total != b.Used() {
+		t.Fatal("actual source owners before fault lift", total, b.Used())
+	}
+}
+func TestASTFormatPrettyEveryGetterStackAndOutputReservation(t *testing.T) {
+	first := -1
+	for ordinal := int64(0); ordinal < 80; ordinal++ {
+		c, g, p, b := dynAckSourceFixture(t)
+		m, e := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: b})
+		paramsMust(t, e)
+		a, e := m.FormatString("word")
+		paramsMust(t, e)
+		line, e := m.FormatLineBreak()
+		paramsMust(t, e)
+		root, e := m.FormatCompose([]ASTHandle{a, line, a, line, a})
+		paramsMust(t, e)
+		out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+		paramsMust(t, e)
+		b.FailAfter(ordinal)
+		e = m.PrintFormat(out, root, c, p, g)
+		astFormatPrettyNamedCold(t, m, g, b, out)
+		text, read := out.String()
+		paramsMust(t, read)
+		if !strings.HasPrefix("word\nword\nword", text) {
+			t.Fatal("literal source output prefix", ordinal, text, e)
+		}
+		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+			t.Fatal(ordinal, e)
+		}
+		if e == nil && text != "word\nword\nword" {
+			t.Fatal("source complete output", ordinal, text)
+		}
+		b.FailAfter(-1)
+		paramsMust(t, out.Close())
+		paramsMust(t, m.Close())
+		astParamsNamedColdGraph(t, g, b)
+		if e == nil {
+			first = int(ordinal)
+			break
+		}
+	}
+	if first < 3 {
+		t.Fatal("actual pp helper/todo/output horizon", first)
+	}
+	t.Log("first success", first)
+}

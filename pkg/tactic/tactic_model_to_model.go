@@ -1,0 +1,23 @@
+// Source: src/tactic/model_converter.cpp:176-181. Licensed under the MIT license.
+package tactic
+
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
+)
+
+func ModelConverterToModel(m *ast.ASTManager, c ModelConverter, out *ModelRef) (err error) {
+	if c == nil {
+		return nil
+	}
+	md, err := model.NewModel(m)
+	if err != nil {
+		return err
+	}
+	if err = out.Set(md.Core()); err != nil {
+		return errors.Join(err, md.Close())
+	}
+	return c.ApplyModel(out, 0)
+}

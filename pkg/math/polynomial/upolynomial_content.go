@@ -1,0 +1,299 @@
+// Source: src/math/polynomial/upolynomial.cpp:213-232; src/util/mpz.cpp:845-912.
+// Source author: Leonardo de Moura.
+// Licensed under the MIT license.
+package polynomial
+
+import (
+	"github.com/glycerine/g3/pkg/util"
+)
+
+// gcdSpan translates raw IntegerManager.GCDMany's source traversal at actual
+// array reads. Only the final result receives mpzzp's normalized assertion;
+// per-pair modular GCD would introduce different checks/actions.
+
+func (m *UPolynomialManager) gcdSpan(v UPolynomialView, out *util.Int) error {
+	return m.gcdSpanWithSourceContext(v, out, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) gcdSpanWithSourceContext(v UPolynomialView, out *util.Int, context integerAllocationInvocationContext) error {
+	if e := m.modular.Check(); e != nil {
+		return e
+	}
+	z := m.modular.Integers()
+	if e := z.Check(out); e != nil {
+		return e
+	}
+	switch v.count {
+	case 0:
+		if e := z.Reset(out); e != nil {
+			return e
+		}
+	case 1:
+		first, e := m.read(v, 0)
+		if e != nil {
+			return e
+		}
+		if e = z.WithAllocationContext((context).utility(z)).CopyFromOwnerTracked(out, z, first, nil); e != nil {
+			return e
+		}
+		if e = z.WithAllocationContext((context).utility(z)).Abs(out); e != nil {
+			return e
+		}
+	default:
+		first, e := m.read(v, 0)
+		if e != nil {
+			return e
+		}
+		second, e := m.read(v, 1)
+		if e != nil {
+			return e
+		}
+		if e = z.WithAllocationContext((context).utility(z)).Gcd(first, second, out); e != nil {
+			return e
+		}
+		for i := uint32(2); i < v.count; i++ {
+			if util.IsOneInteger(out) {
+				break
+			}
+			next, e := m.read(v, i)
+			if e != nil {
+				return e
+			}
+			if e = z.WithAllocationContext((context).utility(z)).Gcd(out, next, out); e != nil {
+				return e
+			}
+		}
+	}
+	return m.modular.AssertNormalized(out)
+}
+func (m *UPolynomialManager) primitiveState(v UPolynomialView, pp *upolyVectorState, cont *util.Int) error {
+	return m.primitiveStateWithSourceContext(v, pp, cont, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) primitiveStateWithSourceContext(v UPolynomialView, pp *upolyVectorState, cont *util.Int, context integerAllocationInvocationContext) error {
+	if polynomialSourceDebug && v.count == 0 {
+		return ErrUPolynomialAssertion
+	}
+	if e := m.gcdSpanWithSourceContext(v, cont, context); e != nil {
+		return e
+	}
+	if polynomialSourceDebug {
+		positive, e := m.modular.IsPos(cont)
+		if e != nil {
+			return e
+		}
+		if !positive {
+			return ErrUPolynomialAssertion
+		}
+	}
+	one, e := m.modular.IsOne(cont)
+	if e != nil {
+		return e
+	}
+	if one {
+		return m.setViewWithSourceContext(pp, v, context)
+	}
+	if e = m.reserve(pp, v.count); e != nil {
+		return e
+	}
+	for i := uint32(0); i < v.count; i++ {
+		x, e := m.read(v, i)
+		if e != nil {
+			return e
+		}
+		zero, e := m.modular.IsZero(x)
+		if e != nil {
+			return e
+		}
+		dst := &m.values(pp)[i]
+		if zero {
+			e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SetInt64(dst, 0)
+		} else {
+			e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Div(x, cont, dst)
+		}
+		if e != nil {
+			return e
+		}
+	}
+	return m.setSize(pp, v.count)
+}
+func (m *UPolynomialManager) PrimitiveAndContentViews(v UPolynomialView, pp UPolynomial, cont *util.Int) error {
+	out, e := m.descriptor(pp)
+	if e != nil {
+		return e
+	}
+	return m.primitiveState(v, &out.state, cont)
+}
+func (m *UPolynomialManager) PrimitiveAndContent(p, pp UPolynomial, cont *util.Int) error {
+	v, e := m.wholeView(p)
+	if e != nil {
+		return e
+	}
+	return m.PrimitiveAndContentViews(v, pp, cont)
+}
+func (m *UPolynomialManager) primitive(v UPolynomialView, pp *upolyVectorState) error {
+	return m.primitiveWithSourceContext(v, pp, integerAllocationInvocationContext{})
+}
+
+// Source: src/math/polynomial/upolynomial.h:212-215.
+func (m *UPolynomialManager) primitiveWithSourceContext(v UPolynomialView, pp *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
+	owner := context.factorFrontendFrame(m.config.Integer)
+	if owner == nil {
+		var cont util.Int
+		defer m.modular.Del(&cont)
+		return m.primitiveStateWithSourceContext(v, pp, &cont, context)
+	}
+	q := &owner.primitive
+	if q.constructed || q.executing || q.invocation == ^uint64(0) {
+		return ErrUPolynomialCleanupPending
+	}
+	*q = upolyFactorPrimitiveScope{owner: owner, invocation: q.invocation + 1, constructed: true, executing: true}
+	defer func() { q.executing = false; cause = q.finish(cause) }()
+	return m.primitiveStateWithSourceContext(v, pp, &q.cont, context)
+}
+func (m *UPolynomialManager) PrimitiveView(v UPolynomialView, pp UPolynomial) error {
+	out, e := m.descriptor(pp)
+	if e != nil {
+		return e
+	}
+	return m.primitive(v, &out.state)
+}
+func (m *UPolynomialManager) Primitive(p, pp UPolynomial) error {
+	v, e := m.wholeView(p)
+	if e != nil {
+		return e
+	}
+	return m.PrimitiveView(v, pp)
+}
+func (m *UPolynomialManager) normalize(v UPolynomialView) error {
+	return (m).normalizeWithSourceContext(v, integerAllocationInvocationContext{})
+}
+
+// Source: src/math/polynomial/upolynomial.cpp:366-401.
+func (m *UPolynomialManager) normalizeWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) (cause error) {
+	if v.count == 0 {
+		return nil
+	}
+	if v.count == 1 {
+		x, e := m.read(v, 0)
+		if e != nil {
+			return e
+		}
+		positive, e := m.modular.IsPos(x)
+		if e != nil {
+			return e
+		}
+		if positive {
+			return m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SetInt64(x, 1)
+		}
+		return m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SetInt64(x, -1)
+	}
+	var legacy util.Int
+	g := &legacy
+	var q *upolyFactorVectorNormalizeScope
+	if context != (integerAllocationInvocationContext{}) {
+		o := context.factorFrontendFrame(m.config.Integer)
+		if o == nil || !o.executing || o.service.manager != m {
+			return ErrUPolynomialOwner
+		}
+		q = &o.vectorNormalize
+		if q.constructed != 0 || q.executing || q.invocation == ^uint64(0) {
+			return ErrUPolynomialCleanupPending
+		}
+		*q = upolyFactorVectorNormalizeScope{owner: o, invocation: q.invocation + 1, constructed: 1, peak: 1, executing: true}
+		g = &q.g
+		defer func() { q.executing = false; cause = q.finish(cause) }()
+	} else {
+		defer m.modular.Del(g)
+	}
+	if e := m.gcdSpanWithSourceContext(v, g, context); e != nil {
+		return e
+	}
+	one, e := m.modular.IsOne(g)
+	if e != nil || one {
+		return e
+	}
+	for i := uint32(0); i < v.count; i++ {
+		if e = m.normalizeCoefficientWithSourceContext(v, i, g, q, context); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+func (m *UPolynomialManager) normalizeCoefficient(v UPolynomialView, i uint32, g *util.Int) error {
+	return m.normalizeCoefficientWithSourceContext(v, i, g, nil, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomialView, i uint32, g *util.Int, q *upolyFactorVectorNormalizeScope, context integerAllocationInvocationContext) (cause error) {
+	var legacyOld, legacyTmp util.Int
+	old, tmp := &legacyOld, &legacyTmp
+	// Source Z3DEBUG lexical temporaries are destroyed tmp then old.
+	if polynomialSourceDebug {
+		if q != nil {
+			if !q.valid() || !q.executing || q.constructed != 1 {
+				return ErrUPolynomialOwner
+			}
+			q.old = util.Int{}
+			q.constructed = 2
+			q.peak = 2
+			q.coefficientExecuting = true
+			old, tmp = &q.old, &q.tmp
+			defer func() { q.coefficientExecuting = false; cause = q.finishCoefficient(cause) }()
+		} else {
+			defer m.modular.Del(old)
+		}
+		x, e := m.read(v, i)
+		if e != nil {
+			return e
+		}
+		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Copy(old, x); e != nil {
+			return e
+		}
+	}
+	x, e := m.read(v, i)
+	if e != nil {
+		return e
+	}
+	if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Div(x, g, x); e != nil {
+		return e
+	}
+	if polynomialSourceDebug {
+		if q != nil {
+			q.tmp = util.Int{}
+			q.constructed = 3
+			q.peak = 3
+		} else {
+			defer m.modular.Del(tmp)
+		}
+		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Mul(g, x, tmp); e != nil {
+			return e
+		}
+		ok, e := m.modular.Equal(tmp, old)
+		if e != nil {
+			return e
+		}
+		if !ok {
+			return ErrUPolynomialAssertion
+		}
+	}
+	return nil
+}
+func (m *UPolynomialManager) NormalizeView(v UPolynomialView) error {
+	if e := m.check(); e != nil {
+		return e
+	}
+	return m.normalize(v)
+}
+func (m *UPolynomialManager) Normalize(p UPolynomial) error {
+	v, e := m.wholeView(p)
+	if e != nil {
+		return e
+	}
+	return m.NormalizeView(v)
+}
+
+// WithCount is the explicit source (pointer,unsigned size) boundary: it
+// changes only the scalar count. It neither borrows/dereferences an owner nor
+// prevalidates physical extent. Algorithms guard at each actual source read;
+// an early return may therefore skip an unavailable tail exactly as C++ does.
+func (v UPolynomialView) WithCount(count uint32) UPolynomialView {
+	v.count = count
+	return v
+}

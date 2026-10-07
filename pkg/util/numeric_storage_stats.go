@@ -1,0 +1,56 @@
+// Source: src/util/mpz.cpp/mpn.cpp; diagnostics of actual numeric storage.
+// Licensed under the MIT license.
+package util
+
+type NumericStorageStats struct {
+	LiveCells, CellSlots, RetiredCells, WordsRefs, CachedCells, NaturalWordsRefs uint32
+}
+
+func (z *IntegerManager) StorageStats() (s NumericStorageStats) {
+	cells := z.Cells.Stats()
+	s.LiveCells, s.CellSlots, s.RetiredCells = cells.Live, cells.Slots, cells.Retired
+	s.WordsRefs = z.Words.Stats().Live
+	for _, ref := range z.Tmp {
+		if ValidNumericRef(z.Cells, ref) {
+			s.CachedCells++
+		}
+	}
+	for _, ref := range z.Arg {
+		if ValidNumericRef(z.Cells, ref) {
+			s.CachedCells++
+		}
+	}
+	for _, a := range [2]Int{z.IntMin, z.Two64} {
+		if ValidNumericRef(z.Cells, a.Cell) {
+			s.CachedCells++
+		}
+	}
+	if z.Natural != nil {
+		for _, ref := range z.Natural.divScratch {
+			if ref.Slot != 0 {
+				s.NaturalWordsRefs++
+			}
+		}
+		for _, ref := range z.Natural.FormatScratch {
+			if ref.Slot != 0 {
+				s.NaturalWordsRefs++
+			}
+		}
+	}
+	return s
+}
+func (m *IntegerModularManager) OwnedNumeralCells() (count uint32) {
+	for _, a := range [7]Int{m.P, m.Lower, m.Upper, m.InvTmp1, m.InvTmp2, m.InvTmp3, m.DivTmp} {
+		if ValidNumericRef(m.manager.Cells, a.Cell) {
+			count++
+		}
+	}
+	return count
+}
+func (m *IntegerManager) InterruptedNumeral(a *Int) bool {
+	if a == nil || !m.ValidOwner() || a.Cell == 0 || !ValidNumericRef(m.Cells, a.Cell) {
+		return false
+	}
+	c := m.Cell(a.Cell)
+	return c.CleanupPending || c.Released
+}
