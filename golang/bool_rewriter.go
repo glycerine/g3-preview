@@ -6,7 +6,7 @@ package g3
 import "errors"
 
 // Original Boolean rewriter's AND/OR core fragment. This inline helper borrows
-// its AST manager. The recursive rewriter engine remains a dependency.
+// its AST manager; boolRewriterStar supplies the original traversal.
 type boolRewriter struct {
 	self                                *boolRewriter
 	params                              smtModuleParamsOwner
@@ -35,15 +35,15 @@ func (rw *boolRewriter) isOperator(h ASTHandle, op int32) (bool, error) {
 }
 
 func (rw *boolRewriter) mkNFlatAndCore(args []ASTHandle, out ASTRef) (brStatus, error) {
-	return rw.mkNFlatCore(args, out, false)
+	return rw.mkNFlatCore(astSliceArguments(args), out, false)
 }
 func (rw *boolRewriter) mkNFlatOrCore(args []ASTHandle, out ASTRef) (brStatus, error) {
-	return rw.mkNFlatCore(args, out, true)
+	return rw.mkNFlatCore(astSliceArguments(args), out, true)
 }
 
 // The two original loops are dual except for OR's optional local-context call.
 // Keep that source branch after mark reset and before the changed-result test.
-func (rw *boolRewriter) mkNFlatCore(args []ASTHandle, out ASTRef, disjunction bool) (status brStatus, err error) {
+func (rw *boolRewriter) mkNFlatCore(args astAppArguments, out ASTRef, disjunction bool) (status brStatus, err error) {
 	m := rw.manager
 	var buffer astProofArguments
 	defer buffer.close(m)
@@ -66,7 +66,11 @@ func (rw *boolRewriter) mkNFlatCore(args []ASTHandle, out ASTRef, disjunction bo
 		return brFailed, e
 	}
 	changed := false
-	for _, arg := range args {
+	for i := uint32(0); i < args.count; i++ {
+		arg, e := args.at(i)
+		if e != nil {
+			return brFailed, e
+		}
 		if arg == unit {
 			changed = true
 			continue
@@ -159,19 +163,23 @@ func (rw *boolRewriter) mkNFlatCore(args []ASTHandle, out ASTRef, disjunction bo
 }
 
 func (rw *boolRewriter) mkFlatAndCore(args []ASTHandle, out ASTRef) (brStatus, error) {
-	return rw.mkFlatCore(args, out, false)
+	return rw.mkFlatCore(astSliceArguments(args), out, false)
 }
 func (rw *boolRewriter) mkFlatOrCore(args []ASTHandle, out ASTRef) (brStatus, error) {
-	return rw.mkFlatCore(args, out, true)
+	return rw.mkFlatCore(astSliceArguments(args), out, true)
 }
-func (rw *boolRewriter) mkFlatCore(args []ASTHandle, out ASTRef, disjunction bool) (brStatus, error) {
+func (rw *boolRewriter) mkFlatCore(args astAppArguments, out ASTRef, disjunction bool) (brStatus, error) {
 	op := int32(ASTOpAnd)
 	if disjunction {
 		op = ASTOpOr
 	}
-	i := 0
-	for ; i < len(args); i++ {
-		nested, e := rw.isOperator(args[i], op)
+	i := uint32(0)
+	for ; i < args.count; i++ {
+		arg, e := args.at(i)
+		if e != nil {
+			return brFailed, e
+		}
+		nested, e := rw.isOperator(arg, op)
 		if e != nil {
 			return brFailed, e
 		}
@@ -179,17 +187,26 @@ func (rw *boolRewriter) mkFlatCore(args []ASTHandle, out ASTRef, disjunction boo
 			break
 		}
 	}
-	if i == len(args) {
+	if i == args.count {
 		return rw.mkNFlatCore(args, out, disjunction)
 	}
 	m := rw.manager
 	var flat astProofArguments
 	defer flat.close(m)
-	if e := flat.append(m, args[:i]); e != nil {
-		return brFailed, e
+	for j := uint32(0); j < i; j++ {
+		arg, e := args.at(j)
+		if e != nil {
+			return brFailed, e
+		}
+		if e = flat.push(m, arg); e != nil {
+			return brFailed, e
+		}
 	}
-	for ; i < len(args); i++ {
-		arg := args[i]
+	for ; i < args.count; i++ {
+		arg, e := args.at(i)
+		if e != nil {
+			return brFailed, e
+		}
 		nested, e := rw.isOperator(arg, op)
 		if e != nil {
 			return brFailed, e
@@ -214,7 +231,7 @@ func (rw *boolRewriter) mkFlatCore(args []ASTHandle, out ASTRef, disjunction boo
 			}
 		}
 	}
-	status, e := rw.mkNFlatCore(flat.slice(), out, disjunction)
+	status, e := rw.mkNFlatCore(astSliceArguments(flat.slice()), out, disjunction)
 	if e != nil {
 		return brFailed, e
 	}

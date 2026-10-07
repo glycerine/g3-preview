@@ -5,18 +5,31 @@ package g3
 
 import "errors"
 
-func (rw *boolRewriter) mkDistinctCore(args []ASTHandle, out ASTRef) (status brStatus, err error) {
+func (rw *boolRewriter) mkDistinctCore(args []ASTHandle, out ASTRef) (brStatus, error) {
+	return rw.mkDistinctCoreArguments(astSliceArguments(args), out)
+}
+func (rw *boolRewriter) mkDistinctCoreArguments(args astAppArguments, out ASTRef) (status brStatus, err error) {
 	m := rw.manager
-	if len(args) <= 1 {
+	if args.count <= 1 {
 		h, e := m.MkTrue()
 		if e != nil {
 			return brFailed, e
 		}
 		return brDone, m.SetRef(out, h)
 	}
-	if len(args) == 2 {
+	if args.count == 2 {
 		// The source's unused local expr_ref stays null throughout this branch.
-		eq, e := m.MkEq(args[0], args[1])
+		eq, e := func() (ASTHandle, error) {
+			a, e := args.at(0)
+			if e != nil {
+				return ASTHandle{}, e
+			}
+			b, e := args.at(1)
+			if e != nil {
+				return ASTHandle{}, e
+			}
+			return m.MkEq(a, b)
+		}()
 		if e != nil {
 			return brFailed, e
 		}
@@ -32,7 +45,11 @@ func (rw *boolRewriter) mkDistinctCore(args []ASTHandle, out ASTRef) (status brS
 	}
 	defer func() { err = errors.Join(err, visited.Close()) }()
 	allValue := true
-	for _, arg := range args {
+	for i := uint32(0); i < args.count; i++ {
+		arg, e := args.at(i)
+		if e != nil {
+			return brFailed, e
+		}
 		marked, e := visited.IsMarked(arg)
 		if e != nil {
 			return brFailed, e
@@ -62,7 +79,11 @@ func (rw *boolRewriter) mkDistinctCore(args []ASTHandle, out ASTRef) (status brS
 		}
 		return brDone, m.SetRef(out, h)
 	}
-	boolean, e := rw.isBool(args[0])
+	first, e := args.at(0)
+	if e != nil {
+		return brFailed, e
+	}
+	boolean, e := rw.isBool(first)
 	if e != nil {
 		return brFailed, e
 	}
@@ -73,12 +94,20 @@ func (rw *boolRewriter) mkDistinctCore(args []ASTHandle, out ASTRef) (status brS
 		}
 		return brDone, m.SetRef(out, h)
 	}
-	if rw.blastDistinct && uint64(len(args)) < uint64(rw.blastDistinctThreshold) {
+	if rw.blastDistinct && uint64(args.count) < uint64(rw.blastDistinctThreshold) {
 		var diseqs astProofArguments
 		defer diseqs.close(m)
-		for i := 0; i < len(args); i++ {
-			for j := i + 1; j < len(args); j++ {
-				eq, e := m.MkEq(args[i], args[j])
+		for i := uint32(0); i < args.count; i++ {
+			for j := i + 1; j < args.count; j++ {
+				a, e := args.at(i)
+				if e != nil {
+					return brFailed, e
+				}
+				b, e := args.at(j)
+				if e != nil {
+					return brFailed, e
+				}
+				eq, e := m.MkEq(a, b)
 				if e != nil {
 					return brFailed, e
 				}

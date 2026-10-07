@@ -18915,7 +18915,9 @@
         "bool_rewriter_eq.go",
         "bool_rewriter_ite.go",
         "bool_rewriter_config.go",
-        "bool_rewriter_local.go"
+        "bool_rewriter_local.go",
+        "rewriter_engine.go",
+        "rewriter_configuration.go"
       ],
       "tests": [
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -18935,7 +18937,15 @@
         "TestBoolRewriterDispatcherFamilyAssertionAndNativeFallback",
         "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning",
         "TestBoolRewriterLocalContextEntryLimitWrapAndSpill",
-        "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches"
+        "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches",
+        "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
+        "TestBoolRewriterStarITEConstantFoldAndCancelReset",
+        "TestBetaReducerOriginalBindingOrderAndBinderShift",
+        "TestRewriterEngineOriginalBoundedRevisitDepthsAndSubstitution",
+        "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
+        "TestRewriterEngineOriginalMacroExpansionUnderBinder",
+        "TestBetaReducerOriginalPatternAndNoPatternReplacement",
+        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
       ],
       "conditionals": [
         {
@@ -19109,13 +19119,22 @@
             "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches",
             "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning"
           ]
+        },
+        {
+          "name": "existing Boolean callbacks read actual borrowed result-vector arguments; scalar callbacks use fixed local operands without cloned dynamic arrays",
+          "status": "ported",
+          "go_target": "rewriter_configuration.go",
+          "tests": [
+            "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
+            "TestBoolRewriterStarITEConstantFoldAndCancelReset"
+          ]
         }
       ],
       "ownership": [
         "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
       ],
       "deviations": [
-        "Local-context OR simplification now uses the original forward/backward rounds, unsigned cost arithmetic, owning vectors and mark reset order. Nested ITE construction uses raw manager operations to prevent recursion. The complete recursive Boolean rewrite engine and whole-class method/ownership audits remain incomplete. Go guards reject invalid short argument arrays outside the source defined domain; the family assertion is debug-only. No whole Boolean rewriter, evaluator or public API completion is credited."
+        "Boolean callbacks now integrate with the original no-proof bool_rewriter_star iterative engine through actual borrowed result-stack arguments. Default pattern skipping, associative flattening and source family dispatch are preserved. Whole-class method/ownership audits and exhaustive failure campaigns remain incomplete. Go guards reject invalid short arrays outside the source defined domain; family assertion is debug-only. No whole Boolean source unit, model evaluator or public API completion is credited."
       ]
     },
     {
@@ -19128,7 +19147,9 @@
         "bool_rewriter_eq.go",
         "bool_rewriter_ite.go",
         "bool_rewriter_config.go",
-        "bool_rewriter_local.go"
+        "bool_rewriter_local.go",
+        "rewriter_engine.go",
+        "rewriter_configuration.go"
       ],
       "tests": [
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -19148,7 +19169,15 @@
         "TestBoolRewriterDispatcherFamilyAssertionAndNativeFallback",
         "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning",
         "TestBoolRewriterLocalContextEntryLimitWrapAndSpill",
-        "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches"
+        "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches",
+        "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
+        "TestBoolRewriterStarITEConstantFoldAndCancelReset",
+        "TestBetaReducerOriginalBindingOrderAndBinderShift",
+        "TestRewriterEngineOriginalBoundedRevisitDepthsAndSubstitution",
+        "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
+        "TestRewriterEngineOriginalMacroExpansionUnderBinder",
+        "TestBetaReducerOriginalPatternAndNoPatternReplacement",
+        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
       ],
       "conditionals": [
         {
@@ -19228,13 +19257,22 @@
             "TestBoolRewriterLocalContextEntryLimitWrapAndSpill",
             "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches"
           ]
+        },
+        {
+          "name": "bool_rewriter_cfg and bool_rewriter_star original no-proof traversal, family dispatch, pattern skip and associative flattening configuration",
+          "status": "ported",
+          "go_target": "rewriter_configuration.go",
+          "tests": [
+            "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
+            "TestBoolRewriterStarITEConstantFoldAndCancelReset"
+          ]
         }
       ],
       "ownership": [
         "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
       ],
       "deviations": [
-        "Local-context OR simplification now uses the original forward/backward rounds, unsigned cost arithmetic, owning vectors and mark reset order. Nested ITE construction uses raw manager operations to prevent recursion. The complete recursive Boolean rewrite engine and whole-class method/ownership audits remain incomplete. Go guards reject invalid short argument arrays outside the source defined domain; the family assertion is debug-only. No whole Boolean rewriter, evaluator or public API completion is credited."
+        "Boolean callbacks now integrate with the original no-proof bool_rewriter_star iterative engine through actual borrowed result-stack arguments. Default pattern skipping, associative flattening and source family dispatch are preserved. Whole-class method/ownership audits and exhaustive failure campaigns remain incomplete. Go guards reject invalid short arrays outside the source defined domain; family assertion is debug-only. No whole Boolean source unit, model evaluator or public API completion is credited."
       ]
     },
     {
@@ -21798,7 +21836,9 @@
       "status": "partial",
       "go_targets": [
         "rewriter_core.go",
-        "var_shifter.go"
+        "var_shifter.go",
+        "rewriter_engine.go",
+        "rewriter_configuration.go"
       ],
       "tests": [
         "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
@@ -21809,7 +21849,15 @@
         "TestVariableShifterNestedBindersPatternsAndAnnotations",
         "TestVariableShifterSharedCacheGroundShortcutAndDeepTraversal",
         "TestInverseVariableShifterNativeWrapAndDebugBoundary",
-        "TestVariableShifterSharedTermDifferentBinderDepthAndOutputLifetime"
+        "TestVariableShifterSharedTermDifferentBinderDepthAndOutputLifetime",
+        "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
+        "TestBoolRewriterStarITEConstantFoldAndCancelReset",
+        "TestBetaReducerOriginalBindingOrderAndBinderShift",
+        "TestRewriterEngineOriginalBoundedRevisitDepthsAndSubstitution",
+        "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
+        "TestRewriterEngineOriginalMacroExpansionUnderBinder",
+        "TestBetaReducerOriginalPatternAndNoPatternReplacement",
+        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
       ],
       "conditionals": [
         {
@@ -21955,10 +22003,10 @@
         }
       ],
       "ownership": [
-        "Actual activity-cache owners are reused by scope level. Frames/scopes borrow scalar handles; result/proof vectors own their references. Derived variable-shifter headers embed the core in place and are charged once. Rebuilt applications/quantifier annotations read actual borrowed result-vector ranges without array clones. Owning output assignment precedes stack pop; outputs survive cache teardown. Cache destruction precedes reverse member teardown. Full failure/ownership auditing remains deferred."
+        "Concrete iterative frames/scopes and borrowed scalar binding/shift vectors retain original growth and state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
       ],
       "deviations": [
-        "Original base rewriting infrastructure and forward/inverse variable-shifting traversal are translated. Bound variables remain unchanged; free indices use original wrapping uint32 arithmetic and native/debug inverse assertions. Scope-sensitive caches, inherited push_frame state argument and source Reset/Cleanup asymmetries are preserved. Trace display and concrete rewriter_tpl traversal/configuration remain unported; the beta-reducer instantiation is not credited. No whole rewriting source unit, model evaluator or public API completion is claimed."
+        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited."
       ]
     },
     {
@@ -21968,7 +22016,9 @@
       "status": "partial",
       "go_targets": [
         "rewriter_core.go",
-        "var_shifter.go"
+        "var_shifter.go",
+        "rewriter_engine.go",
+        "rewriter_configuration.go"
       ],
       "tests": [
         "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
@@ -21979,7 +22029,15 @@
         "TestVariableShifterNestedBindersPatternsAndAnnotations",
         "TestVariableShifterSharedCacheGroundShortcutAndDeepTraversal",
         "TestInverseVariableShifterNativeWrapAndDebugBoundary",
-        "TestVariableShifterSharedTermDifferentBinderDepthAndOutputLifetime"
+        "TestVariableShifterSharedTermDifferentBinderDepthAndOutputLifetime",
+        "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
+        "TestBoolRewriterStarITEConstantFoldAndCancelReset",
+        "TestBetaReducerOriginalBindingOrderAndBinderShift",
+        "TestRewriterEngineOriginalBoundedRevisitDepthsAndSubstitution",
+        "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
+        "TestRewriterEngineOriginalMacroExpansionUnderBinder",
+        "TestBetaReducerOriginalPatternAndNoPatternReplacement",
+        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
       ],
       "conditionals": [
         {
@@ -22052,13 +22110,28 @@
             "TestInverseVariableShifterNativeWrapAndDebugBoundary",
             "TestVariableShifterSharedTermDifferentBinderDepthAndOutputLifetime"
           ]
+        },
+        {
+          "name": "default/beta configurations and concrete no-proof engine; source derived child-flag assertion, depth/cache/resource gates and beta reducer instantiation",
+          "status": "ported",
+          "go_target": "rewriter_configuration.go",
+          "tests": [
+            "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
+            "TestBoolRewriterStarITEConstantFoldAndCancelReset",
+            "TestBetaReducerOriginalBindingOrderAndBinderShift",
+            "TestRewriterEngineOriginalBoundedRevisitDepthsAndSubstitution",
+            "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
+            "TestRewriterEngineOriginalMacroExpansionUnderBinder",
+            "TestBetaReducerOriginalPatternAndNoPatternReplacement",
+            "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
+          ]
         }
       ],
       "ownership": [
-        "Actual activity-cache owners are reused by scope level. Frames/scopes borrow scalar handles; result/proof vectors own their references. Derived variable-shifter headers embed the core in place and are charged once. Rebuilt applications/quantifier annotations read actual borrowed result-vector ranges without array clones. Owning output assignment precedes stack pop; outputs survive cache teardown. Cache destruction precedes reverse member teardown. Full failure/ownership auditing remains deferred."
+        "Concrete iterative frames/scopes and borrowed scalar binding/shift vectors retain original growth and state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
       ],
       "deviations": [
-        "Original base rewriting infrastructure and forward/inverse variable-shifting traversal are translated. Bound variables remain unchanged; free indices use original wrapping uint32 arithmetic and native/debug inverse assertions. Scope-sensitive caches, inherited push_frame state argument and source Reset/Cleanup asymmetries are preserved. Trace display and concrete rewriter_tpl traversal/configuration remain unported; the beta-reducer instantiation is not credited. No whole rewriting source unit, model evaluator or public API completion is claimed."
+        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited."
       ]
     },
     {
@@ -22078,9 +22151,21 @@
       "path": "src/ast/rewriter/rewriter_def.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "rewriter_engine.go",
+        "rewriter_configuration.go"
+      ],
+      "tests": [
+        "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
+        "TestBoolRewriterStarITEConstantFoldAndCancelReset",
+        "TestBetaReducerOriginalBindingOrderAndBinderShift",
+        "TestRewriterEngineOriginalBoundedRevisitDepthsAndSubstitution",
+        "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
+        "TestRewriterEngineOriginalMacroExpansionUnderBinder",
+        "TestBetaReducerOriginalPatternAndNoPatternReplacement",
+        "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
+      ],
       "conditionals": [
         {
           "line": 132,
@@ -22271,9 +22356,29 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "no-proof rewriter traversal: visit/process_var/process_const/constant_fold/process_app/process_quantifier/main_loop/resume_core; bindings/reset/cleanup and original macro expansion",
+          "status": "ported",
+          "go_target": "rewriter_engine.go",
+          "tests": [
+            "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
+            "TestBoolRewriterStarITEConstantFoldAndCancelReset",
+            "TestBetaReducerOriginalBindingOrderAndBinderShift",
+            "TestRewriterEngineOriginalBoundedRevisitDepthsAndSubstitution",
+            "TestRewriterEngineOriginalMaxStepsResumeAndCleanup",
+            "TestRewriterEngineOriginalMacroExpansionUnderBinder",
+            "TestBetaReducerOriginalPatternAndNoPatternReplacement",
+            "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete iterative frames/scopes and borrowed scalar binding/shift vectors retain original growth and state transitions. Base cores, shifters and Boolean helper are embedded; complete cold wrapper header is charged once. Result/temp/annotation vectors own real AST references. Builtin revisit pops occur in original reverse order; quantifier annotation copies retire in reverse declaration order. Output acquisition precedes pop, and delayed builtin/macro states preserve retained m_r. Full failure/ownership campaigns remain deferred."
+      ],
+      "deviations": [
+        "Original base rewriting infrastructure, forward/inverse shifting and no-proof traversal/configuration are translated. Proof-generating rewriter traversal, trace display, whole-unit method/ownership auditing and exhaustive failure campaigns remain incomplete. Unsupported REWRITE_RULE preserves the source's unimplemented state. Cancellation resets; step-limit interruption preserves frames for Resume. No whole rewriting source unit, model evaluator or public API completion is credited."
+      ]
     },
     {
       "path": "src/ast/rewriter/rewriter_params.hpp",

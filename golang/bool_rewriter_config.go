@@ -24,18 +24,22 @@ func newBoolRewriter(m *ASTManager, c *ParamsContext, g *GlobalParamsService, p 
 	if e := m.budget.Reserve(n); e != nil {
 		return nil, e
 	}
-	rw := &boolRewriter{manager: m, header: n}
+	rw := &boolRewriter{header: n}
+	return rw, rw.init(m, c, g, p)
+}
+func (rw *boolRewriter) init(m *ASTManager, c *ParamsContext, g *GlobalParamsService, p *ParamsRef) error {
+	rw.manager = m
 	rw.self = rw
 	rw.params = smtModuleParamsOwner{budget: g.config.Budget}
 	rw.params.self = &rw.params
 	if e := rw.params.bind(c, g); e != nil {
-		return rw, e
+		return e
 	}
 	e := rw.updateParams(p)
 	if e == nil {
 		rw.ready = true
 	}
-	return rw, e
+	return e
 }
 func (rw *boolRewriter) configuredOpen() error {
 	if rw == nil || rw.self != rw || rw.closed {
@@ -174,11 +178,18 @@ func (b *boolRewriterRefBuffer) close(m *ASTManager) error {
 	return nil
 }
 func (rw *boolRewriter) mkAndAsOr(args []ASTHandle, out ASTRef) (err error) {
+	return rw.mkAndAsOrArguments(astSliceArguments(args), out)
+}
+func (rw *boolRewriter) mkAndAsOrArguments(args astAppArguments, out ASTRef) (err error) {
 	m := rw.manager
 	var newArgs boolRewriterRefBuffer
 	defer func() { err = errors.Join(err, newArgs.close(m)) }()
-	for _, arg := range args {
-		e := func() (err error) {
+	for i := uint32(0); i < args.count; i++ {
+		arg, e := args.at(i)
+		if e != nil {
+			return e
+		}
+		e = func() (err error) {
 			tmp, e := m.NewRef(ASTHandle{})
 			if e != nil {
 				return e
@@ -212,65 +223,6 @@ func (rw *boolRewriter) mkAndAsOr(args []ASTHandle, out ASTRef) (err error) {
 	return rw.mkNot(h, out)
 }
 
-func (rw *boolRewriter) mkAppCore(decl ASTHandle, args []ASTHandle, out ASTRef) (brStatus, error) {
-	if rw.self != nil {
-		if e := rw.configuredOpen(); e != nil {
-			return brFailed, e
-		}
-	}
-	fid, e := rw.manager.GetFamilyID(decl)
-	if e != nil {
-		return brFailed, e
-	}
-	if astSourceDebug && fid != 0 {
-		return brFailed, ErrASTDomain
-	}
-	op, e := rw.manager.GetDeclKind(decl)
-	if e != nil {
-		return brFailed, e
-	}
-	switch op {
-	case ASTOpEq, ASTOpIff:
-		if len(args) != 2 {
-			return brFailed, ErrASTDomain
-		}
-		return rw.mkEqCore(args[0], args[1], out)
-	case ASTOpDistinct:
-		return rw.mkDistinctCore(args, out)
-	case ASTOpAnd:
-		return rw.mkAndCore(args, out)
-	case ASTOpOr:
-		return rw.mkOrCore(args, out)
-	case ASTOpNot:
-		if len(args) != 1 {
-			return brFailed, ErrASTDomain
-		}
-		return rw.mkNotCore(args[0], out)
-	case ASTOpIte:
-		if len(args) != 3 {
-			return brFailed, ErrASTDomain
-		}
-		return rw.mkITECore(args[0], args[1], args[2], out)
-	case ASTOpImplies:
-		if len(args) != 2 {
-			return brFailed, ErrASTDomain
-		}
-		return brDone, rw.mkImplies(args[0], args[1], out)
-	case ASTOpXor:
-		switch len(args) {
-		case 0:
-			return brFailed, nil
-		case 1:
-			return brDone, rw.manager.SetRef(out, args[0])
-		case 2:
-			return brDone, rw.mkXor(args[0], args[1], out)
-		default:
-			return brFailed, ErrASTDomain
-		}
-	default:
-		return brFailed, nil
-	}
-}
 func (rw *boolRewriter) mkApp(decl ASTHandle, args []ASTHandle, out ASTRef) error {
 	status, e := rw.mkAppCore(decl, args, out)
 	if e != nil || status != brFailed {

@@ -30,12 +30,13 @@ func newVariableShifter(m *ASTManager, inverse bool) (*variableShifter, error) {
 	if e := m.budget.Reserve(bytes); e != nil {
 		return nil, e
 	}
-	s := &variableShifter{inverse: inverse, header: bytes}
+	s := &variableShifter{header: bytes}
+	return s, s.init(m, inverse)
+}
+func (s *variableShifter) init(m *ASTManager, inverse bool) error {
 	s.self = s
-	if e := s.core.init(m, false); e != nil {
-		return s, e
-	}
-	return s, nil
+	s.inverse = inverse
+	return s.core.init(m, false)
 }
 func (s *variableShifter) open() error {
 	if s == nil || s.self != s || s.closed {
