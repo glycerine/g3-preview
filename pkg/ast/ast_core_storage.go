@@ -306,6 +306,7 @@ type ASTManager struct {
 	arithmeticPluginFailed                         *astArithmeticPluginOwner
 	formatPlugin                                   *astFormatPluginOwner
 	formatPluginFailed                             *astFormatPluginOwner
+	bitVectorUtilityParameters                     astBVUtilityParameters
 	formatLexical                                  astFormatLexical
 	formatExecuting                                bool
 	appCoercion                                    astAppCoercionFrame

@@ -248,6 +248,10 @@ func (m *ASTManager) MkFamilySort(fid FamilyID, k int32, ps []ASTParameter) (AST
 		return ASTHandle{}, e
 	}
 	defer m.mu.Unlock()
+	return m.mkFamilySort(fid, k, ps)
+}
+
+func (m *ASTManager) mkFamilySort(fid FamilyID, k int32, ps []ASTParameter) (ASTHandle, error) {
 	if fid < 0 || !m.pluginAt(fid).present {
 		return ASTHandle{}, nil
 	}

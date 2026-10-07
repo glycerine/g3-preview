@@ -10,6 +10,13 @@ import (
 )
 
 func (m *ASTManager) parameter(p ASTParameter) (*astParameterRecord, error) {
+	if p.origin == m.origin && p.slot == math.MaxUint32-2 {
+		f := &m.bitVectorUtilityParameters
+		if !f.active || p.generation < f.epoch*2 || p.generation-f.epoch*2 >= f.count {
+			return nil, ErrASTHandle
+		}
+		return &f.values[p.generation-f.epoch*2], nil
+	}
 	if p.origin == m.origin && p.slot == math.MaxUint32-1 {
 		if !m.formatLexical.active || p.generation != m.formatLexical.epoch*2 && (!m.formatLexical.localPair || p.generation != m.formatLexical.epoch*2+1) {
 			return nil, ErrASTHandle
@@ -41,7 +48,7 @@ func (m *ASTManager) allocParameter() (ASTParameter, error) {
 		m.liveParameters++
 		return ASTParameter{m.origin, slot, gen}, nil
 	}
-	if m.nextParameter == math.MaxUint32 {
+	if m.nextParameter >= math.MaxUint32-2 {
 		return ASTParameter{}, arena.ErrBounds
 	}
 	slot := m.nextParameter
