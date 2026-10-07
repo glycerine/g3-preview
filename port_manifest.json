@@ -13383,13 +13383,17 @@
         "pkg/ast/ast_uninterpreted_plugin.go",
         "pkg/ast/ast_uninterpreted_plugin_test.go",
         "pkg/ast/ast_bv_uint64_numeral.go",
-        "pkg/ast/ast_bv_uint64_numeral_test.go"
+        "pkg/ast/ast_bv_uint64_numeral_test.go",
+        "pkg/ast/ast_bv_size.go",
+        "pkg/ast/ast_bv_size_test.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
         "TestASTBitVectorOriginalUint64Numeral",
         "TestASTBitVectorUint64ConstructorStrictBoundaryBeforeWidthGuard",
-        "TestASTBitVectorUint64NumeralEveryNumericalReservation"
+        "TestASTBitVectorUint64NumeralEveryNumericalReservation",
+        "TestASTBitVectorOriginalSizeSortAndExpression",
+        "TestASTBitVectorSizeSourceDebugGuardAndReleaseRead"
       ],
       "conditionals": [
         {
@@ -13435,15 +13439,26 @@
             "TestASTBitVectorUint64ConstructorStrictBoundaryBeforeWidthGuard",
             "TestASTBitVectorUint64NumeralEveryNumericalReservation"
           ]
+        },
+        {
+          "name": "original is_bv expression-to-sort recognition and get_bv_size sort/expression overloads with gated SASSERT then signed-to-unsigned parameter read (src/ast/bv_decl_plugin.h:302,390-394)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_size.go",
+          "tests": [
+            "TestASTBitVectorOriginalSizeSortAndExpression",
+            "TestASTBitVectorSizeSourceDebugGuardAndReleaseRead"
+          ]
         }
       ],
       "ownership": [
         "Plugin classification reads borrowed declaration metadata and acquires no references or allocations. Registered plugin tags preserve family identity without assuming numeric family IDs. Tests inspect actual stats under FailAfter(0).",
-        "The uint64 constructor temporary occupies its own slot in the existing address-stable numeral frame. Its captured SetUint64 invocation owns reached constructor allocations, including incomplete failure roots. Inner p0/ps values end before application construction; the input parameter copy ends before the outer ui64 temporary. No second numerical frame or extra parameter-copy operation is introduced."
+        "The uint64 constructor temporary occupies its own slot in the existing address-stable numeral frame. Its captured SetUint64 invocation owns reached constructor allocations, including incomplete failure roots. Inner p0/ps values end before application construction; the input parameter copy ends before the outer ui64 temporary. No second numerical frame or extra parameter-copy operation is introduced.",
+        "BV size and expression recognition borrow sort/parameter metadata and acquire no references or numerical allocations. The sort-taking numeral utility now uses the original gated width getter after its existing strict recognition guard. Tests verify unchanged actual AST stats under FailAfter(0)."
       ],
       "deviations": [
         "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads.",
-        "Selected uint64 numeral construction preserves the strict uint64 setter boundary: values at INT_MAX allocate big backing, unlike the unsigned32 overload. The concrete shared Go frame represents nested source lexical lifetimes and retains existing rational/temporary/header/allocator/assertion/exception ABI qualifications. Runtime refusal tests prove graph ownership and release, not resumability of process-fatal native operations. Other BV construction/conversion utilities and complete rewriter/whole-unit audits remain open."
+        "Selected uint64 numeral construction preserves the strict uint64 setter boundary: values at INT_MAX allocate big backing, unlike the unsigned32 overload. The concrete shared Go frame represents nested source lexical lifetimes and retains existing rational/temporary/header/allocator/assertion/exception ABI qualifications. Runtime refusal tests prove graph ownership and release, not resumability of process-fatal native operations. Other BV construction/conversion utilities and complete rewriter/whole-unit audits remain open.",
+        "The selected width getter preserves source release assertion erasure: wrong family/kind or extra parameters do not block reading a present integer parameter zero. Debug invokes the existing optional namespace assertion adapter before that read. Wrong AST kinds, missing parameters or noninteger parameter access retain checked Go rejection of native invalid/undefined domains. Native global assertion/parameter union/ABI and whole-header ownership audits remain uncredited; remaining BV utility/reducer work is still open."
       ]
     },
     {

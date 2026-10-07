@@ -40,13 +40,13 @@ func (m *ASTManager) BitVectorNumeralForSort(value *util.OwnedRational, s ASTHan
 	if e != nil || !yes {
 		return ASTHandle{}, e
 	}
-	width, _, e := m.bitVectorSortWidth(m.bitVectorPlugin.family, s)
+	width, e := m.bitVectorSortSize(r, nil)
 	if e != nil {
 		return ASTHandle{}, e
 	}
 	previous := m.formatExecuting
 	m.formatExecuting = true
 	defer func() { m.formatExecuting = previous }()
-	n, e := m.mkBitVectorNumeral(value, uint32(width))
+	n, e := m.mkBitVectorNumeral(value, width)
 	return m.external(n), e
 }
