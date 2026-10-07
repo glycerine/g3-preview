@@ -65,14 +65,19 @@ func (f *FunctionInterpretation) Else() (ast.ASTHandle, error) {
 	return f.fallback, nil
 }
 func (f *FunctionInterpretation) FindEntry(args []ast.ASTHandle) (*FunctionEntry, error) {
+	return f.FindEntryArguments(ast.SliceArguments(args))
+}
+
+// FindEntryArguments borrows the traversal's concrete argument view.
+func (f *FunctionInterpretation) FindEntryArguments(args ast.AppArguments) (*FunctionEntry, error) {
 	if e := f.open(); e != nil {
 		return nil, e
 	}
-	if uint64(len(args)) != uint64(f.arity) {
+	if uint64(args.Count()) != uint64(f.arity) {
 		return nil, ast.ErrASTDomain
 	}
 	for _, entry := range f.entries {
-		same, e := entry.equalArgs(args)
+		same, e := entry.equalArguments(args)
 		if e != nil {
 			return nil, e
 		}

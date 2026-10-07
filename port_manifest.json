@@ -9203,7 +9203,8 @@
         "pkg/ast/ast_trace_acquisition.go",
         "pkg/ast/ast_auxiliary_plugins_source_test.go",
         "pkg/ast/rewriter/var_shifter_test.go",
-        "pkg/ast/ast_some_value_proc_test.go"
+        "pkg/ast/ast_some_value_proc_test.go",
+        "pkg/ast/ast_rewriter_access.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -9384,7 +9385,8 @@
         "TestInverseVariableShifterNativeWrapAndDebugBoundary",
         "TestVariableShifterSharedTermDifferentBinderDepthAndOutputLifetime",
         "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
-        "TestASTSomeValueProcFallbackReservationFailureRestores"
+        "TestASTSomeValueProcFallbackReservationFailureRestores",
+        "TestASTAppArgumentViewBorrowAndLockedFactory"
       ],
       "conditionals": [
         {
@@ -10455,7 +10457,8 @@
         "Concrete Go cold acquisition metadata is prepared before app placement, with pointer-free reference tokens stamped at actual successful INC leaves. Source catch releases placement without table/reference rollback. Reached dangling table reads use a typed slot/generation guard (native invalid-lifetime domain); separate owning ACK erases only captured insertion identity/hash and consumes stamped references. Completed caught tuples remain charged until this owning manager ends; no registered source driver credit.",
         "Trace acquisition is gated by actual traceStream, including the format child borrowing the exact parent stream without owning traceFile. Completed member table release and allocator Close stamp source-ended state on matching cold caught contexts/history. Incomplete constructor own abort retires only metadata after those actual actions; it never replays table erasure or DEC in ended node context. Closed pointed-stream constructor is a Go lifetime-guard fixture, distinct from native ostream badbit; actual borrowed file remains caller-owned.",
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
-        "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies."
+        "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies.",
+        "AppArgumentView exposes borrowed application storage to the evaluator. Indexed reads validate the application handle and support factory callbacks under the manager lock without public-manager reentry; original application ownership must outlive the view."
       ]
     },
     {
@@ -10548,7 +10551,8 @@
         "pkg/ast/ast_core_basic_convenience_source_test.go",
         "pkg/ast/ast_core_source_constructor.go",
         "pkg/ast/ast_debug_ref_count.go",
-        "pkg/ast/ast_some_value_proc_test.go"
+        "pkg/ast/ast_some_value_proc_test.go",
+        "pkg/ast/ast_rewriter_access.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -10772,7 +10776,8 @@
         "TestASTSourceFinalizeRetainsDebugInfoParametersForExactOwningClose",
         "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners",
         "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
-        "TestASTSomeValueProcFallbackReservationFailureRestores"
+        "TestASTSomeValueProcFallbackReservationFailureRestores",
+        "TestASTAppArgumentViewBorrowAndLockedFactory"
       ],
       "conditionals": [
         {
@@ -11626,7 +11631,8 @@
         "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
         "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver.",
         "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
-        "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies."
+        "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies.",
+        "AppArgumentView exposes borrowed application storage to the evaluator. Indexed reads validate the application handle and support factory callbacks under the manager lock without public-manager reentry; original application ownership must outlive the view."
       ]
     },
     {
@@ -45054,7 +45060,8 @@
         "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
         "TestFunctionInterpretationMultiArgumentPeelingAndElseMiss",
         "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
-        "TestFunctionInterpretationCopyEntriesAndOwningOutput"
+        "TestFunctionInterpretationCopyEntriesAndOwningOutput",
+        "TestModelEvaluatorFunctionEntriesMacrosAndCompletion"
       ],
       "assertions": [
         {
@@ -45133,7 +45140,7 @@
         "Each entry owns a concrete ground handle array and result; result INC precedes old-result DEC. Entry/graph headers and actual arrays/vector backing are charged to the manager Budget. Parent retains failed unpublished constructors for owning cleanup; graph destruction retires published entries, else and cache before pending owning cleanup. Cached ITE has its own reference; explicit output ASTRefs survive graph close. EvalElse constructs and closes the original VarSubstitution lexical owner with direct index order."
       ],
       "deviations": [
-        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and model_evaluator integration remain pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; concrete linear-probing handle/count cells qualify the obj_map representation."
+        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and selected evaluator paths are now integrated; full theory evaluator completion remains pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; concrete linear-probing handle/count cells qualify the obj_map representation."
       ]
     },
     {
@@ -45155,7 +45162,8 @@
         "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
         "TestFunctionInterpretationMultiArgumentPeelingAndElseMiss",
         "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
-        "TestFunctionInterpretationCopyEntriesAndOwningOutput"
+        "TestFunctionInterpretationCopyEntriesAndOwningOutput",
+        "TestModelEvaluatorFunctionEntriesMacrosAndCompletion"
       ],
       "conditionals": [
         {
@@ -45222,7 +45230,7 @@
         "Each entry owns a concrete ground handle array and result; result INC precedes old-result DEC. Entry/graph headers and actual arrays/vector backing are charged to the manager Budget. Parent retains failed unpublished constructors for owning cleanup; graph destruction retires published entries, else and cache before pending owning cleanup. Cached ITE has its own reference; explicit output ASTRefs survive graph close. EvalElse constructs and closes the original VarSubstitution lexical owner with direct index order."
       ],
       "deviations": [
-        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and model_evaluator integration remain pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; concrete linear-probing handle/count cells qualify the obj_map representation."
+        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and selected evaluator paths are now integrated; full theory evaluator completion remains pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; concrete linear-probing handle/count cells qualify the obj_map representation."
       ]
     },
     {
@@ -45618,9 +45626,19 @@
       "path": "src/model/model_evaluator.cpp",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/model/model_evaluator.go"
+      ],
+      "tests": [
+        "TestModelEvaluatorConstantCompletionAndBooleanReduction",
+        "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
+        "TestModelEvaluatorResourceLimitsAndReset",
+        "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
+        "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
+        "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
+        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+      ],
       "assertions": [
         {
           "line": 102,
@@ -45653,17 +45671,46 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original evaluator configuration parameters, resource callback, value-only function entry lookup, uninterpreted constant/function completion, Boolean reduction, get_macro and no-proof traversal lifecycle",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator.go",
+          "tests": [
+            "TestModelEvaluatorConstantCompletionAndBooleanReduction",
+            "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
+            "TestModelEvaluatorResourceLimitsAndReset",
+            "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
+            "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
+            "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
+            "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+          ]
+        }
+      ],
+      "ownership": [
+        "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array."
+      ],
+      "deviations": [
+        "Only existing base AST and Boolean/uninterpreted evaluator paths are integrated. Arithmetic/BV/array/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, evaluate_partial_theory_func, array equality/extraction and expand_value remain unported. Reached non-base theory applications return ErrModelEvaluatorTheory rather than claim successful evaluation. Runtime AllocationSize is the existing source memory accounting owner; runtime-wide typed allocator wiring remains open. Cooperate and memory-before-step-limit order are preserved; no Budget count substitutes for source memory accounting. Proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+      ]
     },
     {
       "path": "src/model/model_evaluator.h",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/model/model_evaluator.go"
+      ],
+      "tests": [
+        "TestModelEvaluatorConstantCompletionAndBooleanReduction",
+        "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
+        "TestModelEvaluatorResourceLimitsAndReset",
+        "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
+        "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
+        "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
+        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -45676,9 +45723,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original evaluator configuration parameters, resource callback, value-only function entry lookup, uninterpreted constant/function completion, Boolean reduction, get_macro and no-proof traversal lifecycle",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator.go",
+          "tests": [
+            "TestModelEvaluatorConstantCompletionAndBooleanReduction",
+            "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
+            "TestModelEvaluatorResourceLimitsAndReset",
+            "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
+            "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
+            "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
+            "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+          ]
+        }
+      ],
+      "ownership": [
+        "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array."
+      ],
+      "deviations": [
+        "Only existing base AST and Boolean/uninterpreted evaluator paths are integrated. Arithmetic/BV/array/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, evaluate_partial_theory_func, array equality/extraction and expand_value remain unported. Reached non-base theory applications return ErrModelEvaluatorTheory rather than claim successful evaluation. Runtime AllocationSize is the existing source memory accounting owner; runtime-wide typed allocator wiring remains open. Cooperate and memory-before-step-limit order are preserved; no Budget count substitutes for source memory accounting. Proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+      ]
     },
     {
       "path": "src/model/model_evaluator_params.hpp",
@@ -45689,14 +45755,22 @@
         "pkg/util/util_gparams.go",
         "pkg/util/util_gparams_catalog.go",
         "pkg/model/gparams_catalog_collectors.go",
-        "pkg/util/util_gparams_catalog_dispatch.go"
+        "pkg/util/util_gparams_catalog_dispatch.go",
+        "pkg/model/model_evaluator.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription",
+        "TestModelEvaluatorConstantCompletionAndBooleanReduction",
+        "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
+        "TestModelEvaluatorResourceLimitsAndReset",
+        "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
+        "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
+        "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
+        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
       ],
       "conditionals": [
         {
@@ -45725,25 +45799,71 @@
           "go_targets": [
             "pkg/util/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "original evaluator configuration parameters, resource callback, value-only function entry lookup, uninterpreted constant/function completion, Boolean reduction, get_macro and no-proof traversal lifecycle",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator.go",
+          "tests": [
+            "TestModelEvaluatorConstantCompletionAndBooleanReduction",
+            "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
+            "TestModelEvaluatorResourceLimitsAndReset",
+            "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
+            "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
+            "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
+            "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
+        "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array."
       ],
-      "deviations": []
+      "deviations": [
+        "Only existing base AST and Boolean/uninterpreted evaluator paths are integrated. Arithmetic/BV/array/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, evaluate_partial_theory_func, array equality/extraction and expand_value remain unported. Reached non-base theory applications return ErrModelEvaluatorTheory rather than claim successful evaluation. Runtime AllocationSize is the existing source memory accounting owner; runtime-wide typed allocator wiring remains open. Cooperate and memory-before-step-limit order are preserved; no Budget count substitutes for source memory accounting. Proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+      ]
     },
     {
       "path": "src/model/model_evaluator_params.pyg",
       "component": "model",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/model/model_evaluator.go"
+      ],
+      "tests": [
+        "TestModelEvaluatorConstantCompletionAndBooleanReduction",
+        "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
+        "TestModelEvaluatorResourceLimitsAndReset",
+        "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
+        "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
+        "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
+        "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original evaluator configuration parameters, resource callback, value-only function entry lookup, uninterpreted constant/function completion, Boolean reduction, get_macro and no-proof traversal lifecycle",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator.go",
+          "tests": [
+            "TestModelEvaluatorConstantCompletionAndBooleanReduction",
+            "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
+            "TestModelEvaluatorResourceLimitsAndReset",
+            "TestModelEvaluatorPartialFunctionAndUniverseCompletion",
+            "TestModelEvaluatorConstructorRefusalsAndParameterPrecedence",
+            "TestModelEvaluatorIndependentBooleanModelsAndDirectMacroOrder",
+            "TestModelEvaluatorUnportedTheoryDoesNotReturnSuccess"
+          ]
+        }
+      ],
+      "ownership": [
+        "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array."
+      ],
+      "deviations": [
+        "Only existing base AST and Boolean/uninterpreted evaluator paths are integrated. Arithmetic/BV/array/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch, evaluate_partial_theory_func, array equality/extraction and expand_value remain unported. Reached non-base theory applications return ErrModelEvaluatorTheory rather than claim successful evaluation. Runtime AllocationSize is the existing source memory accounting owner; runtime-wide typed allocator wiring remains open. Cooperate and memory-before-step-limit order are preserved; no Budget count substitutes for source memory accounting. Proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited."
+      ]
     },
     {
       "path": "src/model/model_implicant.cpp",

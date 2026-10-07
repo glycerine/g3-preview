@@ -94,13 +94,20 @@ func (f *FunctionEntry) Argument(i uint32) (ast.ASTHandle, error) {
 }
 func (f *FunctionEntry) ArgumentsAreValues() bool { return f.argsAreValues }
 func (f *FunctionEntry) equalArgs(args []ast.ASTHandle) (bool, error) {
+	return f.equalArguments(ast.SliceArguments(args))
+}
+func (f *FunctionEntry) equalArguments(args ast.AppArguments) (bool, error) {
 	if e := f.open(); e != nil {
 		return false, e
 	}
-	if len(args) != len(f.args) {
+	if uint64(args.Count()) != uint64(len(f.args)) {
 		return false, ast.ErrASTDomain
 	}
-	for i, arg := range args {
+	for i := uint32(0); i < args.Count(); i++ {
+		arg, e := args.At(i)
+		if e != nil {
+			return false, e
+		}
 		same, e := f.manager.AreEqual(f.args[i], arg)
 		if e != nil || !same {
 			return false, e

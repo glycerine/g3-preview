@@ -4,6 +4,8 @@ package ast
 // This concrete call-local argument reader selects actual borrowed storage.
 // It never clones a pointer array or grants ownership of its elements.
 type AppArguments struct {
+	app          ASTHandle
+	appOwner     *ASTManager
 	slice        []ASTHandle
 	format       *astFormatRefVector
 	formatOwner  *ASTManager
@@ -16,6 +18,19 @@ type AppArguments struct {
 }
 
 func (a AppArguments) at(i uint32) (ASTHandle, error) {
+	if a.appOwner != nil {
+		m := a.appOwner
+		r, e := m.requireKind(a.app, ASTApp)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		app := m.appAt(r.slot)
+		if i >= app.count {
+			return ASTHandle{}, ErrASTDomain
+		}
+		child, e := m.readInternal(app.args, i)
+		return m.external(child), e
+	}
 	if a.refVector {
 		if i > ^uint32(0)-a.vectorOffset {
 			return ASTHandle{}, ErrASTDomain
@@ -37,7 +52,7 @@ func (a AppArguments) at(i uint32) (ASTHandle, error) {
 }
 
 func (a AppArguments) size() uint64 {
-	if a.refVector || a.raw || a.format != nil {
+	if a.appOwner != nil || a.refVector || a.raw || a.format != nil {
 		return uint64(a.count)
 	}
 	return uint64(len(a.slice))

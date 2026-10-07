@@ -71,3 +71,17 @@ func (m *ASTManager) MkOrVector(v ASTRefVector) (ASTHandle, error) {
 	r, e := m.mkAppArguments(m.basic.declarations[ASTOpOr], AppArguments{refVector: true, vector: s, formatOwner: m, count: s.size})
 	return m.external(r), e
 }
+
+// AppArgumentView borrows an application's checked handle array for a source
+// callback. The application must remain alive until the view is discarded.
+func (m *ASTManager) AppArgumentView(app ASTHandle) (AppArguments, error) {
+	if e := m.lock(); e != nil {
+		return AppArguments{}, e
+	}
+	defer m.mu.Unlock()
+	r, e := m.requireKind(app, ASTApp)
+	if e != nil {
+		return AppArguments{}, e
+	}
+	return AppArguments{app: app, appOwner: m, count: m.appAt(r.slot).count}, nil
+}
