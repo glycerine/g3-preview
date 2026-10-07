@@ -114,3 +114,57 @@ func TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership(t *testin
 		t.Fatal("closed filter accepted", e)
 	}
 }
+
+func TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource(t *testing.T) {
+	m := astTestManager(t)
+	old, e := model.NewModel(m)
+	satOK(t, e)
+	satOK(t, old.Core().IncRef())
+	t.Cleanup(func() { satOK(t, old.Core().DecRef()) })
+	var out ModelRef
+	satOK(t, out.Set(old.Core()))
+	t.Cleanup(func() { satOK(t, out.Close()) })
+	c, e := NewFilterModel(m)
+	satOK(t, e)
+	t.Cleanup(func() { satOK(t, c.Close()) })
+	b, e := m.MkBoolSort()
+	satOK(t, e)
+	yes, e := m.MkTrue()
+	satOK(t, e)
+	no, e := m.MkFalse()
+	satOK(t, e)
+	var decls [2]ast.ASTHandle
+	var graphs [2]*model.FunctionInterpretation
+	for i := range decls {
+		decls[i], e = m.MkFuncDecl(astTestSymbol(t, m, fmt.Sprintf("filter-f-%d", i)), []ast.ASTHandle{b}, b, ast.ASTFuncDeclInfo{})
+		satOK(t, e)
+		graphs[i], e = model.NewFunctionInterpretation(m, 1)
+		satOK(t, e)
+		satOK(t, graphs[i].InsertEntry([]ast.ASTHandle{yes}, no))
+		satOK(t, graphs[i].SetElse(yes))
+		satOK(t, old.Core().RegisterFunction(decls[i], graphs[i]))
+	}
+	satOK(t, c.Insert(decls[0]))
+	satOK(t, c.ApplyUnindexed(&out))
+	next, e := out.Get()
+	satOK(t, e)
+	if next.NumFunctionDeclarations() != 1 {
+		t.Fatal("filter lost unmarked function")
+	}
+	removed, e := next.FunctionInterpretation(decls[0])
+	satOK(t, e)
+	if removed != nil {
+		t.Fatal("marked function was copied")
+	}
+	kept, e := next.FunctionInterpretation(decls[1])
+	satOK(t, e)
+	if kept == nil || kept == graphs[1] || kept.NumEntries() != 1 {
+		t.Fatal("function graph was shared or dropped")
+	}
+	satOK(t, kept.SetElse(no))
+	original, e := graphs[1].Else()
+	satOK(t, e)
+	if original != yes || old.Closed {
+		t.Fatal("filtered model changed external source")
+	}
+}

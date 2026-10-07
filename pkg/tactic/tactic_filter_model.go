@@ -10,10 +10,8 @@ import (
 	"github.com/glycerine/g3/pkg/model"
 )
 
-// Original filter converter's constant/universe path. The function-copy loop,
-// AST translation and display remain unported. Function maps cannot currently
-// be populated through model.ModelCore; a nonempty map reports that missing operation
-// rather than silently producing a model with missing function interpretations.
+// Original filter converter copies unmarked constants/functions and universes.
+// AST translation and display remain unported.
 type tacticFilterModelConverter struct {
 	tacticConverterBase
 	manager      *ast.ASTManager
@@ -113,11 +111,28 @@ func (c *tacticFilterModelConverter) ApplyModel(out *ModelRef, _ uint32) (err er
 			return e
 		}
 	}
-	if e = old.CheckFunctionStorageEmpty(); e != nil {
-		return e
-	}
-	if old.NumFunctionDeclarations() != 0 {
-		return errors.New("filter model converter: function interpretation copying remains unported")
+	for i := uint32(0); i < old.NumFunctionDeclarations(); i++ {
+		d, e := old.Function(i)
+		if e != nil {
+			return e
+		}
+		marked, e := marks.IsMarked(d)
+		if e != nil {
+			return e
+		}
+		if marked {
+			continue
+		}
+		fi, e := old.FunctionInterpretation(d)
+		if e != nil {
+			return e
+		}
+		if fi == nil {
+			return ast.ErrASTHandle
+		}
+		if e = next.Core().CopyFunctionInterpretation(d, fi); e != nil {
+			return e
+		}
 	}
 	if e = next.CopyUniverseInterpretations(old.DerivedModel()); e != nil {
 		return e

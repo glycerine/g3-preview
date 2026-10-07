@@ -45241,7 +45241,8 @@
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_core.go",
-        "pkg/model/model_value.go"
+        "pkg/model/model_value.go",
+        "pkg/model/model_copy.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -45252,7 +45253,10 @@
         "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
         "TestModelCoreHashGrowthCopyAndIndependentOwnership",
         "TestModelSomeValuePrefersFirstUniverseAndBorrows",
-        "TestModelSomeValueMissingEmptyAndBooleanFallback"
+        "TestModelSomeValueMissingEmptyAndBooleanFallback",
+        "TestModelCopyConstantsFunctionsUniversesAndIndependentGraphs",
+        "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
+        "TestModelFunctionCopyReplacementAndSelfCopy"
       ],
       "assertions": [
         {
@@ -45296,11 +45300,21 @@
             "TestModelSomeValuePrefersFirstUniverseAndBorrows",
             "TestModelSomeValueMissingEmptyAndBooleanFallback"
           ]
+        },
+        {
+          "name": "model::copy_func_interps and model::copy constants/functions/universes source order",
+          "status": "ported",
+          "go_target": "pkg/model/model_copy.go",
+          "tests": [
+            "TestModelCopyConstantsFunctionsUniversesAndIndependentGraphs",
+            "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
+            "TestModelFunctionCopyReplacementAndSelfCopy"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
         "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply."
       ]
     },
@@ -45311,7 +45325,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/model_lifecycle.go",
-        "pkg/model/model_value.go"
+        "pkg/model/model_value.go",
+        "pkg/model/model_copy.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -45321,7 +45336,10 @@
         "TestModelConverterToModelOriginalAllocationAndApplication",
         "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
         "TestModelSomeValuePrefersFirstUniverseAndBorrows",
-        "TestModelSomeValueMissingEmptyAndBooleanFallback"
+        "TestModelSomeValueMissingEmptyAndBooleanFallback",
+        "TestModelCopyConstantsFunctionsUniversesAndIndependentGraphs",
+        "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
+        "TestModelFunctionCopyReplacementAndSelfCopy"
       ],
       "conditionals": [
         {
@@ -45357,11 +45375,21 @@
             "TestModelSomeValuePrefersFirstUniverseAndBorrows",
             "TestModelSomeValueMissingEmptyAndBooleanFallback"
           ]
+        },
+        {
+          "name": "model::copy_func_interps and model::copy constants/functions/universes source order",
+          "status": "ported",
+          "go_target": "pkg/model/model_copy.go",
+          "tests": [
+            "TestModelCopyConstantsFunctionsUniversesAndIndependentGraphs",
+            "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
+            "TestModelFunctionCopyReplacementAndSelfCopy"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
         "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply."
       ]
     },
@@ -45503,7 +45531,7 @@
         "Function table cells hold scalar handles and indices; a charged cold directory owns FunctionInterpretation pointers. Successful registration transfers graph ownership, with identical-pointer replacement remaining live. Cold directory is prepared before source declaration-vector publication; registration refusals before graph publication retain caller ownership. Source constants retire before function table bucket iteration, with each function key retired before its graph. Interrupted unregister retains detached key/graph owners in named ModelCore fields for later owning cleanup."
       ],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, get_some_value's callback, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, scoped get_some_value and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
         "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion."
       ]
     },
@@ -45617,7 +45645,7 @@
         "Function table cells hold scalar handles and indices; a charged cold directory owns FunctionInterpretation pointers. Successful registration transfers graph ownership, with identical-pointer replacement remaining live. Cold directory is prepared before source declaration-vector publication; registration refusals before graph publication retain caller ownership. Source constants retire before function table bucket iteration, with each function key retired before its graph. Interrupted unregister retains detached key/graph owners in named ModelCore fields for later owning cleanup."
       ],
       "deviations": [
-        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, full model copy, AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
+        "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
         "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion.",
         "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply."
       ]
@@ -91947,7 +91975,8 @@
       "tests": [
         "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
         "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
-        "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership"
+        "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
+        "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource"
       ],
       "assertions": [
         {
@@ -91959,13 +91988,14 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "operator()(model_ref&, unsigned) constant/universe copying fragment",
+          "name": "operator()(model_ref&, unsigned) constants, function graph filtering/copy and universes",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_filter_model.go",
           "tests": [
             "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
             "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
-            "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership"
+            "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
+            "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource"
           ]
         },
         {
@@ -91979,10 +92009,10 @@
         }
       ],
       "ownership": [
-        "Owning declaration reference trail retains duplicate entries and releases forward; filtered derived model is published after constant/universe copying."
+        "Owning declaration reference trail retains duplicate entries and releases forward; filtered derived model is published after constant/function/universe copying."
       ],
       "deviations": [
-        "Function interpretation copying, AST translation and display remain unported. Current modelCore exposes no function insertion API; a nonempty function member is rejected explicitly. No whole converter or public solver API completion is credited. Go errors before publication retire the reached replacement model. Broad failure-history qualification is deferred."
+        "Original function filtering/copy loop is now integrated, using active function declaration order and independent FunctionInterpretation copies. AST translation, display/TRACE and broader ownership/failure campaigns remain unported or unqualified; no whole converter or public solver API completion is credited. Go errors before model publication retire the reached replacement owner, including a retained unpublished function copy."
       ]
     },
     {
@@ -91996,7 +92026,8 @@
       "tests": [
         "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
         "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
-        "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership"
+        "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
+        "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource"
       ],
       "conditionals": [
         {
@@ -92026,7 +92057,7 @@
         "Concrete func_decl_ref_vector storage increments before append and keeps source duplicate reference ownership; manager is borrowed."
       ],
       "deviations": [
-        "AST translation and display declarations remain without implementations; the model application function-copy branch remains unported."
+        "Original function filtering/copy loop is now integrated, using active function declaration order and independent FunctionInterpretation copies. AST translation, display/TRACE and broader ownership/failure campaigns remain unported or unqualified; no whole converter or public solver API completion is credited. Go errors before model publication retire the reached replacement owner, including a retained unpublished function copy."
       ]
     },
     {

@@ -20,6 +20,7 @@ type ModelCore struct {
 	functionDirectory                  []*FunctionInterpretation
 	functionDirectoryBytes             uint64
 	removedFunction                    *FunctionInterpretation
+	copiedFunction                     *FunctionInterpretation
 	removedDeclaration                 ast.ASTHandle
 	removedDeclarationOwned            bool
 	functionDeclarations               modelDeclarationVector
@@ -315,6 +316,13 @@ func (md *ModelCore) closeCoreMembers() error {
 			}
 			entry.index = 0
 		}
+	}
+	// A copy stopped before publication retains its lexical function owner.
+	if md.copiedFunction != nil {
+		if e := md.copiedFunction.Close(); e != nil {
+			return e
+		}
+		md.copiedFunction = nil
 	}
 	// A stopped unregister has separately retained the removed lexical owners.
 	if e := md.finishFunctionRemoval(); e != nil {
