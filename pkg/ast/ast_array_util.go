@@ -23,6 +23,10 @@ func (m *ASTManager) MkArrayAppArguments(fid FamilyID, op int32, args AppArgumen
 		return ASTHandle{}, e
 	}
 	defer m.mu.Unlock()
+	return m.mkArrayAppArguments(fid, op, nil, args)
+}
+
+func (m *ASTManager) mkArrayAppArguments(fid FamilyID, op int32, ps []ASTParameter, args AppArguments) (ASTHandle, error) {
 	if fid < 0 || !m.pluginAt(fid).present {
 		return ASTHandle{}, nil
 	}
@@ -48,7 +52,7 @@ func (m *ASTManager) MkArrayAppArguments(fid FamilyID, op int32, args AppArgumen
 			return ASTHandle{}, e
 		}
 	}
-	d, e := m.arrayDecl(op, nil, domain.Slice(), ASTHandle{})
+	d, e := m.arrayDecl(op, ps, domain.Slice(), ASTHandle{})
 	if e != nil || d.slot == 0 {
 		return ASTHandle{}, e
 	}

@@ -215,7 +215,13 @@ func (rw *ArrayRewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out a
 		return rw.selectCore(args, out)
 	case ast.ASTArrayOpStore:
 		return rw.storeCore(args, out)
-	case ast.ASTArrayOpMap, ast.ASTArrayOpSetUnion, ast.ASTArrayOpSetIntersect, ast.ASTArrayOpSetSubset, ast.ASTArrayOpSetComplement, ast.ASTArrayOpSetDifference:
+	case ast.ASTArrayOpMap:
+		f, e := rw.manager.ArrayMapFunction(d)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		return rw.mapCore(f, args, out)
+	case ast.ASTArrayOpSetUnion, ast.ASTArrayOpSetIntersect, ast.ASTArrayOpSetSubset, ast.ASTArrayOpSetComplement, ast.ASTArrayOpSetDifference:
 		return RewriteFailed, ErrArrayRewriterRule
 	default:
 		return RewriteFailed, nil
