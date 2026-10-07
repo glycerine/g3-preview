@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func (rw *boolRewriter) mkDistinctCore(args []ast.ASTHandle, out ast.ASTRef) (brStatus, error) {
@@ -99,7 +98,7 @@ func (rw *boolRewriter) mkDistinctCoreArguments(args ast.AppArguments, out ast.A
 		return brDone, m.SetRef(out, h)
 	}
 	if rw.blastDistinct && uint64(args.Count()) < uint64(rw.blastDistinctThreshold) {
-		var diseqs util.PointerBuffer[ast.ASTHandle]
+		var diseqs ast.ASTHandleBuffer
 		defer diseqs.Close(m.Budget())
 		for i := uint32(0); i < args.Count(); i++ {
 			for j := i + 1; j < args.Count(); j++ {

@@ -130,7 +130,7 @@ func (tr *GoalTranslator) CompileGoal(g *tactic.Goal) (err error) {
 		return e
 	}
 	defer func() { err = errors.Join(err, m.DelExprVector(&deps)) }()
-	var forms, allDeps util.PointerVector[ast.ASTHandle]
+	var forms, allDeps ast.ASTHandleVector
 	defer forms.Close(m.Budget())
 	defer allDeps.Close(m.Budget())
 	size, e := g.Size()

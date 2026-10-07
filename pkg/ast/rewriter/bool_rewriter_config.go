@@ -158,7 +158,7 @@ func (rw *boolRewriter) mkOrCore(args []ast.ASTHandle, out ast.ASTRef) (brStatus
 // Concrete expr_ref_buffer: the underlying inline16/doubling pointer storage
 // carries owning AST references here, including repeated entries.
 type boolRewriterRefBuffer struct {
-	values util.PointerBuffer[ast.ASTHandle]
+	values ast.ASTHandleBuffer
 }
 
 func (b *boolRewriterRefBuffer) push(m *ast.ASTManager, h ast.ASTHandle) error {

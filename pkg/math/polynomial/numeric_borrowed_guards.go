@@ -11,18 +11,6 @@ type borrowedPolynomialGuard interface {
 	numericCallerBinding() *util.NumericCallerBinding
 }
 
-func borrowedPolynomialCaller[T any](z polynomialGuardOwner, kind uint32) (zero T) {
-	for b := z.CallerBindings(); b != nil; b = b.Previous() {
-		if b.Kind() == kind {
-			if q, ok := b.Guard().(borrowedPolynomialGuard); ok {
-				if owner, ok := q.numericCallerOwner().(T); ok {
-					return owner
-				}
-			}
-		}
-	}
-	return zero
-}
 func setBorrowedPolynomialCaller(z polynomialGuardOwner, owner any, kind uint32, q borrowedPolynomialGuard) {
 	var current *util.NumericCallerBinding
 	for b := z.CallerBindings(); b != nil; b = b.Previous() {
@@ -64,7 +52,16 @@ func setBorrowedPolynomialCaller(z polynomialGuardOwner, owner any, kind uint32,
 	}
 }
 func algebraicNegCaller(z polynomialGuardOwner) *AlgebraicRootCore {
-	return borrowedPolynomialCaller[*AlgebraicRootCore](z, 8)
+	for b := z.CallerBindings(); b != nil; b = b.Previous() {
+		if b.Kind() == 8 {
+			if q, ok := b.Guard().(borrowedPolynomialGuard); ok {
+				if owner, ok := q.numericCallerOwner().(*AlgebraicRootCore); ok {
+					return owner
+				}
+			}
+		}
+	}
+	return nil
 }
 func setAlgebraicNegCaller(z polynomialGuardOwner, owner *AlgebraicRootCore) {
 	var q borrowedPolynomialGuard
@@ -83,7 +80,16 @@ func (q *algebraicNegScope) numericCallerBinding() *util.NumericCallerBinding {
 	return &q.numeric.integerBinding
 }
 func factorCoreCaller(z polynomialGuardOwner) *polynomialFactorCoreFrame {
-	return borrowedPolynomialCaller[*polynomialFactorCoreFrame](z, 9)
+	for b := z.CallerBindings(); b != nil; b = b.Previous() {
+		if b.Kind() == 9 {
+			if q, ok := b.Guard().(borrowedPolynomialGuard); ok {
+				if owner, ok := q.numericCallerOwner().(*polynomialFactorCoreFrame); ok {
+					return owner
+				}
+			}
+		}
+	}
+	return nil
 }
 func setFactorCoreCaller(z polynomialGuardOwner, owner *polynomialFactorCoreFrame) {
 	var q borrowedPolynomialGuard
@@ -102,7 +108,16 @@ func (q *polynomialFactorCoreFrame) numericCallerBinding() *util.NumericCallerBi
 	return &q.callerBinding
 }
 func factorFrontendCaller(z polynomialGuardOwner) *upolyFactorFrontendScope {
-	return borrowedPolynomialCaller[*upolyFactorFrontendScope](z, 10)
+	for b := z.CallerBindings(); b != nil; b = b.Previous() {
+		if b.Kind() == 10 {
+			if q, ok := b.Guard().(borrowedPolynomialGuard); ok {
+				if owner, ok := q.numericCallerOwner().(*upolyFactorFrontendScope); ok {
+					return owner
+				}
+			}
+		}
+	}
+	return nil
 }
 func setFactorFrontendCaller(z polynomialGuardOwner, owner *upolyFactorFrontendScope) {
 	var q borrowedPolynomialGuard
@@ -121,7 +136,16 @@ func (q *upolyFactorFrontendScope) numericCallerBinding() *util.NumericCallerBin
 	return &q.numeric.integerBinding
 }
 func upolyDisplayCaller(z polynomialGuardOwner) *upolyDisplayScope {
-	return borrowedPolynomialCaller[*upolyDisplayScope](z, 11)
+	for b := z.CallerBindings(); b != nil; b = b.Previous() {
+		if b.Kind() == 11 {
+			if q, ok := b.Guard().(borrowedPolynomialGuard); ok {
+				if owner, ok := q.numericCallerOwner().(*upolyDisplayScope); ok {
+					return owner
+				}
+			}
+		}
+	}
+	return nil
 }
 func setUpolyDisplayCaller(z polynomialGuardOwner, owner *upolyDisplayScope) {
 	var q borrowedPolynomialGuard
@@ -140,7 +164,16 @@ func (q *upolyDisplayScope) numericCallerBinding() *util.NumericCallerBinding {
 	return &q.numeric.integerBinding
 }
 func upolyDisplaySequenceCaller(z polynomialGuardOwner) *UPolynomialSequence {
-	return borrowedPolynomialCaller[*UPolynomialSequence](z, 12)
+	for b := z.CallerBindings(); b != nil; b = b.Previous() {
+		if b.Kind() == 12 {
+			if q, ok := b.Guard().(borrowedPolynomialGuard); ok {
+				if owner, ok := q.numericCallerOwner().(*UPolynomialSequence); ok {
+					return owner
+				}
+			}
+		}
+	}
+	return nil
 }
 func setUpolyDisplaySequenceCaller(z polynomialGuardOwner, owner *UPolynomialSequence) {
 	var q borrowedPolynomialGuard
@@ -159,7 +192,16 @@ func (q *UPolynomialSequence) numericCallerBinding() *util.NumericCallerBinding 
 	return &q.callerBinding
 }
 func factorFrontendConstantCaller(z polynomialGuardOwner) *UPolynomialFactorizationService {
-	return borrowedPolynomialCaller[*UPolynomialFactorizationService](z, 13)
+	for b := z.CallerBindings(); b != nil; b = b.Previous() {
+		if b.Kind() == 13 {
+			if q, ok := b.Guard().(borrowedPolynomialGuard); ok {
+				if owner, ok := q.numericCallerOwner().(*UPolynomialFactorizationService); ok {
+					return owner
+				}
+			}
+		}
+	}
+	return nil
 }
 func setFactorFrontendConstantCaller(z polynomialGuardOwner, owner *UPolynomialFactorizationService) {
 	var q borrowedPolynomialGuard
@@ -178,7 +220,16 @@ func (q *upolyFactorConstantBinding) numericCallerBinding() *util.NumericCallerB
 	return &q.numeric.integerBinding
 }
 func factorUnivariateCaller(z polynomialGuardOwner) *MultivariatePolynomialManager {
-	return borrowedPolynomialCaller[*MultivariatePolynomialManager](z, 14)
+	for b := z.CallerBindings(); b != nil; b = b.Previous() {
+		if b.Kind() == 14 {
+			if q, ok := b.Guard().(borrowedPolynomialGuard); ok {
+				if owner, ok := q.numericCallerOwner().(*MultivariatePolynomialManager); ok {
+					return owner
+				}
+			}
+		}
+	}
+	return nil
 }
 func setFactorUnivariateCaller(z polynomialGuardOwner, owner *MultivariatePolynomialManager) {
 	var q borrowedPolynomialGuard
@@ -197,7 +248,16 @@ func (q *polynomialFactorUnivariateScope) numericCallerBinding() *util.NumericCa
 	return &q.callerBinding
 }
 func factorNumeralVectorCaller(z polynomialGuardOwner) *MultivariatePolynomialManager {
-	return borrowedPolynomialCaller[*MultivariatePolynomialManager](z, 15)
+	for b := z.CallerBindings(); b != nil; b = b.Previous() {
+		if b.Kind() == 15 {
+			if q, ok := b.Guard().(borrowedPolynomialGuard); ok {
+				if owner, ok := q.numericCallerOwner().(*MultivariatePolynomialManager); ok {
+					return owner
+				}
+			}
+		}
+	}
+	return nil
 }
 func setFactorNumeralVectorCaller(z polynomialGuardOwner, owner *MultivariatePolynomialManager) {
 	var q borrowedPolynomialGuard

@@ -76,6 +76,29 @@ func TestExecutableEvidenceKeepsMethodPackageScope(t *testing.T) {
 	}
 }
 
+func TestExecutableEvidenceExplicitSplitMethodTargets(t *testing.T) {
+	root := t.TempDir()
+	for _, item := range []struct{ dir, name string }{{"leaf", "TestLeaf"}, {"caller", "TestCaller"}} {
+		source(t, root, item.dir+"/impl.go", "package fixture\nfunc One() {}\n")
+		source(t, root, item.dir+"/impl_test.go", fmt.Sprintf("package fixture\nimport \"testing\"\nfunc %s(t *testing.T) {}\n", item.name))
+	}
+	method := Method{Name: "Split", GoTarget: "leaf/impl.go", Tests: []string{"TestLeaf", "TestCaller"}}
+	m := Manifest{Units: []Unit{{Path: "src/util/fixture.cpp", GoTargets: []string{"leaf/impl.go", "caller/impl.go"}, Methods: []Method{method}}}}
+	if err := VerifyEvidence(m, root); err == nil {
+		t.Fatal("unit-wide targets must not implicitly extend method evidence")
+	}
+	m.Units[0].Methods[0].GoTargets = []string{"caller/impl.go"}
+	if err := VerifyEvidence(m, root); err != nil {
+		t.Fatal("explicit split implementation should include both packages", err)
+	}
+	if err := os.Remove(filepath.Join(root, "caller/impl_test.go")); err != nil {
+		t.Fatal(err)
+	}
+	if err := VerifyEvidence(m, root); err == nil {
+		t.Fatal("explicit package target must not conceal removed tests")
+	}
+}
+
 func BenchmarkExecutableEvidenceSharedDirectory(b *testing.B) {
 	root := b.TempDir()
 	if e := os.WriteFile(filepath.Join(root, "api.go"), []byte("package fixture\nfunc One() {}\n"), 0600); e != nil {

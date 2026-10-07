@@ -22,11 +22,15 @@ type Manifest struct {
 	Units    []Unit `json:"units"`
 	APIs     []API  `json:"api_operations"`
 }
+
+// GoTarget is the primary implementation. GoTargets records explicit additional
+// implementation or test files when a source method spans Go packages.
 type Method struct {
-	Name     string   `json:"name"`
-	Status   string   `json:"status"`
-	GoTarget string   `json:"go_target,omitempty"`
-	Tests    []string `json:"tests,omitempty"`
+	Name      string   `json:"name"`
+	Status    string   `json:"status"`
+	GoTarget  string   `json:"go_target,omitempty"`
+	GoTargets []string `json:"go_targets,omitempty"`
+	Tests     []string `json:"tests,omitempty"`
 }
 type Line struct {
 	Number int    `json:"line"`
@@ -259,6 +263,13 @@ func Validate(m Manifest) error {
 		for _, p := range u.GoTargets {
 			if !validPath(p) {
 				return fmt.Errorf("invalid Go target %q", p)
+			}
+		}
+		for _, method := range u.Methods {
+			for _, p := range append([]string{method.GoTarget}, method.GoTargets...) {
+				if p != "" && !validPath(p) {
+					return fmt.Errorf("invalid Go target %q for method %s in %s", p, method.Name, u.Path)
+				}
 			}
 		}
 	}

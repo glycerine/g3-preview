@@ -1,10 +1,6 @@
 package ast
 
-import (
-	"github.com/glycerine/g3/pkg/util"
-)
-
-type astProofArguments struct{ util.PointerBuffer[ASTHandle] }
+type astProofArguments struct{ ASTHandleBuffer }
 
 func (a *astProofArguments) slice() []ASTHandle                    { return a.Slice() }
 func (a *astProofArguments) push(m *ASTManager, h ASTHandle) error { return a.Push(m.BudgetField, h) }

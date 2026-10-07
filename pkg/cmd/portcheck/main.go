@@ -11,7 +11,7 @@ import (
 
 func main() {
 	root := flag.String("source", "", "reference root; reads reference only when supplied")
-	manifest := flag.String("manifest", "port_manifest.json", "ledger path")
+	manifest := flag.String("manifest", "../port_manifest.json", "repository ledger path; Go targets are relative to its directory")
 	generate := flag.Bool("generate", false, "create initial ledger (refuses overwrite)")
 	flag.Parse()
 	if err := run(*root, *manifest, *generate); err != nil {
@@ -39,7 +39,16 @@ func run(root, p string, generate bool) error {
 		fmt.Printf("inventoried %d source/tool units and %d API operations\n", len(m.Units), len(m.APIs))
 		return nil
 	}
-	if err := portcheck.CheckNoGenerics(filepath.Dir(p)); err != nil {
+	evidenceRoot := filepath.Dir(p)
+	goRoot := filepath.Join(evidenceRoot, "pkg")
+	if info, err := os.Stat(filepath.Join(goRoot, "go.mod")); os.IsNotExist(err) {
+		goRoot = evidenceRoot
+	} else if err != nil {
+		return err
+	} else if info.IsDir() {
+		return fmt.Errorf("Go module file is a directory: %s", filepath.Join(goRoot, "go.mod"))
+	}
+	if err := portcheck.CheckNoGenerics(goRoot); err != nil {
 		return err
 	}
 	m, err := portcheck.Load(p)
@@ -49,7 +58,7 @@ func run(root, p string, generate bool) error {
 	if err = portcheck.Validate(m); err != nil {
 		return err
 	}
-	if err := portcheck.VerifyEvidence(m, filepath.Dir(p)); err != nil {
+	if err := portcheck.VerifyEvidence(m, evidenceRoot); err != nil {
 		return err
 	}
 	if root != "" {

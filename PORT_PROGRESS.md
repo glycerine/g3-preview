@@ -1,6 +1,8 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
-Current source provenance policy: the C++ reference is fixed. Keep originating repository-relative source paths in ported files; do not compute, store, or verify C++ content hashes, checksums, or fingerprints. Omit Microsoft copyright lines from current and new ported headers, retain license notices and `LICENSE.txt`, and preserve other authors’ notices. Solver algorithm hashing/fingerprints and Go working-tree SHA verification remain unchanged. Historical source digest records below have been removed; source paths, method mappings, assertions, conditional profiles, and test evidence remain.
+Current source provenance policy: the C++ reference is fixed. Keep originating repository-relative source paths and line numbers in ported files; do not compute, store, or verify C++ content hashes, checksums, or fingerprints. Omit MIT-license, author, and Microsoft copyright notices from Go headers; retain repository license files. Solver algorithm hashing/fingerprints and Go working-tree SHA verification remain unchanged. Historical source digest records below have been removed; source paths, method mappings, assertions, conditional profiles, and test evidence remain.
+
+Current layout after reorganization: `pkg/` is the Go module. This progress record and `port_manifest.json` live at the repository root. Manifest Go targets are repository-relative `pkg/...` paths. Run verification from `pkg/` with `go run ./cmd/portcheck -source ..`; the default manifest is `../port_manifest.json`, and the syntax audit explicitly scans the `pkg/` module. Historical flat filenames, `mpnum/`, `golang/`, and verification-copy paths below describe their original checkpoints and are not current build instructions. Keep implementation changes visible in the main worktree; temporary verification artifacts may live outside it.
 
 [Current facts](#current-facts-and-conflict-resolution) · [TODO](#todo--prioritized-handoff) · [FINISHED](#finished--committed-subset-with-explicit-limits) · [Source inventory](#source-inventory--current-ledger-not-historical-packet-counts) · [Evidence](#current-failure-evidence-and-paused-working-tree) · [Family audits](#family-audits-against-actual-code-and-evidence)
 
@@ -14,7 +16,7 @@ lists here as work lands. Machine-readable source/API/assertion inventories rema
 in their existing JSON files; keep them synchronized with justified promotions.
 
 The objective remains the entire patched Z3 4.7.1 fork described by the root
-[GO_PORT_PLAN.md](../GO_PORT_PLAN.md): all source, solver/theories, proof/checker/interpolation, APIs,
+[GO_PORT_PLAN.md](GO_PORT_PLAN.md): all source, solver/theories, proof/checker/interpolation, APIs,
 frontends, tests, build/tooling and generated bindings. Foundations and selected
 passing suites do not satisfy this objective.
 
@@ -257,7 +259,7 @@ passing suites do not satisfy this objective.
   charged actual cold owners/backing peaks and real retained cleanup roots.
 - Defer WASM/JS/WASI builds/execution and race checks at this single-goroutine
   stage. Earlier platform/race evidence is historical only, not a current gate.
-- Write project files and build/cache/temp artifacts only under `golang/`.
+- Write Go implementation files under `pkg/` and the existing root ledgers at the repository root; keep active implementation visible.
   Never amend/rebase commits. Use `test_vectors`, not `testdata`.
 - Source completed publication survives failures. Actual dead-pointer/endangered
   accesses are guarded; no blanket rollback, numeral repair, invented allocation

@@ -2,6 +2,8 @@
 
 Audited 2026-10-07 at commit `fba0ad7` against parent `d959ab8` and the local C++ sources. Module: `pkg/go.mod`, `github.com/glycerine/g3/pkg`.
 
+Follow-up scope: A1 is declined. A2–A5 are approved for repair. All attempted A6 source-header changes were reverted at the user's request; A6 and placement questions D1/D2 remain untouched.
+
 The initial audit changed no implementation or test files. At the user's subsequent request, `pkg/gparams_production_test.go` now contains an intentionally failing regression test for A1; no implementation fix was made. `smtcore/` is deliberately an amalgam of C++ packages to avoid Go import cycles. Its mixed source origins are not placement defects.
 
 ## Findings at a glance
@@ -67,6 +69,8 @@ exit status 1
 
 **Validation after fixing:** Run the no-generics checker over the entire module, affected ownership/allocation-failure tests, and the full native suite. Resolve A5 as well before expecting the complete portcheck command to pass.
 
+**Repair:** The generic util containers are replaced by concrete `ASTHandleBuffer` and `ASTHandleVector` in `pkg/ast/`, and all production users now use those concrete types. Polynomial caller lookups now use concrete pointer assertions and preserve the original binding traversal. The no-generics check passes through the complete portcheck command.
+
 ## A3. PointerVector allocation accounting uses inconsistent widths
 
 **Evidence:** `pkg/util/pointer_vector.go:13` obtains `reflect.TypeOf(d).Size()`, the dynamic value width. Allocation and release during growth use that width. `Close`, at `pkg/util/pointer_vector.go:39-40`, releases capacity multiplied by `reflect.TypeFor[T]().Size()`, the static slice element width.
@@ -91,6 +95,8 @@ The slice requires two interface slots, each 16 bytes. The reservation is 16 byt
 
 **Validation after fixing:** Verify actual storage charges through initial growth, later growth, failed reservation, erasure, and Close. Verify that cleanup returns the budget to its initial value.
 
+**Repair:** The concrete AST containers reserve and release using the same static ASTHandle width. Interface instantiations are no longer admitted. Migrated container tests verify source growth, erasure and balanced cleanup; an additional vector test verifies old-plus-new peak refusal, unchanged published values/backing after failure, and clearing the erased slot.
+
 ## A4. Zero-sized elements and zero stride panic
 
 **Evidence:** `pkg/util/pointer_buffer.go:36-37` divides by `reflect.TypeFor[T]().Size()` without checking for zero. `pkg/util/source_vector_capacity.go:6-12` likewise divides by its public `stride` argument.
@@ -113,6 +119,8 @@ The first 16 pushes fit inline; the spill path divides by zero. `SourceVectorCap
 
 **Validation after fixing:** Cover the inline-to-spill boundary and zero-stride public helper input. Do not claim the panic proves a defect in existing ASTHandle buffering; that concrete element has nonzero width.
 
+**Repair:** Concrete AST buffers cannot contain zero-sized elements. `SourceVectorCapacity` now rejects zero stride with `arena.ErrConfig` and invalid/overflowing capacities with `arena.ErrBounds` before arithmetic. The new zero-stride test first reproduced the panic and passes after the fix; the migrated buffer test covers the seventeenth insertion and failed spill publication.
+
 ## A5. Port coverage ledger and recorded outstanding work were lost
 
 **Evidence:** Parent commit `d959ab8` contains `golang/port_manifest.json` and `golang/PORT_PROGRESS.md`. Neither has a migrated counterpart in the current tree. `pkg/cmd/portcheck/main.go:16` still defaults to `port_manifest.json`; its run function still loads, validates, and verifies evidence from that manifest after the syntax check.
@@ -124,6 +132,8 @@ The first 16 pushes fit inline; the spill path divides by zero. `SourceVectorCap
 **Validation after fixing:** Run the complete portcheck command, including evidence validation. Confirm that all referenced Go files/tests exist, and that incomplete entries remain explicitly incomplete unless their behavior has actually been implemented and validated.
 
 note: I restored these files from the parent comment at the top level of the repo.
+
+**Repair:** The restored files stay at the repository root. All manifest Go targets are migrated to `pkg/...`, including extracted dictionary/deletion/module-parameter helpers and production collector owners. Five renamed dictionary tests are mapped to their current declarations. Methods spanning packages list explicit additional `go_targets`; verification still rejects missing tests and does not implicitly borrow unit-wide scope. No unit/method status, ownership claim, assertion/conditional inventory, or API completion entry was promoted. Portcheck verifies all 2,102 units and 677 API entries against the current reference: 37 ported, 270 partial, 1,795 unported. The progress record now identifies the current module/root-ledger layout and treats older paths as historical.
 
 ## A6. Incorrect C++ provenance paths
 

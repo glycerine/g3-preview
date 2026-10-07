@@ -6,7 +6,6 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 const (
@@ -127,7 +126,7 @@ func (t *modelConstantMap) close(m *ast.ASTManager) {
 }
 
 type modelDeclarationVector struct {
-	util.PointerVector[ast.ASTHandle]
+	ast.ASTHandleVector
 }
 
 func (v *modelDeclarationVector) push(m *ast.ASTManager, d ast.ASTHandle) error {

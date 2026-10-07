@@ -6,12 +6,11 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func (rw *boolRewriter) simpNestedNotOr(app ast.ASTHandle, neg *ast.ASTFastMark1, pos *ast.ASTFastMark2, out ast.ASTRef) (simplified bool, err error) {
 	m := rw.manager
-	var newArgs util.PointerBuffer[ast.ASTHandle]
+	var newArgs ast.ASTHandleBuffer
 	defer newArgs.Close(m.Budget())
 	n, e := m.GetNumArgs(app)
 	if e != nil {

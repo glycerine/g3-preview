@@ -49,7 +49,7 @@ func (rw *boolRewriter) mkNFlatOrCore(args []ast.ASTHandle, out ast.ASTRef) (brS
 // Keep that source branch after mark reset and before the changed-result test.
 func (rw *boolRewriter) mkNFlatCore(args ast.AppArguments, out ast.ASTRef, disjunction bool) (status brStatus, err error) {
 	m := rw.manager
-	var buffer util.PointerBuffer[ast.ASTHandle]
+	var buffer ast.ASTHandleBuffer
 	defer buffer.Close(m.Budget())
 	neg, e := ast.NewASTFastMark1(m)
 	if e != nil {
@@ -195,7 +195,7 @@ func (rw *boolRewriter) mkFlatCore(args ast.AppArguments, out ast.ASTRef, disjun
 		return rw.mkNFlatCore(args, out, disjunction)
 	}
 	m := rw.manager
-	var flat util.PointerBuffer[ast.ASTHandle]
+	var flat ast.ASTHandleBuffer
 	defer flat.Close(m.Budget())
 	for j := uint32(0); j < i; j++ {
 		arg, e := args.At(j)

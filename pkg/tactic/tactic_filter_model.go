@@ -8,7 +8,6 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Original filter converter's constant/universe path. The function-copy loop,
@@ -18,7 +17,7 @@ import (
 type tacticFilterModelConverter struct {
 	tacticConverterBase
 	manager      *ast.ASTManager
-	declarations util.PointerVector[ast.ASTHandle] // func_decl_ref_vector: owning entries
+	declarations ast.ASTHandleVector // func_decl_ref_vector: owning entries
 }
 
 func NewFilterModel(m *ast.ASTManager) (*tacticFilterModelConverter, error) {

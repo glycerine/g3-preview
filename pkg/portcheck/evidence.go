@@ -62,8 +62,12 @@ func VerifyEvidence(m Manifest, root string) error {
 			return err
 		}
 		for _, method := range u.Methods {
+			targets := append([]string(nil), method.GoTargets...)
 			if method.GoTarget != "" {
-				if err := check(u.Path+"::"+method.Name, []string{method.GoTarget}, method.Tests); err != nil {
+				targets = append(targets, method.GoTarget)
+			}
+			if len(targets) != 0 {
+				if err := check(u.Path+"::"+method.Name, targets, method.Tests); err != nil {
 					return err
 				}
 			}
