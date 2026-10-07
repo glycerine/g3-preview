@@ -14,11 +14,15 @@ const (
 	astUpdateNoPatterns
 )
 
-func (m *ASTManager) sameQuantifierList(p arena.SmallBytesRef, n uint32, values []ASTHandle) (bool, error) {
-	if uint64(len(values)) != uint64(n) {
+func (m *ASTManager) sameQuantifierList(p arena.SmallBytesRef, n uint32, values astAppArguments) (bool, error) {
+	if values.size() != uint64(n) {
 		return false, nil
 	}
-	for i, h := range values {
+	for i := uint32(0); i < uint32(values.size()); i++ {
+		h, e := values.at(i)
+		if e != nil {
+			return false, e
+		}
 		r, e := m.readInternal(p, uint32(i))
 		if e != nil {
 			return false, e
@@ -58,11 +62,15 @@ func (m *ASTManager) copyQuantifierPayload(p arena.SmallBytesRef, count, stride 
 	return out, nil
 }
 
-func (m *ASTManager) checkUpdatePatterns(values []ASTHandle) error {
-	if uint64(len(values)) > math.MaxUint32 {
+func (m *ASTManager) checkUpdatePatterns(values astAppArguments) error {
+	if values.size() > math.MaxUint32 {
 		return arena.ErrBounds
 	}
-	for _, h := range values {
+	for i := uint32(0); i < uint32(values.size()); i++ {
+		h, e := values.at(i)
+		if e != nil {
+			return e
+		}
 		r, e := m.requireExpr(h)
 		if e != nil {
 			return e
@@ -95,6 +103,10 @@ func (m *ASTManager) checkUpdatePatterns(values []ASTHandle) error {
 }
 
 func (m *ASTManager) updateQuantifier(h, body ASTHandle, forall bool, weight int32, patterns, noPatterns []ASTHandle, flags uint8) (ASTHandle, error) {
+	return m.updateQuantifierArguments(h, body, forall, weight, astAppArguments{slice: patterns, count: uint32(len(patterns))}, astAppArguments{slice: noPatterns, count: uint32(len(noPatterns))}, flags)
+}
+
+func (m *ASTManager) updateQuantifierArguments(h, body ASTHandle, forall bool, weight int32, patterns, noPatterns astAppArguments, flags uint8) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}
@@ -139,19 +151,19 @@ func (m *ASTManager) updateQuantifier(h, body ASTHandle, forall bool, weight int
 		next.weight = weight
 	}
 	if flags&astUpdatePatterns != 0 {
-		if uint64(len(patterns)) > math.MaxUint32 {
+		if patterns.size() > math.MaxUint32 {
 			return ASTHandle{}, arena.ErrBounds
 		}
-		next.patternCount = uint32(len(patterns))
+		next.patternCount = uint32(patterns.size())
 		if flags&astUpdateNoPatterns == 0 && next.patternCount != 0 {
 			next.noPatternCount = 0
 		}
 	}
 	if flags&astUpdateNoPatterns != 0 {
-		if uint64(len(noPatterns)) > math.MaxUint32 {
+		if noPatterns.size() > math.MaxUint32 {
 			return ASTHandle{}, arena.ErrBounds
 		}
-		next.noPatternCount = uint32(len(noPatterns))
+		next.noPatternCount = uint32(noPatterns.size())
 	}
 	if next.patternCount != 0 && next.noPatternCount != 0 || astSourceDebug && next.count == 0 {
 		return ASTHandle{}, ErrASTDomain
@@ -166,7 +178,11 @@ func (m *ASTManager) updateQuantifier(h, body ASTHandle, forall bool, weight int
 		}
 	}
 	if flags&astUpdateNoPatterns != 0 {
-		for _, h := range noPatterns {
+		for i := uint32(0); i < noPatterns.count; i++ {
+			h, e := noPatterns.at(i)
+			if e != nil {
+				return ASTHandle{}, e
+			}
 			if _, e = m.requireExpr(h); e != nil {
 				return ASTHandle{}, e
 			}
@@ -193,14 +209,14 @@ func (m *ASTManager) updateQuantifier(h, body ASTHandle, forall bool, weight int
 	}
 	if e == nil {
 		if flags&astUpdatePatterns != 0 {
-			v.patterns, e = m.newASTPayload(patterns)
+			v.patterns, e = m.newASTPayloadArguments(patterns)
 		} else {
 			v.patterns, e = m.copyQuantifierPayload(old.patterns, old.patternCount, astRefBytes)
 		}
 	}
 	if e == nil {
 		if flags&astUpdateNoPatterns != 0 {
-			v.noPatterns, e = m.newASTPayload(noPatterns)
+			v.noPatterns, e = m.newASTPayloadArguments(noPatterns)
 		} else {
 			v.noPatterns, e = m.copyQuantifierPayload(old.noPatterns, next.noPatternCount, astRefBytes)
 		}

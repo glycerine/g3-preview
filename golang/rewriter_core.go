@@ -107,23 +107,31 @@ func newRewriterCore(m *ASTManager, proofGen bool) (*rewriterCore, error) {
 	if e := m.budget.Reserve(bytes); e != nil {
 		return nil, e
 	}
-	c := &rewriterCore{manager: m, proofGen: proofGen, cancelCheck: true, header: bytes}
+	c := &rewriterCore{header: bytes}
+	e := c.init(m, proofGen)
+	return c, e
+}
+
+// Embedded derived objects charge their full header once, then construct this
+// base in place with header=0. Standalone construction retains its own charge.
+func (c *rewriterCore) init(m *ASTManager, proofGen bool) error {
+	c.manager, c.proofGen, c.cancelCheck = m, proofGen, true
 	c.self = c
 	var e error
 	// Both owning result-vector members are constructed, even without proofs.
 	c.results, e = m.NewRefVector()
 	if e != nil {
-		return c, e
+		return e
 	}
 	c.proofResults, e = m.NewRefVector()
 	if e != nil {
-		return c, e
+		return e
 	}
 	if e = c.initCacheStack(); e != nil {
-		return c, e
+		return e
 	}
 	c.ready = true
-	return c, nil
+	return nil
 }
 func (c *rewriterCore) open() error {
 	if c == nil || c.self != c || c.closed {

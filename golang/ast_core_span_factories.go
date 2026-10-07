@@ -6,19 +6,23 @@ package g3
 // This concrete call-local argument reader selects actual borrowed storage.
 // It never clones a pointer array or grants ownership of its elements.
 type astAppArguments struct {
-	slice       []ASTHandle
-	format      *astFormatRefVector
-	formatOwner *ASTManager
-	vector      astRefVectorState
-	refVector   bool
-	span        ASTLiteralVectorSpan
-	count       uint32
-	raw         bool
+	slice        []ASTHandle
+	format       *astFormatRefVector
+	formatOwner  *ASTManager
+	vector       astRefVectorState
+	vectorOffset uint32
+	refVector    bool
+	span         ASTLiteralVectorSpan
+	count        uint32
+	raw          bool
 }
 
 func (a astAppArguments) at(i uint32) (ASTHandle, error) {
 	if a.refVector {
-		r, e := a.formatOwner.vectorValue(a.vector, i)
+		if i > ^uint32(0)-a.vectorOffset {
+			return ASTHandle{}, ErrASTDomain
+		}
+		r, e := a.formatOwner.vectorValue(a.vector, a.vectorOffset+i)
 		return a.formatOwner.external(r), e
 	}
 	if a.format != nil {
@@ -32,6 +36,13 @@ func (a astAppArguments) at(i uint32) (ASTHandle, error) {
 		return a.span.At(i)
 	}
 	return a.slice[i], nil
+}
+
+func (a astAppArguments) size() uint64 {
+	if a.refVector || a.raw || a.format != nil {
+		return uint64(a.count)
+	}
+	return uint64(len(a.slice))
 }
 func (m *ASTManager) MkOrSpan(n uint32, span ASTLiteralVectorSpan) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
