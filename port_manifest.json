@@ -9016,12 +9016,13 @@
       "path": "src/ast/array_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_array_plugin.go",
         "pkg/ast/ast_array_plugin_source_test.go",
         "pkg/ast/ast_array_cardinality.go",
-        "pkg/ast/ast_array_cardinality_callback_source_test.go"
+        "pkg/ast/ast_array_cardinality_callback_source_test.go",
+        "pkg/ast/ast_array_decl.go"
       ],
       "tests": [
         "TestASTArraySourceConstructorAndInfiniteSortParameters",
@@ -9032,7 +9033,11 @@
         "TestASTArrayFiniteEveryReturnExpressionReservation",
         "TestASTArrayFiniteRealCallbackOwnerGuard",
         "TestASTArrayFiniteEveryRuntimeCountFailureTransport",
-        "TestASTArrayFiniteEveryActualBodyBudgetReservation"
+        "TestASTArrayFiniteEveryActualBodyBudgetReservation",
+        "TestASTArrayOriginalSelectStoreConstDeclarationsAndApplications",
+        "TestASTArrayDeclarationRejectsInvalidAritiesAndSorts",
+        "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
+        "TestASTArrayDeclarationLexicalSpillRefusalAndReuse"
       ],
       "assertions": [
         {
@@ -9085,22 +9090,42 @@
             "TestASTArrayFiniteEveryRuntimeCountFailureTransport",
             "TestASTArrayFiniteEveryActualBodyBudgetReservation"
           ]
+        },
+        {
+          "name": "array operation enum, mk_select/mk_store/mk_const and selected mk_func_decl switch cases",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_decl.go",
+          "tests": [
+            "TestASTArrayOriginalSelectStoreConstDeclarationsAndApplications",
+            "TestASTArrayDeclarationRejectsInvalidAritiesAndSorts",
+            "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
+            "TestASTArrayDeclarationLexicalSpillRefusalAndReuse"
+          ]
         }
       ],
       "ownership": [
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
+        "Select/store build source inline16/doubling normalized domain buffers and release them after declaration factory dispatch. Const declarations retain the private array-sort parameter through the actual copied info owner, retiring the lexical parameter afterward. Existing AST declaration/application factories retain node/domain references and canonical identity."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities, value creation, array rewriter/evaluator rules, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
       ]
     },
     {
       "path": "src/ast/array_decl_plugin.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_array_decl.go"
+      ],
+      "tests": [
+        "TestASTArrayOriginalSelectStoreConstDeclarationsAndApplications",
+        "TestASTArrayDeclarationRejectsInvalidAritiesAndSorts",
+        "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
+        "TestASTArrayDeclarationLexicalSpillRefusalAndReuse"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -9113,9 +9138,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "array operation enum, mk_select/mk_store/mk_const and selected mk_func_decl switch cases",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_decl.go",
+          "tests": [
+            "TestASTArrayOriginalSelectStoreConstDeclarationsAndApplications",
+            "TestASTArrayDeclarationRejectsInvalidAritiesAndSorts",
+            "TestASTArrayDeclarationsNormalizeCompatibleArithmeticDomains",
+            "TestASTArrayDeclarationLexicalSpillRefusalAndReuse"
+          ]
+        }
+      ],
+      "ownership": [
+        "Select/store build source inline16/doubling normalized domain buffers and release them after declaration factory dispatch. Const declarations retain the private array-sort parameter through the actual copied info owner, retiring the lexical parameter afterward. Existing AST declaration/application factories retain node/domain references and canonical identity."
+      ],
+      "deviations": [
+        "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities, value creation, array rewriter/evaluator rules, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open."
+      ]
     },
     {
       "path": "src/ast/ast.cpp",

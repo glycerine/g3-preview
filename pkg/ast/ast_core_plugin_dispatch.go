@@ -162,6 +162,8 @@ func (m *ASTManager) mkFamilyApp(fid FamilyID, k int32, ps []ASTParameter, args 
 	var e error
 	if fid == 0 {
 		decl, e = m.basicDecl(k, ps, domain)
+	} else if m.pluginAt(fid).kind == astArrayPlugin {
+		decl, e = m.arrayDecl(k, ps, domain, ASTHandle{})
 	} else if m.pluginAt(fid).kind == astFormatPlugin {
 		decl, e = m.formatDecl(k, ps, domain)
 	} else {
@@ -181,7 +183,7 @@ func (m *ASTManager) MkFamilyApp(fid FamilyID, k int32, ps []ASTParameter, args 
 	return m.external(r), e
 }
 
-// All five eager source plugins ignore the optional range in this overload.
+// The eager base plugins ignore optional range; array const declarations use it.
 func (m *ASTManager) MkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, domain []ASTHandle, rangeSort ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
@@ -197,6 +199,8 @@ func (m *ASTManager) MkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 	var e error
 	if fid == 0 {
 		r, e = m.basicDecl(k, ps, domain)
+	} else if m.pluginAt(fid).kind == astArrayPlugin {
+		r, e = m.arrayDecl(k, ps, domain, rangeSort)
 	} else if m.pluginAt(fid).kind == astFormatPlugin {
 		r, e = m.formatDecl(k, ps, domain)
 	} else {
