@@ -21779,9 +21779,16 @@
       "path": "src/ast/rewriter/rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "rewriter_core.go"
+      ],
+      "tests": [
+        "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
+        "TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields",
+        "TestRewriterCoreProofCompactionResetAndCleanupSourceAsymmetry",
+        "TestRewriterCoreNativeAndDebugAssertionBoundaries"
+      ],
       "conditionals": [
         {
           "line": 46,
@@ -21900,17 +21907,40 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "rewriter_core constructors/destructor; scoped cache ownership and lookup; reset/free_memory/cleanup; direct-child detection; proof compaction",
+          "status": "ported",
+          "go_target": "rewriter_core.go",
+          "tests": [
+            "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
+            "TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields",
+            "TestRewriterCoreProofCompactionResetAndCleanupSourceAsymmetry",
+            "TestRewriterCoreNativeAndDebugAssertionBoundaries"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual activity-cache owners are kept in original growing pointer stacks and reused by scope level. Frames/scopes borrow scalar AST handles; result/proof vectors own their AST references. Cache deletion precedes reverse member destruction. Reached cold constructors/pointer append failures retain an explicitly closable owner/pending cache. Reset clears only base caches; higher retained cache contents remain. Cleanup leaves the proof result stack intact exactly as source. Full failure/ownership auditing remains deferred."
+      ],
+      "deviations": [
+        "Only the original rewriter_core infrastructure is translated. Packed scalar fields preserve source unsigned bitfield truncation. Original native/debug assertions, cache reuse, cost-independent scopes and Reset/Cleanup asymmetries are preserved; Go guards avoid source invalid-pointer/empty-scope undefined domains. Trace display, var_shifter_core, forward/inverse variable shifters and concrete rewriting traversal/configuration remain unported. No recursive rewriter/evaluator or public API completion is credited."
+      ]
     },
     {
       "path": "src/ast/rewriter/rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "rewriter_core.go"
+      ],
+      "tests": [
+        "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
+        "TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields",
+        "TestRewriterCoreProofCompactionResetAndCleanupSourceAsymmetry",
+        "TestRewriterCoreNativeAndDebugAssertionBoundaries"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -21949,9 +21979,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "rewriter_core constructors/destructor; scoped cache ownership and lookup; reset/free_memory/cleanup; direct-child detection; proof compaction",
+          "status": "ported",
+          "go_target": "rewriter_core.go",
+          "tests": [
+            "TestRewriterCoreOriginalScopedCachesAndRootRestoration",
+            "TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields",
+            "TestRewriterCoreProofCompactionResetAndCleanupSourceAsymmetry",
+            "TestRewriterCoreNativeAndDebugAssertionBoundaries"
+          ]
+        },
+        {
+          "name": "concrete packed frame/state/depth/index; must_cache; push_frame; child flags; set_cancel_check",
+          "status": "ported",
+          "go_target": "rewriter_core.go",
+          "tests": [
+            "TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields",
+            "TestRewriterCoreNativeAndDebugAssertionBoundaries",
+            "TestRewriterCoreOriginalScopedCachesAndRootRestoration"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual activity-cache owners are kept in original growing pointer stacks and reused by scope level. Frames/scopes borrow scalar AST handles; result/proof vectors own their AST references. Cache deletion precedes reverse member destruction. Reached cold constructors/pointer append failures retain an explicitly closable owner/pending cache. Reset clears only base caches; higher retained cache contents remain. Cleanup leaves the proof result stack intact exactly as source. Full failure/ownership auditing remains deferred."
+      ],
+      "deviations": [
+        "Only the original rewriter_core infrastructure is translated. Packed scalar fields preserve source unsigned bitfield truncation. Original native/debug assertions, cache reuse, cost-independent scopes and Reset/Cleanup asymmetries are preserved; Go guards avoid source invalid-pointer/empty-scope undefined domains. Trace display, var_shifter_core, forward/inverse variable shifters and concrete rewriting traversal/configuration remain unported. No recursive rewriter/evaluator or public API completion is credited."
+      ]
     },
     {
       "path": "src/ast/rewriter/rewriter.txt",
