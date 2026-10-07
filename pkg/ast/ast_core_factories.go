@@ -3,6 +3,7 @@
 package ast
 
 import (
+	"errors"
 	"math"
 	"reflect"
 
@@ -178,14 +179,13 @@ func (m *ASTManager) mkAppCore(decl astNodeRef, args []ASTHandle) (astNodeRef, e
 	}
 	return m.mkAppCoreArguments(decl, AppArguments{slice: args, count: uint32(len(args))})
 }
-func (m *ASTManager) mkAppCoreArguments(decl astNodeRef, args AppArguments) (astNodeRef, error) {
+func (m *ASTManager) mkAppCoreArguments(decl astNodeRef, args AppArguments) (result astNodeRef, err error) {
 	frame, prepareError := m.prepareTraceAcquisition(args.count)
 	if prepareError != nil {
 		return astNodeRef{}, prepareError
 	}
 	defer func() { m.finishTraceAcquisition(frame) }()
-	// Source allocates app storage before check_args/coercion. The arithmetic
-	// plugin is an explicit dependency; no fabricated int/real cast is emitted.
+	// Source allocates app storage before coercion and check_args.
 	r, e := m.allocateNode(ASTApp)
 	if e != nil {
 		return r, e
@@ -199,6 +199,23 @@ func (m *ASTManager) mkAppCoreArguments(decl astNodeRef, args AppArguments) (ast
 		return astNodeRef{}, e
 	}
 	d := m.declAt(decl.slot)
+	needed, e := m.appCoercionNeeded(decl, args, flags.LeftAssociative && flags.RightAssociative)
+	if e != nil {
+		m.freeNodeStorage(r)
+		return astNodeRef{}, e
+	}
+	if needed {
+		if m.appCoercion.active {
+			m.freeNodeStorage(r)
+			return astNodeRef{}, ErrASTPending
+		}
+		defer func() { err = errors.Join(err, m.cleanupAppCoercion(false)) }()
+		args, e = m.coerceAppArguments(decl, args, flags.LeftAssociative && flags.RightAssociative)
+		if e != nil {
+			m.freeNodeStorage(r)
+			return astNodeRef{}, e
+		}
+	}
 	for i := uint32(0); i < args.count; i++ {
 		h, e := args.at(i)
 		if e != nil {

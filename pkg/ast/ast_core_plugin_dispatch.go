@@ -15,6 +15,16 @@ func (m *ASTManager) mkFamilyApp(fid FamilyID, k int32, ps []ASTParameter, args 
 	if uint64(len(args)) > math.MaxUint32 {
 		return astNodeRef{}, arena.ErrBounds
 	}
+	if m.pluginAt(fid).kind == astArithmeticPlugin {
+		previous := m.formatExecuting
+		m.formatExecuting = true
+		defer func() { m.formatExecuting = previous }()
+		d, e := m.arithmeticExprDecl(k, ps, args)
+		if e != nil || d.slot == 0 {
+			return astNodeRef{}, e
+		}
+		return m.mkApp(d, args)
+	}
 	// The basic expr overload bypasses decl_plugin's domain buffer for these
 	// branches. This matters for overflow-reservation actions on large arities.
 	if fid == 0 {
@@ -197,7 +207,12 @@ func (m *ASTManager) MkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 	}
 	var r astNodeRef
 	var e error
-	if fid == 0 {
+	if m.pluginAt(fid).kind == astArithmeticPlugin {
+		previous := m.formatExecuting
+		m.formatExecuting = true
+		defer func() { m.formatExecuting = previous }()
+		r, e = m.arithmeticDecl(k, ps, domain)
+	} else if fid == 0 {
 		r, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		r, e = m.arrayDecl(k, ps, domain, rangeSort)

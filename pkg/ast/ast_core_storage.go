@@ -308,6 +308,7 @@ type ASTManager struct {
 	formatPluginFailed                             *astFormatPluginOwner
 	formatLexical                                  astFormatLexical
 	formatExecuting                                bool
+	appCoercion                                    astAppCoercionFrame
 	formatFrames                                   *astFormatFlatFrame
 	formatFrameSerial                              uint64
 	ppFrames                                       *astFormatPPFrame

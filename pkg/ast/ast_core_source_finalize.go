@@ -37,6 +37,9 @@ func (m *ASTManager) SourceFinalize() error {
 // drains exact remaining global parameter/info allocations and the Go header;
 // it never replays the source destructor or its EOF action.
 func (m *ASTManager) closeSourceOwnedStorageCore() error {
+	if e := m.cleanupAppCoercion(true); e != nil {
+		return e
+	}
 	if e := m.llFrameDestroy(true); e != nil {
 		return e
 	}

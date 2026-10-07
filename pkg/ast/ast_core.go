@@ -232,6 +232,9 @@ func (m *ASTManager) Close() error {
 	return e
 }
 func (m *ASTManager) closeCore(source bool) error {
+	if e := m.cleanupAppCoercion(!source); e != nil {
+		return e
+	}
 	if !source {
 		if e := m.cleanupArrayCardinality(); e != nil {
 			return e

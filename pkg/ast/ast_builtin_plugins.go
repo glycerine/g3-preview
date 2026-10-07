@@ -16,8 +16,8 @@ func (m *ASTManager) pluginDecl(name util.Symbol, fid FamilyID, k int32, ps []AS
 	return m.mkFuncDecl(name, domain, m.external(result), ASTFuncDeclInfo{m.origin, s, g})
 }
 func (m *ASTManager) builtinDecl(fid FamilyID, k int32, ps []ASTParameter, domain []ASTHandle) (astNodeRef, error) {
-	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin && k == 0 {
-		return m.arithmeticNumeralDecl(ps, len(domain))
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin {
+		return m.arithmeticDecl(k, ps, domain)
 	}
 	switch fid {
 	case 1:
