@@ -193,9 +193,8 @@ func (m *ASTManager) bitVectorDecl(k int32, ps []ASTParameter, domain []ASTHandl
 	case 60:
 		return p.fields[3], nil
 	}
-	// The Boolean-bit constructor requires its own source factory.
 	if k == 56 {
-		return astNodeRef{}, ErrASTDomain
+		return m.bitVectorMKBV(domain)
 	}
 	fail := func(message string) (astNodeRef, error) {
 		return astNodeRef{}, ASTException{util.NewDefaultException(message)}
@@ -286,31 +285,41 @@ func (p *astBitVectorPluginOwner) finalizeFixedPending(own bool) error {
 	}
 	v := &p.fixed[p.fixedPendingKind]
 	i := p.fixedPendingWidth
+	if p.fixedPendingKind == 55 {
+		v = &p.bit2bool[p.fixedPendingWidth]
+		i = p.fixedPendingIndex
+	}
 	v.words[2+i*2], v.words[3+i*2] = 0, 0
 	p.fixedPending = astNodeRef{}
 	return nil
 }
 func (p *astBitVectorPluginOwner) finalizeFixed() error {
 	for _, k := range astBVFixedOrder {
-		v := &p.fixed[k]
-		for i := uint32(0); i < v.size(); i++ {
-			r, e := v.at(i)
-			if e != nil {
-				return e
+		if e := p.finalizeBitVectorCache(&p.fixed[k]); e != nil {
+			return e
+		}
+	}
+	return p.finalizeBooleanBits()
+}
+
+func (p *astBitVectorPluginOwner) finalizeBitVectorCache(v *astFormatRefVector) error {
+	for i := uint32(0); i < v.size(); i++ {
+		r, e := v.at(i)
+		if e != nil {
+			return e
+		}
+		if r.slot == 0 {
+			continue
+		}
+		consumed, e := p.owner.decNode(r)
+		if consumed {
+			v.words[2+i*2], v.words[3+i*2] = 0, 0
+		}
+		if e != nil {
+			if p.destructorCause == nil {
+				p.destructorCause = e
 			}
-			if r.slot == 0 {
-				continue
-			}
-			consumed, e := p.owner.decNode(r)
-			if consumed {
-				v.words[2+i*2], v.words[3+i*2] = 0, 0
-			}
-			if e != nil {
-				if p.destructorCause == nil {
-					p.destructorCause = e
-				}
-				return e
-			}
+			return e
 		}
 	}
 	return nil

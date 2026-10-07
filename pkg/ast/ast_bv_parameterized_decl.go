@@ -66,6 +66,8 @@ func (m *ASTManager) bitVectorParameterizedDecl(k int32, ps []ASTParameter, doma
 	var e error
 	kept := ps
 	switch k {
+	case 55:
+		return m.bitVectorBit2Bool(uint32(width), ps, domain)
 	case 57, 58:
 		return p.conversionDecl(k, uint32(width), ps, domain)
 	case 37:

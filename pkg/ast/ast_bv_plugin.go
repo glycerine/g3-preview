@@ -27,6 +27,9 @@ type astBitVectorPluginOwner struct {
 	fixedPending                           astNodeRef
 	fixedPendingKind                       int32
 	fixedPendingWidth                      uint32
+	fixedPendingIndex                      uint32
+	bit2bool                               []astFormatRefVector
+	bit2boolSize                           uint32
 	sorts                                  astFormatRefVector
 	family                                 FamilyID
 	header                                 uint64
@@ -38,10 +41,10 @@ type astBitVectorPluginOwner struct {
 func (m *ASTManager) bitVectorPluginBytes() uint64 {
 	var n uint64
 	if p := m.bitVectorPlugin; p != nil {
-		n += p.header + p.fixedBytes() + p.sorts.bytes() + p.numeralBytes() + p.literalBytes() + uint64(len(p.sortAcquired))
+		n += p.header + p.booleanBitsBytes() + p.fixedBytes() + p.sorts.bytes() + p.numeralBytes() + p.literalBytes() + uint64(len(p.sortAcquired))
 	}
 	for p := m.bitVectorPluginFailed; p != nil; p = p.next {
-		n += p.header + p.fixedBytes() + p.sorts.bytes() + p.numeralBytes() + p.literalBytes() + uint64(len(p.sortAcquired))
+		n += p.header + p.booleanBitsBytes() + p.fixedBytes() + p.sorts.bytes() + p.numeralBytes() + p.literalBytes() + uint64(len(p.sortAcquired))
 	}
 	return n
 }
@@ -50,6 +53,7 @@ func (m *ASTManager) releaseBitVectorPluginHeaders() {
 		if !p.powerActive {
 			p.releaseLiteralFrames()
 			p.releaseNumeralFrames()
+			p.releaseBooleanBits()
 			p.releaseFixed()
 			p.sorts.close(m.BudgetField)
 			m.BudgetField.Release(uint64(len(p.sortAcquired)))
@@ -66,6 +70,7 @@ func (m *ASTManager) releaseBitVectorPluginHeaders() {
 		next := p.next
 		p.releaseLiteralFrames()
 		p.releaseNumeralFrames()
+		p.releaseBooleanBits()
 		p.releaseFixed()
 		p.sorts.close(m.BudgetField)
 		m.BudgetField.Release(uint64(len(p.sortAcquired)))
