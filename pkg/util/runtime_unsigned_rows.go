@@ -188,6 +188,9 @@ func (o *RuntimeUnsignedRows) AppendColumn(src *RuntimeUintColumn) error {
 	if e := o.open(); e != nil {
 		return e
 	}
+	if src == nil || src.Raw.Runtime != o.runtime {
+		return ErrRuntimeVectorOwner
+	}
 	n, e := o.RowCount()
 	if e != nil {
 		return e
@@ -207,7 +210,7 @@ func (o *RuntimeUnsignedRows) AppendColumn(src *RuntimeUintColumn) error {
 	o.appendActive, o.appendIndex = true, n
 	dst := &o.rows[n]
 	dst.Bind(o.runtime)
-	if e = copyCliqueColumn(&dst.Raw, &src.Raw, 4); e != nil {
+	if e = CopyRuntimeVectorColumn(&dst.Raw, &src.Raw, 4); e != nil {
 		return e
 	}
 	if e = unsignedRowWrite(o.runtime, o.raw, n, dst.Raw.Block); e != nil {

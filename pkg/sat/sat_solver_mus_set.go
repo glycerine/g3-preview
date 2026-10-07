@@ -161,43 +161,7 @@ func (s *satMUSLiteralSet) assign(other *satMUSLiteralSet) error {
 // A failed copy constructor has no source destructor. Pending allocation stays
 // a named member root for separate owning cleanup, without repairing headers.
 func satMUSCopyColumn(dst, src *RuntimeVectorColumn, stride uint32) error {
-	if src.Block == (util.Block{}) {
-		dst.Block = util.Block{}
-		return nil
-	}
-	n, e := src.Size()
-	if e != nil {
-		return e
-	}
-	c, e := src.Capacity()
-	if e != nil {
-		return e
-	}
-	h, e := src.Runtime.Allocate(satMUSCopyRequestFor(c, stride, src.Runtime.SizeTBits()))
-	dst.Pending = h
-	if e != nil {
-		return e
-	}
-	if e = WriteRuntimeWord(src.Runtime, h, 0, c); e != nil {
-		return e
-	}
-	if e = WriteRuntimeWord(src.Runtime, h, 4, n); e != nil {
-		return e
-	}
-	dst.Block = h
-	dst.Pending = util.Block{}
-	for i := uint32(0); i < n; i++ {
-		for k := uint32(0); k < stride; k++ {
-			b, e := src.Runtime.Read(src.Block, 8+uint64(i)*uint64(stride)+uint64(k))
-			if e != nil {
-				return e
-			}
-			if e = dst.Runtime.Write(h, 8+uint64(i)*uint64(stride)+uint64(k), b); e != nil {
-				return e
-			}
-		}
-	}
-	return nil
+	return util.CopyRuntimeVectorColumn(dst, src, stride)
 }
 
 func satMUSCopyRequest(capacity, stride uint32) uint64 { return uint64(capacity)*uint64(stride) + 8 }

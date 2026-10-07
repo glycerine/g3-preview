@@ -49,6 +49,8 @@ func (o *RuntimeUnsignedRows) ReserveEmptyRows(n uint32) error {
 	return nil
 }
 
+// Row borrows an element for reading; callers must not independently grow or
+// finalize it, because the outer owner publishes and destroys its pointer.
 // Concrete outer-element reference: validate scalar provenance without an
 // eager inner size read. The consumer reads inner headers at its source site.
 func (o *RuntimeUnsignedRows) Row(i uint32) (*RuntimeUintColumn, error) {

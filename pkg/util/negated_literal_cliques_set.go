@@ -122,5 +122,5 @@ func (s *cliqueUintSet) assign(other *cliqueUintSet) error {
 	}
 	s.words = RuntimeUintColumn{}
 	s.words.Bind(r)
-	return copyCliqueColumn(&s.words.Raw, &other.words.Raw, 4)
+	return CopyRuntimeVectorColumn(&s.words.Raw, &other.words.Raw, 4)
 }

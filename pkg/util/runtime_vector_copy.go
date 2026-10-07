@@ -1,7 +1,9 @@
 // Source: src/util/vector.h:191-216.
 package util
 
-func copyCliqueColumn(dst, src *RuntimeVectorColumn, stride uint32) error {
+// CopyRuntimeVectorColumn implements the source vector copy constructor.
+// Callers bind dst to the same Runtime as src and retain failed-copy roots.
+func CopyRuntimeVectorColumn(dst, src *RuntimeVectorColumn, stride uint32) error {
 	if src.Block == (Block{}) {
 		dst.Block = Block{}
 		return nil

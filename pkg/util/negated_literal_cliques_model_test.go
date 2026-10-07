@@ -87,3 +87,90 @@ func TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs(t *testing.T)
 		})
 	}
 }
+
+// The oracle enumerates satisfying assignments, independently of graph walks.
+// Selected goals cover opposite signs and an implication through a non-goal.
+func TestNegatedLiteralCliquesMixedPolarityAndTransitiveBooleanOracle(t *testing.T) {
+	edges := [][2]uint32{{1, 2}, {3, 5}}
+	for _, goal := range [][]uint32{{0, 4}, {0, 3}, {0, 3, 4}, {1, 2, 5}} {
+		t.Run(fmt.Sprint(goal), func(t *testing.T) {
+			m, b := memoryRuntimeFixture(t, false, 64)
+			g, e := NewNegatedLiteralCliques(m, b)
+			memoryRuntimeRequire(t, e)
+			t.Cleanup(func() { memoryRuntimeRequire(t, g.Close()) })
+			for _, edge := range edges {
+				memoryRuntimeRequire(t, g.AddEdge(edge[0], edge[1]))
+			}
+			ps := cliqueTestInput(t, m)
+			for _, v := range goal {
+				memoryRuntimeRequire(t, ps.Push(v))
+			}
+			out, e := NewRuntimeUnsignedRows(m, b)
+			memoryRuntimeRequire(t, e)
+			t.Cleanup(func() { memoryRuntimeRequire(t, out.CloseChecked()) })
+			truth := func(assignment, l uint32) bool { return (assignment&(1<<(l>>1)) != 0) != (l&1 != 0) }
+			mutex := func(a, b uint32) bool {
+				for assignment := uint32(0); assignment < 8; assignment++ {
+					valid := true
+					for _, edge := range edges {
+						if !truth(assignment, edge[0]) && !truth(assignment, edge[1]) {
+							valid = false
+						}
+					}
+					if valid && truth(assignment, a) && truth(assignment, b) {
+						return false
+					}
+				}
+				return true
+			}
+			remaining := append([]uint32{}, goal...)
+			var expected [][]uint32
+			for len(remaining) > 0 {
+				candidate := append([]uint32{}, remaining...)
+				var row []uint32
+				for len(candidate) > 0 {
+					v := candidate[0]
+					row = append(row, v)
+					next := remaining[:0]
+					for _, x := range remaining {
+						if x != v {
+							next = append(next, x)
+						}
+					}
+					remaining = next
+					nextCandidates := candidate[:0]
+					for _, x := range candidate[1:] {
+						if mutex(v, x) {
+							nextCandidates = append(nextCandidates, x)
+						}
+					}
+					candidate = nextCandidates
+				}
+				if len(row) > 1 {
+					expected = append(expected, row)
+				}
+			}
+			memoryRuntimeRequire(t, g.Cliques(ps, out))
+			cliqueTestAudit(t, m, g, ps, out)
+			n, e := out.RowCount()
+			memoryRuntimeRequire(t, e)
+			if int(n) != len(expected) {
+				t.Fatal(n, expected)
+			}
+			for i, want := range expected {
+				got, e := cliqueTestCapture(out, uint32(i))
+				memoryRuntimeRequire(t, e)
+				if int(got.count) != len(want) {
+					t.Fatal(got.count, want)
+				}
+				for j, v := range want {
+					x, e := got.read(uint32(j))
+					memoryRuntimeRequire(t, e)
+					if x != v {
+						t.Fatal(x, v)
+					}
+				}
+			}
+		})
+	}
+}

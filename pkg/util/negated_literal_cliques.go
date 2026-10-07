@@ -223,6 +223,12 @@ func (g *NegatedLiteralCliques) Cliques(ps *RuntimeUintColumn, out *RuntimeUnsig
 	if err = g.open(); err != nil {
 		return err
 	}
+	if ps == nil || ps.Raw.Runtime != g.runtime {
+		return ErrRuntimeVectorOwner
+	}
+	if err = out.CheckRuntime(g.runtime); err != nil {
+		return err
+	}
 	num, e := ps.Size()
 	if e != nil {
 		return e
