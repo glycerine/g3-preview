@@ -8,9 +8,14 @@ import "errors"
 var errBoolRewriterLocalContext = errors.New("Boolean rewriter: local-context simplification remains unported")
 
 // Original Boolean rewriter's AND/OR core fragment. This inline helper borrows
-// its AST manager. Full parameter construction, local-context simplification,
-// other operators and the recursive rewriter engine remain dependencies.
+// its AST manager. Local-context simplification and the recursive rewriter
+// engine remain dependencies.
 type boolRewriter struct {
+	self                                *boolRewriter
+	params                              smtModuleParamsOwner
+	header                              uint64
+	ready, closed                       bool
+	elimAnd                             bool
 	blastDistinct                       bool
 	blastDistinctThreshold              uint32
 	manager                             *ASTManager

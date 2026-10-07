@@ -428,16 +428,8 @@ func (rw *boolRewriter) mkNot(a ASTHandle, out ASTRef) error {
 	}
 	return rw.manager.SetRef(out, h)
 }
-// Current AND forwarding covers the source elim_and=false branches. The
-// parameter constructor and mk_and_as_or elimination branch remain unported.
 func (rw *boolRewriter) mkAnd(args []ASTHandle, out ASTRef) error {
-	var status brStatus
-	var e error
-	if rw.flat {
-		status, e = rw.mkFlatAndCore(args, out)
-	} else {
-		status, e = rw.mkNFlatAndCore(args, out)
-	}
+	status, e := rw.mkAndCore(args, out)
 	if e != nil || status != brFailed {
 		return e
 	}

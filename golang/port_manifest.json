@@ -18851,7 +18851,8 @@
       "go_targets": [
         "bool_rewriter.go",
         "bool_rewriter_eq.go",
-        "bool_rewriter_ite.go"
+        "bool_rewriter_ite.go",
+        "bool_rewriter_config.go"
       ],
       "tests": [
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -18863,7 +18864,12 @@
         "TestBoolRewriterITEEqualityIndependentPartialBranchTruthTables",
         "TestBoolRewriterITEExactBranchesAndIndependentTruthTables",
         "TestBoolRewriterDistinctCardinalityThresholdAndPairOrder",
-        "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape"
+        "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape",
+        "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention",
+        "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables",
+        "TestBoolRewriterAppDispatcherAndFallbackDepths",
+        "TestBoolRewriterConstructorHelperRefusalRetiresReachedHeader",
+        "TestBoolRewriterDispatcherFamilyAssertionAndNativeFallback"
       ],
       "conditionals": [
         {
@@ -18976,12 +18982,37 @@
           ]
         },
         {
-          "name": "mk_ite_core control flow (configurable AND/OR wrapper dependencies outstanding)",
+          "name": "mk_ite_core control flow (local-context OR dependency outstanding)",
           "status": "partial",
           "go_target": "bool_rewriter_ite.go",
           "tests": [
             "TestBoolRewriterITEExactBranchesAndIndependentTruthTables",
             "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape"
+          ]
+        },
+        {
+          "name": "updt_params / get_param_descrs",
+          "status": "ported",
+          "go_target": "bool_rewriter_config.go",
+          "tests": [
+            "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention"
+          ]
+        },
+        {
+          "name": "mk_and_as_or",
+          "status": "partial",
+          "go_target": "bool_rewriter_config.go",
+          "tests": [
+            "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables"
+          ]
+        },
+        {
+          "name": "mk_app_core dispatch (local-context OR dependency outstanding)",
+          "status": "partial",
+          "go_target": "bool_rewriter_config.go",
+          "tests": [
+            "TestBoolRewriterAppDispatcherAndFallbackDepths",
+            "TestBoolRewriterDispatcherFamilyAssertionAndNativeFallback"
           ]
         }
       ],
@@ -18989,7 +19020,7 @@
         "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
       ],
       "deviations": [
-        "Equality, negation, general ITE and distinct core rules now follow source with owning output/temporary references and exact bounded rewrite statuses. Full constructor/parameter updates, dispatch, local-context simplification, mk_and_as_or elimination and the recursive rewriter engine remain unported. ITE/derived-connective credit stays partial through incomplete configurable AND/OR wrappers. No whole rewriter or public evaluator completion is credited."
+        "Original parameter update order, conjunction elimination and operator dispatch are translated. Local-context OR simplification and the recursive rewriter engine remain unported; dependent ITE, derived connectives, conjunction elimination and dispatch remain partial for that configuration. Go guards reject invalid short argument arrays outside the source defined domain. The family assertion is checked only in debug builds, preserving the native unknown-kind fallback. No whole Boolean rewriter, evaluator or public API completion is credited."
       ]
     },
     {
@@ -19000,7 +19031,8 @@
       "go_targets": [
         "bool_rewriter.go",
         "bool_rewriter_eq.go",
-        "bool_rewriter_ite.go"
+        "bool_rewriter_ite.go",
+        "bool_rewriter_config.go"
       ],
       "tests": [
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -19012,7 +19044,12 @@
         "TestBoolRewriterITEEqualityIndependentPartialBranchTruthTables",
         "TestBoolRewriterITEExactBranchesAndIndependentTruthTables",
         "TestBoolRewriterDistinctCardinalityThresholdAndPairOrder",
-        "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape"
+        "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape",
+        "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention",
+        "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables",
+        "TestBoolRewriterAppDispatcherAndFallbackDepths",
+        "TestBoolRewriterConstructorHelperRefusalRetiresReachedHeader",
+        "TestBoolRewriterDispatcherFamilyAssertionAndNativeFallback"
       ],
       "conditionals": [
         {
@@ -19052,11 +19089,12 @@
           ]
         },
         {
-          "name": "mk_and / mk_or default elimination forwarding",
+          "name": "mk_and / mk_or configurable forwarding (local-context OR outstanding)",
           "status": "partial",
           "go_target": "bool_rewriter_eq.go",
           "tests": [
-            "TestBoolRewriterDerivedConnectivesIndependentTruthTables"
+            "TestBoolRewriterDerivedConnectivesIndependentTruthTables",
+            "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables"
           ]
         },
         {
@@ -19068,13 +19106,25 @@
             "TestBoolRewriterDistinctCardinalityThresholdAndPairOrder",
             "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape"
           ]
+        },
+        {
+          "name": "constructor / updt_params / reset_local_ctx_cost / mk_app fallback",
+          "status": "partial",
+          "go_target": "bool_rewriter_config.go",
+          "tests": [
+            "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention",
+            "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables",
+            "TestBoolRewriterAppDispatcherAndFallbackDepths",
+            "TestBoolRewriterConstructorHelperRefusalRetiresReachedHeader",
+            "TestBoolRewriterDispatcherFamilyAssertionAndNativeFallback"
+          ]
         }
       ],
       "ownership": [
         "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
       ],
       "deviations": [
-        "Equality, negation, general ITE and distinct core rules now follow source with owning output/temporary references and exact bounded rewrite statuses. Full constructor/parameter updates, dispatch, local-context simplification, mk_and_as_or elimination and the recursive rewriter engine remain unported. ITE/derived-connective credit stays partial through incomplete configurable AND/OR wrappers. No whole rewriter or public evaluator completion is credited."
+        "Original parameter update order, conjunction elimination and operator dispatch are translated. Local-context OR simplification and the recursive rewriter engine remain unported; dependent ITE, derived connectives, conjunction elimination and dispatch remain partial for that configuration. Go guards reject invalid short argument arrays outside the source defined domain. The family assertion is checked only in debug builds, preserving the native unknown-kind fallback. No whole Boolean rewriter, evaluator or public API completion is credited."
       ]
     },
     {
@@ -19086,14 +19136,20 @@
         "util_gparams.go",
         "util_gparams_catalog.go",
         "util_gparams_catalog_collectors.go",
-        "util_gparams_catalog_dispatch.go"
+        "util_gparams_catalog_dispatch.go",
+        "bool_rewriter_config.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
+        "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription",
+        "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention",
+        "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables",
+        "TestBoolRewriterAppDispatcherAndFallbackDepths",
+        "TestBoolRewriterConstructorHelperRefusalRetiresReachedHeader",
+        "TestBoolRewriterDispatcherFamilyAssertionAndNativeFallback"
       ],
       "conditionals": [
         {
@@ -19119,12 +19175,23 @@
             "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
             "TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription"
           ]
+        },
+        {
+          "name": "captured global/local/default lookup for seven Boolean rewriter parameters",
+          "status": "ported",
+          "go_target": "bool_rewriter_config.go",
+          "tests": [
+            "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention",
+            "TestBoolRewriterConstructorHelperRefusalRetiresReachedHeader"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Static descriptor/catalog evidence is preserved. Generated runtime lookup uses actual retained local parameter references and captured global module references through the existing lexical helper owner; reached constructor failures retain an explicitly closable owner. Broader facade/ownership auditing remains incomplete."
       ],
-      "deviations": []
+      "deviations": [
+        "Original parameter update order, conjunction elimination and operator dispatch are translated. Local-context OR simplification and the recursive rewriter engine remain unported; dependent ITE, derived connectives, conjunction elimination and dispatch remain partial for that configuration. Go guards reject invalid short argument arrays outside the source defined domain. The family assertion is checked only in debug builds, preserving the native unknown-kind fallback. No whole Boolean rewriter, evaluator or public API completion is credited."
+      ]
     },
     {
       "path": "src/ast/rewriter/bool_rewriter_params.pyg",
