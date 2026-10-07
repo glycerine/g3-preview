@@ -13425,7 +13425,8 @@
         "pkg/ast/ast_bv_app_parameter_util.go",
         "pkg/ast/ast_bv_app_parameter_util_test.go",
         "pkg/ast/ast_bv_numeral_identity.go",
-        "pkg/ast/ast_bv_numeral_identity_test.go"
+        "pkg/ast/ast_bv_numeral_identity_test.go",
+        "pkg/ast/ast_bv_operation_identity.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -13446,7 +13447,8 @@
         "TestASTBitVectorOriginalToIntUtility",
         "TestASTBitVectorUtilityEveryColdReservation",
         "TestASTBitVectorUtilityRejectsUnsignedNegativeExtension",
-        "TestASTBitVectorNumeralPredicateOnlyReadsIdentity"
+        "TestASTBitVectorNumeralPredicateOnlyReadsIdentity",
+        "TestASTBitVectorOperationIdentityErasesMetadata"
       ],
       "conditionals": [
         {
@@ -13548,6 +13550,14 @@
           "go_target": "pkg/ast/ast_bv_numeral_identity.go",
           "tests": [
             "TestASTBitVectorNumeralPredicateOnlyReadsIdentity"
+          ]
+        },
+        {
+          "name": "original parameter-free is_concat/is_bv_add/is_bv_mul app/family/kind predicates for structural trailing analysis (src/ast/bv_decl_plugin.h:304,313,315; src/ast/ast.h:1308)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_operation_identity.go",
+          "tests": [
+            "TestASTBitVectorOperationIdentityErasesMetadata"
           ]
         }
       ],
@@ -21642,12 +21652,23 @@
       "role": "production",
       "status": "unported",
       "go_targets": [
-        "pkg/ast/ast_bv_trailing_numeral.go"
+        "pkg/ast/ast_bv_trailing_numeral.go",
+        "pkg/ast/rewriter/bv_trailing.go",
+        "pkg/ast/rewriter/bv_trailing_count.go",
+        "pkg/ast/rewriter/bv_trailing_table.go"
       ],
       "tests": [
         "TestASTBitVectorOriginalNumeralTrailingZeros",
         "TestASTBitVectorTrailingNumeralEveryActualReservation",
-        "TestASTBitVectorTrailingNumeralPublicationScope"
+        "TestASTBitVectorTrailingNumeralPublicationScope",
+        "TestBVTrailingOriginalCountingAlgorithms",
+        "TestBVTrailingIndependentBoundsAndDepthReferences",
+        "TestBVTrailingEmptyCompoundsAndUnreadOperands",
+        "TestBVTrailingEveryColdCountReservation",
+        "TestBVTrailingConstructorBorrowsExtractionOwner",
+        "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+        "TestBVTrailingCacheGrowthAndEqualThresholdReset",
+        "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
       ],
       "assertions": [
         {
@@ -21743,13 +21764,37 @@
             "TestASTBitVectorTrailingNumeralEveryActualReservation",
             "TestASTBitVectorTrailingNumeralPublicationScope"
           ]
+        },
+        {
+          "name": "original complete depth-five count_trailing analyzer: depth-zero fallback, numeral loop, first-coefficient multiplication, addition parity, reverse concatenation bounds and short-circuit reads (src/ast/rewriter/bv_trailing.cpp:87-103,246-336,395-397)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing_count.go",
+          "tests": [
+            "TestBVTrailingOriginalCountingAlgorithms",
+            "TestBVTrailingIndependentBoundsAndDepthReferences",
+            "TestBVTrailingEmptyCompoundsAndUnreadOperands",
+            "TestBVTrailingEveryColdCountReservation"
+          ]
+        },
+        {
+          "name": "original borrowed extraction constructor/destructor, lazy per-depth obj_map key INC before insertion, exact strict reset threshold and ascending cache/key DEC order (src/ast/rewriter/bv_trailing.cpp:24-51,338-389,403-405; src/ast/rewriter/bv_trailing.h:24-44)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing.go",
+          "tests": [
+            "TestBVTrailingConstructorBorrowsExtractionOwner",
+            "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+            "TestBVTrailingCacheGrowthAndEqualThresholdReset",
+            "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
+          ]
         }
       ],
       "ownership": [
-        "AST-owned address-stable numerical frame owns copied e_val and helper-local two. Direct division operates on e_val in place, increments count before the call in counting and after the call in removal, and retires each successful invocation completely before reusing that call site. Failed child contexts are retained for checked owning cleanup. Removal destroys two before nested NUM construction/publication; the copied numeral remains alive until caller exit. Exact nested constructor receipt joins before older DT. Actual cold numerical reservation campaigns retain source counts/output behavior and close shared graphs to zero budget."
+        "AST-owned address-stable numerical frame owns copied e_val and helper-local two. Direct division operates on e_val in place, increments count before the call in counting and after the call in removal, and retires each successful invocation completely before reusing that call site. Failed child contexts are retained for checked owning cleanup. Removal destroys two before nested NUM construction/publication; the copied numeral remains alive until caller exit. Exact nested constructor receipt joins before older DT. Actual cold numerical reservation campaigns retain source counts/output behavior and close shared graphs to zero budget.",
+        "Five lazy depth caches each own one reference per inserted expression. Depth zero performs no cache allocation or INC. Table construction precedes key INC; growth/insertion follows it. A refused insertion retains that exact pending INC for owning closure. Reset visits depths one through five and table buckets in source order, resets only size>=condition or condition zero, and records actual DEC consumption even when child deletion returns an error. Owning Close resumes that cleanup cursor without a second DEC. Successful cache hits read only key/hash/bounds, erasing numeral/child traversal. Fresh cold campaigns close cache/extraction/AST/numeric/symbol owners to zero shared budget."
       ],
       "deviations": [
-        "Only the original numerical branch algorithms are selected, provided as AST cores to use private numeral/reference ownership without reverse imports. The rewriter analyzer, five depth-specific reference-owning caches, structural add/mul/concat removal/count and equality wrappers remain unported. Nonnumeral identity guard erases bookkeeping for the native allocation-free default rational; zero-limit removal erases input/output numerical reads after existing manager boundary checks. Depth and BV assertion preconditions belong to the future full caller. Native stack/pointer/allocator/assertion/exception ABI and whole-unit ownership remain uncredited; actual Runtime fault cleanup is not native-fatal resumability."
+        "Only the original numerical branch algorithms are selected, provided as AST cores to use private numeral/reference ownership without reverse imports. The rewriter analyzer, five depth-specific reference-owning caches, structural add/mul/concat removal/count and equality wrappers remain unported. Nonnumeral identity guard erases bookkeeping for the native allocation-free default rational; zero-limit removal erases input/output numerical reads after existing manager boundary checks. Depth and BV assertion preconditions belong to the future full caller. Native stack/pointer/allocator/assertion/exception ABI and whole-unit ownership remain uncredited; actual Runtime fault cleanup is not native-fatal resumability.",
+        "Complete counting and count-cache algorithms are selected; structural removal and equality reduction remain unported. The typed append-only obj_map specialization resides in rewriter to avoid generics and reverse util/ast imports. Go header and concrete entry-slice backing are charged to the shared budget, with origin/generation handles and explicit ownership/cursors; native inline-wrapper/vtable/key-pointer/free-sentinel layout, Runtime allocation/fatal/exception ABI and whole-unit audit are uncredited. Checked closed/copied/reentrant/stopped owners reject; cleanup after reached failure is owning closure, not a resumable source operation. Shallow structural count guards retain their source width read without inventing an early return."
       ]
     },
     {
@@ -21757,8 +21802,21 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/rewriter/bv_trailing.go",
+        "pkg/ast/rewriter/bv_trailing_count.go",
+        "pkg/ast/rewriter/bv_trailing_table.go"
+      ],
+      "tests": [
+        "TestBVTrailingOriginalCountingAlgorithms",
+        "TestBVTrailingIndependentBoundsAndDepthReferences",
+        "TestBVTrailingEmptyCompoundsAndUnreadOperands",
+        "TestBVTrailingEveryColdCountReservation",
+        "TestBVTrailingConstructorBorrowsExtractionOwner",
+        "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+        "TestBVTrailingCacheGrowthAndEqualThresholdReset",
+        "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -21771,9 +21829,36 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original complete depth-five count_trailing analyzer: depth-zero fallback, numeral loop, first-coefficient multiplication, addition parity, reverse concatenation bounds and short-circuit reads (src/ast/rewriter/bv_trailing.cpp:87-103,246-336,395-397)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing_count.go",
+          "tests": [
+            "TestBVTrailingOriginalCountingAlgorithms",
+            "TestBVTrailingIndependentBoundsAndDepthReferences",
+            "TestBVTrailingEmptyCompoundsAndUnreadOperands",
+            "TestBVTrailingEveryColdCountReservation"
+          ]
+        },
+        {
+          "name": "original borrowed extraction constructor/destructor, lazy per-depth obj_map key INC before insertion, exact strict reset threshold and ascending cache/key DEC order (src/ast/rewriter/bv_trailing.cpp:24-51,338-389,403-405; src/ast/rewriter/bv_trailing.h:24-44)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing.go",
+          "tests": [
+            "TestBVTrailingConstructorBorrowsExtractionOwner",
+            "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+            "TestBVTrailingCacheGrowthAndEqualThresholdReset",
+            "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
+          ]
+        }
+      ],
+      "ownership": [
+        "Five lazy depth caches each own one reference per inserted expression. Depth zero performs no cache allocation or INC. Table construction precedes key INC; growth/insertion follows it. A refused insertion retains that exact pending INC for owning closure. Reset visits depths one through five and table buckets in source order, resets only size>=condition or condition zero, and records actual DEC consumption even when child deletion returns an error. Owning Close resumes that cleanup cursor without a second DEC. Successful cache hits read only key/hash/bounds, erasing numeral/child traversal. Fresh cold campaigns close cache/extraction/AST/numeric/symbol owners to zero shared budget."
+      ],
+      "deviations": [
+        "Complete counting and count-cache algorithms are selected; structural removal and equality reduction remain unported. The typed append-only obj_map specialization resides in rewriter to avoid generics and reverse util/ast imports. Go header and concrete entry-slice backing are charged to the shared budget, with origin/generation handles and explicit ownership/cursors; native inline-wrapper/vtable/key-pointer/free-sentinel layout, Runtime allocation/fatal/exception ABI and whole-unit audit are uncredited. Checked closed/copied/reentrant/stopped owners reject; cleanup after reached failure is owning closure, not a resumable source operation. Shallow structural count guards retain their source width read without inventing an early return."
+      ]
     },
     {
       "path": "src/ast/rewriter/datatype_rewriter.cpp",
@@ -113851,7 +113936,8 @@
         "pkg/util/str_int32_map_runtime_destructor_source_test.go",
         "pkg/util/str_int32_map_runtime.go",
         "pkg/util/str_int32_map_owner_identity_source_test.go",
-        "pkg/model/model_array_tuple_table.go"
+        "pkg/model/model_array_tuple_table.go",
+        "pkg/ast/rewriter/bv_trailing_table.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -114105,7 +114191,12 @@
         "TestStrInt32MapLegacyAccidentalGoCopyCannotOwnSourceActions",
         "TestStrInt32MapZeroGoWrapperCannotOwnCleanup",
         "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
-        "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
+        "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
+        "TestBVTrailingConstructorBorrowsExtractionOwner",
+        "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+        "TestBVTrailingCacheGrowthAndEqualThresholdReset",
+        "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+        "TestBVTrailingEveryColdCountReservation"
       ],
       "conditionals": [
         {
@@ -115050,6 +115141,18 @@
             "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
             "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal"
           ]
+        },
+        {
+          "name": "concrete append-only obj_map<expr,pair<unsigned,unsigned>> source hash/key comparison, linear probing, capacity-eight strict three-quarter pre-insert growth, source-order rehash and table iteration (src/util/obj_hashtable.h:58-105,144-159; src/util/hashtable.h:155-214,219-227,244-256,377-396,494-510)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing_table.go",
+          "tests": [
+            "TestBVTrailingConstructorBorrowsExtractionOwner",
+            "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+            "TestBVTrailingCacheGrowthAndEqualThresholdReset",
+            "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+            "TestBVTrailingEveryColdCountReservation"
+          ]
         }
       ],
       "ownership": [
@@ -115092,7 +115195,8 @@
         "Public Runtime TLS signed-overflow free fixture is source-undefined arithmetic domain; later dangling source pointer DT is a reached Go lifetime guard, not native successful destruction credit. Ordinary postphysical replacement OOM NULL-DT already passed; true regression was blanket bodycause masking reached destructor pointer guard. Native allocator ABI/global and other class specializations remain partial.",
         "Statistics config models HASHTABLE_STATISTICS compiled class profile; mixed statistics/nonstatistics swaps reject before mutation. Concrete field UINT64_MAX arithmetic codec proves unsigned wrap, not a claim that bounded fixture generated that many collisions. Source-defined selected Runtime and legacy statistics and narrow existing ostream profile are implemented; native ABI/global allocator, other pointer-specializations and full arbitrary ostream locale/exception profiles remain partial. No registered char-pointer driver credit. Source has get_num_collision, not a new display_statistics method; dump reuses exact existing insertion chain without changing collision count.",
         "These are Go owner/config guard-domain proofs, not native C++ algorithm failure or source copy-constructor credit. Four real accidental-Go-copy public actions previously returned success, with Close/source DT releasing original owner bytes; they now reject without affecting original backing/state/cause/charges. No new storage or source allocator events.",
-        "Selected Runtime32/64 and legacy char-pointer/int32 engines implement literal source action/publication order and real shared assertion transport; representation geometry is not native ABI. Source source-pointer/runtime provider/borrowed spelling lifetime qualifications remain explicit. Malformed uninitialized value and dangling DT, closed assertion provider, and host ErrorTransport reentry are Go guard-domain proofs rather than ordinary native math REDs. Registered src/test/map.cpp:23-44 exact14 ENSURE credit remains unchanged, independent tests add none. Core dump key_data ostream instantiation lacks a source-defined operator<<; no fabricated value formatting is supplied. Other entry/key/value/native/global/compiler profiles remain partial."
+        "Selected Runtime32/64 and legacy char-pointer/int32 engines implement literal source action/publication order and real shared assertion transport; representation geometry is not native ABI. Source source-pointer/runtime provider/borrowed spelling lifetime qualifications remain explicit. Malformed uninitialized value and dangling DT, closed assertion provider, and host ErrorTransport reentry are Go guard-domain proofs rather than ordinary native math REDs. Registered src/test/map.cpp:23-44 exact14 ENSURE credit remains unchanged, independent tests add none. Core dump key_data ostream instantiation lacks a source-defined operator<<; no fabricated value formatting is supplied. Other entry/key/value/native/global/compiler profiles remain partial.",
+        "BV trailing count-cache specialization uses concrete Go entry storage and checked AST identity handles without generics, at its rewriter consumer to avoid import cycles. It preserves selected append-only probing/growth/iteration algorithms and key reference ownership; generic map APIs, native object-pointer/sentinel/entry layout and Runtime allocator/exception/fatal ABI remain uncredited."
       ]
     },
     {
@@ -135947,7 +136051,8 @@
       "go_targets": [
         "pkg/ast/ast_sparse_mark.go",
         "pkg/ast/ast_expr_substitution_table.go",
-        "pkg/ast/ast_expr_substitution_ops.go"
+        "pkg/ast/ast_expr_substitution_ops.go",
+        "pkg/ast/rewriter/bv_trailing_table.go"
       ],
       "tests": [
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
@@ -136001,7 +136106,12 @@
         "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
         "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
         "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths",
+        "TestBVTrailingConstructorBorrowsExtractionOwner",
+        "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+        "TestBVTrailingCacheGrowthAndEqualThresholdReset",
+        "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+        "TestBVTrailingEveryColdCountReservation"
       ],
       "conditionals": [
         {
@@ -136105,6 +136215,18 @@
             "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
             "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
           ]
+        },
+        {
+          "name": "concrete append-only obj_map<expr,pair<unsigned,unsigned>> source hash/key comparison, linear probing, capacity-eight strict three-quarter pre-insert growth, source-order rehash and table iteration (src/util/obj_hashtable.h:58-105,144-159; src/util/hashtable.h:155-214,219-227,244-256,377-396,494-510)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing_table.go",
+          "tests": [
+            "TestBVTrailingConstructorBorrowsExtractionOwner",
+            "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
+            "TestBVTrailingCacheGrowthAndEqualThresholdReset",
+            "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+            "TestBVTrailingEveryColdCountReservation"
+          ]
         }
       ],
       "ownership": [
@@ -136112,7 +136234,8 @@
         "Three selected expression substitution map backings retain distinct capacities and actual ownership bits; expansion temporaries are nonowning, sparse reset publishes half-capacity before allocation and finalize publishes64 after allocation. Generic maps remain partial."
       ],
       "deviations": [
-        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md."
+        "Source pointer identity becomes scalar generation identity; backing-only iterator epochs and explicit cleanup continuations guard invalid lifetime/failure domains. Whole generic object tables, enabled statistics, implicit owning copies and SMT2 display remain open. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
+        "BV trailing count-cache specialization uses concrete Go entry storage and checked AST identity handles without generics, at its rewriter consumer to avoid import cycles. It preserves selected append-only probing/growth/iteration algorithms and key reference ownership; generic map APIs, native object-pointer/sentinel/entry layout and Runtime allocator/exception/fatal ABI remain uncredited."
       ]
     },
     {
