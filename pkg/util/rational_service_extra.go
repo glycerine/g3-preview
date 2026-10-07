@@ -1,6 +1,8 @@
 // Source: remaining src/util/rational.h wrappers; concrete owner-local facade.
 package util
 
+import "errors"
+
 // RationalDoubleError classifies the source UNREACHABLE double constructor and
 // assignment. It does not implement a numerical floating-point conversion.
 type RationalDoubleError struct{}
@@ -60,6 +62,9 @@ func (s *RationalService) GCDCoefficients(a, b, x, y *OwnedRational) (_lexOut Ow
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	return s.gcdCoefficientsLockedWithInvocation(a, b, x, y, nil)
+}
+func (s *RationalService) gcdCoefficientsLockedWithInvocation(a, b, x, y *OwnedRational, c *RationalServiceInvocation) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
@@ -71,7 +76,15 @@ func (s *RationalService) GCDCoefficients(a, b, x, y *OwnedRational) (_lexOut Ow
 	}
 	result := NewRational()
 	defer s.destroyLexicalRational(&result)
-	if e := s.Manager.ExtendedGCD(&a.Raw, &b.Raw, &x.Raw, &y.Raw, &result); e != nil {
+	defer func() {
+		if cause := c.childSource(); cause != nil {
+			if s.Lexical.Cause == nil {
+				s.Lexical.Cause = cause
+			}
+			_lexErr = errors.Join(_lexErr, cause)
+		}
+	}()
+	if e := s.Manager.extendedGCDWithAllocationContext(&a.Raw, &b.Raw, &x.Raw, &y.Raw, &result, c.allocationContext()); e != nil {
 		return OwnedRational{}, e
 	}
 	return s.facadeTakeLocked(&result)

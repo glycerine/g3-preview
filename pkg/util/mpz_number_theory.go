@@ -61,6 +61,7 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 			return e
 		}
 		values = &public.Values
+		context.recordRationalServiceRaw(m, receipt)
 		context.recordCaller(m, "extended", NumericInvocationReceipt{Raw: receipt})
 		context = context.withRawInvocation(receipt)
 		defer func() {

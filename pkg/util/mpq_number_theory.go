@@ -52,6 +52,9 @@ func (m *RationalManager) GCDMany(as []Rational, g *Rational) error {
 // Source resets all three output denominators BEFORE the integer algorithm.
 // Their published prefixes remain even if a later local allocation fails.
 func (m *RationalManager) ExtendedGCD(r1, r2, a, b, g *Rational) error {
+	return m.extendedGCDWithAllocationContext(r1, r2, a, b, g, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Rational, context integerAllocationInvocationContext) error {
 	if e := m.integerOperands(r1, r2); e != nil {
 		return e
 	}
@@ -69,7 +72,7 @@ func (m *RationalManager) ExtendedGCD(r1, r2, a, b, g *Rational) error {
 	if e := m.resetDenominator(g); e != nil {
 		return e
 	}
-	return m.Z.ExtendedGCD(&r1.Num, &r2.Num, &a.Num, &b.Num, &g.Num)
+	return m.Z.extendedGCDWithAllocationContext(&r1.Num, &r2.Num, &a.Num, &b.Num, &g.Num, context)
 }
 func (m *RationalManager) LCM(a, b, out *Rational) error {
 	if e := m.integerOperands(a, b); e != nil {

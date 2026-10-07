@@ -234,6 +234,22 @@ func (s *RationalService) ModWithInvocation(a, b *OwnedRational, c *RationalServ
 func (s *RationalService) AddWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) (OwnedRational, error) {
 	return s.valueWithInvocation(a, b, c, rationalFacadeAdd)
 }
+
+// Source: src/util/rational.h:519-523. The result is returned by value; x and y
+// publish in the original manager order, including prefixes before failure.
+func (s *RationalService) GCDCoefficientsWithInvocation(a, b, x, y *OwnedRational, c *RationalServiceInvocation) (v OwnedRational, e error) {
+	if e = s.lock(); e != nil {
+		return
+	}
+	defer s.mu.Unlock()
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	return s.gcdCoefficientsLockedWithInvocation(a, b, x, y, c)
+}
 func (s *RationalService) valueWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation, op rationalFacadeBinaryOp) (v OwnedRational, e error) {
 	if e = s.lock(); e != nil {
 		return

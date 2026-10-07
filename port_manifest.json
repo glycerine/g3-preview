@@ -139239,7 +139239,9 @@
         "pkg/util/rational_service_global_binding.go",
         "pkg/util/rational_service_global_binding_test.go",
         "pkg/util/util_rational_global_service.go",
-        "pkg/util/util_rational_global_service_test.go"
+        "pkg/util/util_rational_global_service_test.go",
+        "pkg/util/rational_service_invocation.go",
+        "pkg/util/rational_service_gcd_invocation_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -139382,7 +139384,9 @@
         "TestRationalGlobalNeverInitializedFinalizeEndsFirstStaticBeforeNullGuard",
         "TestRationalGlobalOwnerCopiesAndForeignProviderRejected",
         "TestRationalServiceSourceGlobalSlotExactPublicationAndStaticEnd",
-        "TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes"
+        "TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes",
+        "TestRationalServiceGCDCoefficientsInvocation",
+        "TestRationalServiceGCDCoefficientsInvocationEveryRuntimeReservation"
       ],
       "conditionals": [
         {
@@ -139908,6 +139912,15 @@
             "TestRationalServiceSourceGlobalSlotExactPublicationAndStaticEnd",
             "TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes"
           ]
+        },
+        {
+          "name": "original gcd(a,b,x,y) value wrapper with caller-embedded exact extended-GCD invocation, denominator/coefficient publication prefixes and retained Runtime failure cleanup (src/util/rational.h:519-523)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceGCDCoefficientsInvocation",
+            "TestRationalServiceGCDCoefficientsInvocationEveryRuntimeReservation"
+          ]
         }
       ],
       "ownership": [
@@ -139919,7 +139932,8 @@
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open.",
         "Selected alias division owns a real retained raw Int; source body failure skips explicit Del, source end precedes sign/normalize, and owning cleanup is separate. The raw scope is ten Int fields charged by the manager header; facade lexical bound remains nine. Named physical audits include active div and retain exact equality.",
         "Prepared cold header/config is charged once; manager-nil returned Integer constructor failure is separate actual owner, not published manager. Standalone constructor forwards that child receipt after only outer header refund. Source finalizer stops at first unconditional null-manager access; explicit owning abort drains retained child and cold header. Exact named provider/slab/object/raw graphs precede fault disable.",
-        "Source current is a borrowed scalar slot, never a duplicate manager owning root. Failed returned children and post-finalization managers are concrete charged acquisition nodes; first completed manager transfers at source publication to original static context. Owning cleanup drains exact nodes then retained original context and detaches only after real closure."
+        "Source current is a borrowed scalar slot, never a duplicate manager owning root. Failed returned children and post-finalization managers are concrete charged acquisition nodes; first completed manager transfers at source publication to original static context. Owning cleanup drains exact nodes then retained original context and detaches only after real closure.",
+        "GCDCoefficientsWithInvocation embeds its lexical ownership in the caller and captures the actual extended-GCD child receipt at integer algorithm entry. Allocation context reaches the existing manager algorithm; explicit source/own cleanup drains this exact child before EndContext. The source output denominator and coefficient prefixes remain published on error; no staging, rollback or substitute host GCD is introduced."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",
@@ -139933,7 +139947,8 @@
         "Generated process memory initialize/finalize remains open. Pending failed-child source init retry is an explicit Go pending-own guard; source rational::initialize with null pointer would retry. Valid fresh source constants remain inline; no invented postmanager allocation failure. Cold ordinary service methods reject unavailable source state; OwnerID remains scalar inspection.",
         "Process-global generated memory lifecycle remains open. Explicit caller-confined namespace binding replaces native process globals; heterogeneous process initializer/finalizer orchestration is not claimed.",
         "Ended static objects are not reconstructed: source reinitialization and repeated finalization reach explicit invalid-lifetime guards after literal completed publication prefixes.",
-        "TLS signed-overflow release fixture is source-undefined guarded-domain evidence, not valid-source OOM. Cold acquisition nodes are actual Go ownership metadata, not source malloc events."
+        "TLS signed-overflow release fixture is source-undefined guarded-domain evidence, not valid-source OOM. Cold acquisition nodes are actual Go ownership metadata, not source malloc events.",
+        "The selected gcd wrapper now supports caller-local invocation ownership needed by BV modular inverse. The BV inverse caller remains to be ported; concrete Go scalar/header and native allocator/assertion/exception ABI qualifications remain. Actual Runtime refusal tests prove explicit owning release of interrupted invocations, not resumability of the process-fatal source operation."
       ]
     },
     {
