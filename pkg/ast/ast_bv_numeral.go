@@ -27,12 +27,16 @@ type astBVNumeralFrame struct {
 	offsetDistinct                   bool
 	allOne                           bool
 	signExtension                    bool
+	trailingNumeral                  bool
 	inverse                          bool
 	unsignedNumeral                  bool
 	bodyCause, sourceCause, ownCause error
 }
 
 func (f *astBVNumeralFrame) childOrder() [13]int {
+	if f.trailingNumeral {
+		return [13]int{1, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+	}
 	if f.signExtension {
 		return [13]int{1, 0, 3, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 	}

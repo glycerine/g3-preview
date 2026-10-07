@@ -21641,8 +21641,14 @@
       "component": "ast",
       "role": "production",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/ast_bv_trailing_numeral.go"
+      ],
+      "tests": [
+        "TestASTBitVectorOriginalNumeralTrailingZeros",
+        "TestASTBitVectorTrailingNumeralEveryActualReservation",
+        "TestASTBitVectorTrailingNumeralPublicationScope"
+      ],
       "assertions": [
         {
           "line": 52,
@@ -21727,9 +21733,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "original count_trailing_core numeral loop and remove_trailing(size_t,numeral&) plus numeral removal publication branch (src/ast/rewriter/bv_trailing.cpp:213-234,311-327)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_trailing_numeral.go",
+          "tests": [
+            "TestASTBitVectorOriginalNumeralTrailingZeros",
+            "TestASTBitVectorTrailingNumeralEveryActualReservation",
+            "TestASTBitVectorTrailingNumeralPublicationScope"
+          ]
+        }
+      ],
+      "ownership": [
+        "AST-owned address-stable numerical frame owns copied e_val and helper-local two. Direct division operates on e_val in place, increments count before the call in counting and after the call in removal, and retires each successful invocation completely before reusing that call site. Failed child contexts are retained for checked owning cleanup. Removal destroys two before nested NUM construction/publication; the copied numeral remains alive until caller exit. Exact nested constructor receipt joins before older DT. Actual cold numerical reservation campaigns retain source counts/output behavior and close shared graphs to zero budget."
+      ],
+      "deviations": [
+        "Only the original numerical branch algorithms are selected, provided as AST cores to use private numeral/reference ownership without reverse imports. The rewriter analyzer, five depth-specific reference-owning caches, structural add/mul/concat removal/count and equality wrappers remain unported. Nonnumeral identity guard erases bookkeeping for the native allocation-free default rational; zero-limit removal erases input/output numerical reads after existing manager boundary checks. Depth and BV assertion preconditions belong to the future full caller. Native stack/pointer/allocator/assertion/exception ABI and whole-unit ownership remain uncredited; actual Runtime fault cleanup is not native-fatal resumability."
+      ]
     },
     {
       "path": "src/ast/rewriter/bv_trailing.h",
