@@ -10,11 +10,11 @@ import (
 type satMutexFrame struct {
 	next            *satMutexFrame
 	ownerBytes      uint64
-	graph           *satMaxCliques
+	graph           *util.NegatedLiteralCliques
 	seen            satMutexPairSet
 	seenComplete    bool
 	seenUsed        bool
-	results         *satSolverLiteralRows
+	results         *util.RuntimeUnsignedRows
 	ps, row         RuntimeUintColumn
 	psUsed, rowUsed bool
 	cursor          uint32
@@ -137,7 +137,7 @@ func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result 
 		return util.LUndef, e
 	}
 	defer func() { err = s.mutexDrop(f, err) }()
-	f.graph, err = newSATMaxCliques(s.runtime.memory, s.budget)
+	f.graph, err = util.NewNegatedLiteralCliques(s.runtime.memory, s.budget)
 	if err != nil {
 		return util.LUndef, err
 	}
@@ -184,12 +184,12 @@ func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result 
 			if err = f.seen.insert(a, b); err != nil {
 				return util.LUndef, err
 			}
-			if err = f.graph.addEdge(a, b); err != nil {
+			if err = f.graph.AddEdge(a, b); err != nil {
 				return util.LUndef, err
 			}
 		}
 	}
-	f.results, err = newSATSolverLiteralRows(s.runtime.memory, s.budget)
+	f.results, err = util.NewRuntimeUnsignedRows(s.runtime.memory, s.budget)
 	if err != nil {
 		return util.LUndef, err
 	}
@@ -200,11 +200,11 @@ func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result 
 			return util.LUndef, err
 		}
 	}
-	if err = f.graph.cliques(&f.ps, f.results); err != nil {
+	if err = f.graph.Cliques(&f.ps, f.results); err != nil {
 		return util.LUndef, err
 	}
 	for i := uint32(0); ; i++ {
-		n, e := f.results.rowCount()
+		n, e := f.results.RowCount()
 		if e != nil {
 			return util.LUndef, e
 		}
@@ -214,7 +214,7 @@ func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result 
 		f.row = RuntimeUintColumn{}
 		f.row.Bind(s.runtime.memory)
 		f.rowUsed = true
-		src, e := f.results.unsignedRow(i)
+		src, e := f.results.Row(i)
 		if e != nil {
 			return util.LUndef, e
 		}

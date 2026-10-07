@@ -1,84 +1,86 @@
 // Source: src/util/max_cliques.h:26-137; src/sat/sat_solver.cpp:3113-3117.
-package sat
+package util
 
 import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
-type satMaxCliques struct {
-	self                        *satMaxCliques
-	runtime                     *util.Runtime
+// NegatedLiteralCliques greedily partitions complement-paired unsigned literals.
+// Negation is index XOR 1. Reachability caches persist across queries, as in
+// max_cliques.h; callers needing an independent query construct a fresh owner.
+type NegatedLiteralCliques struct {
+	self                        *NegatedLiteralCliques
+	runtime                     *Runtime
 	budget                      *arena.Budget
 	ownerBytes                  uint64
-	next, tc                    *satSolverLiteralRows
-	reachable                   [2]satCliqueUintSet
-	seen1, seen2                satCliqueUintSet
+	next, tc                    *RuntimeUnsignedRows
+	reachable                   [2]cliqueUintSet
+	seen1, seen2                cliqueUintSet
 	todo, clique                RuntimeUintColumn
-	vars                        satCliqueUintSet
+	vars                        cliqueUintSet
 	callActive, closing, closed bool
 	closeCursor                 uint32
 }
 
-func newSATMaxCliques(r *util.Runtime, b *arena.Budget) (*satMaxCliques, error) {
+func NewNegatedLiteralCliques(r *Runtime, b *arena.Budget) (*NegatedLiteralCliques, error) {
 	if r == nil || r.Budget() != b {
-		return nil, ErrSATOwner
+		return nil, ErrRuntimeVectorOwner
 	}
 	if e := r.CheckOpen(); e != nil {
 		return nil, e
 	}
-	bytes := uint64(reflect.TypeOf(satMaxCliques{}).Size())
+	bytes := uint64(reflect.TypeOf(NegatedLiteralCliques{}).Size())
 	if e := b.Reserve(bytes); e != nil {
 		return nil, e
 	}
-	g := &satMaxCliques{runtime: r, budget: b, ownerBytes: bytes}
+	g := &NegatedLiteralCliques{runtime: r, budget: b, ownerBytes: bytes}
 	g.self = g
-	for _, s := range []*satCliqueUintSet{&g.reachable[0], &g.reachable[1], &g.seen1, &g.seen2, &g.vars} {
+	for _, s := range []*cliqueUintSet{&g.reachable[0], &g.reachable[1], &g.seen1, &g.seen2, &g.vars} {
 		s.words.Bind(r)
 	}
 	g.todo.Bind(r)
 	g.clique.Bind(r)
 	var e error
-	g.next, e = newSATSolverLiteralRows(r, b)
+	g.next, e = NewRuntimeUnsignedRows(r, b)
 	if e != nil {
 		return g, e
 	}
-	g.tc, e = newSATSolverLiteralRows(r, b)
+	g.tc, e = NewRuntimeUnsignedRows(r, b)
 	return g, e
 }
-func (g *satMaxCliques) open() error {
+func (g *NegatedLiteralCliques) open() error {
 	if g == nil || g.self != g {
-		return ErrSATOwner
+		return ErrRuntimeVectorOwner
 	}
 	if g.closing || g.closed || g.callActive || g.next == nil || g.tc == nil {
 		return arena.ErrClosed
 	}
 	return g.runtime.CheckOpen()
 }
-func satCliqueMaxPlusOne(a, b uint32) uint32 {
+func cliqueMaxPlusOne(a, b uint32) uint32 {
 	if b > a {
 		a = b
 	}
 	return a + 1
 }
-func (g *satMaxCliques) addEdge(src, dst uint32) error {
+func (g *NegatedLiteralCliques) AddEdge(src, dst uint32) error {
 	if e := g.open(); e != nil {
 		return e
 	}
-	if e := g.next.reserveEmptyRows(satCliqueMaxPlusOne(src, dst)); e != nil {
+	if e := g.next.ReserveEmptyRows(cliqueMaxPlusOne(src, dst)); e != nil {
 		return e
 	}
-	if e := g.next.reserveEmptyRows(satCliqueMaxPlusOne(src^1, dst^1)); e != nil {
+	if e := g.next.ReserveEmptyRows(cliqueMaxPlusOne(src^1, dst^1)); e != nil {
 		return e
 	}
-	if e := satCliqueRowPush(g.next, src, dst); e != nil {
+	if e := cliqueRowPush(g.next, src, dst); e != nil {
 		return e
 	}
-	return satCliqueRowPush(g.next, dst, src)
+	return cliqueRowPush(g.next, dst, src)
 }
-func (g *satMaxCliques) getReachable(p uint32, goal, out *satCliqueUintSet) error {
+func (g *NegatedLiteralCliques) getReachable(p uint32, goal, out *cliqueUintSet) error {
 	if e := g.seen1.reset(); e != nil {
 		return e
 	}
@@ -115,7 +117,7 @@ func (g *satMaxCliques) getReachable(p uint32, goal, out *satCliqueUintSet) erro
 			return e
 		}
 		if seen {
-			tc, e := g.tc.unsignedRow(p)
+			tc, e := g.tc.Row(p)
 			if e != nil {
 				return e
 			}
@@ -149,11 +151,11 @@ func (g *satMaxCliques) getReachable(p uint32, goal, out *satCliqueUintSet) erro
 					return e
 				}
 			}
-			succ, e := g.next.unsignedRow(np)
+			succ, e := g.next.Row(np)
 			if e != nil {
 				return e
 			}
-			if e = satCliqueAppend(&g.todo, succ); e != nil {
+			if e = cliqueAppend(&g.todo, succ); e != nil {
 				return e
 			}
 		}
@@ -179,7 +181,7 @@ func (g *satMaxCliques) getReachable(p uint32, goal, out *satCliqueUintSet) erro
 			return e
 		}
 		np := p ^ 1
-		_, e = g.tc.unsignedRow(p)
+		_, e = g.tc.Row(p)
 		if e != nil {
 			return e
 		}
@@ -188,11 +190,11 @@ func (g *satMaxCliques) getReachable(p uint32, goal, out *satCliqueUintSet) erro
 			return e
 		}
 		if yes {
-			if e = satCliqueRowPush(g.tc, p, np); e != nil {
+			if e = cliqueRowPush(g.tc, p, np); e != nil {
 				return e
 			}
 		} else {
-			succ, e := g.next.unsignedRow(np)
+			succ, e := g.next.Row(np)
 			if e != nil {
 				return e
 			}
@@ -205,11 +207,11 @@ func (g *satMaxCliques) getReachable(p uint32, goal, out *satCliqueUintSet) erro
 				if e != nil {
 					return e
 				}
-				row, e := g.tc.unsignedRow(v)
+				row, e := g.tc.Row(v)
 				if e != nil {
 					return e
 				}
-				if e = satCliqueRowAppend(g.tc, p, row); e != nil {
+				if e = cliqueRowAppend(g.tc, p, row); e != nil {
 					return e
 				}
 			}
@@ -217,7 +219,7 @@ func (g *satMaxCliques) getReachable(p uint32, goal, out *satCliqueUintSet) erro
 	}
 	return nil
 }
-func (g *satMaxCliques) cliques(ps *RuntimeUintColumn, out *satSolverLiteralRows) (err error) {
+func (g *NegatedLiteralCliques) Cliques(ps *RuntimeUintColumn, out *RuntimeUnsignedRows) (err error) {
 	if err = g.open(); err != nil {
 		return err
 	}
@@ -231,25 +233,25 @@ func (g *satMaxCliques) cliques(ps *RuntimeUintColumn, out *satSolverLiteralRows
 		if e != nil {
 			return e
 		}
-		n := satCliqueMaxPlusOne(p, p^1)
+		n := cliqueMaxPlusOne(p, p^1)
 		if n > max {
 			max = n
 		}
 	}
-	if err = g.next.reserveEmptyRows(max); err != nil {
+	if err = g.next.ReserveEmptyRows(max); err != nil {
 		return err
 	}
-	n, e := g.next.rowCount()
+	n, e := g.next.RowCount()
 	if e != nil {
 		return e
 	}
-	if err = g.tc.reserveEmptyRows(n); err != nil {
+	if err = g.tc.ReserveEmptyRows(n); err != nil {
 		return err
 	}
 	g.callActive = true
 	g.clique = RuntimeUintColumn{}
 	g.clique.Bind(g.runtime)
-	g.vars = satCliqueUintSet{}
+	g.vars = cliqueUintSet{}
 	g.vars.words.Bind(g.runtime)
 	defer func() {
 		if e := g.vars.words.Finalize(); e != nil {
@@ -331,15 +333,15 @@ func (g *satMaxCliques) cliques(ps *RuntimeUintColumn, out *satSolverLiteralRows
 			return e
 		}
 		if n > 1 {
-			if err = out.appendColumn(&g.clique); err != nil {
+			if err = out.AppendColumn(&g.clique); err != nil {
 				return err
 			}
 		}
 	}
 }
-func (g *satMaxCliques) Close() error {
+func (g *NegatedLiteralCliques) Close() error {
 	if g == nil || g.self != g {
-		return ErrSATOwner
+		return ErrRuntimeVectorOwner
 	}
 	if g.closed {
 		return nil

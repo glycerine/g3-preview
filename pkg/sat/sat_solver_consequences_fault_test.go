@@ -58,16 +58,16 @@ func TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners(t *testing.
 					satFullSolverRuntimeAudit(t, s, out)
 					satFullSolverUserClauseAudit(t, s)
 					// Even an interrupted row construction cannot alter the caller's first row.
-					slot, er := out.runtime.ReadUint32(out.raw, 8)
+					slot, er := s.runtime.memory.ReadUint32(out.storage().StorageState().Raw, 8)
 					satOK(t, er)
-					gen, er := out.runtime.ReadUint32(out.raw, 12)
+					gen, er := s.runtime.memory.ReadUint32(out.storage().StorageState().Raw, 12)
 					satOK(t, er)
-					if len(out.oldRows) != 0 {
+					if len(out.storage().StorageState().OldRows) != 0 {
 						// In a stopped move, the original row is owned by precisely one actual
 						// current-prefix or old-suffix field; compare its payload below.
-						row := &out.rows[0]
-						if row.Raw.Block.Slot() != slot || row.Raw.Block.Generation() != gen {
-							row = &out.oldRows[0]
+						row := out.storage().StorageState().Rows[0]
+						if row.Block.Slot() != slot || row.Block.Generation() != gen {
+							row = out.storage().StorageState().OldRows[0]
 						}
 						v, er := row.Read(0)
 						satOK(t, er)
@@ -75,7 +75,7 @@ func TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners(t *testing.
 							t.Fatal(v)
 						}
 					} else {
-						v, er := out.rows[0].Read(0)
+						v, er := out.storage().StorageState().Rows[0].Read(0)
 						satOK(t, er)
 						if v != 0 {
 							t.Fatal(v)

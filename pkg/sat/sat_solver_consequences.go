@@ -9,13 +9,7 @@ func (s *Solver) consequenceEntry(out *satSolverLiteralRows) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	if e := out.open(); e != nil {
-		return e
-	}
-	if out.runtime != s.runtime.memory || out.budget != s.budget {
-		return ErrSATOwner
-	}
-	return nil
+	return out.storage().CheckRuntime(s.runtime.memory)
 }
 func (s *Solver) getConsequences(asms []Literal, vars []BoolVar, out *satSolverLiteralRows) (util.LBool, error) {
 	return s.getConsequencesInputs(satConsequenceLiterals(asms), satConsequenceInput{variables: vars, count: uint32(len(vars))}, out)

@@ -98,17 +98,8 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 		}
 	}
 	for _, out := range outputs {
-		add(out.raw)
-		add(out.pending)
-		add(out.oldRaw)
-		for i := range out.rows {
-			col(&out.rows[i])
-		}
-		for i := range out.oldRows {
-			col(&out.oldRows[i])
-		}
-		if out.temporaryActive {
-			col(&out.temporary)
+		for _, h := range out.storage().OwningRoots() {
+			add(h)
 		}
 	}
 

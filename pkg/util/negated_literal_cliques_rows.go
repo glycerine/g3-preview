@@ -1,16 +1,16 @@
 // Source: src/util/max_cliques.h; src/util/vector.h:342-387.
-package sat
+package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
 // reserve(n) on vector<unsigned_vector> default-constructs actual empty rows.
-func (o *satSolverLiteralRows) reserveEmptyRows(n uint32) error {
+func (o *RuntimeUnsignedRows) ReserveEmptyRows(n uint32) error {
 	if e := o.open(); e != nil {
 		return e
 	}
-	old, e := o.rowCount()
+	old, e := o.RowCount()
 	if e != nil {
 		return e
 	}
@@ -41,7 +41,7 @@ func (o *satSolverLiteralRows) reserveEmptyRows(n uint32) error {
 		}
 		o.rows[i] = RuntimeUintColumn{}
 		o.rows[i].Bind(o.runtime)
-		if e = satLiteralRowWrite(o.runtime, o.raw, i, o.rows[i].Raw.Block); e != nil {
+		if e = unsignedRowWrite(o.runtime, o.raw, i, o.rows[i].Raw.Block); e != nil {
 			return e
 		}
 	}
@@ -51,17 +51,17 @@ func (o *satSolverLiteralRows) reserveEmptyRows(n uint32) error {
 
 // Concrete outer-element reference: validate scalar provenance without an
 // eager inner size read. The consumer reads inner headers at its source site.
-func (o *satSolverLiteralRows) unsignedRow(i uint32) (*RuntimeUintColumn, error) {
+func (o *RuntimeUnsignedRows) Row(i uint32) (*RuntimeUintColumn, error) {
 	if e := o.open(); e != nil {
 		return nil, e
 	}
-	if satStorageSourceDebug {
-		n, e := o.rowCount()
+	if RuntimeVectorSourceDebug {
+		n, e := o.RowCount()
 		if e != nil {
 			return nil, e
 		}
 		if i >= n {
-			return nil, ErrSATAssertion
+			return nil, ErrRuntimeVectorAssertion
 		}
 	}
 	slot, e := o.runtime.ReadUint32(o.raw, 8+uint64(i)*8)
@@ -77,11 +77,11 @@ func (o *satSolverLiteralRows) unsignedRow(i uint32) (*RuntimeUintColumn, error)
 	}
 	row := &o.rows[i]
 	if row.Raw.Self != &row.Raw || slot != row.Raw.Block.Slot() || gen != row.Raw.Block.Generation() {
-		return nil, ErrSATOwner
+		return nil, ErrRuntimeVectorOwner
 	}
 	return row, nil
 }
-func satCliqueAppend(dst, src *RuntimeUintColumn) error {
+func cliqueAppend(dst, src *RuntimeUintColumn) error {
 	for i := uint32(0); ; i++ {
 		n, e := src.Size()
 		if e != nil {
@@ -99,15 +99,15 @@ func satCliqueAppend(dst, src *RuntimeUintColumn) error {
 		}
 	}
 }
-func satCliqueRowPush(o *satSolverLiteralRows, i, v uint32) error {
-	row, e := o.unsignedRow(i)
+func cliqueRowPush(o *RuntimeUnsignedRows, i, v uint32) error {
+	row, e := o.Row(i)
 	if e != nil {
 		return e
 	}
 	before := row.Raw.Block
 	cause := row.Push(v)
 	if row.Raw.Block != before {
-		if e = satLiteralRowWrite(o.runtime, o.raw, i, row.Raw.Block); e != nil {
+		if e = unsignedRowWrite(o.runtime, o.raw, i, row.Raw.Block); e != nil {
 			if cause == nil {
 				return e
 			}
@@ -115,7 +115,7 @@ func satCliqueRowPush(o *satSolverLiteralRows, i, v uint32) error {
 	}
 	return cause
 }
-func satCliqueRowAppend(o *satSolverLiteralRows, index uint32, src *RuntimeUintColumn) error {
+func cliqueRowAppend(o *RuntimeUnsignedRows, index uint32, src *RuntimeUintColumn) error {
 	for i := uint32(0); ; i++ {
 		n, e := src.Size()
 		if e != nil {
@@ -128,7 +128,7 @@ func satCliqueRowAppend(o *satSolverLiteralRows, index uint32, src *RuntimeUintC
 		if e != nil {
 			return e
 		}
-		if e = satCliqueRowPush(o, index, v); e != nil {
+		if e = cliqueRowPush(o, index, v); e != nil {
 			return e
 		}
 	}

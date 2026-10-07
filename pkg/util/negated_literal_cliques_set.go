@@ -1,10 +1,10 @@
 // Source: src/util/uint_set.h:24-225; src/util/vector.h:191-216.
-package sat
+package util
 
 // Actual uint_set bit words, distinct from sat::literal_set's char membership.
-type satCliqueUintSet struct{ words RuntimeUintColumn }
+type cliqueUintSet struct{ words RuntimeUintColumn }
 
-func (s *satCliqueUintSet) contains(v uint32) (bool, error) {
+func (s *cliqueUintSet) contains(v uint32) (bool, error) {
 	n, e := s.words.Size()
 	if e != nil {
 		return false, e
@@ -16,7 +16,7 @@ func (s *satCliqueUintSet) contains(v uint32) (bool, error) {
 	w, e := s.words.Read(i)
 	return w&(uint32(1)<<(v&31)) != 0, e
 }
-func (s *satCliqueUintSet) insert(v uint32) error {
+func (s *cliqueUintSet) insert(v uint32) error {
 	idx := v >> 5
 	old, e := s.words.Size()
 	if e != nil {
@@ -51,7 +51,7 @@ func (s *satCliqueUintSet) insert(v uint32) error {
 	}
 	return s.words.Write(idx, w|(uint32(1)<<(v&31)))
 }
-func (s *satCliqueUintSet) remove(v uint32) error {
+func (s *cliqueUintSet) remove(v uint32) error {
 	n, e := s.words.Size()
 	if e != nil {
 		return e
@@ -66,8 +66,8 @@ func (s *satCliqueUintSet) remove(v uint32) error {
 	}
 	return s.words.Write(i, w & ^(uint32(1)<<(v&31)))
 }
-func (s *satCliqueUintSet) reset() error { return s.words.Shrink(0) }
-func (s *satCliqueUintSet) empty() (bool, error) {
+func (s *cliqueUintSet) reset() error { return s.words.Shrink(0) }
+func (s *cliqueUintSet) empty() (bool, error) {
 	n, e := s.words.Size()
 	if e != nil {
 		return false, e
@@ -83,7 +83,7 @@ func (s *satCliqueUintSet) empty() (bool, error) {
 	}
 	return true, nil
 }
-func (s *satCliqueUintSet) first() (uint32, error) {
+func (s *cliqueUintSet) first() (uint32, error) {
 	n, e := s.words.Size()
 	if e != nil {
 		return 0, e
@@ -112,7 +112,7 @@ func (s *satCliqueUintSet) first() (uint32, error) {
 	}
 	return index, nil
 }
-func (s *satCliqueUintSet) assign(other *satCliqueUintSet) error {
+func (s *cliqueUintSet) assign(other *cliqueUintSet) error {
 	if s == other {
 		return nil
 	}
@@ -122,5 +122,5 @@ func (s *satCliqueUintSet) assign(other *satCliqueUintSet) error {
 	}
 	s.words = RuntimeUintColumn{}
 	s.words.Bind(r)
-	return satMUSCopyColumn(&s.words.Raw, &other.words.Raw, 4)
+	return copyCliqueColumn(&s.words.Raw, &other.words.Raw, 4)
 }

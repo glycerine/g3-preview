@@ -1,39 +1,36 @@
 // Source: src/util/max_cliques.h; independent bounded canonical mutex CNFs.
-package sat
+package util
 
 import (
 	"fmt"
 	"testing"
 )
 
-func TestSATMaxCliquesIndependentAllThreeVertexMutexGraphs(t *testing.T) {
+func TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs(t *testing.T) {
 	pairs := [3][2]uint32{{0, 1}, {0, 2}, {1, 2}}
 	for mask := uint32(0); mask < 8; mask++ {
 		t.Run(fmt.Sprint(mask), func(t *testing.T) {
-			s, _, _ := satSolverCheckFixture(t)
-			g, e := newSATMaxCliques(s.runtime.memory, s.budget)
-			satOK(t, e)
-			t.Cleanup(func() { satOK(t, g.Close()) })
+			m, b := memoryRuntimeFixture(t, false, 64)
+			g, e := NewNegatedLiteralCliques(m, b)
+			memoryRuntimeRequire(t, e)
+			t.Cleanup(func() { memoryRuntimeRequire(t, g.Close()) })
 			neighbors := [3]uint32{}
 			for j, p := range pairs {
 				if mask&(1<<j) != 0 {
-					satOK(t, g.addEdge(2*p[0]+1, 2*p[1]+1))
+					memoryRuntimeRequire(t, g.AddEdge(2*p[0]+1, 2*p[1]+1))
 					neighbors[p[0]] |= 1 << p[1]
 					neighbors[p[1]] |= 1 << p[0]
 				}
 			}
-			f, e := s.consequenceFrame()
-			satOK(t, e)
-			satOK(t, f.vector(s, 0, nil))
-			t.Cleanup(func() { satOK(t, s.consequenceDrop(f, nil)) })
+			ps := cliqueTestInput(t, m)
 			for _, v := range []uint32{0, 2, 4} {
-				satOK(t, f.vectors[0].Push(v))
+				memoryRuntimeRequire(t, ps.Push(v))
 			}
-			out, e := newSATSolverLiteralRows(s.runtime.memory, s.budget)
-			satOK(t, e)
-			t.Cleanup(func() { satOK(t, out.CloseChecked()) })
-			satOK(t, g.cliques(&f.vectors[0], out))
-			satMutexGraphAudit(t, s, g, out)
+			out, e := NewRuntimeUnsignedRows(m, b)
+			memoryRuntimeRequire(t, e)
+			t.Cleanup(func() { memoryRuntimeRequire(t, out.CloseChecked()) })
+			memoryRuntimeRequire(t, g.Cliques(ps, out))
+			cliqueTestAudit(t, m, g, ps, out)
 			// Independent greedy intersection oracle for the canonical negative-pair
 			// domain. Not a replacement algorithm; source traversal/caches execute above.
 			expected := [][]uint32{}
@@ -55,21 +52,21 @@ func TestSATMaxCliquesIndependentAllThreeVertexMutexGraphs(t *testing.T) {
 					expected = append(expected, clique)
 				}
 			}
-			n, e := out.rowCount()
-			satOK(t, e)
+			n, e := out.RowCount()
+			memoryRuntimeRequire(t, e)
 			if int(n) != len(expected) {
 				t.Fatal(n, expected)
 			}
 			for i, row := range expected {
-				got, e := out.captureRow(uint32(i))
-				satOK(t, e)
+				got, e := cliqueTestCapture(out, uint32(i))
+				memoryRuntimeRequire(t, e)
 				if int(got.count) != len(row) {
 					t.Fatal(got.count, row)
 				}
 				for j, v := range row {
 					x, e := got.read(uint32(j))
-					satOK(t, e)
-					if x.index() != v {
+					memoryRuntimeRequire(t, e)
+					if x != v {
 						t.Fatal(x, v)
 					}
 					for k := 0; k < j; k++ {
