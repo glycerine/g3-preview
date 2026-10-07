@@ -59,8 +59,8 @@ func (b *tacticStoredLabelBuffer) close(budget *arena.Budget) {
 }
 
 // Original model2mc's ownership/application portion. The stored value currently
-// exposes model_core through the original derived lifetime dispatch. Function
-// interpretations, display and AST translation remain required; this wrapper
+// exposes model_core through the original derived lifetime dispatch;
+// display and AST translation remain required; this wrapper
 // does not build or evaluate a model.
 type tacticStoredModelConverter struct {
 	tacticConverterBase

@@ -91916,9 +91916,16 @@
       "path": "src/tactic/extension_model_converter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/tactic_extension_model.go"
+      ],
+      "tests": [
+        "TestTacticExtensionModelOriginalReverseDefinitionOrder",
+        "TestTacticExtensionModelFunctionFallbackCompletionAndDefaultCallbacks",
+        "TestTacticExtensionInvocationRefusalsCleanupAndReuse",
+        "TestTacticExtensionOwningTrailsCopiedClosedAndGoalGuards"
+      ],
       "conditionals": [
         {
           "line": 28,
@@ -91937,17 +91944,40 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "extension_model_converter construction/destruction, insert and reverse-order indexed model reconstruction; inherited unindexed/labels/cancel no-op operations",
+          "status": "partial",
+          "go_target": "pkg/tactic/tactic_extension_model.go",
+          "tests": [
+            "TestTacticExtensionModelOriginalReverseDefinitionOrder",
+            "TestTacticExtensionModelFunctionFallbackCompletionAndDefaultCallbacks",
+            "TestTacticExtensionInvocationRefusalsCleanupAndReuse",
+            "TestTacticExtensionOwningTrailsCopiedClosedAndGoalGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete owning declaration/definition trails INC before source push and retain duplicate entries. Indexed application borrows the input model, constructs the original evaluator then its owning value reference, and retains any unpublished function graph. Lexical cleanup retires graph, value, then evaluator; interrupted cleanup stays named in the converter until drained. Destructor retires definition trail before declaration trail, each in forward entry order. Successful registration transfers graph ownership to the original model; the converter does not replace its ModelRef."
+      ],
+      "deviations": [
+        "Original reverse reconstruction and constant/function publication are integrated for the existing evaluator base paths. Source model completion is enabled and array_equalities disabled. Theory evaluation, array expansion, source display/TRACE and AST translation remain required; this is not whole converter or solver API completion. Source indexed goal assertion applies only in checked/debug profiles; inherited unindexed model and label callbacks remain empty. Explicit borrowed parameter/Runtime/Cooperation services replace source process-global access; runtime-wide typed allocator binding and whole native allocator/ownership campaigns remain unqualified."
+      ]
     },
     {
       "path": "src/tactic/extension_model_converter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/tactic_extension_model.go"
+      ],
+      "tests": [
+        "TestTacticExtensionModelOriginalReverseDefinitionOrder",
+        "TestTacticExtensionModelFunctionFallbackCompletionAndDefaultCallbacks",
+        "TestTacticExtensionInvocationRefusalsCleanupAndReuse",
+        "TestTacticExtensionOwningTrailsCopiedClosedAndGoalGuards"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -91960,9 +91990,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "extension_model_converter construction/destruction, insert and reverse-order indexed model reconstruction; inherited unindexed/labels/cancel no-op operations",
+          "status": "partial",
+          "go_target": "pkg/tactic/tactic_extension_model.go",
+          "tests": [
+            "TestTacticExtensionModelOriginalReverseDefinitionOrder",
+            "TestTacticExtensionModelFunctionFallbackCompletionAndDefaultCallbacks",
+            "TestTacticExtensionInvocationRefusalsCleanupAndReuse",
+            "TestTacticExtensionOwningTrailsCopiedClosedAndGoalGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete owning declaration/definition trails INC before source push and retain duplicate entries. Indexed application borrows the input model, constructs the original evaluator then its owning value reference, and retains any unpublished function graph. Lexical cleanup retires graph, value, then evaluator; interrupted cleanup stays named in the converter until drained. Destructor retires definition trail before declaration trail, each in forward entry order. Successful registration transfers graph ownership to the original model; the converter does not replace its ModelRef."
+      ],
+      "deviations": [
+        "Original reverse reconstruction and constant/function publication are integrated for the existing evaluator base paths. Source model completion is enabled and array_equalities disabled. Theory evaluation, array expansion, source display/TRACE and AST translation remain required; this is not whole converter or solver API completion. Source indexed goal assertion applies only in checked/debug profiles; inherited unindexed model and label callbacks remain empty. Explicit borrowed parameter/Runtime/Cooperation services replace source process-global access; runtime-wide typed allocator binding and whole native allocator/ownership campaigns remain unqualified."
+      ]
     },
     {
       "path": "src/tactic/filter_model_converter.cpp",
