@@ -22989,9 +22989,18 @@
       "path": "src/ast/rewriter/var_subst.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/var_substitution.go",
+        "pkg/ast/rewriter/var_substitution_test.go"
+      ],
+      "tests": [
+        "TestVarSubstitutionOriginalRegisteredIdentities",
+        "TestVarSubstitutionOrderResetNullAndGround",
+        "TestVarSubstitutionCancellationPreservesOutputAndReuses",
+        "TestVarSubstitutionColdConstructionCleanup",
+        "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+      ],
       "assertions": [
         {
           "line": 27,
@@ -23028,17 +23037,55 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Original var_subst constructor, std_order and reset with embedded beta_reducer (var_subst.h:35-53)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/var_substitution.go",
+          "tests": [
+            "TestVarSubstitutionOriginalRegisteredIdentities",
+            "TestVarSubstitutionOrderResetNullAndGround",
+            "TestVarSubstitutionCancellationPreservesOutputAndReuses",
+            "TestVarSubstitutionColdConstructionCleanup",
+            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+          ]
+        },
+        {
+          "name": "Original var_subst operator reset then normal/inverse bindings and beta traversal (var_subst.cpp:26-40)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/var_substitution.go",
+          "tests": [
+            "TestVarSubstitutionOriginalRegisteredIdentities",
+            "TestVarSubstitutionOrderResetNullAndGround",
+            "TestVarSubstitutionCancellationPreservesOutputAndReuses",
+            "TestVarSubstitutionColdConstructionCleanup",
+            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+          ]
+        }
+      ],
+      "ownership": [
+        "Complete enclosing header charged once; beta_reducer and its original engine/shifter/cache/ref members constructed in place. Partial construction returns the actual owner for Close; constructor-refusal tests warm the AST manager retained ref directory before measuring independent empty member constructions. Borrowed caller bindings retain the original engine protocol; output is an owning ASTRef."
+      ],
+      "deviations": [
+        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. Other var_subst translation-unit facilities (unused-variable elimination, instantiate, free-variable enumeration) remain unported. Explicit boolean constructor argument supplies the C++ standard-order option; model function interpretation/evaluator integration remains pending."
+      ]
     },
     {
       "path": "src/ast/rewriter/var_subst.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/rewriter/var_substitution.go",
+        "pkg/ast/rewriter/var_substitution_test.go"
+      ],
+      "tests": [
+        "TestVarSubstitutionOriginalRegisteredIdentities",
+        "TestVarSubstitutionOrderResetNullAndGround",
+        "TestVarSubstitutionCancellationPreservesOutputAndReuses",
+        "TestVarSubstitutionColdConstructionCleanup",
+        "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -23051,9 +23098,38 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Original var_subst constructor, std_order and reset with embedded beta_reducer (var_subst.h:35-53)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/var_substitution.go",
+          "tests": [
+            "TestVarSubstitutionOriginalRegisteredIdentities",
+            "TestVarSubstitutionOrderResetNullAndGround",
+            "TestVarSubstitutionCancellationPreservesOutputAndReuses",
+            "TestVarSubstitutionColdConstructionCleanup",
+            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+          ]
+        },
+        {
+          "name": "Original var_subst operator reset then normal/inverse bindings and beta traversal (var_subst.cpp:26-40)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/var_substitution.go",
+          "tests": [
+            "TestVarSubstitutionOriginalRegisteredIdentities",
+            "TestVarSubstitutionOrderResetNullAndGround",
+            "TestVarSubstitutionCancellationPreservesOutputAndReuses",
+            "TestVarSubstitutionColdConstructionCleanup",
+            "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal"
+          ]
+        }
+      ],
+      "ownership": [
+        "Complete enclosing header charged once; beta_reducer and its original engine/shifter/cache/ref members constructed in place. Partial construction returns the actual owner for Close; constructor-refusal tests warm the AST manager retained ref directory before measuring independent empty member constructions. Borrowed caller bindings retain the original engine protocol; output is an owning ASTRef."
+      ],
+      "deviations": [
+        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. Other var_subst translation-unit facilities (unused-variable elimination, instantiate, free-variable enumeration) remain unported. Explicit boolean constructor argument supplies the C++ standard-order option; model function interpretation/evaluator integration remains pending."
+      ]
     },
     {
       "path": "src/ast/scoped_proof.h",
