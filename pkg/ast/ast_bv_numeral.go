@@ -24,10 +24,14 @@ type astBVNumeralFrame struct {
 	ownPrefixDone                    bool
 	normalization                    bool
 	offsetDistinct                   bool
+	allOne                           bool
 	bodyCause, sourceCause, ownCause error
 }
 
 func (f *astBVNumeralFrame) childOrder() [10]int {
+	if f.allOne {
+		return [10]int{6, 4, 5, 1, 0, 2, -1, -1, -1, -1}
+	}
 	if f.offsetDistinct {
 		return [10]int{7, 6, 5, 4, 3, 2, 1, 0, -1, -1}
 	}
