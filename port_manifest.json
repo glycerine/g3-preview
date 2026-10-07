@@ -9027,7 +9027,9 @@
         "pkg/ast/ast_array_as_array.go",
         "pkg/ast/ast_array_map.go",
         "pkg/ast/ast_array_set.go",
-        "pkg/ast/ast_array_default_ext.go"
+        "pkg/ast/ast_array_default_ext.go",
+        "pkg/ast/ast_array_callbacks.go",
+        "pkg/model/model_array_callbacks_test.go"
       ],
       "tests": [
         "TestASTArraySourceConstructorAndInfiniteSortParameters",
@@ -9057,7 +9059,11 @@
         "TestASTArraySetOriginalValidation",
         "TestASTArrayOriginalDefaultAndExtensionalityDeclarations",
         "TestASTArrayDefaultExtensionalityOriginalValidationAndStructuralSorts",
-        "TestASTArrayExtensionalityWarmRefusalAndParameterCleanup"
+        "TestASTArrayExtensionalityWarmRefusalAndParameterCleanup",
+        "TestASTArrayOriginalRecursiveFullInterpretation",
+        "TestASTArrayOriginalSomeValueRecursiveOverrideAndFallback",
+        "TestASTArraySomeValueRecursiveReservationRefusalRestoresProc",
+        "TestModelOriginalRecursiveArrayRangeUniverseAndCompletion"
       ],
       "assertions": [
         {
@@ -9170,6 +9176,24 @@
             "TestASTArrayDefaultExtensionalityOriginalValidationAndStructuralSorts",
             "TestASTArrayExtensionalityWarmRefusalAndParameterCleanup"
           ]
+        },
+        {
+          "name": "original recursive is_fully_interp and range-only get_some_value callbacks (src/ast/array_decl_plugin.cpp:543-558)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_callbacks.go",
+          "tests": [
+            "TestASTArrayOriginalRecursiveFullInterpretation",
+            "TestASTArrayOriginalSomeValueRecursiveOverrideAndFallback",
+            "TestASTArraySomeValueRecursiveReservationRefusalRestoresProc"
+          ]
+        },
+        {
+          "name": "nested array callbacks through model range-universe choice and evaluator completion",
+          "status": "partial",
+          "go_target": "pkg/model/model_array_callbacks_test.go",
+          "tests": [
+            "TestModelOriginalRecursiveArrayRangeUniverseAndCompletion"
+          ]
         }
       ],
       "ownership": [
@@ -9178,12 +9202,14 @@
         "As-array builds its function domain/range parameters in a concrete lexical source vector with original growth, releases its descriptors/storage on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration.",
         "Map declarations retain the original mapped function parameter and output array sort. Actual lexical vector<parameter> owns Go parameter descriptors and source-grown storage; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly.",
         "Set declarations use the original exact sort identity and Boolean-range checks. Union retains its single sort parameter; intersection retains no parameter. Union/intersection canonicalize to nonflat binary declarations and applications use the existing source right-association path. Constant/empty/full-set utilities borrow source Boolean values and keep lexical parameter descriptors through publication and cleanup.",
-        "Default copies the source final sort parameter into an actual lexical Go descriptor before validation and drops it after declaration publication/refusal. Extensionality creates its own retained integer index parameter, while the utility owns a separate caller parameter through the source declaration overload. Warm refusal tests restore temporary descriptor count and failed-call charge, preserve canonical declaration identity, and account successful checked/debug capacity growth to the actual manager storage; final fixture closure restores total charge."
+        "Default copies the source final sort parameter into an actual lexical Go descriptor before validation and drops it after declaration publication/refusal. Extensionality creates its own retained integer index parameter, while the utility owns a separate caller parameter through the source declaration overload. Warm refusal tests restore temporary descriptor count and failed-call charge, preserve canonical declaration identity, and account successful checked/debug capacity growth to the actual manager storage; final fixture closure restores total charge.",
+        "Recursive value creation borrows its range, invokes the same scoped manager override, and owns the lexical sort parameter until const-array publication/refusal. Warm refusal tests restore callback and descriptor count; fixture closure drains manager-owned raw intermediates and storage. Interpretation traverses domains in order and short-circuits before the range."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
         "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array, map and set operations, value creation, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open.",
-        "Selected default/extensionality factories preserve structural sort-parameter reads without adding an array-family restriction absent from these C++ methods. Malformed kind/arity/index and UNREACHABLE routes use the existing checked Go typed precondition profile, not native assertion/exception/undefined-execution equivalence. Indexed extensionality returns the index-domain sort, not the array value range. Source-native allocator/ABI/whole-unit audits and remaining theory callbacks remain open."
+        "Selected default/extensionality factories preserve structural sort-parameter reads without adding an array-family restriction absent from these C++ methods. Malformed kind/arity/index and UNREACHABLE routes use the existing checked Go typed precondition profile, not native assertion/exception/undefined-execution equivalence. Indexed extensionality returns the index-domain sort, not the array value range. Source-native allocator/ABI/whole-unit audits and remaining theory callbacks remain open.",
+        "Selected array recursive callbacks are dispatched by the actual manager. Value creation inspects only ranges and preserves outer override priority, inner override refusal and scoped restoration. Recursive domain/range interpretation replaces the former blanket registered-family result for arrays. Non-array plugin callbacks, native assertions/exceptions and whole-unit allocator/ABI audits retain their previous partial qualifications."
       ]
     },
     {
@@ -9197,7 +9223,9 @@
         "pkg/ast/ast_array_as_array.go",
         "pkg/ast/ast_array_map.go",
         "pkg/ast/ast_array_set.go",
-        "pkg/ast/ast_array_default_ext.go"
+        "pkg/ast/ast_array_default_ext.go",
+        "pkg/ast/ast_array_callbacks.go",
+        "pkg/model/model_array_callbacks_test.go"
       ],
       "tests": [
         "TestASTArrayOriginalSelectStoreConstDeclarationsAndApplications",
@@ -9218,7 +9246,11 @@
         "TestASTArraySetOriginalValidation",
         "TestASTArrayOriginalDefaultAndExtensionalityDeclarations",
         "TestASTArrayDefaultExtensionalityOriginalValidationAndStructuralSorts",
-        "TestASTArrayExtensionalityWarmRefusalAndParameterCleanup"
+        "TestASTArrayExtensionalityWarmRefusalAndParameterCleanup",
+        "TestASTArrayOriginalRecursiveFullInterpretation",
+        "TestASTArrayOriginalSomeValueRecursiveOverrideAndFallback",
+        "TestASTArraySomeValueRecursiveReservationRefusalRestoresProc",
+        "TestModelOriginalRecursiveArrayRangeUniverseAndCompletion"
       ],
       "conditionals": [
         {
@@ -9292,6 +9324,24 @@
             "TestASTArrayDefaultExtensionalityOriginalValidationAndStructuralSorts",
             "TestASTArrayExtensionalityWarmRefusalAndParameterCleanup"
           ]
+        },
+        {
+          "name": "original recursive is_fully_interp and range-only get_some_value callbacks (src/ast/array_decl_plugin.cpp:543-558)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_array_callbacks.go",
+          "tests": [
+            "TestASTArrayOriginalRecursiveFullInterpretation",
+            "TestASTArrayOriginalSomeValueRecursiveOverrideAndFallback",
+            "TestASTArraySomeValueRecursiveReservationRefusalRestoresProc"
+          ]
+        },
+        {
+          "name": "nested array callbacks through model range-universe choice and evaluator completion",
+          "status": "partial",
+          "go_target": "pkg/model/model_array_callbacks_test.go",
+          "tests": [
+            "TestModelOriginalRecursiveArrayRangeUniverseAndCompletion"
+          ]
         }
       ],
       "ownership": [
@@ -9299,11 +9349,13 @@
         "As-array builds its function domain/range parameters in a concrete lexical source vector with original growth, releases its descriptors/storage on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration.",
         "Map declarations retain the original mapped function parameter and output array sort. Actual lexical vector<parameter> owns Go parameter descriptors and source-grown storage; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly.",
         "Set declarations use the original exact sort identity and Boolean-range checks. Union retains its single sort parameter; intersection retains no parameter. Union/intersection canonicalize to nonflat binary declarations and applications use the existing source right-association path. Constant/empty/full-set utilities borrow source Boolean values and keep lexical parameter descriptors through publication and cleanup.",
-        "Default copies the source final sort parameter into an actual lexical Go descriptor before validation and drops it after declaration publication/refusal. Extensionality creates its own retained integer index parameter, while the utility owns a separate caller parameter through the source declaration overload. Warm refusal tests restore temporary descriptor count and failed-call charge, preserve canonical declaration identity, and account successful checked/debug capacity growth to the actual manager storage; final fixture closure restores total charge."
+        "Default copies the source final sort parameter into an actual lexical Go descriptor before validation and drops it after declaration publication/refusal. Extensionality creates its own retained integer index parameter, while the utility owns a separate caller parameter through the source declaration overload. Warm refusal tests restore temporary descriptor count and failed-call charge, preserve canonical declaration identity, and account successful checked/debug capacity growth to the actual manager storage; final fixture closure restores total charge.",
+        "Recursive value creation borrows its range, invokes the same scoped manager override, and owns the lexical sort parameter until const-array publication/refusal. Warm refusal tests restore callback and descriptor count; fixture closure drains manager-owned raw intermediates and storage. Interpretation traverses domains in order and short-circuits before the range."
       ],
       "deviations": [
         "Selected array select/store/const declaration and expression-overload dispatch is now implemented. Optional explicit range is used by the const-array fallback; valid sort parameters take priority. Select/store normalize compatible arithmetic domains using the actual registered arithmetic family and coercion flag; const preserves its supplied domain. Existing application coercion insertion remains unported, without a fabricated cast. Other array declaration kinds/utilities beyond as-array, map and set operations, value creation, exact source exception diagnostics and whole-unit ownership/allocator ABI campaigns remain open.",
-        "Selected default/extensionality factories preserve structural sort-parameter reads without adding an array-family restriction absent from these C++ methods. Malformed kind/arity/index and UNREACHABLE routes use the existing checked Go typed precondition profile, not native assertion/exception/undefined-execution equivalence. Indexed extensionality returns the index-domain sort, not the array value range. Source-native allocator/ABI/whole-unit audits and remaining theory callbacks remain open."
+        "Selected default/extensionality factories preserve structural sort-parameter reads without adding an array-family restriction absent from these C++ methods. Malformed kind/arity/index and UNREACHABLE routes use the existing checked Go typed precondition profile, not native assertion/exception/undefined-execution equivalence. Indexed extensionality returns the index-domain sort, not the array value range. Source-native allocator/ABI/whole-unit audits and remaining theory callbacks remain open.",
+        "Selected array recursive callbacks are dispatched by the actual manager. Value creation inspects only ranges and preserves outer override priority, inner override refusal and scoped restoration. Recursive domain/range interpretation replaces the former blanket registered-family result for arrays. Non-array plugin callbacks, native assertions/exceptions and whole-unit allocator/ABI audits retain their previous partial qualifications."
       ]
     },
     {
@@ -9393,7 +9445,8 @@
         "pkg/ast/ast_auxiliary_plugins_source_test.go",
         "pkg/ast/rewriter/var_shifter_test.go",
         "pkg/ast/ast_some_value_proc_test.go",
-        "pkg/ast/ast_rewriter_access.go"
+        "pkg/ast/ast_rewriter_access.go",
+        "pkg/ast/ast_array_callbacks.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -9576,7 +9629,10 @@
         "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
         "TestASTSomeValueProcFallbackReservationFailureRestores",
         "TestASTAppArgumentViewBorrowAndLockedFactory",
-        "TestASTAppArgumentSubrangesRemainBorrowedAndBounded"
+        "TestASTAppArgumentSubrangesRemainBorrowedAndBounded",
+        "TestASTArrayOriginalRecursiveFullInterpretation",
+        "TestASTArrayOriginalSomeValueRecursiveOverrideAndFallback",
+        "TestASTArraySomeValueRecursiveReservationRefusalRestoresProc"
       ],
       "conditionals": [
         {
@@ -10622,6 +10678,16 @@
           "go_target": "pkg/ast/ast_core_span_factories.go",
           "tests": [
             "TestASTAppArgumentSubrangesRemainBorrowedAndBounded"
+          ]
+        },
+        {
+          "name": "selected original recursive array plugin get_some_value/is_fully_interp dispatch preserving scoped override priority (src/ast/ast.cpp:2566-2593)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_builtin_plugins_values.go",
+          "tests": [
+            "TestASTArrayOriginalRecursiveFullInterpretation",
+            "TestASTArrayOriginalSomeValueRecursiveOverrideAndFallback",
+            "TestASTArraySomeValueRecursiveReservationRefusalRestoresProc"
           ]
         }
       ],

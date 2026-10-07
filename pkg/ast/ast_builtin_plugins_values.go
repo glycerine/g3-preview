@@ -156,6 +156,9 @@ func (m *ASTManager) getSomeValue(r astNodeRef) (ASTHandle, error) {
 		v, e := m.mkFamilyApp(0, ASTOpFalse, nil, nil)
 		return m.external(v), e
 	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArrayPlugin {
+		return m.arraySomeValue(r)
+	}
 	// Actual manager fallback constructs two lexical parameters; AST-valued
 	// parameter construction doesn't retain until its declaration info attaches.
 	index, e := m.newParameterInt(0)
@@ -183,12 +186,18 @@ func (m *ASTManager) IsFullyInterpreted(sort ASTHandle) (bool, error) {
 	if e != nil {
 		return false, e
 	}
+	return m.isFullyInterpreted(r)
+}
+func (m *ASTManager) isFullyInterpreted(r astNodeRef) (bool, error) {
 	fid, _, e := m.declIdentity(r)
 	if e != nil {
 		return false, e
 	}
 	if fid == NullFamilyID || fid == 4 {
 		return false, nil
+	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArrayPlugin {
+		return m.arrayFullyInterpreted(r)
 	}
 	return fid >= 0 && m.pluginAt(fid).present, nil
 }
