@@ -21655,7 +21655,8 @@
         "pkg/ast/ast_bv_trailing_numeral.go",
         "pkg/ast/rewriter/bv_trailing.go",
         "pkg/ast/rewriter/bv_trailing_count.go",
-        "pkg/ast/rewriter/bv_trailing_table.go"
+        "pkg/ast/rewriter/bv_trailing_table.go",
+        "pkg/ast/ast_bv_numeral_scope.go"
       ],
       "tests": [
         "TestASTBitVectorOriginalNumeralTrailingZeros",
@@ -21668,7 +21669,12 @@
         "TestBVTrailingConstructorBorrowsExtractionOwner",
         "TestBVTrailingCacheReferencesGrowthAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
-        "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
+        "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+        "TestASTBitVectorNumeralScopeOriginalLifetime",
+        "TestASTBitVectorNumeralScopeErasedGuard",
+        "TestASTBitVectorNumeralScopeEveryReachedReservation",
+        "TestASTBitVectorNumeralScopeStoppedAndForeignChildren",
+        "TestASTBitVectorNumeralScopeStoredOnePredicate"
       ],
       "assertions": [
         {
@@ -21786,15 +21792,29 @@
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
             "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
           ]
+        },
+        {
+          "name": "original multiplication removal c_val copy/is_one scope, lifetime through result publication and exact nested unsigned numeral construction (src/ast/rewriter/bv_trailing.cpp:149-171); structural removal body still required",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_numeral_scope.go",
+          "tests": [
+            "TestASTBitVectorNumeralScopeOriginalLifetime",
+            "TestASTBitVectorNumeralScopeErasedGuard",
+            "TestASTBitVectorNumeralScopeEveryReachedReservation",
+            "TestASTBitVectorNumeralScopeStoppedAndForeignChildren",
+            "TestASTBitVectorNumeralScopeStoredOnePredicate"
+          ]
         }
       ],
       "ownership": [
         "AST-owned address-stable numerical frame owns copied e_val and helper-local two. Direct division operates on e_val in place, increments count before the call in counting and after the call in removal, and retires each successful invocation completely before reusing that call site. Failed child contexts are retained for checked owning cleanup. Removal destroys two before nested NUM construction/publication; the copied numeral remains alive until caller exit. Exact nested constructor receipt joins before older DT. Actual cold numerical reservation campaigns retain source counts/output behavior and close shared graphs to zero budget.",
-        "Five lazy depth caches each own one reference per inserted expression. Depth zero performs no cache allocation or INC. Table construction precedes key INC; growth/insertion follows it. A refused insertion retains that exact pending INC for owning closure. Reset visits depths one through five and table buckets in source order, resets only size>=condition or condition zero, and records actual DEC consumption even when child deletion returns an error. Owning Close resumes that cleanup cursor without a second DEC. Successful cache hits read only key/hash/bounds, erasing numeral/child traversal. Fresh cold campaigns close cache/extraction/AST/numeric/symbol owners to zero shared budget."
+        "Five lazy depth caches each own one reference per inserted expression. Depth zero performs no cache allocation or INC. Table construction precedes key INC; growth/insertion follows it. A refused insertion retains that exact pending INC for owning closure. Reset visits depths one through five and table buckets in source order, resets only size>=condition or condition zero, and records actual DEC consumption even when child deletion returns an error. Owning Close resumes that cleanup cursor without a second DEC. Successful cache hits read only key/hash/bounds, erasing numeral/child traversal. Fresh cold campaigns close cache/extraction/AST/numeric/symbol owners to zero shared budget.",
+        "The AST-owned address-stable c_val scope copies stored numerical metadata without normalization and holds that rational across subsequent AST calls through output publication. Nonnumeral default rational bookkeeping is erased. The unsigned numeral constructor is captured before entry, joined before older c_val DT and never retried at the same call site. Body and source-DT completion are separate; source readiness does not become true merely because owning cleanup ran. Successful scopes retire their exact invocation; failed scopes retain their actual plugin-list frame/context/header until plugin owning Close. Copied, ended, premature cleanup and uncaptured stopped-younger scopes reject. Actual Runtime campaigns refuse every reached read/constructor reservation until success and close the shared graph to zero budget."
       ],
       "deviations": [
-        "Only the original numerical branch algorithms are selected, provided as AST cores to use private numeral/reference ownership without reverse imports. The rewriter analyzer, five depth-specific reference-owning caches, structural add/mul/concat removal/count and equality wrappers remain unported. Nonnumeral identity guard erases bookkeeping for the native allocation-free default rational; zero-limit removal erases input/output numerical reads after existing manager boundary checks. Depth and BV assertion preconditions belong to the future full caller. Native stack/pointer/allocator/assertion/exception ABI and whole-unit ownership remain uncredited; actual Runtime fault cleanup is not native-fatal resumability.",
-        "Complete counting and count-cache algorithms are selected; structural removal and equality reduction remain unported. The typed append-only obj_map specialization resides in rewriter to avoid generics and reverse util/ast imports. Go header and concrete entry-slice backing are charged to the shared budget, with origin/generation handles and explicit ownership/cursors; native inline-wrapper/vtable/key-pointer/free-sentinel layout, Runtime allocation/fatal/exception ABI and whole-unit audit are uncredited. Checked closed/copied/reentrant/stopped owners reject; cleanup after reached failure is owning closure, not a resumable source operation. Shallow structural count guards retain their source width read without inventing an early return."
+        "The numerical branch algorithms are provided as AST cores to use private numeral/reference ownership without reverse imports. Nonnumeral identity guards erase bookkeeping for the native allocation-free default rational; zero-limit numeral removal erases input/output numerical reads after existing manager boundary checks. Counting and its caches are now selected separately, while structural add/mul/concat removal, removal depth/BV preconditions and equality reduction remain required. Native stack/pointer/allocator/assertion/exception ABI and whole-unit ownership remain uncredited; actual Runtime fault cleanup is not native-fatal resumability.",
+        "Complete counting and count-cache algorithms are selected; structural removal and equality reduction remain unported. The typed append-only obj_map specialization resides in rewriter to avoid generics and reverse util/ast imports. Go header and concrete entry-slice backing are charged to the shared budget, with origin/generation handles and explicit ownership/cursors; native inline-wrapper/vtable/key-pointer/free-sentinel layout, Runtime allocation/fatal/exception ABI and whole-unit audit are uncredited. Checked closed/copied/reentrant/stopped owners reject; cleanup after reached failure is owning closure, not a resumable source operation. Shallow structural count guards retain their source width read without inventing an early return.",
+        "The copied c_val/is_one operation and its source lifetime are selected as an AST core to preserve pkg import boundaries. It is the dependency for the remaining structural multiplication removal, not a claim that remove_trailing_mul or equality reduction is complete. Native allocation-free default rational erasure remains for nonnumerals. Checked Go scope tokens, returning failure transport and address-stable owner frames do not establish native stack/pointer/allocator/assertion/exception ABI, native-fatal resumability or whole-unit ownership completion."
       ]
     },
     {
