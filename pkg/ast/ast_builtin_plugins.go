@@ -19,6 +19,9 @@ func (m *ASTManager) builtinDecl(fid FamilyID, k int32, ps []ASTParameter, domai
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin {
 		return m.arithmeticDecl(k, ps, domain)
 	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astBitVectorPlugin {
+		return m.bitVectorDecl(k, ps, domain)
+	}
 	switch fid {
 	case 1:
 		if k == 0 {

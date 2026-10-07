@@ -57,33 +57,8 @@ func (f *astArithNumeralFrame) destroy(m *ASTManager, own bool) error {
 // Filling the gaps and publishing the new size happen only after all growth.
 func (p *astArithmeticPluginOwner) cacheNumeral(which int, index uint32, r astNodeRef) error {
 	v := &p.small[which]
-	size := v.size()
-	capacity := uint32(0)
-	if len(v.words) != 0 {
-		capacity = v.words[0]
-	}
-	for capacity <= index {
-		n := (capacity*3 + 1) / 2
-		if n < 2 {
-			n = 2
-		}
-		bytes := uint64(n*2+2) * 4
-		if e := p.owner.BudgetField.Reserve(bytes); e != nil {
-			return e
-		}
-		words := make([]uint32, n*2+2)
-		words[0], words[1] = n, size
-		for i := uint32(0); i < size*2; i++ {
-			words[2+i] = v.words[2+i]
-		}
-		p.owner.BudgetField.Release(v.bytes())
-		v.words, capacity = words, n
-	}
-	if size <= index {
-		for i := size; i <= index; i++ {
-			v.words[2+i*2], v.words[3+i*2] = 0, 0
-		}
-		v.words[1] = index + 1
+	if e := v.resizeNull(p.owner.BudgetField, index+1); e != nil {
+		return e
 	}
 	v.words[2+index*2], v.words[3+index*2] = r.slot, r.generation
 	return nil

@@ -23,6 +23,10 @@ type astBitVectorPluginOwner struct {
 	fields                                 [5]astNodeRef
 	fieldAcquired                          [5]bool
 	sortAcquired                           []byte // charged cold leaf receipts, not a second pointer table
+	fixed                                  [61]astFormatRefVector
+	fixedPending                           astNodeRef
+	fixedPendingKind                       int32
+	fixedPendingWidth                      uint32
 	sorts                                  astFormatRefVector
 	family                                 FamilyID
 	header                                 uint64
@@ -34,10 +38,10 @@ type astBitVectorPluginOwner struct {
 func (m *ASTManager) bitVectorPluginBytes() uint64 {
 	var n uint64
 	if p := m.bitVectorPlugin; p != nil {
-		n += p.header + p.sorts.bytes() + p.numeralBytes() + p.literalBytes() + uint64(len(p.sortAcquired))
+		n += p.header + p.fixedBytes() + p.sorts.bytes() + p.numeralBytes() + p.literalBytes() + uint64(len(p.sortAcquired))
 	}
 	for p := m.bitVectorPluginFailed; p != nil; p = p.next {
-		n += p.header + p.sorts.bytes() + p.numeralBytes() + p.literalBytes() + uint64(len(p.sortAcquired))
+		n += p.header + p.fixedBytes() + p.sorts.bytes() + p.numeralBytes() + p.literalBytes() + uint64(len(p.sortAcquired))
 	}
 	return n
 }
@@ -46,6 +50,7 @@ func (m *ASTManager) releaseBitVectorPluginHeaders() {
 		if !p.powerActive {
 			p.releaseLiteralFrames()
 			p.releaseNumeralFrames()
+			p.releaseFixed()
 			p.sorts.close(m.BudgetField)
 			m.BudgetField.Release(uint64(len(p.sortAcquired)))
 			p.sortAcquired = nil
@@ -61,6 +66,7 @@ func (m *ASTManager) releaseBitVectorPluginHeaders() {
 		next := p.next
 		p.releaseLiteralFrames()
 		p.releaseNumeralFrames()
+		p.releaseFixed()
 		p.sorts.close(m.BudgetField)
 		m.BudgetField.Release(uint64(len(p.sortAcquired)))
 		p.sortAcquired = nil
@@ -89,6 +95,9 @@ func (m *ASTManager) finalizeBitVectorPlugin() error {
 	p := m.bitVectorPlugin
 	if p == nil {
 		return nil
+	}
+	if e := p.finalizeFixedPending(!m.sourceClosing); e != nil {
+		return e
 	}
 	if e := p.destroyLiteralFrames(!m.sourceClosing); e != nil {
 		return e
@@ -142,9 +151,7 @@ func (m *ASTManager) finalizeBitVectorPlugin() error {
 			return e
 		}
 	}
-	// All remaining concrete source declaration-cache vectors are default-empty
-	// in this constructor profile; no allocation/destruction leaf is fabricated.
-	return nil
+	return p.finalizeFixed()
 }
 func (p *astBitVectorPluginOwner) mkSort(bits uint32) (astNodeRef, error) {
 	m := p.owner
