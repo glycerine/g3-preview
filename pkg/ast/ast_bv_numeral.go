@@ -1,6 +1,7 @@
 // Source: src/ast/bv_decl_plugin.cpp:416-435,778-789,865-868.
 // Source: src/ast/rewriter/bv_rewriter.cpp:2141-2168 (zero-bit local mode).
 // Source: src/ast/rewriter/bv_rewriter.h:39 (coefficient return temporary).
+// Source: src/ast/rewriter/poly_rewriter_def.h:47-53,70-74,78-124 (factory locals).
 package ast
 
 import (
@@ -15,29 +16,33 @@ import (
 // The actual lexical parameter RATIONALs and full-expression temporaries.
 // This primary owner is embedded once; a stopped owner keeps its exact address.
 type astBVNumeralFrame struct {
-	self                             *astBVNumeralFrame
-	owner                            *astBitVectorPluginOwner
-	next                             *astBVNumeralFrame
-	normalizationChild               astBVNormalizationReceipt
-	children                         [13]util.RationalServiceInvocation
-	values                           [8]util.OwnedRational // utility p[0], power, mod, p0, ps[0]
-	placed, complete, consumed       [8]bool
-	header, invocation               uint64
-	sourceDone, ownDone, retired     bool
-	ownPrefixDone                    bool
-	normalization                    bool
-	offsetDistinct                   bool
-	allOne                           bool
-	signExtension                    bool
-	trailingNumeral                  bool
-	zeroBit                          bool
-	coefficientNormalization         bool
-	inverse                          bool
-	unsignedNumeral                  bool
-	bodyCause, sourceCause, ownCause error
+	self                              *astBVNumeralFrame
+	owner                             *astBitVectorPluginOwner
+	next                              *astBVNumeralFrame
+	normalizationChild                astBVNormalizationReceipt
+	children                          [13]util.RationalServiceInvocation
+	values                            [8]util.OwnedRational // utility p[0], power, mod, p0, ps[0]
+	placed, complete, consumed        [8]bool
+	header, invocation                uint64
+	sourceDone, ownDone, retired      bool
+	ownPrefixDone                     bool
+	normalization                     bool
+	offsetDistinct                    bool
+	allOne                            bool
+	signExtension                     bool
+	trailingNumeral                   bool
+	zeroBit                           bool
+	coefficientNormalization          bool
+	polynomialZero, polynomialLiteral bool
+	inverse                           bool
+	unsignedNumeral                   bool
+	bodyCause, sourceCause, ownCause  error
 }
 
 func (f *astBVNumeralFrame) childOrder() [13]int {
+	if f.polynomialZero {
+		return [13]int{2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
+	}
 	if f.coefficientNormalization {
 		return [13]int{0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 	}
@@ -50,7 +55,7 @@ func (f *astBVNumeralFrame) childOrder() [13]int {
 	if f.signExtension {
 		return [13]int{1, 0, 3, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 	}
-	if f.unsignedNumeral {
+	if f.unsignedNumeral || f.polynomialLiteral {
 		return [13]int{6, 5, 1, 0, 2, 9, -1, -1, -1, -1, -1, -1, -1}
 	}
 	if f.inverse {
@@ -174,7 +179,7 @@ abortChildren:
 }
 
 func (f *astBVNumeralFrame) valueOrder() [8]int {
-	if f.unsignedNumeral {
+	if f.unsignedNumeral || f.polynomialLiteral {
 		return [8]int{7, 6, 4, 3, 2, 1, 0, 5}
 	}
 	return [8]int{7, 6, 5, 4, 3, 2, 1, 0}

@@ -5,14 +5,22 @@ package ast
 // MkBitVectorOrArguments borrows the actual operand storage through the
 // original cached declaration and application factories, without a clone.
 func (m *ASTManager) MkBitVectorOrArguments(args AppArguments) (ASTHandle, error) {
+	return m.mkBitVectorArguments(31, args)
+}
+
+func (m *ASTManager) mkBitVectorArguments(kind int32, args AppArguments) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}
 	defer m.mu.Unlock()
+	return m.bitVectorArgumentsCore(kind, args)
+}
+
+func (m *ASTManager) bitVectorArgumentsCore(kind int32, args AppArguments) (ASTHandle, error) {
 	if m.bitVectorPlugin == nil {
 		return ASTHandle{}, ErrASTDomain
 	}
-	d, handled, e := m.bitVectorExprDeclArguments(31, nil, args)
+	d, handled, e := m.bitVectorExprDeclArguments(kind, nil, args)
 	if e != nil {
 		return ASTHandle{}, e
 	}
