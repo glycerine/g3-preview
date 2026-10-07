@@ -249,6 +249,10 @@ func (m *ASTManager) MkFamilySort(fid FamilyID, k int32, ps []ASTParameter) (AST
 	}
 	var r astNodeRef
 	var e error
+	if m.pluginAt(fid).kind == astBitVectorPlugin {
+		r, e = m.bitVectorSort(ps)
+		return m.external(r), e
+	}
 	if m.pluginAt(fid).kind == astFormatPlugin {
 		if ASTSourceDebug && k != 0 {
 			return ASTHandle{}, ErrASTDomain
