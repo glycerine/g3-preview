@@ -111802,9 +111802,16 @@
       "path": "src/util/backtrackable_set.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/backtrackable_set.go",
+        "pkg/util/backtrackable_set_test.go"
+      ],
+      "tests": [
+        "TestBacktrackableSetNestedUndoAndEvents",
+        "TestBacktrackableSetLevelZeroEraseAndReset",
+        "TestBacktrackableSetPointerIdentityAndValues"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -111825,11 +111832,53 @@
           "text": "SASSERT(t.first == DEL);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "default_eh and backtrackable_set constructor/event policy",
+          "status": "ported",
+          "go_target": "pkg/util/backtrackable_set.go",
+          "tests": [
+            "TestBacktrackableSetNestedUndoAndEvents",
+            "TestBacktrackableSetLevelZeroEraseAndReset"
+          ]
+        },
+        {
+          "name": "insert, erase, contains and empty",
+          "status": "ported",
+          "go_target": "pkg/util/backtrackable_set.go",
+          "tests": [
+            "TestBacktrackableSetNestedUndoAndEvents",
+            "TestBacktrackableSetLevelZeroEraseAndReset",
+            "TestBacktrackableSetPointerIdentityAndValues"
+          ]
+        },
+        {
+          "name": "push_scope, pop_scope reverse restoration and reset",
+          "status": "ported",
+          "go_target": "pkg/util/backtrackable_set.go",
+          "tests": [
+            "TestBacktrackableSetNestedUndoAndEvents",
+            "TestBacktrackableSetLevelZeroEraseAndReset"
+          ]
+        },
+        {
+          "name": "begin/end iteration",
+          "status": "ported",
+          "go_target": "pkg/util/backtrackable_set.go",
+          "tests": [
+            "TestBacktrackableSetPointerIdentityAndValues"
+          ]
+        }
+      ],
+      "ownership": [
+        "BacktrackableSet owns its Go map, trail values and scope indices. It retains comparable key interface values and an optional event closure until removal, undo or reset; returned Values slices are caller-owned snapshots."
+      ],
+      "deviations": [
+        "The retained source specialization stores quantifier pointers. A map[any]struct{} supports comparable Go pointer identity without Go generics; non-comparable dynamic values retain a caller precondition and panic at the built-in map operation. Values replaces begin/end and deliberately promises no order, matching hash-set iteration semantics.",
+        "src/util/backtrackable_set.h:62-65 implements level-zero erase by calling m_set.insert(e), contradicting the method name and the scoped branch. The Go port deletes the value; TestBacktrackableSetLevelZeroEraseAndReset covers the correction. ErrBacktrackableSetScope replaces popping an empty source scope vector."
+      ]
     },
     {
       "path": "src/util/basic_interval.h",

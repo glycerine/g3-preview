@@ -30450,3 +30450,11 @@ Ported UnionFindDefaultContext, UnionFindContext, UnionFind and BasicUnionFind a
 Corrected src/util/union_find.h:138-147. The source dissolve loop saves the next member in w but never assigns it back to v, so a multi-member class is left inconsistent. The Go implementation advances through the saved next link and resets every member, matching the method's stated contract; the four-member regression checks every parent, size and circular-next entry.
 
 Focused native and g3debug union-find checks pass (0.004s/0.005s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:65 ported,287 partial,1745 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
+
+### util file: backtrackable_set.h
+
+Ported the complete retained behavior as exported BacktrackableSet and BacktrackableSetEvent APIs without Go generics. The live source specialization stores quantifier pointers, so comparable Go values preserve pointer identity through map[any]struct{}. Insert/erase no-ops, nested trail boundaries, reverse restoration callbacks, reset without callbacks, empty/contains queries and unordered value snapshots are covered.
+
+Corrected src/util/backtrackable_set.h:62-65. Its level-zero erase branch calls insert, while the scoped branch and method contract remove the element. The Go implementation deletes it, and the focused regression distinguishes the incorrect retained value from the required empty result.
+
+Focused native and g3debug backtrackable-set checks pass (0.004s/0.005s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:66 ported,287 partial,1744 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
