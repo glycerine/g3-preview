@@ -34,6 +34,10 @@ func (m *RationalManager) CloseChecked() error {
 			return m
 		}
 	}
+	if e := m.CleanupDecimalStream(); e != nil {
+		m.CleanupCauseField = e
+		return m
+	}
 	if e := m.CleanupSMT2Stream(); e != nil {
 		m.CleanupCauseField = e
 		return m

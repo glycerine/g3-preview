@@ -80,6 +80,9 @@ func (m *RationalManager) SourceFinalize() error {
 		return m.sourceCause
 	}
 	fail := func(e error) error { m.sourceCause = e; m.CleanupCauseField = e; return e }
+	if e := m.finishDecimalStreamSource(); e != nil {
+		return fail(e)
+	}
 	if e := m.finishSMT2StreamSource(); e != nil {
 		return fail(e)
 	}
