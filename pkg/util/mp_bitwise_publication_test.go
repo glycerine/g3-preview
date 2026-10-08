@@ -536,10 +536,27 @@ func TestBitwisePublicationBigNotZeroWidthCopyOrder(t *testing.T) {
 		t.Fatal("source copy precedes zero-width output reset", e, out)
 	}
 	budget.FailAfter(-1)
+	// Failure retains the reached RAW frame; a fresh invocation cannot replace
+	// its physical roots before explicit owning cleanup. This does not resume
+	// the failed source body or credit its unreached forward DEL sequence.
+	raw := &m.BitwiseNotRaw
+	generation := raw.Invocation
+	if !raw.Active || raw.BodyCause != e || raw.cursor != 0 || raw.ended {
+		t.Fatal("failed source copy lost its RAW frame", raw)
+	}
+	if retry := m.BitwiseNot(0, &a, &out); !errors.Is(retry, ErrNumericPending) {
+		t.Fatal("stopped RAW frame was replaced", retry)
+	}
+	mpzPublicationAudit(t, m, roots...)
+	qopsMust(t, m.CleanupBitwiseNot())
+	mpzPublicationAudit(t, m, roots...)
+	if raw.Active || raw.Invocation != generation || raw.BodyCause != e || raw.cursor != raw.Count || !raw.owned || raw.ended {
+		t.Fatal("owning cleanup changed source history", raw)
+	}
 	qopsMust(t, m.BitwiseNot(0, &a, &out))
 	mpzPublicationAudit(t, m, roots...)
-	if out != NewInt(0) {
-		t.Fatal(out)
+	if out != NewInt(0) || raw.Invocation != generation+1 || !raw.BodySucceeded || !raw.ended || raw.cursor != raw.Count {
+		t.Fatal("fresh zero-width invocation", out, raw)
 	}
 	for i := range bank {
 		qopsMust(t, m.Del(&bank[i]))
