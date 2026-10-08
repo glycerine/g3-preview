@@ -1,9 +1,14 @@
-// Source: src/util/mpq_inf.h:26-271,279.
+// Source: src/util/mpq_inf.h:26-279; src/util/mpq_inf.cpp:22-43.
 package util
 
 import (
+	"errors"
+	"fmt"
+	"io"
 	"math"
 	"math/big"
+	"math/rand/v2"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -430,5 +435,360 @@ func TestMPQInfConstructorEveryReservation(t *testing.T) {
 		if !completed {
 			t.Fatal("constructor completion horizon")
 		}
+	}
+}
+
+func TestMPQInfOwnedFormattingSignsFractionsAndLifetime(t *testing.T) {
+	for _, sync := range []bool{false, true} {
+		for _, tc := range []struct{ first, second, want string }{
+			{"0", "0", "0"}, {"-3", "0", "-3"}, {"3", "-2", "(3 -e*2)"}, {"-3/2", "-2/3", "(-3/2 -e*2/3)"}, {"3/2", "2/3", "(3/2 +e*2/3)"},
+			{"123456789012345678901234567890123456789/23", "-987654321098765432109876543210987654321/17", "(123456789012345678901234567890123456789/23 -e*58097313005809731300580973130058097313)"},
+		} {
+			p, b := mpqInfFixture(t, sync)
+			x := mpqInfValue(t, p, tc.first, tc.second)
+			var text OwnedString
+			serviceMust(t, p.ToString(&x, &text))
+			got, e := text.View().String()
+			serviceMust(t, e)
+			if got != tc.want {
+				t.Fatal(sync, tc, got)
+			}
+			if p.format.active || p.format.tmpLive {
+				t.Fatal("successful formatting left scope")
+			}
+			serviceMust(t, p.Del(&x))
+			serviceMust(t, p.Close())
+			got, e = text.View().String()
+			serviceMust(t, e)
+			if got != tc.want || b.Used() != uint64(len(text.External)) {
+				t.Fatal("return ownership", got, b.Used())
+			}
+			text.SourceDestroy()
+		}
+	}
+}
+
+func TestMPQInfDisplayWholeStringAndFlags(t *testing.T) {
+	for _, align := range []NumericAlignment{NumericLeft, NumericRight, NumericInternal} {
+		p, b := mpqInfFixture(t, false)
+		x := mpqInfValue(t, p, "3/2", "-2/3")
+		out, e := NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+		serviceMust(t, e)
+		serviceMust(t, out.SetIntegerBase(16))
+		serviceMust(t, out.SetShowBase(true))
+		serviceMust(t, out.SetShowPos(true))
+		serviceMust(t, out.SetFill('_'))
+		serviceMust(t, out.SetAlignment(align))
+		serviceMust(t, out.SetWidth(20))
+		serviceMust(t, p.Display(out, &x))
+		got, e := out.String()
+		serviceMust(t, e)
+		want := ""
+		// Build padding from the independently expected whole-string length.
+		literal := "(3/2 -e*2/3)"
+		padding := ""
+		for i := len(literal); i < 20; i++ {
+			padding += "_"
+		}
+		want = padding + literal
+		if align == NumericLeft {
+			want = literal + padding
+		}
+		if got != want || out.State().Width != 0 || out.State().IntegerBase != 16 || !out.State().ShowPos {
+			t.Fatal(got, want, out.State())
+		}
+		if p.format.active {
+			t.Fatal("display retained success")
+		}
+		serviceMust(t, p.Del(&x))
+		serviceMust(t, out.Close())
+		serviceMust(t, p.Close())
+	}
+}
+
+func mpqInfFormattingBytes(p *MPQInfManager, ret *OwnedString) uint64 {
+	s := &p.format
+	strings := [5]*OwnedString{&s.number, &s.denominator, &s.display, &s.stream.Buffer.String, ret}
+	var bytes uint64
+	for _, v := range strings {
+		if v != nil {
+			bytes += uint64(len(v.External) + len(v.Pending))
+		}
+	}
+	return bytes
+}
+
+func TestMPQInfEveryColdFormattingAndDisplayReservation(t *testing.T) {
+	for _, sync := range []bool{false, true} {
+		for _, mode := range []string{"zero", "pair", "display", "large"} {
+			completed := false
+			retainedTmp := false
+			for ordinal := int64(0); ordinal < 200; ordinal++ {
+				p, b := mpqInfFixture(t, sync)
+				first := "123456789012345678901234567890123456789/23"
+				second := "-987654321098765432109876543210987654321/19"
+				if mode == "zero" {
+					second = "0"
+				}
+				if mode == "large" {
+					first = strings.Repeat("9", 600) + "/23"
+					second = "-" + strings.Repeat("7", 600) + "/19"
+				}
+				x := mpqInfValue(t, p, first, second)
+				before := x // non-owning snapshot, never Del the snapshot.
+				var text OwnedString
+				var out *NumericTextStream
+				if mode == "display" {
+					var e error
+					out, e = NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+					serviceMust(t, e)
+				}
+				b.FailAfter(ordinal)
+				var e error
+				if out == nil {
+					e = p.ToString(&x, &text)
+				} else {
+					e = p.Display(out, &x)
+				}
+				roots := []*Int{&x.First.Num, &x.First.Den, &x.Second.Num, &x.Second.Den}
+				if p.format.tmpLive {
+					roots = append(roots, &p.format.tmp.Num, &p.format.tmp.Den)
+					retainedTmp = true
+				}
+				qopsAuditLiveOwnership(t, p.m, roots)
+				actual := p.header + p.m.HeaderBytes + integerActualOwnedBytes(p.m.Z) + mpqInfFormattingBytes(p, &text)
+				if out != nil {
+					st := out.Stats()
+					actual += st.OwnerBytes + st.ScratchBytes + st.OutputOwnerBytes + st.OutputOverflowBytes
+				}
+				if b.Used() != actual {
+					t.Fatal(sync, mode, ordinal, "immediate physical graph", b.Used(), actual)
+				}
+				if x != before {
+					t.Fatal("const input mutation", sync, mode, ordinal)
+				}
+				if e != nil {
+					if !numericPhysicalReservationRefusal(e) {
+						t.Fatal(sync, mode, ordinal, e)
+					}
+					if !p.format.active {
+						t.Fatal("failure dropped scope")
+					}
+					var untouched OwnedString
+					if p.ToString(&x, &untouched) != e || untouched.Self != nil {
+						t.Fatal("sticky formatting replay")
+					}
+					if _, sticky := p.IsZero(&x); sticky != e {
+						t.Fatal("sticky numeric replay")
+					}
+				} else {
+					got := ""
+					var err error
+					if out == nil {
+						got, err = text.View().String()
+					} else {
+						got, err = out.String()
+					}
+					serviceMust(t, err)
+					f, ok := new(big.Rat).SetString(first)
+					if !ok {
+						t.Fatal("oracle")
+					}
+					want := f.RatString()
+					if mode != "zero" {
+						eps, ok := new(big.Rat).SetString(second)
+						if !ok {
+							t.Fatal("epsilon oracle")
+						}
+						eps.Abs(eps)
+						want = "(" + want + " -e*" + eps.RatString() + ")"
+					}
+					if got != want {
+						t.Fatal(sync, mode, ordinal, got, want)
+					}
+					completed = true
+				}
+				b.FailAfter(-1)
+				serviceMust(t, p.CleanupValue(&x))
+				if e != nil && (text.External != nil || text.Pending != nil) {
+					t.Fatal("return slot not reclaimed")
+				}
+				text.OwnAbort()
+				if out != nil {
+					serviceMust(t, out.Close())
+				}
+				serviceMust(t, p.Close())
+				if b.Used() != 0 {
+					t.Fatal("formatting refund", sync, mode, ordinal, b.Used())
+				}
+				if completed {
+					break
+				}
+			}
+			if !completed {
+				t.Fatal("format completion horizon", sync, mode)
+			}
+			if mode != "zero" && !retainedTmp {
+				t.Fatal("raw temporary failure path unexercised", sync, mode)
+			}
+		}
+	}
+}
+
+func TestMPQInfFormattingIndependentRationalOracle(t *testing.T) {
+	random := rand.New(rand.NewChaCha8([32]byte{81, 42, 9}))
+	for _, sync := range []bool{false, true} {
+		p, _ := mpqInfFixture(t, sync)
+		for i := 0; i < 2000; i++ {
+			fn := int64(random.IntN(200001) - 100000)
+			fd := int64(random.IntN(1000) + 1)
+			en := int64(random.IntN(200001) - 100000)
+			ed := int64(random.IntN(1000) + 1)
+			if i%11 == 0 {
+				en = 0
+			}
+			first, second := fmt.Sprintf("%d/%d", fn, fd), fmt.Sprintf("%d/%d", en, ed)
+			x := mpqInfValue(t, p, first, second)
+			var out OwnedString
+			serviceMust(t, p.ToString(&x, &out))
+			got, e := out.View().String()
+			serviceMust(t, e)
+			f := new(big.Rat).SetFrac(big.NewInt(fn), big.NewInt(fd))
+			epsilon := new(big.Rat).SetFrac(big.NewInt(en), big.NewInt(ed))
+			want := f.RatString()
+			if en != 0 {
+				sign := " +e*"
+				if en < 0 {
+					sign = " -e*"
+				}
+				epsilon.Abs(epsilon)
+				want = "(" + want + sign + epsilon.RatString() + ")"
+			}
+			if got != want {
+				t.Fatal(sync, i, first, second, got, want)
+			}
+			mpqInfText(t, p, &x, f.RatString(), new(big.Rat).SetFrac(big.NewInt(en), big.NewInt(ed)).RatString())
+			out.SourceDestroy()
+			serviceMust(t, p.Del(&x))
+		}
+	}
+}
+
+func TestMPQInfFormattingReadErasureAndExplicitCleanup(t *testing.T) {
+	p, b := mpqInfFixture(t, false)
+	x := mpqInfValue(t, p, "3", "0")
+	x.Second.Den = NewInt(0) // untouched poisoned denominator in zero epsilon branch.
+	b.FailAfter(0)
+	var text OwnedString
+	serviceMust(t, p.ToString(&x, &text))
+	got, e := text.View().String()
+	serviceMust(t, e)
+	if got != "3" || p.format.tmpLive {
+		t.Fatal("epsilon denominator read or tmp acquired")
+	}
+	text.SourceDestroy()
+	b.FailAfter(-1)
+	serviceMust(t, p.Del(&x))
+	for _, mode := range []string{"nil", "closed"} {
+		p, b := mpqInfFixture(t, false)
+		x := mpqInfValue(t, p, "123456789012345678901234567890123456789", "-2")
+		var out *NumericTextStream
+		if mode == "closed" {
+			out, e = NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+			serviceMust(t, e)
+			serviceMust(t, out.Close())
+		}
+		e = p.Display(out, &x)
+		wantError := ErrNumericStreamOwner
+		if mode == "closed" {
+			wantError = arena.ErrClosed
+		}
+		if !errors.Is(e, wantError) {
+			t.Fatal(mode, e)
+		}
+		if !p.format.active || p.format.tmpLive || !p.format.display.Matches("(123456789012345678901234567890123456789 -e*2)") {
+			t.Fatal("completed temporary lost on insertion failure")
+		}
+		b.FailAfter(0)
+		serviceMust(t, p.CleanupFormatting())
+		serviceMust(t, p.CleanupFormatting())
+		if p.format.active {
+			t.Fatal("scope not joined")
+		}
+		var fresh OwnedString
+		if p.ToString(&x, &fresh) != e || fresh.Self != nil {
+			t.Fatal("cleanup resumed source execution")
+		}
+		b.FailAfter(-1)
+		serviceMust(t, p.CleanupValue(&x))
+		serviceMust(t, p.Close())
+	}
+}
+
+func TestMPQInfDisplayActualFileBorrowAndNonthrowingFailure(t *testing.T) {
+	f, out, _ := numericFileFixture(t)
+	p, b := mpqInfFixture(t, false)
+	x := mpqInfValue(t, p, "3", "-2")
+	used := b.Used()
+	b.FailAfter(0) // all reached numeral/string objects fit their real inline storage.
+	serviceMust(t, out.SetWidth(12))
+	serviceMust(t, out.SetFill('_'))
+	serviceMust(t, p.Display(out, &x))
+	if b.Used() != used || p.format.active {
+		t.Fatal("inline file display storage")
+	}
+	_, e := f.Seek(0, io.SeekStart)
+	serviceMust(t, e)
+	actual, e := io.ReadAll(f)
+	serviceMust(t, e)
+	if string(actual) != "____(3 -e*2)" {
+		t.Fatal(string(actual))
+	}
+	serviceMust(t, f.Close())
+	serviceMust(t, p.Display(out, &x))
+	if !out.FileBad || p.format.active {
+		t.Fatal("nonthrowing failed write retained temporary")
+	}
+	serviceMust(t, out.SetWidth(19))
+	serviceMust(t, p.Display(out, &x))
+	if out.State().Width != 19 || p.format.active || b.Used() != used {
+		t.Fatal("failed sentry branch")
+	}
+	b.FailAfter(-1)
+	serviceMust(t, p.Del(&x))
+	serviceMust(t, p.Close())
+}
+
+func TestMPQInfFormattingCloseJoinsAbandonedScope(t *testing.T) {
+	completed := false
+	for ordinal := int64(0); ordinal < 100; ordinal++ {
+		p, b := mpqInfFixture(t, false)
+		x := mpqInfValue(t, p, "123456789012345678901234567890123456789/23", "-987654321098765432109876543210987654321/19")
+		b.FailAfter(ordinal)
+		var text OwnedString
+		e := p.ToString(&x, &text)
+		if e != nil && !numericPhysicalReservationRefusal(e) {
+			t.Fatal(ordinal, e)
+		}
+		if e == nil {
+			text.SourceDestroy()
+			completed = true
+		}
+		b.FailAfter(-1)
+		// Abandon caller numerals too: manager Close owns its physical allocations.
+		serviceMust(t, p.Close())
+		serviceMust(t, p.Close())
+		if b.Used() != 0 || p.format.active || text.External != nil || text.Pending != nil {
+			t.Fatal("abandoned scope", ordinal, b.Used())
+		}
+		if e != nil && text.Self != nil && !text.Closed {
+			t.Fatal("failure return slot remained open")
+		}
+		if completed {
+			break
+		}
+	}
+	if !completed {
+		t.Fatal("close completion horizon")
 	}
 }

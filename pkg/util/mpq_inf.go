@@ -1,4 +1,4 @@
-// Source: src/util/mpq_inf.h:26-271,279.
+// Source: src/util/mpq_inf.h:26-279; src/util/mpq_inf.cpp:22-43.
 package util
 
 import (
@@ -34,6 +34,7 @@ type MPQInfManager struct {
 	header         uint64
 	cause          error
 	active, closed bool
+	format         mpqInfFormattingScope
 }
 
 func NewMPQInfManager(config RationalConfig) (*MPQInfManager, error) {
@@ -109,6 +110,9 @@ func (p *MPQInfManager) Close() error {
 	}
 	p.active = true
 	defer func() { p.active = false }()
+	if e := p.cleanupFormatting(); e != nil {
+		return e
+	}
 	if e := p.m.CloseChecked(); e != nil {
 		return e
 	}
@@ -132,6 +136,9 @@ func (p *MPQInfManager) CleanupValue(a *MPQInf) error {
 	}
 	p.active = true
 	defer func() { p.active = false }()
+	if e := p.cleanupFormatting(); e != nil {
+		return e
+	}
 	if e := p.m.cleanupRawArithmetic(); e != nil {
 		return e
 	}
@@ -697,4 +704,213 @@ func (p *MPQInfManager) Floor(a *MPQInf, b *Rational) (e error) {
 	}
 	one := Rational{Num: NewInt(1), Den: NewInt(1)}
 	return p.m.Sub(&a.First, &one, b)
+}
+
+// Concrete lexical storage retains actual source objects at a stopped call.
+// The manager header accounts this control storage; strings account backing.
+// out is the implicit return slot, borrowed during execution and owned by this
+// scope on failure. Successful ToString transfers that ownership to the caller.
+type mpqInfFormattingScope struct {
+	active                       bool
+	out                          *OwnedString
+	number, denominator, display OwnedString
+	stream                       OwnedStringStream
+	tmp                          Rational
+	tmpLive                      bool
+}
+
+// formatInteger follows mpz.cpp:1432-1435 without the retained text assembly
+// adapter: display into the actual local output stream, copy str(), destroy it.
+func (p *MPQInfManager) formatInteger(a *Int, dst *OwnedString) error {
+	s := &p.format
+	if e := s.stream.Construct(p.m.BudgetField); e != nil {
+		return e
+	}
+	if e := p.m.Z.insertSourceInteger(&s.stream, a); e != nil {
+		return e
+	}
+	if e := s.stream.Str(dst); e != nil {
+		return e
+	}
+	s.stream.OwnAbort()
+	s.stream = OwnedStringStream{}
+	return nil
+}
+
+// mpq.cpp:123-127. The concrete Go profile selects left-to-right evaluation of
+// the C++ concatenation operands. Numerator, slash and denominator retain their
+// distinct source lifetimes; C++'s unspecified operand evaluation order is not
+// claimed as a native allocation sequence across all compilers.
+func (p *MPQInfManager) formatRational(a *Rational, dst *OwnedString) error {
+	integer, e := p.m.IsInt(a)
+	if e != nil {
+		return e
+	}
+	if e = p.formatInteger(&a.Num, dst); e != nil {
+		return e
+	}
+	if integer {
+		return nil
+	}
+	if e = dst.AppendCString(LiteralParamsStringView("/")); e != nil {
+		return e
+	}
+	s := &p.format
+	if e = p.formatInteger(&a.Den, &s.denominator); e != nil {
+		return e
+	}
+	if e = dst.Append(s.denominator.View()); e != nil {
+		return e
+	}
+	s.denominator.SourceDestroy()
+	s.denominator = OwnedString{}
+	return nil
+}
+
+// mpq_inf.cpp:22-43. tmp is raw (not a scoped numeral); its explicit del is
+// reached only after copy, abs, conversion and append all succeed.
+func (p *MPQInfManager) formatPair(a *MPQInf, dst *OwnedString) error {
+	s := &p.format
+	s.active = true
+	s.out = dst
+	zero, e := p.m.IsZero(&a.Second)
+	if e != nil {
+		return e
+	}
+	if zero {
+		return p.formatRational(&a.First, dst)
+	}
+	if e = dst.Construct(p.m.BudgetField, LiteralParamsStringView("(")); e != nil {
+		return e
+	}
+	if e = p.formatRational(&a.First, &s.number); e != nil {
+		return e
+	}
+	if e = dst.Append(s.number.View()); e != nil {
+		return e
+	}
+	s.number.SourceDestroy()
+	s.number = OwnedString{}
+	negative, e := p.m.IsNeg(&a.Second)
+	if e != nil {
+		return e
+	}
+	suffix := " +e*"
+	if negative {
+		suffix = " -e*"
+	}
+	if e = dst.AppendCString(LiteralParamsStringView(suffix)); e != nil {
+		return e
+	}
+	s.tmp = NewRational()
+	s.tmpLive = true
+	if e = p.m.Copy(&s.tmp, &a.Second); e != nil {
+		return e
+	}
+	if e = p.m.Abs(&s.tmp); e != nil {
+		return e
+	}
+	if e = p.formatRational(&s.tmp, &s.number); e != nil {
+		return e
+	}
+	if e = dst.Append(s.number.View()); e != nil {
+		return e
+	}
+	s.number.SourceDestroy()
+	s.number = OwnedString{}
+	if e = p.m.Del(&s.tmp); e != nil {
+		return e
+	}
+	s.tmpLive = false
+	return dst.AppendCString(LiteralParamsStringView(")"))
+}
+
+// ToString constructs the native return string in caller-provided fresh
+// storage. On success the caller owns it and must SourceDestroy it. On failure
+// CleanupFormatting, CleanupValue or Close releases the retained return slot;
+// the caller must not dispose that slot before owning cleanup joins its scope.
+func (p *MPQInfManager) ToString(a *MPQInf, dst *OwnedString) (e error) {
+	if e = p.begin(a); e != nil {
+		return e
+	}
+	defer p.end(&e)
+	if dst == nil || dst.Self != nil {
+		return ErrParamsPrecondition
+	}
+	if e = p.formatPair(a, dst); e != nil {
+		return e
+	}
+	p.format = mpqInfFormattingScope{}
+	return nil
+}
+
+// Display follows mpq_inf.h:275-277: construct the whole return string, insert
+// it once (width applies to the whole string), then destroy the temporary.
+func (p *MPQInfManager) Display(out *NumericTextStream, a *MPQInf) (e error) {
+	if e = p.begin(a); e != nil {
+		return e
+	}
+	defer p.end(&e)
+	s := &p.format
+	if e = p.formatPair(a, &s.display); e != nil {
+		return e
+	}
+	if out == nil {
+		return ErrNumericStreamOwner
+	}
+	if e = out.AppendOwnedString(&s.display); e != nil {
+		return e
+	}
+	s.display.SourceDestroy()
+	p.format = mpqInfFormattingScope{}
+	return nil
+}
+
+func (p *MPQInfManager) cleanupFormatting() error {
+	s := &p.format
+	if !s.active {
+		return nil
+	}
+	// Join the younger numerical allocation/character scopes before raw tmp or
+	// any older return-string object. No formatting/output source work is replayed.
+	if e := p.m.Z.Natural.cleanupOutputFormatting(); e != nil {
+		return e
+	}
+	if e := p.m.cleanupRawArithmetic(); e != nil {
+		return e
+	}
+	if e := p.m.lexical.cleanup(p.m.Z); e != nil {
+		return e
+	}
+	s.stream.OwnAbort()
+	s.denominator.OwnAbort()
+	s.number.OwnAbort()
+	if s.tmpLive {
+		if e := p.m.Del(&s.tmp); e != nil {
+			return e
+		}
+		s.tmpLive = false
+	}
+	if s.out != nil {
+		s.out.OwnAbort()
+	}
+	p.format = mpqInfFormattingScope{}
+	return nil
+}
+
+// CleanupFormatting joins the actual retained lexical scope after failure.
+// The parent cause remains sticky; owning cleanup does not resume source work.
+func (p *MPQInfManager) CleanupFormatting() error {
+	if p == nil || p.self != p {
+		return ErrMPQInfOwner
+	}
+	if p.closed {
+		return arena.ErrClosed
+	}
+	if p.active {
+		return ErrNumericPending
+	}
+	p.active = true
+	defer func() { p.active = false }()
+	return p.cleanupFormatting()
 }

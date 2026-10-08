@@ -135227,23 +135227,61 @@
       "path": "src/util/mpq_inf.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/mpq_inf.go",
+        "pkg/util/mpq_inf_test.go",
+        "pkg/util/owned_string.go",
+        "pkg/util/owned_string_append_test.go",
+        "pkg/util/owned_string_stream.go",
+        "pkg/util/owned_string_stream_test.go"
+      ],
+      "tests": [
+        "TestMPQInfOwnedFormattingSignsFractionsAndLifetime",
+        "TestMPQInfDisplayWholeStringAndFlags",
+        "TestMPQInfEveryColdFormattingAndDisplayReservation",
+        "TestMPQInfFormattingIndependentRationalOracle",
+        "TestMPQInfFormattingReadErasureAndExplicitCleanup",
+        "TestMPQInfDisplayActualFileBorrowAndNonthrowingFailure",
+        "TestMPQInfFormattingCloseJoinsAbandonedScope"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "to_string zero epsilon fast return or actual owned first/sign/absolute raw epsilon/closing assembly (mpq_inf.cpp:22-43)",
+          "status": "ported",
+          "go_target": "pkg/util/mpq_inf.go",
+          "tests": [
+            "TestMPQInfOwnedFormattingSignsFractionsAndLifetime",
+            "TestMPQInfDisplayWholeStringAndFlags",
+            "TestMPQInfEveryColdFormattingAndDisplayReservation",
+            "TestMPQInfFormattingIndependentRationalOracle",
+            "TestMPQInfFormattingReadErasureAndExplicitCleanup",
+            "TestMPQInfDisplayActualFileBorrowAndNonthrowingFailure",
+            "TestMPQInfFormattingCloseJoinsAbandonedScope"
+          ]
+        }
+      ],
+      "ownership": [
+        "Actual returned-string storage is caller-owned after successful ToString and retained through the implicit return-slot pointer on failure. Parent charged control storage holds distinct rational return/denominator strings, local output stream, raw epsilon temporary and display temporary; only reached actual backing is allocated. Source first/epsilon string scopes dispose in order on success; explicit tmp del occurs only after successful conversion/append. CleanupFormatting, CleanupValue and Close join younger actual numeric/character/raw scopes before strings and raw tmp, without replaying source output. Every cold formatting/display reservation has immediate full physical-root/accounting audits and final owning refund in both numerical profiles; successful return lifetime, stream flags/whole width, actual borrowed file failure and parent Close are tested."
+      ],
+      "deviations": [
+        "Uses the selected narrow default-decimal libstdc++ string/output storage policy through concrete Go adapters. C++ concatenation operands use an explicit left-to-right profile; unspecified native evaluation order/temporary-elision, locale/stream object ABI, iostream exception masks and native allocator exception/fatal transport are not claimed. Source bytes, rational component order, raw tmp set/abs/del, short-circuit zero epsilon and single whole-string output insertion are preserved. Go caller-provided fresh return slot replaces implicit C++ return storage; successful callers dispose it, failed ownership is joined explicitly. No host compatibility string assembly, C/cgo or generic implementation replaces the source bodies."
+      ]
     },
     {
       "path": "src/util/mpq_inf.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/mpq_inf.go",
-        "pkg/util/mpq_inf_test.go"
+        "pkg/util/mpq_inf_test.go",
+        "pkg/util/owned_string.go",
+        "pkg/util/owned_string_append_test.go",
+        "pkg/util/owned_string_stream.go",
+        "pkg/util/owned_string_stream_test.go"
       ],
       "tests": [
         "TestMPQInfSourceFloorQuirkAndEpsilonApproximation",
@@ -135252,7 +135290,14 @@
         "TestMPQInfScalarKindsSettersAndUnaryBranches",
         "TestMPQInfSourceSequentialCrossAliases",
         "TestMPQInfEveryColdNumericReservationAndCleanup",
-        "TestMPQInfConstructorEveryReservation"
+        "TestMPQInfConstructorEveryReservation",
+        "TestMPQInfOwnedFormattingSignsFractionsAndLifetime",
+        "TestMPQInfDisplayWholeStringAndFlags",
+        "TestMPQInfEveryColdFormattingAndDisplayReservation",
+        "TestMPQInfFormattingIndependentRationalOracle",
+        "TestMPQInfFormattingReadErasureAndExplicitCleanup",
+        "TestMPQInfDisplayActualFileBorrowAndNonthrowingFailure",
+        "TestMPQInfFormattingCloseJoinsAbandonedScope"
       ],
       "conditionals": [
         {
@@ -135264,8 +135309,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "All selected numeric inline bodies, original first-component floor quirk, ordered pair/scalar/kind comparisons and parent owned manager (mpq_inf.h:26-271,279)",
@@ -135283,16 +135328,26 @@
         },
         {
           "name": "to_string return declaration and display returned-string insertion (mpq_inf.h:273-277; mpq_inf.cpp:22-43)",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/util/mpq_inf.go",
+          "tests": [
+            "TestMPQInfOwnedFormattingSignsFractionsAndLifetime",
+            "TestMPQInfDisplayWholeStringAndFlags",
+            "TestMPQInfEveryColdFormattingAndDisplayReservation",
+            "TestMPQInfFormattingIndependentRationalOracle",
+            "TestMPQInfFormattingReadErasureAndExplicitCleanup",
+            "TestMPQInfDisplayActualFileBorrowAndNonthrowingFailure",
+            "TestMPQInfFormattingCloseJoinsAbandonedScope"
+          ]
         }
       ],
       "ownership": [
-        "Exported raw rational pair owns its two components; NewMPQInf initializes both, and Set/Del handle owned copying and destruction. Parent manager owns a concrete RationalManager and charged Go control header. Sequential source calls preserve partial first-component publication and cross aliases; failed numerical calls retain underlying actual raw arithmetic cohorts and original cause. CleanupValue joins younger actual scopes before caller values; parent Close joins its child before header release. Every reached constructor and selected numeric reservation is tested in both scratch profiles with physical-root and immediate budget audits, sticky replay and final zero budget."
+        "Exported raw rational pair owns its two components; NewMPQInf initializes both, and Set/Del handle owned copying and destruction. Parent manager owns a concrete RationalManager and charged Go control header. Sequential source calls preserve partial first-component publication and cross aliases; failed numerical calls retain underlying actual raw arithmetic cohorts and original cause. CleanupValue joins younger actual scopes before caller values; parent Close joins its child before header release. Every reached constructor and selected numeric reservation is tested in both scratch profiles with physical-root and immediate budget audits, sticky replay and final zero budget.",
+        "Actual returned-string storage is caller-owned after successful ToString and retained through the implicit return-slot pointer on failure. Parent charged control storage holds distinct rational return/denominator strings, local output stream, raw epsilon temporary and display temporary; only reached actual backing is allocated. Source first/epsilon string scopes dispose in order on success; explicit tmp del occurs only after successful conversion/append. CleanupFormatting, CleanupValue and Close join younger actual numeric/character/raw scopes before strings and raw tmp, without replaying source output. Every cold formatting/display reservation has immediate full physical-root/accounting audits and final owning refund in both numerical profiles; successful return lifetime, stream flags/whole width, actual borrowed file failure and parent Close are tested."
       ],
       "deviations": [
-        "Synchronized is the explicit concrete RationalConfig profile, selecting source local versus reusable scratch algorithms under confinement. Go checked owner, nil domain, reentry and retained failure guards qualify native exception/assertion/fatal ABI; unknown setter kind intentionally leaves epsilon unchanged, while reached comparison unreachable is returned as ErrMPQInfKind. Fixed approximation offset accepts negative/NaN values and depends only on epsilon sign, as in source. Original floor tests the sign of FIRST rather than epsilon and is preserved. Native allocation/stack/temporary-elision ABI, concurrent critical sections and formatting/owned-string scopes remain uncredited; cpp source body is not promoted. Upstream simplex.cpp uses this manager but is not a direct standalone class driver; solver integration is not credited by these independent class tests."
+        "Synchronized is the explicit concrete RationalConfig profile, selecting source local versus reusable scratch algorithms under confinement. Go checked owner, nil domain, reentry and retained failure guards qualify native exception/assertion/fatal ABI; unknown setter kind intentionally leaves epsilon unchanged, while reached comparison unreachable is returned as ErrMPQInfKind. Fixed approximation offset accepts negative/NaN values and depends only on epsilon sign, as in source. Original floor tests the sign of FIRST rather than epsilon and is preserved. Native allocation/stack/temporary-elision ABI and concurrent critical sections remain qualified; the defined formatting bodies are now implemented with actual lexical string and numerical scopes. Upstream simplex.cpp uses this manager but is not a direct standalone class driver; solver integration is not credited by these independent class tests.",
+        "Uses the selected narrow default-decimal libstdc++ string/output storage policy through concrete Go adapters. C++ concatenation operands use an explicit left-to-right profile; unspecified native evaluation order/temporary-elision, locale/stream object ABI, iostream exception masks and native allocator exception/fatal transport are not claimed. Source bytes, rational component order, raw tmp set/abs/del, short-circuit zero epsilon and single whole-string output insertion are preserved. Go caller-provided fresh return slot replaces implicit C++ return storage; successful callers dispose it, failed ownership is joined explicitly. No host compatibility string assembly, C/cgo or generic implementation replaces the source bodies."
       ]
     },
     {
