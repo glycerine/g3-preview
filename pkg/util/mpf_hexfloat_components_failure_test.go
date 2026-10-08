@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:1609-1621; actual scoped-value and child prefixes.
+// Source: src/util/mpf.cpp:1608-1619; actual scoped-value and child prefixes.
 package util
 
 import (

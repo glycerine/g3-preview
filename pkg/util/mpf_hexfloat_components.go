@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:1609-1621; src/util/mpf.h:294.
+// Source: src/util/mpf.cpp:1608-1619; src/util/mpf.h:294.
 package util
 
 // ToStringHexfloatComponentsInto restores scale and strips the hidden bit,
