@@ -24,6 +24,7 @@ type BVRewriter struct {
 	extraction            *bvExtractInvocation
 	leConcat              *bvLEConcatInvocation
 	leOverflow            *bvLEOverflowInvocation
+	leq                   *bvLEInvocation
 	propagation           *bvExtractPropagation
 	trailing              *BVTrailing
 	eqRemainder           *ast.BitVectorRemainderEqualityNumerals
@@ -223,6 +224,12 @@ func (p *BVRewriter) Close() error {
 			return e
 		}
 		p.leConcat = nil
+	}
+	if p.leq != nil {
+		if e := p.leq.close(p.manager); e != nil {
+			return e
+		}
+		p.leq = nil
 	}
 	if p.propagation != nil {
 		if e := p.propagation.close(p.manager); e != nil {

@@ -21393,7 +21393,14 @@
         "pkg/ast/rewriter/bv_rewriter_leq_overflow_test.go",
         "pkg/ast/rewriter/bv_rewriter_leq_overflow_numeric_test.go",
         "pkg/ast/ast_bv_overflow_comparison_numerals.go",
-        "pkg/ast/ast_bv_overflow_comparison_numerals_test.go"
+        "pkg/ast/ast_bv_overflow_comparison_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_leq.go",
+        "pkg/ast/rewriter/bv_rewriter_leq_test.go",
+        "pkg/ast/rewriter/bv_rewriter_leq_numeric_test.go",
+        "pkg/ast/rewriter/bv_rewriter_leq_wrappers.go",
+        "pkg/ast/rewriter/bv_rewriter_leq_wrappers_test.go",
+        "pkg/ast/ast_bv_le_comparison_numerals.go",
+        "pkg/ast/ast_bv_le_comparison_numerals_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21587,7 +21594,14 @@
         "TestBVRewriterLEOverflowEveryColdReservationAndPublication",
         "TestBVRewriterLEOverflowIndependentWraparoundEnumeration",
         "TestBVRewriterLEOverflowEveryActualNumericReservation",
-        "TestASTBitVectorOverflowComparisonEveryActualReservation"
+        "TestASTBitVectorOverflowComparisonEveryActualReservation",
+        "TestBVRewriterLEOriginalBranchesAndStatuses",
+        "TestBVRewriterLESignedRemainderGuardsAndExtraHelpers",
+        "TestBVRewriterLEEveryColdReservationAndPublication",
+        "TestBVRewriterLEEveryActualNumericReservation",
+        "TestBVRewriterLEOriginalWrappers",
+        "TestBVRewriterLEWrappersEveryColdReservationAndPublication",
+        "TestASTBitVectorLEComparisonEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -22837,6 +22851,34 @@
           "tests": [
             "TestASTBitVectorOverflowComparisonEveryActualReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_leq_core: original three defaults/two reads before identity, shared stored-width normalization, numeric/bounds rewrites, ordered signed-remainder predicate and repeated sum expression, configured concat then overflow helpers, descending zero-bit scan and original statuses (src/ast/rewriter/bv_rewriter.cpp:436-584; src/ast/rewriter/bv_rewriter.h:82)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_leq.go",
+          "tests": [
+            "TestBVRewriterLEOriginalBranchesAndStatuses",
+            "TestBVRewriterLESignedRemainderGuardsAndExtraHelpers",
+            "TestBVRewriterLEEveryColdReservationAndPublication",
+            "TestBVRewriterLEEveryActualNumericReservation"
+          ]
+        },
+        {
+          "name": "Complete selected signed/unsigned LE/GE/LT wrappers: reversed core calls, raw reversed fallback after FAILED and raw NOT of reversed comparison with REWRITE2 (src/ast/rewriter/bv_rewriter.cpp:210-242; src/ast/rewriter/bv_rewriter.h:73-78)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_leq_wrappers.go",
+          "tests": [
+            "TestBVRewriterLEOriginalWrappers",
+            "TestBVRewriterLEWrappersEveryColdReservationAndPublication"
+          ]
+        },
+        {
+          "name": "Exact LE numerical authority: original unused r3, later default lower/upper, reached signed literals/power/negation/subtraction/norm/remainder/sum returns, original assignment/full-expression ends and captured numeral factory (src/ast/rewriter/bv_rewriter.cpp:436-517,560-568)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_le_comparison_numerals.go",
+          "tests": [
+            "TestASTBitVectorLEComparisonEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22881,7 +22923,8 @@
         "The derived BV owner retains the stopped XOR frame: borrowed flat/new argument buffers, actual positive plane1 then negative plane2 before v1/v2, exact scalar/numeral/all-one/unsigned-zero child receipts, mask literal two, owning inline16/doubling expr_ref_buffer and younger owning not_t, or the final rebuild owning constant c even when unused. Each original polarity collision clears its reached mark before all-one XOR expression entry. Mask pushes INC before buffer growth and retain any uninserted incoming INC on refusal for explicit owning cleanup; source success ends not_t before forward buffer DEC, then two/v2/v1 before negative/positive marks and older flat buffer. Rebuild c ends before its borrowed buffer and numerical locals. Publication precedes those source ends; already-consumed old-output decrements and sticky caller history survive cleanup.",
         "The BV owner retains younger propagation before extraction: exact single-default numerical scopes, captured scalar/power/literal/factory receipts, borrowed inline16/doubling argument buffers and the extraction ep_res reference constructed even when propagation returns zero. Success publishes before reached ui64 literal/ep_res/buffers/default v source ends. Failed numerical children join before older buffers/defaults; output INC/consumed old DEC and sticky replay/history survive owning cleanup. Removing an entire concat head borrows AppArguments.Range directly and adds no argument-copy buffer reservation; only the original declaration sort-domain buffer remains.",
         "The persistent BV owner retains a stopped concat-comparison frame. af then bf defaults exist only inside the nonempty first-numeral branch; original short-circuit reads skip bf assignment after nonnumeric af. Each reached power/division temporary ends after hi_af/hi_bf initialization. Those high values survive both younger default new_a/new_b refs and branch-local borrowed buffers. Each shortened-head buffer ends after its own ref assignment; output publication precedes new_b/new_a and hi_bf/hi_af/bf/af source destruction. Exact failed normalization/scalar/NUM children join before buffer/ref/older numeric owning cleanup, preserving consumed old-output decrements and cause history.",
-        "Unsigned overflow comparison constructs owning default common before a0/b0 defaults. Sum recognition preserves both initial and repeated static-zero assignments, original pointer-order checks and direct borrowed ADD suffix reconstruction. The less-offset returned difference survives output assignment then ends before older locals; lower/upper initialization ends only reached power/compound-subtraction expression temporaries and retains both constants through publication. Exact failed scalar/NUM receipts join before numerical owning cleanup, then the older common ref; consumed old-output decrements and sticky replay/history survive close."
+        "Unsigned overflow comparison constructs owning default common before a0/b0 defaults. Sum recognition preserves both initial and repeated static-zero assignments, original pointer-order checks and direct borrowed ADD suffix reconstruction. The less-offset returned difference survives output assignment then ends before older locals; lower/upper initialization ends only reached power/compound-subtraction expression temporaries and retains both constants through publication. Exact failed scalar/NUM receipts join before numerical owning cleanup, then the older common ref; consumed old-output decrements and sticky replay/history survive close.",
+        "The persistent BV owner retains the parent LE frame behind younger concat/overflow helper frames. r1/r2/r3 defaults precede both stored reads and identity; lower/upper defaults are reached only after numeric comparison guards. Each normalization performs the original return-copy assignment and ends its distinct return. Bounds use actual signed literal temporaries rather than borrowed static constants. The signed-remainder guard uses returned operator% and evaluates/ends the sum-minus-static-one/power expression before branch entry, then reconstructs it for NUM/output publication. Concrete construction stamps track only physically reached temporary values so owning cleanup follows their actual reverse creation order despite reused power/arithmetic slots. Descending zero-bit child receipts join before older parent numeric scopes; consumed old-output decrements and sticky replay/history survive close."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -22925,7 +22968,8 @@
         "Twenty-two shape/status cases cover positive/negative duplicate parity, both opposite orders, repeated opposite toggles, first-survivor argument order, numeric/zero/FAILED paths, one-level flattening/equal-count discard, all-one final NOT and BR_REWRITE3 masks including direct singleton extraction. Twelve cold campaigns include original unused c construction and actual output publication followed by consumed old BOR32 deletion refusal. Five fresh Runtime campaigns cover noncanonical numerical XOR at widths65/257, opposite-polarity numeric/helper children, a 65-piece owning mask and a raw high-only mask whose original unnormalized scan returns one full-width extract of its input. Actual 16/32/64 growth refusals prove the completed incoming INC is retained and owning cleanup deletes the uninserted piece; all graphs close to zero budget. Sorting retains the existing std::sort comparator/output-contract qualification; guarded invalid domains, native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. Full application dispatch and arithmetic/solver integration remain outstanding; no whole-unit promotion is credited.",
         "Seventeen extraction branch/status cases, seven cold extraction campaigns, seven propagation order/shape cases, five propagation/helper/parent/ITE cold campaigns and four actual Runtime numeric campaigns cover source failures and independently modeled values/shapes. The source reduces negative inputs at RESULT width before shifting; the preserved -128[7:4] result is zero. Nonzero numeric concat prefixes are shortened rather than required to be zero, and a symbolic-first prefix scan keeps its original later sort-only checks. Cold publication tests reach real old BOR32 destruction refusal; all actual Runtime graphs close to zero budget. Invalid sorts/widths and unreachable malformed concat domains retain guarded adaptations. Native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, unspecified nested ITE argument evaluation order, independently stopped source destruction and fatal resumability remain qualified; TRACE-only output is not credited. Full BV comparison/application dispatch and solver integration remain outstanding; no whole source unit is promoted.",
         "Thirteen independent shape/status cases, six every-cold-reservation campaigns and two actual Runtime parent campaigns cover numeric inequality, signed high prefixes, equal high prefixes switching to unsigned tails, either partial prefix, common prefix/postfix, FAILED with absent output and real postpublication old BOR32 deletion refusal. Three actual numerical-owner Runtime campaigns cover 65/257-bit signed/negative/noncanonical high prefixes, returned division/power source ends, copied/stopped owners, older-local retention and zero-budget closure. Guarded empty/equal/unreachable direct-helper domains preserve DEBUG assertion boundaries. Native nested-expression argument evaluation order, stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. mk_leq_core, overflow comparison and full dispatch/integration remain outstanding; no whole-unit promotion is credited.",
-        "Fifteen shape/status/commonality cases, seven every-cold-reservation/publication campaigns, complete independent 4-bit enumeration (16x16 offsets and 16 common values), four actual Runtime parent campaigns and four numerical-owner Runtime campaigns at widths65/257 pass. Cold publication reaches real old BOR32 deletion refusal; independently modeled big boundaries and graph closure to zero budget are checked. Raw noncanonical coefficients remain unnormalized, including the less-offset branch that retains its original right operand. The C++ mixed ADD/non-ADD branches read the non-ADD arity and reject on its false has_num flag; preserve this quirk. Non-application to_app, empty/invalid sorts and other source undefined domains retain guarded adaptations. Native nested-expression evaluation order, stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. mk_leq_core/full application dispatch and solver integration remain outstanding; no whole-unit promotion is credited."
+        "Fifteen shape/status/commonality cases, seven every-cold-reservation/publication campaigns, complete independent 4-bit enumeration (16x16 offsets and 16 common values), four actual Runtime parent campaigns and four numerical-owner Runtime campaigns at widths65/257 pass. Cold publication reaches real old BOR32 deletion refusal; independently modeled big boundaries and graph closure to zero budget are checked. Raw noncanonical coefficients remain unnormalized, including the less-offset branch that retains its original right operand. The C++ mixed ADD/non-ADD branches read the non-ADD arity and reject on its false has_num flag; preserve this quirk. Non-application to_app, empty/invalid sorts and other source undefined domains retain guarded adaptations. Native nested-expression evaluation order, stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. mk_leq_core/full application dispatch and solver integration remain outstanding; no whole-unit promotion is credited.",
+        "Seventeen core branch/status cases, seven signed-rule guard cases, enabled concat/overflow helper routing, nine core cold campaigns, six wrapper shape cases and five wrapper cold campaigns cover original publication/status and real old BOR32 deletion refusal. Five numerical-owner and four parent actual Runtime campaigns cover signed/unsigned bounds at widths65/257, noncanonical normalization, the original unused r3, signed remainder/strict-power sum guard, zero constants and bit64 leading-zero routing; all graphs close to zero budget. Source does not require remainder dividend identity with the outer first ADD operand; preserve/test that quirk. DEBUG/native invalid domains retain existing guarded adaptations. C++ nested argument evaluation order, native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified; disabled #if0 and TRACE-only branches are not credited. Full application dispatch and solver integration remain outstanding; no whole-unit promotion is credited."
       ]
     },
     {
@@ -23111,7 +23155,14 @@
         "pkg/ast/rewriter/bv_rewriter_leq_overflow_test.go",
         "pkg/ast/rewriter/bv_rewriter_leq_overflow_numeric_test.go",
         "pkg/ast/ast_bv_overflow_comparison_numerals.go",
-        "pkg/ast/ast_bv_overflow_comparison_numerals_test.go"
+        "pkg/ast/ast_bv_overflow_comparison_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_leq.go",
+        "pkg/ast/rewriter/bv_rewriter_leq_test.go",
+        "pkg/ast/rewriter/bv_rewriter_leq_numeric_test.go",
+        "pkg/ast/rewriter/bv_rewriter_leq_wrappers.go",
+        "pkg/ast/rewriter/bv_rewriter_leq_wrappers_test.go",
+        "pkg/ast/ast_bv_le_comparison_numerals.go",
+        "pkg/ast/ast_bv_le_comparison_numerals_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -23322,7 +23373,14 @@
         "TestBVRewriterLEOverflowEveryColdReservationAndPublication",
         "TestBVRewriterLEOverflowIndependentWraparoundEnumeration",
         "TestBVRewriterLEOverflowEveryActualNumericReservation",
-        "TestASTBitVectorOverflowComparisonEveryActualReservation"
+        "TestASTBitVectorOverflowComparisonEveryActualReservation",
+        "TestBVRewriterLEOriginalBranchesAndStatuses",
+        "TestBVRewriterLESignedRemainderGuardsAndExtraHelpers",
+        "TestBVRewriterLEEveryColdReservationAndPublication",
+        "TestBVRewriterLEEveryActualNumericReservation",
+        "TestBVRewriterLEOriginalWrappers",
+        "TestBVRewriterLEWrappersEveryColdReservationAndPublication",
+        "TestASTBitVectorLEComparisonEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -24128,6 +24186,34 @@
           "tests": [
             "TestASTBitVectorOverflowComparisonEveryActualReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_leq_core: original three defaults/two reads before identity, shared stored-width normalization, numeric/bounds rewrites, ordered signed-remainder predicate and repeated sum expression, configured concat then overflow helpers, descending zero-bit scan and original statuses (src/ast/rewriter/bv_rewriter.cpp:436-584; src/ast/rewriter/bv_rewriter.h:82)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_leq.go",
+          "tests": [
+            "TestBVRewriterLEOriginalBranchesAndStatuses",
+            "TestBVRewriterLESignedRemainderGuardsAndExtraHelpers",
+            "TestBVRewriterLEEveryColdReservationAndPublication",
+            "TestBVRewriterLEEveryActualNumericReservation"
+          ]
+        },
+        {
+          "name": "Complete selected signed/unsigned LE/GE/LT wrappers: reversed core calls, raw reversed fallback after FAILED and raw NOT of reversed comparison with REWRITE2 (src/ast/rewriter/bv_rewriter.cpp:210-242; src/ast/rewriter/bv_rewriter.h:73-78)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_leq_wrappers.go",
+          "tests": [
+            "TestBVRewriterLEOriginalWrappers",
+            "TestBVRewriterLEWrappersEveryColdReservationAndPublication"
+          ]
+        },
+        {
+          "name": "Exact LE numerical authority: original unused r3, later default lower/upper, reached signed literals/power/negation/subtraction/norm/remainder/sum returns, original assignment/full-expression ends and captured numeral factory (src/ast/rewriter/bv_rewriter.cpp:436-517,560-568)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_le_comparison_numerals.go",
+          "tests": [
+            "TestASTBitVectorLEComparisonEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -24168,7 +24254,8 @@
         "The derived BV owner retains the stopped XOR frame: borrowed flat/new argument buffers, actual positive plane1 then negative plane2 before v1/v2, exact scalar/numeral/all-one/unsigned-zero child receipts, mask literal two, owning inline16/doubling expr_ref_buffer and younger owning not_t, or the final rebuild owning constant c even when unused. Each original polarity collision clears its reached mark before all-one XOR expression entry. Mask pushes INC before buffer growth and retain any uninserted incoming INC on refusal for explicit owning cleanup; source success ends not_t before forward buffer DEC, then two/v2/v1 before negative/positive marks and older flat buffer. Rebuild c ends before its borrowed buffer and numerical locals. Publication precedes those source ends; already-consumed old-output decrements and sticky caller history survive cleanup.",
         "The BV owner retains younger propagation before extraction: exact single-default numerical scopes, captured scalar/power/literal/factory receipts, borrowed inline16/doubling argument buffers and the extraction ep_res reference constructed even when propagation returns zero. Success publishes before reached ui64 literal/ep_res/buffers/default v source ends. Failed numerical children join before older buffers/defaults; output INC/consumed old DEC and sticky replay/history survive owning cleanup. Removing an entire concat head borrows AppArguments.Range directly and adds no argument-copy buffer reservation; only the original declaration sort-domain buffer remains.",
         "The persistent BV owner retains a stopped concat-comparison frame. af then bf defaults exist only inside the nonempty first-numeral branch; original short-circuit reads skip bf assignment after nonnumeric af. Each reached power/division temporary ends after hi_af/hi_bf initialization. Those high values survive both younger default new_a/new_b refs and branch-local borrowed buffers. Each shortened-head buffer ends after its own ref assignment; output publication precedes new_b/new_a and hi_bf/hi_af/bf/af source destruction. Exact failed normalization/scalar/NUM children join before buffer/ref/older numeric owning cleanup, preserving consumed old-output decrements and cause history.",
-        "Unsigned overflow comparison constructs owning default common before a0/b0 defaults. Sum recognition preserves both initial and repeated static-zero assignments, original pointer-order checks and direct borrowed ADD suffix reconstruction. The less-offset returned difference survives output assignment then ends before older locals; lower/upper initialization ends only reached power/compound-subtraction expression temporaries and retains both constants through publication. Exact failed scalar/NUM receipts join before numerical owning cleanup, then the older common ref; consumed old-output decrements and sticky replay/history survive close."
+        "Unsigned overflow comparison constructs owning default common before a0/b0 defaults. Sum recognition preserves both initial and repeated static-zero assignments, original pointer-order checks and direct borrowed ADD suffix reconstruction. The less-offset returned difference survives output assignment then ends before older locals; lower/upper initialization ends only reached power/compound-subtraction expression temporaries and retains both constants through publication. Exact failed scalar/NUM receipts join before numerical owning cleanup, then the older common ref; consumed old-output decrements and sticky replay/history survive close.",
+        "The persistent BV owner retains the parent LE frame behind younger concat/overflow helper frames. r1/r2/r3 defaults precede both stored reads and identity; lower/upper defaults are reached only after numeric comparison guards. Each normalization performs the original return-copy assignment and ends its distinct return. Bounds use actual signed literal temporaries rather than borrowed static constants. The signed-remainder guard uses returned operator% and evaluates/ends the sum-minus-static-one/power expression before branch entry, then reconstructs it for NUM/output publication. Concrete construction stamps track only physically reached temporary values so owning cleanup follows their actual reverse creation order despite reused power/arithmetic slots. Descending zero-bit child receipts join before older parent numeric scopes; consumed old-output decrements and sticky replay/history survive close."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -24210,7 +24297,8 @@
         "Twenty-two shape/status cases cover positive/negative duplicate parity, both opposite orders, repeated opposite toggles, first-survivor argument order, numeric/zero/FAILED paths, one-level flattening/equal-count discard, all-one final NOT and BR_REWRITE3 masks including direct singleton extraction. Twelve cold campaigns include original unused c construction and actual output publication followed by consumed old BOR32 deletion refusal. Five fresh Runtime campaigns cover noncanonical numerical XOR at widths65/257, opposite-polarity numeric/helper children, a 65-piece owning mask and a raw high-only mask whose original unnormalized scan returns one full-width extract of its input. Actual 16/32/64 growth refusals prove the completed incoming INC is retained and owning cleanup deletes the uninserted piece; all graphs close to zero budget. Sorting retains the existing std::sort comparator/output-contract qualification; guarded invalid domains, native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. Full application dispatch and arithmetic/solver integration remain outstanding; no whole-unit promotion is credited.",
         "Seventeen extraction branch/status cases, seven cold extraction campaigns, seven propagation order/shape cases, five propagation/helper/parent/ITE cold campaigns and four actual Runtime numeric campaigns cover source failures and independently modeled values/shapes. The source reduces negative inputs at RESULT width before shifting; the preserved -128[7:4] result is zero. Nonzero numeric concat prefixes are shortened rather than required to be zero, and a symbolic-first prefix scan keeps its original later sort-only checks. Cold publication tests reach real old BOR32 destruction refusal; all actual Runtime graphs close to zero budget. Invalid sorts/widths and unreachable malformed concat domains retain guarded adaptations. Native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, unspecified nested ITE argument evaluation order, independently stopped source destruction and fatal resumability remain qualified; TRACE-only output is not credited. Full BV comparison/application dispatch and solver integration remain outstanding; no whole source unit is promoted.",
         "Thirteen independent shape/status cases, six every-cold-reservation campaigns and two actual Runtime parent campaigns cover numeric inequality, signed high prefixes, equal high prefixes switching to unsigned tails, either partial prefix, common prefix/postfix, FAILED with absent output and real postpublication old BOR32 deletion refusal. Three actual numerical-owner Runtime campaigns cover 65/257-bit signed/negative/noncanonical high prefixes, returned division/power source ends, copied/stopped owners, older-local retention and zero-budget closure. Guarded empty/equal/unreachable direct-helper domains preserve DEBUG assertion boundaries. Native nested-expression argument evaluation order, stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. mk_leq_core, overflow comparison and full dispatch/integration remain outstanding; no whole-unit promotion is credited.",
-        "Fifteen shape/status/commonality cases, seven every-cold-reservation/publication campaigns, complete independent 4-bit enumeration (16x16 offsets and 16 common values), four actual Runtime parent campaigns and four numerical-owner Runtime campaigns at widths65/257 pass. Cold publication reaches real old BOR32 deletion refusal; independently modeled big boundaries and graph closure to zero budget are checked. Raw noncanonical coefficients remain unnormalized, including the less-offset branch that retains its original right operand. The C++ mixed ADD/non-ADD branches read the non-ADD arity and reject on its false has_num flag; preserve this quirk. Non-application to_app, empty/invalid sorts and other source undefined domains retain guarded adaptations. Native nested-expression evaluation order, stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. mk_leq_core/full application dispatch and solver integration remain outstanding; no whole-unit promotion is credited."
+        "Fifteen shape/status/commonality cases, seven every-cold-reservation/publication campaigns, complete independent 4-bit enumeration (16x16 offsets and 16 common values), four actual Runtime parent campaigns and four numerical-owner Runtime campaigns at widths65/257 pass. Cold publication reaches real old BOR32 deletion refusal; independently modeled big boundaries and graph closure to zero budget are checked. Raw noncanonical coefficients remain unnormalized, including the less-offset branch that retains its original right operand. The C++ mixed ADD/non-ADD branches read the non-ADD arity and reject on its false has_num flag; preserve this quirk. Non-application to_app, empty/invalid sorts and other source undefined domains retain guarded adaptations. Native nested-expression evaluation order, stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. mk_leq_core/full application dispatch and solver integration remain outstanding; no whole-unit promotion is credited.",
+        "Seventeen core branch/status cases, seven signed-rule guard cases, enabled concat/overflow helper routing, nine core cold campaigns, six wrapper shape cases and five wrapper cold campaigns cover original publication/status and real old BOR32 deletion refusal. Five numerical-owner and four parent actual Runtime campaigns cover signed/unsigned bounds at widths65/257, noncanonical normalization, the original unused r3, signed remainder/strict-power sum guard, zero constants and bit64 leading-zero routing; all graphs close to zero budget. Source does not require remainder dividend identity with the outer first ADD operand; preserve/test that quirk. DEBUG/native invalid domains retain existing guarded adaptations. C++ nested argument evaluation order, native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified; disabled #if0 and TRACE-only branches are not credited. Full application dispatch and solver integration remain outstanding; no whole-unit promotion is credited."
       ]
     },
     {
