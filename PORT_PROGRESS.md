@@ -30367,4 +30367,12 @@ Tests now cover counted embedded NUL data, C-string first-NUL behavior, independ
 
 Focused native checks pass for util, AST and smtcore (1.757s/0.331s/0.320s); focused g3debug checks pass (1.819s/0.320s/0.348s). Vet for those packages and the port ledger pass. The full native `go test -C pkg ./...` checkpoint completed with exit0 at 2026-10-08 21:37 UTC: polynomial256.419s, util151.069s, AST32.163s, rewriter18.963s, with all other tested packages passing or reporting no tests. Whole util completion remains partial.
 
+### util file: scoped_timer.h and scoped_timer.cpp
+
+Ported the scoped timer through Go's time.AfterFunc instead of reproducing the source's Windows timer queue and pthread condition-variable implementations. NewScopedTimer preserves the source's disabled zero and MaxUint32 intervals and dispatches EventCallerTimeout for enabled timers. Close replaces the destructor, is idempotent for the exact owner, prevents callbacks that have not begun, and deliberately does not wait on an already-running callback so an event handler can close its own timer without deadlock.
+
+EventCaller and EventHandler are exported concrete Go interfaces for util consumers; the existing cancel-handler constants remain aliases with their original numeric values. Tests cover timeout dispatch, both disabled intervals, close-before-fire, repeated close, nil and typed-nil handlers, copied/nil owner rejection, closing during a blocked callback, and handler-driven self-close. The Go runtime supplies platform waiting, spurious-wakeup handling and timer cleanup; no operating-system thread primitives or C++ exception behavior are ported.
+
+Focused native and g3debug scoped-timer/cancel-handler checks pass (0.243s/0.240s). Util vet, ledger and diff checks pass; inventory is now2102 units,677 APIs:55 ported,287 partial,1760 unported. The clean full-native checkpoint at21:37 UTC covers the preceding Go-text commit; this timer chunk uses focused checks because it follows immediately afterward. Whole util completion remains partial.
+
 Final focused native util/AST checks pass (2.294s/0.238s); g3debug checks pass (2.436s/0.204s). These cover stream, raw/binary/rational output, rational-owned-string, decimal/SMT2 stream, MPQInf and AST bit-vector integer/trace output tests. Util vet passes. The legacy OwnedString return adapter and other string emulation remain migration work; this is not full util completion. No additional full-suite run was needed before the next hourly checkpoint.

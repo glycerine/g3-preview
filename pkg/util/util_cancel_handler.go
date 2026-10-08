@@ -1,14 +1,24 @@
 // Concrete reslimit specialization of src/util/event_handler.h/cancel_eh.h.
 package util
 
-type utilEventCaller uint32
+type EventCaller uint32
 
 const (
-	utilUnsetCaller utilEventCaller = iota
-	utilControlCCaller
-	utilTimeoutCaller
-	utilResourceLimitCaller
-	utilAPIInterruptCaller
+	EventCallerUnset EventCaller = iota
+	EventCallerControlC
+	EventCallerTimeout
+	EventCallerResourceLimit
+	EventCallerAPIInterrupt
+)
+
+type utilEventCaller = EventCaller
+
+const (
+	utilUnsetCaller         = EventCallerUnset
+	utilControlCCaller      = EventCallerControlC
+	utilTimeoutCaller       = EventCallerTimeout
+	utilResourceLimitCaller = EventCallerResourceLimit
+	utilAPIInterruptCaller  = EventCallerAPIInterrupt
 )
 
 // This cold scope borrows its resource owner. Invoke and Close must be serialized

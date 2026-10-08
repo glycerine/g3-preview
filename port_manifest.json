@@ -149306,9 +149306,16 @@
       "path": "src/util/scoped_timer.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/util_scoped_timer.go",
+        "pkg/util/util_scoped_timer_test.go"
+      ],
+      "tests": [
+        "TestScopedTimerFiresWithTimeoutCaller",
+        "TestScopedTimerDisabledIntervalsAndClose",
+        "TestScopedTimerAuthorityAndRunningCallbackClose"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -149445,19 +149452,41 @@
           "text": "ENSURE(pthread_create(&m_thread_id, NULL, &thread_func, this) == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "scoped_timer constructor, disabled intervals, asynchronous timeout dispatch and destructor",
+          "status": "ported",
+          "go_target": "pkg/util/util_scoped_timer.go",
+          "tests": [
+            "TestScopedTimerFiresWithTimeoutCaller",
+            "TestScopedTimerDisabledIntervalsAndClose",
+            "TestScopedTimerAuthorityAndRunningCallbackClose"
+          ]
+        }
+      ],
+      "ownership": [
+        "ScopedTimer owns one Go time.Timer when enabled and borrows the EventHandler. Close is idempotent for the exact owner, prevents callbacks that have not begun, and releases the handler reference. An already-running callback owns its closure until return, allowing handler-driven Close without self-deadlock."
+      ],
+      "deviations": [
+        "Go time.AfterFunc replaces all Windows, macOS, Linux, FreeBSD and NetBSD timer-thread branches. The Go runtime supplies platform waiting, spurious-wakeup handling and timer cleanup. No pthread, OS timer queue, C ABI or C++ exception transport is ported. Handler panics retain Go callback semantics."
+      ]
     },
     {
       "path": "src/util/scoped_timer.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/util_scoped_timer.go",
+        "pkg/util/util_scoped_timer_test.go"
+      ],
+      "tests": [
+        "TestScopedTimerFiresWithTimeoutCaller",
+        "TestScopedTimerDisabledIntervalsAndClose",
+        "TestScopedTimerAuthorityAndRunningCallbackClose"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -149468,11 +149497,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "scoped_timer(unsigned,event_handler*) and destructor",
+          "status": "ported",
+          "go_target": "pkg/util/util_scoped_timer.go",
+          "tests": [
+            "TestScopedTimerFiresWithTimeoutCaller",
+            "TestScopedTimerDisabledIntervalsAndClose",
+            "TestScopedTimerAuthorityAndRunningCallbackClose"
+          ]
+        }
+      ],
+      "ownership": [
+        "NewScopedTimer returns the exact Go owner; its handler is borrowed. Close replaces the source destructor and rejects copied/nil owners."
+      ],
+      "deviations": [
+        "Go time.Timer is used directly. There is no port of the C++ pimpl or operating-system threading primitives."
+      ]
     },
     {
       "path": "src/util/scoped_vector.h",
