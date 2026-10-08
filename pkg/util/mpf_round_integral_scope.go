@@ -25,7 +25,7 @@ func (z *IntegerManager) mpfArithmeticTransportActive() bool {
 		return false
 	}
 	m := z.MpfParent
-	return m != nil && m.self == m && m.integer == z && (m.integralRound.valid() && m.integralRound.NumericExecuting() || m.addSub.valid() && m.addSub.NumericExecuting() || m.mul.valid() && m.mul.NumericExecuting() || m.div.valid() && m.div.NumericExecuting()) && m.memory != nil && m.memory.FailureTransportActive()
+	return m != nil && m.self == m && m.integer == z && (m.integralRound.valid() && m.integralRound.NumericExecuting() || m.addSub.valid() && m.addSub.NumericExecuting() || m.mul.valid() && m.mul.NumericExecuting() || m.div.valid() && m.div.NumericExecuting() || m.fma.valid() && m.fma.NumericExecuting()) && m.memory != nil && m.memory.FailureTransportActive()
 }
 
 func (s *arbitraryFloatIntegralRoundScope) valid() bool {

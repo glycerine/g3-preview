@@ -37,7 +37,7 @@ func (m *ArbitraryFloatManager) valueGuard(a *ArbitraryFloat) error {
 	if !m.constructorComplete || m.closed || m.sourceEnded {
 		return arena.ErrClosed
 	}
-	if m.valueExecuting || m.div.finishing || m.div.executing && m.memory != nil && m.memory.FailureTransportActive() || m.mul.finishing || m.mul.executing && m.memory != nil && m.memory.FailureTransportActive() || m.addSub.finishing || m.addSub.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integralRound.finishing || m.integralRound.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integerQuery.finishing || m.integer.mpfBorrowedSourceCallbackActive() {
+	if m.valueExecuting || m.fma.finishing || m.fma.executing && m.memory != nil && m.memory.FailureTransportActive() || m.div.finishing || m.div.executing && m.memory != nil && m.memory.FailureTransportActive() || m.mul.finishing || m.mul.executing && m.memory != nil && m.memory.FailureTransportActive() || m.addSub.finishing || m.addSub.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integralRound.finishing || m.integralRound.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integerQuery.finishing || m.integer.mpfBorrowedSourceCallbackActive() {
 		return ErrNumericPending
 	}
 	return nil
@@ -178,7 +178,7 @@ func (m *ArbitraryFloatManager) CleanupValue(a *ArbitraryFloat) error {
 	if !m.constructorComplete || m.closed {
 		return arena.ErrClosed
 	}
-	if m.valueExecuting || m.div.finishing || m.div.executing && m.memory != nil && m.memory.FailureTransportActive() || m.mul.finishing || m.mul.executing && m.memory != nil && m.memory.FailureTransportActive() || m.addSub.finishing || m.addSub.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integralRound.finishing || m.integralRound.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integerQuery.finishing || m.integer.mpfBorrowedSourceCallbackActive() {
+	if m.valueExecuting || m.fma.finishing || m.fma.executing && m.memory != nil && m.memory.FailureTransportActive() || m.div.finishing || m.div.executing && m.memory != nil && m.memory.FailureTransportActive() || m.mul.finishing || m.mul.executing && m.memory != nil && m.memory.FailureTransportActive() || m.addSub.finishing || m.addSub.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integralRound.finishing || m.integralRound.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integerQuery.finishing || m.integer.mpfBorrowedSourceCallbackActive() {
 		return ErrNumericPending
 	}
 	m.valueExecuting = true
