@@ -25,6 +25,7 @@ type BVRewriter struct {
 	eqRemainder           *ast.BitVectorRemainderEqualityNumerals
 	mkbv                  *ast.BitVectorMkBVNumerals
 	ite                   *ast.BitVectorIteNumerals
+	arithmeticShift       *ast.BitVectorArithmeticShiftNumerals
 	shift                 *ast.BitVectorLogicalShiftNumerals
 	shiftArgs             [2]ast.ASTHandle
 	concat                *bvConcatInvocation
@@ -181,6 +182,12 @@ func (p *BVRewriter) Close() error {
 		if e := p.polynomial.closeInvocations(); e != nil {
 			return e
 		}
+	}
+	if p.arithmeticShift != nil {
+		if e := p.arithmeticShift.Close(); e != nil {
+			return e
+		}
+		p.arithmeticShift = nil
 	}
 	if p.shift != nil {
 		if e := p.shift.Close(); e != nil {

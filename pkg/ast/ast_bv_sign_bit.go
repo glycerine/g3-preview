@@ -14,7 +14,29 @@ func (m *ASTManager) BitVectorHasSignBit(n *util.OwnedRational, bits uint32) (bo
 	return m.bitVectorHasSignBit(n, bits, nil)
 }
 
-func (m *ASTManager) bitVectorHasSignBit(n *util.OwnedRational, bits uint32, g *util.GlobalParamsService) (sign bool, result error) {
+// BitVectorHasSignBitWithInvocation captures the actual sign-test frame at entry.
+func (m *ASTManager) BitVectorHasSignBitWithInvocation(n *util.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (sign bool, result error) {
+	if c == nil {
+		return false, ErrASTHandle
+	}
+	if e := m.lock(); e != nil {
+		return false, e
+	}
+	defer m.mu.Unlock()
+	if e := c.prepare(m); e != nil {
+		return false, e
+	}
+	defer c.finish(&result)
+	previous := m.formatExecuting
+	m.formatExecuting = true
+	defer func() { m.formatExecuting = previous }()
+	return m.bitVectorHasSignBitCaptured(n, bits, nil, &c.receipt)
+}
+
+func (m *ASTManager) bitVectorHasSignBit(n *util.OwnedRational, bits uint32, g *util.GlobalParamsService) (bool, error) {
+	return m.bitVectorHasSignBitCaptured(n, bits, g, nil)
+}
+func (m *ASTManager) bitVectorHasSignBitCaptured(n *util.OwnedRational, bits uint32, g *util.GlobalParamsService, captured *astBVNormalizationReceipt) (sign bool, result error) {
 	enabled, e := astBVAssertionEnabled(g)
 	if e != nil {
 		return false, e
@@ -28,7 +50,10 @@ func (m *ASTManager) bitVectorHasSignBit(n *util.OwnedRational, bits uint32, g *
 	if e != nil {
 		return false, e
 	}
-	defer f.finishNumeral(&result, nil)
+	if captured != nil {
+		*captured = astBVNormalizationReceipt{frame: f, invocation: f.invocation}
+	}
+	defer f.finishNumeral(&result, captured)
 	v, e := m.normalizeBitVectorWithFrame(n, bits, false, g, &f.normalizationChild)
 	if e != nil {
 		return false, e
