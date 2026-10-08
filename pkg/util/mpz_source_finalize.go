@@ -28,6 +28,9 @@ func (m *IntegerManager) SourceFinalize() error {
 	if m.originalCause != nil {
 		return arena.ErrClosed
 	}
+	if e := m.finishSMT2StreamSource(); e != nil {
+		return e
+	}
 	if e := m.finishMyMPZSqrtSource(); e != nil {
 		return e
 	}

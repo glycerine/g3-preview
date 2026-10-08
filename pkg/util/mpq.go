@@ -30,6 +30,7 @@ type RationalConfig struct {
 // source reusable scratch algorithms. Both are owner-confined, not concurrent.
 // Manager header bytes include all retained scalar rational scratch members.
 type RationalManager struct {
+	smt2Stream                                     rationalSMT2StreamScope
 	stringScope                                    rationalOwnedStringScope
 	mpfParent                                      *ArbitraryFloatManager
 	lexical                                        rationalManagerLexicalScope
