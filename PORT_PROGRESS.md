@@ -30383,7 +30383,7 @@ Ledger validation passes with sstream.h classified as a platform replacement. In
 
 ### util file: machine.h
 
-Ported the source PTR_ALIGNMENT macro as exported Go target queries. PointerAlignmentBytes comes from unsafe.Alignof(uintptr(0)); PointerAlignmentShift derives its low-zero-bit count with math/bits; PointerTagMask supplies the corresponding low tag mask. This follows the actual Go target rather than copying the C++ compiler's AMD64-versus-other conditional. Tests compare the reported values with independent standard-library queries and an allocated pointer.
+Ported the source PTR_ALIGNMENT macro as exported Go target queries. PointerAlignmentBytes comes from unsafe.Alignof(uintptr(0)); PointerAlignmentShift derives its low-zero-bit count with math/bits. This follows the actual Go target rather than copying the C++ compiler's AMD64-versus-other conditional. Tests compare the reported values with independent standard-library queries and an allocated pointer.
 
 Focused native and g3debug machine checks pass (0.004s each). Util vet, ledger and diff checks pass; inventory is now2102 units,677 APIs:56 ported,287 partial,1758 unported, plus the separately classified sstream platform replacement. No new full suite was needed after the21:37 UTC checkpoint.
 
@@ -30500,3 +30500,9 @@ Ported the complete exposed top_sort behavior as exported NewTopSort, TopSort.In
 The fork exposes only its dependency-first result. Its active-node revisit condition never changes the partition stack, so the observable algorithm is DFS completion order with registered cycles visited once and dependency pointers absent from the key map ignored. The Go traversal preserves that behavior with explicit frames, avoiding call-stack exhaustion. Go-owned maps and slices replace the source maps, vectors and dependency-set destructor; TopSorted returns a copy of the retained order.
 
 Five focused tests cover dependency chains and absent keys, cycles, duplicate edges, dependency replacement, deterministic roots, atomic nil/nonpointer rejection, immutable result publication, a 100,000-node chain, and 100 deterministic ChaCha8 DAGs of 250 nodes checked against the independent dependency-order property. Focused native and g3debug checks pass (0.147s/0.142s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:72 ported,287 partial,1736 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
+
+### util file: tptr.h
+
+Audited all pointer-manipulation macros and retained consumers. TAG, UNTAG, GET_TAG, BOXINT, BOXTAGINT, UNBOXINT and ALIGN encode discriminants or integers in raw C++ pointer bits. A Go translation would hide pointers from the garbage collector and depend on unsafe uintptr round trips. Recorded the header as a language/runtime replacement: each concrete consumer must use ordinary typed pointer fields with an explicit enum or boolean, and ordinary integer fields for boxed values.
+
+Removed the unused exported PointerTagMask helper and the suggestion that shared tagged-pointer adapters should use it. The separate machine.h port still exposes the actual Go target alignment and shift and tests its alignment against a real allocation using a test-local mask. Focused native and g3debug machine checks pass; util vet, ledger and diff validation pass. Inventory is now2102 units,677 APIs:72 ported,287 partial,1735 unported, plus the separately classified platform replacements. No C++ pointer-bit API or unsafe shared facade remains.

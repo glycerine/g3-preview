@@ -11,11 +11,7 @@ import (
 const PointerAlignmentBytes = uint(unsafe.Alignof(uintptr(0)))
 
 // PointerAlignmentShift is the number of low zero bits guaranteed by the host
-// pointer alignment. Tagged-pointer adapters use it instead of PTR_ALIGNMENT.
+// pointer alignment. It is the Go-target translation of PTR_ALIGNMENT.
 func PointerAlignmentShift() uint {
 	return uint(bits.TrailingZeros(PointerAlignmentBytes))
-}
-
-func PointerTagMask() uintptr {
-	return uintptr(PointerAlignmentBytes - 1)
 }

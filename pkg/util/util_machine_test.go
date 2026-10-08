@@ -15,15 +15,13 @@ func TestMachinePointerAlignmentFromGoTarget(t *testing.T) {
 	if PointerAlignmentShift() != uint(bits.TrailingZeros(want)) || uint(1)<<PointerAlignmentShift() != want {
 		t.Fatal("pointer alignment shift", PointerAlignmentShift(), want)
 	}
-	if PointerTagMask() != uintptr(want-1) {
-		t.Fatal("pointer tag mask", PointerTagMask(), want-1)
-	}
 }
 
 func TestMachinePointerAlignmentCoversAllocatedPointer(t *testing.T) {
 	x := new(uintptr)
 	pointer := uintptr(unsafe.Pointer(x))
-	if pointer&PointerTagMask() != 0 {
-		t.Fatal("allocated pointer violates reported alignment", pointer, PointerTagMask())
+	mask := uintptr(PointerAlignmentBytes - 1)
+	if pointer&mask != 0 {
+		t.Fatal("allocated pointer violates reported alignment", pointer, mask)
 	}
 }

@@ -153914,7 +153914,7 @@
       "path": "src/util/tptr.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -153927,11 +153927,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The complete header consists of unsafe C++ pointer-bit macros: alignment rounding, tag packing/unpacking, tag extraction and integer boxing. Go's garbage collector must retain real typed pointers and does not permit portable pointer tagging through uintptr. Each concrete consumer must represent its alternatives with ordinary typed pointer fields plus an enum or boolean, and boxed integers with Go integer fields. No shared TAG/UNTAG/BOXINT facade is created. PointerAlignmentShift remains the separate src/util/machine.h target query; no exported tag mask or pointer-reinterpretation API is retained."
+      ]
     },
     {
       "path": "src/util/trace.cpp",
