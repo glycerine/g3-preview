@@ -21300,7 +21300,11 @@
         "pkg/ast/ast_bv_negatable_numerals.go",
         "pkg/ast/ast_bv_negatable_numerals_test.go",
         "pkg/ast/ast_bv_one_numeral.go",
-        "pkg/ast/ast_bv_one_numeral_test.go"
+        "pkg/ast/ast_bv_one_numeral_test.go",
+        "pkg/ast/rewriter/bv_rewriter_not.go",
+        "pkg/ast/rewriter/bv_rewriter_not_test.go",
+        "pkg/ast/ast_bv_not_numerals.go",
+        "pkg/ast/ast_bv_not_numerals_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21450,7 +21454,12 @@
         "TestASTBitVectorNegatableEveryActualReservation",
         "TestASTBitVectorNegatableStoredReadAndReturnLifetime",
         "TestASTBitVectorBorrowedOneEveryActualReservation",
-        "TestASTBitVectorBorrowedOneWidthGuard"
+        "TestASTBitVectorBorrowedOneWidthGuard",
+        "TestBVRewriterNotOriginalBranches",
+        "TestBVRewriterNotEveryColdReservation",
+        "TestBVRewriterNotFlagPrecedenceAndErasedIdentity",
+        "TestBVRewriterNotOriginalNonunaryGuard",
+        "TestASTBitVectorNotNumeralsEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -22532,6 +22541,23 @@
             "TestASTBitVectorBorrowedOneEveryActualReservation",
             "TestASTBitVectorBorrowedOneWidthGuard"
           ]
+        },
+        {
+          "name": "Complete selected mk_bv_not: original guard/branch/configuration order, complement assignment and temporary end, borrowed concat buffer, literal versus static one, t-before-s negatable helpers, raw ordered ternary ADD and reverse reference/default-value end (bv_rewriter.cpp:1905-1969; bv_rewriter.h:91)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_not.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bv_rewriter_not_test.go",
+            "pkg/ast/ast_bv_not_numerals.go",
+            "pkg/ast/ast_bv_not_numerals_test.go"
+          ],
+          "tests": [
+            "TestBVRewriterNotOriginalBranches",
+            "TestBVRewriterNotEveryColdReservation",
+            "TestBVRewriterNotFlagPrecedenceAndErasedIdentity",
+            "TestBVRewriterNotOriginalNonunaryGuard",
+            "TestASTBitVectorNotNumeralsEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22755,7 +22781,11 @@
         "pkg/ast/rewriter/bv_rewriter_negatable.go",
         "pkg/ast/rewriter/bv_rewriter_negatable_test.go",
         "pkg/ast/ast_bv_negatable_numerals.go",
-        "pkg/ast/ast_bv_negatable_numerals_test.go"
+        "pkg/ast/ast_bv_negatable_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_not.go",
+        "pkg/ast/rewriter/bv_rewriter_not_test.go",
+        "pkg/ast/ast_bv_not_numerals.go",
+        "pkg/ast/ast_bv_not_numerals_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -22922,7 +22952,12 @@
         "TestBVRewriterNegatableEveryColdReservation",
         "TestBVRewriterNegatableOriginalNotArityAssertion",
         "TestASTBitVectorNegatableEveryActualReservation",
-        "TestASTBitVectorNegatableStoredReadAndReturnLifetime"
+        "TestASTBitVectorNegatableStoredReadAndReturnLifetime",
+        "TestBVRewriterNotOriginalBranches",
+        "TestBVRewriterNotEveryColdReservation",
+        "TestBVRewriterNotFlagPrecedenceAndErasedIdentity",
+        "TestBVRewriterNotOriginalNonunaryGuard",
+        "TestASTBitVectorNotNumeralsEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -23559,6 +23594,23 @@
             "TestBVRewriterNegatableOriginalNotArityAssertion",
             "TestASTBitVectorNegatableEveryActualReservation",
             "TestASTBitVectorNegatableStoredReadAndReturnLifetime"
+          ]
+        },
+        {
+          "name": "Complete selected mk_bv_not: original guard/branch/configuration order, complement assignment and temporary end, borrowed concat buffer, literal versus static one, t-before-s negatable helpers, raw ordered ternary ADD and reverse reference/default-value end (bv_rewriter.cpp:1905-1969; bv_rewriter.h:91)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_not.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bv_rewriter_not_test.go",
+            "pkg/ast/ast_bv_not_numerals.go",
+            "pkg/ast/ast_bv_not_numerals_test.go"
+          ],
+          "tests": [
+            "TestBVRewriterNotOriginalBranches",
+            "TestBVRewriterNotEveryColdReservation",
+            "TestBVRewriterNotFlagPrecedenceAndErasedIdentity",
+            "TestBVRewriterNotOriginalNonunaryGuard",
+            "TestASTBitVectorNotNumeralsEveryActualReservation"
           ]
         }
       ],

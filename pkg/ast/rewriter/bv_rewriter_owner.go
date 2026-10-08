@@ -36,6 +36,7 @@ type BVRewriter struct {
 	extensionPair         [2]ast.ASTHandle
 	minusOne              *ast.BitVectorMinusOneNumerals
 	negatable             *ast.BitVectorNegatableNumerals
+	bvnot                 *bvNotInvocation
 	unsignedDivision      *ast.BitVectorUnsignedDivisionNumerals
 	signedDivision        *ast.BitVectorSignedDivisionNumerals
 	signedRemainder       *ast.BitVectorSignedRemainderNumerals
@@ -207,6 +208,12 @@ func (p *BVRewriter) Close() error {
 			return e
 		}
 		p.negatable = nil
+	}
+	if p.bvnot != nil {
+		if e := p.bvnot.close(p.manager); e != nil {
+			return e
+		}
+		p.bvnot = nil
 	}
 	if p.minusOne != nil {
 		if e := p.minusOne.Close(); e != nil {
