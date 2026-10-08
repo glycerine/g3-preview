@@ -30486,3 +30486,9 @@ Ported the complete project-owned persistent singly linked list as exported List
 Ported all four registered append identity assertions and the source concatenation/self-append paths. Additional tests prove copied-prefix independence, exact suffix identity, mutable head/tail access, prefix/postfix iterator behavior, nil values distinct from end, length, and 2,000 deterministic ChaCha8 cases against an independent slice oracle. Go container/list is deliberately not used because its mutable doubly linked nodes cannot represent the source structural-sharing contract; no C++ standard-library container is ported.
 
 Focused native and g3debug list checks pass (0.033s/0.029s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:71 ported,287 partial,1738 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
+
+### util file: pool.h
+
+Audited the complete generic object-cache header and both retained pool<enode_vector> consumers in src/smt/mam.cpp. Each consumer resets every value immediately after retrieval and observes neither cache occupancy nor object identity. Recorded pool.h as a Go standard-library replacement: the eventual concrete consumers must use sync.Pool with New constructing an empty vector, Get followed by reset, and Put for recycling. Go garbage collection replaces deletion of cached objects; sync.Pool discarding cached values is observationally equivalent to the source allocating a fresh reset vector.
+
+No generic or any-valued util pool facade, C++ vector translation, or test of Go's standard library was added. Ledger and diff validation pass. Inventory is now2102 units,677 APIs:71 ported,287 partial,1737 unported, plus the separately classified platform replacements. The22:34 UTC full-suite checkpoint remains current.

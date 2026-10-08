@@ -145670,7 +145670,7 @@
       "path": "src/util/pool.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -145683,11 +145683,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The complete header is a generic reusable-object cache: mk returns a cached object or allocates one, recycle caches an object, and destruction deletes cached objects. Both retained pool<enode_vector> consumers in src/smt/mam.cpp reset every object immediately after mk and do not observe cache size or identity. Their Go ports must use a concrete sync.Pool with New constructing the vector, Get followed by reset, and Put for recycling. Go garbage collection replaces explicit cached-object destruction. sync.Pool may discard cached values at any collection, which is observationally equivalent because a fresh reset vector has the same project state. No generic or any-valued util pool wrapper is created, and no C++ standard-library vector/for_each machinery is ported."
+      ]
     },
     {
       "path": "src/util/pop_scopes.h",
