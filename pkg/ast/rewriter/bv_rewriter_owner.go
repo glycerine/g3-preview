@@ -22,6 +22,8 @@ type BVRewriter struct {
 	polynomial            *BVPolynomialRewriter
 	extract               MkExtractProc
 	trailing              *BVTrailing
+	eqRemainder           *ast.BitVectorRemainderEqualityNumerals
+	eqRefs                [2]ast.ASTRef
 	defaultParams         util.ParamsRef
 	defaultDecrement      util.ParamsDecrementReceipt
 	defaultPlaced         bool
@@ -173,6 +175,15 @@ func (p *BVRewriter) Close() error {
 		if e := p.polynomial.closeInvocations(); e != nil {
 			return e
 		}
+	}
+	if p.eqRemainder != nil {
+		if e := p.eqRemainder.Close(); e != nil {
+			return e
+		}
+		p.eqRemainder = nil
+	}
+	if e := p.endEqualityRefs(); e != nil {
+		return e
 	}
 	if p.trailing != nil {
 		if e := p.trailing.Close(); e != nil {
