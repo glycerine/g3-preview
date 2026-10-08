@@ -147747,8 +147747,10 @@
       "path": "src/util/ref_vector.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/util/ref_vector.go",
+        "pkg/util/ref_vector_test.go",
         "pkg/ast/ast_ref.go",
         "pkg/ast/ast_ref_vector.go",
         "pkg/ast/ast_ref_vector_access.go",
@@ -147786,6 +147788,11 @@
         "pkg/ast/ast_bv_bv2int_numerals_test.go"
       ],
       "tests": [
+        "TestRefVectorCoreCallbacksResizeReserveAndErase",
+        "TestRefVectorCopyMoveAssignSwapAndOrderOperations",
+        "TestRefVectorElementReferenceAndStructuralInvalidation",
+        "TestSRefVectorAndPointerHashEquality",
+        "TestRefVectorPreconditions",
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
         "TestASTRefVectorCopyAppendResizeAndTransfer",
         "TestASTRefVectorElementBorrowRetainsAndInvalidatesOnGrowth",
@@ -147924,9 +147931,47 @@
           "text": "SASSERT(m_ref);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "ref_vector_core construction, move, destruction, reset/finalize, both resize forms, reserve, shrink, push/pop, access, mutation, append, swap and reverse",
+          "status": "ported",
+          "go_target": "pkg/util/ref_vector.go",
+          "tests": [
+            "TestRefVectorCoreCallbacksResizeReserveAndErase",
+            "TestRefVectorCopyMoveAssignSwapAndOrderOperations",
+            "TestRefVectorElementReferenceAndStructuralInvalidation",
+            "TestRefVectorPreconditions"
+          ]
+        },
+        {
+          "name": "ref_manager_wrapper, ref_vector construction/copy/move/manager access/whole-vector swap/set and element_ref",
+          "status": "ported",
+          "go_target": "pkg/util/ref_vector.go",
+          "tests": [
+            "TestRefVectorCopyMoveAssignSwapAndOrderOperations",
+            "TestRefVectorElementReferenceAndStructuralInvalidation",
+            "TestRefVectorPreconditions"
+          ]
+        },
+        {
+          "name": "ref_unmanaged_wrapper and sref_vector self-managed reference operations",
+          "status": "ported",
+          "go_target": "pkg/util/ref_vector.go",
+          "tests": [
+            "TestSRefVectorAndPointerHashEquality"
+          ]
+        },
+        {
+          "name": "ref_vector_ptr_hash and ref_vector_ptr_eq",
+          "status": "ported",
+          "go_target": "pkg/util/ref_vector.go",
+          "tests": [
+            "TestSRefVectorAndPointerHashEquality",
+            "TestRefVectorPreconditions"
+          ]
+        },
         {
           "name": "actual sexpr concrete specialization constructors/copy/move/assignment, roots, projections and vector element/iterator adaptations",
           "status": "ported",
@@ -147950,7 +147995,7 @@
         },
         {
           "name": "concrete AST manager-bound owning ref/ref-vector specialization, callback order, copy/move/assignment and physical borrows",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_ref_vector.go",
           "tests": [
             "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -147968,7 +148013,7 @@
         },
         {
           "name": "Concrete dependency ref_vector source callback/growth/copy/resize/borrow/lifecycle operations",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency_ref_vector.go",
           "tests": [
             "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
@@ -148005,7 +148050,7 @@
         },
         {
           "name": "Concrete selected polynomial owning ref/reference-vector methods for actual Newton consumers; completed DEC and unjoined INC retain separate source versus owning phases",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_ref.go",
           "tests": [
             "TestPolynomialNewtonSourceInterpolation",
@@ -148030,7 +148075,7 @@
         },
         {
           "name": "Actual successful INC and vector publication receipts with exact consumed DEC owning continuation (src/util/ref_vector.h:28-217)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_ref_vector_push_source.go",
           "tests": [
             "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
@@ -148043,7 +148088,7 @@
         },
         {
           "name": "Reached reset, resize from completed zero range and SET INC-before-DEC (ref_vector.h:57-71,128-132)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_ref_vector_set.go",
           "tests": [
             "TestPolynomialSubresultantChainResetCallbackBeforeLocalConstructorsRefusesOwnerClose",
@@ -148059,7 +148104,7 @@
         },
         {
           "name": "Concrete SET optional factory transfer at actual caller incoming INC before old-slot read/DEC (ref_vector.h:128-132)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_ref_vector_set.go",
           "tests": [
             "TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry",
@@ -148072,7 +148117,7 @@
         },
         {
           "name": "Concrete source push_back INC then growth, actual caller-vector incoming acquisition ref_vector.h:96-100",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_ref_vector_push_receipt.go",
           "tests": [
             "TestPolynomialPSCChain2ResetCallbackNineReferencesAndOwnerRefusal",
@@ -148086,7 +148131,7 @@
         },
         {
           "name": "concrete acquired-reference receipt observation for lexical caller cleanup after source INC-before-growth failure",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_ref_vector_push_source.go",
           "tests": [
             "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
@@ -148095,7 +148140,7 @@
         },
         {
           "name": "Selected bv2int concrete owning vector INC-before-growth, INC/old-DEC/store replacement and consumed old/pending replacement cleanup (ref_vector.h:41-55,96-101,128-132)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_bv2int.go",
           "go_targets": [
             "pkg/ast/rewriter/bv_rewriter_bv2int_test.go",
@@ -148111,6 +148156,8 @@
         }
       ],
       "ownership": [
+        "RefVectorCore owns one acquired reference per stored slot. Push and fill growth increment before publication; Set increments incoming before decrementing old; Pop and Erase remove before decrement; shrink/reset/finalize/Close decrement removed ranges from first to last.",
+        "Clone and Assign acquire independent reference sequences. Move transfers the backing sequence without callbacks and leaves the source open and empty. Whole-vector Swap requires identical manager identity. Mutable element references and iterators borrow a particular structural generation and reject use after structural invalidation.",
         "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See PORT_PROGRESS.md#audit-sexpr-port-status-md.",
         "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in PORT_PROGRESS.md#audit-ast-core-packet-md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes.",
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
@@ -148121,10 +148168,11 @@
         "Persistent derived BV owner retains the reached bv2int invocation on failure. Its concrete numeric block owns default v and reached literal two/returned general power, with exact scalar and arithmetic-factory receipts. Numeric full-expression values survive tmp assignment, then end before vector replacement; loop tmp ends after size update. Owning cleanup joins exact newer numeric children and pending incoming INC before loop tmp, then forward vector elements and older v. Source vector SET stores replacement only after old DEC; consumed old references are recorded before a returned refusal so cleanup never repeats them. Source final vector destruction precedes default v."
       ],
       "deviations": [
-        "This concrete specialization does not implement all AST/other source specializations or remaining generic helper/hash surfaces. Ref-vector null callbacks and nonempty self-append have explicit checked Go adaptations.",
-        "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable in release and by physical borrows; never-initialized/OOB access is guarded. Other template specializations and pointer-hash/eq helpers remain open.",
-        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "Only selected default/INC-before-push/get/size/reset/assignment/destructor methods; full concrete equivalents of all source generic Ref/vector methods and global lifetime bindings remain open.",
+        "The source templates become non-generic any-valued RefVectorCore, RefVector and SRefVector types that accept nil or Go pointer elements. Manager methods become callbacks, while SelfRefCounted supplies the unmanaged wrapper contract. Go slices replace ptr_vector storage without porting the C++ container.",
+        "Nonempty self-append, invalid indices, stale mutable elements/iterators and use after Close are explicit checked Go preconditions instead of source undefined behavior. Ref-vector null callbacks remain governed by the supplied concrete manager callbacks.",
+        "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable by live borrows; never-initialized/OOB access is guarded.",
+        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
+        "Concrete package integrations retain their own allocator, callback-failure and lifetime qualifications; the generic util contract is complete independently of those integration profiles.",
         "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
         "Source remark equal-degree limitation and checked assertions retained. Default registered PSC dispatch uses optimized chain; dormant alternative gains zero active-driver credit. Pointer resize evidence covers only reached growth after completed reset, not ref_vector shrink. Signed-host TLS source release proof is an owner-primitive profile, not ordinary mathematical OOM. Actual mpz.h:156-163 old-TMP destruction before failing replacement leaves tmp[i]==0; only that literal dangling-pointer guard domain expects ErrInvalidSlot on retry. No scratch repair.",
         "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
