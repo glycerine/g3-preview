@@ -15,7 +15,11 @@ func (m *RationalManager) ToOwnedString(a *Rational, out *OwnedString) (cause er
 		return ErrParamsPrecondition
 	}
 	s := &m.stringScope
-	*s = rationalOwnedStringScope{manager: m, out: out, active: true, executing: true}
+	if s.invocation == ^uint64(0) {
+		return ErrNumericPending
+	}
+	next := s.invocation + 1
+	*s = rationalOwnedStringScope{manager: m, invocation: next, out: out, active: true, executing: true}
 	if e := s.bind(); e != nil {
 		s.executing = false
 		return e
@@ -75,6 +79,7 @@ func (m *RationalManager) ToOwnedString(a *Rational, out *OwnedString) (cause er
 }
 
 type rationalOwnedStringScope struct {
+	invocation                                                           uint64
 	manager                                                              *RationalManager
 	out                                                                  *OwnedString
 	denominator                                                          OwnedString

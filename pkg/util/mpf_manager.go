@@ -14,6 +14,7 @@ import (
 // manager-local mpz-wrapper IDs. No wrapper exists in default empty maps.
 // MPF numeral algorithms and populated powers2 operations remain separate.
 type ArbitraryFloatManager struct {
+	rationalString           arbitraryFloatRationalStringScope
 	rawString                arbitraryFloatRawStringScope
 	ieeeBV                   arbitraryFloatIEEEBVScope
 	sbv                      arbitraryFloatSBVScope
@@ -135,7 +136,7 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return ErrRuntimeOwner
 	}
-	if m.integer.rationalStringExecuting(false) || m.rawString.executing || m.rawString.finishing || m.ieeeBV.executing || m.ieeeBV.finishing || m.sbv.executing || m.sbv.finishing || m.toMPZ.executing || m.toMPZ.finishing || m.integer.mpfToMPZExecuting(false) || m.rem.executing || m.rem.finishing || m.partialRemainder.executing || m.partialRemainder.finishing || m.renormalize.executing || m.renormalize.finishing || m.sqrt.executing || m.sqrt.finishing || m.fma.executing || m.fma.finishing || m.div.executing || m.div.finishing || m.mul.executing || m.mul.finishing || m.addSub.executing || m.addSub.finishing || m.integralRound.executing || m.integralRound.finishing || m.integerQuery.executing || m.integerQuery.finishing || m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
+	if m.rationalString.executing || m.rationalString.finishing || m.integer.rationalStringExecuting(false) || m.rawString.executing || m.rawString.finishing || m.ieeeBV.executing || m.ieeeBV.finishing || m.sbv.executing || m.sbv.finishing || m.toMPZ.executing || m.toMPZ.finishing || m.integer.mpfToMPZExecuting(false) || m.rem.executing || m.rem.finishing || m.partialRemainder.executing || m.partialRemainder.finishing || m.renormalize.executing || m.renormalize.finishing || m.sqrt.executing || m.sqrt.finishing || m.fma.executing || m.fma.finishing || m.div.executing || m.div.finishing || m.mul.executing || m.mul.finishing || m.addSub.executing || m.addSub.finishing || m.integralRound.executing || m.integralRound.finishing || m.integerQuery.executing || m.integerQuery.finishing || m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
 	}
 	// The caller-owned format context is a younger lexical scope. Query only
@@ -154,6 +155,12 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	}
 	if !m.constructorComplete {
 		return arena.ErrClosed
+	}
+	if e := m.finishRationalStringSource(); e != nil {
+		if m.sourceCause == nil {
+			m.sourceCause = e
+		}
+		return e
 	}
 	if e := m.finishRawStringSource(); e != nil {
 		if m.sourceCause == nil {
@@ -301,7 +308,7 @@ func (m *ArbitraryFloatManager) Close() error {
 	if m == nil || m.self != m {
 		return ErrRuntimeOwner
 	}
-	if m.integer.rationalStringExecuting(false) || m.rawString.executing || m.rawString.finishing || m.ieeeBV.executing || m.ieeeBV.finishing || m.sbv.executing || m.sbv.finishing || m.toMPZ.executing || m.toMPZ.finishing || m.integer.mpfToMPZExecuting(false) || m.rem.executing || m.rem.finishing || m.partialRemainder.executing || m.partialRemainder.finishing || m.renormalize.executing || m.renormalize.finishing || m.sqrt.executing || m.sqrt.finishing || m.fma.executing || m.fma.finishing || m.div.executing || m.div.finishing || m.mul.executing || m.mul.finishing || m.addSub.executing || m.addSub.finishing || m.integralRound.executing || m.integralRound.finishing || m.integerQuery.executing || m.integerQuery.finishing || m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
+	if m.rationalString.executing || m.rationalString.finishing || m.integer.rationalStringExecuting(false) || m.rawString.executing || m.rawString.finishing || m.ieeeBV.executing || m.ieeeBV.finishing || m.sbv.executing || m.sbv.finishing || m.toMPZ.executing || m.toMPZ.finishing || m.integer.mpfToMPZExecuting(false) || m.rem.executing || m.rem.finishing || m.partialRemainder.executing || m.partialRemainder.finishing || m.renormalize.executing || m.renormalize.finishing || m.sqrt.executing || m.sqrt.finishing || m.fma.executing || m.fma.finishing || m.div.executing || m.div.finishing || m.mul.executing || m.mul.finishing || m.addSub.executing || m.addSub.finishing || m.integralRound.executing || m.integralRound.finishing || m.integerQuery.executing || m.integerQuery.finishing || m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
 	}
 	// Registered diagnostic metadata is not ownership. Refuse only actual
@@ -321,6 +328,9 @@ func (m *ArbitraryFloatManager) Close() error {
 		return e
 	}
 	if e := m.CleanupIntegerQuery(); e != nil {
+		return stop(e)
+	}
+	if e := m.CleanupRationalString(); e != nil {
 		return stop(e)
 	}
 	if e := m.CleanupRawString(); e != nil {
@@ -451,7 +461,7 @@ func (m *ArbitraryFloatManager) OwnedStorageBytes() uint64 {
 	if m == nil || m.self != m {
 		panic(ErrRuntimeOwner)
 	}
-	n := m.rawString.storageBytes() + m.header + m.rationalSetHistoryBytes + m.formattedSetHistoryBytes + m.roundHistoryBytes + m.valueHistoryBytes + m.powerWrapperBytes + m.conversionHistoryBytes + m.inputHistoryBytes
+	n := m.rationalString.storageBytes() + m.rawString.storageBytes() + m.header + m.rationalSetHistoryBytes + m.formattedSetHistoryBytes + m.roundHistoryBytes + m.valueHistoryBytes + m.powerWrapperBytes + m.conversionHistoryBytes + m.inputHistoryBytes
 	var z *IntegerManager
 	if m.rational != nil {
 		n += m.rational.HeaderBytes + m.rational.stringScope.storageBytes()

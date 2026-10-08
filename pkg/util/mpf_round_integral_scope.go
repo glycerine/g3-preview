@@ -25,7 +25,7 @@ func (z *IntegerManager) mpfArithmeticTransportActive() bool {
 		return false
 	}
 	m := z.MpfParent
-	return m != nil && m.self == m && m.integer == z && (m.rawString.valid() && m.rawString.NumericExecuting() || m.ieeeBV.valid() && m.ieeeBV.NumericExecuting() || m.sbv.valid() && m.sbv.NumericExecuting() || m.rem.valid() && m.rem.NumericExecuting() || m.partialRemainder.valid() && m.partialRemainder.NumericExecuting() || m.renormalize.valid() && m.renormalize.NumericExecuting() || m.integralRound.valid() && m.integralRound.NumericExecuting() || m.addSub.valid() && m.addSub.NumericExecuting() || m.mul.valid() && m.mul.NumericExecuting() || m.div.valid() && m.div.NumericExecuting() || m.fma.valid() && m.fma.NumericExecuting() || m.sqrt.valid() && m.sqrt.NumericExecuting()) && m.memory != nil && m.memory.FailureTransportActive()
+	return m != nil && m.self == m && m.integer == z && (m.rationalString.valid() && m.rationalString.NumericExecuting() || m.rawString.valid() && m.rawString.NumericExecuting() || m.ieeeBV.valid() && m.ieeeBV.NumericExecuting() || m.sbv.valid() && m.sbv.NumericExecuting() || m.rem.valid() && m.rem.NumericExecuting() || m.partialRemainder.valid() && m.partialRemainder.NumericExecuting() || m.renormalize.valid() && m.renormalize.NumericExecuting() || m.integralRound.valid() && m.integralRound.NumericExecuting() || m.addSub.valid() && m.addSub.NumericExecuting() || m.mul.valid() && m.mul.NumericExecuting() || m.div.valid() && m.div.NumericExecuting() || m.fma.valid() && m.fma.NumericExecuting() || m.sqrt.valid() && m.sqrt.NumericExecuting()) && m.memory != nil && m.memory.FailureTransportActive()
 }
 
 func (s *arbitraryFloatIntegralRoundScope) valid() bool {
