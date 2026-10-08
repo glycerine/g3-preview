@@ -648,3 +648,35 @@ func (s *RationalService) NegWithInvocation(a *OwnedRational, c *RationalService
 	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
 	return s.facadeUnaryLockedWithInvocation(a, facadeNeg, 0, c)
 }
+
+// Source: src/util/rational.h:171-174. Preserve the original physical
+// receiver for operator%= without constructing a returned rational.
+func (s *RationalService) RemAssignWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) (e error) {
+	if e = s.lock(); e != nil {
+		return e
+	}
+	defer s.mu.Unlock()
+	for _, value := range []*OwnedRational{a, b} {
+		if e = s.rationalScalarOwner(value); e != nil {
+			return e
+		}
+	}
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return e
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	if e = s.beginLexical(); e != nil {
+		return e
+	}
+	defer s.endLexicalError(&e)
+	e = s.Manager.integerOpRationalWithAllocationContext(&a.Raw, &b.Raw, &a.Raw, qIntegerRem, c.allocationContext())
+	if cause := c.childSource(); cause != nil {
+		if s.Lexical.Cause == nil {
+			s.Lexical.Cause = cause
+		}
+		e = errors.Join(e, cause)
+	}
+	return e
+}
