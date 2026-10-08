@@ -29,6 +29,7 @@ type BVPolynomialRewriter struct {
 	blastEquality            *bvBlastEqInvocation
 	concatEquality           *bvConcatEqualityInvocation
 	isolation                *bvIsolationInvocation
+	mulEquality              *ast.BitVectorMulEqualityNumerals
 	multiplicationConcat     [2]ast.ASTHandle
 	pair                     [2]ast.ASTHandle
 	header                   uint64
@@ -258,6 +259,12 @@ func (p *BVPolynomialRewriter) Close() error {
 			return e
 		}
 		p.cancellation = nil
+	}
+	if p.mulEquality != nil {
+		if e := p.mulEquality.Close(); e != nil {
+			return e
+		}
+		p.mulEquality = nil
 	}
 	if p.isolation != nil {
 		if e := p.isolation.close(); e != nil {
