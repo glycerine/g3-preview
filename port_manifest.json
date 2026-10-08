@@ -149528,13 +149528,16 @@
       "path": "src/util/scoped_numeral_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/scoped_numeral_buffer.go",
         "pkg/util/scoped_numeral_buffer_source_test.go",
         "pkg/util/scoped_numeral_buffer_review_test.go"
       ],
       "tests": [
+        "TestGenericScopedNumeralBufferPushResetAndLiveAccess",
+        "TestGenericScopedNumeralBufferResizeShrinkAndFailurePrefix",
+        "TestGenericScopedNumeralBufferOwnerPreconditions",
         "TestScopedNumeralBufferInlineGrowthResetAndResize",
         "TestScopedNumeralBufferBigCopiesAndFieldNormalization",
         "TestScopedNumeralBufferEveryActualReservationPrefix",
@@ -149558,12 +149561,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
+          "name": "complete non-generic _scoped_numeral_buffer construction/destruction, manager and mutable access, push, reset, shrink and resize",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_numeral_buffer.go",
+          "tests": [
+            "TestGenericScopedNumeralBufferPushResetAndLiveAccess",
+            "TestGenericScopedNumeralBufferResizeShrinkAndFailurePrefix",
+            "TestGenericScopedNumeralBufferOwnerPreconditions"
+          ]
+        },
+        {
           "name": "Concrete mpzzp128 ctor/manager/reset/push/shrink/resize/dtor with actual inline and Runtime-expanded backing",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/scoped_numeral_buffer.go",
           "tests": [
             "TestScopedNumeralBufferInlineGrowthResetAndResize",
@@ -149582,10 +149595,12 @@
         }
       ],
       "ownership": [
+        "ScopedNumeralBuffer owns every dynamically typed numeral in its Go slice and borrows one ScopedNumeralManager. Push publishes a default slot before deep copy, shrink/reset/Close delete removed numerals from first to last, and Close releases the slice only after successful reset.",
         "The concrete inline128 NUM fields reside once in the reflected enclosing header; expanded12-byte scalar codec relocates owning references without NUM Copy. Ascending source Del stops before older elements and pending backing; own abort matches exact physical receipts. Borrowed views are actual source fields, not a clone."
       ],
       "deviations": [
-        "Only polynomial mpzzp128 specialization selected. Other Manager/size specializations, native ABI/global allocators and defined higher-level alias domains remain open. Expanded const-reference alias after source old-buffer destruction is undefined and not promoted as supported."
+        "The Manager and inline-size templates become the non-generic ScopedNumeralManager adapter and a Go slice with initial capacity 16. The existing polynomial mpzzp specialization retains its source inline128 layout. Go slice allocation replaces sbuffer; no C++ buffer implementation is ported.",
+        "Expanded const-reference alias after source old-buffer destruction is undefined and not promoted as supported."
       ]
     },
     {

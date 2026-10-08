@@ -3,10 +3,105 @@ package util
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
+
+func TestGenericScopedNumeralBufferPushResetAndLiveAccess(t *testing.T) {
+	var deleted []int
+	manager := testScopedNumeralManager(&deleted)
+	buffer, err := NewScopedNumeralBuffer(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := buffer.Manager(); got != manager || cap(buffer.values) != 16 || !buffer.Empty() {
+		t.Fatal("constructor state")
+	}
+	for _, value := range []int{4, 7, 9} {
+		if err = buffer.PushBack(value); err != nil {
+			t.Fatal(err)
+		}
+	}
+	second, err := buffer.Get(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	*second = 8
+	view, err := buffer.CPtr()
+	if err != nil || buffer.Size() != 3 || view[1] != 8 {
+		t.Fatal("live access", err, view)
+	}
+	if err = buffer.Reset(); err != nil || !buffer.Empty() || cap(buffer.values) != 16 {
+		t.Fatal("reset", err)
+	}
+	if want := []int{4, 8, 9}; !reflect.DeepEqual(deleted, want) {
+		t.Fatalf("delete order = %v, want %v", deleted, want)
+	}
+	if err = buffer.Close(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestGenericScopedNumeralBufferResizeShrinkAndFailurePrefix(t *testing.T) {
+	var deleted []int
+	manager := testScopedNumeralManager(&deleted)
+	buffer, _ := NewScopedNumeralBuffer(manager)
+	if err := buffer.Resize(4); err != nil {
+		t.Fatal(err)
+	}
+	for index, value := range []int{1, 2, 3, 4} {
+		slot, _ := buffer.Get(uint32(index))
+		*slot = value
+	}
+	if err := buffer.Shrink(2); err != nil {
+		t.Fatal(err)
+	}
+	if want := []int{3, 4}; !reflect.DeepEqual(deleted, want) || buffer.Size() != 2 {
+		t.Fatalf("shrink = %v, size %d", deleted, buffer.Size())
+	}
+	if err := buffer.Resize(1); err != nil {
+		t.Fatal(err)
+	}
+	if want := []int{3, 4, 2}; !reflect.DeepEqual(deleted, want) {
+		t.Fatalf("resize shrink = %v", deleted)
+	}
+	if err := buffer.Shrink(2); !errors.Is(err, arena.ErrBounds) {
+		t.Fatalf("growing shrink = %v", err)
+	}
+	_ = buffer.Close()
+
+	setFailure := errors.New("set failure")
+	failing := testScopedNumeralManager(new([]int))
+	failing.Set = func(*any, any) error { return setFailure }
+	prefix, _ := NewScopedNumeralBuffer(failing)
+	if err := prefix.PushBack(5); !errors.Is(err, setFailure) || prefix.Size() != 1 {
+		t.Fatalf("failed push prefix = %v, size %d", err, prefix.Size())
+	}
+	failing.Set = func(out *any, value any) error { *out = value; return nil }
+	_ = prefix.Close()
+}
+
+func TestGenericScopedNumeralBufferOwnerPreconditions(t *testing.T) {
+	if buffer, err := NewScopedNumeralBuffer(nil); buffer != nil || !errors.Is(err, ErrScopedOwner) {
+		t.Fatalf("nil manager = %#v, %v", buffer, err)
+	}
+	buffer, _ := NewScopedNumeralBuffer(testScopedNumeralManager(new([]int)))
+	copyOfBuffer := *buffer
+	if _, err := copyOfBuffer.Get(0); !errors.Is(err, ErrScopedCopy) {
+		t.Fatal("copied owner", err)
+	}
+	if _, err := buffer.Get(0); !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("bounds", err)
+	}
+	if err := buffer.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := buffer.CPtr(); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("closed owner", err)
+	}
+}
 
 func scopedBufferFixture(t *testing.T) (*IntegerModularManager, *scopedIntegerModularBuffer128) {
 	t.Helper()
