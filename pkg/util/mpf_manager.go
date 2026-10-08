@@ -141,7 +141,7 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return ErrRuntimeOwner
 	}
-	if m.signedFraction.executing || m.signedFraction.finishing || m.hexfloatComponents.executing || m.hexfloatComponents.finishing || m.binaryString.executing || m.binaryString.finishing || m.decimalStream.executing || m.decimalStream.finishing || m.integer.decimalStreamExecuting(false) || m.smt2Stream.executing || m.smt2Stream.finishing || m.integer.smt2StreamExecuting(false) || m.rationalString.executing || m.rationalString.finishing || m.integer.rationalStringExecuting(false) || m.rawString.executing || m.rawString.finishing || m.ieeeBV.executing || m.ieeeBV.finishing || m.sbv.executing || m.sbv.finishing || m.toMPZ.executing || m.toMPZ.finishing || m.integer.mpfToMPZExecuting(false) || m.rem.executing || m.rem.finishing || m.partialRemainder.executing || m.partialRemainder.finishing || m.renormalize.executing || m.renormalize.finishing || m.sqrt.executing || m.sqrt.finishing || m.fma.executing || m.fma.finishing || m.div.executing || m.div.finishing || m.mul.executing || m.mul.finishing || m.addSub.executing || m.addSub.finishing || m.integralRound.executing || m.integralRound.finishing || m.integerQuery.executing || m.integerQuery.finishing || m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
+	if m.integer != nil && m.integer.stringSet.NumericExecuting() || m.signedFraction.executing || m.signedFraction.finishing || m.hexfloatComponents.executing || m.hexfloatComponents.finishing || m.binaryString.executing || m.binaryString.finishing || m.decimalStream.executing || m.decimalStream.finishing || m.integer.decimalStreamExecuting(false) || m.smt2Stream.executing || m.smt2Stream.finishing || m.integer.smt2StreamExecuting(false) || m.rationalString.executing || m.rationalString.finishing || m.integer.rationalStringExecuting(false) || m.rawString.executing || m.rawString.finishing || m.ieeeBV.executing || m.ieeeBV.finishing || m.sbv.executing || m.sbv.finishing || m.toMPZ.executing || m.toMPZ.finishing || m.integer.mpfToMPZExecuting(false) || m.rem.executing || m.rem.finishing || m.partialRemainder.executing || m.partialRemainder.finishing || m.renormalize.executing || m.renormalize.finishing || m.sqrt.executing || m.sqrt.finishing || m.fma.executing || m.fma.finishing || m.div.executing || m.div.finishing || m.mul.executing || m.mul.finishing || m.addSub.executing || m.addSub.finishing || m.integralRound.executing || m.integralRound.finishing || m.integerQuery.executing || m.integerQuery.finishing || m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
 	}
 	// The caller-owned format context is a younger lexical scope. Query only
@@ -160,6 +160,12 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 	}
 	if !m.constructorComplete {
 		return arena.ErrClosed
+	}
+	if e := m.integer.stringSetSourceReady(); e != nil {
+		if m.integer.stringSet.sourceCause != nil && m.sourceCause == nil {
+			m.sourceCause = e
+		}
+		return e
 	}
 	if e := m.finishSignedFractionSource(); e != nil {
 		if m.sourceCause == nil {
@@ -343,7 +349,7 @@ func (m *ArbitraryFloatManager) Close() error {
 	if m == nil || m.self != m {
 		return ErrRuntimeOwner
 	}
-	if m.signedFraction.executing || m.signedFraction.finishing || m.hexfloatComponents.executing || m.hexfloatComponents.finishing || m.binaryString.executing || m.binaryString.finishing || m.decimalStream.executing || m.decimalStream.finishing || m.integer.decimalStreamExecuting(false) || m.smt2Stream.executing || m.smt2Stream.finishing || m.integer.smt2StreamExecuting(false) || m.rationalString.executing || m.rationalString.finishing || m.integer.rationalStringExecuting(false) || m.rawString.executing || m.rawString.finishing || m.ieeeBV.executing || m.ieeeBV.finishing || m.sbv.executing || m.sbv.finishing || m.toMPZ.executing || m.toMPZ.finishing || m.integer.mpfToMPZExecuting(false) || m.rem.executing || m.rem.finishing || m.partialRemainder.executing || m.partialRemainder.finishing || m.renormalize.executing || m.renormalize.finishing || m.sqrt.executing || m.sqrt.finishing || m.fma.executing || m.fma.finishing || m.div.executing || m.div.finishing || m.mul.executing || m.mul.finishing || m.addSub.executing || m.addSub.finishing || m.integralRound.executing || m.integralRound.finishing || m.integerQuery.executing || m.integerQuery.finishing || m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
+	if m.integer != nil && m.integer.stringSet.NumericExecuting() || m.signedFraction.executing || m.signedFraction.finishing || m.hexfloatComponents.executing || m.hexfloatComponents.finishing || m.binaryString.executing || m.binaryString.finishing || m.decimalStream.executing || m.decimalStream.finishing || m.integer.decimalStreamExecuting(false) || m.smt2Stream.executing || m.smt2Stream.finishing || m.integer.smt2StreamExecuting(false) || m.rationalString.executing || m.rationalString.finishing || m.integer.rationalStringExecuting(false) || m.rawString.executing || m.rawString.finishing || m.ieeeBV.executing || m.ieeeBV.finishing || m.sbv.executing || m.sbv.finishing || m.toMPZ.executing || m.toMPZ.finishing || m.integer.mpfToMPZExecuting(false) || m.rem.executing || m.rem.finishing || m.partialRemainder.executing || m.partialRemainder.finishing || m.renormalize.executing || m.renormalize.finishing || m.sqrt.executing || m.sqrt.finishing || m.fma.executing || m.fma.finishing || m.div.executing || m.div.finishing || m.mul.executing || m.mul.finishing || m.addSub.executing || m.addSub.finishing || m.integralRound.executing || m.integralRound.finishing || m.integerQuery.executing || m.integerQuery.finishing || m.plainRationalSet.executing || m.plainRationalSet.finishing || m.rationalSet.executing || m.rationalSet.finishing || (m.integer != nil && m.integer.rationalServiceReadCallbackActive()) || m.formattedSet.executing || m.formattedSet.finishing || m.rationalConversion.executing || m.rationalConversion.finishing || m.valueExecuting || m.formatInvocationExecuting() || (m.integer != nil && m.integer.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
 	}
 	// Registered diagnostic metadata is not ownership. Refuse only actual
@@ -364,6 +370,11 @@ func (m *ArbitraryFloatManager) Close() error {
 	}
 	if e := m.CleanupIntegerQuery(); e != nil {
 		return stop(e)
+	}
+	if m.integer != nil {
+		if e := m.integer.CleanupStringSet(); e != nil {
+			return stop(e)
+		}
 	}
 	if e := m.CleanupSignedFraction(); e != nil {
 		return stop(e)

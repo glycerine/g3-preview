@@ -263,8 +263,8 @@ func TestParserBudgetFailureCleanup(t *testing.T) {
 					if e != nil {
 						failures++
 						var failure Failure
-						if integer == 1 && ((!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != FailureMemout || !m.Z.Memory.State().OutOfMemory)) || rationalString(t, m, &a) != "17/13" || integerString(t, m.Z, &out) != "17") {
-							t.Fatal("integer parser failure published", synch, text, integer, after, e)
+						if integer == 1 && ((!errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != FailureMemout || !m.Z.Memory.State().OutOfMemory)) || rationalString(t, m, &a) != "17/13" || !integerParserSourcePrefixMatches(t, m.Z, &out, text)) {
+							t.Fatal("integer parser source prefix differs", synch, text, integer, after, e)
 						}
 					} else {
 						successes++

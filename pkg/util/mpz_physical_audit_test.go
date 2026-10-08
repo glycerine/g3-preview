@@ -53,6 +53,9 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 	if m.MatchesAddMulInvocation(&m.GcdRaw.AddMul) || m.MatchesAddMulInvocation(&m.AddMulInvocation.Receipt) {
 		add(m.AddMulInvocation.Tmp.Cell)
 	}
+	if m.stringSet.declared {
+		add(m.stringSet.tmp.Cell)
+	}
 	add(m.PowerRaw.Value.Cell)
 	for i := range m.RootRaw.Values {
 		add(m.RootRaw.Values[i].Cell)

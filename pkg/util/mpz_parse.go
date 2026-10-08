@@ -1,4 +1,4 @@
-// Source: src/util/mpz.cpp set(mpz &, char const *), _MP_INTERNAL backend.
+// Source: src/util/mpz.cpp:283-303; src/util/mpz.h:692.
 package util
 
 // numeralByte gives the finite Go-string boundary the source C-string's NUL
@@ -10,44 +10,88 @@ func numeralByte(text string, i int) byte {
 	return text[i]
 }
 
-// SetString translates the source permissive byte parser: initial ASCII spaces
-// are skipped for sign detection, while all nondigits are ignored thereafter.
-// Input is borrowed only for the call. Work is staged before owner publication.
+// SetString preserves the source caller RESET, direct digit publication and
+// RAW temporary's end-only DEL. Input is borrowed only for this call.
+// Failed bodies retain actual RAW work; CleanupStringSet joins that work.
 func (m *IntegerManager) SetString(out *Int, text string) error {
+	return m.setStringWithBeginCapture(out, text, nil, nil)
+}
+func (m *IntegerManager) setStringWithBeginCapture(out *Int, text string, frame **integerStringSetScope, invocation *uint64) (cause error) {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	var work, tmp Int
-	defer m.Del(&work)
-	defer m.Del(&tmp)
-	if e := m.Reset(&work); e != nil {
+	s := &m.stringSet
+	if s.active || s.invocation == ^uint64(0) {
+		return ErrNumericPending
+	}
+	*s = integerStringSetScope{manager: m, invocation: s.invocation + 1, active: true, executing: true}
+	if frame != nil {
+		*frame = s
+	}
+	if invocation != nil {
+		*invocation = s.invocation
+	}
+	s.hooks.Policy = s
+	if e := s.bind(); e != nil {
+		s.executing = false
 		return e
 	}
-	ten := NewInt(10)
-	i := 0
-	for numeralByte(text, i) == ' ' {
-		i++
+	defer func() {
+		s.executing = false
+		s.bodyCause = cause
+		if s.sourceCause == nil {
+			s.sourceCause = m.Natural.PnVerificationSourceCause(&s.verification)
+		}
+		cause = JoinNumericErrors(cause, s.sourceCause)
+		cause = JoinNumericErrors(cause, s.unbind())
+		if cause == nil {
+			s.active = false
+		}
+	}()
+	// RESET precedes the two RAW declarations; a release failure constructs neither.
+	if _, e := SourceNumeralDel(m, out); e != nil {
+		s.sourceCause = e
+		return e
 	}
-	negative := numeralByte(text, i) == '-'
-	for ; numeralByte(text, i) != 0; i++ {
-		b := numeralByte(text, i)
-		if b >= '0' && b <= '9' {
-			digit := NewInt(int32(b - '0'))
-			if e := m.Mul(&work, &ten, &tmp); e != nil {
+	out.Val = 0
+	s.ten = NewInt(10)
+	s.declared = true
+	c := integerAllocationInvocationContext{Caller: &s.hooks}
+	for numeralByte(text, s.index) == ' ' {
+		s.index++
+	}
+	s.negative = numeralByte(text, s.index) == '-'
+	for numeralByte(text, s.index) != 0 {
+		ch := numeralByte(text, s.index)
+		if ch >= '0' && ch <= '9' {
+			s.stage = 1
+			if e := m.mulWithAllocationContext(out, &s.ten, &s.tmp, c); e != nil {
 				return e
 			}
-			if e := m.Add(&tmp, &digit, &work); e != nil {
+			digit := NewInt(int32(ch - '0'))
+			s.stage = 2
+			if e := m.addSubWithAllocationContext(&s.tmp, &digit, out, false, c); e != nil {
 				return e
 			}
 		}
+		s.index++
 	}
-	if e := m.Del(&tmp); e != nil {
+	s.stage = 3
+	s.endReached = true
+	if _, e := SourceNumeralDel(m, &s.tmp); e != nil {
+		s.sourceCause = e
 		return e
 	}
-	if negative {
-		if e := m.Neg(&work); e != nil {
+	s.tmpDelDone = true
+	s.stage = 4
+	if s.negative {
+		if e := m.negWithAllocationContext(out, c); e != nil {
 			return e
 		}
 	}
-	return m.Move(out, &work)
+	if e := s.cleanupArithmetic(); e != nil {
+		return e
+	}
+	s.bodySucceeded = true
+	return nil
 }
