@@ -20,6 +20,8 @@ type BVPolynomialRewriter struct {
 	config                   *BVPolynomialConfiguration
 	addition                 *BVPolynomialAdditionCore
 	multiplication           *BVPolynomialMultiplicationCore
+	negation                 *ast.BitVectorPolynomialNegationNumerals
+	subtraction              *bvPolynomialSubtraction
 	pair                     [2]ast.ASTHandle
 	header                   uint64
 	running, stopped, closed bool
@@ -225,6 +227,18 @@ func (p *BVPolynomialRewriter) Close() error {
 			return e
 		}
 		p.multiplication = nil
+	}
+	if p.negation != nil {
+		if e := p.negation.Close(); e != nil {
+			return e
+		}
+		p.negation = nil
+	}
+	if p.subtraction != nil {
+		if e := p.subtraction.Close(); e != nil {
+			return e
+		}
+		p.subtraction = nil
 	}
 	if p.config != nil {
 		if e := p.config.Close(); e != nil {

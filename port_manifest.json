@@ -21621,7 +21621,15 @@
         "pkg/ast/ast_bv_power_product.go",
         "pkg/ast/ast_bv_power_product_test.go",
         "pkg/ast/rewriter/bv_polynomial_owner.go",
-        "pkg/ast/rewriter/bv_polynomial_owner_test.go"
+        "pkg/ast/rewriter/bv_polynomial_owner_test.go",
+        "pkg/ast/ast_bv_polynomial_neg_numerals.go",
+        "pkg/ast/ast_bv_polynomial_sub_literal.go",
+        "pkg/ast/ast_bv_polynomial_neg_sub_lifetime_test.go",
+        "pkg/ast/rewriter/bv_polynomial_neg.go",
+        "pkg/ast/rewriter/bv_polynomial_neg_test.go",
+        "pkg/ast/rewriter/bv_polynomial_sub.go",
+        "pkg/ast/rewriter/bv_polynomial_sub_test.go",
+        "pkg/ast/rewriter/bv_polynomial_neg_sub_numeric_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -21655,7 +21663,15 @@
         "TestBVPolynomialOwnerSharedSortThroughHoistAndFailure",
         "TestBVPolynomialOwnerEveryPersistentMapAndCoreReservation",
         "TestBVPolynomialOwnerConstructorEveryReservation",
-        "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
+        "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls",
+        "TestASTBitVectorUnaryMinusPhysicalLocalAndLiteralLifetimes",
+        "TestASTBitVectorSubtractionLiteralRefAcquiredBeforeTemporaryRetires",
+        "TestBVPolynomialUnaryMinusNumeralsAndSymbolicProduct",
+        "TestBVPolynomialUnaryMinusEveryColdReservationAndPlacedBeforeSort",
+        "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
+        "TestBVPolynomialSubtractionEveryVectorAndFactoryReservation",
+        "TestBVPolynomialSubtractionSingletonBeforeSortAndAllocation",
+        "TestBVPolynomialNegationSubtractionEveryActualNumericReservation"
       ],
       "conditionals": [
         {
@@ -21756,6 +21772,14 @@
             "TestBVPolynomialOwnerEveryPersistentMapAndCoreReservation",
             "TestBVPolynomialOwnerConstructorEveryReservation",
             "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
+          ]
+        },
+        {
+          "name": "BV Config numerical hooks consumed by selected unary minus and subtraction, with charged actual caller literals and exact NUM children (src/ast/rewriter/bv_rewriter.h:35-43; src/ast/rewriter/poly_rewriter_def.h:667-701)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_polynomial_neg_numerals.go",
+          "tests": [
+            "TestASTBitVectorUnaryMinusPhysicalLocalAndLiteralLifetimes"
           ]
         }
       ],
@@ -23496,7 +23520,15 @@
         "pkg/ast/rewriter/bv_polynomial_config.go",
         "pkg/ast/rewriter/bv_polynomial_config_test.go",
         "pkg/ast/rewriter/bv_polynomial_owner.go",
-        "pkg/ast/rewriter/bv_polynomial_owner_test.go"
+        "pkg/ast/rewriter/bv_polynomial_owner_test.go",
+        "pkg/ast/rewriter/bv_polynomial_neg.go",
+        "pkg/ast/rewriter/bv_polynomial_neg_test.go",
+        "pkg/ast/rewriter/bv_polynomial_sub.go",
+        "pkg/ast/rewriter/bv_polynomial_sub_test.go",
+        "pkg/ast/rewriter/bv_polynomial_neg_sub_numeric_test.go",
+        "pkg/ast/ast_bv_polynomial_neg_numerals.go",
+        "pkg/ast/ast_bv_polynomial_sub_literal.go",
+        "pkg/ast/ast_bv_polynomial_neg_sub_lifetime_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23578,7 +23610,15 @@
         "TestBVPolynomialOwnerSharedSortThroughHoistAndFailure",
         "TestBVPolynomialOwnerEveryPersistentMapAndCoreReservation",
         "TestBVPolynomialOwnerConstructorEveryReservation",
-        "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
+        "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls",
+        "TestBVPolynomialUnaryMinusNumeralsAndSymbolicProduct",
+        "TestBVPolynomialUnaryMinusEveryColdReservationAndPlacedBeforeSort",
+        "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
+        "TestBVPolynomialSubtractionEveryVectorAndFactoryReservation",
+        "TestBVPolynomialSubtractionSingletonBeforeSortAndAllocation",
+        "TestBVPolynomialNegationSubtractionEveryActualNumericReservation",
+        "TestASTBitVectorUnaryMinusPhysicalLocalAndLiteralLifetimes",
+        "TestASTBitVectorSubtractionLiteralRefAcquiredBeforeTemporaryRetires"
       ],
       "conditionals": [
         {
@@ -23861,11 +23901,33 @@
             "TestBVPolynomialOwnerConstructorEveryReservation",
             "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
           ]
+        },
+        {
+          "name": "Complete selected BV mk_uminus body: default a before current-sort read, copied stored numeral, in-place negation/normalization/result or distinct -1 coefficient full expression through output assignment (src/ast/rewriter/poly_rewriter_def.h:667-681)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_neg.go",
+          "tests": [
+            "TestBVPolynomialUnaryMinusNumeralsAndSymbolicProduct",
+            "TestBVPolynomialUnaryMinusEveryColdReservationAndPlacedBeforeSort",
+            "TestBVPolynomialNegationSubtractionEveryActualNumericReservation"
+          ]
+        },
+        {
+          "name": "Complete selected BV mk_sub body and pair overload: singleton before sort, minus-one reference INC before literal DT, original ordered raw products and zero skipping, owning new_args and output before reverse vector/ref DT, fixed REWRITE2 status (src/ast/rewriter/poly_rewriter_def.h:683-701; src/ast/rewriter/poly_rewriter.h:169-172)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_sub.go",
+          "tests": [
+            "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
+            "TestBVPolynomialSubtractionEveryVectorAndFactoryReservation",
+            "TestBVPolynomialSubtractionSingletonBeforeSortAndAllocation",
+            "TestBVPolynomialNegationSubtractionEveryActualNumericReservation"
+          ]
         }
       ],
       "ownership": [
         "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited.",
-        "BVPolynomialRewriter owns one actual borrowed-key positions table across invocations; addition helper borrows it and never destroys it. Dense resets preserve source capacity/backing. Core, hoist and merger bind directly to the same physical owner current-sort field before allocation/refusal, including last-factor sort writes. Singleton assignment precedes current-sort lookup and charged helper placement. Successful scopes source-end and owning-close before the next invocation; failed scopes remain captured and prohibit replay while exact child cleanup finishes. Concrete Go owner/helper/config wrappers and pair storage are charged. Every reached AST/parameter constructor and repeated-add/hoist body reservation is refused through success; each graph closes to zero. Existing final-reference deletion may allocate during singleton assignment, so allocation-free singleton tests first retire the unrelated old large output. Native layout/stack/process-global/temporary-elision/assertion/fatal/exception ABI, independently injected stopped source DT, broader polynomial methods/arith specialization and overall solver integration remain uncredited."
+        "BVPolynomialRewriter owns one actual borrowed-key positions table across invocations; addition helper borrows it and never destroys it. Dense resets preserve source capacity/backing. Core, hoist and merger bind directly to the same physical owner current-sort field before allocation/refusal, including last-factor sort writes. Singleton assignment precedes current-sort lookup and charged helper placement. Successful scopes source-end and owning-close before the next invocation; failed scopes remain captured and prohibit replay while exact child cleanup finishes. Concrete Go owner/helper/config wrappers and pair storage are charged. Every reached AST/parameter constructor and repeated-add/hoist body reservation is refused through success; each graph closes to zero. Existing final-reference deletion may allocate during singleton assignment, so allocation-free singleton tests first retire the unrelated old large output. Native layout/stack/process-global/temporary-elision/assertion/fatal/exception ABI, independently injected stopped source DT, broader polynomial methods/arith specialization and overall solver integration remain uncredited.",
+        "Persistent owner captures concrete unary default/literal values or subtraction helper plus exact vector/ref/numeric children. Unary output assignment precedes -1 full-expression and outer a source DT. Subtraction constructs an owning minus-one reference after numeral-callee return but before outer literal DT, then places new_args; source exit ends vector before minus-one ref. Refused vector growth retains exact unpublished INC and saved original vector identity. Body refusal stops owner replay and retains actual prefix for two-phase numeric/AST owning cleanup. Width65 actual Runtime campaigns exercise copied big stored NUM, negation/normalization, minus-one modulo construction and zero reads; cold 40-operand campaign covers vector/factory allocations. Every graph closes to zero. Independently stopped source DT/final-reference deletion, native temporary/layout/process-global/fatal/assertion/exception ABI and broader polynomial/arith/solver completion remain uncredited."
       ],
       "deviations": [
         "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
@@ -23926,7 +23988,15 @@
         "pkg/ast/rewriter/bv_polynomial_config.go",
         "pkg/ast/rewriter/bv_polynomial_config_test.go",
         "pkg/ast/rewriter/bv_polynomial_owner.go",
-        "pkg/ast/rewriter/bv_polynomial_owner_test.go"
+        "pkg/ast/rewriter/bv_polynomial_owner_test.go",
+        "pkg/ast/rewriter/bv_polynomial_neg.go",
+        "pkg/ast/rewriter/bv_polynomial_neg_test.go",
+        "pkg/ast/rewriter/bv_polynomial_sub.go",
+        "pkg/ast/rewriter/bv_polynomial_sub_test.go",
+        "pkg/ast/rewriter/bv_polynomial_neg_sub_numeric_test.go",
+        "pkg/ast/ast_bv_polynomial_neg_numerals.go",
+        "pkg/ast/ast_bv_polynomial_sub_literal.go",
+        "pkg/ast/ast_bv_polynomial_neg_sub_lifetime_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -24005,7 +24075,15 @@
         "TestBVPolynomialOwnerSharedSortThroughHoistAndFailure",
         "TestBVPolynomialOwnerEveryPersistentMapAndCoreReservation",
         "TestBVPolynomialOwnerConstructorEveryReservation",
-        "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
+        "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls",
+        "TestBVPolynomialUnaryMinusNumeralsAndSymbolicProduct",
+        "TestBVPolynomialUnaryMinusEveryColdReservationAndPlacedBeforeSort",
+        "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
+        "TestBVPolynomialSubtractionEveryVectorAndFactoryReservation",
+        "TestBVPolynomialSubtractionSingletonBeforeSortAndAllocation",
+        "TestBVPolynomialNegationSubtractionEveryActualNumericReservation",
+        "TestASTBitVectorUnaryMinusPhysicalLocalAndLiteralLifetimes",
+        "TestASTBitVectorSubtractionLiteralRefAcquiredBeforeTemporaryRetires"
       ],
       "assertions": [
         {
@@ -24202,11 +24280,33 @@
             "TestBVPolynomialOwnerConstructorEveryReservation",
             "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
           ]
+        },
+        {
+          "name": "Complete selected BV mk_uminus body: default a before current-sort read, copied stored numeral, in-place negation/normalization/result or distinct -1 coefficient full expression through output assignment (src/ast/rewriter/poly_rewriter_def.h:667-681)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_neg.go",
+          "tests": [
+            "TestBVPolynomialUnaryMinusNumeralsAndSymbolicProduct",
+            "TestBVPolynomialUnaryMinusEveryColdReservationAndPlacedBeforeSort",
+            "TestBVPolynomialNegationSubtractionEveryActualNumericReservation"
+          ]
+        },
+        {
+          "name": "Complete selected BV mk_sub body and pair overload: singleton before sort, minus-one reference INC before literal DT, original ordered raw products and zero skipping, owning new_args and output before reverse vector/ref DT, fixed REWRITE2 status (src/ast/rewriter/poly_rewriter_def.h:683-701; src/ast/rewriter/poly_rewriter.h:169-172)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_sub.go",
+          "tests": [
+            "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
+            "TestBVPolynomialSubtractionEveryVectorAndFactoryReservation",
+            "TestBVPolynomialSubtractionSingletonBeforeSortAndAllocation",
+            "TestBVPolynomialNegationSubtractionEveryActualNumericReservation"
+          ]
         }
       ],
       "ownership": [
         "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited.",
-        "BVPolynomialRewriter owns one actual borrowed-key positions table across invocations; addition helper borrows it and never destroys it. Dense resets preserve source capacity/backing. Core, hoist and merger bind directly to the same physical owner current-sort field before allocation/refusal, including last-factor sort writes. Singleton assignment precedes current-sort lookup and charged helper placement. Successful scopes source-end and owning-close before the next invocation; failed scopes remain captured and prohibit replay while exact child cleanup finishes. Concrete Go owner/helper/config wrappers and pair storage are charged. Every reached AST/parameter constructor and repeated-add/hoist body reservation is refused through success; each graph closes to zero. Existing final-reference deletion may allocate during singleton assignment, so allocation-free singleton tests first retire the unrelated old large output. Native layout/stack/process-global/temporary-elision/assertion/fatal/exception ABI, independently injected stopped source DT, broader polynomial methods/arith specialization and overall solver integration remain uncredited."
+        "BVPolynomialRewriter owns one actual borrowed-key positions table across invocations; addition helper borrows it and never destroys it. Dense resets preserve source capacity/backing. Core, hoist and merger bind directly to the same physical owner current-sort field before allocation/refusal, including last-factor sort writes. Singleton assignment precedes current-sort lookup and charged helper placement. Successful scopes source-end and owning-close before the next invocation; failed scopes remain captured and prohibit replay while exact child cleanup finishes. Concrete Go owner/helper/config wrappers and pair storage are charged. Every reached AST/parameter constructor and repeated-add/hoist body reservation is refused through success; each graph closes to zero. Existing final-reference deletion may allocate during singleton assignment, so allocation-free singleton tests first retire the unrelated old large output. Native layout/stack/process-global/temporary-elision/assertion/fatal/exception ABI, independently injected stopped source DT, broader polynomial methods/arith specialization and overall solver integration remain uncredited.",
+        "Persistent owner captures concrete unary default/literal values or subtraction helper plus exact vector/ref/numeric children. Unary output assignment precedes -1 full-expression and outer a source DT. Subtraction constructs an owning minus-one reference after numeral-callee return but before outer literal DT, then places new_args; source exit ends vector before minus-one ref. Refused vector growth retains exact unpublished INC and saved original vector identity. Body refusal stops owner replay and retains actual prefix for two-phase numeric/AST owning cleanup. Width65 actual Runtime campaigns exercise copied big stored NUM, negation/normalization, minus-one modulo construction and zero reads; cold 40-operand campaign covers vector/factory allocations. Every graph closes to zero. Independently stopped source DT/final-reference deletion, native temporary/layout/process-global/fatal/assertion/exception ABI and broader polynomial/arith/solver completion remain uncredited."
       ],
       "deviations": [
         "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
@@ -130922,7 +131022,8 @@
         "pkg/util/rational_service_unsigned_invocation_test.go",
         "pkg/util/rational_service_mod_into_invocation_test.go",
         "pkg/util/rational_service_mod_into_callback_source_test.go",
-        "pkg/util/rational_service_mul_assign_invocation_test.go"
+        "pkg/util/rational_service_mul_assign_invocation_test.go",
+        "pkg/util/rational_service_neg_assign_invocation_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -131160,7 +131261,9 @@
         "TestRationalServiceIDivIntoInvocationEveryActualReservation",
         "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner",
         "TestRationalServiceMulAssignInvocationAliasingAndSourceBranches",
-        "TestRationalServiceMulAssignInvocationEveryActualReservation"
+        "TestRationalServiceMulAssignInvocationEveryActualReservation",
+        "TestRationalServiceNegAssignInvocationPhysicalNumerator",
+        "TestRationalServiceNegAssignInvocationEveryIntMinReservation"
       ],
       "conditionals": [
         {
@@ -132208,6 +132311,15 @@
             "TestRationalServiceMulAssignInvocationAliasingAndSourceBranches",
             "TestRationalServiceMulAssignInvocationEveryActualReservation"
           ]
+        },
+        {
+          "name": "Physical caller rational::neg invocation: numerator-only mutation and inline INT_MIN signed setter allocation, exact lexical allocation context (src/util/rational.h:242-244; src/util/mpq.h:201; src/util/mpz.h:499-510)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceNegAssignInvocationPhysicalNumerator",
+            "TestRationalServiceNegAssignInvocationEveryIntMinReservation"
+          ]
         }
       ],
       "ownership": [
@@ -132234,7 +132346,8 @@
         "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
         "Unsigned32 invocation passes the original caller allocation context to the existing integer uint32 overload and resets DEN only after successful NUM publication. Owned values retain previous setter destruction rules; actual facade lexical scopes join through the caller receipt. Tests replace big numerator/denominator, check inclusive INT_MAX, reject copied contexts and end source/own contexts.",
         "The void modulo invocation writes the caller-owned rational directly, without a returned value or copy temporary. It passes the exact allocation context into the existing literal manager operation, records sticky child source causes and transfers reached lexical/allocation roots at the actual service epilogue. Actual Runtime callback tests reject caller/output/service cleanup during the held invocation, name its transferred allocation in the immediate physical audit and close the entire graph to zero budget.",
-        "Void integer division writes the existing physical NUM, resets DEN only after successful integer publication, and transfers the exact caller context at the service epilogue. Negative division now records its reached IntegerRawScope receipt into that same rational-service invocation before entering machine_div_rem. Tests cover direct and value-returning paths, every actual allocation refusal, exact held child identity during Runtime callbacks, rejected reentrant cleanup and zero-budget owning closure; immutable invocation/body history survives cleanup."
+        "Void integer division writes the existing physical NUM, resets DEN only after successful integer publication, and transfers the exact caller context at the service epilogue. Negative division now records its reached IntegerRawScope receipt into that same rational-service invocation before entering machine_div_rem. Tests cover direct and value-returning paths, every actual allocation refusal, exact held child identity during Runtime callbacks, rejected reentrant cleanup and zero-budget owning closure; immutable invocation/body history survives cleanup.",
+        "NegAssignWithInvocation changes only the caller physical NUM and captures the actual inline INT_MIN setter allocation in its exact RationalServiceInvocation. No returned negation/copy-assignment temporary is substituted. Tests prove unchanged DEN/big NUM storage, all reached actual Runtime allocation refusals, permitted old/new/failed NUM publication, live physical roots/budget, copied/stopped receipt guards, preserved history and complete owning cleanup. Parsing can retain big INT_MIN magnitude; the campaign reaches the real signed setter before injection to guarantee the inline source branch. Native fatal/assertion/allocator/layout ABI remains uncredited."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -134706,7 +134819,9 @@
         "pkg/util/integer_public_addsubmul_raw_source_test.go",
         "pkg/util/integer_divides_numeral_invocation.go",
         "pkg/util/mpz_physical_audit_test.go",
-        "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go"
+        "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go",
+        "pkg/util/rational_service_invocation.go",
+        "pkg/util/rational_service_neg_assign_invocation_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -135007,7 +135122,9 @@
         "TestIntegerPNormalizeNilReturningTransportOwnerRefusal",
         "TestRationalServiceIDivIntoInvocationAliasesAndInline",
         "TestRationalServiceIDivIntoInvocationEveryActualReservation",
-        "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner"
+        "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner",
+        "TestRationalServiceNegAssignInvocationPhysicalNumerator",
+        "TestRationalServiceNegAssignInvocationEveryIntMinReservation"
       ],
       "conditionals": [
         {
@@ -136432,6 +136549,15 @@
             "TestRationalServiceIDivIntoInvocationEveryActualReservation",
             "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner"
           ]
+        },
+        {
+          "name": "Physical caller rational::neg invocation: numerator-only mutation and inline INT_MIN signed setter allocation, exact lexical allocation context (src/util/rational.h:242-244; src/util/mpq.h:201; src/util/mpz.h:499-510)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceNegAssignInvocationPhysicalNumerator",
+            "TestRationalServiceNegAssignInvocationEveryIntMinReservation"
+          ]
         }
       ],
       "ownership": [
@@ -136465,7 +136591,8 @@
         "False acknowledges only completed younger child suffix; true retires exact unjoined acquisitions after caller older source declarations, preserving first cause and later foreign generation.",
         "Actual self/embedded frame/nonwrapping captured invocation identities; direct cell/backing/allocator and Natural buffer acquisitions only. Scoped bool tmp construction precedes zero branch; all completed constructors run strict source DT. First source cause persists across separate false/true owning acknowledgment until next actual invocation. Successful shared Natural publications remain member-owned.",
         "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
-        "Void integer division writes the existing physical NUM, resets DEN only after successful integer publication, and transfers the exact caller context at the service epilogue. Negative division now records its reached IntegerRawScope receipt into that same rational-service invocation before entering machine_div_rem. Tests cover direct and value-returning paths, every actual allocation refusal, exact held child identity during Runtime callbacks, rejected reentrant cleanup and zero-budget owning closure; immutable invocation/body history survives cleanup."
+        "Void integer division writes the existing physical NUM, resets DEN only after successful integer publication, and transfers the exact caller context at the service epilogue. Negative division now records its reached IntegerRawScope receipt into that same rational-service invocation before entering machine_div_rem. Tests cover direct and value-returning paths, every actual allocation refusal, exact held child identity during Runtime callbacks, rejected reentrant cleanup and zero-budget owning closure; immutable invocation/body history survives cleanup.",
+        "NegAssignWithInvocation changes only the caller physical NUM and captures the actual inline INT_MIN setter allocation in its exact RationalServiceInvocation. No returned negation/copy-assignment temporary is substituted. Tests prove unchanged DEN/big NUM storage, all reached actual Runtime allocation refusals, permitted old/new/failed NUM publication, live physical roots/budget, copied/stopped receipt guards, preserved history and complete owning cleanup. Parsing can retain big INT_MIN magnitude; the campaign reaches the real signed setter before injection to guarantee the inline source branch. Native fatal/assertion/allocator/layout ABI remains uncredited."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -137415,7 +137542,10 @@
         "pkg/math/polynomial/polynomial_psc_unwind_test.go",
         "pkg/math/polynomial/polynomial_gcd_prs.go",
         "pkg/math/polynomial/polynomial_primitive_return_order_source_test.go",
-        "pkg/math/polynomial/polynomial_iccp_cleanup_order_source_test.go"
+        "pkg/math/polynomial/polynomial_iccp_cleanup_order_source_test.go",
+        "pkg/ast/ast_bv_polynomial_neg_numerals.go",
+        "pkg/ast/ast_bv_polynomial_sub_literal.go",
+        "pkg/ast/ast_bv_polynomial_neg_sub_lifetime_test.go"
       ],
       "tests": [
         "TestASTRefVectorBorrowedInputDefaultEraseAndMove",
@@ -137500,7 +137630,9 @@
         "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
         "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals",
         "TestPolynomialFactoryActualIncomingINCTransfersBeforeOldDECCallback",
-        "TestPolynomialFactoryReferenceWrongPointerAndForeignReceiptGuards"
+        "TestPolynomialFactoryReferenceWrongPointerAndForeignReceiptGuards",
+        "TestASTBitVectorUnaryMinusPhysicalLocalAndLiteralLifetimes",
+        "TestASTBitVectorSubtractionLiteralRefAcquiredBeforeTemporaryRetires"
       ],
       "conditionals": [
         {
@@ -137642,6 +137774,14 @@
           "tests": [
             "TestPolynomialPrimitivePartReturnedTemporaryPrecedesCallerAssignment",
             "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals"
+          ]
+        },
+        {
+          "name": "Subtraction expr_ref NUM acquisition before outer -1 literal temporary DT, actual owning Go reference survives literal-owner cleanup (src/util/obj_ref.h:39-43; src/ast/ast.h:2259; src/ast/rewriter/poly_rewriter_def.h:690)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_polynomial_sub_literal.go",
+          "tests": [
+            "TestASTBitVectorSubtractionLiteralRefAcquiredBeforeTemporaryRetires"
           ]
         }
       ],
@@ -140937,7 +141077,8 @@
         "pkg/util/rational_service_mod_into_callback_source_test.go",
         "pkg/util/rational_service_compare_invocation.go",
         "pkg/util/rational_service_compare_invocation_test.go",
-        "pkg/util/rational_service_mul_assign_invocation_test.go"
+        "pkg/util/rational_service_mul_assign_invocation_test.go",
+        "pkg/util/rational_service_neg_assign_invocation_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -141093,7 +141234,9 @@
         "TestRationalServiceComparisonInvocationSourceBranches",
         "TestRationalServiceComparisonInvocationEveryActualReservation",
         "TestRationalServiceMulAssignInvocationAliasingAndSourceBranches",
-        "TestRationalServiceMulAssignInvocationEveryActualReservation"
+        "TestRationalServiceMulAssignInvocationEveryActualReservation",
+        "TestRationalServiceNegAssignInvocationPhysicalNumerator",
+        "TestRationalServiceNegAssignInvocationEveryIntMinReservation"
       ],
       "conditionals": [
         {
@@ -141675,6 +141818,15 @@
             "TestRationalServiceMulAssignInvocationAliasingAndSourceBranches",
             "TestRationalServiceMulAssignInvocationEveryActualReservation"
           ]
+        },
+        {
+          "name": "Physical caller rational::neg invocation: numerator-only mutation and inline INT_MIN signed setter allocation, exact lexical allocation context (src/util/rational.h:242-244; src/util/mpq.h:201; src/util/mpz.h:499-510)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceNegAssignInvocationPhysicalNumerator",
+            "TestRationalServiceNegAssignInvocationEveryIntMinReservation"
+          ]
         }
       ],
       "ownership": [
@@ -141691,7 +141843,8 @@
         "The ui64 constructor entry now passes an explicit caller-local allocation context through the rational manager uint64 setter to its existing integer implementation, before resetting the output denominator. The original public setter shares that implementation with an empty context; successful/failure output publication prefixes are preserved.",
         "Unsigned32 invocation passes the original caller allocation context to the existing integer uint32 overload and resets DEN only after successful NUM publication. Owned values retain previous setter destruction rules; actual facade lexical scopes join through the caller receipt. Tests replace big numerator/denominator, check inclusive INT_MAX, reject copied contexts and end source/own contexts.",
         "The void modulo invocation writes the caller-owned rational directly, without a returned value or copy temporary. It passes the exact allocation context into the existing literal manager operation, records sticky child source causes and transfers reached lexical/allocation roots at the actual service epilogue. Actual Runtime callback tests reject caller/output/service cleanup during the held invocation, name its transferred allocation in the immediate physical audit and close the entire graph to zero budget.",
-        "Void integer division writes the existing physical NUM, resets DEN only after successful integer publication, and transfers the exact caller context at the service epilogue. Negative division now records its reached IntegerRawScope receipt into that same rational-service invocation before entering machine_div_rem. Tests cover direct and value-returning paths, every actual allocation refusal, exact held child identity during Runtime callbacks, rejected reentrant cleanup and zero-budget owning closure; immutable invocation/body history survives cleanup."
+        "Void integer division writes the existing physical NUM, resets DEN only after successful integer publication, and transfers the exact caller context at the service epilogue. Negative division now records its reached IntegerRawScope receipt into that same rational-service invocation before entering machine_div_rem. Tests cover direct and value-returning paths, every actual allocation refusal, exact held child identity during Runtime callbacks, rejected reentrant cleanup and zero-budget owning closure; immutable invocation/body history survives cleanup.",
+        "NegAssignWithInvocation changes only the caller physical NUM and captures the actual inline INT_MIN setter allocation in its exact RationalServiceInvocation. No returned negation/copy-assignment temporary is substituted. Tests prove unchanged DEN/big NUM storage, all reached actual Runtime allocation refusals, permitted old/new/failed NUM publication, live physical roots/budget, copied/stopped receipt guards, preserved history and complete owning cleanup. Parsing can retain big INT_MIN magnitude; the campaign reaches the real signed setter before injection to guarantee the inline source branch. Native fatal/assertion/allocator/layout ABI remains uncredited."
       ],
       "deviations": [
         "Explicit manager projects rational.h inclusive32-bit wrappers, distinct from strict MPZ boundaries; global wrapper remains incomplete. Float positive converted denominator SASSERT becomes typed ErrRationalFloatDomain. Source raw component alias publication can leave denominator zero; subsequent operations diagnose initialization.",

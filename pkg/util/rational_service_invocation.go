@@ -345,6 +345,31 @@ func (s *RationalService) CopyWithInvocation(dst, src *OwnedRational, c *Rationa
 	return s.copyLockedWithContext(dst, src, c.allocationContext())
 }
 
+// Source: src/util/rational.h:242-244; src/util/mpq.h:201;
+// src/util/mpz.h:499-510.
+// NegAssignWithInvocation preserves the caller's physical numerator. Only the
+// inline INT_MIN branch reaches a signed setter and its actual allocation.
+func (s *RationalService) NegAssignWithInvocation(a *OwnedRational, c *RationalServiceInvocation) (e error) {
+	if e = s.lock(); e != nil {
+		return e
+	}
+	defer s.mu.Unlock()
+	if e = s.rationalScalarOwner(a); e != nil {
+		return e
+	}
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return e
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	if e = s.beginLexical(); e != nil {
+		return e
+	}
+	defer s.endLexicalError(&e)
+	return s.Manager.negWithSourceContext(&a.Raw, c.allocationContext())
+}
+
 // Same source compound operator; the caller's NUM is the physical receiver.
 func (s *RationalService) AddAssignWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) error {
 	return s.compoundWithInvocation(a, b, c, rationalFacadeAdd)
