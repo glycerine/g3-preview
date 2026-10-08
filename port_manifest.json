@@ -129869,7 +129869,13 @@
         "pkg/util/mpf_renormalize_scope.go",
         "pkg/util/mpf_renormalize_test.go",
         "pkg/util/mpf_renormalize_failure_test.go",
-        "pkg/util/mpf_renormalize_callback_test.go"
+        "pkg/util/mpf_renormalize_callback_test.go",
+        "pkg/util/mpf_partial_remainder.go",
+        "pkg/util/mpf_partial_remainder_scope.go",
+        "pkg/util/mpf_partial_remainder_test.go",
+        "pkg/util/mpf_partial_remainder_failure_test.go",
+        "pkg/util/mpf_partial_remainder_callback_test.go",
+        "pkg/util/mpf_partial_remainder_literal_test.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -130028,7 +130034,11 @@
         "TestArbitraryFloatRenormalizeZeroAndWarmInlineNoReservation",
         "TestArbitraryFloatRenormalizeEveryColdReservation",
         "TestArbitraryFloatRenormalizeSignedExponentPublication",
-        "TestArbitraryFloatRenormalizeReturningTransportAndOwnerGuards"
+        "TestArbitraryFloatRenormalizeReturningTransportAndOwnerGuards",
+        "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
+        "TestArbitraryFloatPartialRemainderEveryColdReservation",
+        "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
+        "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant"
       ],
       "conditionals": [
         {
@@ -130690,6 +130700,17 @@
             "TestArbitraryFloatRenormalizeSignedExponentPublication",
             "TestArbitraryFloatRenormalizeReturningTransportAndOwnerGuards"
           ]
+        },
+        {
+          "name": "mpf.cpp:1272-1436; mpf.h:232 partial_remainder original quotient, alignment, sticky and final rounding body",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_partial_remainder.go",
+          "tests": [
+            "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
+            "TestArbitraryFloatPartialRemainderEveryColdReservation",
+            "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
+            "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant"
+          ]
         }
       ],
       "ownership": [
@@ -130719,7 +130740,8 @@
         "FMA embeds actual mr/a/b/c/res floats and reached sticky NUM in its reflected owner. Default/formatted construction and self-significand SET erasure follow scoped_mpf. The result copy constructor separately records started owning storage and completed source construction; failed constructor storage is joined without running an unreached completed source destructor. Actual leaf receipts and reached Round frame/invocation govern reverse source and owning cleanup. Every cold general reservation at precisions 4/24/120/4000 includes all output aliases, immediate complete physical/byte audits, a reached failed res construction and zero owning refunds. Actual unpack returning transport refuses reentrant root acquisition and parent/primitive mutation and Close joins the abandoned scope.",
         "Actual default scoped a is embedded and charged in the MPF owner. Integer Root performs literal output SET before its original raw bisection; caller context captures unpublished allocating leaves, actual copy/root/power receipts and natural buffers/verification, while raw numerals stay in their actual Integer frames. Source destruction checks younger Round and Root/Power source stops before a. CleanupSqrt joins only captured children and actual NUMs. Every cold general reservation at precisions 2/24/120 and early NaN/infinity/zero/negative branch is audited with complete immediate public/local/Root/Power/Round/scratch/cache/copy/Runtime physical roots, exact live bytes and zero refunds. Actual unpack returning transport protects parent/primitive mutation and Close joins the abandoned caller. Copied/ended caller contexts are denied before scalar output SET and before root-frame entry.",
         "mpf.cpp:951-1003 actual lower/upper/mid/product/diff NUMs are embedded and charged in the Integer manager, independent of an MPF parent. Exact invocation bindings capture reached Integer allocation/copy and Natural buffer/verification leaves. Source reverse destruction stops at its youngest failed child; explicit owning cleanup joins actual receipts and locals without replay. Manager source/owning end includes this helper. During real returning transport the exact helper protects its Integer owner and scalar mutation, without imposing unrelated polynomial callback restrictions.",
-        "Renormalize declares no lexical NUM or RAW. Actual persistent Power wrapper members own cached upper/lower bounds; the concrete reflected manager scope captures only reached in-place Integer shift allocation prefixes. Executing exact Integer/Natural bindings and MPF guards deny owner retirement and scalar mutation during real returning transport. Explicit owning cleanup releases captured unpublished prefixes without disposing borrowed caller fields. Source declares no helper numeral destructor; no fictitious local root is introduced."
+        "Renormalize declares no lexical NUM or RAW. Actual persistent Power wrapper members own cached upper/lower bounds; the concrete reflected manager scope captures only reached in-place Integer shift allocation prefixes. Executing exact Integer/Natural bindings and MPF guards deny owner retirement and scalar mutation during real returning transport. Explicit owning cleanup releases captured unpublished prefixes without disposing borrowed caller fields. Source declares no helper numeral destructor; no fictitious local root is introduced.",
+        "partial_remainder embeds and charges the thirteen actual scoped integer declarations in the reflected manager header, including unused x_rem_y_sig and branch-local sticky_rem/rnd_bits. Exact live flags begin only at reached source declarations; sticky_rem ends before subtraction and rnd_bits ends after final SET. Reverse source destruction checks the actual younger Natural verification stop before older NUMs; exact owning cleanup joins captured Integer/copy/Natural buffer/verification leaves and actual live locals without replay. Public x/y remain borrowed. The concrete helper is included in parent source/owning end and precise Integer transport guards. Copied/ended body scopes are rejected before inline publication."
       ],
       "deviations": [
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
@@ -130742,7 +130764,8 @@
         "FMA now implements the literal source algorithm. Independent fused IEEE and exact rational oracles cover ordinary precision >=4; special classes, signed zero, all modes and aliases are checked separately. Source initial assertion deliberately fails to compare z format. For precision 2/3 the literal 7-sbits left shift reaches the Round debug size assertion; release unsigned leading-zero wrap yields a noncanonical expanded significand and exact value 128 for 1*1+1. This original source behavior is tested, not replaced by IEEE arithmetic. Source NYI debug assertion before renormalization exponent carry is preserved. Reached undefined signed exponent expressions return arena.ErrBounds. Go owning continuation adapts native constructor/destructor/fatal ABI; no whole MPF/f2n/solver completion or new upstream scalar-driver FMA credit. Dedicated new-caller younger Round source/first-own transport stress refinements remain outstanding.",
         "Only public sqrt at mpf.cpp:1005-1045 is credited; free helper my_mpz_sqrt at 951-1003 remains separate. Production uses the original Integer root algorithm and source parity/shift/inexact decrement, not host sqrt or math/big. Independent IEEE and exact-square rational oracles test all modes, aliases, normal/denormal and positive/negative exponent parity. Cold sweep horizon was enlarged beyond 256 to finish precision 120; exhaustive precision-4000 bisection sweep remains deferred as a large debug sweep, with no claimed large/direct-profile cold coverage. Dedicated new-caller younger source/first-own transport stress extensions remain outstanding. No new upstream scalar-driver sqrt credit or whole MPF/f2n/util completion claim.",
         "The standalone helper now preserves original lower bound, parity-specific upper shift, endpoint sticky selection, exact midpoint and literal lower==upper branch. Independent big.Int ceiling-root oracles appear only in tests. Bare Integer tests prove no MPF parent requirement. Cold prefixes at precisions 2/24/80 cover both parity settings and aliases; a real TLS allocation failure covers executing-owner guards and abandoned enclosing cleanup. Replay denies an active invocation before reading a possibly damaged public output. The source normalized positive-radicand bound remains a precondition; no replacement general-purpose algorithm is introduced. Whole MPF units remain partial.",
-        "Renormalize preserves zero before cache acquisition, unused ebits, repeated division/multiplication by two, truncation and signed exponent publication after each shift. Reached undefined signed exponent overflow returns arena.ErrBounds after the preceding source significand mutation. Independent bit-length oracles cover precisions 1/2/24/80/120 and values through 240 bits. Every selected cold reservation at precisions 2/24/80/120 is physically/byte audited; warm inline calls refuse every new reservation and still succeed. Actual cached-power returning transport, copied/ended context denial and final zero refunds are verified. Negative significands are outside the source normalization domain. Whole MPF units and remaining partial_remainder/rem bodies remain incomplete."
+        "Renormalize preserves zero before cache acquisition, unused ebits, repeated division/multiplication by two, truncation and signed exponent publication after each shift. Reached undefined signed exponent overflow returns arena.ErrBounds after the preceding source significand mutation. Independent bit-length oracles cover precisions 1/2/24/80/120 and values through 240 bits. Every selected cold reservation at precisions 2/24/80/120 is physically/byte audited; warm inline calls refuse every new reservation and still succeed. Actual cached-power returning transport, copied/ended context denial and final zero refunds are verified. Negative significands are outside the source normalization domain. Whole MPF units and remaining partial_remainder/rem bodies remain incomplete.",
+        "PartialRemainder preserves the signed32 D conversion, quotient truncation versus nearest-even switch, original cached powers and repeated renormalize calls, unsigned shifts, large-alignment sticky swap and literal final mpz(32) comparison. Independent exact rational quotient/remainder oracles cover normalized inputs at precisions 2/7/24/80/120, signs, both reduction modes and selected exponent differences. Cold sweeps include unchanged-x early return, exact zero, same input identity, subtraction sign changes and partial/complete reductions, with immediate physical/byte graphs and zero refunds. A defined literal helper profile supplies exp_diff=0 with differing stored exponents to reach the large-alignment branch: precision 4 keeps significand 15, precision 7 yields 128 and precision 24 yields 2^24, each with exponent 39. The source does not validate exp_diff against stored fields, and these expected noncanonical/raw results are not advertised as IEEE mathematical remainder. Reached undefined signed exponent expressions return arena.ErrBounds. Native real transport reaches numerator allocation; debug can first reach an assertion bound cache. Public rem at mpf.cpp:1438-1485 remains a separate unfinished obligation. No new upstream driver assertions or whole MPF/util completion credit."
       ]
     },
     {
@@ -130837,7 +130860,13 @@
         "pkg/util/mpf_renormalize_scope.go",
         "pkg/util/mpf_renormalize_test.go",
         "pkg/util/mpf_renormalize_failure_test.go",
-        "pkg/util/mpf_renormalize_callback_test.go"
+        "pkg/util/mpf_renormalize_callback_test.go",
+        "pkg/util/mpf_partial_remainder.go",
+        "pkg/util/mpf_partial_remainder_scope.go",
+        "pkg/util/mpf_partial_remainder_test.go",
+        "pkg/util/mpf_partial_remainder_failure_test.go",
+        "pkg/util/mpf_partial_remainder_callback_test.go",
+        "pkg/util/mpf_partial_remainder_literal_test.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -130948,7 +130977,11 @@
         "TestArbitraryFloatRenormalizeZeroAndWarmInlineNoReservation",
         "TestArbitraryFloatRenormalizeEveryColdReservation",
         "TestArbitraryFloatRenormalizeSignedExponentPublication",
-        "TestArbitraryFloatRenormalizeReturningTransportAndOwnerGuards"
+        "TestArbitraryFloatRenormalizeReturningTransportAndOwnerGuards",
+        "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
+        "TestArbitraryFloatPartialRemainderEveryColdReservation",
+        "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
+        "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant"
       ],
       "conditionals": [
         {
@@ -131192,6 +131225,17 @@
             "TestArbitraryFloatRenormalizeSignedExponentPublication",
             "TestArbitraryFloatRenormalizeReturningTransportAndOwnerGuards"
           ]
+        },
+        {
+          "name": "mpf.cpp:1272-1436; mpf.h:232 partial_remainder original quotient, alignment, sticky and final rounding body",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_partial_remainder.go",
+          "tests": [
+            "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
+            "TestArbitraryFloatPartialRemainderEveryColdReservation",
+            "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
+            "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant"
+          ]
         }
       ],
       "ownership": [
@@ -131211,7 +131255,8 @@
         "Actual warm Add/Sub/Mul/Div calls run with every new reservation refused and still stamp the freshly entered Round frame/invocation while retaining a zero allocation-history receipt. Exact Runtime state/budget equality verifies no metadata reservation. A genuine later public Round reuses that same actual frame; cleanup of the ended arithmetic caller erases its obsolete tuple and preserves the later child state/bytes. These assertions inspect actual invoked scope storage, not inferred snapshots or invented owning roots.",
         "FMA embeds actual mr/a/b/c/res floats and reached sticky NUM in its reflected owner. Default/formatted construction and self-significand SET erasure follow scoped_mpf. The result copy constructor separately records started owning storage and completed source construction; failed constructor storage is joined without running an unreached completed source destructor. Actual leaf receipts and reached Round frame/invocation govern reverse source and owning cleanup. Every cold general reservation at precisions 4/24/120/4000 includes all output aliases, immediate complete physical/byte audits, a reached failed res construction and zero owning refunds. Actual unpack returning transport refuses reentrant root acquisition and parent/primitive mutation and Close joins the abandoned scope.",
         "Actual default scoped a is embedded and charged in the MPF owner. Integer Root performs literal output SET before its original raw bisection; caller context captures unpublished allocating leaves, actual copy/root/power receipts and natural buffers/verification, while raw numerals stay in their actual Integer frames. Source destruction checks younger Round and Root/Power source stops before a. CleanupSqrt joins only captured children and actual NUMs. Every cold general reservation at precisions 2/24/120 and early NaN/infinity/zero/negative branch is audited with complete immediate public/local/Root/Power/Round/scratch/cache/copy/Runtime physical roots, exact live bytes and zero refunds. Actual unpack returning transport protects parent/primitive mutation and Close joins the abandoned caller. Copied/ended caller contexts are denied before scalar output SET and before root-frame entry.",
-        "Renormalize declares no lexical NUM or RAW. Actual persistent Power wrapper members own cached upper/lower bounds; the concrete reflected manager scope captures only reached in-place Integer shift allocation prefixes. Executing exact Integer/Natural bindings and MPF guards deny owner retirement and scalar mutation during real returning transport. Explicit owning cleanup releases captured unpublished prefixes without disposing borrowed caller fields. Source declares no helper numeral destructor; no fictitious local root is introduced."
+        "Renormalize declares no lexical NUM or RAW. Actual persistent Power wrapper members own cached upper/lower bounds; the concrete reflected manager scope captures only reached in-place Integer shift allocation prefixes. Executing exact Integer/Natural bindings and MPF guards deny owner retirement and scalar mutation during real returning transport. Explicit owning cleanup releases captured unpublished prefixes without disposing borrowed caller fields. Source declares no helper numeral destructor; no fictitious local root is introduced.",
+        "partial_remainder embeds and charges the thirteen actual scoped integer declarations in the reflected manager header, including unused x_rem_y_sig and branch-local sticky_rem/rnd_bits. Exact live flags begin only at reached source declarations; sticky_rem ends before subtraction and rnd_bits ends after final SET. Reverse source destruction checks the actual younger Natural verification stop before older NUMs; exact owning cleanup joins captured Integer/copy/Natural buffer/verification leaves and actual live locals without replay. Public x/y remain borrowed. The concrete helper is included in parent source/owning end and precise Integer transport guards. Copied/ended body scopes are rejected before inline publication."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -131227,7 +131272,8 @@
         "Read-only pending FMA source review at mpf.cpp:748-949 found source details requiring literal regression expectations: SASSERT at 749-750 repeats x/y precision and compares z.ebits to itself; the sbits<4 branch at 934 left-shifts by 4-sbits+3. Infinity conditions at 761/769/777/785 correctly parse as is_inf(z) && (sgn(x) ^ sgn(y) ^ sgn(z)); XOR binds more tightly than logical AND in C++. An initial reversed-precedence interpretation was verified against the C++ draft grammar and rejected before commit. Preserve actual source behavior without silently changing assertions or small-precision arithmetic. No FMA implementation or completion credit yet. Scoped res copy construction and separate source-versus-owning cleanup also require exact reached constructor tracking.",
         "FMA now implements the literal source algorithm. Independent fused IEEE and exact rational oracles cover ordinary precision >=4; special classes, signed zero, all modes and aliases are checked separately. Source initial assertion deliberately fails to compare z format. For precision 2/3 the literal 7-sbits left shift reaches the Round debug size assertion; release unsigned leading-zero wrap yields a noncanonical expanded significand and exact value 128 for 1*1+1. This original source behavior is tested, not replaced by IEEE arithmetic. Source NYI debug assertion before renormalization exponent carry is preserved. Reached undefined signed exponent expressions return arena.ErrBounds. Go owning continuation adapts native constructor/destructor/fatal ABI; no whole MPF/f2n/solver completion or new upstream scalar-driver FMA credit. Dedicated new-caller younger Round source/first-own transport stress refinements remain outstanding.",
         "Only public sqrt at mpf.cpp:1005-1045 is credited; free helper my_mpz_sqrt at 951-1003 remains separate. Production uses the original Integer root algorithm and source parity/shift/inexact decrement, not host sqrt or math/big. Independent IEEE and exact-square rational oracles test all modes, aliases, normal/denormal and positive/negative exponent parity. Cold sweep horizon was enlarged beyond 256 to finish precision 120; exhaustive precision-4000 bisection sweep remains deferred as a large debug sweep, with no claimed large/direct-profile cold coverage. Dedicated new-caller younger source/first-own transport stress extensions remain outstanding. No new upstream scalar-driver sqrt credit or whole MPF/f2n/util completion claim.",
-        "Renormalize preserves zero before cache acquisition, unused ebits, repeated division/multiplication by two, truncation and signed exponent publication after each shift. Reached undefined signed exponent overflow returns arena.ErrBounds after the preceding source significand mutation. Independent bit-length oracles cover precisions 1/2/24/80/120 and values through 240 bits. Every selected cold reservation at precisions 2/24/80/120 is physically/byte audited; warm inline calls refuse every new reservation and still succeed. Actual cached-power returning transport, copied/ended context denial and final zero refunds are verified. Negative significands are outside the source normalization domain. Whole MPF units and remaining partial_remainder/rem bodies remain incomplete."
+        "Renormalize preserves zero before cache acquisition, unused ebits, repeated division/multiplication by two, truncation and signed exponent publication after each shift. Reached undefined signed exponent overflow returns arena.ErrBounds after the preceding source significand mutation. Independent bit-length oracles cover precisions 1/2/24/80/120 and values through 240 bits. Every selected cold reservation at precisions 2/24/80/120 is physically/byte audited; warm inline calls refuse every new reservation and still succeed. Actual cached-power returning transport, copied/ended context denial and final zero refunds are verified. Negative significands are outside the source normalization domain. Whole MPF units and remaining partial_remainder/rem bodies remain incomplete.",
+        "PartialRemainder preserves the signed32 D conversion, quotient truncation versus nearest-even switch, original cached powers and repeated renormalize calls, unsigned shifts, large-alignment sticky swap and literal final mpz(32) comparison. Independent exact rational quotient/remainder oracles cover normalized inputs at precisions 2/7/24/80/120, signs, both reduction modes and selected exponent differences. Cold sweeps include unchanged-x early return, exact zero, same input identity, subtraction sign changes and partial/complete reductions, with immediate physical/byte graphs and zero refunds. A defined literal helper profile supplies exp_diff=0 with differing stored exponents to reach the large-alignment branch: precision 4 keeps significand 15, precision 7 yields 128 and precision 24 yields 2^24, each with exponent 39. The source does not validate exp_diff against stored fields, and these expected noncanonical/raw results are not advertised as IEEE mathematical remainder. Reached undefined signed exponent expressions return arena.ErrBounds. Native real transport reaches numerator allocation; debug can first reach an assertion bound cache. Public rem at mpf.cpp:1438-1485 remains a separate unfinished obligation. No new upstream driver assertions or whole MPF/util completion credit."
       ]
     },
     {
