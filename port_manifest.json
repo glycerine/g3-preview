@@ -129810,7 +129810,9 @@
         "pkg/util/mpf_plain_rational_set_source_stop_test.go",
         "pkg/util/mpf_plain_rational_set_source_test.go",
         "pkg/util/mpf_numeral_helpers.go",
-        "pkg/util/mpf_numeral_helpers_test.go"
+        "pkg/util/mpf_numeral_helpers_test.go",
+        "pkg/util/mpf_integer_query.go",
+        "pkg/util/mpf_integer_query_test.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -129906,7 +129908,11 @@
         "TestArbitraryFloatRegularSourceClassesAndDefaultErasure",
         "TestArbitraryFloatPrevPowerSourceFormulaAndDebugDomains",
         "TestArbitraryFloatMkOneAndResetReplaceBIGNumerals",
-        "TestArbitraryFloatNumeralHelpersEveryColdReservation"
+        "TestArbitraryFloatNumeralHelpersEveryColdReservation",
+        "TestArbitraryFloatIsIntIndependentDyadicOracle",
+        "TestArbitraryFloatIsIntSourceSpecialsAndErasedCopy",
+        "TestArbitraryFloatIsIntEveryColdCopyReservation",
+        "TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope"
       ],
       "conditionals": [
         {
@@ -130440,6 +130446,17 @@
             "TestArbitraryFloatPrevPowerSourceFormulaAndDebugDomains",
             "TestArbitraryFloatNumeralHelpersEveryColdReservation"
           ]
+        },
+        {
+          "name": "mpf.cpp:1795-1819; mpf.h:183 is_int normal/precision guards and scoped copy/odd/shift loop",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_integer_query.go",
+          "tests": [
+            "TestArbitraryFloatIsIntIndependentDyadicOracle",
+            "TestArbitraryFloatIsIntSourceSpecialsAndErasedCopy",
+            "TestArbitraryFloatIsIntEveryColdCopyReservation",
+            "TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope"
+          ]
         }
       ],
       "ownership": [
@@ -130458,7 +130475,8 @@
         "Checked assertion mpf.cpp:279 retains le(1,sig) first operand and short circuit before lt(sig,2). Its deliberately below-one helper-domain regression audits exact comparison scratch publication and does not claim public normalized SET reachability.",
         "Never-entered exponent+rational scope (manager nil/invocation zero) erases all child cleanup reads after supplied receipt validation. Actual incomplete MPF/AST constructors may not yet publish Integer/Natural; unchanged constructor-prefix regressions prove this early source/own boundary. Entered and earlier issued-history cleanup routes retain exact identity guards.",
         "One real scoped exponent declaration precedes inline SET0 and the same exponent+rational engine. Actual child begin stamps the concrete parent/frame/nonwrap tuple; no before/after inference. Completed child false acknowledgment precedes older exp owning DT; exact true child abort follows. Original parent body/source/first-own diagnostics are stored only in the actual reached child allocation record and survive later erased invocation until owner end. There is no entry metadata reserve or invented additional numerical algorithm.",
-        "Numeral helpers introduce no numerical owners or cached host substitutes. MkOne replaces the actual old significand through source SET0; Reset enters the original SetInt32 input engine and reached bottom-exponent cache. Every cold helper reservation has immediate actual Integer/Runtime/cache ownership and byte audits before recovery, with exact owning refunds; BIG numeral replacement is included. Default regularity erases poisoned significand and exponent-bound reads."
+        "Numeral helpers introduce no numerical owners or cached host substitutes. MkOne replaces the actual old significand through source SET0; Reset enters the original SetInt32 input engine and reached bottom-exponent cache. Every cold helper reservation has immediate actual Integer/Runtime/cache ownership and byte audits before recovery, with exact owning refunds; BIG numeral replacement is included. Default regularity erases poisoned significand and exponent-bound reads.",
+        "Actual reached integer-query scoped_mpz storage is embedded in the manager and included in its reflected header. SET captures its concrete IntegerManager allocation receipt. Source returns destroy the actual local; explicit CleanupIntegerQuery joins only that captured child and numeral without replay. Parent source/own finalization includes the scope, and executing/finishing guards exclude reentrant teardown. Every cold pooled/direct SET reservation is audited against complete physical roots and exact live bytes; a real returning Runtime allocation transport also proves owner guards and Close joining an abandoned query."
       ],
       "deviations": [
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
@@ -130471,7 +130489,8 @@
         "mpf.cpp:233-300 only is completed by this slice; preceding plain-rational mpf.cpp:185-193 and formatted-string mpf.cpp:194-231 remain separate. No new original-driver or whole-unit credit. BIG negative exponent follows literal mk_inf. Source uint32 shifts and pp-to-signed32 constructor representation are retained. Signed-host TLS destructor stops use actual Runtime helper domain; reached Prev/Floor and Round transport fixtures lift allocation failure to arm release domain and do not claim allocation-before-fault-lift graphs. Initial straight TLS and missing comparison-one recipes remain diagnostic/RED evidence, not youngest-stop credit. Literal source scratch old-free then allocation-before-assignment holes are not repaired.",
         "mpz.h:95 declares only mpz(int); the actual uint32 pp immediate converts through represented signed32 NewInt(int32(pp)), without substituting unsigned SET allocation.",
         "mpf.cpp:186-192 is the selected caller only. TRACE remains diagnostic; no new original-driver or whole-unit completion claim. Source-stop and first-own TLS fixtures use actual signed-host owner-primitive helper profiles and preserve before-recovery named physical/cold graphs; they are not ordinary mathematical OOM. Formatted-string mpf.cpp:194-231 remains separate.",
-        "Only mpf.h:75,181 and mpf.cpp:1890-1896,2133-2141 are added in this chunk. Source is_regular excludes formatted zeros; positive zero with wide precision and release +infinity follow the literal previous-power formula. Reached undefined signed64 addition returns arena.ErrBounds; erased negative branches do not evaluate it. Existing explicit owner/lifetime guards remain. MPF arithmetic, integral rounding and other remaining methods are not credited; whole unit remains partial."
+        "Only mpf.h:75,181 and mpf.cpp:1890-1896,2133-2141 are added in this chunk. Source is_regular excludes formatted zeros; positive zero with wide precision and release +infinity follow the literal previous-power formula. Reached undefined signed64 addition returns arena.ErrBounds; erased negative branches do not evaluate it. Existing explicit owner/lifetime guards remain. MPF arithmetic, integral rounding and other remaining methods are not credited; whole unit remains partial.",
+        "IsInt retains source false for formatted zeros, denormals, NaNs and infinities, plus erased copying for negative/large exponents. Independent dyadic rational tests use math/big only as an oracle; production uses the original copy/odd/single-bit-shift loop. Go explicit owning cleanup/returning failure transport replaces native scoped destructor/exception/fatal ABI; no whole MPF-unit, f2n binding or solver integration claim."
       ]
     },
     {
@@ -130512,7 +130531,9 @@
         "pkg/util/mpf_plain_rational_set_source_stop_test.go",
         "pkg/util/mpf_plain_rational_set_source_test.go",
         "pkg/util/mpf_numeral_helpers.go",
-        "pkg/util/mpf_numeral_helpers_test.go"
+        "pkg/util/mpf_numeral_helpers_test.go",
+        "pkg/util/mpf_integer_query.go",
+        "pkg/util/mpf_integer_query_test.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -130564,7 +130585,11 @@
         "TestArbitraryFloatRegularSourceClassesAndDefaultErasure",
         "TestArbitraryFloatPrevPowerSourceFormulaAndDebugDomains",
         "TestArbitraryFloatMkOneAndResetReplaceBIGNumerals",
-        "TestArbitraryFloatNumeralHelpersEveryColdReservation"
+        "TestArbitraryFloatNumeralHelpersEveryColdReservation",
+        "TestArbitraryFloatIsIntIndependentDyadicOracle",
+        "TestArbitraryFloatIsIntSourceSpecialsAndErasedCopy",
+        "TestArbitraryFloatIsIntEveryColdCopyReservation",
+        "TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope"
       ],
       "conditionals": [
         {
@@ -130691,6 +130716,17 @@
             "TestArbitraryFloatRegularSourceClassesAndDefaultErasure",
             "TestArbitraryFloatNumeralHelpersEveryColdReservation"
           ]
+        },
+        {
+          "name": "mpf.cpp:1795-1819; mpf.h:183 is_int normal/precision guards and scoped copy/odd/shift loop",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_integer_query.go",
+          "tests": [
+            "TestArbitraryFloatIsIntIndependentDyadicOracle",
+            "TestArbitraryFloatIsIntSourceSpecialsAndErasedCopy",
+            "TestArbitraryFloatIsIntEveryColdCopyReservation",
+            "TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope"
+          ]
         }
       ],
       "ownership": [
@@ -130700,14 +130736,16 @@
         "Checked assertion mpf.cpp:279 retains le(1,sig) first operand and short circuit before lt(sig,2). Its deliberately below-one helper-domain regression audits exact comparison scratch publication and does not claim public normalized SET reachability.",
         "Never-entered exponent+rational scope (manager nil/invocation zero) erases all child cleanup reads after supplied receipt validation. Actual incomplete MPF/AST constructors may not yet publish Integer/Natural; unchanged constructor-prefix regressions prove this early source/own boundary. Entered and earlier issued-history cleanup routes retain exact identity guards.",
         "One real scoped exponent declaration precedes inline SET0 and the same exponent+rational engine. Actual child begin stamps the concrete parent/frame/nonwrap tuple; no before/after inference. Completed child false acknowledgment precedes older exp owning DT; exact true child abort follows. Original parent body/source/first-own diagnostics are stored only in the actual reached child allocation record and survive later erased invocation until owner end. There is no entry metadata reserve or invented additional numerical algorithm.",
-        "Numeral helpers introduce no numerical owners or cached host substitutes. MkOne replaces the actual old significand through source SET0; Reset enters the original SetInt32 input engine and reached bottom-exponent cache. Every cold helper reservation has immediate actual Integer/Runtime/cache ownership and byte audits before recovery, with exact owning refunds; BIG numeral replacement is included. Default regularity erases poisoned significand and exponent-bound reads."
+        "Numeral helpers introduce no numerical owners or cached host substitutes. MkOne replaces the actual old significand through source SET0; Reset enters the original SetInt32 input engine and reached bottom-exponent cache. Every cold helper reservation has immediate actual Integer/Runtime/cache ownership and byte audits before recovery, with exact owning refunds; BIG numeral replacement is included. Default regularity erases poisoned significand and exponent-bound reads.",
+        "Actual reached integer-query scoped_mpz storage is embedded in the manager and included in its reflected header. SET captures its concrete IntegerManager allocation receipt. Source returns destroy the actual local; explicit CleanupIntegerQuery joins only that captured child and numeral without replay. Parent source/own finalization includes the scope, and executing/finishing guards exclude reentrant teardown. Every cold pooled/direct SET reservation is audited against complete physical roots and exact live bytes; a real returning Runtime allocation transport also proves owner guards and Close joining an abandoned query."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
         "mpf.cpp:233-300 only is completed by this slice; preceding plain-rational mpf.cpp:185-193 and formatted-string mpf.cpp:194-231 remain separate. No new original-driver or whole-unit credit. BIG negative exponent follows literal mk_inf. Source uint32 shifts and pp-to-signed32 constructor representation are retained. Signed-host TLS destructor stops use actual Runtime helper domain; reached Prev/Floor and Round transport fixtures lift allocation failure to arm release domain and do not claim allocation-before-fault-lift graphs. Initial straight TLS and missing comparison-one recipes remain diagnostic/RED evidence, not youngest-stop credit. Literal source scratch old-free then allocation-before-assignment holes are not repaired.",
         "mpz.h:95 declares only mpz(int); the actual uint32 pp immediate converts through represented signed32 NewInt(int32(pp)), without substituting unsigned SET allocation.",
         "mpf.cpp:186-192 is the selected caller only. TRACE remains diagnostic; no new original-driver or whole-unit completion claim. Source-stop and first-own TLS fixtures use actual signed-host owner-primitive helper profiles and preserve before-recovery named physical/cold graphs; they are not ordinary mathematical OOM. Formatted-string mpf.cpp:194-231 remains separate.",
-        "Only mpf.h:75,181 and mpf.cpp:1890-1896,2133-2141 are added in this chunk. Source is_regular excludes formatted zeros; positive zero with wide precision and release +infinity follow the literal previous-power formula. Reached undefined signed64 addition returns arena.ErrBounds; erased negative branches do not evaluate it. Existing explicit owner/lifetime guards remain. MPF arithmetic, integral rounding and other remaining methods are not credited; whole unit remains partial."
+        "Only mpf.h:75,181 and mpf.cpp:1890-1896,2133-2141 are added in this chunk. Source is_regular excludes formatted zeros; positive zero with wide precision and release +infinity follow the literal previous-power formula. Reached undefined signed64 addition returns arena.ErrBounds; erased negative branches do not evaluate it. Existing explicit owner/lifetime guards remain. MPF arithmetic, integral rounding and other remaining methods are not credited; whole unit remains partial.",
+        "IsInt retains source false for formatted zeros, denormals, NaNs and infinities, plus erased copying for negative/large exponents. Independent dyadic rational tests use math/big only as an oracle; production uses the original copy/odd/single-bit-shift loop. Go explicit owning cleanup/returning failure transport replaces native scoped destructor/exception/fatal ABI; no whole MPF-unit, f2n binding or solver integration claim."
       ]
     },
     {

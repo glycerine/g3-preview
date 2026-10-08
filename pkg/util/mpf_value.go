@@ -37,7 +37,7 @@ func (m *ArbitraryFloatManager) valueGuard(a *ArbitraryFloat) error {
 	if !m.constructorComplete || m.closed || m.sourceEnded {
 		return arena.ErrClosed
 	}
-	if m.valueExecuting || m.integer.mpfBorrowedSourceCallbackActive() {
+	if m.valueExecuting || m.integerQuery.finishing || m.integer.mpfBorrowedSourceCallbackActive() {
 		return ErrNumericPending
 	}
 	return nil
@@ -178,7 +178,7 @@ func (m *ArbitraryFloatManager) CleanupValue(a *ArbitraryFloat) error {
 	if !m.constructorComplete || m.closed {
 		return arena.ErrClosed
 	}
-	if m.valueExecuting || m.integer.mpfBorrowedSourceCallbackActive() {
+	if m.valueExecuting || m.integerQuery.finishing || m.integer.mpfBorrowedSourceCallbackActive() {
 		return ErrNumericPending
 	}
 	m.valueExecuting = true
