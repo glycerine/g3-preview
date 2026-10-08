@@ -24,6 +24,8 @@ type BVPolynomialRewriter struct {
 	subtraction              *bvPolynomialSubtraction
 	cancellation             *bvPolynomialCancellation
 	additionBits             ast.ASTBitVectorNumeralInvocation
+	multiplicationNumerals   *ast.BitVectorMultiplicationNumerals
+	multiplicationConcat     [2]ast.ASTHandle
 	pair                     [2]ast.ASTHandle
 	header                   uint64
 	running, stopped, closed bool
@@ -252,6 +254,12 @@ func (p *BVPolynomialRewriter) Close() error {
 			return e
 		}
 		p.cancellation = nil
+	}
+	if p.multiplicationNumerals != nil {
+		if e := p.multiplicationNumerals.Close(); e != nil {
+			return e
+		}
+		p.multiplicationNumerals = nil
 	}
 	if e := p.manager.CleanupBitVectorNumeralInvocation(&p.additionBits); e != nil {
 		return e
