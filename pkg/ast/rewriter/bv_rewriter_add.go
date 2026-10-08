@@ -10,6 +10,10 @@ import "github.com/glycerine/g3/pkg/ast"
 // A final-assignment deletion error may accompany an already-published OR;
 // the output reference records which decrement was consumed.
 func RewriteBitVectorAdditionAfterCore(m *ast.ASTManager, incoming RewriteStatus, original ast.AppArguments, out ast.ASTRef) (RewriteStatus, error) {
+	return rewriteBitVectorAdditionAfterCore(m, incoming, original, out, nil)
+}
+
+func rewriteBitVectorAdditionAfterCore(m *ast.ASTManager, incoming RewriteStatus, original ast.AppArguments, out ast.ASTRef, child *ast.ASTBitVectorNumeralInvocation) (RewriteStatus, error) {
 	if incoming != RewriteFailed && incoming != RewriteDone {
 		return incoming, nil
 	}
@@ -52,7 +56,12 @@ func RewriteBitVectorAdditionAfterCore(m *ast.ASTManager, incoming RewriteStatus
 			if e != nil {
 				return incoming, e
 			}
-			zero, e := m.BitVectorZeroBit(arg, bit)
+			var zero bool
+			if child == nil {
+				zero, e = m.BitVectorZeroBit(arg, bit)
+			} else {
+				zero, e = m.BitVectorZeroBitWithInvocation(arg, bit, child)
+			}
 			if e != nil {
 				return incoming, e
 			}
@@ -71,4 +80,29 @@ func RewriteBitVectorAdditionAfterCore(m *ast.ASTManager, incoming RewriteStatus
 	// The factory acquires the operand references before assignment can delete
 	// the old sum. Do not read its borrowed argument view after this assignment.
 	return Rewrite1, m.SetRef(out, result)
+}
+
+// Source: src/ast/rewriter/bv_rewriter.cpp:2076-2079,2109-2137.
+// The core's source scopes end before the disjoint-bit rule reads the original
+// arguments (FAILED) or borrows the newly assigned addition's arguments (DONE).
+func (p *BVPolynomialRewriter) RewriteBitVectorAddition(args ast.AppArguments, out ast.ASTRef) (st RewriteStatus, err error) {
+	if e := p.open(); e != nil {
+		return RewriteFailed, e
+	}
+	p.running = true
+	defer func() {
+		p.running = false
+		if err != nil {
+			p.fail(err)
+		}
+	}()
+	st, e := p.rewriteBody(args, out, true, false)
+	if e != nil {
+		return st, e
+	}
+	st, e = rewriteBitVectorAdditionAfterCore(p.manager, st, args, out, &p.additionBits)
+	if e != nil {
+		return st, e
+	}
+	return st, p.manager.BitVectorNumeralInvocationSourceReady(&p.additionBits)
 }

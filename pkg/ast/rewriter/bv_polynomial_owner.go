@@ -23,6 +23,7 @@ type BVPolynomialRewriter struct {
 	negation                 *ast.BitVectorPolynomialNegationNumerals
 	subtraction              *bvPolynomialSubtraction
 	cancellation             *bvPolynomialCancellation
+	additionBits             ast.ASTBitVectorNumeralInvocation
 	pair                     [2]ast.ASTHandle
 	header                   uint64
 	running, stopped, closed bool
@@ -153,6 +154,11 @@ func (p *BVPolynomialRewriter) rewrite(args ast.AppArguments, out ast.ASTRef, ad
 			p.fail(err)
 		}
 	}()
+	return p.rewriteBody(args, out, add, fallback)
+}
+
+// The nested source caller already owns the reentrancy/failure boundary.
+func (p *BVPolynomialRewriter) rewriteBody(args ast.AppArguments, out ast.ASTRef, add, fallback bool) (st RewriteStatus, err error) {
 	if args.Count() == 0 {
 		return RewriteFailed, ast.ErrASTDomain
 	}
@@ -246,6 +252,9 @@ func (p *BVPolynomialRewriter) Close() error {
 			return e
 		}
 		p.cancellation = nil
+	}
+	if e := p.manager.CleanupBitVectorNumeralInvocation(&p.additionBits); e != nil {
+		return e
 	}
 	if p.config != nil {
 		if e := p.config.Close(); e != nil {
