@@ -27,6 +27,9 @@ func (m *ArbitraryFloatManager) SetRational(out *ArbitraryFloat, ebits, sbits ui
 	return m.SetRationalWithReceipt(out, ebits, sbits, mode, value, nil)
 }
 func (m *ArbitraryFloatManager) SetRationalWithReceipt(out *ArbitraryFloat, ebits, sbits uint32, mode ArbitraryFloatRoundingMode, value *Rational, r *ArbitraryFloatPlainRationalSetReceipt) (cause error) {
+	return m.setRationalWithBeginReceipt(out, ebits, sbits, mode, value, r, nil, nil)
+}
+func (m *ArbitraryFloatManager) setRationalWithBeginReceipt(out *ArbitraryFloat, ebits, sbits uint32, mode ArbitraryFloatRoundingMode, value *Rational, r *ArbitraryFloatPlainRationalSetReceipt, frame **arbitraryFloatPlainRationalSetScope, invocation *uint64) (cause error) {
 	if e := m.valueGuard(out); e != nil {
 		return e
 	}
@@ -35,6 +38,12 @@ func (m *ArbitraryFloatManager) SetRationalWithReceipt(out *ArbitraryFloat, ebit
 		return ErrNumericPending
 	}
 	*s = arbitraryFloatPlainRationalSetScope{manager: m, invocation: s.invocation + 1, active: true, executing: true, receipt: r}
+	if frame != nil {
+		*frame = s
+	}
+	if invocation != nil {
+		*invocation = s.invocation
+	}
 	defer func() {
 		s.executing = false
 		s.bodyCause = cause

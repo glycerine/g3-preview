@@ -101,6 +101,9 @@ func (m *ArbitraryFloatManager) CleanupExponentRationalSet() error {
 	return m.CleanupExponentRationalSetWithReceipt(nil, true)
 }
 func (m *ArbitraryFloatManager) CleanupExponentRationalSetWithReceipt(r *ArbitraryFloatRationalSetReceipt, abort bool) error {
+	return m.cleanupExponentRationalSetScope(r, abort, false)
+}
+func (m *ArbitraryFloatManager) cleanupExponentRationalSetScope(r *ArbitraryFloatRationalSetReceipt, abort, currentOnly bool) error {
 	if m == nil || m.self != m {
 		return ErrRuntimeOwner
 	}
@@ -176,7 +179,7 @@ func (m *ArbitraryFloatManager) CleanupExponentRationalSetWithReceipt(r *Arbitra
 	}
 
 	for h := m.RationalSetHistories; h != nil; h = h.Next {
-		if selected != nil && h != selected {
+		if currentOnly && h != s.history || selected != nil && h != selected {
 			continue
 		}
 		if !h.owned {
