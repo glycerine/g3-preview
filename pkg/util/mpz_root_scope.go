@@ -197,3 +197,22 @@ func (m *IntegerManager) endRootRawScope() error {
 	m.RootRaw.EndEntered = true
 	return m.finishRoot()
 }
+
+// Caller capture changes only ownership of unpublished allocation prefixes.
+// The actual Root/Power raw numerals and original algorithms remain unchanged.
+func (m *IntegerManager) rootRawCallWithContext(op uint8, a, b, out *Int, context integerAllocationInvocationContext) error {
+	if context == (integerAllocationInvocationContext{}) {
+		return m.rootRawCall(op, a, b, out)
+	}
+	switch op {
+	case 0:
+		return m.powerWithAllocationContext(a, uint32(b.Val), out, &m.RootRaw.powerInvocation, context)
+	case 1:
+		return m.addSubWithAllocationContext(a, b, out, false, context)
+	case 2:
+		return m.machineDiv2kCore(out, uint32(b.Val))
+	case 3:
+		return m.machineDivWithAllocationContext(a, b, out, context)
+	}
+	return ErrIntegerAssertion
+}

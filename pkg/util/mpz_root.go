@@ -68,7 +68,30 @@ func (m *IntegerManager) rootInPlaceWithReceipt(a *Int, n uint32, receipt *integ
 func (m *IntegerManager) rootCore(a *Int, n uint32) (bool, error) {
 	return m.rootCoreWithReceipt(a, n, nil)
 }
-func (m *IntegerManager) rootCoreWithReceipt(a *Int, n uint32, receipt *integerRootInvocationReceipt) (exact bool, cause error) {
+func (m *IntegerManager) rootWithAllocationContext(a *Int, n uint32, out *Int, copyReceipt *integerCopyAllocationReceipt, receipt *integerRootInvocationReceipt, context integerAllocationInvocationContext) (bool, error) {
+	if context != (integerAllocationInvocationContext{}) && context.roots(m) == nil {
+		return false, ErrNumericOwner
+	}
+	if e := m.copyFromOwnerWithAllocationContext(out, m, a, copyReceipt, context); e != nil {
+		return false, e
+	}
+	if e := m.check(out); e != nil {
+		return false, e
+	}
+	if e := rootDomain(out, n); e != nil {
+		return false, e
+	}
+	return m.rootCoreWithReceiptAndContext(out, n, receipt, context)
+}
+
+func (m *IntegerManager) rootCoreWithReceipt(a *Int, n uint32, receipt *integerRootInvocationReceipt) (bool, error) {
+	return m.rootCoreWithReceiptAndContext(a, n, receipt, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) rootCoreWithReceiptAndContext(a *Int, n uint32, receipt *integerRootInvocationReceipt, context integerAllocationInvocationContext) (exact bool, cause error) {
+	if context != (integerAllocationInvocationContext{}) && context.roots(m) == nil {
+		return false, ErrNumericOwner
+	}
+
 	if a.Val == 0 {
 		return true, nil
 	}
@@ -99,17 +122,17 @@ func (m *IntegerManager) rootCoreWithReceipt(a *Int, n uint32, receipt *integerR
 	two := NewInt(2)
 	loExp, hiExp := NewInt(int32(l)), NewInt(int32(u))
 	if a.Val > 0 {
-		if e = m.rootRawCall(0, &two, &loExp, lower); e != nil {
+		if e = m.rootRawCallWithContext(0, &two, &loExp, lower, context); e != nil {
 			return false, e
 		}
-		if e = m.rootRawCall(0, &two, &hiExp, upper); e != nil {
+		if e = m.rootRawCallWithContext(0, &two, &hiExp, upper, context); e != nil {
 			return false, e
 		}
 	} else {
-		if e = m.rootRawCall(0, &two, &hiExp, lower); e != nil {
+		if e = m.rootRawCallWithContext(0, &two, &hiExp, lower, context); e != nil {
 			return false, e
 		}
-		if e = m.rootRawCall(0, &two, &loExp, upper); e != nil {
+		if e = m.rootRawCallWithContext(0, &two, &loExp, upper, context); e != nil {
 			return false, e
 		}
 		if e = m.Neg(lower); e != nil {
@@ -139,15 +162,15 @@ func (m *IntegerManager) rootCoreWithReceipt(a *Int, n uint32, receipt *integerR
 		return true, m.endRootRawScope()
 	}
 	for {
-		if e = m.rootRawCall(1, upper, lower, mid); e != nil {
+		if e = m.rootRawCallWithContext(1, upper, lower, mid, context); e != nil {
 			return false, e
 		}
 		one := NewInt(1)
-		if e = m.rootRawCall(2, nil, &one, mid); e != nil {
+		if e = m.rootRawCallWithContext(2, nil, &one, mid, context); e != nil {
 			return false, e
 		}
 		power := NewInt(int32(n))
-		if e = m.rootRawCall(0, mid, &power, midN); e != nil {
+		if e = m.rootRawCallWithContext(0, mid, &power, midN, context); e != nil {
 			return false, e
 		}
 		equal, e = m.Equal(midN, a)
