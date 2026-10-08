@@ -149220,7 +149220,7 @@
       "path": "src/util/scoped_numeral.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/scoped_numeral.go",
         "pkg/util/scoped_binary.go",
@@ -149237,6 +149237,9 @@
         "pkg/math/polynomial/polynomial_neg_source_guard_test.go"
       ],
       "tests": [
+        "TestGenericScopedNumeralCompleteOperations",
+        "TestGenericScopedNumeralCopyAssignmentAndSwap",
+        "TestGenericScopedNumeralOwnerAndManagerFailures",
         "TestScopedNumeralSourceTstScoped",
         "TestScopedNumeralResizeFailurePrefixesAndBudget",
         "TestScopedNumeralMoveAndAscendingCleanup",
@@ -149313,9 +149316,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "complete non-generic _scoped_numeral manager adapter, construction/copy/destruction, mutable access, assignment, reset/swap, compound and copy arithmetic, comparisons, predicates, abs/neg and display",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_numeral.go",
+          "tests": [
+            "TestGenericScopedNumeralCompleteOperations",
+            "TestGenericScopedNumeralCopyAssignmentAndSwap",
+            "TestGenericScopedNumeralOwnerAndManagerFailures"
+          ]
+        },
         {
           "name": "selected Int/Rational constructor, destructor, get/m borrow and deep copy/assignment",
           "status": "ported",
@@ -149461,7 +149474,7 @@
         },
         {
           "name": "Selected negative SMT2 DEFAULT temporary completion, fresh failed-copy null destructor and inner-before-outer retained cleanup; source undefined TLS overflow is guarded explicitly",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/mp_smt2_scope.go",
           "tests": [
             "TestSMT2FreshDefaultCopyFailureNullDestructor",
@@ -149470,7 +149483,7 @@
         },
         {
           "name": "Selected evaluator auxiliary default construction and source reverse lexical destruction across three concrete domains",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_evaluation.go",
           "tests": [
             "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
@@ -149480,7 +149493,7 @@
         },
         {
           "name": "Actual selected GCD/ICCP/Normalize numeral declaration and reverse lexical destructor stack, distinct completed owning acknowledgement and unjoined abort",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_scope.go",
           "tests": [
             "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
@@ -149495,6 +149508,7 @@
         }
       ],
       "ownership": [
+        "ScopedNumeral borrows one immutable callback manager and owns exactly one dynamically typed numeral returned by its New callback. Clone and copy arithmetic acquire independent numerals; Close invokes Delete exactly once. Mutable Get and SwapValue are explicit live borrows into that ownership slot.",
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See PORT_PROGRESS.md#audit-scoped-numeral-port-status-md.",
         "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See PORT_PROGRESS.md#audit-mpbq-port-status-md.",
         "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See PORT_PROGRESS.md#audit-mpff-port-status-md.",
@@ -149504,9 +149518,9 @@
         "scoped_numeral.h:31-33 actual Neg minus_a source destructor precedes factory result exposure; stopped source history remains distinct from exact owning acknowledgment."
       ],
       "deviations": [
-        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",
-        "Concrete MPBQ specialization; unsupported source div/rem/abs template instantiations are not invented. Other manager specializations and full custom ostream integration remain open.",
-        "Concrete MPFF types; explicit Close and provenance/self-copy checks. Borrowed indexed Go pointers have documented lifetime limits. Other manager specializations and persistent custom ostream integration remain open.",
+        "The Manager template becomes the non-generic ScopedNumeralManager callback table and numeral values use any slots. Concrete typed wrappers remain for the integer, rational, binary-rational and fast-float managers. Explicit Close substitutes RAII and self identity rejects shallow Go owner copies.",
+        "Concrete MPBQ wrappers expose only operations supported by that manager; the complete generic adapter exposes div/rem/abs when its supplied manager callbacks support them. Display returns a Go string instead of recreating C++ ostream insertion.",
+        "Concrete MPFF types retain explicit Close and provenance/self-copy checks. Borrowed indexed Go pointers have documented lifetime limits.",
         "TLS signed-host overflow fixtures test an explicitly guarded source-undefined domain, not ordinary exhaustion or an end-to-end recursive arithmetic claim."
       ]
     },

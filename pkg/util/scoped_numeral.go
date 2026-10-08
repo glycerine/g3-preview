@@ -12,6 +12,289 @@ import (
 var ErrScopedCopy = errors.New("mpnum: shallow scoped owner copy")
 var ErrScopedOwner = errors.New("mpnum: invalid scoped numeral owner")
 
+// ScopedNumeralManager is the non-generic adapter for the Manager template in
+// scoped_numeral.h. Every callback operates on the manager's concrete numeral
+// value stored in an any slot.
+type ScopedNumeralManager struct {
+	New     func() any
+	Delete  func(*any) error
+	Set     func(*any, any) error
+	SetInt  func(*any, int) error
+	Reset   func(*any) error
+	Add     func(*any, any, any) error
+	Sub     func(*any, any, any) error
+	Mul     func(*any, any, any) error
+	Div     func(*any, any, any) error
+	Rem     func(*any, any, any) error
+	Neg     func(*any) error
+	Abs     func(*any) error
+	Compare func(any, any) (int, error)
+	Sign    func(any) (int, error)
+	Display func(any) (string, error)
+}
+
+func (manager *ScopedNumeralManager) valid() bool {
+	return manager != nil && manager.New != nil && manager.Delete != nil && manager.Set != nil &&
+		manager.SetInt != nil && manager.Reset != nil && manager.Add != nil && manager.Sub != nil &&
+		manager.Mul != nil && manager.Div != nil && manager.Rem != nil && manager.Neg != nil &&
+		manager.Abs != nil && manager.Compare != nil && manager.Sign != nil && manager.Display != nil
+}
+
+// ScopedNumeral is the non-generic Go form of _scoped_numeral. Concrete
+// numerical packages may also expose typed wrappers such as ScopedInt.
+type ScopedNumeral struct {
+	self    *ScopedNumeral
+	manager *ScopedNumeralManager
+	num     any
+	closed  bool
+}
+
+func NewScopedNumeral(manager *ScopedNumeralManager) (*ScopedNumeral, error) {
+	if !manager.valid() {
+		return nil, ErrScopedOwner
+	}
+	scope := &ScopedNumeral{manager: manager, num: manager.New()}
+	scope.self = scope
+	return scope, nil
+}
+
+func (scope *ScopedNumeral) requireOpen() error {
+	if scope == nil || scope.self != scope {
+		return ErrScopedCopy
+	}
+	if scope.closed {
+		return arena.ErrClosed
+	}
+	return nil
+}
+
+func (scope *ScopedNumeral) Get() (*any, error) {
+	if err := scope.requireOpen(); err != nil {
+		return nil, err
+	}
+	return &scope.num, nil
+}
+
+func (scope *ScopedNumeral) Manager() (*ScopedNumeralManager, error) {
+	if err := scope.requireOpen(); err != nil {
+		return nil, err
+	}
+	return scope.manager, nil
+}
+
+func (scope *ScopedNumeral) Set(value any) error {
+	if err := scope.requireOpen(); err != nil {
+		return err
+	}
+	return scope.manager.Set(&scope.num, value)
+}
+
+func (scope *ScopedNumeral) SetInt(value int) error {
+	if err := scope.requireOpen(); err != nil {
+		return err
+	}
+	return scope.manager.SetInt(&scope.num, value)
+}
+
+func (scope *ScopedNumeral) Assign(other *ScopedNumeral) error {
+	if err := scope.requireOpen(); err != nil {
+		return err
+	}
+	if err := other.requireOpen(); err != nil {
+		return err
+	}
+	if scope == other {
+		return nil
+	}
+	return scope.manager.Set(&scope.num, other.num)
+}
+
+func (scope *ScopedNumeral) Clone() (*ScopedNumeral, error) {
+	if err := scope.requireOpen(); err != nil {
+		return nil, err
+	}
+	clone, err := NewScopedNumeral(scope.manager)
+	if err != nil {
+		return nil, err
+	}
+	if err = clone.Set(scope.num); err != nil {
+		_ = clone.Close()
+		return nil, err
+	}
+	return clone, nil
+}
+
+func (scope *ScopedNumeral) Reset() error {
+	if err := scope.requireOpen(); err != nil {
+		return err
+	}
+	return scope.manager.Reset(&scope.num)
+}
+
+func (scope *ScopedNumeral) Swap(other *ScopedNumeral) error {
+	if err := scope.requireOpen(); err != nil {
+		return err
+	}
+	if err := other.requireOpen(); err != nil {
+		return err
+	}
+	scope.num, other.num = other.num, scope.num
+	return nil
+}
+
+func (scope *ScopedNumeral) SwapValue(value *any) error {
+	if err := scope.requireOpen(); err != nil {
+		return err
+	}
+	if value == nil {
+		return ErrScopedOwner
+	}
+	scope.num, *value = *value, scope.num
+	return nil
+}
+
+func (scope *ScopedNumeral) apply(value any, operation uint8) error {
+	if err := scope.requireOpen(); err != nil {
+		return err
+	}
+	switch operation {
+	case 0:
+		return scope.manager.Add(&scope.num, scope.num, value)
+	case 1:
+		return scope.manager.Sub(&scope.num, scope.num, value)
+	case 2:
+		return scope.manager.Mul(&scope.num, scope.num, value)
+	case 3:
+		return scope.manager.Div(&scope.num, scope.num, value)
+	default:
+		return scope.manager.Rem(&scope.num, scope.num, value)
+	}
+}
+
+func (scope *ScopedNumeral) AddAssign(value any) error { return scope.apply(value, 0) }
+func (scope *ScopedNumeral) SubAssign(value any) error { return scope.apply(value, 1) }
+func (scope *ScopedNumeral) MulAssign(value any) error { return scope.apply(value, 2) }
+func (scope *ScopedNumeral) DivAssign(value any) error { return scope.apply(value, 3) }
+func (scope *ScopedNumeral) RemAssign(value any) error { return scope.apply(value, 4) }
+
+func (scope *ScopedNumeral) result(value any, operation uint8) (*ScopedNumeral, error) {
+	clone, err := scope.Clone()
+	if err != nil {
+		return nil, err
+	}
+	if err = clone.apply(value, operation); err != nil {
+		_ = clone.Close()
+		return nil, err
+	}
+	return clone, nil
+}
+
+func (scope *ScopedNumeral) Add(value any) (*ScopedNumeral, error) {
+	return scope.result(value, 0)
+}
+func (scope *ScopedNumeral) Sub(value any) (*ScopedNumeral, error) {
+	return scope.result(value, 1)
+}
+func (scope *ScopedNumeral) Mul(value any) (*ScopedNumeral, error) {
+	return scope.result(value, 2)
+}
+func (scope *ScopedNumeral) Div(value any) (*ScopedNumeral, error) {
+	return scope.result(value, 3)
+}
+
+func (scope *ScopedNumeral) Neg() error {
+	if err := scope.requireOpen(); err != nil {
+		return err
+	}
+	return scope.manager.Neg(&scope.num)
+}
+
+func (scope *ScopedNumeral) AbsCopy() (*ScopedNumeral, error) {
+	clone, err := scope.Clone()
+	if err != nil {
+		return nil, err
+	}
+	if err = clone.manager.Abs(&clone.num); err != nil {
+		_ = clone.Close()
+		return nil, err
+	}
+	return clone, nil
+}
+
+func (scope *ScopedNumeral) Compare(value any) (int, error) {
+	if err := scope.requireOpen(); err != nil {
+		return 0, err
+	}
+	return scope.manager.Compare(scope.num, value)
+}
+
+func (scope *ScopedNumeral) Equal(value any) (bool, error) {
+	comparison, err := scope.Compare(value)
+	return comparison == 0, err
+}
+func (scope *ScopedNumeral) NotEqual(value any) (bool, error) {
+	equal, err := scope.Equal(value)
+	return !equal, err
+}
+func (scope *ScopedNumeral) Less(value any) (bool, error) {
+	comparison, err := scope.Compare(value)
+	return comparison < 0, err
+}
+func (scope *ScopedNumeral) Greater(value any) (bool, error) {
+	comparison, err := scope.Compare(value)
+	return comparison > 0, err
+}
+func (scope *ScopedNumeral) LessEqual(value any) (bool, error) {
+	comparison, err := scope.Compare(value)
+	return comparison <= 0, err
+}
+func (scope *ScopedNumeral) GreaterEqual(value any) (bool, error) {
+	comparison, err := scope.Compare(value)
+	return comparison >= 0, err
+}
+
+func (scope *ScopedNumeral) sign() (int, error) {
+	if err := scope.requireOpen(); err != nil {
+		return 0, err
+	}
+	return scope.manager.Sign(scope.num)
+}
+
+func (scope *ScopedNumeral) IsZero() (bool, error) { sign, err := scope.sign(); return sign == 0, err }
+func (scope *ScopedNumeral) IsPos() (bool, error)  { sign, err := scope.sign(); return sign > 0, err }
+func (scope *ScopedNumeral) IsNeg() (bool, error)  { sign, err := scope.sign(); return sign < 0, err }
+func (scope *ScopedNumeral) IsNonpos() (bool, error) {
+	sign, err := scope.sign()
+	return sign <= 0, err
+}
+func (scope *ScopedNumeral) IsNonneg() (bool, error) {
+	sign, err := scope.sign()
+	return sign >= 0, err
+}
+
+func (scope *ScopedNumeral) Display() (string, error) {
+	if err := scope.requireOpen(); err != nil {
+		return "", err
+	}
+	return scope.manager.Display(scope.num)
+}
+
+func (scope *ScopedNumeral) Close() error {
+	if scope == nil || scope.self != scope {
+		return ErrScopedCopy
+	}
+	if scope.closed {
+		return nil
+	}
+	if err := scope.manager.Delete(&scope.num); err != nil {
+		return err
+	}
+	scope.num = nil
+	scope.manager = nil
+	scope.closed = true
+	return nil
+}
+
 // ScopedInt owns one numeral and borrows its manager. Get returns the source's
 // mutable numeral reference; it is valid only until Close and must not be copied
 // as an owning Int. Clone is the explicit deep copy operation. All objects are

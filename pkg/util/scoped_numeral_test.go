@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math/rand"
 	"reflect"
+	"strconv"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -55,6 +56,240 @@ func TestScopedNumeralSourceTstScoped(t *testing.T) {
 	m.Close()
 	if budget.Used() != 0 {
 		t.Fatal(budget.Used())
+	}
+}
+
+func testScopedNumeralManager(deleted *[]int) *ScopedNumeralManager {
+	binary := func(operation func(int, int) int) func(*any, any, any) error {
+		return func(out *any, left, right any) error {
+			*out = operation(left.(int), right.(int))
+			return nil
+		}
+	}
+	return &ScopedNumeralManager{
+		New:    func() any { return 0 },
+		Delete: func(value *any) error { *deleted = append(*deleted, (*value).(int)); *value = 0; return nil },
+		Set:    func(out *any, value any) error { *out = value.(int); return nil },
+		SetInt: func(out *any, value int) error { *out = value; return nil },
+		Reset:  func(out *any) error { *out = 0; return nil },
+		Add:    binary(func(a, b int) int { return a + b }),
+		Sub:    binary(func(a, b int) int { return a - b }),
+		Mul:    binary(func(a, b int) int { return a * b }),
+		Div:    binary(func(a, b int) int { return a / b }),
+		Rem:    binary(func(a, b int) int { return a % b }),
+		Neg:    func(value *any) error { *value = -(*value).(int); return nil },
+		Abs: func(value *any) error {
+			if number := (*value).(int); number < 0 {
+				*value = -number
+			}
+			return nil
+		},
+		Compare: func(left, right any) (int, error) {
+			a, b := left.(int), right.(int)
+			if a < b {
+				return -1, nil
+			}
+			if a > b {
+				return 1, nil
+			}
+			return 0, nil
+		},
+		Sign: func(value any) (int, error) {
+			number := value.(int)
+			if number < 0 {
+				return -1, nil
+			}
+			if number > 0 {
+				return 1, nil
+			}
+			return 0, nil
+		},
+		Display: func(value any) (string, error) { return strconv.Itoa(value.(int)), nil },
+	}
+}
+
+func TestGenericScopedNumeralCompleteOperations(t *testing.T) {
+	var deleted []int
+	manager := testScopedNumeralManager(&deleted)
+	scope, err := NewScopedNumeral(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = scope.SetInt(-12); err != nil {
+		t.Fatal(err)
+	}
+	abs, err := scope.AbsCopy()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if text, _ := abs.Display(); text != "12" {
+		t.Fatalf("abs = %s", text)
+	}
+	_ = abs.Close()
+
+	for _, check := range []struct {
+		name string
+		want string
+		op   func() error
+	}{
+		{"add", "13", func() error { _ = scope.SetInt(10); return scope.AddAssign(3) }},
+		{"sub", "7", func() error { _ = scope.SetInt(10); return scope.SubAssign(3) }},
+		{"mul", "30", func() error { _ = scope.SetInt(10); return scope.MulAssign(3) }},
+		{"div", "3", func() error { _ = scope.SetInt(10); return scope.DivAssign(3) }},
+		{"rem", "1", func() error { _ = scope.SetInt(10); return scope.RemAssign(3) }},
+	} {
+		if err = check.op(); err != nil {
+			t.Fatal(check.name, err)
+		}
+		if text, _ := scope.Display(); text != check.want {
+			t.Fatalf("%s = %s, want %s", check.name, text, check.want)
+		}
+	}
+	_ = scope.SetInt(-5)
+	if zero, _ := scope.IsZero(); zero {
+		t.Fatal("negative value is zero")
+	}
+	if negative, _ := scope.IsNeg(); !negative {
+		t.Fatal("negative predicate")
+	}
+	if nonpositive, _ := scope.IsNonpos(); !nonpositive {
+		t.Fatal("nonpositive predicate")
+	}
+	if less, _ := scope.Less(0); !less {
+		t.Fatal("comparison")
+	}
+	if equal, _ := scope.Equal(-5); !equal {
+		t.Fatal("equality")
+	}
+	if unequal, _ := scope.NotEqual(0); !unequal {
+		t.Fatal("inequality")
+	}
+	if greater, _ := scope.Greater(-6); !greater {
+		t.Fatal("greater comparison")
+	}
+	if lessEqual, _ := scope.LessEqual(-5); !lessEqual {
+		t.Fatal("less-equal comparison")
+	}
+	if greaterEqual, _ := scope.GreaterEqual(-5); !greaterEqual {
+		t.Fatal("greater-equal comparison")
+	}
+	if positive, _ := scope.IsPos(); positive {
+		t.Fatal("negative value is positive")
+	}
+	if nonnegative, _ := scope.IsNonneg(); nonnegative {
+		t.Fatal("negative value is nonnegative")
+	}
+	if err = scope.Neg(); err != nil {
+		t.Fatal(err)
+	}
+	result, err := scope.Add(7)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if text, _ := result.Display(); text != "12" {
+		t.Fatalf("copy arithmetic = %s", text)
+	}
+	if text, _ := scope.Display(); text != "5" {
+		t.Fatalf("copy arithmetic changed input: %s", text)
+	}
+	for _, check := range []struct {
+		name string
+		want string
+		make func() (*ScopedNumeral, error)
+	}{
+		{"sub", "3", func() (*ScopedNumeral, error) { return scope.Sub(2) }},
+		{"mul", "10", func() (*ScopedNumeral, error) { return scope.Mul(2) }},
+		{"div", "2", func() (*ScopedNumeral, error) { return scope.Div(2) }},
+	} {
+		copyResult, copyErr := check.make()
+		if copyErr != nil {
+			t.Fatal(check.name, copyErr)
+		}
+		if text, _ := copyResult.Display(); text != check.want {
+			t.Fatalf("copy %s = %s, want %s", check.name, text, check.want)
+		}
+		_ = copyResult.Close()
+	}
+	_ = result.Close()
+	_ = scope.Close()
+	if !reflect.DeepEqual(deleted, []int{12, 3, 10, 2, 12, 5}) {
+		t.Fatalf("deleted = %v", deleted)
+	}
+}
+
+func TestGenericScopedNumeralCopyAssignmentAndSwap(t *testing.T) {
+	var deletedA, deletedB []int
+	managerA := testScopedNumeralManager(&deletedA)
+	managerB := testScopedNumeralManager(&deletedB)
+	left, _ := NewScopedNumeral(managerA)
+	right, _ := NewScopedNumeral(managerB)
+	_ = left.SetInt(4)
+	_ = right.SetInt(9)
+	if manager, _ := left.Manager(); manager != managerA {
+		t.Fatal("manager identity")
+	}
+	if value, _ := left.Get(); (*value).(int) != 4 {
+		t.Fatal("mutable get")
+	}
+	if err := left.Assign(right); err != nil {
+		t.Fatal(err)
+	}
+	clone, err := left.Clone()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = left.Swap(right); err != nil {
+		t.Fatal(err)
+	}
+	value := any(13)
+	if err = right.SwapValue(&value); err != nil {
+		t.Fatal(err)
+	}
+	if left.num != 9 || right.num != 13 || value != 9 || clone.num != 9 {
+		t.Fatalf("values = %v %v %v %v", left.num, right.num, value, clone.num)
+	}
+	_ = clone.Reset()
+	_ = clone.Close()
+	_ = left.Close()
+	_ = right.Close()
+}
+
+func TestGenericScopedNumeralOwnerAndManagerFailures(t *testing.T) {
+	var nilScope *ScopedNumeral
+	if _, err := nilScope.Get(); !errors.Is(err, ErrScopedCopy) {
+		t.Fatal("nil owner", err)
+	}
+	if scope, err := NewScopedNumeral(nil); scope != nil || !errors.Is(err, ErrScopedOwner) {
+		t.Fatalf("nil manager = %#v, %v", scope, err)
+	}
+	incomplete := testScopedNumeralManager(new([]int))
+	incomplete.Div = nil
+	if scope, err := NewScopedNumeral(incomplete); scope != nil || !errors.Is(err, ErrScopedOwner) {
+		t.Fatalf("incomplete manager = %#v, %v", scope, err)
+	}
+	var deleted []int
+	scope, _ := NewScopedNumeral(testScopedNumeralManager(&deleted))
+	copyOfScope := *scope
+	if _, err := copyOfScope.Get(); !errors.Is(err, ErrScopedCopy) {
+		t.Fatal("copied owner", err)
+	}
+	if err := scope.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := scope.Get(); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("closed owner", err)
+	}
+
+	deleteFailure := errors.New("delete failure")
+	failingManager := testScopedNumeralManager(new([]int))
+	failingManager.Delete = func(*any) error { return deleteFailure }
+	failing, _ := NewScopedNumeral(failingManager)
+	if err := failing.Close(); !errors.Is(err, deleteFailure) || failing.closed {
+		t.Fatal("failed delete published close", err)
+	}
+	failingManager.Delete = func(*any) error { return nil }
+	if err := failing.Close(); err != nil {
+		t.Fatal(err)
 	}
 }
 
