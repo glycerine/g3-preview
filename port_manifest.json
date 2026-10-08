@@ -146547,28 +146547,66 @@
       "path": "src/util/s_integer.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/s_integer.go",
+        "pkg/util/s_integer_test.go"
+      ],
+      "tests": [
+        "TestSIntegerConstructorsParsingAndTraits",
+        "TestSIntegerIndependentFiniteArithmeticAndNumberTheory",
+        "TestSIntegerRationalConversionsAndStream",
+        "TestSIntegerIndependentLP64Parsing",
+        "TestSIntegerRepresentableBoundaryArithmetic",
+        "TestSIntegerDisplayEveryColdReservation"
+      ],
       "assertions": [
         {
           "line": 45,
           "text": "SASSERT(r1.is_int() && r2.is_int());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "All defined s_integer constructors, casts/traits/projections, functors, comparisons, arithmetic, signed mod, increments, sign/parity, floor/ceil, expt/power, fused operations, abs, signed gcd/lcm, rational conversions and insertion (s_integer.h:25-145; s_integer.cpp:22-70)",
+          "status": "ported",
+          "go_target": "pkg/util/s_integer.go",
+          "tests": [
+            "TestSIntegerConstructorsParsingAndTraits",
+            "TestSIntegerIndependentFiniteArithmeticAndNumberTheory",
+            "TestSIntegerRationalConversionsAndStream",
+            "TestSIntegerIndependentLP64Parsing",
+            "TestSIntegerRepresentableBoundaryArithmetic",
+            "TestSIntegerDisplayEveryColdReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline int32 class owns no payload and uses value-copy semantics. LP64 decimal C-string scanner borrows input without retaining or allocating it. ToRational invokes the exact signed32 manager setter on a fresh owned rational; every int32 boundary stays inline with allocation refused, and callers destroy returned values. FromRational borrows the service/value and preserves its native debug guard versus release NUM-only scalar read. Display borrows the stream and retains actual output prefixes and accounting on reservation failures."
+      ],
+      "deviations": [
+        "Selected LP64 C-locale strtol profile saturates signed long before int32 narrowing. Native C++ signed-overflow/INT_MIN negation and zero-divisor undefined domains are not claimed; Go signed operations wrap and division by zero panics. The original gcd zero-input domain reaches a zero divisor and is not repaired. Unsigned power exponents with bit31 set make the source mask loop nonterminating; after reaching the wrap, the Go adapter returns its reached value and ErrSIntegerNonterminating instead of hanging or replacing the algorithm. The declared C++ to_string has no definition anywhere in src or cppsrc; exported ToString is an explicit Go decimal convenience, not a credited source body. Const scalar reference results map to Go value copies; static values are immutable through their accessors. No dedicated upstream s_integer test was found in src/test."
+      ]
     },
     {
       "path": "src/util/s_integer.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/s_integer.go",
+        "pkg/util/s_integer_test.go"
+      ],
+      "tests": [
+        "TestSIntegerConstructorsParsingAndTraits",
+        "TestSIntegerIndependentFiniteArithmeticAndNumberTheory",
+        "TestSIntegerRationalConversionsAndStream",
+        "TestSIntegerIndependentLP64Parsing",
+        "TestSIntegerRepresentableBoundaryArithmetic",
+        "TestSIntegerDisplayEveryColdReservation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -146579,11 +146617,29 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "All defined s_integer constructors, casts/traits/projections, functors, comparisons, arithmetic, signed mod, increments, sign/parity, floor/ceil, expt/power, fused operations, abs, signed gcd/lcm, rational conversions and insertion (s_integer.h:25-145; s_integer.cpp:22-70)",
+          "status": "ported",
+          "go_target": "pkg/util/s_integer.go",
+          "tests": [
+            "TestSIntegerConstructorsParsingAndTraits",
+            "TestSIntegerIndependentFiniteArithmeticAndNumberTheory",
+            "TestSIntegerRationalConversionsAndStream",
+            "TestSIntegerIndependentLP64Parsing",
+            "TestSIntegerRepresentableBoundaryArithmetic",
+            "TestSIntegerDisplayEveryColdReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline int32 class owns no payload and uses value-copy semantics. LP64 decimal C-string scanner borrows input without retaining or allocating it. ToRational invokes the exact signed32 manager setter on a fresh owned rational; every int32 boundary stays inline with allocation refused, and callers destroy returned values. FromRational borrows the service/value and preserves its native debug guard versus release NUM-only scalar read. Display borrows the stream and retains actual output prefixes and accounting on reservation failures."
+      ],
+      "deviations": [
+        "Selected LP64 C-locale strtol profile saturates signed long before int32 narrowing. Native C++ signed-overflow/INT_MIN negation and zero-divisor undefined domains are not claimed; Go signed operations wrap and division by zero panics. The original gcd zero-input domain reaches a zero divisor and is not repaired. Unsigned power exponents with bit31 set make the source mask loop nonterminating; after reaching the wrap, the Go adapter returns its reached value and ErrSIntegerNonterminating instead of hanging or replacing the algorithm. The declared C++ to_string has no definition anywhere in src or cppsrc; exported ToString is an explicit Go decimal convenience, not a credited source body. Const scalar reference results map to Go value copies; static values are immutable through their accessors. No dedicated upstream s_integer test was found in src/test."
+      ]
     },
     {
       "path": "src/util/scoped_ctrl_c.cpp",
