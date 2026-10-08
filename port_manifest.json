@@ -21128,7 +21128,11 @@
         "pkg/ast/rewriter/bv_rewriter_mkbv.go",
         "pkg/ast/rewriter/bv_rewriter_mkbv_test.go",
         "pkg/ast/ast_bv_mkbv_numerals.go",
-        "pkg/ast/ast_bv_mkbv_numerals_test.go"
+        "pkg/ast/ast_bv_mkbv_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_ite.go",
+        "pkg/ast/rewriter/bv_rewriter_ite_test.go",
+        "pkg/ast/ast_bv_ite_numerals.go",
+        "pkg/ast/ast_bv_ite_numerals_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21214,7 +21218,12 @@
         "TestBVRewriterMkBVOriginalBitOrderAndGuards",
         "TestBVRewriterMkBVEveryColdReservationAndPublishedResult",
         "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
-        "TestASTBitVectorMkBVPostfixDistinctReturn"
+        "TestASTBitVectorMkBVPostfixDistinctReturn",
+        "TestBVRewriterIteOriginalBranchOrderAndIdentities",
+        "TestBVRewriterIteOneBitNumeralBranches",
+        "TestBVRewriterIteUnreachedConditionAndWideBranches",
+        "TestBVRewriterIteEveryColdReservationAndPublication",
+        "TestASTBitVectorIteEveryActualCopyReservation"
       ],
       "conditionals": [
         {
@@ -21992,6 +22001,25 @@
             "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
             "TestASTBitVectorMkBVPostfixDistinctReturn"
           ]
+        },
+        {
+          "name": "Complete selected mk_ite_core: equal branches before condition reads, unconditional negated-condition swap, ordered enabled equality/BV guards and identity orientations, numeral-LHS swap, original one-bit conditional identity/NOT selection (src/ast/rewriter/bv_rewriter.cpp:2657-2704)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_ite.go",
+          "tests": [
+            "TestBVRewriterIteOriginalBranchOrderAndIdentities",
+            "TestBVRewriterIteOneBitNumeralBranches",
+            "TestBVRewriterIteUnreachedConditionAndWideBranches",
+            "TestBVRewriterIteEveryColdReservationAndPublication"
+          ]
+        },
+        {
+          "name": "Original one-bit ITE reached rhs_n/e_n/t_n declarations, RHS/then/else numeric copy order, independent widths, checked source assertions and reverse declaration destruction after output assignment (src/ast/rewriter/bv_rewriter.cpp:2687-2698)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_ite_numerals.go",
+          "tests": [
+            "TestASTBitVectorIteEveryActualCopyReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22013,7 +22041,8 @@
         "BV option fields and actual generated module snapshot are embedded in the existing reflected/charged concrete configuration owner. The borrowed local params_ref is not copied or retained beyond update; the module snapshot is released only after the final repeated sort lookup/assignment. Base poly/arith snapshots retire before the derived local update. All reached snapshots use actual decrement receipts and reverse owning cleanup; failure history stops replay. Existing empty/default polynomial constructor remains independent of the derived BV suffix. Actual first-time option-name reads are allocation-free string comparisons; tests refuse all new allocation and verify module reference retirement.",
         "The derived owner captures the actual polynomial base, embedded extraction declaration cache and allocated trailing implementation/caches. Its reflected header charges extraction fields once; standalone extraction construction uses the same original initializer with its own header. A default local parameter full-expression spans both base updates and derived construction/local update. Failed constructor prefixes retain the borrowed context independently of possibly absent base configuration. Stopped invocation frames are joined first, before reverse trailing/extraction/base persistent-member destruction. Exact existing numerical/decrement receipts preserve failure history and published outputs. Fresh refusal campaigns cover both independent borrowed budget channels and configured multiplication with pre-existing caches and consumed old-output DEC failure; all fixture graphs close to zero.",
         "Equality dispatcher owns both default new_lhs/new_rhs refs before the polynomial guard, retaining them across cancellation/isolation/concat/fallback and destroying rhs then lhs after output assignment. Nested existing callers retain actual receipts and their own failure frames; outer close joins younger polynomial frames before older equality locals and persistent trailing/extraction/base members. The optional remainder block places divisor/rhs defaults before recognition, copies rhs first, preserves stored widths without new equality-width validation and retains separate actual Add/PowerOfTwo returned values until the condition ends. Valid BV numerical parameters are integers, so original GE comparisons use the original integer comparison fast path. Sum/power invocations capture exact scalar contexts; actual Runtime width65 refusal/lifetime/history tests close graphs to zero. A reached trailing FAILED still publishes raw equality and is followed by reset_cache(4096).",
-        "MkBV validates all arguments in source order before val/two placement, then scans from the last bit. Each physical val multiplication and postfix increment names its actual scalar invocation; copied postfix old value is owned and destroyed at the full-expression boundary even though unused. Numeric factory child receipt joins before older two/val DT, which follow output assignment. Parent retains stopped numeric owner, published result and original cause until exact cleanup. Actual Runtime width65 all-one campaigns refuse every reached numeric reservation through success and retain separate unchanged old postfix result; cold factory campaigns reach published result with consumed old DEC failure. All fixture graphs close to zero."
+        "MkBV validates all arguments in source order before val/two placement, then scans from the last bit. Each physical val multiplication and postfix increment names its actual scalar invocation; copied postfix old value is owned and destroyed at the full-expression boundary even though unused. Numeric factory child receipt joins before older two/val DT, which follow output assignment. Parent retains stopped numeric owner, published result and original cause until exact cleanup. Actual Runtime width65 all-one campaigns refuse every reached numeric reservation through success and retain separate unchanged old postfix result; cold factory campaigns reach published result with consumed old DEC failure. All fixture graphs close to zero.",
+        "The ITE rule reaches no numeric placement until the enabled identity/equality/BV/RHS-width guards pass. Three original default numerals are declared RHS/else/then but copied RHS/then/else under source short-circuit guards. Even wide then/else numerals are copied before the then-width guard rejects simplification. Real physical numeric values and exact scalar copy receipts are retained until output assignment and reverse then/else/RHS DT. Failed outer calls retain the exact numeric child, reject replay and close it before persistent members. Equal branches do not read the condition; negated-condition rewriting precedes the ite2id option. Fresh actual Runtime width65 copy campaigns and cold publication/old-DEC campaigns close all graphs to zero and preserve recorded failure history."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -22034,7 +22063,8 @@
         "Selected BV local/combined option updates, setter and descriptor collection are complete on the existing configuration adapter. Full derived BV object construction with extraction/trailing members, equality/application dispatch and solver integration remain required. The descriptor externalRelease argument represents the original compile-time _EXTERNAL_RELEASE choice; native build macro/stack/layout/destructor/fatal ABI remains qualified. No whole source unit is promoted.",
         "Selected derived member construction/configured add/mul integration is complete on the concrete Go owner, but full equality/application dispatcher and solver integration remain required. Native base/imp embedding, stack/default argument/temporary-elision/process-global/assertion/fatal/exception/destructor ABI remain qualified; Go headers account actual wrapper storage and do not claim native layout. The arithmetic utility plugin remains lazy/null; source family lookup does not install it. ASTManager already constructs the arithmetic family, so the actual arithmetic utility lookup is warm and allocation-free. No whole source unit is promoted.",
         "Selected equality dispatcher algorithm and required remainder numerical scope are complete through existing source implementations. Full application dispatcher, remaining BV operator bodies, arithmetic/solver integration and whole source-unit coverage remain required. TRACE/CTTRACE diagnostics, C++ unspecified argument evaluation order, native stack/layout/temporary-elision/default-reference/fatal/exception/global/assertion/destructor ABI and independently stopped source DT remain qualified. Go orders sum before power and retires power before sum at condition exit; no native compiler evaluation-prefix claim is made. No whole source unit is promoted.",
-        "Selected mk_mkbv body and exact postfix invocation interface are complete through the configured derived owner. Full BV application dispatch, remaining operator bodies and solver integration remain required. Existing postfix named return/temporary-elision/native layout/global/fatal/exception/assertion/destructor ABI qualifications remain; interface delegates original postfix body rather than replacing postfix with prefix or bit packing. No whole source unit is promoted."
+        "Selected mk_mkbv body and exact postfix invocation interface are complete through the configured derived owner. Full BV application dispatch, remaining operator bodies and solver integration remain required. Existing postfix named return/temporary-elision/native layout/global/fatal/exception/assertion/destructor ABI qualifications remain; interface delegates original postfix body rather than replacing postfix with prefix or bit packing. No whole source unit is promoted.",
+        "Selected BV mk_ite_core algorithm is complete through the configured derived owner; full BV application dispatch, remaining operators, arithmetic/solver integration and whole unit audits remain required. Source TRACE and native assertion/stack/layout/temporary-elision/global/fatal/exception/destructor ABI remain qualified. DEBUG width/distinctness assertions use checked Go domain boundaries without release prevalidation. No whole source unit is promoted."
       ]
     },
     {
@@ -22116,7 +22146,11 @@
         "pkg/ast/rewriter/bv_rewriter_mkbv.go",
         "pkg/ast/rewriter/bv_rewriter_mkbv_test.go",
         "pkg/ast/ast_bv_mkbv_numerals.go",
-        "pkg/ast/ast_bv_mkbv_numerals_test.go"
+        "pkg/ast/ast_bv_mkbv_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_ite.go",
+        "pkg/ast/rewriter/bv_rewriter_ite_test.go",
+        "pkg/ast/ast_bv_ite_numerals.go",
+        "pkg/ast/ast_bv_ite_numerals_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -22221,7 +22255,12 @@
         "TestBVRewriterMkBVOriginalBitOrderAndGuards",
         "TestBVRewriterMkBVEveryColdReservationAndPublishedResult",
         "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
-        "TestASTBitVectorMkBVPostfixDistinctReturn"
+        "TestASTBitVectorMkBVPostfixDistinctReturn",
+        "TestBVRewriterIteOriginalBranchOrderAndIdentities",
+        "TestBVRewriterIteOneBitNumeralBranches",
+        "TestBVRewriterIteUnreachedConditionAndWideBranches",
+        "TestBVRewriterIteEveryColdReservationAndPublication",
+        "TestASTBitVectorIteEveryActualCopyReservation"
       ],
       "conditionals": [
         {
@@ -22567,6 +22606,25 @@
             "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
             "TestASTBitVectorMkBVPostfixDistinctReturn"
           ]
+        },
+        {
+          "name": "Complete selected mk_ite_core: equal branches before condition reads, unconditional negated-condition swap, ordered enabled equality/BV guards and identity orientations, numeral-LHS swap, original one-bit conditional identity/NOT selection (src/ast/rewriter/bv_rewriter.cpp:2657-2704)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_ite.go",
+          "tests": [
+            "TestBVRewriterIteOriginalBranchOrderAndIdentities",
+            "TestBVRewriterIteOneBitNumeralBranches",
+            "TestBVRewriterIteUnreachedConditionAndWideBranches",
+            "TestBVRewriterIteEveryColdReservationAndPublication"
+          ]
+        },
+        {
+          "name": "Original one-bit ITE reached rhs_n/e_n/t_n declarations, RHS/then/else numeric copy order, independent widths, checked source assertions and reverse declaration destruction after output assignment (src/ast/rewriter/bv_rewriter.cpp:2687-2698)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_ite_numerals.go",
+          "tests": [
+            "TestASTBitVectorIteEveryActualCopyReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22584,7 +22642,8 @@
         "BV option fields and actual generated module snapshot are embedded in the existing reflected/charged concrete configuration owner. The borrowed local params_ref is not copied or retained beyond update; the module snapshot is released only after the final repeated sort lookup/assignment. Base poly/arith snapshots retire before the derived local update. All reached snapshots use actual decrement receipts and reverse owning cleanup; failure history stops replay. Existing empty/default polynomial constructor remains independent of the derived BV suffix. Actual first-time option-name reads are allocation-free string comparisons; tests refuse all new allocation and verify module reference retirement.",
         "The derived owner captures the actual polynomial base, embedded extraction declaration cache and allocated trailing implementation/caches. Its reflected header charges extraction fields once; standalone extraction construction uses the same original initializer with its own header. A default local parameter full-expression spans both base updates and derived construction/local update. Failed constructor prefixes retain the borrowed context independently of possibly absent base configuration. Stopped invocation frames are joined first, before reverse trailing/extraction/base persistent-member destruction. Exact existing numerical/decrement receipts preserve failure history and published outputs. Fresh refusal campaigns cover both independent borrowed budget channels and configured multiplication with pre-existing caches and consumed old-output DEC failure; all fixture graphs close to zero.",
         "Equality dispatcher owns both default new_lhs/new_rhs refs before the polynomial guard, retaining them across cancellation/isolation/concat/fallback and destroying rhs then lhs after output assignment. Nested existing callers retain actual receipts and their own failure frames; outer close joins younger polynomial frames before older equality locals and persistent trailing/extraction/base members. The optional remainder block places divisor/rhs defaults before recognition, copies rhs first, preserves stored widths without new equality-width validation and retains separate actual Add/PowerOfTwo returned values until the condition ends. Valid BV numerical parameters are integers, so original GE comparisons use the original integer comparison fast path. Sum/power invocations capture exact scalar contexts; actual Runtime width65 refusal/lifetime/history tests close graphs to zero. A reached trailing FAILED still publishes raw equality and is followed by reset_cache(4096).",
-        "MkBV validates all arguments in source order before val/two placement, then scans from the last bit. Each physical val multiplication and postfix increment names its actual scalar invocation; copied postfix old value is owned and destroyed at the full-expression boundary even though unused. Numeric factory child receipt joins before older two/val DT, which follow output assignment. Parent retains stopped numeric owner, published result and original cause until exact cleanup. Actual Runtime width65 all-one campaigns refuse every reached numeric reservation through success and retain separate unchanged old postfix result; cold factory campaigns reach published result with consumed old DEC failure. All fixture graphs close to zero."
+        "MkBV validates all arguments in source order before val/two placement, then scans from the last bit. Each physical val multiplication and postfix increment names its actual scalar invocation; copied postfix old value is owned and destroyed at the full-expression boundary even though unused. Numeric factory child receipt joins before older two/val DT, which follow output assignment. Parent retains stopped numeric owner, published result and original cause until exact cleanup. Actual Runtime width65 all-one campaigns refuse every reached numeric reservation through success and retain separate unchanged old postfix result; cold factory campaigns reach published result with consumed old DEC failure. All fixture graphs close to zero.",
+        "The ITE rule reaches no numeric placement until the enabled identity/equality/BV/RHS-width guards pass. Three original default numerals are declared RHS/else/then but copied RHS/then/else under source short-circuit guards. Even wide then/else numerals are copied before the then-width guard rejects simplification. Real physical numeric values and exact scalar copy receipts are retained until output assignment and reverse then/else/RHS DT. Failed outer calls retain the exact numeric child, reject replay and close it before persistent members. Equal branches do not read the condition; negated-condition rewriting precedes the ite2id option. Fresh actual Runtime width65 copy campaigns and cold publication/old-DEC campaigns close all graphs to zero and preserve recorded failure history."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -22603,7 +22662,8 @@
         "Selected BV local/combined option updates, setter and descriptor collection are complete on the existing configuration adapter. Full derived BV object construction with extraction/trailing members, equality/application dispatch and solver integration remain required. The descriptor externalRelease argument represents the original compile-time _EXTERNAL_RELEASE choice; native build macro/stack/layout/destructor/fatal ABI remains qualified. No whole source unit is promoted.",
         "Selected derived member construction/configured add/mul integration is complete on the concrete Go owner, but full equality/application dispatcher and solver integration remain required. Native base/imp embedding, stack/default argument/temporary-elision/process-global/assertion/fatal/exception/destructor ABI remain qualified; Go headers account actual wrapper storage and do not claim native layout. The arithmetic utility plugin remains lazy/null; source family lookup does not install it. ASTManager already constructs the arithmetic family, so the actual arithmetic utility lookup is warm and allocation-free. No whole source unit is promoted.",
         "Selected equality dispatcher algorithm and required remainder numerical scope are complete through existing source implementations. Full application dispatcher, remaining BV operator bodies, arithmetic/solver integration and whole source-unit coverage remain required. TRACE/CTTRACE diagnostics, C++ unspecified argument evaluation order, native stack/layout/temporary-elision/default-reference/fatal/exception/global/assertion/destructor ABI and independently stopped source DT remain qualified. Go orders sum before power and retires power before sum at condition exit; no native compiler evaluation-prefix claim is made. No whole source unit is promoted.",
-        "Selected mk_mkbv body and exact postfix invocation interface are complete through the configured derived owner. Full BV application dispatch, remaining operator bodies and solver integration remain required. Existing postfix named return/temporary-elision/native layout/global/fatal/exception/assertion/destructor ABI qualifications remain; interface delegates original postfix body rather than replacing postfix with prefix or bit packing. No whole source unit is promoted."
+        "Selected mk_mkbv body and exact postfix invocation interface are complete through the configured derived owner. Full BV application dispatch, remaining operator bodies and solver integration remain required. Existing postfix named return/temporary-elision/native layout/global/fatal/exception/assertion/destructor ABI qualifications remain; interface delegates original postfix body rather than replacing postfix with prefix or bit packing. No whole source unit is promoted.",
+        "Selected BV mk_ite_core algorithm is complete through the configured derived owner; full BV application dispatch, remaining operators, arithmetic/solver integration and whole unit audits remain required. Source TRACE and native assertion/stack/layout/temporary-elision/global/fatal/exception/destructor ABI remain qualified. DEBUG width/distinctness assertions use checked Go domain boundaries without release prevalidation. No whole source unit is promoted."
       ]
     },
     {

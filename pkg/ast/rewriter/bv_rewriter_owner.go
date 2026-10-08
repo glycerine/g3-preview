@@ -24,6 +24,7 @@ type BVRewriter struct {
 	trailing              *BVTrailing
 	eqRemainder           *ast.BitVectorRemainderEqualityNumerals
 	mkbv                  *ast.BitVectorMkBVNumerals
+	ite                   *ast.BitVectorIteNumerals
 	eqRefs                [2]ast.ASTRef
 	defaultParams         util.ParamsRef
 	defaultDecrement      util.ParamsDecrementReceipt
@@ -176,6 +177,12 @@ func (p *BVRewriter) Close() error {
 		if e := p.polynomial.closeInvocations(); e != nil {
 			return e
 		}
+	}
+	if p.ite != nil {
+		if e := p.ite.Close(); e != nil {
+			return e
+		}
+		p.ite = nil
 	}
 	if p.mkbv != nil {
 		if e := p.mkbv.Close(); e != nil {
