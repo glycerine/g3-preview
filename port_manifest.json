@@ -147626,11 +147626,18 @@
       "path": "src/util/ref_util.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/util/ref_util.go",
+        "pkg/util/ref_util_test.go",
         "pkg/ast/ast_expr_substitution_ops.go"
       ],
       "tests": [
+        "TestDecRefMapKeyValuesOrderAndReset",
+        "TestDecRefMapKeyValuesSameManager",
+        "TestDecRefMapKeysValuesAndCollection",
+        "TestDecRefCleanupEmptyAndInterruptedBehavior",
+        "TestDecRefCleanupRejectsMissingCallbacksBeforeEffects",
         "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
         "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
         "TestASTExprSubstitutionBoundedIndependentReferenceModel",
@@ -147715,16 +147722,24 @@
           ]
         },
         {
-          "name": "generic managers/maps, keys-only and collection specializations",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "name": "generic two-manager and same-manager key/value cleanup, keys-only cleanup, values-only cleanup and collection cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/ref_util.go",
+          "tests": [
+            "TestDecRefMapKeyValuesOrderAndReset",
+            "TestDecRefMapKeyValuesSameManager",
+            "TestDecRefMapKeysValuesAndCollection",
+            "TestDecRefCleanupEmptyAndInterruptedBehavior",
+            "TestDecRefCleanupRejectsMissingCallbacksBeforeEffects"
+          ]
         }
       ],
       "ownership": [
-        "Real AST/dependency DEC callbacks run in ascending physical bucket order, key before value, with consumed/refused state recorded in actual table entries. Reset publication follows callbacks; remaining generic utility specializations remain open."
+        "Every helper borrows an ordered snapshot of entries or values. It decrements each selected reference in order and invokes the caller's reset only after the complete traversal; interrupted callbacks leave reset unpublished.",
+        "Real AST/dependency DEC callbacks run in ascending physical bucket order, key before value, with consumed/refused state recorded in actual table entries. Reset publication follows callbacks."
       ],
       "deviations": [
+        "The source container and manager templates become ordered RefMapEntry/value slices, decrement callbacks and a reset callback. Callers adapt their native Go container rather than exposing C++ iterator or map machinery; this also prevents accidental nondeterministic iteration of a built-in Go map.",
         "Interrupted Go callback cleanup resumes scalar progress rather than replaying consumed references; same-entry completion and destructor continuation are distinguished from C++ exception semantics."
       ]
     },
