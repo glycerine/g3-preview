@@ -129834,7 +129834,15 @@
         "pkg/util/mpf_mul_oracle_test.go",
         "pkg/util/mpf_mul_scope.go",
         "pkg/util/mpf_mul_special_test.go",
-        "pkg/util/mpf_mul_test.go"
+        "pkg/util/mpf_mul_test.go",
+        "pkg/util/mpf_div.go",
+        "pkg/util/mpf_div_callback_test.go",
+        "pkg/util/mpf_div_domains_test.go",
+        "pkg/util/mpf_div_failure_test.go",
+        "pkg/util/mpf_div_oracle_test.go",
+        "pkg/util/mpf_div_scope.go",
+        "pkg/util/mpf_div_special_test.go",
+        "pkg/util/mpf_div_test.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -129960,7 +129968,17 @@
         "TestArbitraryFloatMulIndependentWideDirectedOracle",
         "TestArbitraryFloatMulEveryColdSpecialReservation",
         "TestArbitraryFloatMulSharedInputAndOutput",
-        "TestArbitraryFloatMulIndependentIEEEPairsAndAliases"
+        "TestArbitraryFloatMulIndependentIEEEPairsAndAliases",
+        "TestArbitraryFloatDivUnpackTransportAndOwnerGuards",
+        "TestArbitraryFloatDivReachedUndefinedExponentSubtraction",
+        "TestArbitraryFloatDivDebugFormatGuardAndErasedMode",
+        "TestArbitraryFloatDivGeneralPublicationAndCopiedScope",
+        "TestArbitraryFloatDivOverflowDirectedAndSignedZeros",
+        "TestArbitraryFloatDivEveryColdGeneralReservation",
+        "TestArbitraryFloatDivIndependentWideDirectedOracle",
+        "TestArbitraryFloatDivEveryColdSpecialReservation",
+        "TestArbitraryFloatDivSharedInputAndOutput",
+        "TestArbitraryFloatDivIndependentIEEEPairsAndAliases"
       ],
       "conditionals": [
         {
@@ -130552,6 +130570,23 @@
             "TestArbitraryFloatMulSharedInputAndOutput",
             "TestArbitraryFloatMulIndependentIEEEPairsAndAliases"
           ]
+        },
+        {
+          "name": "mpf.cpp:667-746; mpf.h:127 original division with normalized scoped numerals, widened numerator, quotient/sticky and Round",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_div.go",
+          "tests": [
+            "TestArbitraryFloatDivUnpackTransportAndOwnerGuards",
+            "TestArbitraryFloatDivReachedUndefinedExponentSubtraction",
+            "TestArbitraryFloatDivDebugFormatGuardAndErasedMode",
+            "TestArbitraryFloatDivGeneralPublicationAndCopiedScope",
+            "TestArbitraryFloatDivOverflowDirectedAndSignedZeros",
+            "TestArbitraryFloatDivEveryColdGeneralReservation",
+            "TestArbitraryFloatDivIndependentWideDirectedOracle",
+            "TestArbitraryFloatDivEveryColdSpecialReservation",
+            "TestArbitraryFloatDivSharedInputAndOutput",
+            "TestArbitraryFloatDivIndependentIEEEPairsAndAliases"
+          ]
         }
       ],
       "ownership": [
@@ -130575,7 +130610,8 @@
         "Actual reached scoped_mpf a and scoped_mpz div/rem are embedded in the reflected MPF manager header, with declaration flags at source sites. Original Integer/Natural algorithms receive concrete caller policy and actual allocation/buffer/verification receipts. Source destruction orders rem, div, a; CleanupRoundToIntegral joins exact younger children and real locals without replay. Bindings protect actual Integer/Natural owners through body and cleanup. Every cold general and early-branch reservation audits complete live public/scoped/scratch/cached/copy/Runtime roots and exact bytes before recovery, with final zero-budget owning cleanup. A real unpack-allocation Runtime transport verifies denied roots, parent/primitive reentry and enclosing Close joining the abandoned local.",
         "The unpack transport primitive guard is qualified by exact active MPF parent/scope identity, not by any numeric caller binding. A full native checkpoint exposed polynomial callback receivers intentionally operating during transport; those cases pass after narrowing the guard. Their original algorithm and callback policy are unchanged.",
         "Actual default scoped floats a/b and sticky remainder are embedded and charged in the MPF owner. Copies, Integer/Natural allocating leaves, and reached Round frame/invocation are captured directly. Round entry stamps even nonallocating children with no history receipt. Source destruction stops at a younger Round source cause before older locals; explicit CleanupAddSub joins the exact child and actual locals. Cold refusals audit all public/local/Round/scratch/cache/copy/Runtime roots and exact live bytes before recovery, then owning cleanup refunds to zero. The real unpack transport excludes reentrant root acquisition, arithmetic mutation and parent/primitive teardown through the precise active MPF identity guard.",
-        "Multiplication embeds its actual formatted scoped_mpf a/b and reached sticky remainder in the reflected manager header. Source constructors set only format/exponent; copies, normalized unpack and primitive multiplication/division retain their original owning algorithms and leaf capture. The actual Round frame/invocation is stamped at child entry, including nonallocating children; reverse source destruction stops at a younger child cause. Cold numerical reservations at precisions 2/3/4/24/120/4000 include all five modes and both aliases, complete immediate physical/byte audits and exact refunds. Actual unpack returning transport guards parent/primitive mutation and Close joins an abandoned caller."
+        "Multiplication embeds its actual formatted scoped_mpf a/b and reached sticky remainder in the reflected manager header. Source constructors set only format/exponent; copies, normalized unpack and primitive multiplication/division retain their original owning algorithms and leaf capture. The actual Round frame/invocation is stamped at child entry, including nonallocating children; reverse source destruction stops at a younger child cause. Cold numerical reservations at precisions 2/3/4/24/120/4000 include all five modes and both aliases, complete immediate physical/byte audits and exact refunds. Actual unpack returning transport guards parent/primitive mutation and Close joins an abandoned caller.",
+        "Division embeds actual default scoped_mpf a/b and reached sticky NUM in its reflected manager header. It captures actual copy/Integer/Natural leaves and reached Round frame/invocation; the numerator uses the literal two-argument in-place shift overload without SET. Source reverse destruction stops at a younger Round cause before older locals, and CleanupDiv joins actual children and numerals. Every cold numerical reservation across precisions 2/3/4/24/120/4000, all five modes and both aliases has complete immediate public/local/Round/scratch/cache/copy/Runtime physical and byte audits plus zero-budget owning refunds. Real unpack returning transport verifies denied caller roots, parent/primitive reentry and scalar mutation, then Close joins the abandoned actual scope."
       ],
       "deviations": [
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
@@ -130592,7 +130628,8 @@
         "IsInt retains source false for formatted zeros, denormals, NaNs and infinities, plus erased copying for negative/large exponents. Independent dyadic rational tests use math/big only as an oracle; production uses the original copy/odd/single-bit-shift loop. Go explicit owning cleanup/returning failure transport replaces native scoped destructor/exception/fatal ABI; no whole MPF-unit, f2n binding or solver integration claim.",
         "Only integral rounding is credited by this addition; MPF arithmetic and remaining unit methods still require their original implementations. Valid modes, signed zero, canonical NaN, infinity/integer copying, ties, carry, output aliases and source branch publication are preserved. Source renormalization may reach the special exponent without an overflow-policy call; this behavior is preserved. Invalid uint8 Go modes exercise original switch/assertion paths without claiming arbitrary native enum/ABI domains. Existing source scratch-destructor null guards are proved at exact source cursor/ref before separate owning cleanup, not silently repaired. No new upstream mpf driver cases exist for this operation; original driver has only scalar SET assertions, which remain covered by focused regressions. Returning transport and embedded Go scope adapt native stack/exception/fatal ABI; no whole MPF/f2n/solver integration completion claim.",
         "This addition credits Add/Sub only; enclosing MPF units remain partial. Production preserves the original numerical algorithms, exponent swap, alignment clamp, sticky decrement/increment, signs, aliases and early branch erasure. Tests use IEEE arithmetic and exact rational quantization solely as independent oracles, including wide significands, all five modes and normal/denormal boundaries. Early cold branches use source classification predicates because ToDouble only accepts its supported machine formats. No new upstream mpf driver arithmetic cases, whole MPF/f2n completion, C/cgo or arbitrary native ABI claim. Dedicated younger Round destructor-stop/first-own transport refinements remain separate stress-test work; existing Round scope regressions run with this chunk.",
-        "Only multiplication is added by this chunk. Independent exact rational and IEEE tests cover wide/tiny precision, denormal products, aliases including a single input/output identity, all rounding modes, signed zero, NaN/infinity and directed overflow. Reached undefined signed exponent addition returns arena.ErrBounds before exponent/product publication; it does not acquire a numerical substitute. No new upstream scalar-driver arithmetic credit or whole MPF/f2n/solver completion. Dedicated younger Round destructor-stop/first-own transport stress extensions remain outstanding; existing Round tests are included in the broader focused gate."
+        "Only multiplication is added by this chunk. Independent exact rational and IEEE tests cover wide/tiny precision, denormal products, aliases including a single input/output identity, all rounding modes, signed zero, NaN/infinity and directed overflow. Reached undefined signed exponent addition returns arena.ErrBounds before exponent/product publication; it does not acquire a numerical substitute. No new upstream scalar-driver arithmetic credit or whole MPF/f2n/solver completion. Dedicated younger Round destructor-stop/first-own transport stress extensions remain outstanding; existing Round tests are included in the broader focused gate.",
+        "Only division is added in this chunk; enclosing MPF units remain partial. Independent IEEE and exact rational quotient oracles cover aliases, a shared input/output identity, all modes, wide/small precision, denormal operands and exact/inexact quotients. Directed overflow fixtures encode the 2-bit exponent denominator 0.5 as a denormal, rather than incorrectly changing a one exponent to the bottom zero exponent. Reached undefined signed exponent subtraction returns arena.ErrBounds before exponent/quotient publication. No new upstream scalar-driver division assertions or whole MPF/f2n/solver completion claim. Dedicated new-caller younger Round destructor-stop/first-own transport stress refinements remain outstanding; existing Round source/ownership regressions run in the broader focused gate."
       ]
     },
     {
@@ -130657,7 +130694,15 @@
         "pkg/util/mpf_mul_oracle_test.go",
         "pkg/util/mpf_mul_scope.go",
         "pkg/util/mpf_mul_special_test.go",
-        "pkg/util/mpf_mul_test.go"
+        "pkg/util/mpf_mul_test.go",
+        "pkg/util/mpf_div.go",
+        "pkg/util/mpf_div_callback_test.go",
+        "pkg/util/mpf_div_domains_test.go",
+        "pkg/util/mpf_div_failure_test.go",
+        "pkg/util/mpf_div_oracle_test.go",
+        "pkg/util/mpf_div_scope.go",
+        "pkg/util/mpf_div_special_test.go",
+        "pkg/util/mpf_div_test.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -130739,7 +130784,17 @@
         "TestArbitraryFloatMulIndependentWideDirectedOracle",
         "TestArbitraryFloatMulEveryColdSpecialReservation",
         "TestArbitraryFloatMulSharedInputAndOutput",
-        "TestArbitraryFloatMulIndependentIEEEPairsAndAliases"
+        "TestArbitraryFloatMulIndependentIEEEPairsAndAliases",
+        "TestArbitraryFloatDivUnpackTransportAndOwnerGuards",
+        "TestArbitraryFloatDivReachedUndefinedExponentSubtraction",
+        "TestArbitraryFloatDivDebugFormatGuardAndErasedMode",
+        "TestArbitraryFloatDivGeneralPublicationAndCopiedScope",
+        "TestArbitraryFloatDivOverflowDirectedAndSignedZeros",
+        "TestArbitraryFloatDivEveryColdGeneralReservation",
+        "TestArbitraryFloatDivIndependentWideDirectedOracle",
+        "TestArbitraryFloatDivEveryColdSpecialReservation",
+        "TestArbitraryFloatDivSharedInputAndOutput",
+        "TestArbitraryFloatDivIndependentIEEEPairsAndAliases"
       ],
       "conditionals": [
         {
@@ -130924,6 +130979,23 @@
             "TestArbitraryFloatMulSharedInputAndOutput",
             "TestArbitraryFloatMulIndependentIEEEPairsAndAliases"
           ]
+        },
+        {
+          "name": "mpf.cpp:667-746; mpf.h:127 original division with normalized scoped numerals, widened numerator, quotient/sticky and Round",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_div.go",
+          "tests": [
+            "TestArbitraryFloatDivUnpackTransportAndOwnerGuards",
+            "TestArbitraryFloatDivReachedUndefinedExponentSubtraction",
+            "TestArbitraryFloatDivDebugFormatGuardAndErasedMode",
+            "TestArbitraryFloatDivGeneralPublicationAndCopiedScope",
+            "TestArbitraryFloatDivOverflowDirectedAndSignedZeros",
+            "TestArbitraryFloatDivEveryColdGeneralReservation",
+            "TestArbitraryFloatDivIndependentWideDirectedOracle",
+            "TestArbitraryFloatDivEveryColdSpecialReservation",
+            "TestArbitraryFloatDivSharedInputAndOutput",
+            "TestArbitraryFloatDivIndependentIEEEPairsAndAliases"
+          ]
         }
       ],
       "ownership": [
@@ -130938,7 +131010,8 @@
         "Actual reached scoped_mpf a and scoped_mpz div/rem are embedded in the reflected MPF manager header, with declaration flags at source sites. Original Integer/Natural algorithms receive concrete caller policy and actual allocation/buffer/verification receipts. Source destruction orders rem, div, a; CleanupRoundToIntegral joins exact younger children and real locals without replay. Bindings protect actual Integer/Natural owners through body and cleanup. Every cold general and early-branch reservation audits complete live public/scoped/scratch/cached/copy/Runtime roots and exact bytes before recovery, with final zero-budget owning cleanup. A real unpack-allocation Runtime transport verifies denied roots, parent/primitive reentry and enclosing Close joining the abandoned local.",
         "The unpack transport primitive guard is qualified by exact active MPF parent/scope identity, not by any numeric caller binding. A full native checkpoint exposed polynomial callback receivers intentionally operating during transport; those cases pass after narrowing the guard. Their original algorithm and callback policy are unchanged.",
         "Actual default scoped floats a/b and sticky remainder are embedded and charged in the MPF owner. Copies, Integer/Natural allocating leaves, and reached Round frame/invocation are captured directly. Round entry stamps even nonallocating children with no history receipt. Source destruction stops at a younger Round source cause before older locals; explicit CleanupAddSub joins the exact child and actual locals. Cold refusals audit all public/local/Round/scratch/cache/copy/Runtime roots and exact live bytes before recovery, then owning cleanup refunds to zero. The real unpack transport excludes reentrant root acquisition, arithmetic mutation and parent/primitive teardown through the precise active MPF identity guard.",
-        "Multiplication embeds its actual formatted scoped_mpf a/b and reached sticky remainder in the reflected manager header. Source constructors set only format/exponent; copies, normalized unpack and primitive multiplication/division retain their original owning algorithms and leaf capture. The actual Round frame/invocation is stamped at child entry, including nonallocating children; reverse source destruction stops at a younger child cause. Cold numerical reservations at precisions 2/3/4/24/120/4000 include all five modes and both aliases, complete immediate physical/byte audits and exact refunds. Actual unpack returning transport guards parent/primitive mutation and Close joins an abandoned caller."
+        "Multiplication embeds its actual formatted scoped_mpf a/b and reached sticky remainder in the reflected manager header. Source constructors set only format/exponent; copies, normalized unpack and primitive multiplication/division retain their original owning algorithms and leaf capture. The actual Round frame/invocation is stamped at child entry, including nonallocating children; reverse source destruction stops at a younger child cause. Cold numerical reservations at precisions 2/3/4/24/120/4000 include all five modes and both aliases, complete immediate physical/byte audits and exact refunds. Actual unpack returning transport guards parent/primitive mutation and Close joins an abandoned caller.",
+        "Division embeds actual default scoped_mpf a/b and reached sticky NUM in its reflected manager header. It captures actual copy/Integer/Natural leaves and reached Round frame/invocation; the numerator uses the literal two-argument in-place shift overload without SET. Source reverse destruction stops at a younger Round cause before older locals, and CleanupDiv joins actual children and numerals. Every cold numerical reservation across precisions 2/3/4/24/120/4000, all five modes and both aliases has complete immediate public/local/Round/scratch/cache/copy/Runtime physical and byte audits plus zero-budget owning refunds. Real unpack returning transport verifies denied caller roots, parent/primitive reentry and scalar mutation, then Close joins the abandoned actual scope."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -130949,7 +131022,8 @@
         "IsInt retains source false for formatted zeros, denormals, NaNs and infinities, plus erased copying for negative/large exponents. Independent dyadic rational tests use math/big only as an oracle; production uses the original copy/odd/single-bit-shift loop. Go explicit owning cleanup/returning failure transport replaces native scoped destructor/exception/fatal ABI; no whole MPF-unit, f2n binding or solver integration claim.",
         "Only integral rounding is credited by this addition; MPF arithmetic and remaining unit methods still require their original implementations. Valid modes, signed zero, canonical NaN, infinity/integer copying, ties, carry, output aliases and source branch publication are preserved. Source renormalization may reach the special exponent without an overflow-policy call; this behavior is preserved. Invalid uint8 Go modes exercise original switch/assertion paths without claiming arbitrary native enum/ABI domains. Existing source scratch-destructor null guards are proved at exact source cursor/ref before separate owning cleanup, not silently repaired. No new upstream mpf driver cases exist for this operation; original driver has only scalar SET assertions, which remain covered by focused regressions. Returning transport and embedded Go scope adapt native stack/exception/fatal ABI; no whole MPF/f2n/solver integration completion claim.",
         "This addition credits Add/Sub only; enclosing MPF units remain partial. Production preserves the original numerical algorithms, exponent swap, alignment clamp, sticky decrement/increment, signs, aliases and early branch erasure. Tests use IEEE arithmetic and exact rational quantization solely as independent oracles, including wide significands, all five modes and normal/denormal boundaries. Early cold branches use source classification predicates because ToDouble only accepts its supported machine formats. No new upstream mpf driver arithmetic cases, whole MPF/f2n completion, C/cgo or arbitrary native ABI claim. Dedicated younger Round destructor-stop/first-own transport refinements remain separate stress-test work; existing Round scope regressions run with this chunk.",
-        "Only multiplication is added by this chunk. Independent exact rational and IEEE tests cover wide/tiny precision, denormal products, aliases including a single input/output identity, all rounding modes, signed zero, NaN/infinity and directed overflow. Reached undefined signed exponent addition returns arena.ErrBounds before exponent/product publication; it does not acquire a numerical substitute. No new upstream scalar-driver arithmetic credit or whole MPF/f2n/solver completion. Dedicated younger Round destructor-stop/first-own transport stress extensions remain outstanding; existing Round tests are included in the broader focused gate."
+        "Only multiplication is added by this chunk. Independent exact rational and IEEE tests cover wide/tiny precision, denormal products, aliases including a single input/output identity, all rounding modes, signed zero, NaN/infinity and directed overflow. Reached undefined signed exponent addition returns arena.ErrBounds before exponent/product publication; it does not acquire a numerical substitute. No new upstream scalar-driver arithmetic credit or whole MPF/f2n/solver completion. Dedicated younger Round destructor-stop/first-own transport stress extensions remain outstanding; existing Round tests are included in the broader focused gate.",
+        "Only division is added in this chunk; enclosing MPF units remain partial. Independent IEEE and exact rational quotient oracles cover aliases, a shared input/output identity, all modes, wide/small precision, denormal operands and exact/inexact quotients. Directed overflow fixtures encode the 2-bit exponent denominator 0.5 as a denormal, rather than incorrectly changing a one exponent to the bottom zero exponent. Reached undefined signed exponent subtraction returns arena.ErrBounds before exponent/quotient publication. No new upstream scalar-driver division assertions or whole MPF/f2n/solver completion claim. Dedicated new-caller younger Round destructor-stop/first-own transport stress refinements remain outstanding; existing Round source/ownership regressions run in the broader focused gate."
       ]
     },
     {
