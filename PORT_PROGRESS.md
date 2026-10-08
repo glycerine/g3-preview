@@ -30478,3 +30478,11 @@ Focused native and g3debug total-order checks pass (0.010s/0.008s). Util vet, le
 Audited every retained source reference and all six template operations; no source file includes or instantiates dlist. The header only applies caller-provided accessors to caller-owned next/previous fields. Recorded it as a direct-language replacement: any future concrete Go owner must update its typed links directly and use ordinary loops for contains, length and invariants. No unused generic or interface-based list facade is introduced.
 
 Ledger and diff validation pass. Inventory is now2102 units,677 APIs:69 ported,287 partial,1740 unported, plus the separately classified platform replacements. No test run is attached to this no-code, no-consumer classification; the22:34 UTC full-suite checkpoint remains current.
+
+### util file: list.h and test file: list.cpp
+
+Ported the complete project-owned persistent singly linked list as exported List, ListIterator, NewList, ListLength and AppendList APIs. This is not std::list: when the second list is nonnil, AppendList copies every node in the first prefix and shares the second suffix; when the second list is nil, it returns the first list unchanged. Ordinary Go allocation and garbage collection replace the region used only to own nodes. One non-generic any-valued node supports the retained scalar test and pointer specializations without introducing Go generics.
+
+Ported all four registered append identity assertions and the source concatenation/self-append paths. Additional tests prove copied-prefix independence, exact suffix identity, mutable head/tail access, prefix/postfix iterator behavior, nil values distinct from end, length, and 2,000 deterministic ChaCha8 cases against an independent slice oracle. Go container/list is deliberately not used because its mutable doubly linked nodes cannot represent the source structural-sharing contract; no C++ standard-library container is ported.
+
+Focused native and g3debug list checks pass (0.033s/0.029s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:71 ported,287 partial,1738 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.

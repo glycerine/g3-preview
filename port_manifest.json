@@ -104263,9 +104263,16 @@
       "path": "src/test/list.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/list_test.go"
+      ],
+      "tests": [
+        "TestListRegisteredAppendAssertions",
+        "TestListAppendCopiesPrefixAndSharesSuffix",
+        "TestListIteratorMutationNilValueAndPostAdvance",
+        "TestListAppendChaCha8AgainstSliceOracle"
+      ],
       "assertions": [
         {
           "line": 30,
@@ -104284,9 +104291,18 @@
           "text": "ENSURE(append(r, static_cast<list<int> *>(nullptr), static_cast<list<int> *>(nullptr)) == nullptr);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst1 construction, nil append identities, concatenation and self append",
+          "status": "ported",
+          "go_target": "pkg/util/list_test.go",
+          "tests": [
+            "TestListRegisteredAppendAssertions"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -122111,9 +122127,17 @@
       "path": "src/util/list.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/list.go",
+        "pkg/util/list_test.go"
+      ],
+      "tests": [
+        "TestListRegisteredAppendAssertions",
+        "TestListAppendCopiesPrefixAndSharesSuffix",
+        "TestListIteratorMutationNilValueAndPostAdvance",
+        "TestListAppendChaCha8AgainstSliceOracle"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -122124,11 +122148,55 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "list constructor and mutable/const head and tail access",
+          "status": "ported",
+          "go_target": "pkg/util/list.go",
+          "tests": [
+            "TestListRegisteredAppendAssertions",
+            "TestListAppendCopiesPrefixAndSharesSuffix",
+            "TestListIteratorMutationNilValueAndPostAdvance"
+          ]
+        },
+        {
+          "name": "iterator dereference, prefix/postfix advance and equality",
+          "status": "ported",
+          "go_target": "pkg/util/list.go",
+          "tests": [
+            "TestListIteratorMutationNilValueAndPostAdvance",
+            "TestListAppendChaCha8AgainstSliceOracle"
+          ]
+        },
+        {
+          "name": "length",
+          "status": "ported",
+          "go_target": "pkg/util/list.go",
+          "tests": [
+            "TestListAppendCopiesPrefixAndSharesSuffix",
+            "TestListAppendChaCha8AgainstSliceOracle"
+          ]
+        },
+        {
+          "name": "non-destructive append with copied prefix and shared suffix",
+          "status": "ported",
+          "go_target": "pkg/util/list.go",
+          "tests": [
+            "TestListRegisteredAppendAssertions",
+            "TestListAppendCopiesPrefixAndSharesSuffix",
+            "TestListAppendChaCha8AgainstSliceOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "List nodes are ordinary Go allocations. Reachability and garbage collection replace the source region that owns list nodes; AppendList retains the source structural-sharing contract."
+      ],
+      "deviations": [
+        "The source template is represented by one non-generic List whose head has dynamic Go type any. Retained consumers recover their concrete scalar or pointer type with an assertion. The region parameter is omitted because Go owns node lifetime.",
+        "The project persistent-list contract cannot be implemented by container/list, whose mutable doubly linked nodes cannot share an immutable suffix. No C++ standard-library container is ported."
+      ]
     },
     {
       "path": "src/util/lp/CMakeLists.txt",
