@@ -17,6 +17,17 @@ type arbitraryFloatIntegralRoundScope struct {
 	bodyCause, sourceCause         error
 }
 
+// This protects exactly the borrowed primitive of the executing MPF caller.
+// Other numeric caller policies may intentionally allow an unrelated receiver
+// to operate during returning transport; their existing policy still applies.
+func (z *IntegerManager) mpfIntegralTransportActive() bool {
+	if z == nil || z.self != z {
+		return false
+	}
+	m := z.MpfParent
+	return m != nil && m.self == m && m.integer == z && m.integralRound.valid() && m.integralRound.NumericExecuting() && m.memory != nil && m.memory.FailureTransportActive()
+}
+
 func (s *arbitraryFloatIntegralRoundScope) valid() bool {
 	return s != nil && s.manager != nil && s.manager.self == s.manager && s == &s.manager.integralRound && s.invocation != 0
 }
