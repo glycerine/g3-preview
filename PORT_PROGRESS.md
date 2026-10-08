@@ -30387,4 +30387,8 @@ Ported the source PTR_ALIGNMENT macro as exported Go target queries. PointerAlig
 
 Focused native and g3debug machine checks pass (0.004s each). Util vet, ledger and diff checks pass; inventory is now2102 units,677 APIs:56 ported,287 partial,1758 unported, plus the separately classified sstream platform replacement. No new full suite was needed after the21:37 UTC checkpoint.
 
-Final focused native util/AST checks pass (2.294s/0.238s); g3debug checks pass (2.436s/0.204s). These cover stream, raw/binary/rational output, rational-owned-string, decimal/SMT2 stream, MPQInf and AST bit-vector integer/trace output tests. Util vet passes. The legacy OwnedString return adapter and other string emulation remain migration work; this is not full util completion. No additional full-suite run was needed before the next hourly checkpoint.
+### util file: stats.h
+
+Ported print_stat and print_stat_f as exported PrintStat and PrintStatFloat helpers over io.Writer. The positive-only conditions are preserved, including suppression of zero, negative floats and NaN. Message strings stop at their first NUL with strings.IndexByte. strconv supplies unsigned decimal and six-significant-digit float32 formatting; Go write errors return to the caller instead of becoming ostream state. Tests cover the complete gate, C-string boundary, finite/subnormal/max/infinite formatting, and reached versus skipped writer errors.
+
+Focused native and g3debug statistics checks pass (0.005s each). Util vet, ledger and diff checks pass; inventory is now2102 units,677 APIs:57 ported,287 partial,1757 unported, plus the separately classified sstream platform replacement. No new full suite was needed after the21:37 UTC checkpoint.

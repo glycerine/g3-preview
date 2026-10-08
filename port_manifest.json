@@ -151809,9 +151809,16 @@
       "path": "src/util/stats.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/util_stats.go",
+        "pkg/util/util_stats_test.go"
+      ],
+      "tests": [
+        "TestPrintStatPositiveGateAndCStringMessage",
+        "TestPrintStatFloatGoFormattingAndPositiveGate",
+        "TestPrintStatWriterErrorsOnlyAfterPositiveGate"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -151822,11 +151829,34 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "print_stat positive unsigned output",
+          "status": "ported",
+          "go_target": "pkg/util/util_stats.go",
+          "tests": [
+            "TestPrintStatPositiveGateAndCStringMessage",
+            "TestPrintStatWriterErrorsOnlyAfterPositiveGate"
+          ]
+        },
+        {
+          "name": "print_stat_f positive float output",
+          "status": "ported",
+          "go_target": "pkg/util/util_stats.go",
+          "tests": [
+            "TestPrintStatFloatGoFormattingAndPositiveGate",
+            "TestPrintStatWriterErrorsOnlyAfterPositiveGate"
+          ]
+        }
+      ],
+      "ownership": [
+        "The helpers borrow io.Writer and message string for one call and retain no storage."
+      ],
+      "deviations": [
+        "Go io.Writer replaces std::ostream. strconv supplies unsigned decimal and six-significant-digit float32 formatting; strings.IndexByte applies the source C-string message boundary. Go write errors are returned to the caller instead of being stored in ostream state."
+      ]
     },
     {
       "path": "src/util/stopwatch.h",
