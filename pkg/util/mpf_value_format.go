@@ -4,6 +4,12 @@ package util
 // ToStringInto writes the source result into its actual owned text context.
 // The returned c_str view borrows that result until the caller's result DT.
 func (m *ArbitraryFloatManager) ToStringInto(a *ArbitraryFloat, text ArbitraryFloatFormatTarget) (view ArbitraryFloatFormattedCString, err error) {
+	return m.toStringIntoWithReceipt(a, text, nil, nil)
+}
+
+// Capture the exact invocation at successful begin, before text body callbacks.
+// Refused entry issues no receipt, even if a callback begins another frame.
+func (m *ArbitraryFloatManager) toStringIntoWithReceipt(a *ArbitraryFloat, text ArbitraryFloatFormatTarget, frame **ArbitraryFloatFormatInvocation, invocation *uint64) (view ArbitraryFloatFormattedCString, err error) {
 	if e := m.valueGuard(a); e != nil {
 		return view, e
 	}
@@ -13,6 +19,10 @@ func (m *ArbitraryFloatManager) ToStringInto(a *ArbitraryFloat, text ArbitraryFl
 	s := text.NumericInvocation()
 	if e := m.beginFormatInvocation(s, text); e != nil {
 		return view, e
+	}
+	if frame != nil && invocation != nil {
+		*frame = s
+		*invocation = s.invocation
 	}
 	defer func() {
 		s.executing = false
