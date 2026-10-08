@@ -114163,9 +114163,22 @@
       "path": "src/util/checked_int64.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/checked_int64.go",
+        "pkg/util/checked_int64_test.go"
+      ],
+      "tests": [
+        "TestCheckedInt64OriginalParityAndSubtractionHole",
+        "TestCheckedInt64IndependentAddSubOracle",
+        "TestCheckedInt64UnaryCopiesComparisonsAndFunctors",
+        "TestCheckedInt64MultiplyOriginalRationalFallback",
+        "TestCheckedInt64EveryColdRationalFallbackReservation",
+        "TestCheckedInt64DisplayIntegerFlagsAndEveryReservation",
+        "TestCheckedInt64ScopeCopyLifetimeAndErasedProvider",
+        "TestCheckedInt64OverflowExceptionSubtype",
+        "TestCheckedInt64WideRandomRationalProductOracle"
+      ],
       "conditionals": [
         {
           "line": 24,
@@ -114176,11 +114189,32 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "All defined checked_int64, overflow_exception, hash/eq functors and value operators in both CHECK profiles (checked_int64.h:30-219)",
+          "status": "ported",
+          "go_target": "pkg/util/checked_int64.go",
+          "tests": [
+            "TestCheckedInt64OriginalParityAndSubtractionHole",
+            "TestCheckedInt64IndependentAddSubOracle",
+            "TestCheckedInt64UnaryCopiesComparisonsAndFunctors",
+            "TestCheckedInt64MultiplyOriginalRationalFallback",
+            "TestCheckedInt64EveryColdRationalFallbackReservation",
+            "TestCheckedInt64DisplayIntegerFlagsAndEveryReservation",
+            "TestCheckedInt64ScopeCopyLifetimeAndErasedProvider",
+            "TestCheckedInt64OverflowExceptionSubtype",
+            "TestCheckedInt64WideRandomRationalProductOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Checked/unchecked values are copyable inline int64/profile scalars. Overflow checks precede scalar publication; abs/neg/inc/dec and arithmetic value operators preserve the original mutation order. Large checked multiplication constructs actual service-owned rational(int64) operands and calls the original rational multiplication facade including copy/compound/copy, then destroys full-expression operands before named-result inspection, assigns before result destruction and destroys the completed result on overflow. Caller-provided CheckedInt64MulScope retains actual failed operand/result roots and original cause; Cleanup joins younger numerical/facade scopes then operands without replaying multiplication. Fast/unchecked multiplication erases service/scope reads. Every fallback reservation refusal audits all live public/service/scratch/facade roots and exact physical budget before cleanup, and exact final refund."
+      ],
+      "deviations": [
+        "One non-generic scalar class represents the two C++ CHECK instantiations through constructor-selected boolean profile; Go zero value is unchecked. Mixed arithmetic profiles return an explicit guard; value comparisons use scalar values. Value-return overloads use explicit named Go helpers, pointer mutators model source references, and an explicit RationalService plus fresh caller-provided scope replace global rational manager/stack lifetime. C++ unsigned-to-signed checked arithmetic selects two-complement int64; unchecked native signed overflow is undefined, with Go wrapping explicitly qualified. Original is_even returns true ONLY for value 1, and checked zero-minus-INT64_MIN intentionally wraps without throwing. Original strict INT_MIN < operand <= INT_MAX multiplication fast guard is preserved; larger checked multiplication is NOT replaced by machine/128-bit/big.Int production arithmetic. C++ temporary/operand evaluation order is the explicit left-to-right construction and reverse operand destruction profile, not a promise across native compilers; native exception/destructor/assertion/ABI and reentrant external mutation of const reference arguments are qualified. The nested overflow subtype implements the existing Z3Exception interface with exact message and default error-code semantics. No C/C++ source is built and no Go generics are used."
+      ]
     },
     {
       "path": "src/util/cmd_context_types.cpp",
