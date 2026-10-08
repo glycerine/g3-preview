@@ -101319,9 +101319,16 @@
       "path": "src/test/buffer.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/ptr_scoped_buffer_test.go"
+      ],
+      "tests": [
+        "TestPtrScopedBufferRegisteredAssertions",
+        "TestPtrScopedBufferResetFinalizeReleaseAppendAndIterator",
+        "TestPtrScopedBufferIdentityTypedNilAndAtomicAppend",
+        "TestPtrScopedBufferOwnerAndBoundsPanics"
+      ],
       "assertions": [
         {
           "line": 27,
@@ -101360,10 +101367,21 @@
           "text": "ENSURE(b.size() == 2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst1 complete ptr_scoped_buffer<point> assertion sequence and destructor",
+          "status": "ported",
+          "go_target": "pkg/util/ptr_scoped_buffer_test.go",
+          "tests": [
+            "TestPtrScopedBufferRegisteredAssertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "The registered point pointers are concrete Go allocations adopted by PtrScopedBuffer. The test destruction callback records exact pop, replacement and final destructor ownership actions."
+      ],
       "deviations": []
     },
     {
@@ -145904,9 +145922,17 @@
       "path": "src/util/ptr_scoped_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/ptr_scoped_buffer.go",
+        "pkg/util/ptr_scoped_buffer_test.go"
+      ],
+      "tests": [
+        "TestPtrScopedBufferRegisteredAssertions",
+        "TestPtrScopedBufferResetFinalizeReleaseAppendAndIterator",
+        "TestPtrScopedBufferIdentityTypedNilAndAtomicAppend",
+        "TestPtrScopedBufferOwnerAndBoundsPanics"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -145917,11 +145943,65 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor, destructor, deallocate_all, reset and finalize",
+          "status": "ported",
+          "go_target": "pkg/util/ptr_scoped_buffer.go",
+          "tests": [
+            "TestPtrScopedBufferRegisteredAssertions",
+            "TestPtrScopedBufferResetFinalizeReleaseAppendAndIterator",
+            "TestPtrScopedBufferOwnerAndBoundsPanics"
+          ]
+        },
+        {
+          "name": "release ownership, size, empty and const iteration",
+          "status": "ported",
+          "go_target": "pkg/util/ptr_scoped_buffer.go",
+          "tests": [
+            "TestPtrScopedBufferResetFinalizeReleaseAppendAndIterator",
+            "TestPtrScopedBufferOwnerAndBoundsPanics"
+          ]
+        },
+        {
+          "name": "push_back, back, pop_back and get",
+          "status": "ported",
+          "go_target": "pkg/util/ptr_scoped_buffer.go",
+          "tests": [
+            "TestPtrScopedBufferRegisteredAssertions",
+            "TestPtrScopedBufferResetFinalizeReleaseAppendAndIterator",
+            "TestPtrScopedBufferOwnerAndBoundsPanics"
+          ]
+        },
+        {
+          "name": "set identity no-op and destruction before replacement",
+          "status": "ported",
+          "go_target": "pkg/util/ptr_scoped_buffer.go",
+          "tests": [
+            "TestPtrScopedBufferRegisteredAssertions",
+            "TestPtrScopedBufferIdentityTypedNilAndAtomicAppend",
+            "TestPtrScopedBufferOwnerAndBoundsPanics"
+          ]
+        },
+        {
+          "name": "append pointer range",
+          "status": "ported",
+          "go_target": "pkg/util/ptr_scoped_buffer.go",
+          "tests": [
+            "TestPtrScopedBufferResetFinalizeReleaseAppendAndIterator",
+            "TestPtrScopedBufferIdentityTypedNilAndAtomicAppend"
+          ]
+        }
+      ],
+      "ownership": [
+        "PtrScopedBuffer owns every nonnil pointer until pop, replacement, reset, finalize, Close or Release. A caller-supplied concrete callback performs observable destruction; nil selects Go garbage collection. Release clears Go references without calling the callback, transferring lifetime back to pointers already retained by the caller."
+      ],
+      "deviations": [
+        "The source T* and deallocator templates become a non-generic any-valued buffer that validates nil or Go pointer dynamic values and accepts a concrete destroy callback. Typed nil values are source null pointers; a stable self pointer rejects copied owners.",
+        "A Go slice replaces ptr_buffer and its inline16/heap allocation policy. Finalize releases the slice, Reset retains reusable capacity, and Append accepts a Go slice instead of an explicit count plus pointer. No C++ buffer or iterator implementation is ported."
+      ]
     },
     {
       "path": "src/util/rational.cpp",
