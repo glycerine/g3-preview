@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:1857-1891,1907-1919.
+// Source: src/util/mpf.cpp:1857-1891,1898-1919.
 package util
 
 // Each bitfield assignment is a literal source action. The final sign write in
@@ -46,6 +46,37 @@ func (m *ArbitraryFloatManager) MkInf(ebits, sbits uint32, sign bool, out *Arbit
 	m.valueExecuting = true
 	defer func() { m.valueExecuting = false }()
 	return m.integer.SetInt32(&out.significand, 0)
+}
+
+// MkMaxValue publishes format, sign and exponent before copying the cached
+// fraction. The optional receipt names only the actual allocating SET child.
+func (m *ArbitraryFloatManager) MkMaxValue(ebits, sbits uint32, sign bool, out *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt) (cause error) {
+	if e := m.valueGuard(out); e != nil {
+		return e
+	}
+	out.assignSbits(sbits)
+	out.assignEbits(ebits)
+	out.assignSign(sign)
+	top, e := m.topExponent(ebits)
+	if e != nil {
+		return e
+	}
+	out.exponent = top - 1
+	w, e := m.powerTwoMinusOneWrapper(sbits-1, false)
+	if e != nil {
+		return e
+	}
+	source, e := w.Capture()
+	if e != nil {
+		return e
+	}
+	m.valueExecuting = true
+	defer func() { m.valueExecuting = false }()
+	if e := m.beginValueCopyBinding(receipt, m.integer); e != nil {
+		return e
+	}
+	defer func() { m.finishValueCopyBinding(cause) }()
+	return m.copyValueSignificand(&out.significand, &source)
 }
 func (m *ArbitraryFloatManager) MkNaN(ebits, sbits uint32, out *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt) error {
 	return m.mkNaNWithSourceContext(ebits, sbits, out, receipt, integerAllocationInvocationContext{})
