@@ -30436,3 +30436,9 @@ Focused native and g3debug version checks pass (0.004s each). Util vet, ledger a
 Audited the complete template and all retained source references; nothing includes or instantiates critical_flet. It combines generic RAII assignment/restoration with a named OpenMP critical section. Under the selected single-goroutine Go profile, a concrete future use must save its typed value locally, assign the temporary value and defer restoration. Recorded this as a language/runtime replacement without adding Go generics or a fake OpenMP lock.
 
 Ledger and diff validation pass. Inventory is now2102 units,677 APIs:63 ported,287 partial,1747 unported, plus the separately classified platform replacements. No test run is attached to this no-code, no-consumer classification; the22:34 UTC full-suite checkpoint remains current.
+
+### util file: trail.h
+
+Ported the heterogeneous undo core as exported Trail, TrailFunc, UndoTrailStack and TrailStack APIs. Go closures replace the source value/reset/pointer/vector/map/object template subclasses without introducing Go generics: each consumer captures its concrete typed old state and undo action. Reverse undo order, nested scope boundaries, multi-scope pops, level-zero cleanup and retained-prefix behavior match the source. Ordinary Go reachability replaces the region used solely to allocate heterogeneous C++ trail objects, so no allocator facade is copied.
+
+Focused native and g3debug trail checks pass (0.005s each). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:64 ported,287 partial,1746 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.

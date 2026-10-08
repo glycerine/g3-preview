@@ -153815,9 +153815,16 @@
       "path": "src/util/trail.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/trail.go",
+        "pkg/util/trail_test.go"
+      ],
+      "tests": [
+        "TestTrailStackReverseUndoAcrossScopesAndLevelZero",
+        "TestTrailStackClosureReplacementsForTypedTemplateTrails",
+        "TestUndoTrailStackPrefixAndTrailErrors"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -153846,11 +153853,44 @@
           "text": "SASSERT(num_scopes <= lvl);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "trail abstract undo operation and templated value/reset/pointer/vector/map/object helper trails",
+          "status": "ported",
+          "go_target": "pkg/util/trail.go",
+          "tests": [
+            "TestTrailStackClosureReplacementsForTypedTemplateTrails",
+            "TestUndoTrailStackPrefixAndTrailErrors"
+          ]
+        },
+        {
+          "name": "undo_trail_stack reverse prefix restoration",
+          "status": "ported",
+          "go_target": "pkg/util/trail.go",
+          "tests": [
+            "TestUndoTrailStackPrefixAndTrailErrors",
+            "TestTrailStackReverseUndoAcrossScopesAndLevelZero"
+          ]
+        },
+        {
+          "name": "trail_stack reset, push_ptr, push, get_num_scopes, push_scope and pop_scope",
+          "status": "ported",
+          "go_target": "pkg/util/trail.go",
+          "tests": [
+            "TestTrailStackReverseUndoAcrossScopesAndLevelZero",
+            "TestUndoTrailStackPrefixAndTrailErrors"
+          ]
+        }
+      ],
+      "ownership": [
+        "TrailStack owns its retained Trail interface values and scope indices. TrailFunc closures retain their concrete captured state through ordinary Go reachability until reverse undo clears the corresponding interface slots."
+      ],
+      "deviations": [
+        "TrailFunc closures replace the source's templated trail subclasses without Go generics. Each concrete consumer captures its typed old value, vector, map, object or reference operation directly; constructor-specific preconditions remain at that concrete capture site.",
+        "The source region exists only to allocate heterogeneous C++ trail objects. Go garbage collection owns closure storage, so TrailStack has no get_region allocator API. ErrTrailNil and ErrTrailScopes replace null dereference, old-size assertion and scope-count assertion failures. Context arguments are captured by closures instead of being threaded through a generic Ctx template parameter."
+      ]
     },
     {
       "path": "src/util/uint_map.h",
