@@ -14,6 +14,9 @@ type BVPolynomialAdditionOptions struct{ SortSums, ASTOrder, HoistCoefficients, 
 // Inputs borrow caller lifetimes through source exit, including mark destruction.
 type BVPolynomialAdditionCore struct {
 	pendingMarks                         [2]ast.ASTHandle
+	flatArgs                             ast.ASTHandleBuffer
+	currentSort                          ast.ASTHandle
+	localsEnded                          bool
 	family                               ast.FamilyID
 	savedVector                          ast.ASTRefVector
 	self                                 *BVPolynomialAdditionCore
@@ -447,6 +450,9 @@ func (p *BVPolynomialAdditionCore) childrenSource() error {
 	return p.manager.BitVectorNumeralInvocationSourceReady(&p.factory)
 }
 func (p *BVPolynomialAdditionCore) sourceEnd() error {
+	if p.localsEnded {
+		return p.childrenSource()
+	}
 	if e := p.childrenSource(); e != nil {
 		return e
 	}
@@ -478,10 +484,28 @@ func (p *BVPolynomialAdditionCore) sourceEnd() error {
 			return e
 		}
 	}
-	p.sourceDone = true
+	p.localsEnded = true
 	return nil
 }
+
+// Rewrite is the original mk_nflat_add_core entry with the caller's current sort.
 func (p *BVPolynomialAdditionCore) Rewrite(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialAdditionOptions) (RewriteStatus, error) {
+	return p.rewrite(sort, args, out, o, false, false)
+}
+
+// RewriteFlat specializes mk_flat_add_core. Expansion is exactly depth one.
+// Source: src/ast/rewriter/poly_rewriter_def.h:371-400.
+func (p *BVPolynomialAdditionCore) RewriteFlat(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialAdditionOptions) (RewriteStatus, error) {
+	return p.rewrite(sort, args, out, o, true, false)
+}
+
+// RewriteApplication is mk_add_core: a singleton assigns before sort lookup;
+// otherwise the physical current sort comes from the first argument.
+// Source: src/ast/rewriter/poly_rewriter.h:137-148.
+func (p *BVPolynomialAdditionCore) RewriteApplication(args ast.AppArguments, out ast.ASTRef, flat bool, o BVPolynomialAdditionOptions) (RewriteStatus, error) {
+	return p.rewrite(ast.ASTHandle{}, args, out, o, flat, true)
+}
+func (p *BVPolynomialAdditionCore) rewrite(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialAdditionOptions, flat, application bool) (RewriteStatus, error) {
 	if p == nil || p.self != p || p.closed {
 		return RewriteFailed, ast.ErrASTHandle
 	}
@@ -490,14 +514,41 @@ func (p *BVPolynomialAdditionCore) Rewrite(sort ast.ASTHandle, args ast.AppArgum
 	}
 	p.started, p.running = true, true
 	defer func() { p.running = false }()
-	st, e := p.body(sort, args, out, o)
+	st, e := p.dispatch(sort, args, out, o, flat, application)
 	p.bodyCause = e
 	if e != nil {
 		p.sourceCause = p.childrenSource()
 		return st, e
 	}
 	p.sourceCause = p.sourceEnd()
+	if p.sourceCause == nil {
+		p.flatArgs.Close(p.manager.Budget())
+		p.sourceDone = true
+	}
 	return st, p.sourceCause
+}
+func (p *BVPolynomialAdditionCore) dispatch(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialAdditionOptions, flat, application bool) (RewriteStatus, error) {
+	if application {
+		if args.Count() == 0 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		first, e := args.At(0)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if args.Count() == 1 {
+			return RewriteDone, p.manager.SetRef(out, first)
+		}
+		sort, e = p.manager.GetSort(first)
+		if e != nil {
+			return RewriteFailed, e
+		}
+	}
+	p.currentSort = sort
+	if !flat {
+		return p.body(sort, args, out, o)
+	}
+	return p.flatBody(sort, args, out, o)
 }
 func (p *BVPolynomialAdditionCore) SourceReady() error {
 	if p == nil || p.self != p {
@@ -576,6 +627,7 @@ func (p *BVPolynomialAdditionCore) Close() error {
 			return e
 		}
 	}
+	p.flatArgs.Close(p.manager.Budget())
 	p.positions.close()
 	p.manager.Budget().Release(p.header)
 	p.header = 0
