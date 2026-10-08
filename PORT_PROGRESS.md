@@ -30381,4 +30381,10 @@ Audited src/util/sstream.h completely. It contains only a thin wrapper around st
 
 Ledger validation passes with sstream.h classified as a platform replacement. Inventory is now2102 units,677 APIs:55 ported,287 partial,1759 unported; the remaining unit is recorded separately as a deliberate standard-library replacement.
 
+### util file: machine.h
+
+Ported the source PTR_ALIGNMENT macro as exported Go target queries. PointerAlignmentBytes comes from unsafe.Alignof(uintptr(0)); PointerAlignmentShift derives its low-zero-bit count with math/bits; PointerTagMask supplies the corresponding low tag mask. This follows the actual Go target rather than copying the C++ compiler's AMD64-versus-other conditional. Tests compare the reported values with independent standard-library queries and an allocated pointer.
+
+Focused native and g3debug machine checks pass (0.004s each). Util vet, ledger and diff checks pass; inventory is now2102 units,677 APIs:56 ported,287 partial,1758 unported, plus the separately classified sstream platform replacement. No new full suite was needed after the21:37 UTC checkpoint.
+
 Final focused native util/AST checks pass (2.294s/0.238s); g3debug checks pass (2.436s/0.204s). These cover stream, raw/binary/rational output, rational-owned-string, decimal/SMT2 stream, MPQInf and AST bit-vector integer/trace output tests. Util vet passes. The legacy OwnedString return adapter and other string emulation remain migration work; this is not full util completion. No additional full-suite run was needed before the next hourly checkpoint.

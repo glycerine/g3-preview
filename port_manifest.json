@@ -127466,9 +127466,15 @@
       "path": "src/util/machine.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/util_machine.go",
+        "pkg/util/util_machine_test.go"
+      ],
+      "tests": [
+        "TestMachinePointerAlignmentFromGoTarget",
+        "TestMachinePointerAlignmentCoversAllocatedPointer"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -127491,11 +127497,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "PTR_ALIGNMENT host pointer alignment shift",
+          "status": "ported",
+          "go_target": "pkg/util/util_machine.go",
+          "tests": [
+            "TestMachinePointerAlignmentFromGoTarget",
+            "TestMachinePointerAlignmentCoversAllocatedPointer"
+          ]
+        }
+      ],
+      "ownership": [
+        "Compile-time Go target constants and pure queries own no storage."
+      ],
+      "deviations": [
+        "unsafe.Alignof(uintptr(0)) supplies the actual Go target alignment. This is more accurate for Go targets than the source's AMD64-versus-other preprocessor split. math/bits computes the shift; no C++ platform macro or ABI assumption is copied."
+      ]
     },
     {
       "path": "src/util/map.h",
