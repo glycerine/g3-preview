@@ -22,6 +22,7 @@ type BVRewriter struct {
 	polynomial            *BVPolynomialRewriter
 	extract               MkExtractProc
 	extraction            *bvExtractInvocation
+	leConcat              *bvLEConcatInvocation
 	propagation           *bvExtractPropagation
 	trailing              *BVTrailing
 	eqRemainder           *ast.BitVectorRemainderEqualityNumerals
@@ -210,6 +211,12 @@ func (p *BVRewriter) Close() error {
 	}
 	p.repeatArgs.Close(p.manager.Budget())
 	p.bitwiseArgs.Close(p.manager.Budget())
+	if p.leConcat != nil {
+		if e := p.leConcat.close(p.manager); e != nil {
+			return e
+		}
+		p.leConcat = nil
+	}
 	if p.propagation != nil {
 		if e := p.propagation.close(p.manager); e != nil {
 			return e
