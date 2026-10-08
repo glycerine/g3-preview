@@ -135240,9 +135240,20 @@
       "path": "src/util/mpq_inf.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/mpq_inf.go",
+        "pkg/util/mpq_inf_test.go"
+      ],
+      "tests": [
+        "TestMPQInfSourceFloorQuirkAndEpsilonApproximation",
+        "TestMPQInfIndependentArithmeticOrderingAndAliases",
+        "TestMPQInfSourceShortCircuitReads",
+        "TestMPQInfScalarKindsSettersAndUnaryBranches",
+        "TestMPQInfSourceSequentialCrossAliases",
+        "TestMPQInfEveryColdNumericReservationAndCleanup",
+        "TestMPQInfConstructorEveryReservation"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -135255,9 +135266,34 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "All selected numeric inline bodies, original first-component floor quirk, ordered pair/scalar/kind comparisons and parent owned manager (mpq_inf.h:26-271,279)",
+          "status": "ported",
+          "go_target": "pkg/util/mpq_inf.go",
+          "tests": [
+            "TestMPQInfSourceFloorQuirkAndEpsilonApproximation",
+            "TestMPQInfIndependentArithmeticOrderingAndAliases",
+            "TestMPQInfSourceShortCircuitReads",
+            "TestMPQInfScalarKindsSettersAndUnaryBranches",
+            "TestMPQInfSourceSequentialCrossAliases",
+            "TestMPQInfEveryColdNumericReservationAndCleanup",
+            "TestMPQInfConstructorEveryReservation"
+          ]
+        },
+        {
+          "name": "to_string return declaration and display returned-string insertion (mpq_inf.h:273-277; mpq_inf.cpp:22-43)",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Exported raw rational pair owns its two components; NewMPQInf initializes both, and Set/Del handle owned copying and destruction. Parent manager owns a concrete RationalManager and charged Go control header. Sequential source calls preserve partial first-component publication and cross aliases; failed numerical calls retain underlying actual raw arithmetic cohorts and original cause. CleanupValue joins younger actual scopes before caller values; parent Close joins its child before header release. Every reached constructor and selected numeric reservation is tested in both scratch profiles with physical-root and immediate budget audits, sticky replay and final zero budget."
+      ],
+      "deviations": [
+        "Synchronized is the explicit concrete RationalConfig profile, selecting source local versus reusable scratch algorithms under confinement. Go checked owner, nil domain, reentry and retained failure guards qualify native exception/assertion/fatal ABI; unknown setter kind intentionally leaves epsilon unchanged, while reached comparison unreachable is returned as ErrMPQInfKind. Fixed approximation offset accepts negative/NaN values and depends only on epsilon sign, as in source. Original floor tests the sign of FIRST rather than epsilon and is preserved. Native allocation/stack/temporary-elision ABI, concurrent critical sections and formatting/owned-string scopes remain uncredited; cpp source body is not promoted. Upstream simplex.cpp uses this manager but is not a direct standalone class driver; solver integration is not credited by these independent class tests."
+      ]
     },
     {
       "path": "src/util/mpz.cpp",
