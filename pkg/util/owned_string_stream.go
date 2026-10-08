@@ -124,11 +124,16 @@ func (s *OwnedStringStream) emit(ch byte) error {
 	return e
 }
 func (s *OwnedStringStream) AppendInt32(n int32) error {
+	return s.AppendInt64(int64(n))
+}
+
+// AppendInt64 supplies the signed exponent insertion used by mpf.cpp:1598.
+func (s *OwnedStringStream) AppendInt64(n int64) error {
 	if e := s.check(); e != nil {
 		return e
 	}
-	var digits [12]byte
-	text := strconv.AppendInt(digits[:0], int64(n), 10)
+	var digits [20]byte
+	text := strconv.AppendInt(digits[:0], n, 10)
 	for _, ch := range text {
 		if e := s.emit(ch); e != nil {
 			return e
