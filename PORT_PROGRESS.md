@@ -30442,3 +30442,11 @@ Ledger and diff validation pass. Inventory is now2102 units,677 APIs:63 ported,2
 Ported the heterogeneous undo core as exported Trail, TrailFunc, UndoTrailStack and TrailStack APIs. Go closures replace the source value/reset/pointer/vector/map/object template subclasses without introducing Go generics: each consumer captures its concrete typed old state and undo action. Reverse undo order, nested scope boundaries, multi-scope pops, level-zero cleanup and retained-prefix behavior match the source. Ordinary Go reachability replaces the region used solely to allocate heterogeneous C++ trail objects, so no allocator facade is copied.
 
 Focused native and g3debug trail checks pass (0.005s each). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:64 ported,287 partial,1746 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
+
+### util file: union_find.h
+
+Ported UnionFindDefaultContext, UnionFindContext, UnionFind and BasicUnionFind as exported concrete Go APIs without generics. UnionFind borrows a shared TrailStack and preserves union-by-size without path compression, circular class links, variable and merge undo order, before/after/unmerge callbacks, class size, display and invariant checks. BasicUnionFind preserves unknown values as implicit singleton roots and grows through the largest merged ID. Tests cover exact callback arguments and order, nested backtracking, full circular traversal, automatic growth, idempotent same-class merge, reset, display and deliberate invariant corruption.
+
+Corrected src/util/union_find.h:138-147. The source dissolve loop saves the next member in w but never assigns it back to v, so a multi-member class is left inconsistent. The Go implementation advances through the saved next link and resets every member, matching the method's stated contract; the four-member regression checks every parent, size and circular-next entry.
+
+Focused native and g3debug union-find checks pass (0.004s/0.005s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:65 ported,287 partial,1745 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.

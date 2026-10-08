@@ -154221,9 +154221,17 @@
       "path": "src/util/union_find.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/union_find.go",
+        "pkg/util/union_find_test.go"
+      ],
+      "tests": [
+        "TestUnionFindBacktrackingCallbacksAndClassCycle",
+        "TestUnionFindDissolveEntireClassAndDisplay",
+        "TestBasicUnionFindUnknownMergeCycleAndReset",
+        "TestUnionFindContextValidationAndInvariantFailure"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -154268,11 +154276,61 @@
           "text": "SASSERT(m_size[v] == sz);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "union_find_default_ctx callbacks and shared trail stack",
+          "status": "ported",
+          "go_target": "pkg/util/union_find.go",
+          "tests": [
+            "TestUnionFindBacktrackingCallbacksAndClassCycle",
+            "TestUnionFindContextValidationAndInvariantFailure"
+          ]
+        },
+        {
+          "name": "union_find constructor, mk_var, get_num_vars, find, next, size and is_root",
+          "status": "ported",
+          "go_target": "pkg/util/union_find.go",
+          "tests": [
+            "TestUnionFindBacktrackingCallbacksAndClassCycle"
+          ]
+        },
+        {
+          "name": "union_find merge, unmerge callback order and trail restoration",
+          "status": "ported",
+          "go_target": "pkg/util/union_find.go",
+          "tests": [
+            "TestUnionFindBacktrackingCallbacksAndClassCycle"
+          ]
+        },
+        {
+          "name": "union_find dissolve, display and debug invariant",
+          "status": "ported",
+          "go_target": "pkg/util/union_find.go",
+          "tests": [
+            "TestUnionFindDissolveEntireClassAndDisplay",
+            "TestUnionFindContextValidationAndInvariantFailure"
+          ]
+        },
+        {
+          "name": "basic_union_find mk_var, get_num_vars, find, next, is_root, merge and reset",
+          "status": "ported",
+          "go_target": "pkg/util/union_find.go",
+          "tests": [
+            "TestBasicUnionFindUnknownMergeCycleAndReset"
+          ]
+        }
+      ],
+      "ownership": [
+        "UnionFind and BasicUnionFind exclusively own their parent, size and circular-next uint32 slices. UnionFind borrows its context and shared TrailStack, which must outlive every pending merge or variable trail. Callback closures retained by that stack keep the UnionFind owner reachable until undo.",
+        "UnionFindDefaultContext owns its TrailStack. Node IDs, roots and callback arguments are scalar values and carry no storage ownership."
+      ],
+      "deviations": [
+        "UnionFindContext replaces the Ctx template parameter without Go generics. TrailFunc closures replace mk_var_trail and merge_trail region objects while preserving shared-stack reverse order. Go slices replace svector<unsigned> and io.Writer replaces std::ostream.",
+        "src/util/union_find.h:138-147 saves the next member in w but never advances v, so dissolve resets only the requested node and leaves a multi-member class inconsistent. The Go loop advances value=next and dissolves the complete equivalence class promised by the source comment; TestUnionFindDissolveEntireClassAndDisplay covers all members.",
+        "Backtrackable methods retain the source in-range precondition and use Go bounds panics for invalid IDs. NewUnionFind returns ErrUnionFindContext for a missing shared trail rather than dereferencing it."
+      ]
     },
     {
       "path": "src/util/util.cpp",
