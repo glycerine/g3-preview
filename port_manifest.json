@@ -114632,7 +114632,7 @@
       "path": "src/util/critical_flet.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -114645,11 +114645,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "critical_flet is an unused generic RAII value-restore wrapper around one named OpenMP critical section. No retained source file includes or instantiates it. Under the selected single-goroutine Go profile, a future concrete use must save the old concrete value, assign the temporary value, and defer restoration in the same lexical function. No generic Go type or fake OpenMP lock is introduced."
+      ]
     },
     {
       "path": "src/util/debug.cpp",

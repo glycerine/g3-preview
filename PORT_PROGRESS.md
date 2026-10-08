@@ -30430,3 +30430,9 @@ Focused native and g3debug NatSet checks pass (0.004s/0.006s). Util vet, ledger 
 Replaced the generated C macros and both build templates with exported typed Go constants Z3MajorVersion, Z3MinorVersion, Z3BuildNumber, Z3RevisionNumber and Z3FullVersion. Values come from the checked-in src/util/version.h:2-7 and remain4.7.1.0. The Go build needs no generated header. The optional CMake git-hash definition is omitted in accordance with the project rule against source hashing. A focused test checks the exact tuple and composes the full version independently.
 
 Focused native and g3debug version checks pass (0.004s each). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:63 ported,287 partial,1748 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
+
+### util file: critical_flet.h
+
+Audited the complete template and all retained source references; nothing includes or instantiates critical_flet. It combines generic RAII assignment/restoration with a named OpenMP critical section. Under the selected single-goroutine Go profile, a concrete future use must save its typed value locally, assign the temporary value and defer restoration. Recorded this as a language/runtime replacement without adding Go generics or a fake OpenMP lock.
+
+Ledger and diff validation pass. Inventory is now2102 units,677 APIs:63 ported,287 partial,1747 unported, plus the separately classified platform replacements. No test run is attached to this no-code, no-consumer classification; the22:34 UTC full-suite checkpoint remains current.
