@@ -150,13 +150,21 @@ func (m *ASTManager) mkFamilyApp(fid FamilyID, k int32, ps []ASTParameter, args 
 			return m.mkApp(d, args)
 		}
 	}
+	return m.mkFamilyAppDomainArguments(fid, k, ps, SliceArguments(args))
+}
+
+func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTParameter, args AppArguments) (astNodeRef, error) {
 	// Source decl_plugin's expr overload builds a lexical ptr_buffer of sorts;
 	// basic directly routes common operators but the same sorts have no callbacks.
 	var inline [16]ASTHandle
 	domain := inline[:0]
 	var bytes uint64
 	defer func() { m.BudgetField.Release(bytes) }()
-	for _, h := range args {
+	for i := uint32(0); i < args.Count(); i++ {
+		h, e := args.At(i)
+		if e != nil {
+			return astNodeRef{}, e
+		}
 		r, e := m.requireExpr(h)
 		if e != nil {
 			return astNodeRef{}, e
@@ -197,7 +205,7 @@ func (m *ASTManager) mkFamilyApp(fid FamilyID, k int32, ps []ASTParameter, args 
 	if e != nil || decl.slot == 0 {
 		return astNodeRef{}, e
 	}
-	return m.mkApp(decl, args)
+	return m.mkAppArguments(decl, args)
 }
 func (m *ASTManager) MkFamilyApp(fid FamilyID, k int32, ps []ASTParameter, args []ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {

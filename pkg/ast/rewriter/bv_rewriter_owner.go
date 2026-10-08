@@ -21,6 +21,8 @@ type BVRewriter struct {
 	bvFamily, arithFamily ast.FamilyID
 	polynomial            *BVPolynomialRewriter
 	extract               MkExtractProc
+	extraction            *bvExtractInvocation
+	propagation           *bvExtractPropagation
 	trailing              *BVTrailing
 	eqRemainder           *ast.BitVectorRemainderEqualityNumerals
 	mkbv                  *ast.BitVectorMkBVNumerals
@@ -208,6 +210,18 @@ func (p *BVRewriter) Close() error {
 	}
 	p.repeatArgs.Close(p.manager.Budget())
 	p.bitwiseArgs.Close(p.manager.Budget())
+	if p.propagation != nil {
+		if e := p.propagation.close(p.manager); e != nil {
+			return e
+		}
+		p.propagation = nil
+	}
+	if p.extraction != nil {
+		if e := p.extraction.close(p.manager); e != nil {
+			return e
+		}
+		p.extraction = nil
+	}
 	if p.bvxor != nil {
 		if e := p.bvxor.close(p.manager); e != nil {
 			return e

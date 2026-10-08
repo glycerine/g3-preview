@@ -13,6 +13,21 @@ func (m *ASTManager) MkBitVectorXorArguments(args AppArguments) (ASTHandle, erro
 	return m.mkBitVectorArguments(33, args)
 }
 
+// Source: src/ast/bv_decl_plugin.h:404.
+// MkBitVectorConcatArguments borrows the original argument array, including
+// suffix ranges used when extract propagation removes a leading segment.
+func (m *ASTManager) MkBitVectorConcatArguments(args AppArguments) (ASTHandle, error) {
+	if e := m.lock(); e != nil {
+		return ASTHandle{}, e
+	}
+	defer m.mu.Unlock()
+	if m.bitVectorPlugin == nil {
+		return ASTHandle{}, ErrASTDomain
+	}
+	r, e := m.mkFamilyAppDomainArguments(m.bitVectorPlugin.family, 37, nil, args)
+	return m.external(r), e
+}
+
 func (m *ASTManager) mkBitVectorArguments(kind int32, args AppArguments) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e

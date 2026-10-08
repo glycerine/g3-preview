@@ -9665,7 +9665,9 @@
         "pkg/ast/ast_array_callbacks.go",
         "pkg/ast/ast_app_coercion.go",
         "pkg/ast/ast_arith_decl_test.go",
-        "pkg/ast/ast_dec_ref_consumed_test.go"
+        "pkg/ast/ast_dec_ref_consumed_test.go",
+        "pkg/ast/ast_bv_arguments.go",
+        "pkg/ast/ast_bv_concat_arguments_test.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -9856,7 +9858,8 @@
         "TestASTArithmeticOriginalMixedApplications",
         "TestASTArithmeticExpressionOverloadReadErasure",
         "TestASTArithmeticAppCoercionEveryWarmReservation",
-        "TestASTDecRefConsumedActualDeletionRefusal"
+        "TestASTDecRefConsumedActualDeletionRefusal",
+        "TestASTBitVectorConcatBorrowedSuffix"
       ],
       "conditionals": [
         {
@@ -10930,6 +10933,14 @@
           "tests": [
             "TestASTDecRefConsumedActualDeletionRefusal"
           ]
+        },
+        {
+          "name": "Original concat factory over borrowed source argument suffixes: shared lexical inline16/doubling SORT domain and unchanged declaration/candidate application factory (src/ast/bv_decl_plugin.h:404; src/ast/ast.cpp:1568-1638)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_arguments.go",
+          "tests": [
+            "TestASTBitVectorConcatBorrowedSuffix"
+          ]
         }
       ],
       "ownership": [
@@ -10966,7 +10977,8 @@
         "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies.",
         "AppArgumentView exposes borrowed application storage to the evaluator. Indexed reads validate the application handle and support factory callbacks under the manager lock without public-manager reentry; original application ownership must outlive the view.",
         "The selected original Int/Real coercion pass is now implemented for associative and ordinary arithmetic domains, including other-family declarations such as array select/store. Cast direction follows the expected sort kind, calls the actual arithmetic OP_TO_REAL/OP_TO_INT declaration dispatch and leaves nonarithmetic mismatches for check_args rejection. The explicit Go returning-error continuation names unpublished INCs and qualifies cleanup refusal; native allocation/exception/TRACE and complete owner/representation audits remain open.",
-        "DecRefConsumed exposes the existing Go deletion transport consumption result so extraction cache owners retire acquired references on later deletion failure. The original DecRef API retains its behavior. This is a checked Go ownership adapter, not an added native algorithm or whole-unit pointer/destructor/ABI audit credit."
+        "DecRefConsumed exposes the existing Go deletion transport consumption result so extraction cache owners retire acquired references on later deletion failure. The original DecRef API retains its behavior. This is a checked Go ownership adapter, not an added native algorithm or whole-unit pointer/destructor/ABI audit credit.",
+        "The concrete AppArguments suffix reader avoids an extra pointer-buffer copy when extraction propagation removes a complete leading concat segment. Existing family fallback domain construction is shared without changing its numerical sort/declaration/application order or existing failure-cleanup qualifications. Borrowed suffix tests check mixed-width output, hash-cons identity, domain growth and source-application expiry; propagation every-reservation campaigns cover both suffix and shortened-head paths."
       ]
     },
     {
@@ -13619,7 +13631,9 @@
         "pkg/ast/ast_bv_numeric_caller_invocation_test.go",
         "pkg/ast/ast_bv_extract_bounds.go",
         "pkg/ast/ast_bv_extract_bounds_test.go",
-        "pkg/ast/ast_bv_arguments_test.go"
+        "pkg/ast/ast_bv_arguments_test.go",
+        "pkg/ast/ast_core_plugin_dispatch.go",
+        "pkg/ast/ast_bv_concat_arguments_test.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -13649,7 +13663,8 @@
         "TestASTBitVectorNumericCallerExactEveryActualReservation",
         "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases",
         "TestASTBitVectorExtractBoundsOriginalParameters",
-        "TestASTBitVectorBorrowedXORFactoryAndLifetime"
+        "TestASTBitVectorBorrowedXORFactoryAndLifetime",
+        "TestASTBitVectorConcatBorrowedSuffix"
       ],
       "conditionals": [
         {
@@ -13813,6 +13828,14 @@
           "tests": [
             "TestASTBitVectorBorrowedXORFactoryAndLifetime"
           ]
+        },
+        {
+          "name": "Original concat factory over borrowed source argument suffixes: shared lexical inline16/doubling SORT domain and unchanged declaration/candidate application factory (src/ast/bv_decl_plugin.h:404; src/ast/ast.cpp:1568-1638)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_arguments.go",
+          "tests": [
+            "TestASTBitVectorConcatBorrowedSuffix"
+          ]
         }
       ],
       "ownership": [
@@ -13837,7 +13860,8 @@
         "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited.",
         "Selected parameter-free numeral predicate exposes the existing original identity algorithm for BV reducers. Missing registered plugin and invalid Go handle/kind domains retain checked adapter behavior; native whole-header pointer/union/assertion/ownership audit is not credited.",
         "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition now uses this factory in its post-core reduction and still requires its original polynomial core.",
-        "The new exact norm/inverse entry points delegate already implemented original bodies, preserving existing DEBUG/release/global-slot/transport/normalization qualifications. Caller tokens name actual frames rather than adopting ambient numerical ownership. Returned unsigned norm is not the coefficient copy-assignment helper. Full mk_mul_eq and broader BV configuration/equality/solver dispatch remain required; no whole source unit is promoted and explicit Go owning cleanup is not native-fatal resumability."
+        "The new exact norm/inverse entry points delegate already implemented original bodies, preserving existing DEBUG/release/global-slot/transport/normalization qualifications. Caller tokens name actual frames rather than adopting ambient numerical ownership. Returned unsigned norm is not the coefficient copy-assignment helper. Full mk_mul_eq and broader BV configuration/equality/solver dispatch remain required; no whole source unit is promoted and explicit Go owning cleanup is not native-fatal resumability.",
+        "The concrete AppArguments suffix reader avoids an extra pointer-buffer copy when extraction propagation removes a complete leading concat segment. Existing family fallback domain construction is shared without changing its numerical sort/declaration/application order or existing failure-cleanup qualifications. Borrowed suffix tests check mixed-width output, hash-cons identity, domain growth and source-application expiry; propagation every-reservation campaigns cover both suffix and shortened-head paths."
       ]
     },
     {
@@ -21332,7 +21356,14 @@
         "pkg/ast/rewriter/bv_rewriter_or_numeric_test.go",
         "pkg/ast/rewriter/bv_rewriter_xor.go",
         "pkg/ast/rewriter/bv_rewriter_xor_test.go",
-        "pkg/ast/rewriter/bv_rewriter_xor_numeric_test.go"
+        "pkg/ast/rewriter/bv_rewriter_xor_numeric_test.go",
+        "pkg/ast/rewriter/bv_rewriter_extract.go",
+        "pkg/ast/rewriter/bv_rewriter_extract_test.go",
+        "pkg/ast/rewriter/bv_rewriter_extract_numeric_test.go",
+        "pkg/ast/rewriter/bv_rewriter_extract_propagation.go",
+        "pkg/ast/rewriter/bv_rewriter_extract_propagation_test.go",
+        "pkg/ast/ast_bv_extract_numerals.go",
+        "pkg/ast/ast_bv_extract_numerals_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21508,7 +21539,16 @@
         "TestBVRewriterXOROriginalBranchesAndStatuses",
         "TestBVRewriterXOREveryColdReservationAndPublication",
         "TestBVRewriterXORSortingFlatConfigurationAndErasedSingleton",
-        "TestBVRewriterXOREveryActualNumericAndMaskReservation"
+        "TestBVRewriterXOREveryActualNumericAndMaskReservation",
+        "TestBVRewriterExtractOriginalBranchesAndStatuses",
+        "TestBVRewriterExtractEveryColdReservationAndPublication",
+        "TestBVRewriterExtractEveryActualNumericReservation",
+        "TestBVRewriterExtractPropagationConfigurationAndIdentity",
+        "TestBVRewriterExtractPropagationEveryActualNumericReservation",
+        "TestBVRewriterExtractPropagationOriginalOrderAndShapes",
+        "TestBVRewriterExtractPropagationEveryColdReservation",
+        "TestASTBitVectorExtractNumeralsEveryActualReservation",
+        "TestASTBitVectorExtractNumeralsExpressionCleanupRetainsOlderDefault"
       ],
       "conditionals": [
         {
@@ -22690,6 +22730,37 @@
             "TestBVRewriterXORSortingFlatConfigurationAndErasedSingleton",
             "TestBVRewriterXOREveryActualNumericAndMaskReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_extract: whole-width erasure before default v, original negative modulo/result-width and saturating shifts, nested fusion, concat routing/statuses, ordered operation distribution, configured propagation and ITE routing (src/ast/rewriter/bv_rewriter.cpp:668-790; src/ast/rewriter/bv_rewriter.h:85)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_extract.go",
+          "tests": [
+            "TestBVRewriterExtractOriginalBranchesAndStatuses",
+            "TestBVRewriterExtractEveryColdReservationAndPublication",
+            "TestBVRewriterExtractEveryActualNumericReservation",
+            "TestBVRewriterExtractPropagationConfigurationAndIdentity",
+            "TestBVRewriterExtractPropagationEveryActualNumericReservation"
+          ]
+        },
+        {
+          "name": "Complete selected propagate_extract: ADD/MUL/top guards, single default val, order-dependent numerical/symbolic prefix scan, shortened numerals, borrowed concat suffix and original raw operation rebuilding (src/ast/rewriter/bv_rewriter.cpp:590-666; src/ast/rewriter/bv_rewriter.h:84)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_extract_propagation.go",
+          "tests": [
+            "TestBVRewriterExtractPropagationOriginalOrderAndShapes",
+            "TestBVRewriterExtractPropagationEveryColdReservation",
+            "TestBVRewriterExtractPropagationEveryActualNumericReservation"
+          ]
+        },
+        {
+          "name": "Exact extraction/propagation numerical authority: one default v/val, distinct reached power and ui64 literal, void aliased modulo/division, captured numeral factory and expression cleanup before older v (src/ast/rewriter/bv_rewriter.cpp:590-666,668-690; src/util/util.h:133-139)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_extract_numerals.go",
+          "tests": [
+            "TestASTBitVectorExtractNumeralsEveryActualReservation",
+            "TestASTBitVectorExtractNumeralsExpressionCleanupRetainsOlderDefault"
+          ]
         }
       ],
       "ownership": [
@@ -22731,7 +22802,8 @@
         "The derived BV owner retains is_negatable default r and a distinct reached bitwise_not result. Exact scalar invocation captures the actual utility RAW complement child; successful return physically copies into r and ends the temporary at assignment before BV numeral factory entry. r remains live through output assignment, then source end. Exact stopped factory children join before older scalar/numerical values on owning close; copied/stopped owner guards and source/body history survive cleanup. False predicates do not read caller output storage. The numerical owner stays in pkg/ast to access existing manager-owned rational/factory continuations without changing pkg boundaries or introducing import cycles.",
         "The OR/XOR numerical prerequisite owns original default v1 then v2, and captures actual scalar bitwise RAW, normalization and numeral-factory children. Reached returned bitwise values are physically copied into v1 before source destruction. Power, signed literal one and subtraction return remain through caller comparison or numeral publication; opposite XOR toggles end the younger bitwise return first. Repeated mask all-one expressions preserve older literal two. Each modulo condition destroys its return before the void aliased division body. Stopped children and placed values remain for explicit owning cleanup; copied-owner guards and child history survive cleanup. The structural caller must construct this owner after its source mark planes and provide source buffer/reference destruction ordering.",
         "The derived BV owner retains the exact stopped OR frame: borrowed inline16/doubling flat/new/branch pointer buffers, concrete positive mark plane1 then negative mark plane2, default v1/v2 numerical owner, exact zero-bit/unsigned-zero/numeral/normalization/bitwise child receipts and original persistent cached extraction member. Successful assignment ends all-one expression temporaries before mask pieces/two, then v2/v1 before negative/positive marks and older argument buffers. Owning cleanup joins exact numerical children/younger temporaries before releasing the branch buffer, then older two/v2/v1 and mark planes in reverse order. Full-expression cleanup does not credit an unreached source return; stopped replay and already-consumed old-output decrements are preserved.",
-        "The derived BV owner retains the stopped XOR frame: borrowed flat/new argument buffers, actual positive plane1 then negative plane2 before v1/v2, exact scalar/numeral/all-one/unsigned-zero child receipts, mask literal two, owning inline16/doubling expr_ref_buffer and younger owning not_t, or the final rebuild owning constant c even when unused. Each original polarity collision clears its reached mark before all-one XOR expression entry. Mask pushes INC before buffer growth and retain any uninserted incoming INC on refusal for explicit owning cleanup; source success ends not_t before forward buffer DEC, then two/v2/v1 before negative/positive marks and older flat buffer. Rebuild c ends before its borrowed buffer and numerical locals. Publication precedes those source ends; already-consumed old-output decrements and sticky caller history survive cleanup."
+        "The derived BV owner retains the stopped XOR frame: borrowed flat/new argument buffers, actual positive plane1 then negative plane2 before v1/v2, exact scalar/numeral/all-one/unsigned-zero child receipts, mask literal two, owning inline16/doubling expr_ref_buffer and younger owning not_t, or the final rebuild owning constant c even when unused. Each original polarity collision clears its reached mark before all-one XOR expression entry. Mask pushes INC before buffer growth and retain any uninserted incoming INC on refusal for explicit owning cleanup; source success ends not_t before forward buffer DEC, then two/v2/v1 before negative/positive marks and older flat buffer. Rebuild c ends before its borrowed buffer and numerical locals. Publication precedes those source ends; already-consumed old-output decrements and sticky caller history survive cleanup.",
+        "The BV owner retains younger propagation before extraction: exact single-default numerical scopes, captured scalar/power/literal/factory receipts, borrowed inline16/doubling argument buffers and the extraction ep_res reference constructed even when propagation returns zero. Success publishes before reached ui64 literal/ep_res/buffers/default v source ends. Failed numerical children join before older buffers/defaults; output INC/consumed old DEC and sticky replay/history survive owning cleanup. Removing an entire concat head borrows AppArguments.Range directly and adds no argument-copy buffer reservation; only the original declaration sort-domain buffer remains."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -22772,7 +22844,8 @@
         "Three cold caller campaigns and fresh actual Runtime width65 campaigns cover numeric/bvnot/false branches, output publication followed by consumed old BOR32 decrement refusal, raw noncanonical stored-value copying, returned complement retirement, exact factory joining and zero-budget ownership closure. A deliberately nonunary raw bvnot declaration exercises the original DEBUG assertion and release first-child read as guarded-domain evidence, not ordinary valid C++ input. Native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source DT and whole-unit completion remain qualified. The larger bvnot rewrite and full dispatcher remain incomplete; no whole-unit promotion is credited.",
         "Sixteen fresh actual Runtime reservation campaigns cover OR/XOR accumulation, opposite-polarity toggles, all-one comparison/publication, all-one mask-run expressions with older two, and normalized OR versus unnormalized XOR mask scans at widths65/257. Independent big-integer values and bit oracles cover noncanonical stored numerals, changed stored-width metadata and symbolic reads preserving caller outputs. This completes only the numerical prerequisite; full OR/XOR control flow, original mark planes, buffer/reference scopes, final expression publication and dispatcher integration remain outstanding. Native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified; no whole-unit promotion is credited.",
         "Nineteen shape/status cases cover both polarities, numeric/zero/all-one/FAILED/coefficient paths, one-level flattening and equal-count discard, overlapping/disjoint/all-zero concats and original low-to-high mask runs reversed at publication. Eleven cold campaigns reach actual output publication followed by consumed BOR32 deletion refusal; four fresh Runtime campaigns cover raw noncanonical numeric OR at widths65/257, a 65-piece mask with buffer growth and width65 concat zero-bit children. Configured sorting, disabled flattening, non-BV singleton erasure and a source argument view invalidated at publication are checked. Concrete heapsort reuses the existing std::sort comparator/output-contract port; C++ library comparator/swap/refusal-prefix order is not credited. Nonempty/invalid-sort domains retain guarded adaptations and _TRACE-only copying/output remains qualified. XOR, full application dispatch and arithmetic/solver integration remain outstanding; native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. No whole-unit promotion is credited.",
-        "Twenty-two shape/status cases cover positive/negative duplicate parity, both opposite orders, repeated opposite toggles, first-survivor argument order, numeric/zero/FAILED paths, one-level flattening/equal-count discard, all-one final NOT and BR_REWRITE3 masks including direct singleton extraction. Twelve cold campaigns include original unused c construction and actual output publication followed by consumed old BOR32 deletion refusal. Five fresh Runtime campaigns cover noncanonical numerical XOR at widths65/257, opposite-polarity numeric/helper children, a 65-piece owning mask and a raw high-only mask whose original unnormalized scan returns one full-width extract of its input. Actual 16/32/64 growth refusals prove the completed incoming INC is retained and owning cleanup deletes the uninserted piece; all graphs close to zero budget. Sorting retains the existing std::sort comparator/output-contract qualification; guarded invalid domains, native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. Full application dispatch and arithmetic/solver integration remain outstanding; no whole-unit promotion is credited."
+        "Twenty-two shape/status cases cover positive/negative duplicate parity, both opposite orders, repeated opposite toggles, first-survivor argument order, numeric/zero/FAILED paths, one-level flattening/equal-count discard, all-one final NOT and BR_REWRITE3 masks including direct singleton extraction. Twelve cold campaigns include original unused c construction and actual output publication followed by consumed old BOR32 deletion refusal. Five fresh Runtime campaigns cover noncanonical numerical XOR at widths65/257, opposite-polarity numeric/helper children, a 65-piece owning mask and a raw high-only mask whose original unnormalized scan returns one full-width extract of its input. Actual 16/32/64 growth refusals prove the completed incoming INC is retained and owning cleanup deletes the uninserted piece; all graphs close to zero budget. Sorting retains the existing std::sort comparator/output-contract qualification; guarded invalid domains, native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. Full application dispatch and arithmetic/solver integration remain outstanding; no whole-unit promotion is credited.",
+        "Seventeen extraction branch/status cases, seven cold extraction campaigns, seven propagation order/shape cases, five propagation/helper/parent/ITE cold campaigns and four actual Runtime numeric campaigns cover source failures and independently modeled values/shapes. The source reduces negative inputs at RESULT width before shifting; the preserved -128[7:4] result is zero. Nonzero numeric concat prefixes are shortened rather than required to be zero, and a symbolic-first prefix scan keeps its original later sort-only checks. Cold publication tests reach real old BOR32 destruction refusal; all actual Runtime graphs close to zero budget. Invalid sorts/widths and unreachable malformed concat domains retain guarded adaptations. Native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, unspecified nested ITE argument evaluation order, independently stopped source destruction and fatal resumability remain qualified; TRACE-only output is not credited. Full BV comparison/application dispatch and solver integration remain outstanding; no whole source unit is promoted."
       ]
     },
     {
@@ -22941,7 +23014,14 @@
         "pkg/ast/rewriter/bv_rewriter_or_numeric_test.go",
         "pkg/ast/rewriter/bv_rewriter_xor.go",
         "pkg/ast/rewriter/bv_rewriter_xor_test.go",
-        "pkg/ast/rewriter/bv_rewriter_xor_numeric_test.go"
+        "pkg/ast/rewriter/bv_rewriter_xor_numeric_test.go",
+        "pkg/ast/rewriter/bv_rewriter_extract.go",
+        "pkg/ast/rewriter/bv_rewriter_extract_test.go",
+        "pkg/ast/rewriter/bv_rewriter_extract_numeric_test.go",
+        "pkg/ast/rewriter/bv_rewriter_extract_propagation.go",
+        "pkg/ast/rewriter/bv_rewriter_extract_propagation_test.go",
+        "pkg/ast/ast_bv_extract_numerals.go",
+        "pkg/ast/ast_bv_extract_numerals_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -23134,7 +23214,16 @@
         "TestBVRewriterXOROriginalBranchesAndStatuses",
         "TestBVRewriterXOREveryColdReservationAndPublication",
         "TestBVRewriterXORSortingFlatConfigurationAndErasedSingleton",
-        "TestBVRewriterXOREveryActualNumericAndMaskReservation"
+        "TestBVRewriterXOREveryActualNumericAndMaskReservation",
+        "TestBVRewriterExtractOriginalBranchesAndStatuses",
+        "TestBVRewriterExtractEveryColdReservationAndPublication",
+        "TestBVRewriterExtractEveryActualNumericReservation",
+        "TestBVRewriterExtractPropagationConfigurationAndIdentity",
+        "TestBVRewriterExtractPropagationEveryActualNumericReservation",
+        "TestBVRewriterExtractPropagationOriginalOrderAndShapes",
+        "TestBVRewriterExtractPropagationEveryColdReservation",
+        "TestASTBitVectorExtractNumeralsEveryActualReservation",
+        "TestASTBitVectorExtractNumeralsExpressionCleanupRetainsOlderDefault"
       ],
       "conditionals": [
         {
@@ -23872,6 +23961,37 @@
             "TestBVRewriterXORSortingFlatConfigurationAndErasedSingleton",
             "TestBVRewriterXOREveryActualNumericAndMaskReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_extract: whole-width erasure before default v, original negative modulo/result-width and saturating shifts, nested fusion, concat routing/statuses, ordered operation distribution, configured propagation and ITE routing (src/ast/rewriter/bv_rewriter.cpp:668-790; src/ast/rewriter/bv_rewriter.h:85)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_extract.go",
+          "tests": [
+            "TestBVRewriterExtractOriginalBranchesAndStatuses",
+            "TestBVRewriterExtractEveryColdReservationAndPublication",
+            "TestBVRewriterExtractEveryActualNumericReservation",
+            "TestBVRewriterExtractPropagationConfigurationAndIdentity",
+            "TestBVRewriterExtractPropagationEveryActualNumericReservation"
+          ]
+        },
+        {
+          "name": "Complete selected propagate_extract: ADD/MUL/top guards, single default val, order-dependent numerical/symbolic prefix scan, shortened numerals, borrowed concat suffix and original raw operation rebuilding (src/ast/rewriter/bv_rewriter.cpp:590-666; src/ast/rewriter/bv_rewriter.h:84)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_extract_propagation.go",
+          "tests": [
+            "TestBVRewriterExtractPropagationOriginalOrderAndShapes",
+            "TestBVRewriterExtractPropagationEveryColdReservation",
+            "TestBVRewriterExtractPropagationEveryActualNumericReservation"
+          ]
+        },
+        {
+          "name": "Exact extraction/propagation numerical authority: one default v/val, distinct reached power and ui64 literal, void aliased modulo/division, captured numeral factory and expression cleanup before older v (src/ast/rewriter/bv_rewriter.cpp:590-666,668-690; src/util/util.h:133-139)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_extract_numerals.go",
+          "tests": [
+            "TestASTBitVectorExtractNumeralsEveryActualReservation",
+            "TestASTBitVectorExtractNumeralsExpressionCleanupRetainsOlderDefault"
+          ]
         }
       ],
       "ownership": [
@@ -23909,7 +24029,8 @@
         "The derived BV owner retains is_negatable default r and a distinct reached bitwise_not result. Exact scalar invocation captures the actual utility RAW complement child; successful return physically copies into r and ends the temporary at assignment before BV numeral factory entry. r remains live through output assignment, then source end. Exact stopped factory children join before older scalar/numerical values on owning close; copied/stopped owner guards and source/body history survive cleanup. False predicates do not read caller output storage. The numerical owner stays in pkg/ast to access existing manager-owned rational/factory continuations without changing pkg boundaries or introducing import cycles.",
         "The OR/XOR numerical prerequisite owns original default v1 then v2, and captures actual scalar bitwise RAW, normalization and numeral-factory children. Reached returned bitwise values are physically copied into v1 before source destruction. Power, signed literal one and subtraction return remain through caller comparison or numeral publication; opposite XOR toggles end the younger bitwise return first. Repeated mask all-one expressions preserve older literal two. Each modulo condition destroys its return before the void aliased division body. Stopped children and placed values remain for explicit owning cleanup; copied-owner guards and child history survive cleanup. The structural caller must construct this owner after its source mark planes and provide source buffer/reference destruction ordering.",
         "The derived BV owner retains the exact stopped OR frame: borrowed inline16/doubling flat/new/branch pointer buffers, concrete positive mark plane1 then negative mark plane2, default v1/v2 numerical owner, exact zero-bit/unsigned-zero/numeral/normalization/bitwise child receipts and original persistent cached extraction member. Successful assignment ends all-one expression temporaries before mask pieces/two, then v2/v1 before negative/positive marks and older argument buffers. Owning cleanup joins exact numerical children/younger temporaries before releasing the branch buffer, then older two/v2/v1 and mark planes in reverse order. Full-expression cleanup does not credit an unreached source return; stopped replay and already-consumed old-output decrements are preserved.",
-        "The derived BV owner retains the stopped XOR frame: borrowed flat/new argument buffers, actual positive plane1 then negative plane2 before v1/v2, exact scalar/numeral/all-one/unsigned-zero child receipts, mask literal two, owning inline16/doubling expr_ref_buffer and younger owning not_t, or the final rebuild owning constant c even when unused. Each original polarity collision clears its reached mark before all-one XOR expression entry. Mask pushes INC before buffer growth and retain any uninserted incoming INC on refusal for explicit owning cleanup; source success ends not_t before forward buffer DEC, then two/v2/v1 before negative/positive marks and older flat buffer. Rebuild c ends before its borrowed buffer and numerical locals. Publication precedes those source ends; already-consumed old-output decrements and sticky caller history survive cleanup."
+        "The derived BV owner retains the stopped XOR frame: borrowed flat/new argument buffers, actual positive plane1 then negative plane2 before v1/v2, exact scalar/numeral/all-one/unsigned-zero child receipts, mask literal two, owning inline16/doubling expr_ref_buffer and younger owning not_t, or the final rebuild owning constant c even when unused. Each original polarity collision clears its reached mark before all-one XOR expression entry. Mask pushes INC before buffer growth and retain any uninserted incoming INC on refusal for explicit owning cleanup; source success ends not_t before forward buffer DEC, then two/v2/v1 before negative/positive marks and older flat buffer. Rebuild c ends before its borrowed buffer and numerical locals. Publication precedes those source ends; already-consumed old-output decrements and sticky caller history survive cleanup.",
+        "The BV owner retains younger propagation before extraction: exact single-default numerical scopes, captured scalar/power/literal/factory receipts, borrowed inline16/doubling argument buffers and the extraction ep_res reference constructed even when propagation returns zero. Success publishes before reached ui64 literal/ep_res/buffers/default v source ends. Failed numerical children join before older buffers/defaults; output INC/consumed old DEC and sticky replay/history survive owning cleanup. Removing an entire concat head borrows AppArguments.Range directly and adds no argument-copy buffer reservation; only the original declaration sort-domain buffer remains."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -23948,7 +24069,8 @@
         "Three cold caller campaigns and fresh actual Runtime width65 campaigns cover numeric/bvnot/false branches, output publication followed by consumed old BOR32 decrement refusal, raw noncanonical stored-value copying, returned complement retirement, exact factory joining and zero-budget ownership closure. A deliberately nonunary raw bvnot declaration exercises the original DEBUG assertion and release first-child read as guarded-domain evidence, not ordinary valid C++ input. Native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source DT and whole-unit completion remain qualified. The larger bvnot rewrite and full dispatcher remain incomplete; no whole-unit promotion is credited.",
         "Sixteen fresh actual Runtime reservation campaigns cover OR/XOR accumulation, opposite-polarity toggles, all-one comparison/publication, all-one mask-run expressions with older two, and normalized OR versus unnormalized XOR mask scans at widths65/257. Independent big-integer values and bit oracles cover noncanonical stored numerals, changed stored-width metadata and symbolic reads preserving caller outputs. This completes only the numerical prerequisite; full OR/XOR control flow, original mark planes, buffer/reference scopes, final expression publication and dispatcher integration remain outstanding. Native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified; no whole-unit promotion is credited.",
         "Nineteen shape/status cases cover both polarities, numeric/zero/all-one/FAILED/coefficient paths, one-level flattening and equal-count discard, overlapping/disjoint/all-zero concats and original low-to-high mask runs reversed at publication. Eleven cold campaigns reach actual output publication followed by consumed BOR32 deletion refusal; four fresh Runtime campaigns cover raw noncanonical numeric OR at widths65/257, a 65-piece mask with buffer growth and width65 concat zero-bit children. Configured sorting, disabled flattening, non-BV singleton erasure and a source argument view invalidated at publication are checked. Concrete heapsort reuses the existing std::sort comparator/output-contract port; C++ library comparator/swap/refusal-prefix order is not credited. Nonempty/invalid-sort domains retain guarded adaptations and _TRACE-only copying/output remains qualified. XOR, full application dispatch and arithmetic/solver integration remain outstanding; native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. No whole-unit promotion is credited.",
-        "Twenty-two shape/status cases cover positive/negative duplicate parity, both opposite orders, repeated opposite toggles, first-survivor argument order, numeric/zero/FAILED paths, one-level flattening/equal-count discard, all-one final NOT and BR_REWRITE3 masks including direct singleton extraction. Twelve cold campaigns include original unused c construction and actual output publication followed by consumed old BOR32 deletion refusal. Five fresh Runtime campaigns cover noncanonical numerical XOR at widths65/257, opposite-polarity numeric/helper children, a 65-piece owning mask and a raw high-only mask whose original unnormalized scan returns one full-width extract of its input. Actual 16/32/64 growth refusals prove the completed incoming INC is retained and owning cleanup deletes the uninserted piece; all graphs close to zero budget. Sorting retains the existing std::sort comparator/output-contract qualification; guarded invalid domains, native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. Full application dispatch and arithmetic/solver integration remain outstanding; no whole-unit promotion is credited."
+        "Twenty-two shape/status cases cover positive/negative duplicate parity, both opposite orders, repeated opposite toggles, first-survivor argument order, numeric/zero/FAILED paths, one-level flattening/equal-count discard, all-one final NOT and BR_REWRITE3 masks including direct singleton extraction. Twelve cold campaigns include original unused c construction and actual output publication followed by consumed old BOR32 deletion refusal. Five fresh Runtime campaigns cover noncanonical numerical XOR at widths65/257, opposite-polarity numeric/helper children, a 65-piece owning mask and a raw high-only mask whose original unnormalized scan returns one full-width extract of its input. Actual 16/32/64 growth refusals prove the completed incoming INC is retained and owning cleanup deletes the uninserted piece; all graphs close to zero budget. Sorting retains the existing std::sort comparator/output-contract qualification; guarded invalid domains, native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, independently stopped source destruction and fatal resumability remain qualified. Full application dispatch and arithmetic/solver integration remain outstanding; no whole-unit promotion is credited.",
+        "Seventeen extraction branch/status cases, seven cold extraction campaigns, seven propagation order/shape cases, five propagation/helper/parent/ITE cold campaigns and four actual Runtime numeric campaigns cover source failures and independently modeled values/shapes. The source reduces negative inputs at RESULT width before shifting; the preserved -128[7:4] result is zero. Nonzero numeric concat prefixes are shortened rather than required to be zero, and a symbolic-first prefix scan keeps its original later sort-only checks. Cold publication tests reach real old BOR32 destruction refusal; all actual Runtime graphs close to zero budget. Invalid sorts/widths and unreachable malformed concat domains retain guarded adaptations. Native stack/layout/temporary-elision/allocator/assertion/fatal/exception ABI, unspecified nested ITE argument evaluation order, independently stopped source destruction and fatal resumability remain qualified; TRACE-only output is not credited. Full BV comparison/application dispatch and solver integration remain outstanding; no whole source unit is promoted."
       ]
     },
     {
