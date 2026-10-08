@@ -145693,9 +145693,17 @@
       "path": "src/util/pool.h",
       "component": "util",
       "role": "production",
-      "status": "platform_replacement",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/pool.go",
+        "pkg/util/pool_test.go"
+      ],
+      "tests": [
+        "TestPoolLIFOReuseAndFactoryOnlyWhenEmpty",
+        "TestPoolRetainsCachedObjectsAcrossGarbageCollection",
+        "TestPoolCloseDestroysCachedObjectsForwardAndLeavesCheckedOutAlone",
+        "TestPoolOwnerAndPointerPreconditions"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -145708,10 +145716,42 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "pool::pool and pool::~pool establish an empty cache and destroy every cached object from first to last",
+          "status": "ported",
+          "go_target": "pkg/util/pool.go",
+          "tests": [
+            "TestPoolCloseDestroysCachedObjectsForwardAndLeavesCheckedOutAlone",
+            "TestPoolOwnerAndPointerPreconditions"
+          ]
+        },
+        {
+          "name": "pool::mk allocates when empty and otherwise removes and returns the last recycled object",
+          "status": "ported",
+          "go_target": "pkg/util/pool.go",
+          "tests": [
+            "TestPoolLIFOReuseAndFactoryOnlyWhenEmpty",
+            "TestPoolRetainsCachedObjectsAcrossGarbageCollection"
+          ]
+        },
+        {
+          "name": "pool::recycle appends the transferred object to the retained cache",
+          "status": "ported",
+          "go_target": "pkg/util/pool.go",
+          "tests": [
+            "TestPoolLIFOReuseAndFactoryOnlyWhenEmpty",
+            "TestPoolRetainsCachedObjectsAcrossGarbageCollection"
+          ]
+        }
+      ],
+      "ownership": [
+        "Recycle transfers a nonnil pointer to the pool. A strong slice reference retains every cached object across garbage collections until Mk transfers it back to the caller or Close disposes it.",
+        "Mk transfers the returned object to the caller. Close processes cached objects in insertion order and does not touch checked-out objects, matching the source destructor's ownership boundary."
+      ],
       "deviations": [
-        "The complete header is a generic reusable-object cache: mk returns a cached object or allocates one, recycle caches an object, and destruction deletes cached objects. Both retained pool<enode_vector> consumers in src/smt/mam.cpp reset every object immediately after mk and do not observe cache size or identity. Their Go ports must use a concrete sync.Pool with New constructing the vector, Get followed by reset, and Put for recycling. Go garbage collection replaces explicit cached-object destruction. sync.Pool may discard cached values at any collection, which is observationally equivalent because a fresh reset vector has the same project state. No generic or any-valued util pool wrapper is created, and no C++ standard-library vector/for_each machinery is ported."
+        "The source T template becomes a non-generic any-valued API that rejects nil and nonpointer values. Constructor and destructor behavior are supplied by factory and optional destroy callbacks; nil destroy delegates final memory reclamation to Go garbage collection.",
+        "A Go slice replaces ptr_vector storage while preserving strong retention, LIFO reuse and forward-order disposal. sync.Pool is intentionally not used because it may discard cached objects during garbage collection and therefore cannot preserve the source ownership contract."
       ]
     },
     {

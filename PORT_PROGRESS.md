@@ -30489,9 +30489,9 @@ Focused native and g3debug list checks pass (0.033s/0.029s). Util vet, ledger an
 
 ### util file: pool.h
 
-Audited the complete generic object-cache header and both retained pool<enode_vector> consumers in src/smt/mam.cpp. Each consumer resets every value immediately after retrieval and observes neither cache occupancy nor object identity. Recorded pool.h as a Go standard-library replacement: the eventual concrete consumers must use sync.Pool with New constructing an empty vector, Get followed by reset, and Put for recycling. Go garbage collection replaces deletion of cached objects; sync.Pool discarding cached values is observationally equivalent to the source allocating a fresh reset vector.
+Corrected the earlier replacement classification and ported the complete object-pool contract as exported NewPool, Pool.Mk, Pool.Recycle, Pool.Cached and Pool.Close APIs. The source template becomes a non-generic dynamically typed pointer boundary. An explicit Go slice strongly retains every recycled object, returns the most recently recycled object first, and disposes all still-cached objects from first to last at Close; checked-out objects remain caller-owned. Factory and optional destroy callbacks replace source construction and deletion without porting C++ library machinery.
 
-No generic or any-valued util pool facade, C++ vector translation, or test of Go's standard library was added. Ledger and diff validation pass. Inventory is now2102 units,677 APIs:71 ported,287 partial,1737 unported, plus the separately classified platform replacements. The22:34 UTC full-suite checkpoint remains current.
+Focused tests prove exact LIFO identity, allocation only on an empty cache, retention across repeated garbage collections, forward disposal order, checked-out ownership, and owner/pointer preconditions. sync.Pool was rejected because its documented permission to discard cached values during garbage collection is not equivalent to pool.h's deterministic ownership. Focused native and g3debug checks, util vet, ledger and diff validation pass. Inventory is now 2102 units, 677 APIs: 77 ported, 286 partial, 1730 unported, plus separately classified platform replacements. The 22:34 UTC full-suite checkpoint remains current.
 
 ### util file: top_sort.h
 
