@@ -30458,3 +30458,9 @@ Ported the complete retained behavior as exported BacktrackableSet and Backtrack
 Corrected src/util/backtrackable_set.h:62-65. Its level-zero erase branch calls insert, while the scoped branch and method contract remove the element. The Go implementation deletes it, and the focused regression distinguishes the incorrect retained value from the required empty result.
 
 Focused native and g3debug backtrackable-set checks pass (0.004s/0.005s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:66 ported,287 partial,1744 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
+
+### util file: uint_map.h
+
+Ported the dense unsigned-to-pointer adapter as exported UintPtrMap. The distinct name avoids collision with the existing UintMap port of u_map<unsigned> from src/util/map.h. A dense slot slice preserves sparse growth, O(1) contains/find, replacement, erase and reset; an explicit presence bit keeps hot queries free of reflection. Insert validates once that the dynamic value is a non-nil Go pointer, preserving the source T* constraint and pointer identity without generics. Focused tests cover holes, growth, replacement, absent lookup, typed nil and non-pointer rejection, out-of-range erase, reset and equal-content distinct pointers.
+
+Focused native and g3debug UintMap/UintPtrMap checks pass (0.181s each). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:67 ported,287 partial,1743 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.

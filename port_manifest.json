@@ -153945,9 +153945,16 @@
       "path": "src/util/uint_map.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/uint_ptr_map.go",
+        "pkg/util/uint_ptr_map_test.go"
+      ],
+      "tests": [
+        "TestUintPtrMapSparseInsertFindReplaceEraseAndReset",
+        "TestUintPtrMapMissingAndNilValuesPanic",
+        "TestUintPtrMapPointerIdentity"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -153968,11 +153975,44 @@
           "text": "SASSERT(contains(k));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "contains and both find overloads",
+          "status": "ported",
+          "go_target": "pkg/util/uint_ptr_map.go",
+          "tests": [
+            "TestUintPtrMapSparseInsertFindReplaceEraseAndReset",
+            "TestUintPtrMapMissingAndNilValuesPanic"
+          ]
+        },
+        {
+          "name": "insert sparse growth and replacement",
+          "status": "ported",
+          "go_target": "pkg/util/uint_ptr_map.go",
+          "tests": [
+            "TestUintPtrMapSparseInsertFindReplaceEraseAndReset",
+            "TestUintPtrMapPointerIdentity",
+            "TestUintPtrMapMissingAndNilValuesPanic"
+          ]
+        },
+        {
+          "name": "erase and reset",
+          "status": "ported",
+          "go_target": "pkg/util/uint_ptr_map.go",
+          "tests": [
+            "TestUintPtrMapSparseInsertFindReplaceEraseAndReset"
+          ]
+        }
+      ],
+      "ownership": [
+        "UintPtrMap exclusively owns its dense slot slice and retains non-nil Go pointers as interface values. Erase and Reset clear slots so the pointed-to objects are no longer retained by the map; the map never owns or finalizes those objects."
+      ],
+      "deviations": [
+        "The existing exported UintMap name belongs to the concrete u_map<unsigned> port from src/util/map.h, so this source uint_map<T*> becomes UintPtrMap. A []uintPtrMapSlot replaces ptr_vector<T>; an explicit present bit keeps Contains hot without reflection, while Insert performs one cold reflection check that the dynamic value is a non-nil pointer.",
+        "Find returns (any, bool), while Get is the source asserted find overload and panics for an absent key. Insert panics for nil or non-pointer values, adapting the source T* compile-time constraint and post-insert assertion."
+      ]
     },
     {
       "path": "src/util/uint_set.h",
