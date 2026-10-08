@@ -148629,10 +148629,10 @@
       "path": "src/util/resource_limit.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/util/util_search_resource_limit.go",
-        "pkg/util/util_search_resource_limit_test.go"
+        "pkg/util/resource_limit.go",
+        "pkg/util/resource_limit_test.go"
       ],
       "tests": [
         "TestSearchResourceLimitCounterBoundaryAndReset",
@@ -148653,13 +148653,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "resource_limit cold virtual contract; concrete base constructor and trivial destruction",
           "status": "ported",
-          "go_target": "pkg/util/util_search_resource_limit.go",
+          "go_target": "pkg/util/resource_limit.go",
           "tests": [
             "TestSearchResourceLimitCounterBoundaryAndReset",
             "TestSearchResourceLimitLinearSignedPolicies",
@@ -148673,7 +148673,7 @@
         {
           "name": "base counters, limits, descriptions, setters and reset",
           "status": "ported",
-          "go_target": "pkg/util/util_search_resource_limit.go",
+          "go_target": "pkg/util/resource_limit.go",
           "tests": [
             "TestSearchResourceLimitCounterBoundaryAndReset",
             "TestSearchResourceLimitLinearSignedPolicies",
@@ -148687,7 +148687,7 @@
         {
           "name": "li_resource_limit constructor and literal addition-before-maximum increment",
           "status": "ported",
-          "go_target": "pkg/util/util_search_resource_limit.go",
+          "go_target": "pkg/util/resource_limit.go",
           "tests": [
             "TestSearchResourceLimitCounterBoundaryAndReset",
             "TestSearchResourceLimitLinearSignedPolicies",
@@ -148701,7 +148701,7 @@
         {
           "name": "ei_resource_limit constructor and double-product conversion-before-maximum increment",
           "status": "ported",
-          "go_target": "pkg/util/util_search_resource_limit.go",
+          "go_target": "pkg/util/resource_limit.go",
           "tests": [
             "TestSearchResourceLimitCounterBoundaryAndReset",
             "TestSearchResourceLimitLinearSignedPolicies",
@@ -148713,10 +148713,14 @@
           ]
         },
         {
-          "name": "TRACE rejected limit increment through process-global diagnostic stream",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "name": "TRACE-only rejected-limit diagnostic omitted while preserving the false return and unchanged limit",
+          "status": "ported",
+          "go_target": "pkg/util/resource_limit.go",
+          "tests": [
+            "TestSearchResourceLimitCounterBoundaryAndReset",
+            "TestSearchResourceLimitLinearSignedPolicies",
+            "TestSearchResourceLimitExponentialTruncatesBeforeMaximum"
+          ]
         }
       ],
       "ownership": [
@@ -148724,7 +148728,7 @@
       ],
       "deviations": [
         "Source signed int is represented by int32. Reached signed counter/addition overflow and nonfinite/out-of-range double-to-int conversion are explicit guarded undefined domains, without publishing wrapped state.",
-        "Raw CString process addresses differ; null and present-empty descriptions remain distinct and NUL truncation preserves source spelling. Source TRACE diagnostic stream remains open."
+        "Raw CString process addresses differ; null and present-empty descriptions remain distinct and NUL truncation preserves source spelling. Rejected increments return false directly; the source's optional TRACE-only diagnostic has no state or control-flow effect and is omitted instead of recreating a C++ global stream."
       ]
     },
     {
