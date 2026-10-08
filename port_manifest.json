@@ -21205,7 +21205,10 @@
         "pkg/ast/rewriter/bv_rewriter_smod.go",
         "pkg/ast/rewriter/bv_rewriter_smod_test.go",
         "pkg/ast/ast_bv_smod_numerals.go",
-        "pkg/ast/ast_bv_smod_numerals_test.go"
+        "pkg/ast/ast_bv_smod_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_scalar.go",
+        "pkg/ast/rewriter/bv_rewriter_scalar_test.go",
+        "pkg/ast/ast_bv_scalar_invocation_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21332,7 +21335,10 @@
         "TestASTBitVectorUnsignedRemainderEveryActualReservation",
         "TestBVRewriterSignedModuloOriginalBranches",
         "TestBVRewriterSignedModuloEveryColdReservationAndPublication",
-        "TestASTBitVectorSignedModuloEveryActualReservation"
+        "TestASTBitVectorSignedModuloEveryActualReservation",
+        "TestBVRewriterScalarOperatorsOnDerivedOwner",
+        "TestBVRewriterScalarEveryColdReservationAndPublication",
+        "TestASTBitVectorReductionANDCallerEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -22305,6 +22311,23 @@
           "tests": [
             "TestASTBitVectorSignedModuloEveryActualReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_bv_redor/mk_bv_redand/mk_bv_comp through persistent BV owner: original kind/zero/default-r/raw comparison and identity/numeral/conditional guard order, exact output status and child lifetime (src/ast/rewriter/bv_rewriter.cpp:2040-2074; src/ast/rewriter/bv_rewriter.h:133-135)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_scalar.go",
+          "tests": [
+            "TestBVRewriterScalarOperatorsOnDerivedOwner",
+            "TestBVRewriterScalarEveryColdReservationAndPublication"
+          ]
+        },
+        {
+          "name": "Exact unsigned numeral factory invocation capture at real unsigned constructor/factory frame; AND caller keeps power/one/subtraction/default-r alive through publication and joins younger stopped factory first (src/ast/rewriter/bv_rewriter.cpp:2048-2056; src/ast/rewriter/bv_rewriter.h:177)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_unsigned_numeral.go",
+          "tests": [
+            "TestASTBitVectorReductionANDCallerEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22337,7 +22360,8 @@
         "Unsigned division physically copies returned unsigned norms into rhs then reached lhs, ending each norm return at assignment. Zero/one skip lhs copying; hardware-zero power/one/subtraction and numeric returned quotient remain through output publication. Power-of-two handling precedes configured inverse; inv_r2 is placed only in its original option block, remains through successful MUL publication and ends before internal fallback on failed inversion. Exact inverse/norm/factory/scalar children join before older locals on owning close, preserve history and reject stopped replay. Cold campaigns under both HiDiv0 settings cover all seven branch families and published-old-DEC refusal; actual width65 Runtime campaigns cover numeric, shortcuts, power and successful/failed inverse with zero owner graphs.",
         "Minus-one helper constructs its default r before numeral recognition; power, literal one and returned subtraction are reached only for numerals and live through raw stored-value comparison. Reverse expression destruction precedes older r at function return. The binary-add helper checks identity then arity, invokes the first operand helper before the second and assigns only the borrowed other operand after a match; false/refused calls preserve output. Exact stopped scalar children remain captured on the persistent owner and close before older values, preserving history. Width65 real Runtime campaigns include allones, positive noncanonical, raw negative, other and symbolic inputs; cold root campaigns cover first/second/no match and kind/arity rejection.",
         "Unsigned remainder copies lhs before rhs recognition, retaining that copy even on zero/one shortcuts. RHS recognition overwrites width before lhs norm; returned norm values end after physical copies. Original operator%= modifies physical r1 without returned remainder. Power rewrite constructs zero then persistent cached extract and borrows two charged parent handles through concat publication. Low x-minus-one branch ends power/one/subtraction after its minus-one NUM declaration before later ITE factories; nested helper ownership joins before older UREM values on failure. Both HiDiv0 settings preserve lhs-zero/x-minus-one and internal fallbacks. Ten cold branch families reach published-old-DEC failure; six width65 Runtime campaigns preserve history and close graphs to zero.",
-        "Signed modulo constructs default r1/r2, reads/signed-normalizes lhs and reaches zero UREM rewrite before RHS recognition. RHS width controls later absolute normalization. Distinct absolute operands and u retain their returned unsigned norms, with abs/remainder input temporaries ending at each declaration expression. Default r is copied from u or from original unsigned-normalized sign adjustment, retaining negation/add/norm expressions until assignment. Result publication precedes reverse r/u/absolute operands/r2/r1 destruction. Exact scalar/norm/factory children remain captured on failure, join before older locals and preserve history. Nine cold branch families under both HiDiv0 settings cover publication/consumed old DEC refusal; actual width65 numeric campaigns cover all signs and minimum/negative-one and close graphs to zero."
+        "Signed modulo constructs default r1/r2, reads/signed-normalizes lhs and reaches zero UREM rewrite before RHS recognition. RHS width controls later absolute normalization. Distinct absolute operands and u retain their returned unsigned norms, with abs/remainder input temporaries ending at each declaration expression. Default r is copied from u or from original unsigned-normalized sign adjustment, retaining negation/add/norm expressions until assignment. Result publication precedes reverse r/u/absolute operands/r2/r1 destruction. Exact scalar/norm/factory children remain captured on failure, join before older locals and preserve history. Nine cold branch families under both HiDiv0 settings cover publication/consumed old DEC refusal; actual width65 numeric campaigns cover all signs and minimum/negative-one and close graphs to zero.",
+        "Persistent BV owner embeds an unsigned-numeral receipt in its actual charged header; OR/COMP have no default numerical local and reach the captured factory only after original guards. AND uses the concrete default-r/power/one/subtraction owner shared with the identical minus-one comparison expression, constructing r before numeral recognition even on FAILED. The expression remains live through NUM construction/output publication, then ends before older r. Younger captured factory joins before the numeric owner on failure; outer cause rejects replay and survives owning close. Nine cold caller branches cover FAILED, numeric/identity and symbolic ITE paths and published-old-DEC refusal. Width65 Runtime tests distinguish canonical/negative/noncanonical stored values, prove actual comparison/assignment lifetimes and exact factory joining with zero graphs."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -22369,7 +22393,8 @@
         "Selected unsigned division core/two wrappers are complete; unsigned remainder, signed modulo, remaining BV operations, complete application dispatch and arithmetic/solver integration remain required. The optional udiv2mul rule is the original modular-inverse multiplication algorithm, without substituting another division algorithm. Source TRACE and native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. C++ nested argument evaluation is unspecified; Go constructs condition, zero operation and internal fallback in that order for the symbolic low ITE. No whole source unit is promoted.",
         "Selected minus-one/x-minus-one bodies are complete as prerequisites for unsigned remainder; is_negatable, complete unsigned remainder and other remaining BV bodies/dispatcher remain uncredited. Stored noncanonical and negative numerals are compared without normalization, matching source. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. Go evaluates power before literal one in the nested arithmetic expression; C++ argument evaluation order is unspecified. The public pointer adapter rejects nil output storage. No whole source unit is promoted.",
         "Selected unsigned remainder core/two wrappers are complete; signed modulo, is_negatable, remaining BV operators/application dispatcher, arithmetic/solver integration and whole-unit audits remain required. Stored RHS width controls lhs normalization, preserving source behavior on independently stored operand widths. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. Go constructs condition, yes and no in order for nested C++ ITE arguments with unspecified evaluation order. No whole source unit is promoted.",
-        "Selected signed modulo core/two wrappers are complete; is_negatable, remaining BV operations/full application dispatcher, arithmetic/solver integration and whole-unit audits remain required. Original lhs-zero raw UREM rewrite precedes reading RHS; symbolic positive-one returns REWRITE2 while numeric folding returns DONE. No direct mathematical modulo algorithm substitutes for source absolute/rem/sign branches. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. C++ nested ITE argument evaluation is unspecified; Go builds condition, yes then no. No whole source unit is promoted."
+        "Selected signed modulo core/two wrappers are complete; is_negatable, remaining BV operations/full application dispatcher, arithmetic/solver integration and whole-unit audits remain required. Original lhs-zero raw UREM rewrite precedes reading RHS; symbolic positive-one returns REWRITE2 while numeric folding returns DONE. No direct mathematical modulo algorithm substitutes for source absolute/rem/sign branches. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. C++ nested ITE argument evaluation is unspecified; Go builds condition, yes then no. No whole source unit is promoted.",
+        "Selected scalar bodies are now wired through the persistent derived owner with exact factory receipt, in addition to existing standalone entry points. Whole source unit status is unchanged; complete BV dispatcher, remaining operator bodies and arithmetic/solver integration remain required. Existing standalone allocation/failure authority qualifications are not promoted by these new callers. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. C++ nested COMP ITE argument order is unspecified; Go constructs equality, one then zero. The numeric owner header is actual charged Go storage, without native stack-layout credit."
       ]
     },
     {
@@ -22495,7 +22520,10 @@
         "pkg/ast/rewriter/bv_rewriter_smod.go",
         "pkg/ast/rewriter/bv_rewriter_smod_test.go",
         "pkg/ast/ast_bv_smod_numerals.go",
-        "pkg/ast/ast_bv_smod_numerals_test.go"
+        "pkg/ast/ast_bv_smod_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_scalar.go",
+        "pkg/ast/rewriter/bv_rewriter_scalar_test.go",
+        "pkg/ast/ast_bv_scalar_invocation_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -22641,7 +22669,10 @@
         "TestASTBitVectorUnsignedRemainderEveryActualReservation",
         "TestBVRewriterSignedModuloOriginalBranches",
         "TestBVRewriterSignedModuloEveryColdReservationAndPublication",
-        "TestASTBitVectorSignedModuloEveryActualReservation"
+        "TestASTBitVectorSignedModuloEveryActualReservation",
+        "TestBVRewriterScalarOperatorsOnDerivedOwner",
+        "TestBVRewriterScalarEveryColdReservationAndPublication",
+        "TestASTBitVectorReductionANDCallerEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -23182,6 +23213,23 @@
           "tests": [
             "TestASTBitVectorSignedModuloEveryActualReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_bv_redor/mk_bv_redand/mk_bv_comp through persistent BV owner: original kind/zero/default-r/raw comparison and identity/numeral/conditional guard order, exact output status and child lifetime (src/ast/rewriter/bv_rewriter.cpp:2040-2074; src/ast/rewriter/bv_rewriter.h:133-135)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_scalar.go",
+          "tests": [
+            "TestBVRewriterScalarOperatorsOnDerivedOwner",
+            "TestBVRewriterScalarEveryColdReservationAndPublication"
+          ]
+        },
+        {
+          "name": "Exact unsigned numeral factory invocation capture at real unsigned constructor/factory frame; AND caller keeps power/one/subtraction/default-r alive through publication and joins younger stopped factory first (src/ast/rewriter/bv_rewriter.cpp:2048-2056; src/ast/rewriter/bv_rewriter.h:177)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_unsigned_numeral.go",
+          "tests": [
+            "TestASTBitVectorReductionANDCallerEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -23210,7 +23258,8 @@
         "Unsigned division physically copies returned unsigned norms into rhs then reached lhs, ending each norm return at assignment. Zero/one skip lhs copying; hardware-zero power/one/subtraction and numeric returned quotient remain through output publication. Power-of-two handling precedes configured inverse; inv_r2 is placed only in its original option block, remains through successful MUL publication and ends before internal fallback on failed inversion. Exact inverse/norm/factory/scalar children join before older locals on owning close, preserve history and reject stopped replay. Cold campaigns under both HiDiv0 settings cover all seven branch families and published-old-DEC refusal; actual width65 Runtime campaigns cover numeric, shortcuts, power and successful/failed inverse with zero owner graphs.",
         "Minus-one helper constructs its default r before numeral recognition; power, literal one and returned subtraction are reached only for numerals and live through raw stored-value comparison. Reverse expression destruction precedes older r at function return. The binary-add helper checks identity then arity, invokes the first operand helper before the second and assigns only the borrowed other operand after a match; false/refused calls preserve output. Exact stopped scalar children remain captured on the persistent owner and close before older values, preserving history. Width65 real Runtime campaigns include allones, positive noncanonical, raw negative, other and symbolic inputs; cold root campaigns cover first/second/no match and kind/arity rejection.",
         "Unsigned remainder copies lhs before rhs recognition, retaining that copy even on zero/one shortcuts. RHS recognition overwrites width before lhs norm; returned norm values end after physical copies. Original operator%= modifies physical r1 without returned remainder. Power rewrite constructs zero then persistent cached extract and borrows two charged parent handles through concat publication. Low x-minus-one branch ends power/one/subtraction after its minus-one NUM declaration before later ITE factories; nested helper ownership joins before older UREM values on failure. Both HiDiv0 settings preserve lhs-zero/x-minus-one and internal fallbacks. Ten cold branch families reach published-old-DEC failure; six width65 Runtime campaigns preserve history and close graphs to zero.",
-        "Signed modulo constructs default r1/r2, reads/signed-normalizes lhs and reaches zero UREM rewrite before RHS recognition. RHS width controls later absolute normalization. Distinct absolute operands and u retain their returned unsigned norms, with abs/remainder input temporaries ending at each declaration expression. Default r is copied from u or from original unsigned-normalized sign adjustment, retaining negation/add/norm expressions until assignment. Result publication precedes reverse r/u/absolute operands/r2/r1 destruction. Exact scalar/norm/factory children remain captured on failure, join before older locals and preserve history. Nine cold branch families under both HiDiv0 settings cover publication/consumed old DEC refusal; actual width65 numeric campaigns cover all signs and minimum/negative-one and close graphs to zero."
+        "Signed modulo constructs default r1/r2, reads/signed-normalizes lhs and reaches zero UREM rewrite before RHS recognition. RHS width controls later absolute normalization. Distinct absolute operands and u retain their returned unsigned norms, with abs/remainder input temporaries ending at each declaration expression. Default r is copied from u or from original unsigned-normalized sign adjustment, retaining negation/add/norm expressions until assignment. Result publication precedes reverse r/u/absolute operands/r2/r1 destruction. Exact scalar/norm/factory children remain captured on failure, join before older locals and preserve history. Nine cold branch families under both HiDiv0 settings cover publication/consumed old DEC refusal; actual width65 numeric campaigns cover all signs and minimum/negative-one and close graphs to zero.",
+        "Persistent BV owner embeds an unsigned-numeral receipt in its actual charged header; OR/COMP have no default numerical local and reach the captured factory only after original guards. AND uses the concrete default-r/power/one/subtraction owner shared with the identical minus-one comparison expression, constructing r before numeral recognition even on FAILED. The expression remains live through NUM construction/output publication, then ends before older r. Younger captured factory joins before the numeric owner on failure; outer cause rejects replay and survives owning close. Nine cold caller branches cover FAILED, numeric/identity and symbolic ITE paths and published-old-DEC refusal. Width65 Runtime tests distinguish canonical/negative/noncanonical stored values, prove actual comparison/assignment lifetimes and exact factory joining with zero graphs."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -23240,7 +23289,8 @@
         "Selected unsigned division core/two wrappers are complete; unsigned remainder, signed modulo, remaining BV operations, complete application dispatch and arithmetic/solver integration remain required. The optional udiv2mul rule is the original modular-inverse multiplication algorithm, without substituting another division algorithm. Source TRACE and native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. C++ nested argument evaluation is unspecified; Go constructs condition, zero operation and internal fallback in that order for the symbolic low ITE. No whole source unit is promoted.",
         "Selected minus-one/x-minus-one bodies are complete as prerequisites for unsigned remainder; is_negatable, complete unsigned remainder and other remaining BV bodies/dispatcher remain uncredited. Stored noncanonical and negative numerals are compared without normalization, matching source. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. Go evaluates power before literal one in the nested arithmetic expression; C++ argument evaluation order is unspecified. The public pointer adapter rejects nil output storage. No whole source unit is promoted.",
         "Selected unsigned remainder core/two wrappers are complete; signed modulo, is_negatable, remaining BV operators/application dispatcher, arithmetic/solver integration and whole-unit audits remain required. Stored RHS width controls lhs normalization, preserving source behavior on independently stored operand widths. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. Go constructs condition, yes and no in order for nested C++ ITE arguments with unspecified evaluation order. No whole source unit is promoted.",
-        "Selected signed modulo core/two wrappers are complete; is_negatable, remaining BV operations/full application dispatcher, arithmetic/solver integration and whole-unit audits remain required. Original lhs-zero raw UREM rewrite precedes reading RHS; symbolic positive-one returns REWRITE2 while numeric folding returns DONE. No direct mathematical modulo algorithm substitutes for source absolute/rem/sign branches. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. C++ nested ITE argument evaluation is unspecified; Go builds condition, yes then no. No whole source unit is promoted."
+        "Selected signed modulo core/two wrappers are complete; is_negatable, remaining BV operations/full application dispatcher, arithmetic/solver integration and whole-unit audits remain required. Original lhs-zero raw UREM rewrite precedes reading RHS; symbolic positive-one returns REWRITE2 while numeric folding returns DONE. No direct mathematical modulo algorithm substitutes for source absolute/rem/sign branches. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. C++ nested ITE argument evaluation is unspecified; Go builds condition, yes then no. No whole source unit is promoted.",
+        "Selected scalar bodies are now wired through the persistent derived owner with exact factory receipt, in addition to existing standalone entry points. Whole source unit status is unchanged; complete BV dispatcher, remaining operator bodies and arithmetic/solver integration remain required. Existing standalone allocation/failure authority qualifications are not promoted by these new callers. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. C++ nested COMP ITE argument order is unspecified; Go constructs equality, one then zero. The numeric owner header is actual charged Go storage, without native stack-layout credit."
       ]
     },
     {

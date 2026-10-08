@@ -42,3 +42,24 @@ func (m *ASTManager) bitVectorNumeralUnsignedCaptured(value uint32, bits uint32,
 	}
 	return m.bitVectorNumeralAppCore(f, bits)
 }
+
+// BitVectorNumeralUnsignedWithInvocation captures the original unsigned
+// constructor/factory frame so its older caller can join a stopped child.
+func (m *ASTManager) BitVectorNumeralUnsignedWithInvocation(value, bits uint32, c *ASTBitVectorNumeralInvocation) (node ASTHandle, result error) {
+	if c == nil {
+		return node, ErrASTHandle
+	}
+	if e := m.lock(); e != nil {
+		return node, e
+	}
+	defer m.mu.Unlock()
+	if e := c.prepare(m); e != nil {
+		return node, e
+	}
+	defer c.finish(&result)
+	previous := m.formatExecuting
+	m.formatExecuting = true
+	defer func() { m.formatExecuting = previous }()
+	r, e := m.bitVectorNumeralUnsignedCaptured(value, bits, &c.receipt)
+	return m.external(r), e
+}

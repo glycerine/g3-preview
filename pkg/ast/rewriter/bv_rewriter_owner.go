@@ -28,6 +28,7 @@ type BVRewriter struct {
 	signedModulo          *ast.BitVectorSignedModuloNumerals
 	unsignedRemainder     *ast.BitVectorUnsignedRemainderNumerals
 	uremArgs              [2]ast.ASTHandle
+	scalarNumeral         ast.ASTBitVectorNumeralInvocation
 	minusOne              *ast.BitVectorMinusOneNumerals
 	unsignedDivision      *ast.BitVectorUnsignedDivisionNumerals
 	signedDivision        *ast.BitVectorSignedDivisionNumerals
@@ -189,6 +190,9 @@ func (p *BVRewriter) Close() error {
 		if e := p.polynomial.closeInvocations(); e != nil {
 			return e
 		}
+	}
+	if e := p.manager.CleanupBitVectorNumeralInvocation(&p.scalarNumeral); e != nil {
+		return e
 	}
 	if p.minusOne != nil {
 		if e := p.minusOne.Close(); e != nil {
