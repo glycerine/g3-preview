@@ -72,3 +72,16 @@ func (a *ASTHandleBuffer) Reset() {
 		a.spill = a.spill[:0]
 	}
 }
+
+// PopBack decreases the logical size without releasing borrowed expressions
+// or backing storage. Source: src/util/buffer.h:160-175.
+func (a *ASTHandleBuffer) PopBack() error {
+	if a.count == 0 {
+		return arena.ErrBounds
+	}
+	a.count--
+	if a.spill != nil {
+		a.spill = a.spill[:a.count]
+	}
+	return nil
+}

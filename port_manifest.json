@@ -23447,7 +23447,10 @@
         "pkg/ast/rewriter/bv_polynomial_mul_buffers.go",
         "pkg/ast/rewriter/bv_polynomial_mul_core_test.go",
         "pkg/ast/ast_bv_polynomial_mul_numerals.go",
-        "pkg/ast/ast_bv_polynomial_mul_numerals_test.go"
+        "pkg/ast/ast_bv_polynomial_mul_numerals_test.go",
+        "pkg/ast/rewriter/bv_polynomial_flat_mul.go",
+        "pkg/ast/rewriter/bv_polynomial_make_mul.go",
+        "pkg/ast/rewriter/bv_polynomial_flat_mul_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23513,7 +23516,12 @@
         "TestBVPolynomialNonflatMultiplicationCheapGuardAndHeaderRefusal",
         "TestBVPolynomialNonflatMultiplicationIntermediateReferencePublication",
         "TestASTBitVectorPolynomialMultiplicationNumeralsPlacementAndShadowLifetime",
-        "TestASTBitVectorPolynomialMultiplicationNumeralsHeaderAndCopyGuards"
+        "TestASTBitVectorPolynomialMultiplicationNumeralsHeaderAndCopyGuards",
+        "TestBVPolynomialFlatMultiplicationRecursiveFactorsAndCoefficientGuard",
+        "TestBVPolynomialFlatMultiplicationEveryStackSpillAndFallbackReservation",
+        "TestBVPolynomialMultiplicationCallerSingletonAndOriginalFallback",
+        "TestBVPolynomialMultiplicationCallerSelectionAndConvenience",
+        "TestBVPolynomialFlatMultiplicationPropagatesCartesianRewriteDepth"
       ],
       "conditionals": [
         {
@@ -23752,6 +23760,25 @@
             "TestASTBitVectorPolynomialMultiplicationNumeralsPlacementAndShadowLifetime",
             "TestASTBitVectorPolynomialMultiplicationNumeralsHeaderAndCopyGuards"
           ]
+        },
+        {
+          "name": "selected complete BV mk_flat_mul_core: coefficient-form guard, prefix append, reverse-child stack push, recursive flatten and FAILED fallback (src/ast/rewriter/poly_rewriter_def.h:140-194)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_flat_mul.go",
+          "tests": [
+            "TestBVPolynomialFlatMultiplicationRecursiveFactorsAndCoefficientGuard",
+            "TestBVPolynomialFlatMultiplicationEveryStackSpillAndFallbackReservation",
+            "TestBVPolynomialFlatMultiplicationPropagatesCartesianRewriteDepth"
+          ]
+        },
+        {
+          "name": "selected complete BV mk_mul_core and mk_mul overloads: singleton before sort, flat/nonflat selection and original-argument FAILED fallback after scope exit (src/ast/rewriter/poly_rewriter.h:125-136,157-164)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_mul_core.go",
+          "tests": [
+            "TestBVPolynomialMultiplicationCallerSingletonAndOriginalFallback",
+            "TestBVPolynomialMultiplicationCallerSelectionAndConvenience"
+          ]
         }
       ],
       "ownership": [],
@@ -23768,7 +23795,8 @@
         "Selected BV nonflat addition body now consumes the original borrowed identity position map, two fast mark planes, concrete rational coefficient buffer, monomial comparator, factories and both hoist bodies. The exact numeric owner in ast accesses private numerical services without reverse imports; c and a are physical distinct locals and coefficient slots receive original copy construction/compound addition. Original scan/collection/rebuild order, modulo normalization, constant-leading FAILED guards, first-encounter output order and DONE/FULL statuses are preserved. Inputs must remain caller-owned through source exit including mark destruction. Successful source exit destroys new_args, coeffs, multiple, visited, a and c. A refused mark append retains its already-set candidate for owning cleanup; a refused vector append retains the exact unpublished INC and original vector identity. Failed invocations reject reuse; owning cleanup preserves source history. Actual Go wrappers/backing are charged. External std::sort uses the existing concrete heapsort comparator/output adaptation, without claiming C++ callback/fault-prefix ordering. Native pointer/layout/stack/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; body campaigns do not separately inject stopped source DT or final-reference deletion failure. Flat addition, multiplication cores, persistent full polynomial configuration/current-sort owner, arith specialization and overall rewriter/solver dispatch integration remain required.",
         "Selected BV flat addition and mk_add_core caller now consume the completed nonflat body. Flattening expands only immediate ADD arguments, preserves prefix/sibling order and leaves deeper ADDs intact. No nested ADD passes the original nonflat FAILED result through; a nested ADD causes a FAILED nonflat result to be rebuilt and reported DONE. Nested nonflat numeric/vector/mark locals end before fallback factory work, while the outer borrowed inline16/doubling flatten buffer ends after result assignment. DONE/FULL statuses otherwise propagate unchanged. Singleton caller assignment erases sort/numeric/flatten/hoist work, and multi-argument caller publishes current sort from the first operand before dispatch. The owner still names one invocation; persistent full configuration, mk_add convenience fallback, multiplication bodies, arith specialization and overall rewriter/solver dispatch integration remain required. Cold spill/factory refusal tests preserve child source history and exact retained prefixes; no native stack/pointer/layout/allocator/assertion/fatal/exception ABI, native-fatal resumability or whole-unit completion is claimed.",
         "Selected BV mk_add convenience overloads now consume the complete flat/nonflat addition caller. Core locals and any flatten buffer end before the FAILED fallback factory, which borrows original arguments and assigns through the existing checked AST reference adapter. Successful singleton/constant/collected/hoisted core results remain unchanged. The pair overload stores two borrowed handles left to right in the charged owner and guards stopped invocation reuse before overwriting them. Body/factory refusal campaigns preserve exact historical readiness and release retained owning storage without claiming native-fatal resumability. Persistent polynomial configuration/current-sort ownership, multiplication cores, arith specialization and overall dispatch integration remain required. Native pointer/layout/stack/allocator/assertion/fatal/exception ABI and whole-unit completion remain uncredited.",
-        "Selected complete BV nonflat multiplication body now follows all branches of the source use_power=false algorithm. The numeric owner places a before the cheap guard, c(1) only afterwards, and c_prime only in the one-variable branch; debug shadow construction/read/equality/DT remains distinct. Coefficients fold through exact physical compound multiplication, normalize modulo BV width and retain nested zero-coefficient products per original factory behavior. Non-distributive rebuilding publishes the intermediate owning product before the coefficient wrapper. Cartesian expansion borrows original argument/app views in three concrete inline16/doubling buffers, advances the first coordinate fastest, keeps an owning sum vector, and checks strict sum.size()>som_blowup before each product; the original exception becomes a named Go error with retained prefix. Success ends branch buffers, then reached numeric locals in reverse declaration order. Exact failed vector INC/numeric children remain available for owning cleanup, stopped core calls reject reuse and source history is immutable. Actual Go headers/backing are charged; external std::sort keeps the existing heapsort comparator/output adaptation without C++ library callback/failure-prefix order credit. No native stack/pointer/layout/allocator/assertion/fatal/exception ABI, native-fatal resumability or whole-unit completion is claimed. Flat multiplication, multiplication callers, persistent full polynomial configuration/current-sort ownership, arith specialization and overall rewriter/solver integration remain required."
+        "Selected complete BV nonflat multiplication body now follows all branches of the source use_power=false algorithm. The numeric owner places a before the cheap guard, c(1) only afterwards, and c_prime only in the one-variable branch; debug shadow construction/read/equality/DT remains distinct. Coefficients fold through exact physical compound multiplication, normalize modulo BV width and retain nested zero-coefficient products per original factory behavior. Non-distributive rebuilding publishes the intermediate owning product before the coefficient wrapper. Cartesian expansion borrows original argument/app views in three concrete inline16/doubling buffers, advances the first coordinate fastest, keeps an owning sum vector, and checks strict sum.size()>som_blowup before each product; the original exception becomes a named Go error with retained prefix. Success ends branch buffers, then reached numeric locals in reverse declaration order. Exact failed vector INC/numeric children remain available for owning cleanup, stopped core calls reject reuse and source history is immutable. Actual Go headers/backing are charged; external std::sort keeps the existing heapsort comparator/output adaptation without C++ library callback/failure-prefix order credit. No native stack/pointer/layout/allocator/assertion/fatal/exception ABI, native-fatal resumability or whole-unit completion is claimed. Flat multiplication, multiplication callers, persistent full polynomial configuration/current-sort ownership, arith specialization and overall rewriter/solver integration remain required.",
+        "Selected BV recursive flat multiplication and its core/convenience callers now consume the completed nonflat body. The original coefficient-form guard skips c*x and c*plain-product flattening; nested coefficient products are flattened recursively with a todo stack, pushing children backwards to preserve left-to-right depth-first factor order. Nested core locals end before the flat FAILED fallback; todo then flat_args end before a convenience fallback over original arguments. Singleton assignment precedes sort/numeric/flatten work; multi-argument current sort is published from argument zero before flat/nonflat dispatch. The pair overload keeps the left-to-right initializer in charged scalar storage and rejects stopped reuse before mutation. A cold 48-factor campaign checks retained flatten order before numeric-core construction and covers stack/flat spills plus fallback factory refusals. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI, native-fatal resumability and whole-unit completion remain uncredited. Persistent full polynomial configuration/current-sort ownership, arith specialization and overall rewriter/solver integration remain required."
       ]
     },
     {
@@ -23806,7 +23834,10 @@
         "pkg/ast/rewriter/bv_polynomial_mul_buffers.go",
         "pkg/ast/rewriter/bv_polynomial_mul_core_test.go",
         "pkg/ast/ast_bv_polynomial_mul_numerals.go",
-        "pkg/ast/ast_bv_polynomial_mul_numerals_test.go"
+        "pkg/ast/ast_bv_polynomial_mul_numerals_test.go",
+        "pkg/ast/rewriter/bv_polynomial_flat_mul.go",
+        "pkg/ast/rewriter/bv_polynomial_make_mul.go",
+        "pkg/ast/rewriter/bv_polynomial_flat_mul_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23869,7 +23900,12 @@
         "TestBVPolynomialNonflatMultiplicationCheapGuardAndHeaderRefusal",
         "TestBVPolynomialNonflatMultiplicationIntermediateReferencePublication",
         "TestASTBitVectorPolynomialMultiplicationNumeralsPlacementAndShadowLifetime",
-        "TestASTBitVectorPolynomialMultiplicationNumeralsHeaderAndCopyGuards"
+        "TestASTBitVectorPolynomialMultiplicationNumeralsHeaderAndCopyGuards",
+        "TestBVPolynomialFlatMultiplicationRecursiveFactorsAndCoefficientGuard",
+        "TestBVPolynomialFlatMultiplicationEveryStackSpillAndFallbackReservation",
+        "TestBVPolynomialMultiplicationCallerSingletonAndOriginalFallback",
+        "TestBVPolynomialMultiplicationCallerSelectionAndConvenience",
+        "TestBVPolynomialFlatMultiplicationPropagatesCartesianRewriteDepth"
       ],
       "assertions": [
         {
@@ -24053,7 +24089,8 @@
         "Selected BV nonflat addition body now consumes the original borrowed identity position map, two fast mark planes, concrete rational coefficient buffer, monomial comparator, factories and both hoist bodies. The exact numeric owner in ast accesses private numerical services without reverse imports; c and a are physical distinct locals and coefficient slots receive original copy construction/compound addition. Original scan/collection/rebuild order, modulo normalization, constant-leading FAILED guards, first-encounter output order and DONE/FULL statuses are preserved. Inputs must remain caller-owned through source exit including mark destruction. Successful source exit destroys new_args, coeffs, multiple, visited, a and c. A refused mark append retains its already-set candidate for owning cleanup; a refused vector append retains the exact unpublished INC and original vector identity. Failed invocations reject reuse; owning cleanup preserves source history. Actual Go wrappers/backing are charged. External std::sort uses the existing concrete heapsort comparator/output adaptation, without claiming C++ callback/fault-prefix ordering. Native pointer/layout/stack/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; body campaigns do not separately inject stopped source DT or final-reference deletion failure. Flat addition, multiplication cores, persistent full polynomial configuration/current-sort owner, arith specialization and overall rewriter/solver dispatch integration remain required.",
         "Selected BV flat addition and mk_add_core caller now consume the completed nonflat body. Flattening expands only immediate ADD arguments, preserves prefix/sibling order and leaves deeper ADDs intact. No nested ADD passes the original nonflat FAILED result through; a nested ADD causes a FAILED nonflat result to be rebuilt and reported DONE. Nested nonflat numeric/vector/mark locals end before fallback factory work, while the outer borrowed inline16/doubling flatten buffer ends after result assignment. DONE/FULL statuses otherwise propagate unchanged. Singleton caller assignment erases sort/numeric/flatten/hoist work, and multi-argument caller publishes current sort from the first operand before dispatch. The owner still names one invocation; persistent full configuration, mk_add convenience fallback, multiplication bodies, arith specialization and overall rewriter/solver dispatch integration remain required. Cold spill/factory refusal tests preserve child source history and exact retained prefixes; no native stack/pointer/layout/allocator/assertion/fatal/exception ABI, native-fatal resumability or whole-unit completion is claimed.",
         "Selected BV mk_add convenience overloads now consume the complete flat/nonflat addition caller. Core locals and any flatten buffer end before the FAILED fallback factory, which borrows original arguments and assigns through the existing checked AST reference adapter. Successful singleton/constant/collected/hoisted core results remain unchanged. The pair overload stores two borrowed handles left to right in the charged owner and guards stopped invocation reuse before overwriting them. Body/factory refusal campaigns preserve exact historical readiness and release retained owning storage without claiming native-fatal resumability. Persistent polynomial configuration/current-sort ownership, multiplication cores, arith specialization and overall dispatch integration remain required. Native pointer/layout/stack/allocator/assertion/fatal/exception ABI and whole-unit completion remain uncredited.",
-        "Selected complete BV nonflat multiplication body now follows all branches of the source use_power=false algorithm. The numeric owner places a before the cheap guard, c(1) only afterwards, and c_prime only in the one-variable branch; debug shadow construction/read/equality/DT remains distinct. Coefficients fold through exact physical compound multiplication, normalize modulo BV width and retain nested zero-coefficient products per original factory behavior. Non-distributive rebuilding publishes the intermediate owning product before the coefficient wrapper. Cartesian expansion borrows original argument/app views in three concrete inline16/doubling buffers, advances the first coordinate fastest, keeps an owning sum vector, and checks strict sum.size()>som_blowup before each product; the original exception becomes a named Go error with retained prefix. Success ends branch buffers, then reached numeric locals in reverse declaration order. Exact failed vector INC/numeric children remain available for owning cleanup, stopped core calls reject reuse and source history is immutable. Actual Go headers/backing are charged; external std::sort keeps the existing heapsort comparator/output adaptation without C++ library callback/failure-prefix order credit. No native stack/pointer/layout/allocator/assertion/fatal/exception ABI, native-fatal resumability or whole-unit completion is claimed. Flat multiplication, multiplication callers, persistent full polynomial configuration/current-sort ownership, arith specialization and overall rewriter/solver integration remain required."
+        "Selected complete BV nonflat multiplication body now follows all branches of the source use_power=false algorithm. The numeric owner places a before the cheap guard, c(1) only afterwards, and c_prime only in the one-variable branch; debug shadow construction/read/equality/DT remains distinct. Coefficients fold through exact physical compound multiplication, normalize modulo BV width and retain nested zero-coefficient products per original factory behavior. Non-distributive rebuilding publishes the intermediate owning product before the coefficient wrapper. Cartesian expansion borrows original argument/app views in three concrete inline16/doubling buffers, advances the first coordinate fastest, keeps an owning sum vector, and checks strict sum.size()>som_blowup before each product; the original exception becomes a named Go error with retained prefix. Success ends branch buffers, then reached numeric locals in reverse declaration order. Exact failed vector INC/numeric children remain available for owning cleanup, stopped core calls reject reuse and source history is immutable. Actual Go headers/backing are charged; external std::sort keeps the existing heapsort comparator/output adaptation without C++ library callback/failure-prefix order credit. No native stack/pointer/layout/allocator/assertion/fatal/exception ABI, native-fatal resumability or whole-unit completion is claimed. Flat multiplication, multiplication callers, persistent full polynomial configuration/current-sort ownership, arith specialization and overall rewriter/solver integration remain required.",
+        "Selected BV recursive flat multiplication and its core/convenience callers now consume the completed nonflat body. The original coefficient-form guard skips c*x and c*plain-product flattening; nested coefficient products are flattened recursively with a todo stack, pushing children backwards to preserve left-to-right depth-first factor order. Nested core locals end before the flat FAILED fallback; todo then flat_args end before a convenience fallback over original arguments. Singleton assignment precedes sort/numeric/flatten work; multi-argument current sort is published from argument zero before flat/nonflat dispatch. The pair overload keeps the left-to-right initializer in charged scalar storage and rejects stopped reuse before mutation. A cold 48-factor campaign checks retained flatten order before numeric-core construction and covers stack/flat spills plus fallback factory refusals. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI, native-fatal resumability and whole-unit completion remain uncredited. Persistent full polynomial configuration/current-sort ownership, arith specialization and overall rewriter/solver integration remain required."
       ]
     },
     {
@@ -110208,7 +110245,8 @@
         "pkg/ast/ast_handle_buffer.go",
         "pkg/ast/ast_handle_containers_test.go",
         "pkg/util/rational_buffer.go",
-        "pkg/util/rational_buffer_test.go"
+        "pkg/util/rational_buffer_test.go",
+        "pkg/ast/ast_handle_buffer_pop_test.go"
       ],
       "tests": [
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
@@ -110282,7 +110320,8 @@
         "TestRationalBuffer16InlineCopiesAndStorageRelocation",
         "TestRationalBuffer16SourceDestructionStopsBeforeLaterElements",
         "TestRationalBuffer16ConstructionAndShallowCopyGuards",
-        "TestRationalBuffer16EveryGrowthAndActualCopyReservation"
+        "TestRationalBuffer16EveryGrowthAndActualCopyReservation",
+        "TestASTHandleBufferPopRetainsSpillAndBorrowedReferences"
       ],
       "conditionals": [
         {
@@ -110501,6 +110540,14 @@
             "TestRationalBuffer16ConstructionAndShallowCopyGuards",
             "TestRationalBuffer16EveryGrowthAndActualCopyReservation"
           ]
+        },
+        {
+          "name": "selected AST ptr_buffer pop_back used by recursive multiplication flattening: decrement without reference ownership or backing release (src/util/buffer.h:160-175)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_handle_buffer.go",
+          "tests": [
+            "TestASTHandleBufferPopRetainsSpillAndBorrowedReferences"
+          ]
         }
       ],
       "ownership": [
@@ -110517,7 +110564,8 @@
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Concrete prerequisite does not implement all source buffer types or complete ICCP algorithm.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
-        "RationalBuffer16 is the nongeneric concrete buffer<rational> dependency for polynomial coefficient collection, with sixteen raw inline slots and double-capacity relocation without numeric copies/destructors. Each appended value is copy-constructed into its physical slot through an exact invocation embedded in the charged header, and count advances only after construction returns. Expanded storage and the reflected Go owner are charged through Budget rather than claiming native allocation/layout/stack/pointer ABI. At borrows an address only until expansion/end; aliases retained across expansion are outside the source consumer contract. Successful source scopes explicitly run SourceEnd in ascending element order before backing release. Failed body calls retain their actual partial slot/child and stop; SourceEnd rejects simulated native unwinding, while explicit two-phase Go cleanup consumes the real fields without altering failure history. The stale-element DT test proves the checked boundary traversal prefix, not native fatal/exception resumability. General buffer APIs/reset/finalize and integration into the whole polynomial current-sort/mark/core owner remain required; no whole-unit completion is credited."
+        "RationalBuffer16 is the nongeneric concrete buffer<rational> dependency for polynomial coefficient collection, with sixteen raw inline slots and double-capacity relocation without numeric copies/destructors. Each appended value is copy-constructed into its physical slot through an exact invocation embedded in the charged header, and count advances only after construction returns. Expanded storage and the reflected Go owner are charged through Budget rather than claiming native allocation/layout/stack/pointer ABI. At borrows an address only until expansion/end; aliases retained across expansion are outside the source consumer contract. Successful source scopes explicitly run SourceEnd in ascending element order before backing release. Failed body calls retain their actual partial slot/child and stop; SourceEnd rejects simulated native unwinding, while explicit two-phase Go cleanup consumes the real fields without altering failure history. The stale-element DT test proves the checked boundary traversal prefix, not native fatal/exception resumability. General buffer APIs/reset/finalize and integration into the whole polynomial current-sort/mark/core owner remain required; no whole-unit completion is credited.",
+        "ASTHandleBuffer.PopBack supplies the selected scalar non-destructing pop operation for the polynomial todo stack. It retains spilled capacity, acquires/releases no AST references and reports empty-pop as a checked Go bounds error. Native assertion/underflow/layout/allocator ABI and general template-buffer completion remain uncredited."
       ]
     },
     {

@@ -19,6 +19,10 @@ type BVPolynomialMultiplicationOptions struct {
 // BVPolynomialMultiplicationCore names a single nonflat source invocation.
 // All inputs and argument views borrow caller lifetimes through scope exit.
 type BVPolynomialMultiplicationCore struct {
+	flatArgs, todo                       ast.ASTHandleBuffer
+	pair                                 [2]ast.ASTHandle
+	currentSort                          ast.ASTHandle
+	localsEnded                          bool
 	self                                 *BVPolynomialMultiplicationCore
 	manager                              *ast.ASTManager
 	numeric                              *ast.BitVectorPolynomialMultiplicationNumerals
@@ -457,7 +461,45 @@ func (p *BVPolynomialMultiplicationCore) releaseBuffers() error {
 	p.terms.Close(p.manager.Budget())
 	return nil
 }
+
+// Rewrite names the original nonflat multiplication body with caller sort.
 func (p *BVPolynomialMultiplicationCore) Rewrite(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialMultiplicationOptions) (RewriteStatus, error) {
+	return p.rewrite(sort, args, out, o, false, false, false)
+}
+
+// RewriteFlat follows the original coefficient-form guard and recursive stack.
+func (p *BVPolynomialMultiplicationCore) RewriteFlat(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialMultiplicationOptions) (RewriteStatus, error) {
+	return p.rewrite(sort, args, out, o, true, false, false)
+}
+
+// RewriteApplication is the mk_mul_core singleton/sort/flat dispatch caller.
+// Source: src/ast/rewriter/poly_rewriter.h:125-136.
+func (p *BVPolynomialMultiplicationCore) RewriteApplication(args ast.AppArguments, out ast.ASTRef, flat bool, o BVPolynomialMultiplicationOptions) (RewriteStatus, error) {
+	return p.rewrite(ast.ASTHandle{}, args, out, o, flat, true, false)
+}
+func (p *BVPolynomialMultiplicationCore) sourceEnd() error {
+	if e := p.childrenSource(); e != nil {
+		return e
+	}
+	if p.localsEnded {
+		return nil
+	}
+	if e := p.releaseBuffers(); e != nil {
+		return e
+	}
+	if p.numeric != nil {
+		if e := p.numeric.SourceEnd(); e != nil {
+			return e
+		}
+	}
+	p.localsEnded = true
+	return nil
+}
+func (p *BVPolynomialMultiplicationCore) endFlat() {
+	p.todo.Close(p.manager.Budget())
+	p.flatArgs.Close(p.manager.Budget())
+}
+func (p *BVPolynomialMultiplicationCore) rewrite(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialMultiplicationOptions, flat, application, fallback bool) (RewriteStatus, error) {
 	if p == nil || p.self != p || p.closed {
 		return RewriteFailed, ast.ErrASTHandle
 	}
@@ -466,7 +508,7 @@ func (p *BVPolynomialMultiplicationCore) Rewrite(sort ast.ASTHandle, args ast.Ap
 	}
 	p.started, p.running = true, true
 	defer func() { p.running = false }()
-	st, e := p.body(sort, args, out, o)
+	st, e := p.dispatch(sort, args, out, o, flat, application)
 	p.bodyCause = e
 	p.sourceCause = p.childrenSource()
 	if e != nil {
@@ -475,12 +517,48 @@ func (p *BVPolynomialMultiplicationCore) Rewrite(sort ast.ASTHandle, args ast.Ap
 	if p.sourceCause != nil {
 		return st, p.sourceCause
 	}
-	if e = p.releaseBuffers(); e == nil && p.numeric != nil {
-		e = p.numeric.SourceEnd()
+	p.sourceCause = p.sourceEnd()
+	if p.sourceCause != nil {
+		return st, p.sourceCause
 	}
-	p.sourceCause = e
-	p.sourceDone = e == nil
-	return st, e
+	p.endFlat()
+	if fallback && st == RewriteFailed {
+		node, body := p.manager.MkBitVectorPolynomialMulWithInvocation(p.currentSort, args, &p.factory)
+		if body == nil {
+			body = p.manager.SetRef(out, node)
+		}
+		if body != nil {
+			p.bodyCause = body
+			p.sourceCause = p.childrenSource()
+			return st, body
+		}
+	}
+	p.sourceCause = p.childrenSource()
+	p.sourceDone = p.sourceCause == nil
+	return st, p.sourceCause
+}
+func (p *BVPolynomialMultiplicationCore) dispatch(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialMultiplicationOptions, flat, application bool) (RewriteStatus, error) {
+	if application {
+		if args.Count() == 0 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		first, e := args.At(0)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if args.Count() == 1 {
+			return RewriteDone, p.manager.SetRef(out, first)
+		}
+		sort, e = p.manager.GetSort(first)
+		if e != nil {
+			return RewriteFailed, e
+		}
+	}
+	p.currentSort = sort
+	if flat {
+		return p.flatBody(sort, args, out, o)
+	}
+	return p.body(sort, args, out, o)
 }
 func (p *BVPolynomialMultiplicationCore) SourceReady() error {
 	if p == nil || p.self != p {
@@ -524,6 +602,7 @@ func (p *BVPolynomialMultiplicationCore) Close() error {
 			return e
 		}
 	}
+	p.endFlat()
 	p.manager.Budget().Release(p.header)
 	p.header = 0
 	p.closed = true
