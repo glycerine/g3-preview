@@ -25,6 +25,7 @@ type BVRewriter struct {
 	eqRemainder           *ast.BitVectorRemainderEqualityNumerals
 	mkbv                  *ast.BitVectorMkBVNumerals
 	ite                   *ast.BitVectorIteNumerals
+	concat                *bvConcatInvocation
 	mulBound              *ast.BitVectorMultiplyBoundNumerals
 	eqRefs                [2]ast.ASTRef
 	defaultParams         util.ParamsRef
@@ -178,6 +179,12 @@ func (p *BVRewriter) Close() error {
 		if e := p.polynomial.closeInvocations(); e != nil {
 			return e
 		}
+	}
+	if p.concat != nil {
+		if e := p.concat.close(p.manager); e != nil {
+			return e
+		}
+		p.concat = nil
 	}
 	if p.mulBound != nil {
 		if e := p.mulBound.Close(); e != nil {

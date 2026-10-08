@@ -13522,7 +13522,9 @@
         "pkg/ast/ast_bv_allone_invocation_test.go",
         "pkg/ast/ast_bv_inverse.go",
         "pkg/ast/ast_bv_normalization.go",
-        "pkg/ast/ast_bv_numeric_caller_invocation_test.go"
+        "pkg/ast/ast_bv_numeric_caller_invocation_test.go",
+        "pkg/ast/ast_bv_extract_bounds.go",
+        "pkg/ast/ast_bv_extract_bounds_test.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -13550,7 +13552,8 @@
         "TestASTBitVectorAllOneExactInvocationEveryReservation",
         "TestASTBitVectorNumericCallerReturnedNormAndInverse",
         "TestASTBitVectorNumericCallerExactEveryActualReservation",
-        "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases"
+        "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases",
+        "TestASTBitVectorExtractBoundsOriginalParameters"
       ],
       "conditionals": [
         {
@@ -13697,6 +13700,14 @@
             "TestASTBitVectorNumericCallerReturnedNormAndInverse",
             "TestASTBitVectorNumericCallerExactEveryActualReservation",
             "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases"
+          ]
+        },
+        {
+          "name": "Original individual get_extract_high/get_extract_low parameter reads without eager combined recognition (src/ast/bv_decl_plugin.h:307-310)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_extract_bounds.go",
+          "tests": [
+            "TestASTBitVectorExtractBoundsOriginalParameters"
           ]
         }
       ],
@@ -21136,7 +21147,11 @@
         "pkg/ast/rewriter/bv_rewriter_mul_bounds.go",
         "pkg/ast/rewriter/bv_rewriter_mul_bounds_test.go",
         "pkg/ast/ast_bv_mul_bound_numerals.go",
-        "pkg/ast/ast_bv_mul_bound_numerals_test.go"
+        "pkg/ast/ast_bv_mul_bound_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_concat.go",
+        "pkg/ast/rewriter/bv_rewriter_concat_test.go",
+        "pkg/ast/ast_bv_concat_numerals.go",
+        "pkg/ast/ast_bv_concat_numerals_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21230,7 +21245,11 @@
         "TestASTBitVectorIteEveryActualCopyReservation",
         "TestBVRewriterMultiplyBoundsOriginalBranches",
         "TestBVRewriterMultiplyBoundsStoredWidthAndColdPublication",
-        "TestASTBitVectorMultiplyBoundEveryActualReservation"
+        "TestASTBitVectorMultiplyBoundEveryActualReservation",
+        "TestBVRewriterConcatOriginalBranchesAndStatuses",
+        "TestBVRewriterConcatEveryColdReservationAndPublication",
+        "TestBVConcatRefBufferPushPopAndForwardDestruction",
+        "TestASTBitVectorConcatEveryActualReservationAndPowerLifetime"
       ],
       "conditionals": [
         {
@@ -22044,6 +22063,24 @@
           "tests": [
             "TestASTBitVectorMultiplyBoundEveryActualReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_concat: ordered numeral fusion, one-level configured flattening, adjacent same-base extraction fusion, original result/status precedence (src/ast/rewriter/bv_rewriter.cpp:1451-1510)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_concat.go",
+          "tests": [
+            "TestBVRewriterConcatOriginalBranchesAndStatuses",
+            "TestBVRewriterConcatEveryColdReservationAndPublication",
+            "TestBVConcatRefBufferPushPopAndForwardDestruction"
+          ]
+        },
+        {
+          "name": "Original concat v1/v2 locals, physical v2 multiplication/addition, returned power full-expression lifetime and exact numeral factory invocation (src/ast/rewriter/bv_rewriter.cpp:1452-1469)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_concat_numerals.go",
+          "tests": [
+            "TestASTBitVectorConcatEveryActualReservationAndPowerLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -22067,7 +22104,8 @@
         "Equality dispatcher owns both default new_lhs/new_rhs refs before the polynomial guard, retaining them across cancellation/isolation/concat/fallback and destroying rhs then lhs after output assignment. Nested existing callers retain actual receipts and their own failure frames; outer close joins younger polynomial frames before older equality locals and persistent trailing/extraction/base members. The optional remainder block places divisor/rhs defaults before recognition, copies rhs first, preserves stored widths without new equality-width validation and retains separate actual Add/PowerOfTwo returned values until the condition ends. Valid BV numerical parameters are integers, so original GE comparisons use the original integer comparison fast path. Sum/power invocations capture exact scalar contexts; actual Runtime width65 refusal/lifetime/history tests close graphs to zero. A reached trailing FAILED still publishes raw equality and is followed by reset_cache(4096).",
         "MkBV validates all arguments in source order before val/two placement, then scans from the last bit. Each physical val multiplication and postfix increment names its actual scalar invocation; copied postfix old value is owned and destroyed at the full-expression boundary even though unused. Numeric factory child receipt joins before older two/val DT, which follow output assignment. Parent retains stopped numeric owner, published result and original cause until exact cleanup. Actual Runtime width65 all-one campaigns refuse every reached numeric reservation through success and retain separate unchanged old postfix result; cold factory campaigns reach published result with consumed old DEC failure. All fixture graphs close to zero.",
         "The ITE rule reaches no numeric placement until the enabled identity/equality/BV/RHS-width guards pass. Three original default numerals are declared RHS/else/then but copied RHS/then/else under source short-circuit guards. Even wide then/else numerals are copied before the then-width guard rejects simplification. Real physical numeric values and exact scalar copy receipts are retained until output assignment and reverse then/else/RHS DT. Failed outer calls retain the exact numeric child, reject replay and close it before persistent members. Equal branches do not read the condition; negated-condition rewriting precedes the ite2id option. Fresh actual Runtime width65 copy campaigns and cold publication/old-DEC campaigns close all graphs to zero and preserve recorded failure history.",
-        "Multiplication predicates place a0/a1 before both recognitions, copy both operands before source zero/one shortcuts and preserve the second numeral width overwrite. Overflow places returned product then limit; underflow places full then half modulus, conditionally subtracts full modulus from a0 then a1 in their physical receivers, places product then distinct copied negative limit. Output assignment precedes reverse reached declarations. Exact scalar contexts name actual copy/product/power/subtraction/negation operations; returned values survive child retirement. Cold published-output/old-DEC and actual Runtime width65 campaigns cover all modes and a left-one/right-big copy fast path, preserve stopped history and close all graphs to zero."
+        "Multiplication predicates place a0/a1 before both recognitions, copy both operands before source zero/one shortcuts and preserve the second numeral width overwrite. Overflow places returned product then limit; underflow places full then half modulus, conditionally subtracts full modulus from a0 then a1 in their physical receivers, places product then distinct copied negative limit. Output assignment precedes reverse reached declarations. Exact scalar contexts name actual copy/product/power/subtraction/negation operations; returned values survive child retirement. Cold published-output/old-DEC and actual Runtime width65 campaigns cover all modes and a left-one/right-big copy fast path, preserve stopped history and close all graphs to zero.",
+        "Selected concat owns a concrete inline16/doubling ref buffer: INC precedes raw push; refused push retains pending INC; raw pop precedes DEC; consumed DEC is recorded before returning refusal; final forward destruction never replays a consumed reference. Default v1/v2 precede all reads; returned power survives physical multiplication and ends before addition. Numeral fusion pops before its factory; extraction fusion constructs before pop. Numeric locals end after result assignment and before the older owning buffer. Stopped outer owner captures exact numeric/factory/buffer prefixes; cold and real Runtime campaigns close shared graphs to zero without changing history."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -22090,7 +22128,8 @@
         "Selected equality dispatcher algorithm and required remainder numerical scope are complete through existing source implementations. Full application dispatcher, remaining BV operator bodies, arithmetic/solver integration and whole source-unit coverage remain required. TRACE/CTTRACE diagnostics, C++ unspecified argument evaluation order, native stack/layout/temporary-elision/default-reference/fatal/exception/global/assertion/destructor ABI and independently stopped source DT remain qualified. Go orders sum before power and retires power before sum at condition exit; no native compiler evaluation-prefix claim is made. No whole source unit is promoted.",
         "Selected mk_mkbv body and exact postfix invocation interface are complete through the configured derived owner. Full BV application dispatch, remaining operator bodies and solver integration remain required. Existing postfix named return/temporary-elision/native layout/global/fatal/exception/assertion/destructor ABI qualifications remain; interface delegates original postfix body rather than replacing postfix with prefix or bit packing. No whole source unit is promoted.",
         "Selected BV mk_ite_core algorithm is complete through the configured derived owner; full BV application dispatch, remaining operators, arithmetic/solver integration and whole unit audits remain required. Source TRACE and native assertion/stack/layout/temporary-elision/global/fatal/exception/destructor ABI remain qualified. DEBUG width/distinctness assertions use checked Go domain boundaries without release prevalidation. No whole source unit is promoted.",
-        "Selected three multiplication-bound bodies are complete through a concrete Go mode adapter; full BV application dispatcher, remaining BV operations and arithmetic/solver integration remain required. Valid BV numeric values use original MPQ integer comparison paths. Existing returned-negation/named-return/temporary-elision/native layout/stack/global/assertion/fatal/exception/destructor ABI and TRACE qualifications remain. No whole source unit is promoted."
+        "Selected three multiplication-bound bodies are complete through a concrete Go mode adapter; full BV application dispatcher, remaining BV operations and arithmetic/solver integration remain required. Valid BV numeric values use original MPQ integer comparison paths. Existing returned-negation/named-return/temporary-elision/native layout/stack/global/assertion/fatal/exception/destructor ABI and TRACE qualifications remain. No whole source unit is promoted.",
+        "Selected concat body is complete; full BV application dispatcher, other operators and solver integration remain required. Go concrete wrapper headers charge actual storage; native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. Owning cleanup of failed INC/raw-push prefixes is not native-fatal resumability. No whole source unit is promoted."
       ]
     },
     {
@@ -22180,7 +22219,11 @@
         "pkg/ast/rewriter/bv_rewriter_mul_bounds.go",
         "pkg/ast/rewriter/bv_rewriter_mul_bounds_test.go",
         "pkg/ast/ast_bv_mul_bound_numerals.go",
-        "pkg/ast/ast_bv_mul_bound_numerals_test.go"
+        "pkg/ast/ast_bv_mul_bound_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_concat.go",
+        "pkg/ast/rewriter/bv_rewriter_concat_test.go",
+        "pkg/ast/ast_bv_concat_numerals.go",
+        "pkg/ast/ast_bv_concat_numerals_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -22293,7 +22336,11 @@
         "TestASTBitVectorIteEveryActualCopyReservation",
         "TestBVRewriterMultiplyBoundsOriginalBranches",
         "TestBVRewriterMultiplyBoundsStoredWidthAndColdPublication",
-        "TestASTBitVectorMultiplyBoundEveryActualReservation"
+        "TestASTBitVectorMultiplyBoundEveryActualReservation",
+        "TestBVRewriterConcatOriginalBranchesAndStatuses",
+        "TestBVRewriterConcatEveryColdReservationAndPublication",
+        "TestBVConcatRefBufferPushPopAndForwardDestruction",
+        "TestASTBitVectorConcatEveryActualReservationAndPowerLifetime"
       ],
       "conditionals": [
         {
@@ -22675,6 +22722,24 @@
           "tests": [
             "TestASTBitVectorMultiplyBoundEveryActualReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_concat: ordered numeral fusion, one-level configured flattening, adjacent same-base extraction fusion, original result/status precedence (src/ast/rewriter/bv_rewriter.cpp:1451-1510)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_concat.go",
+          "tests": [
+            "TestBVRewriterConcatOriginalBranchesAndStatuses",
+            "TestBVRewriterConcatEveryColdReservationAndPublication",
+            "TestBVConcatRefBufferPushPopAndForwardDestruction"
+          ]
+        },
+        {
+          "name": "Original concat v1/v2 locals, physical v2 multiplication/addition, returned power full-expression lifetime and exact numeral factory invocation (src/ast/rewriter/bv_rewriter.cpp:1452-1469)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_concat_numerals.go",
+          "tests": [
+            "TestASTBitVectorConcatEveryActualReservationAndPowerLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -22694,7 +22759,8 @@
         "Equality dispatcher owns both default new_lhs/new_rhs refs before the polynomial guard, retaining them across cancellation/isolation/concat/fallback and destroying rhs then lhs after output assignment. Nested existing callers retain actual receipts and their own failure frames; outer close joins younger polynomial frames before older equality locals and persistent trailing/extraction/base members. The optional remainder block places divisor/rhs defaults before recognition, copies rhs first, preserves stored widths without new equality-width validation and retains separate actual Add/PowerOfTwo returned values until the condition ends. Valid BV numerical parameters are integers, so original GE comparisons use the original integer comparison fast path. Sum/power invocations capture exact scalar contexts; actual Runtime width65 refusal/lifetime/history tests close graphs to zero. A reached trailing FAILED still publishes raw equality and is followed by reset_cache(4096).",
         "MkBV validates all arguments in source order before val/two placement, then scans from the last bit. Each physical val multiplication and postfix increment names its actual scalar invocation; copied postfix old value is owned and destroyed at the full-expression boundary even though unused. Numeric factory child receipt joins before older two/val DT, which follow output assignment. Parent retains stopped numeric owner, published result and original cause until exact cleanup. Actual Runtime width65 all-one campaigns refuse every reached numeric reservation through success and retain separate unchanged old postfix result; cold factory campaigns reach published result with consumed old DEC failure. All fixture graphs close to zero.",
         "The ITE rule reaches no numeric placement until the enabled identity/equality/BV/RHS-width guards pass. Three original default numerals are declared RHS/else/then but copied RHS/then/else under source short-circuit guards. Even wide then/else numerals are copied before the then-width guard rejects simplification. Real physical numeric values and exact scalar copy receipts are retained until output assignment and reverse then/else/RHS DT. Failed outer calls retain the exact numeric child, reject replay and close it before persistent members. Equal branches do not read the condition; negated-condition rewriting precedes the ite2id option. Fresh actual Runtime width65 copy campaigns and cold publication/old-DEC campaigns close all graphs to zero and preserve recorded failure history.",
-        "Multiplication predicates place a0/a1 before both recognitions, copy both operands before source zero/one shortcuts and preserve the second numeral width overwrite. Overflow places returned product then limit; underflow places full then half modulus, conditionally subtracts full modulus from a0 then a1 in their physical receivers, places product then distinct copied negative limit. Output assignment precedes reverse reached declarations. Exact scalar contexts name actual copy/product/power/subtraction/negation operations; returned values survive child retirement. Cold published-output/old-DEC and actual Runtime width65 campaigns cover all modes and a left-one/right-big copy fast path, preserve stopped history and close all graphs to zero."
+        "Multiplication predicates place a0/a1 before both recognitions, copy both operands before source zero/one shortcuts and preserve the second numeral width overwrite. Overflow places returned product then limit; underflow places full then half modulus, conditionally subtracts full modulus from a0 then a1 in their physical receivers, places product then distinct copied negative limit. Output assignment precedes reverse reached declarations. Exact scalar contexts name actual copy/product/power/subtraction/negation operations; returned values survive child retirement. Cold published-output/old-DEC and actual Runtime width65 campaigns cover all modes and a left-one/right-big copy fast path, preserve stopped history and close all graphs to zero.",
+        "Selected concat owns a concrete inline16/doubling ref buffer: INC precedes raw push; refused push retains pending INC; raw pop precedes DEC; consumed DEC is recorded before returning refusal; final forward destruction never replays a consumed reference. Default v1/v2 precede all reads; returned power survives physical multiplication and ends before addition. Numeral fusion pops before its factory; extraction fusion constructs before pop. Numeric locals end after result assignment and before the older owning buffer. Stopped outer owner captures exact numeric/factory/buffer prefixes; cold and real Runtime campaigns close shared graphs to zero without changing history."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -22715,7 +22781,8 @@
         "Selected equality dispatcher algorithm and required remainder numerical scope are complete through existing source implementations. Full application dispatcher, remaining BV operator bodies, arithmetic/solver integration and whole source-unit coverage remain required. TRACE/CTTRACE diagnostics, C++ unspecified argument evaluation order, native stack/layout/temporary-elision/default-reference/fatal/exception/global/assertion/destructor ABI and independently stopped source DT remain qualified. Go orders sum before power and retires power before sum at condition exit; no native compiler evaluation-prefix claim is made. No whole source unit is promoted.",
         "Selected mk_mkbv body and exact postfix invocation interface are complete through the configured derived owner. Full BV application dispatch, remaining operator bodies and solver integration remain required. Existing postfix named return/temporary-elision/native layout/global/fatal/exception/assertion/destructor ABI qualifications remain; interface delegates original postfix body rather than replacing postfix with prefix or bit packing. No whole source unit is promoted.",
         "Selected BV mk_ite_core algorithm is complete through the configured derived owner; full BV application dispatch, remaining operators, arithmetic/solver integration and whole unit audits remain required. Source TRACE and native assertion/stack/layout/temporary-elision/global/fatal/exception/destructor ABI remain qualified. DEBUG width/distinctness assertions use checked Go domain boundaries without release prevalidation. No whole source unit is promoted.",
-        "Selected three multiplication-bound bodies are complete through a concrete Go mode adapter; full BV application dispatcher, remaining BV operations and arithmetic/solver integration remain required. Valid BV numeric values use original MPQ integer comparison paths. Existing returned-negation/named-return/temporary-elision/native layout/stack/global/assertion/fatal/exception/destructor ABI and TRACE qualifications remain. No whole source unit is promoted."
+        "Selected three multiplication-bound bodies are complete through a concrete Go mode adapter; full BV application dispatcher, remaining BV operations and arithmetic/solver integration remain required. Valid BV numeric values use original MPQ integer comparison paths. Existing returned-negation/named-return/temporary-elision/native layout/stack/global/assertion/fatal/exception/destructor ABI and TRACE qualifications remain. No whole source unit is promoted.",
+        "Selected concat body is complete; full BV application dispatcher, other operators and solver integration remain required. Go concrete wrapper headers charge actual storage; native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. Owning cleanup of failed INC/raw-push prefixes is not native-fatal resumability. No whole source unit is promoted."
       ]
     },
     {
@@ -142959,7 +143026,9 @@
         "pkg/math/polynomial/polynomial_gcd_monomial_buffer.go",
         "pkg/math/polynomial/polynomial_gcd_buffer_stopped_growth_source_test.go",
         "pkg/math/polynomial/polynomial_psc_cleanup_reentry_source_test.go",
-        "pkg/math/polynomial/polynomial_psc_next_invocation_source_test.go"
+        "pkg/math/polynomial/polynomial_psc_next_invocation_source_test.go",
+        "pkg/ast/rewriter/bv_rewriter_concat.go",
+        "pkg/ast/rewriter/bv_rewriter_concat_test.go"
       ],
       "tests": [
         "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
@@ -143002,7 +143071,8 @@
         "TestPolynomialPSCHActualCleanupDeletionReentry",
         "TestPolynomialPSCNextActualChildInvocationEveryReservationPrefix",
         "TestPolynomialPSCNextBorrowedHCallbackCannotMutateOwnedBuffer",
-        "TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH"
+        "TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH",
+        "TestBVConcatRefBufferPushPopAndForwardDestruction"
       ],
       "conditionals": [
         {
@@ -143093,6 +143163,15 @@
           "go_target": "pkg/math/polynomial/polynomial_gcd_monomial_buffer.go",
           "tests": [
             "TestPolynomialGCDMonomialBufferConsumedOldGrowth"
+          ]
+        },
+        {
+          "name": "Concrete concat expr_ref_buffer INC-before-push, pop-before-DEC, forward dec_range_ref and consumed-reference owning cleanup (src/util/ref_buffer.h:35-68)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_concat.go",
+          "tests": [
+            "TestBVConcatRefBufferPushPopAndForwardDestruction",
+            "TestBVRewriterConcatEveryColdReservationAndPublication"
           ]
         }
       ],
