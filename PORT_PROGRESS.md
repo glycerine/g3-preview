@@ -30565,4 +30565,6 @@ Completed the existing resource-limit port as exported ResourceLimit, BaseResour
 
 The source's TRACE statement only reports a rejected increment and has no state or control-flow effect. The Go port returns the same false result with the limit unchanged and omits recreation of the C++ process-global diagnostic stream. Reached signed overflow and invalid floating conversion remain explicit errors because those operations are undefined in the C++ source domain.
 
-Seven focused tests, including 3,125 independent action histories, remain green after exporting the API and renaming the files to match resource_limit.h. Focused native and g3debug checks pass (0.005s each). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 81 ported, 282 partial, 1730 unported, plus separately classified platform replacements. No additional full suite was needed after the 22:34 UTC checkpoint.
+Seven focused tests, including 3,125 independent action histories, remain green after exporting the API and renaming the files to match resource_limit.h. Focused native and g3debug checks pass (0.005s each). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 81 ported, 282 partial, 1730 unported, plus separately classified platform replacements.
+
+The full native suite passed at 23:35 UTC after the pool, ref_buffer, ref_util, ref_vector and resource_limit commits: polynomial 256.562s, util 152.418s, AST 32.957s, rewriter 19.828s, with every other tested package green.
