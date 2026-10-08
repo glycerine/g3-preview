@@ -8915,7 +8915,9 @@
         "pkg/ast/rewriter/bool_rewriter_arith_distinct_test.go",
         "pkg/ast/ast_arith_names.go",
         "pkg/ast/ast_builtin_names.go",
-        "pkg/ast/ast_arith_names_test.go"
+        "pkg/ast/ast_arith_names_test.go",
+        "pkg/ast/ast_numeric_util_families.go",
+        "pkg/ast/ast_numeric_util_families_test.go"
       ],
       "tests": [
         "TestASTArithmeticSourceRegistrationAndDeclarations",
@@ -8939,7 +8941,8 @@
         "TestASTArithmeticOriginalSortNamesAndPersistentConversion",
         "TestASTArithmeticOriginalOperatorNamesOrderAndLogic",
         "TestASTArithmeticNameVectorRefusalPreservesFlagAndPrefix",
-        "TestASTArithmeticNameCallbacksAppendToExistingVector"
+        "TestASTArithmeticNameCallbacksAppendToExistingVector",
+        "TestASTNumericUtilityFamilyConstruction"
       ],
       "assertions": [
         {
@@ -9072,6 +9075,14 @@
             "TestASTArithmeticNameCallbacksAppendToExistingVector",
             "TestASTArithmeticOriginalConvertedNumeralsAndDeclaration"
           ]
+        },
+        {
+          "name": "Original arithmetic utility family creation without plugin installation and BV utility repeated family lookup with DEBUG plugin assertion (src/ast/arith_decl_plugin.cpp:641-645; src/ast/bv_decl_plugin.cpp:850-855)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_numeric_util_families.go",
+          "tests": [
+            "TestASTNumericUtilityFamilyConstruction"
+          ]
         }
       ],
       "ownership": [
@@ -9079,7 +9090,8 @@
         "Each lexical rational parameter lives in an embedded owner continuation with its actual numeric copy invocation. Source cleanup checks completed numeric children before parameter destruction; separate owning cleanup handles incomplete payloads and aborts invocation children before reuse. The original cache INC is recorded before setx; every geometric expansion preserves old size until complete gap filling/publication. Unjoined cache INC blocks further numeral publication and source finalization until explicit owned manager cleanup drains it. Source finalize decrements original fields before small Int then Real entries; cache buffers close with the owner. Reflected Go header includes actual continuation/vector fields, and cache capacities are separately charged.",
         "Non-numeral declaration selection borrows source cached members without new INCs or allocation. The arithmetic expression overload reads only the required argument-sort prefix, short-circuits at the first Real sort for coercible operators, and avoids the base decl_plugin domain buffer. Non-numeral parameters and explicit range are ignored as in C++; only zero-arity nonconstant operators are rejected at this factory stage. The existing app arity/sort checks remain separate.",
         "Offset checks borrow original ADD arguments and the stored numeral rational; no numerical copies, AST INCs or allocation are introduced. The four source branches retain exact base identity, two-argument arity, selected family and NUM checks before reading the rational parameter. Tests run both operand orders and all source offset positions with Budget.FailAfter(0), then drain the normal enclosing AST/numeral fixture.",
-        "Caller-owned concrete builtin-name vector holds borrowed symbol records and charges its actual reflected Go backing on source geometric 2,3,5,8,... growth. Callback construction interns each source literal before pushing its record and preserves the exact appended prefix on growth refusal. Reset retains storage; Close releases backing. Conversion is set before the nonlinear-real name append and persists through refusal and later non-NRA queries. Symbols remain with the borrowed SymbolManager, not the vector; native builtin_name/svector ABI/copy profiles are not credited."
+        "Caller-owned concrete builtin-name vector holds borrowed symbol records and charges its actual reflected Go backing on source geometric 2,3,5,8,... growth. Callback construction interns each source literal before pushing its record and preserves the exact appended prefix on growth refusal. Reset retains storage; Close releases backing. Conversion is set before the nonlinear-real name append and persists through refusal and later non-NRA queries. Symbols remain with the borrowed SymbolManager, not the vector; native builtin_name/svector ABI/copy profiles are not credited.",
+        "Utility family bridges borrow ASTManager and return its actual source family identities; no plugin is installed by utility construction. The containing derived BV owner captures the identities in charged fields. Existing native utility plugin pointer/layout/assertion ABI qualifications remain; cached plugin access continues through the manager."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -13036,7 +13048,9 @@
         "pkg/ast/ast_bv_numeral_read.go",
         "pkg/ast/ast_bv_numeral_read_test.go",
         "pkg/ast/ast_bv_allone_invocation_test.go",
-        "pkg/ast/ast_bv_numeric_caller_invocation_test.go"
+        "pkg/ast/ast_bv_numeric_caller_invocation_test.go",
+        "pkg/ast/ast_numeric_util_families.go",
+        "pkg/ast/ast_numeric_util_families_test.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -13121,7 +13135,8 @@
         "TestASTBitVectorAllOneExactInvocationEveryReservation",
         "TestASTBitVectorNumericCallerReturnedNormAndInverse",
         "TestASTBitVectorNumericCallerExactEveryActualReservation",
-        "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases"
+        "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases",
+        "TestASTNumericUtilityFamilyConstruction"
       ],
       "conditionals": [
         {
@@ -13428,6 +13443,14 @@
             "TestASTBitVectorNumericCallerExactEveryActualReservation",
             "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases"
           ]
+        },
+        {
+          "name": "Original arithmetic utility family creation without plugin installation and BV utility repeated family lookup with DEBUG plugin assertion (src/ast/arith_decl_plugin.cpp:641-645; src/ast/bv_decl_plugin.cpp:850-855)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_numeric_util_families.go",
+          "tests": [
+            "TestASTNumericUtilityFamilyConstruction"
+          ]
         }
       ],
       "ownership": [
@@ -13447,7 +13470,8 @@
         "Sort-taking numeral construction borrows sort metadata, erases the numerical input on a failed recognizer guard, and delegates to the existing exact numeral frame only after reading width. The returned numeral uses the source width-based canonical sort, without acquiring the caller raw sort. Original input rational parameter copy precedes the inner zero-width guard; existing numeric invocation owners retain failure cleanup authority. Transport guard saves and restores its predecessor.",
         "One/two scalar source stack parameters are represented by two embedded cold-manager records with scoped epoch tokens, separately from declaration-info scratch. They borrow values and do not allocate arena parameter slots or INC an AST sort. Factory metadata copies retain their existing ownership. Scope ends on success/refusal; stale tokens reject. Every cold constructor reservation campaign closes actual shared owners with zero budget.",
         "Optional all-one invocation prepares the actual caller token before numeric-frame acquisition and captures frame identity/generation at entry. It delegates the unchanged original copied numeral/power/subtraction/compare body, preserves full-expression/local DT, captures failed scopes for exact older-caller cleanup and prohibits failed-call replay even after cleanup. Fresh actual Runtime raw width65 numeral campaigns refuse every reached allocation, preserve recorded SourceReady across cleanup and reject copied contexts. Existing legacy callers and nonnumeral/default bookkeeping adaptations retain their prior qualifications.",
-        "The exact caller interfaces prepare the actual ASTBitVectorNumeralInvocation before numerical acquisition, capture the real inverse/normalization frame identity and generation at entry, and delegate the original bodies without extra wrappers or substitute arithmetic. Unsigned normalization returns its original distinct owned value and never assigns the input; inverse retains the physical output assignment and its one/even/aliased branches. Failed exact frames can be joined before older caller locals end, with preserved source history and failed-call replay rejection after owning cleanup. Fresh actual Runtime width65 campaigns refuse all reached norm and inverse allocations through success; live returned normalized/output values survive child cleanup and both inputs remain unchanged. Enclosing production callers must embed/charge and retain the invocation through source exit. Native layout/stack/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source DT, higher-level multiplication-equality integration and whole-unit completion remain uncredited."
+        "The exact caller interfaces prepare the actual ASTBitVectorNumeralInvocation before numerical acquisition, capture the real inverse/normalization frame identity and generation at entry, and delegate the original bodies without extra wrappers or substitute arithmetic. Unsigned normalization returns its original distinct owned value and never assigns the input; inverse retains the physical output assignment and its one/even/aliased branches. Failed exact frames can be joined before older caller locals end, with preserved source history and failed-call replay rejection after owning cleanup. Fresh actual Runtime width65 campaigns refuse all reached norm and inverse allocations through success; live returned normalized/output values survive child cleanup and both inputs remain unchanged. Enclosing production callers must embed/charge and retain the invocation through source exit. Native layout/stack/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source DT, higher-level multiplication-equality integration and whole-unit completion remain uncredited.",
+        "Utility family bridges borrow ASTManager and return its actual source family identities; no plugin is installed by utility construction. The containing derived BV owner captures the identities in charged fields. Existing native utility plugin pointer/layout/assertion ABI qualifications remain; cached plugin access continues through the manager."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -21091,7 +21115,12 @@
         "pkg/ast/rewriter/bv_rewriter_mul_eq_numeric_test.go",
         "pkg/ast/rewriter/bv_rewriter_config.go",
         "pkg/ast/rewriter/bv_rewriter_config_test.go",
-        "pkg/ast/rewriter/bv_polynomial_config.go"
+        "pkg/ast/rewriter/bv_polynomial_config.go",
+        "pkg/ast/rewriter/bv_rewriter_owner.go",
+        "pkg/ast/rewriter/bv_rewriter_owner_test.go",
+        "pkg/ast/rewriter/mk_extract_proc.go",
+        "pkg/ast/ast_numeric_util_families.go",
+        "pkg/ast/ast_numeric_util_families_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21163,7 +21192,11 @@
         "TestBVRewriterConfigurationDefaultsAndLocalOnlyOption",
         "TestBVRewriterConfigurationModuleFallbackAndSorting",
         "TestBVRewriterConfigurationAllocationFreeSnapshotAndStoppedOwner",
-        "TestBVRewriterConfigurationDescriptionsAndIndependentSetter"
+        "TestBVRewriterConfigurationDescriptionsAndIndependentSetter",
+        "TestBVRewriterOwnerOriginalConstructionAndConfiguredMultiplication",
+        "TestBVRewriterOwnerEveryConstructorReservation",
+        "TestBVRewriterOwnerEveryConfiguredMultiplicationReservation",
+        "TestASTNumericUtilityFamilyConstruction"
       ],
       "conditionals": [
         {
@@ -21875,6 +21908,26 @@
           "tests": [
             "TestBVRewriterConfigurationDescriptionsAndIndependentSetter"
           ]
+        },
+        {
+          "name": "Complete selected derived BV owner construction: BV utility family lookups, polynomial map/two base parameter updates, embedded extraction initialization, trailing cache implementation owner, arithmetic family lookup then local BV update and caller default-parameter exit (src/ast/rewriter/bv_rewriter.h:158-164; src/ast/arith_decl_plugin.cpp:641-645; src/ast/bv_decl_plugin.cpp:850-855)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_owner.go",
+          "tests": [
+            "TestBVRewriterOwnerOriginalConstructionAndConfiguredMultiplication",
+            "TestBVRewriterOwnerEveryConstructorReservation",
+            "TestBVRewriterOwnerEveryConfiguredMultiplicationReservation"
+          ]
+        },
+        {
+          "name": "Configured original BV addition/multiplication callers consuming the real local state and persistent extraction member, stopped-parent replay guards and reverse persistent-member cleanup (src/ast/rewriter/bv_rewriter.cpp:2076-2079,2109-2137,2170-2205)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_owner.go",
+          "tests": [
+            "TestBVRewriterOwnerOriginalConstructionAndConfiguredMultiplication",
+            "TestBVRewriterOwnerEveryConstructorReservation",
+            "TestBVRewriterOwnerEveryConfiguredMultiplicationReservation"
+          ]
         }
       ],
       "ownership": [
@@ -21893,7 +21946,8 @@
         "Concatenation equality borrows actual application argument views or charged physical lhs/rhs singleton storage, without clones or AST INC. It traverses both arrays from their low ends, reads only reached current widths, retains unsigned residual/offset arithmetic and the original equal/shorter-left/shorter-right branches, and updates cursors only after the equality push succeeds. Actual raw inline16/doubling equality buffer and borrowed views/cursors live in a charged concrete invocation. Final manager AND array assignment precedes buffer destruction. Failed prefixes stop replay; parent close releases actual buffer/header without dereferencing possibly retired borrowed views and preserves source history. Forty-segment cold campaigns refuse each reached wrapper/extraction/equality/buffer/factory reservation through success, verify cursor frontiers and observe published AND with consumed old-reference worklist failure. Separate scalar-side/selector tests preserve orientation and erased reads. DEBUG-only completion checks reject unmatched tails, while release retains the original reached-prefix AND behavior. Native stack/layout/assertion/fatal/exception ABI, unspecified C++ nested-call evaluation/failure-prefix order and whole BV configuration/equality dispatch/solver integration remain uncredited.",
         "Isolation constructs t1 then t2 owning reference records before assigning either; t1 holds original first term, t2 holds the raw original tail sum or second term. Tail arguments are a borrowed range, without clones/folding/sorting. Binary multiplication recognizers read both borrowed factors before inspecting the first. Exact all-one caller invocation names the actual existing AST numeral frame before numerical acquisition; successful NUM scopes source-end before subtraction/equality factories, failed NUM scopes are joined before older t2/t1 reference destruction. Final assignment precedes reverse t2/t1 source destruction, with consumed old-reference worklist failures retained by existing checked AST ownership. Cold and actual Runtime width65 all-one campaigns refuse every reached reservation through success, preserve stopped history and close graphs to zero. Native layout/stack/default-nonnumeral bookkeeping/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source reference DT and whole BV equality/configuration/solver dispatch remain uncredited.",
         "Selected mk_mul_eq keeps default outer c_val/c_inv_val alive across inverse and numeral factories; rhs_val/c2_val are placed only in the successful first block, and end before the second lhs-numeral guard when falling through. Product full-expression temporaries and returned new_c2 remain distinct; the non-unit coefficient branch recomputes the product as in source. Search locals are placed only after the constant-sum guard. Actual child receipts join before older numerical DT. Output publication precedes source scope exit; stopped owners retain failure prefixes through exact owning cleanup.",
-        "BV option fields and actual generated module snapshot are embedded in the existing reflected/charged concrete configuration owner. The borrowed local params_ref is not copied or retained beyond update; the module snapshot is released only after the final repeated sort lookup/assignment. Base poly/arith snapshots retire before the derived local update. All reached snapshots use actual decrement receipts and reverse owning cleanup; failure history stops replay. Existing empty/default polynomial constructor remains independent of the derived BV suffix. Actual first-time option-name reads are allocation-free string comparisons; tests refuse all new allocation and verify module reference retirement."
+        "BV option fields and actual generated module snapshot are embedded in the existing reflected/charged concrete configuration owner. The borrowed local params_ref is not copied or retained beyond update; the module snapshot is released only after the final repeated sort lookup/assignment. Base poly/arith snapshots retire before the derived local update. All reached snapshots use actual decrement receipts and reverse owning cleanup; failure history stops replay. Existing empty/default polynomial constructor remains independent of the derived BV suffix. Actual first-time option-name reads are allocation-free string comparisons; tests refuse all new allocation and verify module reference retirement.",
+        "The derived owner captures the actual polynomial base, embedded extraction declaration cache and allocated trailing implementation/caches. Its reflected header charges extraction fields once; standalone extraction construction uses the same original initializer with its own header. A default local parameter full-expression spans both base updates and derived construction/local update. Failed constructor prefixes retain the borrowed context independently of possibly absent base configuration. Stopped invocation frames are joined first, before reverse trailing/extraction/base persistent-member destruction. Exact existing numerical/decrement receipts preserve failure history and published outputs. Fresh refusal campaigns cover both independent borrowed budget channels and configured multiplication with pre-existing caches and consumed old-output DEC failure; all fixture graphs close to zero."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -21911,7 +21965,8 @@
         "The complete selected concat alignment body and target predicates are exposed through existing owner/manager entry points. The actual split_concat_eq option is supplied explicitly to predicates; generated BV snapshot/update integration and full equality dispatcher/solver integration remain required. DEBUG source assertions use checked Go domain boundaries; release receives no new equal-width or at-least-one-concat validation. The borrowed cached extraction procedure orders left then right in Go; unspecified C++ nested argument evaluation order is uncredited. No extra AST references or flattened operand clones are introduced, and no whole source unit is promoted.",
         "The complete selected isolate_term/mk_t1_add_t2_eq_c/is_minus_one_times_t bodies and is_add_mul_const predicate are exposed through the persistent owner/manager. The all-one invocation only wraps the existing original numerical body and captures its actual frame. Unmatched default-numeral bookkeeping retains the existing erased zero-cost adaptation without native lifetime/layout credit. No coefficient reordering, -1 rational substitute, sum-tail flattening or simplification is introduced. Full equality/configuration dispatch and solver integration remain required; no whole source unit is promoted.",
         "Selected mk_mul_eq algorithm is complete, with actual Runtime width65 campaigns and g3debug assertions, but generated BV configuration, full equality dispatcher and solver integration remain required. DEBUG uses the enabled-default g3debug profile; native runtime assertion gate and C++ unspecified nested argument evaluation order remain qualified. Native layout/temporary elision/process-global/fatal/exception ABI and independently stopped source DT remain uncredited. No whole source unit is promoted; Go owning cleanup is not native-fatal resumability.",
-        "Selected BV local/combined option updates, setter and descriptor collection are complete on the existing configuration adapter. Full derived BV object construction with extraction/trailing members, equality/application dispatch and solver integration remain required. The descriptor externalRelease argument represents the original compile-time _EXTERNAL_RELEASE choice; native build macro/stack/layout/destructor/fatal ABI remains qualified. No whole source unit is promoted."
+        "Selected BV local/combined option updates, setter and descriptor collection are complete on the existing configuration adapter. Full derived BV object construction with extraction/trailing members, equality/application dispatch and solver integration remain required. The descriptor externalRelease argument represents the original compile-time _EXTERNAL_RELEASE choice; native build macro/stack/layout/destructor/fatal ABI remains qualified. No whole source unit is promoted.",
+        "Selected derived member construction/configured add/mul integration is complete on the concrete Go owner, but full equality/application dispatcher and solver integration remain required. Native base/imp embedding, stack/default argument/temporary-elision/process-global/assertion/fatal/exception/destructor ABI remain qualified; Go headers account actual wrapper storage and do not claim native layout. The arithmetic utility plugin remains lazy/null; source family lookup does not install it. ASTManager already constructs the arithmetic family, so the actual arithmetic utility lookup is warm and allocation-free. No whole source unit is promoted."
       ]
     },
     {
@@ -21980,7 +22035,12 @@
         "pkg/ast/rewriter/bv_rewriter_mul_eq_numeric_test.go",
         "pkg/ast/rewriter/bv_rewriter_config.go",
         "pkg/ast/rewriter/bv_rewriter_config_test.go",
-        "pkg/ast/rewriter/bv_polynomial_config.go"
+        "pkg/ast/rewriter/bv_polynomial_config.go",
+        "pkg/ast/rewriter/bv_rewriter_owner.go",
+        "pkg/ast/rewriter/bv_rewriter_owner_test.go",
+        "pkg/ast/rewriter/mk_extract_proc.go",
+        "pkg/ast/ast_numeric_util_families.go",
+        "pkg/ast/ast_numeric_util_families_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -22071,7 +22131,11 @@
         "TestBVRewriterConfigurationDefaultsAndLocalOnlyOption",
         "TestBVRewriterConfigurationModuleFallbackAndSorting",
         "TestBVRewriterConfigurationAllocationFreeSnapshotAndStoppedOwner",
-        "TestBVRewriterConfigurationDescriptionsAndIndependentSetter"
+        "TestBVRewriterConfigurationDescriptionsAndIndependentSetter",
+        "TestBVRewriterOwnerOriginalConstructionAndConfiguredMultiplication",
+        "TestBVRewriterOwnerEveryConstructorReservation",
+        "TestBVRewriterOwnerEveryConfiguredMultiplicationReservation",
+        "TestASTNumericUtilityFamilyConstruction"
       ],
       "conditionals": [
         {
@@ -22351,6 +22415,26 @@
           "tests": [
             "TestBVRewriterConfigurationDescriptionsAndIndependentSetter"
           ]
+        },
+        {
+          "name": "Complete selected derived BV owner construction: BV utility family lookups, polynomial map/two base parameter updates, embedded extraction initialization, trailing cache implementation owner, arithmetic family lookup then local BV update and caller default-parameter exit (src/ast/rewriter/bv_rewriter.h:158-164; src/ast/arith_decl_plugin.cpp:641-645; src/ast/bv_decl_plugin.cpp:850-855)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_owner.go",
+          "tests": [
+            "TestBVRewriterOwnerOriginalConstructionAndConfiguredMultiplication",
+            "TestBVRewriterOwnerEveryConstructorReservation",
+            "TestBVRewriterOwnerEveryConfiguredMultiplicationReservation"
+          ]
+        },
+        {
+          "name": "Configured original BV addition/multiplication callers consuming the real local state and persistent extraction member, stopped-parent replay guards and reverse persistent-member cleanup (src/ast/rewriter/bv_rewriter.cpp:2076-2079,2109-2137,2170-2205)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_owner.go",
+          "tests": [
+            "TestBVRewriterOwnerOriginalConstructionAndConfiguredMultiplication",
+            "TestBVRewriterOwnerEveryConstructorReservation",
+            "TestBVRewriterOwnerEveryConfiguredMultiplicationReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22365,7 +22449,8 @@
         "Concatenation equality borrows actual application argument views or charged physical lhs/rhs singleton storage, without clones or AST INC. It traverses both arrays from their low ends, reads only reached current widths, retains unsigned residual/offset arithmetic and the original equal/shorter-left/shorter-right branches, and updates cursors only after the equality push succeeds. Actual raw inline16/doubling equality buffer and borrowed views/cursors live in a charged concrete invocation. Final manager AND array assignment precedes buffer destruction. Failed prefixes stop replay; parent close releases actual buffer/header without dereferencing possibly retired borrowed views and preserves source history. Forty-segment cold campaigns refuse each reached wrapper/extraction/equality/buffer/factory reservation through success, verify cursor frontiers and observe published AND with consumed old-reference worklist failure. Separate scalar-side/selector tests preserve orientation and erased reads. DEBUG-only completion checks reject unmatched tails, while release retains the original reached-prefix AND behavior. Native stack/layout/assertion/fatal/exception ABI, unspecified C++ nested-call evaluation/failure-prefix order and whole BV configuration/equality dispatch/solver integration remain uncredited.",
         "Isolation constructs t1 then t2 owning reference records before assigning either; t1 holds original first term, t2 holds the raw original tail sum or second term. Tail arguments are a borrowed range, without clones/folding/sorting. Binary multiplication recognizers read both borrowed factors before inspecting the first. Exact all-one caller invocation names the actual existing AST numeral frame before numerical acquisition; successful NUM scopes source-end before subtraction/equality factories, failed NUM scopes are joined before older t2/t1 reference destruction. Final assignment precedes reverse t2/t1 source destruction, with consumed old-reference worklist failures retained by existing checked AST ownership. Cold and actual Runtime width65 all-one campaigns refuse every reached reservation through success, preserve stopped history and close graphs to zero. Native layout/stack/default-nonnumeral bookkeeping/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source reference DT and whole BV equality/configuration/solver dispatch remain uncredited.",
         "Selected mk_mul_eq keeps default outer c_val/c_inv_val alive across inverse and numeral factories; rhs_val/c2_val are placed only in the successful first block, and end before the second lhs-numeral guard when falling through. Product full-expression temporaries and returned new_c2 remain distinct; the non-unit coefficient branch recomputes the product as in source. Search locals are placed only after the constant-sum guard. Actual child receipts join before older numerical DT. Output publication precedes source scope exit; stopped owners retain failure prefixes through exact owning cleanup.",
-        "BV option fields and actual generated module snapshot are embedded in the existing reflected/charged concrete configuration owner. The borrowed local params_ref is not copied or retained beyond update; the module snapshot is released only after the final repeated sort lookup/assignment. Base poly/arith snapshots retire before the derived local update. All reached snapshots use actual decrement receipts and reverse owning cleanup; failure history stops replay. Existing empty/default polynomial constructor remains independent of the derived BV suffix. Actual first-time option-name reads are allocation-free string comparisons; tests refuse all new allocation and verify module reference retirement."
+        "BV option fields and actual generated module snapshot are embedded in the existing reflected/charged concrete configuration owner. The borrowed local params_ref is not copied or retained beyond update; the module snapshot is released only after the final repeated sort lookup/assignment. Base poly/arith snapshots retire before the derived local update. All reached snapshots use actual decrement receipts and reverse owning cleanup; failure history stops replay. Existing empty/default polynomial constructor remains independent of the derived BV suffix. Actual first-time option-name reads are allocation-free string comparisons; tests refuse all new allocation and verify module reference retirement.",
+        "The derived owner captures the actual polynomial base, embedded extraction declaration cache and allocated trailing implementation/caches. Its reflected header charges extraction fields once; standalone extraction construction uses the same original initializer with its own header. A default local parameter full-expression spans both base updates and derived construction/local update. Failed constructor prefixes retain the borrowed context independently of possibly absent base configuration. Stopped invocation frames are joined first, before reverse trailing/extraction/base persistent-member destruction. Exact existing numerical/decrement receipts preserve failure history and published outputs. Fresh refusal campaigns cover both independent borrowed budget channels and configured multiplication with pre-existing caches and consumed old-output DEC failure; all fixture graphs close to zero."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -22381,7 +22466,8 @@
         "The complete selected concat alignment body and target predicates are exposed through existing owner/manager entry points. The actual split_concat_eq option is supplied explicitly to predicates; generated BV snapshot/update integration and full equality dispatcher/solver integration remain required. DEBUG source assertions use checked Go domain boundaries; release receives no new equal-width or at-least-one-concat validation. The borrowed cached extraction procedure orders left then right in Go; unspecified C++ nested argument evaluation order is uncredited. No extra AST references or flattened operand clones are introduced, and no whole source unit is promoted.",
         "The complete selected isolate_term/mk_t1_add_t2_eq_c/is_minus_one_times_t bodies and is_add_mul_const predicate are exposed through the persistent owner/manager. The all-one invocation only wraps the existing original numerical body and captures its actual frame. Unmatched default-numeral bookkeeping retains the existing erased zero-cost adaptation without native lifetime/layout credit. No coefficient reordering, -1 rational substitute, sum-tail flattening or simplification is introduced. Full equality/configuration dispatch and solver integration remain required; no whole source unit is promoted.",
         "Selected mk_mul_eq algorithm is complete, with actual Runtime width65 campaigns and g3debug assertions, but generated BV configuration, full equality dispatcher and solver integration remain required. DEBUG uses the enabled-default g3debug profile; native runtime assertion gate and C++ unspecified nested argument evaluation order remain qualified. Native layout/temporary elision/process-global/fatal/exception ABI and independently stopped source DT remain uncredited. No whole source unit is promoted; Go owning cleanup is not native-fatal resumability.",
-        "Selected BV local/combined option updates, setter and descriptor collection are complete on the existing configuration adapter. Full derived BV object construction with extraction/trailing members, equality/application dispatch and solver integration remain required. The descriptor externalRelease argument represents the original compile-time _EXTERNAL_RELEASE choice; native build macro/stack/layout/destructor/fatal ABI remains qualified. No whole source unit is promoted."
+        "Selected BV local/combined option updates, setter and descriptor collection are complete on the existing configuration adapter. Full derived BV object construction with extraction/trailing members, equality/application dispatch and solver integration remain required. The descriptor externalRelease argument represents the original compile-time _EXTERNAL_RELEASE choice; native build macro/stack/layout/destructor/fatal ABI remains qualified. No whole source unit is promoted.",
+        "Selected derived member construction/configured add/mul integration is complete on the concrete Go owner, but full equality/application dispatcher and solver integration remain required. Native base/imp embedding, stack/default argument/temporary-elision/process-global/assertion/fatal/exception/destructor ABI remain qualified; Go headers account actual wrapper storage and do not claim native layout. The arithmetic utility plugin remains lazy/null; source family lookup does not install it. ASTManager already constructs the arithmetic family, so the actual arithmetic utility lookup is warm and allocation-free. No whole source unit is promoted."
       ]
     },
     {

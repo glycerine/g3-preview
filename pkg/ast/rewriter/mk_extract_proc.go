@@ -31,9 +31,17 @@ func NewMkExtractProc(m *ast.ASTManager) (*MkExtractProc, error) {
 	if e := m.Budget().Reserve(bytes); e != nil {
 		return nil, e
 	}
-	p := &MkExtractProc{manager: m, low: ^uint32(0), header: bytes}
-	p.self = p
+	p := &MkExtractProc{header: bytes}
+	p.constructSource(m)
 	return p, nil
+}
+
+// The containing derived rewriter charges this embedded member in its header.
+// Standalone construction delegates the same original initialization.
+func (p *MkExtractProc) constructSource(m *ast.ASTManager) {
+	p.manager = m
+	p.low = ^uint32(0)
+	p.self = p
 }
 
 func (p *MkExtractProc) Apply(high, low uint32, arg ast.ASTHandle) (_ ast.ASTHandle, body error) {

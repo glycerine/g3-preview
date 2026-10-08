@@ -230,6 +230,28 @@ func (p *BVPolynomialRewriter) Close() error {
 	if p.running {
 		return ast.ErrASTPending
 	}
+	if e := p.closeInvocations(); e != nil {
+		return e
+	}
+	if p.config != nil {
+		if e := p.config.Close(); e != nil {
+			return e
+		}
+		p.config = nil
+	}
+	if p.positions != nil {
+		p.positions.close()
+		p.positions = nil
+	}
+	p.manager.Budget().Release(p.header)
+	p.header = 0
+	p.closed = true
+	return nil
+}
+
+// closeInvocations joins younger stopped source locals before the enclosing
+// derived rewriter destroys its trailing/extraction members and base storage.
+func (p *BVPolynomialRewriter) closeInvocations() error {
 	if p.addition != nil {
 		if e := p.addition.Close(); e != nil {
 			return e
@@ -297,18 +319,5 @@ func (p *BVPolynomialRewriter) Close() error {
 	if e := p.manager.CleanupBitVectorNumeralInvocation(&p.additionBits); e != nil {
 		return e
 	}
-	if p.config != nil {
-		if e := p.config.Close(); e != nil {
-			return e
-		}
-		p.config = nil
-	}
-	if p.positions != nil {
-		p.positions.close()
-		p.positions = nil
-	}
-	p.manager.Budget().Release(p.header)
-	p.header = 0
-	p.closed = true
 	return nil
 }
