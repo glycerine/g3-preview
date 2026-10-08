@@ -151080,22 +151080,57 @@
       "path": "src/util/timer.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/timer.go",
+        "pkg/util/timer_test.go"
+      ],
+      "tests": [
+        "TestTimerOriginalStartQueriesAndStrictTimeouts",
+        "TestTimerClockFailureAndReentryPrefixes",
+        "TestTimerEveryColdConstructorReservation",
+        "TestTimerRuntimeLimitRetainsReachedAllocationPrefix",
+        "TestTimerActualProcessClock"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Complete timer construction, destruction, start/get_seconds and short-circuit strict timeouts (timer.h:27-36; timer.cpp:24-39)",
+          "status": "ported",
+          "go_target": "pkg/util/timer.go",
+          "tests": [
+            "TestTimerOriginalStartQueriesAndStrictTimeouts",
+            "TestTimerClockFailureAndReentryPrefixes",
+            "TestTimerEveryColdConstructorReservation",
+            "TestTimerRuntimeLimitRetainsReachedAllocationPrefix",
+            "TestTimerActualProcessClock"
+          ]
+        }
+      ],
+      "ownership": [
+        "Borrowed Runtime/clock; separately charged Go control metadata owns an actual 32-byte Linux stopwatch Runtime allocation. Elapsed, running and reached timespec fields live in that block, including invalid padding and unreached timespec bytes. Constructor errors return the retained owner prefix; Close deallocates valid blocks before metadata, including TLS post-allocation failures. Stop publishes its state before the restart clock read; copied/stopped/reentrant owner checks prevent duplicate ownership."
+      ],
+      "deviations": [
+        "Selected Linux 64-bit stopwatch profile; 32-bit Runtime layouts are rejected explicitly. Native Windows/Darwin stopwatch behavior is not claimed by this wrapper. Existing Go stopwatch clock-error adaptation returns errors; failed clock queries preserve reached state, and constructor errors remain replayable until owning Close. Native C++ exception/destructor ABI and automatic stack cleanup are represented through explicit error/Close operations."
+      ]
     },
     {
       "path": "src/util/timer.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/timer.go",
+        "pkg/util/timer_test.go"
+      ],
+      "tests": [
+        "TestTimerOriginalStartQueriesAndStrictTimeouts",
+        "TestTimerClockFailureAndReentryPrefixes",
+        "TestTimerEveryColdConstructorReservation",
+        "TestTimerRuntimeLimitRetainsReachedAllocationPrefix",
+        "TestTimerActualProcessClock"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -151106,11 +151141,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Complete timer construction, destruction, start/get_seconds and short-circuit strict timeouts (timer.h:27-36; timer.cpp:24-39)",
+          "status": "ported",
+          "go_target": "pkg/util/timer.go",
+          "tests": [
+            "TestTimerOriginalStartQueriesAndStrictTimeouts",
+            "TestTimerClockFailureAndReentryPrefixes",
+            "TestTimerEveryColdConstructorReservation",
+            "TestTimerRuntimeLimitRetainsReachedAllocationPrefix",
+            "TestTimerActualProcessClock"
+          ]
+        }
+      ],
+      "ownership": [
+        "Borrowed Runtime/clock; separately charged Go control metadata owns an actual 32-byte Linux stopwatch Runtime allocation. Elapsed, running and reached timespec fields live in that block, including invalid padding and unreached timespec bytes. Constructor errors return the retained owner prefix; Close deallocates valid blocks before metadata, including TLS post-allocation failures. Stop publishes its state before the restart clock read; copied/stopped/reentrant owner checks prevent duplicate ownership."
+      ],
+      "deviations": [
+        "Selected Linux 64-bit stopwatch profile; 32-bit Runtime layouts are rejected explicitly. Native Windows/Darwin stopwatch behavior is not claimed by this wrapper. Existing Go stopwatch clock-error adaptation returns errors; failed clock queries preserve reached state, and constructor errors remain replayable until owning Close. Native C++ exception/destructor ABI and automatic stack cleanup are represented through explicit error/Close operations."
+      ]
     },
     {
       "path": "src/util/top_sort.h",
