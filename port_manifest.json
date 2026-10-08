@@ -142112,9 +142112,17 @@
       "path": "src/util/nat_set.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/nat_set.go",
+        "pkg/util/nat_set_test.go"
+      ],
+      "tests": [
+        "TestNatSetDomainMembershipResetAndRemoval",
+        "TestNatSetDomainGrowthShrinkAndRegrowth",
+        "TestNatSetTimestampWrapClearsBacking",
+        "TestNatSetOutOfDomainAccessPanics"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -142125,11 +142133,51 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "nat_set constructor, set_domain, get_domain and assure_domain",
+          "status": "ported",
+          "go_target": "pkg/util/nat_set.go",
+          "tests": [
+            "TestNatSetDomainGrowthShrinkAndRegrowth"
+          ]
+        },
+        {
+          "name": "contains, insert and remove",
+          "status": "ported",
+          "go_target": "pkg/util/nat_set.go",
+          "tests": [
+            "TestNatSetDomainMembershipResetAndRemoval",
+            "TestNatSetOutOfDomainAccessPanics"
+          ]
+        },
+        {
+          "name": "reset timestamp advance and UINT_MAX clearing",
+          "status": "ported",
+          "go_target": "pkg/util/nat_set.go",
+          "tests": [
+            "TestNatSetDomainMembershipResetAndRemoval",
+            "TestNatSetTimestampWrapClearsBacking"
+          ]
+        },
+        {
+          "name": "empty domain scan",
+          "status": "ported",
+          "go_target": "pkg/util/nat_set.go",
+          "tests": [
+            "TestNatSetDomainMembershipResetAndRemoval",
+            "TestNatSetTimestampWrapClearsBacking"
+          ]
+        }
+      ],
+      "ownership": [
+        "NatSet exclusively owns its timestamp slice. Domain resizing copies the retained prefix and zero-initializes every newly exposed slot; no borrowed storage is retained."
+      ],
+      "deviations": [
+        "A Go []uint32 replaces svector<unsigned>. Out-of-domain Contains, Insert and Remove retain the source precondition and fail with Go's bounds panic instead of C++ undefined memory access."
+      ]
     },
     {
       "path": "src/util/numeral_buffer.h",

@@ -30418,3 +30418,9 @@ Focused native and g3debug cooperation checks pass (0.005s/0.004s), and ledger a
 Audited the complete statement macro and all retained source references; no source file invokes POP_SCOPES. Recorded it as a language-level replacement instead of creating an unused generic trail abstraction. A future concrete consumer must spell out the source reverse action loop and the two slice truncations using its concrete Go element types.
 
 Ledger and diff validation pass. Inventory is now2102 units,677 APIs:59 ported,287 partial,1752 unported, with four platform replacements recorded separately. No test run is attached to this no-code, no-consumer classification; the22:34 UTC full-suite checkpoint remains current.
+
+### util file: nat_set.h
+
+Ported the complete concrete class as exported NatSet with NewNatSet, SetDomain, GetDomain, AssureDomain, Contains, Insert, Remove, Reset and Empty. A Go uint32 timestamp slice preserves the source constant-time normal reset and the UINT_MAX wraparound clearing scan. Resizing retains the surviving prefix and zeroes every newly exposed slot. Focused tests cover membership transitions, shrinking and regrowth, wraparound, empty scans and the source in-domain access precondition.
+
+Focused native and g3debug NatSet checks pass (0.004s/0.006s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:60 ported,287 partial,1751 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
