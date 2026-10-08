@@ -20995,7 +20995,12 @@
         "pkg/ast/rewriter/bv_rewriter_bit2bool_test.go",
         "pkg/ast/rewriter/bv_rewriter_bit2bool_numeric_test.go",
         "pkg/ast/ast_bv_bit2bool_numerals.go",
-        "pkg/ast/ast_bv_bit2bool_numerals_test.go"
+        "pkg/ast/ast_bv_bit2bool_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_blast_eq.go",
+        "pkg/ast/rewriter/bv_rewriter_blast_eq_test.go",
+        "pkg/ast/rewriter/bv_rewriter_blast_eq_numeric_test.go",
+        "pkg/ast/ast_bv_blast_eq_numerals.go",
+        "pkg/ast/ast_bv_blast_eq_numerals_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21044,7 +21049,12 @@
         "TestBVRewriterBit2BoolEveryColdReservation",
         "TestBVRewriterBit2BoolNOTAndITEEveryColdReservation",
         "TestBVRewriterBit2BoolEveryActualNumeralCopyReservation",
-        "TestASTBit2BoolSubtractionReturnAndLiteralLifetimes"
+        "TestASTBit2BoolSubtractionReturnAndLiteralLifetimes",
+        "TestBVRewriterBlastEqualityOriginalBitOrder",
+        "TestBVRewriterBlastEqualityGuardsSwapAndRHSWidth",
+        "TestBVRewriterBlastEqualityEveryColdReservation",
+        "TestBVRewriterBlastEqualityEveryActualNumericalReservation",
+        "TestASTBlastEqualityPhysicalDivisionAndRemainderLifetimes"
       ],
       "conditionals": [
         {
@@ -21654,6 +21664,25 @@
           "tests": [
             "TestASTBit2BoolSubtractionReturnAndLiteralLifetimes"
           ]
+        },
+        {
+          "name": "Complete selected mk_blast_eq_value: width-one guard before swap, copied rhs updates loop width, OR/XOR/NOT guard, ordered remainder/extract/bit equality push/direct division, and final AND assignment (src/ast/rewriter/bv_rewriter.cpp:2279-2304)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_blast_eq.go",
+          "tests": [
+            "TestBVRewriterBlastEqualityOriginalBitOrder",
+            "TestBVRewriterBlastEqualityGuardsSwapAndRHSWidth",
+            "TestBVRewriterBlastEqualityEveryColdReservation",
+            "TestBVRewriterBlastEqualityEveryActualNumericalReservation"
+          ]
+        },
+        {
+          "name": "Blast equality default v, reached two, remainder return full-expression lifetime, captured unsigned bit numeral and void division into the physical v receiver (src/ast/rewriter/bv_rewriter.cpp:2287-2302; src/util/rational.h:43,46,182-184,202-206)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_blast_eq_numerals.go",
+          "tests": [
+            "TestASTBlastEqualityPhysicalDivisionAndRemainderLifetimes"
+          ]
         }
       ],
       "ownership": [
@@ -21667,7 +21696,8 @@
         "Zero-bit numerical calls use the existing AST-owned address-stable frame. The copied val stays live through the entire helper. PowerOfTwo returns a source temporary; direct division mutates the physical val receiver, then the power ends before two and the value-returning modulo temporary are constructed. Source exit ends modulo return then two then val. An optional exact invocation token captures the actual frame at entry before numerical acquisition, preserves body/source history and permits cleanup without ambient adoption. Failed call sites reject reuse after owning cleanup. Nonnumeral/default-rational bookkeeping is erased through iterative reverse-concat traversal. Actual Runtime cold copy/power/negative-division/modulo campaigns refuse every reached reservation until success and close shared graphs to zero budget.",
         "The complete selected active BV addition caller runs the existing configured persistent polynomial core, ends its successful source scope, then scans original FAILED operands or the actual assigned DONE addition view. Other statuses bypass bit reads. The charged parent embeds an exact ASTBitVectorNumeralInvocation; a reached failed bit read stays captured after core scope exit, prohibits replay, and is joined by owning cleanup without changing history. Successful OR construction acquires operands before final assignment can delete the sole-owned old sum. Cold symbolic and actual Runtime width65 campaigns refuse every reached reservation through success and close graphs to zero. A separate final-reference worklist campaign proves OR publication with consumed old DEC on failure and no duplicate decrement during cleanup. Independently stopped numeric source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, disabled #if 0 branch, full rewriter dispatch and solver integration remain uncredited.",
         "The selected multiplication caller ends the actual persistent polynomial core before the post-core rule. It borrows original FAILED factors or assigned DONE product factors only when binary. Enabled mul2concat places default v before first-factor recognition and copies the stored numeral through an exact scalar child without extra normalization. The power predicate consumes the existing original rational/mpq/mpz inspection. Cached extraction precedes the captured unsigned-zero factory, whose full-expression locals end before concat; v stays live through final assignment and ends afterwards. The actual parent initializer and numerical wrapper are charged, raw initializer handles acquire no extra references, and failed helpers remain captured with stopped parent and exact owning cleanup. Cold symbolic and actual Runtime width129/shift64 campaigns refuse every reached reservation through success, observe extraction publication before later refusal and close all graphs to zero budget. Final old-reference worklist refusal can publish concat with consumed DEC; cleanup never replays that decrement. Independently stopped numerical source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, whole BV configuration/dispatch and solver integration remain uncredited.",
-        "The selected one-bit equality rule reads only lhs width before swap and copies the reached rhs numeral without a new rhs-width check. Physical v stays live through all source scopes. Literal one and a returned 1-v retain distinct ownership until the full assignment expression ends; bit1 acquires a real owning reference before its literal ends. Raw ptr_buffer equalities retain source operand order without extra INC. OR/XOR is assigned before optional NOT, retaining a published intermediate on later refusal. Successful source destruction ends raw buffer, bit1 ref, then v; exact failed scalar/numeral children remain captured and the stopped parent rejects replay. Owning cleanup preserves history, including consumed old-reference worklist failure. Forty-operand cold, NOT/ITE factory, actual Runtime mixed-width large-numeral-copy and lifetime tests close all graphs to zero budget. Independently stopped numerical source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, C++ unspecified nested-call argument evaluation order and full BV configuration/dispatch/solver integration remain uncredited."
+        "The selected one-bit equality rule reads only lhs width before swap and copies the reached rhs numeral without a new rhs-width check. Physical v stays live through all source scopes. Literal one and a returned 1-v retain distinct ownership until the full assignment expression ends; bit1 acquires a real owning reference before its literal ends. Raw ptr_buffer equalities retain source operand order without extra INC. OR/XOR is assigned before optional NOT, retaining a published intermediate on later refusal. Successful source destruction ends raw buffer, bit1 ref, then v; exact failed scalar/numeral children remain captured and the stopped parent rejects replay. Owning cleanup preserves history, including consumed old-reference worklist failure. Forty-operand cold, NOT/ITE factory, actual Runtime mixed-width large-numeral-copy and lifetime tests close all graphs to zero budget. Independently stopped numerical source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, C++ unspecified nested-call argument evaluation order and full BV configuration/dispatch/solver integration remain uncredited.",
+        "The selected wider equality rule guards only original lhs width==1, swaps a numeral lhs, copies the rhs into physical v and publishes its width before supported-operator guards. Reached two precedes raw inline16/doubling new_args. Each returned remainder is tested and source-destroyed before extraction/bit-numeral/equality construction; the equality is pushed before direct void div(v,two,v). The unsigned bit factory owns and captures its actual literal full-expression. Final AND assignment precedes raw-buffer, two and v source destruction. Raw equality pointers acquire no extra references. Failed scalar/numeral/loop prefixes remain captured by the stopped parent and exact owning cleanup preserves history. Cold forty-bit campaigns cover spill and final consumed old-reference failure; actual Runtime width65/18446744073709551621 campaigns refuse every reached numeral/remainder/division/extraction/factory reservation through success, observe retained loop terms and close graphs to zero. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source numeric DT, _TRACE diagnostics and unspecified C++ nested-call evaluation/failure-prefix order remain uncredited."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -21680,7 +21710,8 @@
         "The complete selected is_zero_bit helper resides in ast to use private numerical/reference owners without a reverse import; the ADD post-core reduction now calls it, while the complete selected ADD caller now consumes the actual polynomial core and original OR factory. Numerical bits inspect stored values without width normalization or a new index/width guard. Unknown bits return false; an exhausted/out-of-range concat reaches source UNREACHABLE/release undefined behavior and the Go boundary returns ErrASTDomain. Wrapper/token/stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; Go returning-error cleanup is not native-fatal resumability. This selection does not promote the whole BV rewriter source unit.",
         "The complete selected active mk_bv_add caller now invokes the actual configured polynomial core through BVPolynomialRewriter.RewriteBitVectorAddition; the standalone after-core entry remains available. Exact failed bit-read children are retained in the charged parent, while existing AST checked reference ownership retains consumed final-decrement worklist failures. Disabled #if 0, native ABI, full rewriter dispatch/solver integration and whole-unit completion remain uncredited.",
         "The complete selected mk_bv_mul algorithm receives the actual mul2concat boolean and borrows the existing MkExtractProc through its public entry point. Generated BV parameter snapshot/update integration and the whole bv_rewriter object/dispatch remain required; no default option or substitute polynomial core is fabricated. The source debug shift>=1 assertion uses the checked Go domain boundary, without native assertion/fatal ABI credit. Original unsigned extraction arithmetic is preserved, without a new width/shift guard. Go explicit error cleanup is not native-fatal resumability, and no whole source unit is promoted.",
-        "The complete selected mk_bit2bool is exposed on the existing persistent owner; generated bit2bool option update and equality dispatcher integration remain required. Checked Go boundaries represent the source DEBUG-only v.is_one()||v.is_zero() domain without native assertion ABI credit. Nested ITE/eq argument evaluation is ordered explicitly in Go; unspecified C++ compiler evaluation/failure-prefix order is uncredited. No new rhs-width guard, direct Boolean-variable simplification or flattened XOR substitute is introduced. Whole source-unit completion remains uncredited."
+        "The complete selected mk_bit2bool is exposed on the existing persistent owner; generated bit2bool option update and equality dispatcher integration remain required. Checked Go boundaries represent the source DEBUG-only v.is_one()||v.is_zero() domain without native assertion ABI credit. Nested ITE/eq argument evaluation is ordered explicitly in Go; unspecified C++ compiler evaluation/failure-prefix order is uncredited. No new rhs-width guard, direct Boolean-variable simplification or flattened XOR substitute is introduced. Whole source-unit completion remains uncredited.",
+        "The complete selected mk_blast_eq_value is exposed on the persistent owner and borrows the existing MkExtractProc. Generated blast_eq_value option update, the full equality dispatcher/BV rewriter object and solver integration remain required. The original rhs copied width controls the loop without a new equality-width guard, and the void division is not replaced by returned quotient assignment. _TRACE diagnostics and unspecified C++ nested-call argument evaluation are uncredited; the Go adapter orders extraction then the unsigned bit numeral. No whole source unit is promoted and explicit owning cleanup is not native-fatal resumability."
       ]
     },
     {
@@ -21729,7 +21760,12 @@
         "pkg/ast/rewriter/bv_rewriter_bit2bool_test.go",
         "pkg/ast/rewriter/bv_rewriter_bit2bool_numeric_test.go",
         "pkg/ast/ast_bv_bit2bool_numerals.go",
-        "pkg/ast/ast_bv_bit2bool_numerals_test.go"
+        "pkg/ast/ast_bv_bit2bool_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_blast_eq.go",
+        "pkg/ast/rewriter/bv_rewriter_blast_eq_test.go",
+        "pkg/ast/rewriter/bv_rewriter_blast_eq_numeric_test.go",
+        "pkg/ast/ast_bv_blast_eq_numerals.go",
+        "pkg/ast/ast_bv_blast_eq_numerals_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -21797,7 +21833,12 @@
         "TestBVRewriterBit2BoolEveryColdReservation",
         "TestBVRewriterBit2BoolNOTAndITEEveryColdReservation",
         "TestBVRewriterBit2BoolEveryActualNumeralCopyReservation",
-        "TestASTBit2BoolSubtractionReturnAndLiteralLifetimes"
+        "TestASTBit2BoolSubtractionReturnAndLiteralLifetimes",
+        "TestBVRewriterBlastEqualityOriginalBitOrder",
+        "TestBVRewriterBlastEqualityGuardsSwapAndRHSWidth",
+        "TestBVRewriterBlastEqualityEveryColdReservation",
+        "TestBVRewriterBlastEqualityEveryActualNumericalReservation",
+        "TestASTBlastEqualityPhysicalDivisionAndRemainderLifetimes"
       ],
       "conditionals": [
         {
@@ -21975,6 +22016,25 @@
           "tests": [
             "TestASTBit2BoolSubtractionReturnAndLiteralLifetimes"
           ]
+        },
+        {
+          "name": "Complete selected mk_blast_eq_value: width-one guard before swap, copied rhs updates loop width, OR/XOR/NOT guard, ordered remainder/extract/bit equality push/direct division, and final AND assignment (src/ast/rewriter/bv_rewriter.cpp:2279-2304)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_blast_eq.go",
+          "tests": [
+            "TestBVRewriterBlastEqualityOriginalBitOrder",
+            "TestBVRewriterBlastEqualityGuardsSwapAndRHSWidth",
+            "TestBVRewriterBlastEqualityEveryColdReservation",
+            "TestBVRewriterBlastEqualityEveryActualNumericalReservation"
+          ]
+        },
+        {
+          "name": "Blast equality default v, reached two, remainder return full-expression lifetime, captured unsigned bit numeral and void division into the physical v receiver (src/ast/rewriter/bv_rewriter.cpp:2287-2302; src/util/rational.h:43,46,182-184,202-206)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_blast_eq_numerals.go",
+          "tests": [
+            "TestASTBlastEqualityPhysicalDivisionAndRemainderLifetimes"
+          ]
         }
       ],
       "ownership": [
@@ -21984,7 +22044,8 @@
         "Cancellation borrows actual input monomial views and one persistent positions table. Actual mark planes precede c(0)/a, then coefficient buffer and raw lhs/rhs inline16 buffers. Source exit closes RHS then LHS raw buffers, coefficients, a/c, multiple then visited; owning cleanup first joins exact captured scalar/numeral children and clears any bit-before-list pending candidate. No raw output-buffer INC is introduced. Collected coefficients are checked for zero before coefficient NUM normalization, preserving original retained 0*x. Go source fatal prefixes keep stopped owner/child history, including sparse reset delete-before-replacement allocation and an already-assigned left output at a refused right factory. Cold 88-variable and actual Runtime width65 campaigns refuse every reached allocation through success and close all graphs to zero. std::sort uses a concrete heapsort output/comparator adaptation without library callback/swap/failure-prefix order credit. Independently stopped source DT/final-reference deletion, native layout/stack/process-global/temporary-elision/fatal/assertion/exception ABI, arithmetic specialization and remaining polynomial/solver integration remain uncredited.",
         "The complete selected active BV addition caller runs the existing configured persistent polynomial core, ends its successful source scope, then scans original FAILED operands or the actual assigned DONE addition view. Other statuses bypass bit reads. The charged parent embeds an exact ASTBitVectorNumeralInvocation; a reached failed bit read stays captured after core scope exit, prohibits replay, and is joined by owning cleanup without changing history. Successful OR construction acquires operands before final assignment can delete the sole-owned old sum. Cold symbolic and actual Runtime width65 campaigns refuse every reached reservation through success and close graphs to zero. A separate final-reference worklist campaign proves OR publication with consumed old DEC on failure and no duplicate decrement during cleanup. Independently stopped numeric source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, disabled #if 0 branch, full rewriter dispatch and solver integration remain uncredited.",
         "The selected multiplication caller ends the actual persistent polynomial core before the post-core rule. It borrows original FAILED factors or assigned DONE product factors only when binary. Enabled mul2concat places default v before first-factor recognition and copies the stored numeral through an exact scalar child without extra normalization. The power predicate consumes the existing original rational/mpq/mpz inspection. Cached extraction precedes the captured unsigned-zero factory, whose full-expression locals end before concat; v stays live through final assignment and ends afterwards. The actual parent initializer and numerical wrapper are charged, raw initializer handles acquire no extra references, and failed helpers remain captured with stopped parent and exact owning cleanup. Cold symbolic and actual Runtime width129/shift64 campaigns refuse every reached reservation through success, observe extraction publication before later refusal and close all graphs to zero budget. Final old-reference worklist refusal can publish concat with consumed DEC; cleanup never replays that decrement. Independently stopped numerical source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, whole BV configuration/dispatch and solver integration remain uncredited.",
-        "The selected one-bit equality rule reads only lhs width before swap and copies the reached rhs numeral without a new rhs-width check. Physical v stays live through all source scopes. Literal one and a returned 1-v retain distinct ownership until the full assignment expression ends; bit1 acquires a real owning reference before its literal ends. Raw ptr_buffer equalities retain source operand order without extra INC. OR/XOR is assigned before optional NOT, retaining a published intermediate on later refusal. Successful source destruction ends raw buffer, bit1 ref, then v; exact failed scalar/numeral children remain captured and the stopped parent rejects replay. Owning cleanup preserves history, including consumed old-reference worklist failure. Forty-operand cold, NOT/ITE factory, actual Runtime mixed-width large-numeral-copy and lifetime tests close all graphs to zero budget. Independently stopped numerical source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, C++ unspecified nested-call argument evaluation order and full BV configuration/dispatch/solver integration remain uncredited."
+        "The selected one-bit equality rule reads only lhs width before swap and copies the reached rhs numeral without a new rhs-width check. Physical v stays live through all source scopes. Literal one and a returned 1-v retain distinct ownership until the full assignment expression ends; bit1 acquires a real owning reference before its literal ends. Raw ptr_buffer equalities retain source operand order without extra INC. OR/XOR is assigned before optional NOT, retaining a published intermediate on later refusal. Successful source destruction ends raw buffer, bit1 ref, then v; exact failed scalar/numeral children remain captured and the stopped parent rejects replay. Owning cleanup preserves history, including consumed old-reference worklist failure. Forty-operand cold, NOT/ITE factory, actual Runtime mixed-width large-numeral-copy and lifetime tests close all graphs to zero budget. Independently stopped numerical source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, C++ unspecified nested-call argument evaluation order and full BV configuration/dispatch/solver integration remain uncredited.",
+        "The selected wider equality rule guards only original lhs width==1, swaps a numeral lhs, copies the rhs into physical v and publishes its width before supported-operator guards. Reached two precedes raw inline16/doubling new_args. Each returned remainder is tested and source-destroyed before extraction/bit-numeral/equality construction; the equality is pushed before direct void div(v,two,v). The unsigned bit factory owns and captures its actual literal full-expression. Final AND assignment precedes raw-buffer, two and v source destruction. Raw equality pointers acquire no extra references. Failed scalar/numeral/loop prefixes remain captured by the stopped parent and exact owning cleanup preserves history. Cold forty-bit campaigns cover spill and final consumed old-reference failure; actual Runtime width65/18446744073709551621 campaigns refuse every reached numeral/remainder/division/extraction/factory reservation through success, observe retained loop terms and close graphs to zero. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source numeric DT, _TRACE diagnostics and unspecified C++ nested-call evaluation/failure-prefix order remain uncredited."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -21995,7 +22056,8 @@
         "Selected polynomial factories now consume the existing BV Config numeral construction path, with separate integer-zero/one and copied-zero frame modes. The shared borrowed BV argument factory accepts an operator kind without changing declaration/application branches. The whole current-sort polynomial owner and full BV rewriter remain unported; Go frame/token/layout/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited.",
         "The coefficient-valued power-product helper now uses the existing exact copied-numeral body and an actual one-temporary frame mode within AST, avoiding reverse imports. It does not implement the full polynomial owner, core or solver integration; native wrapper/stack/pointer/allocation/assertion/fatal/exception ABI and whole-unit ownership remain uncredited.",
         "The complete selected mk_bv_mul algorithm receives the actual mul2concat boolean and borrows the existing MkExtractProc through its public entry point. Generated BV parameter snapshot/update integration and the whole bv_rewriter object/dispatch remain required; no default option or substitute polynomial core is fabricated. The source debug shift>=1 assertion uses the checked Go domain boundary, without native assertion/fatal ABI credit. Original unsigned extraction arithmetic is preserved, without a new width/shift guard. Go explicit error cleanup is not native-fatal resumability, and no whole source unit is promoted.",
-        "The complete selected mk_bit2bool is exposed on the existing persistent owner; generated bit2bool option update and equality dispatcher integration remain required. Checked Go boundaries represent the source DEBUG-only v.is_one()||v.is_zero() domain without native assertion ABI credit. Nested ITE/eq argument evaluation is ordered explicitly in Go; unspecified C++ compiler evaluation/failure-prefix order is uncredited. No new rhs-width guard, direct Boolean-variable simplification or flattened XOR substitute is introduced. Whole source-unit completion remains uncredited."
+        "The complete selected mk_bit2bool is exposed on the existing persistent owner; generated bit2bool option update and equality dispatcher integration remain required. Checked Go boundaries represent the source DEBUG-only v.is_one()||v.is_zero() domain without native assertion ABI credit. Nested ITE/eq argument evaluation is ordered explicitly in Go; unspecified C++ compiler evaluation/failure-prefix order is uncredited. No new rhs-width guard, direct Boolean-variable simplification or flattened XOR substitute is introduced. Whole source-unit completion remains uncredited.",
+        "The complete selected mk_blast_eq_value is exposed on the persistent owner and borrows the existing MkExtractProc. Generated blast_eq_value option update, the full equality dispatcher/BV rewriter object and solver integration remain required. The original rhs copied width controls the loop without a new equality-width guard, and the void division is not replaced by returned quotient assignment. _TRACE diagnostics and unspecified C++ nested-call argument evaluation are uncredited; the Go adapter orders extraction then the unsigned bit numeral. No whole source unit is promoted and explicit owning cleanup is not native-fatal resumability."
       ]
     },
     {
