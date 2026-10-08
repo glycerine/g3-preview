@@ -152016,9 +152016,16 @@
       "path": "src/util/stack.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/stack.go"
+      ],
+      "tests": [
+        "TestStackSmallBigZeroLIFOAndReset",
+        "TestStackPageRecyclingAndBigPageRelease",
+        "TestStackPlacementDeleteAndDestructorOrder",
+        "TestStackOwnerBoundsAndClosePreconditions"
+      ],
       "assertions": [
         {
           "line": 53,
@@ -152085,19 +152092,60 @@
           "text": "SASSERT(m_curr_ptr > m_curr_page);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mark storage, page acquisition and constructor/destructor/reset (src/util/stack.cpp:24-82)",
+          "status": "ported",
+          "go_target": "pkg/util/stack.go",
+          "tests": [
+            "TestStackSmallBigZeroLIFOAndReset",
+            "TestStackPageRecyclingAndBigPageRelease"
+          ]
+        },
+        {
+          "name": "top, small/big allocation and alignment boundary behavior (src/util/stack.cpp:84-120)",
+          "status": "ported",
+          "go_target": "pkg/util/stack.go",
+          "tests": [
+            "TestStackSmallBigZeroLIFOAndReset",
+            "TestStackPageRecyclingAndBigPageRelease"
+          ]
+        },
+        {
+          "name": "strict LIFO deallocation, external release and default-page recycling (src/util/stack.cpp:122-147)",
+          "status": "ported",
+          "go_target": "pkg/util/stack.go",
+          "tests": [
+            "TestStackPageRecyclingAndBigPageRelease",
+            "TestStackPlacementDeleteAndDestructorOrder"
+          ]
+        }
+      ],
+      "ownership": [
+        "Stack exclusively owns its BytesRegion, all active default and large pages, and every live allocation. StackRef is a checked borrowed allocation identity; deallocation invalidates it immediately.",
+        "Each allocation owns one nested region scope. Deallocate and Reset roll back scopes in strict last-in-first-out order, release large backing immediately, and retain default pages strongly for deterministic reuse until Close."
+      ],
+      "deviations": [
+        "BytesRegion scalar page links and checked StackRef values replace raw addresses, in-band tagged marks, page.h pointers and tptr.h tagging. This preserves allocation order, alignment-sized marks, large-object release and default-page reuse without exposing unsafe pointers.",
+        "Close explicitly replaces the C++ destructor. Invalid ownership, empty operations and bounds are reported as Go errors instead of debug-only assertions."
+      ]
     },
     {
       "path": "src/util/stack.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/stack.go"
+      ],
+      "tests": [
+        "TestStackSmallBigZeroLIFOAndReset",
+        "TestStackPageRecyclingAndBigPageRelease",
+        "TestStackPlacementDeleteAndDestructorOrder",
+        "TestStackOwnerBoundsAndClosePreconditions"
+      ],
       "conditionals": [
         {
           "line": 18,
@@ -152118,11 +152166,44 @@
           "text": "inline void operator delete(void * ptr, stack & r) { SASSERT(ptr == r.top()); r.deallocate(); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "stack construction, destruction, allocate, deallocate, empty, top and reset (src/util/stack.h:38-43)",
+          "status": "ported",
+          "go_target": "pkg/util/stack.go",
+          "tests": [
+            "TestStackSmallBigZeroLIFOAndReset",
+            "TestStackPageRecyclingAndBigPageRelease",
+            "TestStackOwnerBoundsAndClosePreconditions"
+          ]
+        },
+        {
+          "name": "typed top-checked destruction and deallocation (src/util/stack.h:44)",
+          "status": "ported",
+          "go_target": "pkg/util/stack.go",
+          "tests": [
+            "TestStackPlacementDeleteAndDestructorOrder"
+          ]
+        },
+        {
+          "name": "placement allocation and top-checked placement deletion (src/util/stack.h:47-48)",
+          "status": "ported",
+          "go_target": "pkg/util/stack.go",
+          "tests": [
+            "TestStackPlacementDeleteAndDestructorOrder"
+          ]
+        }
+      ],
+      "ownership": [
+        "Stack owns allocation backing until strict-LIFO Deallocate, Reset or Close. StackRef borrows one live allocation and is bound to its original Stack owner.",
+        "DeallocateValue borrows a concrete destructor callback and invokes it before reclaiming the top allocation, matching the source typed deallocate order."
+      ],
+      "deviations": [
+        "The non-generic DeallocateValue callback supplies the source template destructor operation while following the project rule against Go generics. Allocate plus checked StackRef replaces placement new and raw void pointers.",
+        "Go standard errors replace SASSERT-only failure behavior; no C++ standard-library facility is ported."
+      ]
     },
     {
       "path": "src/util/statistics.cpp",
