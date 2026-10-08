@@ -129903,7 +129903,9 @@
         "pkg/util/mpf_bias_exp.go",
         "pkg/util/mpf_max_value_callback_test.go",
         "pkg/util/mpf_max_value_failure_test.go",
-        "pkg/util/mpf_max_value_test.go"
+        "pkg/util/mpf_max_value_test.go",
+        "pkg/util/mpf_exponent_bounds_test.go",
+        "pkg/util/mpf_exponent_bounds_failure_test.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -130093,7 +130095,11 @@
         "TestArbitraryFloatMkMaxValueCopyTransportPublication",
         "TestArbitraryFloatMkMaxValueEveryActualReservationPrefix",
         "TestArbitraryFloatMkMaxValueIndependentFormat",
-        "TestArbitraryFloatMkMaxValueWarmInline"
+        "TestArbitraryFloatMkMaxValueWarmInline",
+        "TestArbitraryFloatPublicExponentBoundsIndependentAndWarm",
+        "TestArbitraryFloatPublicExponentBoundsSignedBoundary",
+        "TestArbitraryFloatPublicExponentBoundsEveryColdReservation",
+        "TestArbitraryFloatPublicExponentBoundsCacheTransportGuards"
       ],
       "conditionals": [
         {
@@ -130836,6 +130842,17 @@
             "TestArbitraryFloatMkMaxValueIndependentFormat",
             "TestArbitraryFloatMkMaxValueWarmInline"
           ]
+        },
+        {
+          "name": "mpf.cpp:1828-1848; mpf.h:202-205 public mk_bot_exp/mk_top_exp/mk_min_exp/mk_max_exp source cached numerical bounds",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_predicates.go",
+          "tests": [
+            "TestArbitraryFloatPublicExponentBoundsIndependentAndWarm",
+            "TestArbitraryFloatPublicExponentBoundsSignedBoundary",
+            "TestArbitraryFloatPublicExponentBoundsEveryColdReservation",
+            "TestArbitraryFloatPublicExponentBoundsCacheTransportGuards"
+          ]
         }
       ],
       "ownership": [
@@ -130871,7 +130888,8 @@
         "to_mpz declares no lexical NUM or RAW. Source x and explicit output remain borrowed; a concrete reflected MPF scope captures only reached output Integer COPY/shift allocation leaves and the actual copy receipt. Exact source/output Integer and Natural bindings protect both owner graphs during execution, including separate-runtime failure transport and an output Integer borrowed from a different MPF manager. Typed guards inspect actual bindings and exclude unrelated numeric caller policies. Owning cleanup joins captured output prefixes without disposing public source/output fields or inventing helper numerals. Copied/ended body contexts fail before COPY, including inline destinations.",
         "to_sbv_mpq embeds and charges default scoped t and z, both constructed before the first COPY and source-destructed z before t. Exact MPF/Integer COPY receipts, Numeric roots, Natural buffers and verification receipts retain actual reached allocation prefixes. The output rational is borrowed in the source manager namespace. Numerator COPY precedes denominator reset; a refused output COPY preserves its prior denominator. Separate owning cleanup joins only captured invocation receipts and source locals. Actual unpack returning transport protects MPF, Integer and Rational lifecycle/mutation without broadening unrelated caller guards; copied and ended body contexts are refused before inline publication.",
         "to_ieee_bv_mpz embeds and charges only its actual finite-branch biased_exp NUM, with a reached live flag before bias cache lookup/SET; infinity constructs no NUM. Actual Numeric roots and Natural buffer/verification receipts own reached allocating SET/shift/ADD prefixes. Public input/output remain borrowed in the source Integer namespace. Source DT observes younger verifier failure before ending the local; separate owning cleanup joins retained actual roots without replaying the algorithm. Actual BIG biased-exp SET transport protects MPF/Integer/Rational owners, primitive mutations and caller roots. Copied/ended body contexts are refused before publication; class Close joins an abandoned invocation.",
-        "MkMaxValue declares no local NUM or RAW. Output remains caller-owned; cache wrappers stay owned by the MPF manager. It reuses the existing exact allocating SET copy binding and opaque receipt, preserving cold metadata materialization only at an actual allocating copy. Separate receipt cleanup and public-value cleanup join failed COPY prefixes; no new numerals or ownership snapshots are introduced. Real cached 39999-bit fraction COPY failure checks scalar publication before transport, owner/receipt/mutation guards, immediate complete physical/byte graph and zero refunds."
+        "MkMaxValue declares no local NUM or RAW. Output remains caller-owned; cache wrappers stay owned by the MPF manager. It reuses the existing exact allocating SET copy binding and opaque receipt, preserving cold metadata materialization only at an actual allocating copy. Separate receipt cleanup and public-value cleanup join failed COPY prefixes; no new numerals or ownership snapshots are introduced. Real cached 39999-bit fraction COPY failure checks scalar publication before transport, owner/receipt/mutation guards, immediate complete physical/byte graph and zero refunds.",
+        "Public exponent bounds delegate to existing original cached power numerical bodies after the actual manager value-owner guard. They declare no local NUM or RAW and add no invocation metadata: cached numerals and failed cache acquisitions remain owned by existing class wrapper roots. Every selected cold reservation across all four methods includes immediate complete physical/byte graph and zero refunds. Real returning transport at cached wrapper acquisition proves all four bound calls and actual owners are protected by existing execution guards, without unrelated new primitive restrictions."
       ],
       "deviations": [
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
@@ -130900,7 +130918,8 @@
         "ToMPZ assumes unpacked input exactly as the source. The initial exponent assertion is one-sided (exponent < INT_MAX); the int cast follows the target signed32 narrowing. Direct x.sbits is an unsigned 16-bit bit-field, unlike get_sbits() or an unsigned local, and promotes to signed int. Verified against the primary C++ draft conv.prom at https://eel.is/c++draft/conv.prom before implementation; an initial unsigned-subtraction test assumption was corrected. Signed subtraction and following +1 are checked separately at their reached expressions after output COPY and negation. Out-of-range negative exponents can narrow to a small signed32 value without violating the source assertion; literal tests preserve that behavior. Independent truncation oracles cover precisions 2/24/80/120, signs, aliases and foreign descriptor namespaces. Every selected same/foreign cold allocation is physically/byte audited with zero refunds; warm inline calls refuse every reservation and succeed. A real independent foreign-runtime COPY failure protects both MPF/Integer owners and mutations while the source runtime stays idle. No C++ build, new upstream driver assertions or whole MPF/util completion credit. Other MPF bit-vector/rational conversions remain unfinished.",
         "ToSBVMPQ preserves the original per-bit last/round/sticky loop, all five rounding modes, sign application after rational SET, and the source mode switch only for a negative effective exponent. Signed exponent subtraction and following +1 fail separately at their reached source expressions when undefined. Independent big.Rat rounding tests cover precisions 2/24/120, both signs, denormals and exponents; math/big is test-only. Every selected cold allocation prefix is physically and byte audited, including output numerator COPY refusal and unchanged denominator. Warm inline calls allocate nothing with every reservation refused. Real unpack returning transport and reached signed subtraction overflow are tested. No new upstream-driver coverage or whole MPF/util completion is claimed; remaining conversions and dedicated younger-source/first-own transport stress refinements remain outstanding.",
         "ToIEEEBVMPZ preserves stored fields without unpacking, source NaN/one-sided exponent assertions, both infinity/finite assembly branches, source sign SET before shifts/ADDs, and the final significand read after output publication. A shared input significand/output therefore doubles the assembled prefix at the final ADD, as in C++; literal alias tests distinguish this from ordinary IEEE encoding. Independent encodings cover precisions 2/24/53/80/120 and exponent widths 3/8/11/17/32, both signs and bottom exponents; actual IEEE64 signed zero/subnormal/normal/infinity vectors are checked. Every selected cold finite/infinity reservation and alias is physically/byte audited with zero refunds. Infinity fixtures explicitly SET zero; source DEL alone does not clear the value. Debug infinity coverage uses exponent width17 because width32 violates the source exp<INT_MAX precondition. BiasExp/UnbiasExp use actual cached numerals and diagnose reached undefined signed overflow, including exact signed64 boundaries. Warm inline calls create no reservations. No host numerical substitute, new upstream scalar-driver credit or whole MPF/util completion is claimed. Dedicated younger-source/first-own transport refinements remain outstanding.",
-        "MkMaxValue preserves sbits, ebits, sign publication before top-exponent lookup, exponent top-1 before fraction cache lookup/COPY, and original cache arguments. Independent expected maximal fractions/exponents cover exponent widths2/8/11/32/63 and precisions2/24/53/80/120, both signs, including actual +/-MaxFloat64. Every selected cold reservation uses inline/BIG prior outputs with immediate physical/byte graph checks and zero refunds. Warm inline construction succeeds with every reservation refused and exact Runtime/budget equality. No new upstream scalar-driver coverage or whole MPF/util completion is claimed."
+        "MkMaxValue preserves sbits, ebits, sign publication before top-exponent lookup, exponent top-1 before fraction cache lookup/COPY, and original cache arguments. Independent expected maximal fractions/exponents cover exponent widths2/8/11/32/63 and precisions2/24/53/80/120, both signs, including actual +/-MaxFloat64. Every selected cold reservation uses inline/BIG prior outputs with immediate physical/byte graph checks and zero refunds. Warm inline construction succeeds with every reservation refused and exact Runtime/budget equality. No new upstream scalar-driver coverage or whole MPF/util completion is claimed.",
+        "Independent public exponent-bound tests cover every width2-63 and warm allocation refusal with exact Runtime/budget equality. Min/max width1 remains valid whereas top/bottom assert width>=2 in debug. Width64 bot/min/max retain signed limits; debug top reaches the original get_int64 assertion, while release top narrows 2^63 to MinInt64 as in source. This exposed a missing reached top-1 overflow guard in the preceding MkMaxValue port and equivalent internal roundOverflow expression; both now return arena.ErrBounds at the undefined subtraction before exponent/COPY publication. The public constructor test preserves already-published format/sign and old exponent/significand on this boundary. No mathematical replacement of cached bounds, upstream-driver credit or whole MPF/util completion is claimed."
       ]
     },
     {
@@ -131029,7 +131048,9 @@
         "pkg/util/mpf_bias_exp.go",
         "pkg/util/mpf_max_value_callback_test.go",
         "pkg/util/mpf_max_value_failure_test.go",
-        "pkg/util/mpf_max_value_test.go"
+        "pkg/util/mpf_max_value_test.go",
+        "pkg/util/mpf_exponent_bounds_test.go",
+        "pkg/util/mpf_exponent_bounds_failure_test.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -131171,7 +131192,11 @@
         "TestArbitraryFloatMkMaxValueCopyTransportPublication",
         "TestArbitraryFloatMkMaxValueEveryActualReservationPrefix",
         "TestArbitraryFloatMkMaxValueIndependentFormat",
-        "TestArbitraryFloatMkMaxValueWarmInline"
+        "TestArbitraryFloatMkMaxValueWarmInline",
+        "TestArbitraryFloatPublicExponentBoundsIndependentAndWarm",
+        "TestArbitraryFloatPublicExponentBoundsSignedBoundary",
+        "TestArbitraryFloatPublicExponentBoundsEveryColdReservation",
+        "TestArbitraryFloatPublicExponentBoundsCacheTransportGuards"
       ],
       "conditionals": [
         {
@@ -131496,6 +131521,17 @@
             "TestArbitraryFloatMkMaxValueIndependentFormat",
             "TestArbitraryFloatMkMaxValueWarmInline"
           ]
+        },
+        {
+          "name": "mpf.cpp:1828-1848; mpf.h:202-205 public mk_bot_exp/mk_top_exp/mk_min_exp/mk_max_exp source cached numerical bounds",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_predicates.go",
+          "tests": [
+            "TestArbitraryFloatPublicExponentBoundsIndependentAndWarm",
+            "TestArbitraryFloatPublicExponentBoundsSignedBoundary",
+            "TestArbitraryFloatPublicExponentBoundsEveryColdReservation",
+            "TestArbitraryFloatPublicExponentBoundsCacheTransportGuards"
+          ]
         }
       ],
       "ownership": [
@@ -131521,7 +131557,8 @@
         "to_mpz declares no lexical NUM or RAW. Source x and explicit output remain borrowed; a concrete reflected MPF scope captures only reached output Integer COPY/shift allocation leaves and the actual copy receipt. Exact source/output Integer and Natural bindings protect both owner graphs during execution, including separate-runtime failure transport and an output Integer borrowed from a different MPF manager. Typed guards inspect actual bindings and exclude unrelated numeric caller policies. Owning cleanup joins captured output prefixes without disposing public source/output fields or inventing helper numerals. Copied/ended body contexts fail before COPY, including inline destinations.",
         "to_sbv_mpq embeds and charges default scoped t and z, both constructed before the first COPY and source-destructed z before t. Exact MPF/Integer COPY receipts, Numeric roots, Natural buffers and verification receipts retain actual reached allocation prefixes. The output rational is borrowed in the source manager namespace. Numerator COPY precedes denominator reset; a refused output COPY preserves its prior denominator. Separate owning cleanup joins only captured invocation receipts and source locals. Actual unpack returning transport protects MPF, Integer and Rational lifecycle/mutation without broadening unrelated caller guards; copied and ended body contexts are refused before inline publication.",
         "to_ieee_bv_mpz embeds and charges only its actual finite-branch biased_exp NUM, with a reached live flag before bias cache lookup/SET; infinity constructs no NUM. Actual Numeric roots and Natural buffer/verification receipts own reached allocating SET/shift/ADD prefixes. Public input/output remain borrowed in the source Integer namespace. Source DT observes younger verifier failure before ending the local; separate owning cleanup joins retained actual roots without replaying the algorithm. Actual BIG biased-exp SET transport protects MPF/Integer/Rational owners, primitive mutations and caller roots. Copied/ended body contexts are refused before publication; class Close joins an abandoned invocation.",
-        "MkMaxValue declares no local NUM or RAW. Output remains caller-owned; cache wrappers stay owned by the MPF manager. It reuses the existing exact allocating SET copy binding and opaque receipt, preserving cold metadata materialization only at an actual allocating copy. Separate receipt cleanup and public-value cleanup join failed COPY prefixes; no new numerals or ownership snapshots are introduced. Real cached 39999-bit fraction COPY failure checks scalar publication before transport, owner/receipt/mutation guards, immediate complete physical/byte graph and zero refunds."
+        "MkMaxValue declares no local NUM or RAW. Output remains caller-owned; cache wrappers stay owned by the MPF manager. It reuses the existing exact allocating SET copy binding and opaque receipt, preserving cold metadata materialization only at an actual allocating copy. Separate receipt cleanup and public-value cleanup join failed COPY prefixes; no new numerals or ownership snapshots are introduced. Real cached 39999-bit fraction COPY failure checks scalar publication before transport, owner/receipt/mutation guards, immediate complete physical/byte graph and zero refunds.",
+        "Public exponent bounds delegate to existing original cached power numerical bodies after the actual manager value-owner guard. They declare no local NUM or RAW and add no invocation metadata: cached numerals and failed cache acquisitions remain owned by existing class wrapper roots. Every selected cold reservation across all four methods includes immediate complete physical/byte graph and zero refunds. Real returning transport at cached wrapper acquisition proves all four bound calls and actual owners are protected by existing execution guards, without unrelated new primitive restrictions."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -131543,7 +131580,8 @@
         "ToMPZ assumes unpacked input exactly as the source. The initial exponent assertion is one-sided (exponent < INT_MAX); the int cast follows the target signed32 narrowing. Direct x.sbits is an unsigned 16-bit bit-field, unlike get_sbits() or an unsigned local, and promotes to signed int. Verified against the primary C++ draft conv.prom at https://eel.is/c++draft/conv.prom before implementation; an initial unsigned-subtraction test assumption was corrected. Signed subtraction and following +1 are checked separately at their reached expressions after output COPY and negation. Out-of-range negative exponents can narrow to a small signed32 value without violating the source assertion; literal tests preserve that behavior. Independent truncation oracles cover precisions 2/24/80/120, signs, aliases and foreign descriptor namespaces. Every selected same/foreign cold allocation is physically/byte audited with zero refunds; warm inline calls refuse every reservation and succeed. A real independent foreign-runtime COPY failure protects both MPF/Integer owners and mutations while the source runtime stays idle. No C++ build, new upstream driver assertions or whole MPF/util completion credit. Other MPF bit-vector/rational conversions remain unfinished.",
         "ToSBVMPQ preserves the original per-bit last/round/sticky loop, all five rounding modes, sign application after rational SET, and the source mode switch only for a negative effective exponent. Signed exponent subtraction and following +1 fail separately at their reached source expressions when undefined. Independent big.Rat rounding tests cover precisions 2/24/120, both signs, denormals and exponents; math/big is test-only. Every selected cold allocation prefix is physically and byte audited, including output numerator COPY refusal and unchanged denominator. Warm inline calls allocate nothing with every reservation refused. Real unpack returning transport and reached signed subtraction overflow are tested. No new upstream-driver coverage or whole MPF/util completion is claimed; remaining conversions and dedicated younger-source/first-own transport stress refinements remain outstanding.",
         "ToIEEEBVMPZ preserves stored fields without unpacking, source NaN/one-sided exponent assertions, both infinity/finite assembly branches, source sign SET before shifts/ADDs, and the final significand read after output publication. A shared input significand/output therefore doubles the assembled prefix at the final ADD, as in C++; literal alias tests distinguish this from ordinary IEEE encoding. Independent encodings cover precisions 2/24/53/80/120 and exponent widths 3/8/11/17/32, both signs and bottom exponents; actual IEEE64 signed zero/subnormal/normal/infinity vectors are checked. Every selected cold finite/infinity reservation and alias is physically/byte audited with zero refunds. Infinity fixtures explicitly SET zero; source DEL alone does not clear the value. Debug infinity coverage uses exponent width17 because width32 violates the source exp<INT_MAX precondition. BiasExp/UnbiasExp use actual cached numerals and diagnose reached undefined signed overflow, including exact signed64 boundaries. Warm inline calls create no reservations. No host numerical substitute, new upstream scalar-driver credit or whole MPF/util completion is claimed. Dedicated younger-source/first-own transport refinements remain outstanding.",
-        "MkMaxValue preserves sbits, ebits, sign publication before top-exponent lookup, exponent top-1 before fraction cache lookup/COPY, and original cache arguments. Independent expected maximal fractions/exponents cover exponent widths2/8/11/32/63 and precisions2/24/53/80/120, both signs, including actual +/-MaxFloat64. Every selected cold reservation uses inline/BIG prior outputs with immediate physical/byte graph checks and zero refunds. Warm inline construction succeeds with every reservation refused and exact Runtime/budget equality. No new upstream scalar-driver coverage or whole MPF/util completion is claimed."
+        "MkMaxValue preserves sbits, ebits, sign publication before top-exponent lookup, exponent top-1 before fraction cache lookup/COPY, and original cache arguments. Independent expected maximal fractions/exponents cover exponent widths2/8/11/32/63 and precisions2/24/53/80/120, both signs, including actual +/-MaxFloat64. Every selected cold reservation uses inline/BIG prior outputs with immediate physical/byte graph checks and zero refunds. Warm inline construction succeeds with every reservation refused and exact Runtime/budget equality. No new upstream scalar-driver coverage or whole MPF/util completion is claimed.",
+        "Independent public exponent-bound tests cover every width2-63 and warm allocation refusal with exact Runtime/budget equality. Min/max width1 remains valid whereas top/bottom assert width>=2 in debug. Width64 bot/min/max retain signed limits; debug top reaches the original get_int64 assertion, while release top narrows 2^63 to MinInt64 as in source. This exposed a missing reached top-1 overflow guard in the preceding MkMaxValue port and equivalent internal roundOverflow expression; both now return arena.ErrBounds at the undefined subtraction before exponent/COPY publication. The public constructor test preserves already-published format/sign and old exponent/significand on this boundary. No mathematical replacement of cached bounds, upstream-driver credit or whole MPF/util completion is claimed."
       ]
     },
     {

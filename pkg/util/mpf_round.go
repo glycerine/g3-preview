@@ -66,7 +66,11 @@ func (m *ArbitraryFloatManager) roundOverflow(mode ArbitraryFloatRoundingMode, x
 		x.exponent = top
 		return m.integer.SetInt32(&x.significand, 0)
 	}
-	x.exponent = top - 1
+	exponent, e := roundSignedSub(top, 1)
+	if e != nil {
+		return e
+	}
+	x.exponent = exponent
 	p, e := m.roundPower(x.SBits()-1, true)
 	if e != nil {
 		return e

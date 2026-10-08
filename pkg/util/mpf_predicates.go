@@ -1,6 +1,34 @@
 // Source: src/util/mpf.cpp:392-417,1771-1792,1821-1847.
 package util
 
+// MkTopExp and MkBotExp are the reserved exponents for special values.
+// MkMinExp and MkMaxExp delimit the ordinary exponent range.
+// Source: src/util/mpf.cpp:1828-1848; src/util/mpf.h:202-205.
+func (m *ArbitraryFloatManager) MkTopExp(ebits uint32) (int64, error) {
+	if e := m.valueOwnerGuard(); e != nil {
+		return 0, e
+	}
+	return m.topExponent(ebits)
+}
+func (m *ArbitraryFloatManager) MkBotExp(ebits uint32) (int64, error) {
+	if e := m.valueOwnerGuard(); e != nil {
+		return 0, e
+	}
+	return m.bottomExponent(ebits)
+}
+func (m *ArbitraryFloatManager) MkMinExp(ebits uint32) (int64, error) {
+	if e := m.valueOwnerGuard(); e != nil {
+		return 0, e
+	}
+	return m.minExponent(ebits)
+}
+func (m *ArbitraryFloatManager) MkMaxExp(ebits uint32) (int64, error) {
+	if e := m.valueOwnerGuard(); e != nil {
+		return 0, e
+	}
+	return m.maxExponent(ebits)
+}
+
 func (m *ArbitraryFloatManager) topExponent(e uint32) (int64, error) {
 	if modularSourceDebug && e < 2 {
 		return 0, ErrIntegerAssertion

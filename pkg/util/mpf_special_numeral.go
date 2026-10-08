@@ -61,7 +61,11 @@ func (m *ArbitraryFloatManager) MkMaxValue(ebits, sbits uint32, sign bool, out *
 	if e != nil {
 		return e
 	}
-	out.exponent = top - 1
+	exponent, e := roundSignedSub(top, 1)
+	if e != nil {
+		return e
+	}
+	out.exponent = exponent
 	w, e := m.powerTwoMinusOneWrapper(sbits-1, false)
 	if e != nil {
 		return e
