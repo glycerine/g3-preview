@@ -30398,3 +30398,11 @@ Focused native and g3debug statistics checks pass (0.005s each). Util vet, ledge
 Audited src/util/stream_buffer.h completely. It is a one-byte lookahead wrapper around std::istream, and its only retained consumer is the unported src/api/z3_replayer.cpp. Deliberately created no Go mirror of the C++ stream type. That consumer must use bufio.Reader or another io.ByteReader directly when ported, with io.EOF carrying the end/error result instead of the C++ integer sentinel.
 
 Ledger and diff validation pass. Inventory is now2102 units,677 APIs:57 ported,287 partial,1756 unported, with sstream.h and stream_buffer.h separately classified as deliberate standard-library replacements.
+
+### util files: min_cut.h, min_cut.cpp
+
+Ported the concrete min-cut graph and algorithm as exported MinCut, NewMinCut, NewNode, AddEdge, AddEdgeCapacity and ComputeMinCut APIs. The Go implementation retains uint32 capacity arithmetic, initial distance labels, admissible-edge advance/retreat, bottleneck augmentation, residual reachability and source-ordered cut-node appending. Focused tests cover construction, bounds, the source/sink-only early return, weighted branches, zero-capacity enumeration and every valid four-node DAG against an independent partition oracle.
+
+Corrected src/util/min_cut.cpp:166: the source comment and surrounding loop require a reverse edge to predecessor l, but the implementation inserts hard-coded node1. That creates a sink self-loop and makes a small weighted branch graph fail to terminate. The Go port inserts the predecessor and keeps a regression for it. The source also loops on reached cycles and reached positive dead ends; ComputeMinCut detects those invalid source graphs before residual mutation and rejects repeated computation after capacities have been consumed.
+
+Focused native and g3debug min-cut checks pass (0.005s each), util vet and ledger validation pass, and inventory is now2102 units,677 APIs:59 ported,287 partial,1754 unported. The full native suite is green at the22:34 UTC hourly checkpoint: polynomial258.778s, util153.061s, AST32.841s, rewriter19.440s, and all remaining packages passed or had no tests.

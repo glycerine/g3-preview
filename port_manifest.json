@@ -128877,22 +128877,61 @@
       "path": "src/util/min_cut.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/util_min_cut.go",
+        "pkg/util/util_min_cut_test.go"
+      ],
+      "tests": [
+        "TestMinCutWeightedBranchesAndAppendOrder",
+        "TestMinCutZeroCapacityStillAppearsInCutEnumeration",
+        "TestMinCutRejectsSourceGraphsThatWouldNotTerminate",
+        "TestMinCutExhaustiveFourNodeDAGAgainstPartitionOracle"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "initial distance labels, admissible-edge advance/retreat, path augmentation and residual reverse capacity",
+          "status": "ported",
+          "go_target": "pkg/util/util_min_cut.go",
+          "tests": [
+            "TestMinCutWeightedBranchesAndAppendOrder",
+            "TestMinCutExhaustiveFourNodeDAGAgainstPartitionOracle"
+          ]
+        },
+        {
+          "name": "residual reachability and ordered cut-node emission",
+          "status": "ported",
+          "go_target": "pkg/util/util_min_cut.go",
+          "tests": [
+            "TestMinCutWeightedBranchesAndAppendOrder",
+            "TestMinCutZeroCapacityStillAppearsInCutEnumeration"
+          ]
+        }
+      ],
+      "ownership": [
+        "MinCut owns its adjacency, distance and predecessor slices. ComputeMinCut mutates owned residual capacities and appends to caller-owned cut storage without retaining it."
+      ],
+      "deviations": [
+        "src/util/min_cut.cpp:166 says it increases reverse flow but inserts edge(1, max), creating a sink self-loop and nontermination on a two-branch weighted graph. The Go port inserts the actual predecessor node l; the weighted regression and exhaustive partition oracle cover the correction.",
+        "The source traversal does not terminate for a reached cycle or for a positive-capacity reached node that cannot reach sink 1. The Go API returns ErrMinCutGraph before mutating capacities and returns ErrMinCutComputed on a second residual computation. These guards make the source algorithm's required graph domain explicit."
+      ]
     },
     {
       "path": "src/util/min_cut.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/util_min_cut.go",
+        "pkg/util/util_min_cut_test.go"
+      ],
+      "tests": [
+        "TestMinCutNodeConstructionAndBounds",
+        "TestMinCutSourceSinkOnlyPreservesOutput",
+        "TestMinCutWeightedBranchesAndAppendOrder"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -128903,11 +128942,42 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "min_cut constructor and new_node",
+          "status": "ported",
+          "go_target": "pkg/util/util_min_cut.go",
+          "tests": [
+            "TestMinCutNodeConstructionAndBounds"
+          ]
+        },
+        {
+          "name": "add_edge with default or explicit capacity",
+          "status": "ported",
+          "go_target": "pkg/util/util_min_cut.go",
+          "tests": [
+            "TestMinCutNodeConstructionAndBounds",
+            "TestMinCutWeightedBranchesAndAppendOrder"
+          ]
+        },
+        {
+          "name": "compute_min_cut append contract",
+          "status": "ported",
+          "go_target": "pkg/util/util_min_cut.go",
+          "tests": [
+            "TestMinCutSourceSinkOnlyPreservesOutput",
+            "TestMinCutWeightedBranchesAndAppendOrder"
+          ]
+        }
+      ],
+      "ownership": [
+        "NewMinCut constructs source 0 and sink 1 and owns all subsequently appended graph nodes and edges. Returned node indices and cut entries are scalar values."
+      ],
+      "deviations": [
+        "Go has no default arguments, so AddEdge supplies unit capacity and AddEdgeCapacity supplies the source's optional explicit capacity. Out-of-range node indices return ErrMinCutNode instead of entering C++ undefined behavior."
+      ]
     },
     {
       "path": "src/util/mpbq.cpp",
