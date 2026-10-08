@@ -145488,7 +145488,7 @@
       "path": "src/util/pop_scopes.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -145501,11 +145501,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "POP_SCOPES is an unused C statement macro; no retained C++ source invokes it. Per the no-generics rule, the Go port does not create a polymorphic trail wrapper merely to mirror the macro. A future concrete consumer must execute the reverse action loop directly, then reslice its concrete trail to lim[newLevel] and its concrete limit slice to newLevel."
+      ]
     },
     {
       "path": "src/util/prime_generator.cpp",

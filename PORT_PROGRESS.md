@@ -30412,3 +30412,9 @@ Focused native and g3debug min-cut checks pass (0.005s each), util vet and ledge
 Audited the OpenMP compatibility shim and classified it as a platform replacement. The current single-goroutine port uses the source _NO_OMP_ profile: no parallel region, thread number zero, one processor and no-op nested locks. util_cooperate.go already applies those values directly and its focused tests cover the observable control flow. Deliberately added no Go copy of omp.h, omp_nest_lock_t or the C macros; concrete future concurrency belongs in Go runtime and synchronization APIs at each consumer.
 
 Focused native and g3debug cooperation checks pass (0.005s/0.004s), and ledger and diff validation pass. Inventory is now2102 units,677 APIs:59 ported,287 partial,1753 unported, with three platform replacements recorded separately. The22:34 UTC full-suite checkpoint remains current.
+
+### util file: pop_scopes.h
+
+Audited the complete statement macro and all retained source references; no source file invokes POP_SCOPES. Recorded it as a language-level replacement instead of creating an unused generic trail abstraction. A future concrete consumer must spell out the source reverse action loop and the two slice truncations using its concrete Go element types.
+
+Ledger and diff validation pass. Inventory is now2102 units,677 APIs:59 ported,287 partial,1752 unported, with four platform replacements recorded separately. No test run is attached to this no-code, no-consumer classification; the22:34 UTC full-suite checkpoint remains current.
