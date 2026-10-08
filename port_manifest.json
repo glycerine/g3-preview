@@ -13034,7 +13034,8 @@
         "pkg/ast/ast_bv_app_parameter_util_test.go",
         "pkg/ast/ast_bv_arguments.go",
         "pkg/ast/ast_bv_numeral_read.go",
-        "pkg/ast/ast_bv_numeral_read_test.go"
+        "pkg/ast/ast_bv_numeral_read_test.go",
+        "pkg/ast/ast_bv_allone_invocation_test.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -13115,7 +13116,8 @@
         "TestASTBitVectorBorrowedORGuardsAndLifetime",
         "TestASTBitVectorNumeralReadInvocationStoredValueAndUnmatchedOutputs",
         "TestASTBitVectorNumeralReadCopiesBeforeReachedWidthError",
-        "TestASTBitVectorNumeralReadEveryActualCopyReservation"
+        "TestASTBitVectorNumeralReadEveryActualCopyReservation",
+        "TestASTBitVectorAllOneExactInvocationEveryReservation"
       ],
       "conditionals": [
         {
@@ -13394,6 +13396,14 @@
             "TestASTBitVectorNumeralReadCopiesBeforeReachedWidthError",
             "TestASTBitVectorNumeralReadEveryActualCopyReservation"
           ]
+        },
+        {
+          "name": "Exact optional caller invocation around existing all-one recognizer body and real copied numeral/power/subtraction condition frame, without ambient numerical adoption (src/ast/bv_decl_plugin.cpp:794-803; src/ast/rewriter/bv_rewriter.h:38)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_recognizers.go",
+          "tests": [
+            "TestASTBitVectorAllOneExactInvocationEveryReservation"
+          ]
         }
       ],
       "ownership": [
@@ -13411,7 +13421,8 @@
         "Multiplicative inverse owns the original parity rational/mod full-expression, default g/x/y values, gcd return and assignment, optional correction and debug expression values in the shared address-stable BV frame. Thirteen exact child invocations capture copies, powers, gcd, products and moduli. Full-expression values end at their original boundaries and y/x/g drain in reverse declaration order. Failure retains exact owners for whole-context abort. Output assignment preserves aliasing and source publication prefixes; even parity never accesses output. Runtime transport rejects AST cleanup/factory reentry and restores the previous execution guard.",
         "Sign-bit recognition owns the nested normalization receipt captured at actual frame entry and the returned normalized rational and half-modulus values. Source cleanup joins the nested child before older caller values; owning cleanup acknowledges its exact source and abort phases. Successful normalization retires before its returned value is placed in the caller frame, and p then m end in reverse declaration order. Numerical transport spans both caller and nested call and restores the predecessor guard.",
         "Sort-taking numeral construction borrows sort metadata, erases the numerical input on a failed recognizer guard, and delegates to the existing exact numeral frame only after reading width. The returned numeral uses the source width-based canonical sort, without acquiring the caller raw sort. Original input rational parameter copy precedes the inner zero-width guard; existing numeric invocation owners retain failure cleanup authority. Transport guard saves and restores its predecessor.",
-        "One/two scalar source stack parameters are represented by two embedded cold-manager records with scoped epoch tokens, separately from declaration-info scratch. They borrow values and do not allocate arena parameter slots or INC an AST sort. Factory metadata copies retain their existing ownership. Scope ends on success/refusal; stale tokens reject. Every cold constructor reservation campaign closes actual shared owners with zero budget."
+        "One/two scalar source stack parameters are represented by two embedded cold-manager records with scoped epoch tokens, separately from declaration-info scratch. They borrow values and do not allocate arena parameter slots or INC an AST sort. Factory metadata copies retain their existing ownership. Scope ends on success/refusal; stale tokens reject. Every cold constructor reservation campaign closes actual shared owners with zero budget.",
+        "Optional all-one invocation prepares the actual caller token before numeric-frame acquisition and captures frame identity/generation at entry. It delegates the unchanged original copied numeral/power/subtraction/compare body, preserves full-expression/local DT, captures failed scopes for exact older-caller cleanup and prohibits failed-call replay even after cleanup. Fresh actual Runtime raw width65 numeral campaigns refuse every reached allocation, preserve recorded SourceReady across cleanup and reject copied contexts. Existing legacy callers and nonnumeral/default bookkeeping adaptations retain their prior qualifications."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -13456,7 +13467,9 @@
         "pkg/ast/ast_bv_numeral_identity.go",
         "pkg/ast/ast_bv_numeral_identity_test.go",
         "pkg/ast/ast_bv_operation_identity.go",
-        "pkg/ast/ast_bv_arguments.go"
+        "pkg/ast/ast_bv_arguments.go",
+        "pkg/ast/ast_bv_recognizers.go",
+        "pkg/ast/ast_bv_allone_invocation_test.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -13480,7 +13493,8 @@
         "TestASTBitVectorNumeralPredicateOnlyReadsIdentity",
         "TestASTBitVectorOperationIdentityErasesMetadata",
         "TestASTBitVectorBorrowedORArguments",
-        "TestASTBitVectorBorrowedORGuardsAndLifetime"
+        "TestASTBitVectorBorrowedORGuardsAndLifetime",
+        "TestASTBitVectorAllOneExactInvocationEveryReservation"
       ],
       "conditionals": [
         {
@@ -13600,6 +13614,14 @@
             "TestASTBitVectorBorrowedORArguments",
             "TestASTBitVectorBorrowedORGuardsAndLifetime"
           ]
+        },
+        {
+          "name": "Exact optional caller invocation around existing all-one recognizer body and real copied numeral/power/subtraction condition frame, without ambient numerical adoption (src/ast/bv_decl_plugin.cpp:794-803; src/ast/rewriter/bv_rewriter.h:38)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_recognizers.go",
+          "tests": [
+            "TestASTBitVectorAllOneExactInvocationEveryReservation"
+          ]
         }
       ],
       "ownership": [
@@ -13610,7 +13632,8 @@
         "Parameter-free application utilities borrow operand handles/slices and delegate to the original family declaration and application factories. Warm binary calls reuse cached declarations and hash-consed applications under FailAfter(0), with unchanged actual AST stats. No extra INC, DEC or argument buffer is introduced by the utility wrapper.",
         "Division-by-zero declaration helpers borrow the original declaration metadata and first domain. New declaration ownership follows the unchanged family factory and fixed BV cache. Warm helpers retain identical stats under FailAfter(0); twelve cold reservation refusals before success each end with zero shared budget after the actual owning closure.",
         "One/two scalar source stack parameters are represented by two embedded cold-manager records with scoped epoch tokens, separately from declaration-info scratch. They borrow values and do not allocate arena parameter slots or INC an AST sort. Factory metadata copies retain their existing ownership. Scope ends on success/refusal; stale tokens reject. Every cold constructor reservation campaign closes actual shared owners with zero budget.",
-        "The numeral identity overload borrows app/declaration tags without reading or copying parameters or acquiring any reference. Tests use parameterless raw NUM metadata and actual unchanged AST stats under FailAfter(0), including wrong family/kind and variable branches."
+        "The numeral identity overload borrows app/declaration tags without reading or copying parameters or acquiring any reference. Tests use parameterless raw NUM metadata and actual unchanged AST stats under FailAfter(0), including wrong family/kind and variable branches.",
+        "Optional all-one invocation prepares the actual caller token before numeric-frame acquisition and captures frame identity/generation at entry. It delegates the unchanged original copied numeral/power/subtraction/compare body, preserves full-expression/local DT, captures failed scopes for exact older-caller cleanup and prohibits failed-call replay even after cleanup. Fresh actual Runtime raw width65 numeral campaigns refuse every reached allocation, preserve recorded SourceReady across cleanup and reject copied contexts. Existing legacy callers and nonnumeral/default bookkeeping adaptations retain their prior qualifications."
       ],
       "deviations": [
         "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads.",
@@ -21002,7 +21025,11 @@
         "pkg/ast/ast_bv_blast_eq_numerals.go",
         "pkg/ast/ast_bv_blast_eq_numerals_test.go",
         "pkg/ast/rewriter/bv_rewriter_eq_concat.go",
-        "pkg/ast/rewriter/bv_rewriter_eq_concat_test.go"
+        "pkg/ast/rewriter/bv_rewriter_eq_concat_test.go",
+        "pkg/ast/rewriter/bv_rewriter_isolate.go",
+        "pkg/ast/rewriter/bv_rewriter_isolate_test.go",
+        "pkg/ast/rewriter/bv_rewriter_isolate_numeric_test.go",
+        "pkg/ast/ast_bv_allone_invocation_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21060,7 +21087,12 @@
         "TestBVRewriterConcatEqualityOriginalAlignment",
         "TestBVRewriterConcatEqualitySingletonSidesAndTargetGuards",
         "TestBVRewriterConcatEqualityEveryColdReservation",
-        "TestBVRewriterConcatEqualityOriginalDebugCompletionGuard"
+        "TestBVRewriterConcatEqualityOriginalDebugCompletionGuard",
+        "TestBVRewriterIsolateTermOriginalOrientation",
+        "TestBVRewriterIsolateTermGuardsBinaryAndConstantPredicate",
+        "TestBVRewriterIsolateTermEveryColdReservation",
+        "TestBVRewriterIsolateTermEveryActualAllOneReservation",
+        "TestASTBitVectorAllOneExactInvocationEveryReservation"
       ],
       "conditionals": [
         {
@@ -21708,6 +21740,33 @@
           "tests": [
             "TestBVRewriterConcatEqualitySingletonSidesAndTargetGuards"
           ]
+        },
+        {
+          "name": "Complete selected term isolation and helper: original numeral/add swap guards, both owning expr_ref constructors before assignment, original first/raw remaining sum, binary first-factor all-one recognition and original subtraction/equality orientation (src/ast/rewriter/bv_rewriter.cpp:2380-2414)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_isolate.go",
+          "tests": [
+            "TestBVRewriterIsolateTermOriginalOrientation",
+            "TestBVRewriterIsolateTermGuardsBinaryAndConstantPredicate",
+            "TestBVRewriterIsolateTermEveryColdReservation",
+            "TestBVRewriterIsolateTermEveryActualAllOneReservation"
+          ]
+        },
+        {
+          "name": "Original is_add_mul_const: ordered sum operands, numeral-only recognition and binary multiplication with first-factor numeral guard (src/ast/rewriter/bv_rewriter.cpp:2416-2431)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_isolate.go",
+          "tests": [
+            "TestBVRewriterIsolateTermGuardsBinaryAndConstantPredicate"
+          ]
+        },
+        {
+          "name": "Exact optional caller invocation around existing all-one recognizer body and real copied numeral/power/subtraction condition frame, without ambient numerical adoption (src/ast/bv_decl_plugin.cpp:794-803; src/ast/rewriter/bv_rewriter.h:38)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_recognizers.go",
+          "tests": [
+            "TestASTBitVectorAllOneExactInvocationEveryReservation"
+          ]
         }
       ],
       "ownership": [
@@ -21723,7 +21782,8 @@
         "The selected multiplication caller ends the actual persistent polynomial core before the post-core rule. It borrows original FAILED factors or assigned DONE product factors only when binary. Enabled mul2concat places default v before first-factor recognition and copies the stored numeral through an exact scalar child without extra normalization. The power predicate consumes the existing original rational/mpq/mpz inspection. Cached extraction precedes the captured unsigned-zero factory, whose full-expression locals end before concat; v stays live through final assignment and ends afterwards. The actual parent initializer and numerical wrapper are charged, raw initializer handles acquire no extra references, and failed helpers remain captured with stopped parent and exact owning cleanup. Cold symbolic and actual Runtime width129/shift64 campaigns refuse every reached reservation through success, observe extraction publication before later refusal and close all graphs to zero budget. Final old-reference worklist refusal can publish concat with consumed DEC; cleanup never replays that decrement. Independently stopped numerical source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, whole BV configuration/dispatch and solver integration remain uncredited.",
         "The selected one-bit equality rule reads only lhs width before swap and copies the reached rhs numeral without a new rhs-width check. Physical v stays live through all source scopes. Literal one and a returned 1-v retain distinct ownership until the full assignment expression ends; bit1 acquires a real owning reference before its literal ends. Raw ptr_buffer equalities retain source operand order without extra INC. OR/XOR is assigned before optional NOT, retaining a published intermediate on later refusal. Successful source destruction ends raw buffer, bit1 ref, then v; exact failed scalar/numeral children remain captured and the stopped parent rejects replay. Owning cleanup preserves history, including consumed old-reference worklist failure. Forty-operand cold, NOT/ITE factory, actual Runtime mixed-width large-numeral-copy and lifetime tests close all graphs to zero budget. Independently stopped numerical source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, C++ unspecified nested-call argument evaluation order and full BV configuration/dispatch/solver integration remain uncredited.",
         "The selected wider equality rule guards only original lhs width==1, swaps a numeral lhs, copies the rhs into physical v and publishes its width before supported-operator guards. Reached two precedes raw inline16/doubling new_args. Each returned remainder is tested and source-destroyed before extraction/bit-numeral/equality construction; the equality is pushed before direct void div(v,two,v). The unsigned bit factory owns and captures its actual literal full-expression. Final AND assignment precedes raw-buffer, two and v source destruction. Raw equality pointers acquire no extra references. Failed scalar/numeral/loop prefixes remain captured by the stopped parent and exact owning cleanup preserves history. Cold forty-bit campaigns cover spill and final consumed old-reference failure; actual Runtime width65/18446744073709551621 campaigns refuse every reached numeral/remainder/division/extraction/factory reservation through success, observe retained loop terms and close graphs to zero. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source numeric DT, _TRACE diagnostics and unspecified C++ nested-call evaluation/failure-prefix order remain uncredited.",
-        "Concatenation equality borrows actual application argument views or charged physical lhs/rhs singleton storage, without clones or AST INC. It traverses both arrays from their low ends, reads only reached current widths, retains unsigned residual/offset arithmetic and the original equal/shorter-left/shorter-right branches, and updates cursors only after the equality push succeeds. Actual raw inline16/doubling equality buffer and borrowed views/cursors live in a charged concrete invocation. Final manager AND array assignment precedes buffer destruction. Failed prefixes stop replay; parent close releases actual buffer/header without dereferencing possibly retired borrowed views and preserves source history. Forty-segment cold campaigns refuse each reached wrapper/extraction/equality/buffer/factory reservation through success, verify cursor frontiers and observe published AND with consumed old-reference worklist failure. Separate scalar-side/selector tests preserve orientation and erased reads. DEBUG-only completion checks reject unmatched tails, while release retains the original reached-prefix AND behavior. Native stack/layout/assertion/fatal/exception ABI, unspecified C++ nested-call evaluation/failure-prefix order and whole BV configuration/equality dispatch/solver integration remain uncredited."
+        "Concatenation equality borrows actual application argument views or charged physical lhs/rhs singleton storage, without clones or AST INC. It traverses both arrays from their low ends, reads only reached current widths, retains unsigned residual/offset arithmetic and the original equal/shorter-left/shorter-right branches, and updates cursors only after the equality push succeeds. Actual raw inline16/doubling equality buffer and borrowed views/cursors live in a charged concrete invocation. Final manager AND array assignment precedes buffer destruction. Failed prefixes stop replay; parent close releases actual buffer/header without dereferencing possibly retired borrowed views and preserves source history. Forty-segment cold campaigns refuse each reached wrapper/extraction/equality/buffer/factory reservation through success, verify cursor frontiers and observe published AND with consumed old-reference worklist failure. Separate scalar-side/selector tests preserve orientation and erased reads. DEBUG-only completion checks reject unmatched tails, while release retains the original reached-prefix AND behavior. Native stack/layout/assertion/fatal/exception ABI, unspecified C++ nested-call evaluation/failure-prefix order and whole BV configuration/equality dispatch/solver integration remain uncredited.",
+        "Isolation constructs t1 then t2 owning reference records before assigning either; t1 holds original first term, t2 holds the raw original tail sum or second term. Tail arguments are a borrowed range, without clones/folding/sorting. Binary multiplication recognizers read both borrowed factors before inspecting the first. Exact all-one caller invocation names the actual existing AST numeral frame before numerical acquisition; successful NUM scopes source-end before subtraction/equality factories, failed NUM scopes are joined before older t2/t1 reference destruction. Final assignment precedes reverse t2/t1 source destruction, with consumed old-reference worklist failures retained by existing checked AST ownership. Cold and actual Runtime width65 all-one campaigns refuse every reached reservation through success, preserve stopped history and close graphs to zero. Native layout/stack/default-nonnumeral bookkeeping/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source reference DT and whole BV equality/configuration/solver dispatch remain uncredited."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -21738,7 +21798,8 @@
         "The complete selected mk_bv_mul algorithm receives the actual mul2concat boolean and borrows the existing MkExtractProc through its public entry point. Generated BV parameter snapshot/update integration and the whole bv_rewriter object/dispatch remain required; no default option or substitute polynomial core is fabricated. The source debug shift>=1 assertion uses the checked Go domain boundary, without native assertion/fatal ABI credit. Original unsigned extraction arithmetic is preserved, without a new width/shift guard. Go explicit error cleanup is not native-fatal resumability, and no whole source unit is promoted.",
         "The complete selected mk_bit2bool is exposed on the existing persistent owner; generated bit2bool option update and equality dispatcher integration remain required. Checked Go boundaries represent the source DEBUG-only v.is_one()||v.is_zero() domain without native assertion ABI credit. Nested ITE/eq argument evaluation is ordered explicitly in Go; unspecified C++ compiler evaluation/failure-prefix order is uncredited. No new rhs-width guard, direct Boolean-variable simplification or flattened XOR substitute is introduced. Whole source-unit completion remains uncredited.",
         "The complete selected mk_blast_eq_value is exposed on the persistent owner and borrows the existing MkExtractProc. Generated blast_eq_value option update, the full equality dispatcher/BV rewriter object and solver integration remain required. The original rhs copied width controls the loop without a new equality-width guard, and the void division is not replaced by returned quotient assignment. _TRACE diagnostics and unspecified C++ nested-call argument evaluation are uncredited; the Go adapter orders extraction then the unsigned bit numeral. No whole source unit is promoted and explicit owning cleanup is not native-fatal resumability.",
-        "The complete selected concat alignment body and target predicates are exposed through existing owner/manager entry points. The actual split_concat_eq option is supplied explicitly to predicates; generated BV snapshot/update integration and full equality dispatcher/solver integration remain required. DEBUG source assertions use checked Go domain boundaries; release receives no new equal-width or at-least-one-concat validation. The borrowed cached extraction procedure orders left then right in Go; unspecified C++ nested argument evaluation order is uncredited. No extra AST references or flattened operand clones are introduced, and no whole source unit is promoted."
+        "The complete selected concat alignment body and target predicates are exposed through existing owner/manager entry points. The actual split_concat_eq option is supplied explicitly to predicates; generated BV snapshot/update integration and full equality dispatcher/solver integration remain required. DEBUG source assertions use checked Go domain boundaries; release receives no new equal-width or at-least-one-concat validation. The borrowed cached extraction procedure orders left then right in Go; unspecified C++ nested argument evaluation order is uncredited. No extra AST references or flattened operand clones are introduced, and no whole source unit is promoted.",
+        "The complete selected isolate_term/mk_t1_add_t2_eq_c/is_minus_one_times_t bodies and is_add_mul_const predicate are exposed through the persistent owner/manager. The all-one invocation only wraps the existing original numerical body and captures its actual frame. Unmatched default-numeral bookkeeping retains the existing erased zero-cost adaptation without native lifetime/layout credit. No coefficient reordering, -1 rational substitute, sum-tail flattening or simplification is introduced. Full equality/configuration dispatch and solver integration remain required; no whole source unit is promoted."
       ]
     },
     {
@@ -21794,7 +21855,12 @@
         "pkg/ast/ast_bv_blast_eq_numerals.go",
         "pkg/ast/ast_bv_blast_eq_numerals_test.go",
         "pkg/ast/rewriter/bv_rewriter_eq_concat.go",
-        "pkg/ast/rewriter/bv_rewriter_eq_concat_test.go"
+        "pkg/ast/rewriter/bv_rewriter_eq_concat_test.go",
+        "pkg/ast/rewriter/bv_rewriter_isolate.go",
+        "pkg/ast/rewriter/bv_rewriter_isolate_test.go",
+        "pkg/ast/rewriter/bv_rewriter_isolate_numeric_test.go",
+        "pkg/ast/ast_bv_recognizers.go",
+        "pkg/ast/ast_bv_allone_invocation_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -21871,7 +21937,12 @@
         "TestBVRewriterConcatEqualityOriginalAlignment",
         "TestBVRewriterConcatEqualitySingletonSidesAndTargetGuards",
         "TestBVRewriterConcatEqualityEveryColdReservation",
-        "TestBVRewriterConcatEqualityOriginalDebugCompletionGuard"
+        "TestBVRewriterConcatEqualityOriginalDebugCompletionGuard",
+        "TestBVRewriterIsolateTermOriginalOrientation",
+        "TestBVRewriterIsolateTermGuardsBinaryAndConstantPredicate",
+        "TestBVRewriterIsolateTermEveryColdReservation",
+        "TestBVRewriterIsolateTermEveryActualAllOneReservation",
+        "TestASTBitVectorAllOneExactInvocationEveryReservation"
       ],
       "conditionals": [
         {
@@ -22087,6 +22158,33 @@
           "tests": [
             "TestBVRewriterConcatEqualitySingletonSidesAndTargetGuards"
           ]
+        },
+        {
+          "name": "Complete selected term isolation and helper: original numeral/add swap guards, both owning expr_ref constructors before assignment, original first/raw remaining sum, binary first-factor all-one recognition and original subtraction/equality orientation (src/ast/rewriter/bv_rewriter.cpp:2380-2414)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_isolate.go",
+          "tests": [
+            "TestBVRewriterIsolateTermOriginalOrientation",
+            "TestBVRewriterIsolateTermGuardsBinaryAndConstantPredicate",
+            "TestBVRewriterIsolateTermEveryColdReservation",
+            "TestBVRewriterIsolateTermEveryActualAllOneReservation"
+          ]
+        },
+        {
+          "name": "Original is_add_mul_const: ordered sum operands, numeral-only recognition and binary multiplication with first-factor numeral guard (src/ast/rewriter/bv_rewriter.cpp:2416-2431)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_isolate.go",
+          "tests": [
+            "TestBVRewriterIsolateTermGuardsBinaryAndConstantPredicate"
+          ]
+        },
+        {
+          "name": "Exact optional caller invocation around existing all-one recognizer body and real copied numeral/power/subtraction condition frame, without ambient numerical adoption (src/ast/bv_decl_plugin.cpp:794-803; src/ast/rewriter/bv_rewriter.h:38)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_recognizers.go",
+          "tests": [
+            "TestASTBitVectorAllOneExactInvocationEveryReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22098,7 +22196,8 @@
         "The selected multiplication caller ends the actual persistent polynomial core before the post-core rule. It borrows original FAILED factors or assigned DONE product factors only when binary. Enabled mul2concat places default v before first-factor recognition and copies the stored numeral through an exact scalar child without extra normalization. The power predicate consumes the existing original rational/mpq/mpz inspection. Cached extraction precedes the captured unsigned-zero factory, whose full-expression locals end before concat; v stays live through final assignment and ends afterwards. The actual parent initializer and numerical wrapper are charged, raw initializer handles acquire no extra references, and failed helpers remain captured with stopped parent and exact owning cleanup. Cold symbolic and actual Runtime width129/shift64 campaigns refuse every reached reservation through success, observe extraction publication before later refusal and close all graphs to zero budget. Final old-reference worklist refusal can publish concat with consumed DEC; cleanup never replays that decrement. Independently stopped numerical source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, whole BV configuration/dispatch and solver integration remain uncredited.",
         "The selected one-bit equality rule reads only lhs width before swap and copies the reached rhs numeral without a new rhs-width check. Physical v stays live through all source scopes. Literal one and a returned 1-v retain distinct ownership until the full assignment expression ends; bit1 acquires a real owning reference before its literal ends. Raw ptr_buffer equalities retain source operand order without extra INC. OR/XOR is assigned before optional NOT, retaining a published intermediate on later refusal. Successful source destruction ends raw buffer, bit1 ref, then v; exact failed scalar/numeral children remain captured and the stopped parent rejects replay. Owning cleanup preserves history, including consumed old-reference worklist failure. Forty-operand cold, NOT/ITE factory, actual Runtime mixed-width large-numeral-copy and lifetime tests close all graphs to zero budget. Independently stopped numerical source DT, native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, C++ unspecified nested-call argument evaluation order and full BV configuration/dispatch/solver integration remain uncredited.",
         "The selected wider equality rule guards only original lhs width==1, swaps a numeral lhs, copies the rhs into physical v and publishes its width before supported-operator guards. Reached two precedes raw inline16/doubling new_args. Each returned remainder is tested and source-destroyed before extraction/bit-numeral/equality construction; the equality is pushed before direct void div(v,two,v). The unsigned bit factory owns and captures its actual literal full-expression. Final AND assignment precedes raw-buffer, two and v source destruction. Raw equality pointers acquire no extra references. Failed scalar/numeral/loop prefixes remain captured by the stopped parent and exact owning cleanup preserves history. Cold forty-bit campaigns cover spill and final consumed old-reference failure; actual Runtime width65/18446744073709551621 campaigns refuse every reached numeral/remainder/division/extraction/factory reservation through success, observe retained loop terms and close graphs to zero. Native stack/layout/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source numeric DT, _TRACE diagnostics and unspecified C++ nested-call evaluation/failure-prefix order remain uncredited.",
-        "Concatenation equality borrows actual application argument views or charged physical lhs/rhs singleton storage, without clones or AST INC. It traverses both arrays from their low ends, reads only reached current widths, retains unsigned residual/offset arithmetic and the original equal/shorter-left/shorter-right branches, and updates cursors only after the equality push succeeds. Actual raw inline16/doubling equality buffer and borrowed views/cursors live in a charged concrete invocation. Final manager AND array assignment precedes buffer destruction. Failed prefixes stop replay; parent close releases actual buffer/header without dereferencing possibly retired borrowed views and preserves source history. Forty-segment cold campaigns refuse each reached wrapper/extraction/equality/buffer/factory reservation through success, verify cursor frontiers and observe published AND with consumed old-reference worklist failure. Separate scalar-side/selector tests preserve orientation and erased reads. DEBUG-only completion checks reject unmatched tails, while release retains the original reached-prefix AND behavior. Native stack/layout/assertion/fatal/exception ABI, unspecified C++ nested-call evaluation/failure-prefix order and whole BV configuration/equality dispatch/solver integration remain uncredited."
+        "Concatenation equality borrows actual application argument views or charged physical lhs/rhs singleton storage, without clones or AST INC. It traverses both arrays from their low ends, reads only reached current widths, retains unsigned residual/offset arithmetic and the original equal/shorter-left/shorter-right branches, and updates cursors only after the equality push succeeds. Actual raw inline16/doubling equality buffer and borrowed views/cursors live in a charged concrete invocation. Final manager AND array assignment precedes buffer destruction. Failed prefixes stop replay; parent close releases actual buffer/header without dereferencing possibly retired borrowed views and preserves source history. Forty-segment cold campaigns refuse each reached wrapper/extraction/equality/buffer/factory reservation through success, verify cursor frontiers and observe published AND with consumed old-reference worklist failure. Separate scalar-side/selector tests preserve orientation and erased reads. DEBUG-only completion checks reject unmatched tails, while release retains the original reached-prefix AND behavior. Native stack/layout/assertion/fatal/exception ABI, unspecified C++ nested-call evaluation/failure-prefix order and whole BV configuration/equality dispatch/solver integration remain uncredited.",
+        "Isolation constructs t1 then t2 owning reference records before assigning either; t1 holds original first term, t2 holds the raw original tail sum or second term. Tail arguments are a borrowed range, without clones/folding/sorting. Binary multiplication recognizers read both borrowed factors before inspecting the first. Exact all-one caller invocation names the actual existing AST numeral frame before numerical acquisition; successful NUM scopes source-end before subtraction/equality factories, failed NUM scopes are joined before older t2/t1 reference destruction. Final assignment precedes reverse t2/t1 source destruction, with consumed old-reference worklist failures retained by existing checked AST ownership. Cold and actual Runtime width65 all-one campaigns refuse every reached reservation through success, preserve stopped history and close graphs to zero. Native layout/stack/default-nonnumeral bookkeeping/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source reference DT and whole BV equality/configuration/solver dispatch remain uncredited."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -22111,7 +22210,8 @@
         "The complete selected mk_bv_mul algorithm receives the actual mul2concat boolean and borrows the existing MkExtractProc through its public entry point. Generated BV parameter snapshot/update integration and the whole bv_rewriter object/dispatch remain required; no default option or substitute polynomial core is fabricated. The source debug shift>=1 assertion uses the checked Go domain boundary, without native assertion/fatal ABI credit. Original unsigned extraction arithmetic is preserved, without a new width/shift guard. Go explicit error cleanup is not native-fatal resumability, and no whole source unit is promoted.",
         "The complete selected mk_bit2bool is exposed on the existing persistent owner; generated bit2bool option update and equality dispatcher integration remain required. Checked Go boundaries represent the source DEBUG-only v.is_one()||v.is_zero() domain without native assertion ABI credit. Nested ITE/eq argument evaluation is ordered explicitly in Go; unspecified C++ compiler evaluation/failure-prefix order is uncredited. No new rhs-width guard, direct Boolean-variable simplification or flattened XOR substitute is introduced. Whole source-unit completion remains uncredited.",
         "The complete selected mk_blast_eq_value is exposed on the persistent owner and borrows the existing MkExtractProc. Generated blast_eq_value option update, the full equality dispatcher/BV rewriter object and solver integration remain required. The original rhs copied width controls the loop without a new equality-width guard, and the void division is not replaced by returned quotient assignment. _TRACE diagnostics and unspecified C++ nested-call argument evaluation are uncredited; the Go adapter orders extraction then the unsigned bit numeral. No whole source unit is promoted and explicit owning cleanup is not native-fatal resumability.",
-        "The complete selected concat alignment body and target predicates are exposed through existing owner/manager entry points. The actual split_concat_eq option is supplied explicitly to predicates; generated BV snapshot/update integration and full equality dispatcher/solver integration remain required. DEBUG source assertions use checked Go domain boundaries; release receives no new equal-width or at-least-one-concat validation. The borrowed cached extraction procedure orders left then right in Go; unspecified C++ nested argument evaluation order is uncredited. No extra AST references or flattened operand clones are introduced, and no whole source unit is promoted."
+        "The complete selected concat alignment body and target predicates are exposed through existing owner/manager entry points. The actual split_concat_eq option is supplied explicitly to predicates; generated BV snapshot/update integration and full equality dispatcher/solver integration remain required. DEBUG source assertions use checked Go domain boundaries; release receives no new equal-width or at-least-one-concat validation. The borrowed cached extraction procedure orders left then right in Go; unspecified C++ nested argument evaluation order is uncredited. No extra AST references or flattened operand clones are introduced, and no whole source unit is promoted.",
+        "The complete selected isolate_term/mk_t1_add_t2_eq_c/is_minus_one_times_t bodies and is_add_mul_const predicate are exposed through the persistent owner/manager. The all-one invocation only wraps the existing original numerical body and captures its actual frame. Unmatched default-numeral bookkeeping retains the existing erased zero-cost adaptation without native lifetime/layout credit. No coefficient reordering, -1 rational substitute, sum-tail flattening or simplification is introduced. Full equality/configuration dispatch and solver integration remain required; no whole source unit is promoted."
       ]
     },
     {

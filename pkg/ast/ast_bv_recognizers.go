@@ -59,11 +59,29 @@ func (m *ASTManager) IsBitVectorZero(h ASTHandle) (bool, error) {
 	return m.numerals.IsZero(&value.Rational)
 }
 
-func (m *ASTManager) IsBitVectorAllOne(h ASTHandle) (all bool, result error) {
+func (m *ASTManager) IsBitVectorAllOne(h ASTHandle) (bool, error) { return m.isBitVectorAllOne(h, nil) }
+
+// IsBitVectorAllOneWithInvocation names the actual copied-numeral/condition
+// frame so an older caller can join a failed child before reference destruction.
+func (m *ASTManager) IsBitVectorAllOneWithInvocation(h ASTHandle, c *ASTBitVectorNumeralInvocation) (bool, error) {
+	if c == nil {
+		return false, ErrASTHandle
+	}
+	return m.isBitVectorAllOne(h, c)
+}
+func (m *ASTManager) isBitVectorAllOne(h ASTHandle, c *ASTBitVectorNumeralInvocation) (all bool, result error) {
 	if e := m.lock(); e != nil {
 		return false, e
 	}
 	defer m.mu.Unlock()
+	var receipt *astBVNormalizationReceipt
+	if c != nil {
+		if e := c.prepare(m); e != nil {
+			return false, e
+		}
+		defer c.finish(&result)
+		receipt = &c.receipt
+	}
 	r, e := m.requireExpr(h)
 	if e != nil {
 		return false, e
@@ -80,7 +98,10 @@ func (m *ASTManager) IsBitVectorAllOne(h ASTHandle) (all bool, result error) {
 		return false, e
 	}
 	f.allOne = true
-	defer f.finishNumeral(&result, nil)
+	if receipt != nil {
+		*receipt = astBVNormalizationReceipt{frame: f, invocation: f.invocation}
+	}
+	defer f.finishNumeral(&result, receipt)
 	all, e = m.bitVectorAllOneCondition(f, r)
 	if e != nil {
 		return false, e
