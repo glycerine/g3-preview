@@ -111497,22 +111497,51 @@
       "path": "src/util/approx_nat.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/approx_nat.go",
+        "pkg/util/approx_nat_test.go"
+      ],
+      "tests": [
+        "TestApproxNatBoundariesAndSourceComparisons",
+        "TestApproxNatIndependentArithmetic",
+        "TestApproxNatDisplayAndEveryColdReservation"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Complete approx_nat constructors, assignment, unsigned/class addition and multiplication, huge/value predicates, guarded comparisons and stream insertion (approx_nat.h:26-43; approx_nat.cpp:22-61)",
+          "status": "ported",
+          "go_target": "pkg/util/approx_nat.go",
+          "tests": [
+            "TestApproxNatBoundariesAndSourceComparisons",
+            "TestApproxNatIndependentArithmetic",
+            "TestApproxNatDisplayAndEveryColdReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline uint32 value owns no payload; Go value copies preserve source class copying. Assigning arithmetic returns the receiver. Stream is borrowed, each original insertion uses the corresponding NumericTextStream leaf, and every reached allocation refusal is tested for immediate accounting and cleanup."
+      ],
+      "deviations": [
+        "C++ overloads map to exported unsigned and class operand methods; operator<< maps to Display using the existing NumericTextStream platform profile. No upstream approx_nat test exists in src/test; independent boundary, exhaustive small-pair and seeded wide-integer oracle tests cover the complete class."
+      ]
     },
     {
       "path": "src/util/approx_nat.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/approx_nat.go",
+        "pkg/util/approx_nat_test.go"
+      ],
+      "tests": [
+        "TestApproxNatBoundariesAndSourceComparisons",
+        "TestApproxNatIndependentArithmetic",
+        "TestApproxNatDisplayAndEveryColdReservation"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -111523,11 +111552,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Complete approx_nat constructors, assignment, unsigned/class addition and multiplication, huge/value predicates, guarded comparisons and stream insertion (approx_nat.h:26-43; approx_nat.cpp:22-61)",
+          "status": "ported",
+          "go_target": "pkg/util/approx_nat.go",
+          "tests": [
+            "TestApproxNatBoundariesAndSourceComparisons",
+            "TestApproxNatIndependentArithmetic",
+            "TestApproxNatDisplayAndEveryColdReservation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline uint32 value owns no payload; Go value copies preserve source class copying. Assigning arithmetic returns the receiver. Stream is borrowed, each original insertion uses the corresponding NumericTextStream leaf, and every reached allocation refusal is tested for immediate accounting and cleanup."
+      ],
+      "deviations": [
+        "C++ overloads map to exported unsigned and class operand methods; operator<< maps to Display using the existing NumericTextStream platform profile. No upstream approx_nat test exists in src/test; independent boundary, exhaustive small-pair and seeded wide-integer oracle tests cover the complete class."
+      ]
     },
     {
       "path": "src/util/approx_set.cpp",
