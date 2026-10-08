@@ -22,6 +22,7 @@ type BVPolynomialRewriter struct {
 	multiplication           *BVPolynomialMultiplicationCore
 	negation                 *ast.BitVectorPolynomialNegationNumerals
 	subtraction              *bvPolynomialSubtraction
+	cancellation             *bvPolynomialCancellation
 	pair                     [2]ast.ASTHandle
 	header                   uint64
 	running, stopped, closed bool
@@ -239,6 +240,12 @@ func (p *BVPolynomialRewriter) Close() error {
 			return e
 		}
 		p.subtraction = nil
+	}
+	if p.cancellation != nil {
+		if e := p.cancellation.Close(); e != nil {
+			return e
+		}
+		p.cancellation = nil
 	}
 	if p.config != nil {
 		if e := p.config.Close(); e != nil {

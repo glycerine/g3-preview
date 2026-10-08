@@ -1,4 +1,5 @@
 // Source: src/ast/rewriter/poly_rewriter_def.h:530-534,563,570-587,606-609;
+// src/ast/rewriter/poly_rewriter_def.h:708-883;
 // src/util/rational.h:131-134,151-153; src/util/buffer.h:29-75,146-151.
 package ast
 
@@ -8,7 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// BitVectorPolynomialAdditionNumerals owns the addition caller's c and a,
+// BitVectorPolynomialAdditionNumerals owns the addition/cancellation caller's c and a,
 // coefficient buffer and exact numeric children. The manager is borrowed.
 type BitVectorPolynomialAdditionNumerals struct {
 	self                            *BitVectorPolynomialAdditionNumerals
@@ -227,7 +228,15 @@ func (n *BitVectorPolynomialAdditionNumerals) LoadCoefficient(pos uint32) error 
 	}
 	return e
 }
-func (n *BitVectorPolynomialAdditionNumerals) Constant(sort ASTHandle) (node ASTHandle, result error) {
+func (n *BitVectorPolynomialAdditionNumerals) Constant(sort ASTHandle) (ASTHandle, error) {
+	return n.constant(sort, 0)
+}
+
+// Source: src/ast/rewriter/poly_rewriter_def.h:842.
+func (n *BitVectorPolynomialAdditionNumerals) CoefficientConstant(sort ASTHandle) (ASTHandle, error) {
+	return n.constant(sort, 1)
+}
+func (n *BitVectorPolynomialAdditionNumerals) constant(sort ASTHandle, index int) (node ASTHandle, result error) {
 	if e := n.open(); e != nil {
 		return node, e
 	}
@@ -254,7 +263,7 @@ func (n *BitVectorPolynomialAdditionNumerals) Constant(sort ASTHandle) (node AST
 	previous := n.manager.formatExecuting
 	n.manager.formatExecuting = true
 	defer func() { n.manager.formatExecuting = previous }()
-	r, e := n.manager.mkBitVectorNumeralCaptured(&n.values[0], width, &n.call.receipt)
+	r, e := n.manager.mkBitVectorNumeralCaptured(&n.values[index], width, &n.call.receipt)
 	return n.manager.external(r), e
 }
 func (n *BitVectorPolynomialAdditionNumerals) Product(sort, pp ASTHandle) (ASTHandle, error) {
@@ -358,4 +367,106 @@ func (n *BitVectorPolynomialAdditionNumerals) Close() error {
 	n.header = 0
 	n.closed = true
 	return nil
+}
+
+// Source: src/ast/rewriter/poly_rewriter_def.h:720-721.
+func (n *BitVectorPolynomialAdditionNumerals) BeginCancellation() error {
+	if e := n.check(); e != nil {
+		return e
+	}
+	if n.started {
+		return ErrASTPending
+	}
+	n.started = true
+	v, e := n.manager.numerals.NewValue()
+	if e != nil {
+		n.stopped = true
+		return e
+	}
+	n.values[0] = v
+	n.placed[0] = true
+	e = n.manager.numerals.SetInt64WithInvocation(&n.values[0], 0, &n.scalar)
+	if e == nil {
+		e = n.retire()
+	}
+	if e != nil {
+		n.stopped = true
+		return e
+	}
+	v, e = n.manager.numerals.NewValue()
+	if e != nil {
+		n.stopped = true
+		return e
+	}
+	n.values[1] = v
+	n.placed[1] = true
+	return nil
+}
+
+// Source: src/ast/rewriter/poly_rewriter_def.h:743.
+func (n *BitVectorPolynomialAdditionNumerals) SubtractConstant() error {
+	if e := n.open(); e != nil {
+		return e
+	}
+	e := n.manager.numerals.SubAssignWithInvocation(&n.values[0], &n.values[1], &n.scalar)
+	if e == nil {
+		e = n.retire()
+	}
+	if e != nil {
+		n.stopped = true
+	}
+	return e
+}
+
+// Source: src/ast/rewriter/poly_rewriter_def.h:799.
+func (n *BitVectorPolynomialAdditionNumerals) SubtractCoefficient(pos uint32) error {
+	if e := n.open(); e != nil {
+		return e
+	}
+	if n.coeffs == nil {
+		return ErrASTPending
+	}
+	dst, e := n.coeffs.At(pos)
+	if e != nil {
+		return e
+	}
+	e = n.manager.numerals.SubAssignWithInvocation(dst, &n.values[1], &n.scalar)
+	if e == nil {
+		e = n.retire()
+	}
+	if e != nil {
+		n.stopped = true
+	}
+	return e
+}
+
+// Source: src/ast/rewriter/poly_rewriter_def.h:840,869.
+func (n *BitVectorPolynomialAdditionNumerals) Negate(coefficient bool) error {
+	if e := n.open(); e != nil {
+		return e
+	}
+	i := 0
+	if coefficient {
+		i = 1
+	}
+	e := n.manager.numerals.NegAssignWithInvocation(&n.values[i], &n.scalar)
+	if e == nil {
+		e = n.retire()
+	}
+	if e != nil {
+		n.stopped = true
+	}
+	return e
+}
+func (n *BitVectorPolynomialAdditionNumerals) CoefficientIsMinusOne() (bool, error) {
+	if e := n.open(); e != nil {
+		return false, e
+	}
+	return n.manager.numerals.IsMinusOne(&n.values[1])
+}
+func (n *BitVectorPolynomialAdditionNumerals) CoefficientIsOne() (bool, error) {
+	if e := n.open(); e != nil {
+		return false, e
+	}
+	return n.manager.numerals.IsOne(&n.values[1])
 }
