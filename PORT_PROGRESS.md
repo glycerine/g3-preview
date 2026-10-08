@@ -30406,3 +30406,9 @@ Ported the concrete min-cut graph and algorithm as exported MinCut, NewMinCut, N
 Corrected src/util/min_cut.cpp:166: the source comment and surrounding loop require a reverse edge to predecessor l, but the implementation inserts hard-coded node1. That creates a sink self-loop and makes a small weighted branch graph fail to terminate. The Go port inserts the predecessor and keeps a regression for it. The source also loops on reached cycles and reached positive dead ends; ComputeMinCut detects those invalid source graphs before residual mutation and rejects repeated computation after capacities have been consumed.
 
 Focused native and g3debug min-cut checks pass (0.005s each), util vet and ledger validation pass, and inventory is now2102 units,677 APIs:59 ported,287 partial,1754 unported. The full native suite is green at the22:34 UTC hourly checkpoint: polynomial258.778s, util153.061s, AST32.841s, rewriter19.440s, and all remaining packages passed or had no tests.
+
+### util file: z3_omp.h
+
+Audited the OpenMP compatibility shim and classified it as a platform replacement. The current single-goroutine port uses the source _NO_OMP_ profile: no parallel region, thread number zero, one processor and no-op nested locks. util_cooperate.go already applies those values directly and its focused tests cover the observable control flow. Deliberately added no Go copy of omp.h, omp_nest_lock_t or the C macros; concrete future concurrency belongs in Go runtime and synchronization APIs at each consumer.
+
+Focused native and g3debug cooperation checks pass (0.005s/0.004s), and ledger and diff validation pass. Inventory is now2102 units,677 APIs:59 ported,287 partial,1753 unported, with three platform replacements recorded separately. The22:34 UTC full-suite checkpoint remains current.
