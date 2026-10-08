@@ -21318,7 +21318,9 @@
         "pkg/ast/rewriter/bv_rewriter_derived_bitwise.go",
         "pkg/ast/rewriter/bv_rewriter_derived_bitwise_test.go",
         "pkg/ast/ast_bv_arguments.go",
-        "pkg/ast/ast_bv_arguments_test.go"
+        "pkg/ast/ast_bv_arguments_test.go",
+        "pkg/ast/rewriter/bv_rewriter_derived_rotate.go",
+        "pkg/ast/rewriter/bv_rewriter_derived_rotate_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21477,7 +21479,9 @@
         "TestBVRewriterDerivedBitwiseOriginalShape",
         "TestBVRewriterDerivedBitwiseEveryColdReservation",
         "TestBVRewriterDerivedBitwiseBorrowsAppArguments",
-        "TestASTBitVectorBorrowedXORFactoryAndLifetime"
+        "TestASTBitVectorBorrowedXORFactoryAndLifetime",
+        "TestBVRewriterDerivedFixedRotations",
+        "TestBVRewriterDerivedRotationEveryColdReservation"
       ],
       "conditionals": [
         {
@@ -22592,6 +22596,18 @@
             "TestBVRewriterDerivedBitwiseBorrowsAppArguments",
             "TestASTBitVectorBorrowedXORFactoryAndLifetime"
           ]
+        },
+        {
+          "name": "Complete selected fixed left/right rotations on derived owner: original modulo/identity guards, ordered embedded extraction cache calls, borrowed pair/concat publication and right-to-left delegation with repeated size read (bv_rewriter.cpp:2000-2021; bv_rewriter.h:98-99)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_derived_rotate.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bv_rewriter_derived_rotate_test.go"
+          ],
+          "tests": [
+            "TestBVRewriterDerivedFixedRotations",
+            "TestBVRewriterDerivedRotationEveryColdReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22823,7 +22839,9 @@
         "pkg/ast/rewriter/bv_rewriter_derived_bitwise.go",
         "pkg/ast/rewriter/bv_rewriter_derived_bitwise_test.go",
         "pkg/ast/ast_bv_arguments.go",
-        "pkg/ast/ast_bv_arguments_test.go"
+        "pkg/ast/ast_bv_arguments_test.go",
+        "pkg/ast/rewriter/bv_rewriter_derived_rotate.go",
+        "pkg/ast/rewriter/bv_rewriter_derived_rotate_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -22999,7 +23017,9 @@
         "TestBVRewriterDerivedBitwiseOriginalShape",
         "TestBVRewriterDerivedBitwiseEveryColdReservation",
         "TestBVRewriterDerivedBitwiseBorrowsAppArguments",
-        "TestASTBitVectorBorrowedXORFactoryAndLifetime"
+        "TestASTBitVectorBorrowedXORFactoryAndLifetime",
+        "TestBVRewriterDerivedFixedRotations",
+        "TestBVRewriterDerivedRotationEveryColdReservation"
       ],
       "conditionals": [
         {
@@ -23669,6 +23689,18 @@
             "TestBVRewriterDerivedBitwiseEveryColdReservation",
             "TestBVRewriterDerivedBitwiseBorrowsAppArguments",
             "TestASTBitVectorBorrowedXORFactoryAndLifetime"
+          ]
+        },
+        {
+          "name": "Complete selected fixed left/right rotations on derived owner: original modulo/identity guards, ordered embedded extraction cache calls, borrowed pair/concat publication and right-to-left delegation with repeated size read (bv_rewriter.cpp:2000-2021; bv_rewriter.h:98-99)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_derived_rotate.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bv_rewriter_derived_rotate_test.go"
+          ],
+          "tests": [
+            "TestBVRewriterDerivedFixedRotations",
+            "TestBVRewriterDerivedRotationEveryColdReservation"
           ]
         }
       ],
