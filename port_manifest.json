@@ -121667,22 +121667,60 @@
       "path": "src/util/inf_s_integer.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/inf_s_integer.go",
+        "pkg/util/inf_s_integer_test.go"
+      ],
+      "tests": [
+        "TestInfSIntegerConstructorsTraitsAndDebugGuards",
+        "TestInfSIntegerIndependentLexicographicAlgebra",
+        "TestInfSIntegerRationalConstructorAndAssignment",
+        "TestInfSIntegerDisplayOriginalNegativeCoefficientAndColdPrefixes",
+        "TestInfSIntegerWideOrderingAndRepresentableArithmetic",
+        "TestInfSIntegerFileFormattingFlagsAndBorrow"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "All defined inf_s_integer scalar/pair/rational constructors, constants, functors, projections/guards, assignments, scalar/pair arithmetic, increments, lexicographic pair and both-direction scalar comparisons, signs, floor/ceil, fused operations, abs and original coefficient stream insertion (inf_s_integer.h:25-347; inf_s_integer.cpp:22-24)",
+          "status": "ported",
+          "go_target": "pkg/util/inf_s_integer.go",
+          "tests": [
+            "TestInfSIntegerConstructorsTraitsAndDebugGuards",
+            "TestInfSIntegerIndependentLexicographicAlgebra",
+            "TestInfSIntegerRationalConstructorAndAssignment",
+            "TestInfSIntegerDisplayOriginalNegativeCoefficientAndColdPrefixes",
+            "TestInfSIntegerWideOrderingAndRepresentableArithmetic",
+            "TestInfSIntegerFileFormattingFlagsAndBorrow"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline two-int32 class owns no payload; value copies preserve source copy construction. Borrowed rational scalar getter runs before assignment writes, preserving the old pair on errors. Native source static const references map to scalar value accessors. Display borrows output and preserves exact separate insertion actions, actual cold output prefixes, immediate complete budget accounting, unchanged input, file-stream allocation erasure and provider lifetime."
+      ],
+      "deviations": [
+        "Go debug tags preserve denominator/projection assertions and existing rational debug integrality checks; release erases those guards exactly, with no fabricated denominator division or epsilon check in scalar getters. C++ signed-overflow, INT_MIN negation, overflowing hash second+1 and zero-divisor undefined domains are not claimed; Go arithmetic wraps and division by zero panics. Undefined source to_string declaration maps to an explicit Go decimal convenience with no source-body credit. Commented-out nonlinear infinitesimal operations remain unimplemented and uncredited. No dedicated upstream inf_s_integer tests exist in src/test. Native reference/pointer identity and assertion/exception ABI remain representation adaptations."
+      ]
     },
     {
       "path": "src/util/inf_s_integer.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/inf_s_integer.go",
+        "pkg/util/inf_s_integer_test.go"
+      ],
+      "tests": [
+        "TestInfSIntegerConstructorsTraitsAndDebugGuards",
+        "TestInfSIntegerIndependentLexicographicAlgebra",
+        "TestInfSIntegerRationalConstructorAndAssignment",
+        "TestInfSIntegerDisplayOriginalNegativeCoefficientAndColdPrefixes",
+        "TestInfSIntegerWideOrderingAndRepresentableArithmetic",
+        "TestInfSIntegerFileFormattingFlagsAndBorrow"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -121707,11 +121745,29 @@
           "text": "SASSERT(r.m_second == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "All defined inf_s_integer scalar/pair/rational constructors, constants, functors, projections/guards, assignments, scalar/pair arithmetic, increments, lexicographic pair and both-direction scalar comparisons, signs, floor/ceil, fused operations, abs and original coefficient stream insertion (inf_s_integer.h:25-347; inf_s_integer.cpp:22-24)",
+          "status": "ported",
+          "go_target": "pkg/util/inf_s_integer.go",
+          "tests": [
+            "TestInfSIntegerConstructorsTraitsAndDebugGuards",
+            "TestInfSIntegerIndependentLexicographicAlgebra",
+            "TestInfSIntegerRationalConstructorAndAssignment",
+            "TestInfSIntegerDisplayOriginalNegativeCoefficientAndColdPrefixes",
+            "TestInfSIntegerWideOrderingAndRepresentableArithmetic",
+            "TestInfSIntegerFileFormattingFlagsAndBorrow"
+          ]
+        }
+      ],
+      "ownership": [
+        "Inline two-int32 class owns no payload; value copies preserve source copy construction. Borrowed rational scalar getter runs before assignment writes, preserving the old pair on errors. Native source static const references map to scalar value accessors. Display borrows output and preserves exact separate insertion actions, actual cold output prefixes, immediate complete budget accounting, unchanged input, file-stream allocation erasure and provider lifetime."
+      ],
+      "deviations": [
+        "Go debug tags preserve denominator/projection assertions and existing rational debug integrality checks; release erases those guards exactly, with no fabricated denominator division or epsilon check in scalar getters. C++ signed-overflow, INT_MIN negation, overflowing hash second+1 and zero-divisor undefined domains are not claimed; Go arithmetic wraps and division by zero panics. Undefined source to_string declaration maps to an explicit Go decimal convenience with no source-body credit. Commented-out nonlinear infinitesimal operations remain unimplemented and uncredited. No dedicated upstream inf_s_integer tests exist in src/test. Native reference/pointer identity and assertion/exception ABI remain representation adaptations."
+      ]
     },
     {
       "path": "src/util/lbool.cpp",
