@@ -13,24 +13,24 @@ import (
 // at the reached service epilogue, never copied from an observer/census. No
 // separate per-call header or inline numerical reservation is introduced.
 type RationalServiceInvocation struct {
-	self                          *RationalServiceInvocation
-	service                       *RationalService
-	manager                       *RationalManager
-	integer                       *IntegerManager
-	borrowedInteger               *IntegerManager
-	next                          *RationalServiceInvocation
-	characters                    integerCharacterScope
-	characterFormatting           naturalFormattingScope
-	insertion                     NumeralInsertionReceipt
-	scope                         rationalLexicalScope
-	numeric                       NumericAllocationRoots
-	division, gcd, extended       integerRawInvocationReceipt
-	addGeneration, normGeneration uint64
-	compareGeneration             uint64
-	transferred                   SmallAllocatorPendingAllocation
-	originalCell                  SourceCellBacking
-	originalPending               Block
-	cellRetired                   bool
+	self                               *RationalServiceInvocation
+	service                            *RationalService
+	manager                            *RationalManager
+	integer                            *IntegerManager
+	borrowedInteger                    *IntegerManager
+	next                               *RationalServiceInvocation
+	characters                         integerCharacterScope
+	characterFormatting                naturalFormattingScope
+	insertion                          NumeralInsertionReceipt
+	scope                              rationalLexicalScope
+	numeric                            NumericAllocationRoots
+	division, gcd, extended            integerRawInvocationReceipt
+	addGeneration, normGeneration      uint64
+	compareGeneration, powerGeneration uint64
+	transferred                        SmallAllocatorPendingAllocation
+	originalCell                       SourceCellBacking
+	originalPending                    Block
+	cellRetired                        bool
 
 	invocation                            uint64
 	executing, ended, falseDone, trueDone bool
@@ -694,4 +694,20 @@ func (s *RationalService) AbsWithInvocation(a *OwnedRational, c *RationalService
 	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
 	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
 	return s.facadeUnaryLockedWithInvocation(a, facadeAbs, 0, c)
+}
+
+// Source: src/util/rational.h:503-505; src/util/mpq.cpp:282-295.
+// Delegate original repeated squaring and its actual RAW power child.
+func (s *RationalService) PowerWithInvocation(a *OwnedRational, exponent uint32, c *RationalServiceInvocation) (v OwnedRational, e error) {
+	if e = s.lock(); e != nil {
+		return
+	}
+	defer s.mu.Unlock()
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	return s.facadeUnaryLockedWithInvocation(a, facadePower, exponent, c)
 }

@@ -461,7 +461,15 @@ func (s *RationalService) facadeUnaryLockedWithInvocation(a *OwnedRational, op r
 	case facadeDenominator:
 		e = s.Manager.DenominatorRational(&a.Raw, &work)
 	case facadePower:
-		e = s.Manager.Power(&a.Raw, p, &work)
+		e = s.Manager.powerWithAllocationContext(&a.Raw, p, &work, c.allocationContext())
+		// A reached child source-end failure stops the older result's source
+		// destructor before the ordinary facade epilogue can attempt it.
+		if cause := c.childSource(); cause != nil {
+			if s.Lexical.Cause == nil {
+				s.Lexical.Cause = cause
+			}
+			e = errors.Join(e, cause)
+		}
 	default:
 		e = ErrRationalFacadeDomain
 	}

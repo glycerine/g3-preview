@@ -4,7 +4,10 @@ package util
 // Power preserves source rational repeated squaring, including zero^zero=1.
 // Unlike integer Power it has no 0/1/2 fast paths. Nonterminating source mask
 // inputs fail only at their actual mask wrap, retaining completed publications.
-func (m *RationalManager) Power(a *Rational, p uint32, out *Rational) (_rawErr error) {
+func (m *RationalManager) Power(a *Rational, p uint32, out *Rational) error {
+	return m.powerWithAllocationContext(a, p, out, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) powerWithAllocationContext(a *Rational, p uint32, out *Rational, context integerAllocationInvocationContext) (_rawErr error) {
 	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
@@ -20,6 +23,9 @@ func (m *RationalManager) Power(a *Rational, p uint32, out *Rational) (_rawErr e
 		return e
 	}
 	r.PowerGeneration = generation
+	if c := context.rationalServiceFrame(m.Z); c != nil {
+		c.powerGeneration = generation
+	}
 	r.Power = NewRational()
 	r.PowerActive = true
 	r.powerEnd = false
@@ -28,10 +34,10 @@ func (m *RationalManager) Power(a *Rational, p uint32, out *Rational) (_rawErr e
 	r.powerCause = nil
 	power := &r.Power
 	defer m.finishRawPower(&_rawErr)
-	if e := m.Copy(power, a); e != nil {
+	if e := m.copyWithAllocationContext(power, a, context); e != nil {
 		return e
 	}
-	if e := m.SetInt64(out, 1); e != nil {
+	if e := m.setInt64WithAllocationContext(out, 1, context); e != nil {
 		return e
 	}
 	for mask := uint32(1); mask <= p; mask <<= 1 {
@@ -39,11 +45,11 @@ func (m *RationalManager) Power(a *Rational, p uint32, out *Rational) (_rawErr e
 			return &PowerDomainError{Exponent: p, Reason: PowerMaskOverflow}
 		}
 		if mask&p != 0 {
-			if e := m.Mul(out, power, out); e != nil {
+			if e := m.mulWithAllocationContext(out, power, out, context); e != nil {
 				return e
 			}
 		}
-		if e := m.Mul(power, power, power); e != nil {
+		if e := m.mulWithAllocationContext(power, power, power, context); e != nil {
 			return e
 		}
 	}

@@ -51,6 +51,9 @@ func (c *RationalServiceInvocation) childSource() error {
 	if c.addGeneration != 0 && c.addGeneration == r.addGeneration && r.addEnd && r.addCause != nil {
 		return r.addCause
 	}
+	if c.powerGeneration != 0 && c.powerGeneration == r.PowerGeneration && r.powerEnd && r.powerCause != nil {
+		return r.powerCause
+	}
 	for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd} {
 		if e := c.integer.RawInvocationSourceCause(r); e != nil {
 			return e
@@ -102,5 +105,19 @@ func (c *RationalServiceInvocation) cleanupRationalRaw(abort bool) error {
 		}
 		r.AddActive = false
 	}
+	if c.powerGeneration != 0 && c.powerGeneration == r.PowerGeneration && r.PowerActive && (abort || r.powerEnd) {
+		for r.powerCursor < 2 {
+			p := &r.Power.Num
+			if r.powerCursor == 1 {
+				p = &r.Power.Den
+			}
+			if e := c.integer.CleanupRawNumeral(p); e != nil {
+				return e
+			}
+			r.powerCursor++
+		}
+		r.PowerActive = false
+	}
+
 	return nil
 }
