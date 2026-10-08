@@ -156069,40 +156069,88 @@
       "path": "src/util/version.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/version.go",
+        "pkg/util/version_test.go"
+      ],
+      "tests": [
+        "TestVersionConstantsMatchGeneratedSourceHeader"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Z3_MAJOR_VERSION, Z3_MINOR_VERSION, Z3_BUILD_NUMBER, Z3_REVISION_NUMBER and Z3_FULL_VERSION generated definitions",
+          "status": "ported",
+          "go_target": "pkg/util/version.go",
+          "tests": [
+            "TestVersionConstantsMatchGeneratedSourceHeader"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Exported typed Go constants replace the generated C preprocessor definitions. Z3FullVersion is ordinary immutable Go string data."
+      ]
     },
     {
       "path": "src/util/version.h.cmake.in",
       "component": "util",
       "role": "reference_support",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/version.go",
+        "pkg/util/version_test.go"
+      ],
+      "tests": [
+        "TestVersionConstantsMatchGeneratedSourceHeader"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "CMake version placeholder and optional git-hash configuration",
+          "status": "ported",
+          "go_target": "pkg/util/version.go",
+          "tests": [
+            "TestVersionConstantsMatchGeneratedSourceHeader"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go compilation uses the checked-in release constants directly and needs no CMake-generated header. The optional Z3GITHASH configure value is deliberately omitted because this project forbids source hashing and the checked-in generated src/util/version.h does not define it."
+      ]
     },
     {
       "path": "src/util/version.h.in",
       "component": "util",
       "role": "reference_support",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/version.go",
+        "pkg/util/version_test.go"
+      ],
+      "tests": [
+        "TestVersionConstantsMatchGeneratedSourceHeader"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Make version placeholders",
+          "status": "ported",
+          "go_target": "pkg/util/version.go",
+          "tests": [
+            "TestVersionConstantsMatchGeneratedSourceHeader"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go compilation uses exported constants instead of substituting placeholders into a generated C header. Values match src/util/version.h:2-7."
+      ]
     },
     {
       "path": "src/util/warning.cpp",
