@@ -153605,9 +153605,18 @@
       "path": "src/util/top_sort.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/top_sort.go",
+        "pkg/util/top_sort_test.go"
+      ],
+      "tests": [
+        "TestTopSortDependencyFirstAndUnregisteredDependencies",
+        "TestTopSortCyclesReplacementAndDeterministicRoots",
+        "TestTopSortPointerValidationIsAtomic",
+        "TestTopSortLargeChainUsesIterativeTraversal",
+        "TestTopSortChaCha8DAGAgainstDependencyProperty"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -153628,11 +153637,57 @@
           "text": "SASSERT(m_stack_P.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "insert dependency-set ownership and replacement",
+          "status": "ported",
+          "go_target": "pkg/util/top_sort.go",
+          "tests": [
+            "TestTopSortCyclesReplacementAndDeterministicRoots",
+            "TestTopSortPointerValidationIsAtomic"
+          ]
+        },
+        {
+          "name": "traverse registered dependencies with cycle detection and missing-key early return",
+          "status": "ported",
+          "go_target": "pkg/util/top_sort.go",
+          "tests": [
+            "TestTopSortDependencyFirstAndUnregisteredDependencies",
+            "TestTopSortCyclesReplacementAndDeterministicRoots",
+            "TestTopSortLargeChainUsesIterativeTraversal",
+            "TestTopSortChaCha8DAGAgainstDependencyProperty"
+          ]
+        },
+        {
+          "name": "topological_sort state reset and dependency-first publication",
+          "status": "ported",
+          "go_target": "pkg/util/top_sort.go",
+          "tests": [
+            "TestTopSortDependencyFirstAndUnregisteredDependencies",
+            "TestTopSortCyclesReplacementAndDeterministicRoots",
+            "TestTopSortLargeChainUsesIterativeTraversal",
+            "TestTopSortChaCha8DAGAgainstDependencyProperty"
+          ]
+        },
+        {
+          "name": "top_sorted const result access",
+          "status": "ported",
+          "go_target": "pkg/util/top_sort.go",
+          "tests": [
+            "TestTopSortDependencyFirstAndUnregisteredDependencies"
+          ]
+        }
+      ],
+      "ownership": [
+        "Insert copies each dependency set into Go-owned storage. Go garbage collection replaces destruction of the source-owned dependency sets and temporary maps/vectors. Returned TopSorted slices are copies so callers cannot mutate retained state."
+      ],
+      "deviations": [
+        "The source template T* is represented by non-generic any values validated once at Insert as non-nil Go pointers. Internal maps therefore retain pointer identity without introducing Go generics.",
+        "The fork exposes only top_sorted, and its active revisit condition leaves the partition stack unchanged, making the observable result dependency-first DFS completion order. The Go implementation computes that same result iteratively to avoid Go call-stack exhaustion; it does not expose or emulate unobservable partition bookkeeping.",
+        "Independent roots and dependency sets use caller insertion order rather than C++ object-hash bucket order. A separate node slice supplies deterministic iteration without depending on Go map order."
+      ]
     },
     {
       "path": "src/util/total_order.h",
