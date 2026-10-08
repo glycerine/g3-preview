@@ -25,6 +25,7 @@ type BVRewriter struct {
 	eqRemainder           *ast.BitVectorRemainderEqualityNumerals
 	mkbv                  *ast.BitVectorMkBVNumerals
 	ite                   *ast.BitVectorIteNumerals
+	minusOne              *ast.BitVectorMinusOneNumerals
 	unsignedDivision      *ast.BitVectorUnsignedDivisionNumerals
 	signedDivision        *ast.BitVectorSignedDivisionNumerals
 	signedRemainder       *ast.BitVectorSignedRemainderNumerals
@@ -185,6 +186,12 @@ func (p *BVRewriter) Close() error {
 		if e := p.polynomial.closeInvocations(); e != nil {
 			return e
 		}
+	}
+	if p.minusOne != nil {
+		if e := p.minusOne.Close(); e != nil {
+			return e
+		}
+		p.minusOne = nil
 	}
 	if p.unsignedDivision != nil {
 		if e := p.unsignedDivision.Close(); e != nil {
