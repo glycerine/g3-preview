@@ -28,6 +28,9 @@ func (m *IntegerManager) SourceFinalize() error {
 	if m.originalCause != nil {
 		return arena.ErrClosed
 	}
+	if e := m.finishMyMPZSqrtSource(); e != nil {
+		return e
+	}
 	m.SourceFinalizing = true
 	fail := func(e error) error { m.CleanupCauseField = e; return e }
 	for m.SourceFinalizeStage < 8 {

@@ -45,6 +45,7 @@ type IntegerConfig struct {
 // Cells, transitional Natural Words and the actual memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
+	mySqrt          integerMPFSqrtHelperScope
 	callerExecuting func() bool
 	callerBindings  *NumericCallerBinding
 
@@ -265,7 +266,7 @@ func (m *IntegerManager) check(a *Int) error {
 	if m == nil || m.self != m {
 		return ErrRuntimeOwner
 	}
-	if m.mpfArithmeticTransportActive() {
+	if m.mpfArithmeticTransportActive() || m.myMPZSqrtTransportActive() {
 		return ErrNumericPending
 	}
 	if m.rationalServiceReadCallbackActive() || (m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive()) {
@@ -549,6 +550,9 @@ func (m *IntegerManager) CloseChecked() error {
 		}
 	}
 
+	if e := m.CleanupMyMPZSqrt(); e != nil {
+		return fail(e)
+	}
 	if e := m.CleanupRoot(); e != nil {
 		return fail(e)
 	}
@@ -645,7 +649,7 @@ func (m *IntegerManager) CloseChecked() error {
 // Del preserves the source's m_val after releasing a big cell. Thus deleting a
 // big positive/negative value leaves inline +1/-1. Reset additionally writes 0.
 func (m *IntegerManager) Del(a *Int) error {
-	if m.mpfArithmeticTransportActive() {
+	if m.mpfArithmeticTransportActive() || m.myMPZSqrtTransportActive() {
 		return ErrNumericPending
 	}
 	if e := m.checkCleanup(a); e != nil {
