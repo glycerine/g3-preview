@@ -129893,7 +129893,14 @@
         "pkg/util/mpf_to_sbv_mpq_callback_test.go",
         "pkg/util/mpf_to_sbv_mpq_failure_test.go",
         "pkg/util/mpf_to_sbv_mpq_scope.go",
-        "pkg/util/mpf_to_sbv_mpq_test.go"
+        "pkg/util/mpf_to_sbv_mpq_test.go",
+        "pkg/util/mpf_to_ieee_bv.go",
+        "pkg/util/mpf_to_ieee_bv_boundary_test.go",
+        "pkg/util/mpf_to_ieee_bv_callback_test.go",
+        "pkg/util/mpf_to_ieee_bv_failure_test.go",
+        "pkg/util/mpf_to_ieee_bv_scope.go",
+        "pkg/util/mpf_to_ieee_bv_test.go",
+        "pkg/util/mpf_bias_exp.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -130073,7 +130080,13 @@
         "TestArbitraryFloatToSBVMPQEveryColdReservationAndOutputPrefix",
         "TestArbitraryFloatToSBVMPQWarmInlineAndModeBranchAuthority",
         "TestArbitraryFloatToSBVMPQReachedExponentOverflow",
-        "TestArbitraryFloatToSBVMPQIndependentRoundingOracle"
+        "TestArbitraryFloatToSBVMPQIndependentRoundingOracle",
+        "TestArbitraryFloatToIEEEBVWarmAuthorityAndLiteralAlias",
+        "TestArbitraryFloatBiasExpIndependentBounds",
+        "TestArbitraryFloatToIEEEBVSourceAssertionsAndBiasOverflow",
+        "TestArbitraryFloatToIEEEBVBiasSetTransportAndOwnerGuards",
+        "TestArbitraryFloatToIEEEBVEveryColdReservationAndAliases",
+        "TestArbitraryFloatToIEEEBVIndependentEncoding"
       ],
       "conditionals": [
         {
@@ -130784,6 +130797,27 @@
             "TestArbitraryFloatToSBVMPQReachedExponentOverflow",
             "TestArbitraryFloatToSBVMPQIndependentRoundingOracle"
           ]
+        },
+        {
+          "name": "mpf.cpp:1228-1253; mpf.h:218 to_ieee_bv_mpz original sign/exponent/significand assembly and finite scoped biased_exp",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_to_ieee_bv.go",
+          "tests": [
+            "TestArbitraryFloatToIEEEBVWarmAuthorityAndLiteralAlias",
+            "TestArbitraryFloatToIEEEBVSourceAssertionsAndBiasOverflow",
+            "TestArbitraryFloatToIEEEBVBiasSetTransportAndOwnerGuards",
+            "TestArbitraryFloatToIEEEBVEveryColdReservationAndAliases",
+            "TestArbitraryFloatToIEEEBVIndependentEncoding"
+          ]
+        },
+        {
+          "name": "mpf.cpp:1850-1855; mpf.h:207-208 bias_exp/unbias_exp actual cached bias and signed addition/subtraction",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_bias_exp.go",
+          "tests": [
+            "TestArbitraryFloatBiasExpIndependentBounds",
+            "TestArbitraryFloatToIEEEBVSourceAssertionsAndBiasOverflow"
+          ]
         }
       ],
       "ownership": [
@@ -130817,7 +130851,8 @@
         "partial_remainder embeds and charges the thirteen actual scoped integer declarations in the reflected manager header, including unused x_rem_y_sig and branch-local sticky_rem/rnd_bits. Exact live flags begin only at reached source declarations; sticky_rem ends before subtraction and rnd_bits ends after final SET. Reverse source destruction checks the actual younger Natural verification stop before older NUMs; exact owning cleanup joins captured Integer/copy/Natural buffer/verification leaves and actual live locals without replay. Public x/y remain borrowed. The concrete helper is included in parent source/owning end and precise Integer transport guards. Copied/ended body scopes are rejected before inline publication.",
         "Public rem embeds and charges actual default ST0/ST1 numerals. Exact copy/Integer/Natural receipts own reached parent leaves; original partial helper locals remain in their actual child scope. Repeated partial calls capture the actual changed invocation and completion state, protecting older ST1/ST0 on a youngest source stop and joining only unfinished captured children. Same-format SET remains its literal COPY fast path; only an actually begun formatted invocation contributes its original source cause and exact history receipt. Final Round stamps the actual child even when no history materializes. Source and owning cleanup preserve younger-child-before-older-NUM order; ended cleanup clears obsolete tuples without touching later actual helper/format/Round calls. Real unpack returning transport refuses parent/primitive lifecycle and mutation, and parent Close joins the abandoned scope.",
         "to_mpz declares no lexical NUM or RAW. Source x and explicit output remain borrowed; a concrete reflected MPF scope captures only reached output Integer COPY/shift allocation leaves and the actual copy receipt. Exact source/output Integer and Natural bindings protect both owner graphs during execution, including separate-runtime failure transport and an output Integer borrowed from a different MPF manager. Typed guards inspect actual bindings and exclude unrelated numeric caller policies. Owning cleanup joins captured output prefixes without disposing public source/output fields or inventing helper numerals. Copied/ended body contexts fail before COPY, including inline destinations.",
-        "to_sbv_mpq embeds and charges default scoped t and z, both constructed before the first COPY and source-destructed z before t. Exact MPF/Integer COPY receipts, Numeric roots, Natural buffers and verification receipts retain actual reached allocation prefixes. The output rational is borrowed in the source manager namespace. Numerator COPY precedes denominator reset; a refused output COPY preserves its prior denominator. Separate owning cleanup joins only captured invocation receipts and source locals. Actual unpack returning transport protects MPF, Integer and Rational lifecycle/mutation without broadening unrelated caller guards; copied and ended body contexts are refused before inline publication."
+        "to_sbv_mpq embeds and charges default scoped t and z, both constructed before the first COPY and source-destructed z before t. Exact MPF/Integer COPY receipts, Numeric roots, Natural buffers and verification receipts retain actual reached allocation prefixes. The output rational is borrowed in the source manager namespace. Numerator COPY precedes denominator reset; a refused output COPY preserves its prior denominator. Separate owning cleanup joins only captured invocation receipts and source locals. Actual unpack returning transport protects MPF, Integer and Rational lifecycle/mutation without broadening unrelated caller guards; copied and ended body contexts are refused before inline publication.",
+        "to_ieee_bv_mpz embeds and charges only its actual finite-branch biased_exp NUM, with a reached live flag before bias cache lookup/SET; infinity constructs no NUM. Actual Numeric roots and Natural buffer/verification receipts own reached allocating SET/shift/ADD prefixes. Public input/output remain borrowed in the source Integer namespace. Source DT observes younger verifier failure before ending the local; separate owning cleanup joins retained actual roots without replaying the algorithm. Actual BIG biased-exp SET transport protects MPF/Integer/Rational owners, primitive mutations and caller roots. Copied/ended body contexts are refused before publication; class Close joins an abandoned invocation."
       ],
       "deviations": [
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
@@ -130844,7 +130879,8 @@
         "PartialRemainder preserves the signed32 D conversion, quotient truncation versus nearest-even switch, original cached powers and repeated renormalize calls, unsigned shifts, large-alignment sticky swap and literal final mpz(32) comparison. Independent exact rational quotient/remainder oracles cover normalized inputs at precisions 2/7/24/80/120, signs, both reduction modes and selected exponent differences. Cold sweeps include unchanged-x early return, exact zero, same input identity, subtraction sign changes and partial/complete reductions, with immediate physical/byte graphs and zero refunds. A defined literal helper profile supplies exp_diff=0 with differing stored exponents to reach the large-alignment branch: precision 4 keeps significand 15, precision 7 yields 128 and precision 24 yields 2^24, each with exponent 39. The source does not validate exp_diff against stored fields, and these expected noncanonical/raw results are not advertised as IEEE mathematical remainder. Reached undefined signed exponent expressions return arena.ErrBounds. Native real transport reaches numerator allocation; debug can first reach an assertion bound cache. Public rem at mpf.cpp:1438-1485 remains a separate unfinished obligation. No new upstream driver assertions or whole MPF/util completion credit.",
         "Rem preserves initial equal-format debug assertion, ordered NaN/inf/zero branches, default ST0/ST1 copy and normalized unpack, signed exponent comparisons, repeated original partial_remainder, in-place shift, same-format SET and final nearest-even Round. Host math.Remainder and big.Rat appear only in independent tests. IEEE64 tests cover signs, ties and output aliases; exact rational tests cover precisions 2/7/24/120, denormals, both signs, large exponent gaps and repeated reductions. Denormal test significands are bounded by their format, including precision-2 zero/subnormal cases; raw out-of-range fractions are not claimed as ordinary numerical oracle coverage. Every selected general/special cold reservation includes immediate physical/byte graph and zero refund checks. Same input identity yields signed zero; warm inline calls succeed with every new reservation refused and preserve exact Runtime state/bytes. Actual later helper/format/Round invocations survive cleanup of the ended parent. No source algorithm substitution, new upstream driver assertions or whole MPF/util completion claim. Dedicated younger-source/first-own transport stress refinements remain outstanding.",
         "ToMPZ assumes unpacked input exactly as the source. The initial exponent assertion is one-sided (exponent < INT_MAX); the int cast follows the target signed32 narrowing. Direct x.sbits is an unsigned 16-bit bit-field, unlike get_sbits() or an unsigned local, and promotes to signed int. Verified against the primary C++ draft conv.prom at https://eel.is/c++draft/conv.prom before implementation; an initial unsigned-subtraction test assumption was corrected. Signed subtraction and following +1 are checked separately at their reached expressions after output COPY and negation. Out-of-range negative exponents can narrow to a small signed32 value without violating the source assertion; literal tests preserve that behavior. Independent truncation oracles cover precisions 2/24/80/120, signs, aliases and foreign descriptor namespaces. Every selected same/foreign cold allocation is physically/byte audited with zero refunds; warm inline calls refuse every reservation and succeed. A real independent foreign-runtime COPY failure protects both MPF/Integer owners and mutations while the source runtime stays idle. No C++ build, new upstream driver assertions or whole MPF/util completion credit. Other MPF bit-vector/rational conversions remain unfinished.",
-        "ToSBVMPQ preserves the original per-bit last/round/sticky loop, all five rounding modes, sign application after rational SET, and the source mode switch only for a negative effective exponent. Signed exponent subtraction and following +1 fail separately at their reached source expressions when undefined. Independent big.Rat rounding tests cover precisions 2/24/120, both signs, denormals and exponents; math/big is test-only. Every selected cold allocation prefix is physically and byte audited, including output numerator COPY refusal and unchanged denominator. Warm inline calls allocate nothing with every reservation refused. Real unpack returning transport and reached signed subtraction overflow are tested. No new upstream-driver coverage or whole MPF/util completion is claimed; remaining conversions and dedicated younger-source/first-own transport stress refinements remain outstanding."
+        "ToSBVMPQ preserves the original per-bit last/round/sticky loop, all five rounding modes, sign application after rational SET, and the source mode switch only for a negative effective exponent. Signed exponent subtraction and following +1 fail separately at their reached source expressions when undefined. Independent big.Rat rounding tests cover precisions 2/24/120, both signs, denormals and exponents; math/big is test-only. Every selected cold allocation prefix is physically and byte audited, including output numerator COPY refusal and unchanged denominator. Warm inline calls allocate nothing with every reservation refused. Real unpack returning transport and reached signed subtraction overflow are tested. No new upstream-driver coverage or whole MPF/util completion is claimed; remaining conversions and dedicated younger-source/first-own transport stress refinements remain outstanding.",
+        "ToIEEEBVMPZ preserves stored fields without unpacking, source NaN/one-sided exponent assertions, both infinity/finite assembly branches, source sign SET before shifts/ADDs, and the final significand read after output publication. A shared input significand/output therefore doubles the assembled prefix at the final ADD, as in C++; literal alias tests distinguish this from ordinary IEEE encoding. Independent encodings cover precisions 2/24/53/80/120 and exponent widths 3/8/11/17/32, both signs and bottom exponents; actual IEEE64 signed zero/subnormal/normal/infinity vectors are checked. Every selected cold finite/infinity reservation and alias is physically/byte audited with zero refunds. Infinity fixtures explicitly SET zero; source DEL alone does not clear the value. Debug infinity coverage uses exponent width17 because width32 violates the source exp<INT_MAX precondition. BiasExp/UnbiasExp use actual cached numerals and diagnose reached undefined signed overflow, including exact signed64 boundaries. Warm inline calls create no reservations. No host numerical substitute, new upstream scalar-driver credit or whole MPF/util completion is claimed. Dedicated younger-source/first-own transport refinements remain outstanding."
       ]
     },
     {
@@ -130963,7 +130999,14 @@
         "pkg/util/mpf_to_sbv_mpq_callback_test.go",
         "pkg/util/mpf_to_sbv_mpq_failure_test.go",
         "pkg/util/mpf_to_sbv_mpq_scope.go",
-        "pkg/util/mpf_to_sbv_mpq_test.go"
+        "pkg/util/mpf_to_sbv_mpq_test.go",
+        "pkg/util/mpf_to_ieee_bv.go",
+        "pkg/util/mpf_to_ieee_bv_boundary_test.go",
+        "pkg/util/mpf_to_ieee_bv_callback_test.go",
+        "pkg/util/mpf_to_ieee_bv_failure_test.go",
+        "pkg/util/mpf_to_ieee_bv_scope.go",
+        "pkg/util/mpf_to_ieee_bv_test.go",
+        "pkg/util/mpf_bias_exp.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -131095,7 +131138,13 @@
         "TestArbitraryFloatToSBVMPQEveryColdReservationAndOutputPrefix",
         "TestArbitraryFloatToSBVMPQWarmInlineAndModeBranchAuthority",
         "TestArbitraryFloatToSBVMPQReachedExponentOverflow",
-        "TestArbitraryFloatToSBVMPQIndependentRoundingOracle"
+        "TestArbitraryFloatToSBVMPQIndependentRoundingOracle",
+        "TestArbitraryFloatToIEEEBVWarmAuthorityAndLiteralAlias",
+        "TestArbitraryFloatBiasExpIndependentBounds",
+        "TestArbitraryFloatToIEEEBVSourceAssertionsAndBiasOverflow",
+        "TestArbitraryFloatToIEEEBVBiasSetTransportAndOwnerGuards",
+        "TestArbitraryFloatToIEEEBVEveryColdReservationAndAliases",
+        "TestArbitraryFloatToIEEEBVIndependentEncoding"
       ],
       "conditionals": [
         {
@@ -131388,6 +131437,27 @@
             "TestArbitraryFloatToSBVMPQReachedExponentOverflow",
             "TestArbitraryFloatToSBVMPQIndependentRoundingOracle"
           ]
+        },
+        {
+          "name": "mpf.cpp:1228-1253; mpf.h:218 to_ieee_bv_mpz original sign/exponent/significand assembly and finite scoped biased_exp",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_to_ieee_bv.go",
+          "tests": [
+            "TestArbitraryFloatToIEEEBVWarmAuthorityAndLiteralAlias",
+            "TestArbitraryFloatToIEEEBVSourceAssertionsAndBiasOverflow",
+            "TestArbitraryFloatToIEEEBVBiasSetTransportAndOwnerGuards",
+            "TestArbitraryFloatToIEEEBVEveryColdReservationAndAliases",
+            "TestArbitraryFloatToIEEEBVIndependentEncoding"
+          ]
+        },
+        {
+          "name": "mpf.cpp:1850-1855; mpf.h:207-208 bias_exp/unbias_exp actual cached bias and signed addition/subtraction",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_bias_exp.go",
+          "tests": [
+            "TestArbitraryFloatBiasExpIndependentBounds",
+            "TestArbitraryFloatToIEEEBVSourceAssertionsAndBiasOverflow"
+          ]
         }
       ],
       "ownership": [
@@ -131411,7 +131481,8 @@
         "partial_remainder embeds and charges the thirteen actual scoped integer declarations in the reflected manager header, including unused x_rem_y_sig and branch-local sticky_rem/rnd_bits. Exact live flags begin only at reached source declarations; sticky_rem ends before subtraction and rnd_bits ends after final SET. Reverse source destruction checks the actual younger Natural verification stop before older NUMs; exact owning cleanup joins captured Integer/copy/Natural buffer/verification leaves and actual live locals without replay. Public x/y remain borrowed. The concrete helper is included in parent source/owning end and precise Integer transport guards. Copied/ended body scopes are rejected before inline publication.",
         "Public rem embeds and charges actual default ST0/ST1 numerals. Exact copy/Integer/Natural receipts own reached parent leaves; original partial helper locals remain in their actual child scope. Repeated partial calls capture the actual changed invocation and completion state, protecting older ST1/ST0 on a youngest source stop and joining only unfinished captured children. Same-format SET remains its literal COPY fast path; only an actually begun formatted invocation contributes its original source cause and exact history receipt. Final Round stamps the actual child even when no history materializes. Source and owning cleanup preserve younger-child-before-older-NUM order; ended cleanup clears obsolete tuples without touching later actual helper/format/Round calls. Real unpack returning transport refuses parent/primitive lifecycle and mutation, and parent Close joins the abandoned scope.",
         "to_mpz declares no lexical NUM or RAW. Source x and explicit output remain borrowed; a concrete reflected MPF scope captures only reached output Integer COPY/shift allocation leaves and the actual copy receipt. Exact source/output Integer and Natural bindings protect both owner graphs during execution, including separate-runtime failure transport and an output Integer borrowed from a different MPF manager. Typed guards inspect actual bindings and exclude unrelated numeric caller policies. Owning cleanup joins captured output prefixes without disposing public source/output fields or inventing helper numerals. Copied/ended body contexts fail before COPY, including inline destinations.",
-        "to_sbv_mpq embeds and charges default scoped t and z, both constructed before the first COPY and source-destructed z before t. Exact MPF/Integer COPY receipts, Numeric roots, Natural buffers and verification receipts retain actual reached allocation prefixes. The output rational is borrowed in the source manager namespace. Numerator COPY precedes denominator reset; a refused output COPY preserves its prior denominator. Separate owning cleanup joins only captured invocation receipts and source locals. Actual unpack returning transport protects MPF, Integer and Rational lifecycle/mutation without broadening unrelated caller guards; copied and ended body contexts are refused before inline publication."
+        "to_sbv_mpq embeds and charges default scoped t and z, both constructed before the first COPY and source-destructed z before t. Exact MPF/Integer COPY receipts, Numeric roots, Natural buffers and verification receipts retain actual reached allocation prefixes. The output rational is borrowed in the source manager namespace. Numerator COPY precedes denominator reset; a refused output COPY preserves its prior denominator. Separate owning cleanup joins only captured invocation receipts and source locals. Actual unpack returning transport protects MPF, Integer and Rational lifecycle/mutation without broadening unrelated caller guards; copied and ended body contexts are refused before inline publication.",
+        "to_ieee_bv_mpz embeds and charges only its actual finite-branch biased_exp NUM, with a reached live flag before bias cache lookup/SET; infinity constructs no NUM. Actual Numeric roots and Natural buffer/verification receipts own reached allocating SET/shift/ADD prefixes. Public input/output remain borrowed in the source Integer namespace. Source DT observes younger verifier failure before ending the local; separate owning cleanup joins retained actual roots without replaying the algorithm. Actual BIG biased-exp SET transport protects MPF/Integer/Rational owners, primitive mutations and caller roots. Copied/ended body contexts are refused before publication; class Close joins an abandoned invocation."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -131431,7 +131502,8 @@
         "PartialRemainder preserves the signed32 D conversion, quotient truncation versus nearest-even switch, original cached powers and repeated renormalize calls, unsigned shifts, large-alignment sticky swap and literal final mpz(32) comparison. Independent exact rational quotient/remainder oracles cover normalized inputs at precisions 2/7/24/80/120, signs, both reduction modes and selected exponent differences. Cold sweeps include unchanged-x early return, exact zero, same input identity, subtraction sign changes and partial/complete reductions, with immediate physical/byte graphs and zero refunds. A defined literal helper profile supplies exp_diff=0 with differing stored exponents to reach the large-alignment branch: precision 4 keeps significand 15, precision 7 yields 128 and precision 24 yields 2^24, each with exponent 39. The source does not validate exp_diff against stored fields, and these expected noncanonical/raw results are not advertised as IEEE mathematical remainder. Reached undefined signed exponent expressions return arena.ErrBounds. Native real transport reaches numerator allocation; debug can first reach an assertion bound cache. Public rem at mpf.cpp:1438-1485 remains a separate unfinished obligation. No new upstream driver assertions or whole MPF/util completion credit.",
         "Rem preserves initial equal-format debug assertion, ordered NaN/inf/zero branches, default ST0/ST1 copy and normalized unpack, signed exponent comparisons, repeated original partial_remainder, in-place shift, same-format SET and final nearest-even Round. Host math.Remainder and big.Rat appear only in independent tests. IEEE64 tests cover signs, ties and output aliases; exact rational tests cover precisions 2/7/24/120, denormals, both signs, large exponent gaps and repeated reductions. Denormal test significands are bounded by their format, including precision-2 zero/subnormal cases; raw out-of-range fractions are not claimed as ordinary numerical oracle coverage. Every selected general/special cold reservation includes immediate physical/byte graph and zero refund checks. Same input identity yields signed zero; warm inline calls succeed with every new reservation refused and preserve exact Runtime state/bytes. Actual later helper/format/Round invocations survive cleanup of the ended parent. No source algorithm substitution, new upstream driver assertions or whole MPF/util completion claim. Dedicated younger-source/first-own transport stress refinements remain outstanding.",
         "ToMPZ assumes unpacked input exactly as the source. The initial exponent assertion is one-sided (exponent < INT_MAX); the int cast follows the target signed32 narrowing. Direct x.sbits is an unsigned 16-bit bit-field, unlike get_sbits() or an unsigned local, and promotes to signed int. Verified against the primary C++ draft conv.prom at https://eel.is/c++draft/conv.prom before implementation; an initial unsigned-subtraction test assumption was corrected. Signed subtraction and following +1 are checked separately at their reached expressions after output COPY and negation. Out-of-range negative exponents can narrow to a small signed32 value without violating the source assertion; literal tests preserve that behavior. Independent truncation oracles cover precisions 2/24/80/120, signs, aliases and foreign descriptor namespaces. Every selected same/foreign cold allocation is physically/byte audited with zero refunds; warm inline calls refuse every reservation and succeed. A real independent foreign-runtime COPY failure protects both MPF/Integer owners and mutations while the source runtime stays idle. No C++ build, new upstream driver assertions or whole MPF/util completion credit. Other MPF bit-vector/rational conversions remain unfinished.",
-        "ToSBVMPQ preserves the original per-bit last/round/sticky loop, all five rounding modes, sign application after rational SET, and the source mode switch only for a negative effective exponent. Signed exponent subtraction and following +1 fail separately at their reached source expressions when undefined. Independent big.Rat rounding tests cover precisions 2/24/120, both signs, denormals and exponents; math/big is test-only. Every selected cold allocation prefix is physically and byte audited, including output numerator COPY refusal and unchanged denominator. Warm inline calls allocate nothing with every reservation refused. Real unpack returning transport and reached signed subtraction overflow are tested. No new upstream-driver coverage or whole MPF/util completion is claimed; remaining conversions and dedicated younger-source/first-own transport stress refinements remain outstanding."
+        "ToSBVMPQ preserves the original per-bit last/round/sticky loop, all five rounding modes, sign application after rational SET, and the source mode switch only for a negative effective exponent. Signed exponent subtraction and following +1 fail separately at their reached source expressions when undefined. Independent big.Rat rounding tests cover precisions 2/24/120, both signs, denormals and exponents; math/big is test-only. Every selected cold allocation prefix is physically and byte audited, including output numerator COPY refusal and unchanged denominator. Warm inline calls allocate nothing with every reservation refused. Real unpack returning transport and reached signed subtraction overflow are tested. No new upstream-driver coverage or whole MPF/util completion is claimed; remaining conversions and dedicated younger-source/first-own transport stress refinements remain outstanding.",
+        "ToIEEEBVMPZ preserves stored fields without unpacking, source NaN/one-sided exponent assertions, both infinity/finite assembly branches, source sign SET before shifts/ADDs, and the final significand read after output publication. A shared input significand/output therefore doubles the assembled prefix at the final ADD, as in C++; literal alias tests distinguish this from ordinary IEEE encoding. Independent encodings cover precisions 2/24/53/80/120 and exponent widths 3/8/11/17/32, both signs and bottom exponents; actual IEEE64 signed zero/subnormal/normal/infinity vectors are checked. Every selected cold finite/infinity reservation and alias is physically/byte audited with zero refunds. Infinity fixtures explicitly SET zero; source DEL alone does not clear the value. Debug infinity coverage uses exponent width17 because width32 violates the source exp<INT_MAX precondition. BiasExp/UnbiasExp use actual cached numerals and diagnose reached undefined signed overflow, including exact signed64 boundaries. Warm inline calls create no reservations. No host numerical substitute, new upstream scalar-driver credit or whole MPF/util completion is claimed. Dedicated younger-source/first-own transport refinements remain outstanding."
       ]
     },
     {
