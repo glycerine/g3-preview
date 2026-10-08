@@ -98,8 +98,8 @@ func (s *RationalService) facadeValueLockedWithInvocation(a, b *OwnedRational, o
 		}
 		workComplete = true
 		var body error
-		if c != nil && op == rationalFacadeAdd {
-			body = s.Manager.addSubWithAllocationContext(&work, &b.Raw, &work, false, c.allocationContext())
+		if c != nil && (op == rationalFacadeAdd || op == rationalFacadeSub) {
+			body = s.Manager.addSubWithAllocationContext(&work, &b.Raw, &work, op == rationalFacadeSub, c.allocationContext())
 		} else if c != nil && op == rationalFacadeMul {
 			body = s.Manager.mulWithAllocationContext(&work, &b.Raw, &work, c.allocationContext())
 		} else {

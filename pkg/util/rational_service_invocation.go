@@ -235,6 +235,11 @@ func (s *RationalService) ModWithInvocation(a, b *OwnedRational, c *RationalServ
 func (s *RationalService) AddWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) (OwnedRational, error) {
 	return s.valueWithInvocation(a, b, c, rationalFacadeAdd)
 }
+
+// Source: src/util/rational.h:462-464. Copy, subtract in place, then return copy.
+func (s *RationalService) SubWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) (OwnedRational, error) {
+	return s.valueWithInvocation(a, b, c, rationalFacadeSub)
+}
 func (s *RationalService) MulWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) (OwnedRational, error) {
 	return s.valueWithInvocation(a, b, c, rationalFacadeMul)
 }
