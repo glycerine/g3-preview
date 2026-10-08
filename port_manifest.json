@@ -152237,7 +152237,7 @@
       "path": "src/util/stream_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -152250,11 +152250,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "This file only wraps std::istream with one byte of lookahead, and its sole retained consumer is src/api/z3_replayer.cpp. Per the project rule against porting the C++ standard library, no Go stream wrapper or wrapper unit test is created. The replayer port must read through bufio.Reader or another io.ByteReader directly; io.EOF replaces the std::char_traits<char>::eof() sentinel, and the Go reader owns buffering and error state."
+      ]
     },
     {
       "path": "src/util/string_buffer.h",

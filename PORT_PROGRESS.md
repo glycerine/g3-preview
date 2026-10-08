@@ -30392,3 +30392,9 @@ Focused native and g3debug machine checks pass (0.004s each). Util vet, ledger a
 Ported print_stat and print_stat_f as exported PrintStat and PrintStatFloat helpers over io.Writer. The positive-only conditions are preserved, including suppression of zero, negative floats and NaN. Message strings stop at their first NUL with strings.IndexByte. strconv supplies unsigned decimal and six-significant-digit float32 formatting; Go write errors return to the caller instead of becoming ostream state. Tests cover the complete gate, C-string boundary, finite/subnormal/max/infinite formatting, and reached versus skipped writer errors.
 
 Focused native and g3debug statistics checks pass (0.005s each). Util vet, ledger and diff checks pass; inventory is now2102 units,677 APIs:57 ported,287 partial,1757 unported, plus the separately classified sstream platform replacement. No new full suite was needed after the21:37 UTC checkpoint.
+
+### util file: stream_buffer.h
+
+Audited src/util/stream_buffer.h completely. It is a one-byte lookahead wrapper around std::istream, and its only retained consumer is the unported src/api/z3_replayer.cpp. Deliberately created no Go mirror of the C++ stream type. That consumer must use bufio.Reader or another io.ByteReader directly when ported, with io.EOF carrying the end/error result instead of the C++ integer sentinel.
+
+Ledger and diff validation pass. Inventory is now2102 units,677 APIs:57 ported,287 partial,1756 unported, with sstream.h and stream_buffer.h separately classified as deliberate standard-library replacements.
