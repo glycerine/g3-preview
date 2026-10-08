@@ -116416,9 +116416,17 @@
       "path": "src/util/ext_numeral.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/ext_numeral.go",
+        "pkg/util/ext_numeral_test.go"
+      ],
+      "tests": [
+        "TestExtNumeralUpstreamArithmeticAndRelations",
+        "TestExtNumeralInfinityReadErasureAndPower",
+        "TestExtNumeralUpstreamPredicatesResetAndDisplay",
+        "TestExtNumeralSourceKindPublicationOnManagerStop"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -116477,9 +116485,31 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Original enum/sign/assignment/unary/arithmetic/power/comparison/display branch bodies through non-generic concrete operand-slot manager protocol and actual rational binding (ext_numeral.h:25-345)",
+          "status": "ported",
+          "go_target": "pkg/util/ext_numeral.go",
+          "tests": [
+            "TestExtNumeralUpstreamArithmeticAndRelations",
+            "TestExtNumeralInfinityReadErasureAndPower",
+            "TestExtNumeralUpstreamPredicatesResetAndDisplay",
+            "TestExtNumeralSourceKindPublicationOnManagerStop"
+          ]
+        },
+        {
+          "name": "Complete independent arithmetic/alias/debug invalid-domain and every-cold physical ownership audits before unit promotion",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The shared branch algorithms own no numerals or dynamic storage. ExtRationalBinding borrows actual operand/output pointers and manager; typed operands stay in that concrete binding and are not boxed. Infinity branches preserve source manager/operand read erasure, including nil bindings. Source kind publication order is tested with controlled manager stops separately from actual allocator ownership tests, which remain pending. The underlying concrete numerical managers retain their existing owned allocation and stopped-scope protocols."
+      ],
+      "deviations": [
+        "C++ manager/numeral template parameters are a non-generic Go manager protocol with concrete call-local A/B/C slot binding; numerical operands stay typed in the implementation. Original source branch bodies and actual upstream unsynchronized rational instantiation are exercised. Debug assertions are explicit ErrExtNumeralAssertion, release erasure is preserved, and reached invalid comparison switches return ErrExtNumeralKind while other invalid switches keep their original no-op behavior. All 212 upstream literal unary/arithmetic/relation cases are stored with exact source line references under test_vectors and commutative wrappers are preserved. Unit stays partial pending additional independent finite/alias/debug boundary and actual every-cold numerical physical ownership audits; no other native manager/client/solver integration is claimed. No Go generics or C/C++ builds are used."
+      ]
     },
     {
       "path": "src/util/f2n.h",
