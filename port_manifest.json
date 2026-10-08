@@ -107135,7 +107135,7 @@
       "path": "src/test/optional.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -107192,11 +107192,13 @@
           "text": "ENSURE(*(*v) == 10);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "All registered assertions test only the C++ optional wrapper itself: empty state, scalar assignment/dereference, class replacement, and the pointer specialization. Go uses a typed pointer for nullable pointers and a concrete value plus an ok/present boolean for optional values. Per the no-generics and standard-library/language-preference rules, no Go test is created for these built-in language conventions; each concrete project consumer tests its own optional state and lifecycle."
+      ]
     },
     {
       "path": "src/test/parray.cpp",
@@ -143192,7 +143194,7 @@
       "path": "src/util/optional.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -143223,11 +143225,14 @@
           "text": "SASSERT(m_initialized==1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The complete primary template is manual optional-value storage: initialized state, heap construction/destruction, deep copying, reset, checked dereference and assignment. Concrete Go consumers must store their typed value directly with an explicit ok/present boolean; Go assignment supplies copying and garbage collection supplies destruction.",
+        "The complete pointer specialization uses nil as the uninitialized state and shallow-copies the pointer. Concrete Go consumers must use an ordinary typed pointer and nil checks. No generic, any-valued or reflection-based Optional wrapper is created, and no C++ allocation/lifetime machinery is ported."
+      ]
     },
     {
       "path": "src/util/page.cpp",
