@@ -115,6 +115,8 @@ func (s *RationalService) facadeValueLockedWithInvocation(a, b *OwnedRational, o
 		body = s.Manager.modWithAllocationContext(&a.Raw, &b.Raw, &work, c.allocationContext())
 	} else if c != nil && op == rationalFacadeRem {
 		body = s.Manager.integerOpRationalWithAllocationContext(&a.Raw, &b.Raw, &work, qIntegerRem, c.allocationContext())
+	} else if c != nil && op == rationalFacadeMachineDiv {
+		body = s.Manager.integerOpRationalWithAllocationContext(&a.Raw, &b.Raw, &work, qIntegerMachineDiv, c.allocationContext())
 	} else if c != nil && op == rationalFacadeIDiv {
 		body = s.Manager.integerOpRationalWithAllocationContext(&a.Raw, &b.Raw, &work, qIntegerDiv, c.allocationContext())
 	} else {

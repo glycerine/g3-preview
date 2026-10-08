@@ -431,6 +431,12 @@ func (s *RationalService) IDivWithInvocation(a, b *OwnedRational, c *RationalSer
 	return s.valueWithInvocation(a, b, c, rationalFacadeIDiv)
 }
 
+// Source: src/util/rational.h:186-190. Delegate original truncating machine
+// integer division with its actual returned-value child allocation context.
+func (s *RationalService) MachineDivWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) (OwnedRational, error) {
+	return s.valueWithInvocation(a, b, c, rationalFacadeMachineDiv)
+}
+
 // Source rational(mpz const&) constructs NUM from the explicitly supplied
 // Integer owner, then reset_denominator publishes DEN. The source NUM is borrowed.
 func (s *RationalService) SetIntegerFromOwnerWithInvocation(out *OwnedRational, source *IntegerManager, n *Int, c *RationalServiceInvocation) (e error) {
