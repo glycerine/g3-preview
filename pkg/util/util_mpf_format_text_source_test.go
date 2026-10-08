@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:1519-1569; selected libstdc++ basic_string.tcc:414-429.
+// Source: src/util/mpf.cpp:1519-1569.
 package util
 
 import (
