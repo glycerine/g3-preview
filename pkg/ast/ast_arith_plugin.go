@@ -13,6 +13,7 @@ import (
 
 type astArithmeticPluginOwner struct {
 	numeral                    astArithNumeralFrame
+	numeralSerial              uint64
 	small                      [2]astFormatRefVector // Int, Real source ptr_vectors
 	cachePending               astNodeRef            // actual INC before setx publication
 	convertIntNumerals         bool

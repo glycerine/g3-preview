@@ -6,11 +6,16 @@ import (
 	"errors"
 	"math"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
 // The lexical rational parameter stays at this address if cleanup stops.
 type astArithNumeralFrame struct {
+	owner                                *astArithmeticPluginOwner
+	invocation                           uint64
+	ownDone                              bool
+	bodyCause                            error
 	value                                util.OwnedRational
 	copy                                 util.RationalServiceInvocation
 	active, placed, complete, sourceDone bool
@@ -49,7 +54,8 @@ func (f *astArithNumeralFrame) destroy(m *ASTManager, own bool) error {
 	if e := f.copy.EndContext(); e != nil {
 		return e
 	}
-	*f = astArithNumeralFrame{}
+	f.ownDone = true
+	f.active = false
 	return nil
 }
 
@@ -65,6 +71,10 @@ func (p *astArithmeticPluginOwner) cacheNumeral(which int, index uint32, r astNo
 }
 
 func (m *ASTManager) mkArithmeticNumeral(value *util.OwnedRational, integer bool, zero bool) (result astNodeRef, err error) {
+	return m.mkArithmeticNumeralCaptured(value, integer, zero, nil)
+}
+
+func (m *ASTManager) mkArithmeticNumeralCaptured(value *util.OwnedRational, integer bool, zero bool, call *ASTArithmeticNumeralInvocation) (result astNodeRef, err error) {
 	p := m.arithmeticPlugin
 	if p == nil || !p.published {
 		return result, ErrASTHandle
@@ -108,13 +118,25 @@ func (m *ASTManager) mkArithmeticNumeral(value *util.OwnedRational, integer bool
 			return r, e
 		}
 	}
+	if p.numeralSerial == math.MaxUint64 {
+		return result, arena.ErrBounds
+	}
+	p.numeralSerial++
 	f := &p.numeral
-	f.active = true
+	*f = astArithNumeralFrame{owner: p, invocation: p.numeralSerial, active: true}
+	if call != nil {
+		call.frame, call.invocation = f, f.invocation
+	}
 	defer func() {
+		f.bodyCause = err
 		source := f.destroy(m, false)
 		err = errors.Join(err, source)
 		if source == nil {
 			err = errors.Join(err, f.destroy(m, true))
+		}
+		if call != nil {
+			call.bodyCause, call.sourceCause = f.bodyCause, f.sourceCause
+			call.sourceDone, call.retired = f.sourceDone, f.ownDone
 		}
 	}()
 	f.value, err = m.numerals.NewValue()

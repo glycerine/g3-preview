@@ -8919,7 +8919,9 @@
         "pkg/ast/ast_numeric_util_families.go",
         "pkg/ast/ast_numeric_util_families_test.go",
         "pkg/ast/ast_arith_numeral_read.go",
-        "pkg/ast/ast_arith_numeral_read_test.go"
+        "pkg/ast/ast_arith_numeral_read_test.go",
+        "pkg/ast/ast_arith_numeral_invocation.go",
+        "pkg/ast/ast_arith_numeral_invocation_test.go"
       ],
       "tests": [
         "TestASTArithmeticSourceRegistrationAndDeclarations",
@@ -8945,7 +8947,10 @@
         "TestASTArithmeticNameVectorRefusalPreservesFlagAndPrefix",
         "TestASTArithmeticNameCallbacksAppendToExistingVector",
         "TestASTNumericUtilityFamilyConstruction",
-        "TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy"
+        "TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy",
+        "TestASTArithmeticNumeralInvocationEveryActualReservation",
+        "TestASTArithmeticNumeralInvocationCacheAndGuardHaveNoChild",
+        "TestASTArithmeticNumeralInvocationCapturesExecutingCopy"
       ],
       "assertions": [
         {
@@ -9094,6 +9099,21 @@
           "tests": [
             "TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy"
           ]
+        },
+        {
+          "name": "Selected original arithmetic numeral factory exact caller invocation, reached parameter generation and owning cleanup (arith_decl_plugin.cpp:400-449)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_arith_numeral_invocation.go",
+          "go_targets": [
+            "pkg/ast/ast_arith_numeral.go",
+            "pkg/ast/ast_arith_plugin.go",
+            "pkg/ast/ast_arith_numeral_invocation_test.go"
+          ],
+          "tests": [
+            "TestASTArithmeticNumeralInvocationEveryActualReservation",
+            "TestASTArithmeticNumeralInvocationCacheAndGuardHaveNoChild",
+            "TestASTArithmeticNumeralInvocationCapturesExecutingCopy"
+          ]
         }
       ],
       "ownership": [
@@ -9103,14 +9123,16 @@
         "Offset checks borrow original ADD arguments and the stored numeral rational; no numerical copies, AST INCs or allocation are introduced. The four source branches retain exact base identity, two-argument arity, selected family and NUM checks before reading the rational parameter. Tests run both operand orders and all source offset positions with Budget.FailAfter(0), then drain the normal enclosing AST/numeral fixture.",
         "Caller-owned concrete builtin-name vector holds borrowed symbol records and charges its actual reflected Go backing on source geometric 2,3,5,8,... growth. Callback construction interns each source literal before pushing its record and preserves the exact appended prefix on growth refusal. Reset retains storage; Close releases backing. Conversion is set before the nonlinear-real name append and persists through refusal and later non-NRA queries. Symbols remain with the borrowed SymbolManager, not the vector; native builtin_name/svector ABI/copy profiles are not credited.",
         "Utility family bridges borrow ASTManager and return its actual source family identities; no plugin is installed by utility construction. The containing derived BV owner captures the identities in charged fields. Existing native utility plugin pointer/layout/assertion ABI qualifications remain; cached plugin access continues through the manager.",
-        "Arithmetic numeral reader borrows declaration metadata, recognizes against already-constructed caller utility family identity, copies parameter zero into physical receiver with actual scalar context, then reads parameter-one integer flag as nonzero. Nonmatches leave outputs/context unread. Tests prove raw zero/positive/negative flag semantics, retained value after malformed flag failure and nonmatch erasure of nil outputs. Numeric caller owns later metadata errors after a completed scalar copy; exact successful copy context can be retired independently."
+        "Arithmetic numeral reader borrows declaration metadata, recognizes against already-constructed caller utility family identity, copies parameter zero into physical receiver with actual scalar context, then reads parameter-one integer flag as nonzero. Nonmatches leave outputs/context unread. Tests prove raw zero/positive/negative flag semantics, retained value after malformed flag failure and nonmatch erasure of nil outputs. Numeric caller owns later metadata errors after a completed scalar copy; exact successful copy context can be retired independently.",
+        "ArithmeticNumeralWithInvocation captures the original reached rational parameter frame in the embedded arithmetic plugin owner. Generation is issued only after integer validation and cached-return guards. Source/body history is copied to the caller receipt before frame reuse; exact cleanup ignores retired receipts and rejects copied/foreign/executing/stopped reuse. Original parameter copy and source/own cleanup are shared with the existing factory, without a separate per-call allocation. Cache INC retained before failed vector growth stays a plugin member and is not adopted by lexical cleanup."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
         "Selected numeral factories and numeric value/unique-value/zero callbacks are implemented. Source utility rejects fractional Int inputs, while raw numeral declarations retain any rational with a nonzero integer flag. Converted small integer inputs retain Real flag zero, while converted uncached integer inputs retain Int flag one with a Real range, as the source does. Original sort-name registration now selects the nonlinear-real conversion mode, including flag-before-growth refusal and persistence. The explicit Go returning-error profile keeps unjoined INCs named and refuses source finalization before publication cleanup; native allocation-fatal/exception behavior and allocator ABI equivalence are not claimed. Algebraic-number factory/comparison, other arithmetic factories/reducers, native assertions/TRACE/exception transport and complete ownership/representation audits remain open.",
         "All original registered arithmetic operators now have cached declaration and expression-overload dispatch. Mixed valid Int/Real applications reach the original global mk_app_core coercion pass. This does not implement arithmetic evaluation/reduction, algebraic construction/comparison, full parser name-table consumers or native assertion/exception/allocator profiles.",
         "Selected original rational/integer nonzero-offset distinctness now reaches manager dispatch and Boolean equality rewriting. Three-argument ADD, symbolic offsets, zero offsets and different base identities preserve the original conservative result. Algebraic-number construction and the am().neq comparison branch remain required; this does not claim a complete are_distinct algebraic profile or arithmetic evaluation/reduction. Native TRACE/exception/allocator and whole-unit ownership/representation audits remain open.",
-        "Original arithmetic sort/operator name callbacks are implemented and expose the actual numeral-conversion state through their source logic names. Caller-owned vector append/reset/close uses the explicit Go budget-backed representation; native allocator/header/record ABI, copying an active owner, assertion/exception and whole-unit ownership profiles remain open. Parser name-table integration, other theory name callbacks, arithmetic reducers/evaluation and algebraic-number construction/comparison remain required."
+        "Original arithmetic sort/operator name callbacks are implemented and expose the actual numeral-conversion state through their source logic names. Caller-owned vector append/reset/close uses the explicit Go budget-backed representation; native allocator/header/record ABI, copying an active owner, assertion/exception and whole-unit ownership profiles remain open. Parser name-table integration, other theory name callbacks, arithmetic reducers/evaluation and algebraic-number construction/comparison remain required.",
+        "Actual Runtime integer/fractional copy and small-cache growth refusal campaigns establish matching invocation capture, older-return lifetime, source/body history and complete owning release. The held copy callback proves capture and executing-cleanup guards. These body-refusal tests do not independently establish source-destructor refusal, native fatal resumability or native stack/layout/allocator/assertion/exception ABI. Whole arithmetic plugin and bv2int integration remain incomplete; no whole-unit promotion is credited."
       ]
     },
     {
