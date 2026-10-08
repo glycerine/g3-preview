@@ -31,13 +31,20 @@ func arbitraryFloatFormat(ebits, sbits uint32, sign bool) uint32 {
 }
 
 func (m *ArbitraryFloatManager) valueGuard(a *ArbitraryFloat) error {
-	if m == nil || m.self != m || m.integer == nil || m.integer.self != m.integer || a == nil {
+	if a == nil {
+		return ErrRuntimeOwner
+	}
+	return m.valueOwnerGuard()
+}
+
+func (m *ArbitraryFloatManager) valueOwnerGuard() error {
+	if m == nil || m.self != m || m.integer == nil || m.integer.self != m.integer {
 		return ErrRuntimeOwner
 	}
 	if !m.constructorComplete || m.closed || m.sourceEnded {
 		return arena.ErrClosed
 	}
-	if m.valueExecuting || m.sqrt.finishing || m.sqrt.executing && m.memory != nil && m.memory.FailureTransportActive() || m.fma.finishing || m.fma.executing && m.memory != nil && m.memory.FailureTransportActive() || m.div.finishing || m.div.executing && m.memory != nil && m.memory.FailureTransportActive() || m.mul.finishing || m.mul.executing && m.memory != nil && m.memory.FailureTransportActive() || m.addSub.finishing || m.addSub.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integralRound.finishing || m.integralRound.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integerQuery.finishing || m.integer.mpfBorrowedSourceCallbackActive() {
+	if m.valueExecuting || m.renormalize.finishing || m.renormalize.executing && m.memory != nil && m.memory.FailureTransportActive() || m.sqrt.finishing || m.sqrt.executing && m.memory != nil && m.memory.FailureTransportActive() || m.fma.finishing || m.fma.executing && m.memory != nil && m.memory.FailureTransportActive() || m.div.finishing || m.div.executing && m.memory != nil && m.memory.FailureTransportActive() || m.mul.finishing || m.mul.executing && m.memory != nil && m.memory.FailureTransportActive() || m.addSub.finishing || m.addSub.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integralRound.finishing || m.integralRound.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integerQuery.finishing || m.integer.mpfBorrowedSourceCallbackActive() {
 		return ErrNumericPending
 	}
 	return nil
@@ -178,7 +185,7 @@ func (m *ArbitraryFloatManager) CleanupValue(a *ArbitraryFloat) error {
 	if !m.constructorComplete || m.closed {
 		return arena.ErrClosed
 	}
-	if m.valueExecuting || m.sqrt.finishing || m.sqrt.executing && m.memory != nil && m.memory.FailureTransportActive() || m.fma.finishing || m.fma.executing && m.memory != nil && m.memory.FailureTransportActive() || m.div.finishing || m.div.executing && m.memory != nil && m.memory.FailureTransportActive() || m.mul.finishing || m.mul.executing && m.memory != nil && m.memory.FailureTransportActive() || m.addSub.finishing || m.addSub.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integralRound.finishing || m.integralRound.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integerQuery.finishing || m.integer.mpfBorrowedSourceCallbackActive() {
+	if m.valueExecuting || m.renormalize.finishing || m.renormalize.executing && m.memory != nil && m.memory.FailureTransportActive() || m.sqrt.finishing || m.sqrt.executing && m.memory != nil && m.memory.FailureTransportActive() || m.fma.finishing || m.fma.executing && m.memory != nil && m.memory.FailureTransportActive() || m.div.finishing || m.div.executing && m.memory != nil && m.memory.FailureTransportActive() || m.mul.finishing || m.mul.executing && m.memory != nil && m.memory.FailureTransportActive() || m.addSub.finishing || m.addSub.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integralRound.finishing || m.integralRound.executing && m.memory != nil && m.memory.FailureTransportActive() || m.integerQuery.finishing || m.integer.mpfBorrowedSourceCallbackActive() {
 		return ErrNumericPending
 	}
 	m.valueExecuting = true
