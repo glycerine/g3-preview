@@ -21124,7 +21124,11 @@
         "pkg/ast/rewriter/bv_rewriter_equality.go",
         "pkg/ast/rewriter/bv_rewriter_equality_test.go",
         "pkg/ast/ast_bv_remainder_eq_numerals.go",
-        "pkg/ast/ast_bv_remainder_eq_numerals_test.go"
+        "pkg/ast/ast_bv_remainder_eq_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_mkbv.go",
+        "pkg/ast/rewriter/bv_rewriter_mkbv_test.go",
+        "pkg/ast/ast_bv_mkbv_numerals.go",
+        "pkg/ast/ast_bv_mkbv_numerals_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21206,7 +21210,11 @@
         "TestBVRewriterEqualityCancellationIsolationAndConcat",
         "TestBVRewriterEqualityEveryColdReservation",
         "TestBVRewriterEqualityBitConversionOptionOrder",
-        "TestASTBitVectorRemainderEqualityEveryActualReservation"
+        "TestASTBitVectorRemainderEqualityEveryActualReservation",
+        "TestBVRewriterMkBVOriginalBitOrderAndGuards",
+        "TestBVRewriterMkBVEveryColdReservationAndPublishedResult",
+        "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
+        "TestASTBitVectorMkBVPostfixDistinctReturn"
       ],
       "conditionals": [
         {
@@ -21966,6 +21974,24 @@
           "tests": [
             "TestASTBitVectorRemainderEqualityEveryActualReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_mkbv: disabled option/ordered all-Boolean-literal guards before numeric placement, reverse bit scan with physical val*=two and discarded original postfix old value, numerator factory/output assignment before two/val DT (src/ast/rewriter/bv_rewriter.cpp:2636-2655)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_mkbv.go",
+          "tests": [
+            "TestBVRewriterMkBVOriginalBitOrderAndGuards",
+            "TestBVRewriterMkBVEveryColdReservationAndPublishedResult"
+          ]
+        },
+        {
+          "name": "Original mk_mkbv physical val/two locals, captured compound multiplication/postfix contexts and distinct discarded old-value full-expression lifetime (src/ast/rewriter/bv_rewriter.cpp:2642-2652; src/util/rational.h:220-225)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_mkbv_numerals.go",
+          "tests": [
+            "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
+            "TestASTBitVectorMkBVPostfixDistinctReturn"
+          ]
         }
       ],
       "ownership": [
@@ -21986,7 +22012,8 @@
         "Selected mk_mul_eq keeps default outer c_val/c_inv_val alive across inverse and numeral factories; rhs_val/c2_val are placed only in the successful first block, and end before the second lhs-numeral guard when falling through. Product full-expression temporaries and returned new_c2 remain distinct; the non-unit coefficient branch recomputes the product as in source. Search locals are placed only after the constant-sum guard. Actual child receipts join before older numerical DT. Output publication precedes source scope exit; stopped owners retain failure prefixes through exact owning cleanup.",
         "BV option fields and actual generated module snapshot are embedded in the existing reflected/charged concrete configuration owner. The borrowed local params_ref is not copied or retained beyond update; the module snapshot is released only after the final repeated sort lookup/assignment. Base poly/arith snapshots retire before the derived local update. All reached snapshots use actual decrement receipts and reverse owning cleanup; failure history stops replay. Existing empty/default polynomial constructor remains independent of the derived BV suffix. Actual first-time option-name reads are allocation-free string comparisons; tests refuse all new allocation and verify module reference retirement.",
         "The derived owner captures the actual polynomial base, embedded extraction declaration cache and allocated trailing implementation/caches. Its reflected header charges extraction fields once; standalone extraction construction uses the same original initializer with its own header. A default local parameter full-expression spans both base updates and derived construction/local update. Failed constructor prefixes retain the borrowed context independently of possibly absent base configuration. Stopped invocation frames are joined first, before reverse trailing/extraction/base persistent-member destruction. Exact existing numerical/decrement receipts preserve failure history and published outputs. Fresh refusal campaigns cover both independent borrowed budget channels and configured multiplication with pre-existing caches and consumed old-output DEC failure; all fixture graphs close to zero.",
-        "Equality dispatcher owns both default new_lhs/new_rhs refs before the polynomial guard, retaining them across cancellation/isolation/concat/fallback and destroying rhs then lhs after output assignment. Nested existing callers retain actual receipts and their own failure frames; outer close joins younger polynomial frames before older equality locals and persistent trailing/extraction/base members. The optional remainder block places divisor/rhs defaults before recognition, copies rhs first, preserves stored widths without new equality-width validation and retains separate actual Add/PowerOfTwo returned values until the condition ends. Valid BV numerical parameters are integers, so original GE comparisons use the original integer comparison fast path. Sum/power invocations capture exact scalar contexts; actual Runtime width65 refusal/lifetime/history tests close graphs to zero. A reached trailing FAILED still publishes raw equality and is followed by reset_cache(4096)."
+        "Equality dispatcher owns both default new_lhs/new_rhs refs before the polynomial guard, retaining them across cancellation/isolation/concat/fallback and destroying rhs then lhs after output assignment. Nested existing callers retain actual receipts and their own failure frames; outer close joins younger polynomial frames before older equality locals and persistent trailing/extraction/base members. The optional remainder block places divisor/rhs defaults before recognition, copies rhs first, preserves stored widths without new equality-width validation and retains separate actual Add/PowerOfTwo returned values until the condition ends. Valid BV numerical parameters are integers, so original GE comparisons use the original integer comparison fast path. Sum/power invocations capture exact scalar contexts; actual Runtime width65 refusal/lifetime/history tests close graphs to zero. A reached trailing FAILED still publishes raw equality and is followed by reset_cache(4096).",
+        "MkBV validates all arguments in source order before val/two placement, then scans from the last bit. Each physical val multiplication and postfix increment names its actual scalar invocation; copied postfix old value is owned and destroyed at the full-expression boundary even though unused. Numeric factory child receipt joins before older two/val DT, which follow output assignment. Parent retains stopped numeric owner, published result and original cause until exact cleanup. Actual Runtime width65 all-one campaigns refuse every reached numeric reservation through success and retain separate unchanged old postfix result; cold factory campaigns reach published result with consumed old DEC failure. All fixture graphs close to zero."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -22006,7 +22033,8 @@
         "Selected mk_mul_eq algorithm is complete, with actual Runtime width65 campaigns and g3debug assertions, but generated BV configuration, full equality dispatcher and solver integration remain required. DEBUG uses the enabled-default g3debug profile; native runtime assertion gate and C++ unspecified nested argument evaluation order remain qualified. Native layout/temporary elision/process-global/fatal/exception ABI and independently stopped source DT remain uncredited. No whole source unit is promoted; Go owning cleanup is not native-fatal resumability.",
         "Selected BV local/combined option updates, setter and descriptor collection are complete on the existing configuration adapter. Full derived BV object construction with extraction/trailing members, equality/application dispatch and solver integration remain required. The descriptor externalRelease argument represents the original compile-time _EXTERNAL_RELEASE choice; native build macro/stack/layout/destructor/fatal ABI remains qualified. No whole source unit is promoted.",
         "Selected derived member construction/configured add/mul integration is complete on the concrete Go owner, but full equality/application dispatcher and solver integration remain required. Native base/imp embedding, stack/default argument/temporary-elision/process-global/assertion/fatal/exception/destructor ABI remain qualified; Go headers account actual wrapper storage and do not claim native layout. The arithmetic utility plugin remains lazy/null; source family lookup does not install it. ASTManager already constructs the arithmetic family, so the actual arithmetic utility lookup is warm and allocation-free. No whole source unit is promoted.",
-        "Selected equality dispatcher algorithm and required remainder numerical scope are complete through existing source implementations. Full application dispatcher, remaining BV operator bodies, arithmetic/solver integration and whole source-unit coverage remain required. TRACE/CTTRACE diagnostics, C++ unspecified argument evaluation order, native stack/layout/temporary-elision/default-reference/fatal/exception/global/assertion/destructor ABI and independently stopped source DT remain qualified. Go orders sum before power and retires power before sum at condition exit; no native compiler evaluation-prefix claim is made. No whole source unit is promoted."
+        "Selected equality dispatcher algorithm and required remainder numerical scope are complete through existing source implementations. Full application dispatcher, remaining BV operator bodies, arithmetic/solver integration and whole source-unit coverage remain required. TRACE/CTTRACE diagnostics, C++ unspecified argument evaluation order, native stack/layout/temporary-elision/default-reference/fatal/exception/global/assertion/destructor ABI and independently stopped source DT remain qualified. Go orders sum before power and retires power before sum at condition exit; no native compiler evaluation-prefix claim is made. No whole source unit is promoted.",
+        "Selected mk_mkbv body and exact postfix invocation interface are complete through the configured derived owner. Full BV application dispatch, remaining operator bodies and solver integration remain required. Existing postfix named return/temporary-elision/native layout/global/fatal/exception/assertion/destructor ABI qualifications remain; interface delegates original postfix body rather than replacing postfix with prefix or bit packing. No whole source unit is promoted."
       ]
     },
     {
@@ -22084,7 +22112,11 @@
         "pkg/ast/rewriter/bv_rewriter_equality.go",
         "pkg/ast/rewriter/bv_rewriter_equality_test.go",
         "pkg/ast/ast_bv_remainder_eq_numerals.go",
-        "pkg/ast/ast_bv_remainder_eq_numerals_test.go"
+        "pkg/ast/ast_bv_remainder_eq_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_mkbv.go",
+        "pkg/ast/rewriter/bv_rewriter_mkbv_test.go",
+        "pkg/ast/ast_bv_mkbv_numerals.go",
+        "pkg/ast/ast_bv_mkbv_numerals_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -22185,7 +22217,11 @@
         "TestBVRewriterEqualityCancellationIsolationAndConcat",
         "TestBVRewriterEqualityEveryColdReservation",
         "TestBVRewriterEqualityBitConversionOptionOrder",
-        "TestASTBitVectorRemainderEqualityEveryActualReservation"
+        "TestASTBitVectorRemainderEqualityEveryActualReservation",
+        "TestBVRewriterMkBVOriginalBitOrderAndGuards",
+        "TestBVRewriterMkBVEveryColdReservationAndPublishedResult",
+        "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
+        "TestASTBitVectorMkBVPostfixDistinctReturn"
       ],
       "conditionals": [
         {
@@ -22513,6 +22549,24 @@
           "tests": [
             "TestASTBitVectorRemainderEqualityEveryActualReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_mkbv: disabled option/ordered all-Boolean-literal guards before numeric placement, reverse bit scan with physical val*=two and discarded original postfix old value, numerator factory/output assignment before two/val DT (src/ast/rewriter/bv_rewriter.cpp:2636-2655)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_mkbv.go",
+          "tests": [
+            "TestBVRewriterMkBVOriginalBitOrderAndGuards",
+            "TestBVRewriterMkBVEveryColdReservationAndPublishedResult"
+          ]
+        },
+        {
+          "name": "Original mk_mkbv physical val/two locals, captured compound multiplication/postfix contexts and distinct discarded old-value full-expression lifetime (src/ast/rewriter/bv_rewriter.cpp:2642-2652; src/util/rational.h:220-225)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_mkbv_numerals.go",
+          "tests": [
+            "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
+            "TestASTBitVectorMkBVPostfixDistinctReturn"
+          ]
         }
       ],
       "ownership": [
@@ -22529,7 +22583,8 @@
         "Selected mk_mul_eq keeps default outer c_val/c_inv_val alive across inverse and numeral factories; rhs_val/c2_val are placed only in the successful first block, and end before the second lhs-numeral guard when falling through. Product full-expression temporaries and returned new_c2 remain distinct; the non-unit coefficient branch recomputes the product as in source. Search locals are placed only after the constant-sum guard. Actual child receipts join before older numerical DT. Output publication precedes source scope exit; stopped owners retain failure prefixes through exact owning cleanup.",
         "BV option fields and actual generated module snapshot are embedded in the existing reflected/charged concrete configuration owner. The borrowed local params_ref is not copied or retained beyond update; the module snapshot is released only after the final repeated sort lookup/assignment. Base poly/arith snapshots retire before the derived local update. All reached snapshots use actual decrement receipts and reverse owning cleanup; failure history stops replay. Existing empty/default polynomial constructor remains independent of the derived BV suffix. Actual first-time option-name reads are allocation-free string comparisons; tests refuse all new allocation and verify module reference retirement.",
         "The derived owner captures the actual polynomial base, embedded extraction declaration cache and allocated trailing implementation/caches. Its reflected header charges extraction fields once; standalone extraction construction uses the same original initializer with its own header. A default local parameter full-expression spans both base updates and derived construction/local update. Failed constructor prefixes retain the borrowed context independently of possibly absent base configuration. Stopped invocation frames are joined first, before reverse trailing/extraction/base persistent-member destruction. Exact existing numerical/decrement receipts preserve failure history and published outputs. Fresh refusal campaigns cover both independent borrowed budget channels and configured multiplication with pre-existing caches and consumed old-output DEC failure; all fixture graphs close to zero.",
-        "Equality dispatcher owns both default new_lhs/new_rhs refs before the polynomial guard, retaining them across cancellation/isolation/concat/fallback and destroying rhs then lhs after output assignment. Nested existing callers retain actual receipts and their own failure frames; outer close joins younger polynomial frames before older equality locals and persistent trailing/extraction/base members. The optional remainder block places divisor/rhs defaults before recognition, copies rhs first, preserves stored widths without new equality-width validation and retains separate actual Add/PowerOfTwo returned values until the condition ends. Valid BV numerical parameters are integers, so original GE comparisons use the original integer comparison fast path. Sum/power invocations capture exact scalar contexts; actual Runtime width65 refusal/lifetime/history tests close graphs to zero. A reached trailing FAILED still publishes raw equality and is followed by reset_cache(4096)."
+        "Equality dispatcher owns both default new_lhs/new_rhs refs before the polynomial guard, retaining them across cancellation/isolation/concat/fallback and destroying rhs then lhs after output assignment. Nested existing callers retain actual receipts and their own failure frames; outer close joins younger polynomial frames before older equality locals and persistent trailing/extraction/base members. The optional remainder block places divisor/rhs defaults before recognition, copies rhs first, preserves stored widths without new equality-width validation and retains separate actual Add/PowerOfTwo returned values until the condition ends. Valid BV numerical parameters are integers, so original GE comparisons use the original integer comparison fast path. Sum/power invocations capture exact scalar contexts; actual Runtime width65 refusal/lifetime/history tests close graphs to zero. A reached trailing FAILED still publishes raw equality and is followed by reset_cache(4096).",
+        "MkBV validates all arguments in source order before val/two placement, then scans from the last bit. Each physical val multiplication and postfix increment names its actual scalar invocation; copied postfix old value is owned and destroyed at the full-expression boundary even though unused. Numeric factory child receipt joins before older two/val DT, which follow output assignment. Parent retains stopped numeric owner, published result and original cause until exact cleanup. Actual Runtime width65 all-one campaigns refuse every reached numeric reservation through success and retain separate unchanged old postfix result; cold factory campaigns reach published result with consumed old DEC failure. All fixture graphs close to zero."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -22547,7 +22602,8 @@
         "Selected mk_mul_eq algorithm is complete, with actual Runtime width65 campaigns and g3debug assertions, but generated BV configuration, full equality dispatcher and solver integration remain required. DEBUG uses the enabled-default g3debug profile; native runtime assertion gate and C++ unspecified nested argument evaluation order remain qualified. Native layout/temporary elision/process-global/fatal/exception ABI and independently stopped source DT remain uncredited. No whole source unit is promoted; Go owning cleanup is not native-fatal resumability.",
         "Selected BV local/combined option updates, setter and descriptor collection are complete on the existing configuration adapter. Full derived BV object construction with extraction/trailing members, equality/application dispatch and solver integration remain required. The descriptor externalRelease argument represents the original compile-time _EXTERNAL_RELEASE choice; native build macro/stack/layout/destructor/fatal ABI remains qualified. No whole source unit is promoted.",
         "Selected derived member construction/configured add/mul integration is complete on the concrete Go owner, but full equality/application dispatcher and solver integration remain required. Native base/imp embedding, stack/default argument/temporary-elision/process-global/assertion/fatal/exception/destructor ABI remain qualified; Go headers account actual wrapper storage and do not claim native layout. The arithmetic utility plugin remains lazy/null; source family lookup does not install it. ASTManager already constructs the arithmetic family, so the actual arithmetic utility lookup is warm and allocation-free. No whole source unit is promoted.",
-        "Selected equality dispatcher algorithm and required remainder numerical scope are complete through existing source implementations. Full application dispatcher, remaining BV operator bodies, arithmetic/solver integration and whole source-unit coverage remain required. TRACE/CTTRACE diagnostics, C++ unspecified argument evaluation order, native stack/layout/temporary-elision/default-reference/fatal/exception/global/assertion/destructor ABI and independently stopped source DT remain qualified. Go orders sum before power and retires power before sum at condition exit; no native compiler evaluation-prefix claim is made. No whole source unit is promoted."
+        "Selected equality dispatcher algorithm and required remainder numerical scope are complete through existing source implementations. Full application dispatcher, remaining BV operator bodies, arithmetic/solver integration and whole source-unit coverage remain required. TRACE/CTTRACE diagnostics, C++ unspecified argument evaluation order, native stack/layout/temporary-elision/default-reference/fatal/exception/global/assertion/destructor ABI and independently stopped source DT remain qualified. Go orders sum before power and retires power before sum at condition exit; no native compiler evaluation-prefix claim is made. No whole source unit is promoted.",
+        "Selected mk_mkbv body and exact postfix invocation interface are complete through the configured derived owner. Full BV application dispatch, remaining operator bodies and solver integration remain required. Existing postfix named return/temporary-elision/native layout/global/fatal/exception/assertion/destructor ABI qualifications remain; interface delegates original postfix body rather than replacing postfix with prefix or bit packing. No whole source unit is promoted."
       ]
     },
     {
@@ -141903,7 +141959,9 @@
         "pkg/util/rational_service_compare_invocation_test.go",
         "pkg/util/rational_service_mul_assign_invocation_test.go",
         "pkg/util/rational_service_neg_assign_invocation_test.go",
-        "pkg/util/rational_service_sub_invocation_test.go"
+        "pkg/util/rational_service_sub_invocation_test.go",
+        "pkg/ast/ast_bv_mkbv_numerals.go",
+        "pkg/ast/ast_bv_mkbv_numerals_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -142062,7 +142120,9 @@
         "TestRationalServiceMulAssignInvocationEveryActualReservation",
         "TestRationalServiceNegAssignInvocationPhysicalNumerator",
         "TestRationalServiceNegAssignInvocationEveryIntMinReservation",
-        "TestRationalServiceSubReturnEveryActualReservation"
+        "TestRationalServiceSubReturnEveryActualReservation",
+        "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
+        "TestASTBitVectorMkBVPostfixDistinctReturn"
       ],
       "conditionals": [
         {
@@ -142660,6 +142720,15 @@
           "go_target": "pkg/util/rational_service_invocation.go",
           "tests": [
             "TestRationalServiceSubReturnEveryActualReservation"
+          ]
+        },
+        {
+          "name": "Exact postfix-increment invocation: original old-value copy before physical receiver add-one, returned old owning value and actual raw add/copy contexts (src/util/rational.h:220-225)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_mkbv_numerals.go",
+          "tests": [
+            "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
+            "TestASTBitVectorMkBVPostfixDistinctReturn"
           ]
         }
       ],

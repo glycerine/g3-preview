@@ -340,26 +340,45 @@ func (s *RationalService) facadePrefix(a *OwnedRational, dec bool) error {
 }
 func (s *RationalService) PrefixInc(a *OwnedRational) error { return s.facadePrefix(a, false) }
 func (s *RationalService) PrefixDec(a *OwnedRational) error { return s.facadePrefix(a, true) }
-func (s *RationalService) facadePostfix(a *OwnedRational, dec bool) (_lexOut OwnedRational, _lexErr error) {
+func (s *RationalService) facadePostfix(a *OwnedRational, dec bool) (OwnedRational, error) {
 	if e := s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	return s.facadePostfixLockedWithInvocation(a, dec, nil)
+}
+func (s *RationalService) facadePostfixLockedWithInvocation(a *OwnedRational, dec bool, c *RationalServiceInvocation) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.endLexicalRational(&_lexOut, &_lexErr)
+	defer func() {
+		if cause := c.childSource(); cause != nil {
+			if s.Lexical.Cause == nil {
+				s.Lexical.Cause = cause
+			}
+			_lexErr = errors.Join(_lexErr, cause)
+		}
+	}()
 	if e := s.check(a); e != nil {
 		return OwnedRational{}, e
 	}
 	old := NewRational()
 	oldComplete := false
 	defer s.endLexicalLocal(&old, &oldComplete)
-	if e := s.Manager.Copy(&old, &a.Raw); e != nil {
+	if e := s.Manager.copyWithAllocationContext(&old, &a.Raw, c.allocationContext()); e != nil {
 		return OwnedRational{}, e
 	}
 	oldComplete = true
-	if e := s.facadePrefixLocked(a, dec); e != nil {
+	var e error
+	if c == nil {
+		e = s.facadePrefixLocked(a, dec)
+	} else {
+		one := NewRational()
+		one.Num = NewInt(1)
+		e = s.Manager.addSubWithAllocationContext(&a.Raw, &one, &a.Raw, dec, c.allocationContext())
+	}
+	if e != nil {
 		return OwnedRational{}, e
 	}
 	return s.facadeTakeLocked(&old)

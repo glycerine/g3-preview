@@ -611,3 +611,19 @@ func (s *RationalService) IDivIntoWithInvocation(a, b, out *OwnedRational, c *Ra
 	}
 	return e
 }
+
+// Source: src/util/rational.h:220-225. Copy old value before mutating receiver;
+// retain the distinct returned old value even when the caller discards it.
+func (s *RationalService) PostIncWithInvocation(a *OwnedRational, c *RationalServiceInvocation) (v OwnedRational, e error) {
+	if e = s.lock(); e != nil {
+		return
+	}
+	defer s.mu.Unlock()
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	return s.facadePostfixLockedWithInvocation(a, false, c)
+}
