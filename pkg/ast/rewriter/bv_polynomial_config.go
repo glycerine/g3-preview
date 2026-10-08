@@ -18,9 +18,10 @@ type BVPolynomialConfiguration struct {
 	context         *util.ParamsContext
 	globals         *util.GlobalParams
 	state           BVPolynomialConfigurationState
-	snapshots       [3]util.ParamsRef // poly, arith, optional outer default params_ref
-	placed          [3]bool
-	decrements      [3]util.ParamsDecrementReceipt
+	bitVector       BVRewriterConfigurationState
+	snapshots       [4]util.ParamsRef // poly, arith, optional outer default params_ref, BV
+	placed          [4]bool
+	decrements      [4]util.ParamsDecrementReceipt
 	header          uint64
 	passes          uint64
 	stopped, closed bool
@@ -214,7 +215,7 @@ func (p *BVPolynomialConfiguration) Close() error {
 	if p.closed {
 		return nil
 	}
-	for _, i := range [3]int{1, 0, 2} {
+	for _, i := range [4]int{3, 1, 0, 2} {
 		if e := p.end(i); e != nil {
 			return e
 		}
