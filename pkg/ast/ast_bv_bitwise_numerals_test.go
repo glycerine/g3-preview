@@ -216,3 +216,26 @@ func TestASTBitVectorBitwiseNumeralsStoredWidthAndSymbolicRead(t *testing.T) {
 	}
 	astTestMust(t, n.SourceEnd())
 }
+
+func TestASTBitVectorBitwiseCloseExpressionPreservesOlderMaskLocals(t *testing.T) {
+	m := bvOffsetRuntimeTestManager(t)
+	n, e := NewBitVectorBitwiseNumerals(m)
+	astTestMust(t, e)
+	astTestMust(t, n.BeginMask())
+	astTestMust(t, n.AllOne(65))
+	astTestMust(t, n.CloseExpression())
+	for i, placed := range n.placed {
+		if placed != (i < 3) {
+			t.Fatal("expression cleanup crossed caller buffer/two boundary", i, placed)
+		}
+	}
+	if n.ended {
+		t.Fatal("owning cleanup credited source return")
+	}
+	if e = n.SourceEnd(); e != ErrASTPending {
+		t.Fatal("source return after owning cleanup", e)
+	}
+	astTestMust(t, n.CloseExpression())
+	astTestMust(t, n.Close())
+	astTestMust(t, n.Close())
+}

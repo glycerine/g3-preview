@@ -21,6 +21,7 @@ type BitVectorBitwiseNumerals struct {
 	header                 uint64
 	sourceCause            error
 	stopped, ended, closed bool
+	expressionClosed       bool
 }
 
 func NewBitVectorBitwiseNumerals(m *ASTManager) (*BitVectorBitwiseNumerals, error) {
@@ -44,7 +45,7 @@ func (n *BitVectorBitwiseNumerals) open() error {
 	if n == nil || n.self != n || n.closed {
 		return ErrASTHandle
 	}
-	if n.stopped || n.ended {
+	if n.stopped || n.ended || n.expressionClosed {
 		return ErrASTPending
 	}
 	return nil
@@ -335,11 +336,14 @@ func (n *BitVectorBitwiseNumerals) SourceEnd() error {
 	n.ended = true
 	return nil
 }
-func (n *BitVectorBitwiseNumerals) Close() error {
+
+// CloseExpression joins younger numerical children/temporaries before the
+// caller releases its borrowed mask buffer. The older two/v2/v1 remain placed.
+func (n *BitVectorBitwiseNumerals) CloseExpression() error {
 	if n == nil || n.self != n {
 		return ErrASTHandle
 	}
-	if n.closed {
+	if n.closed || n.expressionClosed {
 		return nil
 	}
 	if e := n.manager.CleanupBitVectorNumeralInvocation(&n.call); e != nil {
@@ -351,7 +355,28 @@ func (n *BitVectorBitwiseNumerals) Close() error {
 	if e := n.scalar.Cleanup(false); e != nil {
 		return e
 	}
-	for i := len(n.values) - 1; i >= 0; i-- {
+	for i := len(n.values) - 1; i >= 3; i-- {
+		if n.placed[i] {
+			if e := n.manager.numerals.CleanupValue(&n.values[i]); e != nil {
+				return e
+			}
+			n.placed[i] = false
+		}
+	}
+	n.expressionClosed = true
+	return nil
+}
+func (n *BitVectorBitwiseNumerals) Close() error {
+	if n == nil || n.self != n {
+		return ErrASTHandle
+	}
+	if n.closed {
+		return nil
+	}
+	if e := n.CloseExpression(); e != nil {
+		return e
+	}
+	for i := 2; i >= 0; i-- {
 		if n.placed[i] {
 			if e := n.manager.numerals.CleanupValue(&n.values[i]); e != nil {
 				return e

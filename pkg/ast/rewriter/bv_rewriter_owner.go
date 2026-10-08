@@ -35,6 +35,7 @@ type BVRewriter struct {
 	scalarNumeral         ast.ASTBitVectorNumeralInvocation
 	repeatArgs            ast.ASTHandleBuffer
 	bitwiseArgs           ast.ASTHandleBuffer
+	bvor                  *bvOrInvocation
 	extensionPair         [2]ast.ASTHandle
 	rotationArgs          [2]ast.ASTHandle
 	minusOne              *ast.BitVectorMinusOneNumerals
@@ -206,6 +207,12 @@ func (p *BVRewriter) Close() error {
 	}
 	p.repeatArgs.Close(p.manager.Budget())
 	p.bitwiseArgs.Close(p.manager.Budget())
+	if p.bvor != nil {
+		if e := p.bvor.close(p.manager); e != nil {
+			return e
+		}
+		p.bvor = nil
+	}
 	p.extensionPair = [2]ast.ASTHandle{}
 	p.rotationArgs = [2]ast.ASTHandle{}
 	if p.extendedRotate != nil {
