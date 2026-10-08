@@ -23434,7 +23434,11 @@
         "pkg/ast/rewriter/bv_polynomial_merge_test.go",
         "pkg/ast/rewriter/bv_polynomial_mul_hoist.go",
         "pkg/ast/rewriter/bv_polynomial_mul_hoist_test.go",
-        "pkg/ast/ast_bv_polynomial_zero_assign_test.go"
+        "pkg/ast/ast_bv_polynomial_zero_assign_test.go",
+        "pkg/ast/rewriter/bv_polynomial_add_core.go",
+        "pkg/ast/rewriter/bv_polynomial_add_core_test.go",
+        "pkg/ast/ast_bv_polynomial_add_numerals.go",
+        "pkg/ast/ast_bv_polynomial_add_numerals_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23473,7 +23477,16 @@
         "TestBVPolynomialMultiplicationHoistValidityAndZeroPlaceholders",
         "TestBVPolynomialMultiplicationHoistSoleInputOwnershipAndSpill",
         "TestBVPolynomialMultiplicationHoistEveryColdReservation",
-        "TestASTBitVectorPolynomialZeroAssignmentLiteralLifetime"
+        "TestASTBitVectorPolynomialZeroAssignmentLiteralLifetime",
+        "TestBVPolynomialNonflatAdditionCollectsAndCancelsCoefficients",
+        "TestBVPolynomialNonflatAdditionShortcutsConstantsAndOrdering",
+        "TestBVPolynomialNonflatAdditionZeroAndConstantLeadingGuard",
+        "TestBVPolynomialNonflatAdditionBothHoistPaths",
+        "TestBVPolynomialNonflatAdditionEveryColdReservation",
+        "TestBVPolynomialNonflatAdditionEveryActualNumericReservation",
+        "TestBVPolynomialNonflatAdditionConstructorRefusalAndCopyGuards",
+        "TestASTBitVectorPolynomialAdditionNumeralsPhysicalSlotsAndSourceEnd",
+        "TestASTBitVectorPolynomialAdditionNumeralsHeaderAndCopyGuards"
       ],
       "conditionals": [
         {
@@ -23636,6 +23649,29 @@
           "tests": [
             "TestASTBitVectorPolynomialZeroAssignmentLiteralLifetime"
           ]
+        },
+        {
+          "name": "selected complete BV mk_nflat_add_core: original scan, repeated coefficient collection, first-encounter rebuild, shortcuts, monomial sorting and both hoists (src/ast/rewriter/poly_rewriter_def.h:527-660)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_add_core.go",
+          "tests": [
+            "TestBVPolynomialNonflatAdditionCollectsAndCancelsCoefficients",
+            "TestBVPolynomialNonflatAdditionShortcutsConstantsAndOrdering",
+            "TestBVPolynomialNonflatAdditionZeroAndConstantLeadingGuard",
+            "TestBVPolynomialNonflatAdditionBothHoistPaths",
+            "TestBVPolynomialNonflatAdditionEveryColdReservation",
+            "TestBVPolynomialNonflatAdditionEveryActualNumericReservation",
+            "TestBVPolynomialNonflatAdditionConstructorRefusalAndCopyGuards"
+          ]
+        },
+        {
+          "name": "selected BV nonflat addition numeric locals and coefficient buffer with exact reads, accumulation, copy assignment, normalization and source DT (src/ast/rewriter/poly_rewriter_def.h:530-534,563,570-587,606-609)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_polynomial_add_numerals.go",
+          "tests": [
+            "TestASTBitVectorPolynomialAdditionNumeralsPhysicalSlotsAndSourceEnd",
+            "TestASTBitVectorPolynomialAdditionNumeralsHeaderAndCopyGuards"
+          ]
         }
       ],
       "ownership": [],
@@ -23648,7 +23684,8 @@
         "Selected comparator uses the actual AST numerical frame to own two default-constructed coefficient locals and exact copy/comparison invocations. Both coefficient reads occur before classification shortcuts; stored values are not normalized. Source DT ends c2 before c1 after joining reached children, with stopped call sites and stable failure history. AST placement accesses private numerical owners without a reverse import; operands and power products acquire no references. Wrapper storage is charged at actual Go width, without native stack/pointer/layout/allocator/assertion/fatal/exception ABI or whole-unit credit. Full coefficient-hoist sorting/grouping, multiplication hoist, polynomial current-sort/mark/coefficient owner, addition/multiplication cores, arith specialization and rewriter/solver integration remain required.",
         "The BV hoist grouping body is complete using the original use_power=false expression factories and exact coefficient reader. The external std::sort contract uses the project concrete no-scratch heapsort adaptation; C++ library comparison/swap order and its fault prefix are not claimed. Default coefficient locals and the borrowed ptr_buffer are placed only after sorting. The last-element test still executes is_mul before testing the index. Equal coefficients are not normalized; original literal nodes are reused, including zero, without coefficient-one/zero simplification. g3debug executes the original extra numeral-read/equality assertion before the separate initializer read. The actual wrapper, exact children, inline pps and two-operand array are charged; no native stack/pointer/layout/allocator/assertion/fatal/exception ABI is claimed. In-place vector updates use existing checked AST adapters and keep their published failure prefix, rather than claiming native-fatal unwinding. Successful source exit ends pps then c_prime then c; failed body calls retain their real prefix for owning Close and immutable source readiness. The caller owns the vector and must close this borrowed-manager invocation before its manager. Full multiplication hoist, polynomial current-sort/mark/coefficient owner and addition/multiplication cores, arith specialization and rewriter/solver integration remain required; no whole-unit completion is credited.",
         "BV merge_muls is complete for original use_power=false, with borrowed inline16/doubling factor buffers and a charged one-invocation Go wrapper. TO_BUFFER keeps source non-depth-first order and revisits replaced slots; matching uses pointer/handle identity and original swaps, retaining multiplicities and residual order. The physical caller current-sort field is updated from the last visited left factor before assertions/factories. g3debug keeps k>0 and size assertions; release follows original no-common behavior. Empty residual products execute exact source numeral-one constructors through existing tracked factories, in initializer order, and failed children remain named for cleanup. Return handles and factor entries are borrowed with no extra INC/DEC. Success destroys the second factor buffer before the first; failed bodies retain actual prefixes and reject reuse, while owning Close preserves source readiness. Manual independent-result-sort test proves the selected body read choice in the checked AST boundary, not complete native well-sorted/plugin ABI. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited. The multiplication-hoist caller, polynomial current-sort/mark/coefficient owner, full addition/multiplication cores, arith specialization and rewriter/solver integration remain required.",
-        "Selected BV hoist_mul body follows original TO_BUFFER order, skips numeral factors, uses borrowed identity-to-position map and validity flags, merges each participating term once, keeps zero placeholders and publishes the final sum through the existing checked AST reference adapter. Exact zero construction ends numeral-factory locals before pointer publication and ends the outer rational(0) temporary afterwards. The charged one-invocation wrapper retains exact children and failed prefixes; owning cleanup preserves source history. Successful source exit releases map, validity storage, muls and adds without dereferencing expired borrowed keys. Tests cover release/debug behavior, spill, sole-input ownership and cold body reservation refusals; they do not independently inject stopped numeric source DT. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited. The full polynomial current-sort/mark/coefficient owner, addition/multiplication cores, arith specialization and overall rewriter/solver integration remain required."
+        "Selected BV hoist_mul body follows original TO_BUFFER order, skips numeral factors, uses borrowed identity-to-position map and validity flags, merges each participating term once, keeps zero placeholders and publishes the final sum through the existing checked AST reference adapter. Exact zero construction ends numeral-factory locals before pointer publication and ends the outer rational(0) temporary afterwards. The charged one-invocation wrapper retains exact children and failed prefixes; owning cleanup preserves source history. Successful source exit releases map, validity storage, muls and adds without dereferencing expired borrowed keys. Tests cover release/debug behavior, spill, sole-input ownership and cold body reservation refusals; they do not independently inject stopped numeric source DT. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited. The full polynomial current-sort/mark/coefficient owner, addition/multiplication cores, arith specialization and overall rewriter/solver integration remain required.",
+        "Selected BV nonflat addition body now consumes the original borrowed identity position map, two fast mark planes, concrete rational coefficient buffer, monomial comparator, factories and both hoist bodies. The exact numeric owner in ast accesses private numerical services without reverse imports; c and a are physical distinct locals and coefficient slots receive original copy construction/compound addition. Original scan/collection/rebuild order, modulo normalization, constant-leading FAILED guards, first-encounter output order and DONE/FULL statuses are preserved. Inputs must remain caller-owned through source exit including mark destruction. Successful source exit destroys new_args, coeffs, multiple, visited, a and c. A refused mark append retains its already-set candidate for owning cleanup; a refused vector append retains the exact unpublished INC and original vector identity. Failed invocations reject reuse; owning cleanup preserves source history. Actual Go wrappers/backing are charged. External std::sort uses the existing concrete heapsort comparator/output adaptation, without claiming C++ callback/fault-prefix ordering. Native pointer/layout/stack/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; body campaigns do not separately inject stopped source DT or final-reference deletion failure. Flat addition, multiplication cores, persistent full polynomial configuration/current-sort owner, arith specialization and overall rewriter/solver dispatch integration remain required."
       ]
     },
     {
@@ -23673,7 +23710,11 @@
         "pkg/ast/rewriter/bv_polynomial_merge_test.go",
         "pkg/ast/rewriter/bv_polynomial_mul_hoist.go",
         "pkg/ast/rewriter/bv_polynomial_mul_hoist_test.go",
-        "pkg/ast/ast_bv_polynomial_zero_assign_test.go"
+        "pkg/ast/ast_bv_polynomial_zero_assign_test.go",
+        "pkg/ast/rewriter/bv_polynomial_add_core.go",
+        "pkg/ast/rewriter/bv_polynomial_add_core_test.go",
+        "pkg/ast/ast_bv_polynomial_add_numerals.go",
+        "pkg/ast/ast_bv_polynomial_add_numerals_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23709,7 +23750,16 @@
         "TestBVPolynomialMultiplicationHoistValidityAndZeroPlaceholders",
         "TestBVPolynomialMultiplicationHoistSoleInputOwnershipAndSpill",
         "TestBVPolynomialMultiplicationHoistEveryColdReservation",
-        "TestASTBitVectorPolynomialZeroAssignmentLiteralLifetime"
+        "TestASTBitVectorPolynomialZeroAssignmentLiteralLifetime",
+        "TestBVPolynomialNonflatAdditionCollectsAndCancelsCoefficients",
+        "TestBVPolynomialNonflatAdditionShortcutsConstantsAndOrdering",
+        "TestBVPolynomialNonflatAdditionZeroAndConstantLeadingGuard",
+        "TestBVPolynomialNonflatAdditionBothHoistPaths",
+        "TestBVPolynomialNonflatAdditionEveryColdReservation",
+        "TestBVPolynomialNonflatAdditionEveryActualNumericReservation",
+        "TestBVPolynomialNonflatAdditionConstructorRefusalAndCopyGuards",
+        "TestASTBitVectorPolynomialAdditionNumeralsPhysicalSlotsAndSourceEnd",
+        "TestASTBitVectorPolynomialAdditionNumeralsHeaderAndCopyGuards"
       ],
       "assertions": [
         {
@@ -23889,7 +23939,8 @@
         "Selected is_mul coefficient matcher is implemented for the original BV Config with its actual caller coefficient receiver and exact numerical invocation. Unmatched inputs erase coefficient/product/invocation reads; matched publication borrows the second operand without INC only after stored-rational copy and width read complete. A reached width error keeps the copied coefficient prefix and leaves the product unchanged. It has no owned numerical/reference locals and does not normalize or construct another copied numeral. The hoist comparator/algorithm, polynomial current-sort/mark/coefficient owner, full core/rewriter/solver integration and arith specialization remain required; no native pointer/layout/allocation/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
         "Selected add/mul expression-factory bodies are complete for the original BV Config whose use_power is false; the current sort is supplied by the future concrete caller rather than implementing the whole polynomial owner. Empty factories construct the original numeral(int) temporary before the sort-based numeral factory and end it at the return full expression. Only empty factories consult the current sort; singleton handles are borrowed without manager/sort/handle validation and multi-operand applications borrow their actual argument reader through the existing fixed-declaration/app factories. Coefficient multiplication retains original c.is_one then copied stored-value is_zero: no coefficient-zero shortcut, no operand normalization during zero testing, and no new one shortcut after coefficient numeral normalization. Actual invocation receipts capture numerical children at entry; stopped contexts remain with the AST plugin and source history is unaffected by owning cleanup. The AST placement avoids reverse imports. Arith use_power folding, hoisting, full polynomial current-sort/mark/coefficient owner/core and rewriter/solver integration remain required. Native wrapper/stack/pointer/return-value/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are not credited; returning Go cleanup is not native-fatal resumability.",
         "Selected coefficient-valued power-product reader is complete for BV Config. Stored coefficients are copied into the physical caller receiver without normalization. The fallback constructs a separate numeral(int) one, copy-assigns it and ends it at the full expression, rather than directly setting/swapping the receiver. Actual invocation receipts capture the read or constructor/assignment child before acquisition; stopped calls reject reuse after owning cleanup and retain recorded source history. Return handles are borrowed without INC. Symbolic/nary/unary/empty/bare-numeral shapes preserve the source guards and unread metadata; a small-inline fallback introduces no numeric allocation. The AST numerical wrapper/header is charged where physically allocated; native stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership/completion are uncredited. Arith specialization, hoisting, full current-sort/mark/coefficient owner, polynomial core and overall rewriter/solver integration remain required. Returning Go cleanup is not native-fatal resumability.",
-        "Selected BV hoist_mul body follows original TO_BUFFER order, skips numeral factors, uses borrowed identity-to-position map and validity flags, merges each participating term once, keeps zero placeholders and publishes the final sum through the existing checked AST reference adapter. Exact zero construction ends numeral-factory locals before pointer publication and ends the outer rational(0) temporary afterwards. The charged one-invocation wrapper retains exact children and failed prefixes; owning cleanup preserves source history. Successful source exit releases map, validity storage, muls and adds without dereferencing expired borrowed keys. Tests cover release/debug behavior, spill, sole-input ownership and cold body reservation refusals; they do not independently inject stopped numeric source DT. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited. The full polynomial current-sort/mark/coefficient owner, addition/multiplication cores, arith specialization and overall rewriter/solver integration remain required."
+        "Selected BV hoist_mul body follows original TO_BUFFER order, skips numeral factors, uses borrowed identity-to-position map and validity flags, merges each participating term once, keeps zero placeholders and publishes the final sum through the existing checked AST reference adapter. Exact zero construction ends numeral-factory locals before pointer publication and ends the outer rational(0) temporary afterwards. The charged one-invocation wrapper retains exact children and failed prefixes; owning cleanup preserves source history. Successful source exit releases map, validity storage, muls and adds without dereferencing expired borrowed keys. Tests cover release/debug behavior, spill, sole-input ownership and cold body reservation refusals; they do not independently inject stopped numeric source DT. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited. The full polynomial current-sort/mark/coefficient owner, addition/multiplication cores, arith specialization and overall rewriter/solver integration remain required.",
+        "Selected BV nonflat addition body now consumes the original borrowed identity position map, two fast mark planes, concrete rational coefficient buffer, monomial comparator, factories and both hoist bodies. The exact numeric owner in ast accesses private numerical services without reverse imports; c and a are physical distinct locals and coefficient slots receive original copy construction/compound addition. Original scan/collection/rebuild order, modulo normalization, constant-leading FAILED guards, first-encounter output order and DONE/FULL statuses are preserved. Inputs must remain caller-owned through source exit including mark destruction. Successful source exit destroys new_args, coeffs, multiple, visited, a and c. A refused mark append retains its already-set candidate for owning cleanup; a refused vector append retains the exact unpublished INC and original vector identity. Failed invocations reject reuse; owning cleanup preserves source history. Actual Go wrappers/backing are charged. External std::sort uses the existing concrete heapsort comparator/output adaptation, without claiming C++ callback/fault-prefix ordering. Native pointer/layout/stack/allocator/assertion/fatal/exception ABI and whole-unit ownership remain uncredited; body campaigns do not separately inject stopped source DT or final-reference deletion failure. Flat addition, multiplication cores, persistent full polynomial configuration/current-sort owner, arith specialization and overall rewriter/solver dispatch integration remain required."
       ]
     },
     {
