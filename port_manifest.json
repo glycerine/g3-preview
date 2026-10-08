@@ -129925,7 +129925,14 @@
         "pkg/util/mpf_decimal_stream_callback_test.go",
         "pkg/util/mpf_decimal_stream_source_stop_test.go",
         "pkg/util/owned_string_repeat.go",
-        "pkg/util/owned_string_repeat_test.go"
+        "pkg/util/owned_string_repeat_test.go",
+        "pkg/util/mpf_binary_string.go",
+        "pkg/util/mpf_binary_string_test.go",
+        "pkg/util/mpf_binary_string_failure_test.go",
+        "pkg/util/mpf_binary_string_callback_test.go",
+        "pkg/util/mpf_binary_string_source_stop_test.go",
+        "pkg/util/owned_string_transfer.go",
+        "pkg/util/owned_string_transfer_test.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -130147,7 +130154,18 @@
         "TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ",
         "TestOwnedStringRepeatedConstructorAndReverse",
         "TestOwnedStringRepeatedAllByteValues",
-        "TestOwnedStringRepeatedConstructorFailureAndAuthority"
+        "TestOwnedStringRepeatedConstructorFailureAndAuthority",
+        "TestArbitraryFloatBinaryStringLiteralBranches",
+        "TestArbitraryFloatBinaryStringIndependentBits",
+        "TestArbitraryFloatBinaryStringEveryColdReservation",
+        "TestArbitraryFloatBinaryStringWarmAndLaterCalls",
+        "TestArbitraryFloatBinaryStringEntryAuthority",
+        "TestArbitraryFloatBinaryStringRefusedDivisionKeepsOlderRoots",
+        "TestArbitraryFloatBinaryStringActualCopyTransportGuards",
+        "TestArbitraryFloatBinaryStringTemporarySourceStop",
+        "TestOwnedStringReserveAndMoveAssignment",
+        "TestOwnedStringCStringConcat",
+        "TestOwnedStringTransferAuthorityAndBounds"
       ],
       "conditionals": [
         {
@@ -130954,6 +130972,24 @@
             "TestArbitraryFloatDecimalStreamConversionTransportGuards",
             "TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ"
           ]
+        },
+        {
+          "name": "mpf.cpp:1635-1693; mpf.h:295 to_string_binary literal special text and original odd/divide/reverse bit loops",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_binary_string.go",
+          "tests": [
+            "TestArbitraryFloatBinaryStringLiteralBranches",
+            "TestArbitraryFloatBinaryStringIndependentBits",
+            "TestArbitraryFloatBinaryStringEveryColdReservation",
+            "TestArbitraryFloatBinaryStringWarmAndLaterCalls",
+            "TestArbitraryFloatBinaryStringEntryAuthority",
+            "TestArbitraryFloatBinaryStringRefusedDivisionKeepsOlderRoots",
+            "TestArbitraryFloatBinaryStringActualCopyTransportGuards",
+            "TestArbitraryFloatBinaryStringTemporarySourceStop",
+            "TestOwnedStringReserveAndMoveAssignment",
+            "TestOwnedStringCStringConcat",
+            "TestOwnedStringTransferAuthorityAndBounds"
+          ]
         }
       ],
       "ownership": [
@@ -130994,7 +131030,8 @@
         "ToStringRaw owns the actual return slot only until successful return, with separate nested integer and exponent streams and returned-string temporaries embedded/charged in the class header. OwnedString backing bytes are counted through the exact retained fields; successful result backing transfers to the caller. Exact integer-display receipt protects older temporaries on a younger source destructor stop. Separate owning cleanup validates actual character/formatting invocation tuples and frees their retained roots without repeating a stopped source destructor or crediting an unreached source end. Actual transport guards protect executing MPF/Integer/Rational owners and public-value mutation. Completed cleanup leaves caller-owned successful strings untouched.",
         "ToRationalString embeds and charges the actual scoped rational and failed result slot in the MPF header. It records only actually begun conversion and formatter invocations using nonwrapping child counters, joins completed conversion adapter receipts before integer formatting reuses primitive frames, and preserves a younger source stop before scoped q destruction. Separate owning cleanup joins only captured children before remaining q fields and any failed returned-string backing. Successful strings transfer to the caller. Actual conversion transport protects wrapper, child and borrowed input fields; a refused entry does not adopt or clean an older retained conversion.",
         "The MPF SMT2 caller-stream wrapper embeds and charges the actual scoped q. It captures only actually begun ToRational and rational stream invocations by exact child counters; completed conversion adapter receipts are joined before formatter frame reuse. Source DT preserves younger child source stops before q.Num/q.Den destruction. Separate owning cleanup joins exact captured children and remaining q fields without body or source-destructor replay. The borrowed caller stream is neither retained nor owned; its partial prefix survives all cleanup. Precise MPF primitive/value/class guards include this actual executing invocation. A second refused-entry test primes a nonallocating conversion before creating an older rational formatter with an actual retained COPY descriptor. The wrapper completes its own conversion, records no formatter invocation on refusal, and leaves the older rational/Integer frames and exact physical roots unchanged.",
-        "MPF decimal caller-stream display embeds and charges its actual scoped q and exact begun conversion/decimal child counters. Completed conversion adapter receipts are joined before decimal frame reuse. Body failure of the RAW decimal child skips its own source DEL while the older scoped q still source-destructs unless a younger destructor actually stopped. Source cause propagation protects q on such a stop; separate owning cleanup joins exact captured children before remaining q fields without source or algorithm replay. Stream/input stay borrowed with no retained stream pointer/backing ownership. Typed MPF execution guards include this invocation."
+        "MPF decimal caller-stream display embeds and charges its actual scoped q and exact begun conversion/decimal child counters. Completed conversion adapter receipts are joined before decimal frame reuse. Body failure of the RAW decimal child skips its own source DEL while the older scoped q still source-destructs unless a younger destructor actually stopped. Source cause propagation protects q on such a stop; separate owning cleanup joins exact captured children before remaining q fields without source or algorithm replay. Stream/input stay borrowed with no retained stream pointer/backing ownership. Typed MPF execution guards include this invocation.",
+        "Binary output owns the actual DEFAULT tmp, tmp_str, current expression/repeat temporaries and fresh result slot until return. Exact numeric roots, Natural buffer/verification and actually begun division receipts are charged in the reflected manager scope. Completed source cleanup transfers result ownership to the caller; failed source/owning paths remain separate, and a younger source stop protects res and the enclosing class. Refused older division entry cannot be captured or joined. Typed guards protect the actual namespace during Runtime transport."
       ],
       "deviations": [
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
@@ -131029,7 +131066,8 @@
         "Independent dyadic strings cover precisions2/24/53/120, both signs, normal/subnormal inputs and exponents. Every selected cold reservation includes immediate complete physical and byte graphs and zero refunds; actual RationalManager NTmp is named as the normalization scratch. Warm inline FailAfter(0) preserves exact Runtime/budget state and ended wrapper cleanup leaves later conversion/formatting children and returned texts intact. Real unpack allocation transport checks nested lifecycle/mutation guards. A PageSize1 cold descriptor refusal verifies older conversion preservation. The existing selected OwnedString and left-to-right rational formatting profile is retained; arbitrary native ABI/locale/NRVO alternatives and dedicated younger-source/first-own transport stress refinements are not claimed. No active upstream-driver rational-string assertion or whole MPF/util completion is claimed.",
         "Independent exact dyadic syntax spans precisions2/24/53/120, signs, normal/subnormal values and both decimal settings. Every selected cold reservation covers immediate complete actual physical/byte graphs and zero refunds; warmed inline calls refuse all reservations with exact Runtime/budget state and ended wrapper cleanup preserves later children. Every9 selected negative-rational insertion is failed with literal prefix and scoped-q source-DT checks. Real unpack allocation transport tests nested lifecycle/scalar protection; refused old conversion entry proves no adoption. A real signed-host TLS guard at the integer negative temporary DT stops the rational child and protects older scoped q and class state until explicit owning join. This is an explicit checked-runtime profile rather than defined native signed overflow. Existing upstream driver has no active display_smt2 assertion; no upstream-driver or whole MPF/util completion is claimed.",
         "Independent dyadic decimal output covers precisions0/1/5/12/120, MPF precisions2/24/53/120, signs and normal/subnormal values. All selected cold reservations include immediate complete physical/byte graphs, replay refusal and zero refunds. Warm inline FailAfter(0) preserves exact Runtime/budget equality and ended-wrapper cleanup leaves later children intact. All5 actual -1.75 precision1 stream insertions, including ?, are failed in turn: raw child sourceCursor0, older scoped q sourceCursor2, unchanged output after owning join. Real unpack allocation transport verifies nested scalar/lifecycle refusal. Refused older conversion and older decimal descriptor entry preserve exact unrelated child frames/roots. Real checked TLS failure in the decimal child end-label DEL protects older q and class state until owning cleanup, preserving source history and completed output. Checked signed overflow profile is explicit. Original scalar drivers provide no active MPF display_decimal assertion; whole MPF/util completion is not claimed.",
-        "Binary-output prerequisite only: selected count/character OwnedString construction and in-place reversal are implemented and tested against every byte value, inline/heap boundaries, failed constructor ownership, exact charged backing, trailing NUL and retained borrow identity. These cover dependencies used at mpf.cpp:1639-1654,1673,1686; to_string_binary itself remains unported. No binary-method or whole-unit completion credit is claimed."
+        "Binary-output prerequisite only: selected count/character OwnedString construction and in-place reversal are implemented and tested against every byte value, inline/heap boundaries, failed constructor ownership, exact charged backing, trailing NUL and retained borrow identity. These cover dependencies used at mpf.cpp:1639-1654,1673,1686; to_string_binary itself remains unported. No binary-method or whole-unit completion credit is claimed.",
+        "Binary output preserves NaN forced sign0, infinity extra1, denormal biased minimum exponent1, unsigned extra-count wrapping and extended significant bits rather than imposing an IEEE bit representation. Independent binary-text, every cold reservation, warm inline, later-call isolation, actual COPY transport, older retained division and real checked TLS temporary-DT stop tests pass. Count constructors, reserve/concatenation and equal-budget move assignment follow the selected owned-string profile; compiler evaluation order, native STL ABI/NRVO and arbitrary allocator alternatives are not claimed. Negative stored significand in the finite branch retains the original debug assertion; undefined format domains and nonterminating invalid release inputs do not gain new semantics. Original upstream MPF driver contains no active binary-output assertion; whole MPF/util completion remains unclaimed."
       ]
     },
     {
@@ -131178,7 +131216,14 @@
         "pkg/util/mpf_decimal_stream_test.go",
         "pkg/util/mpf_decimal_stream_failure_test.go",
         "pkg/util/mpf_decimal_stream_callback_test.go",
-        "pkg/util/mpf_decimal_stream_source_stop_test.go"
+        "pkg/util/mpf_decimal_stream_source_stop_test.go",
+        "pkg/util/mpf_binary_string.go",
+        "pkg/util/mpf_binary_string_test.go",
+        "pkg/util/mpf_binary_string_failure_test.go",
+        "pkg/util/mpf_binary_string_callback_test.go",
+        "pkg/util/mpf_binary_string_source_stop_test.go",
+        "pkg/util/owned_string_transfer.go",
+        "pkg/util/owned_string_transfer_test.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -131349,7 +131394,18 @@
         "TestArbitraryFloatDecimalStreamRefusedChildKeepsOlderInvocation",
         "TestArbitraryFloatDecimalStreamRefusedFormatterKeepsOlderAllocation",
         "TestArbitraryFloatDecimalStreamConversionTransportGuards",
-        "TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ"
+        "TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ",
+        "TestArbitraryFloatBinaryStringLiteralBranches",
+        "TestArbitraryFloatBinaryStringIndependentBits",
+        "TestArbitraryFloatBinaryStringEveryColdReservation",
+        "TestArbitraryFloatBinaryStringWarmAndLaterCalls",
+        "TestArbitraryFloatBinaryStringEntryAuthority",
+        "TestArbitraryFloatBinaryStringRefusedDivisionKeepsOlderRoots",
+        "TestArbitraryFloatBinaryStringActualCopyTransportGuards",
+        "TestArbitraryFloatBinaryStringTemporarySourceStop",
+        "TestOwnedStringReserveAndMoveAssignment",
+        "TestOwnedStringCStringConcat",
+        "TestOwnedStringTransferAuthorityAndBounds"
       ],
       "conditionals": [
         {
@@ -131738,6 +131794,24 @@
             "TestArbitraryFloatDecimalStreamConversionTransportGuards",
             "TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ"
           ]
+        },
+        {
+          "name": "mpf.cpp:1635-1693; mpf.h:295 to_string_binary literal special text and original odd/divide/reverse bit loops",
+          "status": "ported",
+          "go_target": "pkg/util/mpf_binary_string.go",
+          "tests": [
+            "TestArbitraryFloatBinaryStringLiteralBranches",
+            "TestArbitraryFloatBinaryStringIndependentBits",
+            "TestArbitraryFloatBinaryStringEveryColdReservation",
+            "TestArbitraryFloatBinaryStringWarmAndLaterCalls",
+            "TestArbitraryFloatBinaryStringEntryAuthority",
+            "TestArbitraryFloatBinaryStringRefusedDivisionKeepsOlderRoots",
+            "TestArbitraryFloatBinaryStringActualCopyTransportGuards",
+            "TestArbitraryFloatBinaryStringTemporarySourceStop",
+            "TestOwnedStringReserveAndMoveAssignment",
+            "TestOwnedStringCStringConcat",
+            "TestOwnedStringTransferAuthorityAndBounds"
+          ]
         }
       ],
       "ownership": [
@@ -131768,7 +131842,8 @@
         "ToStringRaw owns the actual return slot only until successful return, with separate nested integer and exponent streams and returned-string temporaries embedded/charged in the class header. OwnedString backing bytes are counted through the exact retained fields; successful result backing transfers to the caller. Exact integer-display receipt protects older temporaries on a younger source destructor stop. Separate owning cleanup validates actual character/formatting invocation tuples and frees their retained roots without repeating a stopped source destructor or crediting an unreached source end. Actual transport guards protect executing MPF/Integer/Rational owners and public-value mutation. Completed cleanup leaves caller-owned successful strings untouched.",
         "ToRationalString embeds and charges the actual scoped rational and failed result slot in the MPF header. It records only actually begun conversion and formatter invocations using nonwrapping child counters, joins completed conversion adapter receipts before integer formatting reuses primitive frames, and preserves a younger source stop before scoped q destruction. Separate owning cleanup joins only captured children before remaining q fields and any failed returned-string backing. Successful strings transfer to the caller. Actual conversion transport protects wrapper, child and borrowed input fields; a refused entry does not adopt or clean an older retained conversion.",
         "The MPF SMT2 caller-stream wrapper embeds and charges the actual scoped q. It captures only actually begun ToRational and rational stream invocations by exact child counters; completed conversion adapter receipts are joined before formatter frame reuse. Source DT preserves younger child source stops before q.Num/q.Den destruction. Separate owning cleanup joins exact captured children and remaining q fields without body or source-destructor replay. The borrowed caller stream is neither retained nor owned; its partial prefix survives all cleanup. Precise MPF primitive/value/class guards include this actual executing invocation. A second refused-entry test primes a nonallocating conversion before creating an older rational formatter with an actual retained COPY descriptor. The wrapper completes its own conversion, records no formatter invocation on refusal, and leaves the older rational/Integer frames and exact physical roots unchanged.",
-        "MPF decimal caller-stream display embeds and charges its actual scoped q and exact begun conversion/decimal child counters. Completed conversion adapter receipts are joined before decimal frame reuse. Body failure of the RAW decimal child skips its own source DEL while the older scoped q still source-destructs unless a younger destructor actually stopped. Source cause propagation protects q on such a stop; separate owning cleanup joins exact captured children before remaining q fields without source or algorithm replay. Stream/input stay borrowed with no retained stream pointer/backing ownership. Typed MPF execution guards include this invocation."
+        "MPF decimal caller-stream display embeds and charges its actual scoped q and exact begun conversion/decimal child counters. Completed conversion adapter receipts are joined before decimal frame reuse. Body failure of the RAW decimal child skips its own source DEL while the older scoped q still source-destructs unless a younger destructor actually stopped. Source cause propagation protects q on such a stop; separate owning cleanup joins exact captured children before remaining q fields without source or algorithm replay. Stream/input stay borrowed with no retained stream pointer/backing ownership. Typed MPF execution guards include this invocation.",
+        "Binary output owns the actual DEFAULT tmp, tmp_str, current expression/repeat temporaries and fresh result slot until return. Exact numeric roots, Natural buffer/verification and actually begun division receipts are charged in the reflected manager scope. Completed source cleanup transfers result ownership to the caller; failed source/owning paths remain separate, and a younger source stop protects res and the enclosing class. Refused older division entry cannot be captured or joined. Typed guards protect the actual namespace during Runtime transport."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -131795,7 +131870,8 @@
         "Raw output preserves the literal bracket/sign/significand/exponent/N-or-D sequence, including classification of zero, NaN and infinity as D and the independent stored sign. Default decimal exponent insertion uses a bounded signed64 stack buffer in the existing selected OwnedStringStream profile. Short strings remain inline; a signed64-minimum exponent reaches stream growth after15 characters even on a warm call. Independent literal tests and every selected cold reservation cover classification, BIG significands and long exponents, immediate physical/byte graphs and zero refunds. A real integer-display allocation callback checks the already appended prefix and exact owner/scalar/cleanup guards. Native std::string/stringbuf ABI, arbitrary locales and compiler-specific NRVO choices are not claimed by the existing selected-profile adapter. No upstream raw-string driver credit or whole MPF/util completion is claimed; dedicated younger-source/first-own transport stress refinements remain outstanding.",
         "Independent dyadic strings cover precisions2/24/53/120, both signs, normal/subnormal inputs and exponents. Every selected cold reservation includes immediate complete physical and byte graphs and zero refunds; actual RationalManager NTmp is named as the normalization scratch. Warm inline FailAfter(0) preserves exact Runtime/budget state and ended wrapper cleanup leaves later conversion/formatting children and returned texts intact. Real unpack allocation transport checks nested lifecycle/mutation guards. A PageSize1 cold descriptor refusal verifies older conversion preservation. The existing selected OwnedString and left-to-right rational formatting profile is retained; arbitrary native ABI/locale/NRVO alternatives and dedicated younger-source/first-own transport stress refinements are not claimed. No active upstream-driver rational-string assertion or whole MPF/util completion is claimed.",
         "Independent exact dyadic syntax spans precisions2/24/53/120, signs, normal/subnormal values and both decimal settings. Every selected cold reservation covers immediate complete actual physical/byte graphs and zero refunds; warmed inline calls refuse all reservations with exact Runtime/budget state and ended wrapper cleanup preserves later children. Every9 selected negative-rational insertion is failed with literal prefix and scoped-q source-DT checks. Real unpack allocation transport tests nested lifecycle/scalar protection; refused old conversion entry proves no adoption. A real signed-host TLS guard at the integer negative temporary DT stops the rational child and protects older scoped q and class state until explicit owning join. This is an explicit checked-runtime profile rather than defined native signed overflow. Existing upstream driver has no active display_smt2 assertion; no upstream-driver or whole MPF/util completion is claimed.",
-        "Independent dyadic decimal output covers precisions0/1/5/12/120, MPF precisions2/24/53/120, signs and normal/subnormal values. All selected cold reservations include immediate complete physical/byte graphs, replay refusal and zero refunds. Warm inline FailAfter(0) preserves exact Runtime/budget equality and ended-wrapper cleanup leaves later children intact. All5 actual -1.75 precision1 stream insertions, including ?, are failed in turn: raw child sourceCursor0, older scoped q sourceCursor2, unchanged output after owning join. Real unpack allocation transport verifies nested scalar/lifecycle refusal. Refused older conversion and older decimal descriptor entry preserve exact unrelated child frames/roots. Real checked TLS failure in the decimal child end-label DEL protects older q and class state until owning cleanup, preserving source history and completed output. Checked signed overflow profile is explicit. Original scalar drivers provide no active MPF display_decimal assertion; whole MPF/util completion is not claimed."
+        "Independent dyadic decimal output covers precisions0/1/5/12/120, MPF precisions2/24/53/120, signs and normal/subnormal values. All selected cold reservations include immediate complete physical/byte graphs, replay refusal and zero refunds. Warm inline FailAfter(0) preserves exact Runtime/budget equality and ended-wrapper cleanup leaves later children intact. All5 actual -1.75 precision1 stream insertions, including ?, are failed in turn: raw child sourceCursor0, older scoped q sourceCursor2, unchanged output after owning join. Real unpack allocation transport verifies nested scalar/lifecycle refusal. Refused older conversion and older decimal descriptor entry preserve exact unrelated child frames/roots. Real checked TLS failure in the decimal child end-label DEL protects older q and class state until owning cleanup, preserving source history and completed output. Checked signed overflow profile is explicit. Original scalar drivers provide no active MPF display_decimal assertion; whole MPF/util completion is not claimed.",
+        "Binary output preserves NaN forced sign0, infinity extra1, denormal biased minimum exponent1, unsigned extra-count wrapping and extended significant bits rather than imposing an IEEE bit representation. Independent binary-text, every cold reservation, warm inline, later-call isolation, actual COPY transport, older retained division and real checked TLS temporary-DT stop tests pass. Count constructors, reserve/concatenation and equal-budget move assignment follow the selected owned-string profile; compiler evaluation order, native STL ABI/NRVO and arbitrary allocator alternatives are not claimed. Negative stored significand in the finite branch retains the original debug assertion; undefined format domains and nonterminating invalid release inputs do not gain new semantics. Original upstream MPF driver contains no active binary-output assertion; whole MPF/util completion remains unclaimed."
       ]
     },
     {
