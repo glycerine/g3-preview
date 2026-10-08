@@ -149525,8 +149525,10 @@
       "path": "src/util/scoped_ptr_vector.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/util/scoped_ptr_vector.go",
+        "pkg/util/scoped_ptr_vector_test.go",
         "pkg/math/polynomial/polynomial_skeleton.go",
         "pkg/math/polynomial/polynomial_skeleton_test.go",
         "pkg/math/polynomial/polynomial_skeleton_vector.go",
@@ -149537,6 +149539,10 @@
         "pkg/math/polynomial/polynomial_newton_physical_test.go"
       ],
       "tests": [
+        "TestScopedPtrVectorResetForwardAndResizeReverseDestruction",
+        "TestScopedPtrVectorSetPopGrowAndIdentity",
+        "TestScopedPtrVectorGCOnlyAndTypedNil",
+        "TestScopedPtrVectorOwnerAndPreconditionPanics",
         "TestPolynomialSkeletonSourceGroupsAndLifetime",
         "TestPolynomialSkeletonSourcePointerOnlyRead",
         "TestPolynomialSkeletonConstructorEveryReservation",
@@ -149571,38 +149577,55 @@
           "text": "void pop_back() { SASSERT(!empty()); set(size()-1, nullptr); m_vector.pop_back(); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Concrete polynomial skeleton cpp2958–3068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923–2952. TRACE/global stream binding remains open.",
-          "status": "partial",
-          "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
+          "name": "destructor and reset with forward owned-pointer destruction",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_ptr_vector.go",
           "tests": [
-            "TestPolynomialSkeletonSourceGroupsAndLifetime",
-            "TestPolynomialSkeletonSourcePointerOnlyRead",
-            "TestPolynomialSkeletonConstructorEveryReservation",
-            "TestPolynomialSkeletonSourceDisplay",
-            "TestPolynomialSkeletonSourceDisplayReachedPointer",
-            "TestPolynomialSkeletonSourceInline128Overflow",
-            "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
-            "TestPolynomialSkeletonOverflowConstructorEveryReservation",
-            "TestPolynomialSkeletonVectorSourceOperations",
-            "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
-            "TestPolynomialSkeletonVectorPushEveryReservation",
-            "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
-            "TestPolynomialSkeletonVectorOwnerGuards",
-            "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
-            "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
-            "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
-            "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix"
+            "TestScopedPtrVectorResetForwardAndResizeReverseDestruction",
+            "TestScopedPtrVectorGCOnlyAndTypedNil",
+            "TestScopedPtrVectorOwnerAndPreconditionPanics"
+          ]
+        },
+        {
+          "name": "push_back, indexed access, size and empty",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_ptr_vector.go",
+          "tests": [
+            "TestScopedPtrVectorSetPopGrowAndIdentity",
+            "TestScopedPtrVectorGCOnlyAndTypedNil",
+            "TestScopedPtrVectorOwnerAndPreconditionPanics"
+          ]
+        },
+        {
+          "name": "set identity no-op and old-pointer destruction before replacement",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_ptr_vector.go",
+          "tests": [
+            "TestScopedPtrVectorSetPopGrowAndIdentity",
+            "TestScopedPtrVectorOwnerAndPreconditionPanics"
+          ]
+        },
+        {
+          "name": "pop_back and resize with reverse shrink destruction and nil growth",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_ptr_vector.go",
+          "tests": [
+            "TestScopedPtrVectorResetForwardAndResizeReverseDestruction",
+            "TestScopedPtrVectorSetPopGrowAndIdentity"
           ]
         }
       ],
       "ownership": [
+        "ScopedPtrVector owns its Go slice and every nonnil pointer stored in it. A caller-supplied concrete destruction callback preserves project cleanup; nil selects ordinary Go garbage collection. Reset destroys first-to-last, resize shrink destroys last-to-first, set destroys the old value before publication, and Close performs the source destructor exactly once.",
         "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership."
       ],
       "deviations": [
+        "The source T* template becomes one non-generic any-valued vector that accepts only nil or Go pointer dynamic values. Pointer identity is checked with reflect at the API boundary; hot indexed reads use direct slice access. A stable self pointer rejects accidental owner copies.",
+        "Go slices replace ptr_vector storage. The explicit destroy callback is omitted when garbage collection is the complete source deletion action; concrete consumers with observable Close or reference-release behavior provide that action.",
         "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open."
       ]
     },
