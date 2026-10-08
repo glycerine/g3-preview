@@ -130555,7 +130555,8 @@
         "pkg/util/rational_service_invocation.go",
         "pkg/util/rational_service_unsigned_invocation_test.go",
         "pkg/util/rational_service_mod_into_invocation_test.go",
-        "pkg/util/rational_service_mod_into_callback_source_test.go"
+        "pkg/util/rational_service_mod_into_callback_source_test.go",
+        "pkg/util/rational_service_mul_assign_invocation_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -130791,7 +130792,9 @@
         "TestRationalServiceModIntoInvocationActualTransportRefusesHeldOwner",
         "TestRationalServiceIDivIntoInvocationAliasesAndInline",
         "TestRationalServiceIDivIntoInvocationEveryActualReservation",
-        "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner"
+        "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner",
+        "TestRationalServiceMulAssignInvocationAliasingAndSourceBranches",
+        "TestRationalServiceMulAssignInvocationEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -131830,6 +131833,15 @@
             "TestRationalServiceIDivIntoInvocationEveryActualReservation",
             "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner"
           ]
+        },
+        {
+          "name": "selected rational operator*= exact invocation: physical receiver NUM then DEN and normalization; integer shortcut and self-aliasing (src/util/rational.h:161-164; src/util/mpq.h:324-332)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceMulAssignInvocationAliasingAndSourceBranches",
+            "TestRationalServiceMulAssignInvocationEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -131879,7 +131891,8 @@
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
         "The existing unsigned service setter now names the original uint32 manager overload rather than the numerically equivalent signed64 facade shortcut. Small uint32 uses original int32 publication; larger values still reach original int64 path. Native rational/union/allocator/exception ABI and whole-unit ownership audits remain uncredited; integration faults are separately covered at the BV caller.",
         "The selected caller-local void overload is a prerequisite of original sign-extension numeral rewriting. It preserves the native negative-dividend/divisor-output alias defect: correction rereads the overwritten divisor and produces zero. Tests do not pre-copy the divisor to repair source behavior. Source denominator reset follows successful numerator publication; failure leaves original DEN untouched. Native pointer/stack/assertion/exception/allocator ABI and whole-unit ownership audits remain uncredited; Runtime returning transport closure does not prove native-fatal resumability.",
-        "The source divisor/output alias defect is preserved: after machine quotient publication, negative correction rereads the overwritten divisor and follows quotient sign. Other valid cases use independent Euclidean arithmetic test oracles. The returning Go failure transport remains a qualified adapter; no native-fatal resumability, allocator/pointer/stack/assertion/exception ABI or whole-unit completion is credited. This ports the direct division dependency used by bv_trailing; its analyzer/cache/removal algorithms remain open."
+        "The source divisor/output alias defect is preserved: after machine quotient publication, negative correction rereads the overwritten divisor and follows quotient sign. Other valid cases use independent Euclidean arithmetic test oracles. The returning Go failure transport remains a qualified adapter; no native-fatal resumability, allocator/pointer/stack/assertion/exception ABI or whole-unit completion is credited. This ports the direct division dependency used by bv_trailing; its analyzer/cache/removal algorithms remain open.",
+        "Compound multiplication now captures its actual numerical child in RationalServiceInvocation, using the same physical caller receiver as operator*= rather than a returned temporary/copy assignment. Raw multiplication preserves NUM-before-DEN publication, integer shortcut and normalization generation ownership. Tests refuse every reached actual Runtime reservation for distinct and self-aliasing fractions, inspect component prefixes, reject copied/stopped receipts and close owner graphs without leaks. These body refusal campaigns do not separately establish a stopped source destructor or native fatal resumability. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI and whole-unit completion remain uncredited."
       ]
     },
     {
@@ -140557,7 +140570,8 @@
         "pkg/util/rational_service_mod_into_invocation_test.go",
         "pkg/util/rational_service_mod_into_callback_source_test.go",
         "pkg/util/rational_service_compare_invocation.go",
-        "pkg/util/rational_service_compare_invocation_test.go"
+        "pkg/util/rational_service_compare_invocation_test.go",
+        "pkg/util/rational_service_mul_assign_invocation_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -140711,7 +140725,9 @@
         "TestRationalServiceIDivIntoInvocationEveryActualReservation",
         "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner",
         "TestRationalServiceComparisonInvocationSourceBranches",
-        "TestRationalServiceComparisonInvocationEveryActualReservation"
+        "TestRationalServiceComparisonInvocationEveryActualReservation",
+        "TestRationalServiceMulAssignInvocationAliasingAndSourceBranches",
+        "TestRationalServiceMulAssignInvocationEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -141284,6 +141300,15 @@
             "TestRationalServiceComparisonInvocationSourceBranches",
             "TestRationalServiceComparisonInvocationEveryActualReservation"
           ]
+        },
+        {
+          "name": "selected rational operator*= exact invocation: physical receiver NUM then DEN and normalization; integer shortcut and self-aliasing (src/util/rational.h:161-164; src/util/mpq.h:324-332)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_invocation.go",
+          "tests": [
+            "TestRationalServiceMulAssignInvocationAliasingAndSourceBranches",
+            "TestRationalServiceMulAssignInvocationEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -141319,7 +141344,8 @@
         "The existing unsigned service setter now names the original uint32 manager overload rather than the numerically equivalent signed64 facade shortcut. Small uint32 uses original int32 publication; larger values still reach original int64 path. Native rational/union/allocator/exception ABI and whole-unit ownership audits remain uncredited; integration faults are separately covered at the BV caller.",
         "The selected caller-local void overload is a prerequisite of original sign-extension numeral rewriting. It preserves the native negative-dividend/divisor-output alias defect: correction rereads the overwritten divisor and produces zero. Tests do not pre-copy the divisor to repair source behavior. Source denominator reset follows successful numerator publication; failure leaves original DEN untouched. Native pointer/stack/assertion/exception/allocator ABI and whole-unit ownership audits remain uncredited; Runtime returning transport closure does not prove native-fatal resumability.",
         "The source divisor/output alias defect is preserved: after machine quotient publication, negative correction rereads the overwritten divisor and follows quotient sign. Other valid cases use independent Euclidean arithmetic test oracles. The returning Go failure transport remains a qualified adapter; no native-fatal resumability, allocator/pointer/stack/assertion/exception ABI or whole-unit completion is credited. This ports the direct division dependency used by bv_trailing; its analyzer/cache/removal algorithms remain open.",
-        "Added exact invocation forms for less/greater without changing the comparison algorithm. Greater reverses operands as original operator> does. The caller embeds/charges its invocation; no per-call numeric header is introduced. A reached synchronized raw comparison cohort receives a generation captured at entry by its actual invocation; cleanup only joins matching cohorts, so an older completed call cannot adopt a newer failed comparison. Source end stops retain cursor/cause independently of owning cleanup; native allocator/stack/pointer/assertion/fatal/exception ABI and native-fatal resumability are uncredited. The BV hoist comparator consumes these operations, while whole polynomial core/hoisting integration remains required."
+        "Added exact invocation forms for less/greater without changing the comparison algorithm. Greater reverses operands as original operator> does. The caller embeds/charges its invocation; no per-call numeric header is introduced. A reached synchronized raw comparison cohort receives a generation captured at entry by its actual invocation; cleanup only joins matching cohorts, so an older completed call cannot adopt a newer failed comparison. Source end stops retain cursor/cause independently of owning cleanup; native allocator/stack/pointer/assertion/fatal/exception ABI and native-fatal resumability are uncredited. The BV hoist comparator consumes these operations, while whole polynomial core/hoisting integration remains required.",
+        "Compound multiplication now captures its actual numerical child in RationalServiceInvocation, using the same physical caller receiver as operator*= rather than a returned temporary/copy assignment. Raw multiplication preserves NUM-before-DEN publication, integer shortcut and normalization generation ownership. Tests refuse every reached actual Runtime reservation for distinct and self-aliasing fractions, inspect component prefixes, reject copied/stopped receipts and close owner graphs without leaks. These body refusal campaigns do not separately establish a stopped source destructor or native fatal resumability. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI and whole-unit completion remain uncredited."
       ]
     },
     {

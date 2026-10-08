@@ -347,12 +347,19 @@ func (s *RationalService) CopyWithInvocation(dst, src *OwnedRational, c *Rationa
 
 // Same source compound operator; the caller's NUM is the physical receiver.
 func (s *RationalService) AddAssignWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) error {
-	return s.compoundWithInvocation(a, b, c, false)
+	return s.compoundWithInvocation(a, b, c, rationalFacadeAdd)
 }
 func (s *RationalService) SubAssignWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) error {
-	return s.compoundWithInvocation(a, b, c, true)
+	return s.compoundWithInvocation(a, b, c, rationalFacadeSub)
 }
-func (s *RationalService) compoundWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation, subtract bool) (e error) {
+
+// MulAssignWithInvocation uses the physical caller receiver for both NUM and
+// DEN, retaining the original operator*= component publication order.
+// Source: src/util/rational.h:161-164; src/util/mpq.h:324-332.
+func (s *RationalService) MulAssignWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation) error {
+	return s.compoundWithInvocation(a, b, c, rationalFacadeMul)
+}
+func (s *RationalService) compoundWithInvocation(a, b *OwnedRational, c *RationalServiceInvocation, op rationalFacadeBinaryOp) (e error) {
 	if e = s.lock(); e != nil {
 		return
 	}
@@ -373,7 +380,11 @@ func (s *RationalService) compoundWithInvocation(a, b *OwnedRational, c *Rationa
 	if e = s.rationalScalarOwner(b); e != nil {
 		return
 	}
-	e = s.Manager.addSubWithAllocationContext(&a.Raw, &b.Raw, &a.Raw, subtract, c.allocationContext())
+	if op == rationalFacadeMul {
+		e = s.Manager.mulWithAllocationContext(&a.Raw, &b.Raw, &a.Raw, c.allocationContext())
+	} else {
+		e = s.Manager.addSubWithAllocationContext(&a.Raw, &b.Raw, &a.Raw, op == rationalFacadeSub, c.allocationContext())
+	}
 	if cause := c.childSource(); cause != nil {
 		if s.Lexical.Cause == nil {
 			s.Lexical.Cause = cause
