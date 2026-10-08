@@ -116416,7 +116416,7 @@
       "path": "src/util/ext_numeral.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/ext_numeral.go",
         "pkg/util/ext_numeral_test.go"
@@ -116425,7 +116425,12 @@
         "TestExtNumeralUpstreamArithmeticAndRelations",
         "TestExtNumeralInfinityReadErasureAndPower",
         "TestExtNumeralUpstreamPredicatesResetAndDisplay",
-        "TestExtNumeralSourceKindPublicationOnManagerStop"
+        "TestExtNumeralSourceKindPublicationOnManagerStop",
+        "TestExtNumeralIndependentRationalArithmeticAndAliases",
+        "TestExtNumeralEveryColdNumericalAndDisplayReservation",
+        "TestExtNumeralDebugDomainsReleaseErasureAndInvalidKinds",
+        "TestExtNumeralIndependentComparisonOracle",
+        "TestExtNumeralDebugFieldAssertionAndPoisonedErasure"
       ],
       "conditionals": [
         {
@@ -116483,8 +116488,8 @@
           "text": "SASSERT(!is_infinite(ak));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Original enum/sign/assignment/unary/arithmetic/power/comparison/display branch bodies through non-generic concrete operand-slot manager protocol and actual rational binding (ext_numeral.h:25-345)",
@@ -116494,21 +116499,21 @@
             "TestExtNumeralUpstreamArithmeticAndRelations",
             "TestExtNumeralInfinityReadErasureAndPower",
             "TestExtNumeralUpstreamPredicatesResetAndDisplay",
-            "TestExtNumeralSourceKindPublicationOnManagerStop"
+            "TestExtNumeralSourceKindPublicationOnManagerStop",
+            "TestExtNumeralIndependentRationalArithmeticAndAliases",
+            "TestExtNumeralEveryColdNumericalAndDisplayReservation",
+            "TestExtNumeralDebugDomainsReleaseErasureAndInvalidKinds",
+            "TestExtNumeralIndependentComparisonOracle",
+            "TestExtNumeralDebugFieldAssertionAndPoisonedErasure"
           ]
-        },
-        {
-          "name": "Complete independent arithmetic/alias/debug invalid-domain and every-cold physical ownership audits before unit promotion",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
         }
       ],
       "ownership": [
-        "The shared branch algorithms own no numerals or dynamic storage. ExtRationalBinding borrows actual operand/output pointers and manager; typed operands stay in that concrete binding and are not boxed. Infinity branches preserve source manager/operand read erasure, including nil bindings. Source kind publication order is tested with controlled manager stops separately from actual allocator ownership tests, which remain pending. The underlying concrete numerical managers retain their existing owned allocation and stopped-scope protocols."
+        "The shared branch algorithms own no numerals or dynamic storage. ExtRationalBinding borrows actual operand/output pointers and manager; typed operands stay in that concrete binding and are not boxed. Infinity branches preserve source manager/operand read erasure, including nil bindings. Source kind publication order is tested with controlled manager stops separately from actual allocator ownership tests, which remain pending. The underlying concrete numerical managers retain their existing owned allocation and stopped-scope protocols.",
+        "Completed independent arbitrary-precision extended arithmetic/comparison oracle in both actual rational scratch profiles, including large values and both output aliases. Every cold add/sub/mul/div/set/inv/power/lt/display reservation is refused in turn with complete immediate public/scratch/raw/formatter/output physical ownership audit, original kind publication prefix checks and exact final zero-budget owning refund. Output failures are verified against the original numerator-field width and insertion prefix. Infinite zero operand erasure, debug field/undefined-domain guards, release inverse-zero swap and invalid kind switches are exercised. Adapter inverse invokes actual InvInPlace directly, eliminating the non-source self-copy call."
       ],
       "deviations": [
-        "C++ manager/numeral template parameters are a non-generic Go manager protocol with concrete call-local A/B/C slot binding; numerical operands stay typed in the implementation. Original source branch bodies and actual upstream unsynchronized rational instantiation are exercised. Debug assertions are explicit ErrExtNumeralAssertion, release erasure is preserved, and reached invalid comparison switches return ErrExtNumeralKind while other invalid switches keep their original no-op behavior. All 212 upstream literal unary/arithmetic/relation cases are stored with exact source line references under test_vectors and commutative wrappers are preserved. Unit stays partial pending additional independent finite/alias/debug boundary and actual every-cold numerical physical ownership audits; no other native manager/client/solver integration is claimed. No Go generics or C/C++ builds are used."
+        "C++ manager/numeral template parameters are a non-generic Go manager protocol with concrete call-local A/B/C slot binding; numerical operands stay typed in the implementation. Original source branch bodies and actual upstream unsynchronized rational instantiation are exercised. Debug assertions are explicit ErrExtNumeralAssertion, release erasure is preserved, and reached invalid comparison switches return ErrExtNumeralKind while other invalid switches keep their original no-op behavior. All 212 upstream literal unary/arithmetic/relation cases are stored with exact source line references under test_vectors and commutative wrappers are preserved. Shared algorithms and the actual rational binding are audited; no other native manager binding/client/solver integration, arbitrary native ABI or concurrent behavior is claimed. No Go generics or C/C++ builds are used."
       ]
     },
     {

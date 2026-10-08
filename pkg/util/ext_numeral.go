@@ -383,7 +383,7 @@ func (b *ExtRationalBinding) Set(a, c ExtNumeralSlot) error {
 func (b *ExtRationalBinding) Reset(s ExtNumeralSlot) error { return b.Manager.Reset(b.Operands[s]) }
 func (b *ExtRationalBinding) Neg(s ExtNumeralSlot) error   { return b.Manager.Neg(b.Operands[s]) }
 func (b *ExtRationalBinding) Inv(s ExtNumeralSlot) error {
-	return b.Manager.Inv(b.Operands[s], b.Operands[s])
+	return b.Manager.InvInPlace(b.Operands[s])
 }
 func (b *ExtRationalBinding) Add() error {
 	return b.Manager.Add(b.Operands[ExtA], b.Operands[ExtB], b.Operands[ExtC])
