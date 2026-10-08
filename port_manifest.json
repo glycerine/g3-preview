@@ -147405,8 +147405,10 @@
       "path": "src/util/ref_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/util/ref_buffer.go",
+        "pkg/util/ref_buffer_test.go",
         "pkg/ast/ast_dependency_ref_buffer_borrow.go",
         "pkg/ast/ast_dependency_ref_buffer.go",
         "pkg/ast/ast_dependency_ref_buffer_ops.go",
@@ -147426,6 +147428,10 @@
         "pkg/ast/rewriter/bv_rewriter_concat_test.go"
       ],
       "tests": [
+        "TestRefBufferCallbackOrderPushSetPopReset",
+        "TestRefBufferResizeSetXShrinkAndNilCallbacks",
+        "TestRefBufferSelfAppendCloneAssignAndRawReferences",
+        "TestRefBufferUnmanagedAndPreconditionPanics",
         "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
         "TestASTDependencyRefBufferMutableBackUsesSourceAssertion",
         "TestASTDependencyRefOwnersPointerFreeAndDistinctStorage",
@@ -147493,12 +147499,41 @@
           "text": "SASSERT(this->m_buffer.size() == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
+          "name": "ref_buffer_core construction/destruction, push_back, pop_back, back, c_ptr, indexing, set, size, empty, reset and finalize",
+          "status": "ported",
+          "go_target": "pkg/util/ref_buffer.go",
+          "tests": [
+            "TestRefBufferCallbackOrderPushSetPopReset",
+            "TestRefBufferResizeSetXShrinkAndNilCallbacks",
+            "TestRefBufferSelfAppendCloneAssignAndRawReferences",
+            "TestRefBufferUnmanagedAndPreconditionPanics"
+          ]
+        },
+        {
+          "name": "ref_buffer_core append overloads, resize, shrink, setx and copy assignment",
+          "status": "ported",
+          "go_target": "pkg/util/ref_buffer.go",
+          "tests": [
+            "TestRefBufferResizeSetXShrinkAndNilCallbacks",
+            "TestRefBufferSelfAppendCloneAssignAndRawReferences"
+          ]
+        },
+        {
+          "name": "ref_buffer managed construction/copy and sref_buffer unmanaged construction",
+          "status": "ported",
+          "go_target": "pkg/util/ref_buffer.go",
+          "tests": [
+            "TestRefBufferSelfAppendCloneAssignAndRawReferences",
+            "TestRefBufferUnmanagedAndPreconditionPanics"
+          ]
+        },
+        {
           "name": "Concrete dependency inline16 ref_buffer source callbacks/growth/captured raw append/resize/lifecycle",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency_ref_buffer.go",
           "tests": [
             "TestASTDependencyRefBufferInlineSourceRoutesAndCapturedAppend",
@@ -147534,14 +147569,16 @@
           ]
         },
         {
-          "name": "Dependency ref_buffer copy constructor (preserved uninstantiable dependent-base append lookup), other sizes/configurations",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "name": "ref_buffer managed copy constructor retains the manager and increments an independent copied reference sequence",
+          "status": "ported",
+          "go_target": "pkg/util/ref_buffer.go",
+          "tests": [
+            "TestRefBufferSelfAppendCloneAssignAndRawReferences"
+          ]
         },
         {
           "name": "Selected concrete polynomial PSC lexical reference buffer/reference lifetime; inline16, source callbacks and heap growth",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_psc_buffer.go",
           "tests": [
             "TestPolynomialPSCBufferInlineAndUnjoinedPush",
@@ -147554,7 +147591,7 @@
         },
         {
           "name": "Concrete selected monomial ref_buffer lexical range, raw second-growth consumption and completed versus incoming ownership phases",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_monomial_buffer.go",
           "tests": [
             "TestPolynomialGCDMonomialBufferConsumedOldGrowth"
@@ -147562,7 +147599,7 @@
         },
         {
           "name": "Concrete concat expr_ref_buffer INC-before-push, pop-before-DEC, forward dec_range_ref and consumed-reference owning cleanup (src/util/ref_buffer.h:35-68)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_concat.go",
           "tests": [
             "TestBVConcatRefBufferPushPopAndForwardDestruction",
@@ -147571,6 +147608,8 @@
         }
       ],
       "ownership": [
+        "RefBuffer owns one reference for every stored slot. PushBack and Set increment incoming pointers before publication; PopBack removes before decrement; shrinking, reset, finalize and Close decrement removed slots from first to last. Clone and Assign acquire independent reference sets while retaining the same manager and callbacks.",
+        "CPtr and BackRef are live borrows into slice storage and become invalid after structural edits. Close invalidates the owner; checked pointer/copy-owner guards prevent continued use of an invalid or accidentally copied owning wrapper.",
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
         "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md.",
         "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
@@ -147578,7 +147617,8 @@
         "polynomial.cpp:5659-5831: source/own finalization marks the exact actor as finishing before child cleanup or DEC. Actual delete-callback same-finalizer reentry refuses before cursor/root/history changes; H has an independent real-finalization guard. Source constructor order and DEC prefix are unchanged."
       ],
       "deviations": [
-        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. Preserved ref_buffer copy ctor dependent-base lookup is uninstantiable; no repaired copy API. General templates, other owners/configs and full consumers remain open. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
+        "The source templates become one non-generic any-valued RefBuffer that accepts nil or Go pointer values and uses optional increment/decrement callbacks. Clone supplies the intended managed copy-constructor behavior despite the source's dependent-base append lookup, and nil callbacks supply sref_buffer behavior. Go slices replace ptr_buffer storage; Append captures its input before growth so self-append remains valid.",
+        "Owning construction cleanup refusal in concrete consumers publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
         "H uses concrete 16-byte polynomial handle storage rather than native pointer ABI. New helper tests do not increase historical active-driver assertion counts; original optimized source mathematics and alternative layouts remain unchanged."
       ]
     },
