@@ -116466,9 +116466,15 @@
       "path": "src/util/file_path.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/file_path.go",
+        "pkg/util/file_path_test.go"
+      ],
+      "tests": [
+        "TestGetExtensionSourcePathsAndCStringBoundary",
+        "TestGetExtensionExhaustiveAndBorrowedSuffix"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -116479,11 +116485,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Complete last-dot C-string extension lookup (file_path.h:23-35)",
+          "status": "ported",
+          "go_target": "pkg/util/file_path.go",
+          "tests": [
+            "TestGetExtensionSourcePathsAndCStringBoundary",
+            "TestGetExtensionExhaustiveAndBorrowedSuffix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Returned byte slice borrows the original input without allocation or mutation. Nil distinguishes a null input/no dot from the non-nil empty suffix of a trailing dot. No input is retained by an owner."
+      ],
+      "deviations": [
+        "Go byte slices provide the borrowed C-string view bounded by first NUL or slice end; callers treat the suffix as read-only. Byte traversal preserves the complete original last-dot semantics, including directory dots, rather than imposing path normalization. No upstream get_extension tests were found in src/test."
+      ]
     },
     {
       "path": "src/util/fixed_bit_vector.cpp",
