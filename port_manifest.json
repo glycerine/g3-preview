@@ -22662,7 +22662,14 @@
             "TestBVRewriterOROriginalBranchesAndStatuses",
             "TestBVRewriterOREveryColdReservationAndPublication",
             "TestBVRewriterORSortingFlatConfigurationAndErasedSingleton",
-            "TestBVRewriterOREveryActualNumericAndMaskReservation",
+            "TestBVRewriterOREveryActualNumericAndMaskReservation"
+          ]
+        },
+        {
+          "name": "Exact OR mask expression cleanup boundary: join younger numerical children/temporaries before caller branch buffer while preserving older two/v2/v1 and without crediting source return (src/ast/rewriter/bv_rewriter.cpp:1677-1716)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_bitwise_numerals.go",
+          "tests": [
             "TestASTBitVectorBitwiseCloseExpressionPreservesOlderMaskLocals"
           ]
         }
@@ -23817,7 +23824,14 @@
             "TestBVRewriterOROriginalBranchesAndStatuses",
             "TestBVRewriterOREveryColdReservationAndPublication",
             "TestBVRewriterORSortingFlatConfigurationAndErasedSingleton",
-            "TestBVRewriterOREveryActualNumericAndMaskReservation",
+            "TestBVRewriterOREveryActualNumericAndMaskReservation"
+          ]
+        },
+        {
+          "name": "Exact OR mask expression cleanup boundary: join younger numerical children/temporaries before caller branch buffer while preserving older two/v2/v1 and without crediting source return (src/ast/rewriter/bv_rewriter.cpp:1677-1716)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_bitwise_numerals.go",
+          "tests": [
             "TestASTBitVectorBitwiseCloseExpressionPreservesOlderMaskLocals"
           ]
         }
