@@ -680,3 +680,18 @@ func (s *RationalService) RemAssignWithInvocation(a, b *OwnedRational, c *Ration
 	}
 	return e
 }
+
+// Source: src/util/rational.h:507-511. Copy input, apply original abs and return.
+func (s *RationalService) AbsWithInvocation(a *OwnedRational, c *RationalServiceInvocation) (v OwnedRational, e error) {
+	if e = s.lock(); e != nil {
+		return
+	}
+	defer s.mu.Unlock()
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	return s.facadeUnaryLockedWithInvocation(a, facadeAbs, 0, c)
+}
