@@ -150677,7 +150677,7 @@
       "path": "src/util/small_object_allocator.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/arena/small_bytes.go",
         "pkg/util/util_small_object_allocator.go",
@@ -150865,8 +150865,8 @@
           "text": "SASSERT(!chunks.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "release constructor/destructor/reset",
@@ -150965,7 +150965,7 @@
         },
         {
           "name": "source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and retained cleanup roots",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
@@ -150990,7 +150990,7 @@
         },
         {
           "name": "source allocator borrowed CString diagnostics and real NumericTextStream verbosity",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_small_object_allocator_stream.go",
           "tests": [
             "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
@@ -151001,7 +151001,7 @@
         },
         {
           "name": "Concrete little-endian initialized uint32 byte-view adapter and guarded real rounded object extent",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/uint32_codec.go",
           "tests": [
             "TestMemoryUint32CodecActualBackingAndInitializedBytes",
@@ -151012,7 +151012,7 @@
         },
         {
           "name": "Actual before/after physical deallocation prefixes and charged retained release authority; explicit checked cleanup continuation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/release_progress.go",
           "tests": [
             "TestMemoryTrackedReleaseLatePhysicalPrefix",
@@ -151027,7 +151027,7 @@
         },
         {
           "name": "Read-only checked Go PendingRoots diagnostic exposes actual pending allocation/two lexical roots during stopped cleanup; no source action/allocation/directory sweep or new source method completion",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator_pending_roots.go",
           "tests": [
             "TestSmallAllocatorActualPendingRootsIdentityOnly"
@@ -151035,7 +151035,7 @@
         },
         {
           "name": "Selected raw deallocate cpp72-96 size_t entry/zero/debug bypass/receiver subtraction/direct free/foreign pooled nextword-head publication and actual owning invocation abort",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator_raw.go",
           "tests": [
             "TestSmallAllocatorRawForeignDirectSourceCounters",
@@ -151050,7 +151050,7 @@
         },
         {
           "name": "Source size_t32/64 argument conversion before zero in Allocate/DeallocateTracked; exact normalized CompleteRelease receipt; zero preserves actual stopped raw invocation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/release_progress.go",
           "tests": [
             "TestSmallAllocatorCheckedActualSizeTEntry",
@@ -151063,7 +151063,7 @@
         },
         {
           "name": "get_allocation_size and get_wasted_size/get_num_free_objs read published count/free-list prefix during stopped raw sidecar allocation without mutation or cleanup",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator.go",
           "tests": [
             "TestSmallAllocatorQueriesReadPublishedPrefixDuringRawStop"
@@ -151071,7 +151071,7 @@
         },
         {
           "name": "Actual source runtime assertions_enabled read at reached allocator SASSERT sites; erased release/nonWindows direct/zero branches; optional cold borrow of actual DebugContext",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_small_object_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorActualAssertionSwitchForeignDirect",
@@ -151082,7 +151082,7 @@
         },
         {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_verbose_context.go",
           "tests": [
             "TestVerboseContextMutableAllocatorSelection",
@@ -151095,7 +151095,7 @@
         },
         {
           "name": "Selected ostream provider prerequisite and external CString strlen-before-badbit sentry; actual file write failure sets nonthrowing badbit without output-buffer allocation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_small_object_allocator_stream.go",
           "tests": [
             "TestNumericFileStreamExactFormattingAndBorrow",
@@ -151106,7 +151106,7 @@
         },
         {
           "name": "allocate optional concrete actual acquisition outcome preserves same source engine: stamp guarded frame/nonce at body start, actual rememberPending and installed/free-list object leaves; zero/rejected entry unchanged",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator_allocation_outcome.go",
           "tests": [
             "TestSmallAllocatorOutcomeActualAcquisitionAndUnchangedQuickGuard",
@@ -151115,7 +151115,7 @@
         },
         {
           "name": "AllocateWithOutcomeStarted src/util/small_object_allocator.cpp:97-140: Same allocation engine; existing public entry signatures/routes unchanged. Concrete started result only actual guarded metadata publication.",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator.go",
           "tests": [
             "TestSmallAllocatorGuardedStartPreservesRejectedHistory",
@@ -151142,20 +151142,20 @@
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
         "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
         "Storage limits checked before publication; invalid size/generation diagnosed.",
-        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
+        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; Go runtime and explicit diagnostic-stream bindings replace native global wiring. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
         "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle.",
-        "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Actual MPZ/Natural and transitive numerical failure owners remain required.",
-        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial.",
+        "Ordinary retry of an interrupted beforefree invocation resumes its real retained phase; explicit CompleteRelease can acknowledge afterfree failure without counter repair. This is a Go owning cleanup adapter to bounded source-undefined signed-overflow domains, not a C++ exception recovery claim. Downstream numerical owners retain their independent cleanup obligations.",
+        "A checked Runtime provider and ObjectRef values replace the source global allocator and native pointer ABI. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit.",
         "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate.",
-        "Partial SET acquisition prerequisite only; allocating finite-field PNormalize, complete Discriminant source-stop/reservation/coldgraph proof and source parent remain open. No source unit/API promotion.",
-        "Selected actual monomial raw allocator transport closure only; whole source classes/units and fullFactor remain partial; dormant registered driver credit0."
+        "Finite-field and discriminant callers retain independent algorithm and cleanup obligations outside this allocator source unit.",
+        "Monomial callers retain independent algorithm obligations outside this allocator source unit."
       ]
     },
     {
       "path": "src/util/small_object_allocator.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/arena/small_bytes.go",
         "pkg/util/util_small_object_allocator.go",
@@ -151283,8 +151283,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "release constructor/destructor/reset",
@@ -151383,7 +151383,7 @@
         },
         {
           "name": "source allocator profiles, intrusive chunks/free links, runtime-backed consolidation and retained cleanup roots",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorRegisteredPrintOnlyReplay",
@@ -151408,7 +151408,7 @@
         },
         {
           "name": "source allocator borrowed CString diagnostics and real NumericTextStream verbosity",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_small_object_allocator_stream.go",
           "tests": [
             "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
@@ -151419,7 +151419,7 @@
         },
         {
           "name": "Read-only checked Go PendingRoots diagnostic exposes actual pending allocation/two lexical roots during stopped cleanup; no source action/allocation/directory sweep or new source method completion",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator_pending_roots.go",
           "tests": [
             "TestSmallAllocatorActualPendingRootsIdentityOnly"
@@ -151427,7 +151427,7 @@
         },
         {
           "name": "Selected raw deallocate cpp72-96 size_t entry/zero/debug bypass/receiver subtraction/direct free/foreign pooled nextword-head publication and actual owning invocation abort",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator_raw.go",
           "tests": [
             "TestSmallAllocatorRawForeignDirectSourceCounters",
@@ -151442,7 +151442,7 @@
         },
         {
           "name": "Source size_t32/64 argument conversion before zero in Allocate/DeallocateTracked; exact normalized CompleteRelease receipt; zero preserves actual stopped raw invocation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/release_progress.go",
           "tests": [
             "TestSmallAllocatorCheckedActualSizeTEntry",
@@ -151455,7 +151455,7 @@
         },
         {
           "name": "get_allocation_size and get_wasted_size/get_num_free_objs read published count/free-list prefix during stopped raw sidecar allocation without mutation or cleanup",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator.go",
           "tests": [
             "TestSmallAllocatorQueriesReadPublishedPrefixDuringRawStop"
@@ -151463,7 +151463,7 @@
         },
         {
           "name": "Actual source runtime assertions_enabled read at reached allocator SASSERT sites; erased release/nonWindows direct/zero branches; optional cold borrow of actual DebugContext",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_small_object_allocator.go",
           "tests": [
             "TestSmallObjectAllocatorActualAssertionSwitchForeignDirect",
@@ -151474,7 +151474,7 @@
         },
         {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_verbose_context.go",
           "tests": [
             "TestVerboseContextMutableAllocatorSelection",
@@ -151487,7 +151487,7 @@
         },
         {
           "name": "Selected ostream provider prerequisite and external CString strlen-before-badbit sentry; actual file write failure sets nonthrowing badbit without output-buffer allocation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_small_object_allocator_stream.go",
           "tests": [
             "TestNumericFileStreamExactFormattingAndBorrow",
@@ -151498,7 +151498,7 @@
         },
         {
           "name": "AllocateWithOutcomeStarted src/util/small_object_allocator.cpp:97-140: Same allocation engine; existing public entry signatures/routes unchanged. Concrete started result only actual guarded metadata publication.",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/small_allocator.go",
           "tests": [
             "TestSmallAllocatorGuardedStartPreservesRejectedHistory",
@@ -151522,10 +151522,10 @@
         "Reset/Close reclaim tracked live direct blocks as explicit typed owner cleanup extension; source only frees pooled chunks.",
         "Conceptual chunk/block indices replace machine addresses for sorting; source strict endpoint/floor-count retention quirk preserved.",
         "Storage limits checked before publication; invalid size/generation diagnosed.",
-        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; global runtime/ostream wiring remains open. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
-        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial.",
+        "Standalone deterministic scalar address codec and external sort adapter preserve source scan/relink order without claiming native pointer placements. Borrowed explicit diagnostic streams model selected bytes/state; Go runtime and explicit diagnostic-stream bindings replace native global wiring. Legacy arena/small_bytes is a separate storage adapter with its recorded extensions.",
+        "A checked Runtime provider and ObjectRef values replace the source global allocator and native pointer ABI. SizeT32 conversion before zero/bypass applies to raw and checked allocation/deallocation entries; owning receipts match normalized size and exact private serial. Read-only source getters observe the published prefix while raw mutation stays stopped. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit.",
         "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate.",
-        "Selected actual monomial raw allocator transport closure only; whole source classes/units and fullFactor remain partial; dormant registered driver credit0."
+        "Monomial callers retain independent algorithm obligations outside this allocator source unit."
       ]
     },
     {
