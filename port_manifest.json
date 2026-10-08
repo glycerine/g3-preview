@@ -13051,7 +13051,8 @@
         "pkg/ast/ast_bv_numeric_caller_invocation_test.go",
         "pkg/ast/ast_numeric_util_families.go",
         "pkg/ast/ast_numeric_util_families_test.go",
-        "pkg/ast/ast_bv_sign_bit_invocation_test.go"
+        "pkg/ast/ast_bv_sign_bit_invocation_test.go",
+        "pkg/ast/ast_bv_signed_normalization_invocation_test.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -13139,7 +13140,8 @@
         "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases",
         "TestASTNumericUtilityFamilyConstruction",
         "TestASTBitVectorSignBitInvocationEveryActualReservation",
-        "TestASTBitVectorSignBitInvocationAssertionBeforeInput"
+        "TestASTBitVectorSignBitInvocationAssertionBeforeInput",
+        "TestASTBitVectorSignedNormalizationDistinctReturnAndCopy"
       ],
       "conditionals": [
         {
@@ -13462,6 +13464,14 @@
           "tests": [
             "TestASTBitVectorSignBitInvocationEveryActualReservation",
             "TestASTBitVectorSignBitInvocationAssertionBeforeInput"
+          ]
+        },
+        {
+          "name": "Exact signed norm invocation bridge delegates original norm with signed=true, retains distinct returned ownership and unchanged caller value until physical copy (src/ast/bv_decl_plugin.cpp:753-765)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_normalization.go",
+          "tests": [
+            "TestASTBitVectorSignedNormalizationDistinctReturnAndCopy"
           ]
         }
       ],
@@ -21171,7 +21181,11 @@
         "pkg/ast/rewriter/bv_rewriter_ashr.go",
         "pkg/ast/rewriter/bv_rewriter_ashr_test.go",
         "pkg/ast/ast_bv_arithmetic_shift_numerals.go",
-        "pkg/ast/ast_bv_arithmetic_shift_numerals_test.go"
+        "pkg/ast/ast_bv_arithmetic_shift_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_srem.go",
+        "pkg/ast/rewriter/bv_rewriter_srem_test.go",
+        "pkg/ast/ast_bv_srem_numerals.go",
+        "pkg/ast/ast_bv_srem_numerals_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21277,7 +21291,11 @@
         "TestBVRewriterArithmeticShiftOriginalBranches",
         "TestBVRewriterArithmeticShiftEveryColdReservationAndPublication",
         "TestBVRewriterArithmeticShiftOriginalWidthOverwrite",
-        "TestASTBitVectorArithmeticShiftEveryActualReservation"
+        "TestASTBitVectorArithmeticShiftEveryActualReservation",
+        "TestBVRewriterSignedRemainderOriginalBranches",
+        "TestBVRewriterSignedRemainderEveryColdReservationAndPublication",
+        "TestBVRewriterSignedRemainderStoredWidthAndNegativeOne",
+        "TestASTBitVectorSignedRemainderEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -22145,6 +22163,24 @@
           "tests": [
             "TestASTBitVectorArithmeticShiftEveryActualReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_bv_srem_core and configured/internal wrappers: signed RHS normalization before zero/one, independent width overwrites, original rational percent rem, raw internal fallback and hi_div0 conditional interpretation (src/ast/rewriter/bv_rewriter.cpp:1101-1144; src/ast/rewriter/bv_rewriter.h:123,128)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_srem.go",
+          "tests": [
+            "TestBVRewriterSignedRemainderOriginalBranches",
+            "TestBVRewriterSignedRemainderEveryColdReservationAndPublication",
+            "TestBVRewriterSignedRemainderStoredWidthAndNegativeOne"
+          ]
+        },
+        {
+          "name": "Original SREM default r1/r2, distinct signed norm returns and physical copy assignments, returned remainder through factory/output and exact scalar/norm/factory ownership (src/ast/rewriter/bv_rewriter.cpp:1101-1144; src/ast/bv_decl_plugin.cpp:753-765)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_srem_numerals.go",
+          "tests": [
+            "TestASTBitVectorSignedRemainderEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22171,7 +22207,8 @@
         "Multiplication predicates place a0/a1 before both recognitions, copy both operands before source zero/one shortcuts and preserve the second numeral width overwrite. Overflow places returned product then limit; underflow places full then half modulus, conditionally subtracts full modulus from a0 then a1 in their physical receivers, places product then distinct copied negative limit. Output assignment precedes reverse reached declarations. Exact scalar contexts name actual copy/product/power/subtraction/negation operations; returned values survive child retirement. Cold published-output/old-DEC and actual Runtime width65 campaigns cover all modes and a left-one/right-big copy fast path, preserve stopped history and close all graphs to zero.",
         "Selected concat owns a concrete inline16/doubling ref buffer: INC precedes raw push; refused push retains pending INC; raw pop precedes DEC; consumed DEC is recorded before returning refusal; final forward destruction never replays a consumed reference. Default v1/v2 precede all reads; returned power survives physical multiplication and ends before addition. Numeral fusion pops before its factory; extraction fusion constructs before pop. Numeric locals end after result assignment and before the older owning buffer. Stopped outer owner captures exact numeric/factory/buffer prefixes; cold and real Runtime campaigns close shared graphs to zero without changing history.",
         "Logical shifts place default r1/r2 before lhs sort access and copy rhs before zero/threshold guards; the lhs numeral is never read on those short circuits. The threshold temporary ends at comparison. Narrow rn lives through factory/publication and retains separate returned normalization until physical copy. Wide SHL retains power/product/norm returns through physical r1 copy, then retires them before factory; wide LSHR divides into r1 without a returned normalized value. Concrete outer initializer fields preserve left extract-before-zero/right zero-before-extract order. Every actual cold and Runtime reservation is refused through success, old sole-owned BOR DEC can fail after publication, and owning Close joins both exact normalization/factory children before older locals, with explicit ownDone/history assertions and graph-zero evidence.",
-        "Arithmetic shift captures the original default r1/r2 before sort access, rhs copy before zero and lhs copy before numeric threshold. Last successful numeral read controls stored width, including nested amount. Narrow returned uint64 numeral survives result assignment. Wide sign test names exact real frame/normalization children; division modifies r1 and ends returned power before padding. Each numeral(2) ends after physical p multiplication, and p ends at its block before final factory. Oversized negative power/one/subtraction returns survive assignment and end in reverse order. Stopped exact sign/factory/scalar children join before older locals; fresh cold and actual Runtime refusal campaigns assert child ownDone, immutable failure history, no duplicate DEC after output publication and zero owner graphs."
+        "Arithmetic shift captures the original default r1/r2 before sort access, rhs copy before zero and lhs copy before numeric threshold. Last successful numeral read controls stored width, including nested amount. Narrow returned uint64 numeral survives result assignment. Wide sign test names exact real frame/normalization children; division modifies r1 and ends returned power before padding. Each numeral(2) ends after physical p multiplication, and p ends at its block before final factory. Oversized negative power/one/subtraction returns survive assignment and end in reverse order. Stopped exact sign/factory/scalar children join before older locals; fresh cold and actual Runtime refusal campaigns assert child ownDone, immutable failure history, no duplicate DEC after output publication and zero owner graphs.",
+        "Signed remainder owns defaults before RHS recognition, normalizes/copies RHS before all shortcuts, then conditionally reads/normalizes/copies LHS using its independently stored width. Each norm return ends after physical copy before later recognition/factory; operator percent captures original rem rather than mod and retains its returned owner through result assignment. Positive-one/zero shortcuts never copy LHS. Configured/internal wrappers retain original HiDiv0 selection. Symbolic low interpretation builds condition, zero operation, internal operation then ITE. Stopped exact norm/factory/scalar receipts join before older locals and preserve body/source histories; every actual cold and Runtime reservation is refused through success, final published-old-DEC failure never repeats decrement, and fixture graphs close to zero."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -22197,7 +22234,8 @@
         "Selected three multiplication-bound bodies are complete through a concrete Go mode adapter; full BV application dispatcher, remaining BV operations and arithmetic/solver integration remain required. Valid BV numeric values use original MPQ integer comparison paths. Existing returned-negation/named-return/temporary-elision/native layout/stack/global/assertion/fatal/exception/destructor ABI and TRACE qualifications remain. No whole source unit is promoted.",
         "Selected concat body is complete; full BV application dispatcher, other operators and solver integration remain required. Go concrete wrapper headers charge actual storage; native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. Owning cleanup of failed INC/raw-push prefixes is not native-fatal resumability. No whole source unit is promoted.",
         "Selected logical left/right shift bodies are complete through existing source arithmetic and concrete configured owner. Arithmetic right shift, other BV operations, complete application dispatcher and solver integration remain required. Source TRACE/DEBUG gate and native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT retain existing qualifications. Go uint64 shifts match the original guarded saturating helpers; no packed-machine substitute is used for width>64. No whole source unit is promoted.",
-        "Selected active mk_bv_ashr body is complete; original #if 0 symbolic extraction expansion stays disabled. Other BV operations, complete application dispatcher and arithmetic/solver integration remain required. Wide signed padding uses the original loop rather than packed shifts or signed host arithmetic. Source TRACE/DEBUG gates, native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI, unspecified C++ nested argument evaluation order and independently stopped source DT remain qualified. Go orders allone power before one. No whole source unit is promoted."
+        "Selected active mk_bv_ashr body is complete; original #if 0 symbolic extraction expansion stays disabled. Other BV operations, complete application dispatcher and arithmetic/solver integration remain required. Wide signed padding uses the original loop rather than packed shifts or signed host arithmetic. Source TRACE/DEBUG gates, native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI, unspecified C++ nested argument evaluation order and independently stopped source DT remain qualified. Go orders allone power before one. No whole source unit is promoted.",
+        "Selected signed remainder core and two wrappers are complete. Signed/unsigned division, unsigned remainder/modulo, other BV operations, complete application dispatch and arithmetic/solver integration remain required. Source native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. C++ nested argument evaluation is unspecified; this Go adapter builds condition, zero interpretation and internal operation in that order. Exact Go owning cleanup is not native-fatal resumability. No whole source unit is promoted."
       ]
     },
     {
@@ -22299,7 +22337,11 @@
         "pkg/ast/rewriter/bv_rewriter_ashr.go",
         "pkg/ast/rewriter/bv_rewriter_ashr_test.go",
         "pkg/ast/ast_bv_arithmetic_shift_numerals.go",
-        "pkg/ast/ast_bv_arithmetic_shift_numerals_test.go"
+        "pkg/ast/ast_bv_arithmetic_shift_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_srem.go",
+        "pkg/ast/rewriter/bv_rewriter_srem_test.go",
+        "pkg/ast/ast_bv_srem_numerals.go",
+        "pkg/ast/ast_bv_srem_numerals_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -22424,7 +22466,11 @@
         "TestBVRewriterArithmeticShiftOriginalBranches",
         "TestBVRewriterArithmeticShiftEveryColdReservationAndPublication",
         "TestBVRewriterArithmeticShiftOriginalWidthOverwrite",
-        "TestASTBitVectorArithmeticShiftEveryActualReservation"
+        "TestASTBitVectorArithmeticShiftEveryActualReservation",
+        "TestBVRewriterSignedRemainderOriginalBranches",
+        "TestBVRewriterSignedRemainderEveryColdReservationAndPublication",
+        "TestBVRewriterSignedRemainderStoredWidthAndNegativeOne",
+        "TestASTBitVectorSignedRemainderEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -22860,6 +22906,24 @@
           "tests": [
             "TestASTBitVectorArithmeticShiftEveryActualReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_bv_srem_core and configured/internal wrappers: signed RHS normalization before zero/one, independent width overwrites, original rational percent rem, raw internal fallback and hi_div0 conditional interpretation (src/ast/rewriter/bv_rewriter.cpp:1101-1144; src/ast/rewriter/bv_rewriter.h:123,128)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_srem.go",
+          "tests": [
+            "TestBVRewriterSignedRemainderOriginalBranches",
+            "TestBVRewriterSignedRemainderEveryColdReservationAndPublication",
+            "TestBVRewriterSignedRemainderStoredWidthAndNegativeOne"
+          ]
+        },
+        {
+          "name": "Original SREM default r1/r2, distinct signed norm returns and physical copy assignments, returned remainder through factory/output and exact scalar/norm/factory ownership (src/ast/rewriter/bv_rewriter.cpp:1101-1144; src/ast/bv_decl_plugin.cpp:753-765)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_srem_numerals.go",
+          "tests": [
+            "TestASTBitVectorSignedRemainderEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22882,7 +22946,8 @@
         "Multiplication predicates place a0/a1 before both recognitions, copy both operands before source zero/one shortcuts and preserve the second numeral width overwrite. Overflow places returned product then limit; underflow places full then half modulus, conditionally subtracts full modulus from a0 then a1 in their physical receivers, places product then distinct copied negative limit. Output assignment precedes reverse reached declarations. Exact scalar contexts name actual copy/product/power/subtraction/negation operations; returned values survive child retirement. Cold published-output/old-DEC and actual Runtime width65 campaigns cover all modes and a left-one/right-big copy fast path, preserve stopped history and close all graphs to zero.",
         "Selected concat owns a concrete inline16/doubling ref buffer: INC precedes raw push; refused push retains pending INC; raw pop precedes DEC; consumed DEC is recorded before returning refusal; final forward destruction never replays a consumed reference. Default v1/v2 precede all reads; returned power survives physical multiplication and ends before addition. Numeral fusion pops before its factory; extraction fusion constructs before pop. Numeric locals end after result assignment and before the older owning buffer. Stopped outer owner captures exact numeric/factory/buffer prefixes; cold and real Runtime campaigns close shared graphs to zero without changing history.",
         "Logical shifts place default r1/r2 before lhs sort access and copy rhs before zero/threshold guards; the lhs numeral is never read on those short circuits. The threshold temporary ends at comparison. Narrow rn lives through factory/publication and retains separate returned normalization until physical copy. Wide SHL retains power/product/norm returns through physical r1 copy, then retires them before factory; wide LSHR divides into r1 without a returned normalized value. Concrete outer initializer fields preserve left extract-before-zero/right zero-before-extract order. Every actual cold and Runtime reservation is refused through success, old sole-owned BOR DEC can fail after publication, and owning Close joins both exact normalization/factory children before older locals, with explicit ownDone/history assertions and graph-zero evidence.",
-        "Arithmetic shift captures the original default r1/r2 before sort access, rhs copy before zero and lhs copy before numeric threshold. Last successful numeral read controls stored width, including nested amount. Narrow returned uint64 numeral survives result assignment. Wide sign test names exact real frame/normalization children; division modifies r1 and ends returned power before padding. Each numeral(2) ends after physical p multiplication, and p ends at its block before final factory. Oversized negative power/one/subtraction returns survive assignment and end in reverse order. Stopped exact sign/factory/scalar children join before older locals; fresh cold and actual Runtime refusal campaigns assert child ownDone, immutable failure history, no duplicate DEC after output publication and zero owner graphs."
+        "Arithmetic shift captures the original default r1/r2 before sort access, rhs copy before zero and lhs copy before numeric threshold. Last successful numeral read controls stored width, including nested amount. Narrow returned uint64 numeral survives result assignment. Wide sign test names exact real frame/normalization children; division modifies r1 and ends returned power before padding. Each numeral(2) ends after physical p multiplication, and p ends at its block before final factory. Oversized negative power/one/subtraction returns survive assignment and end in reverse order. Stopped exact sign/factory/scalar children join before older locals; fresh cold and actual Runtime refusal campaigns assert child ownDone, immutable failure history, no duplicate DEC after output publication and zero owner graphs.",
+        "Signed remainder owns defaults before RHS recognition, normalizes/copies RHS before all shortcuts, then conditionally reads/normalizes/copies LHS using its independently stored width. Each norm return ends after physical copy before later recognition/factory; operator percent captures original rem rather than mod and retains its returned owner through result assignment. Positive-one/zero shortcuts never copy LHS. Configured/internal wrappers retain original HiDiv0 selection. Symbolic low interpretation builds condition, zero operation, internal operation then ITE. Stopped exact norm/factory/scalar receipts join before older locals and preserve body/source histories; every actual cold and Runtime reservation is refused through success, final published-old-DEC failure never repeats decrement, and fixture graphs close to zero."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -22906,7 +22971,8 @@
         "Selected three multiplication-bound bodies are complete through a concrete Go mode adapter; full BV application dispatcher, remaining BV operations and arithmetic/solver integration remain required. Valid BV numeric values use original MPQ integer comparison paths. Existing returned-negation/named-return/temporary-elision/native layout/stack/global/assertion/fatal/exception/destructor ABI and TRACE qualifications remain. No whole source unit is promoted.",
         "Selected concat body is complete; full BV application dispatcher, other operators and solver integration remain required. Go concrete wrapper headers charge actual storage; native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. Owning cleanup of failed INC/raw-push prefixes is not native-fatal resumability. No whole source unit is promoted.",
         "Selected logical left/right shift bodies are complete through existing source arithmetic and concrete configured owner. Arithmetic right shift, other BV operations, complete application dispatcher and solver integration remain required. Source TRACE/DEBUG gate and native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT retain existing qualifications. Go uint64 shifts match the original guarded saturating helpers; no packed-machine substitute is used for width>64. No whole source unit is promoted.",
-        "Selected active mk_bv_ashr body is complete; original #if 0 symbolic extraction expansion stays disabled. Other BV operations, complete application dispatcher and arithmetic/solver integration remain required. Wide signed padding uses the original loop rather than packed shifts or signed host arithmetic. Source TRACE/DEBUG gates, native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI, unspecified C++ nested argument evaluation order and independently stopped source DT remain qualified. Go orders allone power before one. No whole source unit is promoted."
+        "Selected active mk_bv_ashr body is complete; original #if 0 symbolic extraction expansion stays disabled. Other BV operations, complete application dispatcher and arithmetic/solver integration remain required. Wide signed padding uses the original loop rather than packed shifts or signed host arithmetic. Source TRACE/DEBUG gates, native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI, unspecified C++ nested argument evaluation order and independently stopped source DT remain qualified. Go orders allone power before one. No whole source unit is promoted.",
+        "Selected signed remainder core and two wrappers are complete. Signed/unsigned division, unsigned remainder/modulo, other BV operations, complete application dispatch and arithmetic/solver integration remain required. Source native stack/layout/temporary-elision/process-global/assertion/fatal/exception/destructor ABI and independently stopped source DT remain qualified. C++ nested argument evaluation is unspecified; this Go adapter builds condition, zero interpretation and internal operation in that order. Exact Go owning cleanup is not native-fatal resumability. No whole source unit is promoted."
       ]
     },
     {

@@ -21,7 +21,16 @@ func astBVAssertionEnabled(g *util.GlobalParamsService) (bool, error) {
 
 // NormalizeBitVectorValueWithInvocation returns the original unsigned norm
 // value. It does not assign into or copy-normalize the input receiver.
-func (m *ASTManager) NormalizeBitVectorValueWithInvocation(value *util.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (out util.OwnedRational, result error) {
+func (m *ASTManager) NormalizeBitVectorValueWithInvocation(value *util.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (util.OwnedRational, error) {
+	return m.normalizeBitVectorValueWithInvocation(value, bits, false, c)
+}
+
+// NormalizeSignedBitVectorValueWithInvocation returns the original signed norm.
+// Its returned owner stays distinct from the input until caller copy assignment.
+func (m *ASTManager) NormalizeSignedBitVectorValueWithInvocation(value *util.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (util.OwnedRational, error) {
+	return m.normalizeBitVectorValueWithInvocation(value, bits, true, c)
+}
+func (m *ASTManager) normalizeBitVectorValueWithInvocation(value *util.OwnedRational, bits uint32, signed bool, c *ASTBitVectorNumeralInvocation) (out util.OwnedRational, result error) {
 	if c == nil {
 		return out, ErrASTHandle
 	}
@@ -36,7 +45,7 @@ func (m *ASTManager) NormalizeBitVectorValueWithInvocation(value *util.OwnedRati
 	previous := m.formatExecuting
 	m.formatExecuting = true
 	defer func() { m.formatExecuting = previous }()
-	return m.normalizeBitVectorWithFrame(value, bits, false, nil, &c.receipt)
+	return m.normalizeBitVectorWithFrame(value, bits, signed, nil, &c.receipt)
 }
 
 func (m *ASTManager) normalizeBitVector(value *util.OwnedRational, bits uint32, signed bool, g *util.GlobalParamsService) (out util.OwnedRational, result error) {
