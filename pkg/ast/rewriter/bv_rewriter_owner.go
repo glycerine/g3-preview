@@ -26,6 +26,7 @@ type BVRewriter struct {
 	leOverflow            *bvLEOverflowInvocation
 	leq                   *bvLEInvocation
 	propagation           *bvExtractPropagation
+	signExtension         *bvSignExtensionInvocation
 	trailing              *BVTrailing
 	eqRemainder           *ast.BitVectorRemainderEqualityNumerals
 	mkbv                  *ast.BitVectorMkBVNumerals
@@ -230,6 +231,12 @@ func (p *BVRewriter) Close() error {
 			return e
 		}
 		p.leq = nil
+	}
+	if p.signExtension != nil {
+		if e := p.signExtension.close(p.manager); e != nil {
+			return e
+		}
+		p.signExtension = nil
 	}
 	if p.propagation != nil {
 		if e := p.propagation.close(p.manager); e != nil {
