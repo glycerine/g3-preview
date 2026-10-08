@@ -8,6 +8,11 @@ func (m *ASTManager) MkBitVectorOrArguments(args AppArguments) (ASTHandle, error
 	return m.mkBitVectorArguments(31, args)
 }
 
+// Source: src/ast/bv_decl_plugin.h:408.
+func (m *ASTManager) MkBitVectorXorArguments(args AppArguments) (ASTHandle, error) {
+	return m.mkBitVectorArguments(33, args)
+}
+
 func (m *ASTManager) mkBitVectorArguments(kind int32, args AppArguments) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e

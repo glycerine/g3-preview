@@ -112,3 +112,62 @@ func TestASTBitVectorBorrowedORGuardsAndLifetime(t *testing.T) {
 		}
 	}
 }
+
+// Source: src/ast/bv_decl_plugin.h:408.
+func TestASTBitVectorBorrowedXORFactoryAndLifetime(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	sort, e := m.BitVectorSort(8)
+	astTestMust(t, e)
+	args := make([]ASTHandle, 40)
+	for i := range args {
+		args[i], e = m.MkVar(uint32(i), sort)
+		astTestMust(t, e)
+		astTestPin(t, m, args[i])
+	}
+	source, e := m.MkBitVectorOr(args)
+	astTestMust(t, e)
+	pin, e := m.NewRef(source)
+	astTestMust(t, e)
+	view, e := m.AppArgumentView(source)
+	astTestMust(t, e)
+	expected, e := m.MkBitVectorXor(args)
+	astTestMust(t, e)
+	astTestPin(t, m, expected)
+	before := m.Stats()
+	m.Budget().FailAfter(0)
+	_, e = m.MkBitVectorXorArguments(view)
+	m.Budget().FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) || m.Stats() != before {
+		t.Fatal("original candidate allocation", e)
+	}
+	got, e := m.MkBitVectorXorArguments(view)
+	astTestMust(t, e)
+	if got != expected || m.Stats() != before {
+		t.Fatal("borrowed factory identity")
+	}
+	kind, e := m.GetDeclKind(got)
+	astTestMust(t, e)
+	count, e := m.GetNumArgs(got)
+	astTestMust(t, e)
+	if kind != 33 || count != 40 {
+		t.Fatal("original XOR shape", kind, count)
+	}
+	for i, a := range args {
+		child, e := m.GetArg(got, uint32(i))
+		astTestMust(t, e)
+		if child != a {
+			t.Fatal("borrowed order", i)
+		}
+	}
+	astTestMust(t, m.DelRef(&pin))
+	if _, e = m.MkBitVectorXorArguments(view); e == nil {
+		t.Fatal("stale borrowed storage accepted")
+	}
+	if _, e = m.MkBitVectorXorArguments(SliceArguments(nil)); e == nil {
+		t.Fatal("empty input accepted")
+	}
+}

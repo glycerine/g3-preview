@@ -13618,7 +13618,8 @@
         "pkg/ast/ast_bv_normalization.go",
         "pkg/ast/ast_bv_numeric_caller_invocation_test.go",
         "pkg/ast/ast_bv_extract_bounds.go",
-        "pkg/ast/ast_bv_extract_bounds_test.go"
+        "pkg/ast/ast_bv_extract_bounds_test.go",
+        "pkg/ast/ast_bv_arguments_test.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -13647,7 +13648,8 @@
         "TestASTBitVectorNumericCallerReturnedNormAndInverse",
         "TestASTBitVectorNumericCallerExactEveryActualReservation",
         "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases",
-        "TestASTBitVectorExtractBoundsOriginalParameters"
+        "TestASTBitVectorExtractBoundsOriginalParameters",
+        "TestASTBitVectorBorrowedXORFactoryAndLifetime"
       ],
       "conditionals": [
         {
@@ -13802,6 +13804,14 @@
           "go_target": "pkg/ast/ast_bv_extract_bounds.go",
           "tests": [
             "TestASTBitVectorExtractBoundsOriginalParameters"
+          ]
+        },
+        {
+          "name": "Original mk_bv_xor unsigned-arity factory bridge over borrowed concrete argument storage, preserving candidate allocation and stale-view guards (bv_decl_plugin.h:408)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_arguments.go",
+          "tests": [
+            "TestASTBitVectorBorrowedXORFactoryAndLifetime"
           ]
         }
       ],
@@ -21304,7 +21314,11 @@
         "pkg/ast/rewriter/bv_rewriter_not.go",
         "pkg/ast/rewriter/bv_rewriter_not_test.go",
         "pkg/ast/ast_bv_not_numerals.go",
-        "pkg/ast/ast_bv_not_numerals_test.go"
+        "pkg/ast/ast_bv_not_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_derived_bitwise.go",
+        "pkg/ast/rewriter/bv_rewriter_derived_bitwise_test.go",
+        "pkg/ast/ast_bv_arguments.go",
+        "pkg/ast/ast_bv_arguments_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21459,7 +21473,11 @@
         "TestBVRewriterNotEveryColdReservation",
         "TestBVRewriterNotFlagPrecedenceAndErasedIdentity",
         "TestBVRewriterNotOriginalNonunaryGuard",
-        "TestASTBitVectorNotNumeralsEveryActualReservation"
+        "TestASTBitVectorNotNumeralsEveryActualReservation",
+        "TestBVRewriterDerivedBitwiseOriginalShape",
+        "TestBVRewriterDerivedBitwiseEveryColdReservation",
+        "TestBVRewriterDerivedBitwiseBorrowsAppArguments",
+        "TestASTBitVectorBorrowedXORFactoryAndLifetime"
       ],
       "conditionals": [
         {
@@ -22558,6 +22576,22 @@
             "TestBVRewriterNotOriginalNonunaryGuard",
             "TestASTBitVectorNotNumeralsEveryActualReservation"
           ]
+        },
+        {
+          "name": "Selected original AND/NAND/NOR/XNOR derived-owner bodies: ordered De Morgan construction, source buffer retained through stopped publication, direct borrowed NOR/XNOR argument views and original rewrite depths (bv_rewriter.cpp:1971-1998; bv_rewriter.h:94-97; bv_decl_plugin.h:406-408)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_derived_bitwise.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bv_rewriter_derived_bitwise_test.go",
+            "pkg/ast/ast_bv_arguments.go",
+            "pkg/ast/ast_bv_arguments_test.go"
+          ],
+          "tests": [
+            "TestBVRewriterDerivedBitwiseOriginalShape",
+            "TestBVRewriterDerivedBitwiseEveryColdReservation",
+            "TestBVRewriterDerivedBitwiseBorrowsAppArguments",
+            "TestASTBitVectorBorrowedXORFactoryAndLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -22785,7 +22819,11 @@
         "pkg/ast/rewriter/bv_rewriter_not.go",
         "pkg/ast/rewriter/bv_rewriter_not_test.go",
         "pkg/ast/ast_bv_not_numerals.go",
-        "pkg/ast/ast_bv_not_numerals_test.go"
+        "pkg/ast/ast_bv_not_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_derived_bitwise.go",
+        "pkg/ast/rewriter/bv_rewriter_derived_bitwise_test.go",
+        "pkg/ast/ast_bv_arguments.go",
+        "pkg/ast/ast_bv_arguments_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -22957,7 +22995,11 @@
         "TestBVRewriterNotEveryColdReservation",
         "TestBVRewriterNotFlagPrecedenceAndErasedIdentity",
         "TestBVRewriterNotOriginalNonunaryGuard",
-        "TestASTBitVectorNotNumeralsEveryActualReservation"
+        "TestASTBitVectorNotNumeralsEveryActualReservation",
+        "TestBVRewriterDerivedBitwiseOriginalShape",
+        "TestBVRewriterDerivedBitwiseEveryColdReservation",
+        "TestBVRewriterDerivedBitwiseBorrowsAppArguments",
+        "TestASTBitVectorBorrowedXORFactoryAndLifetime"
       ],
       "conditionals": [
         {
@@ -23611,6 +23653,22 @@
             "TestBVRewriterNotFlagPrecedenceAndErasedIdentity",
             "TestBVRewriterNotOriginalNonunaryGuard",
             "TestASTBitVectorNotNumeralsEveryActualReservation"
+          ]
+        },
+        {
+          "name": "Selected original AND/NAND/NOR/XNOR derived-owner bodies: ordered De Morgan construction, source buffer retained through stopped publication, direct borrowed NOR/XNOR argument views and original rewrite depths (bv_rewriter.cpp:1971-1998; bv_rewriter.h:94-97; bv_decl_plugin.h:406-408)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_derived_bitwise.go",
+          "go_targets": [
+            "pkg/ast/rewriter/bv_rewriter_derived_bitwise_test.go",
+            "pkg/ast/ast_bv_arguments.go",
+            "pkg/ast/ast_bv_arguments_test.go"
+          ],
+          "tests": [
+            "TestBVRewriterDerivedBitwiseOriginalShape",
+            "TestBVRewriterDerivedBitwiseEveryColdReservation",
+            "TestBVRewriterDerivedBitwiseBorrowsAppArguments",
+            "TestASTBitVectorBorrowedXORFactoryAndLifetime"
           ]
         }
       ],
