@@ -1,4 +1,4 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:245-252,344-434;
+// Source: src/ast/rewriter/bv_rewriter.cpp:245-252,349-434;
 // src/ast/rewriter/bv_rewriter.h:79.
 package rewriter
 

@@ -1,4 +1,4 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:344-434.
+// Source: src/ast/rewriter/bv_rewriter.cpp:349-434.
 package rewriter
 
 import (

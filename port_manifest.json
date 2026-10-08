@@ -22772,7 +22772,7 @@
           ]
         },
         {
-          "name": "Complete selected rw_leq_concats and short-circuited concat: ordered concat guards, high-numeral short circuit, normalized high-prefix comparisons, owning suffix reconstruction, common prefix unsigned comparison and postfix original-signedness comparison (src/ast/rewriter/bv_rewriter.cpp:245-252,344-434; src/ast/rewriter/bv_rewriter.h:79)",
+          "name": "Complete selected rw_leq_concats and short-circuited concat: ordered concat guards, high-numeral short circuit, normalized high-prefix comparisons, owning suffix reconstruction, common prefix unsigned comparison and postfix original-signedness comparison (src/ast/rewriter/bv_rewriter.cpp:245-252,349-434; src/ast/rewriter/bv_rewriter.h:79)",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq_concat.go",
           "tests": [
@@ -22782,7 +22782,7 @@
           ]
         },
         {
-          "name": "Exact concat comparison numerical authority: af/bf defaults, only reached returned power/division, retained normalized hi_af/hi_bf, captured shortened-prefix NUM factory and source/owning expression boundaries (src/ast/rewriter/bv_rewriter.cpp:344-388)",
+          "name": "Exact concat comparison numerical authority: af/bf defaults, only reached returned power/division, retained normalized hi_af/hi_bf, captured shortened-prefix NUM factory and source/owning expression boundaries (src/ast/rewriter/bv_rewriter.cpp:358-393)",
           "status": "partial",
           "go_target": "pkg/ast/ast_bv_concat_comparison_numerals.go",
           "tests": [
@@ -24032,7 +24032,7 @@
           ]
         },
         {
-          "name": "Complete selected rw_leq_concats and short-circuited concat: ordered concat guards, high-numeral short circuit, normalized high-prefix comparisons, owning suffix reconstruction, common prefix unsigned comparison and postfix original-signedness comparison (src/ast/rewriter/bv_rewriter.cpp:245-252,344-434; src/ast/rewriter/bv_rewriter.h:79)",
+          "name": "Complete selected rw_leq_concats and short-circuited concat: ordered concat guards, high-numeral short circuit, normalized high-prefix comparisons, owning suffix reconstruction, common prefix unsigned comparison and postfix original-signedness comparison (src/ast/rewriter/bv_rewriter.cpp:245-252,349-434; src/ast/rewriter/bv_rewriter.h:79)",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq_concat.go",
           "tests": [
@@ -24042,7 +24042,7 @@
           ]
         },
         {
-          "name": "Exact concat comparison numerical authority: af/bf defaults, only reached returned power/division, retained normalized hi_af/hi_bf, captured shortened-prefix NUM factory and source/owning expression boundaries (src/ast/rewriter/bv_rewriter.cpp:344-388)",
+          "name": "Exact concat comparison numerical authority: af/bf defaults, only reached returned power/division, retained normalized hi_af/hi_bf, captured shortened-prefix NUM factory and source/owning expression boundaries (src/ast/rewriter/bv_rewriter.cpp:358-393)",
           "status": "partial",
           "go_target": "pkg/ast/ast_bv_concat_comparison_numerals.go",
           "tests": [
