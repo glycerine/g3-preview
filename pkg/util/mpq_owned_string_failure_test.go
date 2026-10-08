@@ -23,7 +23,7 @@ func TestRationalOwnedStringEveryColdReservation(t *testing.T) {
 			integerPhysicalAudit(t, m.integer, &a.Num, &a.Den)
 			callerBytes := uint64(0)
 			if body == nil {
-				callerBytes = uint64(len(out.External) + len(out.Pending))
+				callerBytes = out.StorageBytes()
 			}
 			if a != before || b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+callerBytes {
 				t.Fatal("immediate rational string graph", tc, ordinal, body, b.Used(), m.OwnedStorageBytes(), r.Stats(), callerBytes)
@@ -95,8 +95,8 @@ func TestRationalOwnedStringWarmInlineAndReturnOwnership(t *testing.T) {
 	serviceMust(t, m.rational.Del(&a))
 	serviceMust(t, m.Close())
 	serviceMust(t, r.Close())
-	if !out.Matches(want) || b.Used() != uint64(len(out.External)) {
-		t.Fatal("returned string was not independent of numeral owner", b.Used(), len(out.External))
+	if !out.Matches(want) || b.Used() != out.StorageBytes() {
+		t.Fatal("returned string was not independent of numeral owner", b.Used(), out.StorageBytes())
 	}
 	out.SourceDestroy()
 	if b.Used() != 0 {

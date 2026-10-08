@@ -26,7 +26,7 @@ func TestArbitraryFloatRawStringEveryColdReservation(t *testing.T) {
 			integerPhysicalAudit(t, m.integer, &x.significand)
 			callerBytes := uint64(0)
 			if body == nil {
-				callerBytes = uint64(len(out.External) + len(out.Pending))
+				callerBytes = out.StorageBytes()
 			}
 			if x != before || b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+callerBytes {
 				t.Fatal("immediate raw string graph", tc, ordinal, body, b.Used(), m.OwnedStorageBytes(), r.Stats(), callerBytes)
@@ -83,11 +83,12 @@ func TestArbitraryFloatRawStringWarmStreamReservation(t *testing.T) {
 	b.FailAfter(0)
 	var second OwnedString
 	e := m.ToStringRaw(&x, &second)
-	// Go’s builder completes exponent formatting independently of arena faults.
-	// The legacy returned-output adapter can still reach an arena allocation.
-	if !numericPhysicalReservationRefusal(e) || e == nil || m.rawString.exponentStream.Buffer.Position != 20 {
-		t.Fatal("exponent did not finish in the Go builder", e)
+	// Both text buffering and returned storage are Go-managed.
+	serviceMust(t, e)
+	if m.rawString.exponentStream.Buffer.Position != 20 || !second.Matches("[+ 1 -9223372036854775808 N]") {
+		t.Fatal("Go output must finish independently of numeric arena failures", second.External)
 	}
+	second.SourceDestroy()
 	b.FailAfter(-1)
 	serviceMust(t, m.CleanupRawString())
 }

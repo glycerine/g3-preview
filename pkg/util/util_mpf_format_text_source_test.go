@@ -65,7 +65,7 @@ func TestMPFFormatTextEveryTemporaryAndAppendReservationPrefix(t *testing.T) {
 		b.FailAfter(ordinal)
 		call := text.AppendStreamString(stream)
 		stats := text.Stream.NumericTextStream.Stats()
-		named := text.Header + uint64(len(text.Result.External)+len(text.Result.Pending)+len(text.Temporary.External)+len(text.Temporary.Pending)) + stats.OwnerBytes + stats.ScratchBytes + stats.OutputOwnerBytes + stats.OutputOverflowBytes
+		named := text.Header + uint64(text.Result.StorageBytes()+text.Temporary.StorageBytes()) + stats.OwnerBytes + stats.ScratchBytes + stats.OutputOwnerBytes + stats.OutputOverflowBytes
 		if b.Used() != named {
 			t.Fatal("before-lift exact res/temp/stream cold graph", ordinal, call, b.Used(), named)
 		}
@@ -190,7 +190,7 @@ func TestMPFFormatTextActualNumericalEveryReservationPrefix(t *testing.T) {
 		_, call := m.ToStringInto(&a, text)
 		t.Logf("actual prefix %d body=%v", ordinal, call)
 		mpfFormatNumericRawGraph(t, q, m, nil, []*ArbitraryFloatFormatText{text}, &a)
-		owned := text.Header + uint64(len(text.Result.External)+len(text.Result.Pending)+len(text.Temporary.External)+len(text.Temporary.Pending))
+		owned := text.Header + uint64(text.Result.StorageBytes()+text.Temporary.StorageBytes())
 		if text.Stream.NumericTextStream != nil {
 			stats := text.Stream.NumericTextStream.Stats()
 			if !text.Stream.ClosedField {
@@ -358,7 +358,7 @@ func TestASTCheckpointMPFFormatTextEveryTemporaryAndAppendReservationPrefix(t *t
 		b.FailAfter(ordinal)
 		call := text.AppendStreamString(stream)
 		stats := text.Stream.NumericTextStream.Stats()
-		named := text.Header + uint64(len(text.Result.External)+len(text.Result.Pending)+len(text.Temporary.External)+len(text.Temporary.Pending)) + stats.OwnerBytes + stats.ScratchBytes + stats.OutputOwnerBytes + stats.OutputOverflowBytes
+		named := text.Header + uint64(text.Result.StorageBytes()+text.Temporary.StorageBytes()) + stats.OwnerBytes + stats.ScratchBytes + stats.OutputOwnerBytes + stats.OutputOverflowBytes
 		if b.Used() != named {
 			t.Fatal("before-lift exact res/temp/stream cold graph", ordinal, call, b.Used(), named)
 		}

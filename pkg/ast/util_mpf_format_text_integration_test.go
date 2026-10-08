@@ -79,7 +79,7 @@ func TestASTCheckpointMPFFormatTextActualNumericalEveryReservationPrefix(t *test
 		_, call := p.numeric.ToStringInto(&a, text)
 		t.Logf("actual prefix %d body=%v", ordinal, call)
 		astFloatingPointFormatRawGraph(t, m.numerals, p, text)
-		owned := text.Header + uint64(len(text.Result.External)+len(text.Result.Pending)+len(text.Temporary.External)+len(text.Temporary.Pending))
+		owned := text.Header + uint64(text.Result.StorageBytes()+text.Temporary.StorageBytes())
 		if text.Stream.NumericTextStream != nil {
 			stats := text.Stream.NumericTextStream.Stats()
 			if !text.Stream.ClosedField {

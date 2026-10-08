@@ -198,11 +198,9 @@ func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result err
 	f.keyComplete = true
 	n := uint32(f.key.Length)
 	for i := uint32(0); i < n; i++ {
-		ch := f.key.Inline[0]
-		if f.key.External != nil {
-			ch = f.key.External[i]
-		} else {
-			ch = f.key.Inline[i]
+		ch, readErr := f.key.View().Byte(uint64(i))
+		if readErr != nil {
+			return readErr
 		}
 		if ch >= 'A' && ch <= 'Z' {
 			f.key.Put(uint64(i), ch-'A'+'a')
@@ -252,11 +250,9 @@ func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result err
 		return e
 	}
 	for i := uint64(0); i < f.key.Length; i++ {
-		ch := f.key.Inline[0]
-		if f.key.External != nil {
-			ch = f.key.External[i]
-		} else {
-			ch = f.key.Inline[i]
+		ch, readErr := f.key.View().Byte(uint64(i))
+		if readErr != nil {
+			return readErr
 		}
 		if e = f.buffer.AppendByte(ch); e != nil {
 			return e

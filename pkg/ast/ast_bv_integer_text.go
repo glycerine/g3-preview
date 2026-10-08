@@ -145,10 +145,7 @@ func (v astBVIntegerCString) Byte(i uint64) (byte, error) {
 	if i > x.result.Length {
 		return 0, arena.ErrBounds
 	}
-	if x.result.External != nil {
-		return x.result.External[i], nil
-	}
-	return x.result.Inline[i], nil
+	return x.result.CStringByte(i)
 }
 func (v astBVIntegerCString) Length() (uint64, error) {
 	for i := uint64(0); ; i++ {
@@ -169,7 +166,7 @@ func (x *astBVIntegerText) cstring() (util.ArbitraryFloatFormattedCString, error
 }
 
 func (x *astBVIntegerText) storageBytes() uint64 {
-	n := uint64(len(x.result.External) + len(x.result.Pending))
+	n := x.result.StorageBytes()
 	if x.stream != nil {
 		s := x.stream.Stats()
 		n += s.OwnerBytes + s.ScratchBytes + s.OutputOwnerBytes + s.OutputOverflowBytes

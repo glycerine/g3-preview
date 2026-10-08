@@ -25,7 +25,7 @@ func TestArbitraryFloatSMT2StreamEveryColdReservation(t *testing.T) {
 				body := m.DisplaySMT2Into(&out, &x, true)
 				s, c := &m.smt2Stream, &m.rationalConversion
 				integerPhysicalAudit(t, m.integer, &x.significand, &s.q.Num, &s.q.Den, &c.a.significand, &c.n, &c.d, &m.rational.NTmp, &m.integer.smt2Stream.tmp)
-				callerBytes := uint64(len(out.Buffer.String.External) + len(out.Buffer.String.Pending))
+				callerBytes := out.Buffer.String.StorageBytes()
 				if x != before || b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+callerBytes {
 					t.Fatal("immediate SMT2 wrapper graph", sb, exp, ordinal, body, b.Used(), m.OwnedStorageBytes(), r.Stats(), callerBytes)
 				}

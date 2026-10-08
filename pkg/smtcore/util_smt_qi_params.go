@@ -139,7 +139,7 @@ func (s *SMTQIParams) update(local *util.ParamsRef) (result error) {
 	if e := s.open(); e != nil {
 		return e
 	}
-	if s.Helpers != nil || s.DestructorCause != nil || s.cost.Pending != nil {
+	if s.Helpers != nil || s.DestructorCause != nil {
 		return util.ErrParamsPrecondition
 	}
 	s.Running = true

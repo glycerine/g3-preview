@@ -157,12 +157,12 @@ func contextMethodsCold(t *testing.T, s *ContextParams, g *util.GlobalParamsServ
 		n += gparamsGraph(x)
 	}
 	if s != nil {
-		n += s.header + uint64(len(s.dotProof.External)+len(s.dotProof.Pending)+len(s.traceFile.External)+len(s.traceFile.Pending))
+		n += s.header + uint64(s.dotProof.StorageBytes()+s.traceFile.StorageBytes())
 		for f := s.frames; f != nil; f = f.next {
 			if f.self != f || f.owner != s || f.invocation == 0 {
 				t.Fatal("actual lexical owner binding")
 			}
-			n += f.header + uint64(len(f.key.External)+len(f.key.Pending)) + uint64(len(f.buffer.State.Heap))
+			n += f.header + f.key.StorageBytes() + uint64(len(f.buffer.State.Heap))
 			d := &f.descriptor
 			if d.Self != nil {
 				if d.Self != d || d.OwnerBytes != 0 {
@@ -233,13 +233,13 @@ func TestContextParamsActualLongStringSetEveryAllocationAndErrorScanRefusal(t *t
 		if ordinal == 0 && !errors.Is(e, arena.ErrInjectedFailure) {
 			t.Fatal("real lexical frame before members", e)
 		}
-		if ordinal == 1 && !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal("actual string replacement after frame", e)
+		if ordinal == 1 && e != nil {
+			t.Fatal("Go string replacement after frame", e)
 		}
 		got, x := s.TraceFile().String()
 		paramsMust(t, x)
-		if got != old {
-			t.Fatal("allocation refusal does not publish member")
+		if (ordinal == 0 && got != old) || (ordinal == 1 && got != value) {
+			t.Fatal("header refusal versus successful Go text assignment", got)
 		}
 		b.FailAfter(-1)
 		paramsMust(t, s.Set(&key, &value))
@@ -482,7 +482,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	}
 	otherBody := errors.New("older body diagnostic")
 	x = s3.endSourceFrame(older, otherBody)
-	if !errors.Is(x, otherBody) || !errors.Is(x, arena.ErrBounds) || older.key.Closed || len(older.key.External) != 82 {
+	if !errors.Is(x, otherBody) || !errors.Is(x, arena.ErrBounds) || older.key.Closed || older.key.Length != 81 {
 		t.Fatal("younger stop protects older lexical storage", x)
 	}
 	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*util.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &younger.value}}})

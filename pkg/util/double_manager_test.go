@@ -250,7 +250,7 @@ func TestDoubleManagerOwnedPrecision12FormattingEveryReservation(t *testing.T) {
 			var local OwnedStringStream
 			var result OwnedString
 			e := DoubleManagerToString(tc.a, b, &local, &result)
-			actual := uint64(len(local.Buffer.String.External) + len(local.Buffer.String.Pending) + len(result.External) + len(result.Pending))
+			actual := uint64(local.Buffer.String.StorageBytes() + result.StorageBytes())
 			if b.Used() != actual {
 				t.Fatal("physical graph", tc.a, fail, b.Used(), actual)
 			}

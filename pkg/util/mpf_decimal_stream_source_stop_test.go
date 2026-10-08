@@ -43,7 +43,7 @@ func TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ(t *testing.T)
 		t.Fatal("stopped source touched older owner")
 	}
 	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &x.significand, &s.q.Num, &s.q.Den, &child.values[0], &child.values[1], &child.values[2], &child.values[3], &m.rational.NTmp, &m.rationalConversion.a.significand, &m.rationalConversion.n, &m.rationalConversion.d)
-	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+uint64(len(out.Buffer.String.External)) {
+	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+out.Buffer.String.StorageBytes() {
 		t.Fatal("immediate wrapper source-stop graph", b.Used())
 	}
 	recovery, e := r.Allocate(200000)

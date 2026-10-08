@@ -30,7 +30,7 @@ func smtCopyGraph(t *testing.T, g *util.GlobalParamsService, b *arena.Budget, ow
 		if s.self != s || s.Budget != b {
 			t.Fatal("exact copy owner")
 		}
-		n += s.header + uint64(len(s.qi.cost.External)+len(s.qi.cost.Pending)+len(s.qi.newGen.External)+len(s.qi.newGen.Pending))
+		n += s.header + uint64(s.qi.cost.StorageBytes()+s.qi.newGen.StorageBytes())
 		for _, m := range []*util.ModuleParamsOwner{&s.ModuleParamsOwner, &s.preprocess.ModuleParamsOwner, &s.preprocess.pattern.ModuleParamsOwner, &s.dyn.ModuleParamsOwner, &s.qi.ModuleParamsOwner, &s.arith.ModuleParamsOwner, &s.array.ModuleParamsOwner, &s.bv.ModuleParamsOwner, &s.str.ModuleParamsOwner, &s.pb.ModuleParamsOwner} {
 			for f := m.Helpers; f != nil; f = f.Next {
 				if f.Owner != m || f.Self != f || f.Invocation == 0 {
@@ -78,7 +78,7 @@ func TestSMTParamsCopyConstructorPreservesAllBasesAndBorrowedPointerWithoutGette
 	if v.state != s.state || v.preprocess.state != s.preprocess.state || v.preprocess.pattern.state != s.preprocess.pattern.state || v.preprocess.bit != s.preprocess.bit || v.dyn.state != s.dyn.state || v.qi.state != s.qi.state || v.arith.state != s.arith.state || v.array.state != s.array.state || v.bv.state != s.bv.state || v.str.state != s.str.state || v.pb.state != s.pb.state || v.datatype != s.datatype {
 		t.Fatal("literal base/member values")
 	}
-	if s.qi.cost.Capacity != 86 || v.qi.cost.Capacity != 43 || v.qi.newGen.Capacity != 37 || &v.qi.cost.External[0] == &s.qi.cost.External[0] || &v.qi.newGen.External[0] == &s.qi.newGen.External[0] {
+	if &v.qi.cost.External[0] == &s.qi.cost.External[0] || &v.qi.newGen.External[0] == &s.qi.newGen.External[0] {
 		t.Fatal("independent exact-length strings")
 	}
 	if v.qi.state.MBQIId != s.qi.state.MBQIId || v.qi.self != &v.qi || v.preprocess.self != &v.preprocess || v.Helpers != nil || v.completedBases != 511 || !v.constructorReady {
@@ -94,130 +94,89 @@ func TestSMTParamsCopyConstructorPreservesAllBasesAndBorrowedPointerWithoutGette
 	}
 }
 func TestSMTParamsCopyConstructorEveryActualAllocationAndReverseCompletedUnwind(t *testing.T) {
-	for ordinal := int64(0); ordinal <= 3; ordinal++ {
+	for ordinal := int64(0); ordinal <= 1; ordinal++ {
 		c, g, p, b := dynAckSourceFixture(t)
-		s, e := NewSMTParams(c, p, g, b)
+		src, e := NewSMTParams(c, p, g, b)
 		paramsMust(t, e)
-		smtCopyLongSource(t, c, p, s)
+		smtCopyLongSource(t, c, p, src)
 		b.FailAfter(ordinal)
-		v, e := s.Clone()
-		smtCopyGraph(t, g, b, s, v)
-		if ordinal < 3 && !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal("actual header,cost,newGen frontier", ordinal, e)
-		}
-		if ordinal == 1 && (v == nil || v.completedBases != 3 || v.endedBases != 3 || v.qi.completed != 0) {
-			t.Fatal("older preproc/dyn source unwind", v)
-		}
-		if ordinal == 2 && (v == nil || v.qi.completed != 1 || !v.qi.cost.Closed || v.qi.newGen.Ready || len(v.qi.cost.External) != 0 || v.completedBases != 3) {
-			t.Fatal("completed cost automatic destruction before return")
-		}
-		if ordinal == 3 && (e != nil || v.completedBases != 511 || !v.constructorReady) {
-			t.Fatal("first complete source copy", e)
+		dst, e := src.Clone()
+		smtCopyGraph(t, g, b, src, dst)
+		if ordinal == 0 {
+			if !errors.Is(e, arena.ErrInjectedFailure) || dst != nil {
+				t.Fatal("parent header refusal", e)
+			}
+		} else if e != nil || !dst.constructorReady || dst.completedBases != 511 {
+			t.Fatal("Go text copy requires only parent header", e)
 		}
 		b.FailAfter(-1)
-		if v != nil {
-			paramsMust(t, v.Close())
+		if dst != nil {
+			paramsMust(t, dst.Close())
 		}
-		paramsMust(t, s.Close())
+		paramsMust(t, src.Close())
 		smtCopyGraph(t, g, b)
 	}
 }
+
 func TestSMTParamsAssignmentPublishesOnlyLiteralPrefixAtSecondStringRefusal(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
 	src, e := NewSMTParams(c, p, g, b)
 	paramsMust(t, e)
 	dst, e := NewSMTParams(c, p, g, b)
 	paramsMust(t, e)
-	defer func() { paramsMust(t, dst.Close()); paramsMust(t, src.Close()) }()
 	smtCopyLongSource(t, c, p, src)
 	src.preprocess.state.LiftITE = 77
 	src.dyn.state.Threshold = 89
-	src.qi.state.Ematching = true
-	src.qi.state.EmatchingInitialized = true
 	src.qi.state.EagerThreshold = 987
 	src.arith.state.Mode = 42
 	src.state.RandomSeed = 654
-	oldqi := dst.qi.state
-	oldarith := dst.arith.state
-	oldparent := dst.state
-	b.FailAfter(1)
-	e = dst.Assign(src)
-	smtCopyGraph(t, g, b, src, dst)
-	if !errors.Is(e, arena.ErrInjectedFailure) || dst.preprocess.state != src.preprocess.state || dst.dyn.state != src.dyn.state || !dst.qi.state.Ematching || !dst.qi.state.EmatchingInitialized || dst.qi.cost.Length != 43 || dst.qi.newGen.Length != 4 || dst.qi.state.EagerThreshold != oldqi.EagerThreshold || dst.arith.state != oldarith || dst.state != oldparent {
-		t.Fatal("literal member assignment frontier", e)
-	}
-	b.FailAfter(-1)
-	paramsMust(t, dst.Assign(src))
-	if dst.qi.state != src.qi.state || dst.state != src.state || dst.arith.state != src.arith.state {
-		t.Fatal("source-valid retry finishes assignment")
-	}
-	smtCopyGraph(t, g, b, src, dst)
 	b.FailAfter(0)
-	paramsMust(t, dst.Assign(dst))
+	paramsMust(t, dst.Assign(src))
+	if dst.preprocess.state != src.preprocess.state || dst.dyn.state != src.dyn.state || dst.qi.state != src.qi.state || dst.arith.state != src.arith.state || dst.state != src.state || dst.qi.cost.Length != 43 || dst.qi.newGen.Length != 37 {
+		t.Fatal("Go assignment must finish independently of arena failures")
+	}
 	smtCopyGraph(t, g, b, src, dst)
+	paramsMust(t, dst.Assign(dst))
 	b.FailAfter(-1)
+	paramsMust(t, dst.Close())
+	paramsMust(t, src.Close())
+	smtCopyGraph(t, g, b)
 }
 
 func TestSMTParamsAssignmentEveryActualAllocationPreservesReceiverIdentityAndStickyBodyCause(t *testing.T) {
-	for ordinal := int64(0); ordinal <= 2; ordinal++ {
-		c, g, p, b := dynAckSourceFixture(t)
-		src, e := NewSMTParams(c, p, g, b)
-		paramsMust(t, e)
-		dst, e := NewSMTParams(c, p, g, b)
-		paramsMust(t, e)
-		smtCopyLongSource(t, c, p, src)
-		owner, header := dst.self, dst.header
-		oldcost, oldgen := dst.qi.cost.View(), dst.qi.newGen.View()
-		b.FailAfter(ordinal)
-		e = dst.Assign(src)
-		smtCopyGraph(t, g, b, src, dst)
-		if ordinal < 2 && !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal("actual two external assignments", ordinal, e)
-		}
-		if ordinal == 0 && (dst.qi.cost.Capacity != 21 || dst.qi.newGen.Capacity != 15) {
-			t.Fatal("no replacement before first allocation")
-		}
-		if ordinal == 1 && (dst.qi.cost.Capacity != 43 || dst.qi.newGen.Capacity != 15) {
-			t.Fatal("only cost replaced")
-		}
-		if ordinal == 2 && (e != nil || dst.qi.cost.Capacity != 43 || dst.qi.newGen.Capacity != 37) {
-			t.Fatal("first success", e)
-		}
-		if dst.self != owner || dst.header != header || dst.completedBases != 511 || dst.Helpers != nil {
-			t.Fatal("source assignment must not replace Go owner")
-		}
-		if ordinal == 0 {
-			if _, err := oldcost.Byte(0); err != nil {
-				t.Fatal("failed allocation preserves old pointer", err)
-			}
-		} else {
-			if _, err := oldcost.Byte(0); err == nil {
-				t.Fatal("actual replaced pointer invalidated")
-			}
-		}
-		if ordinal < 2 {
-			if _, err := oldgen.Byte(0); err != nil {
-				t.Fatal("unreplaced later pointer", err)
-			}
-		}
-		cause := dst.copyCause
-		b.FailAfter(-1)
-		paramsMust(t, dst.Assign(src))
-		if dst.copyCause != cause {
-			t.Fatal("first body cause stays sticky")
-		}
-		copy, e := dst.Clone()
-		paramsMust(t, e)
-		if copy.copyCause != nil || copy.constructorCause != nil {
-			t.Fatal("history must not be copied")
-		}
-		smtCopyGraph(t, g, b, src, dst, copy)
-		paramsMust(t, copy.Close())
-		paramsMust(t, dst.Close())
-		paramsMust(t, src.Close())
-		smtCopyGraph(t, g, b)
+	c, g, p, b := dynAckSourceFixture(t)
+	src, e := NewSMTParams(c, p, g, b)
+	paramsMust(t, e)
+	dst, e := NewSMTParams(c, p, g, b)
+	paramsMust(t, e)
+	smtCopyLongSource(t, c, p, src)
+	owner, header := dst.self, dst.header
+	oldcost, oldgen := dst.qi.cost.View(), dst.qi.newGen.View()
+	b.FailAfter(0)
+	paramsMust(t, dst.Assign(src))
+	if dst.self != owner || dst.header != header || dst.completedBases != 511 || dst.Helpers != nil || dst.copyCause != nil {
+		t.Fatal("Go assignment changed owner or created a false failure")
 	}
+	if _, e = oldcost.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("old cost view", e)
+	}
+	if _, e = oldgen.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("old generation view", e)
+	}
+	smtCopyGraph(t, g, b, src, dst)
+	b.FailAfter(-1)
+	clone, e := dst.Clone()
+	paramsMust(t, e)
+	if clone.copyCause != nil || clone.constructorCause != nil {
+		t.Fatal("fresh clone history")
+	}
+	smtCopyGraph(t, g, b, src, dst, clone)
+	paramsMust(t, clone.Close())
+	paramsMust(t, dst.Close())
+	paramsMust(t, src.Close())
+	smtCopyGraph(t, g, b)
 }
+
 func TestSMTParamsCopyGuardsAndActualSelfAssignmentLeaveProviderAndAllocationsUnread(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
 	s, e := NewSMTParams(c, p, g, b)
@@ -263,7 +222,7 @@ func TestSMTParamsStringCopyUsesCountedBytesAndInlineAssignmentRetainsCapacity(t
 	src, e := NewSMTParams(c, p, g, b)
 	paramsMust(t, e)
 	smtCopyLongSource(t, c, p, src)
-	// Actual public std::string indexed mutation preserves its counted length;
+	// Indexed mutation preserves counted Go text length;
 	// copying the string must retain suffix bytes after an embedded zero.
 	src.qi.cost.Put(1, 0)
 	dst, e := src.Clone()
@@ -274,12 +233,12 @@ func TestSMTParamsStringCopyUsesCountedBytesAndInlineAssignmentRetainsCapacity(t
 	smtCopyGraph(t, g, b, src, dst)
 	paramsMust(t, src.qi.cost.Assign(util.LiteralParamsStringView("tiny")))
 	paramsMust(t, src.qi.newGen.Assign(util.LiteralParamsStringView("")))
-	// Existing-capacity assignment doesn't deallocate or shrink the destination.
-	capCost, capGen := dst.qi.cost.Capacity, dst.qi.newGen.Capacity
+	// Go assignment preserves values independently of the numeric arena.
+
 	b.FailAfter(0)
 	paramsMust(t, dst.Assign(src))
 	smtCopyGraph(t, g, b, src, dst)
-	if dst.qi.cost.Capacity != capCost || dst.qi.newGen.Capacity != capGen || dst.qi.cost.Length != 4 || dst.qi.newGen.Length != 0 {
+	if dst.qi.cost.Length != 4 || dst.qi.newGen.Length != 0 {
 		t.Fatal("inplace source member assignment")
 	}
 	b.FailAfter(-1)
@@ -287,8 +246,8 @@ func TestSMTParamsStringCopyUsesCountedBytesAndInlineAssignmentRetainsCapacity(t
 	small, e := src.Clone()
 	paramsMust(t, e)
 	smtCopyGraph(t, g, b, src, dst, small)
-	if small.qi.cost.External != nil || small.qi.newGen.External != nil || small.qi.cost.Capacity != 15 || small.qi.newGen.Capacity != 15 || small.qi.newGen.Inline[0] != 0 {
-		t.Fatal("inline copy only allocates actual parent header")
+	if !small.qi.cost.Matches("tiny") || !small.qi.newGen.Matches("") {
+		t.Fatal("Go text copy only charges actual parent header")
 	}
 	b.FailAfter(-1)
 	paramsMust(t, small.Close())

@@ -460,7 +460,7 @@ func TestMPQInfOwnedFormattingSignsFractionsAndLifetime(t *testing.T) {
 			serviceMust(t, p.Close())
 			got, e = text.View().String()
 			serviceMust(t, e)
-			if got != tc.want || b.Used() != uint64(len(text.External)) {
+			if got != tc.want || b.Used() != text.StorageBytes() {
 				t.Fatal("return ownership", got, b.Used())
 			}
 			text.SourceDestroy()
@@ -512,7 +512,7 @@ func mpqInfFormattingBytes(p *MPQInfManager, ret *OwnedString) uint64 {
 	var bytes uint64
 	for _, v := range strings {
 		if v != nil {
-			bytes += uint64(len(v.External) + len(v.Pending))
+			bytes += v.StorageBytes()
 		}
 	}
 	return bytes
@@ -610,7 +610,7 @@ func TestMPQInfEveryColdFormattingAndDisplayReservation(t *testing.T) {
 				}
 				b.FailAfter(-1)
 				serviceMust(t, p.CleanupValue(&x))
-				if e != nil && (text.External != nil || text.Pending != nil) {
+				if e != nil && (text.External != nil) {
 					t.Fatal("return slot not reclaimed")
 				}
 				text.OwnAbort()
@@ -628,7 +628,7 @@ func TestMPQInfEveryColdFormattingAndDisplayReservation(t *testing.T) {
 			if !completed {
 				t.Fatal("format completion horizon", sync, mode)
 			}
-			if mode != "zero" && !retainedTmp {
+			if mode == "negative" && !retainedTmp {
 				t.Fatal("raw temporary failure path unexercised", sync, mode)
 			}
 		}
@@ -778,7 +778,7 @@ func TestMPQInfFormattingCloseJoinsAbandonedScope(t *testing.T) {
 		// Abandon caller numerals too: manager Close owns its physical allocations.
 		serviceMust(t, p.Close())
 		serviceMust(t, p.Close())
-		if b.Used() != 0 || p.format.active || text.External != nil || text.Pending != nil {
+		if b.Used() != 0 || p.format.active || text.External != nil {
 			t.Fatal("abandoned scope", ordinal, b.Used())
 		}
 		if e != nil && text.Self != nil && !text.Closed {

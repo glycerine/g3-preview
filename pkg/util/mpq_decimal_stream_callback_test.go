@@ -49,7 +49,7 @@ func TestRationalDecimalStreamDenominatorCopyTransportGuards(t *testing.T) {
 		t.Fatal("actual second COPY transport missing", body, calls)
 	}
 	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &a.Num, &a.Den, &s.values[0], &s.values[1], &s.values[2], &s.values[3])
-	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+uint64(len(out.Buffer.String.External)+len(out.Buffer.String.Pending)) {
+	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+out.Buffer.String.StorageBytes() {
 		t.Fatal("immediate second COPY graph", b.Used())
 	}
 	serviceMust(t, r.SetMaxSize(0))

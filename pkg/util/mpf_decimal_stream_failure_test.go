@@ -25,7 +25,7 @@ func TestArbitraryFloatDecimalStreamEveryColdReservation(t *testing.T) {
 				body := m.DisplayDecimalInto(&out, &x, 12)
 				s, c := &m.decimalStream, &m.rationalConversion
 				integerPhysicalAudit(t, m.integer, &x.significand, &s.q.Num, &s.q.Den, &c.a.significand, &c.n, &c.d, &m.rational.NTmp, &m.rational.decimalStream.values[0], &m.rational.decimalStream.values[1], &m.rational.decimalStream.values[2], &m.rational.decimalStream.values[3])
-				callerBytes := uint64(len(out.Buffer.String.External) + len(out.Buffer.String.Pending))
+				callerBytes := out.Buffer.String.StorageBytes()
 				if x != before || b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+callerBytes {
 					t.Fatal("immediate SMT2 wrapper graph", sb, exp, ordinal, body, b.Used(), m.OwnedStorageBytes(), r.Stats(), callerBytes)
 				}

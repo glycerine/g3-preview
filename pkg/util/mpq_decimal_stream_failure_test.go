@@ -24,7 +24,7 @@ func TestRationalDecimalStreamEveryColdReservation(t *testing.T) {
 			body := m.rational.DisplayDecimalInto(&out, &a, 12, false)
 			s := &m.rational.decimalStream
 			integerPhysicalAudit(t, m.integer, &a.Num, &a.Den, &s.values[0], &s.values[1], &s.values[2], &s.values[3])
-			streamBytes := uint64(len(out.Buffer.String.External) + len(out.Buffer.String.Pending))
+			streamBytes := out.Buffer.String.StorageBytes()
 			if a != before || b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+streamBytes {
 				t.Fatal("immediate decimal stream graph", tc, ordinal, body, b.Used(), streamBytes)
 			}

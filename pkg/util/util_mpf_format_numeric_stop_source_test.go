@@ -81,7 +81,7 @@ func TestMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *testing.T) {
 	// Immediate physical and cold graph before fault recovery. The actual q
 	// source release has happened; surviving NUM and owned res remain named.
 	mpfFormatNumericRawGraph(t, q, m, nil, []*ArbitraryFloatFormatText{text}, &a)
-	owned := text.Header + uint64(len(text.Result.External)+len(text.Result.Pending)+len(text.Temporary.External)+len(text.Temporary.Pending))
+	owned := text.Header + uint64(text.Result.StorageBytes()+text.Temporary.StorageBytes())
 	if text.Stream.NumericTextStream != nil && !text.Stream.ClosedField {
 		stats := text.Stream.NumericTextStream.Stats()
 		owned += stats.OwnerBytes + stats.ScratchBytes + stats.OutputOwnerBytes + stats.OutputOverflowBytes

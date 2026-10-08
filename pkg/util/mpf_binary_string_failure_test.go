@@ -33,7 +33,7 @@ func TestArbitraryFloatBinaryStringEveryColdReservation(t *testing.T) {
 			integerPhysicalAudit(t, m.integer, &x.significand, &s.tmp)
 			callerBytes := uint64(0)
 			if body == nil {
-				callerBytes = uint64(len(out.External) + len(out.Pending))
+				callerBytes = out.StorageBytes()
 			}
 			if x != before || b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+callerBytes {
 				t.Fatal("binary immediate graph", tc, ordinal, body, b.Used(), m.OwnedStorageBytes(), r.Stats(), callerBytes)

@@ -28,7 +28,7 @@ func TestOwnedStringStreamIndependentLengthsAndReturnedString(t *testing.T) {
 		if got != text {
 			t.Fatal(n, "result", got)
 		}
-		if b.Used() != uint64(len(result.External)) {
+		if b.Used() != result.StorageBytes() {
 			t.Fatal("returned output accounting")
 		}
 		// Returned string owns separate backing and survives destruction of buffer.
@@ -131,7 +131,7 @@ func TestOwnedStringStreamSourceIntegerEveryColdReservation(t *testing.T) {
 					e = out.Str(&result)
 				}
 				qopsAuditLiveOwnership(t, p.m, []*Int{&x.First.Num, &x.First.Den, &x.Second.Num, &x.Second.Den})
-				actual := p.header + p.m.HeaderBytes + integerActualOwnedBytes(p.m.Z) + uint64(len(out.Buffer.String.External)+len(out.Buffer.String.Pending)+len(result.External)+len(result.Pending))
+				actual := p.header + p.m.HeaderBytes + integerActualOwnedBytes(p.m.Z) + uint64(out.Buffer.String.StorageBytes()+result.StorageBytes())
 				if b.Used() != actual {
 					t.Fatal(sync, len(text), fail, "immediate ownership", b.Used(), actual)
 				}

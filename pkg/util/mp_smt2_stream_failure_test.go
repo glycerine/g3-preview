@@ -24,7 +24,7 @@ func TestRationalSMT2StreamEveryColdReservation(t *testing.T) {
 			body := m.rational.DisplaySMT2Into(&out, &a, true)
 			s := &m.integer.smt2Stream
 			integerPhysicalAudit(t, m.integer, &a.Num, &a.Den, &s.tmp)
-			streamBytes := uint64(len(out.Buffer.String.External) + len(out.Buffer.String.Pending))
+			streamBytes := out.Buffer.String.StorageBytes()
 			if a != before || b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+streamBytes {
 				t.Fatal("immediate SMT2 stream graph", tc, ordinal, body, b.Used(), streamBytes)
 			}

@@ -1,25 +1,24 @@
-// Source: selected libstdc++ basic_string.h/basic_string.tcc and
-// src/smt/params/qi_params.cpp:43-64; src/util/params.cpp:928-930.
+// Source: src/smt/params/qi_params.cpp:43-64; src/util/params.cpp:928-930.
 package util
 
 import (
+	"bytes"
 	"math"
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// Concrete selected char std::string storage policy: inline15 plus NUL,
-// constructor exact capacity, replacement geometric capacity, then dispose /
-// pointer-capacity-length publication. This is not a native STL ABI promise.
+// OwnedString is a checked Go text adapter for existing project APIs. Its bytes
+// are Go-managed; neither storage nor growth follows a C++ string implementation.
+// Budget is retained only for compatibility with callers' numeric contexts.
 type OwnedString struct {
-	goBuilder                    *strings.Builder
-	Self                         *OwnedString
-	Budget                       *arena.Budget
-	Inline                       [16]byte
-	External, Pending            []byte
-	Length, Capacity, Generation uint64
-	Ready, Closed                bool
+	Self               *OwnedString
+	Budget             *arena.Budget
+	External           []byte
+	Length, Generation uint64
+	Ready, Closed      bool
+	goBuilder          *strings.Builder
 }
 
 type OwnedStringView struct {
@@ -28,9 +27,9 @@ type OwnedStringView struct {
 }
 
 func (v OwnedStringView) Len() uint64 { return v.Length }
-
+func (s *OwnedString) valid() bool    { return s != nil && s.Self == s && s.Ready && !s.Closed }
 func (v OwnedStringView) Byte(i uint64) (byte, error) {
-	if v.Owner == nil || v.Owner.Self != v.Owner || v.Owner.Closed || v.Generation != v.Owner.Generation {
+	if !v.Owner.valid() || v.Generation != v.Owner.Generation {
 		return 0, arena.ErrInvalidSlot
 	}
 	if i >= v.Length {
@@ -43,226 +42,259 @@ func (v OwnedStringView) Byte(i uint64) (byte, error) {
 		}
 		return text[i], nil
 	}
-	if v.Owner.External != nil {
-		return v.Owner.External[i], nil
+	if i >= uint64(len(v.Owner.External)) {
+		return 0, arena.ErrBounds
 	}
-	return v.Owner.Inline[i], nil
+	return v.Owner.External[i], nil
 }
-
-// String is a diagnostic caller-owned Go copy; source getter/display paths
-// never call it or acquire ownership through it.
 func (v OwnedStringView) String() (string, error) {
-	if v.Owner != nil && v.Owner.goBuilder != nil {
-		if v.Owner.Self != v.Owner || v.Owner.Closed || v.Generation != v.Owner.Generation {
-			return "", arena.ErrInvalidSlot
-		}
+	if !v.Owner.valid() || v.Generation != v.Owner.Generation {
+		return "", arena.ErrInvalidSlot
+	}
+	if v.Owner.goBuilder != nil {
 		text := v.Owner.goBuilder.String()
 		if v.Length > uint64(len(text)) {
 			return "", arena.ErrBounds
 		}
 		return text[:v.Length], nil
 	}
-	if v.Length > uint64(^uint(0)>>1) {
+	if v.Length > uint64(len(v.Owner.External)) {
 		return "", arena.ErrBounds
 	}
-	a := make([]byte, int(v.Length))
-	for i := range a {
-		b, e := v.Byte(uint64(i))
+	return string(v.Owner.External[:v.Length]), nil
+}
+
+// CStringByte supplies a virtual terminator to project interfaces that consume
+// NUL-terminated bytes; no terminator is stored in the Go slice.
+func (s *OwnedString) CStringByte(i uint64) (byte, error) {
+	if !s.valid() {
+		return 0, arena.ErrInvalidSlot
+	}
+	if i == s.Length {
+		return 0, nil
+	}
+	return s.View().Byte(i)
+}
+
+// StorageBytes reports numeric-arena storage. Go owns this adapter's memory.
+func (s *OwnedString) StorageBytes() uint64 { return 0 }
+
+func paramsStringText(v ParamsStringView) (string, error) {
+	if v.Mode == 1 && v.PresentField {
+		text := v.literal
+		if i := strings.IndexByte(text, 0); i >= 0 {
+			text = text[:i]
+		}
+		return text, nil
+	}
+	var text strings.Builder
+	for i := uint64(0); ; i++ {
+		ch, e := v.Byte(i)
 		if e != nil {
 			return "", e
 		}
-		a[i] = b
-	}
-	return string(a), nil
-}
-
-func (s *OwnedString) Construct(b *arena.Budget, v ParamsStringView) error {
-	s.Self = s
-	s.Budget = b
-	s.Capacity = 15
-	s.Generation = 1
-	n, e := v.Length()
-	if e != nil {
-		return e
-	}
-	if n > 15 {
-		if n >= uint64(^uint(0)>>1) {
-			return arena.ErrBounds
+		if ch == 0 {
+			return text.String(), nil
 		}
-		if e = b.Reserve(n + 1); e != nil {
-			return e
+		if i >= uint64(^uint(0)>>1)-1 {
+			return "", arena.ErrBounds
 		}
-		s.External = make([]byte, int(n+1))
-		s.Capacity = n
-	}
-	for i := uint64(0); i < n; i++ {
-		ch, e := v.Byte(i)
-		if e != nil {
-			s.SourceDestroy()
-			return e
-		}
-		s.Put(i, ch)
-	}
-	s.Put(n, 0)
-	s.Length = n
-	s.Ready = true
-	return nil
-}
-
-func (s *OwnedString) Put(i uint64, ch byte) {
-	if s.External != nil {
-		s.External[i] = ch
-	} else {
-		s.Inline[i] = ch
+		text.WriteByte(ch)
 	}
 }
-
-func (s *OwnedString) Assign(v ParamsStringView) error {
-	if s.Self != s || !s.Ready || s.Closed || s.Pending != nil {
+func (s *OwnedString) initialize(b *arena.Budget, data []byte) error {
+	if s == nil || (s.Self != nil && !s.Closed) {
 		return ErrParamsPrecondition
 	}
-	n, e := v.Length()
-	if e != nil {
-		return e
-	}
-	if n <= s.Capacity {
-		for i := uint64(0); i < n; i++ {
-			ch, e := v.Byte(i)
-			if e != nil {
-				return e
-			}
-			s.Put(i, ch)
-		}
-		s.Put(n, 0)
-		s.Length = n
-		return nil
-	}
-	if s.Generation == math.MaxUint64 || n >= uint64(^uint(0)>>1) {
-		return arena.ErrBounds
-	}
-	capacity := n
-	if capacity < 2*s.Capacity {
-		capacity = 2 * s.Capacity
-	}
-	if capacity >= uint64(^uint(0)>>1) {
-		return arena.ErrBounds
-	}
-	if e = s.Budget.Reserve(capacity + 1); e != nil {
-		return e
-	}
-	s.Pending = make([]byte, int(capacity+1))
-	for i := uint64(0); i < n; i++ {
-		ch, e := v.Byte(i)
-		if e != nil {
-			return e
-		}
-		s.Pending[i] = ch
-	}
-	s.Pending[n] = 0
-	s.Budget.Release(uint64(len(s.External)))
-	s.External = s.Pending
-	s.Pending = nil
-	s.Capacity = capacity
-	s.Generation++
-	s.Length = n
-	return nil
-}
-
-func (s *OwnedString) SourceDestroy() {
-	if s.Self != s || s.Closed {
-		return
-	}
-	s.Budget.Release(uint64(len(s.External)))
-	s.External = nil
-	s.Closed = true
-}
-
-func (s *OwnedString) OwnAbort() {
-	s.SourceDestroy()
-	if s.Pending != nil {
-		s.Budget.Release(uint64(len(s.Pending)))
-		s.Pending = nil
-	}
-}
-
-func (s *OwnedString) View() OwnedStringView { return OwnedStringView{s, s.Generation, s.Length} }
-
-// Append follows selected libstdc++ basic_string.tcc:326-341,414-427.
-// The counted source includes embedded NUL bytes. Self append reads the old
-// storage until the completed replacement is published.
-func (s *OwnedString) Append(v OwnedStringView) error {
-	return s.appendSource(v, ParamsStringView{}, true, v.Length)
-}
-
-// AppendCString follows the C-string overload: strlen precedes _M_append.
-func (s *OwnedString) AppendCString(v ParamsStringView) error {
-	if s == nil || s.Self != s || !s.Ready || s.Closed || s.Pending != nil {
-		return ErrParamsPrecondition
-	}
-	n, e := v.Length()
-	if e != nil {
-		return e
-	}
-	return s.appendSource(OwnedStringView{}, v, false, n)
-}
-
-func (s *OwnedString) appendSource(v OwnedStringView, c ParamsStringView, counted bool, n uint64) error {
-	if s == nil || s.Self != s || !s.Ready || s.Closed || s.Pending != nil {
-		return ErrParamsPrecondition
-	}
-	max := uint64(^uint(0) >> 1)
-	if s.Length >= max || n >= max-s.Length {
-		return arena.ErrBounds
-	}
-	length := s.Length + n
-	grow := length > s.Capacity
-	capacity := s.Capacity
-	if grow {
+	generation := uint64(1)
+	if s.Self != nil {
 		if s.Generation == math.MaxUint64 {
 			return arena.ErrBounds
 		}
-		capacity = length
-		if s.Capacity <= (max-1)/2 && capacity < 2*s.Capacity {
-			capacity = 2 * s.Capacity
-		}
-		if e := s.Budget.Reserve(capacity + 1); e != nil {
-			return e
-		}
-		s.Pending = make([]byte, int(capacity+1))
-		old := s.View()
-		for i := uint64(0); i < s.Length; i++ {
-			ch, e := old.Byte(i)
-			if e != nil {
-				return e
-			}
-			s.Pending[i] = ch
-		}
+		generation = s.Generation + 1
 	}
-	for i := uint64(0); i < n; i++ {
-		var ch byte
-		var e error
-		if counted {
-			ch, e = v.Byte(i)
-		} else {
-			ch, e = c.Byte(i)
-		}
-		if e != nil {
-			return e
-		}
-		if grow {
-			s.Pending[s.Length+i] = ch
-		} else {
-			s.Put(s.Length+i, ch)
-		}
+	*s = OwnedString{Budget: b, External: data, Length: uint64(len(data)), Generation: generation, Ready: true}
+	s.Self = s
+	return nil
+}
+func (s *OwnedString) Construct(b *arena.Budget, v ParamsStringView) error {
+	if s == nil || (s.Self != nil && !s.Closed) {
+		return ErrParamsPrecondition
 	}
-	if grow {
-		s.Budget.Release(uint64(len(s.External)))
-		s.External, s.Pending = s.Pending, nil
-		s.Capacity = capacity
-		s.Generation++
+	text, e := paramsStringText(v)
+	if e != nil {
+		return e
 	}
-	s.Put(length, 0)
-	s.Length = length
+	return s.initialize(b, []byte(text))
+}
+func (s *OwnedString) replace(data []byte) error {
+	if !s.valid() || s.goBuilder != nil {
+		return ErrParamsPrecondition
+	}
+	if s.Generation == math.MaxUint64 {
+		return arena.ErrBounds
+	}
+	s.External = data
+	s.Length = uint64(len(data))
+	s.Generation++
+	return nil
+}
+func (s *OwnedString) Assign(v ParamsStringView) error {
+	if !s.valid() || s.goBuilder != nil {
+		return ErrParamsPrecondition
+	}
+	text, e := paramsStringText(v)
+	if e != nil {
+		return e
+	}
+	return s.replace([]byte(text))
+}
+func (s *OwnedString) Put(i uint64, ch byte) {
+	if !s.valid() || s.goBuilder != nil {
+		return
+	}
+	if i < uint64(len(s.External)) {
+		s.External[i] = ch
+	}
+}
+func (s *OwnedString) SourceDestroy() {
+	if s == nil || s.Self != s || s.Closed {
+		return
+	}
+	s.External = nil
+	s.goBuilder = nil
+	s.Closed = true
+}
+func (s *OwnedString) OwnAbort()             { s.SourceDestroy() }
+func (s *OwnedString) View() OwnedStringView { return OwnedStringView{s, s.Generation, s.Length} }
+func (s *OwnedString) Append(v OwnedStringView) error {
+	if !s.valid() || s.goBuilder != nil {
+		return ErrParamsPrecondition
+	}
+	if v.Length >= uint64(^uint(0)>>1)-s.Length {
+		return arena.ErrBounds
+	}
+	if v.Length == 0 {
+		return nil
+	}
+	text, e := v.String()
+	if e != nil {
+		return e
+	}
+	if s.Generation == math.MaxUint64 {
+		return arena.ErrBounds
+	}
+	s.External = append(s.External, text...)
+	s.Length = uint64(len(s.External))
+	s.Generation++
+	return nil
+}
+func (s *OwnedString) AppendCString(v ParamsStringView) error {
+	if !s.valid() || s.goBuilder != nil {
+		return ErrParamsPrecondition
+	}
+	text, e := paramsStringText(v)
+	if e != nil {
+		return e
+	}
+	if uint64(len(text)) >= uint64(^uint(0)>>1)-s.Length || s.Generation == math.MaxUint64 {
+		return arena.ErrBounds
+	}
+	s.External = append(s.External, text...)
+	s.Length = uint64(len(s.External))
+	s.Generation++
+	return nil
+}
+func (s *OwnedString) CopyConstruct(b *arena.Budget, src *OwnedString) error {
+	if !src.valid() {
+		return ErrParamsOwner
+	}
+	text, e := src.View().String()
+	if e != nil {
+		return e
+	}
+	return s.initialize(b, []byte(text))
+}
+func (s *OwnedString) CopyAssign(src *OwnedString) error {
+	if !s.valid() {
+		return ErrParamsPrecondition
+	}
+	if !src.valid() {
+		return ErrParamsOwner
+	}
+	if s == src {
+		return nil
+	}
+	text, e := src.View().String()
+	if e != nil {
+		return e
+	}
+	return s.replace([]byte(text))
+}
+func (s *OwnedString) Matches(text string) bool {
+	if !s.valid() {
+		return false
+	}
+	actual, e := s.View().String()
+	return e == nil && actual == text
+}
+func (s *OwnedString) Reserve(count uint64) error {
+	if !s.valid() || s.goBuilder != nil {
+		return ErrParamsPrecondition
+	}
+	if count >= uint64(^uint(0)>>1) {
+		return arena.ErrBounds
+	}
+	if count > uint64(cap(s.External)) {
+		buffer := bytes.NewBuffer(s.External)
+		buffer.Grow(int(count) - buffer.Len())
+		s.External = buffer.Bytes()
+	}
+	return nil
+}
+func (s *OwnedString) MoveAssign(src *OwnedString) error {
+	if !s.valid() || !src.valid() || s.goBuilder != nil || src.goBuilder != nil {
+		return ErrParamsPrecondition
+	}
+	if s == src {
+		return nil
+	}
+	if s.Generation == math.MaxUint64 || src.Generation == math.MaxUint64 {
+		return arena.ErrBounds
+	}
+	s.External, src.External = src.External, nil
+	s.Length, src.Length = src.Length, 0
+	s.Generation++
+	src.Generation++
+	return nil
+}
+func (s *OwnedString) ConstructCStringConcat(b *arena.Budget, prefix ParamsStringView, rhs OwnedStringView) error {
+	first, e := paramsStringText(prefix)
+	if e != nil {
+		return e
+	}
+	last, e := rhs.String()
+	if e != nil {
+		return e
+	}
+	return s.initialize(b, []byte(first+last))
+}
+func (s *OwnedString) ConstructRepeated(b *arena.Budget, count uint64, ch byte) error {
+	if s == nil || (s.Self != nil && !s.Closed) {
+		return ErrParamsPrecondition
+	}
+	if count >= uint64(^uint(0)>>1) {
+		return arena.ErrBounds
+	}
+	return s.initialize(b, bytes.Repeat([]byte{ch}, int(count)))
+}
+func (s *OwnedString) Reverse() error {
+	if !s.valid() || s.goBuilder != nil {
+		return ErrParamsPrecondition
+	}
+	for left, right := 0, len(s.External)-1; left < right; left, right = left+1, right-1 {
+		s.External[left], s.External[right] = s.External[right], s.External[left]
+	}
 	return nil
 }
 
@@ -301,106 +333,4 @@ func (out *NumericTextStream) AppendOwnedString(s *OwnedString) error {
 		return out.padding(pad)
 	}
 	return nil
-}
-
-// Selected libstdc++ basic_string.h:547-552/basic_string.tcc:222-255:
-// copy uses the source length directly, exact constructor capacity and the
-// actual construction guard dispose if a reached checked byte read fails.
-func (s *OwnedString) CopyConstruct(b *arena.Budget, src *OwnedString) error {
-	if src == nil || src.Self != src || src.Closed || !src.Ready {
-		return ErrParamsOwner
-	}
-	s.Self = s
-	s.Budget = b
-	s.Capacity = 15
-	s.Generation = 1
-	n := src.Length
-	if n > 15 {
-		if n >= uint64(^uint(0)>>1) {
-			return arena.ErrBounds
-		}
-		if e := b.Reserve(n + 1); e != nil {
-			return e
-		}
-		s.External = make([]byte, int(n+1))
-		s.Capacity = n
-	}
-	view := src.View()
-	for i := uint64(0); i < n; i++ {
-		ch, e := view.Byte(i)
-		if e != nil {
-			s.SourceDestroy()
-			return e
-		}
-		s.Put(i, ch)
-	}
-	s.Put(n, 0)
-	s.Length = n
-	s.Ready = true
-	return nil
-}
-
-// Selected libstdc++ basic_string.tcc:278-300 _M_assign allocates, disposes
-// old storage, publishes pointer/capacity, then copies bytes and sets length.
-// This differs from the existing const-char-pointer replacement source leaf.
-func (s *OwnedString) CopyAssign(src *OwnedString) error {
-	if s.Self != s || !s.Ready || s.Closed || s.Pending != nil {
-		return ErrParamsPrecondition
-	}
-	if src == nil || src.Self != src || src.Closed || !src.Ready {
-		return ErrParamsOwner
-	}
-	if s == src {
-		return nil
-	}
-	n := src.Length
-	if n > s.Capacity {
-		if s.Generation == math.MaxUint64 || n >= uint64(^uint(0)>>1) {
-			return arena.ErrBounds
-		}
-		cap := n
-		if cap < 2*s.Capacity {
-			cap = 2 * s.Capacity
-		}
-		if cap >= uint64(^uint(0)>>1) {
-			return arena.ErrBounds
-		}
-		if e := s.Budget.Reserve(cap + 1); e != nil {
-			return e
-		}
-		next := make([]byte, int(cap+1))
-		s.Budget.Release(uint64(len(s.External)))
-		s.External = next
-		s.Capacity = cap
-		s.Generation++
-	}
-	view := src.View()
-	for i := uint64(0); i < n; i++ {
-		ch, e := view.Byte(i)
-		if e != nil {
-			return e
-		}
-		s.Put(i, ch)
-	}
-	s.Put(n, 0)
-	s.Length = n
-	return nil
-}
-
-func (k *OwnedString) Matches(v string) bool {
-	if k.Length != uint64(len(v)) {
-		return false
-	}
-	for i := 0; i < len(v); i++ {
-		b := k.Inline[0]
-		if k.External != nil {
-			b = k.External[i]
-		} else {
-			b = k.Inline[i]
-		}
-		if b != v[i] {
-			return false
-		}
-	}
-	return true
 }

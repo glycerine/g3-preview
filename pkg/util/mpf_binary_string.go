@@ -482,7 +482,7 @@ func (s *arbitraryFloatBinaryStringScope) storageBytes() uint64 {
 	var n uint64
 	for _, str := range [...]*OwnedString{&s.bits, &s.expr, &s.repeats[0], &s.repeats[1], s.out} {
 		if str != nil {
-			n += uint64(len(str.External) + len(str.Pending))
+			n += str.StorageBytes()
 		}
 	}
 	return n

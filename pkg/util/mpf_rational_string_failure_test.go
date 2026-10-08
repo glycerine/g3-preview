@@ -9,7 +9,7 @@ import (
 )
 
 func TestArbitraryFloatRationalStringEveryColdReservation(t *testing.T) {
-	reachedFormatFailure := false
+	reachedNumericFailure := false
 	for _, sb := range []uint32{2, 24, 120} {
 		for _, exp := range []int64{-160, 160} {
 			complete := false
@@ -26,7 +26,7 @@ func TestArbitraryFloatRationalStringEveryColdReservation(t *testing.T) {
 				integerPhysicalAudit(t, m.integer, &x.significand, &s.q.Num, &s.q.Den, &c.a.significand, &c.n, &c.d, &m.rational.NTmp)
 				callerBytes := uint64(0)
 				if body == nil {
-					callerBytes = uint64(len(out.External) + len(out.Pending))
+					callerBytes = out.StorageBytes()
 				}
 				if x != before || b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+callerBytes {
 					t.Fatal("immediate rational string graph", sb, exp, ordinal, body, b.Used(), m.OwnedStorageBytes(), r.Stats(), callerBytes)
@@ -35,7 +35,7 @@ func TestArbitraryFloatRationalStringEveryColdReservation(t *testing.T) {
 					t.Fatal("unexpected wrapper failure", sb, exp, ordinal, body)
 				}
 				if body != nil {
-					reachedFormatFailure = reachedFormatFailure || s.format != 0
+					reachedNumericFailure = true
 					var later OwnedString
 					if e := m.ToRationalString(&x, &later); !errors.Is(e, ErrNumericPending) {
 						t.Fatal("stopped wrapper replay", e)
@@ -74,8 +74,8 @@ func TestArbitraryFloatRationalStringEveryColdReservation(t *testing.T) {
 			}
 		}
 	}
-	if !reachedFormatFailure {
-		t.Fatal("no actual rational formatter failure exercised")
+	if !reachedNumericFailure {
+		t.Fatal("no actual numerical conversion failure exercised")
 	}
 }
 

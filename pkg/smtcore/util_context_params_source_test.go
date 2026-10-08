@@ -27,7 +27,7 @@ func contextParamsCold(t *testing.T, v *ContextParams, g *util.GlobalParamsServi
 		if v.self != v || v.budget != b {
 			t.Fatal("exact owner")
 		}
-		n += v.header + uint64(len(v.dotProof.External)+len(v.dotProof.Pending)+len(v.traceFile.External)+len(v.traceFile.Pending))
+		n += v.header + uint64(v.dotProof.StorageBytes()+v.traceFile.StorageBytes())
 	}
 	if n != b.Used() {
 		t.Fatal("before-lift named cold graph", n, b.Used())
@@ -132,8 +132,8 @@ func TestContextParamsEveryConstructorReservationAndReverseStringUnwind(t *testi
 		}
 		contextParamsCold(t, nil, g, b)
 		if e == nil {
-			if ordinal != 3 {
-				t.Fatal("actual header and two external arrays", ordinal)
+			if ordinal != 1 {
+				t.Fatal("actual header; text is Go-managed", ordinal)
 			}
 			break
 		}
@@ -152,88 +152,60 @@ func TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards(t *testi
 	key = "unsat_core"
 	paramsMust(t, c.SetBoolName(p, &key, true))
 	key = "trace_file_name"
-	val := strings.Repeat("q", 90)
-	paramsMust(t, c.SetStringName(p, &key, &val))
+	value := strings.Repeat("q", 90)
+	paramsMust(t, c.SetStringName(p, &key, &value))
 	before := b.Used()
 	b.FailAfter(0)
-	e = v.Update(p)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	s, x := v.State()
-	paramsMust(t, x)
-	a, x := v.TraceFile().String()
-	paramsMust(t, x)
-	if s.Timeout != 29 || s.UnsatCore || a != "z3.log" || b.Used() != before {
-		t.Fatal("prefix scalar before trace assignment; suffix unread", s, a)
+	paramsMust(t, v.Update(p))
+	state, e := v.State()
+	paramsMust(t, e)
+	text, e := v.TraceFile().String()
+	paramsMust(t, e)
+	if state.Timeout != 29 || !state.UnsatCore || text != value || b.Used() != before {
+		t.Fatal("Go strings must not stop the project update on an arena fault", state, text)
 	}
 	contextParamsCold(t, v, g, b)
 	b.FailAfter(-1)
-	paramsMust(t, v.Update(p))
-	s, x = v.State()
-	paramsMust(t, x)
-	if !s.UnsatCore {
-		t.Fatal(s)
-	}
-	copyOwner := *v
-	if e := copyOwner.Close(); !errors.Is(e, util.ErrParamsOwner) {
-		t.Fatal("shallow-copy guard", e)
+	copied := *v
+	if !errors.Is(copied.Close(), util.ErrParamsOwner) {
+		t.Fatal("copied owner")
 	}
 }
 
 func TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime(t *testing.T) {
-	for ordinal := int64(0); ; ordinal++ {
-		c, g, p, b := dynAckSourceFixture(t)
-		v, e := NewContextParams(c, g, b)
-		paramsMust(t, e)
-		key := "trace_file_name"
-		trace := strings.Repeat("a", 41)
-		paramsMust(t, c.SetStringName(p, &key, &trace))
-		key = "dot_proof_file"
-		dot := strings.Repeat("b", 47)
-		paramsMust(t, c.SetStringName(p, &key, &dot))
-		key = "unsat_core"
-		paramsMust(t, c.SetBoolName(p, &key, true))
-		old := v.TraceFile()
-		b.FailAfter(ordinal)
-		e = v.Update(p)
-		contextParamsCold(t, v, g, b)
-		s, x := v.State()
-		paramsMust(t, x)
-		a, x := v.TraceFile().String()
-		paramsMust(t, x)
-		d, x := v.DotProofFile().String()
-		paramsMust(t, x)
-		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal(e)
-		}
-		if ordinal == 0 && (a != "z3.log" || d != "proof.dot" || s.UnsatCore) {
-			t.Fatal("first string refusal", a, d, s)
-		}
-		if ordinal == 1 && (a != trace || d != "proof.dot" || s.UnsatCore) {
-			t.Fatal("first string published before second refusal", a, d, s)
-		}
-		if ordinal >= 1 {
-			if _, x := old.Byte(0); !errors.Is(x, arena.ErrInvalidSlot) {
-				t.Fatal("real replacement invalidates captured view", x)
-			}
-		}
-		closedView := v.TraceFile()
-		b.FailAfter(-1)
-		paramsMust(t, v.Close())
-		contextParamsCold(t, nil, g, b)
-		if _, x := closedView.Byte(0); x == nil {
-			t.Fatal("closed borrowed view")
-		}
-		if e == nil {
-			if ordinal != 2 || a != trace || d != dot || !s.UnsatCore {
-				t.Fatal("exact two arrays and suffix", ordinal, a, d, s)
-			}
-			break
-		}
-		if ordinal > 2 {
-			t.Fatal("bounded horizon")
-		}
+	c, g, p, b := dynAckSourceFixture(t)
+	v, e := NewContextParams(c, g, b)
+	paramsMust(t, e)
+	key := "trace_file_name"
+	trace := strings.Repeat("a", 41)
+	paramsMust(t, c.SetStringName(p, &key, &trace))
+	key = "dot_proof_file"
+	dot := strings.Repeat("b", 47)
+	paramsMust(t, c.SetStringName(p, &key, &dot))
+	key = "unsat_core"
+	paramsMust(t, c.SetBoolName(p, &key, true))
+	old := v.TraceFile()
+	b.FailAfter(0)
+	paramsMust(t, v.Update(p))
+	state, e := v.State()
+	paramsMust(t, e)
+	text, e := v.TraceFile().String()
+	paramsMust(t, e)
+	proof, e := v.DotProofFile().String()
+	paramsMust(t, e)
+	if text != trace || proof != dot || !state.UnsatCore {
+		t.Fatal("complete Go text update", state, text, proof)
+	}
+	if _, e = old.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("old view", e)
+	}
+	contextParamsCold(t, v, g, b)
+	current := v.TraceFile()
+	b.FailAfter(-1)
+	paramsMust(t, v.Close())
+	contextParamsCold(t, nil, g, b)
+	if _, e = current.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("closed view", e)
 	}
 }
 

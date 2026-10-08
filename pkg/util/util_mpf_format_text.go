@@ -1,14 +1,15 @@
-// Source: src/util/mpf.cpp:1519-1569; selected libstdc++ basic_string.tcc:326-344,414-429.
+// Source: src/util/mpf.cpp:1519-1569.
 package util
 
 import (
+	"bytes"
 	"math"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// The actual res and ss.str temporary have distinct inline/external storage.
+// The result and counted output snapshot have independent Go-managed text.
 // This used cold transport header is charged once; NUM scope binding follows
 // the exact numerical invocation seam rather than owning numerals here.
 type ArbitraryFloatFormatText struct {
@@ -100,14 +101,14 @@ func (s *mpfFormatStream) SourceFinalize() error {
 }
 func (s *mpfFormatStream) Close() error { return s.SourceFinalize() }
 
-// Source ss.str constructs a separate length-based string, preserving embedded
-// NUL bytes. It does not use CString construction or a Go string snapshot.
+// captureStreamTemporary copies counted output, preserving embedded NULs.
 func (t *ArbitraryFloatFormatText) captureStreamTemporary(s *NumericTextStream) error {
 	return CaptureNumericStreamOwnedString(&t.Temporary, s, t.budget)
 }
-
-// Same actual ss.str() owned-string constructor, used by numerical callers.
 func CaptureNumericStreamOwnedString(q *OwnedString, s *NumericTextStream, b *arena.Budget) error {
+	if q == nil {
+		return ErrParamsPrecondition
+	}
 	if e := s.lock(); e != nil {
 		return e
 	}
@@ -115,88 +116,11 @@ func CaptureNumericStreamOwnedString(q *OwnedString, s *NumericTextStream, b *ar
 	if s.fileMode || s.Buffer == nil {
 		return ErrNumericStreamFile
 	}
-	if q.Self != nil && !q.Closed && (q.Ready || len(q.External) != 0 || len(q.Pending) != 0) {
-		return ErrParamsPrecondition
-	}
-	*q = OwnedString{Budget: b, Capacity: 15, Generation: 1}
-	q.Self = q
-	n := s.Buffer.State.Pos
-	if n > 15 {
-		if n >= uint64(^uint(0)>>1) {
-			return arena.ErrBounds
-		}
-		if e := b.Reserve(n + 1); e != nil {
-			return e
-		}
-		q.External = make([]byte, int(n+1))
-		q.Capacity = n
-	}
 	data := s.Buffer.State.Data(s.Buffer.Inline[:])
-	for i := uint64(0); i < n; i++ {
-		q.Put(i, data[i])
-	}
-	q.Put(n, 0)
-	q.Length = n
-	q.Ready = true
-	return nil
+	return q.initialize(b, bytes.Clone(data[:s.Buffer.State.Pos]))
 }
 func (t *ArbitraryFloatFormatText) appendTemporary() error {
-	dst, src := &t.Result, &t.Temporary
-	if !src.Ready || src.Closed || dst.Pending != nil {
-		return ErrParamsPrecondition
-	}
-	if src.Length > math.MaxUint64-dst.Length {
-		return arena.ErrBounds
-	}
-	n := dst.Length + src.Length
-	if n <= dst.Capacity {
-		for i := uint64(0); i < src.Length; i++ {
-			b, e := src.View().Byte(i)
-			if e != nil {
-				return e
-			}
-			dst.Put(dst.Length+i, b)
-		}
-		dst.Put(n, 0)
-		dst.Length = n
-		return nil
-	}
-	if n >= uint64(^uint(0)>>1) || dst.Generation == math.MaxUint64 {
-		return arena.ErrBounds
-	}
-	capacity := n
-	if capacity < 2*dst.Capacity {
-		capacity = 2 * dst.Capacity
-	}
-	if capacity >= uint64(^uint(0)>>1) {
-		return arena.ErrBounds
-	}
-	if e := t.budget.Reserve(capacity + 1); e != nil {
-		return e
-	}
-	dst.Pending = make([]byte, int(capacity+1))
-	for i := uint64(0); i < dst.Length; i++ {
-		b, e := dst.View().Byte(i)
-		if e != nil {
-			return e
-		}
-		dst.Pending[i] = b
-	}
-	for i := uint64(0); i < src.Length; i++ {
-		b, e := src.View().Byte(i)
-		if e != nil {
-			return e
-		}
-		dst.Pending[dst.Length+i] = b
-	}
-	t.budget.Release(uint64(len(dst.External)))
-	dst.External = dst.Pending
-	dst.Pending = nil
-	dst.Capacity = capacity
-	dst.Generation++
-	dst.Put(n, 0)
-	dst.Length = n
-	return nil
+	return t.Result.Append(t.Temporary.View())
 }
 func (t *ArbitraryFloatFormatText) AppendStreamString(stream ArbitraryFloatFormatStream) error {
 	if e := t.open(); e != nil {
@@ -298,7 +222,7 @@ func (t *ArbitraryFloatFormatText) Close() error {
 
 // StorageBytes accounts for this concrete transport and its actual storage.
 func (t *ArbitraryFloatFormatText) StorageBytes() uint64 {
-	n := t.Header + uint64(len(t.Result.External)+len(t.Result.Pending)+len(t.Temporary.External)+len(t.Temporary.Pending))
+	n := t.Header + uint64(t.Result.StorageBytes()+t.Temporary.StorageBytes())
 	if s := t.Stream.NumericTextStream; s != nil {
 		v := s.Stats()
 		n += v.OwnerBytes + v.ScratchBytes + v.OutputOwnerBytes + v.OutputOverflowBytes

@@ -68,7 +68,7 @@ func TestRationalDecimalStreamReachedEndLabelSourceStop(t *testing.T) {
 		t.Fatal("source stop changed unread older owner")
 	}
 	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &a.Num, &a.Den, &s.values[0], &s.values[1], &s.values[2], &s.values[3])
-	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+uint64(len(out.Buffer.String.External)) {
+	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+out.Buffer.String.StorageBytes() {
 		t.Fatal("immediate decimal end-label graph", b.Used())
 	}
 	recovery, e := r.Allocate(200000)

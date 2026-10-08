@@ -28,10 +28,7 @@ func (n astTraceFilename) Byte(i uint64) (byte, error) {
 	if i > v.Length {
 		return 0, arena.ErrBounds
 	}
-	if v.Owner.External != nil {
-		return v.Owner.External[i], nil
-	}
-	return v.Owner.Inline[i], nil
+	return v.Owner.CStringByte(i)
 }
 func (n astTraceFilename) Length() (uint64, error) {
 	if !n.ownedMode {

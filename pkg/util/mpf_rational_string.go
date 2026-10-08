@@ -195,7 +195,7 @@ func (m *ArbitraryFloatManager) CleanupRationalString() (cause error) {
 }
 func (s *arbitraryFloatRationalStringScope) storageBytes() uint64 {
 	if s.outputOwned && s.out != nil {
-		return uint64(len(s.out.External) + len(s.out.Pending))
+		return s.out.StorageBytes()
 	}
 	return 0
 }

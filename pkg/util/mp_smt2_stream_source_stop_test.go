@@ -70,7 +70,7 @@ func TestRationalSMT2StreamNegativeSourceStopProtectsContinuation(t *testing.T) 
 		t.Fatal("stopped source changed older owner")
 	}
 	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &a.Num, &a.Den, &s.tmp)
-	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+uint64(len(out.Buffer.String.External)) {
+	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+out.Buffer.String.StorageBytes() {
 		t.Fatal("immediate source-stop graph", b.Used())
 	}
 	recovery, e := r.Allocate(200000)

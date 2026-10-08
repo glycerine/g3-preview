@@ -114,7 +114,7 @@ func smtParamsNamedCold(t *testing.T, s *SMTParams, g *util.GlobalParamsService,
 				n += f.Header
 			}
 		}
-		n += uint64(len(s.qi.cost.External) + len(s.qi.cost.Pending) + len(s.qi.newGen.External) + len(s.qi.newGen.Pending))
+		n += uint64(s.qi.cost.StorageBytes() + s.qi.newGen.StorageBytes())
 	}
 	if g.Symbols.Budget == b {
 		n += astTestSymbolGraph(g.Symbols) + g.Symbols.Stats().Table.RetainedBytes
@@ -170,8 +170,8 @@ func TestSMTParamsEveryWarmConstructorReservationAndCompletedBaseUnwind(t *testi
 		}
 		smtParamsNamedCold(t, nil, g, b)
 		if e == nil {
-			if ordinal != 15 {
-				t.Fatal("actual header/ownedcost and source helper declarations", ordinal)
+			if ordinal != 14 {
+				t.Fatal("actual header and source helper declarations; Go text is not arena-allocated", ordinal)
 			}
 			break
 		}
@@ -769,7 +769,7 @@ func TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation(t *testing.
 			break
 		}
 	}
-	if success != 26 {
+	if success != 25 {
 		t.Fatal("every actual shared acquisition through first success", success)
 	}
 }

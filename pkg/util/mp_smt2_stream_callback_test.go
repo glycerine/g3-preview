@@ -50,7 +50,7 @@ func TestRationalSMT2StreamCopyTransportGuards(t *testing.T) {
 		t.Fatal("actual negative COPY transport missing", body, calls)
 	}
 	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &a.Num, &a.Den, &m.integer.smt2Stream.tmp)
-	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+uint64(len(out.Buffer.String.External)+len(out.Buffer.String.Pending)) {
+	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+out.Buffer.String.StorageBytes() {
 		t.Fatal("immediate COPY graph", b.Used())
 	}
 	serviceMust(t, r.SetMaxSize(0))

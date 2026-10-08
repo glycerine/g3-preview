@@ -209,7 +209,7 @@ func (s *arbitraryFloatRawStringScope) storageBytes() uint64 {
 	var n uint64
 	for _, str := range [...]*OwnedString{&s.exponent, &s.exponentStream.Buffer.String, &s.number, &s.numberStream.Buffer.String, s.out} {
 		if str != nil {
-			n += uint64(len(str.External) + len(str.Pending))
+			n += str.StorageBytes()
 		}
 	}
 	return n
