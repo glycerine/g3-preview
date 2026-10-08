@@ -19165,7 +19165,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/util_smt_arith_params.go",
-        "pkg/smtcore/util_smt_arith_params_source_test.go"
+        "pkg/smtcore/util_smt_arith_params_source_test.go",
+        "pkg/ast/rewriter/bv_polynomial_config.go",
+        "pkg/ast/rewriter/bv_polynomial_config_test.go"
       ],
       "tests": [
         "TestSMTArithAllFortySixLiteralDefaults",
@@ -19174,7 +19176,13 @@
         "TestSMTArithEveryWarmConstructorReservation",
         "TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags",
         "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
-        "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
+        "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards",
+        "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
+        "TestBVPolynomialConfigurationTypedLocalModuleFallback",
+        "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
+        "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
+        "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
+        "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -19192,10 +19200,24 @@
             "TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation",
             "TestSMTArithNullGlobalConstructorAndForeignLocalReachedGuards"
           ]
+        },
+        {
+          "name": "Concrete arith_ineq_lhs=false getter consumed by polynomial AST-order configuration; separate owning rewriter module snapshot (src/ast/rewriter/arith_rewriter_params.pyg; scripts/mk_genfile_common.py:895-921)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_config.go",
+          "tests": [
+            "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
+            "TestBVPolynomialConfigurationTypedLocalModuleFallback",
+            "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
+            "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
+            "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
+            "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
+          ]
         }
       ],
       "ownership": [
-        "Forty-six scalar members use exact declaration/default/display order. The actual smt helper is acquired before fifteen RHS/publications; the actual rewriter helper is acquired only after those complete, followed by eq2ineq. Each returned module ParamsRef stamps acquisition in the existing concrete shared helper engine; lexical reverse source destruction and exact stopped-child owning continuation remain separate. Reflected standalone wrapper/frame cold charges are Go lifetime representation, not native scalar/stack allocations; caller local/context/global owners remain borrowed."
+        "Forty-six scalar members use exact declaration/default/display order. The actual smt helper is acquired before fifteen RHS/publications; the actual rewriter helper is acquired only after those complete, followed by eq2ineq. Each returned module ParamsRef stamps acquisition in the existing concrete shared helper engine; lexical reverse source destruction and exact stopped-child owning continuation remain separate. Reflected standalone wrapper/frame cold charges are Go lifetime representation, not native scalar/stack allocations; caller local/context/global owners remain borrowed.",
+        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited."
       ],
       "deviations": [
         "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles."
@@ -23450,7 +23472,9 @@
         "pkg/ast/ast_bv_polynomial_mul_numerals_test.go",
         "pkg/ast/rewriter/bv_polynomial_flat_mul.go",
         "pkg/ast/rewriter/bv_polynomial_make_mul.go",
-        "pkg/ast/rewriter/bv_polynomial_flat_mul_test.go"
+        "pkg/ast/rewriter/bv_polynomial_flat_mul_test.go",
+        "pkg/ast/rewriter/bv_polynomial_config.go",
+        "pkg/ast/rewriter/bv_polynomial_config_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23521,7 +23545,13 @@
         "TestBVPolynomialFlatMultiplicationEveryStackSpillAndFallbackReservation",
         "TestBVPolynomialMultiplicationCallerSingletonAndOriginalFallback",
         "TestBVPolynomialMultiplicationCallerSelectionAndConvenience",
-        "TestBVPolynomialFlatMultiplicationPropagatesCartesianRewriteDepth"
+        "TestBVPolynomialFlatMultiplicationPropagatesCartesianRewriteDepth",
+        "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
+        "TestBVPolynomialConfigurationTypedLocalModuleFallback",
+        "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
+        "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
+        "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
+        "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
       ],
       "conditionals": [
         {
@@ -23779,9 +23809,24 @@
             "TestBVPolynomialMultiplicationCallerSingletonAndOriginalFallback",
             "TestBVPolynomialMultiplicationCallerSelectionAndConvenience"
           ]
+        },
+        {
+          "name": "Selected configuration portion of constructor: sort_sums=false, two parameter updates and intervening debug constraints; independent set_flat/set_sort_sums (src/ast/rewriter/poly_rewriter.h:95-123); full Config/map/current-sort construction remains required",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_config.go",
+          "tests": [
+            "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
+            "TestBVPolynomialConfigurationTypedLocalModuleFallback",
+            "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
+            "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
+            "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
+            "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited."
+      ],
       "deviations": [
         "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
         "Selected is_mul coefficient matcher is implemented for the original BV Config with its actual caller coefficient receiver and exact numerical invocation. Unmatched inputs erase coefficient/product/invocation reads; matched publication borrows the second operand without INC only after stored-rational copy and width read complete. A reached width error keeps the copied coefficient prefix and leaves the product unchanged. It has no owned numerical/reference locals and does not normalize or construct another copied numeral. The hoist comparator/algorithm, polynomial current-sort/mark/coefficient owner, full core/rewriter/solver integration and arith specialization remain required; no native pointer/layout/allocation/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
@@ -23837,7 +23882,9 @@
         "pkg/ast/ast_bv_polynomial_mul_numerals_test.go",
         "pkg/ast/rewriter/bv_polynomial_flat_mul.go",
         "pkg/ast/rewriter/bv_polynomial_make_mul.go",
-        "pkg/ast/rewriter/bv_polynomial_flat_mul_test.go"
+        "pkg/ast/rewriter/bv_polynomial_flat_mul_test.go",
+        "pkg/ast/rewriter/bv_polynomial_config.go",
+        "pkg/ast/rewriter/bv_polynomial_config_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23905,7 +23952,13 @@
         "TestBVPolynomialFlatMultiplicationEveryStackSpillAndFallbackReservation",
         "TestBVPolynomialMultiplicationCallerSingletonAndOriginalFallback",
         "TestBVPolynomialMultiplicationCallerSelectionAndConvenience",
-        "TestBVPolynomialFlatMultiplicationPropagatesCartesianRewriteDepth"
+        "TestBVPolynomialFlatMultiplicationPropagatesCartesianRewriteDepth",
+        "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
+        "TestBVPolynomialConfigurationTypedLocalModuleFallback",
+        "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
+        "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
+        "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
+        "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
       ],
       "assertions": [
         {
@@ -24077,9 +24130,24 @@
             "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
             "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation"
           ]
+        },
+        {
+          "name": "Complete selected updt_params/get_param_descrs: separate poly/arith module snapshots, ordered typed assignments, SOM constraints and inverted arithmetic ordering (src/ast/rewriter/poly_rewriter_def.h:28-45)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_config.go",
+          "tests": [
+            "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
+            "TestBVPolynomialConfigurationTypedLocalModuleFallback",
+            "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
+            "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
+            "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
+            "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited."
+      ],
       "deviations": [
         "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
         "Selected is_mul coefficient matcher is implemented for the original BV Config with its actual caller coefficient receiver and exact numerical invocation. Unmatched inputs erase coefficient/product/invocation reads; matched publication borrows the second operand without INC only after stored-rational copy and width read complete. A reached width error keeps the copied coefficient prefix and leaves the product unchanged. It has no owned numerical/reference locals and does not normalize or construct another copied numeral. The hoist comparator/algorithm, polynomial current-sort/mark/coefficient owner, full core/rewriter/solver integration and arith specialization remain required; no native pointer/layout/allocation/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
@@ -24150,12 +24218,38 @@
       "component": "ast",
       "role": "generated_input",
       "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "go_targets": [
+        "pkg/ast/rewriter/bv_polynomial_config.go",
+        "pkg/ast/rewriter/bv_polynomial_config_test.go"
+      ],
+      "tests": [
+        "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
+        "TestBVPolynomialConfigurationTypedLocalModuleFallback",
+        "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
+        "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
+        "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
+        "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "All five concrete generated getters and literal defaults consumed by polynomial configuration with exact existing descriptor collector (src/ast/rewriter/poly_rewriter_params.pyg; scripts/mk_genfile_common.py:895-921)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_config.go",
+          "tests": [
+            "TestBVPolynomialConfigurationDefaultsAndIndependentSetters",
+            "TestBVPolynomialConfigurationTypedLocalModuleFallback",
+            "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
+            "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
+            "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
+            "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
+          ]
+        }
+      ],
+      "ownership": [
+        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited."
+      ],
       "deviations": []
     },
     {
