@@ -149607,8 +149607,10 @@
       "path": "src/util/scoped_numeral_vector.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/util/scoped_numeral_vector.go",
+        "pkg/util/scoped_numeral_vector_test.go",
         "pkg/util/scoped_numeral.go",
         "pkg/util/scoped_binary.go",
         "pkg/util/scoped_fast_float_vector.go",
@@ -149616,6 +149618,8 @@
         "pkg/math/polynomial/upolynomial_source_test.go"
       ],
       "tests": [
+        "TestGenericScopedNumeralVectorCompleteLifecycle",
+        "TestGenericScopedNumeralVectorFailureAndOwnerPreconditions",
         "TestScopedNumeralSourceTstScoped",
         "TestScopedNumeralResizeFailurePrefixesAndBudget",
         "TestScopedNumeralMoveAndAscendingCleanup",
@@ -149695,9 +149699,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "complete non-generic _scoped_numeral_vector construction/destruction, manager/indexed access, reset, push/pop, shrink and resize",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_numeral_vector.go",
+          "tests": [
+            "TestGenericScopedNumeralVectorCompleteLifecycle",
+            "TestGenericScopedNumeralVectorFailureAndOwnerPreconditions"
+          ]
+        },
         {
           "name": "selected Int/Rational borrowed manager and noncopyable vector lifetime",
           "status": "ported",
@@ -149826,15 +149839,15 @@
         }
       ],
       "ownership": [
+        "ScopedNumeralVector owns each numeral through its composed buffer core and borrows one ScopedNumeralManager. Push publishes a default slot before copy; Pop delegates to one-element Shrink; shrink/reset/Close delete removed values from first to last.",
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See PORT_PROGRESS.md#audit-scoped-numeral-port-status-md.",
         "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See PORT_PROGRESS.md#audit-mpbq-port-status-md.",
         "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See PORT_PROGRESS.md#audit-mpff-port-status-md.",
-        "Scalar external polynomial owners and actual Int arrays preserve source numeral callbacks and publication prefixes; other manager specializations remain open. See PORT_PROGRESS.md#audit-upolynomial-port-status-md."
+        "Scalar external polynomial owners and actual Int arrays preserve source numeral callbacks and publication prefixes. See PORT_PROGRESS.md#audit-upolynomial-port-status-md."
       ],
       "deviations": [
-        "Explicit Close substitutes RAII; self identity rejects shallow Go owner copies. Vectors expose deep Read/Set rather than escaping indexed element addresses. Source noncopyable vector remains noncopyable; other numeral manager specializations stay open.",
-        "Concrete MPBQ specialization; unsupported source div/rem/abs template instantiations are not invented. Other manager specializations and full custom ostream integration remain open.",
-        "Concrete MPFF types; explicit Close and provenance/self-copy checks. Borrowed indexed Go pointers have documented lifetime limits. Other manager specializations and persistent custom ostream integration remain open."
+        "The Manager template becomes ScopedNumeralManager and svector storage becomes a zero-capacity Go slice managed through ScopedNumeralBuffer ownership operations. Explicit Close substitutes RAII and self identity rejects shallow Go owner copies; no C++ vector implementation is ported.",
+        "Concrete MPBQ and MPFF specializations retain their manager-specific allocator, provenance and unsupported-operation qualifications. The general vector contract is available through the callback manager."
       ]
     },
     {
