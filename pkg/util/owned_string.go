@@ -168,6 +168,85 @@ func (s *OwnedString) OwnAbort() {
 
 func (s *OwnedString) View() OwnedStringView { return OwnedStringView{s, s.Generation, s.Length} }
 
+// Append follows selected libstdc++ basic_string.tcc:326-341,414-427.
+// The counted source includes embedded NUL bytes. Self append reads the old
+// storage until the completed replacement is published.
+func (s *OwnedString) Append(v OwnedStringView) error {
+	return s.appendSource(v, ParamsStringView{}, true, v.Length)
+}
+
+// AppendCString follows the C-string overload: strlen precedes _M_append.
+func (s *OwnedString) AppendCString(v ParamsStringView) error {
+	if s == nil || s.Self != s || !s.Ready || s.Closed || s.Pending != nil {
+		return ErrParamsPrecondition
+	}
+	n, e := v.Length()
+	if e != nil {
+		return e
+	}
+	return s.appendSource(OwnedStringView{}, v, false, n)
+}
+
+func (s *OwnedString) appendSource(v OwnedStringView, c ParamsStringView, counted bool, n uint64) error {
+	if s == nil || s.Self != s || !s.Ready || s.Closed || s.Pending != nil {
+		return ErrParamsPrecondition
+	}
+	max := uint64(^uint(0) >> 1)
+	if s.Length >= max || n >= max-s.Length {
+		return arena.ErrBounds
+	}
+	length := s.Length + n
+	grow := length > s.Capacity
+	capacity := s.Capacity
+	if grow {
+		if s.Generation == math.MaxUint64 {
+			return arena.ErrBounds
+		}
+		capacity = length
+		if s.Capacity <= (max-1)/2 && capacity < 2*s.Capacity {
+			capacity = 2 * s.Capacity
+		}
+		if e := s.Budget.Reserve(capacity + 1); e != nil {
+			return e
+		}
+		s.Pending = make([]byte, int(capacity+1))
+		old := s.View()
+		for i := uint64(0); i < s.Length; i++ {
+			ch, e := old.Byte(i)
+			if e != nil {
+				return e
+			}
+			s.Pending[i] = ch
+		}
+	}
+	for i := uint64(0); i < n; i++ {
+		var ch byte
+		var e error
+		if counted {
+			ch, e = v.Byte(i)
+		} else {
+			ch, e = c.Byte(i)
+		}
+		if e != nil {
+			return e
+		}
+		if grow {
+			s.Pending[s.Length+i] = ch
+		} else {
+			s.Put(s.Length+i, ch)
+		}
+	}
+	if grow {
+		s.Budget.Release(uint64(len(s.External)))
+		s.External, s.Pending = s.Pending, nil
+		s.Capacity = capacity
+		s.Generation++
+	}
+	s.Put(length, 0)
+	s.Length = length
+	return nil
+}
+
 func (out *NumericTextStream) AppendOwnedString(s *OwnedString) error {
 	if e := out.lock(); e != nil {
 		return e
