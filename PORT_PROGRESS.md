@@ -30375,4 +30375,10 @@ EventCaller and EventHandler are exported concrete Go interfaces for util consum
 
 Focused native and g3debug scoped-timer/cancel-handler checks pass (0.243s/0.240s). Util vet, ledger and diff checks pass; inventory is now2102 units,677 APIs:55 ported,287 partial,1760 unported. The clean full-native checkpoint at21:37 UTC covers the preceding Go-text commit; this timer chunk uses focused checks because it follows immediately afterward. Whole util completion remains partial.
 
+### util file: sstream.h
+
+Audited src/util/sstream.h completely. It contains only a thin wrapper around std::ostringstream/std::string, and no retained C++ source includes it or refers to lean::sstream. Deliberately created no Go wrapper and no tests of the Go standard library. Any future equivalent use must compose strings.Builder with fmt.Fprint/Fprintf directly. The manifest records this as resolved by the standard library rather than leaving it as an apparent porting obligation.
+
+Ledger validation passes with sstream.h classified as a platform replacement. Inventory is now2102 units,677 APIs:55 ported,287 partial,1759 unported; the remaining unit is recorded separately as a deliberate standard-library replacement.
+
 Final focused native util/AST checks pass (2.294s/0.238s); g3debug checks pass (2.436s/0.204s). These cover stream, raw/binary/rational output, rational-owned-string, decimal/SMT2 stream, MPQInf and AST bit-vector integer/trace output tests. Util vet passes. The legacy OwnedString return adapter and other string emulation remain migration work; this is not full util completion. No additional full-suite run was needed before the next hourly checkpoint.

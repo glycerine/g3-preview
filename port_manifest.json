@@ -151280,14 +151280,16 @@
       "path": "src/util/sstream.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "This file only wraps std::ostringstream and std::string. It has no consumers in the retained source tree. Per the project rule against porting the C++ standard library, no Go wrapper or unit test is created. Any future equivalent consumer must use strings.Builder with fmt.Fprint/Fprintf directly. Go's standard library owns formatting, buffering and allocation behavior."
+      ]
     },
     {
       "path": "src/util/stack.cpp",
