@@ -17,3 +17,6 @@ checks for the current single-goroutine porting work. Preserve the pkg/ split.
 Insertion-ordered dictionaries: use github.com/glycerine/insdict at v0.10.1
 when a dictionary/hashmap must iterate keys in insertion order. Its generics
 are an explicitly approved exception to the general no-generics rule.
+
+Never port any of the C++ standard library. Use Go standard-library string
+handling exclusively; fidelity applies to project algorithms, not STL internals.

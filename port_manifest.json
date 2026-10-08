@@ -129942,9 +129942,7 @@
         "pkg/util/mpf_signed_fraction_test.go",
         "pkg/util/mpf_signed_fraction_callback_test.go",
         "pkg/util/mpf_signed_fraction_source_stop_test.go",
-        "pkg/util/mpq_signed_fraction_source.go",
-        "pkg/util/owned_string_substring.go",
-        "pkg/util/owned_string_substring_test.go"
+        "pkg/util/mpq_signed_fraction_source.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -130197,13 +130195,7 @@
         "TestArbitraryFloatSignedFractionRefusedOlderChild",
         "TestArbitraryFloatSignedFractionRefusedNormalizationKeepsOlderGCD",
         "TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory",
-        "TestArbitraryFloatSignedFractionYoungerSourceStop",
-        "TestOwnedStringFindByteIndependentCountedBytes",
-        "TestOwnedStringSubstringIndependentPositionsAndLengths",
-        "TestOwnedStringSubstringEveryColdReservation",
-        "TestOwnedStringSubstringAuthorityAndBounds",
-        "TestOwnedStringSubstringRetainedReplacementAndSeparateBudget",
-        "TestOwnedStringMPFInputSubstringAndFindSequence"
+        "TestArbitraryFloatSignedFractionYoungerSourceStop"
       ],
       "conditionals": [
         {
@@ -131062,19 +131054,6 @@
             "TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory",
             "TestArbitraryFloatSignedFractionYoungerSourceStop"
           ]
-        },
-        {
-          "name": "selected string dependencies for mpf.cpp:207-218: counted find(char,pos) and substring return constructor (libstdc++ basic_string.h:586-594,3208-3211; basic_string.tcc:664-677)",
-          "status": "ported",
-          "go_target": "pkg/util/owned_string_substring.go",
-          "tests": [
-            "TestOwnedStringFindByteIndependentCountedBytes",
-            "TestOwnedStringSubstringIndependentPositionsAndLengths",
-            "TestOwnedStringSubstringEveryColdReservation",
-            "TestOwnedStringSubstringAuthorityAndBounds",
-            "TestOwnedStringSubstringRetainedReplacementAndSeparateBudget",
-            "TestOwnedStringMPFInputSubstringAndFindSequence"
-          ]
         }
       ],
       "ownership": [
@@ -131118,8 +131097,7 @@
         "MPF decimal caller-stream display embeds and charges its actual scoped q and exact begun conversion/decimal child counters. Completed conversion adapter receipts are joined before decimal frame reuse. Body failure of the RAW decimal child skips its own source DEL while the older scoped q still source-destructs unless a younger destructor actually stopped. Source cause propagation protects q on such a stop; separate owning cleanup joins exact captured children before remaining q fields without source or algorithm replay. Stream/input stay borrowed with no retained stream pointer/backing ownership. Typed MPF execution guards include this invocation.",
         "Binary output owns the actual DEFAULT tmp, tmp_str, current expression/repeat temporaries and fresh result slot until return. Exact numeric roots, Natural buffer/verification and actually begun division receipts are charged in the reflected manager scope. Completed source cleanup transfers result ownership to the caller; failed source/owning paths remain separate, and a younger source stop protects res and the enclosing class. Refused older division entry cannot be captured or joined. Typed guards protect the actual namespace during Runtime transport.",
         "Component-based hexfloat output owns the actual default scoped q and q_sig in declaration order. Caller text stays borrowed; exact ordinary-format frame identity is issued at successful child begin, before callbacks, and refused entry issues none. Source cleanup propagates younger format, division and verification source causes before q_sig/q. Explicit owning cleanup joins the captured child and actual numeric prefixes without repeating source destruction, preserving caller text and input. It accepts the exact already-owned child history after the caller has closed its text context. Exact typed execution guards protect this numeric namespace during Runtime transport.",
-        "Signed-fraction SET embeds and charges its actual scoped q, typed normalization allocation roots, only begun GCD/division/verification/buffer receipts, exact plain child frame/counter and allocating history receipt. Completed normalization adapters are joined before conversion reuses primitive frames. Inline/pre-history conversion cleanup selects only the captured current exponent frame and its history; it does not authorize a global nil-receipt history sweep. Source destruction checks younger source causes before q.Num/q.Den. Separate owning cleanup joins exact children and remaining fields without source replay, including caller-first child cleanup followed by a later zero invocation.",
-        "Selected substring dependency checks position before the returned constructor begins, then uses independent inline15 or exact length+1 heap backing with a charged constructor prefix. Borrowed source backing and any retained pending replacement remain source-owned. Find scans counted bytes without allocating or reading a terminator beyond the counted end. Cross-budget substring lifetime and failed constructor owning cleanup are independently verified. Selected uint64 size-type sentinel and checked object/span guards are explicit."
+        "Signed-fraction SET embeds and charges its actual scoped q, typed normalization allocation roots, only begun GCD/division/verification/buffer receipts, exact plain child frame/counter and allocating history receipt. Completed normalization adapters are joined before conversion reuses primitive frames. Inline/pre-history conversion cleanup selects only the captured current exponent frame and its history; it does not authorize a global nil-receipt history sweep. Source destruction checks younger source causes before q.Num/q.Den. Separate owning cleanup joins exact children and remaining fields without source replay, including caller-first child cleanup followed by a later zero invocation."
       ],
       "deviations": [
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
@@ -131157,8 +131135,7 @@
         "Binary-output prerequisite only: selected count/character OwnedString construction and in-place reversal are implemented and tested against every byte value, inline/heap boundaries, failed constructor ownership, exact charged backing, trailing NUL and retained borrow identity. These cover dependencies used at mpf.cpp:1639-1654,1673,1686; to_string_binary itself remains unported. No binary-method or whole-unit completion credit is claimed.",
         "Binary output preserves NaN forced sign0, infinity extra1, denormal biased minimum exponent1, unsigned extra-count wrapping and extended significant bits rather than imposing an IEEE bit representation. Independent binary-text, every cold reservation, warm inline, later-call isolation, actual COPY transport, older retained division and real checked TLS temporary-DT stop tests pass. Count constructors, reserve/concatenation and equal-budget move assignment follow the selected owned-string profile; compiler evaluation order, native STL ABI/NRVO and arbitrary allocator alternatives are not claimed. Negative stored significand in the finite branch retains the original debug assertion; undefined format domains and nonterminating invalid release inputs do not gain new semantics. Original upstream MPF driver contains no active binary-output assertion; whole MPF/util completion remains unclaimed.",
         "The component-based hexfloat overload deliberately returns ordinary to_string output as in source. Tests cover independent big.Int/decimal mantissas, raw/noncanonical components, Euclidean scale division, every selected cold reservation, complete immediate physical/byte graphs and refunds, warm inline specials, refused older text/division preservation, actual first COPY transport, a later callback formatting invocation and a real checked TLS younger-format DT stop in both owning-cleanup orders. Caller text construction/backing uses the existing explicit ToStringInto adapter; native std::string ABI/NRVO/locale alternatives are not claimed. The platform-dependent mpf-object hexfloat overload at mpf.cpp:1621-1633 remains unported. No active upstream driver assertion for this component overload, or whole MPF/util completion, is claimed.",
-        "Signed32 undefined local negations use the preceding source setter checked domain. Debug zero denominators assert before conversion; release 0/0 fails during normalization while nonzero/0 reaches the existing rational-copy invalid-denominator guard after actual conversion begins. No defined native zero-denominator arithmetic or signed overflow is claimed. Independent exact rational rounding covers five modes and precisions2/4/24/53/120; every selected cold reservation has immediate complete physical/byte accounting, actual child joins and zero refunds. Warm inline, entry authority, real conversion allocation transport, retained older GCD/exponent refusals, unrelated retained history preservation and real checked TLS younger destruction stops with both cleanup orders are covered. The original src/test/mpf.cpp has no active signed-fraction overload assertion; no driver credit is fabricated. Whole MPF/util completion remains partial.",
-        "Six string dependency test groups cover all256 search bytes, embedded NUL, independent substring positions/counts, npos/end/overflow boundaries, every selected cold constructor reservation, copied/closed/nil/live-owner authority, real retained source replacement and independent cross-budget lifetime. The literal MPF preprocessing test models both condition temporaries and the conditional-expression return copies/moves, including lowercase-p lookup before uppercase-P and exact heap return capacity. This is dependency completion only: MPF C-string numerical input and original parser child/source lifetimes remain unfinished. No active upstream numerical assertion exists for this overload in src/test/mpf.cpp. Arbitrary native STL ABI/allocator/NRVO and invalid C++ object states are not claimed; whole MPF/util completion remains partial."
+        "Signed32 undefined local negations use the preceding source setter checked domain. Debug zero denominators assert before conversion; release 0/0 fails during normalization while nonzero/0 reaches the existing rational-copy invalid-denominator guard after actual conversion begins. No defined native zero-denominator arithmetic or signed overflow is claimed. Independent exact rational rounding covers five modes and precisions2/4/24/53/120; every selected cold reservation has immediate complete physical/byte accounting, actual child joins and zero refunds. Warm inline, entry authority, real conversion allocation transport, retained older GCD/exponent refusals, unrelated retained history preservation and real checked TLS younger destruction stops with both cleanup orders are covered. The original src/test/mpf.cpp has no active signed-fraction overload assertion; no driver credit is fabricated. Whole MPF/util completion remains partial."
       ]
     },
     {
@@ -131324,9 +131301,7 @@
         "pkg/util/mpf_signed_fraction_test.go",
         "pkg/util/mpf_signed_fraction_callback_test.go",
         "pkg/util/mpf_signed_fraction_source_stop_test.go",
-        "pkg/util/mpq_signed_fraction_source.go",
-        "pkg/util/owned_string_substring.go",
-        "pkg/util/owned_string_substring_test.go"
+        "pkg/util/mpq_signed_fraction_source.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -131528,13 +131503,7 @@
         "TestArbitraryFloatSignedFractionRefusedOlderChild",
         "TestArbitraryFloatSignedFractionRefusedNormalizationKeepsOlderGCD",
         "TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory",
-        "TestArbitraryFloatSignedFractionYoungerSourceStop",
-        "TestOwnedStringFindByteIndependentCountedBytes",
-        "TestOwnedStringSubstringIndependentPositionsAndLengths",
-        "TestOwnedStringSubstringEveryColdReservation",
-        "TestOwnedStringSubstringAuthorityAndBounds",
-        "TestOwnedStringSubstringRetainedReplacementAndSeparateBudget",
-        "TestOwnedStringMPFInputSubstringAndFindSequence"
+        "TestArbitraryFloatSignedFractionYoungerSourceStop"
       ],
       "conditionals": [
         {
@@ -131975,19 +131944,6 @@
             "TestArbitraryFloatSignedFractionInlineChildKeepsOlderHistory",
             "TestArbitraryFloatSignedFractionYoungerSourceStop"
           ]
-        },
-        {
-          "name": "selected string dependencies for mpf.cpp:207-218: counted find(char,pos) and substring return constructor (libstdc++ basic_string.h:586-594,3208-3211; basic_string.tcc:664-677)",
-          "status": "ported",
-          "go_target": "pkg/util/owned_string_substring.go",
-          "tests": [
-            "TestOwnedStringFindByteIndependentCountedBytes",
-            "TestOwnedStringSubstringIndependentPositionsAndLengths",
-            "TestOwnedStringSubstringEveryColdReservation",
-            "TestOwnedStringSubstringAuthorityAndBounds",
-            "TestOwnedStringSubstringRetainedReplacementAndSeparateBudget",
-            "TestOwnedStringMPFInputSubstringAndFindSequence"
-          ]
         }
       ],
       "ownership": [
@@ -132021,8 +131977,7 @@
         "MPF decimal caller-stream display embeds and charges its actual scoped q and exact begun conversion/decimal child counters. Completed conversion adapter receipts are joined before decimal frame reuse. Body failure of the RAW decimal child skips its own source DEL while the older scoped q still source-destructs unless a younger destructor actually stopped. Source cause propagation protects q on such a stop; separate owning cleanup joins exact captured children before remaining q fields without source or algorithm replay. Stream/input stay borrowed with no retained stream pointer/backing ownership. Typed MPF execution guards include this invocation.",
         "Binary output owns the actual DEFAULT tmp, tmp_str, current expression/repeat temporaries and fresh result slot until return. Exact numeric roots, Natural buffer/verification and actually begun division receipts are charged in the reflected manager scope. Completed source cleanup transfers result ownership to the caller; failed source/owning paths remain separate, and a younger source stop protects res and the enclosing class. Refused older division entry cannot be captured or joined. Typed guards protect the actual namespace during Runtime transport.",
         "Component-based hexfloat output owns the actual default scoped q and q_sig in declaration order. Caller text stays borrowed; exact ordinary-format frame identity is issued at successful child begin, before callbacks, and refused entry issues none. Source cleanup propagates younger format, division and verification source causes before q_sig/q. Explicit owning cleanup joins the captured child and actual numeric prefixes without repeating source destruction, preserving caller text and input. It accepts the exact already-owned child history after the caller has closed its text context. Exact typed execution guards protect this numeric namespace during Runtime transport.",
-        "Signed-fraction SET embeds and charges its actual scoped q, typed normalization allocation roots, only begun GCD/division/verification/buffer receipts, exact plain child frame/counter and allocating history receipt. Completed normalization adapters are joined before conversion reuses primitive frames. Inline/pre-history conversion cleanup selects only the captured current exponent frame and its history; it does not authorize a global nil-receipt history sweep. Source destruction checks younger source causes before q.Num/q.Den. Separate owning cleanup joins exact children and remaining fields without source replay, including caller-first child cleanup followed by a later zero invocation.",
-        "Selected substring dependency checks position before the returned constructor begins, then uses independent inline15 or exact length+1 heap backing with a charged constructor prefix. Borrowed source backing and any retained pending replacement remain source-owned. Find scans counted bytes without allocating or reading a terminator beyond the counted end. Cross-budget substring lifetime and failed constructor owning cleanup are independently verified. Selected uint64 size-type sentinel and checked object/span guards are explicit."
+        "Signed-fraction SET embeds and charges its actual scoped q, typed normalization allocation roots, only begun GCD/division/verification/buffer receipts, exact plain child frame/counter and allocating history receipt. Completed normalization adapters are joined before conversion reuses primitive frames. Inline/pre-history conversion cleanup selects only the captured current exponent frame and its history; it does not authorize a global nil-receipt history sweep. Source destruction checks younger source causes before q.Num/q.Den. Separate owning cleanup joins exact children and remaining fields without source replay, including caller-first child cleanup followed by a later zero invocation."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -132052,8 +132007,7 @@
         "Independent dyadic decimal output covers precisions0/1/5/12/120, MPF precisions2/24/53/120, signs and normal/subnormal values. All selected cold reservations include immediate complete physical/byte graphs, replay refusal and zero refunds. Warm inline FailAfter(0) preserves exact Runtime/budget equality and ended-wrapper cleanup leaves later children intact. All5 actual -1.75 precision1 stream insertions, including ?, are failed in turn: raw child sourceCursor0, older scoped q sourceCursor2, unchanged output after owning join. Real unpack allocation transport verifies nested scalar/lifecycle refusal. Refused older conversion and older decimal descriptor entry preserve exact unrelated child frames/roots. Real checked TLS failure in the decimal child end-label DEL protects older q and class state until owning cleanup, preserving source history and completed output. Checked signed overflow profile is explicit. Original scalar drivers provide no active MPF display_decimal assertion; whole MPF/util completion is not claimed.",
         "Binary output preserves NaN forced sign0, infinity extra1, denormal biased minimum exponent1, unsigned extra-count wrapping and extended significant bits rather than imposing an IEEE bit representation. Independent binary-text, every cold reservation, warm inline, later-call isolation, actual COPY transport, older retained division and real checked TLS temporary-DT stop tests pass. Count constructors, reserve/concatenation and equal-budget move assignment follow the selected owned-string profile; compiler evaluation order, native STL ABI/NRVO and arbitrary allocator alternatives are not claimed. Negative stored significand in the finite branch retains the original debug assertion; undefined format domains and nonterminating invalid release inputs do not gain new semantics. Original upstream MPF driver contains no active binary-output assertion; whole MPF/util completion remains unclaimed.",
         "The component-based hexfloat overload deliberately returns ordinary to_string output as in source. Tests cover independent big.Int/decimal mantissas, raw/noncanonical components, Euclidean scale division, every selected cold reservation, complete immediate physical/byte graphs and refunds, warm inline specials, refused older text/division preservation, actual first COPY transport, a later callback formatting invocation and a real checked TLS younger-format DT stop in both owning-cleanup orders. Caller text construction/backing uses the existing explicit ToStringInto adapter; native std::string ABI/NRVO/locale alternatives are not claimed. The platform-dependent mpf-object hexfloat overload at mpf.cpp:1621-1633 remains unported. No active upstream driver assertion for this component overload, or whole MPF/util completion, is claimed.",
-        "Signed32 undefined local negations use the preceding source setter checked domain. Debug zero denominators assert before conversion; release 0/0 fails during normalization while nonzero/0 reaches the existing rational-copy invalid-denominator guard after actual conversion begins. No defined native zero-denominator arithmetic or signed overflow is claimed. Independent exact rational rounding covers five modes and precisions2/4/24/53/120; every selected cold reservation has immediate complete physical/byte accounting, actual child joins and zero refunds. Warm inline, entry authority, real conversion allocation transport, retained older GCD/exponent refusals, unrelated retained history preservation and real checked TLS younger destruction stops with both cleanup orders are covered. The original src/test/mpf.cpp has no active signed-fraction overload assertion; no driver credit is fabricated. Whole MPF/util completion remains partial.",
-        "Six string dependency test groups cover all256 search bytes, embedded NUL, independent substring positions/counts, npos/end/overflow boundaries, every selected cold constructor reservation, copied/closed/nil/live-owner authority, real retained source replacement and independent cross-budget lifetime. The literal MPF preprocessing test models both condition temporaries and the conditional-expression return copies/moves, including lowercase-p lookup before uppercase-P and exact heap return capacity. This is dependency completion only: MPF C-string numerical input and original parser child/source lifetimes remain unfinished. No active upstream numerical assertion exists for this overload in src/test/mpf.cpp. Arbitrary native STL ABI/allocator/NRVO and invalid C++ object states are not claimed; whole MPF/util completion remains partial."
+        "Signed32 undefined local negations use the preceding source setter checked domain. Debug zero denominators assert before conversion; release 0/0 fails during normalization while nonzero/0 reaches the existing rational-copy invalid-denominator guard after actual conversion begins. No defined native zero-denominator arithmetic or signed overflow is claimed. Independent exact rational rounding covers five modes and precisions2/4/24/53/120; every selected cold reservation has immediate complete physical/byte accounting, actual child joins and zero refunds. Warm inline, entry authority, real conversion allocation transport, retained older GCD/exponent refusals, unrelated retained history preservation and real checked TLS younger destruction stops with both cleanup orders are covered. The original src/test/mpf.cpp has no active signed-fraction overload assertion; no driver credit is fabricated. Whole MPF/util completion remains partial."
       ]
     },
     {
