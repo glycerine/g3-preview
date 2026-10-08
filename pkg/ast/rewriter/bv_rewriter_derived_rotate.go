@@ -1,4 +1,4 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:2000-2021;
+// Source: src/ast/rewriter/bv_rewriter.cpp:2000-2018;
 // src/ast/rewriter/bv_rewriter.h:98-99.
 package rewriter
 
@@ -18,6 +18,10 @@ func (p *BVRewriter) RewriteRotateRight(n uint32, arg ast.ASTHandle, out ast.AST
 	}
 	p.running = true
 	defer func() { p.running = false; p.fail(err) }()
+	return p.rotateRight(n, arg, out)
+}
+
+func (p *BVRewriter) rotateRight(n uint32, arg ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
 	size, e := p.manager.BitVectorSize(arg)
 	if e != nil {
 		return RewriteFailed, e

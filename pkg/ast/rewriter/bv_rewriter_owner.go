@@ -27,6 +27,7 @@ type BVRewriter struct {
 	ite                   *ast.BitVectorIteNumerals
 	leadingZero           *ast.BitVectorLeadingZeroNumerals
 	int2bv                *ast.BitVectorInt2BVNumerals
+	extendedRotate        *ast.BitVectorExtendedRotateNumerals
 	bv2int                *bv2IntInvocation
 	signedModulo          *ast.BitVectorSignedModuloNumerals
 	unsignedRemainder     *ast.BitVectorUnsignedRemainderNumerals
@@ -207,6 +208,12 @@ func (p *BVRewriter) Close() error {
 	p.bitwiseArgs.Close(p.manager.Budget())
 	p.extensionPair = [2]ast.ASTHandle{}
 	p.rotationArgs = [2]ast.ASTHandle{}
+	if p.extendedRotate != nil {
+		if e := p.extendedRotate.Close(); e != nil {
+			return e
+		}
+		p.extendedRotate = nil
+	}
 	if p.negatable != nil {
 		if e := p.negatable.Close(); e != nil {
 			return e
