@@ -1,6 +1,6 @@
 // Source: src/util/mpq.h:199-201.
 // Source: src/util/mpq.h; src/util/mpq.cpp.
-// Source: src/util/mpq.h and src/util/mpq.cpp, Leonardo de Moura (2010-06-21).
+// Source: src/util/mpq.h and src/util/mpq.cpp.
 package util
 
 import (
@@ -30,6 +30,7 @@ type RationalConfig struct {
 // source reusable scratch algorithms. Both are owner-confined, not concurrent.
 // Manager header bytes include all retained scalar rational scratch members.
 type RationalManager struct {
+	stringScope                                    rationalOwnedStringScope
 	mpfParent                                      *ArbitraryFloatManager
 	lexical                                        rationalManagerLexicalScope
 	RawArithmetic                                  rationalRawArithmeticScope

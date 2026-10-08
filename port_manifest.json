@@ -134057,7 +134057,11 @@
         "pkg/util/rational_service_invocation.go",
         "pkg/util/rational_service_invocation_allocation.go",
         "pkg/util/rational_service_ops.go",
-        "pkg/util/rational_service_power_invocation_test.go"
+        "pkg/util/rational_service_power_invocation_test.go",
+        "pkg/util/mpq_owned_string.go",
+        "pkg/util/mpq_owned_string_callback_test.go",
+        "pkg/util/mpq_owned_string_failure_test.go",
+        "pkg/util/mpq_owned_string_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -134222,7 +134226,11 @@
         "TestMPFFormatTextYoungerNumeralStopProtectsNonemptyResult",
         "TestRationalServicePowerInvocationOriginalSequenceAndReturn",
         "TestRationalServicePowerInvocationEveryActualReservation",
-        "TestRationalServicePowerInvocationFinalUnusedSquareAndMaskWrap"
+        "TestRationalServicePowerInvocationFinalUnusedSquareAndMaskWrap",
+        "TestRationalOwnedStringDenominatorTransportGuards",
+        "TestRationalOwnedStringEveryColdReservation",
+        "TestRationalOwnedStringWarmInlineAndReturnOwnership",
+        "TestRationalOwnedStringLiteralNumerals"
       ],
       "assertions": [
         {
@@ -134787,6 +134795,17 @@
             "TestRationalServicePowerInvocationEveryActualReservation",
             "TestRationalServicePowerInvocationFinalUnusedSquareAndMaskWrap"
           ]
+        },
+        {
+          "name": "mpq.cpp:123-127 rational to_string selected original numerator/slash/denominator owned string sequence",
+          "status": "ported",
+          "go_target": "pkg/util/mpq_owned_string.go",
+          "tests": [
+            "TestRationalOwnedStringDenominatorTransportGuards",
+            "TestRationalOwnedStringEveryColdReservation",
+            "TestRationalOwnedStringWarmInlineAndReturnOwnership",
+            "TestRationalOwnedStringLiteralNumerals"
+          ]
         }
       ],
       "ownership": [
@@ -134807,7 +134826,8 @@
         "Small signed insertion differs from big signed-char CString insertion; CString strlen precedes sentry. Exact active character invocation view, typed actual destructor cause and acquired NUM/char/local roots retained; existing Go ErrorTransport callback guard is an explicit adapter profile, not native callback equivalence.",
         "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
         "Actual MPF text context embeds concrete numerical declarations and captured nonwrapping identity. Direct Integer allocation and Natural buffer/verification receipts retain only reached leaves; decimal RAW end DEL is distinct from failed-body owning abort after older scoped q/denom/num. Source/body/first-own/acquisition histories survive exact ACK until actual text context end. No ambient pending/root-count acquisition authority.",
-        "PowerWithInvocation captures the actual reached RAW PowerGeneration in the caller invocation, routes original copy/set/Mul through its allocation context and joins only that matching power child. Younger normalization/integer children join before the older power numeral; NUM then DEN cleanup retains generation/cursor/cause history. Older completed calls cannot adopt newer stopped power frames. A reached child source-end cause stops older facade source destruction before its epilogue."
+        "PowerWithInvocation captures the actual reached RAW PowerGeneration in the caller invocation, routes original copy/set/Mul through its allocation context and joins only that matching power child. Younger normalization/integer children join before the older power numeral; NUM then DEN cleanup retains generation/cursor/cause history. Older completed calls cannot adopt newer stopped power frames. A reached child source-end cause stops older facade source destruction before its epilogue.",
+        "Direct rational ToOwnedString owns its actual implicit return slot during the call and on failure, separate numerator/denominator integer-format streams, and the denominator return temporary. Source declares no NUM or RAW. Actual insertion receipts retain reached character/formatting children; distinct owning cleanup joins exact tuples without source destructor replay. On successful return the result backing transfers to the caller and survives numeral-owner end. Scope control storage is reflected in the rational header, backing bytes are counted through actual retained string fields. Typed guards inspect only this actual scope and Integer namespace, protecting primitive/Rational/parent MPF owners during real denominator-display transport."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -134826,7 +134846,8 @@
         "Cold adapter generation metadata adds no source allocator event; no arithmetic algorithm changes.",
         "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are private scoped proofs; complete root owned-string/printer integration remains pending. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
-        "General power retains original repeated squaring, zero exponent result one, final unused square and actual uint32 mask-wrap qualification. Integer and fractional exponent65 cold campaigns cover every reached body reservation and exact owning release, without establishing independently stopped source-destructor or native fatal resumability. No native stack/layout/allocator/assertion/exception ABI or whole-unit completion is credited; bv2int integration remains required."
+        "General power retains original repeated squaring, zero exponent result one, final unused square and actual uint32 mask-wrap qualification. Integer and fractional exponent65 cold campaigns cover every reached body reservation and exact owning release, without establishing independently stopped source-destructor or native fatal resumability. No native stack/layout/allocator/assertion/exception ABI or whole-unit completion is credited; bv2int integration remains required.",
+        "ToOwnedString uses the same selected left-to-right concatenation profile as the existing infinitesimal formatter: numerator string, slash append, denominator string and append. It preserves raw zero/negative denominators and performs no normalization. Independent literal cases, every selected cold reservation with immediate physical/byte accounting and zero refunds, warm inline allocation refusal, caller-owned returned text after manager/runtime end, and real denominator-display returning transport are covered. Native C++ operand evaluation order, all library ABIs/NRVO schedules and alternate locale profiles are not claimed. This is the direct mpq to_string dependency for remaining MPF rational-string wrappers, which are still unfinished. Dedicated younger-source/first-own transport refinements remain outstanding."
       ]
     },
     {
@@ -134885,7 +134906,11 @@
         "pkg/util/rational_service_bitwise_not_invocation_test.go",
         "pkg/util/mpz_physical_audit_test.go",
         "pkg/util/rational_service_bitwise_binary_invocation.go",
-        "pkg/util/rational_service_bitwise_binary_invocation_test.go"
+        "pkg/util/rational_service_bitwise_binary_invocation_test.go",
+        "pkg/util/mpq_owned_string.go",
+        "pkg/util/mpq_owned_string_callback_test.go",
+        "pkg/util/mpq_owned_string_failure_test.go",
+        "pkg/util/mpq_owned_string_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -135133,7 +135158,11 @@
         "TestRationalServiceExtraFailurePrefixesAndOwnership",
         "TestRationalServiceBinaryBitwiseEveryActualReservation",
         "TestRationalServiceBinaryBitwiseGenerationIsolation",
-        "TestRationalServiceBinaryBitwiseExecutingRawGuard"
+        "TestRationalServiceBinaryBitwiseExecutingRawGuard",
+        "TestRationalOwnedStringDenominatorTransportGuards",
+        "TestRationalOwnedStringEveryColdReservation",
+        "TestRationalOwnedStringWarmInlineAndReturnOwnership",
+        "TestRationalOwnedStringLiteralNumerals"
       ],
       "conditionals": [
         {
@@ -136238,6 +136267,17 @@
             "TestIntegerBitwiseAliasedFailurePublication",
             "TestRationalServiceExtraFailurePrefixesAndOwnership"
           ]
+        },
+        {
+          "name": "mpq.cpp:123-127 rational to_string selected original numerator/slash/denominator owned string sequence",
+          "status": "ported",
+          "go_target": "pkg/util/mpq_owned_string.go",
+          "tests": [
+            "TestRationalOwnedStringDenominatorTransportGuards",
+            "TestRationalOwnedStringEveryColdReservation",
+            "TestRationalOwnedStringWarmInlineAndReturnOwnership",
+            "TestRationalOwnedStringLiteralNumerals"
+          ]
         }
       ],
       "ownership": [
@@ -136266,7 +136306,8 @@
         "The void modulo invocation writes the caller-owned rational directly, without a returned value or copy temporary. It passes the exact allocation context into the existing literal manager operation, records sticky child source causes and transfers reached lexical/allocation roots at the actual service epilogue. Actual Runtime callback tests reject caller/output/service cleanup during the held invocation, name its transferred allocation in the immediate physical audit and close the entire graph to zero budget.",
         "Void integer division writes the existing physical NUM, resets DEN only after successful integer publication, and transfers the exact caller context at the service epilogue. Negative division now records its reached IntegerRawScope receipt into that same rational-service invocation before entering machine_div_rem. Tests cover direct and value-returning paths, every actual allocation refusal, exact held child identity during Runtime callbacks, rejected reentrant cleanup and zero-budget owning closure; immutable invocation/body history survives cleanup.",
         "NegAssignWithInvocation changes only the caller physical NUM and captures the actual inline INT_MIN setter allocation in its exact RationalServiceInvocation. No returned negation/copy-assignment temporary is substituted. Tests prove unchanged DEN/big NUM storage, all reached actual Runtime allocation refusals, permitted old/new/failed NUM publication, live physical roots/budget, copied/stopped receipt guards, preserved history and complete owning cleanup. Parsing can retain big INT_MIN magnitude; the campaign reaches the real signed setter before injection to guarantee the inline source branch. Native fatal/assertion/allocator/layout ABI remains uncredited.",
-        "General bitwise complement owns original a1/a2/m/tmp in a matching IntegerRawScope with reached Count4. Actual caller receipt captures the RAW generation before copying, and context routes original copy/set/mod/Mul/Add/Div actions and allocation outcomes into that frame. Body refusal retains locals without implicit source DEL; successful source end releases them forward in original order. Exact owning cleanup joins only matching cohorts, preserves source/body/generation history and is integrated into integer manager close. Small inputs at width<=63 acquire no general RAW frame. Independent physical audits name the new retained fields rather than weakening descriptor ownership checks."
+        "General bitwise complement owns original a1/a2/m/tmp in a matching IntegerRawScope with reached Count4. Actual caller receipt captures the RAW generation before copying, and context routes original copy/set/mod/Mul/Add/Div actions and allocation outcomes into that frame. Body refusal retains locals without implicit source DEL; successful source end releases them forward in original order. Exact owning cleanup joins only matching cohorts, preserves source/body/generation history and is integrated into integer manager close. Small inputs at width<=63 acquire no general RAW frame. Independent physical audits name the new retained fields rather than weakening descriptor ownership checks.",
+        "Direct rational ToOwnedString owns its actual implicit return slot during the call and on failure, separate numerator/denominator integer-format streams, and the denominator return temporary. Source declares no NUM or RAW. Actual insertion receipts retain reached character/formatting children; distinct owning cleanup joins exact tuples without source destructor replay. On successful return the result backing transfers to the caller and survives numeral-owner end. Scope control storage is reflected in the rational header, backing bytes are counted through actual retained string fields. Typed guards inspect only this actual scope and Integer namespace, protecting primitive/Rational/parent MPF owners during real denominator-display transport."
       ],
       "deviations": [
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
@@ -136291,7 +136332,8 @@
         "The selected caller-local void overload is a prerequisite of original sign-extension numeral rewriting. It preserves the native negative-dividend/divisor-output alias defect: correction rereads the overwritten divisor and produces zero. Tests do not pre-copy the divisor to repair source behavior. Source denominator reset follows successful numerator publication; failure leaves original DEN untouched. Native pointer/stack/assertion/exception/allocator ABI and whole-unit ownership audits remain uncredited; Runtime returning transport closure does not prove native-fatal resumability.",
         "The source divisor/output alias defect is preserved: after machine quotient publication, negative correction rereads the overwritten divisor and follows quotient sign. Other valid cases use independent Euclidean arithmetic test oracles. The returning Go failure transport remains a qualified adapter; no native-fatal resumability, allocator/pointer/stack/assertion/exception ABI or whole-unit completion is credited. This ports the direct division dependency used by bv_trailing; its analyzer/cache/removal algorithms remain open.",
         "Compound multiplication now captures its actual numerical child in RationalServiceInvocation, using the same physical caller receiver as operator*= rather than a returned temporary/copy assignment. Raw multiplication preserves NUM-before-DEN publication, integer shortcut and normalization generation ownership. Tests refuse every reached actual Runtime reservation for distinct and self-aliasing fractions, inspect component prefixes, reject copied/stopped receipts and close owner graphs without leaks. These body refusal campaigns do not separately establish a stopped source destructor or native fatal resumability. Native stack/pointer/layout/allocator/assertion/fatal/exception ABI and whole-unit completion remain uncredited.",
-        "The original general complement retains its final multiplier update/division and width0 big-input copy/default declarations. Four cold actual Runtime campaigns prove independent finite results, input preservation, body refusal without source DEL, older-generation isolation, copied context rejection and complete owning cleanup. A 4097-bit non-TLS Runtime callback reaches an actual allocation-count refusal and proves executing cleanup guards; TLS count checks remain deferred until source synchronization. Native width63 signed-overflow mask remains the existing guarded adaptation, not new valid native ABI credit. Independently stopped source DT, native fatal resumability, native stack/layout/allocator/assertion/exception ABI and whole-unit completion remain uncredited. is_negatable and bvnot integration remain required."
+        "The original general complement retains its final multiplier update/division and width0 big-input copy/default declarations. Four cold actual Runtime campaigns prove independent finite results, input preservation, body refusal without source DEL, older-generation isolation, copied context rejection and complete owning cleanup. A 4097-bit non-TLS Runtime callback reaches an actual allocation-count refusal and proves executing cleanup guards; TLS count checks remain deferred until source synchronization. Native width63 signed-overflow mask remains the existing guarded adaptation, not new valid native ABI credit. Independently stopped source DT, native fatal resumability, native stack/layout/allocator/assertion/exception ABI and whole-unit completion remain uncredited. is_negatable and bvnot integration remain required.",
+        "ToOwnedString uses the same selected left-to-right concatenation profile as the existing infinitesimal formatter: numerator string, slash append, denominator string and append. It preserves raw zero/negative denominators and performs no normalization. Independent literal cases, every selected cold reservation with immediate physical/byte accounting and zero refunds, warm inline allocation refusal, caller-owned returned text after manager/runtime end, and real denominator-display returning transport are covered. Native C++ operand evaluation order, all library ABIs/NRVO schedules and alternate locale profiles are not claimed. This is the direct mpq to_string dependency for remaining MPF rational-string wrappers, which are still unfinished. Dedicated younger-source/first-own transport refinements remain outstanding."
       ]
     },
     {

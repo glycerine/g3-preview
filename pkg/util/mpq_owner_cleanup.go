@@ -34,6 +34,10 @@ func (m *RationalManager) CloseChecked() error {
 			return m
 		}
 	}
+	if e := m.CleanupOwnedString(); e != nil {
+		m.CleanupCauseField = e
+		return m
+	}
 	m.Closing = true
 	if e := m.cleanupRawArithmetic(); e != nil {
 		m.CleanupCauseField = e

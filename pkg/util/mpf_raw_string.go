@@ -202,36 +202,7 @@ func (m *ArbitraryFloatManager) CleanupRawString() (cause error) {
 // Owning abort joins the exact issued child without repeating a stopped
 // source destructor or crediting an unreached source end.
 func (s *arbitraryFloatRawStringScope) cleanupInsertion() error {
-	r, n := &s.insertion, s.manager.integer.Natural
-	if r.service == nil && r.natural == n && !r.characterOwned && !r.formattingOwned {
-		// An ended insertion holds no child. Do not inspect a genuine later
-		// character invocation merely to discard this obsolete receipt.
-		r.active, r.retired = false, true
-		return nil
-	}
-	if r.service != nil || r.natural != n || !n.matchesIntegerCharacterScope(r.Character) || r.invocation == 0 || r.displayInvocation != r.Character.displayInvocation || r.Character.callExecuting {
-		return ErrNumericOwner
-	}
-	if r.characterOwned && r.invocation != r.Character.invocation {
-		return ErrNumericOwner
-	}
-	if r.formattingOwned {
-		if r.formatting == nil || r.formatting != r.Character.formatting || r.formattingInvocation != r.formatting.invocation {
-			return ErrNumericOwner
-		}
-		if e := n.cleanupFormattingScope(r.formatting); e != nil {
-			return e
-		}
-	}
-	if r.characterOwned && r.Character.pending {
-		if e := r.Character.Buffer.finalize(n.runtime); e != nil {
-			return e
-		}
-		r.Character.reset()
-	}
-	r.characterOwned, r.formattingOwned, r.active = false, false, false
-	r.retired = true
-	return nil
+	return cleanupOwnedNumeralInsertion(&s.insertion, s.manager.integer.Natural)
 }
 
 func (s *arbitraryFloatRawStringScope) storageBytes() uint64 {
