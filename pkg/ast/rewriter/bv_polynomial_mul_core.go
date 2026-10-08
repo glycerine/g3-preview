@@ -22,6 +22,7 @@ type BVPolynomialMultiplicationCore struct {
 	flatArgs, todo                       ast.ASTHandleBuffer
 	pair                                 [2]ast.ASTHandle
 	currentSort                          ast.ASTHandle
+	sortBinding                          *ast.ASTHandle
 	localsEnded                          bool
 	self                                 *BVPolynomialMultiplicationCore
 	manager                              *ast.ASTManager
@@ -523,7 +524,7 @@ func (p *BVPolynomialMultiplicationCore) rewrite(sort ast.ASTHandle, args ast.Ap
 	}
 	p.endFlat()
 	if fallback && st == RewriteFailed {
-		node, body := p.manager.MkBitVectorPolynomialMulWithInvocation(p.currentSort, args, &p.factory)
+		node, body := p.manager.MkBitVectorPolynomialMulWithInvocation(*p.sortSlot(), args, &p.factory)
 		if body == nil {
 			body = p.manager.SetRef(out, node)
 		}
@@ -554,7 +555,7 @@ func (p *BVPolynomialMultiplicationCore) dispatch(sort ast.ASTHandle, args ast.A
 			return RewriteFailed, e
 		}
 	}
-	p.currentSort = sort
+	*p.sortSlot() = sort
 	if flat {
 		return p.flatBody(sort, args, out, o)
 	}
@@ -607,4 +608,11 @@ func (p *BVPolynomialMultiplicationCore) Close() error {
 	p.header = 0
 	p.closed = true
 	return nil
+}
+
+func (p *BVPolynomialMultiplicationCore) sortSlot() *ast.ASTHandle {
+	if p.sortBinding != nil {
+		return p.sortBinding
+	}
+	return &p.currentSort
 }

@@ -21619,7 +21619,9 @@
         "pkg/ast/ast_bv_polynomial_factory.go",
         "pkg/ast/ast_bv_polynomial_factory_test.go",
         "pkg/ast/ast_bv_power_product.go",
-        "pkg/ast/ast_bv_power_product_test.go"
+        "pkg/ast/ast_bv_power_product_test.go",
+        "pkg/ast/rewriter/bv_polynomial_owner.go",
+        "pkg/ast/rewriter/bv_polynomial_owner_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -21648,7 +21650,12 @@
         "TestASTBitVectorPolynomialCoefficientEveryActualReservation",
         "TestASTBitVectorPolynomialPowerProductCoefficientAndFallbackOne",
         "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
-        "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation"
+        "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation",
+        "TestBVPolynomialOwnerPersistentMapAndSharedSort",
+        "TestBVPolynomialOwnerSharedSortThroughHoistAndFailure",
+        "TestBVPolynomialOwnerEveryPersistentMapAndCoreReservation",
+        "TestBVPolynomialOwnerConstructorEveryReservation",
+        "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
       ],
       "conditionals": [
         {
@@ -21738,11 +21745,24 @@
             "TestASTBitVectorPolynomialPowerProductFallbackTemporaryBeforeReceiverGuard",
             "TestASTBitVectorPolynomialPowerProductEveryActualReadReservation"
           ]
+        },
+        {
+          "name": "Persistent BV polynomial owner: expression map constructed before configuration, shared physical current-sort writes through addition/multiplication/hoist/merger, singleton before sort/helper placement, configured core and convenience overloads, and borrowed map retained across source invocations (src/ast/rewriter/poly_rewriter.h:28-41,95-164; src/ast/rewriter/poly_rewriter_def.h:570-586,903-943; src/ast/rewriter/bv_rewriter.h:35-43)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_owner.go",
+          "tests": [
+            "TestBVPolynomialOwnerPersistentMapAndSharedSort",
+            "TestBVPolynomialOwnerSharedSortThroughHoistAndFailure",
+            "TestBVPolynomialOwnerEveryPersistentMapAndCoreReservation",
+            "TestBVPolynomialOwnerConstructorEveryReservation",
+            "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
+          ]
         }
       ],
       "ownership": [
         "The unsigned32 temporary uses existing charged address-stable BV numeral frame value five, capture child nine and source outer/inner temporary DT ordering. No second numeric frame is allocated. INT_MAX stays inline; UINT_MAX reaches actual signed64 large setter and captured failure roots.",
-        "Zero-bit numerical calls use the existing AST-owned address-stable frame. The copied val stays live through the entire helper. PowerOfTwo returns a source temporary; direct division mutates the physical val receiver, then the power ends before two and the value-returning modulo temporary are constructed. Source exit ends modulo return then two then val. An optional exact invocation token captures the actual frame at entry before numerical acquisition, preserves body/source history and permits cleanup without ambient adoption. Failed call sites reject reuse after owning cleanup. Nonnumeral/default-rational bookkeeping is erased through iterative reverse-concat traversal. Actual Runtime cold copy/power/negative-division/modulo campaigns refuse every reached reservation until success and close shared graphs to zero budget."
+        "Zero-bit numerical calls use the existing AST-owned address-stable frame. The copied val stays live through the entire helper. PowerOfTwo returns a source temporary; direct division mutates the physical val receiver, then the power ends before two and the value-returning modulo temporary are constructed. Source exit ends modulo return then two then val. An optional exact invocation token captures the actual frame at entry before numerical acquisition, preserves body/source history and permits cleanup without ambient adoption. Failed call sites reject reuse after owning cleanup. Nonnumeral/default-rational bookkeeping is erased through iterative reverse-concat traversal. Actual Runtime cold copy/power/negative-division/modulo campaigns refuse every reached reservation until success and close shared graphs to zero budget.",
+        "BVPolynomialRewriter owns one actual borrowed-key positions table across invocations; addition helper borrows it and never destroys it. Dense resets preserve source capacity/backing. Core, hoist and merger bind directly to the same physical owner current-sort field before allocation/refusal, including last-factor sort writes. Singleton assignment precedes current-sort lookup and charged helper placement. Successful scopes source-end and owning-close before the next invocation; failed scopes remain captured and prohibit replay while exact child cleanup finishes. Concrete Go owner/helper/config wrappers and pair storage are charged. Every reached AST/parameter constructor and repeated-add/hoist body reservation is refused through success; each graph closes to zero. Existing final-reference deletion may allocate during singleton assignment, so allocation-free singleton tests first retire the unrelated old large output. Native layout/stack/process-global/temporary-elision/assertion/fatal/exception ABI, independently injected stopped source DT, broader polynomial methods/arith specialization and overall solver integration remain uncredited."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -23474,7 +23494,9 @@
         "pkg/ast/rewriter/bv_polynomial_make_mul.go",
         "pkg/ast/rewriter/bv_polynomial_flat_mul_test.go",
         "pkg/ast/rewriter/bv_polynomial_config.go",
-        "pkg/ast/rewriter/bv_polynomial_config_test.go"
+        "pkg/ast/rewriter/bv_polynomial_config_test.go",
+        "pkg/ast/rewriter/bv_polynomial_owner.go",
+        "pkg/ast/rewriter/bv_polynomial_owner_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23551,7 +23573,12 @@
         "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
         "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
         "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
-        "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
+        "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller",
+        "TestBVPolynomialOwnerPersistentMapAndSharedSort",
+        "TestBVPolynomialOwnerSharedSortThroughHoistAndFailure",
+        "TestBVPolynomialOwnerEveryPersistentMapAndCoreReservation",
+        "TestBVPolynomialOwnerConstructorEveryReservation",
+        "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
       ],
       "conditionals": [
         {
@@ -23822,10 +23849,23 @@
             "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
             "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
           ]
+        },
+        {
+          "name": "Persistent BV polynomial owner: expression map constructed before configuration, shared physical current-sort writes through addition/multiplication/hoist/merger, singleton before sort/helper placement, configured core and convenience overloads, and borrowed map retained across source invocations (src/ast/rewriter/poly_rewriter.h:28-41,95-164; src/ast/rewriter/poly_rewriter_def.h:570-586,903-943; src/ast/rewriter/bv_rewriter.h:35-43)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_owner.go",
+          "tests": [
+            "TestBVPolynomialOwnerPersistentMapAndSharedSort",
+            "TestBVPolynomialOwnerSharedSortThroughHoistAndFailure",
+            "TestBVPolynomialOwnerEveryPersistentMapAndCoreReservation",
+            "TestBVPolynomialOwnerConstructorEveryReservation",
+            "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
+          ]
         }
       ],
       "ownership": [
-        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited."
+        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited.",
+        "BVPolynomialRewriter owns one actual borrowed-key positions table across invocations; addition helper borrows it and never destroys it. Dense resets preserve source capacity/backing. Core, hoist and merger bind directly to the same physical owner current-sort field before allocation/refusal, including last-factor sort writes. Singleton assignment precedes current-sort lookup and charged helper placement. Successful scopes source-end and owning-close before the next invocation; failed scopes remain captured and prohibit replay while exact child cleanup finishes. Concrete Go owner/helper/config wrappers and pair storage are charged. Every reached AST/parameter constructor and repeated-add/hoist body reservation is refused through success; each graph closes to zero. Existing final-reference deletion may allocate during singleton assignment, so allocation-free singleton tests first retire the unrelated old large output. Native layout/stack/process-global/temporary-elision/assertion/fatal/exception ABI, independently injected stopped source DT, broader polynomial methods/arith specialization and overall solver integration remain uncredited."
       ],
       "deviations": [
         "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",
@@ -23884,7 +23924,9 @@
         "pkg/ast/rewriter/bv_polynomial_make_mul.go",
         "pkg/ast/rewriter/bv_polynomial_flat_mul_test.go",
         "pkg/ast/rewriter/bv_polynomial_config.go",
-        "pkg/ast/rewriter/bv_polynomial_config_test.go"
+        "pkg/ast/rewriter/bv_polynomial_config_test.go",
+        "pkg/ast/rewriter/bv_polynomial_owner.go",
+        "pkg/ast/rewriter/bv_polynomial_owner_test.go"
       ],
       "tests": [
         "TestBVPolynomialMonomialOrdinalOriginalBranchesAndTies",
@@ -23958,7 +24000,12 @@
         "TestBVPolynomialConfigurationEveryColdReservationAndStoppedPrefix",
         "TestBVPolynomialConfigurationFeedsMultiplicationCaller",
         "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
-        "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
+        "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller",
+        "TestBVPolynomialOwnerPersistentMapAndSharedSort",
+        "TestBVPolynomialOwnerSharedSortThroughHoistAndFailure",
+        "TestBVPolynomialOwnerEveryPersistentMapAndCoreReservation",
+        "TestBVPolynomialOwnerConstructorEveryReservation",
+        "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
       ],
       "assertions": [
         {
@@ -24143,10 +24190,23 @@
             "TestBVPolynomialConfigurationWarmUpdatesRetireModuleReferences",
             "TestBVPolynomialConfigurationDescriptionsAndAdditionCaller"
           ]
+        },
+        {
+          "name": "Persistent BV polynomial owner: expression map constructed before configuration, shared physical current-sort writes through addition/multiplication/hoist/merger, singleton before sort/helper placement, configured core and convenience overloads, and borrowed map retained across source invocations (src/ast/rewriter/poly_rewriter.h:28-41,95-164; src/ast/rewriter/poly_rewriter_def.h:570-586,903-943; src/ast/rewriter/bv_rewriter.h:35-43)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_owner.go",
+          "tests": [
+            "TestBVPolynomialOwnerPersistentMapAndSharedSort",
+            "TestBVPolynomialOwnerSharedSortThroughHoistAndFailure",
+            "TestBVPolynomialOwnerEveryPersistentMapAndCoreReservation",
+            "TestBVPolynomialOwnerConstructorEveryReservation",
+            "TestBVPolynomialOwnerConvenienceAndConfigurationAcrossCalls"
+          ]
         }
       ],
       "ownership": [
-        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited."
+        "Configuration wrapper charges actual reflected Go fields; caller local parameters are borrowed through each update. Generated poly and arith helpers own separate real GetModuleName snapshots and retire arith before poly. Nil local owns a null default outer ParamsRef across both constructor updates. Body failure retains reached snapshot prefix; Close joins exact ParamsDecrementReceipt without repeating a consumed DEC. Warm updates allocate nothing and return module reference counts to baseline. Native process-global singleton, layout/temp-elision/assertion/fatal/exception ABI, independently injected stopped snapshot DT and full persistent polynomial owner remain uncredited.",
+        "BVPolynomialRewriter owns one actual borrowed-key positions table across invocations; addition helper borrows it and never destroys it. Dense resets preserve source capacity/backing. Core, hoist and merger bind directly to the same physical owner current-sort field before allocation/refusal, including last-factor sort writes. Singleton assignment precedes current-sort lookup and charged helper placement. Successful scopes source-end and owning-close before the next invocation; failed scopes remain captured and prohibit replay while exact child cleanup finishes. Concrete Go owner/helper/config wrappers and pair storage are charged. Every reached AST/parameter constructor and repeated-add/hoist body reservation is refused through success; each graph closes to zero. Existing final-reference deletion may allocate during singleton assignment, so allocation-free singleton tests first retire the unrelated old large output. Native layout/stack/process-global/temporary-elision/assertion/fatal/exception ABI, independently injected stopped source DT, broader polynomial methods/arith specialization and overall solver integration remain uncredited."
       ],
       "deviations": [
         "Only the complete selected monomial-order and identity-only power-product bodies are specialized for the original BV Config, whose use_power returns false. The source unused default rational k has no numerical acquisition and its Go bookkeeping is erased. Structural mode delegates to the already-ported ASTLess body; ordinal mode retains the source absence of a binary-arity guard and signed conversion of unsigned IDs for the 32-bit-int source profile. Native missing-operand/assertion/compiler-unreachable domains receive checked Go errors. Power-product return handles are borrowed with no INC, slice clone or numerical metadata read. Arith/use_power specialization, full polynomial core/hoisting/mark/coefficient owner and rewriter/solver integration remain required. No native stack/pointer/allocator/assertion/fatal/exception ABI or whole-unit ownership/completion credit is claimed.",

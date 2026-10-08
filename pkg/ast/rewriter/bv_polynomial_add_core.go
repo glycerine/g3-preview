@@ -17,6 +17,8 @@ type BVPolynomialAdditionCore struct {
 	pair                                 [2]ast.ASTHandle
 	flatArgs                             ast.ASTHandleBuffer
 	currentSort                          ast.ASTHandle
+	sortBinding                          *ast.ASTHandle
+	ownsPositions                        bool
 	localsEnded                          bool
 	family                               ast.FamilyID
 	savedVector                          ast.ASTRefVector
@@ -39,6 +41,10 @@ type BVPolynomialAdditionCore struct {
 }
 
 func NewBVPolynomialAdditionCore(m *ast.ASTManager) (*BVPolynomialAdditionCore, error) {
+	return newBVPolynomialAdditionCore(m, nil, nil)
+}
+
+func newBVPolynomialAdditionCore(m *ast.ASTManager, table *bvPolynomialPositions, sort *ast.ASTHandle) (*BVPolynomialAdditionCore, error) {
 	if _, e := m.ProofsEnabled(); e != nil {
 		return nil, e
 	}
@@ -46,12 +52,22 @@ func NewBVPolynomialAdditionCore(m *ast.ASTManager) (*BVPolynomialAdditionCore, 
 	if e := m.Budget().Reserve(header); e != nil {
 		return nil, e
 	}
-	table, e := newBVPolynomialPositions(m)
-	if e != nil {
+	owns := table == nil
+	if owns {
+		var e error
+		table, e = newBVPolynomialPositions(m)
+		if e != nil {
+			m.Budget().Release(header)
+			return nil, e
+		}
+	} else if table.manager != m {
+		m.Budget().Release(header)
+		return nil, ast.ErrASTHandle
+	} else if e := table.ready(); e != nil {
 		m.Budget().Release(header)
 		return nil, e
 	}
-	p := &BVPolynomialAdditionCore{manager: m, positions: table, header: header}
+	p := &BVPolynomialAdditionCore{manager: m, positions: table, header: header, ownsPositions: owns, sortBinding: sort}
 	p.self = p
 	return p, nil
 }
@@ -422,6 +438,7 @@ func (p *BVPolynomialAdditionCore) body(sort ast.ASTHandle, args ast.AppArgument
 		if e != nil {
 			return RewriteFailed, e
 		}
+		p.mul.sortBinding = p.sortSlot()
 		changed, e := p.mul.Hoist(true, out)
 		if e != nil {
 			return RewriteFailed, e
@@ -525,7 +542,7 @@ func (p *BVPolynomialAdditionCore) rewrite(sort ast.ASTHandle, args ast.AppArgum
 	if p.sourceCause == nil {
 		p.flatArgs.Close(p.manager.Budget())
 		if fallback && st == RewriteFailed {
-			node, body := p.manager.MkBitVectorPolynomialAddWithInvocation(p.currentSort, args, &p.factory)
+			node, body := p.manager.MkBitVectorPolynomialAddWithInvocation(*p.sortSlot(), args, &p.factory)
 			if body == nil {
 				body = p.manager.SetRef(out, node)
 			}
@@ -557,7 +574,7 @@ func (p *BVPolynomialAdditionCore) dispatch(sort ast.ASTHandle, args ast.AppArgu
 			return RewriteFailed, e
 		}
 	}
-	p.currentSort = sort
+	*p.sortSlot() = sort
 	if !flat {
 		return p.body(sort, args, out, o)
 	}
@@ -641,9 +658,18 @@ func (p *BVPolynomialAdditionCore) Close() error {
 		}
 	}
 	p.flatArgs.Close(p.manager.Budget())
-	p.positions.close()
+	if p.ownsPositions {
+		p.positions.close()
+	}
 	p.manager.Budget().Release(p.header)
 	p.header = 0
 	p.closed = true
 	return nil
+}
+
+func (p *BVPolynomialAdditionCore) sortSlot() *ast.ASTHandle {
+	if p.sortBinding != nil {
+		return p.sortBinding
+	}
+	return &p.currentSort
 }

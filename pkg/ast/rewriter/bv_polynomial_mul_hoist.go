@@ -64,6 +64,7 @@ type BVPolynomialMultiplicationHoist struct {
 	self                                 *BVPolynomialMultiplicationHoist
 	manager                              *ast.ASTManager
 	currentSort                          ast.ASTHandle
+	sortBinding                          *ast.ASTHandle
 	adds, muls                           ast.ASTHandleBuffer
 	valid                                bvPolynomialValidity
 	table                                *bvPolynomialPositions
@@ -122,11 +123,11 @@ func (p *BVPolynomialMultiplicationHoist) body(som ast.ASTRef) (bool, error) {
 				return false, e
 			}
 			if found && p.valid.data()[j] && j != uint32(k) {
-				p.currentSort, e = m.GetSort(p.adds.Slice()[k])
+				*p.sortSlot(), e = m.GetSort(p.adds.Slice()[k])
 				if e != nil {
 					return false, e
 				}
-				p.merge, e = NewBVPolynomialMerger(m, &p.currentSort)
+				p.merge, e = NewBVPolynomialMerger(m, p.sortSlot())
 				if e != nil {
 					return false, e
 				}
@@ -139,7 +140,7 @@ func (p *BVPolynomialMultiplicationHoist) body(som ast.ASTRef) (bool, error) {
 					return false, e
 				}
 				p.merge = nil
-				if e = m.AssignBitVectorPolynomialZeroWithInvocation(p.currentSort, &p.adds.Slice()[k], &p.zero); e != nil {
+				if e = m.AssignBitVectorPolynomialZeroWithInvocation(*p.sortSlot(), &p.adds.Slice()[k], &p.zero); e != nil {
 					return false, e
 				}
 				p.valid.data()[j], p.valid.data()[k] = false, false
@@ -154,7 +155,7 @@ func (p *BVPolynomialMultiplicationHoist) body(som ast.ASTRef) (bool, error) {
 	if !change {
 		return false, nil
 	}
-	result, e := m.MkBitVectorPolynomialAdd(p.currentSort, ast.SliceArguments(p.adds.Slice()))
+	result, e := m.MkBitVectorPolynomialAdd(*p.sortSlot(), ast.SliceArguments(p.adds.Slice()))
 	if e != nil {
 		return false, e
 	}
@@ -245,4 +246,11 @@ func (p *BVPolynomialMultiplicationHoist) Close() (result error) {
 	p.header = 0
 	p.closed = true
 	return nil
+}
+
+func (p *BVPolynomialMultiplicationHoist) sortSlot() *ast.ASTHandle {
+	if p.sortBinding != nil {
+		return p.sortBinding
+	}
+	return &p.currentSort
 }
