@@ -30472,3 +30472,9 @@ Ported the complete linked-label algorithm as exported UintTotalOrder and IntTot
 Ported the registered ordering and repeated-rotation assertions, then added a deterministic ChaCha8 campaign with20,000 moves over100 values. Every sampled linked order is checked against an independent slice move implementation and the label/link invariant. A returned-by-value self-referential prototype initially exposed stale sentinel pointers; both exported owners now retain a stable pointer core, and the focused tests cover the corrected lifetime.
 
 Focused native and g3debug total-order checks pass (0.010s/0.008s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:69 ported,287 partial,1741 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
+
+### util file: dlist.h
+
+Audited every retained source reference and all six template operations; no source file includes or instantiates dlist. The header only applies caller-provided accessors to caller-owned next/previous fields. Recorded it as a direct-language replacement: any future concrete Go owner must update its typed links directly and use ordinary loops for contains, length and invariants. No unused generic or interface-based list facade is introduced.
+
+Ledger and diff validation pass. Inventory is now2102 units,677 APIs:69 ported,287 partial,1740 unported, plus the separately classified platform replacements. No test run is attached to this no-code, no-consumer classification; the22:34 UTC full-suite checkpoint remains current.

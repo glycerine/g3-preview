@@ -116114,7 +116114,7 @@
       "path": "src/util/dlist.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
+      "status": "platform_replacement",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -116165,11 +116165,13 @@
           "text": "SASSERT(prev(curr) == old);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "All six operations are unused C++ templates over caller-supplied next/previous field accessors; no retained source file includes dlist.h. Per the no-generics rule, no Go list abstraction is created. A future concrete owner must update its typed next/previous pointers directly for add, delete, pop and insert-after, and use an ordinary Go loop for contains, length and invariant checks. The concrete owner remains responsible for the source null/detached/link-consistency preconditions."
+      ]
     },
     {
       "path": "src/util/double_manager.h",
