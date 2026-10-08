@@ -45,7 +45,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 	if m.MatchesDividesNumeralInvocation(&m.DividesNumeral.Receipt) {
 		add(m.DividesNumeral.Numeral.Cell)
 	}
-	for _, s := range []*IntegerRawScope{&m.DivisionRaw, &m.ExtendedRaw, &m.GcdRaw, &m.BitwiseNotRaw} {
+	for _, s := range []*IntegerRawScope{&m.DivisionRaw, &m.ExtendedRaw, &m.GcdRaw, &m.BitwiseNotRaw, &m.BitwiseOrRaw, &m.BitwiseAndRaw, &m.BitwiseXorRaw} {
 		for i := uint8(0); i < s.Count; i++ {
 			add(s.Values[i].Cell)
 		}

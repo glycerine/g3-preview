@@ -25,6 +25,7 @@ type RationalServiceInvocation struct {
 	scope                               rationalLexicalScope
 	numeric                             NumericAllocationRoots
 	division, gcd, extended, bitwiseNot integerRawInvocationReceipt
+	bitwiseOr, bitwiseAnd, bitwiseXor   integerRawInvocationReceipt
 	addGeneration, normGeneration       uint64
 	compareGeneration, powerGeneration  uint64
 	transferred                         SmallAllocatorPendingAllocation
@@ -96,7 +97,7 @@ func (c *RationalServiceInvocation) cleanupLocked(abort bool) error {
 		}
 	}
 	if !abort {
-		for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd, &c.bitwiseNot} {
+		for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd, &c.bitwiseNot, &c.bitwiseOr, &c.bitwiseAnd, &c.bitwiseXor} {
 			if e := c.integer.CleanupRawInvocation(r, false); e != nil {
 				if c.ownCause == nil {
 					c.ownCause = e
@@ -124,7 +125,7 @@ func (c *RationalServiceInvocation) cleanupLocked(abort bool) error {
 			}
 			return e
 		}
-		for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd, &c.bitwiseNot} {
+		for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd, &c.bitwiseNot, &c.bitwiseOr, &c.bitwiseAnd, &c.bitwiseXor} {
 			if e := c.integer.CleanupRawInvocation(r, true); e != nil {
 				if c.ownCause == nil {
 					c.ownCause = e

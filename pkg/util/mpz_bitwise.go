@@ -31,6 +31,11 @@ func (m *IntegerManager) BitwiseXor(a, b, out *Int) error { return m.bitwiseBina
 // final multiplier/division actions. Work is owner-budgeted source temporaries;
 // errors retain completed caller publications, including aliased operands.
 func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
+	return m.bitwiseBinaryWithAllocationContext(a, b, out, op, integerAllocationInvocationContext{})
+}
+
+// Source: src/util/mpz.cpp:1018-1148.
+func (m *IntegerManager) bitwiseBinaryWithAllocationContext(a, b, out *Int, op uint8, context integerAllocationInvocationContext) (err error) {
 	for _, v := range []*Int{a, b, out} {
 		if e := m.check(v); e != nil {
 			return e
@@ -50,7 +55,7 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 			v = a.Val ^ b.Val
 		}
 		if op == 2 {
-			return m.SetInt64(out, int64(v))
+			return m.setInt64WithAllocationContext(out, int64(v), context)
 		}
 		if e := m.Del(out); e != nil {
 			return e
@@ -58,22 +63,36 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 		out.Val = v
 		return nil
 	}
-	var a1, b1, a2, b2, mult, tmp Int
+	raw, name := &m.BitwiseOrRaw, "bitwise_or"
+	switch op {
+	case 1:
+		raw, name = &m.BitwiseAndRaw, "bitwise_and"
+	case 2:
+		raw, name = &m.BitwiseXorRaw, "bitwise_xor"
+	}
+	receipt, e := m.beginRawInvocation(raw, 6)
+	if e != nil {
+		return e
+	}
+	context.recordRationalServiceRaw(m, receipt)
+	context.recordCaller(m, name, NumericInvocationReceipt{Raw: receipt})
+	context = context.withRawInvocation(receipt)
+	a1, b1, a2, b2, mult, tmp := &raw.Values[0], &raw.Values[1], &raw.Values[2], &raw.Values[3], &raw.Values[4], &raw.Values[5]
 	defer func() {
-		m.Del(&a1)
-		m.Del(&b1)
-		m.Del(&a2)
-		m.Del(&b2)
-		m.Del(&mult)
-		m.Del(&tmp)
+		raw.executing = false
+		raw.BodyCause = err
+		if err == nil {
+			raw.BodySucceeded = true
+			err = m.finishRawSource(raw)
+		}
 	}()
-	if e := m.Copy(&a1, a); e != nil {
+	if e := m.copyFromOwnerWithAllocationContext(a1, m, a, nil, context); e != nil {
 		return e
 	}
-	if e := m.Copy(&b1, b); e != nil {
+	if e := m.copyFromOwnerWithAllocationContext(b1, m, b, nil, context); e != nil {
 		return e
 	}
-	if e := m.SetInt64(&mult, 1); e != nil {
+	if e := m.setInt64WithAllocationContext(mult, 1, context); e != nil {
 		return e
 	}
 	if e := m.Reset(out); e != nil {
@@ -85,17 +104,17 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 		if a1.IsSmall() && b1.IsSmall() && a1.Val == -1 && b1.Val == -1 {
 			return &BitwiseNonterminationError{Operation: BitwiseOperation(op)}
 		}
-		if e := m.Mod(&a1, &m.Two64, &a2); e != nil {
+		if e := m.modWithAllocationContext(a1, &m.Two64, a2, context); e != nil {
 			return e
 		}
-		if e := m.Mod(&b1, &m.Two64, &b2); e != nil {
+		if e := m.modWithAllocationContext(b1, &m.Two64, b2, context); e != nil {
 			return e
 		}
-		u, e := m.Uint64(&a2)
+		u, e := m.Uint64(a2)
 		if e != nil {
 			return e
 		}
-		v, e := m.Uint64(&b2)
+		v, e := m.Uint64(b2)
 		if e != nil {
 			return e
 		}
@@ -107,39 +126,39 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 		case 2:
 			v = u ^ v
 		}
-		if e = m.SetUint64(&tmp, v); e != nil {
+		if e = m.setUint64WithAllocationContext(tmp, v, context); e != nil {
 			return e
 		}
-		if e = m.Mul(&tmp, &mult, &tmp); e != nil {
+		if e = m.mulWithAllocationContext(tmp, mult, tmp, context); e != nil {
 			return e
 		}
-		if e = m.Add(out, &tmp, out); e != nil {
+		if e = m.addSubWithAllocationContext(out, tmp, out, false, context); e != nil {
 			return e
 		}
-		if e = m.Mul(&mult, &m.Two64, &mult); e != nil {
+		if e = m.mulWithAllocationContext(mult, &m.Two64, mult, context); e != nil {
 			return e
 		}
-		if e = m.Div(&a1, &m.Two64, &a1); e != nil {
+		if e = m.divWithAllocationContext(a1, &m.Two64, a1, context); e != nil {
 			return e
 		}
-		if e = m.Div(&b1, &m.Two64, &b1); e != nil {
+		if e = m.divWithAllocationContext(b1, &m.Two64, b1, context); e != nil {
 			return e
 		}
 	}
 	if op != 1 {
 		if a1.Val != 0 {
-			if e := m.Mul(&a1, &mult, &a1); e != nil {
+			if e := m.mulWithAllocationContext(a1, mult, a1, context); e != nil {
 				return e
 			}
-			if e := m.Add(out, &a1, out); e != nil {
+			if e := m.addSubWithAllocationContext(out, a1, out, false, context); e != nil {
 				return e
 			}
 		}
 		if b1.Val != 0 {
-			if e := m.Mul(&b1, &mult, &b1); e != nil {
+			if e := m.mulWithAllocationContext(b1, mult, b1, context); e != nil {
 				return e
 			}
-			if e := m.Add(out, &b1, out); e != nil {
+			if e := m.addSubWithAllocationContext(out, b1, out, false, context); e != nil {
 				return e
 			}
 		}

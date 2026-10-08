@@ -55,6 +55,7 @@ type IntegerManager struct {
 	mpfConversionCaller                             *arbitraryFloatRationalConversionScope
 	DividesNumeral                                  integerDividesNumeralScope
 	DivisionRaw, ExtendedRaw, GcdRaw, BitwiseNotRaw IntegerRawScope
+	BitwiseOrRaw, BitwiseAndRaw, BitwiseXorRaw      IntegerRawScope
 	AddMulInvocation                                integerAddMulScope
 	CopyAllocation                                  integerCopyAllocationScope
 	NormalizationExecuting                          bool
@@ -565,6 +566,12 @@ func (m *IntegerManager) CloseChecked() error {
 	}
 	if e := m.CleanupBitwiseNot(); e != nil {
 		return fail(e)
+	}
+	for _, raw := range []*IntegerRawScope{&m.BitwiseOrRaw, &m.BitwiseAndRaw, &m.BitwiseXorRaw} {
+		r := integerRawInvocationReceipt{m, raw, raw.Invocation}
+		if e := m.CleanupRawInvocation(&r, true); e != nil {
+			return fail(e)
+		}
 	}
 	if e := m.CleanupGCDRaw(); e != nil {
 		return fail(e)

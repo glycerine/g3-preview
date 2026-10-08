@@ -97,6 +97,13 @@ func (s *RationalService) extraBinary(a, b *OwnedRational, op uint8) (_lexOut Ow
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	if op != 0 {
+		atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+		defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	}
+	return s.extraBinaryLockedWithInvocation(a, b, op, nil)
+}
+func (s *RationalService) extraBinaryLockedWithInvocation(a, b *OwnedRational, op uint8, c *RationalServiceInvocation) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
@@ -110,15 +117,16 @@ func (s *RationalService) extraBinary(a, b *OwnedRational, op uint8) (_lexOut Ow
 	result := NewRational()
 	defer s.destroyLexicalRational(&result)
 	var e error
-	switch op {
-	case 0:
+	if op == 0 {
 		e = s.Manager.LCM(&a.Raw, &b.Raw, &result)
-	case 1:
-		e = s.Manager.BitwiseOr(&a.Raw, &b.Raw, &result)
-	case 2:
-		e = s.Manager.BitwiseAnd(&a.Raw, &b.Raw, &result)
-	default:
-		e = s.Manager.BitwiseXor(&a.Raw, &b.Raw, &result)
+	} else {
+		e = s.Manager.rationalBitwiseWithAllocationContext(&a.Raw, &b.Raw, &result, op-1, c.allocationContext())
+	}
+	if cause := c.childSource(); cause != nil {
+		if s.Lexical.Cause == nil {
+			s.Lexical.Cause = cause
+		}
+		e = errors.Join(e, cause)
 	}
 	if e != nil {
 		return OwnedRational{}, e

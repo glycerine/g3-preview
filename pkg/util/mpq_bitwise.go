@@ -12,6 +12,9 @@ func (m *RationalManager) BitwiseXor(a, b, out *Rational) error {
 	return m.rationalBitwise(a, b, out, 2)
 }
 func (m *RationalManager) rationalBitwise(a, b, out *Rational, op uint8) error {
+	return m.rationalBitwiseWithAllocationContext(a, b, out, op, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) rationalBitwiseWithAllocationContext(a, b, out *Rational, op uint8, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -24,15 +27,7 @@ func (m *RationalManager) rationalBitwise(a, b, out *Rational, op uint8) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
-	var e error
-	switch op {
-	case 0:
-		e = m.Z.BitwiseOr(&a.Num, &b.Num, &out.Num)
-	case 1:
-		e = m.Z.BitwiseAnd(&a.Num, &b.Num, &out.Num)
-	default:
-		e = m.Z.BitwiseXor(&a.Num, &b.Num, &out.Num)
-	}
+	e := m.Z.bitwiseBinaryWithAllocationContext(&a.Num, &b.Num, &out.Num, op, context)
 	if e != nil {
 		return e
 	}

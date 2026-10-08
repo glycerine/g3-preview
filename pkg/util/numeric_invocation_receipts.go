@@ -63,6 +63,9 @@ const (
 	IntegerRawGCD
 	IntegerRawExtendedGCD
 	IntegerRawBitwiseNot
+	IntegerRawBitwiseOr
+	IntegerRawBitwiseAnd
+	IntegerRawBitwiseXor
 )
 
 func (r *integerRawInvocationReceipt) Kind() IntegerRawKind {
@@ -76,6 +79,12 @@ func (r *integerRawInvocationReceipt) Kind() IntegerRawKind {
 		return IntegerRawGCD
 	case &r.Manager.BitwiseNotRaw:
 		return IntegerRawBitwiseNot
+	case &r.Manager.BitwiseOrRaw:
+		return IntegerRawBitwiseOr
+	case &r.Manager.BitwiseAndRaw:
+		return IntegerRawBitwiseAnd
+	case &r.Manager.BitwiseXorRaw:
+		return IntegerRawBitwiseXor
 	case &r.Manager.ExtendedRaw:
 		return IntegerRawExtendedGCD
 	}

@@ -133152,7 +133152,9 @@
         "pkg/util/numeric_invocation_receipts.go",
         "pkg/util/rational_service_invocation_allocation.go",
         "pkg/util/rational_service_bitwise_not_invocation_test.go",
-        "pkg/util/mpz_physical_audit_test.go"
+        "pkg/util/mpz_physical_audit_test.go",
+        "pkg/util/rational_service_bitwise_binary_invocation.go",
+        "pkg/util/rational_service_bitwise_binary_invocation_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -133397,7 +133399,10 @@
         "TestRationalServiceBitwiseNotInvocationExecutingRawGuard",
         "TestIntegerBitwiseFailurePublicationAndWarm",
         "TestIntegerBitwiseAliasedFailurePublication",
-        "TestRationalServiceExtraFailurePrefixesAndOwnership"
+        "TestRationalServiceExtraFailurePrefixesAndOwnership",
+        "TestRationalServiceBinaryBitwiseEveryActualReservation",
+        "TestRationalServiceBinaryBitwiseGenerationIsolation",
+        "TestRationalServiceBinaryBitwiseExecutingRawGuard"
       ],
       "conditionals": [
         {
@@ -134477,6 +134482,31 @@
             "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
             "TestRationalServiceExtraFailurePrefixesAndOwnership"
           ]
+        },
+        {
+          "name": "Selected original binary bitwise invocation: separate six-local OR/AND/XOR RAW frames, actual arithmetic allocation contexts, forward source DEL only after success, exact caller receipt cleanup and named rational return without an extra copy (mpz.cpp:1018-1148; mpq.h:632-655; rational.h:370-386)",
+          "status": "partial",
+          "go_target": "pkg/util/mpz_bitwise.go",
+          "go_targets": [
+            "pkg/util/mpq_bitwise.go",
+            "pkg/util/rational_service_bitwise_binary_invocation.go",
+            "pkg/util/rational_service_bitwise_binary_invocation_test.go",
+            "pkg/util/integer_raw_invocation.go",
+            "pkg/util/numeric_invocation_receipts.go",
+            "pkg/util/rational_service_invocation.go",
+            "pkg/util/rational_service_invocation_allocation.go",
+            "pkg/util/rational_service_extra.go",
+            "pkg/util/mpz_physical_audit_test.go"
+          ],
+          "tests": [
+            "TestRationalServiceBinaryBitwiseEveryActualReservation",
+            "TestRationalServiceBinaryBitwiseGenerationIsolation",
+            "TestRationalServiceBinaryBitwiseExecutingRawGuard",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestRationalServiceExtraFailurePrefixesAndOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -134651,7 +134681,9 @@
         "pkg/util/numeric_invocation_receipts.go",
         "pkg/util/rational_service_invocation_allocation.go",
         "pkg/util/rational_service_bitwise_not_invocation_test.go",
-        "pkg/util/mpz_physical_audit_test.go"
+        "pkg/util/mpz_physical_audit_test.go",
+        "pkg/util/rational_service_bitwise_binary_invocation.go",
+        "pkg/util/rational_service_bitwise_binary_invocation_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -134951,7 +134983,10 @@
         "TestRationalServiceBitwiseNotInvocationEveryActualReservation",
         "TestRationalServiceBitwiseNotInvocationExecutingRawGuard",
         "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
-        "TestRationalServiceExtraFailurePrefixesAndOwnership"
+        "TestRationalServiceExtraFailurePrefixesAndOwnership",
+        "TestRationalServiceBinaryBitwiseEveryActualReservation",
+        "TestRationalServiceBinaryBitwiseGenerationIsolation",
+        "TestRationalServiceBinaryBitwiseExecutingRawGuard"
       ],
       "conditionals": [
         {
@@ -136884,6 +136919,31 @@
             "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
             "TestRationalServiceExtraFailurePrefixesAndOwnership"
           ]
+        },
+        {
+          "name": "Selected original binary bitwise invocation: separate six-local OR/AND/XOR RAW frames, actual arithmetic allocation contexts, forward source DEL only after success, exact caller receipt cleanup and named rational return without an extra copy (mpz.cpp:1018-1148; mpq.h:632-655; rational.h:370-386)",
+          "status": "partial",
+          "go_target": "pkg/util/mpz_bitwise.go",
+          "go_targets": [
+            "pkg/util/mpq_bitwise.go",
+            "pkg/util/rational_service_bitwise_binary_invocation.go",
+            "pkg/util/rational_service_bitwise_binary_invocation_test.go",
+            "pkg/util/integer_raw_invocation.go",
+            "pkg/util/numeric_invocation_receipts.go",
+            "pkg/util/rational_service_invocation.go",
+            "pkg/util/rational_service_invocation_allocation.go",
+            "pkg/util/rational_service_extra.go",
+            "pkg/util/mpz_physical_audit_test.go"
+          ],
+          "tests": [
+            "TestRationalServiceBinaryBitwiseEveryActualReservation",
+            "TestRationalServiceBinaryBitwiseGenerationIsolation",
+            "TestRationalServiceBinaryBitwiseExecutingRawGuard",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestRationalServiceExtraFailurePrefixesAndOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -137021,7 +137081,9 @@
         "pkg/util/mpq_bitwise.go",
         "pkg/util/numeric_invocation_receipts.go",
         "pkg/util/rational_service_invocation_allocation.go",
-        "pkg/util/rational_service_bitwise_not_invocation_test.go"
+        "pkg/util/rational_service_bitwise_not_invocation_test.go",
+        "pkg/util/rational_service_bitwise_binary_invocation.go",
+        "pkg/util/rational_service_bitwise_binary_invocation_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -137328,7 +137390,10 @@
         "TestRationalServiceBitwiseNotInvocationEveryActualReservation",
         "TestRationalServiceBitwiseNotInvocationExecutingRawGuard",
         "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
-        "TestRationalServiceExtraFailurePrefixesAndOwnership"
+        "TestRationalServiceExtraFailurePrefixesAndOwnership",
+        "TestRationalServiceBinaryBitwiseEveryActualReservation",
+        "TestRationalServiceBinaryBitwiseGenerationIsolation",
+        "TestRationalServiceBinaryBitwiseExecutingRawGuard"
       ],
       "conditionals": [
         {
@@ -138783,6 +138848,31 @@
             "TestIntegerBitwiseFailurePublicationAndWarm",
             "TestIntegerBitwiseAliasedFailurePublication",
             "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
+            "TestRationalServiceExtraFailurePrefixesAndOwnership"
+          ]
+        },
+        {
+          "name": "Selected original binary bitwise invocation: separate six-local OR/AND/XOR RAW frames, actual arithmetic allocation contexts, forward source DEL only after success, exact caller receipt cleanup and named rational return without an extra copy (mpz.cpp:1018-1148; mpq.h:632-655; rational.h:370-386)",
+          "status": "partial",
+          "go_target": "pkg/util/mpz_bitwise.go",
+          "go_targets": [
+            "pkg/util/mpq_bitwise.go",
+            "pkg/util/rational_service_bitwise_binary_invocation.go",
+            "pkg/util/rational_service_bitwise_binary_invocation_test.go",
+            "pkg/util/integer_raw_invocation.go",
+            "pkg/util/numeric_invocation_receipts.go",
+            "pkg/util/rational_service_invocation.go",
+            "pkg/util/rational_service_invocation_allocation.go",
+            "pkg/util/rational_service_extra.go",
+            "pkg/util/mpz_physical_audit_test.go"
+          ],
+          "tests": [
+            "TestRationalServiceBinaryBitwiseEveryActualReservation",
+            "TestRationalServiceBinaryBitwiseGenerationIsolation",
+            "TestRationalServiceBinaryBitwiseExecutingRawGuard",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestIntegerBitwiseAliasedFailurePublication",
             "TestRationalServiceExtraFailurePrefixesAndOwnership"
           ]
         }
@@ -143326,7 +143416,9 @@
         "pkg/util/rational_service_bitwise_not_invocation_test.go",
         "pkg/util/mpz_physical_audit_test.go",
         "pkg/util/rational_service_one_invocation.go",
-        "pkg/util/rational_service_one_invocation_test.go"
+        "pkg/util/rational_service_one_invocation_test.go",
+        "pkg/util/rational_service_bitwise_binary_invocation.go",
+        "pkg/util/rational_service_bitwise_binary_invocation_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -143504,7 +143596,12 @@
         "TestIntegerBitwiseAliasedFailurePublication",
         "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
         "TestRationalServiceBorrowedOneCopyAndSubtraction",
-        "TestRationalServiceBorrowedOneSubtractionEveryActualReservation"
+        "TestRationalServiceBorrowedOneSubtractionEveryActualReservation",
+        "TestRationalServiceBinaryBitwiseEveryActualReservation",
+        "TestRationalServiceBinaryBitwiseGenerationIsolation",
+        "TestRationalServiceBinaryBitwiseExecutingRawGuard",
+        "TestBitwisePublicationFinalUnusedActions",
+        "TestBitwisePublicationCallerPrefixes"
       ],
       "conditionals": [
         {
@@ -144197,6 +144294,31 @@
           "tests": [
             "TestRationalServiceBorrowedOneCopyAndSubtraction",
             "TestRationalServiceBorrowedOneSubtractionEveryActualReservation"
+          ]
+        },
+        {
+          "name": "Selected original binary bitwise invocation: separate six-local OR/AND/XOR RAW frames, actual arithmetic allocation contexts, forward source DEL only after success, exact caller receipt cleanup and named rational return without an extra copy (mpz.cpp:1018-1148; mpq.h:632-655; rational.h:370-386)",
+          "status": "partial",
+          "go_target": "pkg/util/mpz_bitwise.go",
+          "go_targets": [
+            "pkg/util/mpq_bitwise.go",
+            "pkg/util/rational_service_bitwise_binary_invocation.go",
+            "pkg/util/rational_service_bitwise_binary_invocation_test.go",
+            "pkg/util/integer_raw_invocation.go",
+            "pkg/util/numeric_invocation_receipts.go",
+            "pkg/util/rational_service_invocation.go",
+            "pkg/util/rational_service_invocation_allocation.go",
+            "pkg/util/rational_service_extra.go",
+            "pkg/util/mpz_physical_audit_test.go"
+          ],
+          "tests": [
+            "TestRationalServiceBinaryBitwiseEveryActualReservation",
+            "TestRationalServiceBinaryBitwiseGenerationIsolation",
+            "TestRationalServiceBinaryBitwiseExecutingRawGuard",
+            "TestBitwisePublicationFinalUnusedActions",
+            "TestBitwisePublicationCallerPrefixes",
+            "TestIntegerBitwiseAliasedFailurePublication",
+            "TestRationalServiceExtraFailurePrefixesAndOwnership"
           ]
         }
       ],

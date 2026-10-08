@@ -1,4 +1,4 @@
-// Source: src/util/mpz.h:468-485; src/util/mpz.cpp:730-817,915-985.
+// Source: src/util/mpz.h:468-485; src/util/mpz.cpp:730-817,915-985,1018-1183.
 package util
 
 // Real retained RAW declarations in the charged Integer owner. Count marks
@@ -36,12 +36,15 @@ func (m *IntegerManager) rawInvocationExecuting() bool {
 		(m.ExtendedRaw.Active && m.ExtendedRaw.executing) ||
 		(m.GcdRaw.Active && m.GcdRaw.executing) ||
 		(m.BitwiseNotRaw.Active && m.BitwiseNotRaw.executing) ||
+		(m.BitwiseOrRaw.Active && m.BitwiseOrRaw.executing) ||
+		(m.BitwiseAndRaw.Active && m.BitwiseAndRaw.executing) ||
+		(m.BitwiseXorRaw.Active && m.BitwiseXorRaw.executing) ||
 		(m.AddMulInvocation.Active && m.AddMulInvocation.executing) ||
 		(m.DividesNumeral.Active && m.DividesNumeral.Executing)
 }
 
 func (m *IntegerManager) rawFrameAddress(s *IntegerRawScope) bool {
-	return m != nil && m.self == m && s != nil && (s == &m.DivisionRaw || s == &m.ExtendedRaw || s == &m.GcdRaw || s == &m.BitwiseNotRaw)
+	return m != nil && m.self == m && s != nil && (s == &m.DivisionRaw || s == &m.ExtendedRaw || s == &m.GcdRaw || s == &m.BitwiseNotRaw || s == &m.BitwiseOrRaw || s == &m.BitwiseAndRaw || s == &m.BitwiseXorRaw)
 }
 func (m *IntegerManager) MatchesRawInvocation(r *integerRawInvocationReceipt) bool {
 	return r != nil && r.Manager == m && m.rawFrameAddress(r.Frame) && r.Frame.owner == m && r.Invocation != 0 && r.Invocation == r.Frame.Invocation && r.Frame.Active
@@ -229,6 +232,33 @@ func (m *IntegerManager) CleanupBitwiseNot() error {
 		return ErrNumericOwner
 	}
 	s := &m.BitwiseNotRaw
+	r := integerRawInvocationReceipt{m, s, s.Invocation}
+	return m.CleanupRawInvocation(&r, true)
+}
+
+func (m *IntegerManager) CleanupBitwiseOr() error {
+	if m == nil || m.self != m {
+		return ErrNumericOwner
+	}
+	s := &m.BitwiseOrRaw
+	r := integerRawInvocationReceipt{m, s, s.Invocation}
+	return m.CleanupRawInvocation(&r, true)
+}
+
+func (m *IntegerManager) CleanupBitwiseAnd() error {
+	if m == nil || m.self != m {
+		return ErrNumericOwner
+	}
+	s := &m.BitwiseAndRaw
+	r := integerRawInvocationReceipt{m, s, s.Invocation}
+	return m.CleanupRawInvocation(&r, true)
+}
+
+func (m *IntegerManager) CleanupBitwiseXor() error {
+	if m == nil || m.self != m {
+		return ErrNumericOwner
+	}
+	s := &m.BitwiseXorRaw
 	r := integerRawInvocationReceipt{m, s, s.Invocation}
 	return m.CleanupRawInvocation(&r, true)
 }
