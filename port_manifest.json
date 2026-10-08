@@ -151008,22 +151008,60 @@
       "path": "src/util/timeit.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/timeit.go",
+        "pkg/util/timeit_test.go"
+      ],
+      "tests": [
+        "TestTimeitOriginalMemoryCaptureAndFormatting",
+        "TestTimeitDisabledErasureAndDefaultStreamBorrow",
+        "TestTimeitEveryColdConstructorAndOutputReservation",
+        "TestTimeitClockAndBorrowFailurePrefixes",
+        "TestTimeitNullStaleAndClosedOutputBorrow",
+        "TestTimeitTLSAccountingLimitAndReentry"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Complete timeit and imp constructors/destructors: enable guard, watch start/stop, memory captures, exact report insertion/manipulators and endl (timeit.h:25-31; timeit.cpp:25-58)",
+          "status": "ported",
+          "go_target": "pkg/util/timeit.go",
+          "tests": [
+            "TestTimeitOriginalMemoryCaptureAndFormatting",
+            "TestTimeitDisabledErasureAndDefaultStreamBorrow",
+            "TestTimeitEveryColdConstructorAndOutputReservation",
+            "TestTimeitClockAndBorrowFailurePrefixes",
+            "TestTimeitNullStaleAndClosedOutputBorrow",
+            "TestTimeitTLSAccountingLimitAndReentry"
+          ]
+        }
+      ],
+      "ownership": [
+        "Caller supplies Timeit control storage. Enabled imp owns a real 56-byte Linux 64-bit Runtime block holding stopwatch state and the start_memory double. Message and output pointer fields use borrowed checked Go references, without string copies or extra timer allocation. Constructor memory capture includes the live imp allocation; destructor captures end memory before any insertion and frees only after successful report/flush. Failed prefixes remain owned with sticky source error; Cleanup releases ownership without repeating output or claiming source destructor completion."
+      ],
+      "deviations": [
+        "Selected Linux 64-bit stopwatch/imp layout and existing NumericTextStream profile; Windows/Darwin and native raw pointer-byte ABI are not claimed. Runtime TLS accounting follows its actual synchronization semantics, including an unsynchronized zero baseline. Explicit Construct/Close/Cleanup replace C++ stack construction/destruction/exception ABI. Default stderr is borrowed from an explicitly supplied MemoryStandardStreams service; disabled construction erases providers. No dedicated C++ timeit test exists in src/test; upolynomial.cpp only uses it to report durations."
+      ]
     },
     {
       "path": "src/util/timeit.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/timeit.go",
+        "pkg/util/timeit_test.go"
+      ],
+      "tests": [
+        "TestTimeitOriginalMemoryCaptureAndFormatting",
+        "TestTimeitDisabledErasureAndDefaultStreamBorrow",
+        "TestTimeitEveryColdConstructorAndOutputReservation",
+        "TestTimeitClockAndBorrowFailurePrefixes",
+        "TestTimeitNullStaleAndClosedOutputBorrow",
+        "TestTimeitTLSAccountingLimitAndReentry"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -151034,11 +151072,29 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Complete timeit and imp constructors/destructors: enable guard, watch start/stop, memory captures, exact report insertion/manipulators and endl (timeit.h:25-31; timeit.cpp:25-58)",
+          "status": "ported",
+          "go_target": "pkg/util/timeit.go",
+          "tests": [
+            "TestTimeitOriginalMemoryCaptureAndFormatting",
+            "TestTimeitDisabledErasureAndDefaultStreamBorrow",
+            "TestTimeitEveryColdConstructorAndOutputReservation",
+            "TestTimeitClockAndBorrowFailurePrefixes",
+            "TestTimeitNullStaleAndClosedOutputBorrow",
+            "TestTimeitTLSAccountingLimitAndReentry"
+          ]
+        }
+      ],
+      "ownership": [
+        "Caller supplies Timeit control storage. Enabled imp owns a real 56-byte Linux 64-bit Runtime block holding stopwatch state and the start_memory double. Message and output pointer fields use borrowed checked Go references, without string copies or extra timer allocation. Constructor memory capture includes the live imp allocation; destructor captures end memory before any insertion and frees only after successful report/flush. Failed prefixes remain owned with sticky source error; Cleanup releases ownership without repeating output or claiming source destructor completion."
+      ],
+      "deviations": [
+        "Selected Linux 64-bit stopwatch/imp layout and existing NumericTextStream profile; Windows/Darwin and native raw pointer-byte ABI are not claimed. Runtime TLS accounting follows its actual synchronization semantics, including an unsynchronized zero baseline. Explicit Construct/Close/Cleanup replace C++ stack construction/destruction/exception ABI. Default stderr is borrowed from an explicitly supplied MemoryStandardStreams service; disabled construction erases providers. No dedicated C++ timeit test exists in src/test; upolynomial.cpp only uses it to report durations."
+      ]
     },
     {
       "path": "src/util/timeout.cpp",
