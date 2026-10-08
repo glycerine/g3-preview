@@ -1,7 +1,10 @@
 // Source: remaining src/util/rational.h wrappers; concrete owner-local facade.
 package util
 
-import "errors"
+import (
+	"errors"
+	"sync/atomic"
+)
 
 // RationalDoubleError classifies the source UNREACHABLE double constructor and
 // assignment. It does not implement a numerical floating-point conversion.
@@ -139,6 +142,11 @@ func (s *RationalService) BitwiseNot(width uint32, a *OwnedRational) (_lexOut Ow
 		return OwnedRational{}, e
 	}
 	defer s.mu.Unlock()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	return s.bitwiseNotLockedWithInvocation(width, a, nil)
+}
+func (s *RationalService) bitwiseNotLockedWithInvocation(width uint32, a *OwnedRational, c *RationalServiceInvocation) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
@@ -148,7 +156,14 @@ func (s *RationalService) BitwiseNot(width uint32, a *OwnedRational) (_lexOut Ow
 	}
 	result := NewRational()
 	defer s.destroyLexicalRational(&result)
-	if e := s.Manager.BitwiseNot(width, &a.Raw, &result); e != nil {
+	e := s.Manager.bitwiseNotWithAllocationContext(width, &a.Raw, &result, c.allocationContext())
+	if cause := c.childSource(); cause != nil {
+		if s.Lexical.Cause == nil {
+			s.Lexical.Cause = cause
+		}
+		e = errors.Join(e, cause)
+	}
+	if e != nil {
 		return OwnedRational{}, e
 	}
 	return s.facadeTakeLocked(&result)

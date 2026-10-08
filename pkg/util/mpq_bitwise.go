@@ -39,6 +39,9 @@ func (m *RationalManager) rationalBitwise(a, b, out *Rational, op uint8) error {
 	return m.resetDenominator(out)
 }
 func (m *RationalManager) BitwiseNot(width uint32, a, out *Rational) error {
+	return m.bitwiseNotWithAllocationContext(width, a, out, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) bitwiseNotWithAllocationContext(width uint32, a, out *Rational, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -48,7 +51,7 @@ func (m *RationalManager) BitwiseNot(width uint32, a, out *Rational) error {
 	if modularSourceDebug && !isIntegerRational(a) {
 		return ErrRationalNotInteger
 	}
-	if e := m.Z.BitwiseNot(width, &a.Num, &out.Num); e != nil {
+	if e := m.Z.bitwiseNotWithAllocationContext(width, &a.Num, &out.Num, context); e != nil {
 		return e
 	}
 	return m.resetDenominator(out)

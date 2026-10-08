@@ -13,24 +13,24 @@ import (
 // at the reached service epilogue, never copied from an observer/census. No
 // separate per-call header or inline numerical reservation is introduced.
 type RationalServiceInvocation struct {
-	self                               *RationalServiceInvocation
-	service                            *RationalService
-	manager                            *RationalManager
-	integer                            *IntegerManager
-	borrowedInteger                    *IntegerManager
-	next                               *RationalServiceInvocation
-	characters                         integerCharacterScope
-	characterFormatting                naturalFormattingScope
-	insertion                          NumeralInsertionReceipt
-	scope                              rationalLexicalScope
-	numeric                            NumericAllocationRoots
-	division, gcd, extended            integerRawInvocationReceipt
-	addGeneration, normGeneration      uint64
-	compareGeneration, powerGeneration uint64
-	transferred                        SmallAllocatorPendingAllocation
-	originalCell                       SourceCellBacking
-	originalPending                    Block
-	cellRetired                        bool
+	self                                *RationalServiceInvocation
+	service                             *RationalService
+	manager                             *RationalManager
+	integer                             *IntegerManager
+	borrowedInteger                     *IntegerManager
+	next                                *RationalServiceInvocation
+	characters                          integerCharacterScope
+	characterFormatting                 naturalFormattingScope
+	insertion                           NumeralInsertionReceipt
+	scope                               rationalLexicalScope
+	numeric                             NumericAllocationRoots
+	division, gcd, extended, bitwiseNot integerRawInvocationReceipt
+	addGeneration, normGeneration       uint64
+	compareGeneration, powerGeneration  uint64
+	transferred                         SmallAllocatorPendingAllocation
+	originalCell                        SourceCellBacking
+	originalPending                     Block
+	cellRetired                         bool
 
 	invocation                            uint64
 	executing, ended, falseDone, trueDone bool
@@ -96,7 +96,7 @@ func (c *RationalServiceInvocation) cleanupLocked(abort bool) error {
 		}
 	}
 	if !abort {
-		for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd} {
+		for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd, &c.bitwiseNot} {
 			if e := c.integer.CleanupRawInvocation(r, false); e != nil {
 				if c.ownCause == nil {
 					c.ownCause = e
@@ -124,7 +124,7 @@ func (c *RationalServiceInvocation) cleanupLocked(abort bool) error {
 			}
 			return e
 		}
-		for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd} {
+		for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd, &c.bitwiseNot} {
 			if e := c.integer.CleanupRawInvocation(r, true); e != nil {
 				if c.ownCause == nil {
 					c.ownCause = e
@@ -710,4 +710,19 @@ func (s *RationalService) PowerWithInvocation(a *OwnedRational, exponent uint32,
 	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
 	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
 	return s.facadeUnaryLockedWithInvocation(a, facadePower, exponent, c)
+}
+
+// Source: src/util/rational.h:388-392.
+func (s *RationalService) BitwiseNotWithInvocation(width uint32, a *OwnedRational, c *RationalServiceInvocation) (v OwnedRational, e error) {
+	if e = s.lock(); e != nil {
+		return
+	}
+	defer s.mu.Unlock()
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	return s.bitwiseNotLockedWithInvocation(width, a, c)
 }

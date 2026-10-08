@@ -35,12 +35,13 @@ func (m *IntegerManager) rawInvocationExecuting() bool {
 	return m.numericCallerExecuting() || m.rationalServiceReadCallbackActive() || m.conversionCallerExecuting() || (m.MpfParent != nil && m.MpfParent.formatInvocationExecuting()) || m.mpfBorrowedSourceCallbackActive() || m.mpfLifecycleCallbackActive() || (m.DivisionRaw.Active && m.DivisionRaw.executing) ||
 		(m.ExtendedRaw.Active && m.ExtendedRaw.executing) ||
 		(m.GcdRaw.Active && m.GcdRaw.executing) ||
+		(m.BitwiseNotRaw.Active && m.BitwiseNotRaw.executing) ||
 		(m.AddMulInvocation.Active && m.AddMulInvocation.executing) ||
 		(m.DividesNumeral.Active && m.DividesNumeral.Executing)
 }
 
 func (m *IntegerManager) rawFrameAddress(s *IntegerRawScope) bool {
-	return m != nil && m.self == m && s != nil && (s == &m.DivisionRaw || s == &m.ExtendedRaw || s == &m.GcdRaw)
+	return m != nil && m.self == m && s != nil && (s == &m.DivisionRaw || s == &m.ExtendedRaw || s == &m.GcdRaw || s == &m.BitwiseNotRaw)
 }
 func (m *IntegerManager) MatchesRawInvocation(r *integerRawInvocationReceipt) bool {
 	return r != nil && r.Manager == m && m.rawFrameAddress(r.Frame) && r.Frame.owner == m && r.Invocation != 0 && r.Invocation == r.Frame.Invocation && r.Frame.Active
@@ -218,6 +219,16 @@ func (m *IntegerManager) CleanupGCDRaw() error {
 		return ErrNumericOwner
 	}
 	s := &m.GcdRaw
+	r := integerRawInvocationReceipt{m, s, s.Invocation}
+	return m.CleanupRawInvocation(&r, true)
+}
+
+// Source: src/util/mpz.cpp:1151-1183.
+func (m *IntegerManager) CleanupBitwiseNot() error {
+	if m == nil || m.self != m {
+		return ErrNumericOwner
+	}
+	s := &m.BitwiseNotRaw
 	r := integerRawInvocationReceipt{m, s, s.Invocation}
 	return m.CleanupRawInvocation(&r, true)
 }

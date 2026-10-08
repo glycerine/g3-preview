@@ -51,13 +51,13 @@ type IntegerManager struct {
 	rationalServiceParent *RationalService
 	rationalServiceRead   *RationalServiceInvocation
 
-	conversionDetachedOutputs        *arbitraryFloatRationalConversionScope
-	mpfConversionCaller              *arbitraryFloatRationalConversionScope
-	DividesNumeral                   integerDividesNumeralScope
-	DivisionRaw, ExtendedRaw, GcdRaw IntegerRawScope
-	AddMulInvocation                 integerAddMulScope
-	CopyAllocation                   integerCopyAllocationScope
-	NormalizationExecuting           bool
+	conversionDetachedOutputs                       *arbitraryFloatRationalConversionScope
+	mpfConversionCaller                             *arbitraryFloatRationalConversionScope
+	DividesNumeral                                  integerDividesNumeralScope
+	DivisionRaw, ExtendedRaw, GcdRaw, BitwiseNotRaw IntegerRawScope
+	AddMulInvocation                                integerAddMulScope
+	CopyAllocation                                  integerCopyAllocationScope
+	NormalizationExecuting                          bool
 
 	self                                   *IntegerManager
 	mpfValueRead                           *arbitraryFloatCopyBinding
@@ -561,6 +561,9 @@ func (m *IntegerManager) CloseChecked() error {
 		return fail(e)
 	}
 	if e := m.CleanupExtendedGCD(); e != nil {
+		return fail(e)
+	}
+	if e := m.CleanupBitwiseNot(); e != nil {
 		return fail(e)
 	}
 	if e := m.CleanupGCDRaw(); e != nil {

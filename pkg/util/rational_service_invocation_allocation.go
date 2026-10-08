@@ -54,7 +54,7 @@ func (c *RationalServiceInvocation) childSource() error {
 	if c.powerGeneration != 0 && c.powerGeneration == r.PowerGeneration && r.powerEnd && r.powerCause != nil {
 		return r.powerCause
 	}
-	for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd} {
+	for _, r := range []*integerRawInvocationReceipt{&c.extended, &c.division, &c.gcd, &c.bitwiseNot} {
 		if e := c.integer.RawInvocationSourceCause(r); e != nil {
 			return e
 		}
@@ -65,6 +65,8 @@ func (c integerAllocationInvocationContext) recordRationalServiceRaw(z *IntegerM
 	if s := c.rationalServiceFrame(z); s != nil {
 		r.Frame.formatContext = c
 		switch r.Frame {
+		case &z.BitwiseNotRaw:
+			s.bitwiseNot = *r
 		case &z.DivisionRaw:
 			s.division = *r
 		case &z.GcdRaw:

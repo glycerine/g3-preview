@@ -152,6 +152,9 @@ func (m *IntegerManager) bitwiseBinary(a, b, out *Int, op uint8) error {
 // defines its intended low63 bits without signed overflow. The general path
 // retains all 64-bit source chunk actions, including the final unused multiplier.
 func (m *IntegerManager) BitwiseNot(width uint32, a, out *Int) error {
+	return m.bitwiseNotWithAllocationContext(width, a, out, integerAllocationInvocationContext{})
+}
+func (m *IntegerManager) bitwiseNotWithAllocationContext(width uint32, a, out *Int, context integerAllocationInvocationContext) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -163,24 +166,39 @@ func (m *IntegerManager) BitwiseNot(width uint32, a, out *Int) error {
 	}
 	if a.IsSmall() && width <= 63 {
 		mask := (uint64(1) << width) - 1
-		return m.SetInt64(out, int64(^uint64(a.Val)&mask))
+		return m.setInt64WithAllocationContext(out, int64(^uint64(a.Val)&mask), context)
 	}
-	var a1, a2, mult, tmp Int
-	defer func() { m.Del(&a1); m.Del(&a2); m.Del(&mult); m.Del(&tmp) }()
-	if e := m.Copy(&a1, a); e != nil {
+	raw := &m.BitwiseNotRaw
+	receipt, e := m.beginRawInvocation(raw, 4)
+	if e != nil {
 		return e
 	}
-	if e := m.SetInt64(&mult, 1); e != nil {
+	context.recordRationalServiceRaw(m, receipt)
+	context.recordCaller(m, "bitwise_not", NumericInvocationReceipt{Raw: receipt})
+	context = context.withRawInvocation(receipt)
+	a1, a2, mult, tmp := &raw.Values[0], &raw.Values[1], &raw.Values[2], &raw.Values[3]
+	defer func() {
+		raw.executing = false
+		raw.BodyCause = err
+		if err == nil {
+			raw.BodySucceeded = true
+			err = m.finishRawSource(raw)
+		}
+	}()
+	if e := m.copyFromOwnerWithAllocationContext(a1, m, a, nil, context); e != nil {
 		return e
 	}
-	if e := m.SetInt64(out, 0); e != nil {
+	if e := m.setInt64WithAllocationContext(mult, 1, context); e != nil {
+		return e
+	}
+	if e := m.setInt64WithAllocationContext(out, 0, context); e != nil {
 		return e
 	}
 	for width > 0 {
-		if e := m.Mod(&a1, &m.Two64, &a2); e != nil {
+		if e := m.modWithAllocationContext(a1, &m.Two64, a2, context); e != nil {
 			return e
 		}
-		n, e := m.Uint64(&a2)
+		n, e := m.Uint64(a2)
 		if e != nil {
 			return e
 		}
@@ -191,11 +209,11 @@ func (m *IntegerManager) BitwiseNot(width uint32, a, out *Int) error {
 		if width < 64 {
 			v &= (uint64(1) << width) - 1
 		}
-		if e = m.SetUint64(&tmp, v); e != nil {
+		if e = m.setUint64WithAllocationContext(tmp, v, context); e != nil {
 			return e
 		}
 		if modularSourceDebug {
-			got, err := m.Uint64(&tmp)
+			got, err := m.Uint64(tmp)
 			if err != nil {
 				return err
 			}
@@ -203,16 +221,16 @@ func (m *IntegerManager) BitwiseNot(width uint32, a, out *Int) error {
 				return ErrIntegerAssertion
 			}
 		}
-		if e = m.Mul(&tmp, &mult, &tmp); e != nil {
+		if e = m.mulWithAllocationContext(tmp, mult, tmp, context); e != nil {
 			return e
 		}
-		if e = m.Add(out, &tmp, out); e != nil {
+		if e = m.addSubWithAllocationContext(out, tmp, out, false, context); e != nil {
 			return e
 		}
-		if e = m.Mul(&mult, &m.Two64, &mult); e != nil {
+		if e = m.mulWithAllocationContext(mult, &m.Two64, mult, context); e != nil {
 			return e
 		}
-		if e = m.Div(&a1, &m.Two64, &a1); e != nil {
+		if e = m.divWithAllocationContext(a1, &m.Two64, a1, context); e != nil {
 			return e
 		}
 		if width < 64 {
