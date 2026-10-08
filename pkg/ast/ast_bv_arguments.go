@@ -53,3 +53,10 @@ func (m *ASTManager) bitVectorArgumentsCore(kind int32, args AppArguments) (ASTH
 	r, e := m.mkAppArguments(d, args)
 	return m.external(r), e
 }
+
+// Source: src/ast/ast.cpp:1568-1638; src/ast/bv_decl_plugin.cpp:571-630.
+// MkBitVectorAddArguments borrows the original ADD operand storage, including
+// the common suffix selected by bv_rewriter::are_eq_upto_num.
+func (m *ASTManager) MkBitVectorAddArguments(args AppArguments) (ASTHandle, error) {
+	return m.mkBitVectorArguments(4, args)
+}

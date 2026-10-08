@@ -23,6 +23,7 @@ type BVRewriter struct {
 	extract               MkExtractProc
 	extraction            *bvExtractInvocation
 	leConcat              *bvLEConcatInvocation
+	leOverflow            *bvLEOverflowInvocation
 	propagation           *bvExtractPropagation
 	trailing              *BVTrailing
 	eqRemainder           *ast.BitVectorRemainderEqualityNumerals
@@ -211,6 +212,12 @@ func (p *BVRewriter) Close() error {
 	}
 	p.repeatArgs.Close(p.manager.Budget())
 	p.bitwiseArgs.Close(p.manager.Budget())
+	if p.leOverflow != nil {
+		if e := p.leOverflow.close(p.manager); e != nil {
+			return e
+		}
+		p.leOverflow = nil
+	}
 	if p.leConcat != nil {
 		if e := p.leConcat.close(p.manager); e != nil {
 			return e
