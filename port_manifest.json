@@ -21132,7 +21132,11 @@
         "pkg/ast/rewriter/bv_rewriter_ite.go",
         "pkg/ast/rewriter/bv_rewriter_ite_test.go",
         "pkg/ast/ast_bv_ite_numerals.go",
-        "pkg/ast/ast_bv_ite_numerals_test.go"
+        "pkg/ast/ast_bv_ite_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_mul_bounds.go",
+        "pkg/ast/rewriter/bv_rewriter_mul_bounds_test.go",
+        "pkg/ast/ast_bv_mul_bound_numerals.go",
+        "pkg/ast/ast_bv_mul_bound_numerals_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21223,7 +21227,10 @@
         "TestBVRewriterIteOneBitNumeralBranches",
         "TestBVRewriterIteUnreachedConditionAndWideBranches",
         "TestBVRewriterIteEveryColdReservationAndPublication",
-        "TestASTBitVectorIteEveryActualCopyReservation"
+        "TestASTBitVectorIteEveryActualCopyReservation",
+        "TestBVRewriterMultiplyBoundsOriginalBranches",
+        "TestBVRewriterMultiplyBoundsStoredWidthAndColdPublication",
+        "TestASTBitVectorMultiplyBoundEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -22020,6 +22027,23 @@
           "tests": [
             "TestASTBitVectorIteEveryActualCopyReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_bvsmul_no_overflow/mk_bvumul_no_overflow/mk_bvsmul_no_underflow: both copied operand reads before zero/one guards, original last stored width, returned product/limits, ordered signed adjustment and exact bound comparisons (src/ast/rewriter/bv_rewriter.cpp:2706-2800)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_mul_bounds.go",
+          "tests": [
+            "TestBVRewriterMultiplyBoundsOriginalBranches",
+            "TestBVRewriterMultiplyBoundsStoredWidthAndColdPublication"
+          ]
+        },
+        {
+          "name": "Original multiplication bound operand/product/full-modulus/half-modulus/negative-limit physical locals and exact compound subtraction/returned negation invocation ownership (src/ast/rewriter/bv_rewriter.cpp:2706-2800; src/util/rational.h:474-478)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_mul_bound_numerals.go",
+          "tests": [
+            "TestASTBitVectorMultiplyBoundEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22042,7 +22066,8 @@
         "The derived owner captures the actual polynomial base, embedded extraction declaration cache and allocated trailing implementation/caches. Its reflected header charges extraction fields once; standalone extraction construction uses the same original initializer with its own header. A default local parameter full-expression spans both base updates and derived construction/local update. Failed constructor prefixes retain the borrowed context independently of possibly absent base configuration. Stopped invocation frames are joined first, before reverse trailing/extraction/base persistent-member destruction. Exact existing numerical/decrement receipts preserve failure history and published outputs. Fresh refusal campaigns cover both independent borrowed budget channels and configured multiplication with pre-existing caches and consumed old-output DEC failure; all fixture graphs close to zero.",
         "Equality dispatcher owns both default new_lhs/new_rhs refs before the polynomial guard, retaining them across cancellation/isolation/concat/fallback and destroying rhs then lhs after output assignment. Nested existing callers retain actual receipts and their own failure frames; outer close joins younger polynomial frames before older equality locals and persistent trailing/extraction/base members. The optional remainder block places divisor/rhs defaults before recognition, copies rhs first, preserves stored widths without new equality-width validation and retains separate actual Add/PowerOfTwo returned values until the condition ends. Valid BV numerical parameters are integers, so original GE comparisons use the original integer comparison fast path. Sum/power invocations capture exact scalar contexts; actual Runtime width65 refusal/lifetime/history tests close graphs to zero. A reached trailing FAILED still publishes raw equality and is followed by reset_cache(4096).",
         "MkBV validates all arguments in source order before val/two placement, then scans from the last bit. Each physical val multiplication and postfix increment names its actual scalar invocation; copied postfix old value is owned and destroyed at the full-expression boundary even though unused. Numeric factory child receipt joins before older two/val DT, which follow output assignment. Parent retains stopped numeric owner, published result and original cause until exact cleanup. Actual Runtime width65 all-one campaigns refuse every reached numeric reservation through success and retain separate unchanged old postfix result; cold factory campaigns reach published result with consumed old DEC failure. All fixture graphs close to zero.",
-        "The ITE rule reaches no numeric placement until the enabled identity/equality/BV/RHS-width guards pass. Three original default numerals are declared RHS/else/then but copied RHS/then/else under source short-circuit guards. Even wide then/else numerals are copied before the then-width guard rejects simplification. Real physical numeric values and exact scalar copy receipts are retained until output assignment and reverse then/else/RHS DT. Failed outer calls retain the exact numeric child, reject replay and close it before persistent members. Equal branches do not read the condition; negated-condition rewriting precedes the ite2id option. Fresh actual Runtime width65 copy campaigns and cold publication/old-DEC campaigns close all graphs to zero and preserve recorded failure history."
+        "The ITE rule reaches no numeric placement until the enabled identity/equality/BV/RHS-width guards pass. Three original default numerals are declared RHS/else/then but copied RHS/then/else under source short-circuit guards. Even wide then/else numerals are copied before the then-width guard rejects simplification. Real physical numeric values and exact scalar copy receipts are retained until output assignment and reverse then/else/RHS DT. Failed outer calls retain the exact numeric child, reject replay and close it before persistent members. Equal branches do not read the condition; negated-condition rewriting precedes the ite2id option. Fresh actual Runtime width65 copy campaigns and cold publication/old-DEC campaigns close all graphs to zero and preserve recorded failure history.",
+        "Multiplication predicates place a0/a1 before both recognitions, copy both operands before source zero/one shortcuts and preserve the second numeral width overwrite. Overflow places returned product then limit; underflow places full then half modulus, conditionally subtracts full modulus from a0 then a1 in their physical receivers, places product then distinct copied negative limit. Output assignment precedes reverse reached declarations. Exact scalar contexts name actual copy/product/power/subtraction/negation operations; returned values survive child retirement. Cold published-output/old-DEC and actual Runtime width65 campaigns cover all modes and a left-one/right-big copy fast path, preserve stopped history and close all graphs to zero."
       ],
       "deviations": [
         "Only the three original negated-bitwise reducer bodies are selected, exposed as standalone core adapters for later BV rewriter dispatch/traversal. They preserve source operand order, generated operator nesting and BR_REWRITE2; they do not normalize or evaluate operands. Full BV rewriter constructor/parameters/poly/trailing/extract/dispatch/traversal algorithms, native pointer/buffer/exception ABI and whole-unit ownership audit remain uncredited. Invalid/nil Go manager/reference boundaries use existing checked Go transport.",
@@ -22064,7 +22089,8 @@
         "Selected derived member construction/configured add/mul integration is complete on the concrete Go owner, but full equality/application dispatcher and solver integration remain required. Native base/imp embedding, stack/default argument/temporary-elision/process-global/assertion/fatal/exception/destructor ABI remain qualified; Go headers account actual wrapper storage and do not claim native layout. The arithmetic utility plugin remains lazy/null; source family lookup does not install it. ASTManager already constructs the arithmetic family, so the actual arithmetic utility lookup is warm and allocation-free. No whole source unit is promoted.",
         "Selected equality dispatcher algorithm and required remainder numerical scope are complete through existing source implementations. Full application dispatcher, remaining BV operator bodies, arithmetic/solver integration and whole source-unit coverage remain required. TRACE/CTTRACE diagnostics, C++ unspecified argument evaluation order, native stack/layout/temporary-elision/default-reference/fatal/exception/global/assertion/destructor ABI and independently stopped source DT remain qualified. Go orders sum before power and retires power before sum at condition exit; no native compiler evaluation-prefix claim is made. No whole source unit is promoted.",
         "Selected mk_mkbv body and exact postfix invocation interface are complete through the configured derived owner. Full BV application dispatch, remaining operator bodies and solver integration remain required. Existing postfix named return/temporary-elision/native layout/global/fatal/exception/assertion/destructor ABI qualifications remain; interface delegates original postfix body rather than replacing postfix with prefix or bit packing. No whole source unit is promoted.",
-        "Selected BV mk_ite_core algorithm is complete through the configured derived owner; full BV application dispatch, remaining operators, arithmetic/solver integration and whole unit audits remain required. Source TRACE and native assertion/stack/layout/temporary-elision/global/fatal/exception/destructor ABI remain qualified. DEBUG width/distinctness assertions use checked Go domain boundaries without release prevalidation. No whole source unit is promoted."
+        "Selected BV mk_ite_core algorithm is complete through the configured derived owner; full BV application dispatch, remaining operators, arithmetic/solver integration and whole unit audits remain required. Source TRACE and native assertion/stack/layout/temporary-elision/global/fatal/exception/destructor ABI remain qualified. DEBUG width/distinctness assertions use checked Go domain boundaries without release prevalidation. No whole source unit is promoted.",
+        "Selected three multiplication-bound bodies are complete through a concrete Go mode adapter; full BV application dispatcher, remaining BV operations and arithmetic/solver integration remain required. Valid BV numeric values use original MPQ integer comparison paths. Existing returned-negation/named-return/temporary-elision/native layout/stack/global/assertion/fatal/exception/destructor ABI and TRACE qualifications remain. No whole source unit is promoted."
       ]
     },
     {
@@ -22150,7 +22176,11 @@
         "pkg/ast/rewriter/bv_rewriter_ite.go",
         "pkg/ast/rewriter/bv_rewriter_ite_test.go",
         "pkg/ast/ast_bv_ite_numerals.go",
-        "pkg/ast/ast_bv_ite_numerals_test.go"
+        "pkg/ast/ast_bv_ite_numerals_test.go",
+        "pkg/ast/rewriter/bv_rewriter_mul_bounds.go",
+        "pkg/ast/rewriter/bv_rewriter_mul_bounds_test.go",
+        "pkg/ast/ast_bv_mul_bound_numerals.go",
+        "pkg/ast/ast_bv_mul_bound_numerals_test.go"
       ],
       "tests": [
         "TestASTBitVectorUnsignedNumeralConstructorBoundary",
@@ -22260,7 +22290,10 @@
         "TestBVRewriterIteOneBitNumeralBranches",
         "TestBVRewriterIteUnreachedConditionAndWideBranches",
         "TestBVRewriterIteEveryColdReservationAndPublication",
-        "TestASTBitVectorIteEveryActualCopyReservation"
+        "TestASTBitVectorIteEveryActualCopyReservation",
+        "TestBVRewriterMultiplyBoundsOriginalBranches",
+        "TestBVRewriterMultiplyBoundsStoredWidthAndColdPublication",
+        "TestASTBitVectorMultiplyBoundEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -22625,6 +22658,23 @@
           "tests": [
             "TestASTBitVectorIteEveryActualCopyReservation"
           ]
+        },
+        {
+          "name": "Complete selected mk_bvsmul_no_overflow/mk_bvumul_no_overflow/mk_bvsmul_no_underflow: both copied operand reads before zero/one guards, original last stored width, returned product/limits, ordered signed adjustment and exact bound comparisons (src/ast/rewriter/bv_rewriter.cpp:2706-2800)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_mul_bounds.go",
+          "tests": [
+            "TestBVRewriterMultiplyBoundsOriginalBranches",
+            "TestBVRewriterMultiplyBoundsStoredWidthAndColdPublication"
+          ]
+        },
+        {
+          "name": "Original multiplication bound operand/product/full-modulus/half-modulus/negative-limit physical locals and exact compound subtraction/returned negation invocation ownership (src/ast/rewriter/bv_rewriter.cpp:2706-2800; src/util/rational.h:474-478)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_mul_bound_numerals.go",
+          "tests": [
+            "TestASTBitVectorMultiplyBoundEveryActualReservation"
+          ]
         }
       ],
       "ownership": [
@@ -22643,7 +22693,8 @@
         "The derived owner captures the actual polynomial base, embedded extraction declaration cache and allocated trailing implementation/caches. Its reflected header charges extraction fields once; standalone extraction construction uses the same original initializer with its own header. A default local parameter full-expression spans both base updates and derived construction/local update. Failed constructor prefixes retain the borrowed context independently of possibly absent base configuration. Stopped invocation frames are joined first, before reverse trailing/extraction/base persistent-member destruction. Exact existing numerical/decrement receipts preserve failure history and published outputs. Fresh refusal campaigns cover both independent borrowed budget channels and configured multiplication with pre-existing caches and consumed old-output DEC failure; all fixture graphs close to zero.",
         "Equality dispatcher owns both default new_lhs/new_rhs refs before the polynomial guard, retaining them across cancellation/isolation/concat/fallback and destroying rhs then lhs after output assignment. Nested existing callers retain actual receipts and their own failure frames; outer close joins younger polynomial frames before older equality locals and persistent trailing/extraction/base members. The optional remainder block places divisor/rhs defaults before recognition, copies rhs first, preserves stored widths without new equality-width validation and retains separate actual Add/PowerOfTwo returned values until the condition ends. Valid BV numerical parameters are integers, so original GE comparisons use the original integer comparison fast path. Sum/power invocations capture exact scalar contexts; actual Runtime width65 refusal/lifetime/history tests close graphs to zero. A reached trailing FAILED still publishes raw equality and is followed by reset_cache(4096).",
         "MkBV validates all arguments in source order before val/two placement, then scans from the last bit. Each physical val multiplication and postfix increment names its actual scalar invocation; copied postfix old value is owned and destroyed at the full-expression boundary even though unused. Numeric factory child receipt joins before older two/val DT, which follow output assignment. Parent retains stopped numeric owner, published result and original cause until exact cleanup. Actual Runtime width65 all-one campaigns refuse every reached numeric reservation through success and retain separate unchanged old postfix result; cold factory campaigns reach published result with consumed old DEC failure. All fixture graphs close to zero.",
-        "The ITE rule reaches no numeric placement until the enabled identity/equality/BV/RHS-width guards pass. Three original default numerals are declared RHS/else/then but copied RHS/then/else under source short-circuit guards. Even wide then/else numerals are copied before the then-width guard rejects simplification. Real physical numeric values and exact scalar copy receipts are retained until output assignment and reverse then/else/RHS DT. Failed outer calls retain the exact numeric child, reject replay and close it before persistent members. Equal branches do not read the condition; negated-condition rewriting precedes the ite2id option. Fresh actual Runtime width65 copy campaigns and cold publication/old-DEC campaigns close all graphs to zero and preserve recorded failure history."
+        "The ITE rule reaches no numeric placement until the enabled identity/equality/BV/RHS-width guards pass. Three original default numerals are declared RHS/else/then but copied RHS/then/else under source short-circuit guards. Even wide then/else numerals are copied before the then-width guard rejects simplification. Real physical numeric values and exact scalar copy receipts are retained until output assignment and reverse then/else/RHS DT. Failed outer calls retain the exact numeric child, reject replay and close it before persistent members. Equal branches do not read the condition; negated-condition rewriting precedes the ite2id option. Fresh actual Runtime width65 copy campaigns and cold publication/old-DEC campaigns close all graphs to zero and preserve recorded failure history.",
+        "Multiplication predicates place a0/a1 before both recognitions, copy both operands before source zero/one shortcuts and preserve the second numeral width overwrite. Overflow places returned product then limit; underflow places full then half modulus, conditionally subtracts full modulus from a0 then a1 in their physical receivers, places product then distinct copied negative limit. Output assignment precedes reverse reached declarations. Exact scalar contexts name actual copy/product/power/subtraction/negation operations; returned values survive child retirement. Cold published-output/old-DEC and actual Runtime width65 campaigns cover all modes and a left-one/right-big copy fast path, preserve stopped history and close all graphs to zero."
       ],
       "deviations": [
         "Selected unsigned numeral overload preserves original constructor width and inclusive unsigned32 inline boundary. Existing numeral copy/normalization/parameter/header/exception ABI qualifications remain; actual Runtime failures prove owner cleanup rather than resumability. Full BV rewriter header audits remain uncredited.",
@@ -22663,7 +22714,8 @@
         "Selected derived member construction/configured add/mul integration is complete on the concrete Go owner, but full equality/application dispatcher and solver integration remain required. Native base/imp embedding, stack/default argument/temporary-elision/process-global/assertion/fatal/exception/destructor ABI remain qualified; Go headers account actual wrapper storage and do not claim native layout. The arithmetic utility plugin remains lazy/null; source family lookup does not install it. ASTManager already constructs the arithmetic family, so the actual arithmetic utility lookup is warm and allocation-free. No whole source unit is promoted.",
         "Selected equality dispatcher algorithm and required remainder numerical scope are complete through existing source implementations. Full application dispatcher, remaining BV operator bodies, arithmetic/solver integration and whole source-unit coverage remain required. TRACE/CTTRACE diagnostics, C++ unspecified argument evaluation order, native stack/layout/temporary-elision/default-reference/fatal/exception/global/assertion/destructor ABI and independently stopped source DT remain qualified. Go orders sum before power and retires power before sum at condition exit; no native compiler evaluation-prefix claim is made. No whole source unit is promoted.",
         "Selected mk_mkbv body and exact postfix invocation interface are complete through the configured derived owner. Full BV application dispatch, remaining operator bodies and solver integration remain required. Existing postfix named return/temporary-elision/native layout/global/fatal/exception/assertion/destructor ABI qualifications remain; interface delegates original postfix body rather than replacing postfix with prefix or bit packing. No whole source unit is promoted.",
-        "Selected BV mk_ite_core algorithm is complete through the configured derived owner; full BV application dispatch, remaining operators, arithmetic/solver integration and whole unit audits remain required. Source TRACE and native assertion/stack/layout/temporary-elision/global/fatal/exception/destructor ABI remain qualified. DEBUG width/distinctness assertions use checked Go domain boundaries without release prevalidation. No whole source unit is promoted."
+        "Selected BV mk_ite_core algorithm is complete through the configured derived owner; full BV application dispatch, remaining operators, arithmetic/solver integration and whole unit audits remain required. Source TRACE and native assertion/stack/layout/temporary-elision/global/fatal/exception/destructor ABI remain qualified. DEBUG width/distinctness assertions use checked Go domain boundaries without release prevalidation. No whole source unit is promoted.",
+        "Selected three multiplication-bound bodies are complete through a concrete Go mode adapter; full BV application dispatcher, remaining BV operations and arithmetic/solver integration remain required. Valid BV numeric values use original MPQ integer comparison paths. Existing returned-negation/named-return/temporary-elision/native layout/stack/global/assertion/fatal/exception/destructor ABI and TRACE qualifications remain. No whole source unit is promoted."
       ]
     },
     {
@@ -142021,7 +142073,9 @@
         "pkg/util/rational_service_neg_assign_invocation_test.go",
         "pkg/util/rational_service_sub_invocation_test.go",
         "pkg/ast/ast_bv_mkbv_numerals.go",
-        "pkg/ast/ast_bv_mkbv_numerals_test.go"
+        "pkg/ast/ast_bv_mkbv_numerals_test.go",
+        "pkg/ast/ast_bv_mul_bound_numerals.go",
+        "pkg/ast/ast_bv_mul_bound_numerals_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -142182,7 +142236,8 @@
         "TestRationalServiceNegAssignInvocationEveryIntMinReservation",
         "TestRationalServiceSubReturnEveryActualReservation",
         "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
-        "TestASTBitVectorMkBVPostfixDistinctReturn"
+        "TestASTBitVectorMkBVPostfixDistinctReturn",
+        "TestASTBitVectorMultiplyBoundEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -142789,6 +142844,14 @@
           "tests": [
             "TestASTBitVectorMkBVEveryActualReservationAndPostfixLifetime",
             "TestASTBitVectorMkBVPostfixDistinctReturn"
+          ]
+        },
+        {
+          "name": "Exact returned unary negation invocation: original input copy before physical returned-value negation, unchanged input and actual copy/negation contexts (src/util/rational.h:474-478)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_mul_bound_numerals.go",
+          "tests": [
+            "TestASTBitVectorMultiplyBoundEveryActualReservation"
           ]
         }
       ],

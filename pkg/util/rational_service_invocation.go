@@ -627,3 +627,18 @@ func (s *RationalService) PostIncWithInvocation(a *OwnedRational, c *RationalSer
 	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
 	return s.facadePostfixLockedWithInvocation(a, false, c)
 }
+
+// Source: src/util/rational.h:474-478. Input stays unchanged.
+func (s *RationalService) NegWithInvocation(a *OwnedRational, c *RationalServiceInvocation) (v OwnedRational, e error) {
+	if e = s.lock(); e != nil {
+		return
+	}
+	defer s.mu.Unlock()
+	if e = s.prepareLexicalInvocation(c); e != nil {
+		return
+	}
+	defer func() { e = s.finishLexicalInvocation(c, e) }()
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	return s.facadeUnaryLockedWithInvocation(a, facadeNeg, 0, c)
+}

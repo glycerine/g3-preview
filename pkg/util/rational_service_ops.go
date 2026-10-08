@@ -411,10 +411,21 @@ func (s *RationalService) facadeUnary(a *OwnedRational, op rationalFacadeUnaryOp
 		atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
 		defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
 	}
+	return s.facadeUnaryLockedWithInvocation(a, op, p, nil)
+}
+func (s *RationalService) facadeUnaryLockedWithInvocation(a *OwnedRational, op rationalFacadeUnaryOp, p uint32, c *RationalServiceInvocation) (_lexOut OwnedRational, _lexErr error) {
 	if e := s.beginLexical(); e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.endLexicalRational(&_lexOut, &_lexErr)
+	defer func() {
+		if cause := c.childSource(); cause != nil {
+			if s.Lexical.Cause == nil {
+				s.Lexical.Cause = cause
+			}
+			_lexErr = errors.Join(_lexErr, cause)
+		}
+	}()
 	if op == facadeNumerator || op == facadeDenominator || op == facadeNeg || op == facadeAbs {
 		if e := s.rationalScalarOwner(a); e != nil {
 			return OwnedRational{}, e
@@ -430,11 +441,11 @@ func (s *RationalService) facadeUnary(a *OwnedRational, op rationalFacadeUnaryOp
 	var e error
 	switch op {
 	case facadeNeg, facadeAbs:
-		e = s.Manager.Copy(&work, &a.Raw)
+		e = s.Manager.copyWithAllocationContext(&work, &a.Raw, c.allocationContext())
 		if e == nil {
 			workComplete = true
 			if op == facadeNeg {
-				e = s.Manager.Neg(&work)
+				e = s.Manager.negWithSourceContext(&work, c.allocationContext())
 			} else {
 				e = s.Manager.Abs(&work)
 			}
