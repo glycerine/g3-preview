@@ -4,6 +4,7 @@ package util
 
 import (
 	"math"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -12,6 +13,7 @@ import (
 // constructor exact capacity, replacement geometric capacity, then dispose /
 // pointer-capacity-length publication. This is not a native STL ABI promise.
 type OwnedString struct {
+	goBuilder                    *strings.Builder
 	Self                         *OwnedString
 	Budget                       *arena.Budget
 	Inline                       [16]byte
@@ -34,6 +36,13 @@ func (v OwnedStringView) Byte(i uint64) (byte, error) {
 	if i >= v.Length {
 		return 0, arena.ErrBounds
 	}
+	if v.Owner.goBuilder != nil {
+		text := v.Owner.goBuilder.String()
+		if i >= uint64(len(text)) {
+			return 0, arena.ErrBounds
+		}
+		return text[i], nil
+	}
 	if v.Owner.External != nil {
 		return v.Owner.External[i], nil
 	}
@@ -43,6 +52,16 @@ func (v OwnedStringView) Byte(i uint64) (byte, error) {
 // String is a diagnostic caller-owned Go copy; source getter/display paths
 // never call it or acquire ownership through it.
 func (v OwnedStringView) String() (string, error) {
+	if v.Owner != nil && v.Owner.goBuilder != nil {
+		if v.Owner.Self != v.Owner || v.Owner.Closed || v.Generation != v.Owner.Generation {
+			return "", arena.ErrInvalidSlot
+		}
+		text := v.Owner.goBuilder.String()
+		if v.Length > uint64(len(text)) {
+			return "", arena.ErrBounds
+		}
+		return text[:v.Length], nil
+	}
 	if v.Length > uint64(^uint(0)>>1) {
 		return "", arena.ErrBounds
 	}

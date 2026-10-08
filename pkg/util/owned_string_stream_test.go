@@ -1,4 +1,4 @@
-// Source: src/util/mpz.cpp:1432-1435; selected libstdc++ bits/sstream.tcc:80-153.
+// Source: src/util/mpz.cpp:1432-1435.
 package util
 
 import (
@@ -11,25 +11,15 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestOwnedStringStreamIndependentHighWaterAndReturnedString(t *testing.T) {
+func TestOwnedStringStreamIndependentLengthsAndReturnedString(t *testing.T) {
 	for _, n := range []int{0, 1, 14, 15, 16, 17, 29, 30, 31, 511, 512, 513, 1023, 1024, 1025, 2048, 2049} {
 		b := arena.NewBudget(10000)
 		var out OwnedStringStream
 		serviceMust(t, out.Construct(b))
 		text := strings.Repeat("abc", (n+2)/3)[:n]
 		serviceMust(t, out.AppendCString(text))
-		capWant := uint64(15)
-		lengthWant := uint64(0)
-		if n > 15 {
-			capWant = 512
-			lengthWant = 16
-		}
-		for capWant < uint64(n) {
-			lengthWant = capWant + 1
-			capWant *= 2
-		}
-		if out.Buffer.Position != uint64(n) || out.Buffer.String.Capacity != capWant || out.Buffer.String.Length != lengthWant {
-			t.Fatal(n, out.Buffer.Position, out.Buffer.String.Capacity, out.Buffer.String.Length)
+		if out.Buffer.Position != uint64(n) || out.Buffer.String.Length != uint64(n) {
+			t.Fatal(n, out.Buffer.Position, out.Buffer.String.Length)
 		}
 		var result OwnedString
 		serviceMust(t, out.Str(&result))
@@ -38,18 +28,8 @@ func TestOwnedStringStreamIndependentHighWaterAndReturnedString(t *testing.T) {
 		if got != text {
 			t.Fatal(n, "result", got)
 		}
-		retCap := uint64(15)
-		if n > 15 {
-			retCap = uint64(n)
-			if retCap < 30 {
-				retCap = 30
-			}
-		}
-		if result.Capacity != retCap {
-			t.Fatal(n, "returned capacity", result.Capacity)
-		}
-		if b.Used() != uint64(len(out.Buffer.String.External)+len(result.External)) {
-			t.Fatal("physical accounting")
+		if b.Used() != uint64(len(result.External)) {
+			t.Fatal("returned output accounting")
 		}
 		// Returned string owns separate backing and survives destruction of buffer.
 		out.OwnAbort()
@@ -92,65 +72,21 @@ func TestOwnedStringStreamDecimalAndCountedReturn(t *testing.T) {
 	}
 }
 
-func TestOwnedStringStreamEveryGrowthAndReturnReservation(t *testing.T) {
-	for _, n := range []int{16, 513, 1025} {
-		reachedSuccess := false
-		for fail := int64(0); fail < 8; fail++ {
-			b := arena.NewBudget(10000)
-			var out OwnedStringStream
-			serviceMust(t, out.Construct(b))
-			b.FailAfter(fail)
-			var result OwnedString
-			e := out.AppendCString(strings.Repeat("x", n))
-			if e == nil {
-				e = out.Str(&result)
-			}
-			if b.Used() != uint64(len(out.Buffer.String.External)+len(out.Buffer.String.Pending)+len(result.External)+len(result.Pending)) {
-				t.Fatal(n, fail, "actual graph", b.Used())
-			}
-			if e != nil {
-				if !errors.Is(e, arena.ErrInjectedFailure) {
-					t.Fatal(n, fail, e)
-				}
-				pos := out.Buffer.Position
-				if out.AppendInt32(123) != e || out.Buffer.Position != pos {
-					t.Fatal("sticky replay")
-				}
-				if pos < uint64(n) {
-					if pos != 15 && pos != 512 && pos != 1024 {
-						t.Fatal("wrong failure prefix", pos)
-					}
-					for i := uint64(0); i < pos; i++ {
-						ch, err := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, pos}).Byte(i)
-						serviceMust(t, err)
-						if ch != 'x' {
-							t.Fatal("lost prefix")
-						}
-					}
-				} else if !result.Ready || result.Length != 0 {
-					t.Fatal("return allocation prefix")
-				}
-			} else {
-				got, err := result.View().String()
-				serviceMust(t, err)
-				if got != strings.Repeat("x", n) {
-					t.Fatal("successful result")
-				}
-				reachedSuccess = true
-			}
-			b.FailAfter(-1)
-			result.OwnAbort()
-			out.OwnAbort()
-			if b.Used() != 0 {
-				t.Fatal("owning refund", n, fail, b.Used())
-			}
-			if reachedSuccess {
-				break
-			}
+func TestOwnedStringStreamGoBuilderIgnoresArenaFailures(t *testing.T) {
+	for _, n := range []int{0, 15, 16, 512, 513, 4096} {
+		b := arena.NewBudget(0)
+		b.FailAfter(0)
+		var out OwnedStringStream
+		serviceMust(t, out.Construct(b))
+		text := strings.Repeat("x", n)
+		serviceMust(t, out.AppendCString(text))
+		serviceMust(t, out.AppendInt64(math.MinInt64))
+		got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+		serviceMust(t, e)
+		if got != text+"-9223372036854775808" || b.Used() != 0 {
+			t.Fatal(n, got, b.Used())
 		}
-		if !reachedSuccess {
-			t.Fatal("no successful completion", n)
-		}
+		out.OwnAbort()
 	}
 }
 

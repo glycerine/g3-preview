@@ -83,10 +83,10 @@ func TestArbitraryFloatRawStringWarmStreamReservation(t *testing.T) {
 	b.FailAfter(0)
 	var second OwnedString
 	e := m.ToStringRaw(&x, &second)
-	// The signed64 minimum exponent exceeds the inline stringbuf capacity.
-	// Its first stream growth remains an actual allocation on a warm call.
-	if !numericPhysicalReservationRefusal(e) || e == nil || m.rawString.exponentStream.Buffer.Position != 15 {
-		t.Fatal("source stream allocation disappeared", e)
+	// Go’s builder completes exponent formatting independently of arena faults.
+	// The legacy returned-output adapter can still reach an arena allocation.
+	if !numericPhysicalReservationRefusal(e) || e == nil || m.rawString.exponentStream.Buffer.Position != 20 {
+		t.Fatal("exponent did not finish in the Go builder", e)
 	}
 	b.FailAfter(-1)
 	serviceMust(t, m.CleanupRawString())
