@@ -265,7 +265,7 @@ func (m *IntegerManager) check(a *Int) error {
 	if m == nil || m.self != m {
 		return ErrRuntimeOwner
 	}
-	if m.mpfIntegralTransportActive() {
+	if m.mpfArithmeticTransportActive() {
 		return ErrNumericPending
 	}
 	if m.rationalServiceReadCallbackActive() || (m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive()) {
@@ -645,7 +645,7 @@ func (m *IntegerManager) CloseChecked() error {
 // Del preserves the source's m_val after releasing a big cell. Thus deleting a
 // big positive/negative value leaves inline +1/-1. Reset additionally writes 0.
 func (m *IntegerManager) Del(a *Int) error {
-	if m.mpfIntegralTransportActive() {
+	if m.mpfArithmeticTransportActive() {
 		return ErrNumericPending
 	}
 	if e := m.checkCleanup(a); e != nil {

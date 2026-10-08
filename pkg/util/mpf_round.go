@@ -96,6 +96,16 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 	}
 	invocation := s.Invocation + 1
 	*s = ArbitraryFloatRoundScope{Manager: m, Invocation: invocation, active: true, executing: true, receipt: receipt, parentFormattedSet: parent}
+	if parent.Caller != nil {
+		if caller, ok := parent.Caller.Policy.(interface {
+			enterArbitraryFloatRound(*ArbitraryFloatManager, *ArbitraryFloatRoundScope) error
+		}); ok {
+			if e := caller.enterArbitraryFloatRound(m, s); e != nil {
+				s.executing = false
+				return e
+			}
+		}
+	}
 	if rs := parent.rationalSetFrame(m.integer, true); rs != nil {
 		rs.roundFrame = s
 		rs.roundInvocation = invocation
