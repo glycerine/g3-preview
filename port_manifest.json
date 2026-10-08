@@ -13035,7 +13035,8 @@
         "pkg/ast/ast_bv_arguments.go",
         "pkg/ast/ast_bv_numeral_read.go",
         "pkg/ast/ast_bv_numeral_read_test.go",
-        "pkg/ast/ast_bv_allone_invocation_test.go"
+        "pkg/ast/ast_bv_allone_invocation_test.go",
+        "pkg/ast/ast_bv_numeric_caller_invocation_test.go"
       ],
       "tests": [
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
@@ -13117,7 +13118,10 @@
         "TestASTBitVectorNumeralReadInvocationStoredValueAndUnmatchedOutputs",
         "TestASTBitVectorNumeralReadCopiesBeforeReachedWidthError",
         "TestASTBitVectorNumeralReadEveryActualCopyReservation",
-        "TestASTBitVectorAllOneExactInvocationEveryReservation"
+        "TestASTBitVectorAllOneExactInvocationEveryReservation",
+        "TestASTBitVectorNumericCallerReturnedNormAndInverse",
+        "TestASTBitVectorNumericCallerExactEveryActualReservation",
+        "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases"
       ],
       "conditionals": [
         {
@@ -13404,6 +13408,26 @@
           "tests": [
             "TestASTBitVectorAllOneExactInvocationEveryReservation"
           ]
+        },
+        {
+          "name": "Original unsigned norm returned value exposed with exact caller invocation at actual normalization frame entry; input remains unchanged and returned ownership survives child cleanup (src/ast/bv_decl_plugin.cpp:753-765)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_normalization.go",
+          "tests": [
+            "TestASTBitVectorNumericCallerReturnedNormAndInverse",
+            "TestASTBitVectorNumericCallerExactEveryActualReservation",
+            "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases"
+          ]
+        },
+        {
+          "name": "Original mult_inverse exposed with exact caller invocation at actual inverse frame entry; unchanged one/parity/gcd/correction/assertion/output-copy body and aliased receiver behavior (src/ast/bv_decl_plugin.cpp:827-848)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_inverse.go",
+          "tests": [
+            "TestASTBitVectorNumericCallerReturnedNormAndInverse",
+            "TestASTBitVectorNumericCallerExactEveryActualReservation",
+            "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases"
+          ]
         }
       ],
       "ownership": [
@@ -13422,7 +13446,8 @@
         "Sign-bit recognition owns the nested normalization receipt captured at actual frame entry and the returned normalized rational and half-modulus values. Source cleanup joins the nested child before older caller values; owning cleanup acknowledges its exact source and abort phases. Successful normalization retires before its returned value is placed in the caller frame, and p then m end in reverse declaration order. Numerical transport spans both caller and nested call and restores the predecessor guard.",
         "Sort-taking numeral construction borrows sort metadata, erases the numerical input on a failed recognizer guard, and delegates to the existing exact numeral frame only after reading width. The returned numeral uses the source width-based canonical sort, without acquiring the caller raw sort. Original input rational parameter copy precedes the inner zero-width guard; existing numeric invocation owners retain failure cleanup authority. Transport guard saves and restores its predecessor.",
         "One/two scalar source stack parameters are represented by two embedded cold-manager records with scoped epoch tokens, separately from declaration-info scratch. They borrow values and do not allocate arena parameter slots or INC an AST sort. Factory metadata copies retain their existing ownership. Scope ends on success/refusal; stale tokens reject. Every cold constructor reservation campaign closes actual shared owners with zero budget.",
-        "Optional all-one invocation prepares the actual caller token before numeric-frame acquisition and captures frame identity/generation at entry. It delegates the unchanged original copied numeral/power/subtraction/compare body, preserves full-expression/local DT, captures failed scopes for exact older-caller cleanup and prohibits failed-call replay even after cleanup. Fresh actual Runtime raw width65 numeral campaigns refuse every reached allocation, preserve recorded SourceReady across cleanup and reject copied contexts. Existing legacy callers and nonnumeral/default bookkeeping adaptations retain their prior qualifications."
+        "Optional all-one invocation prepares the actual caller token before numeric-frame acquisition and captures frame identity/generation at entry. It delegates the unchanged original copied numeral/power/subtraction/compare body, preserves full-expression/local DT, captures failed scopes for exact older-caller cleanup and prohibits failed-call replay even after cleanup. Fresh actual Runtime raw width65 numeral campaigns refuse every reached allocation, preserve recorded SourceReady across cleanup and reject copied contexts. Existing legacy callers and nonnumeral/default bookkeeping adaptations retain their prior qualifications.",
+        "The exact caller interfaces prepare the actual ASTBitVectorNumeralInvocation before numerical acquisition, capture the real inverse/normalization frame identity and generation at entry, and delegate the original bodies without extra wrappers or substitute arithmetic. Unsigned normalization returns its original distinct owned value and never assigns the input; inverse retains the physical output assignment and its one/even/aliased branches. Failed exact frames can be joined before older caller locals end, with preserved source history and failed-call replay rejection after owning cleanup. Fresh actual Runtime width65 campaigns refuse all reached norm and inverse allocations through success; live returned normalized/output values survive child cleanup and both inputs remain unchanged. Enclosing production callers must embed/charge and retain the invocation through source exit. Native layout/stack/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source DT, higher-level multiplication-equality integration and whole-unit completion remain uncredited."
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
@@ -13441,7 +13466,8 @@
         "The recognizer checks exactly one sort parameter, unlike the original plugin internal get_bv_size helper, which intentionally remains unchanged. Recognition does not inspect parameter kind; the reached width getter uses the prior checked wrong-kind rejection. No registered BV plugin yields false in this manager-bound adapter; native bv_util construction requires its plugin. Concrete Go sort/parameter/return/numeric-frame representation and existing native allocator/assertion/exception qualifications remain. BV uint64 numeral/conversion/construction utilities and full reducer/whole-unit audits remain required.",
         "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited.",
         "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition now uses this factory in its post-core reduction and still requires its original polynomial core.",
-        "Tracked numeral reading delegates the existing original body directly into the physical caller receiver, without an additional AST numerical wrapper or value-return temporary. Unmatched inputs leave receiver/width/invocation unread; a reached NUM copy requires a nonnil exact caller invocation. Width is published after copy, preserving a modified-coefficient prefix on a reached missing-width domain error. Actual Runtime allocation refusals with a stored negative 4098-bit magnitude are named by the copy child; successful/failed cleanup preserves recorded source readiness and owner graphs close to zero. The future polynomial owner must embed/charge and retain this caller invocation through source exit; native stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership are not credited. Returning Go cleanup is not native-fatal resumability."
+        "Tracked numeral reading delegates the existing original body directly into the physical caller receiver, without an additional AST numerical wrapper or value-return temporary. Unmatched inputs leave receiver/width/invocation unread; a reached NUM copy requires a nonnil exact caller invocation. Width is published after copy, preserving a modified-coefficient prefix on a reached missing-width domain error. Actual Runtime allocation refusals with a stored negative 4098-bit magnitude are named by the copy child; successful/failed cleanup preserves recorded source readiness and owner graphs close to zero. The future polynomial owner must embed/charge and retain this caller invocation through source exit; native stack/pointer/allocator/assertion/fatal/exception ABI and whole-unit ownership are not credited. Returning Go cleanup is not native-fatal resumability.",
+        "The new exact norm/inverse entry points delegate already implemented original bodies, preserving existing DEBUG/release/global-slot/transport/normalization qualifications. Caller tokens name actual frames rather than adopting ambient numerical ownership. Returned unsigned norm is not the coefficient copy-assignment helper. Full mk_mul_eq and broader BV configuration/equality/solver dispatch remain required; no whole source unit is promoted and explicit Go owning cleanup is not native-fatal resumability."
       ]
     },
     {
@@ -13469,7 +13495,10 @@
         "pkg/ast/ast_bv_operation_identity.go",
         "pkg/ast/ast_bv_arguments.go",
         "pkg/ast/ast_bv_recognizers.go",
-        "pkg/ast/ast_bv_allone_invocation_test.go"
+        "pkg/ast/ast_bv_allone_invocation_test.go",
+        "pkg/ast/ast_bv_inverse.go",
+        "pkg/ast/ast_bv_normalization.go",
+        "pkg/ast/ast_bv_numeric_caller_invocation_test.go"
       ],
       "tests": [
         "TestASTOriginalPluginUninterpretedClassification",
@@ -13494,7 +13523,10 @@
         "TestASTBitVectorOperationIdentityErasesMetadata",
         "TestASTBitVectorBorrowedORArguments",
         "TestASTBitVectorBorrowedORGuardsAndLifetime",
-        "TestASTBitVectorAllOneExactInvocationEveryReservation"
+        "TestASTBitVectorAllOneExactInvocationEveryReservation",
+        "TestASTBitVectorNumericCallerReturnedNormAndInverse",
+        "TestASTBitVectorNumericCallerExactEveryActualReservation",
+        "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases"
       ],
       "conditionals": [
         {
@@ -13622,6 +13654,26 @@
           "tests": [
             "TestASTBitVectorAllOneExactInvocationEveryReservation"
           ]
+        },
+        {
+          "name": "Original unsigned norm returned value exposed with exact caller invocation at actual normalization frame entry; input remains unchanged and returned ownership survives child cleanup (src/ast/bv_decl_plugin.cpp:753-765)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_normalization.go",
+          "tests": [
+            "TestASTBitVectorNumericCallerReturnedNormAndInverse",
+            "TestASTBitVectorNumericCallerExactEveryActualReservation",
+            "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases"
+          ]
+        },
+        {
+          "name": "Original mult_inverse exposed with exact caller invocation at actual inverse frame entry; unchanged one/parity/gcd/correction/assertion/output-copy body and aliased receiver behavior (src/ast/bv_decl_plugin.cpp:827-848)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_inverse.go",
+          "tests": [
+            "TestASTBitVectorNumericCallerReturnedNormAndInverse",
+            "TestASTBitVectorNumericCallerExactEveryActualReservation",
+            "TestASTBitVectorNumericCallerOriginalFastPathsAndAliases"
+          ]
         }
       ],
       "ownership": [
@@ -13633,7 +13685,8 @@
         "Division-by-zero declaration helpers borrow the original declaration metadata and first domain. New declaration ownership follows the unchanged family factory and fixed BV cache. Warm helpers retain identical stats under FailAfter(0); twelve cold reservation refusals before success each end with zero shared budget after the actual owning closure.",
         "One/two scalar source stack parameters are represented by two embedded cold-manager records with scoped epoch tokens, separately from declaration-info scratch. They borrow values and do not allocate arena parameter slots or INC an AST sort. Factory metadata copies retain their existing ownership. Scope ends on success/refusal; stale tokens reject. Every cold constructor reservation campaign closes actual shared owners with zero budget.",
         "The numeral identity overload borrows app/declaration tags without reading or copying parameters or acquiring any reference. Tests use parameterless raw NUM metadata and actual unchanged AST stats under FailAfter(0), including wrong family/kind and variable branches.",
-        "Optional all-one invocation prepares the actual caller token before numeric-frame acquisition and captures frame identity/generation at entry. It delegates the unchanged original copied numeral/power/subtraction/compare body, preserves full-expression/local DT, captures failed scopes for exact older-caller cleanup and prohibits failed-call replay even after cleanup. Fresh actual Runtime raw width65 numeral campaigns refuse every reached allocation, preserve recorded SourceReady across cleanup and reject copied contexts. Existing legacy callers and nonnumeral/default bookkeeping adaptations retain their prior qualifications."
+        "Optional all-one invocation prepares the actual caller token before numeric-frame acquisition and captures frame identity/generation at entry. It delegates the unchanged original copied numeral/power/subtraction/compare body, preserves full-expression/local DT, captures failed scopes for exact older-caller cleanup and prohibits failed-call replay even after cleanup. Fresh actual Runtime raw width65 numeral campaigns refuse every reached allocation, preserve recorded SourceReady across cleanup and reject copied contexts. Existing legacy callers and nonnumeral/default bookkeeping adaptations retain their prior qualifications.",
+        "The exact caller interfaces prepare the actual ASTBitVectorNumeralInvocation before numerical acquisition, capture the real inverse/normalization frame identity and generation at entry, and delegate the original bodies without extra wrappers or substitute arithmetic. Unsigned normalization returns its original distinct owned value and never assigns the input; inverse retains the physical output assignment and its one/even/aliased branches. Failed exact frames can be joined before older caller locals end, with preserved source history and failed-call replay rejection after owning cleanup. Fresh actual Runtime width65 campaigns refuse all reached norm and inverse allocations through success; live returned normalized/output values survive child cleanup and both inputs remain unchanged. Enclosing production callers must embed/charge and retain the invocation through source exit. Native layout/stack/temporary-elision/process-global/assertion/fatal/exception ABI, independently stopped source DT, higher-level multiplication-equality integration and whole-unit completion remain uncredited."
       ],
       "deviations": [
         "The selected predicate is connected to model interpretation/completion; whole-header and native representation/assertion/ownership audit are not credited. A declaration naming an unregistered plugin receives false in the checked Go adapter; native consumers require a nonnull registered plugin. Declaration-only numeral identity is a checked consumer adapter of the original app/decl identity recognizers, with no application construction or numerical parameter reads.",
@@ -13644,7 +13697,8 @@
         "Selected get_div0_op/get_div0_decl preserve the five ordinary division/remainder/modulus mappings, family and first domain, erasing input parameters/remaining domains/range. The shared family declaration dispatcher was extracted without changing its branches. Invalid kinds at native UNREACHABLE, invalid handles and empty domain pointers receive checked Go errors; native assertion/compiler-unreachable behavior and whole-header ABI/ownership audits remain uncredited. Full BV rewriter consumers remain separate work.",
         "Selected parameterized utility calls preserve signed int32 conversion of unsigned counts/bounds and original factory guards, including accepted negative extract low versus rejected negative extension. mk_bv2int performs arith family lookup and Int-sort factory before creating its borrowed AST parameter; the source BV2INT declaration erases that parameter. The generic sort dispatcher body is shared without branch changes. Two high parameter-token slots are reserved, reducing the checked arena slot limit; scoped epoch exhaustion and missing plugin remain checked Go adapter boundaries. Native stack/union/assertion/exception ABI and complete whole-unit/reducer ownership audit remain uncredited.",
         "Selected parameter-free numeral predicate exposes the existing original identity algorithm for BV reducers. Missing registered plugin and invalid Go handle/kind domains retain checked adapter behavior; native whole-header pointer/union/assertion/ownership audit is not credited.",
-        "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition now uses this factory in its post-core reduction and still requires its original polynomial core."
+        "Borrowed OR uses checked Go application/ref-vector argument readers without an additional operand-buffer copy. The existing application candidate still allocates before hash-cons lookup. No native pointer/layout/allocation ABI or whole-unit completion is credited; BV addition now uses this factory in its post-core reduction and still requires its original polynomial core.",
+        "The new exact norm/inverse entry points delegate already implemented original bodies, preserving existing DEBUG/release/global-slot/transport/normalization qualifications. Caller tokens name actual frames rather than adopting ambient numerical ownership. Returned unsigned norm is not the coefficient copy-assignment helper. Full mk_mul_eq and broader BV configuration/equality/solver dispatch remain required; no whole source unit is promoted and explicit Go owning cleanup is not native-fatal resumability."
       ]
     },
     {

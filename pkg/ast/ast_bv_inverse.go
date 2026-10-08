@@ -14,7 +14,29 @@ func (m *ASTManager) BitVectorMultiplicativeInverse(n *util.OwnedRational, bits 
 	return m.bitVectorMultiplicativeInverse(n, bits, out, nil)
 }
 
-func (m *ASTManager) bitVectorMultiplicativeInverse(n *util.OwnedRational, bits uint32, out *util.OwnedRational, g *util.GlobalParamsService) (yes bool, result error) {
+// BitVectorMultiplicativeInverseWithInvocation captures this exact inverse
+// call before numeric acquisition, for callers with older owning numerals.
+func (m *ASTManager) BitVectorMultiplicativeInverseWithInvocation(n *util.OwnedRational, bits uint32, out *util.OwnedRational, c *ASTBitVectorNumeralInvocation) (yes bool, result error) {
+	if c == nil {
+		return false, ErrASTHandle
+	}
+	if e := m.lock(); e != nil {
+		return false, e
+	}
+	defer m.mu.Unlock()
+	if e := c.prepare(m); e != nil {
+		return false, e
+	}
+	defer c.finish(&result)
+	previous := m.formatExecuting
+	m.formatExecuting = true
+	defer func() { m.formatExecuting = previous }()
+	return m.bitVectorMultiplicativeInverseCaptured(n, bits, out, nil, &c.receipt)
+}
+func (m *ASTManager) bitVectorMultiplicativeInverse(n *util.OwnedRational, bits uint32, out *util.OwnedRational, g *util.GlobalParamsService) (bool, error) {
+	return m.bitVectorMultiplicativeInverseCaptured(n, bits, out, g, nil)
+}
+func (m *ASTManager) bitVectorMultiplicativeInverseCaptured(n *util.OwnedRational, bits uint32, out *util.OwnedRational, g *util.GlobalParamsService, captured *astBVNormalizationReceipt) (yes bool, result error) {
 	q := m.numerals
 	one, e := q.IsOne(n)
 	if e != nil {
@@ -25,7 +47,10 @@ func (m *ASTManager) bitVectorMultiplicativeInverse(n *util.OwnedRational, bits 
 		return false, e
 	}
 	f.inverse = true
-	defer f.finishNumeral(&result, nil)
+	if captured != nil {
+		*captured = astBVNormalizationReceipt{frame: f, invocation: f.invocation}
+	}
+	defer f.finishNumeral(&result, captured)
 	if one {
 		if e = q.CopyWithInvocation(out, n, &f.children[0]); e != nil {
 			return false, e

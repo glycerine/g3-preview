@@ -19,6 +19,26 @@ func astBVAssertionEnabled(g *util.GlobalParamsService) (bool, error) {
 	return g.NamespaceAssertionsEnabled()
 }
 
+// NormalizeBitVectorValueWithInvocation returns the original unsigned norm
+// value. It does not assign into or copy-normalize the input receiver.
+func (m *ASTManager) NormalizeBitVectorValueWithInvocation(value *util.OwnedRational, bits uint32, c *ASTBitVectorNumeralInvocation) (out util.OwnedRational, result error) {
+	if c == nil {
+		return out, ErrASTHandle
+	}
+	if e := m.lock(); e != nil {
+		return out, e
+	}
+	defer m.mu.Unlock()
+	if e := c.prepare(m); e != nil {
+		return out, e
+	}
+	defer c.finish(&result)
+	previous := m.formatExecuting
+	m.formatExecuting = true
+	defer func() { m.formatExecuting = previous }()
+	return m.normalizeBitVectorWithFrame(value, bits, false, nil, &c.receipt)
+}
+
 func (m *ASTManager) normalizeBitVector(value *util.OwnedRational, bits uint32, signed bool, g *util.GlobalParamsService) (out util.OwnedRational, result error) {
 	return m.normalizeBitVectorWithFrame(value, bits, signed, g, nil)
 }
