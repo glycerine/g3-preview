@@ -149826,9 +149826,18 @@
       "path": "src/util/scoped_vector.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/scoped_vector.go",
+        "pkg/util/scoped_vector_test.go"
+      ],
+      "tests": [
+        "TestScopedVectorLevelZeroSetPopAndEraseSwap",
+        "TestScopedVectorNestedCopyOnWriteAndMultiPop",
+        "TestScopedVectorIteratorOwnerAndDirectRef",
+        "TestScopedVectorChaCha8AgainstSnapshotOracle",
+        "TestScopedVectorPreconditionPanics"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -149873,11 +149882,67 @@
           "text": "SASSERT(src < m_index.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructor, push_scope and multi-level pop_scope rollback",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_vector.go",
+          "tests": [
+            "TestScopedVectorNestedCopyOnWriteAndMultiPop",
+            "TestScopedVectorChaCha8AgainstSnapshotOracle",
+            "TestScopedVectorPreconditionPanics"
+          ]
+        },
+        {
+          "name": "indexed read, direct ref and copy-on-write set",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_vector.go",
+          "tests": [
+            "TestScopedVectorLevelZeroSetPopAndEraseSwap",
+            "TestScopedVectorNestedCopyOnWriteAndMultiPop",
+            "TestScopedVectorIteratorOwnerAndDirectRef",
+            "TestScopedVectorChaCha8AgainstSnapshotOracle"
+          ]
+        },
+        {
+          "name": "iterator owner equality, dereference and prefix/postfix advance",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_vector.go",
+          "tests": [
+            "TestScopedVectorIteratorOwnerAndDirectRef",
+            "TestScopedVectorPreconditionPanics"
+          ]
+        },
+        {
+          "name": "push_back, pop_back, erase_and_swap, size and empty",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_vector.go",
+          "tests": [
+            "TestScopedVectorLevelZeroSetPopAndEraseSwap",
+            "TestScopedVectorNestedCopyOnWriteAndMultiPop",
+            "TestScopedVectorChaCha8AgainstSnapshotOracle",
+            "TestScopedVectorPreconditionPanics"
+          ]
+        },
+        {
+          "name": "set_index trail publication and invariant",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_vector.go",
+          "tests": [
+            "TestScopedVectorNestedCopyOnWriteAndMultiPop",
+            "TestScopedVectorChaCha8AgainstSnapshotOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "ScopedVector owns all logical values, historical scope copies, index mappings and rollback trails in Go slices. PopScope clears discarded any values before reslicing so garbage collection can reclaim their referenced objects."
+      ],
+      "deviations": [
+        "The source template T is represented by one non-generic any-valued vector. Each concrete consumer owns one source specialization and is responsible for consistent dynamic value types.",
+        "Ref returns *any to the current slice slot. Like the source mutable reference, it bypasses copy-on-write and is invalid to retain across structural edits. Source assertion preconditions become Go panics."
+      ]
     },
     {
       "path": "src/util/sexpr.cpp",
