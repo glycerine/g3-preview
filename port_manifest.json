@@ -149124,22 +149124,65 @@
       "path": "src/util/scoped_ctrl_c.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/scoped_ctrl_c.go",
+        "pkg/util/scoped_ctrl_c_test.go"
+      ],
+      "tests": [
+        "TestScopedCtrlCReceivesProcessInterrupt",
+        "TestScopedCtrlCOnceResetAndForwardState",
+        "TestScopedCtrlCRepeatedModeAndDisabledScope",
+        "TestScopedCtrlCNestedLIFOAndRestoration",
+        "TestScopedCtrlCHandlerAndOwnerPreconditions"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "scoped_ctrl_c::on_ctrl_c first delivery, repeated delivery and once-mode forwarding",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_ctrl_c.go",
+          "tests": [
+            "TestScopedCtrlCReceivesProcessInterrupt",
+            "TestScopedCtrlCOnceResetAndForwardState",
+            "TestScopedCtrlCRepeatedModeAndDisabledScope"
+          ]
+        },
+        {
+          "name": "scoped_ctrl_c construction and destruction install and restore nested process handlers",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_ctrl_c.go",
+          "tests": [
+            "TestScopedCtrlCReceivesProcessInterrupt",
+            "TestScopedCtrlCNestedLIFOAndRestoration",
+            "TestScopedCtrlCHandlerAndOwnerPreconditions"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each enabled scope borrows its EventHandler and links to the previously active scope. Close must follow LIFO order, restores the previous scope and stops the package os/signal subscription when the outermost scope closes."
+      ],
+      "deviations": [
+        "Go os/signal supplies process interrupt registration. Once-mode forwarding stops this package's subscription and re-signals the current process so any other Go registration or the runtime default receives it; no C signal function pointer is represented."
+      ]
     },
     {
       "path": "src/util/scoped_ctrl_c.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/scoped_ctrl_c.go",
+        "pkg/util/scoped_ctrl_c_test.go"
+      ],
+      "tests": [
+        "TestScopedCtrlCReceivesProcessInterrupt",
+        "TestScopedCtrlCOnceResetAndForwardState",
+        "TestScopedCtrlCRepeatedModeAndDisabledScope",
+        "TestScopedCtrlCNestedLIFOAndRestoration",
+        "TestScopedCtrlCHandlerAndOwnerPreconditions"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -149150,11 +149193,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "scoped_ctrl_c constructor, destructor and reset",
+          "status": "ported",
+          "go_target": "pkg/util/scoped_ctrl_c.go",
+          "tests": [
+            "TestScopedCtrlCReceivesProcessInterrupt",
+            "TestScopedCtrlCOnceResetAndForwardState",
+            "TestScopedCtrlCRepeatedModeAndDisabledScope",
+            "TestScopedCtrlCNestedLIFOAndRestoration",
+            "TestScopedCtrlCHandlerAndOwnerPreconditions"
+          ]
+        }
+      ],
+      "ownership": [
+        "ScopedCtrlC is a noncopyable explicit owner of one optional process interrupt registration and a borrowed EventHandler. Disabled scopes own no registration."
+      ],
+      "deviations": [
+        "Explicit Close replaces the C++ destructor, and copied owners, use after Close and non-LIFO enabled Close are checked errors. The Go standard library owns signal transport and its required delivery goroutine."
+      ]
     },
     {
       "path": "src/util/scoped_numeral.h",

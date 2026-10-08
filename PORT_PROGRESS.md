@@ -30568,3 +30568,11 @@ The source's TRACE statement only reports a rejected increment and has no state 
 Seven focused tests, including 3,125 independent action histories, remain green after exporting the API and renaming the files to match resource_limit.h. Focused native and g3debug checks pass (0.005s each). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 81 ported, 282 partial, 1730 unported, plus separately classified platform replacements.
 
 The full native suite passed at 23:35 UTC after the pool, ref_buffer, ref_util, ref_vector and resource_limit commits: polynomial 256.562s, util 152.418s, AST 32.957s, rewriter 19.828s, with every other tested package green.
+
+### util files: scoped_ctrl_c.cpp and scoped_ctrl_c.h
+
+Ported the scoped process-interrupt handler as exported ScopedCtrlC with NewScopedCtrlC, Reset, Close and Closed APIs. Go's os/signal package supplies SIGINT registration and delivery. Enabled scopes form the source LIFO stack and restore the previous scope on Close; disabled scopes install nothing. Repeated mode invokes the current handler on every interrupt. Once mode invokes it once, Reset rearms it, and a subsequent interrupt stops this package's subscription and is re-signaled to any other Go registration or the runtime default.
+
+The implementation borrows the shared EventHandler interface already used by ScopedTimer and delivers EventCallerControlC. A mutex protects package signal state and scope lifetime around the standard library's required delivery goroutine. Handler invocation occurs outside that mutex, preserving callback reentrancy. Copied owners, use after Close and non-LIFO enabled Close are explicit checked errors.
+
+Five focused tests cover a real process interrupt, once/reset/forward transitions without sending a terminating second signal, repeated mode, disabled scopes, nested restoration, LIFO enforcement, nil handlers, copied owners and closed owners. Focused native and g3debug checks pass (0.005s each). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 83 ported, 282 partial, 1728 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.
