@@ -79,6 +79,12 @@ func (s *RationalService) facadeValueLockedWithInvocation(a, b *OwnedRational, o
 	if e := s.facadeEntry(b, op); e != nil {
 		return OwnedRational{}, e
 	}
+	return s.facadeValueRawOperandsLockedWithInvocation(&a.Raw, &b.Raw, op, c)
+}
+
+// The caller holds the service lock and lexical scope. Raw operands may be
+// borrowed static constants; only work and the returned value are owned here.
+func (s *RationalService) facadeValueRawOperandsLockedWithInvocation(a, b *Rational, op rationalFacadeBinaryOp, c *RationalServiceInvocation) (_lexOut OwnedRational, _lexErr error) {
 	work := NewRational()
 	workComplete := !(op >= rationalFacadeAdd && op <= rationalFacadeDiv)
 	defer s.endLexicalLocal(&work, &workComplete)
@@ -93,17 +99,17 @@ func (s *RationalService) facadeValueLockedWithInvocation(a, b *OwnedRational, o
 	if op >= rationalFacadeAdd && op <= rationalFacadeDiv {
 		// return rational(a) op= b: copy before compound, then copy the returned
 		// lvalue into the value result. The second copy is intentionally observable.
-		if e := s.Manager.copyWithAllocationContext(&work, &a.Raw, c.allocationContext()); e != nil {
+		if e := s.Manager.copyWithAllocationContext(&work, a, c.allocationContext()); e != nil {
 			return OwnedRational{}, e
 		}
 		workComplete = true
 		var body error
 		if c != nil && (op == rationalFacadeAdd || op == rationalFacadeSub) {
-			body = s.Manager.addSubWithAllocationContext(&work, &b.Raw, &work, op == rationalFacadeSub, c.allocationContext())
+			body = s.Manager.addSubWithAllocationContext(&work, b, &work, op == rationalFacadeSub, c.allocationContext())
 		} else if c != nil && op == rationalFacadeMul {
-			body = s.Manager.mulWithAllocationContext(&work, &b.Raw, &work, c.allocationContext())
+			body = s.Manager.mulWithAllocationContext(&work, b, &work, c.allocationContext())
 		} else {
-			body = s.facadeRawBinaryLocked(&work, &b.Raw, &work, op)
+			body = s.facadeRawBinaryLocked(&work, b, &work, op)
 		}
 		if body != nil {
 			return OwnedRational{}, body
@@ -112,15 +118,15 @@ func (s *RationalService) facadeValueLockedWithInvocation(a, b *OwnedRational, o
 	}
 	var body error
 	if c != nil && op == rationalFacadeMod {
-		body = s.Manager.modWithAllocationContext(&a.Raw, &b.Raw, &work, c.allocationContext())
+		body = s.Manager.modWithAllocationContext(a, b, &work, c.allocationContext())
 	} else if c != nil && op == rationalFacadeRem {
-		body = s.Manager.integerOpRationalWithAllocationContext(&a.Raw, &b.Raw, &work, qIntegerRem, c.allocationContext())
+		body = s.Manager.integerOpRationalWithAllocationContext(a, b, &work, qIntegerRem, c.allocationContext())
 	} else if c != nil && op == rationalFacadeMachineDiv {
-		body = s.Manager.integerOpRationalWithAllocationContext(&a.Raw, &b.Raw, &work, qIntegerMachineDiv, c.allocationContext())
+		body = s.Manager.integerOpRationalWithAllocationContext(a, b, &work, qIntegerMachineDiv, c.allocationContext())
 	} else if c != nil && op == rationalFacadeIDiv {
-		body = s.Manager.integerOpRationalWithAllocationContext(&a.Raw, &b.Raw, &work, qIntegerDiv, c.allocationContext())
+		body = s.Manager.integerOpRationalWithAllocationContext(a, b, &work, qIntegerDiv, c.allocationContext())
 	} else {
-		body = s.facadeRawBinaryLocked(&a.Raw, &b.Raw, &work, op)
+		body = s.facadeRawBinaryLocked(a, b, &work, op)
 	}
 	if body != nil {
 		return OwnedRational{}, body

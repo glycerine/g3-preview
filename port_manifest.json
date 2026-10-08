@@ -21298,7 +21298,9 @@
         "pkg/ast/rewriter/bv_rewriter_negatable.go",
         "pkg/ast/rewriter/bv_rewriter_negatable_test.go",
         "pkg/ast/ast_bv_negatable_numerals.go",
-        "pkg/ast/ast_bv_negatable_numerals_test.go"
+        "pkg/ast/ast_bv_negatable_numerals_test.go",
+        "pkg/ast/ast_bv_one_numeral.go",
+        "pkg/ast/ast_bv_one_numeral_test.go"
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
@@ -21446,7 +21448,9 @@
         "TestBVRewriterNegatableEveryColdReservation",
         "TestBVRewriterNegatableOriginalNotArityAssertion",
         "TestASTBitVectorNegatableEveryActualReservation",
-        "TestASTBitVectorNegatableStoredReadAndReturnLifetime"
+        "TestASTBitVectorNegatableStoredReadAndReturnLifetime",
+        "TestASTBitVectorBorrowedOneEveryActualReservation",
+        "TestASTBitVectorBorrowedOneWidthGuard"
       ],
       "conditionals": [
         {
@@ -22515,6 +22519,18 @@
             "TestBVRewriterNegatableOriginalNotArityAssertion",
             "TestASTBitVectorNegatableEveryActualReservation",
             "TestASTBitVectorNegatableStoredReadAndReturnLifetime"
+          ]
+        },
+        {
+          "name": "Prerequisite for original mk_bv_not static-one factory call: original parameter copy and captured normalization frame without rational(1) outer temporary (bv_rewriter.cpp:1960-1963; rational.h:43,306-308)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_bv_one_numeral.go",
+          "go_targets": [
+            "pkg/ast/ast_bv_one_numeral_test.go"
+          ],
+          "tests": [
+            "TestASTBitVectorBorrowedOneEveryActualReservation",
+            "TestASTBitVectorBorrowedOneWidthGuard"
           ]
         }
       ],
@@ -143118,7 +143134,9 @@
         "pkg/util/integer_raw_invocation.go",
         "pkg/util/numeric_invocation_receipts.go",
         "pkg/util/rational_service_bitwise_not_invocation_test.go",
-        "pkg/util/mpz_physical_audit_test.go"
+        "pkg/util/mpz_physical_audit_test.go",
+        "pkg/util/rational_service_one_invocation.go",
+        "pkg/util/rational_service_one_invocation_test.go"
       ],
       "tests": [
         "TestSourceRationalConversionAssertions",
@@ -143294,7 +143312,9 @@
         "TestRationalServiceBitwiseNotInvocationExecutingRawGuard",
         "TestIntegerBitwiseFailurePublicationAndWarm",
         "TestIntegerBitwiseAliasedFailurePublication",
-        "TestRationalBitwiseFailureOwnershipAndDenominatorPublication"
+        "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
+        "TestRationalServiceBorrowedOneCopyAndSubtraction",
+        "TestRationalServiceBorrowedOneSubtractionEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -143975,6 +143995,18 @@
             "TestIntegerBitwiseAliasedFailurePublication",
             "TestRationalBitwiseFailureOwnershipAndDenominatorPublication",
             "TestRationalServiceExtraFailurePrefixesAndOwnership"
+          ]
+        },
+        {
+          "name": "Selected borrowed static one invocation: direct physical copy and original left-copy/compound subtraction/return-copy without an owned constant temporary (rational.h:43,306-308,462-464)",
+          "status": "partial",
+          "go_target": "pkg/util/rational_service_one_invocation.go",
+          "go_targets": [
+            "pkg/util/rational_service_one_invocation_test.go"
+          ],
+          "tests": [
+            "TestRationalServiceBorrowedOneCopyAndSubtraction",
+            "TestRationalServiceBorrowedOneSubtractionEveryActualReservation"
           ]
         }
       ],
