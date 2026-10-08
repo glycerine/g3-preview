@@ -110444,9 +110444,16 @@
       "path": "src/test/total_order.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/total_order_test.go"
+      ],
+      "tests": [
+        "TestUintTotalOrderRegisteredBasicAssertions",
+        "TestUintTotalOrderRegisteredRepeatedMoves",
+        "TestUintTotalOrderChaCha8MovesAgainstSliceOracle",
+        "TestTotalOrderMoveBeginningEraseDetailAndIntSpecialization"
+      ],
       "assertions": [
         {
           "line": 28,
@@ -110505,11 +110512,40 @@
           "text": "ENSURE(to.lt(v[k], v[k+1]));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "tst1 ordering assertions and tst2 repeated three-element rotations",
+          "status": "ported",
+          "go_target": "pkg/util/total_order_test.go",
+          "tests": [
+            "TestUintTotalOrderRegisteredBasicAssertions",
+            "TestUintTotalOrderRegisteredRepeatedMoves"
+          ]
+        },
+        {
+          "name": "tst3/tst4 randomized move_after campaigns and independent vector order",
+          "status": "ported",
+          "go_target": "pkg/util/total_order_test.go",
+          "tests": [
+            "TestUintTotalOrderChaCha8MovesAgainstSliceOracle"
+          ]
+        },
+        {
+          "name": "bad_case repeated relabeling shape",
+          "status": "ported",
+          "go_target": "pkg/util/total_order_test.go",
+          "tests": [
+            "TestUintTotalOrderRegisteredRepeatedMoves",
+            "TestUintTotalOrderChaCha8MovesAgainstSliceOracle"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The randomized stress campaign uses a fixed Go ChaCha8 stream and 20,000 independently checked moves over 100 values instead of libc rand and the source driver's multi-million progress-printing loops. Every sampled order is compared with a separate slice move implementation and the linked-label invariant; no stdout progress protocol is retained."
+      ]
     },
     {
       "path": "src/test/trigo.cpp",
@@ -153530,9 +153566,17 @@
       "path": "src/util/total_order.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/total_order.go",
+        "pkg/util/total_order_test.go"
+      ],
+      "tests": [
+        "TestUintTotalOrderRegisteredBasicAssertions",
+        "TestUintTotalOrderRegisteredRepeatedMoves",
+        "TestUintTotalOrderChaCha8MovesAgainstSliceOracle",
+        "TestTotalOrderMoveBeginningEraseDetailAndIntSpecialization"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -153681,11 +153725,63 @@
           "text": "SASSERT(curr->m_next == base() || vb(curr) < vb(curr->m_next));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "constructors, sentinel initialization, cell creation/deletion and localized uint64 relabeling",
+          "status": "ported",
+          "go_target": "pkg/util/total_order.go",
+          "tests": [
+            "TestUintTotalOrderRegisteredRepeatedMoves",
+            "TestUintTotalOrderChaCha8MovesAgainstSliceOracle"
+          ]
+        },
+        {
+          "name": "contains, insert, insert_after, move_beginning, move_after and erase",
+          "status": "ported",
+          "go_target": "pkg/util/total_order.go",
+          "tests": [
+            "TestUintTotalOrderRegisteredBasicAssertions",
+            "TestTotalOrderMoveBeginningEraseDetailAndIntSpecialization",
+            "TestUintTotalOrderChaCha8MovesAgainstSliceOracle"
+          ]
+        },
+        {
+          "name": "lt, gt, empty, size, first, has_next, next, has_pred and pred",
+          "status": "ported",
+          "go_target": "pkg/util/total_order.go",
+          "tests": [
+            "TestUintTotalOrderRegisteredBasicAssertions",
+            "TestTotalOrderMoveBeginningEraseDetailAndIntSpecialization"
+          ]
+        },
+        {
+          "name": "display, display_detail, stream insertion and debug invariant",
+          "status": "ported",
+          "go_target": "pkg/util/total_order.go",
+          "tests": [
+            "TestUintTotalOrderRegisteredBasicAssertions",
+            "TestTotalOrderMoveBeginningEraseDetailAndIntSpecialization",
+            "TestUintTotalOrderChaCha8MovesAgainstSliceOracle"
+          ]
+        },
+        {
+          "name": "int_total_order and uint_total_order specializations",
+          "status": "ported",
+          "go_target": "pkg/util/total_order.go",
+          "tests": [
+            "TestTotalOrderMoveBeginningEraseDetailAndIntSpecialization"
+          ]
+        }
+      ],
+      "ownership": [
+        "UintTotalOrder and IntTotalOrder own a stable heap core, linked cells and their Go map index. The pointer core is required because the sentinel contains self-references; cells remain stable until Erase and are never exposed."
+      ],
+      "deviations": [
+        "A Go map and garbage collection replace Map template parameters and small_object_allocator. One non-generic int64 core serves the source int32 and uint32 typedef specializations; exported wrappers preserve their distinct scalar domains.",
+        "io.Writer, fmt and strings.Builder replace std::ostream and operator<<. Source assertion preconditions become panics for absent, duplicate, empty, terminal or same-value move operations."
+      ]
     },
     {
       "path": "src/util/tptr.h",

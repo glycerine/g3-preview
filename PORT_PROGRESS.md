@@ -30464,3 +30464,11 @@ Focused native and g3debug backtrackable-set checks pass (0.004s/0.005s). Util v
 Ported the dense unsigned-to-pointer adapter as exported UintPtrMap. The distinct name avoids collision with the existing UintMap port of u_map<unsigned> from src/util/map.h. A dense slot slice preserves sparse growth, O(1) contains/find, replacement, erase and reset; an explicit presence bit keeps hot queries free of reflection. Insert validates once that the dynamic value is a non-nil Go pointer, preserving the source T* constraint and pointer identity without generics. Focused tests cover holes, growth, replacement, absent lookup, typed nil and non-pointer rejection, out-of-range erase, reset and equal-content distinct pointers.
 
 Focused native and g3debug UintMap/UintPtrMap checks pass (0.181s each). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:67 ported,287 partial,1743 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
+
+### util file: total_order.h and test file: total_order.cpp
+
+Ported the complete linked-label algorithm as exported UintTotalOrder and IntTotalOrder specializations over one non-generic core. The Go port preserves the stable circular sentinel, uint64 relative labels, localized relabeling, insert/move/erase operations, order and navigation queries, display/detail output and structural invariant. Go map allocation and garbage collection replace the source map template and small-object allocator; io.Writer and strings.Builder replace ostream use.
+
+Ported the registered ordering and repeated-rotation assertions, then added a deterministic ChaCha8 campaign with20,000 moves over100 values. Every sampled linked order is checked against an independent slice move implementation and the label/link invariant. A returned-by-value self-referential prototype initially exposed stale sentinel pointers; both exported owners now retain a stable pointer core, and the focused tests cover the corrected lifetime.
+
+Focused native and g3debug total-order checks pass (0.010s/0.008s). Util vet, ledger and diff validation pass; inventory is now2102 units,677 APIs:69 ported,287 partial,1741 unported, plus the separately classified platform replacements. No additional full suite was needed after the22:34 UTC checkpoint.
