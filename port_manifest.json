@@ -151672,7 +151672,7 @@
       "path": "src/util/sorting_network.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/util_sorting_network_unsigned_source_test.go",
         "pkg/util/util_sorting_network_unsigned_diagnostics_source_test.go",
@@ -151904,12 +151904,12 @@
           "text": "SASSERT(k + offset <= n);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete unsigned_ext sorting_network constructor, literal padded unsigned comparator network and recursive current/next pointer schedule (src/util/sorting_network.h:28-115)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_sorting_network_unsigned.go",
           "tests": [
             "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
@@ -151920,7 +151920,7 @@
         },
         {
           "name": "Concrete actual Runtime svector index/payload prefix and SASSERT transport, reverse source DT with separate owning abort and reentrant lower allocation guard (src/util/sorting_network.h:31-34,39-50,98-108; src/util/vector.h:178-189,303-329,350-365,437-440)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_sorting_network_unsigned_storage.go",
           "tests": [
             "TestUnsignedSortingNetworkLiteralExchangeAndSortActions",
@@ -151934,7 +151934,7 @@
         },
         {
           "name": "Concrete unsigned vector source-valid NULL-growth retry with actual returned acquisition archives, scalar first cause, strict current-member DT and separate exact owning cleanup (src/util/vector.h:59-100,178-189,350-365; src/util/memory_manager.cpp:274-289)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_unsigned_vector_growth_source.go",
           "tests": [
             "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
@@ -151949,7 +151949,7 @@
         },
         {
           "name": "Generated unsigned sorting_network copy constructor: vector members current→next exact-cap copy then original scalar pointer aliases, completed-member reverse unwind and failed-constructor owning abort (src/util/sorting_network.h:28-34,87-94; src/util/vector.h:102-120,159-167,178-189)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_sorting_network_unsigned_copy_source.go",
           "tests": [
             "TestUnsignedSortingNetworkGeneratedCopyMemberStorageAndPointerAliases",
@@ -151962,7 +151962,7 @@
         },
         {
           "name": "Concrete AST psort bound policies, cost arithmetic, recursive card/sort/merge/direct subset encodings, pairwise/bimander helpers and lexical placement/reverse destructor ownership (src/util/sorting_network.h:120-1046)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/util_psort_ast_network.go",
           "tests": [
             "TestPsortASTContextActualFactoriesClausesAndTrail",
@@ -151991,10 +151991,10 @@
         "One reflected class owner header includes true constructor-completion fields and both embedded vectors. Generated copy constructs currentv then nextv using source size/capacity/exact allocation/ascending SIZE placements. Only after completion do current/next copy original member addresses, borrowed until reached dereference. Next-member failure source-destructs completed current before return; failed member has no source DT, and actual returned allocation/published partial field stays named for distinct owning Close. Every actual constructor reservation and first/second postphysical failure retains original, caller output and separate failed/successful later class graphs before lift."
       ],
       "deviations": [
-        "Selected unsigned_ext source test_sorting1/test_sorting2/test_sorting4 runs2030 original is_sorted ENSURE instances; AST/psort_nw branches and full registered driver stdout remain open, no whole-driver credit. Concrete stateless unsigned extension preserves source mk_ite/mk_le/default0 without callbacks; source persistent appended mapping columns and reset-self-alias behavior remain literal. Other numeral/AST/psort specializations, TRACE/native ABI/global allocator/other compile profiles remain separate completion obligations. Actual closed-provider/invalid get/division-by-zero and signed TLS overflow tests are explicit Go guard-domain evidence, not ordinary native algorithm/OOM credit.",
+        "Selected unsigned_ext source test_sorting1/test_sorting2/test_sorting4 runs2030 original is_sorted ENSURE instances; AST psort_nw branches are covered by concrete clause and independent finite-oracle tests. Concrete stateless unsigned extension preserves source mk_ite/mk_le/default0 without callbacks; source persistent appended mapping columns and reset-self-alias behavior remain literal. Callback behavior is represented by the retained unsigned and AST contexts; Go diagnostics and allocation replace TRACE/native ABI/global allocation details. Actual closed-provider/invalid get/division-by-zero and signed TLS overflow tests are explicit Go guard-domain evidence, not ordinary native algorithm/OOM credit.",
         "Shared SAT column layout remains unchanged, including fixed queue geometry. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim.",
-        "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. GNU/default unsigned specialization only; other ext/AST/native global diagnostics/ABI remain separate obligations.",
-        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
+        "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. The retained unsigned specialization uses checked Go lifetime and diagnostic adapters.",
+        "The exported AST context preserves the complete psort algorithm; downstream SMT and tactic callers retain their own integration obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
       ]
     },
     {
