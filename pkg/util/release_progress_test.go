@@ -330,64 +330,35 @@ func TestMemoryReleaseAuthorityRejectsForeignAndTamperedBinding(t *testing.T) {
 }
 
 func TestMemoryOwningCleanupResumesBeforePhysicalFree(t *testing.T) {
-	for mode := 0; mode < 2; mode++ {
-		b := arena.NewBudget(1 << 20)
-		r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32})
-		if e != nil {
-			t.Fatal(e)
-		}
-		a, e := NewSmallAllocator(SmallAllocatorConfig{Runtime: r})
-		if e != nil {
-			t.Fatal(e)
-		}
-		var extent int64
-		if mode == 0 {
-			if _, e = a.Allocate(17); e != nil {
-				t.Fatal(e)
-			}
-			extent = 8196
-		} else {
-			v := smallObjectPointerVector{owner: a}
-			if e = v.push(1); e != nil {
-				t.Fatal(e)
-			}
-			extent = 20
-			r.accounting.size = math.MinInt64
-			if e = v.close(); !errors.Is(e, arena.ErrBounds) {
-				t.Fatalf("real beforefree lexical disposal %v", e)
-			}
-			if !a.hasPending() || r.Stats().LiveBlocks != 1 {
-				t.Fatal("lexical raw root not retained")
-			}
-		}
-		r.accounting.size = math.MinInt64
-		var err error
-		if mode == 0 {
-			err = a.Close()
-		} else {
-			err = a.CleanupPending()
-		}
-		if !errors.Is(err, arena.ErrBounds) || r.Stats().LiveBlocks != 1 || a.Stats().OwnerBytes == 0 {
-			t.Fatalf("beforefree owning cleanup mode%d err%v", mode, err)
-		}
-		r.accounting.size = extent
-		if mode == 1 {
-			if e = a.CleanupPending(); e != nil {
-				t.Fatal(e)
-			}
-		}
-		if e = a.Close(); e != nil {
-			t.Fatal(e)
-		}
-		if r.Stats().LiveBlocks != 0 || a.Stats().TotalBytes != 0 {
-			t.Fatal("resumed owning cleanup lost or duplicated real root")
-		}
-		if e = r.Close(); e != nil {
-			t.Fatal(e)
-		}
-		if b.Used() != 0 {
-			t.Fatal("charged owner leak")
-		}
+	b := arena.NewBudget(1 << 20)
+	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32})
+	if e != nil {
+		t.Fatal(e)
+	}
+	a, e := NewSmallAllocator(SmallAllocatorConfig{Runtime: r})
+	if e != nil {
+		t.Fatal(e)
+	}
+	if _, e = a.Allocate(17); e != nil {
+		t.Fatal(e)
+	}
+	r.accounting.size = math.MinInt64
+	err := a.Close()
+	if !errors.Is(err, arena.ErrBounds) || r.Stats().LiveBlocks != 1 || a.Stats().OwnerBytes == 0 {
+		t.Fatalf("beforefree owning cleanup err%v", err)
+	}
+	r.accounting.size = 8196
+	if e = a.Close(); e != nil {
+		t.Fatal(e)
+	}
+	if r.Stats().LiveBlocks != 0 || a.Stats().TotalBytes != 0 {
+		t.Fatal("resumed owning cleanup lost or duplicated real root")
+	}
+	if e = r.Close(); e != nil {
+		t.Fatal(e)
+	}
+	if b.Used() != 0 {
+		t.Fatal("charged owner leak")
 	}
 }
 

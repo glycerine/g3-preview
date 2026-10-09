@@ -270,7 +270,7 @@ func TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal(t *testing.T) {
 	}
 }
 
-func TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure(t *testing.T) {
+func TestSmallObjectAllocatorConsolidateGoSliceScratch(t *testing.T) {
 	for _, bits := range []uint8{32, 64} {
 		a, rt, _ := smallObjectFixture(t, SmallAllocatorProfile{PointerBits: bits})
 		x := smallObjectAlloc(t, a, 1)
@@ -281,8 +281,8 @@ func TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure(t *testing.T) {
 		physical := rt.Stats().PhysicalBytes
 		smallObjectMust(t, a.Consolidate())
 		after := rt.State()
-		if after.GlobalCount != before.GlobalCount+2 || rt.Stats().PhysicalBytes != physical || rt.Stats().LiveBlocks != 2 {
-			t.Fatal("two cap2 scratch vectors retained/reused then destroyed", before, after, rt.Stats())
+		if after.GlobalCount != before.GlobalCount || rt.Stats().PhysicalBytes != physical || rt.Stats().LiveBlocks != 2 {
+			t.Fatal("Go slice scratch touched runtime", before, after, rt.Stats())
 		}
 	}
 	a, rt, _ := smallObjectFixture(t, SmallAllocatorProfile{PointerBits: 64})
@@ -291,13 +291,11 @@ func TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure(t *testing.T) {
 	before := rt.State()
 	physical := rt.Stats().PhysicalBytes
 	smallObjectMust(t, rt.SetMaxCount(uint64(before.GlobalCount+1)))
-	e := a.Consolidate()
-	var z Failure
-	if !errors.As(e, &z) || z.ErrorCode() != uint32(113) {
-		t.Fatal("second scratch refusal", e)
+	if e := a.Consolidate(); e != nil {
+		t.Fatal("runtime limit affected Go slice scratch", e)
 	}
-	if rt.State().GlobalCount != before.GlobalCount+2 || rt.Stats().PhysicalBytes != physical || rt.Stats().LiveBlocks != 1 {
-		t.Fatal("lexical first scratch not cleaned", rt.State(), rt.Stats())
+	if rt.State().GlobalCount != before.GlobalCount || rt.Stats().PhysicalBytes != physical || rt.Stats().LiveBlocks != 1 {
+		t.Fatal("Go slice scratch changed runtime", rt.State(), rt.Stats())
 	}
 	free, e := a.NumFreeObjects()
 	smallObjectMust(t, e)
@@ -656,63 +654,6 @@ func TestSmallObjectAllocatorColdFailureSweepAndResetLedger(t *testing.T) {
 	b.FailAfter(0)
 	smallObjectMust(t, a.Reset())
 	b.FailAfter(-1)
-}
-
-func TestSmallObjectAllocatorLexicalFailedFreeRoots(t *testing.T) {
-	b := arena.NewBudget(1 << 24)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32, ThreadLocal: true})
-	smallObjectMust(t, e)
-	a, e := NewSmallAllocator(SmallAllocatorConfig{Runtime: rt, Profile: SmallAllocatorProfile{PointerBits: 32}})
-	smallObjectMust(t, e)
-	chunks := smallObjectPointerVector{owner: a}
-	freeObjs := smallObjectPointerVector{owner: a}
-	// Actual vector storage exists; comparator/address lookups are unused here.
-	smallObjectMust(t, chunks.push(1))
-	smallObjectMust(t, freeObjs.push(1))
-	t.Cleanup(func() {
-		rt.lane.size = 0
-		_ = rt.Deallocate(&freeObjs.raw)
-		_ = rt.Deallocate(&chunks.raw)
-		_ = a.CleanupPending()
-		_ = a.Close()
-		_ = rt.Close()
-	})
-	rt.lane.size = -1 << 63
-	if e := freeObjs.close(); e != arena.ErrBounds {
-		t.Fatal("before-free signed domain", e)
-	}
-	if e := chunks.close(); e != arena.ErrBounds {
-		t.Fatal("second before-free signed domain", e)
-	}
-	if a.Stats().PendingBlocks != 2 || rt.Stats().LiveBlocks != 2 || rt.Stats().PhysicalBytes != 40 {
-		t.Fatal("lexical roots escaped owning graph", a.Stats(), rt.Stats())
-	}
-	header := a.Stats().OwnerBytes
-	if e := a.Close(); e != ErrAllocatorPending || a.Stats().OwnerBytes != header {
-		t.Fatal("pending lexical Close lost charged owner", e, a.Stats(), header)
-	}
-	before := rt.Stats()
-	charge := b.Used()
-	if r, e := a.Allocate(13); e != arena.ErrClosed || r != (ObjectRef{}) || rt.Stats() != before || b.Used() != charge {
-		t.Fatal("destructor-complete owner accepted ordinary use", r, e, rt.Stats(), before, b.Used(), charge)
-	}
-	if _, e := a.WastedSize(); e != arena.ErrClosed {
-		t.Fatal("destructor-complete traversal", e)
-	}
-	rt.lane.size = 40
-	smallObjectMust(t, a.CleanupPending())
-	if r, e := a.Allocate(13); e != arena.ErrClosed || r != (ObjectRef{}) {
-		t.Fatal("cleanup reopened completed destructor", r, e)
-	}
-	smallObjectMust(t, a.CleanupPending())
-	if rt.Stats().LiveBlocks != 0 || rt.lane.size != 0 {
-		t.Fatal("actual cleanup events", rt.Stats(), rt.State())
-	}
-	smallObjectMust(t, a.Close())
-	smallObjectMust(t, rt.Close())
-	if b.Used() != 0 {
-		t.Fatal("lexical cleanup charge", b.Used())
-	}
 }
 
 func TestSmallObjectAllocatorGenerationExhaustionLedger(t *testing.T) {

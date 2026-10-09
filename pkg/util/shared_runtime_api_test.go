@@ -274,29 +274,3 @@ func TestMemoryNilTransportCannotSuppressFailure(t *testing.T) {
 		t.Fatal("transport refusal metadata cleanup", b.Used())
 	}
 }
-
-func TestMemoryVectorOverflowRetainsActualRootAndClass(t *testing.T) {
-	b := arena.NewBudget(1 << 20)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
-	memoryAPIMust(t, e)
-	a, e := NewSmallAllocator(SmallAllocatorConfig{Runtime: r, Profile: SmallAllocatorProfile{PointerBits: 64}})
-	memoryAPIMust(t, e)
-	v := smallObjectPointerVector{owner: a}
-	memoryAPIMust(t, v.push(1))
-	raw := v.raw
-	state := r.State()
-	stats := r.Stats()
-	// The source unsigned growth guard is scalar; no giant allocation required.
-	v.capacity = ^uint32(0) - 1
-	e = v.grow()
-	var f Failure
-	if !errors.As(e, &f) || f.Kind != FailureVectorOverflow || f.HasErrorCode() || f.ErrorCode() != 0 || f.Message() != "Overflow encountered when expanding vector" || v.raw != raw || r.State() != state || r.Stats() != stats {
-		t.Fatal("source vector overflow before allocation", e, v.raw, raw, r.State(), state, r.Stats(), stats)
-	}
-	memoryAPIMust(t, v.close())
-	memoryAPIMust(t, a.Close())
-	memoryAPIMust(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal("overflow real root cleanup", b.Used())
-	}
-}

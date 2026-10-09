@@ -1,114 +1,49 @@
-// Source vector.h pointer specializations: actual runtime-backed lexical values.
+// Source: src/util/small_object_allocator.cpp:172-242; src/util/vector.h.
 package util
 
-import (
-	"github.com/glycerine/g3/pkg/arena"
-)
+import "github.com/glycerine/g3/pkg/arena"
 
-// Only the borrowed runtime pointer is cold. All element IDs are source pointer
-// codecs in the actual backing after two source uint32 header words.
-
+// smallObjectPointerVector is temporary consolidation scratch. Allocation IDs
+// are scalar values, so ordinary typed slice storage replaces the source vector
+// header and raw pointer array.
 type smallObjectPointerVector struct {
-	owner          *SmallAllocator
-	raw            Block
-	size, capacity uint32
+	owner  *SmallAllocator
+	values []uint32
 }
 
-func (v *smallObjectPointerVector) header(offset uint64, n uint32) error {
-	return smallObjectWriteWord(v.owner.config.Runtime, v.raw, offset, 4, uint64(n))
-}
-func (v *smallObjectPointerVector) grow() error {
-	rt := v.owner.config.Runtime
-	width := uint32(v.owner.pointerBytes())
-	if v.raw == (Block{}) {
-		h, e := rt.Allocate(uint64(8 + 2*width))
-		if e != nil {
-			v.owner.rememberPending(h)
-			return e
-		}
-		v.raw = h
-		if e = v.header(0, 2); e != nil {
-			return e
-		}
-		if e = v.header(4, 0); e != nil {
-			return e
-		}
-		v.capacity = 2
-		v.size = 0
-		return nil
-	}
-	old := v.capacity
-	next := (3*old + 1) >> 1
-	oldBytes := old*width + 8
-	nextBytes := next*width + 8
-	if next <= old || nextBytes <= oldBytes {
-		return v.owner.config.Runtime.emitFailure(FailureVectorOverflow)
-	}
-	h := v.raw
-	e := rt.Reallocate(&h, uint64(nextBytes))
-	if e != nil {
-		if h != v.raw {
-			v.owner.rememberPending(h)
-			v.raw = Block{}
-		}
-		return e
-	}
-	v.raw = h
-	if e = v.header(0, next); e != nil {
-		return e
-	}
-	v.capacity = next
-	return nil
-}
 func (v *smallObjectPointerVector) push(id uint32) error {
-	if v.size == v.capacity {
-		if e := v.grow(); e != nil {
-			return e
-		}
-	}
-	if e := smallObjectWriteWord(v.owner.config.Runtime, v.raw, 8+uint64(v.size)*v.owner.pointerBytes(), v.owner.pointerBytes(), uint64(id)); e != nil {
-		return e
-	}
-	v.size++
-	return v.header(4, v.size)
-}
-func (v *smallObjectPointerVector) reset() error {
-	if v.raw == (Block{}) {
-		return nil
-	}
-	v.size = 0
-	return v.header(4, 0)
-}
-func (v *smallObjectPointerVector) get(i uint32) (uint32, error) {
-	if i >= v.size {
-		return 0, arena.ErrBounds
-	}
-	n, e := smallObjectReadWord(v.owner.config.Runtime, v.raw, 8+uint64(i)*v.owner.pointerBytes(), v.owner.pointerBytes())
-	if e != nil {
-		return 0, e
-	}
-	if n > uint64(^uint32(0)) {
-		return 0, ErrAllocatorOwner
-	}
-	return uint32(n), nil
-}
-func (v *smallObjectPointerVector) set(i, n uint32) error {
-	if i >= v.size {
+	if uint64(len(v.values)) == uint64(^uint32(0)) {
 		return arena.ErrBounds
 	}
-	return smallObjectWriteWord(v.owner.config.Runtime, v.raw, 8+uint64(i)*v.owner.pointerBytes(), v.owner.pointerBytes(), uint64(n))
+	v.values = append(v.values, id)
+	return nil
 }
+
+func (v *smallObjectPointerVector) reset() error {
+	v.values = v.values[:0]
+	return nil
+}
+
+func (v *smallObjectPointerVector) get(i uint32) (uint32, error) {
+	if uint64(i) >= uint64(len(v.values)) {
+		return 0, arena.ErrBounds
+	}
+	return v.values[i], nil
+}
+
+func (v *smallObjectPointerVector) set(i, n uint32) error {
+	if uint64(i) >= uint64(len(v.values)) {
+		return arena.ErrBounds
+	}
+	v.values[i] = n
+	return nil
+}
+
 func (v *smallObjectPointerVector) close() error {
-	if v.raw == (Block{}) {
-		return nil
-	}
-	e := v.owner.config.Runtime.Deallocate(&v.raw)
-	if e != nil && v.raw != (Block{}) {
-		v.owner.retainScratch(v.raw)
-		v.raw = Block{}
-	}
-	return e
+	v.values = nil
+	return nil
 }
+
 func (v *smallObjectPointerVector) less(i, j uint32) (bool, error) {
 	x, e := v.get(i)
 	if e != nil {
@@ -128,6 +63,7 @@ func (v *smallObjectPointerVector) less(i, j uint32) (bool, error) {
 	}
 	return a.address < b.address, nil
 }
+
 func (v *smallObjectPointerVector) swap(i, j uint32) error {
 	a, e := v.get(i)
 	if e != nil {
@@ -142,6 +78,7 @@ func (v *smallObjectPointerVector) swap(i, j uint32) error {
 	}
 	return v.set(j, a)
 }
+
 func (v *smallObjectPointerVector) sift(root, n uint32) error {
 	for uint64(root)*2+1 < uint64(n) {
 		child := root*2 + 1
@@ -169,24 +106,26 @@ func (v *smallObjectPointerVector) sift(root, n uint32) error {
 	return nil
 }
 
-// std::sort is external: concrete no-scratch heapsort preserves the selected
-// deterministic scalar-address ordering, not C++ host pointer placements.
+// The source uses std::sort. This no-scratch heapsort preserves deterministic
+// scalar-address ordering without depending on Go map or pointer order.
 func (v *smallObjectPointerVector) sort() error {
-	if v.size < 2 {
+	n := uint32(len(v.values))
+	if n < 2 {
 		return nil
 	}
-	for i := v.size / 2; i > 0; i-- {
-		if e := v.sift(i-1, v.size); e != nil {
+	for i := n / 2; i > 0; i-- {
+		if e := v.sift(i-1, n); e != nil {
 			return e
 		}
 	}
-	for n := v.size; n > 1; n-- {
+	for n > 1 {
 		if e := v.swap(0, n-1); e != nil {
 			return e
 		}
 		if e := v.sift(0, n-1); e != nil {
 			return e
 		}
+		n--
 	}
 	return nil
 }

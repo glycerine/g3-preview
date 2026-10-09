@@ -85,10 +85,10 @@ func (a *SmallAllocator) Consolidate() (err error) {
 		}
 		objectSize := uint32(a.pointerBytes()) * slot
 		perChunk := (8192 - 2*uint32(a.pointerBytes())) / objectSize
-		if freeObjs.size < perChunk {
+		if uint32(len(freeObjs.values)) < perChunk {
 			continue
 		}
-		if e := a.sourceAssert(chunks.size != 0); e != nil {
+		if e := a.sourceAssert(len(chunks.values) != 0); e != nil {
 			return e
 		}
 		if e := chunks.sort(); e != nil {
@@ -98,7 +98,7 @@ func (a *SmallAllocator) Consolidate() (err error) {
 			return e
 		}
 		var lastChunk, lastFree, objectIndex uint32
-		for chunkIndex := uint32(0); chunkIndex < chunks.size; chunkIndex++ {
+		for chunkIndex := uint32(0); chunkIndex < uint32(len(chunks.values)); chunkIndex++ {
 			chunkID, e := chunks.get(chunkIndex)
 			if e != nil {
 				return e
@@ -110,7 +110,7 @@ func (a *SmallAllocator) Consolidate() (err error) {
 			end := chunk.address + 8192
 			saved := objectIndex
 			var count uint32
-			for objectIndex < freeObjs.size {
+			for objectIndex < uint32(len(freeObjs.values)) {
 				objectID, e := freeObjs.get(objectIndex)
 				if e != nil {
 					return e

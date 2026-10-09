@@ -1,12 +1,12 @@
 // Source: src/util/small_object_allocator.cpp; src/util/memory_manager.cpp.
 package util
 
-// PendingRoots exposes only the actual allocation and two lexical scratch
-// roots retained by this checked owner. It is an identity-only diagnostic,
-// including during stopped cleanup, with no source action or ownership sweep.
+// PendingRoots exposes the actual pending allocation retained by this checked
+// owner. The two trailing zero slots preserve the receipt comparison shape used
+// by current numerical callers; consolidation scratch now uses Go slices.
 func (a *SmallAllocator) PendingRoots() ([3]Block, error) {
 	if a == nil || a.self != a {
 		return [3]Block{}, ErrAllocatorOwner
 	}
-	return [3]Block{a.pending, a.pendingScratch[0], a.pendingScratch[1]}, nil
+	return [3]Block{a.pending}, nil
 }

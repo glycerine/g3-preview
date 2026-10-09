@@ -140,7 +140,7 @@ func TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime(t *testing
 	sourceSmallObjectMust(t, a.Consolidate())
 	text, e := out.String()
 	sourceSmallObjectMust(t, e)
-	want := "(allocator-consolidate :wasted-size 8168 :memory 0.01)\n(end-allocator-consolidate :wasted-size 8168 :memory 0.02)\n"
+	want := "(allocator-consolidate :wasted-size 8168 :memory 0.01)\n(end-allocator-consolidate :wasted-size 8168 :memory 0.01)\n"
 	if text != want || out.State().FloatMode != NumericFixedFloat || out.State().Precision != 2 || rt.State().GlobalSize != 8200 {
 		t.Fatal("real counter/lexical scratch/end-stream state", text, out.State(), rt.State())
 	}

@@ -354,10 +354,6 @@ func astFloatingPointRawGraphSourceOwners(t *testing.T, q *util.RationalService,
 				}
 			}
 			raw(testFieldBySourceName(a, "pending"))
-			v := testFieldBySourceName(a, "pendingScratch")
-			for i := 0; i < v.Len(); i++ {
-				raw(v.Index(i))
-			}
 		}
 	}
 	s := reflect.ValueOf(q).Elem()

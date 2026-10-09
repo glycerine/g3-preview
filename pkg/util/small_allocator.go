@@ -61,7 +61,6 @@ type SmallAllocator struct {
 	chunks, free                        [64]uint32
 	pending                             Block
 	pendingPartial                      bool
-	pendingScratch                      [2]Block
 	cleanupClass, cleanupCurrent        uint32
 	cleanupMode                         uint8
 	closed                              bool
@@ -564,16 +563,7 @@ func (a *SmallAllocator) Reset() error {
 	return nil
 }
 func (a *SmallAllocator) hasPending() bool {
-	return a.pending != (Block{}) || a.pendingScratch[0] != (Block{}) || a.pendingScratch[1] != (Block{})
-}
-func (a *SmallAllocator) retainScratch(h Block) {
-	for i := range a.pendingScratch {
-		if a.pendingScratch[i] == (Block{}) {
-			a.pendingScratch[i] = h
-			return
-		}
-	}
-	panic("small-object lexical root overflow") // exactly two lexical vectors
+	return a.pending != (Block{})
 }
 func (a *SmallAllocator) CleanupPending() error {
 	if a == nil || a.self != a {
@@ -591,13 +581,6 @@ func (a *SmallAllocator) CleanupPending() error {
 		}
 		if e != nil {
 			return e
-		}
-	}
-	for i := range a.pendingScratch {
-		if a.pendingScratch[i] != (Block{}) {
-			if e := a.config.Runtime.Deallocate(&a.pendingScratch[i]); e != nil {
-				return e
-			}
 		}
 	}
 	return nil
@@ -653,11 +636,6 @@ func (a *SmallAllocator) Stats() AllocatorStats {
 	}
 	if a.pending != (Block{}) {
 		s.PendingBlocks = 1
-	}
-	for _, h := range a.pendingScratch {
-		if h != (Block{}) {
-			s.PendingBlocks++
-		}
 	}
 	return s
 }

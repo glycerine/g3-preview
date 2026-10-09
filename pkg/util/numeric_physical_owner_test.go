@@ -346,21 +346,9 @@ func numericAuditPhysical(t *testing.T, manager *IntegerManager, extras ...numer
 		}
 		rawRoots[rawKey(testFieldBySourceName(loc, "raw"))] = true
 	}
-	for _, field := range []string{"pending", "pendingScratch"} {
-		v := testFieldBySourceName(allocator, field)
-		if field == "pending" {
-			key := rawKey(v)
-			if key[1] != 0 {
-				rawRoots[key] = true
-			}
-		} else {
-			for i := 0; i < v.Len(); i++ {
-				key := rawKey(v.Index(i))
-				if key[1] != 0 {
-					rawRoots[key] = true
-				}
-			}
-		}
+	key := rawKey(testFieldBySourceName(allocator, "pending"))
+	if key[1] != 0 {
+		rawRoots[key] = true
 	}
 	// These owners are explicitly supplied by the caller. No Runtime directory
 	// supplies authority for a missing debug root.

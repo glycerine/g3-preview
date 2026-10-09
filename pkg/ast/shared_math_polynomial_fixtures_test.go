@@ -285,21 +285,9 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*polynomial.UPolynomialManag
 		}
 		rawRoots[rawKey(testFieldBySourceName(loc, "raw"))] = true
 	}
-	for _, field := range []string{"pending", "pendingScratch"} {
-		v := testFieldBySourceName(allocator, field)
-		if field == "pending" {
-			key := rawKey(v)
-			if key[1] != 0 {
-				rawRoots[key] = true
-			}
-		} else {
-			for i := 0; i < v.Len(); i++ {
-				key := rawKey(v.Index(i))
-				if key[1] != 0 {
-					rawRoots[key] = true
-				}
-			}
-		}
+	key := rawKey(testFieldBySourceName(allocator, "pending"))
+	if key[1] != 0 {
+		rawRoots[key] = true
 	}
 
 	for _, extra := range extras {
