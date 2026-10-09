@@ -588,3 +588,10 @@ library. Root aliases preserve the API for future upstream consumers.
 
 `util/version` owns the generated Z3 version tuple and its source-header
 consistency test. Root constants remain as compatibility names.
+
+`util/filepath` owns the source filename-extension rule and depends only on
+the standard library. Its API accepts and returns Go strings and reports a
+trailing-dot extension with a separate boolean; the old borrowed `[]byte`
+C-string facade had no Go consumer and has been deleted rather than carried
+across the package boundary. Future API and shell ports should import this
+leaf directly.
