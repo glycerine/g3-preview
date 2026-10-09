@@ -353,7 +353,9 @@ Name-normalization scratch and its temporary string bridge are ordinary Go
 storage and no longer consume the arena budget. The descriptor directory,
 stable parameter cells, and borrowed description-region bindings also use
 ordinary Go slices and heap objects; only their arena-owned descendants remain
-in explicit memory accounting.
+in explicit memory accounting. Global-parameter diagnostics now compose text
+with `strings.Builder` and checked symbol display instead of the translated C++
+string-buffer owner.
 
 The live parameter-descriptor dictionary now uses
 `insdict.Dict[Symbol, paramDescrInfo]`. Copy traversal follows stable insertion

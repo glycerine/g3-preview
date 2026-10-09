@@ -1,6 +1,8 @@
 package util
 
 import (
+	"strings"
+
 	"github.com/glycerine/g3/pkg/arena"
 )
 
@@ -123,29 +125,20 @@ type gparamsErrorPart struct {
 func gpText(s string) gparamsErrorPart   { return gparamsErrorPart{text: s} }
 func gpSymbol(s Symbol) gparamsErrorPart { return gparamsErrorPart{symbol: s, symbolic: true} }
 
-// Parts are transient cold stack arguments, never records. Returned immutable
-// exception/object/text are caller-owned; actual composition owner is charged.
 func (g *GlobalParams) exception(parts ...gparamsErrorPart) error {
-	b, e := NewStringBuffer64(StringBufferConfig{Budget: g.Budget})
-	if e != nil {
-		return e
-	}
-	defer b.Close()
+	var out strings.Builder
 	for _, p := range parts {
 		if p.symbolic {
-			e = b.AppendSymbol(g.SymbolsField, p.symbol)
+			text, e := g.SymbolsField.Display(p.symbol)
+			if e != nil {
+				return e
+			}
+			out.WriteString(text)
 		} else {
-			e = b.AppendCString(p.text)
-		}
-		if e != nil {
-			return e
+			out.WriteString(p.text)
 		}
 	}
-	text, e := b.CStr()
-	if e != nil {
-		return e
-	}
-	return NewDefaultException(text)
+	return NewDefaultException(out.String())
 }
 func (g *GlobalParams) oldName(k Symbol) (bool, error) {
 	for _, name := range gparamsOldNames {
@@ -172,37 +165,13 @@ func (g *GlobalParams) renamedName(k Symbol) (string, bool, error) {
 	return "", false, nil
 }
 func (g *GlobalParams) unknownParameter(k Symbol, d *ParamDescrs, module Symbol) error {
-	b, e := NewStringBuffer64(StringBufferConfig{Budget: g.Budget})
-	if e != nil {
-		return e
-	}
-	defer b.Close()
 	if module == (Symbol{}) {
 		newName, found, e := g.renamedName(k)
 		if e != nil {
 			return e
 		}
 		if found {
-			if e = b.AppendCString("the parameter '"); e != nil {
-				return e
-			}
-			if e = b.AppendSymbol(g.SymbolsField, k); e != nil {
-				return e
-			}
-			if e = b.AppendCString("', invoke 'z3 -p' to obtain the new parameter list, and 'z3 -pp:"); e != nil {
-				return e
-			}
-			if e = b.AppendCString(newName); e != nil {
-				return e
-			}
-			if e = b.AppendCString("' for the full description of the parameter"); e != nil {
-				return e
-			}
-			text, e := b.CStr()
-			if e != nil {
-				return e
-			}
-			return NewDefaultException(text)
+			return g.exception(gpText("the parameter '"), gpSymbol(k), gpText("', invoke 'z3 -p' to obtain the new parameter list, and 'z3 -pp:"), gpText(newName), gpText("' for the full description of the parameter"))
 		}
 		old, e := g.oldName(k)
 		if e != nil {
@@ -212,37 +181,31 @@ func (g *GlobalParams) unknownParameter(k Symbol, d *ParamDescrs, module Symbol)
 			return g.exception(gpText("unknown parameter '"), gpSymbol(k), gpText("', this is an old parameter name, invoke 'z3 -p' to obtain the new parameter list"))
 		}
 	}
-	if e = b.AppendCString("unknown parameter '"); e != nil {
+	keyText, e := g.SymbolsField.Display(k)
+	if e != nil {
 		return e
 	}
-	if e = b.AppendSymbol(g.SymbolsField, k); e != nil {
-		return e
-	}
+	var out strings.Builder
+	out.WriteString("unknown parameter '")
+	out.WriteString(keyText)
 	if module == (Symbol{}) {
-		e = b.AppendCString("'\n")
+		out.WriteString("'\n")
 	} else {
-		if e = b.AppendCString("' at module '"); e != nil {
+		moduleText, e := g.SymbolsField.Display(module)
+		if e != nil {
 			return e
 		}
-		if e = b.AppendSymbol(g.SymbolsField, module); e != nil {
-			return e
-		}
-		e = b.AppendCString("'\n")
+		out.WriteString("' at module '")
+		out.WriteString(moduleText)
+		out.WriteString("'\n")
 	}
+	out.WriteString("Legal parameters are:\n")
+	legal, e := d.Display(2, false, false)
 	if e != nil {
 		return e
 	}
-	if e = b.AppendCString("Legal parameters are:\n"); e != nil {
-		return e
-	}
-	if e = d.DisplayInto(b, 2, false, false); e != nil {
-		return e
-	}
-	text, e := b.CStr()
-	if e != nil {
-		return e
-	}
-	return NewDefaultException(text)
+	out.WriteString(legal)
+	return NewDefaultException(out.String())
 }
 func (g *GlobalParams) findModuleDescriptor(k Symbol) (*ParamDescrs, bool, error) {
 	if e := g.ensureRegistered(); e != nil {
