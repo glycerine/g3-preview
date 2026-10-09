@@ -30638,3 +30638,13 @@ Removed the Go-only StrInt32Map specialization and its allocator, Runtime, asser
 Production C++ does instantiate distinct string-key maps: `char const *` to `unsigned` and `double` in `src/util/statistics.cpp`, and `char const *` to `dtoken` in `src/muz/fp/datalog_parser.cpp`. Those require concrete typed Go implementations at their own live consumers; this test-only int32 specialization is not a substitute. If a real string-to-int32 consumer appears later, implement it directly with `map[string]int32`.
 
 The manifest now records `src/test/map.cpp` as intentionally unported test-only code and removes the deleted specialization from shared `map.h`, `hashtable.h`, and `str_hashtable.h` evidence. All packages compile after the removal.
+
+### util Go string collection replacement
+
+Replaced the C-shaped string table layer with ordinary Go string collections at every retained consumer. SymbolManager now interns through `map[string]arena.BytesRegionRef` and keeps an immutable reverse spelling map for allocation-free symbol reads. DebugContext and TraceContext store enabled names in `map[string]struct{}` and expose string APIs. Byte-producing symbol callers use concrete `InternBytes`, `InternInitializedBytes`, and `InternRuntimeCString` boundaries.
+
+Deleted StrHashtable, StrKey, CStringByteSource, RegionBytes, the Runtime/legacy table emulators, custom output bridge, and their pointer-lifetime, probe, collision, allocator, destructor, and failure-injection tests. The source `str_hashtable.h` unit is now classified as a standard-library replacement: Go string equality and built-in maps replace `strlen`, `strcmp`, `str_hash_proc`, and `ptr_hashtable<char>` mechanics. Exact project hashing remains only where separately observable outside map placement.
+
+Focused symbol, debug, trace, AST, SAT, polynomial, and SMT checks pass. Every package compiles, util/ast vet passes, the manifest validates, and the test-only CString-to-int specialization remains separately excluded based on the complete C++ liveness audit.
+
+The 00:44 UTC full native checkpoint found one stale AST allocation-count assertion: copying a byte slice into its owned Go string performs one Go allocation while preserving symbol identity and charged-budget state. After correcting that expectation, the complete AST package passes (30.034s); every other package in the full checkpoint passed, including util (143.798s) and polynomial (241.581s). No known failing check remains.

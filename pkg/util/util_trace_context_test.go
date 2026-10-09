@@ -14,27 +14,21 @@ func traceRegion(t *testing.T, b *arena.Budget) *arena.BytesRegion {
 	smallObjectMust(t, e)
 	return r
 }
-func traceKey(t *testing.T, r *arena.BytesRegion, s string) StrKey {
-	t.Helper()
-	id := smallObjectID(t, r, s)
-	k, e := BorrowCString(r, id.Ref, 0)
-	smallObjectMust(t, e)
-	return k
-}
+func traceKey(_ *testing.T, _ *arena.BytesRegion, s string) string { return s }
 
 func TestTraceContextUsesOwnedGoStrings(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	r := traceRegion(t, b)
 	c, e := NewTraceContext(r, b)
 	smallObjectMust(t, e)
-	smallObjectMust(t, c.EnableTraceName("parser"))
-	ok, e := c.IsTraceNameEnabled("parser\x00ignored")
+	smallObjectMust(t, c.EnableTrace("parser"))
+	ok, e := c.IsTraceEnabled("parser\x00ignored")
 	smallObjectMust(t, e)
 	if !ok || c.Stats().Tags != 1 {
 		t.Fatal("enabled trace name was not retained")
 	}
-	smallObjectMust(t, c.DisableTraceName("parser"))
-	ok, e = c.IsTraceNameEnabled("parser")
+	smallObjectMust(t, c.DisableTrace("parser"))
+	ok, e = c.IsTraceEnabled("parser")
 	smallObjectMust(t, e)
 	if ok {
 		t.Fatal("disabled trace name remains enabled")
@@ -76,11 +70,11 @@ func TestTraceContextOwnerAndCloseChecks(t *testing.T) {
 	c, e := NewTraceContext(r, b)
 	smallObjectMust(t, e)
 	copy := *c
-	if e = copy.EnableTraceName("x"); !errors.Is(e, ErrTraceContextOwner) {
+	if e = copy.EnableTrace("x"); !errors.Is(e, ErrTraceContextOwner) {
 		t.Fatal(e)
 	}
 	smallObjectMust(t, c.Close())
-	if _, e = c.IsTraceNameEnabled("x"); !errors.Is(e, arena.ErrClosed) {
+	if _, e = c.IsTraceEnabled("x"); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
 	}
 	smallObjectMust(t, r.Close())

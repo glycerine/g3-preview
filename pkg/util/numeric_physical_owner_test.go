@@ -380,31 +380,6 @@ func numericAuditPhysical(t *testing.T, manager *IntegerManager, extras ...numer
 			if d == nil || d.Self != d {
 				t.Fatal("invalid named DebugContext")
 			}
-			addTable := func(table *StrHashtable) {
-				if table == nil {
-					return
-				}
-				roots, e := table.RuntimeRoots()
-				if e != nil {
-					t.Fatal(e)
-				}
-				for _, b := range append([]Block{roots.Object, roots.Table}, roots.Acquisitions...) {
-					if b == (Block{}) {
-						continue
-					}
-					key := [3]uint64{b.OwnerID(), uint64(b.Slot()), uint64(b.Generation())}
-					if key[0] != testFieldBySourceName(runtime, "origin").Uint() || rawRoots[key] {
-						t.Fatal("foreign or duplicate named debug root", key)
-					}
-					rawRoots[key] = true
-				}
-			}
-			if d.TagRuntime != nil {
-				addTable(d.Tags)
-				for node := d.FailedTags; node != nil; node = node.Next {
-					addTable(node.Table)
-				}
-			}
 		}
 	}
 	// The explicitly passed manager owns these concrete lexical formatting

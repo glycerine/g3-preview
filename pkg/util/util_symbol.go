@@ -67,7 +67,14 @@ type SymbolStats struct {
 	OwnerBytes uint64
 	Symbols    uint32
 	Region     arena.BytesRegionStats
-	Table      StrHashtableStats
+	Table      SymbolInternStats
+}
+
+// SymbolInternStats retains the existing accounting view while interning is
+// implemented by Go maps. Map storage is managed by the Go runtime.
+type SymbolInternStats struct {
+	OwnerBytes, TableBytes, DirectoryBytes, RetainedBytes uint64
+	Size, Deleted, Capacity                               uint32
 }
 
 // SymbolManager explicitly owns the source global interning service. It has no

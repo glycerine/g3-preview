@@ -162,10 +162,6 @@ func debugNotificationPhysical(t *testing.T, d *DebugContext, streams *MemorySta
 	if !d.closed {
 		want += d.ownerBytes
 	}
-	if d.Tags != nil {
-		h := d.Tags.Stats()
-		want += h.OwnerBytes + h.TableBytes + h.DirectoryBytes
-	}
 	if !streams.closed {
 		want += streams.header
 	}

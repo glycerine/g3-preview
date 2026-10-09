@@ -173,10 +173,6 @@ func permutationBindingPhysical(t *testing.T, p *RuntimePermutation, d *DebugCon
 	x := d.region.Stats()
 	descriptors := x.Descriptors
 	cold := p.header + unsignedCopyCold(t, &p.forward) + unsignedCopyCold(t, &p.inverse) + d.ownerBytes + x.OwnerBytes + x.PayloadBytes + x.PageHeaderBytes + x.DirectoryBytes + x.LogBytes + x.ScopeBytes + descriptors.OwnerBytes + descriptors.RecordBytes + descriptors.MetadataBytes + descriptors.DirectoryBytes
-	if d.Tags != nil {
-		tags := d.Tags.Stats()
-		cold += tags.OwnerBytes + tags.TableBytes + tags.DirectoryBytes
-	}
 	cold += a.header + in.header + s.header + s.stdout.Stats().OwnerBytes + s.StderrField.Stats().OwnerBytes
 	if p.budget.Used() != r.Stats().TotalBytes+cold {
 		t.Fatal("exact named raw/cold binding graph", p.budget.Used(), r.Stats().TotalBytes, cold)
@@ -384,10 +380,6 @@ func permutationWordViewPhysical(t *testing.T, p *RuntimePermutation, d *DebugCo
 	z := x.Descriptors
 	r := p.forward.Column.Raw.Runtime
 	cold := p.header + unsignedCopyCold(t, &p.forward) + unsignedCopyCold(t, &p.inverse) + other.header + unsignedCopyCold(t, other) + d.ownerBytes + x.OwnerBytes + x.PayloadBytes + x.PageHeaderBytes + x.DirectoryBytes + x.LogBytes + x.ScopeBytes + z.OwnerBytes + z.RecordBytes + z.MetadataBytes + z.DirectoryBytes
-	if d.Tags != nil {
-		tags := d.Tags.Stats()
-		cold += tags.OwnerBytes + tags.TableBytes + tags.DirectoryBytes
-	}
 	if p.budget.Used() != r.Stats().TotalBytes+cold {
 		t.Fatal("named captured-address owners raw/cold graph", p.budget.Used(), r.Stats().TotalBytes, cold)
 	}

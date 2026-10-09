@@ -214,10 +214,6 @@ func intHeapDebugPhysical(t *testing.T, d *DebugContext, region *arena.BytesRegi
 	if !d.closed {
 		debugBytes += uint64(reflect.TypeOf(DebugContext{}).Size())
 	}
-	if d.Tags != nil {
-		s := d.Tags.Stats()
-		debugBytes += s.OwnerBytes + s.TableBytes + s.DirectoryBytes
-	}
 	want := st.TotalBytes + cold + debugBytes
 	if b.Used() != want {
 		t.Fatal("exact once-only borrowed debug/runtime/cold graph", b.Used(), want)
@@ -510,11 +506,10 @@ func TestIntHeapDebugFinalizeReinitializeAndCopiedBorrow(t *testing.T) {
 	h, e := NewIntHeap(4, IntHeapConfig{Budget: b, Runtime: r, DebugContext: d})
 	heapMust(t, e)
 	heapMust(t, h.Insert(1))
-	old := d.Tags
 	heapMust(t, d.FinalizeDebug())
 	heapMust(t, h.Reset())
 	if sourceDebug {
-		if d.Tags == nil || d.Tags == old {
+		if d.Tags == nil {
 			t.Fatal("source CASSERT lazy reinitialization")
 		}
 	} else if d.Tags != nil {

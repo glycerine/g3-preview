@@ -10501,7 +10501,7 @@
           "name": "remaining manager copy/translation, dependencies/marks/compaction, arithmetic coercions/plugins, proofs, printers/trace and global resource integration",
           "status": "unported",
           "go_target": "",
-          "tests": null
+          "tests": []
         },
         {
           "name": "six parameter kinds, concrete copy/move/destruction, equality/hash and scalar extraction",
@@ -11692,7 +11692,8 @@
         },
         {
           "name": "remaining manager copy/translation, dependencies/marks/compaction, arithmetic coercions/plugins, proofs, printers/trace and global resource integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "six parameter kinds, concrete copy/move/destruction, equality/hash and scalar extraction",
@@ -38306,7 +38307,8 @@
         },
         {
           "name": "Complete polynomial manager, arithmetic, PRS/resultant and source owning wrappers",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
@@ -42050,7 +42052,8 @@
         },
         {
           "name": "Complete polynomial manager, arithmetic, PRS/resultant and source owning wrappers",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
@@ -67182,7 +67185,8 @@
         },
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -67341,7 +67345,8 @@
         },
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Selected actual Runtime literal-span placement construction preserves header/ID before reached literal copy and retained constructor-read failure candidate",
@@ -67444,7 +67449,8 @@
         },
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -67496,7 +67502,8 @@
         },
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -68848,7 +68855,8 @@
         },
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Actual source8 two-word justification Runtime column and separately charged clause provenance with fixed borrowed allocator; compact physical clause_offset encoding remains open",
@@ -70101,7 +70109,8 @@
         },
         {
           "name": "Full solver member/default-policy/EXT integration, integrity_checker, global debug tags and verbose report stream/mem_stat binding",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -70250,7 +70259,8 @@
         },
         {
           "name": "Full solver member/default-policy/EXT integration, integrity_checker, global debug tags and verbose report stream/mem_stat binding",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -75078,7 +75088,8 @@
         },
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Selected actual unsigned activity and literal32 trail Runtime storage; source increment/decay/rescale and queue activity borrow; broader solver storage remains open",
@@ -75181,7 +75192,8 @@
         },
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Concrete common-owner solver watch-list storage/copy/move/lifetime/iterator specialization",
@@ -75423,7 +75435,8 @@
         },
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Concrete common-owner solver watch-list storage/copy/move/lifetime/iterator specialization",
@@ -100868,7 +100881,8 @@
         },
         {
           "name": "conditional TRACE sizeof(ast/expr/app/foo) output",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -101305,7 +101319,8 @@
         },
         {
           "name": "Global assertion-switch binding and source test diagnostic/dispatch integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -101627,7 +101642,8 @@
         },
         {
           "name": "source DEBUG_CODE conditional routing and automatic table CASSERT diagnostics",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -105838,7 +105854,8 @@
         },
         {
           "name": "original global invocation/RNG/stdout transcript and persistent ostream/TRACE diagnostic integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -107115,7 +107132,8 @@
         },
         {
           "name": "Original Int/open specialization, ext_numeral and old SMT interval tests and complete registered old_interval execution",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -107394,11 +107412,13 @@
         },
         {
           "name": "active tst5 real AST 100 variables and 1000000 updates, zero ENSURE, process memory output",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "disabled #if0 old expression configuration/tst4 and diagnostic trace profiles",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "registered tst5 real100-slot AST Var array, exact1000000 updates and source factories with actual retained roots",
@@ -108012,7 +108032,8 @@
         },
         {
           "name": "Registered tst_polynomial active PSC suite and complete polynomial manager expression paths",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Dormant monomial manager identity/conversion inputs plus source-body and independent bounded/fault fixtures; registered tst_polynomial runs PSC then returns, no active ENSURE completion credit",
@@ -109462,7 +109483,8 @@
         },
         {
           "name": "Original forever-running randomized harness, native libc rand sequence and printed/source runtime harness profile",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -112075,7 +112097,8 @@
         },
         {
           "name": "Other numeral/closed configurations, field-only inv/div, persistent ostream and generic algorithm consumers",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -112507,7 +112530,8 @@
         },
         {
           "name": "Global assertion-switch binding and source test diagnostic/dispatch integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -112849,7 +112873,8 @@
         },
         {
           "name": "Global assertion-switch binding and source test diagnostic/dispatch integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -114191,19 +114216,19 @@
           "name": "automatic Z3DEBUG CASSERT routing and pointer visited-set check_invariant actions",
           "status": "unported",
           "go_target": "",
-          "tests": null
+          "tests": []
         },
         {
           "name": "other HashProc/EqProc/value/destructor specializations, AST structural/identity table",
           "status": "unported",
           "go_target": "",
-          "tests": null
+          "tests": []
         },
         {
           "name": "disabled #if0 trace and destructor output",
           "status": "unported",
           "go_target": "",
-          "tests": null
+          "tests": []
         },
         {
           "name": "Concrete monomial chained table specialization: actual primary/cellar/free-list traversal, counters, insert/erase/expand and retained source prefixes; native pointer cell replaced by scalar16-byte codec, conditional visited-set diagnostics remain open",
@@ -114779,23 +114804,9 @@
         "pkg/util/util_debug_global_service.go",
         "pkg/util/util_debug_global_service_test.go",
         "pkg/util/util_gparams_service_ops.go",
-        "pkg/util/util_debug_runtime.go",
-        "pkg/util/util_debug_runtime_source_test.go",
-        "pkg/util/util_memory_process.go",
-        "pkg/util/str_hashtable_assertions.go",
-        "pkg/util/str_hashtable_assertions_debug.go",
-        "pkg/util/str_hashtable_assertions_release.go",
-        "pkg/util/str_hashtable_assertions_source_test.go",
-        "pkg/util/util_str_hashtable_assertion_bridge.go",
-        "pkg/util/util_str_hashtable_assertions_source_test.go"
+        "pkg/util/util_memory_process.go"
       ],
       "tests": [
-        "TestDebugContextSourceLazyInitializationAndAssertions",
-        "TestDebugContextFiniteActionOracle",
-        "TestDebugContextEveryLazyConstructionRefusal",
-        "TestDebugContextBorrowedLifetimeAndOwnerGuards",
-        "TestDebugContextConditionalAssertionReadOrder",
-        "TestDebugContextColdOwnerAndExistingTableGrowthRefusal",
         "TestIntHeapDebugSourceConstructorGate",
         "TestIntHeapDebugSourceEnabledInvariantBeforeReset",
         "TestIntHeapDebugSourceDisabledAssertionsSkipTagLookup",
@@ -114852,28 +114863,7 @@
         "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
         "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
         "TestDebugGlobalServiceProcessSubprocessHelper",
-        "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions",
-        "TestDebugRuntimeLazyActualTableAndFinalize",
-        "TestMemoryProcessTagRuntimeBindsOnlyAfterSuccessfulParentPreparation",
-        "TestDebugRuntimeEveryLazyConstructorPrefixAndFailedOwnerRetry",
-        "TestDebugRuntimePrephysicalFailedConstructionRetiresEmptyContexts",
-        "TestDebugRuntimeProcessColdGraphIncludesActualCurrentContext",
-        "TestDebugRuntimeConstructorExecutingTransportCannotRetireOuterContext",
-        "TestDebugRuntimePublicGrowthRetryFinalizeRetainsOlderAcquisition",
-        "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
-        "TestStrHashtableBoundInvariantContinuesLiteralSites",
-        "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
-        "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
-        "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
-        "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
-        "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
-        "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
-        "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
-        "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
-        "TestStrHashtableBoundEveryConstructorReservationImmediateGraph",
-        "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
-        "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
-        "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
+        "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
       ],
       "conditionals": [
         {
@@ -114900,14 +114890,7 @@
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
           "status": "partial",
           "go_target": "pkg/util/util_debug_context.go",
-          "tests": [
-            "TestDebugContextSourceLazyInitializationAndAssertions",
-            "TestDebugContextFiniteActionOracle",
-            "TestDebugContextEveryLazyConstructionRefusal",
-            "TestDebugContextBorrowedLifetimeAndOwnerGuards",
-            "TestDebugContextConditionalAssertionReadOrder",
-            "TestDebugContextColdOwnerAndExistingTableGrowthRefusal"
-          ]
+          "tests": []
         },
         {
           "name": "Selected concrete Runtime IntHeap per-site CASSERT and SASSERT gates, lazy heap-tag lookup, recursive invariant short-circuit and vector placement/index distinction",
@@ -115024,48 +115007,6 @@
             "TestDebugGlobalServiceProcessSubprocessHelper",
             "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
           ]
-        },
-        {
-          "name": "Selected src/util/debug.cpp:44-68 explicit common-Runtime lazy tag table binding, actual failed constructor contexts/current publication, strict finalize and separate owning abort through same MemoryProcess DebugContext",
-          "status": "partial",
-          "go_target": "pkg/util/util_debug_runtime.go",
-          "tests": [
-            "TestDebugRuntimeLazyActualTableAndFinalize",
-            "TestMemoryProcessTagRuntimeBindsOnlyAfterSuccessfulParentPreparation",
-            "TestDebugRuntimeEveryLazyConstructorPrefixAndFailedOwnerRetry",
-            "TestDebugRuntimePrephysicalFailedConstructionRetiresEmptyContexts",
-            "TestDebugRuntimeProcessColdGraphIncludesActualCurrentContext",
-            "TestDebugRuntimeConstructorExecutingTransportCannotRetireOuterContext",
-            "TestDebugRuntimePublicGrowthRetryFinalizeRetainsOlderAcquisition"
-          ]
-        },
-        {
-          "name": "Selected concrete cold DebugContext bridge and real SASSERT/UNREACHABLE source-site transport for Runtime StrHashtable (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644); erased operands remain unread, C resumes literal source body",
-          "status": "partial",
-          "go_target": "pkg/util/util_str_hashtable_assertion_bridge.go",
-          "tests": [
-            "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
-            "TestStrHashtableBoundInvariantContinuesLiteralSites",
-            "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
-            "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
-            "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
-            "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
-            "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
-            "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
-            "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
-            "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
-            "TestStrHashtableBoundEveryConstructorReservationImmediateGraph"
-          ]
-        },
-        {
-          "name": "Selected Runtime core source compile gates and default typed adapter, literal target-deleted static move predicate and finite source end/begin traversal (src/util/hashtable.h:159-215,249,497-514)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_assertions.go",
-          "tests": [
-            "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
-            "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
-            "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
-          ]
         }
       ],
       "ownership": [
@@ -115154,23 +115095,9 @@
         "pkg/util/util_debug_global_service.go",
         "pkg/util/util_debug_global_service_test.go",
         "pkg/util/util_gparams_service_ops.go",
-        "pkg/util/util_debug_runtime.go",
-        "pkg/util/util_debug_runtime_source_test.go",
-        "pkg/util/util_memory_process.go",
-        "pkg/util/str_hashtable_assertions.go",
-        "pkg/util/str_hashtable_assertions_debug.go",
-        "pkg/util/str_hashtable_assertions_release.go",
-        "pkg/util/str_hashtable_assertions_source_test.go",
-        "pkg/util/util_str_hashtable_assertion_bridge.go",
-        "pkg/util/util_str_hashtable_assertions_source_test.go"
+        "pkg/util/util_memory_process.go"
       ],
       "tests": [
-        "TestDebugContextSourceLazyInitializationAndAssertions",
-        "TestDebugContextFiniteActionOracle",
-        "TestDebugContextEveryLazyConstructionRefusal",
-        "TestDebugContextBorrowedLifetimeAndOwnerGuards",
-        "TestDebugContextConditionalAssertionReadOrder",
-        "TestDebugContextColdOwnerAndExistingTableGrowthRefusal",
         "TestIntHeapDebugSourceConstructorGate",
         "TestIntHeapDebugSourceEnabledInvariantBeforeReset",
         "TestIntHeapDebugSourceDisabledAssertionsSkipTagLookup",
@@ -115249,28 +115176,7 @@
         "TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion",
         "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
         "TestDebugGlobalServiceProcessSubprocessHelper",
-        "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions",
-        "TestDebugRuntimeLazyActualTableAndFinalize",
-        "TestMemoryProcessTagRuntimeBindsOnlyAfterSuccessfulParentPreparation",
-        "TestDebugRuntimeEveryLazyConstructorPrefixAndFailedOwnerRetry",
-        "TestDebugRuntimePrephysicalFailedConstructionRetiresEmptyContexts",
-        "TestDebugRuntimeProcessColdGraphIncludesActualCurrentContext",
-        "TestDebugRuntimeConstructorExecutingTransportCannotRetireOuterContext",
-        "TestDebugRuntimePublicGrowthRetryFinalizeRetainsOlderAcquisition",
-        "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
-        "TestStrHashtableBoundInvariantContinuesLiteralSites",
-        "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
-        "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
-        "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
-        "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
-        "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
-        "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
-        "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
-        "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
-        "TestStrHashtableBoundEveryConstructorReservationImmediateGraph",
-        "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
-        "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
-        "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
+        "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
       ],
       "conditionals": [
         {
@@ -115387,14 +115293,7 @@
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
           "status": "partial",
           "go_target": "pkg/util/util_debug_context.go",
-          "tests": [
-            "TestDebugContextSourceLazyInitializationAndAssertions",
-            "TestDebugContextFiniteActionOracle",
-            "TestDebugContextEveryLazyConstructionRefusal",
-            "TestDebugContextBorrowedLifetimeAndOwnerGuards",
-            "TestDebugContextConditionalAssertionReadOrder",
-            "TestDebugContextColdOwnerAndExistingTableGrowthRefusal"
-          ]
+          "tests": []
         },
         {
           "name": "Selected concrete Runtime IntHeap per-site CASSERT and SASSERT gates, lazy heap-tag lookup, recursive invariant short-circuit and vector placement/index distinction",
@@ -115557,48 +115456,6 @@
             "TestDebugGlobalServiceOwnerCopyAndDefaultBorrowLifetime",
             "TestDebugGlobalServiceProcessSubprocessHelper",
             "TestDebugGlobalServiceActualProcessDefaultFalseConsumerActions"
-          ]
-        },
-        {
-          "name": "Selected src/util/debug.cpp:44-68 explicit common-Runtime lazy tag table binding, actual failed constructor contexts/current publication, strict finalize and separate owning abort through same MemoryProcess DebugContext",
-          "status": "partial",
-          "go_target": "pkg/util/util_debug_runtime.go",
-          "tests": [
-            "TestDebugRuntimeLazyActualTableAndFinalize",
-            "TestMemoryProcessTagRuntimeBindsOnlyAfterSuccessfulParentPreparation",
-            "TestDebugRuntimeEveryLazyConstructorPrefixAndFailedOwnerRetry",
-            "TestDebugRuntimePrephysicalFailedConstructionRetiresEmptyContexts",
-            "TestDebugRuntimeProcessColdGraphIncludesActualCurrentContext",
-            "TestDebugRuntimeConstructorExecutingTransportCannotRetireOuterContext",
-            "TestDebugRuntimePublicGrowthRetryFinalizeRetainsOlderAcquisition"
-          ]
-        },
-        {
-          "name": "Selected concrete cold DebugContext bridge and real SASSERT/UNREACHABLE source-site transport for Runtime StrHashtable (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644); erased operands remain unread, C resumes literal source body",
-          "status": "partial",
-          "go_target": "pkg/util/util_str_hashtable_assertion_bridge.go",
-          "tests": [
-            "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
-            "TestStrHashtableBoundInvariantContinuesLiteralSites",
-            "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
-            "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
-            "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
-            "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
-            "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
-            "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
-            "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
-            "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
-            "TestStrHashtableBoundEveryConstructorReservationImmediateGraph"
-          ]
-        },
-        {
-          "name": "Selected Runtime core source compile gates and default typed adapter, literal target-deleted static move predicate and finite source end/begin traversal (src/util/hashtable.h:159-215,249,497-514)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_assertions.go",
-          "tests": [
-            "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
-            "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
-            "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
           ]
         }
       ],
@@ -117633,11 +117490,7 @@
         "pkg/util/runtime_bytes.go",
         "pkg/util/runtime_bytes_test.go",
         "pkg/util/runtime_bytes_bounded.go",
-        "pkg/util/runtime_bytes_bounded_test.go",
-        "pkg/util/str_hashtable.go",
-        "pkg/util/str_hashtable_bytes.go",
-        "pkg/util/region_bytes.go",
-        "pkg/util/str_hashtable_cstring_source_test.go"
+        "pkg/util/runtime_bytes_bounded_test.go"
       ],
       "tests": [
         "TestSourceHashVectors",
@@ -117645,12 +117498,7 @@
         "TestRuntimeBytesSourceLengthAndSignedTail",
         "TestRuntimeBytesReachedDescendingTailRead",
         "TestRuntimeBytesBoundedActualReachedLoads",
-        "TestInlineWordBytesActualColdAndReadOrder",
-        "TestStrHashtableCStringHashAndEqualRereadActualUnstoredPointer",
-        "TestStrHashtableCStringBorrowChangedBeforeInsertionQueryEngine",
-        "TestStrHashtableCStringFiniteLengthAndEqualityOracle",
-        "TestRegionBytesActualAscendingWordsDescendingTailAndZeroUnread",
-        "TestRegionBytesReachedOffsetOverflowBeforeTokenRead"
+        "TestInlineWordBytesActualColdAndReadOrder"
       ],
       "assertions": [
         {
@@ -117886,7 +117734,6 @@
       "go_targets": [
         "pkg/util/uint_map.go",
         "pkg/util/uint_set_map.go",
-        "pkg/util/str_hashtable.go",
         "pkg/util/util_symbol_table.go",
         "pkg/util/util_param_descrs.go",
         "pkg/ast/ast_shared_occs_iterator.go",
@@ -117900,34 +117747,7 @@
         "pkg/sat/sat_solver_index_iterator_source_test.go",
         "pkg/sat/sat_solver_mutex_pair_set.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
-        "pkg/util/str_hashtable_runtime.go",
-        "pkg/util/str_hashtable_runtime_source_test.go",
-        "pkg/util/str_hashtable_runtime_reentrant_source_test.go",
-        "pkg/util/str_hashtable_assertions.go",
-        "pkg/util/str_hashtable_assertions_debug.go",
-        "pkg/util/str_hashtable_assertions_release.go",
-        "pkg/util/str_hashtable_assertions_source_test.go",
-        "pkg/util/util_str_hashtable_assertion_bridge.go",
-        "pkg/util/util_str_hashtable_assertions_source_test.go",
-        "pkg/util/str_hashtable_bytes.go",
-        "pkg/util/str_hashtable_statistics.go",
-        "pkg/util/str_hashtable_statistics_source_test.go",
-        "pkg/util/str_hashtable_output.go",
-        "pkg/util/util_str_hashtable_output.go",
-        "pkg/util/util_str_hashtable_output_source_test.go",
         "pkg/util/runtime_bytes_bounded.go",
-        "pkg/util/region_bytes.go",
-        "pkg/util/str_hashtable_cstring_source_test.go",
-        "pkg/util/str_hashtable_test.go",
-        "pkg/util/str_hashtable_legacy_lifecycle.go",
-        "pkg/util/str_hashtable_legacy_lifecycle_source_test.go",
-        "pkg/util/str_hashtable_legacy_assertions.go",
-        "pkg/util/str_hashtable_legacy_assertions_source_test.go",
-        "pkg/util/util_str_hashtable_legacy_assertions_source_test.go",
-        "pkg/util/str_hashtable_runtime_destructor_source_test.go",
-        "pkg/util/str_hashtable_legacy_statistics_source_test.go",
-        "pkg/util/util_str_hashtable_legacy_statistics_output_source_test.go",
-        "pkg/util/str_hashtable_owner_identity_source_test.go",
         "pkg/model/model_array_tuple_table.go",
         "pkg/ast/rewriter/bv_trailing_table.go"
       ],
@@ -117958,24 +117778,6 @@
         "TestUintSetMapCleanupAndOutOfMemory",
         "TestUintSetMapCopyAssignmentShapeAndIterator",
         "TestUintSetMapRehashFailureAndTemporaryCopies",
-        "TestStrHashtableSourceHashCStringAndEquality",
-        "TestStrHashtableBorrowedLifetimeAndReplacement",
-        "TestStrHashtableSourceProbeThresholdAndTombstones",
-        "TestStrHashtableOperationsAndOutput",
-        "TestStrHashtableIndependentOracleAndCStringLookup",
-        "TestStrHashtableBudgetsSwapAndStaleViews",
-        "TestStrHashtableDumpCStringBytes",
-        "TestStrHashtableKeyOwnerAndStats",
-        "TestStrHashtableCleanupResetAndFailurePeaks",
-        "TestStrHashtableSourceInitialCapacity",
-        "TestStrHashtablePartialRemovalAndStrictReset",
-        "TestStrHashtableEpochExhaustion",
-        "TestStrHashtableMultiOriginQueriesAndAdoption",
-        "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
-        "TestStrHashtableMultiOriginFailureOrderAndAccounting",
-        "TestStrHashtableMultiOriginSwapGraphFailures",
-        "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
-        "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
         "TestSymbolInt32TableColdMutex",
         "TestSymbolInt32TableSourceAssertions",
         "TestSymbolInt32TableIndependentScopes",
@@ -118071,86 +117873,6 @@
         "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
         "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
         "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
-        "TestStrHashtableRuntimeActualWrapperTableAndLazyFieldInitialization",
-        "TestStrHashtableRuntimeProbeGrowthAndIndependentContents",
-        "TestStrHashtableRuntimeResetDestructiveRefusalPrefix",
-        "TestStrHashtableRuntimeEveryConstructorReservationAndCopyPrefixes",
-        "TestStrHashtableRuntimeBorrowRefsCloneSwapAndRemoval",
-        "TestStrHashtableRuntimeEveryGrowthReservationAndRealTLSRetry",
-        "TestStrHashtableRuntimeSourceDestructorPostphysicalStopOwningAcknowledgment",
-        "TestStrHashtableRuntimeLexicalIntersectionHasOnlyTableAllocation",
-        "TestStrHashtableRuntimeUnusedEntryWordsStayUnread",
-        "TestStrHashtableRuntimeRemoveDeletedOOMShortCircuit",
-        "TestStrHashtableRuntimeSizeT32WrappedArrayGuardPrefix",
-        "TestStrHashtableRuntimeEveryResetAndFinalizeReplacementReservation",
-        "TestStrHashtableRuntimeForeignBorrowLifetimeAndTypedObserverGuard",
-        "TestStrHashtableRuntimeEveryLexicalAndDeletedReplacementReservation",
-        "TestStrHashtableRuntimeOrdinaryAllocatorProfiles",
-        "TestStrHashtableRuntimeAllocationReentrantOwningClose",
-        "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
-        "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
-        "TestStrHashtableBoundInvariantContinuesLiteralSites",
-        "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
-        "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
-        "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
-        "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
-        "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
-        "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
-        "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
-        "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
-        "TestStrHashtableBoundEveryConstructorReservationImmediateGraph",
-        "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
-        "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
-        "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate",
-        "TestStrHashtableRuntimeStatisticsActualFieldAndLiteralMissCounts",
-        "TestStrHashtableRuntimeStatisticsEveryConstructorAndCopyReservation",
-        "TestStrHashtableRuntimeStatisticsResetFinalizeInlineAndUnsignedWrap",
-        "TestStrHashtableRuntimeStatisticsEveryReplacementAndGrowthPrefix",
-        "TestStrHashtableRuntimeStatisticsIndependentFiniteProbeCounts",
-        "TestStrHashtableDumpIntoActualFieldFormattingAndCallerWidth",
-        "TestStrHashtableDumpIntoClosedFileStillReachesActualBorrowedCString",
-        "TestStrHashtableDumpIntoEveryOutputReservationAndExactPrefix",
-        "TestStrHashtableDumpIntoActualFileAndEmptyBorrowErasure",
-        "TestStrHashtableDumpIntoBorrowedSpellingRereadAndFileBytes",
-        "TestStrHashtableCStringHashAndEqualRereadActualUnstoredPointer",
-        "TestStrHashtableCStringBorrowChangedBeforeInsertionQueryEngine",
-        "TestStrHashtableCStringFiniteLengthAndEqualityOracle",
-        "TestRegionBytesActualAscendingWordsDescendingTailAndZeroUnread",
-        "TestRegionBytesReachedOffsetOverflowBeforeTokenRead",
-        "TestStrHashtableLegacyResetFinalizeActualDeleteBeforeReplacementRefusal",
-        "TestStrHashtableLegacyCopyCtorForeignBindingRefusalRetainsActualTable",
-        "TestStrHashtableLegacyLexicalCopyCtorFailureRetainedByActualFrame",
-        "TestStrHashtableLegacyCopyAndIntersectEveryReservationPrefix",
-        "TestStrHashtableLegacyIntersectionIndependentFiniteSets",
-        "TestStrHashtableLegacyCompletedCopyDestructorBeforeOwningHeaderAbort",
-        "TestStrHashtableLegacyEmptyResetDoesNotReadDestroyedBacking",
-        "TestStrHashtableLegacyReplacementBodyFailureNullSourceDestructor",
-        "TestStrHashtableLegacyGrowthBodyFailureNonNullSourceDestructor",
-        "TestStrHashtableLegacyGrowthEveryActualReservationBeforeSuccess",
-        "TestStrHashtableLegacyCopyMoveActualDeletedTargetAssertion",
-        "TestStrHashtableLegacyInvariantDefaultSourceAssertion",
-        "TestStrHashtableLegacyActualExhaustedProbeUnreachableProfiles",
-        "TestStrHashtableLegacyCapturedReachedPointerRetainsLiveBacking",
-        "TestStrHashtableLegacyBoundConstructorAndLinearSourceContinuation",
-        "TestStrHashtableLegacyClosedAssertionProviderAtCopyAndInvariantSites",
-        "TestStrHashtableLegacyGrowthSourceAssertionStopRetainsNewAndOld",
-        "TestStrHashtableLegacyClosedFlagAtActualDeletedInsertAndFullRemove",
-        "TestStrHashtableLegacyNonPowerResetRealSourceContinueAndThrow",
-        "TestStrHashtableRuntimeNullReplacementDestructorRetainsUnjoinedNew",
-        "TestStrHashtableRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
-        "TestStrHashtableRuntimeReplacementEveryRefusalThenSourceDestructor",
-        "TestStrHashtableLegacyStatisticsActualScalarAndLiteralMissCounts",
-        "TestStrHashtableLegacyStatisticsIndependentFiniteProbeCounts",
-        "TestStrHashtableLegacyStatisticsEveryConstructorCopyAndReplacementReservation",
-        "TestStrHashtableLegacyStatisticsUnsignedScalarAndCopyBodyOrder",
-        "TestStrHashtableLegacyStatisticsBothInsertMacrosAndProfileBinding",
-        "TestStrHashtableLegacyStatisticsDumpIntoActualFieldFormattingAndCallerWidth",
-        "TestStrHashtableLegacyStatisticsDumpIntoClosedFileStillReachesActualBorrowedCString",
-        "TestStrHashtableLegacyStatisticsDumpIntoEveryOutputReservationAndExactPrefix",
-        "TestStrHashtableLegacyStatisticsDumpIntoActualFileAndEmptyBorrowErasure",
-        "TestStrHashtableLegacyStatisticsDumpIntoBorrowedSpellingRereadAndFileBytes",
-        "TestStrHashtableLegacyAccidentalGoCopyCannotOwnSourceActions",
-        "TestStrHashtableZeroGoWrapperCannotOwnCleanup",
         "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
         "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
         "TestBVTrailingConstructorBorrowsExtractionOwner",
@@ -118462,131 +118184,6 @@
           ]
         },
         {
-          "name": "multi-origin str_hash_proc/str_eq_proc NUL-prefix source hashing/equality",
-          "status": "ported",
-          "go_target": "pkg/util/str_hashtable.go",
-          "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableBorrowedLifetimeAndReplacement",
-            "TestStrHashtableSourceProbeThresholdAndTombstones",
-            "TestStrHashtableOperationsAndOutput",
-            "TestStrHashtableIndependentOracleAndCStringLookup",
-            "TestStrHashtableBudgetsSwapAndStaleViews",
-            "TestStrHashtableDumpCStringBytes",
-            "TestStrHashtableKeyOwnerAndStats",
-            "TestStrHashtableMultiOriginQueriesAndAdoption",
-            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
-            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
-            "TestStrHashtableMultiOriginSwapGraphFailures",
-            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
-            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
-            "TestStrHashtableCleanupResetAndFailurePeaks",
-            "TestStrHashtableSourceInitialCapacity",
-            "TestStrHashtablePartialRemovalAndStrictReset",
-            "TestStrHashtableEpochExhaustion"
-          ]
-        },
-        {
-          "name": "multi-origin borrowed string insertion/find/remove/rehash/reset/finalize/clone/cached entry replacement",
-          "status": "ported",
-          "go_target": "pkg/util/str_hashtable.go",
-          "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableBorrowedLifetimeAndReplacement",
-            "TestStrHashtableSourceProbeThresholdAndTombstones",
-            "TestStrHashtableOperationsAndOutput",
-            "TestStrHashtableIndependentOracleAndCStringLookup",
-            "TestStrHashtableBudgetsSwapAndStaleViews",
-            "TestStrHashtableDumpCStringBytes",
-            "TestStrHashtableKeyOwnerAndStats",
-            "TestStrHashtableMultiOriginQueriesAndAdoption",
-            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
-            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
-            "TestStrHashtableMultiOriginSwapGraphFailures",
-            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
-            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
-            "TestStrHashtableCleanupResetAndFailurePeaks",
-            "TestStrHashtableSourceInitialCapacity",
-            "TestStrHashtablePartialRemovalAndStrictReset",
-            "TestStrHashtableEpochExhaustion"
-          ]
-        },
-        {
-          "name": "multi-origin borrowed table assignment/union/intersection",
-          "status": "ported",
-          "go_target": "pkg/util/str_hashtable.go",
-          "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableBorrowedLifetimeAndReplacement",
-            "TestStrHashtableSourceProbeThresholdAndTombstones",
-            "TestStrHashtableOperationsAndOutput",
-            "TestStrHashtableIndependentOracleAndCStringLookup",
-            "TestStrHashtableBudgetsSwapAndStaleViews",
-            "TestStrHashtableDumpCStringBytes",
-            "TestStrHashtableKeyOwnerAndStats",
-            "TestStrHashtableMultiOriginQueriesAndAdoption",
-            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
-            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
-            "TestStrHashtableMultiOriginSwapGraphFailures",
-            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
-            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
-            "TestStrHashtableCleanupResetAndFailurePeaks",
-            "TestStrHashtableSourceInitialCapacity",
-            "TestStrHashtablePartialRemovalAndStrictReset",
-            "TestStrHashtableEpochExhaustion"
-          ]
-        },
-        {
-          "name": "cross-region borrowed binding swap with atomic table/directory budget transfer",
-          "status": "ported",
-          "go_target": "pkg/util/str_hashtable.go",
-          "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableBorrowedLifetimeAndReplacement",
-            "TestStrHashtableSourceProbeThresholdAndTombstones",
-            "TestStrHashtableOperationsAndOutput",
-            "TestStrHashtableIndependentOracleAndCStringLookup",
-            "TestStrHashtableBudgetsSwapAndStaleViews",
-            "TestStrHashtableDumpCStringBytes",
-            "TestStrHashtableKeyOwnerAndStats",
-            "TestStrHashtableMultiOriginQueriesAndAdoption",
-            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
-            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
-            "TestStrHashtableMultiOriginSwapGraphFailures",
-            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
-            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
-            "TestStrHashtableCleanupResetAndFailurePeaks",
-            "TestStrHashtableSourceInitialCapacity",
-            "TestStrHashtablePartialRemovalAndStrictReset",
-            "TestStrHashtableEpochExhaustion"
-          ]
-        },
-        {
-          "name": "source bucket-order string dump/iterator and disabled-statistics collision count",
-          "status": "ported",
-          "go_target": "pkg/util/str_hashtable.go",
-          "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableBorrowedLifetimeAndReplacement",
-            "TestStrHashtableSourceProbeThresholdAndTombstones",
-            "TestStrHashtableOperationsAndOutput",
-            "TestStrHashtableIndependentOracleAndCStringLookup",
-            "TestStrHashtableBudgetsSwapAndStaleViews",
-            "TestStrHashtableDumpCStringBytes",
-            "TestStrHashtableKeyOwnerAndStats",
-            "TestStrHashtableMultiOriginQueriesAndAdoption",
-            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
-            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
-            "TestStrHashtableMultiOriginSwapGraphFailures",
-            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
-            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
-            "TestStrHashtableCleanupResetAndFailurePeaks",
-            "TestStrHashtableSourceInitialCapacity",
-            "TestStrHashtablePartialRemovalAndStrictReset",
-            "TestStrHashtableEpochExhaustion"
-          ]
-        },
-        {
           "name": "symbol/int32 concrete sentinel hashing/probing/growth/erase/reset and source-order iteration",
           "status": "ported",
           "go_target": "pkg/util/util_symbol_table.go",
@@ -118721,165 +118318,6 @@
             "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
             "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
             "TestSATMutexPairSetWrappedCopyGuardAtActualDestination"
-          ]
-        },
-        {
-          "name": "Selected Runtime-backed char-pointer core class src/util/hashtable.h:94-645: actual pointer/hash entry fields, constructor/copy, probe/insert/remove, growth/reset/finalize, swap/union/assignment and lexical intersection; bound source assertions/statistics/native ostream remain open",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_runtime.go",
-          "tests": [
-            "TestStrHashtableRuntimeActualWrapperTableAndLazyFieldInitialization",
-            "TestStrHashtableRuntimeProbeGrowthAndIndependentContents",
-            "TestStrHashtableRuntimeResetDestructiveRefusalPrefix",
-            "TestStrHashtableRuntimeEveryConstructorReservationAndCopyPrefixes",
-            "TestStrHashtableRuntimeBorrowRefsCloneSwapAndRemoval",
-            "TestStrHashtableRuntimeEveryGrowthReservationAndRealTLSRetry",
-            "TestStrHashtableRuntimeSourceDestructorPostphysicalStopOwningAcknowledgment",
-            "TestStrHashtableRuntimeLexicalIntersectionHasOnlyTableAllocation",
-            "TestStrHashtableRuntimeUnusedEntryWordsStayUnread",
-            "TestStrHashtableRuntimeRemoveDeletedOOMShortCircuit",
-            "TestStrHashtableRuntimeSizeT32WrappedArrayGuardPrefix",
-            "TestStrHashtableRuntimeEveryResetAndFinalizeReplacementReservation",
-            "TestStrHashtableRuntimeForeignBorrowLifetimeAndTypedObserverGuard",
-            "TestStrHashtableRuntimeEveryLexicalAndDeletedReplacementReservation",
-            "TestStrHashtableRuntimeOrdinaryAllocatorProfiles",
-            "TestStrHashtableRuntimeAllocationReentrantOwningClose",
-            "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner"
-          ]
-        },
-        {
-          "name": "Selected concrete cold DebugContext bridge and real SASSERT/UNREACHABLE source-site transport for Runtime StrHashtable (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644); erased operands remain unread, C resumes literal source body",
-          "status": "partial",
-          "go_target": "pkg/util/util_str_hashtable_assertion_bridge.go",
-          "tests": [
-            "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
-            "TestStrHashtableBoundInvariantContinuesLiteralSites",
-            "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
-            "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
-            "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
-            "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
-            "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
-            "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
-            "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
-            "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
-            "TestStrHashtableBoundEveryConstructorReservationImmediateGraph"
-          ]
-        },
-        {
-          "name": "Selected Runtime core source compile gates and default typed adapter, literal target-deleted static move predicate and finite source end/begin traversal (src/util/hashtable.h:159-215,249,497-514)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_assertions.go",
-          "tests": [
-            "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
-            "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
-            "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
-          ]
-        },
-        {
-          "name": "Concrete Runtime HASHTABLE_STATISTICS actual unsigned64 field and source constructor/copy/reset/finalize/swap/probe increments (src/util/hashtable.h:33-36,138-140,254-256,267-269,281-283,359-373,409-424,481-491,533-543,649-653)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_statistics.go",
-          "tests": [
-            "TestStrHashtableRuntimeStatisticsActualFieldAndLiteralMissCounts",
-            "TestStrHashtableRuntimeStatisticsEveryConstructorAndCopyReservation",
-            "TestStrHashtableRuntimeStatisticsResetFinalizeInlineAndUnsignedWrap",
-            "TestStrHashtableRuntimeStatisticsEveryReplacementAndGrowthPrefix",
-            "TestStrHashtableRuntimeStatisticsIndependentFiniteProbeCounts"
-          ]
-        },
-        {
-          "name": "Concrete borrowed NumericTextStream ostream dump chain and reached CString strlen with captured table/end (src/util/hashtable.h:581-600)",
-          "status": "partial",
-          "go_target": "pkg/util/util_str_hashtable_output.go",
-          "tests": [
-            "TestStrHashtableDumpIntoActualFieldFormattingAndCallerWidth",
-            "TestStrHashtableDumpIntoClosedFileStillReachesActualBorrowedCString",
-            "TestStrHashtableDumpIntoEveryOutputReservationAndExactPrefix",
-            "TestStrHashtableDumpIntoActualFileAndEmptyBorrowErasure",
-            "TestStrHashtableDumpIntoBorrowedSpellingRereadAndFileBytes"
-          ]
-        },
-        {
-          "name": "Legacy char-pointer destructive Reset/Finalize, null-skipping source DT, retained failed-copy constructor and lexical Intersect ownership (src/util/hashtable.h:146-148,259-275,287-322,613-623; src/util/memory_manager.h:112-119)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_legacy_lifecycle.go",
-          "tests": [
-            "TestStrHashtableLegacyResetFinalizeActualDeleteBeforeReplacementRefusal",
-            "TestStrHashtableLegacyCopyCtorForeignBindingRefusalRetainsActualTable",
-            "TestStrHashtableLegacyLexicalCopyCtorFailureRetainedByActualFrame",
-            "TestStrHashtableLegacyCopyAndIntersectEveryReservationPrefix",
-            "TestStrHashtableLegacyIntersectionIndependentFiniteSets",
-            "TestStrHashtableLegacyCompletedCopyDestructorBeforeOwningHeaderAbort",
-            "TestStrHashtableLegacyEmptyResetDoesNotReadDestroyedBacking",
-            "TestStrHashtableLegacyReplacementBodyFailureNullSourceDestructor",
-            "TestStrHashtableLegacyGrowthBodyFailureNonNullSourceDestructor"
-          ]
-        },
-        {
-          "name": "Legacy char-pointer actual SASSERT/UNREACHABLE constructor, copy/move, linear wrapped probe, remove and invariant dispatch (src/util/hashtable.h:159-215,249,371-451,559,643-644)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_legacy_assertions.go",
-          "tests": [
-            "TestStrHashtableLegacyGrowthEveryActualReservationBeforeSuccess",
-            "TestStrHashtableLegacyCopyMoveActualDeletedTargetAssertion",
-            "TestStrHashtableLegacyInvariantDefaultSourceAssertion",
-            "TestStrHashtableLegacyActualExhaustedProbeUnreachableProfiles",
-            "TestStrHashtableLegacyCapturedReachedPointerRetainsLiveBacking"
-          ]
-        },
-        {
-          "name": "Borrowed concrete DebugContext legacy constructor C/T and reached flag control (src/util/hashtable.h:249; src/util/debug.h:60-65,76-89)",
-          "status": "partial",
-          "go_target": "pkg/util/util_str_hashtable_legacy_assertions_source_test.go",
-          "tests": [
-            "TestStrHashtableLegacyBoundConstructorAndLinearSourceContinuation",
-            "TestStrHashtableLegacyClosedAssertionProviderAtCopyAndInvariantSites",
-            "TestStrHashtableLegacyGrowthSourceAssertionStopRetainsNewAndOld",
-            "TestStrHashtableLegacyClosedFlagAtActualDeletedInsertAndFullRemove",
-            "TestStrHashtableLegacyNonPowerResetRealSourceContinueAndThrow"
-          ]
-        },
-        {
-          "name": "Runtime completed core source DT distinguishes NULL current table, first body cause and actual reached destructor stop (src/util/hashtable.h:146-148,259-261; src/util/memory_manager.h:112-119)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_runtime.go",
-          "tests": [
-            "TestStrHashtableRuntimeNullReplacementDestructorRetainsUnjoinedNew",
-            "TestStrHashtableRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
-            "TestStrHashtableRuntimeReplacementEveryRefusalThenSourceDestructor"
-          ]
-        },
-        {
-          "name": "Legacy HASHTABLE_STATISTICS actual cold scalar init/copy/swap and source insert/find/remove increments (src/util/hashtable.h:138-140,254-256,267-269,281-283,359-373,409-424,481-491,533-543,649-653)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_statistics.go",
-          "tests": [
-            "TestStrHashtableLegacyStatisticsActualScalarAndLiteralMissCounts",
-            "TestStrHashtableLegacyStatisticsIndependentFiniteProbeCounts",
-            "TestStrHashtableLegacyStatisticsEveryConstructorCopyAndReplacementReservation",
-            "TestStrHashtableLegacyStatisticsUnsignedScalarAndCopyBodyOrder",
-            "TestStrHashtableLegacyStatisticsBothInsertMacrosAndProfileBinding"
-          ]
-        },
-        {
-          "name": "Legacy statistics profile real borrowed ostream dump, badbit late CString and exact every-output-refusal prefix (src/util/hashtable.h:581-600)",
-          "status": "partial",
-          "go_target": "pkg/util/util_str_hashtable_legacy_statistics_output_source_test.go",
-          "tests": [
-            "TestStrHashtableLegacyStatisticsDumpIntoActualFieldFormattingAndCallerWidth",
-            "TestStrHashtableLegacyStatisticsDumpIntoClosedFileStillReachesActualBorrowedCString",
-            "TestStrHashtableLegacyStatisticsDumpIntoEveryOutputReservationAndExactPrefix",
-            "TestStrHashtableLegacyStatisticsDumpIntoActualFileAndEmptyBorrowErasure",
-            "TestStrHashtableLegacyStatisticsDumpIntoBorrowedSpellingRereadAndFileBytes"
-          ]
-        },
-        {
-          "name": "Actual concrete Go owner identity guards before legacy source/owning cleanup and empty reset (source ctor/copy/DT src/util/hashtable.h:243-275; Go non-copying ownership guard)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_runtime.go",
-          "tests": [
-            "TestStrHashtableLegacyAccidentalGoCopyCannotOwnSourceActions",
-            "TestStrHashtableZeroGoWrapperCannotOwnCleanup"
           ]
         },
         {
@@ -120159,7 +119597,8 @@
         },
         {
           "name": "full process memory service and AST register/delete/compress consumers",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Selected real SAT clause-ID embedded Runtime Generator consumer and pre-placement candidate extent retention before fallible Next; legacy profile unchanged",
@@ -120442,7 +119881,8 @@
         },
         {
           "name": "Remaining raw constructors/setters/swap/move/arithmetic domains and owning projection diagnostic cleanup-refusal retention",
-          "status": "partial"
+          "status": "partial",
+          "tests": []
         },
         {
           "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, DEBUG assertions and release FIRST projection with actual component short circuit",
@@ -120896,7 +120336,8 @@
         },
         {
           "name": "Remaining raw constructors/setters/swap/move/arithmetic domains and owning projection diagnostic cleanup-refusal retention",
-          "status": "partial"
+          "status": "partial",
+          "tests": []
         },
         {
           "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, DEBUG assertions and release FIRST projection with actual component short circuit",
@@ -121458,7 +120899,8 @@
         },
         {
           "name": "Remaining raw constructors/setters/swap/move/arithmetic domains and owning projection diagnostic cleanup-refusal retention",
-          "status": "partial"
+          "status": "partial",
+          "tests": []
         },
         {
           "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, DEBUG assertions and release FIRST projection with actual component short circuit",
@@ -129070,7 +128512,8 @@
         },
         {
           "name": "TRACE/STRACE actions and inherited custom ostream persistent flags/locale/stream state integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "concrete binary vector logical reserve/resize, owning move growth and ascending reset; isolation frame specializations",
@@ -129309,7 +128752,8 @@
         },
         {
           "name": "TRACE/STRACE actions and inherited custom ostream persistent flags/locale/stream state integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "concrete binary vector logical reserve/resize, owning move growth and ascending reset; isolation frame specializations",
@@ -129431,7 +128875,8 @@
         },
         {
           "name": "Persistent ostream integration and real polynomial/algebraic consumers",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -132376,7 +131821,8 @@
         },
         {
           "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and subpaving consumer integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Selected MPFF full-precision character and unsigned1024/16 lexical display buffers, completed-default unwind and explicit failed storage cleanup; broader storage/runtime profiles remain open",
@@ -132672,7 +132118,8 @@
         },
         {
           "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and subpaving consumer integration",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Selected MPFF full-precision character and unsigned1024/16 lexical display buffers, completed-default unwind and explicit failed storage cleanup; broader storage/runtime profiles remain open",
@@ -133450,19 +132897,23 @@
         },
         {
           "name": "display_raw",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "trace(a,b,op)",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "trace(a)",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "trace_nl",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Actual Natural reverse published-member SourceFinalize, parent source integration and separate owning cleanup retain failed lexical/unpublished expansion roots; cold guards at reached owners",
@@ -134018,19 +133469,23 @@
         },
         {
           "name": "display_raw",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "trace(a,b,op)",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "trace(a)",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "trace_nl",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Actual Natural reverse published-member SourceFinalize, parent source integration and separate owning cleanup retain failed lexical/unpublished expansion roots; cold guards at reached owners",
@@ -144396,15 +143851,18 @@
         },
         {
           "name": "manager() borrowed dummy value-manager identity accessor; int32 callback object not exposed by Go configuration adapter",
-          "status": "partial"
+          "status": "partial",
+          "tests": []
         },
         {
           "name": "automatic source SASSERT/TRACE diagnostic routing and machine-address rendering",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "real AST expression/dependency callbacks, subpaving bounds and other template configurations",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "parray<expr_dependency*>::mk/del/copy",
@@ -146389,7 +145847,8 @@
         },
         {
           "name": "Remaining raw constructors/setters/swap/move/arithmetic domains and owning projection diagnostic cleanup-refusal retention",
-          "status": "partial"
+          "status": "partial",
+          "tests": []
         },
         {
           "name": "Actual owner-local facade scalar queries/getters/Float64 preserve source raw-domain, narrowing and DEBUG-only fit behavior",
@@ -152167,93 +151626,16 @@
       "path": "src/util/str_hashtable.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "platform_replacement",
       "go_targets": [
-        "pkg/util/str_hashtable.go",
-        "pkg/util/str_hashtable_runtime.go",
-        "pkg/util/str_hashtable_runtime_source_test.go",
-        "pkg/util/str_hashtable_runtime_reentrant_source_test.go",
-        "pkg/util/str_hashtable_assertions.go",
-        "pkg/util/str_hashtable_assertions_debug.go",
-        "pkg/util/str_hashtable_assertions_release.go",
-        "pkg/util/str_hashtable_assertions_source_test.go",
-        "pkg/util/util_str_hashtable_assertion_bridge.go",
-        "pkg/util/util_str_hashtable_assertions_source_test.go",
-        "pkg/util/str_hashtable_bytes.go",
-        "pkg/util/str_hashtable_statistics.go",
-        "pkg/util/str_hashtable_statistics_source_test.go",
-        "pkg/util/str_hashtable_output.go",
-        "pkg/util/util_str_hashtable_output.go",
-        "pkg/util/util_str_hashtable_output_source_test.go",
-        "pkg/util/runtime_bytes_bounded.go",
-        "pkg/util/region_bytes.go",
-        "pkg/util/str_hashtable_cstring_source_test.go"
+        "pkg/util/util_symbol.go",
+        "pkg/util/util_debug_context.go",
+        "pkg/util/util_trace_context.go"
       ],
       "tests": [
-        "TestStrHashtableSourceHashCStringAndEquality",
-        "TestStrHashtableBorrowedLifetimeAndReplacement",
-        "TestStrHashtableSourceProbeThresholdAndTombstones",
-        "TestStrHashtableOperationsAndOutput",
-        "TestStrHashtableIndependentOracleAndCStringLookup",
-        "TestStrHashtableBudgetsSwapAndStaleViews",
-        "TestStrHashtableDumpCStringBytes",
-        "TestStrHashtableKeyOwnerAndStats",
-        "TestStrHashtableMultiOriginQueriesAndAdoption",
-        "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
-        "TestStrHashtableMultiOriginFailureOrderAndAccounting",
-        "TestStrHashtableMultiOriginSwapGraphFailures",
-        "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
-        "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
-        "TestStrHashtableCleanupResetAndFailurePeaks",
-        "TestStrHashtableSourceInitialCapacity",
-        "TestStrHashtablePartialRemovalAndStrictReset",
-        "TestStrHashtableEpochExhaustion",
-        "TestStrHashtableRuntimeActualWrapperTableAndLazyFieldInitialization",
-        "TestStrHashtableRuntimeProbeGrowthAndIndependentContents",
-        "TestStrHashtableRuntimeResetDestructiveRefusalPrefix",
-        "TestStrHashtableRuntimeEveryConstructorReservationAndCopyPrefixes",
-        "TestStrHashtableRuntimeBorrowRefsCloneSwapAndRemoval",
-        "TestStrHashtableRuntimeEveryGrowthReservationAndRealTLSRetry",
-        "TestStrHashtableRuntimeSourceDestructorPostphysicalStopOwningAcknowledgment",
-        "TestStrHashtableRuntimeLexicalIntersectionHasOnlyTableAllocation",
-        "TestStrHashtableRuntimeUnusedEntryWordsStayUnread",
-        "TestStrHashtableRuntimeRemoveDeletedOOMShortCircuit",
-        "TestStrHashtableRuntimeSizeT32WrappedArrayGuardPrefix",
-        "TestStrHashtableRuntimeEveryResetAndFinalizeReplacementReservation",
-        "TestStrHashtableRuntimeForeignBorrowLifetimeAndTypedObserverGuard",
-        "TestStrHashtableRuntimeEveryLexicalAndDeletedReplacementReservation",
-        "TestStrHashtableRuntimeOrdinaryAllocatorProfiles",
-        "TestStrHashtableRuntimeAllocationReentrantOwningClose",
-        "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
-        "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
-        "TestStrHashtableBoundInvariantContinuesLiteralSites",
-        "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
-        "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
-        "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
-        "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
-        "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
-        "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
-        "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
-        "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
-        "TestStrHashtableBoundEveryConstructorReservationImmediateGraph",
-        "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
-        "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
-        "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate",
-        "TestStrHashtableRuntimeStatisticsActualFieldAndLiteralMissCounts",
-        "TestStrHashtableRuntimeStatisticsEveryConstructorAndCopyReservation",
-        "TestStrHashtableRuntimeStatisticsResetFinalizeInlineAndUnsignedWrap",
-        "TestStrHashtableRuntimeStatisticsEveryReplacementAndGrowthPrefix",
-        "TestStrHashtableRuntimeStatisticsIndependentFiniteProbeCounts",
-        "TestStrHashtableDumpIntoActualFieldFormattingAndCallerWidth",
-        "TestStrHashtableDumpIntoClosedFileStillReachesActualBorrowedCString",
-        "TestStrHashtableDumpIntoEveryOutputReservationAndExactPrefix",
-        "TestStrHashtableDumpIntoActualFileAndEmptyBorrowErasure",
-        "TestStrHashtableDumpIntoBorrowedSpellingRereadAndFileBytes",
-        "TestStrHashtableCStringHashAndEqualRereadActualUnstoredPointer",
-        "TestStrHashtableCStringBorrowChangedBeforeInsertionQueryEngine",
-        "TestStrHashtableCStringFiniteLengthAndEqualityOracle",
-        "TestRegionBytesActualAscendingWordsDescendingTailAndZeroUnread",
-        "TestRegionBytesReachedOffsetOverflowBeforeTokenRead"
+        "TestSymbolDuplicateLookupAndInvalidTokens",
+        "TestDebugContextUsesOwnedGoStrings",
+        "TestTraceContextUsesOwnedGoStrings"
       ],
       "conditionals": [
         {
@@ -152269,34 +151651,21 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "str_hash_proc::operator() NUL length and project string_hash seed 17 (src/util/str_hashtable.h:28)",
-          "status": "ported",
-          "go_target": "pkg/util/str_hashtable.go",
+          "name": "Go string maps replace the char-pointer hash/equality specialization",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/util_symbol.go",
           "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableCStringHashAndEqualRereadActualUnstoredPointer",
-            "TestStrHashtableCStringFiniteLengthAndEqualityOracle"
-          ]
-        },
-        {
-          "name": "str_eq_proc::operator() byte-string equality (src/util/str_hashtable.h:30)",
-          "status": "ported",
-          "go_target": "pkg/util/str_hashtable.go",
-          "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableIndependentOracleAndCStringLookup",
-            "TestStrHashtableCStringFiniteLengthAndEqualityOracle"
+            "TestSymbolDuplicateLookupAndInvalidTokens",
+            "TestDebugContextUsesOwnedGoStrings",
+            "TestTraceContextUsesOwnedGoStrings"
           ]
         }
       ],
       "ownership": [
-        "StrHashtable owns its concrete table backing and cold region-binding directory. StrKey is a typed scalar borrow of one NUL-terminated spelling; table operations never own or free spelling bytes.",
-        "Reset, Finalize, Close, copy, assignment, union, intersection and swap preserve the concrete alias's key-borrow and table-ownership rules in both ordinary and checked Runtime storage profiles."
+        "Go strings own immutable key bytes; built-in maps own their key indexes. No borrowed char pointer or C++ table allocation remains."
       ],
       "deviations": [
-        "Checked StrKey origin/ref/offset values replace raw char pointers. Go byte reads and comparisons replace strlen and strcmp; no C standard-library implementation is ported.",
-        "The concrete char-key specialization is complete independently of other hashtable<T> instantiations. Remaining generic hashtable.h obligations stay on that separate manifest entry.",
-        "Go errors and checked epochs replace source undefined behavior for stale, foreign and malformed raw pointers. The project Jenkins-style hash algorithm is retained because it determines table behavior."
+        "The C++ str_hash_proc, str_eq_proc and ptr_hashtable<char> alias are intentionally replaced by Go strings and built-in maps. Project string hashing remains only where separately observable outside map placement."
       ]
     },
     {
@@ -152458,11 +151827,13 @@
         },
         {
           "name": "other INITIAL_SIZE template instantiations",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Windows secure-CRT sprintf_s runtime error/profile semantics",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -152836,7 +152207,8 @@
         },
         {
           "name": "string_buffer symbol insertion for other INITIAL_SIZE template instantiations",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "initialize_symbols/finalize_symbols explicit table pointer: completed publication, null finalize, identity-preserving shortcut and reinitialize",
@@ -153159,7 +152531,8 @@
         },
         {
           "name": "other payload specializations",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -154525,7 +153898,8 @@
         },
         {
           "name": "escaped external custom ostream state/badbit/exception behavior",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",
@@ -154826,7 +154200,8 @@
         },
         {
           "name": "escaped external custom ostream state/badbit/exception behavior",
-          "status": "unported"
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "Selected actual verbosity scalar and borrowed stream getters/setters with reached allocator IF_VERBOSE level rereads and once-per-chain stream selection; native stderr/global binding remains open",

@@ -50,25 +50,7 @@ func (c *TraceContext) open() error {
 
 func traceName(s string) string { return s[:cSymbolLength(s)] }
 
-func (c *TraceContext) nameFromKey(r *arena.BytesRegion, k StrKey) (string, error) {
-	if r == nil {
-		return "", arena.ErrInvalidSlot
-	}
-	if e := validateStrKey(r, k); e != nil {
-		return "", e
-	}
-	b := make([]byte, k.Length())
-	for i := range b {
-		v, e := r.Read(k.Allocation(), k.Offset()+uint32(i))
-		if e != nil {
-			return "", e
-		}
-		b[i] = v
-	}
-	return string(b), nil
-}
-
-func (c *TraceContext) EnableTraceName(name string) error {
+func (c *TraceContext) EnableTrace(name string) error {
 	if e := c.open(); e != nil {
 		return e
 	}
@@ -79,7 +61,7 @@ func (c *TraceContext) EnableTraceName(name string) error {
 	return nil
 }
 
-func (c *TraceContext) DisableTraceName(name string) error {
+func (c *TraceContext) DisableTrace(name string) error {
 	if e := c.open(); e != nil {
 		return e
 	}
@@ -87,7 +69,7 @@ func (c *TraceContext) DisableTraceName(name string) error {
 	return nil
 }
 
-func (c *TraceContext) IsTraceNameEnabled(name string) (bool, error) {
+func (c *TraceContext) IsTraceEnabled(name string) (bool, error) {
 	if e := c.open(); e != nil {
 		return false, e
 	}
@@ -98,37 +80,6 @@ func (c *TraceContext) IsTraceNameEnabled(name string) (bool, error) {
 	return ok, nil
 }
 
-// These methods copy legacy arena-backed names at the API boundary while
-// callers are migrated to the string methods above.
-func (c *TraceContext) EnableTrace(k StrKey) error {
-	name, e := c.nameFromKey(c.region, k)
-	if e != nil {
-		return e
-	}
-	return c.EnableTraceName(name)
-}
-func (c *TraceContext) EnableTraceFrom(r *arena.BytesRegion, k StrKey) error {
-	name, e := c.nameFromKey(r, k)
-	if e != nil {
-		return e
-	}
-	return c.EnableTraceName(name)
-}
-func (c *TraceContext) DisableTrace(k StrKey) error {
-	name, e := c.nameFromKey(c.region, k)
-	if e != nil {
-		return e
-	}
-	return c.DisableTraceName(name)
-}
-func (c *TraceContext) DisableTraceFrom(r *arena.BytesRegion, k StrKey) error {
-	name, e := c.nameFromKey(r, k)
-	if e != nil {
-		return e
-	}
-	return c.DisableTraceName(name)
-}
-
 func (c *TraceContext) EnableAllTrace(all bool) error {
 	if e := c.open(); e != nil {
 		return e
@@ -136,35 +87,6 @@ func (c *TraceContext) EnableAllTrace(all bool) error {
 	c.all = all
 	return nil
 }
-func (c *TraceContext) IsTraceEnabled(k StrKey) (bool, error) {
-	if e := c.open(); e != nil {
-		return false, e
-	}
-	if c.all {
-		return true, nil
-	}
-	name, e := c.nameFromKey(c.region, k)
-	if e != nil {
-		return false, e
-	}
-	_, ok := c.tags[name]
-	return ok, nil
-}
-func (c *TraceContext) IsTraceEnabledFrom(r *arena.BytesRegion, k StrKey) (bool, error) {
-	if e := c.open(); e != nil {
-		return false, e
-	}
-	if c.all {
-		return true, nil
-	}
-	name, e := c.nameFromKey(r, k)
-	if e != nil {
-		return false, e
-	}
-	_, ok := c.tags[name]
-	return ok, nil
-}
-
 func (c *TraceContext) FinalizeTrace() error {
 	if e := c.open(); e != nil {
 		return e
@@ -192,5 +114,5 @@ func (c *TraceContext) Close() error {
 	return nil
 }
 func (c *TraceContext) IsTraceEnabledCString(name string) (bool, error) {
-	return c.IsTraceNameEnabled(name)
+	return c.IsTraceEnabled(name)
 }

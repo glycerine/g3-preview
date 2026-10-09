@@ -241,10 +241,6 @@ func macroHeapPhysical(t *testing.T, p *RuntimePermutation, d *DebugContext, a *
 	z := x.Descriptors
 	r := p.forward.Column.Raw.Runtime
 	cold := p.header + unsignedCopyCold(t, &p.forward) + unsignedCopyCold(t, &p.inverse) + d.ownerBytes + x.OwnerBytes + x.PayloadBytes + x.PageHeaderBytes + x.DirectoryBytes + x.LogBytes + x.ScopeBytes + z.OwnerBytes + z.RecordBytes + z.MetadataBytes + z.DirectoryBytes + intHeapOwnerBytes + a.header + in.header + s.header + s.stdout.Stats().OwnerBytes + s.StderrField.Stats().OwnerBytes
-	if d.Tags != nil {
-		v := d.Tags.Stats()
-		cold += v.OwnerBytes + v.TableBytes + v.DirectoryBytes
-	}
 	if p.budget.Used() != r.Stats().TotalBytes+cold {
 		t.Fatal("actual named macro heap/borrowed caller raw and cold graph", p.budget.Used(), r.Stats().TotalBytes, cold)
 	}

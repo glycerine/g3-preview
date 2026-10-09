@@ -80,8 +80,8 @@ func TestDebugGlobalServiceEveryConstructorRefusalKeepsBorrowedRegion(t *testing
 		if foreign.closed {
 			t.Fatal("adopted unrelated context")
 		}
-		if _, re := region.Read(key.Allocation(), key.Offset()); re != nil {
-			t.Fatal("caller bytes", re)
+		if key != "caller-owned" {
+			t.Fatal("caller string changed", key)
 		}
 		b.FailAfter(-1)
 		if s != nil {

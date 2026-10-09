@@ -198,10 +198,6 @@ func permutationDiagnosticPhysical(t *testing.T, d *DebugContext, r *Runtime, b 
 	if !d.closed {
 		cold += d.ownerBytes
 	}
-	if d.Tags != nil {
-		h := d.Tags.Stats()
-		cold += h.OwnerBytes + h.TableBytes + h.DirectoryBytes
-	}
 	for _, s := range streams {
 		if s != nil {
 			h := s.Stats()
