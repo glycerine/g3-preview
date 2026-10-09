@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/random"
 )
 
 func TestSATSolverReportModelConsumerCopySelfAndGuardedReadPrefix(t *testing.T) {
@@ -75,7 +76,7 @@ func TestSATSolverReportUpdateParamsActualChildrenAndSoleRandom(t *testing.T) {
 	if s.simplifier.resolution || s.simplifier.subsumption || s.asymm.enabled || s.scc.enabled {
 		t.Fatal("actual source child parameter dispatch")
 	}
-	var expected util.Random
+	var expected z3rand.Generator
 	expected.SetSeed(39)
 	if got, want := s.decision.rng.Next(), expected.Next(); got != want {
 		t.Fatal(got, want)

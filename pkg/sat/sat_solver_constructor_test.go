@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/random"
 )
 
 func satSolverCheckFixture(t *testing.T) (*Solver, *util.ParamsContext, util.ParamsRef) {
@@ -39,7 +40,7 @@ func TestSATSolverCompleteMemberConstructorHasRealDefaultChildren(t *testing.T) 
 	key := "random_seed"
 	satOK(t, ctx.SetUIntName(&params, &key, 17))
 	satOK(t, s.UpdateParams(&params))
-	var expected util.Random
+	var expected z3rand.Generator
 	expected.SetSeed(17)
 	if got, want := s.decision.rng.Next(), expected.Next(); got != want {
 		t.Fatal("sole source random member reseeded last", got, want)

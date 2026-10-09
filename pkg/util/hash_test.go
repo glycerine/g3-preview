@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-//go:embed test_vectors/source_hash_random.json
+//go:embed test_vectors/source_hash.json
 var sourceVectorsJSON []byte
 
 type vectors struct {
@@ -15,9 +15,8 @@ type vectors struct {
 		X    uint64
 		Want uint32
 	}
-	String, Composite, Random, RandomZero []uint32
-	Combine, Mix, Pair                    uint32
-	ShuffleZero                           []int32
+	String, Composite  []uint32
+	Combine, Mix, Pair uint32
 }
 
 func sourceVectors(t *testing.T) vectors {
@@ -66,40 +65,6 @@ func TestSourceHashVectors(t *testing.T) {
 		}
 	}
 }
-func TestSourceRandomVectors(t *testing.T) {
-	r := NewRandom(0xffffffff)
-	for i, w := range sourceVectors(t).Random {
-		if g := r.Next(); g != w {
-			t.Fatalf("step %d=%d want %d", i, g, w)
-		}
-	}
-	r.SetSeed(0xffffffff)
-	if r.Bounded(7) != 0 {
-		t.Fatal("bounded modulo")
-	}
-	if RandomMax != 32767 {
-		t.Fatal("max")
-	}
-}
-func TestShuffleTraversal(t *testing.T) {
-	r := NewRandom(0)
-	v := []int32{0, 1, 2, 3, 4}
-	ShuffleInt32(v, r)
-	want := sourceVectors(t).ShuffleZero
-	for i := range v {
-		if v[i] != want[i] {
-			t.Fatalf("shuffle %v want %v", v, want)
-		}
-	}
-}
-func TestSourceZeroSeed(t *testing.T) {
-	var r Random
-	for i, w := range sourceVectors(t).RandomZero {
-		if r.Next() != w {
-			t.Fatal(i)
-		}
-	}
-}
 func TestCompositeVisitOrder(t *testing.T) {
 	for n := uint32(1); n <= 10; n++ {
 		var got []uint32
@@ -134,42 +99,5 @@ func TestWordReaderSourceVectors(t *testing.T) {
 	}
 	if n := testing.AllocsPerRun(100, func() { WordReader(25, 123, func(i uint32) uint32 { return words[i] }) }); n != 0 {
 		t.Fatal("word reader allocations", n)
-	}
-}
-func TestConcreteShuffleSourceDrawOrder(t *testing.T) {
-	want := sourceVectors(t).ShuffleZero
-	r := NewRandom(0)
-	values := []uint32{0, 1, 2, 3, 4}
-	ShuffleUint32(values, r)
-	for i, w := range want {
-		if values[i] != uint32(w) {
-			t.Fatalf("uint32 shuffle %v want %v", values, want)
-		}
-	}
-	if n := r.Next(); n != 8855 {
-		t.Fatalf("shuffle consumed wrong source draws: next=%d want 8855", n)
-	}
-	r.SetSeed(0)
-	signed := []int32{-2, -1, 0, 1, 2}
-	ShuffleInt32(signed, r)
-	for i, w := range want {
-		if signed[i] != w-2 {
-			t.Fatalf("int32 shuffle %v at %d", signed, i)
-		}
-	}
-	if n := r.Next(); n != 8855 {
-		t.Fatal("signed shuffle draw order", n)
-	}
-	for n := 0; n <= 1; n++ {
-		r.SetSeed(0)
-		ShuffleUint32(values[:n], r)
-		if g := r.Next(); g != 38 {
-			t.Fatal("empty/singleton uint32 shuffle consumed draw", n, g)
-		}
-		r.SetSeed(0)
-		ShuffleInt32(signed[:n], r)
-		if g := r.Next(); g != 38 {
-			t.Fatal("empty/singleton int32 shuffle consumed draw", n, g)
-		}
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/random"
 )
 
 // The source campaign never returns. One finite source outer cycle performs
@@ -35,7 +36,7 @@ func TestSATSolverSourceUserScopeFiniteCycle(t *testing.T) {
 			t.Fatalf("source initial variable %d: %d", i, v)
 		}
 	}
-	var rng util.Random
+	var rng z3rand.Generator
 	var frames [][][3]Literal
 	checks, clauses := 0, 0
 	check := func() {

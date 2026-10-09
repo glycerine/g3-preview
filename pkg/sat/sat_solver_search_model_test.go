@@ -6,11 +6,11 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/random"
 )
 
 func TestSATSolverDefaultSearchIndependentThreeVariableCNF(t *testing.T) {
-	var random util.Random
+	var random z3rand.Generator
 	random.SetSeed(91)
 	for seed := 0; seed < 64; seed++ {
 		s, _, _ := satSolverCheckFixture(t)

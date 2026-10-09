@@ -4,7 +4,7 @@ package ast
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/random"
 )
 
 func TestASTSourceNineAssertions(t *testing.T) {
@@ -103,7 +103,7 @@ func TestASTSourcePArrayMillionUpdates(t *testing.T) {
 	astTestMust(t, m.ExprArrayCopy(&a1, &a2))
 	var expected [100]uint32
 	var changed [100]bool
-	rng := util.NewRandom(1) // Explicit portable replacement for external libc rand input only.
+	rng := z3rand.New(1) // Explicit portable replacement for external libc rand input only.
 	var plateau ASTManagerStats
 	for i := uint32(0); i < 1000000; i++ {
 		v := rng.Bounded(100)

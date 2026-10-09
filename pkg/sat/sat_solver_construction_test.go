@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/random"
 )
 
 func TestSATSolverVariableColdPreparationHasNoPrematureQueue(t *testing.T) {
@@ -37,7 +38,7 @@ func TestSATSolverDecisionColdDefaultSeedAndOwningUnwind(t *testing.T) {
 	satOK(t, e)
 	// Source random_gen(unsigned seed=0) is initialized at its member site,
 	// before later child constructors and before final updt_params reseeding.
-	var expected util.Random
+	var expected z3rand.Generator
 	if got, want := d.rng.Next(), expected.Next(); got != want {
 		t.Fatal(got, want)
 	}

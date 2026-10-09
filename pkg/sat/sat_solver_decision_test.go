@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/random"
 )
 
 func satDecisionFixture(t *testing.T, n uint32) (*satSolverDecision, *satSolverGC) {
@@ -128,7 +128,7 @@ func TestSATSolverDecisionEmptyAndRandomDrawOrder(t *testing.T) {
 		if x != NullBoolVar {
 			t.Fatal(x)
 		}
-		oracle := util.NewRandom(73)
+		oracle := z3rand.New(73)
 		oracle.Next() // The threshold draw precedes both empty return routes.
 		if d.rng.Next() != oracle.Next() {
 			t.Fatal("empty next_var source RNG prefix")
@@ -147,7 +147,7 @@ func TestSATSolverDecisionRandomLeavesQueueAndFallbackSkips(t *testing.T) {
 	v := p.variables
 	p.config.state.RandomFreq = 1
 	d.rng.SetSeed(17)
-	oracle := util.NewRandom(17)
+	oracle := z3rand.New(17)
 	oracle.Next()
 	want := BoolVar(oracle.Next() % 4)
 	before := satScalarTestUintSize(t, &v.queue.runtimeValues)
@@ -180,7 +180,7 @@ func TestSATSolverDecisionRejectedRandomCandidateUsesQueue(t *testing.T) {
 		p := g.lifecycle().propagation
 		p.config.state.RandomFreq = 1
 		d.rng.SetSeed(43)
-		oracle := util.NewRandom(43)
+		oracle := z3rand.New(43)
 		oracle.Next()
 		rejected := BoolVar(oracle.Next() % 3)
 		wanted := BoolVar((uint32(rejected) + 1) % 3)
@@ -214,7 +214,7 @@ func TestSATSolverDecisionColdConstructionAndCounterWrap(t *testing.T) {
 	d, e = newSATSolverDecision(s)
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, d.Close()) })
-	oracle := util.NewRandom(91)
+	oracle := z3rand.New(91)
 	if d.rng.Next() != oracle.Next() {
 		t.Fatal("source update seed binding")
 	}
@@ -265,7 +265,7 @@ func TestSATSolverDecisionRandomPhaseAndInvalidCastPrefix(t *testing.T) {
 	p.config.state.RandomFreq = 0
 	p.config.state.Phase = satPhaseRandom
 	d.rng.SetSeed(79)
-	oracle := util.NewRandom(79)
+	oracle := z3rand.New(79)
 	oracle.Next()
 	negative := oracle.Next()%2 != 0
 	ok, e := d.decide()
@@ -279,7 +279,7 @@ func TestSATSolverDecisionRandomPhaseAndInvalidCastPrefix(t *testing.T) {
 		d, g := satDecisionFixture(t, 1)
 		g.lifecycle().propagation.config.state.RandomFreq = f
 		d.rng.SetSeed(21)
-		oracle := util.NewRandom(21)
+		oracle := z3rand.New(21)
 		oracle.Next()
 		_, e := d.nextVar()
 		if !errors.Is(e, arena.ErrBounds) || d.rng.Next() != oracle.Next() || satScalarTestUintSize(t, &g.lifecycle().propagation.variables.queue.runtimeValues) != 2 {

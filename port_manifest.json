@@ -149640,7 +149640,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/random.go",
+        "pkg/util/random/generator.go",
         "pkg/util/mpz_log.go",
         "pkg/util/util_sexpr.go",
         "pkg/util/util_escaped.go",
@@ -149679,7 +149679,7 @@
         {
           "name": "random_gen::operator()",
           "status": "ported",
-          "go_target": "pkg/util/random.go",
+          "go_target": "pkg/util/random/generator.go",
           "tests": [
             "TestSourceRandomVectors",
             "TestShuffleTraversal",
@@ -149689,7 +149689,7 @@
         {
           "name": "random_gen::set_seed",
           "status": "ported",
-          "go_target": "pkg/util/random.go",
+          "go_target": "pkg/util/random/generator.go",
           "tests": [
             "TestSourceRandomVectors",
             "TestShuffleTraversal",
@@ -149699,7 +149699,7 @@
         {
           "name": "shuffle",
           "status": "ported",
-          "go_target": "pkg/util/random.go",
+          "go_target": "pkg/util/random/generator.go",
           "tests": [
             "TestSourceRandomVectors",
             "TestShuffleTraversal",
@@ -149774,7 +149774,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/random.go",
+        "pkg/util/random/generator.go",
         "pkg/util/mpz_log.go",
         "pkg/util/util_sexpr.go",
         "pkg/util/util_escaped.go",
@@ -149981,7 +149981,7 @@
         {
           "name": "random_gen::operator()",
           "status": "ported",
-          "go_target": "pkg/util/random.go",
+          "go_target": "pkg/util/random/generator.go",
           "tests": [
             "TestSourceRandomVectors",
             "TestShuffleTraversal",
@@ -149991,7 +149991,7 @@
         {
           "name": "random_gen::set_seed",
           "status": "ported",
-          "go_target": "pkg/util/random.go",
+          "go_target": "pkg/util/random/generator.go",
           "tests": [
             "TestSourceRandomVectors",
             "TestShuffleTraversal",
@@ -150001,7 +150001,7 @@
         {
           "name": "shuffle",
           "status": "ported",
-          "go_target": "pkg/util/random.go",
+          "go_target": "pkg/util/random/generator.go",
           "tests": [
             "TestSourceRandomVectors",
             "TestShuffleTraversal",

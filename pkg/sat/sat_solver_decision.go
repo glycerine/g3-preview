@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/random"
 )
 
 // Actual decision methods share the conflict owner's source phase-cache flag
@@ -18,7 +18,7 @@ type satSolverDecision struct {
 	budget     *arena.Budget
 	self       *satSolverDecision
 	conflict   *satSolverConflictResolution
-	rng        util.Random
+	rng        z3rand.Generator
 	decisions  uint32
 	ownerBytes uint64
 	closed     bool
@@ -84,7 +84,7 @@ func (d *satSolverDecision) nextVar() (BoolVar, error) {
 		return NullBoolVar, e
 	}
 	draw := d.rng.Next()
-	threshold := math.Trunc(cfg.RandomFreq * float64(util.RandomMax))
+	threshold := math.Trunc(cfg.RandomFreq * float64(z3rand.Max))
 	// The source floating-to-int conversion is undefined outside int32. This
 	// guard is a Go domain adaptation, not a C++ malformed-prefix guarantee.
 	if math.IsNaN(threshold) || threshold < math.MinInt32 || threshold > math.MaxInt32 {
