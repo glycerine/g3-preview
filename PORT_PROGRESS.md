@@ -31667,3 +31667,43 @@ and portcheck passed. Counts remain 2102 units / 677 APIs: 63 ported, 284 partia
 The complete external-container conversion and util split remain open. Next:
 linear solver matrix/RHS collections and remaining SOM/core numeral/monomial
 columns, then SAT scalar collections and the internal util dependency seams.
+
+## Native linear solver matrix and RHS storage
+
+The concrete modular and rational solvers now own [][]util.Int/[]util.Int and
+[][]util.Rational/[]util.Rational. Rational defaults are explicitly initialized
+to 0/1. Removed the byte-backed numeral vector, row locator directory, charged
+container capacity, codecs, pending growth, partial relocation and container
+release failures. The shared storage file now contains only lifecycle state.
+No retained production caller used modular AddIndexed/SolveIndexed after the
+sparse conversion; removed those unused universal view adapters. Add/Solve now
+borrow concrete native slices at each reached index and pass actual cell
+pointers to Copy, preserving BIG self-alias ownership without view machinery.
+
+Gaussian elimination, normalization and descending back substitution retain
+source arithmetic/publication order, including the literal matrix-only pivot
+swap. Add still publishes RHS before reading coefficients. Source Flush still
+deletes RHS then its row entries, ascending; stopped real numeral destruction
+remains sticky and explicit owning continuation drains retained actual fields.
+Actual class headers and numerical allocation/refusal bookkeeping remain.
+
+Native growth/reset/reuse through matrix sizes 129/3/257/0/17 succeeds under
+disabled Runtime reservations. Rational tests check every default 0/1 cell;
+modular tests independently construct and solve a seventeen-variable unit
+triangular system twice. Actual BIG self-copy aliases work for both concrete
+solvers. Independent finite determinant/inverse oracles and every actual large
+rational arithmetic/modular output Copy refusal prefix remain. Physical audits
+now enumerate actual native numeral fields rather than container backing.
+Obsolete vector capacity/relocation/TLS-allocation tests are retired. A warmed
+single-sample sparse interpolation has no Runtime events in release mode;
+g3debug retains allocating factory/numeric assertions, so no zero-event claim
+is made for that mode. Go allocator events remain separately reported.
+
+Validation: focused native linear/sparse/GCD/imp passed (1.013s), matching
+focused g3debug passed (1.575s), module-wide test compilation, polynomial vet,
+gofmt/diff checks and portcheck passed. Counts unchanged. Full native module
+checkpoint at 21:43–21:45 UTC remains current; no repeated full sweep needed.
+The overall knot/split goal remains open: next external container consumers
+are SOM/core numeral and monomial columns, followed by SAT scalar collections;
+internal util numeric/text/parameter cycles still need concrete seams before
+moving files into subpackages.

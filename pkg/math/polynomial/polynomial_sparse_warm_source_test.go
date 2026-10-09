@@ -7,7 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestPolynomialSparseWarmActualSolverAndFactoryGraph(t *testing.T) {
+func TestPolynomialSparseWarmNativeSolverAndFactoryGraph(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	m := full.core
 	z := m.integer
@@ -52,9 +52,10 @@ func TestPolynomialSparseWarmActualSolverAndFactoryGraph(t *testing.T) {
 	}
 	afterCount, e := m.memory.AllocationCount()
 	serviceMust(t, e)
-	if afterCount <= beforeCount {
-		t.Fatal("remaining solver/factory allocations were skipped")
+	// Debug assertions can allocate through the existing factory/numeric checks.
+	if !polynomialSourceDebug && afterCount != beforeCount {
+		t.Fatal("warm native solver/canonical factory allocated Runtime storage")
 	}
 	polynomialSparsePhysical(t, s, out, []Polynomial{p, q})
-	t.Log("actual solver/factory allocations; Go allocator events", allocs)
+	t.Log("warm native solver/canonical factory; Runtime events, Go allocator events", afterCount-beforeCount, allocs)
 }

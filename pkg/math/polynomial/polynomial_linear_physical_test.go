@@ -1,9 +1,8 @@
-// Source: src/math/polynomial/linear_eq_solver.h; src/util/vector.h.
+// Source: src/math/polynomial/linear_eq_solver.h.
 package polynomial
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -12,68 +11,40 @@ import (
 
 func linearDefaultPhysicalCensus(t *testing.T, q *util.RationalManager, s *RationalLinearSolver, baseline uint32) {
 	t.Helper()
-	blocks := map[util.Block]bool{}
-	vs := []*linearNumeralVector{&s.A, &s.b}
-	for i := range s.rows {
-		vs = append(vs, &s.rows[i])
+	if q.Integers().Memory.Stats().LiveBlocks != baseline {
+		t.Fatal("default native matrix allocated Runtime blocks")
 	}
-	for _, v := range vs {
-		for _, b := range []util.Block{v.raw, v.old, v.pending} {
-			if b == (util.Block{}) {
-				continue
-			}
-			if blocks[b] {
-				t.Fatal("duplicate named vector block", b)
-			}
-			blocks[b] = true
-			if _, e := s.runtime.Size(b); e != nil {
-				t.Fatal("named physical block", e)
-			}
-		}
-	}
-	if s.runtime.Stats().LiveBlocks != baseline+uint32(len(blocks)) {
-		t.Fatal("unnamed physical block", s.runtime.Stats(), len(blocks), baseline)
-	}
-	want := q.HeaderBytes + integerActualOwnedBytes(q.Integers()) + s.header + uint64(cap(s.rows))*uint64(reflect.TypeOf(linearNumeralVector{}).Size())
+	want := q.HeaderBytes + integerActualOwnedBytes(q.Integers()) + s.header
 	if q.Budget().Used() != want {
-		t.Fatal("complete actual storage census", q.Budget().Used(), want)
+		t.Fatal("actual default owner census", q.Budget().Used(), want)
 	}
 }
 
-func TestLinearRationalResizeEveryPhysicalReservationPrefix(t *testing.T) {
-	for fail := int64(0); fail < 100; fail++ {
-		q, b := rationalManager(t, false)
-		s, e := NewRationalLinearSolver(q)
-		serviceMust(t, e)
-		base := q.Integers().Memory.Stats().LiveBlocks
-		b.FailAfter(fail)
-		e = s.Resize(5)
-		if e != nil && !numericPhysicalReservationRefusal(e) {
-			t.Fatal("real reservation category", fail, e)
-		}
-		// Snapshot every named block/header and actual cold byte before lifting
-		// refusal. This campaign allocates defaults, not failed numeric setters.
-		linearDefaultPhysicalCensus(t, q, s, base)
-		closeErr := s.Close()
-		if closeErr != nil {
-			if !errors.Is(closeErr, ErrPolynomialAssertion) && !errors.Is(closeErr, arena.ErrBounds) && !errors.Is(closeErr, util.ErrRuntimeUninitialized) {
-				t.Fatal("source partial destruction", fail, closeErr)
+func TestLinearRationalNativeResizeAndReuse(t *testing.T) {
+	q, budget := rationalManager(t, false)
+	s, e := NewRationalLinearSolver(q)
+	serviceMust(t, e)
+	baseline := q.Integers().Memory.Stats().LiveBlocks
+	budget.FailAfter(0)
+	for _, n := range []uint32{129, 3, 257, 0, 17} {
+		serviceMust(t, s.Resize(n))
+		linearDefaultPhysicalCensus(t, q, s, baseline)
+		// Rational defaults must be 0/1, including all newly grown matrix cells.
+		for i := range s.A {
+			for _, a := range s.A[i] {
+				if *a.BorrowNumerator() != util.NewInt(0) || *a.BorrowDenominator() != util.NewInt(1) {
+					t.Fatal("default rational", i, a)
+				}
 			}
-			serviceMust(t, s.Close())
+			if *s.b[i].BorrowNumerator() != util.NewInt(0) || *s.b[i].BorrowDenominator() != util.NewInt(1) {
+				t.Fatal("default RHS", i, s.b[i])
+			}
 		}
-		if q.Integers().Memory.Stats().LiveBlocks != base {
-			t.Fatal("owning abort retained raw", fail)
-		}
-		if b.Used() != q.HeaderBytes+integerActualOwnedBytes(q.Integers()) {
-			t.Fatal("owning abort retained cold bytes", fail)
-		}
-		b.FailAfter(-1)
-		if e == nil {
-			t.Log("all prefix failures before success", fail)
-			return
-		}
+		serviceMust(t, s.Reset())
 	}
-	t.Fatal("no successful actual prefix endpoint")
+	serviceMust(t, s.Close())
+	linearDefaultPhysicalCensus(t, q, s, baseline)
+	budget.FailAfter(-1)
 }
 
 func TestLinearRationalIndependentFiniteTwoByTwo(t *testing.T) {
@@ -237,134 +208,26 @@ func TestLinearModularIndependentFiniteTwoByTwo(t *testing.T) {
 	serviceMust(t, m.Close())
 }
 
-func TestLinearSourceNonNullZeroCapacityReachedAssertion(t *testing.T) {
-	q, b := rationalManager(t, false)
-	v := linearNumeralVector{width: 24}
-	serviceMust(t, v.expand(q.Integers().Memory))
-	raw := v.raw
-	serviceMust(t, q.Integers().Memory.WriteUint32(raw, 0, 0))
-	before := b.Used()
-	b.FailAfter(0)
-	e := v.expand(q.Integers().Memory)
-	b.FailAfter(-1)
-	if polynomialSourceDebug {
-		if !errors.Is(e, ErrPolynomialAssertion) {
-			t.Error("source capacity assertion before growth", e)
-		}
-	} else {
-		var failure util.Failure
-		if !errors.As(e, &failure) || failure.Kind != util.FailureVectorOverflow {
-			t.Error("release source overflow", e)
-		}
-	}
-	if v.raw != raw || v.pending != (util.Block{}) || v.old != (util.Block{}) || b.Used() != before {
-		t.Error("guard preceded allocation/publication")
-	}
-	serviceMust(t, q.Integers().Memory.WriteUint32(raw, 0, 2))
-	storage := linearStorage{runtime: q.Integers().Memory}
-	serviceMust(t, storage.freeTokens(&v))
-}
-
-func TestLinearResizePostphysicalTLSRefusalRetainsUnpublishedVector(t *testing.T) {
-	b := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
-	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
-	serviceMust(t, e)
-	s, e := NewRationalLinearSolver(q)
-	serviceMust(t, e)
-	var prep util.Block
-	defer func() {
-		serviceMust(t, rt.SetMaxSize(0))
-		if e := s.Close(); e != nil {
-			serviceMust(t, s.Close())
-		}
-		serviceMust(t, rt.Deallocate(&prep))
-		serviceMust(t, q.CloseChecked())
-		serviceMust(t, rt.Close())
-		if b.Used() != 0 {
-			t.Error("actual complete owner refund", b.Used())
-		}
-	}()
-	local := rt.State().LocalSize
-	if local < 0 || local >= 99990 {
-		t.Fatal("initial source lane", rt.State())
-	}
-	// A real caller-owned extent primes the actual TLS lane. No counter edits.
-	prep, e = rt.Allocate(uint64(99990 - local - 8))
-	serviceMust(t, e)
-	if rt.State().LocalSize != 99990 {
-		t.Fatal("real physical lane priming", rt.State())
-	}
-	base := rt.Stats().LiveBlocks
-	count, e := rt.AllocationCount()
-	serviceMust(t, e)
-	localCount := rt.State().LocalCount
-	serviceMust(t, rt.SetMaxSize(1))
-	e = s.Resize(1)
-	var refusal util.Failure
-	if !errors.As(e, &refusal) || refusal.Kind != util.FailureMemout || !rt.State().OutOfMemory {
-		t.Fatal("reached TLS malloc refusal", e, rt.State())
-	}
-	if s.A.raw != (util.Block{}) || s.A.pending == (util.Block{}) || s.n != 1 || len(s.rows) != 1 {
-		t.Fatal("actual unpublished malloc root", s.A, s.n, len(s.rows))
-	}
-	size, e := rt.Size(s.A.pending)
-	serviceMust(t, e)
-	afterCount, e := rt.AllocationCount()
-	serviceMust(t, e)
-	if size != 16 || afterCount != count+uint64(localCount)+1 || rt.Stats().LiveBlocks != base+1 {
-		t.Fatal("exact actual allocated extent", size, afterCount, count, rt.Stats())
-	}
-	linearDefaultPhysicalCensus(t, q, s, base)
-	pending := s.A.pending
-	// Literal completed solver/member destruction cannot free the vector
-	// helper's unreturned allocation. Only the explicit owning adapter owns it.
-	serviceMust(t, s.SourceFinalize())
-	if s.A.pending != pending || s.A.raw != (util.Block{}) || rt.Stats().LiveBlocks != base+1 {
-		t.Fatal("source destructor consumed unpublished helper root")
-	}
-	serviceMust(t, rt.SetMaxSize(0))
-	serviceMust(t, s.Close())
-	if rt.Stats().LiveBlocks != base {
-		t.Fatal("owning abort did not consume actual pending extent")
-	}
-}
-
-// All arithmetic roots come from actual manager fields, physical row/RHS
-// fields, and explicit caller numerals. Locator tables provide no owning roots.
 func linearArithmeticPhysicalCensus(t *testing.T, q *util.RationalManager, s *RationalLinearSolver, callers ...*util.Rational) {
 	t.Helper()
 	values := []util.Int{q.NTmp, q.AddTmp1, q.AddTmp2, q.AddMulTmp.Num, q.AddMulTmp.Den, q.LtTmp1.Num, q.LtTmp1.Den, q.LtTmp2.Num, q.LtTmp2.Den}
 	for _, a := range callers {
 		values = append(values, (*a.BorrowNumerator()), (*a.BorrowDenominator()))
 	}
-	var blocks []util.Block
-	vs := []*linearNumeralVector{&s.A, &s.b}
-	for i := range s.rows {
-		vs = append(vs, &s.rows[i])
+	for _, a := range s.b {
+		values = append(values, *a.BorrowNumerator(), *a.BorrowDenominator())
 	}
-	for _, v := range vs {
-		if v.old != (util.Block{}) || v.pending != (util.Block{}) {
-			t.Fatal("prepared arithmetic fixture acquired unreturned vector storage")
-		}
-		if v.raw != (util.Block{}) {
-			blocks = append(blocks, v.raw)
-		}
-		if v.width == 24 && v.raw != (util.Block{}) {
-			for i := uint32(0); i < v.initialized; i++ {
-				a, e := v.rationalAt(s.runtime, i)
-				serviceMust(t, e)
-				values = append(values, (*a.BorrowNumerator()), (*a.BorrowDenominator()))
-			}
+	for _, row := range s.A {
+		for _, a := range row {
+			values = append(values, *a.BorrowNumerator(), *a.BorrowDenominator())
 		}
 	}
 	refs := make([]*util.Int, len(values))
 	for i := range values {
 		refs[i] = &values[i]
 	}
-	integerPhysicalAuditWithRaw(t, q.Integers(), blocks, refs...)
-	want := q.HeaderBytes + integerActualOwnedBytes(q.Integers()) + s.header + uint64(cap(s.rows))*uint64(reflect.TypeOf(linearNumeralVector{}).Size())
+	integerPhysicalAuditWithRaw(t, q.Integers(), nil, refs...)
+	want := q.HeaderBytes + integerActualOwnedBytes(q.Integers()) + s.header
 	if q.Budget().Used() != want {
 		t.Fatal("complete arithmetic physical/cold census", q.Budget().Used(), want)
 	}
@@ -438,70 +301,5 @@ func TestLinearRationalArithmeticEveryReservationPrefix(t *testing.T) {
 		if !success || failures == 0 {
 			t.Fatal("bounded complete real arithmetic campaign", solve, success, failures)
 		}
-	}
-}
-
-// Explicit source-undefined fixture: caller physically truncates the old RHS
-// through Runtime, leaving NUM readable and DEN out of bounds. This is a
-// reached adapter diagnostic, not exhaustion or a valid C++ destructor case.
-func TestLinearStoppedNumeratorMoveRetainsActualOwner(t *testing.T) {
-	q, _ := rationalPublicationDirectOwner(t, false)
-	s, e := NewRationalLinearSolver(q)
-	serviceMust(t, e)
-	serviceMust(t, s.Resize(1))
-	rhs := util.NewRational()
-	serviceMust(t, q.SetString(&rhs, "79228162514264337593543950337"))
-	serviceMust(t, s.Add(0, []util.Rational{util.NewRational()}, &rhs))
-	before, e := s.RightHandSide(0)
-	serviceMust(t, e)
-	// A recorded projection permits fixture cleanup on a failed test; no locator
-	// or reference count supplies an owning root to production recovery.
-	observed := (*before.BorrowNumerator())
-	defer func() {
-		if !s.closed {
-			if e := s.Close(); e != nil {
-				_ = s.Close()
-			}
-		}
-		if util.ValidNumericRef(q.Z.Cells, (observed).Cell) {
-			serviceMust(t, q.Z.Del(&observed))
-		}
-		serviceMust(t, q.Del(&rhs))
-	}()
-	serviceMust(t, s.runtime.Reallocate(&s.b.raw, 20))
-	e = s.b.expand(s.runtime)
-	if !errors.Is(e, arena.ErrBounds) || s.b.raw == (util.Block{}) || s.b.old == (util.Block{}) || s.b.initialized != 0 || s.b.moved != 0 {
-		t.Fatal("actual NUM move before failed DEN read", e, s.b)
-	}
-	moved, e := linearReadInt(s.runtime, s.b.raw, 8)
-	serviceMust(t, e)
-	old, e := linearReadInt(s.runtime, s.b.old, 8)
-	serviceMust(t, e)
-	if moved != (*before.BorrowNumerator()) || (old).Cell != 0 {
-		t.Fatal("physical owner split", moved, old)
-	}
-	values := []util.Int{q.NTmp, q.AddTmp1, q.AddTmp2, q.AddMulTmp.Num, q.AddMulTmp.Den, q.LtTmp1.Num, q.LtTmp1.Den, q.LtTmp2.Num, q.LtTmp2.Den, (*rhs.BorrowNumerator()), (*rhs.BorrowDenominator()), moved}
-	refs := make([]*util.Int, len(values))
-	for i := range values {
-		refs[i] = &values[i]
-	}
-	row, e := s.row(0)
-	serviceMust(t, e)
-	integerPhysicalAuditWithRaw(t, q.Z, []util.Block{s.A.raw, row.raw, s.b.raw, s.b.old}, refs...)
-	want := q.HeaderBytes + integerActualOwnedBytes(q.Z) + s.header + uint64(cap(s.rows))*uint64(reflect.TypeOf(linearNumeralVector{}).Size())
-	if q.BudgetField.Used() != want {
-		t.Fatal("immediate partial physical/cold graph", q.BudgetField.Used(), want)
-	}
-	// Restore only the caller's malformed DEN span, using real Runtime resize and
-	// writes. The source failure prefix above is already independently audited.
-	serviceMust(t, s.runtime.Reallocate(&s.b.old, 32))
-	serviceMust(t, linearWriteInt(s.runtime, s.b.old, 20, util.NewInt(1)))
-	first := s.Close()
-	if !errors.Is(first, arena.ErrBounds) {
-		t.Fatal("literal partial member guard", first)
-	}
-	serviceMust(t, s.Close())
-	if util.ValidNumericRef(q.Z.Cells, (observed).Cell) {
-		t.Fatal("owning abort lost the actually moved numerator")
 	}
 }

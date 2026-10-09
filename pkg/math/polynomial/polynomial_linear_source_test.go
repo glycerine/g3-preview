@@ -182,26 +182,19 @@ func TestLinearModularWholeSourceSolve(t *testing.T) {
 	serviceMust(t, m.Close())
 }
 
-func TestLinearSourceOuterRowReachedIndexAssertion(t *testing.T) {
+func TestLinearNativeOuterRowReachedIndexGuard(t *testing.T) {
 	q, _ := rationalManager(t, false)
 	s, e := NewRationalLinearSolver(q)
 	serviceMust(t, e)
 	serviceMust(t, s.Resize(1))
-	// Keep the actual constructed row and its backing, but shorten the source
-	// vector size: debug operator[] must assert before reading its row locator.
-	serviceMust(t, s.runtime.WriteUint32(s.A.raw, 4, 0))
-	row, e := s.row(0)
+	row, e := s.row(1)
+	want := arena.ErrBounds
 	if polynomialSourceDebug {
-		if !errors.Is(e, ErrPolynomialAssertion) || row != nil {
-			t.Fatal("source vector index assertion", row, e)
-		}
-	} else {
-		serviceMust(t, e)
-		if row != &s.rows[0] {
-			t.Fatal("release reached retained row")
-		}
+		want = ErrPolynomialAssertion
 	}
-	serviceMust(t, s.runtime.WriteUint32(s.A.raw, 4, 1))
+	if !errors.Is(e, want) || row != nil {
+		t.Fatal("reached matrix row guard", row, e)
+	}
 	serviceMust(t, s.Close())
 }
 
@@ -221,7 +214,7 @@ func TestLinearRationalFreshNullRHSFlush(t *testing.T) {
 	rhs := util.NewRational()
 	serviceMust(t, q.SetString(&rhs, "79228162514264337593543950337"))
 	defer func() { budget.FailAfter(-1); serviceMust(t, q.Del(&rhs)) }()
-	baseline := q.Z.Memory.Stats().LiveBlocks - 3 // A, its single row, b
+	baseline := q.Z.Memory.Stats().LiveBlocks
 	budget.FailAfter(0)
 	e = s.Add(0, []util.Rational{util.NewRational()}, &rhs)
 	if !numericPhysicalReservationRefusal(e) {

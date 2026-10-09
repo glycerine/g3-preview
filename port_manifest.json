@@ -35505,8 +35505,7 @@
         "pkg/math/polynomial/polynomial_linear_storage.go",
         "pkg/util/numeric_source_delete.go",
         "pkg/math/polynomial/polynomial_linear_display.go",
-        "pkg/util/mp_integer_array.go",
-        "pkg/math/polynomial/polynomial_linear_indexed_source_test.go",
+        "pkg/math/polynomial/polynomial_linear_native_source_test.go",
         "pkg/math/polynomial/polynomial_linear_local_constructor_source_test.go"
       ],
       "tests": [
@@ -35514,26 +35513,24 @@
         "TestLinearModularSourceDisplayUsesUnderlyingInteger",
         "TestLinearSourceDisplayStoppedWriterBeforeRHSRead",
         "TestLinearSourceDisplayShortWriterGuard",
-        "TestLinearRationalResizeEveryPhysicalReservationPrefix",
+        "TestLinearRationalNativeResizeAndReuse",
         "TestLinearRationalIndependentFiniteTwoByTwo",
         "TestLinearRationalSourceBackSubstitutionOutputGuard",
         "TestLinearModularIndependentFiniteTwoByTwo",
-        "TestLinearSourceNonNullZeroCapacityReachedAssertion",
-        "TestLinearResizePostphysicalTLSRefusalRetainsUnpublishedVector",
         "TestLinearRationalOriginalPolynomialFixture",
         "TestLinearRationalSourcePivotAndSingularPublication",
         "TestLinearRationalSourceAddReachedInput",
         "TestLinearModularWholeSourceSolve",
-        "TestLinearSourceOuterRowReachedIndexAssertion",
+        "TestLinearNativeOuterRowReachedIndexGuard",
         "TestLinearRationalFreshNullRHSFlush",
         "TestLinearRationalArithmeticEveryReservationPrefix",
-        "TestLinearStoppedNumeratorMoveRetainsActualOwner",
         "TestLinearConcreteLocalConstructorGuardAndNoHeaderReservation",
-        "TestLinearIndexedEmptyLeavesViewUnread",
-        "TestLinearIndexedOutputCopyEveryRefusalPrefix",
-        "TestLinearIndexedRHSBeforeReachedInput",
-        "TestLinearIndexedReachedForeignAndObjectViews",
-        "TestLinearIndexedRuntimeOutputsAndRHSAlias"
+        "TestLinearNativeEmptySolve",
+        "TestLinearNativeOutputCopyEveryRefusalPrefix",
+        "TestLinearNativeRHSBeforeReachedInput",
+        "TestLinearNativeOutputsAndRHSAlias",
+        "TestLinearModularNativeGrowthIndependentTriangularSystem",
+        "TestLinearNativeBigSelfCopyAliases"
       ],
       "conditionals": [
         {
@@ -35583,7 +35580,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete rational/modular constructor, resize/reset/add/solve/flush and literal reverse member destruction; actual same-runtime numeral/row vectors and separate owning abort",
+          "name": "Concrete rational/modular constructor, resize/reset/add/solve/flush on native typed matrix/RHS slices; actual numeral destruction and separate owning continuation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_linear_rational.go",
           "tests": [
@@ -35591,20 +35588,19 @@
             "TestLinearModularSourceDisplayUsesUnderlyingInteger",
             "TestLinearSourceDisplayStoppedWriterBeforeRHSRead",
             "TestLinearSourceDisplayShortWriterGuard",
-            "TestLinearRationalResizeEveryPhysicalReservationPrefix",
+            "TestLinearRationalNativeResizeAndReuse",
             "TestLinearRationalIndependentFiniteTwoByTwo",
             "TestLinearRationalSourceBackSubstitutionOutputGuard",
             "TestLinearModularIndependentFiniteTwoByTwo",
-            "TestLinearSourceNonNullZeroCapacityReachedAssertion",
-            "TestLinearResizePostphysicalTLSRefusalRetainsUnpublishedVector",
             "TestLinearRationalOriginalPolynomialFixture",
             "TestLinearRationalSourcePivotAndSingularPublication",
             "TestLinearRationalSourceAddReachedInput",
             "TestLinearModularWholeSourceSolve",
-            "TestLinearSourceOuterRowReachedIndexAssertion",
+            "TestLinearNativeOuterRowReachedIndexGuard",
             "TestLinearRationalFreshNullRHSFlush",
             "TestLinearRationalArithmeticEveryReservationPrefix",
-            "TestLinearStoppedNumeratorMoveRetainsActualOwner"
+            "TestLinearModularNativeGrowthIndependentTriangularSystem",
+            "TestLinearNativeBigSelfCopyAliases"
           ]
         },
         {
@@ -35619,29 +35615,28 @@
           ]
         },
         {
-          "name": "Same concrete modular solver engine embedded default construction and indexed Add/Solve: RHS-first reached input, ascending back-substitution output and exact self-alias",
+          "name": "Concrete embedded modular solver with native slice Add/Solve: RHS-first reached input, descending back-substitution output and exact self-alias",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_linear_modular.go",
           "tests": [
             "TestLinearConcreteLocalConstructorGuardAndNoHeaderReservation",
-            "TestLinearIndexedEmptyLeavesViewUnread",
-            "TestLinearIndexedOutputCopyEveryRefusalPrefix",
-            "TestLinearIndexedRHSBeforeReachedInput",
-            "TestLinearIndexedReachedForeignAndObjectViews",
-            "TestLinearIndexedRuntimeOutputsAndRHSAlias"
+            "TestLinearNativeEmptySolve",
+            "TestLinearNativeOutputCopyEveryRefusalPrefix",
+            "TestLinearNativeRHSBeforeReachedInput",
+            "TestLinearNativeOutputsAndRHSAlias",
+            "TestLinearNativeBigSelfCopyAliases"
           ]
         }
       ],
       "ownership": [
-        "Actual Runtime contiguous12-byte Int/24-byte Rational fields and4-byte cold row locators; no numeric mirror. Row metadata charged real reflected storage. Partial relocation records completed components and actual old initialized suffix. Failed actual allocation preserves exact pending/raw/header roots; source destruction stops sticky, own abort separately drains actual named fields, never locator-derived authority.",
-        "Source pivot swaps matrix rows only, never RHS; source behavior preserved. Add publishes RHS before reached caller coefficient read. Singular return precedes output writes; back substitution reads caller outputs at source index after actual earlier matrix work. Literal Flush deletes RHS then row entries, ascending child vectors, resets A/b, then source member destruction b before A.",
-        "Embedded actual solver has no separate header charge. Constructor source field guard precedes external header reservation. Borrowed Runtime/ObjectRef fields are read only at reached source indices; count-zero view remains unread."
+        "Native [][]util.Int/[]util.Int and [][]util.Rational/[]util.Rational own matrix/RHS cells. Rational defaults are explicitly 0/1. Native slice capacity is outside Runtime budget. Actual BIG numeral resources remain manager-owned and are independently audited after arithmetic refusal prefixes. Source destruction stops sticky; explicit owning continuation drains actual retained numeral fields.",
+        "Source pivot swaps matrix rows only, never RHS; source behavior preserved. Add publishes RHS before reached caller coefficient read. Singular return precedes output writes; descending back substitution copies each output before changing lower RHS cells. Literal Flush deletes RHS then row entries in ascending order, then clears native containers. Source class finalization releases their slices.",
+        "Embedded solver has no separate header charge. Constructor source field guard precedes external header reservation. Add/Solve borrow concrete native slices at reached indices. Actual cell pointers preserve BIG self-copy aliases; empty Solve leaves nil output unread."
       ],
       "deviations": [
-        "No Go generics: concrete rational and integer-modular specializations cover selected required source clients. Native pointer/vector ABI and source global manager/assertion/TRACE binding remain open.",
+        "No Go generics: concrete rational and integer-modular specializations cover retained source clients. C++ vector capacity, allocation and relocation failure behavior intentionally replaced by native Go slices. Actual numerical allocation/refusal behavior and source arithmetic order remain. Global manager/assertion/TRACE binding remains open.",
         "Display maps default decimal context to borrowed io.Writer; full NumericTextStream/ostream flag-state integration remains open. Actual modular display uses integer manager without normalization assertion.",
         "Original polynomial linear fixture contains VERIFY plus three ENSURE sites but source driver returns before it; no active registered-source assertion credit. Independent finite rational determinant and modular inverse checks retained.",
-        "Explicit malformed physically truncated source-undefined vector fixture requires caller span repair before Go owning abort; no native undefined-domain recovery claim. Unrelated arbitrary source-undefined accounting/release continuation is not promoted.",
         "Selected concrete modular client only; global source diagnostic/assertion binding and other clients remain separately partial."
       ]
     },
@@ -36419,7 +36414,7 @@
         "TestPolynomialSparseOutputCallbackCreationRemainsForeign",
         "TestPolynomialSparseOutputCallbackNumericPendingRemainsForeign",
         "TestPolynomialSparseSourceMissingEntryKeepsInputThenReset",
-        "TestPolynomialSparseWarmActualSolverAndFactoryGraph",
+        "TestPolynomialSparseWarmNativeSolverAndFactoryGraph",
         "TestPolynomialTermsIndexedNativeSliceAndResetBeforeRead",
         "TestPolynomialTermsIndexedNativeSliceAndUnreachedTail",
         "TestPolynomialContentMonicCollectorActualRetainedLocals",
@@ -39492,7 +39487,7 @@
             "TestPolynomialSparseOutputCallbackCreationRemainsForeign",
             "TestPolynomialSparseOutputCallbackNumericPendingRemainsForeign",
             "TestPolynomialSparseSourceMissingEntryKeepsInputThenReset",
-            "TestPolynomialSparseWarmActualSolverAndFactoryGraph",
+            "TestPolynomialSparseWarmNativeSolverAndFactoryGraph",
             "TestPolynomialTermsIndexedNativeSliceAndResetBeforeRead",
             "TestPolynomialTermsIndexedNativeSliceAndUnreachedTail",
             "TestPolynomialContentMonicCollectorActualRetainedLocals",
@@ -41555,7 +41550,7 @@
         "TestPolynomialSparseOutputCallbackCreationRemainsForeign",
         "TestPolynomialSparseOutputCallbackNumericPendingRemainsForeign",
         "TestPolynomialSparseSourceMissingEntryKeepsInputThenReset",
-        "TestPolynomialSparseWarmActualSolverAndFactoryGraph",
+        "TestPolynomialSparseWarmNativeSolverAndFactoryGraph",
         "TestPolynomialTermsIndexedNativeSliceAndResetBeforeRead",
         "TestPolynomialTermsIndexedNativeSliceAndUnreachedTail",
         "TestPolynomialContentMonicCollectorActualRetainedLocals",
@@ -43084,7 +43079,7 @@
             "TestPolynomialSparseOutputCallbackCreationRemainsForeign",
             "TestPolynomialSparseOutputCallbackNumericPendingRemainsForeign",
             "TestPolynomialSparseSourceMissingEntryKeepsInputThenReset",
-            "TestPolynomialSparseWarmActualSolverAndFactoryGraph",
+            "TestPolynomialSparseWarmNativeSolverAndFactoryGraph",
             "TestPolynomialTermsIndexedNativeSliceAndResetBeforeRead",
             "TestPolynomialTermsIndexedNativeSliceAndUnreachedTail",
             "TestPolynomialContentMonicCollectorActualRetainedLocals",

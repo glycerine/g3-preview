@@ -48,8 +48,8 @@ func TestLinearModularSourceDisplayUsesUnderlyingInteger(t *testing.T) {
 	serviceMust(t, e)
 	a := util.Int{}
 	serviceMust(t, q.Integers().SetInt64(&a, 9))
-	serviceMust(t, r.putInt(s.runtime, 0, a))
-	serviceMust(t, s.b.putInt(s.runtime, 0, a))
+	(*r)[0] = a
+	s.b[0] = a
 	var out strings.Builder
 	serviceMust(t, s.Display(&out))
 	if out.String() != "9 9\n" {
@@ -81,12 +81,12 @@ func TestLinearSourceDisplayStoppedWriterBeforeRHSRead(t *testing.T) {
 	serviceMust(t, q.SetInt64(&a, 5))
 	serviceMust(t, s.Add(0, []util.Rational{a}, &a))
 	// Make the later RHS read guarded, without changing the reached row.
-	saved := s.b.raw
-	s.b.raw = util.Block{}
+	saved := s.b
+	s.b = nil
 	marker := errors.New("stopped host output")
 	out := linearStoppedWriter{cause: marker}
 	e = s.Display(&out)
-	s.b.raw = saved
+	s.b = saved
 	if !errors.Is(e, marker) || out.seen.String() != "5" || out.calls != 2 {
 		t.Fatal("source space output stops before RHS read", e, out.seen.String(), out.calls)
 	}

@@ -27,20 +27,14 @@ func (s *RationalLinearSolver) Display(out io.Writer) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	size, e := s.A.size(s.runtime)
-	if e != nil {
-		return e
-	}
+	size := uint32(len(s.A))
 	for i := uint32(0); i < size; i++ {
 		row, e := s.row(i)
 		if e != nil {
 			return e
 		}
 		if polynomialSourceDebug {
-			size, e := row.size(s.runtime)
-			if e != nil {
-				return e
-			}
+			size := uint32(len(*row))
 			if size != s.n {
 				return ErrPolynomialAssertion
 			}
@@ -82,20 +76,14 @@ func (s *ModularLinearSolver) Display(out io.Writer) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	size, e := s.A.size(s.runtime)
-	if e != nil {
-		return e
-	}
+	size := uint32(len(s.A))
 	for i := uint32(0); i < size; i++ {
 		row, e := s.row(i)
 		if e != nil {
 			return e
 		}
 		if polynomialSourceDebug {
-			size, e := row.size(s.runtime)
-			if e != nil {
-				return e
-			}
+			size := uint32(len(*row))
 			if size != s.n {
 				return ErrPolynomialAssertion
 			}

@@ -2,7 +2,6 @@
 package polynomial
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
@@ -29,23 +28,17 @@ func polynomialSparsePhysical(t *testing.T, s *PolynomialSparseInterpolator, out
 	}
 	solver := &s.interpolation.solver
 	if s.interpolation.solverConstructed {
-		extra += solver.header + uint64(cap(solver.rows))*uint64(reflect.TypeOf(linearNumeralVector{}).Size())
-		vs := []*linearNumeralVector{&solver.A, &solver.b}
-		for i := range solver.rows {
-			vs = append(vs, &solver.rows[i])
+		extra += solver.header
+		for i := range solver.b {
+			public = append(public, &solver.b[i])
 		}
-		for _, v := range vs {
-			raw = append(raw, v.raw, v.pending, v.old)
-			if v.width != 12 {
-				continue
-			}
-			for i := uint32(0); i < v.initialized; i++ {
-				a, e := v.intAt(m.memory, i)
-				serviceMust(t, e)
-				public = append(public, &a)
+		for i := range solver.A {
+			for j := range solver.A[i] {
+				public = append(public, &solver.A[i][j])
 			}
 		}
 	}
+
 	if sk != nil {
 		extra += sk.header
 	}

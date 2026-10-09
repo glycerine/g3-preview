@@ -9,11 +9,13 @@ import (
 )
 
 // RationalLinearSolver borrows its number-field manager. Matrix/RHS values live only in
-// Runtime bytes. Returned observation values are nonowning scalar projections.
+// native Go slices. Returned observation values are nonowning scalar projections.
 type RationalLinearSolver struct {
 	self    *RationalLinearSolver
 	manager *util.RationalManager
 	linearStorage
+	A [][]util.Rational
+	b []util.Rational
 }
 
 func NewRationalLinearSolver(m *util.RationalManager) (*RationalLinearSolver, error) {
@@ -27,7 +29,7 @@ func NewRationalLinearSolver(m *util.RationalManager) (*RationalLinearSolver, er
 	if e := m.Integers().Budget().Reserve(h); e != nil {
 		return nil, e
 	}
-	s := &RationalLinearSolver{manager: m, linearStorage: linearStorage{runtime: m.Integers().RuntimeOwner(), integer: m.Integers(), header: h, A: linearNumeralVector{width: 4}, b: linearNumeralVector{width: 24}}}
+	s := &RationalLinearSolver{manager: m, linearStorage: linearStorage{integer: m.Integers(), header: h}}
 	s.self = s
 	return s, nil
 }
@@ -49,70 +51,66 @@ func (s *RationalLinearSolver) open() error {
 	}
 	return nil
 }
-func (s *RationalLinearSolver) load(v *linearNumeralVector, i uint32) (util.Rational, error) {
-	if polynomialSourceDebug {
-		n, e := v.size(s.runtime)
-		if e != nil {
-			return util.Rational{}, e
+func (s *RationalLinearSolver) row(i uint32) (*[]util.Rational, error) {
+	if uint64(i) >= uint64(len(s.A)) {
+		if polynomialSourceDebug {
+			return nil, ErrPolynomialAssertion
 		}
-		if i >= n {
+		return nil, arena.ErrBounds
+	}
+	return &s.A[i], nil
+}
+func (s *RationalLinearSolver) swapRows(i, j uint32) error {
+	if _, e := s.row(i); e != nil {
+		return e
+	}
+	if _, e := s.row(j); e != nil {
+		return e
+	}
+	s.A[i], s.A[j] = s.A[j], s.A[i]
+	return nil
+}
+func (s *RationalLinearSolver) load(v *[]util.Rational, i uint32) (util.Rational, error) {
+	if uint64(i) >= uint64(len(*v)) {
+		if polynomialSourceDebug {
 			return util.Rational{}, ErrPolynomialAssertion
 		}
-	}
-	if i >= v.initialized {
 		return util.Rational{}, arena.ErrBounds
 	}
-	return v.rationalAt(s.runtime, i)
+	return (*v)[i], nil
 }
-func (s *RationalLinearSolver) put(v *linearNumeralVector, i uint32, a util.Rational) error {
-	return v.putRational(s.runtime, i, a)
-}
-func (s *RationalLinearSolver) copyInto(v *linearNumeralVector, i uint32, a *util.Rational) error {
-	b, e := s.load(v, i)
-	if e != nil {
+func (s *RationalLinearSolver) copyInto(v *[]util.Rational, i uint32, a *util.Rational) error {
+	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	e = s.manager.Copy(&b, a)
-	return polynomialNewtonJoin(e, s.put(v, i, b))
+	return s.manager.Copy(&(*v)[i], a)
 }
-func (s *RationalLinearSolver) setInto(v *linearNumeralVector, i uint32, value int64) error {
-	a, e := s.load(v, i)
-	if e != nil {
+func (s *RationalLinearSolver) setInto(v *[]util.Rational, i uint32, value int64) error {
+	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	e = s.manager.SetInt64(&a, value)
-	return polynomialNewtonJoin(e, s.put(v, i, a))
+	return s.manager.SetInt64(&(*v)[i], value)
 }
-func (s *RationalLinearSolver) divideInto(v *linearNumeralVector, i uint32, divisor *util.Rational) error {
-	a, e := s.load(v, i)
-	if e != nil {
+func (s *RationalLinearSolver) divideInto(v *[]util.Rational, i uint32, divisor *util.Rational) error {
+	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	e = s.manager.Div(&a, divisor, &a)
-	return polynomialNewtonJoin(e, s.put(v, i, a))
+	return s.manager.Div(&(*v)[i], divisor, &(*v)[i])
 }
-func (s *RationalLinearSolver) submulInto(v *linearNumeralVector, i uint32, b, c *util.Rational) error {
-	a, e := s.load(v, i)
-	if e != nil {
+func (s *RationalLinearSolver) submulInto(v *[]util.Rational, i uint32, b, c *util.Rational) error {
+	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	e = s.manager.SubMul(&a, b, c, &a)
-	return polynomialNewtonJoin(e, s.put(v, i, a))
+	return s.manager.SubMul(&(*v)[i], b, c, &(*v)[i])
 }
-func (s *RationalLinearSolver) deleteInto(v *linearNumeralVector, i uint32, owning bool) error {
-	if i >= v.initialized {
+func (s *RationalLinearSolver) deleteInto(v *[]util.Rational, i uint32, owning bool) error {
+	if uint64(i) >= uint64(len(*v)) {
 		return arena.ErrBounds
 	}
-	a, e := v.rationalAt(s.runtime, i)
-	if e != nil {
-		return e
-	}
 	if owning {
-		e = s.manager.Del(&a)
-	} else {
-		e = util.SourceRationalDel(s.manager, &a)
+		return s.manager.Del(&(*v)[i])
 	}
-	return polynomialNewtonJoin(e, s.put(v, i, a))
+	return util.SourceRationalDel(s.manager, &(*v)[i])
 }
 func (s *RationalLinearSolver) RightHandSide(i uint32) (util.Rational, error) {
 	if e := s.open(); e != nil {
@@ -131,22 +129,14 @@ func (s *RationalLinearSolver) Resize(n uint32) error {
 		return e
 	}
 	s.n = n
-	for i := uint32(0); i < n; i++ {
-		if e := s.appendRow(i); e != nil {
-			return e
+	s.A = make([][]util.Rational, n)
+	s.b = make([]util.Rational, n)
+	for i := range s.A {
+		s.A[i] = make([]util.Rational, n)
+		for j := range s.A[i] {
+			s.A[i][j] = util.NewRational()
 		}
-		r, e := s.row(i)
-		if e != nil {
-			return e
-		}
-		for j := uint32(0); j < n; j++ {
-			if e = r.appendDefault(s.runtime, 0); e != nil {
-				return e
-			}
-		}
-		if e = s.b.appendDefault(s.runtime, 0); e != nil {
-			return e
-		}
+		s.b[i] = util.NewRational()
 	}
 	return nil
 }
@@ -324,7 +314,7 @@ func (s *RationalLinearSolver) Solve(xs []util.Rational) (bool, error) {
 		if uint64(k) >= uint64(len(xs)) {
 			return false, arena.ErrBounds
 		}
-		if e = s.manager.Copy(&xs[k], &b); e != nil {
+		if e = s.manager.Copy(&xs[k], &s.b[k]); e != nil {
 			return false, e
 		}
 		i := k
@@ -357,23 +347,13 @@ func (s *RationalLinearSolver) flushSource() (err error) {
 			s.sourceCause = err
 		}
 	}()
-	sz, e := s.A.size(s.runtime)
-	if e != nil {
-		return e
-	}
 	if s.flushStage == 0 {
-		if polynomialSourceDebug {
-			bs, e := s.b.size(s.runtime)
-			if e != nil {
-				return e
-			}
-			if bs != sz {
-				return ErrPolynomialAssertion
-			}
+		if polynomialSourceDebug && len(s.b) != len(s.A) {
+			return ErrPolynomialAssertion
 		}
 		s.flushStage = 1
 	}
-	for s.flushRow < sz {
+	for uint64(s.flushRow) < uint64(len(s.A)) {
 		r, e := s.row(s.flushRow)
 		if e != nil {
 			return e
@@ -384,14 +364,8 @@ func (s *RationalLinearSolver) flushSource() (err error) {
 			}
 			s.flushStage = 2
 		}
-		if polynomialSourceDebug {
-			rs, e := r.size(s.runtime)
-			if e != nil {
-				return e
-			}
-			if rs != s.n {
-				return ErrPolynomialAssertion
-			}
+		if polynomialSourceDebug && uint64(len(*r)) != uint64(s.n) {
+			return ErrPolynomialAssertion
 		}
 		for s.flushColumn < s.n {
 			if e = s.deleteInto(r, s.flushColumn, false); e != nil {
@@ -403,31 +377,12 @@ func (s *RationalLinearSolver) flushSource() (err error) {
 		s.flushRow++
 		s.flushStage = 1
 	}
-	if s.flushStage < 3 {
-		s.flushStage = 3
-		s.flushRow = 0
-	}
-	// A.reset destroys child vectors in ascending source descriptor order.
-	for s.flushRow < sz {
-		r, e := s.row(s.flushRow)
-		if e != nil {
-			return e
-		}
-		if e = s.sourceBacking(r); e != nil {
-			return e
-		}
-		s.flushRow++
-	}
-	if e = s.A.resetSize(s.runtime); e != nil {
-		return e
-	}
-	if e = s.b.resetSize(s.runtime); e != nil {
-		return e
-	}
+	// Numeric destruction completed in source order; native containers need no destructor.
+	clear(s.A)
+	s.A = s.A[:0]
+	s.b = s.b[:0]
 	s.n = 0
-	s.flushRow = 0
-	s.flushColumn = 0
-	s.flushStage = 0
+	s.flushRow, s.flushColumn, s.flushStage = 0, 0, 0
 	return nil
 }
 func (s *RationalLinearSolver) Flush() error {
@@ -460,18 +415,9 @@ func (s *RationalLinearSolver) SourceFinalize() (err error) {
 		}
 		s.sourceStage = 1
 	}
-	if s.sourceStage == 1 {
-		if e := s.sourceBacking(&s.b); e != nil {
-			return e
-		}
-		s.sourceStage = 2
-	}
-	if s.sourceStage == 2 {
-		if e := s.sourceBacking(&s.A); e != nil {
-			return e
-		}
-		s.sourceStage = 3
-	}
+	s.b = nil
+	s.A = nil
+	s.sourceStage = 3
 	s.sourceFinalized = true
 	return nil
 }
@@ -491,28 +437,21 @@ func (s *RationalLinearSolver) Close() error {
 			return e
 		}
 	}
-	// Only explicit owning continuation acknowledges physical release failures.
-	// Every row below was created by appendRow and is an actual named member.
-	for i := range s.rows {
-		v := &s.rows[i]
-		if e := s.ownVectorNumerals(v); e != nil {
-			return e
-		}
-		if e := s.freeTokens(v); e != nil {
-			return e
+	// Explicit owning continuation releases actual numeral resources after a stopped source destructor.
+	for i := range s.A {
+		for j := range s.A[i] {
+			if e := s.deleteInto(&s.A[i], uint32(j), true); e != nil {
+				return e
+			}
 		}
 	}
-	if e := s.ownVectorNumerals(&s.b); e != nil {
-		return e
+	for i := range s.b {
+		if e := s.deleteInto(&s.b, uint32(i), true); e != nil {
+			return e
+		}
 	}
-	if e := s.freeTokens(&s.b); e != nil {
-		return e
-	}
-	if e := s.freeTokens(&s.A); e != nil {
-		return e
-	}
-	s.integer.Budget().Release(uint64(cap(s.rows))*uint64(reflect.TypeOf(linearNumeralVector{}).Size()) + s.header)
-	s.rows = nil
+	s.A, s.b = nil, nil
+	s.integer.Budget().Release(s.header)
 	s.header = 0
 	s.closed = true
 	return nil
