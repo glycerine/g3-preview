@@ -302,6 +302,16 @@ operation is just a short typed decrement loop followed by clearing the owning
 container. Those loops belong directly in each future concrete consumer, where
 the compiler can check both reference types and the relevant manager method.
 
+The unconsumed diagnostic ownership graph has also been removed: the
+`MemoryProcess` orchestrator, `TraceContext`, `WarningContext`,
+`PrintfFormatter`, and `DebugGlobalService`. These types only called one
+another or appeared in their own tests. The live `DebugContext` remains because
+vectors, heaps, parameter services, AST utilities, and assertion handling use
+it. Future warning and trace entry points should be introduced with their first
+real consumer and should use `fmt`, `io.Writer`, and ordinary string sets. The
+deleted formatter was a manual C `printf`/`va_list` simulation and must not be
+reintroduced.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before

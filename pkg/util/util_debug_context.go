@@ -58,6 +58,9 @@ func (d *DebugContext) AssertionsEnabled() (bool, error) {
 	}
 	return d.assertions, nil
 }
+
+func debugTagName(tag string) string { return tag[:cSymbolLength(tag)] }
+
 func (d *DebugContext) EnableDebug(tag string) error {
 	if e := d.open(); e != nil {
 		return e
@@ -65,7 +68,7 @@ func (d *DebugContext) EnableDebug(tag string) error {
 	if d.Tags == nil {
 		d.Tags = make(map[string]struct{})
 	}
-	d.Tags[traceName(tag)] = struct{}{}
+	d.Tags[debugTagName(tag)] = struct{}{}
 	return nil
 }
 func (d *DebugContext) DisableDebug(tag string) error {
@@ -75,7 +78,7 @@ func (d *DebugContext) DisableDebug(tag string) error {
 	if d.Tags == nil {
 		d.Tags = make(map[string]struct{})
 	}
-	delete(d.Tags, traceName(tag))
+	delete(d.Tags, debugTagName(tag))
 	return nil
 }
 func (d *DebugContext) IsDebugEnabled(tag string) (bool, error) {
@@ -85,7 +88,7 @@ func (d *DebugContext) IsDebugEnabled(tag string) (bool, error) {
 	if d.Tags == nil {
 		d.Tags = make(map[string]struct{})
 	}
-	_, ok := d.Tags[traceName(tag)]
+	_, ok := d.Tags[debugTagName(tag)]
 	return ok, nil
 }
 func (d *DebugContext) IsDebugEnabledCString(tag string) (bool, error) {
