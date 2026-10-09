@@ -17,13 +17,13 @@ func TestSATSolverActivityAndLiteralTrailUseActualRuntime(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 98+600 || v.memory.Stats().LiveBlocks != 6 {
+	if n != 80+600 || v.memory.Stats().LiveBlocks != 5 {
 		t.Fatal("actual activity source allocation missing", n, v.memory.Stats())
 	}
 	satOK(t, v.trailPush(MakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 122+600 || v.memory.Stats().LiveBlocks != 7 {
+	if n != 104+600 || v.memory.Stats().LiveBlocks != 6 {
 		t.Fatal("actual literal32 trail allocation missing", n, v.memory.Stats())
 	}
 }
@@ -169,14 +169,14 @@ func TestSATSolverRuntimeTrailAllActualRefusalPrefixes(t *testing.T) {
 			e := s.assignCore(0, satJustification{})
 			satScalarAuditRoots(t, v)
 			satPropagationAssertGraph(t, s)
-			if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || v.phase[0] != 0 || !v.assignedSinceGC[0] {
+			if v.assignment[0] != lbool.True || satScalarTestUint(t, &v.level, 0) != 1 || v.phase[0] != 0 || !v.assignedSinceGC[0] {
 				t.Fatal("source scalar prefix before trail")
 			}
 			n, x := v.trail.Size(v.trailRef)
 			satOK(t, x)
 			if e != nil {
 				failures++
-				if !satAssignmentActualRefusal(v.memory, e) || n != 0 {
+				if !satRuntimeActualRefusal(v.memory, e) || n != 0 {
 					t.Fatal(ordinal, e, n)
 				}
 			} else {
@@ -204,11 +204,11 @@ func TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix(t *testing.T) {
 	satOK(t, e)
 	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
 	satOK(t, e)
-	prefix, e := r.Allocate(99334)
+	prefix, e := r.Allocate(99352)
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	_, e = v.mkVar(true, true)
-	if !satAssignmentActualRefusal(r, e) || v.activity.values.Raw.Pending == (util.Block{}) || v.activity.values.Raw.Block != (util.Block{}) {
+	if !satRuntimeActualRefusal(r, e) || v.activity.values.Raw.Pending == (util.Block{}) || v.activity.values.Raw.Block != (util.Block{}) {
 		t.Fatal("actual activity owned malloc error", e, r.State())
 	}
 	if uint32(len(v.external)) != 1 || v.activity.Size() != 0 || satScalarTestUintSize(t, &v.level) != 0 {
@@ -242,7 +242,7 @@ func TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix(t *testing.T) {
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	e = v.trailPush(MakeLiteral(0, true))
-	if !satAssignmentActualRefusal(r, e) || v.trail.values.Raw.Pending == (util.Block{}) || v.trail.values.Raw.Block != (util.Block{}) {
+	if !satRuntimeActualRefusal(r, e) || v.trail.values.Raw.Pending == (util.Block{}) || v.trail.values.Raw.Block != (util.Block{}) {
 		t.Fatal(e, r.State())
 	}
 	satScalarAuditOwner(t, v, prefix)

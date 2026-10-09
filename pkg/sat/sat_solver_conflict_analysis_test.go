@@ -97,7 +97,7 @@ func TestSATSolverLemmaAntecedentActualAllocationPrefixes(t *testing.T) {
 				t.Fatal("source mark then unmark then stack", mark, un, st)
 			}
 			if e != nil {
-				if !satAssignmentActualRefusal(v.memory, e) {
+				if !satRuntimeActualRefusal(v.memory, e) {
 					t.Fatal("actual refusal only", e)
 				}
 				failures++
@@ -154,7 +154,7 @@ func TestSATSolverLemmaMinimizationWholeOperationFaultPublication(t *testing.T) 
 			n, e1 := s.lemma.Size()
 			satOK(t, e1)
 			if e != nil {
-				if !satAssignmentActualRefusal(v.memory, e) {
+				if !satRuntimeActualRefusal(v.memory, e) {
 					t.Fatal(e)
 				}
 				failures++
@@ -280,7 +280,7 @@ func TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes(t *testing.T) {
 				t.Fatal("essential decision-leaf lemma unchanged", n, s.minimizedLits)
 			}
 			if e != nil {
-				if !satAssignmentActualRefusal(v.memory, e) {
+				if !satRuntimeActualRefusal(v.memory, e) {
 					t.Fatal(e)
 				}
 				failures++

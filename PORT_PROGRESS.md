@@ -31131,3 +31131,19 @@ obsolete frame destruction fields, focused native AST tests passed (0.39s) and
 full checked/debug AST (28.41s) and SAT (1.10s) tests passed. Module-wide test
 compilation, AST/SAT vet, and portcheck passed. The latest full native module
 checkpoint remains 18:07–18:12 UTC; no full module execution was repeated.
+
+## Replace SAT assignment byte column with typed Go values
+
+Changed the solver's literal assignment member to `[]lbool.LBool`. Real variable
+creation, assignment, backtracking, clause views, scope pop, and integrity checks
+now use the native member directly or its typed owner operations. Removed the
+copied byte-vector header/capacity/retained-spare and allocation-refusal tests.
+The new regression covers current-member borrowing across growth, unchanged
+allocator accounting during assignment, copied/closed owner rejection, and
+bounds errors. The remaining Runtime census now accepts the actual Runtime
+directly, replacing synthetic empty vector readers. Updated surviving TLS
+allocation fixtures and manifest evidence for the removed assignment backing.
+
+Validation: complete native SAT tests passed (0.99s), checked/debug SAT tests
+passed (1.21s), module-wide test compilation passed, and SAT vet/portcheck passed.
+The latest full native module checkpoint remains 18:07–18:12 UTC.

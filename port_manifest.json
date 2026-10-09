@@ -71235,15 +71235,6 @@
         "TestSATSolverUnassignInvalidOldActualReadPrefix",
         "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
         "TestSATSolverPushActualStatementReadTiming",
-        "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
-        "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
-        "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
-        "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
-        "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
-        "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
-        "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
-        "TestSATSolverAssignmentSourceUnsignedGrowthException",
-        "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
         "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
         "TestSATSolverScalarColumnsReachSameRuntime",
         "TestSATSolverScalarSourceBytesAndRetainedSlots",
@@ -71536,7 +71527,8 @@
         "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
         "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
         "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
-        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
+        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased",
+        "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards"
       ],
       "conditionals": [
         {
@@ -72064,24 +72056,16 @@
           ]
         },
         {
-          "name": "Selected actual solver m_assignment char_vector Runtime backing/header/growth/realloc/source operators/shrink and same-runtime checkpoint integration; other typed solver allocation hooks remain open",
+          "name": "Selected actual solver m_assignment uses native []lbool.LBool; literal/variable views read the current member, source-order assignment and backtracking, bounds/lifetime guards and checkpoint domain retained",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_assignment_storage.go",
           "tests": [
-            "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
-            "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
-            "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
-            "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
-            "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
-            "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
-            "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
-            "TestSATSolverAssignmentSourceUnsignedGrowthException",
-            "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
-            "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
+            "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
+            "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards"
           ]
         },
         {
-          "name": "Selected actual Runtime-backed eight char columns and unsigned level share assignment Runtime; other solver storage profiles remain separate",
+          "name": "Selected solver Boolean flags, saved polarities, and assignments use concrete native slices; unsigned level and remaining typed storage retain the solver Runtime",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_scalar_runtime.go",
           "tests": [
@@ -72858,7 +72842,7 @@
       ],
       "ownership": [
         "Borrowed actual assignment/level arrays and real clause allocator storage; no search owner or solver runtime.",
-        "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
+        "Native typed assignments, Boolean flags, and saved polarities; remaining scalar Runtime columns and charged outer watch tokens/metadata own actual children once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
         "Selected probing/dynamic bodies borrow real propagation/lifecycle owners and separate literalMark. Probing assigned literals and conflict assumption membership use native bool/literal slices with unique first-insertion order. Reset retains capacity and regrowth zeroes membership; finalize drops backing and permits another round. Native storage is outside Runtime accounting and does not participate in the retained strict Runtime cache-memory cutoff. Simulated growth and destructor refusals for these members are removed. Failed ordinal roots and marks are inspected before faults are disabled. No independent solver counter or assignment mirror is created.",
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
@@ -73089,15 +73073,6 @@
         "TestSATSolverUnassignInvalidOldActualReadPrefix",
         "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
         "TestSATSolverPushActualStatementReadTiming",
-        "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
-        "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
-        "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
-        "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
-        "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
-        "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
-        "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
-        "TestSATSolverAssignmentSourceUnsignedGrowthException",
-        "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
         "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
         "TestSATSolverScalarColumnsReachSameRuntime",
         "TestSATSolverScalarSourceBytesAndRetainedSlots",
@@ -73316,7 +73291,8 @@
         "TestSATSolverBorrowedZeroAllocAndCopiedClosedGuards",
         "TestSATSolverBorrowedReachedCurrentHeaderReadGuards",
         "TestSATSolverClauseIteratorLearnedEmptyAndOwnerLifetime",
-        "TestSourceMessages"
+        "TestSourceMessages",
+        "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards"
       ],
       "conditionals": [
         {
@@ -73428,24 +73404,16 @@
           ]
         },
         {
-          "name": "Selected actual solver m_assignment char_vector Runtime backing/header/growth/realloc/source operators/shrink and same-runtime checkpoint integration; other typed solver allocation hooks remain open",
+          "name": "Selected actual solver m_assignment uses native []lbool.LBool; literal/variable views read the current member, source-order assignment and backtracking, bounds/lifetime guards and checkpoint domain retained",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_assignment_storage.go",
           "tests": [
-            "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
-            "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
-            "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
-            "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
-            "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
-            "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
-            "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
-            "TestSATSolverAssignmentSourceUnsignedGrowthException",
-            "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
-            "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
+            "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
+            "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards"
           ]
         },
         {
-          "name": "Selected actual Runtime-backed eight char columns and unsigned level share assignment Runtime; other solver storage profiles remain separate",
+          "name": "Selected solver Boolean flags, saved polarities, and assignments use concrete native slices; unsigned level and remaining typed storage retain the solver Runtime",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_scalar_runtime.go",
           "tests": [
@@ -73910,7 +73878,7 @@
         }
       ],
       "ownership": [
-        "Source-width char assignment and scalar columns; charged outer watch tokens/metadata own each actual child once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
+        "Native typed assignments, Boolean flags, and saved polarities; remaining scalar Runtime columns and charged outer watch tokens/metadata own actual children once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
         "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
@@ -149084,15 +149052,6 @@
         "TestUPolynomialIsolationPackedFrameAndScalarExtents",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
-        "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
-        "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
-        "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
-        "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
-        "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
-        "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
-        "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
-        "TestSATSolverAssignmentSourceUnsignedGrowthException",
-        "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
         "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
         "TestMonomialPositionsSourceMapping",
         "TestMonomialPositionsAssertionsAndOwners",
@@ -149241,7 +149200,8 @@
         "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse",
         "TestPointerVectorSourceGrowthAndErase",
         "TestASTHandleVectorNativeGrowthAndEraseClearing",
-        "TestASTLiteralVectorNativeBorrowGrowthAndNonowningReset"
+        "TestASTLiteralVectorNativeBorrowGrowthAndNonowningReset",
+        "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards"
       ],
       "conditionals": [
         {
@@ -149489,20 +149449,12 @@
           ]
         },
         {
-          "name": "Selected actual solver m_assignment char_vector Runtime backing/header/growth/realloc/source operators/shrink and same-runtime checkpoint integration; other typed solver allocation hooks remain open",
+          "name": "Selected actual solver m_assignment uses native []lbool.LBool; literal/variable views read the current member, source-order assignment and backtracking, bounds/lifetime guards and checkpoint domain retained",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_assignment_storage.go",
           "tests": [
-            "TestSATSolverAssignmentAllocationReachesActualCheckpoint",
-            "TestSATSolverAssignmentRuntimeHeadersRetainedBytesAndRealloc",
-            "TestSATSolverAssignmentReleaseWriteAndShrinkSourceRoutes",
-            "TestSATSolverAssignmentRawValueReadDoesNotPrefetchSize",
-            "TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot",
-            "TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding",
-            "TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards",
-            "TestSATSolverAssignmentSourceUnsignedGrowthException",
-            "TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute",
-            "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime"
+            "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
+            "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards"
           ]
         },
         {

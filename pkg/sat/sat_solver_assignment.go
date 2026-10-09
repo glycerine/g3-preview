@@ -45,10 +45,10 @@ func (s *satSolverPropagationState) assignCore(l Literal, j satJustification) er
 	if v.scopeLevel == 0 {
 		j = satJustification{}
 	}
-	if e := v.assignment.Write(l.index(), int8(lbool.True)); e != nil {
+	if e := v.setAssignment(l, lbool.True); e != nil {
 		return e
 	}
-	if e := v.assignment.Write(l.Negated().index(), int8(lbool.False)); e != nil {
+	if e := v.setAssignment(l.Negated(), lbool.False); e != nil {
 		return e
 	}
 	id := uint32(l.variable())

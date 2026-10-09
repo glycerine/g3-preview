@@ -172,7 +172,7 @@ func TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix(t *testing.T) {
 	s.analysis.budget.FailAfter(0)
 	marks := uint32(0)
 	e = s.processAntecedent(0, &marks)
-	if !satAssignmentActualRefusal(p.memory, e) {
+	if !satRuntimeActualRefusal(p.memory, e) {
 		t.Fatal(e)
 	}
 	marked, xerr := s.analysis.marked(0)

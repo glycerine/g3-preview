@@ -16,7 +16,7 @@ func TestSATSolverJustificationActualEightByteSourceAllocation(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 98+600 || v.memory.Stats().LiveBlocks != 6 {
+	if n != 80+600 || v.memory.Stats().LiveBlocks != 5 {
 		t.Fatal("actual source justification allocation absent", n, v.memory.Stats())
 	}
 }
@@ -44,7 +44,7 @@ func TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy(t *testing.
 	if _, e = v.justification.read(0); !errors.Is(e, ErrSATOwner) {
 		t.Fatal("missing provenance may not infer live registry token", e)
 	}
-	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || v.phase[0] != 2 || v.assignedSinceGC[0] {
+	if v.assignment[0] != lbool.True || satScalarTestUint(t, &v.level, 0) != 1 || v.phase[0] != 2 || v.assignedSinceGC[0] {
 		t.Fatal("actual assignment statement prefix")
 	}
 	satScalarAuditRoots(t, v)
@@ -248,16 +248,16 @@ func TestSATSolverJustificationTLSPendingAtActualSourceAllocation(t *testing.T) 
 	satOK(t, e)
 	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
 	satOK(t, e)
-	// Source malloc accounting: heap600 + external request+8 =99980, assignment18
-	// completes below100000, then actual justification32 crosses the TLS check.
-	prefix, e := r.Allocate(99372)
+	// Runtime accounting: heap600 + external request+8 =99998. Native
+	// assignment adds no Runtime bytes; justification32 crosses the TLS check.
+	prefix, e := r.Allocate(99390)
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	_, e = v.mkVar(true, true)
-	if !satAssignmentActualRefusal(r, e) || v.justification.raw.Pending == (util.Block{}) || v.justification.raw.Block != (util.Block{}) {
+	if !satRuntimeActualRefusal(r, e) || v.justification.raw.Pending == (util.Block{}) || v.justification.raw.Block != (util.Block{}) {
 		t.Fatal("actual justification owned physical refusal", e, r.State())
 	}
-	if satAssignmentTestSize(t, &v.assignment) != 2 || satJustificationTestSize(t, &v.justification) != 0 || uint32(len(v.decision)) != 0 || v.justification.provenanceBytes != 0 {
+	if uint32(len(v.assignment)) != 2 || satJustificationTestSize(t, &v.justification) != 0 || uint32(len(v.decision)) != 0 || v.justification.provenanceBytes != 0 {
 		t.Fatal("source publication before actual justification malloc", v.Stats())
 	}
 	satScalarAuditOwner(t, v, prefix)

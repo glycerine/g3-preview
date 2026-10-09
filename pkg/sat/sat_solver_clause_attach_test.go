@@ -245,7 +245,7 @@ func TestSATSolverAttachNaryReorderAndWatchFaultPrefixes(t *testing.T) {
 			c, e := s.mkNaryClause(4, []Literal{0, 2, 4, 6}, false)
 			satLifecycleAssertOwned(t, s)
 			if e != nil {
-				if !satAssignmentActualRefusal(v.memory, e) {
+				if !satRuntimeActualRefusal(v.memory, e) {
 					t.Fatal(e)
 				}
 				failures++
@@ -258,7 +258,7 @@ func TestSATSolverAttachNaryReorderAndWatchFaultPrefixes(t *testing.T) {
 				satOK(t, x)
 				z, x := p.clauses.Literal(c, 1)
 				satOK(t, x)
-				if a != 6 || z != 4 || p.clausePropagations != 1 || satAssignmentTestValue(t, &v.assignment, 6) != int8(lbool.True) {
+				if a != 6 || z != 4 || p.clausePropagations != 1 || v.assignment[6] != lbool.True {
 					t.Fatal("source swaps+assignment precede watches", a, z)
 				}
 				w, x := v.watches.Get(7)

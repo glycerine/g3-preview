@@ -1127,3 +1127,19 @@ Validation includes the independent recursive clause oracle, every remaining
 bound allocation refusal, the short-range cleanup regression, native capture
 lifetime/reference checks, and full native AST/SAT tests. Root Runtime vector
 columns now serve SAT alone; the numeric Runtime itself remains live elsewhere.
+
+## Native SAT assignments
+
+SAT literal assignments now use `[]lbool.LBool`, leaving no Runtime byte columns
+in variable state. Creation appends paired undefined literals; assignment and
+backtracking update each polarity in the original order, and scope pop clears
+and truncates removed literals. Clause views borrow variable state and read its
+current slice, so they remain correct across native growth. Typed reads/writes
+retain owner, close, and reached bounds guards. Removed serialized byte-header,
+spare-slot, capacity-schedule, and assignment allocator-failure tests; remaining
+real Runtime allocation campaigns and their direct Runtime census stay live.
+Native assignment mutation does not change arena/Runtime accounting.
+
+Validation: complete native and checked/debug SAT suites, module-wide test
+compilation, SAT vet, and portcheck passed. Numerical/typed Runtime columns are
+still separate conversion work; root vector storage now serves SAT alone.

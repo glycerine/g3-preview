@@ -25,8 +25,8 @@ func TestSATSimplifierCleanupAll27AssignmentsAndUseCounts(t *testing.T) {
 				state := n % 3
 				n /= 3
 				value := [3]lbool.LBool{lbool.Undef, lbool.False, lbool.True}[state]
-				satOK(t, p.variables.assignment.Write(v*2, int8(value)))
-				satOK(t, p.variables.assignment.Write(v*2+1, -int8(value)))
+				satOK(t, p.variables.setAssignment(Literal(v*2), value))
+				satOK(t, p.variables.setAssignment(Literal(v*2+1), -value))
 				if value != lbool.False {
 					want = append(want, Literal(v*2))
 				}

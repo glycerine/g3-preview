@@ -364,10 +364,7 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		if uint32(len(v.watches.lists)) != n*2 {
 			return false, ErrSATAssertion
 		}
-		size, e := v.assignment.Size()
-		if e != nil {
-			return false, e
-		}
+		size := uint32(len(v.assignment))
 		if size != n*2 {
 			return false, ErrSATAssertion
 		}

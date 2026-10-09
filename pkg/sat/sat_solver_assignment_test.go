@@ -10,7 +10,7 @@ func TestSATSolverAssignConflictStatusSourceOrder(t *testing.T) {
 	s, v, _ := satPropagationFixture(t, 3)
 	j := newSATBinaryJustification(MakeLiteral(2, true))
 	satOK(t, s.assign(MakeLiteral(0, true), j))
-	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.False) || satAssignmentTestValue(t, &v.assignment, 1) != int8(lbool.True) || !satJustificationTestValue(t, &v.justification, 0).None() || satScalarTestUint(t, &v.level, 0) != 0 || v.phase[0] != 1 || !v.assignedSinceGC[0] {
+	if v.assignment[0] != lbool.False || v.assignment[1] != lbool.True || !satJustificationTestValue(t, &v.justification, 0).None() || satScalarTestUint(t, &v.level, 0) != 0 || v.phase[0] != 1 || !v.assignedSinceGC[0] {
 		t.Fatal("base assignment")
 	}
 	v.scopeLevel = 3
@@ -45,10 +45,10 @@ func TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix(t *testing.T) {
 	v.scopeLevel = 1
 	b.FailAfter(0)
 	e := s.assignCore(0, satJustification{})
-	if !satAssignmentActualRefusal(v.memory, e) {
+	if !satRuntimeActualRefusal(v.memory, e) {
 		t.Fatal("actual initial trail refusal", e)
 	}
-	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || v.phase[0] != 0 || !v.assignedSinceGC[0] {
+	if v.assignment[0] != lbool.True || satScalarTestUint(t, &v.level, 0) != 1 || v.phase[0] != 0 || !v.assignedSinceGC[0] {
 		t.Fatal("scalar prefix")
 	}
 	n, x := v.trail.Size(v.trailRef)

@@ -259,9 +259,14 @@ func (s *Solver) gcVar(v uint32) error {
 	if e = x.watches.Shrink(2 * v); e != nil {
 		return e
 	}
-	if e = x.assignment.Shrink(2 * v); e != nil {
-		return e
+	if uint64(2*v) > uint64(len(x.assignment)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
+		return arena.ErrBounds
 	}
+	clear(x.assignment[2*v:])
+	x.assignment = x.assignment[:2*v]
 	if e = x.justification.raw.Shrink(v); e != nil {
 		return e
 	}

@@ -16,7 +16,7 @@ type satSolverVariableState struct {
 	self                                            *satSolverVariableState
 	budget                                          *arena.Budget
 	watches                                         *satSolverWatchLists
-	assignment                                      RuntimeVectorColumn
+	assignment                                      []lbool.LBool
 	memory                                          *util.Runtime
 	phase, previousPhase                            []int8
 	decision, eliminated, external, assignedSinceGC []bool
@@ -60,7 +60,6 @@ func newSATColdVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.Ve
 	s := &satSolverVariableState{budget: b, elimTodo: todo, ownerBytes: n, activityInc: 128}
 	s.self = s
 	s.memory = raw
-	s.assignment.Bind(raw)
 	s.justification.bind(raw, b)
 	s.level.Bind(raw)
 	return s, nil
@@ -127,12 +126,7 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 	if e := s.watches.PushEmpty(); e != nil {
 		return v, e
 	}
-	if e := s.assignment.Push(int8(lbool.Undef)); e != nil {
-		return v, e
-	}
-	if e := s.assignment.Push(int8(lbool.Undef)); e != nil {
-		return v, e
-	}
+	s.assignment = append(s.assignment, lbool.Undef, lbool.Undef)
 	if e := s.justification.push(satJustification{}); e != nil {
 		return v, e
 	}
@@ -177,8 +171,20 @@ func (s *satSolverVariableState) valueLiteral(l Literal) (lbool.LBool, error) {
 	if e := s.open(); e != nil {
 		return lbool.Undef, e
 	}
-	v, e := s.assignment.Read(l.index())
-	return lbool.LBool(v), e
+	if uint64(l.index()) >= uint64(len(s.assignment)) {
+		if satStorageSourceDebug {
+			return lbool.Undef, ErrSATAssertion
+		}
+		return lbool.Undef, arena.ErrBounds
+	}
+	return s.assignment[l.index()], nil
+}
+func (s *satSolverVariableState) setAssignment(l Literal, value lbool.LBool) error {
+	if _, e := s.valueLiteral(l); e != nil {
+		return e
+	}
+	s.assignment[l.index()] = value
+	return nil
 }
 func (s *satSolverVariableState) valueVar(v BoolVar) (lbool.LBool, error) {
 	return s.valueLiteral(Literal(uint32(v) << 1))
@@ -444,9 +450,7 @@ func (s *satSolverVariableState) finalizeColumnsWatches() error {
 	if e := s.justification.finalize(); e != nil {
 		return e
 	}
-	if e := s.assignment.Finalize(); e != nil {
-		return e
-	}
+	s.assignment = nil
 	if s.watches != nil {
 		if e := s.watches.Close(); e != nil {
 			return e

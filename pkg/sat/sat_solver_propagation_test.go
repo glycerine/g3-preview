@@ -169,7 +169,7 @@ func TestSATSolverPropagationIndependentTruthTables(t *testing.T) {
 			for d := 0; d < 3; d++ {
 				want := lbool.False
 				for i, x := range []int{a, b, d} {
-					satOK(t, v.assignment.Write(uint32(2*i), int8(vals[x])))
+					satOK(t, v.setAssignment(Literal(uint32(2*i)), lbool.LBool(vals[x])))
 					if x == 2 {
 						want = lbool.True
 					} else if x == 1 && want != lbool.True {
@@ -322,8 +322,8 @@ func TestSATSolverPropagationWarmActualBackingPlateau(t *testing.T) {
 	satOK(t, e)
 	satPropagationPush(t, s, 0, w)
 	cycle := func() {
-		for i := uint32(0); i < satAssignmentTestSize(t, &v.assignment); i++ {
-			satOK(t, v.assignment.Write(i, int8(lbool.Undef)))
+		for i := uint32(0); i < uint32(len(v.assignment)); i++ {
+			satOK(t, v.setAssignment(Literal(i), lbool.Undef))
 		}
 		satOK(t, v.trail.Shrink(v.trailRef, 0))
 		v.qhead = 0
@@ -360,7 +360,7 @@ func TestSATSolverPropagationLastSelfMoveRawLifetime(t *testing.T) {
 	satOK(t, e)
 	satPropagationPush(t, s, 0, w)
 	satOK(t, s.assign(0, satJustification{}))
-	satOK(t, v.assignment.Write(1, int8(lbool.Undef)))
+	satOK(t, v.setAssignment(Literal(1), lbool.Undef))
 	_, e = s.propagateCore(false)
 	if satStorageSourceDebug {
 		if !errors.Is(e, ErrSATAssertion) || v.qhead != 1 || s.cleanerCounter != -1 || s.asymmCounter != 0 || s.probingCounter != 0 || s.numCheckpoints != 1 {

@@ -159,7 +159,7 @@ func TestSATSolverProbingMissedPropagationTruthTable(t *testing.T) {
 				state := code % 3
 				code /= 3
 				value := []lbool.LBool{lbool.False, lbool.Undef, lbool.True}[state]
-				satOK(t, life.propagation.variables.assignment.Write(2*i, int8(value)))
+				satOK(t, life.propagation.variables.setAssignment(Literal(2*i), value))
 				if value == lbool.Undef {
 					undef++
 				}

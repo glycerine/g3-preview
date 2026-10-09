@@ -300,10 +300,7 @@ func satHeapRuntimeAudit(t *testing.T, q *satVarQueue, a *satSolverRuntimeActivi
 			}
 		}
 	}
-	// An empty synthetic *reader* binds the real Runtime solely for the census;
-	// no invented source owner or allocation enters the expected set.
-	reader := RuntimeVectorColumn{Runtime: r}
-	satAssignmentAuditBlocks(t, &reader, roots...)
+	satRuntimeAuditBlocks(t, r, roots...)
 	if want := r.Stats().TotalBytes + a.ownerBytes + header; want != b.Used() {
 		t.Fatal("once-only actual heap cohort", want, b.Used())
 	}
@@ -322,7 +319,7 @@ func TestSATCaseSplitHeapConstructorEveryActualRefusal(t *testing.T) {
 			q, e := newSATSolverRuntimeVarQueue(a, b)
 			if e != nil {
 				failures++
-				if !satAssignmentActualRefusal(r, e) {
+				if !satRuntimeActualRefusal(r, e) {
 					t.Fatal(e)
 				}
 			} else {
@@ -390,7 +387,7 @@ func TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication(t *testing.T)
 			satOK(t, readErr)
 			if e != nil {
 				failures++
-				if !satAssignmentActualRefusal(r, e) || n != 128 || capacity < 140 {
+				if !satRuntimeActualRefusal(r, e) || n != 128 || capacity < 140 {
 					t.Fatal("all capacity prefix, old logicalsize", e, n, capacity)
 				}
 			} else {
@@ -517,7 +514,7 @@ func TestSATCaseSplitHeapCopyEveryActualRefusal(t *testing.T) {
 			copyOwner, e := q.Clone(b)
 			if e != nil {
 				failures++
-				if !satAssignmentActualRefusal(r, e) {
+				if !satRuntimeActualRefusal(r, e) {
 					t.Fatal(e)
 				}
 			} else {

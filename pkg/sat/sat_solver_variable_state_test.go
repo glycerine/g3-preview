@@ -66,7 +66,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 	if view.variables != s {
 		t.Fatal("source char assignment")
 	}
-	satOK(t, s.assignment.Write(0, int8(lbool.True)))
+	satOK(t, s.setAssignment(Literal(0), lbool.True))
 	value, e := view.value(0)
 	satOK(t, e)
 	if value != lbool.True {
@@ -80,7 +80,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 
 func satVariableAssertFirstPrefix(t *testing.T, s *satSolverVariableState) {
 	t.Helper()
-	sizes := []int{len(s.watches.lists), int(satAssignmentTestSize(t, &s.assignment)), int(satJustificationTestSize(t, &s.justification)), len(s.decision), len(s.eliminated), len(s.external), int(s.activity.Size()), int(satScalarTestUintSize(t, &s.level)), len(s.mark), len(s.literalMark), len(s.phase), len(s.previousPhase), len(s.assignedSinceGC)}
+	sizes := []int{len(s.watches.lists), len(s.assignment), int(satJustificationTestSize(t, &s.justification)), len(s.decision), len(s.eliminated), len(s.external), int(s.activity.Size()), int(satScalarTestUintSize(t, &s.level)), len(s.mark), len(s.literalMark), len(s.phase), len(s.previousPhase), len(s.assignedSinceGC)}
 	want := []int{2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1}
 	unfinished := false
 	for i, n := range sizes {
@@ -123,7 +123,7 @@ func TestSATSolverMkVarAllActualReservationPrefixes(t *testing.T) {
 			}
 			if e != nil {
 				failures++
-				if !satAssignmentActualRefusal(s.memory, e) {
+				if !satRuntimeActualRefusal(s.memory, e) {
 					t.Fatal(fail, e)
 				}
 			} else {
@@ -159,7 +159,7 @@ func TestSATSolverMkVarLateHeapIndexPublicationBeforeRefusal(t *testing.T) {
 			if e2 := s.checkPhysicalOwners(); e2 != nil {
 				t.Fatal(e2)
 			}
-			if e != nil && !satAssignmentActualRefusal(s.memory, e) {
+			if e != nil && !satRuntimeActualRefusal(s.memory, e) {
 				t.Fatal(e)
 			}
 			if e != nil && s.queue.Contains(4) && s.queue.Size() == 4 {
@@ -222,7 +222,7 @@ func TestSATSolverVariableConstructorRefusalAndBorrowedTodo(t *testing.T) {
 		s, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, mem)
 		if e != nil {
 			failures++
-			if !satAssignmentActualRefusal(mem, e) {
+			if !satRuntimeActualRefusal(mem, e) {
 				t.Fatal(fail, e)
 			}
 		} else {
@@ -231,8 +231,7 @@ func TestSATSolverVariableConstructorRefusalAndBorrowedTodo(t *testing.T) {
 		if s != nil {
 			satScalarAuditOwner(t, s)
 		} else {
-			reader := RuntimeVectorColumn{Runtime: mem}
-			satAssignmentAuditBlocks(t, &reader)
+			satRuntimeAuditBlocks(t, mem)
 		}
 		b.FailAfter(-1)
 		if s != nil {
