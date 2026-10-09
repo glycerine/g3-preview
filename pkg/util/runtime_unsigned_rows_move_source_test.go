@@ -19,12 +19,12 @@ func TestRuntimeUnsignedRowsExpansionReadsActualOldPointer(t *testing.T) {
 			m, b := memoryRuntimeFixture(t, false, 64)
 			out, e := NewRuntimeUnsignedRows(m, b)
 			memoryRuntimeRequire(t, e)
-			memoryRuntimeRequire(t, cliqueTestAppendValues(out, []uint32{2}))
-			memoryRuntimeRequire(t, cliqueTestAppendValues(out, []uint32{4}))
+			memoryRuntimeRequire(t, unsignedRowsTestAppend(out, []uint32{2}))
+			memoryRuntimeRequire(t, unsignedRowsTestAppend(out, []uint32{4}))
 			old := out.StorageState().Raw
 			original := [2]Block{out.StorageState().Rows[0].Block, out.StorageState().Rows[1].Block}
 			memoryRuntimeRequire(t, m.WriteUint32(old, 8+uint64(tc.index)*8+tc.word, 0))
-			e = cliqueTestAppendValues(out, []uint32{6})
+			e = unsignedRowsTestAppend(out, []uint32{6})
 			if !errors.Is(e, ErrRuntimeVectorOwner) {
 				t.Errorf("source move ignored actual old pointer: %v", e)
 			}
@@ -48,11 +48,11 @@ func TestRuntimeUnsignedRowsExpansionReadsActualOldPointer(t *testing.T) {
 					}
 				}
 			}
-			cliqueTestRowsAudit(t, m, out)
+			unsignedRowsTestAudit(t, m, out)
 			if er := out.CloseChecked(); er != nil {
 				memoryRuntimeRequire(t, out.CleanupStopped())
 			}
-			cliqueTestRowsAudit(t, m, out)
+			unsignedRowsTestAudit(t, m, out)
 		})
 	}
 }

@@ -18,17 +18,8 @@ func satMutexColumnRoots(c *RuntimeUintColumn) []util.Block {
 	}
 	return r
 }
-func satMaxCliquesRoots(g *util.NegatedLiteralCliques) []util.Block { return g.OwningRoots() }
 func satMutexFrameRoots(f *satMutexFrame) []util.Block {
-	r := satMaxCliquesRoots(f.graph)
-	r = append(r, f.seen.raw, f.seen.pending)
-	r = append(r, f.results.OwningRoots()...)
-	if f.psUsed {
-		r = append(r, satMutexColumnRoots(&f.ps)...)
-	}
-	if f.rowUsed {
-		r = append(r, satMutexColumnRoots(&f.row)...)
-	}
+	r := []util.Block{f.seen.raw, f.seen.pending}
 	return satMutexNonzero(r)
 }
 func satMutexNonzero(roots []util.Block) []util.Block {

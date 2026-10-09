@@ -14,7 +14,7 @@ func TestRuntimeUnsignedRowsCloseDestroysSourceOuterBeforeFailedCopyAbort(t *tes
 	out, e := NewRuntimeUnsignedRows(m, budget)
 	memoryRuntimeRequire(t, e)
 	t.Cleanup(func() { memoryRuntimeRequire(t, out.CloseChecked()) })
-	src := cliqueTestInput(t, m)
+	src := unsignedRowsTestInput(t, m)
 	memoryRuntimeRequire(t, src.Push(6))
 	memoryRuntimeRequire(t, m.WriteUint32(src.Raw.Block, 4, 2)) // second byte-word not initialized
 	e = out.AppendColumn(src)
@@ -31,7 +31,7 @@ func TestRuntimeUnsignedRowsCloseDestroysSourceOuterBeforeFailedCopyAbort(t *tes
 	if n != 0 {
 		t.Fatal("failed ctor published size", n)
 	}
-	cliqueTestRowsAudit(t, m, out, src)
+	unsignedRowsTestAudit(t, m, out, src)
 	memoryRuntimeRequire(t, out.CloseChecked())
 	blocks := testFieldBySourceName(reflect.ValueOf(m).Elem(), "blocks")
 	outerSerial := testFieldBySourceName(testFieldBySourceName(blocks.Index(int(outer.Slot()-1)), "release"), "serial").Uint()
@@ -46,12 +46,12 @@ func TestRuntimeUnsignedRowsSourceFinalizeThenReuseOwnsNewSourceVector(t *testin
 	out, e := NewRuntimeUnsignedRows(m, budget)
 	memoryRuntimeRequire(t, e)
 	t.Cleanup(func() { memoryRuntimeRequire(t, out.CloseChecked()) })
-	memoryRuntimeRequire(t, cliqueTestAppendValues(out, []uint32{2}))
+	memoryRuntimeRequire(t, unsignedRowsTestAppend(out, []uint32{2}))
 	memoryRuntimeRequire(t, out.SourceFinalize())
-	memoryRuntimeRequire(t, cliqueTestAppendValues(out, []uint32{4}))
+	memoryRuntimeRequire(t, unsignedRowsTestAppend(out, []uint32{4}))
 	outer := out.StorageState().Raw
 	inner := out.StorageState().Rows[0].Block
-	cliqueTestRowsAudit(t, m, out)
+	unsignedRowsTestAudit(t, m, out)
 	memoryRuntimeRequire(t, out.SourceFinalize())
 	if _, e = m.Read(outer, 0); e == nil {
 		t.Fatal("second source finalize retained new outer")
@@ -69,19 +69,19 @@ func TestRuntimeUnsignedRowsStoppedSourceFinalizePreservesCauseAndNamedAbort(t *
 	m, budget := memoryRuntimeFixture(t, false, 64)
 	out, e := NewRuntimeUnsignedRows(m, budget)
 	memoryRuntimeRequire(t, e)
-	memoryRuntimeRequire(t, cliqueTestAppendValues(out, []uint32{2}))
+	memoryRuntimeRequire(t, unsignedRowsTestAppend(out, []uint32{2}))
 	memoryRuntimeRequire(t, m.WriteUint32(out.StorageState().Raw, 8, 0)) // explicit source-pointer-domain corruption
 	e = out.SourceFinalize()
 	if !errors.Is(e, ErrRuntimeVectorOwner) {
 		t.Fatal(e)
 	}
-	cliqueTestRowsAudit(t, m, out)
-	if er := cliqueTestAppendValues(out, []uint32{4}); !errors.Is(er, arena.ErrClosed) {
+	unsignedRowsTestAudit(t, m, out)
+	if er := unsignedRowsTestAppend(out, []uint32{4}); !errors.Is(er, arena.ErrClosed) {
 		t.Fatal("stopped source destructor permits mutation", er)
 	}
 	if er := out.CloseChecked(); !errors.Is(er, e) {
 		t.Fatal("lost original source guard", er, e)
 	}
 	memoryRuntimeRequire(t, out.CleanupStopped())
-	cliqueTestRowsAudit(t, m, out)
+	unsignedRowsTestAudit(t, m, out)
 }

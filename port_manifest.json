@@ -71295,11 +71295,9 @@
         "pkg/util/runtime_unsigned_rows_move_source_test.go",
         "pkg/sat/sat_solver_index_iterator_source_test.go",
         "pkg/sat/sat_solver_find_mutexes.go",
-        "pkg/util/negated_literal_cliques.go",
-        "pkg/util/negated_literal_cliques_model_test.go",
-        "pkg/util/negated_literal_cliques_rows.go",
-        "pkg/util/negated_literal_cliques_rows_test.go",
-        "pkg/util/negated_literal_cliques_set.go",
+        "pkg/util/cliques/cliques.go",
+        "pkg/util/cliques/cliques_test.go",
+        "pkg/util/runtime_unsigned_rows.go",
         "pkg/sat/sat_solver_max_cliques_test.go",
         "pkg/sat/sat_solver_mutex_audit_test.go",
         "pkg/sat/sat_solver_mutex_fault_test.go",
@@ -71330,14 +71328,9 @@
         "pkg/sat/sat_solver_stat_display_test.go",
         "pkg/sat/sat_var_queue_runtime.go",
         "pkg/sat/sat_var_queue_runtime_test.go",
-        "pkg/util/runtime_unsigned_rows.go",
         "pkg/util/runtime_unsigned_rows_inspect.go",
         "pkg/util/runtime_vector_copy.go",
-        "pkg/util/runtime_unsigned_rows_test.go",
-        "pkg/util/negated_literal_cliques_test.go",
-        "pkg/util/negated_literal_cliques_fault_test.go",
-        "pkg/util/negated_literal_cliques_external_test.go",
-        "pkg/util/negated_literal_cliques_helpers_test.go"
+        "pkg/util/runtime_unsigned_rows_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -71612,16 +71605,11 @@
         "TestRuntimeUnsignedRowsStoppedSourceFinalizePreservesCauseAndNamedAbort",
         "TestRuntimeUnsignedRowsExpansionReadsActualOldPointer",
         "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer",
-        "TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs",
-        "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
-        "TestNegatedLiteralCliquesNegatedLiteralPartitionAndSourceCache",
+        "TestAllThreeVertexMutexGraphs",
+        "TestNegatedLiteralPartition",
         "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
-        "TestNegatedLiteralCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
-        "TestNegatedLiteralCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
-        "TestNegatedLiteralCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
-        "TestNegatedLiteralCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+        "TestSourceCachePersistsAcrossQueries",
         "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
-        "TestNegatedLiteralCliquesStoppedLexicalContextRejectsOverwrite",
         "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
         "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
         "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
@@ -72780,16 +72768,11 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_find_mutexes.go",
           "tests": [
-            "TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs",
-            "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
-            "TestNegatedLiteralCliquesNegatedLiteralPartitionAndSourceCache",
+            "TestAllThreeVertexMutexGraphs",
+            "TestNegatedLiteralPartition",
             "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
-            "TestNegatedLiteralCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
-            "TestNegatedLiteralCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
-            "TestNegatedLiteralCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
-            "TestNegatedLiteralCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+            "TestSourceCachePersistsAcrossQueries",
             "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
-            "TestNegatedLiteralCliquesStoppedLexicalContextRejectsOverwrite",
             "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
             "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
             "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
@@ -72798,9 +72781,7 @@
             "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
           ],
           "go_targets": [
-            "pkg/util/negated_literal_cliques_model_test.go",
-            "pkg/util/negated_literal_cliques_rows_test.go",
-            "pkg/util/negated_literal_cliques_test.go",
+            "pkg/util/cliques/cliques_test.go",
             "pkg/sat/sat_solver_max_cliques_test.go",
             "pkg/sat/sat_solver_mutex_fault_test.go",
             "pkg/sat/sat_solver_mutex_pair_set_test.go",
@@ -73179,11 +73160,9 @@
         "pkg/util/runtime_unsigned_rows_move_source_test.go",
         "pkg/sat/sat_solver_index_iterator_source_test.go",
         "pkg/sat/sat_solver_find_mutexes.go",
-        "pkg/util/negated_literal_cliques.go",
-        "pkg/util/negated_literal_cliques_model_test.go",
-        "pkg/util/negated_literal_cliques_rows.go",
-        "pkg/util/negated_literal_cliques_rows_test.go",
-        "pkg/util/negated_literal_cliques_set.go",
+        "pkg/util/cliques/cliques.go",
+        "pkg/util/cliques/cliques_test.go",
+        "pkg/util/runtime_unsigned_rows.go",
         "pkg/sat/sat_solver_max_cliques_test.go",
         "pkg/sat/sat_solver_mutex_audit_test.go",
         "pkg/sat/sat_solver_mutex_fault_test.go",
@@ -73207,14 +73186,9 @@
         "pkg/sat/sat_solver_views_test.go",
         "pkg/util/messages/messages.go",
         "pkg/util/messages/messages_test.go",
-        "pkg/util/runtime_unsigned_rows.go",
         "pkg/util/runtime_unsigned_rows_inspect.go",
         "pkg/util/runtime_vector_copy.go",
-        "pkg/util/runtime_unsigned_rows_test.go",
-        "pkg/util/negated_literal_cliques_test.go",
-        "pkg/util/negated_literal_cliques_fault_test.go",
-        "pkg/util/negated_literal_cliques_external_test.go",
-        "pkg/util/negated_literal_cliques_helpers_test.go"
+        "pkg/util/runtime_unsigned_rows_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -73446,16 +73420,11 @@
         "TestRuntimeUnsignedRowsStoppedSourceFinalizePreservesCauseAndNamedAbort",
         "TestRuntimeUnsignedRowsExpansionReadsActualOldPointer",
         "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer",
-        "TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs",
-        "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
-        "TestNegatedLiteralCliquesNegatedLiteralPartitionAndSourceCache",
+        "TestAllThreeVertexMutexGraphs",
+        "TestNegatedLiteralPartition",
         "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
-        "TestNegatedLiteralCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
-        "TestNegatedLiteralCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
-        "TestNegatedLiteralCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
-        "TestNegatedLiteralCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+        "TestSourceCachePersistsAcrossQueries",
         "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
-        "TestNegatedLiteralCliquesStoppedLexicalContextRejectsOverwrite",
         "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
         "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
         "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
@@ -73951,16 +73920,11 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_mutex_pair_vector.go",
           "tests": [
-            "TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs",
-            "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
-            "TestNegatedLiteralCliquesNegatedLiteralPartitionAndSourceCache",
+            "TestAllThreeVertexMutexGraphs",
+            "TestNegatedLiteralPartition",
             "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
-            "TestNegatedLiteralCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
-            "TestNegatedLiteralCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
-            "TestNegatedLiteralCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
-            "TestNegatedLiteralCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
+            "TestSourceCachePersistsAcrossQueries",
             "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
-            "TestNegatedLiteralCliquesStoppedLexicalContextRejectsOverwrite",
             "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
             "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
             "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
@@ -73969,9 +73933,7 @@
             "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
           ],
           "go_targets": [
-            "pkg/util/negated_literal_cliques_model_test.go",
-            "pkg/util/negated_literal_cliques_rows_test.go",
-            "pkg/util/negated_literal_cliques_test.go",
+            "pkg/util/cliques/cliques_test.go",
             "pkg/sat/sat_solver_max_cliques_test.go",
             "pkg/sat/sat_solver_mutex_fault_test.go",
             "pkg/sat/sat_solver_mutex_pair_set_test.go",
@@ -124908,79 +124870,49 @@
       "path": "src/util/max_cliques.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/cliques/cliques.go",
         "pkg/util/cliques/cliques_test.go",
-        "pkg/util/negated_literal_cliques.go",
-        "pkg/util/negated_literal_cliques_model_test.go",
-        "pkg/util/negated_literal_cliques_rows.go",
-        "pkg/util/negated_literal_cliques_rows_test.go",
-        "pkg/util/negated_literal_cliques_set.go",
+        "pkg/sat/sat_solver_find_mutexes.go",
         "pkg/sat/sat_solver_max_cliques_test.go",
-        "pkg/util/negated_literal_cliques_test.go",
-        "pkg/util/negated_literal_cliques_fault_test.go",
-        "pkg/util/negated_literal_cliques_external_test.go",
-        "pkg/util/negated_literal_cliques_helpers_test.go"
+        "pkg/sat/sat_solver_mutex_fault_test.go"
       ],
       "tests": [
         "TestNegatedLiteralPartition",
         "TestSourceCachePersistsAcrossQueries",
         "TestLiteralRangeGuard",
-        "TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs",
-        "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
-        "TestNegatedLiteralCliquesNegatedLiteralPartitionAndSourceCache",
+        "TestAllThreeVertexMutexGraphs",
+        "TestMixedPolarityAndTransitiveBooleanOracle",
         "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
-        "TestNegatedLiteralCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
-        "TestNegatedLiteralCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
-        "TestNegatedLiteralCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
-        "TestNegatedLiteralCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
         "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
-        "TestNegatedLiteralCliquesStoppedLexicalContextRejectsOverwrite",
-        "TestNegatedLiteralCliquesMixedPolarityAndTransitiveBooleanOracle",
-        "TestNegatedLiteralCliquesUtilityOnlyConsumer",
-        "TestNegatedLiteralCliquesEveryReservationOwnsAndCloses"
+        "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Selected concrete neg_literal getReachable34-80/addEdge91-96/cliques98-134 preserve source goal-specific retained cache and greedy partition",
+          "name": "max_cliques get_reachable34-80/add_edge91-96/operator()98-134 with the live neg_literal adapter",
           "status": "ported",
-          "go_target": "pkg/util/negated_literal_cliques.go",
+          "go_target": "pkg/util/cliques/cliques.go",
           "tests": [
             "TestNegatedLiteralPartition",
             "TestSourceCachePersistsAcrossQueries",
-            "TestLiteralRangeGuard",
-            "TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs",
-            "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
-            "TestNegatedLiteralCliquesNegatedLiteralPartitionAndSourceCache",
-            "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
-            "TestNegatedLiteralCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
-            "TestNegatedLiteralCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
-            "TestNegatedLiteralCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
-            "TestNegatedLiteralCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
-            "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
-            "TestNegatedLiteralCliquesStoppedLexicalContextRejectsOverwrite",
-            "TestNegatedLiteralCliquesMixedPolarityAndTransitiveBooleanOracle",
-            "TestNegatedLiteralCliquesUtilityOnlyConsumer",
-            "TestNegatedLiteralCliquesEveryReservationOwnsAndCloses"
+            "TestAllThreeVertexMutexGraphs",
+            "TestMixedPolarityAndTransitiveBooleanOracle",
+            "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput"
           ],
           "go_targets": [
             "pkg/util/cliques/cliques.go",
             "pkg/util/cliques/cliques_test.go",
-            "pkg/util/negated_literal_cliques_model_test.go",
-            "pkg/util/negated_literal_cliques_rows_test.go",
-            "pkg/util/negated_literal_cliques_test.go",
-            "pkg/sat/sat_solver_max_cliques_test.go",
-            "pkg/util/negated_literal_cliques_external_test.go",
-            "pkg/util/negated_literal_cliques_fault_test.go"
+            "pkg/sat/sat_solver_find_mutexes.go",
+            "pkg/sat/sat_solver_max_cliques_test.go"
           ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md."
+        "The live SAT and SMT neg_literal specialization is represented by a typed uint32 API; callers supply edges and literal indices directly. Go slices and bit sets replace C++ vector/uint_set storage. The source goal-specific transitive cache and greedy lowest-literal order are preserved. Host-range guards replace unsigned extent wraparound."
       ]
     },
     {
@@ -149781,12 +149713,10 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/bitset/uint_set.go",
-        "pkg/util/negated_literal_cliques_set.go",
+        "pkg/util/cliques/cliques.go",
         "pkg/sat/sat_solver_max_cliques_test.go",
         "pkg/test/uint_set_test.go",
-        "pkg/util/negated_literal_cliques_model_test.go",
-        "pkg/util/negated_literal_cliques_rows_test.go",
-        "pkg/util/negated_literal_cliques_test.go"
+        "pkg/util/cliques/cliques_test.go"
       ],
       "tests": [
         "TestUintSetSourceTst1",
@@ -149800,16 +149730,11 @@
         "TestUintSetIndependentBoundedOracle",
         "TestUintSetWarmOperationsNoAllocation",
         "TestUintSetOverflowRejectedBeforeGrowth",
-        "TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs",
-        "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
-        "TestNegatedLiteralCliquesNegatedLiteralPartitionAndSourceCache",
+        "TestAllThreeVertexMutexGraphs",
+        "TestNegatedLiteralPartition",
         "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
-        "TestNegatedLiteralCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
-        "TestNegatedLiteralCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
-        "TestNegatedLiteralCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
-        "TestNegatedLiteralCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
-        "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
-        "TestNegatedLiteralCliquesStoppedLexicalContextRejectsOverwrite"
+        "TestSourceCachePersistsAcrossQueries",
+        "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight"
       ],
       "conditionals": [
         {
@@ -149962,23 +149887,16 @@
         {
           "name": "Selected same-Runtime max_cliques uint_set bit-word insert/remove/reset/first/intersection/iteration source24-225",
           "status": "ported",
-          "go_target": "pkg/util/negated_literal_cliques_set.go",
+          "go_target": "pkg/util/cliques/cliques.go",
           "tests": [
-            "TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs",
-            "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
-            "TestNegatedLiteralCliquesNegatedLiteralPartitionAndSourceCache",
+            "TestAllThreeVertexMutexGraphs",
+            "TestNegatedLiteralPartition",
             "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
-            "TestNegatedLiteralCliquesUintSetResizeRefusalKeepsOriginalLogicalSize",
-            "TestNegatedLiteralCliquesRetainsGoalSpecificSourceCacheAcrossCalls",
-            "TestNegatedLiteralCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
-            "TestNegatedLiteralCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
-            "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
-            "TestNegatedLiteralCliquesStoppedLexicalContextRejectsOverwrite"
+            "TestSourceCachePersistsAcrossQueries",
+            "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight"
           ],
           "go_targets": [
-            "pkg/util/negated_literal_cliques_model_test.go",
-            "pkg/util/negated_literal_cliques_rows_test.go",
-            "pkg/util/negated_literal_cliques_test.go",
+            "pkg/util/cliques/cliques_test.go",
             "pkg/sat/sat_solver_max_cliques_test.go"
           ]
         }
@@ -150584,8 +150502,7 @@
         "pkg/sat/sat_solver_literal_rows.go",
         "pkg/sat/sat_solver_literal_rows_test.go",
         "pkg/util/runtime_unsigned_rows_move_source_test.go",
-        "pkg/util/negated_literal_cliques_rows.go",
-        "pkg/util/negated_literal_cliques_rows_test.go",
+        "pkg/util/runtime_unsigned_rows.go",
         "pkg/sat/sat_solver_mutex_pair_vector.go",
         "pkg/sat/sat_solver_mutex_pair_vector_test.go",
         "pkg/math/polynomial/polynomial_som.go",
@@ -150650,11 +150567,11 @@
         "pkg/util/source_vector_capacity.go",
         "pkg/ast/ast_handle_containers_test.go",
         "pkg/util/source_vector_capacity_test.go",
-        "pkg/util/runtime_unsigned_rows.go",
         "pkg/util/runtime_unsigned_rows_inspect.go",
         "pkg/util/runtime_vector_copy.go",
         "pkg/util/runtime_unsigned_rows_test.go",
-        "pkg/ast/ast_ref_cache_resize.go"
+        "pkg/ast/ast_ref_cache_resize.go",
+        "pkg/util/runtime_unsigned_rows_helpers_test.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -150849,7 +150766,6 @@
         "TestRuntimeUnsignedRowsSourceFinalizeThenReuseOwnsNewSourceVector",
         "TestRuntimeUnsignedRowsStoppedSourceFinalizePreservesCauseAndNamedAbort",
         "TestRuntimeUnsignedRowsExpansionReadsActualOldPointer",
-        "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
         "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor",
         "TestPolynomialSOMVectorDefaultOwnerAndSourceMembers",
@@ -151428,7 +151344,6 @@
             "TestRuntimeUnsignedRowsSourceFinalizeThenReuseOwnsNewSourceVector",
             "TestRuntimeUnsignedRowsStoppedSourceFinalizePreservesCauseAndNamedAbort",
             "TestRuntimeUnsignedRowsExpansionReadsActualOldPointer",
-            "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
             "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
             "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
           ],
@@ -151436,7 +151351,6 @@
             "pkg/sat/sat_solver_literal_rows_test.go",
             "pkg/util/runtime_unsigned_rows_test.go",
             "pkg/util/runtime_unsigned_rows_move_source_test.go",
-            "pkg/util/negated_literal_cliques_rows_test.go",
             "pkg/sat/sat_solver_mutex_pair_vector_test.go"
           ]
         },

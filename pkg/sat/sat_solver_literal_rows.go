@@ -40,6 +40,19 @@ func (o *satSolverLiteralRows) appendLiterals(input []Literal) (err error) {
 	}
 	return nil
 }
+func (o *satSolverLiteralRows) appendUnsigned(input []uint32) (err error) {
+	c, e := o.storage().BeginRow()
+	if e != nil {
+		return e
+	}
+	defer func() { err = o.storage().EndRow(err) }()
+	for _, v := range input {
+		if err = c.Push(v); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 type satSolverLiteralRowSpan struct {
 	span  satSolverLiteralSpan

@@ -2,23 +2,19 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/cliques"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 type satMutexFrame struct {
-	next            *satMutexFrame
-	ownerBytes      uint64
-	graph           *util.NegatedLiteralCliques
-	seen            satMutexPairSet
-	seenComplete    bool
-	seenUsed        bool
-	results         *util.RuntimeUnsignedRows
-	ps, row         RuntimeUintColumn
-	psUsed, rowUsed bool
-	cursor          uint32
+	next         *satMutexFrame
+	ownerBytes   uint64
+	seen         satMutexPairSet
+	seenComplete bool
+	seenUsed     bool
+	cursor       uint32
 }
 
 func (s *Solver) mutexFrame() (*satMutexFrame, error) {
@@ -37,32 +33,16 @@ func (s *Solver) mutexDrop(f *satMutexFrame, cause error) error {
 		}
 		return ErrSATOwner
 	}
-	for f.cursor < 6 {
+	for f.cursor < 2 {
 		var e error
 		switch f.cursor {
 		case 0:
-			if f.rowUsed {
-				e = f.row.Finalize()
-			}
-		case 1:
-			if f.psUsed {
-				e = f.ps.Finalize()
-			}
-		case 2:
-			if f.results != nil {
-				e = f.results.CloseChecked()
-			}
-		case 3:
 			if f.seenComplete {
 				e = f.seen.close()
 			}
-		case 5:
+		case 1:
 			if f.seenUsed && !f.seenComplete {
 				e = f.seen.close()
-			}
-		case 4:
-			if f.graph != nil {
-				e = f.graph.Close()
 			}
 		}
 		if e != nil {
@@ -138,10 +118,7 @@ func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result 
 		return lbool.Undef, e
 	}
 	defer func() { err = s.mutexDrop(f, err) }()
-	f.graph, err = util.NewNegatedLiteralCliques(s.runtime.memory, s.budget)
-	if err != nil {
-		return lbool.Undef, err
-	}
+	graph := cliques.New()
 	if err = s.userBinClauses.Reset(); err != nil {
 		return lbool.Undef, err
 	}
@@ -185,63 +162,23 @@ func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result 
 			if err = f.seen.insert(a, b); err != nil {
 				return lbool.Undef, err
 			}
-			if err = f.graph.AddEdge(a, b); err != nil {
+			if err = graph.AddEdge(a, b); err != nil {
 				return lbool.Undef, err
 			}
 		}
 	}
-	f.results, err = util.NewRuntimeUnsignedRows(s.runtime.memory, s.budget)
-	if err != nil {
-		return lbool.Undef, err
+	ps := make([]uint32, len(lits))
+	for i, l := range lits {
+		ps[i] = l.index()
 	}
-	f.psUsed = true
-	f.ps.Bind(s.runtime.memory)
-	for _, l := range lits {
-		if err = f.ps.Push(l.index()); err != nil {
+	results, e := graph.Cliques(ps)
+	if e != nil {
+		return lbool.Undef, e
+	}
+	for _, row := range results {
+		if err = out.appendUnsigned(row); err != nil {
 			return lbool.Undef, err
 		}
-	}
-	if err = f.graph.Cliques(&f.ps, f.results); err != nil {
-		return lbool.Undef, err
-	}
-	for i := uint32(0); ; i++ {
-		n, e := f.results.RowCount()
-		if e != nil {
-			return lbool.Undef, e
-		}
-		if i >= n {
-			break
-		}
-		f.row = RuntimeUintColumn{}
-		f.row.Bind(s.runtime.memory)
-		f.rowUsed = true
-		src, e := f.results.Row(i)
-		if e != nil {
-			return lbool.Undef, e
-		}
-		for j := uint32(0); ; j++ {
-			n, e := src.Size()
-			if e != nil {
-				return lbool.Undef, e
-			}
-			if j >= n {
-				break
-			}
-			v, e := src.Read(j)
-			if e != nil {
-				return lbool.Undef, e
-			}
-			if err = f.row.Push(v); err != nil {
-				return lbool.Undef, err
-			}
-		}
-		if err = out.appendColumn(&f.row); err != nil {
-			return lbool.Undef, err
-		}
-		if err = f.row.Finalize(); err != nil {
-			return lbool.Undef, err
-		}
-		f.rowUsed = false
 	}
 	return lbool.True, nil
 }

@@ -79,18 +79,6 @@ func (o *RuntimeUnsignedRows) OwningRoots() []Block {
 	}
 	return roots
 }
-func (g *NegatedLiteralCliques) OwningRoots() []Block {
-	if g == nil {
-		return nil
-	}
-	roots := g.next.OwningRoots()
-	roots = append(roots, g.tc.OwningRoots()...)
-	for _, s := range []*cliqueUintSet{&g.reachable[0], &g.reachable[1], &g.seen1, &g.seen2, &g.vars} {
-		roots = columnOwningRoots(&s.words, roots)
-	}
-	roots = columnOwningRoots(&g.todo, roots)
-	return columnOwningRoots(&g.clique, roots)
-}
 
 // CheckRuntime validates entry and the caller's allocation authority.
 func (o *RuntimeUnsignedRows) CheckRuntime(r *Runtime) error {

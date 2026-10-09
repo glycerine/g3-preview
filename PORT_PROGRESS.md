@@ -1,11 +1,11 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
-The typed native replacement for `src/util/max_cliques.h` is staged in
-`pkg/util/cliques`. It uses `[][]uint32`, typed bit sets, and ordinary slices
-while preserving greedy source order and the source's retained transitive-cache
-behavior. SAT migration and deletion of the old Runtime-backed implementation
-are the next checkpoint; both implementations temporarily coexist until that
-consumer conversion is green.
+`src/util/max_cliques.h` is extracted into `pkg/util/cliques`. It uses
+`[][]uint32`, typed bit sets, and ordinary slices while preserving greedy source
+order and the source's retained transitive-cache behavior. The SAT caller now
+uses the leaf package, and the duplicate Runtime-backed graph, its storage
+helpers, and allocation-layout tests have been removed. Independent Boolean
+oracles and the SAT integration tests remain.
 
 The unused Go translation of `src/util/resource_limit.h` and its self-only tests
 were removed. The prior whole-tree audit already classified the upstream header

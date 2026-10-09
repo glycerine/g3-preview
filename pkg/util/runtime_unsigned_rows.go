@@ -66,6 +66,39 @@ func (o *RuntimeUnsignedRows) RowCount() (uint32, error) {
 	}
 	return o.runtime.ReadUint32(o.raw, 4)
 }
+
+// Row borrows an element for reading. The outer rows owner remains responsible
+// for growing and finalizing the returned column.
+func (o *RuntimeUnsignedRows) Row(i uint32) (*RuntimeUintColumn, error) {
+	if e := o.open(); e != nil {
+		return nil, e
+	}
+	if RuntimeVectorSourceDebug {
+		n, e := o.RowCount()
+		if e != nil {
+			return nil, e
+		}
+		if i >= n {
+			return nil, ErrRuntimeVectorAssertion
+		}
+	}
+	slot, e := o.runtime.ReadUint32(o.raw, 8+uint64(i)*8)
+	if e != nil {
+		return nil, e
+	}
+	gen, e := o.runtime.ReadUint32(o.raw, 12+uint64(i)*8)
+	if e != nil {
+		return nil, e
+	}
+	if uint64(i) >= uint64(len(o.rows)) {
+		return nil, arena.ErrBounds
+	}
+	row := &o.rows[i]
+	if row.Raw.Self != &row.Raw || slot != row.Raw.Block.Slot() || gen != row.Raw.Block.Generation() {
+		return nil, ErrRuntimeVectorOwner
+	}
+	return row, nil
+}
 func (o *RuntimeUnsignedRows) capacity() (uint32, error) {
 	if o.raw == (Block{}) {
 		return 0, nil

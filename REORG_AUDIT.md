@@ -232,9 +232,17 @@ Existing `util.RuntimeUnsignedVector` and `util.RuntimeUintSet` are useful stora
 
 **Study validation:** Native and focused checked/debug runs of `go test -count=1 -run 'TestPsortAST|TestPsortASTCost|TestSATMaxCliques|TestSATSolverFindMutexes|TestSATMutexPairSet' ./ast ./sat` passed (with `-tags g3checked,g3debug` on the second run). This validates the existing baseline; it does not claim that the proposed extraction has been implemented or tested.
 
-**Implementation (2026-10-07):** D2 is extracted into `pkg/util/negated_literal_cliques.go`, with `RuntimeUnsignedRows` providing the shared raw row owner. SAT retains watch collection, pair deduplication, the enclosing mutex frame, and the literal adapter; its intermediate graph/results are util owners. The SAT adapter uses the same concrete storage address and adds no owner reservation. Graph traversal, cached closure, embedded bit sets, unsigned wrapping, raw vector copy, and source/owning destruction order are preserved. Physical ownership is available through cold read-only diagnostic snapshots, rather than public mutable graph fields.
-
-Graph-only and raw row failure tests now reside in util. The SAT captured-literal lifetime test and enclosing every-reservation audits remain in sat. Added independent Boolean enumeration for mixed signs/transitive paths, a util-only external consumer, and refusal at every measured graph-construction/query reservation. Focused native and checked/debug tests, whole-module vet, and source/no-generics ledger validation pass. The full uncached native suite (`go test -count=1 ./... -timeout=30m` from pkg) also passes; every ordinary package is green. Ledger scope/status counts are unchanged; the SMT consequences consumer remains unported. D1 stays in ast to avoid an import cycle and needs no relocation.
+**Implementation (updated 2026-10-09):** D2 now lives in the leaf package
+`pkg/util/cliques`. The engine uses typed Go slices and bit sets; it has no
+`Runtime`, `Block`, arena, generic, or `any` dependency. SAT retains watch
+collection, pair deduplication, its enclosing mutex frame, and conversion to
+its existing output owner. The old Runtime-backed graph and graph-specific
+allocation-layout tests were deleted. The source greedy order and retained
+goal-specific transitive cache remain covered by direct tests, exhaustive
+three-vertex cases, and an independent mixed-polarity Boolean oracle. SAT’s
+dynamically calibrated refusal audit still covers the allocations owned by the
+SAT caller. The later SMT consequences port can import the same typed leaf.
+D1 stays in ast to avoid an import cycle and needs no relocation.
 
 ## Placement differences that should not be mechanically reversed
 
