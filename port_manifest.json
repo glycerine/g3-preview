@@ -74075,7 +74075,6 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/sat/sat_sets.go",
         "pkg/sat/sat_solver_uint_set.go",
         "pkg/sat/sat_types.go",
         "pkg/sat/sat_solver_literal_set_storage.go",
@@ -74087,9 +74086,6 @@
       ],
       "tests": [
         "TestSATLiteralAndModelRendering",
-        "TestSATLiteralSets",
-        "TestSATSetFiniteModel",
-        "TestSATSetOrderAndOwnership",
         "TestSATSolverModelConverterActualCollectVars",
         "TestSourceSATLiteralConstructors",
         "TestSATSolverDynamicSubsumptionBinaryAndFUIP",
@@ -74187,10 +74183,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -74199,10 +74192,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -74211,10 +74201,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -74223,10 +74210,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -74235,10 +74219,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -74247,10 +74228,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -74259,10 +74237,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -74271,10 +74246,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -74283,10 +74255,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -74295,10 +74264,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -74307,106 +74273,7 @@
           "go_target": "pkg/sat/sat_types.go",
           "tests": [
             "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
-          ]
-        },
-        {
-          "name": "uint_set::insert/remove/contains",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_sets.go",
-          "tests": [
-            "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
-          ]
-        },
-        {
-          "name": "uint_set::operator=",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_sets.go",
-          "tests": [
-            "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
-          ]
-        },
-        {
-          "name": "uint_set::erase",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_sets.go",
-          "tests": [
-            "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
-          ]
-        },
-        {
-          "name": "uint_set::reset/finalize",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_sets.go",
-          "tests": [
-            "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
-          ]
-        },
-        {
-          "name": "uint_set::operator&=",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_sets.go",
-          "tests": [
-            "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
-          ]
-        },
-        {
-          "name": "uint_set::operator|=",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_sets.go",
-          "tests": [
-            "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
-          ]
-        },
-        {
-          "name": "literal_set construction/assignment/copy/vector conversion",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_sets.go",
-          "tests": [
-            "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
-          ]
-        },
-        {
-          "name": "literal_set insert/remove/pop/contains/iteration/reset/finalize/union/intersection",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_sets.go",
-          "tests": [
-            "TestSourceSATLiteralConstructors",
-            "TestSATLiteralAndModelRendering",
-            "TestSATSetOrderAndOwnership",
-            "TestSATLiteralSets",
-            "TestSATSetFiniteModel"
+            "TestSATLiteralAndModelRendering"
           ]
         },
         {
@@ -110727,7 +110594,8 @@
         "pkg/smtcore/smt_literal_approx_set.go",
         "pkg/smtcore/smt_literal_approx_set_source_test.go",
         "pkg/sat/sat_approx_set_source.go",
-        "pkg/sat/sat_approx_set_source_test.go"
+        "pkg/sat/sat_approx_set_source_test.go",
+        "pkg/sat/sat_approx_set_test.go"
       ],
       "tests": [
         "TestSATApproximation",

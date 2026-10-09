@@ -30895,3 +30895,12 @@ the discarded allocation-failure states. Real constructor/Runtime publication
 campaigns and independent native set/order tests remain. Complete SAT/tactic
 tests, focused checked/debug tests, module compilation, vet, and manifest
 validation cover the change.
+
+### Remove unused standalone SAT set prototype
+
+A complete pkg/ consumer scan found satUintSet, satLiteralSet and their factory
+used only inside sat_sets.go and its tests. Removed this redundant prototype
+and its self-tests; current production consumers use the native storage retained
+in solver code. Source SAT sets remain live and are not classified as dead C++.
+Preserved the independent approximation-mask test under sat_approx_set_test.go.
+Complete SAT/tactic tests and manifest validation pass for the removal.

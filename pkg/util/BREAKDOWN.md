@@ -960,3 +960,10 @@ iterator relocation epochs are removed. Elimination ordering ranges over the
 captured values slice. Tests retain insertion order, deduplication, reset and
 regrowth, finalization/reuse, constructor/lifetime checks at real consumers,
 and independent membership/order comparison.
+
+A second standalone SAT set prototype, `sat_sets.go`, was also consumed only by
+its own tests. It has been removed alongside the unconsumed owning facade.
+Current solver work uses the retained native literal/unsigned storage; unused
+copy/pop/vector-wrapper APIs will be implemented only for a concrete future
+consumer. The separate approximation mask is live in clauses and simplification;
+its existing test was moved beside that implementation and retained.
