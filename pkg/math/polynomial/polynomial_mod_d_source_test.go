@@ -261,8 +261,10 @@ func TestPolynomialModDWarmStorageAndColdOwnerGuards(t *testing.T) {
 	valuesBefore := append([]uint32(nil), d.values...)
 	sizeBefore, e := d.size()
 	serviceMust(t, e)
-	allocations := testing.AllocsPerRun(20, operation)
-	numericWarmProfileAudit(t, m.integer, m.integer.Budget(), before, allocations, monoBefore.DirectObjects != 0)
+	for i := 0; i < 20; i++ {
+		operation()
+	}
+	numericWarmRuntimeAudit(t, m.integer, m.integer.Budget(), before, monoBefore.DirectObjects != 0)
 	if m.monomials.allocator.Stats() != monoBefore || len(d.values) != len(valuesBefore) || m.pseudoDivision.active {
 		t.Fatal("stable actual cohort")
 	}

@@ -140,12 +140,12 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 	if _, e := m.tempHash(t); e != nil {
 		return Monomial{}, e
 	}
-	pos, inserted, e := m.table.insert(m, key, false)
+	pos, inserted, e := m.table.insert(m, key)
 	if e != nil {
 		return Monomial{}, e
 	}
 	if !inserted {
-		old, e := m.table.key(m, pos)
+		old, e := m.table.key(pos)
 		if e != nil {
 			return Monomial{}, e
 		}
@@ -233,7 +233,7 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 		}
 		previous = p.Var
 	}
-	if e = m.table.setKey(m, pos, monomialKey{monomialObjectKey, slot}); e != nil {
+	if e = m.table.setKey(pos, monomialKey{monomialObjectKey, slot}); e != nil {
 		return Monomial{}, e
 	}
 	l.published = true
@@ -257,7 +257,7 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 		if !found {
 			return Monomial{m.origin, slot, l.generation}, ErrMonomialAssertion
 		}
-		got, e := m.table.key(m, pos)
+		got, e := m.table.key(pos)
 		if e != nil {
 			return Monomial{m.origin, slot, l.generation}, e
 		}
@@ -350,14 +350,12 @@ func (m *MonomialManager) CleanupCreation() error {
 		m.completeBorrowedContinuation()
 		return nil
 	}
-	if !c.tableRemoved && m.table.raw != (util.Block{}) {
-		k, e := m.table.key(m, c.tableIndex)
+	if !c.tableRemoved {
+		k, e := m.table.key(c.tableIndex)
 		if e != nil {
 			return e
 		}
-		if e = m.table.removeToken(m, k); e != nil {
-			return e
-		}
+		m.table.removeToken(k)
 
 		c.tableRemoved = true
 	}

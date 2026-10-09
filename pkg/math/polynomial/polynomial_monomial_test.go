@@ -68,8 +68,8 @@ func TestMonomialSourceConstructorAndInterning(t *testing.T) {
 	if i.ID != 0 || i.Size != 0 || i.TotalDegree != 0 || i.RefCount != 1 {
 		t.Fatal(i)
 	}
-	if m.RuntimeOwner().Stats().LiveBlocks != 2 {
-		t.Fatal("table and unit pool; native scratch owns no Runtime blocks", m.RuntimeOwner().Stats())
+	if m.RuntimeOwner().Stats().LiveBlocks != 1 {
+		t.Fatal("unit pool; native tables and scratch own no Runtime blocks", m.RuntimeOwner().Stats())
 	}
 	for v := uint32(0); v < 10; v++ {
 		x, e := m.MkVar()
@@ -407,10 +407,10 @@ func TestMonomialSourceInternTemporaryPublicationBeforeStorage(t *testing.T) {
 	if !numericPhysicalReservationRefusal(e) {
 		t.Fatal("actual source object allocation refusal", e)
 	}
-	if m.creation.stage == 0 || m.table.size != 2 {
-		t.Fatal("unit plus actually published temporary table key", m.creation, m.table.size)
+	if m.creation.stage == 0 || m.table.entries.Len() != 2 {
+		t.Fatal("unit plus actually published temporary table key", m.creation, m.table.entries.Len())
 	}
-	key, e := m.table.key(m, m.creation.tableIndex)
+	key, e := m.table.key(m.creation.tableIndex)
 	serviceMust(t, e)
 	if key.kind != monomialTemporaryKey || key.slot != 0 {
 		t.Fatal("source temporary key must precede permanent object", key)
@@ -422,7 +422,7 @@ func TestMonomialSourceInternTemporaryPublicationBeforeStorage(t *testing.T) {
 	monomialPhysicalAudit(t, m)
 	m.config.Budget.FailAfter(-1)
 	serviceMust(t, m.CleanupCreation())
-	if m.creation.stage != 0 || m.table.size != 1 {
+	if m.creation.stage != 0 || m.table.entries.Len() != 1 {
 		t.Fatal("owning abort retains unit and removes only actual pending binding")
 	}
 }
@@ -448,7 +448,6 @@ func TestMonomialCompletedSourceDestructorReverseMembers(t *testing.T) {
 	serviceMust(t, e)
 	m, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
 	serviceMust(t, e)
-	table := m.table.raw
 	serviceMust(t, m.SourceFinalize())
 	if m.sourceStage != 10 || r.Stats().LiveBlocks != 0 {
 		t.Fatal("literal member destruction", m.sourceStage, r.Stats())
@@ -459,8 +458,8 @@ func TestMonomialCompletedSourceDestructorReverseMembers(t *testing.T) {
 		}
 	}
 
-	if _, e = r.Read(table, 0); e == nil {
-		t.Fatal("destroyed table remains live")
+	if m.table.entries.Len() != 0 || m.table.buckets != nil {
+		t.Fatal("native table retained")
 	}
 	if _, e = m.Unit(); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal("ordinary owner guard", e)
@@ -563,9 +562,6 @@ func TestMonomialSourceInternFailurePrefixesAndRetry(t *testing.T) {
 		b.FailAfter(-1)
 		if e != nil {
 			serviceMust(t, m.CleanupCreation())
-			if m.table.pending != (util.Block{}) {
-				serviceMust(t, m.memory.Deallocate(&m.table.pending))
-			}
 		} else {
 			serviceMust(t, m.DecRef(a))
 		}
@@ -699,8 +695,8 @@ func TestMonomialSourceRepeatedRenameFreshLexicalTable(t *testing.T) {
 	b := monomialOwn(t, m, []MonomialPower{{2, 2}})
 	serviceMust(t, m.Rename([]uint32{2, 1, 0}))
 	serviceMust(t, m.Rename([]uint32{2, 1, 0}))
-	if m.table.size != 3 {
-		t.Fatal("each source lexical new_table begins empty", m.table.size)
+	if m.table.entries.Len() != 3 {
+		t.Fatal("each source lexical new_table begins empty", m.table.entries.Len())
 	}
 	monomialEqualPowers(t, m, a, []MonomialPower{{0, 1}})
 	monomialEqualPowers(t, m, b, []MonomialPower{{2, 2}})

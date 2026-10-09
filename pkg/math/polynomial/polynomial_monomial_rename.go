@@ -2,10 +2,9 @@
 package polynomial
 
 import (
-	"errors"
-
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"sort"
 )
 
 func (m *MonomialManager) writePower(a Monomial, i uint32, p MonomialPower) error {
@@ -17,54 +16,6 @@ func (m *MonomialManager) writePower(a Monomial, i uint32, p MonomialPower) erro
 		return e
 	}
 	return m.allocator.WriteUint32(l.raw, 24+uint64(i)*8, p.Degree)
-}
-func (m *MonomialManager) swapPowers(a Monomial, i, j uint32) error {
-	x, e := m.powerCore(a, i)
-	if e != nil {
-		return e
-	}
-	y, e := m.powerCore(a, j)
-	if e != nil {
-		return e
-	}
-	if e = m.writePower(a, i, y); e != nil {
-		return e
-	}
-	return m.writePower(a, j, x)
-}
-func (m *MonomialManager) siftPowers(a Monomial, root, end uint32) error {
-	for {
-		child := uint64(root)*2 + 1
-		if child >= uint64(end) {
-			return nil
-		}
-		i := uint32(child)
-		v, e := m.varCore(a, i)
-		if e != nil {
-			return e
-		}
-		if i+1 < end {
-			w, e := m.varCore(a, i+1)
-			if e != nil {
-				return e
-			}
-			if v < w {
-				i++
-				v = w
-			}
-		}
-		r, e := m.varCore(a, root)
-		if e != nil {
-			return e
-		}
-		if r >= v {
-			return nil
-		}
-		if e = m.swapPowers(a, root, i); e != nil {
-			return e
-		}
-		root = i
-	}
 }
 func (m *MonomialManager) renameObject(a Monomial, xs []uint32) error {
 	n, e := m.sizeCore(a)
@@ -87,19 +38,19 @@ func (m *MonomialManager) renameObject(a Monomial, xs []uint32) error {
 			return e
 		}
 	}
-	for i := n / 2; i > 0; {
-		i--
-		if e = m.siftPowers(a, i, n); e != nil {
-			return e
+	if n > 1 {
+		powers := make([]MonomialPower, n)
+		for i := range powers {
+			powers[i], e = m.powerCore(a, uint32(i))
+			if e != nil {
+				return e
+			}
 		}
-	}
-	for end := n; end > 1; {
-		end--
-		if e = m.swapPowers(a, 0, end); e != nil {
-			return e
-		}
-		if e = m.siftPowers(a, 0, end); e != nil {
-			return e
+		sort.Slice(powers, func(i, j int) bool { return powers[i].Var < powers[j].Var })
+		for i, p := range powers {
+			if e = m.writePower(a, uint32(i), p); e != nil {
+				return e
+			}
 		}
 	}
 	var problem error
@@ -131,120 +82,45 @@ func (m *MonomialManager) Rename(xs []uint32) (err error) {
 	if polynomialSourceDebug && (m.managerRefs > 1 || uint64(len(xs)) != uint64(m.nextVar)) {
 		return ErrMonomialAssertion
 	}
-	if m.renameTable.raw != (util.Block{}) || m.renameTable.pending != (util.Block{}) || m.renameFound != (util.Block{}) {
+	if m.renameTable.entries.Len() != 0 || m.renameFound != nil {
 		return ErrMonomialPending
 	}
 	if polynomialSourceDebug {
-		var capacity, size uint32
-		for size < m.nextVar {
-			if size == capacity {
-				n := uint32(2)
-				if capacity > 0 {
-					n = (3*capacity + 1) >> 1
-				}
-				bytes := n + 8
-				if capacity > 0 && (n <= capacity || bytes <= capacity+8) {
-					return util.Failure{Kind: util.FailureVectorOverflow}
-				}
-				if m.renameFound == (util.Block{}) {
-					raw, e := m.memory.Allocate(uint64(bytes))
-					m.renameFound = raw
-					if e != nil {
-						return e
-					}
-					if e = m.memory.WriteUint32(raw, 4, 0); e != nil {
-						return e
-					}
-				} else {
-					if e := m.memory.Reallocate(&m.renameFound, uint64(bytes)); e != nil {
-						return e
-					}
-				}
-				if e := m.memory.WriteUint32(m.renameFound, 0, n); e != nil {
-					return e
-				}
-				capacity = n
-			}
-			if e := m.memory.Write(m.renameFound, uint64(size)+8, 0); e != nil {
-				return e
-			}
-			size++
-			if e := m.memory.WriteUint32(m.renameFound, 4, size); e != nil {
-				return e
-			}
-		}
+		m.renameFound = make([]bool, m.nextVar)
 		for _, x := range xs {
-			if x >= m.nextVar {
+			if x >= m.nextVar || m.renameFound[x] {
 				return ErrMonomialAssertion
 			}
-			v, e := m.memory.Read(m.renameFound, uint64(x)+8)
+			m.renameFound[x] = true
+		}
+		m.renameFound = nil
+	}
+	t := &m.renameTable
+	defer t.cleanup()
+	for _, entry := range m.table.entries.All() {
+		k := entry.key
+		if k.kind != monomialObjectKey {
+			return ErrMonomialPending
+		}
+		a := Monomial{m.origin, k.slot, m.locations[k.slot-1].generation}
+		if e := m.renameObject(a, xs); e != nil {
+			return e
+		}
+		if polynomialSourceDebug {
+			_, found, e := t.find(m, k)
 			if e != nil {
 				return e
 			}
-			if v != 0 {
+			if found {
 				return ErrMonomialAssertion
 			}
-			if e = m.memory.Write(m.renameFound, uint64(x)+8, 1); e != nil {
-				return e
-			}
 		}
-		if e := m.memory.Deallocate(&m.renameFound); e != nil {
-			return e
-		}
-	}
-	t := &m.renameTable
-	if e := t.construct(m, 8, 2); e != nil {
-		return e
-	}
-	defer func() {
-		if cleanup := t.sourceDestroy(m); cleanup != nil {
-			err = errors.Join(err, cleanup)
-		}
-	}()
-	for head := uint32(0); head < m.table.slots; head++ {
-		next, e := m.table.next(m, head)
+		_, inserted, e := t.insert(m, k)
 		if e != nil {
 			return e
 		}
-		if next == monomialFreeLink {
-			continue
-		}
-		for i := head; ; {
-			k, e := m.table.key(m, i)
-			if e != nil {
-				return e
-			}
-			if k.kind != monomialObjectKey {
-				return ErrMonomialPending
-			}
-			a := Monomial{m.origin, k.slot, m.locations[k.slot-1].generation}
-			if e = m.renameObject(a, xs); e != nil {
-				return e
-			}
-			if polynomialSourceDebug {
-				_, found, e := t.find(m, k)
-				if e != nil {
-					return e
-				}
-				if found {
-					return ErrMonomialAssertion
-				}
-			}
-			_, inserted, e := t.insert(m, k, false)
-			if e != nil {
-				return e
-			}
-			if polynomialSourceDebug && !inserted {
-				return ErrMonomialAssertion
-			}
-			next, e = m.table.next(m, i)
-			if e != nil {
-				return e
-			}
-			if next == 0 {
-				break
-			}
-			i = uint32(next - 1)
+		if polynomialSourceDebug && !inserted {
+			return ErrMonomialAssertion
 		}
 	}
 	m.table, m.renameTable = m.renameTable, m.table
@@ -254,10 +130,7 @@ func (m *MonomialManager) CleanupRename() error {
 	if m == nil || m.self != m || m.closed {
 		return ErrMonomialOwner
 	}
-	if m.renameFound != (util.Block{}) {
-		if e := m.memory.Deallocate(&m.renameFound); e != nil {
-			return e
-		}
-	}
-	return m.renameTable.cleanup(m)
+	m.renameFound = nil
+	m.renameTable.cleanup()
+	return nil
 }

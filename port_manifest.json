@@ -36071,7 +36071,8 @@
         "pkg/math/polynomial/polynomial_imp_binding.go",
         "pkg/math/polynomial/polynomial_som_monomials.go",
         "pkg/math/polynomial/polynomial_numeral_slice_test.go",
-        "pkg/math/polynomial/polynomial_monomial_slice_test.go"
+        "pkg/math/polynomial/polynomial_monomial_slice_test.go",
+        "pkg/math/polynomial/polynomial_monomial_table_native_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -36317,7 +36318,7 @@
         "TestPolynomialDerivativeModularZerosCreatedOnlyCohort",
         "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
         "TestPolynomialDerivativeEveryReservationNamedPrefix",
-        "TestPolynomialRenameEveryReservationKeepsActualAllCells",
+        "TestPolynomialNativeRenameKeepsActualAllCells",
         "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
         "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
         "TestPolynomialDerivativeNumericPendingIdentity",
@@ -36886,7 +36887,11 @@
         "TestPolynomialNativeNumeralGrowthResetAndBounds",
         "TestPolynomialNativeNumeralResetRetainsActualBIG",
         "TestMonomialNativeScratchGrowthResetAndBounds",
-        "TestMonomialNativeVariableCountingAndInterning"
+        "TestMonomialNativeVariableCountingAndInterning",
+        "TestMonomialNativeTableGrowthRenameAndOrder",
+        "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+        "TestMonomialNativeTableSourceCleanupPendingCreation",
+        "TestMonomialNativeRenamePowerSorting"
       ],
       "conditionals": [
         {
@@ -38203,7 +38208,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38236,7 +38245,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38269,7 +38282,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38302,7 +38319,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38335,7 +38356,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38368,7 +38393,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38401,7 +38430,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38435,7 +38468,11 @@
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38469,7 +38506,11 @@
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38502,7 +38543,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38535,7 +38580,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38568,7 +38617,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38601,7 +38654,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38634,7 +38691,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -38668,11 +38729,15 @@
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
-          "name": "manager Rename cpp1270\u20131292: Actual DEBUG permutation vector lexical destruction then new chashtable, old bucket/list traversal, each monomial mutation/hash before source preinsert DEBUG contains and insert; swap only at actual end. Heap-sort backend adapter does not claim C++ comparator call sequence. Stopped physical/table roots retain explicit owning cleanup without restoring hashes.",
+          "name": "manager Rename cpp1270\u20131292: native []bool permutation check, insertion-ordered insdict table traversal, each monomial mutation/project hash before debug contains/insert and final swap. Go sort.Slice sorts native power scratch; owning cleanup retains partial source mutations.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -38701,7 +38766,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -39309,7 +39378,7 @@
             "TestPolynomialDerivativeModularZerosCreatedOnlyCohort",
             "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
             "TestPolynomialDerivativeEveryReservationNamedPrefix",
-            "TestPolynomialRenameEveryReservationKeepsActualAllCells",
+            "TestPolynomialNativeRenameKeepsActualAllCells",
             "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
             "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
             "TestPolynomialDerivativeNumericPendingIdentity",
@@ -40874,7 +40943,8 @@
         "A 129-term independently permuted pure-power fixture sorts native monomial handles with Runtime reservations disabled, checks every descending degree, then completes source coefficient/map movement and validates every paired coefficient. Implicit source finalization retains all actual reference roots until owning cleanup. The naked zero-reference borrowed-product test requiring refusal before native pointer push is retired: native append now completes INC ownership before the still-live numeral allocation can fail, so its eventual DEC legitimately destroys that zero-reference original. Actual square-root final-factory TLS proof now primes the real lane with a named caller allocation and includes it in physical audits, rather than relying on eliminated vector allocation traffic.",
         "Polynomial PSC H reference storage now uses a concrete []Polynomial slice. Removed inline16 capacity emulation, Runtime payload growth/free, scalar-handle codecs, copied/pending/sourceRaw state and the unjoined INC whose only failure point was container publication. Actual INC-before-append and ascending DEC remain; a stopped real destructor retains its exact row and drain state until explicit owning cleanup. Native growth/reuse through 4097 rows succeeds with Runtime reservations disabled; an independent 129-row last-reference deletion fixture stops at row17 and verifies source retry refusal, exact owning continuation and no duplicate callback. Existing PSC mathematical identities, cancellation, actual numeric/factory refusal campaigns, lexical unwind and foreign-invocation guards remain. Three container-topology/failure tests are retired. No whole-unit completion credit is added.",
         "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added.",
-        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added."
+        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added.",
+        "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added."
       ]
     },
     {
@@ -41147,7 +41217,8 @@
         "pkg/math/polynomial/polynomial_imp_binding.go",
         "pkg/math/polynomial/polynomial_som_monomials.go",
         "pkg/math/polynomial/polynomial_numeral_slice_test.go",
-        "pkg/math/polynomial/polynomial_monomial_slice_test.go"
+        "pkg/math/polynomial/polynomial_monomial_slice_test.go",
+        "pkg/math/polynomial/polynomial_monomial_table_native_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -41377,7 +41448,7 @@
         "TestPolynomialDerivativeModularZerosCreatedOnlyCohort",
         "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
         "TestPolynomialDerivativeEveryReservationNamedPrefix",
-        "TestPolynomialRenameEveryReservationKeepsActualAllCells",
+        "TestPolynomialNativeRenameKeepsActualAllCells",
         "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
         "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
         "TestPolynomialDerivativeNumericPendingIdentity",
@@ -41702,7 +41773,11 @@
         "TestPolynomialNativeNumeralGrowthResetAndBounds",
         "TestPolynomialNativeNumeralResetRetainsActualBIG",
         "TestMonomialNativeScratchGrowthResetAndBounds",
-        "TestMonomialNativeVariableCountingAndInterning"
+        "TestMonomialNativeVariableCountingAndInterning",
+        "TestMonomialNativeTableGrowthRenameAndOrder",
+        "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+        "TestMonomialNativeTableSourceCleanupPendingCreation",
+        "TestMonomialNativeRenamePowerSorting"
       ],
       "conditionals": [
         {
@@ -41791,7 +41866,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -41824,7 +41903,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -41857,7 +41940,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -41890,7 +41977,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -41923,7 +42014,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -41956,7 +42051,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -41989,7 +42088,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -42023,7 +42126,11 @@
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -42057,7 +42164,11 @@
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -42090,7 +42201,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -42123,7 +42238,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -42156,7 +42275,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -42189,7 +42312,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -42222,7 +42349,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -42256,11 +42387,15 @@
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
-          "name": "manager Rename cpp1270\u20131292: Actual DEBUG permutation vector lexical destruction then new chashtable, old bucket/list traversal, each monomial mutation/hash before source preinsert DEBUG contains and insert; swap only at actual end. Heap-sort backend adapter does not claim C++ comparator call sequence. Stopped physical/table roots retain explicit owning cleanup without restoring hashes.",
+          "name": "manager Rename cpp1270\u20131292: native []bool permutation check, insertion-ordered insdict table traversal, each monomial mutation/project hash before debug contains/insert and final swap. Go sort.Slice sorts native power scratch; owning cleanup retains partial source mutations.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -42289,7 +42424,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -42837,7 +42976,7 @@
             "TestPolynomialDerivativeModularZerosCreatedOnlyCohort",
             "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
             "TestPolynomialDerivativeEveryReservationNamedPrefix",
-            "TestPolynomialRenameEveryReservationKeepsActualAllCells",
+            "TestPolynomialNativeRenameKeepsActualAllCells",
             "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
             "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
             "TestPolynomialDerivativeNumericPendingIdentity",
@@ -43424,7 +43563,8 @@
         "A 129-term independently permuted pure-power fixture sorts native monomial handles with Runtime reservations disabled, checks every descending degree, then completes source coefficient/map movement and validates every paired coefficient. Implicit source finalization retains all actual reference roots until owning cleanup. The naked zero-reference borrowed-product test requiring refusal before native pointer push is retired: native append now completes INC ownership before the still-live numeral allocation can fail, so its eventual DEC legitimately destroys that zero-reference original. Actual square-root final-factory TLS proof now primes the real lane with a named caller allocation and includes it in physical audits, rather than relying on eliminated vector allocation traffic.",
         "Polynomial PSC H reference storage now uses a concrete []Polynomial slice. Removed inline16 capacity emulation, Runtime payload growth/free, scalar-handle codecs, copied/pending/sourceRaw state and the unjoined INC whose only failure point was container publication. Actual INC-before-append and ascending DEC remain; a stopped real destructor retains its exact row and drain state until explicit owning cleanup. Native growth/reuse through 4097 rows succeeds with Runtime reservations disabled; an independent 129-row last-reference deletion fixture stops at row17 and verifies source retry refusal, exact owning continuation and no duplicate callback. Existing PSC mathematical identities, cancellation, actual numeric/factory refusal campaigns, lexical unwind and foreign-invocation guards remain. Three container-topology/failure tests are retired. No whole-unit completion credit is added.",
         "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added.",
-        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added."
+        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added.",
+        "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added."
       ]
     },
     {
@@ -46090,7 +46230,8 @@
         "Genuine erased-zero RED47337 corrected: no history reservation before Normalize/inline reused zero conversion. Current immutable diagnostic records are materialized only at reached Integer/Natural/vector/factory allocation branches; exact returned inline receipt holds readonly final diagnostic values. Callback-captured old receipts retain final body/source/first-own and actual child tuple history across later reuse. Histories never supply acquisition or cleanup authority. Obsolete pre-entry archive-refusal fixture expectations were migrated to the reached new source invocation while preserving old history and named before-lift graph assertions.",
         "The exported Full-manager selected-variable wrapper is bound to actual full.core/full.upm. UnivariateManager is a Go borrowing accessor, not a C++ getter. Source upolynomial.h:426-450 independently takes pm from p.m() and the UP target m(); arbitrary foreign-manager profiles and whole generic header completion remain unclaimed.",
         "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added.",
-        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added."
+        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added.",
+        "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added."
       ]
     },
     {
@@ -106519,7 +106660,11 @@
         "TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry",
         "TestPolynomialQuasiResultantActualCallerPublicationCallback",
         "TestMonomialNativeScratchGrowthResetAndBounds",
-        "TestMonomialNativeVariableCountingAndInterning"
+        "TestMonomialNativeVariableCountingAndInterning",
+        "TestMonomialNativeTableGrowthRenameAndOrder",
+        "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+        "TestMonomialNativeTableSourceCleanupPendingCreation",
+        "TestMonomialNativeRenamePowerSorting"
       ],
       "conditionals": [
         {
@@ -106899,7 +107044,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -111541,7 +111690,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/polynomial/polynomial_monomial_table.go",
-        "pkg/ast/ast_activity_cache.go"
+        "pkg/ast/ast_activity_cache.go",
+        "pkg/math/polynomial/polynomial_monomial_table_native_test.go"
       ],
       "tests": [
         "TestMonomialSourceConstructorAndInterning",
@@ -111573,7 +111723,11 @@
         "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
         "TestASTActivityCacheOriginalChainDisplacementRehashAndErase",
         "TestMonomialNativeScratchGrowthResetAndBounds",
-        "TestMonomialNativeVariableCountingAndInterning"
+        "TestMonomialNativeVariableCountingAndInterning",
+        "TestMonomialNativeTableGrowthRenameAndOrder",
+        "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+        "TestMonomialNativeTableSourceCleanupPendingCreation",
+        "TestMonomialNativeRenamePowerSorting"
       ],
       "conditionals": [
         {
@@ -111851,7 +112005,7 @@
           "tests": []
         },
         {
-          "name": "Concrete monomial chained table specialization: actual primary/cellar/free-list traversal, counters, insert/erase/expand and retained source prefixes; native pointer cell replaced by scalar16-byte codec, conditional visited-set diagnostics remain open",
+          "name": "Concrete native monomial interning specialization: insertion-ordered insdict entries and Go hash buckets, stable temporary publication, project hash/equality, find/erase and owning token cleanup. C++ table geometry/counters and container failures removed.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_table.go",
           "tests": [
@@ -111880,7 +112034,11 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
-            "TestMonomialNativeVariableCountingAndInterning"
+            "TestMonomialNativeVariableCountingAndInterning",
+            "TestMonomialNativeTableGrowthRenameAndOrder",
+            "TestMonomialNativeTableCollisionsAndTemporaryPublication",
+            "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestMonomialNativeRenamePowerSorting"
           ]
         },
         {
@@ -111897,7 +112055,7 @@
       ],
       "ownership": [
         "Pointer-free key/value/link cell arrays; actual cold owner header and whole physical arrays budgeted, including growth overlap and refunds for failed retries. Source attempted copy updates UsedSlots even on later reservation failure. Borrowed stable hash callback is owner-confined; references/iterators are explicit cold caller values checked against owner epochs. See PORT_PROGRESS.md#audit-chain-table-port-status-md.",
-        "src/util/chashtable.h concrete monomial specialization, actual raw 16-byte scalar-key/next codec. Source primary/cellar/free-list/probing/expand traversal and counters; source native pointer cell size is not Go codec size."
+        "Monomial specialization now uses native insdict entries and Go hash buckets; no source primary/cellar/free-list/codec or container allocation/failure semantics remain. Stable temporary publication and actual monomial object ownership remain."
       ],
       "deviations": [
         "Finalize allocates before deleting old table and charges overlap, preserving the graph on predictable failure; source deletes before allocating. Same-budget swap reserves nothing; cross-budget swap transfers only positive final byte delta before field mutation.",
@@ -149493,7 +149651,8 @@
         "SOM monomial columns now use concrete native []Monomial storage, with native retired-reference lists for standalone implicit source destruction. Removed pointer-vector byte codecs, Runtime growth/pending/free failures and charged retired-monomial capacity. Actual INC/DEC, position writes, append-cohort ownership and stopped reference destruction remain. Source class finalization captures actual remaining reference roots before releasing the slice; owning cleanup consumes those roots. Go sort.Slice applies the original descending graded-lex comparator in place of a handwritten STL sorting backend. With native push, no live allocation remains between position Set and marker release: removed that vector-failure marker transport and its obsolete tests, plus pending-INC tests requiring a failed pointer push. Actual numeral/field/factory refusal tests remain; cold factory fixtures now retain real caller-owned cells to force an actual location reserve, or request a genuinely allocating direct factory extent. Failed BIG assertion-copy tests retain captured-parent/NULL-release history even when source destruction already consumed the failed acquisition. Native span snapshots and complete physical audits exclude monomial slice capacity. No whole-unit completion credit is added.",
         "A 129-term independently permuted pure-power fixture sorts native monomial handles with Runtime reservations disabled, checks every descending degree, then completes source coefficient/map movement and validates every paired coefficient. Implicit source finalization retains all actual reference roots until owning cleanup. The naked zero-reference borrowed-product test requiring refusal before native pointer push is retired: native append now completes INC ownership before the still-live numeral allocation can fail, so its eventual DEC legitimately destroys that zero-reference original. Actual square-root final-factory TLS proof now primes the real lane with a named caller allocation and includes it in physical audits, rather than relying on eliminated vector allocation traffic.",
         "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added.",
-        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added."
+        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added.",
+        "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added."
       ]
     },
     {

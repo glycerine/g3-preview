@@ -90,8 +90,10 @@ func TestPolynomialPSCWarmActualSourceProfile(t *testing.T) {
 	}
 	before := numericWarmProfileSnapshot(t, m.integer, m.integer.Budget())
 	mono := m.monomials.allocator.Stats()
-	allocs := testing.AllocsPerRun(20, run)
-	numericWarmProfileAudit(t, m.integer, m.integer.Budget(), before, allocs, mono.DirectObjects != 0)
+	for i := 0; i < 20; i++ {
+		run()
+	}
+	numericWarmRuntimeAudit(t, m.integer, m.integer.Budget(), before, mono.DirectObjects != 0)
 	if m.monomials.allocator.Stats() != mono {
 		t.Fatal("actual source allocator retained graph changed", mono, m.monomials.allocator.Stats())
 	}

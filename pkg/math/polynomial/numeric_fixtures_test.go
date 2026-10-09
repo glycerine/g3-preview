@@ -183,6 +183,16 @@ func numericWarmProfileSnapshot(t *testing.T, m *util.IntegerManager, b *arena.B
 }
 func numericWarmProfileAudit(t *testing.T, m *util.IntegerManager, b *arena.Budget, before numericWarmSnapshot, goAllocs float64, sourceEvents bool) {
 	t.Helper()
+	numericWarmRuntimeAudit(t, m, b, before, sourceEvents)
+	if !sourceEvents && goAllocs != 0 {
+		t.Fatal("warmed numeric path allocates Go storage", goAllocs)
+	}
+}
+
+// Native polynomial containers may allocate Go storage while the real numeric
+// and Runtime allocator graph remains warm. Audit that graph independently.
+func numericWarmRuntimeAudit(t *testing.T, m *util.IntegerManager, b *arena.Budget, before numericWarmSnapshot, sourceEvents bool) {
+	t.Helper()
 	after := numericWarmProfileSnapshot(t, m, b)
 	if after.used != before.used || after.owned != before.owned || after.size != before.size || after.runtime != before.runtime || after.allocator != before.allocator || after.cells != before.cells {
 		t.Fatal("warmed actual physical graph changed", before, after)
@@ -191,8 +201,8 @@ func numericWarmProfileAudit(t *testing.T, m *util.IntegerManager, b *arena.Budg
 		if after.count <= before.count {
 			t.Fatal("missing real warmed source allocation events", before.count, after.count)
 		}
-	} else if after.count != before.count || goAllocs != 0 {
-		t.Fatal("warmed source-free path allocates", before.count, after.count, goAllocs)
+	} else if after.count != before.count {
+		t.Fatal("warmed path allocates Runtime storage", before.count, after.count)
 	}
 }
 

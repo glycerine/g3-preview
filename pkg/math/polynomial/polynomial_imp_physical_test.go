@@ -446,11 +446,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		put(b)
 	}
 	mm := m.monomials
-	if mm != nil {
-		for _, r := range []util.Block{mm.table.raw, mm.table.pending, mm.renameTable.raw, mm.renameTable.pending, mm.renameFound} {
-			put(r)
-		}
-	}
 
 	za := z.SourceAllocator().Stats()
 	ma := util.AllocatorStats{}

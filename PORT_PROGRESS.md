@@ -31880,3 +31880,52 @@ native module checkpoint at 21:43–21:45 UTC remains current.
 The util knot/split goal remains open. Remaining work includes polynomial's
 monomial interning/rename tables and rename-found vector, SAT collections, and
 internal util numeric/text/parameter dependency seams before the package split.
+
+## Native monomial interning and rename tables
+
+Monomial interning and lexical rename tables now use concrete insertion-ordered
+insdict.Dict v0.10.1 entries and map[uint32][]uint32 project-hash buckets. Stable
+entry IDs retain the real factory's temporary publication and replacement by a
+completed object. Removed C++ primary/cellar/free-list geometry, pointer codecs,
+rehash/growth/collision counters and container allocation/free failures. Native
+[]bool checks debug rename permutations. Go sort.Slice replaces the remaining
+monomial heap sort, using borrowed scalar power scratch.
+
+Rename visits deterministic insertion order, mutates each actual object and
+updates its project hash before inserting it into the new table, then swaps only
+after success. The cached project hash/equality still read actual reached object
+powers. Real monomial allocation, refcounts, factory failures and stopped source
+destructor continuations remain. Owning abort removes a named token from its
+stored bucket after partial source key mutation. Constructor/source destruction
+records when clearing the table already removed a pending factory entry.
+
+New independent tests cover cold growth, duplicates, deletion and iteration order
+through 4097 actual monomials, and two complete renames with canonical identity
+checks, all under disabled Runtime reservations and unchanged accounting. Forced
+project-hash collisions keep unequal powers distinct and preserve peers through
+publication, mutation and removal. A 129-power permutation checks every sorted
+variable/degree pair. Another test checks source destruction and explicit owning
+cleanup of a genuinely failed factory after native temporary publication.
+
+The obsolete polynomial rename table-allocation sweep is replaced by exact-value
+checks under disabled Runtime reservations. Warm ModD/PSC tests audit the actual
+Runtime/numeric graph independently of Go allocations for native dictionary
+insert/delete operations. Pure numeric allocation checks remain strict. Physical
+audits exclude native container capacity and still enumerate real object roots.
+
+The goal remains open. Current retained-code audit also confirms the persistent
+polynomial substitution bool vector, univariate coefficient storage's source
+capacity/growth machinery, AST node/activity/FPA tables, SAT columns/index sets,
+and external numeric text streams still need review/conversion. Internal util
+numeric/text/parameter dependency cycles remain before the package split. Do not
+treat the monomial table conversion as completion of all polynomial consumers.
+
+Validation: the full native module checkpoint at 22:43–22:45 UTC passed with
+terminal exit zero (go test ./... -count=1). Polynomial passed in 37.000s. No Go
+source changed during that checkpoint. Log:
+/mnt/oldrog/tmp/g3-util-knot-native-table-checkpoint.log. Focused g3debug monomial,
+constructor, native rename, warm ModD/PSC, substitution, factory and owning checks
+passed (0.262s); final native scratch/table/power-sorting debug checks passed
+(0.104s). Module-wide compilation, polynomial vet, manifest/portcheck, gofmt and
+diff checks passed. Manifest statuses/counts are unchanged. Keep full native
+module runs sparse until the next hourly checkpoint or new evidence warrants one.

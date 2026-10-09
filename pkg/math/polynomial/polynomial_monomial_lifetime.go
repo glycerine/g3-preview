@@ -17,13 +17,9 @@ func (m *MonomialManager) constructorUnwind() error {
 	if m.idsInitialized {
 		m.ids.Cleanup(0)
 	}
-	if m.table.completed {
-		if m.table.raw != (util.Block{}) {
-			if e := m.memory.Deallocate(&m.table.raw); e != nil {
-				return e
-			}
-		}
-		m.table.completed = false
+	m.table.cleanup()
+	if m.creation.stage != 0 {
+		m.creation.tableRemoved = true
 	}
 	return nil
 }
@@ -68,7 +64,7 @@ func (m *MonomialManager) SourceFinalize() error {
 		m.sourceStage++
 	}
 	if m.sourceStage == 1 {
-		if polynomialSourceDebug && m.table.size != 0 {
+		if polynomialSourceDebug && m.table.entries.Len() != 0 {
 			return ErrMonomialAssertion
 		}
 
@@ -100,8 +96,9 @@ func (m *MonomialManager) SourceFinalize() error {
 		m.sourceStage++
 	}
 	if m.sourceStage == 9 {
-		if e := m.table.sourceDestroy(m); e != nil {
-			return e
+		m.table.cleanup()
+		if m.creation.stage != 0 {
+			m.creation.tableRemoved = true
 		}
 		m.sourceStage++
 	}
@@ -124,11 +121,7 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 	if e != nil {
 		return e
 	}
-	if m.table.raw != (util.Block{}) {
-		if e = m.table.removeToken(m, monomialKey{monomialObjectKey, a.slot}); e != nil {
-			return e
-		}
-	}
+	m.table.removeToken(monomialKey{monomialObjectKey, a.slot})
 	if l.raw != (util.ObjectRef{}) && m.sourceStage >= 3 && m.allocatorOwned {
 		if l.sourceOffset == 0 {
 			e = m.memory.Deallocate(&l.sourceRaw)
@@ -255,9 +248,7 @@ func (m *MonomialManager) CloseChecked() error {
 		m.ids.Cleanup(0)
 		m.idsInitialized = false
 	}
-	if e := m.table.cleanup(m); e != nil {
-		return e
-	}
+	m.table.cleanup()
 	if m.allocatorOwned && m.allocator != nil {
 		if e := m.allocator.CleanupPending(); e != nil {
 			return e

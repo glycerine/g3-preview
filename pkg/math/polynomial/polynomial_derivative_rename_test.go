@@ -294,80 +294,23 @@ func TestPolynomialDerivativeEveryReservationNamedPrefix(t *testing.T) {
 	}
 }
 
-func TestPolynomialRenameEveryReservationKeepsActualAllCells(t *testing.T) {
-	success := false
-	failures := 0
-	for ordinal := int64(0); ordinal < 150; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m, p := polynomialRenameFailureFixture(t)
-			b := m.core.integer.Budget()
-			b.FailAfter(ordinal)
-			e := m.Rename([]uint32{1, 0})
-			if e != nil {
-				failures++
-				if !numericPhysicalReservationRefusal(e) {
-					t.Fatal("actual source table/temporary reservation", e)
-				}
-			} else {
-				success = true
-			}
-			polynomialDerivativePhysicalAudit(t, m, []Polynomial{*p})
-			// Rename mutates shared monomial bytes; partial mutations are not repaired
-			// or replayed. Actual owning table-local cleanup merely drains its roots.
-			b.FailAfter(-1)
-			serviceMust(t, m.core.monomials.CleanupRename())
-			sourceDel := m.core.DecRef(*p)
-			if sourceDel != nil {
-				if !polynomialSourceDebug || sourceDel != ErrMonomialAssertion {
-					t.Fatal("actual renamed-source erase guard", sourceDel)
-				}
-				l, e := m.core.polynomialLocation(*p)
-				serviceMust(t, e)
-				if !l.monomialDropConsumed || !l.monomialDropLast || l.monomialDropCause != sourceDel {
-					t.Fatal("real last reference decrement not recorded")
-				}
-				polynomialDerivativePhysicalAudit(t, m, []Polynomial{*p})
-				state := m.core.memory.State()
-				if again := m.core.DecRef(*p); again != sourceDel || m.core.memory.State() != state {
-					t.Fatal("stopped source leaf replay", again)
-				}
-				serviceMust(t, m.core.CleanupValue(p))
-				if l.monomialDropCause != sourceDel {
-					t.Fatal("owning abort altered source history")
-				}
-			} else {
-				*p = Polynomial{}
-			}
-			polynomialDerivativePhysicalAudit(t, m, nil)
-
-			closeErr := m.CloseChecked()
-			if closeErr != nil {
-				mm := m.core.monomials
-				if closeErr != ErrMonomialAssertion || !mm.unitDropConsumed || mm.unit != (Monomial{}) || mm.sourceStage != 1 || m.core.monomialRetained || mm.managerRefs != 0 {
-					t.Fatal("real completed unit followed by source table assertion", closeErr, mm.sourceStage, mm.managerRefs)
-				}
-				polynomialDerivativePhysicalAudit(t, m, nil)
-				state := m.core.memory.State()
-				if again := mm.SourceFinalize(); again != closeErr || m.core.memory.State() != state {
-					t.Fatal("source assertion retry repeated successful unit DEC", again)
-				}
-				serviceMust(t, m.CloseChecked())
-				if mm.sourceStage != 1 {
-					t.Fatal("owning continuation overwrote source table frontier")
-				}
-			}
-
-		})
-		if success {
-			break
-		}
+func TestPolynomialNativeRenameKeepsActualAllCells(t *testing.T) {
+	m, p := polynomialRenameFixture(t)
+	b := m.core.integer.Budget()
+	b.FailAfter(0)
+	t.Cleanup(func() { b.FailAfter(-1) })
+	before, used := m.core.memory.Stats(), b.Used()
+	serviceMust(t, m.Rename([]uint32{1, 0}))
+	polynomialQueryExpect(t, m.core, *p, map[[3]uint32]int64{
+		{2, 1, 0}: 11, {0, 2, 0}: 13, {3, 0, 0}: 15, {1, 1, 0}: 17, {}: 19,
+	})
+	if m.core.memory.Stats() != before || b.Used() != used {
+		t.Fatal("native rename changed Runtime accounting")
 	}
-	if !success || failures == 0 {
-		t.Fatal("rename source fault sweep incomplete", failures, success)
-	}
+	polynomialDerivativePhysicalAudit(t, m, []Polynomial{*p})
 }
 
-func polynomialRenameFailureFixture(t *testing.T) (*MultivariatePolynomialManager, *Polynomial) {
+func polynomialRenameFixture(t *testing.T) (*MultivariatePolynomialManager, *Polynomial) {
 	t.Helper()
 	q, b := rationalManager(t, false)
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("rename does not checkpoint") }, Cooperation: func() error { panic("rename does not cooperate") }}})

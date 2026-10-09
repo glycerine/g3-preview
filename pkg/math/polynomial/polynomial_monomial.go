@@ -86,7 +86,7 @@ type MonomialManager struct {
 	temps                                                                     [4]monomialTemp
 	powers                                                                    []MonomialPower
 	renameTable                                                               monomialTable
-	renameFound                                                               util.Block
+	renameFound                                                               []bool
 	locations                                                                 []monomialLocation
 	creation                                                                  monomialCreation
 	unit                                                                      Monomial
@@ -168,9 +168,6 @@ func NewMonomialManager(c MonomialManagerConfig) (*MonomialManager, error) {
 		m.originalCause = e
 		m.cleanupCause = m.constructorUnwind()
 		return m, m
-	}
-	if e := m.table.construct(m, 8, 2); e != nil {
-		return fail(e)
 	}
 	m.ids = idgen.NewBudgeted(0, c.Budget, func() bool { return r.State().OutOfMemory })
 	m.idsInitialized = true

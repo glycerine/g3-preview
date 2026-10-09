@@ -363,7 +363,7 @@ func TestPolynomialPreexistingCalleeCreationRemainsBorrowed(t *testing.T) {
 		t.Fatal("real preexisting caller creation", e, m.monomials.creation)
 	}
 	before := m.monomials.creation
-	tableSize := m.monomials.table.size
+	tableSize := m.monomials.table.entries.Len()
 	count, e := m.memory.AllocationCount()
 	serviceMust(t, e)
 	_, e = m.MkVariable(2, 3)
@@ -378,7 +378,7 @@ func TestPolynomialPreexistingCalleeCreationRemainsBorrowed(t *testing.T) {
 	serviceMust(t, m.CleanupConstruction())
 	after, e := m.memory.AllocationCount()
 	serviceMust(t, e)
-	if m.monomials.creation != before || m.monomials.table.size != tableSize || after != count {
+	if m.monomials.creation != before || m.monomials.table.entries.Len() != tableSize || after != count {
 		t.Fatal("borrowed prior creation changed")
 	}
 	polynomialPhysicalAudit(t, m)
