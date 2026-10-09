@@ -152611,17 +152611,20 @@
       "path": "src/util/stopwatch.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/stopwatch.go",
         "pkg/util/clock_linux.go",
-        "pkg/util/clock_portable.go"
+        "pkg/util/clock_portable.go",
+        "pkg/util/stopwatch_test.go"
       ],
       "tests": [
         "TestStopwatchSourceControls",
         "TestStopwatchActualClock",
         "TestStopwatchClockFailurePrefixes",
-        "TestStopwatchUnsignedBorrowGuard"
+        "TestStopwatchUnsignedBorrowGuard",
+        "TestStopwatchNamedQueriesAndScopedWatch",
+        "TestScopedWatchPreconditionsAndFailure"
       ],
       "conditionals": [
         {
@@ -152657,8 +152660,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "POSIX stopwatch start/stop/reset/add/get_seconds control with explicit Go clock adapter",
@@ -152672,15 +152675,32 @@
           ]
         },
         {
-          "name": "scoped_watch owner API and individual native Windows/Mach-specific behavior",
-          "status": "unported"
+          "name": "get_seconds and get_current_seconds exported query surface (src/util/stopwatch.h:114-128,173-187)",
+          "status": "ported",
+          "go_target": "pkg/util/stopwatch.go",
+          "tests": [
+            "TestStopwatchSourceControls",
+            "TestStopwatchNamedQueriesAndScopedWatch"
+          ]
+        },
+        {
+          "name": "scoped_watch constructor reset/start and destructor stop (src/util/stopwatch.h:193-202)",
+          "status": "ported",
+          "go_target": "pkg/util/stopwatch.go",
+          "tests": [
+            "TestStopwatchNamedQueriesAndScopedWatch",
+            "TestScopedWatchPreconditionsAndFailure"
+          ]
         }
       ],
       "ownership": [
-        "Zero-value cold report watch has scalar timing state and no owned dynamic backing. Borrowed deterministic test clock is only finite regression control; nil production clock selects actual platform reader. Running query executes stop then start; reset leaves running start unchanged."
+        "Zero-value cold report watch has scalar timing state and no owned dynamic backing. Borrowed deterministic test clock is only finite regression control; nil production clock selects actual platform reader. Running query executes stop then start; reset leaves running start unchanged.",
+        "ScopedWatch is a small value that borrows one Stopwatch while active. Close performs the source destructor stop, retains the borrow after a failed stop for retry, and releases it after success."
       ],
       "deviations": [
-        "Linux Getrusage process CPU user+system microsecond totals replace CLOCK_PROCESS_CPUTIME_ID nanosecond timespec; other targets use real Go monotonic elapsed diagnostics. Clock read errors are returned instead of uninitialized timespec use. No unsafe/cgo or synthetic elapsed counter; diagnostic platform replacement does not control solver decisions."
+        "Linux Getrusage process CPU user+system microsecond totals replace CLOCK_PROCESS_CPUTIME_ID nanosecond timespec; other targets use Go's portable monotonic clock support. Clock read errors are returned instead of using an uninitialized native timespec.",
+        "ScopedWatch uses explicit defer/Close in place of C++ RAII. Repeated Close is harmless, and the value has no self pointer or owned heap allocation.",
+        "No Windows headers, Mach services, POSIX clock APIs, unsafe code or cgo are ported."
       ]
     },
     {

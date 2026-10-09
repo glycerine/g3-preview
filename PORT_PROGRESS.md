@@ -30614,3 +30614,11 @@ Completed the remaining `get_memory_statistics` implementation as exported GetMe
 The existing concrete Statistics implementation continues to cover contribution storage, append-copy/reset, typed indexed access, aggregation, the three rendering modes, source formatting quirks and resource-limit statistics. A deterministic snapshot test covers exact conversion, both allocation-count domains and source storage ordering; the same test exercises the real Go runtime path and verifies all three exported keys.
 
 All 20 focused Statistics tests pass in native and g3debug builds (0.014s/0.010s). Util vet, ledger and diff validation pass; both source files are now marked ported. Inventory is now 2102 units, 677 APIs: 90 ported, 277 partial, 1726 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.
+
+### util file: stopwatch.h
+
+Completed the exported Stopwatch surface with GetSeconds, CurrentSeconds and GetCurrentSeconds aliases and ported scoped_watch as the value-based ScopedWatch owner. NewScopedWatch optionally resets and starts its borrowed Stopwatch; Close performs the source destructor stop, remains retryable after a clock failure and is harmless after successful closure. The scope has no self pointer or owned heap allocation.
+
+The existing platform adapter retains the Linux process CPU clock behavior and uses Go's portable monotonic support elsewhere. Native Windows headers, Mach services and POSIX clock APIs are not reproduced. Clock failures remain explicit Go errors rather than allowing uninitialized native time values.
+
+Six focused tests cover source start/stop/reset/add and unsigned borrow behavior, actual platform reads, all named query forms, scoped reset/start/stop, repeated closure, nil owners and constructor/destructor clock failures. Focused native and g3debug checks pass (0.005s/0.004s). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 91 ported, 276 partial, 1726 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.

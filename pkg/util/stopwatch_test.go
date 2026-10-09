@@ -116,3 +116,82 @@ func TestStopwatchUnsignedBorrowGuard(t *testing.T) {
 		t.Fatal(e, w)
 	}
 }
+
+func TestStopwatchNamedQueriesAndScopedWatch(t *testing.T) {
+	samples := []uint64{100, 250, 400, 700, 900}
+	index := 0
+	exhausted := errors.New("clock samples exhausted")
+	watch := Stopwatch{elapsed: 25, clock: func() (uint64, error) {
+		if index == len(samples) {
+			return 0, exhausted
+		}
+		value := samples[index]
+		index++
+		return value, nil
+	}}
+	scope, err := NewScopedWatch(&watch, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if watch.ElapsedNanoseconds() != 0 || !watch.Running() || index != 1 {
+		t.Fatal("scoped constructor", watch, index)
+	}
+	if err = scope.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if watch.ElapsedNanoseconds() != 150 || watch.Running() || index != 2 {
+		t.Fatal("scoped close", watch, index)
+	}
+	if err = scope.Close(); err != nil || index != 2 {
+		t.Fatal("repeated close", err, index)
+	}
+
+	if err = watch.Start(); err != nil {
+		t.Fatal(err)
+	}
+	seconds, err := watch.GetSeconds()
+	if err != nil || seconds != 450.0/1e9 || !watch.Running() || index != 5 {
+		t.Fatal(seconds, err, watch, index)
+	}
+	current, err := watch.GetCurrentSeconds()
+	if !errors.Is(err, exhausted) || current != 0 {
+		// The finite clock is exhausted, proving this alias performs the same
+		// running stop/start reads instead of returning cached state.
+		t.Fatal(current, err)
+	}
+}
+
+func TestScopedWatchPreconditionsAndFailure(t *testing.T) {
+	if scope, err := NewScopedWatch(nil, false); scope != (ScopedWatch{}) || !errors.Is(err, ErrStopwatchOwner) {
+		t.Fatal(scope, err)
+	}
+	var nilScope *ScopedWatch
+	if err := nilScope.Close(); !errors.Is(err, ErrStopwatchOwner) {
+		t.Fatal(err)
+	}
+	failure := errors.New("clock unavailable")
+	watch := Stopwatch{elapsed: 9, clock: func() (uint64, error) { return 0, failure }}
+	if scope, err := NewScopedWatch(&watch, true); scope != (ScopedWatch{}) || !errors.Is(err, failure) || watch.ElapsedNanoseconds() != 0 || watch.Running() {
+		t.Fatal(scope, err, watch)
+	}
+
+	reads := 0
+	watch = Stopwatch{clock: func() (uint64, error) {
+		reads++
+		if reads == 1 {
+			return 10, nil
+		}
+		return 0, failure
+	}}
+	scope, err := NewScopedWatch(&watch, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = scope.Close(); !errors.Is(err, failure) || !scope.active || !watch.Running() {
+		t.Fatal(err, scope, watch)
+	}
+	watch.clock = func() (uint64, error) { return 20, nil }
+	if err = scope.Close(); err != nil || scope.active || watch.Running() || watch.ElapsedNanoseconds() != 10 {
+		t.Fatal(err, scope, watch)
+	}
+}
