@@ -276,7 +276,7 @@ func (s *Solver) displayDIMACS(out *util.NumericTextStream) error {
 	if e := out.AppendCString("p cnf "); e != nil {
 		return e
 	}
-	n, e := s.Variables.level.Size()
+	n, e := s.Variables.numVarsChecked()
 	if e != nil {
 		return e
 	}
@@ -316,7 +316,7 @@ func (s *Solver) displayWCNF(out *util.NumericTextStream, count uint32, lits []L
 	if e := out.AppendCString("p wcnf "); e != nil {
 		return e
 	}
-	n, e := s.Variables.level.Size()
+	n, e := s.Variables.numVarsChecked()
 	if e != nil {
 		return e
 	}

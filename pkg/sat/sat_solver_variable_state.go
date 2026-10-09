@@ -22,7 +22,7 @@ type satSolverVariableState struct {
 	decision, eliminated, external, assignedSinceGC []bool
 	mark, literalMark                               []bool
 	justification                                   satSolverRuntimeJustificationColumn
-	level                                           RuntimeUintColumn
+	level                                           []uint32
 	activity                                        *satSolverActivity
 	queue                                           *satVarQueue
 	trail                                           *satSolverRuntimeTrail
@@ -61,7 +61,6 @@ func newSATColdVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.Ve
 	s.self = s
 	s.memory = raw
 	s.justification.bind(raw, b)
-	s.level.Bind(raw)
 	return s, nil
 }
 
@@ -107,7 +106,18 @@ func (s *satSolverVariableState) open() error {
 	return nil
 }
 
-func (s *satSolverVariableState) NumVars() uint32 { n, _ := s.level.Size(); return n }
+func (s *satSolverVariableState) NumVars() uint32 {
+	if s == nil || s.self != s || s.closed {
+		return 0
+	}
+	return uint32(len(s.level))
+}
+func (s *satSolverVariableState) numVarsChecked() (uint32, error) {
+	if e := s.constructionBorrow(); e != nil {
+		return 0, e
+	}
+	return uint32(len(s.level)), nil
+}
 func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 	if e := s.open(); e != nil {
 		return 0, e
@@ -115,7 +125,7 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 	s.modelIsCurrent = false
 	s.modelKnown = true
 	s.mkVarCount++
-	n, e := s.level.Size()
+	n, e := s.numVarsChecked()
 	if e != nil {
 		return 0, e
 	}
@@ -136,9 +146,7 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 	if e := s.activity.Push(0); e != nil {
 		return v, e
 	}
-	if e := s.level.Push(^uint32(0)); e != nil {
-		return v, e
-	}
+	s.level = append(s.level, ^uint32(0))
 	s.mark = append(s.mark, false)
 	s.literalMark = append(s.literalMark, false, false)
 	s.phase = append(s.phase, 2)
@@ -193,7 +201,20 @@ func (s *satSolverVariableState) levelVar(v BoolVar) (uint32, error) {
 	if e := s.open(); e != nil {
 		return 0, e
 	}
-	return s.level.Read(uint32(v))
+	if uint64(v) >= uint64(len(s.level)) {
+		if satStorageSourceDebug {
+			return 0, ErrSATAssertion
+		}
+		return 0, arena.ErrBounds
+	}
+	return s.level[v], nil
+}
+func (s *satSolverVariableState) setLevel(v BoolVar, value uint32) error {
+	if _, e := s.levelVar(v); e != nil {
+		return e
+	}
+	s.level[v] = value
+	return nil
 }
 func (s *satSolverVariableState) IsExternal(v BoolVar) (bool, error) {
 	if e := s.open(); e != nil {
@@ -439,9 +460,7 @@ func (s *satSolverVariableState) finalizeColumnsWatches() error {
 		}
 		s.activity = nil
 	}
-	if e := s.level.Finalize(); e != nil {
-		return e
-	}
+	s.level = nil
 	s.external = nil
 	s.eliminated = nil
 	s.literalMark = nil

@@ -77,6 +77,9 @@ func TestSATSolverNativeFlagsScopeTruncationAndRegrowth(t *testing.T) {
 		v.previousPhase[i] = int8((i + 1) % 2)
 	}
 	satOK(t, s.UserPop(1))
+	if len(v.level) != 2 {
+		t.Fatal("scope level length", len(v.level))
+	}
 	if len(v.phase) != 2 || len(v.previousPhase) != 2 {
 		t.Fatal("scope phase lengths", len(v.phase), len(v.previousPhase))
 	}
@@ -111,6 +114,9 @@ func TestSATSolverNativeFlagsScopeTruncationAndRegrowth(t *testing.T) {
 	}
 	if len(v.activity.values) != 3 || v.activity.values[2] != 0 {
 		t.Fatal("regrowth inherited removed activity", v.activity.values)
+	}
+	if len(v.level) != 3 || v.level[2] != ^uint32(0) {
+		t.Fatal("regrowth inherited removed level", v.level)
 	}
 	if v.phase[2] != 2 || v.previousPhase[2] != 2 {
 		t.Fatal("regrowth inherited removed polarities", v.phase, v.previousPhase)

@@ -12,7 +12,7 @@ func (s *satSolverConflictAnalysis) processAntecedentForMinimization(l Literal) 
 		return false, e
 	}
 	v := uint32(l.variable())
-	level, e := s.propagation.variables.level.Read(v)
+	level, e := s.propagation.variables.levelVar(BoolVar(v))
 	if e != nil {
 		return false, e
 	}
@@ -75,7 +75,7 @@ func (s *satSolverConflictAnalysis) impliedByMarked(l Literal) (bool, error) {
 		}
 		switch j.Kind() {
 		case 0:
-			level, e := s.propagation.variables.level.Read(v)
+			level, e := s.propagation.variables.levelVar(BoolVar(v))
 			if e != nil {
 				return false, e
 			}
@@ -254,7 +254,7 @@ func (s *satSolverConflictAnalysis) updateLemmaLevelSet() error {
 		if e != nil {
 			return e
 		}
-		level, e := s.propagation.variables.level.Read(uint32(Literal(l).variable()))
+		level, e := s.propagation.variables.levelVar(Literal(l).variable())
 		if e != nil {
 			return e
 		}

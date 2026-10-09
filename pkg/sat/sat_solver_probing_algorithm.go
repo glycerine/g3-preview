@@ -315,7 +315,7 @@ func (s *satSolverProbing) run(force bool) (answer bool, err error) {
 		return false, ErrSATSignedCounterDomain
 	}
 	limit := -int32(s.limit)
-	num, e := v.level.Size()
+	num, e := v.numVarsChecked()
 	if e != nil {
 		return false, e
 	}

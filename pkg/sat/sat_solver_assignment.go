@@ -52,7 +52,7 @@ func (s *satSolverPropagationState) assignCore(l Literal, j satJustification) er
 		return e
 	}
 	id := uint32(l.variable())
-	if e := v.level.Write(id, v.scopeLevel); e != nil {
+	if e := v.setLevel(BoolVar(id), v.scopeLevel); e != nil {
 		return e
 	}
 	if e := v.justification.write(id, j); e != nil {

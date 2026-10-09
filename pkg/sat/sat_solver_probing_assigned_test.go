@@ -6,8 +6,6 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverProbingAssignedNativeGrowth(t *testing.T) {
@@ -90,32 +88,4 @@ func TestSATSolverProbingAssignedResetAndReuse(t *testing.T) {
 	if !set.contains(7) || set.size() != 1 {
 		t.Fatal("finalized set is reusable")
 	}
-}
-
-func TestSATSolverProbingUnavailableLevelHeaderAtSourceRead(t *testing.T) {
-	s, life := satProbingFixture(t, 1)
-	v := life.propagation.variables
-	// A genuine allocated but unconstructed raw header exercises the checked
-	// source-read boundary. It is not a normal solver input or a repaired numeral.
-	malformed, e := life.propagation.memory.Allocate(16)
-	satOK(t, e)
-	original := v.level.Raw.Block
-	v.level.Raw.Block = malformed
-	t.Cleanup(func() {
-		v.level.Raw.Block = original
-		if malformed != (util.Block{}) {
-			satOK(t, life.propagation.memory.Deallocate(&malformed))
-		}
-	})
-	done, e := s.run(true)
-	if e == nil || done {
-		t.Fatal("num_vars must not swallow its actual header read failure", done, e)
-	}
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
-		t.Fatal(e)
-	}
-	satProbingAudit(t, s, nil, nil, original)
-	// Caller restores its borrowed binding, then releases only its own raw block.
-	v.level.Raw.Block = original
-	satOK(t, life.propagation.memory.Deallocate(&malformed))
 }

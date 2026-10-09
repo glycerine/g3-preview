@@ -37,33 +37,22 @@ func TestSATSolverSourceModelUsesRealAssignmentAndConverter(t *testing.T) {
 		t.Fatal("unsatisfied binary model accepted")
 	}
 }
-func TestSATSolverSourceModelPublishesCurrentBeforeNumVarsRead(t *testing.T) {
+
+func TestSATSolverSourceModelPublishesCurrentBeforeAllocationFailure(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
 	_, e := s.Variables.mkVar(false, true)
 	satOK(t, e)
-	// Actual initialized-byte guard at source num_vars()==m_level.size().
-	raw := s.Variables.level.Raw.Block
-	satOK(t, s.runtime.memory.Deallocate(&raw))
 	s.Variables.modelIsCurrent = false
+	s.budget.FailAfter(0)
 	e = s.mkModel()
-	if e == nil || !s.Variables.modelIsCurrent {
-		t.Fatal("source reset/current/read ordering", e)
+	if !satRuntimeActualRefusal(s.runtime.memory, e) || !s.Variables.modelIsCurrent {
+		t.Fatal("source reset/current/allocation ordering", e)
 	}
 	if n, e := s.model.Size(); e != nil || n != 0 {
 		t.Fatal(n, e)
 	}
-	// Explicit caller acknowledgment of the already freed malformed member;
-	// no production source header repair or bypass is performed.
-	s.Variables.level.Raw.Block = raw
-	if satStorageSourceDebug {
-		// This malformed member also violates the actual destructor invariant.
-		// Observe that source guard before explicitly acknowledging only this
-		// diagnostic fixture's stopped assertion for owning member teardown.
-		if e = s.Close(); !errors.Is(e, ErrSATAssertion) || s.closeStage != 1 {
-			t.Fatal("source destructor guard", e, s.closeStage)
-		}
-		satOK(t, s.CleanupStopped())
-	}
+	satFullSolverRuntimeAudit(t, s)
+	s.budget.FailAfter(-1)
 	satOK(t, s.Close())
 	if e = s.mkModel(); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)

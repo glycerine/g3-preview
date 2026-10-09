@@ -23,21 +23,21 @@ func (s *Solver) copyFrom(src *Solver) (err error) {
 			return ErrSATAssertion
 		}
 	}
-	n, e := s.Variables.level.Size()
+	n, e := s.Variables.numVarsChecked()
 	if e != nil {
 		return e
 	}
-	sn, e := src.Variables.level.Size()
+	sn, e := src.Variables.numVarsChecked()
 	if e != nil {
 		return e
 	}
 	if n < sn {
-		v, e := s.Variables.level.Size()
+		v, e := s.Variables.numVarsChecked()
 		if e != nil {
 			return e
 		}
 		for ; ; v++ {
-			sn, e = src.Variables.level.Size()
+			sn, e = src.Variables.numVarsChecked()
 			if e != nil {
 				return e
 			}

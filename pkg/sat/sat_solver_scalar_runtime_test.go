@@ -2,11 +2,9 @@
 package sat
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -16,7 +14,7 @@ func TestSATSolverScalarColumnsReachSameRuntime(t *testing.T) {
 	satOK(t, e)
 	amount, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if amount != 56+24+576 || v.memory.Stats().LiveBlocks != 4 {
+	if amount != 32+24+576 || v.memory.Stats().LiveBlocks != 3 {
 		t.Fatal("all actual scalar source allocations", amount, v.memory.Stats())
 	}
 }
@@ -37,7 +35,7 @@ func satScalarTestUintSize(t *testing.T, c *RuntimeUintColumn) uint32 {
 func satScalarAuditRoots(t *testing.T, v *satSolverVariableState, external ...util.Block) {
 	t.Helper()
 	roots := append([]util.Block{}, external...)
-	for _, c := range []*satRuntimeColumn{&v.level.Raw, &v.trail.values.Raw, &v.justification.raw} {
+	for _, c := range []*satRuntimeColumn{&v.trail.values.Raw, &v.justification.raw} {
 		if !c.PendingReplaces && c.Block != (util.Block{}) {
 			roots = append(roots, c.Block)
 		}
@@ -67,67 +65,6 @@ func satScalarAuditOwner(t *testing.T, v *satSolverVariableState, external ...ut
 		t.Fatal("once-only scalar graph", v.Stats(), v.memory.Stats(), v.budget.Used())
 	}
 }
-func TestSATSolverScalarSourceBytesAndRetainedSlots(t *testing.T) {
-	v, _, _ := satVariableStateFixture(t)
-	_, e := v.mkVar(true, true)
-	satOK(t, e)
-	raw, e := v.memory.Size(v.level.Raw.Block)
-	satOK(t, e)
-	if raw != 16 {
-		t.Fatal(raw)
-	}
-	for i := uint64(8); i < 12; i++ {
-		x, e := v.memory.Read(v.level.Raw.Block, i)
-		satOK(t, e)
-		if x != 255 {
-			t.Fatal(i, x)
-		}
-	}
-	satScalarAuditOwner(t, v)
-	u := &v.level
-	_, e = u.Read(1)
-	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATAssertion) {
-			t.Fatal(e)
-		}
-	} else if !errors.Is(e, util.ErrRuntimeUninitialized) {
-		t.Fatal(e)
-	}
-	e = u.Write(1, 0x12345678)
-	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATAssertion) {
-			t.Fatal(e)
-		}
-	} else {
-		satOK(t, e)
-		if satScalarTestUint(t, u, 1) != 0x12345678 {
-			t.Fatal("spare direct uint write")
-		}
-	}
-	old := u.Raw.Block
-	satOK(t, u.Push(17))
-	satOK(t, u.Push(29))
-	if _, e = v.memory.Read(old, 8); e == nil {
-		t.Fatal("realloc captured generation")
-	}
-	satOK(t, u.Shrink(1))
-	x, e := u.Read(2)
-	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATAssertion) {
-			t.Fatal(e)
-		}
-	} else {
-		satOK(t, e)
-		if x != 29 {
-			t.Fatal(x)
-		}
-	}
-	copied := *u
-	if _, e = copied.Read(0); !errors.Is(e, ErrSATOwner) {
-		t.Fatal(e)
-	}
-	satScalarAuditOwner(t, v)
-}
 func TestSATSolverScalarUnsignedGrowthLiteralWidths(t *testing.T) {
 	for _, test := range []struct{ old, n, bytes uint32 }{{0, 2, 16}, {2, 3, 20}, {3, 5, 28}, {5, 8, 40}, {8, 12, 56}, {1 << 30, 1610612736, 2147483656}} {
 		n, b, e := RuntimeScalarColumnNext(test.old, 4)
@@ -138,43 +75,13 @@ func TestSATSolverScalarUnsignedGrowthLiteralWidths(t *testing.T) {
 	}
 }
 
-func TestSATSolverScalarLevelTLSFailureRetainsNamedPendingAndPrefix(t *testing.T) {
-	b := arena.NewBudget(^uint64(0))
-	todo, e := newSATSolverUintSet(b)
-	satOK(t, e)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true})
-	satOK(t, e)
-	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
-	satOK(t, e)
-	prefix, e := r.Allocate(99352)
-	satOK(t, e)
-	satOK(t, r.SetMaxSize(1))
-	_, e = v.mkVar(true, true)
-	if !satRuntimeActualRefusal(r, e) || v.level.Raw.Pending == (util.Block{}) || v.level.Raw.Block != (util.Block{}) {
-		t.Fatal("actual level pre-publication refusal", e, r.State())
-	}
-	if uint32(len(v.assignment)) != 2 || uint32(len(v.external)) != 1 || v.activity.Size() != 1 || satScalarTestUintSize(t, &v.level) != 0 || len(v.mark) != 0 {
-		t.Fatal("literal source prefix")
-	}
-	satScalarAuditOwner(t, v, prefix)
-	if _, e = r.Read(v.level.Raw.Pending, 0); !errors.Is(e, util.ErrRuntimeUninitialized) {
-		t.Fatal("no source vector header publication", e)
-	}
-	satOK(t, v.Close())
-	satOK(t, r.Deallocate(&prefix))
-	satOK(t, todo.Close())
-	satOK(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
-	}
-}
 func TestSATSolverScalarReverseMemberRawDestruction(t *testing.T) {
 	v, _, _ := satVariableStateFixture(t)
 	_, e := v.mkVar(false, true)
 	satOK(t, e)
 	// Actual Runtime release cursors verify source reverse declaration order;
 	// other arena-only members introduce no invented Runtime release events.
-	order := []util.Block{v.queue.runtimeIndices.Raw.Block, v.queue.runtimeValues.Raw.Block, v.level.Raw.Block, v.justification.raw.Block}
+	order := []util.Block{v.queue.runtimeIndices.Raw.Block, v.queue.runtimeValues.Raw.Block, v.justification.raw.Block}
 	satOK(t, v.Close())
 	records := testFieldBySourceName(reflect.ValueOf(v.memory).Elem(), "blocks")
 	for i, h := range order {

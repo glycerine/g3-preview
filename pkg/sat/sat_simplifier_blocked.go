@@ -70,7 +70,7 @@ func (s *satSimplifier) eliminateBlocked() (err error) {
 	if e != nil {
 		return e
 	}
-	n, e := s.lifecycle.propagation.variables.level.Size()
+	n, e := s.lifecycle.propagation.variables.numVarsChecked()
 	if e != nil {
 		return e
 	}

@@ -24,7 +24,7 @@ func TestSATSolverCopyActualFlagsTrailClausesAndUserScope(t *testing.T) {
 	satOK(t, src.Lifecycle.mkBinClause(8, 0, true))
 	satOK(t, src.UserPush())
 	satOK(t, dst.copyFrom(src))
-	n, e := dst.Variables.level.Size()
+	n, e := dst.Variables.numVarsChecked()
 	satOK(t, e)
 	if n != 6 {
 		t.Fatal(n)
@@ -162,7 +162,7 @@ func TestSATSolverCopyDebugEliminatedSourceAssertionAfterEarlierVariable(t *test
 	}
 	satOK(t, src.Variables.setEliminated(BoolVar(1), true))
 	e := dst.copyFrom(src)
-	n, e2 := dst.Variables.level.Size()
+	n, e2 := dst.Variables.numVarsChecked()
 	satOK(t, e2)
 	if satStorageSourceDebug {
 		if e != ErrSATAssertion || n != 1 || dst.Variables.mkVarCount != 1 {

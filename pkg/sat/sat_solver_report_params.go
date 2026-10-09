@@ -72,7 +72,7 @@ func (s *Solver) displayStatus(out *util.NumericTextStream) error {
 	_ = numExt // actual source computes but never prints this counter.
 	var numElim uint32
 	for v := uint32(0); ; v++ {
-		n, e := s.Variables.level.Size()
+		n, e := s.Variables.numVarsChecked()
 		if e != nil {
 			return e
 		}
@@ -125,7 +125,7 @@ func (s *Solver) displayStatus(out *util.NumericTextStream) error {
 	if e = out.AppendCString("\n  :vars            "); e != nil {
 		return e
 	}
-	n, e := s.Variables.level.Size()
+	n, e := s.Variables.numVarsChecked()
 	if e != nil {
 		return e
 	}

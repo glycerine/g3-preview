@@ -60,7 +60,7 @@ func (s *Solver) sourceNumVars() (uint32, error) {
 	if e := s.open(); e != nil {
 		return 0, e
 	}
-	return s.Variables.level.Size()
+	return s.Variables.numVarsChecked()
 }
 func (s *Solver) sourceNumRestarts() (uint32, error) {
 	if e := s.open(); e != nil {

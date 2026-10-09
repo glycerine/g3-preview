@@ -58,11 +58,11 @@ func TestSATSolverClauseLearnedWatchActualSelection(t *testing.T) {
 	s, p, v, _ := satLifecycleFixture(t, 4)
 	v.scopeLevel = 2
 	satOK(t, p.assign(3, satJustification{}))
-	satOK(t, v.level.Write(1, 1))
+	satOK(t, v.setLevel(BoolVar(1), 1))
 	satOK(t, p.assign(5, satJustification{}))
-	satOK(t, v.level.Write(2, 2))
+	satOK(t, v.setLevel(BoolVar(2), 2))
 	satOK(t, p.assign(7, satJustification{}))
-	satOK(t, v.level.Write(3, 1))
+	satOK(t, v.setLevel(BoolVar(3), 1))
 	c, e := s.MkClauseCore(4, []Literal{0, 2, 4, 6}, true)
 	satOK(t, e)
 	x, e := p.clauses.Literal(c, 1)
@@ -217,7 +217,7 @@ func TestSATSolverAttachNaryReorderAndWatchFaultPrefixes(t *testing.T) {
 			v.scopeLevel = 3
 			for i := BoolVar(0); i < 3; i++ {
 				satOK(t, p.assign(MakeLiteral(i, true), satJustification{}))
-				satOK(t, v.level.Write(uint32(i), uint32(i+1)))
+				satOK(t, v.setLevel(BoolVar(uint32(i)), uint32(i+1)))
 			}
 			filler, e := newSATBinaryWatch(7, false)
 			satOK(t, e)

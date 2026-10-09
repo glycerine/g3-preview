@@ -51,7 +51,7 @@ func TestSATSolverCopyEveryActualDestinationRefusalRetainsPublishedGraph(t *test
 				satProbingExpectedRefusal(t, dst.propagation, e)
 				failures++
 			} else {
-				n, e := dst.Variables.level.Size()
+				n, e := dst.Variables.numVarsChecked()
 				satOK(t, e)
 				if n != 6 || len(dst.Lifecycle.Original) != 1 {
 					t.Fatal(n, len(dst.Lifecycle.Original))

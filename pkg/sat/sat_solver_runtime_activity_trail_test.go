@@ -17,13 +17,13 @@ func TestSATSolverNativeActivityAndRuntimeTrailAccounting(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 56+600 || v.memory.Stats().LiveBlocks != 4 {
+	if n != 32+600 || v.memory.Stats().LiveBlocks != 3 {
 		t.Fatal("remaining source allocations", n, v.memory.Stats())
 	}
 	satOK(t, v.trailPush(MakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 80+600 || v.memory.Stats().LiveBlocks != 5 {
+	if n != 56+600 || v.memory.Stats().LiveBlocks != 4 {
 		t.Fatal("actual literal32 trail allocation missing", n, v.memory.Stats())
 	}
 }
@@ -169,7 +169,7 @@ func TestSATSolverRuntimeTrailAllActualRefusalPrefixes(t *testing.T) {
 			e := s.assignCore(0, satJustification{})
 			satScalarAuditRoots(t, v)
 			satPropagationAssertGraph(t, s)
-			if v.assignment[0] != lbool.True || satScalarTestUint(t, &v.level, 0) != 1 || v.phase[0] != 0 || !v.assignedSinceGC[0] {
+			if v.assignment[0] != lbool.True || v.level[0] != 1 || v.phase[0] != 0 || !v.assignedSinceGC[0] {
 				t.Fatal("source scalar prefix before trail")
 			}
 			n, x := v.trail.Size(v.trailRef)

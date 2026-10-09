@@ -1176,3 +1176,24 @@ Validation: full native SAT (0.99s), checked/debug SAT (1.24s), module-wide
 compilation, SAT vet, and portcheck passed. Existing threshold/wrap, decay,
 rescaling, queue copy/move/growth, and native scope-regrowth tests remain live.
 A regression verifies that score mutation/rescaling changes no allocator state.
+
+## Native SAT decision levels and variable count
+
+Decision levels now use `[]uint32`, initialized to the source maximum-unsigned
+sentinel. Assignment updates the native level in source order; clause views read
+the owner's current member. Variable counts now read that slice's length with
+owner/lifetime checks instead of consulting a serialized header. All count
+consumers in decision selection, probing, scopes, model creation, copy, display,
+inspection, SCC, and integrity checks use this representation. Scope truncation
+clears discarded levels and recreated variables receive the sentinel.
+
+Deleted the level-specific capacity/spare-byte/TLS tests and malformed/freed
+header fixtures. Native count/level regressions cover growth, current-member
+borrowing, no allocation, bounds, copied/closed owners, and scope regrowth. The
+model publication-order regression now uses an actual model allocation refusal,
+which remains live, instead of corrupting eliminated level storage. Remaining
+Runtime allocations in variable state belong to justification, trail, and queue.
+
+Validation: full native (0.99s) and checked/debug (1.20s) SAT suites, module-wide
+compilation, SAT vet, and portcheck passed. The full native module checkpoint
+remains 18:07–18:12 UTC; no new whole-module execution was needed for this change.

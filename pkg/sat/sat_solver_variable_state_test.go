@@ -2,6 +2,7 @@
 package sat
 
 import (
+	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
@@ -55,7 +56,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 				t.Fatal(l, value)
 			}
 		}
-		if satScalarTestUint(t, &s.level, i) != ^uint32(0) || satJustificationTestValue(t, &s.justification, i) != (satJustification{}) || s.phase[i] != 2 || s.previousPhase[i] != 2 {
+		if s.level[i] != ^uint32(0) || satJustificationTestValue(t, &s.justification, i) != (satJustification{}) || s.phase[i] != 2 || s.previousPhase[i] != 2 {
 			t.Fatal("source values", i)
 		}
 		if s.decision[i] != (i%3 != 0) || s.external[i] != (i%2 != 0) {
@@ -80,7 +81,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 
 func satVariableAssertFirstPrefix(t *testing.T, s *satSolverVariableState) {
 	t.Helper()
-	sizes := []int{len(s.watches.lists), len(s.assignment), int(satJustificationTestSize(t, &s.justification)), len(s.decision), len(s.eliminated), len(s.external), int(s.activity.Size()), int(satScalarTestUintSize(t, &s.level)), len(s.mark), len(s.literalMark), len(s.phase), len(s.previousPhase), len(s.assignedSinceGC)}
+	sizes := []int{len(s.watches.lists), len(s.assignment), int(satJustificationTestSize(t, &s.justification)), len(s.decision), len(s.eliminated), len(s.external), int(s.activity.Size()), len(s.level), len(s.mark), len(s.literalMark), len(s.phase), len(s.previousPhase), len(s.assignedSinceGC)}
 	want := []int{2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1}
 	unfinished := false
 	for i, n := range sizes {
@@ -284,5 +285,45 @@ func TestSATSolverVariableRetainedSourceRetryAndColdGuards(t *testing.T) {
 	var zero satSolverVariableState
 	if e := zero.Close(); e != ErrSATOwner {
 		t.Fatal(e)
+	}
+}
+
+func TestSATSolverNativeLevelsCurrentBorrowAndGuards(t *testing.T) {
+	v, _, b := satVariableStateFixture(t)
+	_, e := v.mkVar(false, true)
+	satOK(t, e)
+	view := v.clauseState()
+	satOK(t, v.setLevel(0, 7))
+	for i := 0; i < 100; i++ {
+		_, e = v.mkVar(false, true)
+		satOK(t, e)
+	}
+	used, raw := b.Used(), v.memory.State()
+	b.FailAfter(0)
+	satOK(t, v.setLevel(0, 9))
+	level, e := view.level(0)
+	satOK(t, e)
+	n, e := v.numVarsChecked()
+	satOK(t, e)
+	b.FailAfter(-1)
+	if level != 9 || n != 101 || b.Used() != used || v.memory.State() != raw {
+		t.Fatal("native level/count borrow lost current member or touched allocation", level, n)
+	}
+	copied := *v
+	if _, e = copied.levelVar(0); !errors.Is(e, ErrSATOwner) {
+		t.Fatal("copied level owner accepted", e)
+	}
+	_, e = v.levelVar(BoolVar(n))
+	want := arena.ErrBounds
+	if satStorageSourceDebug {
+		want = ErrSATAssertion
+	}
+	if !errors.Is(e, want) {
+		t.Fatal("native level bounds", e)
+	}
+	satScalarAuditOwner(t, v)
+	satOK(t, v.Close())
+	if _, e = view.level(0); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("closed level borrow accepted", e)
 	}
 }

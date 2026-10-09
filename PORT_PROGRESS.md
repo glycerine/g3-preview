@@ -31187,3 +31187,23 @@ including threshold/wrap/rescale behavior, current comparator borrowing after
 growth/copy/move, no allocator changes during native score mutation/rescaling,
 and retained/fresh scope-regrowth values. Module-wide compilation, SAT vet, and
 portcheck passed. Latest full native module checkpoint remains 18:07–18:12 UTC.
+
+## Store SAT decision levels and variable count in native slices
+
+Replaced the level Runtime column with `[]uint32`. Variable creation appends
+maximum-unsigned defaults, assignment writes actual typed levels, and scope
+truncation clears discarded entries. Current variable counts use the actual
+level length with owner/lifetime guards. Converted all reached count/level
+consumers in decision selection, propagation/conflicts, simplification, probing,
+SCC, copy, model creation, display, inspection, and scopes.
+
+Removed eliminated level byte-layout, retained-spare, TLS, and corrupt/freed
+header tests. Added native level/count current-member, growth, no-allocation,
+bounds, copied/closed-owner and scope-regrowth coverage. Model publication order
+is checked with a real remaining model allocation refusal before fault lift.
+Actual Runtime root accounting now includes only justification, queue and trail
+for variable state. Updated manifest evidence and its implementation targets.
+
+Validation: full native SAT (0.99s) and checked/debug SAT (1.20s) passed, as did
+module-wide test compilation, SAT vet, and portcheck. Latest full native module
+checkpoint remains 18:07–18:12 UTC.

@@ -20,25 +20,6 @@ func satDecisionFixture(t *testing.T, n uint32) (*satSolverDecision, *satSolverG
 	return d, g
 }
 
-// A malformed source backing is a Go access-guard fixture, not a valid C++
-// allocation failure. num_vars must propagate the actual endangered read.
-func TestSATSolverDecisionActualNumVarsReadGuard(t *testing.T) {
-	d, g := satDecisionFixture(t, 1)
-	p := g.lifecycle().propagation
-	p.config.state.RandomFreq = 1
-	old := p.variables.level.Raw.Block
-	h, e := p.memory.Allocate(8)
-	satOK(t, e)
-	stale := h
-	satOK(t, p.memory.Deallocate(&h))
-	p.variables.level.Raw.Block = stale
-	_, e = d.nextVar()
-	p.variables.level.Raw.Block = old
-	if e == nil {
-		t.Fatal("source num_vars read guard silently became empty success")
-	}
-}
-
 func TestSATSolverDecisionEveryActualAllocationPrefix(t *testing.T) {
 	firstSuccess := -1
 	for ordinal := int64(0); ordinal < 32; ordinal++ {

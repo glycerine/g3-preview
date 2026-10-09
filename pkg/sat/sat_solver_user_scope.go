@@ -230,7 +230,7 @@ func (s *Solver) gcVar(v uint32) error {
 			v = w + 1
 		}
 	}
-	n, e := s.Variables.level.Size()
+	n, e := s.Variables.numVarsChecked()
 	if e != nil {
 		return e
 	}
@@ -238,7 +238,7 @@ func (s *Solver) gcVar(v uint32) error {
 		return nil
 	}
 	for i := v; ; i++ {
-		n, e := s.Variables.level.Size()
+		n, e := s.Variables.numVarsChecked()
 		if e != nil {
 			return e
 		}
@@ -302,9 +302,14 @@ func (s *Solver) gcVar(v uint32) error {
 	}
 	clear(x.activity.values[v:])
 	x.activity.values = x.activity.values[:v]
-	if e = x.level.Shrink(v); e != nil {
-		return e
+	if uint64(v) > uint64(len(x.level)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
+		return arena.ErrBounds
 	}
+	clear(x.level[v:])
+	x.level = x.level[:v]
 	if uint64(v) > uint64(len(x.mark)) {
 		if satStorageSourceDebug {
 			return ErrSATAssertion

@@ -284,7 +284,7 @@ func (s *satSimplifier) Run(learned bool) (err error) {
 		return e
 	}
 	s.needCleanup = false
-	n, e := p.variables.level.Size()
+	n, e := p.variables.numVarsChecked()
 	if e != nil {
 		return e
 	}
@@ -367,7 +367,7 @@ func (s *satSimplifier) initialize() error {
 	if e != nil {
 		return e
 	}
-	n, e := p.variables.level.Size()
+	n, e := p.variables.numVarsChecked()
 	if e != nil {
 		return e
 	}
@@ -383,7 +383,7 @@ func (s *satSimplifier) initialize() error {
 	if e = p.variables.elimTodo.Reset(); e != nil {
 		return e
 	}
-	n, e = p.variables.level.Size()
+	n, e = p.variables.numVarsChecked()
 	if e != nil {
 		return e
 	}

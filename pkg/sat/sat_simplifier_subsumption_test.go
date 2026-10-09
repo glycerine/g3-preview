@@ -73,7 +73,7 @@ func TestSATSimplifierActualNumVarsUsesLevelAtRead(t *testing.T) {
 	v := l.propagation.variables
 	// Source-pointer safety-domain fixture: initialized columns have differing
 	// logical lengths. The source getter is literally level.size(), not assignment.
-	satOK(t, v.level.Shrink(1))
+	v.level = v.level[:1]
 	satOK(t, s.initialize())
 	if s.useList.length != 2 || s.kernel.length != 2 {
 		t.Fatal("source level getter must determine both actual planes", s.useList.length, s.kernel.length)

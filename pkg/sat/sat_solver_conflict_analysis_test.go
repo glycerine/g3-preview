@@ -84,7 +84,7 @@ func TestSATSolverLemmaAntecedentActualAllocationPrefixes(t *testing.T) {
 		ok := false
 		t.Run(string(rune('A'+fault)), func(t *testing.T) {
 			s, _, v, b := satLemmaFixture(t, 2)
-			satOK(t, v.level.Write(1, 1))
+			satOK(t, v.setLevel(BoolVar(1), 1))
 			s.levelSet.insert(1)
 			b.FailAfter(fault)
 			got, e := s.processAntecedentForMinimization(MakeLiteral(1, false))

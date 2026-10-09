@@ -93,7 +93,7 @@ func (s *satSolverConflictResolution) processAntecedentForUnsatCore(l Literal) e
 	v := a.propagation.variables
 	id := uint32(l.variable())
 	if satStorageSourceDebug {
-		n, e := v.level.Size()
+		n, e := v.numVarsChecked()
 		if e != nil {
 			return e
 		}
@@ -278,7 +278,7 @@ func (s *satSolverConflictResolution) processAntecedentForInit(l Literal) error 
 	v := a.propagation.variables
 	id := uint32(l.variable())
 	if satStorageSourceDebug {
-		n, e := v.level.Size()
+		n, e := v.numVarsChecked()
 		if e != nil {
 			return e
 		}

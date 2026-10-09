@@ -91,7 +91,7 @@ func (d *satSolverDecision) nextVar() (BoolVar, error) {
 		return NullBoolVar, arena.ErrBounds
 	}
 	if int32(draw) < int32(threshold) {
-		num, e := v.level.Size()
+		num, e := v.numVarsChecked()
 		if e != nil {
 			return NullBoolVar, e
 		}
@@ -100,7 +100,7 @@ func (d *satSolverDecision) nextVar() (BoolVar, error) {
 		}
 		// num_vars is reread at the actual source modulo expression.
 		draw := d.rng.Next()
-		num, e = v.level.Size()
+		num, e = v.numVarsChecked()
 		if e != nil {
 			return NullBoolVar, e
 		}

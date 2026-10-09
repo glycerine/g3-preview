@@ -17,7 +17,7 @@ func TestSATSolverLiteralSpanDiffLevelsFiniteOracle(t *testing.T) {
 	for shape := 0; shape < 256; shape++ {
 		code := shape
 		for i := 0; i < 4; i++ {
-			satOK(t, v.level.Write(uint32(i), uint32(code%4)))
+			satOK(t, v.setLevel(BoolVar(uint32(i)), uint32(code%4)))
 			code /= 4
 		}
 		for mask := 0; mask < 16; mask++ {
@@ -58,8 +58,8 @@ func TestSATSolverLiteralSpanDiffLevelsAccessAndFailurePrefixes(t *testing.T) {
 	v.scopeLevel = 3
 	satOK(t, s.assign(0, satJustification{}))
 	satOK(t, s.assign(2, satJustification{}))
-	satOK(t, v.level.Write(0, 1))
-	satOK(t, v.level.Write(1, 2))
+	satOK(t, v.setLevel(BoolVar(0), 1))
+	satOK(t, v.setLevel(BoolVar(1), 2))
 	// The source reserves before touching even the first literal.
 	b.FailAfter(1)
 	_, e := s.numDiffLevelsLiterals(1, nil)
@@ -100,8 +100,8 @@ func TestSATSolverLiteralSpanDiffLevelsSourceDebugAndWarm(t *testing.T) {
 	s, v, b := satPropagationFixture(t, 2)
 	v.scopeLevel = 2
 	satOK(t, s.assign(0, satJustification{}))
-	satOK(t, v.level.Write(0, 1))
-	satOK(t, v.level.Write(1, 2))
+	satOK(t, v.setLevel(BoolVar(0), 1))
+	satOK(t, v.setLevel(BoolVar(1), 2))
 	got, e := s.numDiffLevelsLiterals(2, []Literal{0, 2})
 	if satStorageSourceDebug {
 		if !errors.Is(e, ErrSATAssertion) || got != 1 || s.diffLevels.data[1] != 1 {
@@ -116,7 +116,7 @@ func TestSATSolverLiteralSpanDiffLevelsSourceDebugAndWarm(t *testing.T) {
 		}
 	}
 	satOK(t, s.assign(2, satJustification{}))
-	satOK(t, v.level.Write(1, 2))
+	satOK(t, v.setLevel(BoolVar(1), 2))
 	lits := [4]Literal{0, 2, 1, 3}
 	before := b.Used()
 	b.FailAfter(0)

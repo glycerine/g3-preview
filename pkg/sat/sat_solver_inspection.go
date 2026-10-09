@@ -51,7 +51,7 @@ func (s *Solver) checkMarks() error {
 		return e
 	}
 	for v := uint32(0); ; v++ {
-		n, e := s.Variables.level.Size()
+		n, e := s.Variables.numVarsChecked()
 		if e != nil {
 			return e
 		}

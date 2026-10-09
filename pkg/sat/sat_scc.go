@@ -235,7 +235,7 @@ func (c *satSCC) run() (count uint32, err error) {
 		}
 	}()
 	r := p.memory
-	nv, e := p.variables.level.Size()
+	nv, e := p.variables.numVarsChecked()
 	if e != nil {
 		return 0, e
 	}

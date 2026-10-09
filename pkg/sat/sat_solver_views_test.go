@@ -2,13 +2,11 @@
 package sat
 
 import (
-	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverBorrowedModelCoreCurrentMembers(t *testing.T) {
@@ -316,26 +314,6 @@ func TestSATSolverBorrowedZeroAllocAndCopiedClosedGuards(t *testing.T) {
 	}
 }
 
-func TestSATSolverBorrowedReachedCurrentHeaderReadGuards(t *testing.T) {
-	s := satInspectionFixture(t)
-	old := s.Variables.level.Raw.Block
-	fresh, e := s.runtime.memory.Allocate(8)
-	satOK(t, e)
-	// A real allocated but unreadable source header is a bounded safety-domain fixture.
-	// The displaced real backing remains an explicit caller-owned local until restoration.
-	s.Variables.level.Raw.Block = fresh
-	n, e := s.sourceNumVars()
-	if !errors.Is(e, util.ErrRuntimeUninitialized) || n != 0 {
-		t.Fatal(n, e)
-	}
-	roots := satFullSolverRuntimeRoots(s)
-	roots = append(roots, old)
-	satScalarAuditRoots(t, s.Variables, roots...)
-	s.Variables.level.Raw.Block = old
-	satOK(t, s.runtime.memory.Deallocate(&fresh))
-	satFullSolverRuntimeAudit(t, s)
-}
-
 func TestSATSolverClauseIteratorLearnedEmptyAndOwnerLifetime(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
 	empty, e := s.beginLearnedClauses()
@@ -363,4 +341,28 @@ func TestSATSolverClauseIteratorLearnedEmptyAndOwnerLifetime(t *testing.T) {
 	if _, _, e = it.Next(); e == nil {
 		t.Fatal("closed iterator owner")
 	}
+}
+
+func TestSATSolverBorrowedNativeCountTracksGrowth(t *testing.T) {
+	s := satInspectionFixture(t)
+	n, e := s.sourceNumVars()
+	satOK(t, e)
+	for i := uint32(1); i <= 100; i++ {
+		_, e = s.MkVar(false, true)
+		satOK(t, e)
+		got, e := s.sourceNumVars()
+		satOK(t, e)
+		if got != n+i {
+			t.Fatal("count lost current slice", got, n+i)
+		}
+	}
+	used, raw := s.budget.Used(), s.runtime.memory.State()
+	s.budget.FailAfter(0)
+	got, e := s.sourceNumVars()
+	satOK(t, e)
+	s.budget.FailAfter(-1)
+	if got != n+100 || used != s.budget.Used() || raw != s.runtime.memory.State() {
+		t.Fatal("count touched allocator state", got, e)
+	}
+	satFullSolverRuntimeAudit(t, s)
 }

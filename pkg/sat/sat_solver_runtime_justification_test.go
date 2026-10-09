@@ -16,7 +16,7 @@ func TestSATSolverJustificationActualEightByteSourceAllocation(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 56+600 || v.memory.Stats().LiveBlocks != 4 {
+	if n != 32+600 || v.memory.Stats().LiveBlocks != 3 {
 		t.Fatal("actual source justification allocation absent", n, v.memory.Stats())
 	}
 }
@@ -44,7 +44,7 @@ func TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy(t *testing.
 	if _, e = v.justification.read(0); !errors.Is(e, ErrSATOwner) {
 		t.Fatal("missing provenance may not infer live registry token", e)
 	}
-	if v.assignment[0] != lbool.True || satScalarTestUint(t, &v.level, 0) != 1 || v.phase[0] != 2 || v.assignedSinceGC[0] {
+	if v.assignment[0] != lbool.True || v.level[0] != 1 || v.phase[0] != 2 || v.assignedSinceGC[0] {
 		t.Fatal("actual assignment statement prefix")
 	}
 	satScalarAuditRoots(t, v)

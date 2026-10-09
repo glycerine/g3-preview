@@ -21,7 +21,7 @@ func TestSATSolverVariableColdPreparationHasNoPrematureQueue(t *testing.T) {
 	if v.queue != nil || v.activity != nil || v.watches != nil || v.trail != nil || r.Stats().LiveBlocks != 0 {
 		t.Fatal("source future member constructed early")
 	}
-	if v.memory != r || v.level.Raw.Runtime != r {
+	if v.memory != r || v.level != nil {
 		t.Fatal("cold source borrows not real Runtime")
 	}
 	satOK(t, v.Close())

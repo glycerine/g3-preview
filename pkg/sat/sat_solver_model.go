@@ -15,7 +15,7 @@ func (s *Solver) mkModel() error {
 	}
 	s.Variables.modelIsCurrent = true
 	s.Variables.modelKnown = true
-	n, e := s.Variables.level.Size()
+	n, e := s.Variables.numVarsChecked()
 	if e != nil {
 		return e
 	}

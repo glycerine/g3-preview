@@ -131,7 +131,7 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 			if e != nil {
 				return false, e
 			}
-			vars, e := v.level.Size()
+			vars, e := v.numVarsChecked()
 			if e != nil {
 				return false, e
 			}
@@ -357,7 +357,7 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 	}
 	v := c.lifecycle.propagation.variables
 	if satStorageSourceDebug {
-		n, e := v.level.Size()
+		n, e := v.numVarsChecked()
 		if e != nil {
 			return false, e
 		}
@@ -384,7 +384,7 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 				return false, ErrSATAssertion
 			}
 		}
-		size, e = v.level.Size()
+		size, e = v.numVarsChecked()
 		if e != nil {
 			return false, e
 		}
@@ -407,7 +407,7 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		}
 	}
 	for variable := uint32(0); ; variable++ {
-		n, e := v.level.Size()
+		n, e := v.numVarsChecked()
 		if e != nil {
 			return false, e
 		}

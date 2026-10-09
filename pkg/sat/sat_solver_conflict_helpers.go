@@ -146,7 +146,7 @@ func (s *satSolverConflictResolution) processAntecedent(l Literal, marks *uint32
 		return e
 	}
 	if satStorageSourceDebug {
-		n, e := v.level.Size()
+		n, e := v.numVarsChecked()
 		if e != nil {
 			return e
 		}
@@ -218,7 +218,7 @@ func (s *satSolverConflictResolution) updatePhaseCounters() error {
 }
 func (s *satSolverConflictResolution) checkMarks() error {
 	v := s.analysis.propagation.variables
-	n, e := v.level.Size()
+	n, e := v.numVarsChecked()
 	if e != nil {
 		return e
 	}
