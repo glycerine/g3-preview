@@ -102,7 +102,7 @@ func TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix(t *testing.T)
 	b := arena.NewBudget(1 << 20)
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 32})
 	satOK(t, e)
-	var src, dst RuntimeVectorColumn
+	var src, dst satRuntimeColumn
 	src.Bind(r)
 	dst.Bind(r)
 	t.Cleanup(func() {
@@ -118,7 +118,7 @@ func TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix(t *testing.T)
 	satOK(t, r.WriteUint32(src.Block, 0, 0x40000000))
 	satOK(t, r.WriteUint32(src.Block, 4, 0))
 	before := r.State()
-	e = copyRuntimeVectorColumn(&dst, &src, 4)
+	e = copyRuntimeColumn(&dst, &src, 4)
 	if e != nil {
 		t.Fatal("source32 request wraps to8 before Runtime entry", e)
 	}

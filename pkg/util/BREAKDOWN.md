@@ -809,10 +809,9 @@ observable partial-copy, outer-growth, source-finalization, and ownership-root
 coverage; the util-only public facade and representation tests were removed.
 
 The concrete unsigned32 Runtime column and its copy specialization are likewise
-SAT-only and now live in `sat_solver_scalar_runtime.go`. Root
-`RuntimeVectorColumn` now has only SAT production consumers. AST sorting-network
-literal scratch has moved to native typed slices; the remaining SAT storage
-protocol is a candidate for further conversion or relocation out of root util.
+SAT-only and now live in `sat_solver_scalar_runtime.go`. The remaining Runtime column engine now lives privately in SAT as
+`satRuntimeColumn`; AST sorting-network literal scratch uses native typed
+slices. Root util no longer exports a Runtime vector or scalar-growth facade.
 
 
 Only the currently consumed `StringBuffer64` specialization remains; the 32/128 variants and cross-width test matrix were removed. `StringBuffer64` now uses `bytes.Buffer`, and its callers no longer reach through a C++-style state/inline/overflow representation or charge Go-managed text storage to an arena budget.
@@ -1143,3 +1142,21 @@ Native assignment mutation does not change arena/Runtime accounting.
 Validation: complete native and checked/debug SAT suites, module-wide test
 compilation, SAT vet, and portcheck passed. Numerical/typed Runtime columns are
 still separate conversion work; root vector storage now serves SAT alone.
+
+
+## SAT-only Runtime column engine removed from root util
+
+The remaining typed Runtime columns and their copy/byte codec now live in SAT,
+using a private `satRuntimeColumn`. The former SAT alias file and root utility
+vector implementation are gone. Removed the unused byte push/read/write and
+byte-growth branches after assignments left Runtime storage. Level, activity,
+trail, justification, queue, and remaining solver scratch still use their real
+Runtime allocations pending native conversion; no new common container package
+was introduced.
+
+Debug facilities now own `DebugBuild`, `ErrDebugAssertion`, and the context
+budget/identity accessors. The unused unsigned-growth executing error and root
+vector test census were deleted. The VERIFY macro test uses the actual Runtime
+byte read/write operations directly, so debug testing does not retain a vector
+codec dependency. Native/checked SAT and focused debug/sorting-network tests,
+module-wide compilation, vet, and portcheck verify the new package boundary.

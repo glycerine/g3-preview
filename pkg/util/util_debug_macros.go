@@ -15,7 +15,7 @@ func (d *DebugContext) InvokeAssertionDebugger() error {
 		return e
 	}
 	if d.assertionActions == nil {
-		return ErrRuntimeVectorAssertion
+		return ErrDebugAssertion
 	}
 	return d.assertionActions.InvokeDebugger()
 }

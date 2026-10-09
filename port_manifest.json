@@ -71045,7 +71045,7 @@
         "pkg/sat/sat_solver_clause_attach_test.go",
         "pkg/sat/sat_solver_backtrack.go",
         "pkg/sat/sat_solver_backtrack_test.go",
-        "pkg/sat/sat_solver_assignment_storage.go",
+        "pkg/sat/sat_runtime_column.go",
         "pkg/sat/sat_solver_assignment_storage_test.go",
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/sat/sat_solver_scalar_runtime_test.go",
@@ -72058,7 +72058,7 @@
         {
           "name": "Selected actual solver m_assignment uses native []lbool.LBool; literal/variable views read the current member, source-order assignment and backtracking, bounds/lifetime guards and checkpoint domain retained",
           "status": "ported",
-          "go_target": "pkg/sat/sat_solver_assignment_storage.go",
+          "go_target": "pkg/sat/sat_runtime_column.go",
           "tests": [
             "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
             "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards"
@@ -72895,7 +72895,7 @@
         "pkg/sat/sat_solver_clause_attach_test.go",
         "pkg/sat/sat_solver_backtrack.go",
         "pkg/sat/sat_solver_backtrack_test.go",
-        "pkg/sat/sat_solver_assignment_storage.go",
+        "pkg/sat/sat_runtime_column.go",
         "pkg/sat/sat_solver_assignment_storage_test.go",
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/sat/sat_solver_scalar_runtime_test.go",
@@ -73406,7 +73406,7 @@
         {
           "name": "Selected actual solver m_assignment uses native []lbool.LBool; literal/variable views read the current member, source-order assignment and backtracking, bounds/lifetime guards and checkpoint domain retained",
           "status": "ported",
-          "go_target": "pkg/sat/sat_solver_assignment_storage.go",
+          "go_target": "pkg/sat/sat_runtime_column.go",
           "tests": [
             "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
             "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards"
@@ -102541,7 +102541,7 @@
         "pkg/util/heap/heap_test.go",
         "pkg/util/heap/heap.go",
         "pkg/sat/sat_var_queue_runtime.go",
-        "pkg/sat/sat_solver_assignment_storage.go"
+        "pkg/sat/sat_runtime_column.go"
       ],
       "tests": [
         "TestHeapSourceAssertions",
@@ -112583,7 +112583,7 @@
         "pkg/util/util_debug_context_test.go",
         "pkg/util/heap/heap.go",
         "pkg/sat/sat_var_queue_runtime.go",
-        "pkg/sat/sat_solver_assignment_storage.go",
+        "pkg/sat/sat_runtime_column.go",
         "pkg/util/util_debug_notification.go",
         "pkg/util/util_debug_notification_source_test.go",
         "pkg/util/util_numeric_char_input.go",
@@ -112769,7 +112769,7 @@
         "pkg/util/util_debug_context_test.go",
         "pkg/util/heap/heap.go",
         "pkg/sat/sat_var_queue_runtime.go",
-        "pkg/sat/sat_solver_assignment_storage.go",
+        "pkg/sat/sat_runtime_column.go",
         "pkg/util/small_allocator_assertions.go",
         "pkg/util/util_small_object_allocator_assertions_test.go",
         "pkg/util/util_small_object_allocator.go",
@@ -115423,7 +115423,7 @@
         "pkg/util/heap/heap_test.go",
         "pkg/util/heap/source_frontier_test.go",
         "pkg/util/heap/owner_test.go",
-        "pkg/sat/sat_solver_assignment_storage.go",
+        "pkg/sat/sat_runtime_column.go",
         "pkg/util/util_debug_macros.go",
         "pkg/util/util_debug_macro_source_test.go",
         "pkg/util/heap/source_prefix_test.go"
@@ -148894,7 +148894,7 @@
         "pkg/ast/ast_shared_occs.go",
         "pkg/math/polynomial/upolynomial_binary_vector.go",
         "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
-        "pkg/sat/sat_solver_assignment_storage.go",
+        "pkg/sat/sat_runtime_column.go",
         "pkg/sat/sat_solver_assignment_storage_test.go",
         "pkg/math/polynomial/polynomial_monomial_positions.go",
         "pkg/sat/sat_solver_mus_set.go",
@@ -149451,7 +149451,7 @@
         {
           "name": "Selected actual solver m_assignment uses native []lbool.LBool; literal/variable views read the current member, source-order assignment and backtracking, bounds/lifetime guards and checkpoint domain retained",
           "status": "ported",
-          "go_target": "pkg/sat/sat_solver_assignment_storage.go",
+          "go_target": "pkg/sat/sat_runtime_column.go",
           "tests": [
             "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
             "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards"

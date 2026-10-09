@@ -59,7 +59,7 @@ func TestPsortASTNetworkBoundContinueThenThrowActualSourcePrefix(t *testing.T) {
 	astTestMust(t, e)
 	state, e := input.State()
 	astTestMust(t, e)
-	if util.RuntimeVectorSourceDebug {
+	if util.DebugBuild {
 		var exception z3exception.DefaultException
 		if !errors.As(cause, &exception) || !strings.Contains(string(data), "Line: 983\nm <= n\n") || !strings.Contains(string(data), "Line: 1019\nk + offset <= n\n") || state.Position != 2 {
 			t.Fatal("source bound action chain", cause, string(data), state)
@@ -105,7 +105,7 @@ func TestPsortASTNetworkUnusedClosedAssertionProviderAndDisabledBound(t *testing
 	s.running = true
 	_, e = s.power2(1)
 	s.running = false
-	if util.RuntimeVectorSourceDebug {
+	if util.DebugBuild {
 		if !errors.Is(e, arena.ErrClosed) {
 			t.Fatal("actual reached flag read", e)
 		}

@@ -18,7 +18,7 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 			roots = append(roots, b)
 		}
 	}
-	raw := func(c *RuntimeVectorColumn) {
+	raw := func(c *satRuntimeColumn) {
 		if !c.PendingReplaces {
 			add(c.Block)
 		}

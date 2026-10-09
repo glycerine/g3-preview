@@ -16,7 +16,7 @@ type satJustificationProvenance struct {
 	valid                   bool
 }
 type satSolverRuntimeJustificationColumn struct {
-	raw             RuntimeVectorColumn
+	raw             satRuntimeColumn
 	clauses         *ClauseAllocator // fixed real non-owning allocator binding
 	budget          *arena.Budget
 	provenance      []satJustificationProvenance

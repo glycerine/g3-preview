@@ -676,9 +676,9 @@ func (q *satVarQueue) cloneRuntime(b *arena.Budget) (*satVarQueue, error) {
 	v.literalSource = q.literalSource
 	v.bindRuntime(q.runtimeValues.Raw.Runtime)
 	v.runtimeCompleted = 0
-	if e = copyRuntimeVectorColumn(&v.runtimeValues.Raw, &q.runtimeValues.Raw, 4); e == nil {
+	if e = copyRuntimeColumn(&v.runtimeValues.Raw, &q.runtimeValues.Raw, 4); e == nil {
 		v.runtimeCompleted = 1
-		e = copyRuntimeVectorColumn(&v.runtimeIndices.Raw, &q.runtimeIndices.Raw, 4)
+		e = copyRuntimeColumn(&v.runtimeIndices.Raw, &q.runtimeIndices.Raw, 4)
 		if e == nil {
 			v.runtimeCompleted = 3
 		}

@@ -283,17 +283,17 @@ func TestDebugMacroCassertLiteralTagShortCircuitAndUninitializedCondition(t *tes
 func TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch(t *testing.T) {
 	r, d, _, _, _ := debugActionFixture(t, "C")
 	paramsMust(t, d.EnableAssertions(false))
-	word, e := r.Allocate(4)
+	word, e := r.Allocate(1)
 	paramsMust(t, e)
 	t.Cleanup(func() {
 		if word != (Block{}) {
 			paramsMust(t, r.Deallocate(&word))
 		}
 	})
-	paramsMust(t, WriteRuntimeWord(r, word, 0, 7))
+	paramsMust(t, r.Write(word, 0, 7))
 	// VERIFY evaluates this reached operand in release and with the assertion
 	// switch false. A true condition performs no notification or input action.
-	value, e := ReadRuntimeWord(r, word, 0)
+	value, e := r.Read(word, 0)
 	paramsMust(t, e)
 	if !(value == 7) {
 		paramsMust(t, d.VerifyFailure("macro_fixture.cpp", 121, "value == 7"))
@@ -301,7 +301,7 @@ func TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch(t *testing.T) {
 	paramsMust(t, r.Deallocate(&word))
 	// This actual guarded read proves the same operand is still reached; VERIFY
 	// must not erase it behind the source assertions switch in either profile.
-	_, e = ReadRuntimeWord(r, word, 0)
+	_, e = r.Read(word, 0)
 	if e == nil {
 		t.Fatal("destroyed operand unexpectedly readable")
 	}

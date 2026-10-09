@@ -132,3 +132,11 @@ func (d *DebugContext) ConditionalAssertionEnabled(tag string) (bool, error) {
 	}
 	return d.IsDebugEnabled(tag)
 }
+
+func (d *DebugContext) Budget() *arena.Budget {
+	if d == nil {
+		return nil
+	}
+	return d.BudgetField
+}
+func (d *DebugContext) ValidOwner() bool { return d != nil && d.Self == d }

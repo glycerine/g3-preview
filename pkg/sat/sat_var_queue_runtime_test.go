@@ -291,7 +291,7 @@ func satHeapRuntimeAudit(t *testing.T, q *satVarQueue, a *satSolverRuntimeActivi
 			continue
 		}
 		header += q.ownerBytes
-		for _, c := range []*RuntimeVectorColumn{&q.runtimeValues.Raw, &q.runtimeIndices.Raw} {
+		for _, c := range []*satRuntimeColumn{&q.runtimeValues.Raw, &q.runtimeIndices.Raw} {
 			if !c.PendingReplaces && c.Block != (util.Block{}) {
 				roots = append(roots, c.Block)
 			}

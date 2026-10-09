@@ -157,7 +157,7 @@ func (f *satConsequenceFrame) vector(s *Solver, i uint8, copy *RuntimeUintColumn
 	f.used++
 	f.vectors[i].Bind(s.runtime.memory)
 	if copy != nil {
-		if e := copyRuntimeVectorColumn(&f.vectors[i].Raw, &copy.Raw, 4); e != nil {
+		if e := copyRuntimeColumn(&f.vectors[i].Raw, &copy.Raw, 4); e != nil {
 			return e
 		}
 		f.completed[k] = true

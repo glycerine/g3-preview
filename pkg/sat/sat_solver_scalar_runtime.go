@@ -8,7 +8,7 @@ import (
 
 // RuntimeUintColumn is SAT's concrete svector<unsigned> storage. It keeps the
 // source unsigned32 header and payload layout in the shared checked Runtime.
-type RuntimeUintColumn struct{ Raw util.RuntimeVectorColumn }
+type RuntimeUintColumn struct{ Raw satRuntimeColumn }
 
 func (c *RuntimeUintColumn) Bind(r *util.Runtime)      { c.Raw.Bind(r) }
 func (c *RuntimeUintColumn) Size() (uint32, error)     { return c.Raw.Size() }
@@ -35,10 +35,10 @@ func (c *RuntimeUintColumn) Push(v uint32) error {
 			return e
 		}
 	}
-	if e = util.WriteRuntimeWord(c.Raw.Runtime, c.Raw.Block, 8+4*uint64(n), v); e != nil {
+	if e = WriteRuntimeWord(c.Raw.Runtime, c.Raw.Block, 8+4*uint64(n), v); e != nil {
 		return e
 	}
-	return util.WriteRuntimeWord(c.Raw.Runtime, c.Raw.Block, 4, n+1)
+	return WriteRuntimeWord(c.Raw.Runtime, c.Raw.Block, 4, n+1)
 }
 func (c *RuntimeUintColumn) Read(i uint32) (uint32, error) {
 	if e := c.Raw.Open(); e != nil {
@@ -56,7 +56,7 @@ func (c *RuntimeUintColumn) Read(i uint32) (uint32, error) {
 	if c.Raw.Block == (util.Block{}) {
 		return 0, arena.ErrBounds
 	}
-	return util.ReadRuntimeWord(c.Raw.Runtime, c.Raw.Block, 8+4*uint64(i))
+	return ReadRuntimeWord(c.Raw.Runtime, c.Raw.Block, 8+4*uint64(i))
 }
 func (c *RuntimeUintColumn) Write(i, v uint32) error {
 	if e := c.Raw.Open(); e != nil {
@@ -74,12 +74,12 @@ func (c *RuntimeUintColumn) Write(i, v uint32) error {
 	if c.Raw.Block == (util.Block{}) {
 		return arena.ErrBounds
 	}
-	return util.WriteRuntimeWord(c.Raw.Runtime, c.Raw.Block, 8+4*uint64(i), v)
+	return WriteRuntimeWord(c.Raw.Runtime, c.Raw.Block, 8+4*uint64(i), v)
 }
 
-// copyRuntimeVectorColumn implements the source vector copy constructor.
+// copyRuntimeColumn implements the source vector copy constructor.
 // Callers bind dst to the same Runtime as src and retain failed-copy roots.
-func copyRuntimeVectorColumn(dst, src *util.RuntimeVectorColumn, stride uint32) error {
+func copyRuntimeColumn(dst, src *satRuntimeColumn, stride uint32) error {
 	if src.Block == (util.Block{}) {
 		dst.Block = util.Block{}
 		return nil
@@ -97,10 +97,10 @@ func copyRuntimeVectorColumn(dst, src *util.RuntimeVectorColumn, stride uint32) 
 	if e != nil {
 		return e
 	}
-	if e = util.WriteRuntimeWord(src.Runtime, h, 0, capacity); e != nil {
+	if e = WriteRuntimeWord(src.Runtime, h, 0, capacity); e != nil {
 		return e
 	}
-	if e = util.WriteRuntimeWord(src.Runtime, h, 4, n); e != nil {
+	if e = WriteRuntimeWord(src.Runtime, h, 4, n); e != nil {
 		return e
 	}
 	dst.Block = h

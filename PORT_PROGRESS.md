@@ -31147,3 +31147,25 @@ allocation fixtures and manifest evidence for the removed assignment backing.
 Validation: complete native SAT tests passed (0.99s), checked/debug SAT tests
 passed (1.21s), module-wide test compilation passed, and SAT vet/portcheck passed.
 The latest full native module checkpoint remains 18:07–18:12 UTC.
+
+## Remove SAT-only vector engine from root util
+
+Moved the remaining Runtime column engine into SAT as private `satRuntimeColumn`
+and removed its root type alias/facade. Its uint32 codec, scalar growth, pending
+allocation cleanup, and typed column consumers now live together in SAT. Removed
+byte push/read/write and byte-growth methods with no remaining consumer after
+assignment conversion. The root vector-owner file and unused root vector census
+are gone. No new shared container package was created.
+
+Debug state now owns its `DebugBuild` flag, `ErrDebugAssertion`, and concrete
+context budget/identity methods. Deleted the unused growth-executing error.
+The VERIFY test uses Runtime byte operations directly instead of retaining a
+vector codec dependency. Manifest targets now point at the actual SAT file.
+Further native conversion is still required for typed SAT Runtime storage and
+the numeric allocation/ownership infrastructure.
+
+Validation: complete native and checked/debug SAT tests passed; focused native
+and checked/debug debug tests passed (0.09s/0.08s), sorting-network/native span
+tests passed (0.39s native, 0.48s checked/debug), module-wide test compilation
+passed, and AST/SAT/util vet and portcheck passed. The latest full native module
+checkpoint remains 18:07–18:12 UTC.

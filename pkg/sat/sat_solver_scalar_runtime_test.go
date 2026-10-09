@@ -37,7 +37,7 @@ func satScalarTestUintSize(t *testing.T, c *RuntimeUintColumn) uint32 {
 func satScalarAuditRoots(t *testing.T, v *satSolverVariableState, external ...util.Block) {
 	t.Helper()
 	roots := append([]util.Block{}, external...)
-	for _, c := range []*RuntimeVectorColumn{&v.level.Raw, &v.activity.values.Raw, &v.trail.values.Raw, &v.justification.raw} {
+	for _, c := range []*satRuntimeColumn{&v.level.Raw, &v.activity.values.Raw, &v.trail.values.Raw, &v.justification.raw} {
 		if !c.PendingReplaces && c.Block != (util.Block{}) {
 			roots = append(roots, c.Block)
 		}
@@ -46,7 +46,7 @@ func satScalarAuditRoots(t *testing.T, v *satSolverVariableState, external ...ut
 		}
 	}
 	if v.queue != nil && v.queue.runtimeBacked() {
-		for _, c := range []*RuntimeVectorColumn{&v.queue.runtimeValues.Raw, &v.queue.runtimeIndices.Raw} {
+		for _, c := range []*satRuntimeColumn{&v.queue.runtimeValues.Raw, &v.queue.runtimeIndices.Raw} {
 			if !c.PendingReplaces && c.Block != (util.Block{}) {
 				roots = append(roots, c.Block)
 			}

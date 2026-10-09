@@ -2,8 +2,14 @@
 package util
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/arena"
 )
+
+const DebugBuild = sourceDebug
+
+var ErrDebugAssertion = errors.New("g3: source assertion failure")
 
 // BindAssertionActions borrows identity without reaching action/input/file
 // readiness. Notification and interactive output share one actual binding.
@@ -22,10 +28,10 @@ func (d *DebugContext) BindAssertionActions(a *DebugActionContext) error {
 
 // This leaf is reached only after the source macro switch and false condition.
 // A real C action returns to the caller's next source statement. The unbound
-// ErrRuntimeVectorAssertion route preserves the legacy explicit Go assertion adapter.
+// ErrDebugAssertion route preserves the legacy explicit Go assertion adapter.
 func DebugAssertionFailure(d *DebugContext, file string, line int32, condition string) error {
 	if d == nil || d.assertionActions == nil {
-		return ErrRuntimeVectorAssertion
+		return ErrDebugAssertion
 	}
 	if e := d.NotifyAssertionViolation(file, line, condition); e != nil {
 		return e

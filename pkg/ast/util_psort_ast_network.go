@@ -105,7 +105,7 @@ func (s *PsortASTNetwork) open() error {
 	return s.context.open()
 }
 func (s *PsortASTNetwork) assertions() (bool, error) {
-	if !util.RuntimeVectorSourceDebug {
+	if !util.DebugBuild {
 		return false, nil
 	}
 	if s.debug == nil {

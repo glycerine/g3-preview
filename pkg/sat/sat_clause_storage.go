@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	ErrSATOwner     = util.ErrRuntimeVectorOwner
-	ErrSATAssertion = util.ErrRuntimeVectorAssertion
+	ErrSATOwner     = errors.New("sat: foreign or copied storage owner")
+	ErrSATAssertion = util.ErrDebugAssertion
 	ErrSATKind      = errors.New("sat: invalid pointer-union kind")
 )
 var satStorageNextOwner atomic.Uint64

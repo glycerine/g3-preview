@@ -4,7 +4,6 @@ package util
 import (
 	"errors"
 	"math"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -48,54 +47,5 @@ func contextTLSFinish(t *testing.T, r *Runtime, close func() error) {
 		if !errors.Is(e, arena.ErrBounds) || r.Stats().LiveBlocks >= before {
 			t.Fatal("teardown did not consume actual block", e, r.State())
 		}
-	}
-}
-
-func runtimeVectorAuditBlocks(t *testing.T, c *RuntimeVectorColumn, external ...Block) {
-	t.Helper()
-	roots := append([]Block{}, external...)
-	if !c.PendingReplaces && c.Block != (Block{}) {
-		roots = append(roots, c.Block)
-	}
-	if c.Pending != (Block{}) {
-		roots = append(roots, c.Pending)
-	}
-	type identity struct{ slot, generation uint32 }
-	expected := map[identity]bool{}
-	rv := reflect.ValueOf(c.Runtime).Elem()
-	origin := testFieldBySourceName(rv, "origin").Uint()
-	for _, h := range roots {
-		hv := reflect.ValueOf(h)
-		if testFieldBySourceName(hv, "origin").Uint() != origin {
-			t.Fatal("foreign declared root")
-		}
-		id := identity{uint32(testFieldBySourceName(hv, "slot").Uint()), uint32(testFieldBySourceName(hv, "generation").Uint())}
-		if expected[id] {
-			t.Fatal("duplicate owning root", id)
-		}
-		expected[id] = true
-		_, e := c.Runtime.Size(h)
-		serviceMust(t, e)
-	}
-	records := testFieldBySourceName(rv, "blocks")
-	var physical, init uint64
-	live := 0
-	for i := 0; i < records.Len(); i++ {
-		b := records.Index(i)
-		if !testFieldBySourceName(b, "live").Bool() {
-			continue
-		}
-		id := identity{uint32(i + 1), uint32(testFieldBySourceName(b, "generation").Uint())}
-		if !expected[id] {
-			t.Fatal("anonymous raw allocation", id)
-		}
-		delete(expected, id)
-		live++
-		physical += uint64(testFieldBySourceName(b, "data").Len())
-		init += uint64(testFieldBySourceName(b, "initialized").Len()) * 8
-	}
-	st := c.Runtime.Stats()
-	if len(expected) != 0 || uint32(live) != st.LiveBlocks || physical != st.PhysicalBytes || init != st.InitializationBytes {
-		t.Fatal("actual raw graph", expected, st, physical, init)
 	}
 }
