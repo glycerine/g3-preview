@@ -30633,6 +30633,8 @@ All 103 focused StrHashtable, shared CString and RegionBytes tests pass in nativ
 
 ### util dead CString-to-int specialization removal
 
-Removed the Go-only StrInt32Map specialization and its allocator, Runtime, assertion, iterator, CString, collision and failure-injection tests. Repository production code had no consumer of this type; it existed solely to reproduce `src/test/map.cpp` and generic C++ hashtable mechanics. A concrete `map[string]int32` should be introduced at an actual consumer if one appears.
+Removed the Go-only StrInt32Map specialization and its allocator, Runtime, assertion, iterator, CString, collision and failure-injection tests. A complete C++ tree search found the exact `map<char const *, int, str_hash_proc, str_eq_proc>` specialization only in `src/test/map.cpp`; no production C++ source instantiates it.
+
+Production C++ does instantiate distinct string-key maps: `char const *` to `unsigned` and `double` in `src/util/statistics.cpp`, and `char const *` to `dtoken` in `src/muz/fp/datalog_parser.cpp`. Those require concrete typed Go implementations at their own live consumers; this test-only int32 specialization is not a substitute. If a real string-to-int32 consumer appears later, implement it directly with `map[string]int32`.
 
 The manifest now records `src/test/map.cpp` as intentionally unported test-only code and removes the deleted specialization from shared `map.h`, `hashtable.h`, and `str_hashtable.h` evidence. All packages compile after the removal.
