@@ -382,12 +382,8 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		if size != n {
 			return false, ErrSATAssertion
 		}
-		for _, col := range [3]*RuntimeVectorColumn{&v.decision, &v.eliminated, &v.external} {
-			size, e = col.Size()
-			if e != nil {
-				return false, e
-			}
-			if size != n {
+		for _, flags := range [][]bool{v.decision, v.eliminated, v.external, v.assignedSinceGC} {
+			if uint32(len(flags)) != n {
 				return false, ErrSATAssertion
 			}
 		}
@@ -412,7 +408,7 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		if activitySize != n {
 			return false, ErrSATAssertion
 		}
-		for _, col := range [3]*RuntimeVectorColumn{&v.phase, &v.previousPhase, &v.assignedSinceGC} {
+		for _, col := range [2]*RuntimeVectorColumn{&v.phase, &v.previousPhase} {
 			size, e = col.Size()
 			if e != nil {
 				return false, e

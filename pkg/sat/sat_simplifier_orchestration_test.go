@@ -40,7 +40,7 @@ func TestSATSimplifierDefaultSubsumptionThenActualResolution(t *testing.T) {
 	s, l := satSimplifierFixture(t, 4)
 	p := l.propagation
 	for i := uint32(1); i < 4; i++ {
-		satOK(t, p.variables.external.Write(i, 1))
+		satOK(t, p.variables.setExternal(BoolVar(i), true))
 	}
 	c1, e := l.MkClauseCore(3, []Literal{0, 2, 4}, false)
 	satOK(t, e)
@@ -50,9 +50,9 @@ func TestSATSimplifierDefaultSubsumptionThenActualResolution(t *testing.T) {
 	satOK(t, e)
 	satOK(t, p.clauses.MarkStrengthened(c1))
 	satOK(t, s.Run(false))
-	x, e := p.variables.eliminated.Read(0)
+	x, e := p.variables.wasEliminated(BoolVar(0))
 	satOK(t, e)
-	if x != 1 || s.numElimVars != 1 || s.numSubsumed == 0 || len(l.Original) != 0 {
+	if !x || s.numElimVars != 1 || s.numSubsumed == 0 || len(l.Original) != 0 {
 		t.Fatal("actual removal schedules resolution", x, s.numElimVars, s.numSubsumed, len(l.Original))
 	}
 	// The real model converter is required, not a synthesized projection.
@@ -63,7 +63,7 @@ func TestSATSimplifierDefaultSubsumptionThenActualResolution(t *testing.T) {
 func TestSATSimplifierLearnedTransfersAndFrozenOwnership(t *testing.T) {
 	s, l := satSimplifierFixture(t, 4)
 	for i := uint32(0); i < 4; i++ {
-		satOK(t, l.propagation.variables.external.Write(i, 1))
+		satOK(t, l.propagation.variables.setExternal(BoolVar(i), true))
 	}
 	small, e := l.MkClauseCore(3, []Literal{0, 2, 4}, true)
 	satOK(t, e)
@@ -129,7 +129,7 @@ func TestSATSimplifierIndependentFiniteFullDefaultModelOracle(t *testing.T) {
 			// default algorithm. Fixture b leaves its real pivot internal for resolution.
 			for v := uint32(0); v < 4; v++ {
 				if fi != 1 || v != 0 {
-					satOK(t, p.variables.external.Write(v, 1))
+					satOK(t, p.variables.setExternal(BoolVar(v), true))
 				}
 			}
 			for _, cl := range input {
@@ -202,9 +202,9 @@ func TestSATSimplifierIndependentFiniteFullDefaultModelOracle(t *testing.T) {
 					// Actual solver omits eliminated variables from its projected model;
 					// model_converter's DEBUG contract requires their l_undef.
 					for v := uint32(0); v < 4; v++ {
-						eliminated, e := p.variables.eliminated.Read(v)
+						eliminated, e := p.variables.wasEliminated(BoolVar(v))
 						satOK(t, e)
-						if eliminated != 0 {
+						if eliminated {
 							model[v] = lbool.Undef
 						}
 					}

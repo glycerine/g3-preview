@@ -166,7 +166,7 @@ func TestSATSolverDecisionRandomLeavesQueueAndFallbackSkips(t *testing.T) {
 	satOK(t, v.activity.Set(2, 10))
 	satOK(t, v.queue.ActivityIncreased(2))
 	satOK(t, p.assign(0, satJustification{}))
-	satOK(t, v.eliminated.Write(1, 1))
+	satOK(t, v.setEliminated(BoolVar(1), true))
 	x, e = d.nextVar()
 	satOK(t, e)
 	if x != 2 || satScalarTestUint(t, &v.queue.runtimeIndices, 0) != 0 || satScalarTestUint(t, &v.queue.runtimeIndices, 1) != 0 || satScalarTestUint(t, &v.queue.runtimeIndices, 2) != 0 {
@@ -185,7 +185,7 @@ func TestSATSolverDecisionRejectedRandomCandidateUsesQueue(t *testing.T) {
 		rejected := BoolVar(oracle.Next() % 3)
 		wanted := BoolVar((uint32(rejected) + 1) % 3)
 		if eliminated {
-			satOK(t, p.variables.eliminated.Write(uint32(rejected), 1))
+			satOK(t, p.variables.setEliminated(rejected, true))
 		} else {
 			satOK(t, p.assign(MakeLiteral(rejected, false), satJustification{}))
 		}

@@ -53,15 +53,15 @@ func (s *Solver) copyFrom(src *Solver) (err error) {
 					return ErrSATAssertion
 				}
 			}
-			ext, e := src.Variables.external.Read(v)
+			ext, e := src.Variables.IsExternal(BoolVar(v))
 			if e != nil {
 				return e
 			}
-			dvar, e := src.Variables.decision.Read(v)
+			dvar, e := src.Variables.decisionEligible(BoolVar(v))
 			if e != nil {
 				return e
 			}
-			created, e := s.MkVar(ext != 0, dvar != 0)
+			created, e := s.MkVar(ext, dvar)
 			if e != nil {
 				return e
 			}

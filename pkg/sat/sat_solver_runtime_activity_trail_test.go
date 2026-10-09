@@ -17,13 +17,13 @@ func TestSATSolverActivityAndLiteralTrailUseActualRuntime(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 206+600 || v.memory.Stats().LiveBlocks != 12 {
+	if n != 134+600 || v.memory.Stats().LiveBlocks != 8 {
 		t.Fatal("actual activity source allocation missing", n, v.memory.Stats())
 	}
 	satOK(t, v.trailPush(MakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 230+600 || v.memory.Stats().LiveBlocks != 13 {
+	if n != 158+600 || v.memory.Stats().LiveBlocks != 9 {
 		t.Fatal("actual literal32 trail allocation missing", n, v.memory.Stats())
 	}
 }
@@ -169,7 +169,7 @@ func TestSATSolverRuntimeTrailAllActualRefusalPrefixes(t *testing.T) {
 			e := s.assignCore(0, satJustification{})
 			satScalarAuditRoots(t, v)
 			satPropagationAssertGraph(t, s)
-			if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 0 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 1 {
+			if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 0 || !v.assignedSinceGC[0] {
 				t.Fatal("source scalar prefix before trail")
 			}
 			n, x := v.trail.Size(v.trailRef)
@@ -204,14 +204,14 @@ func TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix(t *testing.T) {
 	satOK(t, e)
 	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
 	satOK(t, e)
-	prefix, e := r.Allocate(99280)
+	prefix, e := r.Allocate(99334)
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	_, e = v.mkVar(true, true)
 	if !satAssignmentActualRefusal(r, e) || v.activity.values.Raw.Pending == (util.Block{}) || v.activity.values.Raw.Block != (util.Block{}) {
 		t.Fatal("actual activity owned malloc error", e, r.State())
 	}
-	if satAssignmentTestSize(t, &v.external) != 1 || v.activity.Size() != 0 || satScalarTestUintSize(t, &v.level) != 0 {
+	if uint32(len(v.external)) != 1 || v.activity.Size() != 0 || satScalarTestUintSize(t, &v.level) != 0 {
 		t.Fatal("source activity/level publication sequence")
 	}
 	satScalarAuditOwner(t, v, prefix)

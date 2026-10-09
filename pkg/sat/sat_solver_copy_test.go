@@ -30,24 +30,24 @@ func TestSATSolverCopyActualFlagsTrailClausesAndUserScope(t *testing.T) {
 		t.Fatal(n)
 	}
 	for v := uint32(1); v < n; v++ {
-		a, e := src.Variables.external.Read(v)
+		a, e := src.Variables.IsExternal(BoolVar(v))
 		satOK(t, e)
-		b, e := dst.Variables.external.Read(v)
+		b, e := dst.Variables.IsExternal(BoolVar(v))
 		satOK(t, e)
 		if a != b {
 			t.Fatal(v, a, b)
 		}
-		a, e = src.Variables.decision.Read(v)
+		a, e = src.Variables.decisionEligible(BoolVar(v))
 		satOK(t, e)
-		b, e = dst.Variables.decision.Read(v)
+		b, e = dst.Variables.decisionEligible(BoolVar(v))
 		satOK(t, e)
 		if a != b {
 			t.Fatal(v, a, b)
 		}
 	}
-	ext, e := dst.Variables.external.Read(0)
+	ext, e := dst.Variables.IsExternal(BoolVar(0))
 	satOK(t, e)
-	if ext != 0 {
+	if ext {
 		t.Fatal("existing flag overwritten", ext)
 	}
 	value, e := dst.Variables.valueLiteral(8)
@@ -160,7 +160,7 @@ func TestSATSolverCopyDebugEliminatedSourceAssertionAfterEarlierVariable(t *test
 		_, e := src.MkVar(true, true)
 		satOK(t, e)
 	}
-	satOK(t, src.Variables.eliminated.Write(1, 1))
+	satOK(t, src.Variables.setEliminated(BoolVar(1), true))
 	e := dst.copyFrom(src)
 	n, e2 := dst.Variables.level.Size()
 	satOK(t, e2)

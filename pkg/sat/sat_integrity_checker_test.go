@@ -4,8 +4,6 @@ package sat
 import (
 	"errors"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATIntegrityCompleteSourceMethodsAndResourceOrder(t *testing.T) {
@@ -137,18 +135,13 @@ func TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask(t *testing.T) {
 		}
 	}
 	satOK(t, list.SetEnd(0))
-	// Explicit source-undefined stale pointer fixture: release size assertions
-	// do not evaluate the decision vector at all. Preserve its real owning token.
-	prior := v.decision.Block
-	temporary, e := v.memory.Allocate(8)
-	satOK(t, e)
-	stale := temporary
-	satOK(t, v.memory.Deallocate(&temporary))
-	v.decision.Block = stale
+	// Native flag lengths are checked only in the source debug profile.
+	prior := v.decision
+	v.decision = nil
 	yes, e = c.checkBoolVars()
 	if satStorageSourceDebug {
-		if !errors.Is(e, util.ErrRuntimeOwner) {
-			t.Fatal("endangered debug size read", e)
+		if !errors.Is(e, ErrSATAssertion) {
+			t.Fatal("debug flag length assertion", e)
 		}
 	} else {
 		satOK(t, e)
@@ -156,7 +149,7 @@ func TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask(t *testing.T) {
 			t.Fatal(yes)
 		}
 	}
-	v.decision.Block = prior
+	v.decision = prior
 	satGCAudit(t, g)
 }
 

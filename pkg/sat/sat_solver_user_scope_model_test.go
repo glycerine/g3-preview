@@ -48,7 +48,7 @@ func TestSATSolverOwningWatchShrinkRetainsOuterCapacity(t *testing.T) {
 }
 
 // Source: src/sat/sat_solver.cpp:135-160,2818-2841.
-func TestSATSolverNativeMarksScopeTruncationAndRegrowth(t *testing.T) {
+func TestSATSolverNativeFlagsScopeTruncationAndRegrowth(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
 	for i := 0; i < 2; i++ {
 		_, e := s.MkVar(false, true)
@@ -67,6 +67,12 @@ func TestSATSolverNativeMarksScopeTruncationAndRegrowth(t *testing.T) {
 	for i := range v.literalMark {
 		v.literalMark[i] = true
 	}
+	for i := range v.decision {
+		v.decision[i] = false
+		v.external[i] = true
+		v.assignedSinceGC[i] = true
+		v.eliminated[i] = i >= 2
+	}
 	satOK(t, s.UserPop(1))
 	if len(v.mark) != 2 || len(v.literalMark) != 4 {
 		t.Fatal("scope mark lengths", len(v.mark), len(v.literalMark))
@@ -81,10 +87,18 @@ func TestSATSolverNativeMarksScopeTruncationAndRegrowth(t *testing.T) {
 			t.Fatal("scope changed retained literal mark")
 		}
 	}
+	for i := 0; i < 2; i++ {
+		if v.decision[i] || !v.external[i] || !v.assignedSinceGC[i] || v.eliminated[i] {
+			t.Fatal("scope changed retained flags", i)
+		}
+	}
 	variable, e := s.MkVar(false, true)
 	satOK(t, e)
 	if variable != 2 || len(v.mark) != 3 || len(v.literalMark) != 6 || v.mark[2] || v.literalMark[4] || v.literalMark[5] {
 		t.Fatal("new variable inherited removed marks", variable, v.mark, v.literalMark)
+	}
+	if !v.decision[2] || v.external[2] || v.eliminated[2] || v.assignedSinceGC[2] {
+		t.Fatal("regrowth inherited removed flags")
 	}
 	satFullSolverRuntimeAudit(t, s)
 }

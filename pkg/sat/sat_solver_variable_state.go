@@ -13,23 +13,24 @@ import (
 // actual columns/queue/trail directly to that owner. Elimination todo is the
 // simplifier's real borrowed set. No callback supplies missing solver behavior.
 type satSolverVariableState struct {
-	self                                                                  *satSolverVariableState
-	budget                                                                *arena.Budget
-	watches                                                               *satSolverWatchLists
-	assignment                                                            RuntimeVectorColumn
-	memory                                                                *util.Runtime
-	decision, eliminated, external, phase, previousPhase, assignedSinceGC RuntimeVectorColumn
-	mark, literalMark                                                     []bool
-	justification                                                         satSolverRuntimeJustificationColumn
-	level                                                                 RuntimeUintColumn
-	activity                                                              *satSolverRuntimeActivity
-	queue                                                                 *satVarQueue
-	trail                                                                 *satSolverRuntimeTrail
-	trailRef                                                              satSolverLiteralListRef
-	elimTodo                                                              *satSolverUintSet
-	ownerBytes                                                            uint64
-	mkVarCount, qhead, scopeLevel, activityInc                            uint32
-	modelIsCurrent, modelKnown, closed                                    bool
+	self                                            *satSolverVariableState
+	budget                                          *arena.Budget
+	watches                                         *satSolverWatchLists
+	assignment                                      RuntimeVectorColumn
+	memory                                          *util.Runtime
+	phase, previousPhase                            RuntimeVectorColumn
+	decision, eliminated, external, assignedSinceGC []bool
+	mark, literalMark                               []bool
+	justification                                   satSolverRuntimeJustificationColumn
+	level                                           RuntimeUintColumn
+	activity                                        *satSolverRuntimeActivity
+	queue                                           *satVarQueue
+	trail                                           *satSolverRuntimeTrail
+	trailRef                                        satSolverLiteralListRef
+	elimTodo                                        *satSolverUintSet
+	ownerBytes                                      uint64
+	mkVarCount, qhead, scopeLevel, activityInc      uint32
+	modelIsCurrent, modelKnown, closed              bool
 }
 type satSolverVariableStats struct {
 	OwnerBytes, ColumnBytes, WatchBytes, ActivityBytes, QueueBytes, TrailBytes, TotalBytes uint64
@@ -61,7 +62,7 @@ func newSATColdVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.Ve
 	s.memory = raw
 	s.assignment.Bind(raw)
 	s.justification.bind(raw, b)
-	for _, col := range []*RuntimeVectorColumn{&s.decision, &s.eliminated, &s.external, &s.phase, &s.previousPhase, &s.assignedSinceGC} {
+	for _, col := range []*RuntimeVectorColumn{&s.phase, &s.previousPhase} {
 		col.Bind(raw)
 	}
 	s.level.Bind(raw)
@@ -138,23 +139,9 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 	if e := s.justification.push(satJustification{}); e != nil {
 		return v, e
 	}
-	decision := int8(0)
-	if dvar {
-		decision = 1
-	}
-	if e := s.decision.Push(decision); e != nil {
-		return v, e
-	}
-	if e := s.eliminated.Push(0); e != nil {
-		return v, e
-	}
-	external := int8(0)
-	if ext {
-		external = 1
-	}
-	if e := s.external.Push(external); e != nil {
-		return v, e
-	}
+	s.decision = append(s.decision, dvar)
+	s.eliminated = append(s.eliminated, false)
+	s.external = append(s.external, ext)
 	if e := s.activity.Push(0); e != nil {
 		return v, e
 	}
@@ -169,9 +156,7 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 	if e := s.previousPhase.Push(2); e != nil {
 		return v, e
 	}
-	if e := s.assignedSinceGC.Push(0); e != nil {
-		return v, e
-	}
+	s.assignedSinceGC = append(s.assignedSinceGC, false)
 	if e := s.queue.MkVar(v); e != nil {
 		return v, e
 	}
@@ -179,11 +164,11 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 		return v, e
 	}
 	if satStorageSourceDebug {
-		eliminated, e := s.eliminated.Read(uint32(v))
+		eliminated, e := s.wasEliminated(v)
 		if e != nil {
 			return v, e
 		}
-		if eliminated != 0 {
+		if eliminated {
 			return v, ErrSATAssertion
 		}
 	}
@@ -215,15 +200,70 @@ func (s *satSolverVariableState) IsExternal(v BoolVar) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}
-	n, e := s.external.Read(uint32(v))
-	return n != 0, e
+	if uint64(v) >= uint64(len(s.external)) {
+		if satStorageSourceDebug {
+			return false, ErrSATAssertion
+		}
+		return false, arena.ErrBounds
+	}
+	return s.external[v], nil
 }
 func (s *satSolverVariableState) wasEliminated(v BoolVar) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}
-	n, e := s.eliminated.Read(uint32(v))
-	return n != 0, e
+	if uint64(v) >= uint64(len(s.eliminated)) {
+		if satStorageSourceDebug {
+			return false, ErrSATAssertion
+		}
+		return false, arena.ErrBounds
+	}
+	return s.eliminated[v], nil
+}
+func (s *satSolverVariableState) decisionEligible(v BoolVar) (bool, error) {
+	if e := s.open(); e != nil {
+		return false, e
+	}
+	if uint64(v) >= uint64(len(s.decision)) {
+		if satStorageSourceDebug {
+			return false, ErrSATAssertion
+		}
+		return false, arena.ErrBounds
+	}
+	return s.decision[v], nil
+}
+func (s *satSolverVariableState) gcAssigned(v BoolVar) (bool, error) {
+	if e := s.open(); e != nil {
+		return false, e
+	}
+	if uint64(v) >= uint64(len(s.assignedSinceGC)) {
+		if satStorageSourceDebug {
+			return false, ErrSATAssertion
+		}
+		return false, arena.ErrBounds
+	}
+	return s.assignedSinceGC[v], nil
+}
+func (s *satSolverVariableState) setExternal(v BoolVar, value bool) error {
+	if _, e := s.IsExternal(v); e != nil {
+		return e
+	}
+	s.external[v] = value
+	return nil
+}
+func (s *satSolverVariableState) setEliminated(v BoolVar, value bool) error {
+	if _, e := s.wasEliminated(v); e != nil {
+		return e
+	}
+	s.eliminated[v] = value
+	return nil
+}
+func (s *satSolverVariableState) setGCAssigned(v BoolVar, value bool) error {
+	if _, e := s.gcAssigned(v); e != nil {
+		return e
+	}
+	s.assignedSinceGC[v] = value
+	return nil
 }
 func (s *satSolverVariableState) trailPush(l Literal) error {
 	if e := s.open(); e != nil {
@@ -348,9 +388,7 @@ func (s *satSolverVariableState) finalizeColumnsWatches() error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
 	}
-	if e := s.assignedSinceGC.Finalize(); e != nil {
-		return e
-	}
+	s.assignedSinceGC = nil
 	if e := s.previousPhase.Finalize(); e != nil {
 		return e
 	}
@@ -366,17 +404,11 @@ func (s *satSolverVariableState) finalizeColumnsWatches() error {
 	if e := s.level.Finalize(); e != nil {
 		return e
 	}
-	if e := s.external.Finalize(); e != nil {
-		return e
-	}
-	if e := s.eliminated.Finalize(); e != nil {
-		return e
-	}
+	s.external = nil
+	s.eliminated = nil
 	s.literalMark = nil
 	s.mark = nil
-	if e := s.decision.Finalize(); e != nil {
-		return e
-	}
+	s.decision = nil
 	if e := s.justification.finalize(); e != nil {
 		return e
 	}

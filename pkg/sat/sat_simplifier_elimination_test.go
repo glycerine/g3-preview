@@ -142,9 +142,9 @@ func TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix(t *testing.T) {
 			s.kernel.elimCounter = 1000
 			yes, e := s.tryEliminate(0)
 			satOK(t, e)
-			eliminated, e := l.propagation.variables.eliminated.Read(0)
+			eliminated, e := l.propagation.variables.wasEliminated(BoolVar(0))
 			satOK(t, e)
-			if yes || eliminated != 0 || l.propagation.converter.Size() != 0 || s.kernel.elimCounter != 1000 {
+			if yes || eliminated || l.propagation.converter.Size() != 0 || s.kernel.elimCounter != 1000 {
 				t.Fatal("literal source cutoff before resolve/MC publication")
 			}
 			satSimplifierAudit(t, s)

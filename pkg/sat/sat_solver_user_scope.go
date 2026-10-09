@@ -265,15 +265,30 @@ func (s *Solver) gcVar(v uint32) error {
 	if e = x.justification.raw.Shrink(v); e != nil {
 		return e
 	}
-	if e = x.decision.Shrink(v); e != nil {
-		return e
+	if uint64(v) > uint64(len(x.decision)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
+		return arena.ErrBounds
 	}
-	if e = x.eliminated.Shrink(v); e != nil {
-		return e
+	clear(x.decision[v:])
+	x.decision = x.decision[:v]
+	if uint64(v) > uint64(len(x.eliminated)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
+		return arena.ErrBounds
 	}
-	if e = x.external.Shrink(v); e != nil {
-		return e
+	clear(x.eliminated[v:])
+	x.eliminated = x.eliminated[:v]
+	if uint64(v) > uint64(len(x.external)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
+		return arena.ErrBounds
 	}
+	clear(x.external[v:])
+	x.external = x.external[:v]
 	if e = x.activity.values.Shrink(v); e != nil {
 		return e
 	}
@@ -302,9 +317,14 @@ func (s *Solver) gcVar(v uint32) error {
 	if e = x.previousPhase.Shrink(v); e != nil {
 		return e
 	}
-	if e = x.assignedSinceGC.Shrink(v); e != nil {
-		return e
+	if uint64(v) > uint64(len(x.assignedSinceGC)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
+		return arena.ErrBounds
 	}
+	clear(x.assignedSinceGC[v:])
+	x.assignedSinceGC = x.assignedSinceGC[:v]
 	if e = x.elimTodo.Reset(); e != nil {
 		return e
 	}

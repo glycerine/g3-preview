@@ -118,18 +118,18 @@ func (s *satSimplifier) orderVariables() error {
 		return e
 	}
 	for _, v := range p.variables.elimTodo.values {
-		external, e := p.variables.external.Read(v)
+		external, e := p.variables.IsExternal(BoolVar(v))
 		if e != nil {
 			return e
 		}
-		if external != 0 {
+		if external {
 			continue
 		}
-		eliminated, e := p.variables.eliminated.Read(v)
+		eliminated, e := p.variables.wasEliminated(BoolVar(v))
 		if e != nil {
 			return e
 		}
-		if eliminated != 0 {
+		if eliminated {
 			continue
 		}
 		value, e := p.variables.valueLiteral(Literal(v * 2))
@@ -594,7 +594,7 @@ func (s *satSimplifier) tryEliminate(v BoolVar) (bool, error) {
 	if e = s.saveClauses(mc, s.negCls); e != nil {
 		return false, e
 	}
-	if e = p.variables.eliminated.Write(uint32(v), 1); e != nil {
+	if e = p.variables.setEliminated(v, true); e != nil {
 		return false, e
 	}
 	if e = s.removeBinaries(pos); e != nil {

@@ -60,7 +60,7 @@ func TestSATSCCExternalRootAndContradiction(t *testing.T) {
 		c, l := satSCCFixture(t, 2)
 		p := l.propagation
 		if ext {
-			satOK(t, p.variables.external.Write(1, 1))
+			satOK(t, p.variables.setExternal(BoolVar(1), true))
 		}
 		satOK(t, l.mkBinClause(1, 2, false))
 		satOK(t, l.mkBinClause(3, 0, false))
@@ -249,7 +249,7 @@ func TestSATElimEqsEmptyUnitUnaffectedAndExternal(t *testing.T) {
 			t.Fatal("unaffected skips sort", got, want)
 		}
 	}
-	satOK(t, p.variables.external.Write(1, 1))
+	satOK(t, p.variables.setExternal(BoolVar(1), true))
 	satOK(t, e.run([]Literal{0, 0, 4}, []BoolVar{1}))
 	elim, err := p.variables.wasEliminated(1)
 	satOK(t, err)

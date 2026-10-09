@@ -13,15 +13,15 @@ type satSimplifierBlocked struct {
 }
 
 func (s *satSimplifier) blockedProcessVar(v BoolVar) (bool, error) {
-	x, e := s.lifecycle.propagation.variables.external.Read(uint32(v))
+	x, e := s.lifecycle.propagation.variables.IsExternal(v)
 	if e != nil {
 		return false, e
 	}
-	if x != 0 {
+	if x {
 		return false, nil
 	}
-	x, e = s.lifecycle.propagation.variables.eliminated.Read(uint32(v))
-	return x == 0, e
+	x, e = s.lifecycle.propagation.variables.wasEliminated(v)
+	return !x, e
 }
 func (s *satSimplifier) closeBlocked() error {
 	b := &s.blocked

@@ -78,7 +78,7 @@ func (s *Solver) sourceSetExternal(v BoolVar) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	return s.Variables.external.Write(uint32(v), 1)
+	return s.Variables.setExternal(v, true)
 }
 func (s *Solver) sourceWasEliminated(v BoolVar) (bool, error) {
 	if e := s.open(); e != nil {

@@ -16,13 +16,13 @@ func (g *satSolverGC) gcDynPSM() error {
 	h, V := uint32(0), uint32(0)
 	n := v.NumVars()
 	for i := uint32(0); i < n; i++ {
-		assigned, e := v.assignedSinceGC.Read(i)
+		assigned, e := v.gcAssigned(BoolVar(i))
 		if e != nil {
 			return e
 		}
-		if assigned != 0 {
+		if assigned {
 			V++
-			if e = v.assignedSinceGC.Write(i, 0); e != nil {
+			if e = v.setGCAssigned(BoolVar(i), false); e != nil {
 				return e
 			}
 		}

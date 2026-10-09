@@ -65,18 +65,18 @@ func (s *satSolverPropagationState) assignCore(l Literal, j satJustification) er
 	if e := v.phase.Write(id, phase); e != nil {
 		return e
 	}
-	if e := v.assignedSinceGC.Write(id, 1); e != nil {
+	if e := v.setGCAssigned(BoolVar(id), true); e != nil {
 		return e
 	}
 	if e := v.trailPush(l); e != nil {
 		return e
 	}
 	if s.extensionPresent {
-		ext, e := v.external.Read(id)
+		ext, e := v.IsExternal(BoolVar(id))
 		if e != nil {
 			return e
 		}
-		if ext != 0 {
+		if ext {
 			return ErrSATMissingSourceExtBinding
 		}
 	}

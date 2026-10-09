@@ -79,11 +79,11 @@ func (s *Solver) displayStatus(out *util.NumericTextStream) error {
 		if v >= n {
 			break
 		}
-		x, e := s.Variables.eliminated.Read(v)
+		x, e := s.Variables.wasEliminated(BoolVar(v))
 		if e != nil {
 			return e
 		}
-		if x != 0 {
+		if x {
 			numElim++
 		}
 	}

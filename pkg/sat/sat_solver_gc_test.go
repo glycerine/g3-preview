@@ -144,7 +144,7 @@ func TestSATSolverGCDynamicFreezeActivateAndInactivity(t *testing.T) {
 	for i := uint32(0); i < 4; i++ {
 		satOK(t, p.variables.phase.Write(i, 0))
 		satOK(t, p.variables.previousPhase.Write(i, 0))
-		satOK(t, p.variables.assignedSinceGC.Write(i, 1))
+		satOK(t, p.variables.setGCAssigned(BoolVar(i), true))
 	}
 	s.conflictsSinceGC = g.gcThreshold + 1
 	satOK(t, g.gc())
@@ -157,7 +157,7 @@ func TestSATSolverGCDynamicFreezeActivateAndInactivity(t *testing.T) {
 	for i := uint32(0); i < 4; i++ {
 		satOK(t, p.variables.phase.Write(i, 1))
 		satOK(t, p.variables.previousPhase.Write(i, 1))
-		satOK(t, p.variables.assignedSinceGC.Write(i, 1))
+		satOK(t, p.variables.setGCAssigned(BoolVar(i), true))
 	}
 	s.conflictsSinceGC = g.gcThreshold + 1
 	satOK(t, g.gc())

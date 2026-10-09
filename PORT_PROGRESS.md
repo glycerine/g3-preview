@@ -31067,3 +31067,24 @@ variables. Phase and assignment columns remain separate live conversion work.
 Validation: complete SAT suites passed in native (1.17s) and g3checked,g3debug
 (1.35s) builds. The new scope mark regression passed separately in both profiles.
 Module-wide test compilation, SAT vet, and portcheck passed.
+
+## Store remaining Boolean SAT flags in concrete slices
+
+Converted decision eligibility, eliminated/external status, and assignment-since-GC
+from Runtime byte columns to `[]bool`. Updated actual solver-copy, assignment,
+elimination, probing, reporting, and GC consumers to typed Boolean operations.
+All six Boolean variable/literal arrays now use native backing and leave the
+Runtime allocation/destruction census. Variable creation preserves action order;
+scope truncation clears removed flags and new variables receive requested flags
+and false defaults. Changed the obsolete stale decision-pointer test to the
+retained debug length assertion. Updated real allocation/refusal fixtures for
+the removed backing, retaining their actual failure and ownership checks.
+
+Extended the scope regression to all six Boolean arrays, including distinct
+retained values and fresh regrowth defaults. Phase/assignment bytes and the
+asymmetric-branch phase snapshot remain live conversion work.
+
+Validation: the full native module suite passed at the 18:07–18:12 UTC checkpoint
+(polynomial 225.5s, util 135.7s, AST 29.8s). Complete checked/debug SAT tests passed
+(1.13s), and the renamed native scope-regrowth regression passed. SAT vet and
+portcheck passed. This is the latest full-suite checkpoint for subsequent work.

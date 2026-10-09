@@ -58,7 +58,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 		if satScalarTestUint(t, &s.level, i) != ^uint32(0) || satJustificationTestValue(t, &s.justification, i) != (satJustification{}) || satAssignmentTestValue(t, &s.phase, i) != 2 || satAssignmentTestValue(t, &s.previousPhase, i) != 2 {
 			t.Fatal("source values", i)
 		}
-		if satAssignmentTestValue(t, &s.decision, i) != int8(map[bool]int{true: 1}[i%3 != 0]) || satAssignmentTestValue(t, &s.external, i) != int8(i%2) {
+		if s.decision[i] != (i%3 != 0) || s.external[i] != (i%2 != 0) {
 			t.Fatal(i)
 		}
 	}
@@ -80,7 +80,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 
 func satVariableAssertFirstPrefix(t *testing.T, s *satSolverVariableState) {
 	t.Helper()
-	sizes := []int{len(s.watches.lists), int(satAssignmentTestSize(t, &s.assignment)), int(satJustificationTestSize(t, &s.justification)), int(satAssignmentTestSize(t, &s.decision)), int(satAssignmentTestSize(t, &s.eliminated)), int(satAssignmentTestSize(t, &s.external)), int(s.activity.Size()), int(satScalarTestUintSize(t, &s.level)), len(s.mark), len(s.literalMark), int(satAssignmentTestSize(t, &s.phase)), int(satAssignmentTestSize(t, &s.previousPhase)), int(satAssignmentTestSize(t, &s.assignedSinceGC))}
+	sizes := []int{len(s.watches.lists), int(satAssignmentTestSize(t, &s.assignment)), int(satJustificationTestSize(t, &s.justification)), len(s.decision), len(s.eliminated), len(s.external), int(s.activity.Size()), int(satScalarTestUintSize(t, &s.level)), len(s.mark), len(s.literalMark), int(satAssignmentTestSize(t, &s.phase)), int(satAssignmentTestSize(t, &s.previousPhase)), len(s.assignedSinceGC)}
 	want := []int{2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1}
 	unfinished := false
 	for i, n := range sizes {

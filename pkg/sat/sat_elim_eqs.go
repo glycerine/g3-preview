@@ -550,7 +550,7 @@ func (e *satElimEqs) saveElim() error {
 			if err != nil {
 				return err
 			}
-			if err = p.variables.eliminated.Write(uint32(v), 1); err != nil {
+			if err = p.variables.setEliminated(v, true); err != nil {
 				return err
 			}
 			if err = p.converter.InsertBinary(entry, lit.Negated(), r); err != nil {

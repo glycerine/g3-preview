@@ -1068,3 +1068,15 @@ physical ownership audits count only the remaining real Runtime consumers.
 Phase storage remains a distinct three-state byte representation; its live
 assignment/decision/GC and asymmetric-branch snapshot consumers still require
 conversion. The shared Runtime vector therefore remains live.
+
+## Remaining Boolean SAT flags
+
+Decision eligibility, eliminated status, external status, and assignment-since-GC
+now also use `[]bool`. All six Boolean variable/literal arrays have left the
+shared Runtime vector. Solver copy reads typed Boolean values; elimination,
+assignment, and GC update the actual native flags. Source action order and
+reached owner/bounds guards remain, while backing growth and cleanup use native
+Go slice operations. Scope pop/regrowth preserves retained flags and initializes
+new variables from their requested decision/external flags and false defaults.
+Only assignment and the two three-state phase arrays still use Runtime byte
+columns in variable state; asymmetric branching also retains its phase snapshot.

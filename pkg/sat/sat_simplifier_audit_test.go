@@ -164,7 +164,7 @@ func TestSATSimplifierAllActualRefusalPrefixes(t *testing.T) {
 					}
 					if route == 0 {
 						for v := uint32(1); v < 4; v++ {
-							satOK(t, p.variables.external.Write(v, 1))
+							satOK(t, p.variables.setExternal(BoolVar(v), true))
 						}
 					}
 					clauses := [][]Literal{{0, 2, 4}, {1, 2, 4}, {0, 2, 4, 6}, {1, 3, 6}}

@@ -16,7 +16,7 @@ func TestSATSolverJustificationActualEightByteSourceAllocation(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 206+600 || v.memory.Stats().LiveBlocks != 12 {
+	if n != 134+600 || v.memory.Stats().LiveBlocks != 8 {
 		t.Fatal("actual source justification allocation absent", n, v.memory.Stats())
 	}
 }
@@ -44,7 +44,7 @@ func TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy(t *testing.
 	if _, e = v.justification.read(0); !errors.Is(e, ErrSATOwner) {
 		t.Fatal("missing provenance may not infer live registry token", e)
 	}
-	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 2 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 0 {
+	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 2 || v.assignedSinceGC[0] {
 		t.Fatal("actual assignment statement prefix")
 	}
 	satScalarAuditRoots(t, v)
@@ -257,7 +257,7 @@ func TestSATSolverJustificationTLSPendingAtActualSourceAllocation(t *testing.T) 
 	if !satAssignmentActualRefusal(r, e) || v.justification.raw.Pending == (util.Block{}) || v.justification.raw.Block != (util.Block{}) {
 		t.Fatal("actual justification owned physical refusal", e, r.State())
 	}
-	if satAssignmentTestSize(t, &v.assignment) != 2 || satJustificationTestSize(t, &v.justification) != 0 || satAssignmentTestSize(t, &v.decision) != 0 || v.justification.provenanceBytes != 0 {
+	if satAssignmentTestSize(t, &v.assignment) != 2 || satJustificationTestSize(t, &v.justification) != 0 || uint32(len(v.decision)) != 0 || v.justification.provenanceBytes != 0 {
 		t.Fatal("source publication before actual justification malloc", v.Stats())
 	}
 	satScalarAuditOwner(t, v, prefix)

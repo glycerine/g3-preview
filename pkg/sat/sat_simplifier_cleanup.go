@@ -103,11 +103,11 @@ func (s *satSimplifier) cleanupClauses(learned, varsEliminated, inUse bool) erro
 				if e != nil {
 					return e
 				}
-				dead, e := p.variables.eliminated.Read(uint32(l.variable()))
+				dead, e := p.variables.wasEliminated(l.variable())
 				if e != nil {
 					return e
 				}
-				if dead != 0 {
+				if dead {
 					break
 				}
 			}

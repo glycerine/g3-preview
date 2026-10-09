@@ -119,7 +119,7 @@ func TestSATSolverReportStatusActualEliminatedInconsistentAndExternalInspection(
 		_, e := s.MkVar(false, true)
 		satOK(t, e)
 	}
-	satOK(t, s.Variables.eliminated.Write(1, 1))
+	satOK(t, s.Variables.setEliminated(BoolVar(1), true))
 	satOK(t, s.MkClause(nil))
 	list, e := s.Variables.watches.Get(0)
 	satOK(t, e)

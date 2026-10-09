@@ -335,11 +335,11 @@ func (s *satSolverProbing) run(force bool) (answer bool, err error) {
 		}
 		skip := value != lbool.Undef
 		if !skip {
-			x, e := v.eliminated.Read(id)
+			x, e := v.wasEliminated(BoolVar(id))
 			if e != nil {
 				return false, e
 			}
-			skip = x != 0
+			skip = x
 		}
 		if skip {
 			if s.cacheEnabled {
