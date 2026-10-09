@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"math"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -164,24 +165,25 @@ func TestSATSolverInspectionBinaryCollectionAppendsOriginalAndLearned(t *testing
 	satOK(t, e)
 	_, e = s.Lifecycle.MkClauseCore(2, []Literal{1, 3}, true)
 	satOK(t, e)
-	out, e := NewBinClauseBuffer(s.runtime.memory, s.budget)
+	out := []BinaryLiteralPair{newSATSolverBinPair(2, 2)}
+	out, e = s.collectBinClauses(out, false)
 	satOK(t, e)
-	t.Cleanup(func() { satOK(t, out.Close()) })
-	satOK(t, out.Push(newSATSolverBinPair(2, 2)))
-	satOK(t, s.collectBinClauses(out, false))
-	n, e := out.Size()
-	satOK(t, e)
-	if n != 2 {
-		t.Fatal(n)
+	if len(out) != 2 || out[0] != newSATSolverBinPair(2, 2) || out[1] != newSATSolverBinPair(0, 2) {
+		t.Fatal("original collection must append after caller contents", out)
 	}
-	satOK(t, s.collectBinClauses(out, true))
-	n, e = out.Size()
+	out, e = s.collectBinClauses(out, true)
 	satOK(t, e)
-	if n != 4 {
-		t.Fatal(n)
+	// Watch indices increase before negation: literal 1 is reached before 0.
+	want := []BinaryLiteralPair{newSATSolverBinPair(2, 2), newSATSolverBinPair(0, 2), newSATSolverBinPair(1, 3), newSATSolverBinPair(0, 2)}
+	if !reflect.DeepEqual(out, want) {
+		t.Fatal("original and learned watch traversal order", out, want)
 	}
-	satOK(t, out.Close())
 	satFullSolverRuntimeAudit(t, s)
+	satOK(t, s.Close())
+	retained, err := s.CollectBinClauses(out, true)
+	if !errors.Is(err, arena.ErrClosed) || !reflect.DeepEqual(retained, want) {
+		t.Fatal("failed collection must preserve caller contents", retained, err)
+	}
 }
 
 func TestSATSolverInspectionExactSourceWatchDisplay(t *testing.T) {

@@ -134,62 +134,33 @@ func TestSATSolverInspectionWarmOutputAndOwnerGuards(t *testing.T) {
 	satOK(t, o.Close())
 }
 
-func TestSATSolverInspectionBinaryOutputEveryActualReservation(t *testing.T) {
-	makeSolver := func(t *testing.T) *Solver {
-		s, _, _ := satSolverCheckFixture(t)
-		for i := 0; i < 24; i++ {
-			_, e := s.MkVar(false, true)
-			satOK(t, e)
+// Native output growth must not consume Runtime allocation reservations.
+func TestSATSolverInspectionBinaryOutputNativeGrowth(t *testing.T) {
+	s, _, _ := satSolverCheckFixture(t)
+	for i := 0; i < 96; i++ {
+		_, e := s.MkVar(false, true)
+		satOK(t, e)
+	}
+	for i := uint32(0); i < 95; i++ {
+		_, e := s.Lifecycle.MkClauseCore(2, []Literal{Literal(i * 2), Literal((i + 1) * 2)}, i&1 != 0)
+		satOK(t, e)
+	}
+	before := s.budget.Used()
+	runtimeBefore := s.runtime.memory.Stats()
+	s.budget.FailAfter(0)
+	defer s.budget.FailAfter(-1)
+	out, e := s.collectBinClauses(nil, true)
+	satOK(t, e)
+	if len(out) != 95 {
+		t.Fatal(len(out))
+	}
+	for i, pair := range out {
+		if pair != newSATSolverBinPair(Literal(2*i), Literal(2*(i+1))) {
+			t.Fatal("watch traversal order", i, pair)
 		}
-		for i := uint32(0); i < 23; i++ {
-			_, e := s.Lifecycle.MkClauseCore(2, []Literal{Literal(i * 2), Literal((i + 1) * 2)}, i&1 != 0)
-			satOK(t, e)
-		}
-		return s
 	}
-	h := int64(0)
-	t.Run("calibrate", func(t *testing.T) {
-		s := makeSolver(t)
-		const n = int64(1 << 50)
-		s.budget.FailAfter(n)
-		satOK(t, s.collectBinClauses(s.userBinClauses, true))
-		h = n - testFieldBySourceName(reflect.ValueOf(s.budget).Elem(), "remaining").Int()
-		satFullSolverRuntimeAudit(t, s)
-		s.budget.FailAfter(-1)
-	})
-	fail, ok := int64(0), 0
-	for fault := int64(0); fault <= h; fault++ {
-		t.Run(fmt.Sprint(fault), func(t *testing.T) {
-			s := makeSolver(t)
-			s.budget.FailAfter(fault)
-			e := s.collectBinClauses(s.userBinClauses, true)
-			satFullSolverRuntimeAudit(t, s)
-			n, x := s.userBinClauses.Size()
-			satOK(t, x)
-			for i := uint32(0); i < n; i++ {
-				pair, x := s.userBinClauses.Get(i)
-				satOK(t, x)
-				if pair.first != 2*i || pair.second != 2*(i+1) {
-					t.Fatal("completed owning append prefix", i, pair)
-				}
-			}
-			if e != nil {
-				var mf util.Failure
-				if !errors.Is(e, arena.ErrInjectedFailure) && !(errors.As(e, &mf) && mf.ErrorCode() == 101 && s.runtime.memory.State().OutOfMemory) {
-					t.Fatal(e)
-				}
-				fail++
-			} else {
-				if n != 23 {
-					t.Fatal(n)
-				}
-				ok++
-			}
-			s.budget.FailAfter(-1)
-		})
+	if s.budget.Used() != before || s.runtime.memory.Stats() != runtimeBefore {
+		t.Fatal("Go output acquired a simulated Runtime allocation")
 	}
-	if fail != h || ok != 1 {
-		t.Fatal(fail, ok, h)
-	}
-	t.Log("binary actual reservations", h)
+	satFullSolverRuntimeAudit(t, s)
 }

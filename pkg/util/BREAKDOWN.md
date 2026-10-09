@@ -919,3 +919,11 @@ and physical-root audits now omit that empty owner. The Words field in
 IntegerConfig remains as Natural output configuration, while independent live
 Words users (parameter metadata, S-expression children, and SAT storage) remain
 separate conversion work.
+
+SAT binary-clause collection now stores its two complete literal indices in
+`[]sat.BinaryLiteralPair`. Solver mutex discovery, maximum-variable scans,
+inspection, and tactic goal recovery use slices directly. The BinClauseBuffer
+wrapper, Runtime vector column, realloc tokens, standalone owner charge, and
+stopped-destructor adapter are gone for this specialization. Watch traversal
+order, original/learned filtering, caller-prefix appending, and full literal
+bits remain covered by focused SAT tests.

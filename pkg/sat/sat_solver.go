@@ -51,7 +51,7 @@ type Solver struct {
 	elimTodo                     *satSolverUintSet
 	antecedents                  *satSolverIndexMap
 	auxLiterals, todoAntecedents RuntimeUintColumn
-	userBinClauses               *BinClauseBuffer
+	userBinClauses               []BinaryLiteralPair
 	binaryClauseGraph            []RuntimeUintColumn
 	closeSourceCause             error
 	closeGuardAcknowledged       bool
@@ -209,9 +209,6 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	// Remaining declared vectors are empty until reached by their algorithms.
 	// The consequence antecedent map is nevertheless eagerly constructed.
 	s.auxLiterals.Bind(c.Runtime.memory)
-	if s.userBinClauses, err = NewBinClauseBuffer(s.runtime.memory, c.Budget); err != nil {
-		return s, err
-	}
 	if s.antecedents, err = newSATSolverIndexMap(c.Runtime.memory, c.Budget); err != nil {
 		return s, err
 	}
@@ -390,9 +387,7 @@ func (s *Solver) closeMembers() error {
 				e = s.antecedents.Close()
 			}
 		case 6:
-			if s.userBinClauses != nil {
-				e = s.userBinClauses.Close()
-			}
+			s.userBinClauses = nil
 		case 7:
 			if s.auxLiterals.Raw.Self != nil {
 				e = s.auxLiterals.Finalize()

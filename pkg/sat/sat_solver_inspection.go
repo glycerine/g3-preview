@@ -71,29 +71,29 @@ func (s *Solver) checkMarks() error {
 	return nil
 }
 
-func (s *Solver) collectBinClauses(out *BinClauseBuffer, learned bool) error {
+func (s *Solver) collectBinClauses(out []BinaryLiteralPair, learned bool) ([]BinaryLiteralPair, error) {
 	if e := s.open(); e != nil {
-		return e
+		return out, e
 	}
 	sz := len(s.Variables.watches.lists)
 	for idx := 0; idx < sz; idx++ {
 		l := Literal(uint32(idx)).Negated()
 		list, e := s.Variables.watches.Get(uint32(idx))
 		if e != nil {
-			return e
+			return out, e
 		}
 		r, e := list.ref()
 		if e != nil {
-			return e
+			return out, e
 		}
 		it, e := s.Variables.watches.store.Iter(r)
 		if e != nil {
-			return e
+			return out, e
 		}
 		for {
 			w, yes, e := it.Next()
 			if e != nil {
-				return e
+				return out, e
 			}
 			if !yes {
 				break
@@ -104,7 +104,7 @@ func (s *Solver) collectBinClauses(out *BinClauseBuffer, learned bool) error {
 			if !learned {
 				yes, e := w.Learned()
 				if e != nil {
-					return e
+					return out, e
 				}
 				if yes {
 					continue
@@ -112,15 +112,13 @@ func (s *Solver) collectBinClauses(out *BinClauseBuffer, learned bool) error {
 			}
 			l2, e := w.Literal()
 			if e != nil {
-				return e
+				return out, e
 			}
 			if l.index() > l2.index() {
 				continue
 			}
-			if e = out.Push(newSATSolverBinPair(l, l2)); e != nil {
-				return e
-			}
+			out = append(out, newSATSolverBinPair(l, l2))
 		}
 	}
-	return nil
+	return out, nil
 }

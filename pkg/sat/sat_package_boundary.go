@@ -13,7 +13,10 @@ func (s *Solver) CheckOwner() error                             { return s.open(
 func (s *Solver) SourceInconsistent() (bool, error)             { return s.sourceInconsistent() }
 func (s *Solver) SourceNumVars() (uint32, error)                { return s.sourceNumVars() }
 func (s *Solver) SourceValueVar(v BoolVar) (lbool.LBool, error) { return s.sourceValueVar(v) }
-func (s *Solver) CollectBinClauses(out *BinClauseBuffer, learned bool) error {
+
+// CollectBinClauses appends in watch traversal order. On error it returns the
+// completed prefix, including the caller's original contents.
+func (s *Solver) CollectBinClauses(out []BinaryLiteralPair, learned bool) ([]BinaryLiteralPair, error) {
 	return s.collectBinClauses(out, learned)
 }
 func (s *Solver) ClauseAllocator() *ClauseAllocator { return s.Clauses }
@@ -34,5 +37,5 @@ func (s *Solver) BoolParameter(name *string, fallback bool) (bool, error) {
 func (s *Solver) UIntParameter(name *string, fallback uint32) (uint32, error) {
 	return s.context.GetUIntName(&s.params, name, fallback)
 }
-func (p satSolverBinPair) FirstIndex() uint32  { return p.first }
-func (p satSolverBinPair) SecondIndex() uint32 { return p.second }
+func (p BinaryLiteralPair) FirstIndex() uint32  { return p.first }
+func (p BinaryLiteralPair) SecondIndex() uint32 { return p.second }

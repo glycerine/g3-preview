@@ -199,24 +199,12 @@ func recoverSATGoalFormulas(tr *GoalTranslator, g *tactic.Goal, learned bool, ma
 			return e
 		}
 	}
-	bins, e := sat.NewBinClauseBuffer(s.RuntimeOwner(), s.Budget())
+	bins, e := s.CollectBinClauses(nil, learned)
 	if e != nil {
 		return e
 	}
-	defer func() { err = errors.Join(err, bins.Close()) }()
-	if e = s.CollectBinClauses(bins, learned); e != nil {
-		return e
-	}
-	count, e := bins.Size()
-	if e != nil {
-		return e
-	}
-	for i := uint32(0); i < count; i++ {
+	for _, pair := range bins {
 		if e = checkpoint(); e != nil {
-			return e
-		}
-		pair, e := bins.Get(i)
-		if e != nil {
 			return e
 		}
 		f, e := m.MkOr(expressions.values[pair.FirstIndex()], expressions.values[pair.SecondIndex()])

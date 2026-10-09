@@ -71191,8 +71191,8 @@
         "pkg/sat/sat_solver_mutex_fault_test.go",
         "pkg/sat/sat_solver_mutex_pair_set.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
-        "pkg/sat/sat_solver_mutex_pair_vector.go",
-        "pkg/sat/sat_solver_mutex_pair_vector_test.go",
+        "pkg/sat/sat_solver_binary_pair.go",
+        "pkg/sat/sat_solver_binary_pair_test.go",
         "pkg/sat/sat_solver_consequences_chunking.go",
         "pkg/sat/sat_solver_consequences_chunking_fault_test.go",
         "pkg/sat/sat_solver_consequences_chunking_model_test.go",
@@ -71500,7 +71500,7 @@
         "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
         "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor",
+        "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestSATConsequenceChunkEveryActualRefusalRetainsLocalAndOutputRoots",
         "TestSATConsequenceBruteForceRealCancellationPreservesPrefix",
         "TestSATConsequenceChunkIndependentBinaryCNFs",
@@ -71537,7 +71537,7 @@
         "TestSATSolverInspectionExactSourceWatchDisplay",
         "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
         "TestSATSolverInspectionWarmOutputAndOwnerGuards",
-        "TestSATSolverInspectionBinaryOutputEveryActualReservation",
+        "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestSATSolverReportEveryStatusStreamReservationAndStatePrefix",
         "TestSATSolverReportEveryDescriptorOwnerReservationPrefix",
         "TestSATSolverReportWarmPhysicalPlateauAndLifetime",
@@ -72649,7 +72649,7 @@
           ]
         },
         {
-          "name": "collect_bin_clauses2818-2838 and find_mutexes3119-3150 actual same-Runtime literal pairs/max_cliques partition; high-level AST facade and TRACE open",
+          "name": "collect_bin_clauses:2818-2838 and find_mutexes:3119-3150 native typed literal pairs/max_cliques partition; high-level AST facade and TRACE open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_find_mutexes.go",
           "tests": [
@@ -72663,14 +72663,14 @@
             "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
             "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
             "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-            "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
+            "TestSATSolverInspectionBinaryOutputNativeGrowth"
           ],
           "go_targets": [
             "pkg/util/cliques/cliques_test.go",
             "pkg/sat/sat_solver_max_cliques_test.go",
             "pkg/sat/sat_solver_mutex_fault_test.go",
             "pkg/sat/sat_solver_mutex_pair_set_test.go",
-            "pkg/sat/sat_solver_mutex_pair_vector_test.go"
+            "pkg/sat/sat_solver_binary_pair_test.go"
           ]
         },
         {
@@ -72787,7 +72787,7 @@
           "go_target": "pkg/sat/sat_solver_inspection.go",
           "tests": [
             "TestSATSolverInspectionBinaryCollectionAppendsOriginalAndLearned",
-            "TestSATSolverInspectionBinaryOutputEveryActualReservation"
+            "TestSATSolverInspectionBinaryOutputNativeGrowth"
           ]
         },
         {
@@ -72814,7 +72814,7 @@
             "TestSATSolverInspectionExactSourceWatchDisplay",
             "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
             "TestSATSolverInspectionWarmOutputAndOwnerGuards",
-            "TestSATSolverInspectionBinaryOutputEveryActualReservation"
+            "TestSATSolverInspectionBinaryOutputNativeGrowth"
           ]
         },
         {
@@ -72897,7 +72897,7 @@
         "Cleaner interruption continuation is charged in the lifecycle header; owning Close drains only retained prefix and unread suffix with actual cursors. Source callbacks run while active; stopped lifecycle and direct pushClause reject later owning publication.",
         "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
         "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call.",
-        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Constructor sweep73 real refusals, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
+        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Binary-clause pairs use native typed slices in solver, inspection and tactic recovery; output append returns the completed prefix on error. Simulated buffer allocation and destructor failures are removed. Constructor sweeps of actual retained reservations, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
@@ -73051,8 +73051,8 @@
         "pkg/sat/sat_solver_mutex_fault_test.go",
         "pkg/sat/sat_solver_mutex_pair_set.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
-        "pkg/sat/sat_solver_mutex_pair_vector.go",
-        "pkg/sat/sat_solver_mutex_pair_vector_test.go",
+        "pkg/sat/sat_solver_binary_pair.go",
+        "pkg/sat/sat_solver_binary_pair_test.go",
         "pkg/sat/sat_solver_copy.go",
         "pkg/sat/sat_solver_copy_fault_test.go",
         "pkg/sat/sat_solver_copy_model_test.go",
@@ -73310,7 +73310,7 @@
         "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
         "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor",
+        "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestSATSolverCopyEveryActualDestinationRefusalRetainsPublishedGraph",
         "TestSATSolverCopyIndependentBinaryCNFsAndDestinationUnion",
         "TestSATSolverCopyIndependentNaryAssignmentModels",
@@ -73339,7 +73339,7 @@
         "TestSATSolverInspectionExactSourceWatchDisplay",
         "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
         "TestSATSolverInspectionWarmOutputAndOwnerGuards",
-        "TestSATSolverInspectionBinaryOutputEveryActualReservation",
+        "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestSATSolverBorrowedModelCoreCurrentMembers",
         "TestSATSolverBorrowedScalarSourceAuthorities",
         "TestSATSolverClauseIteratorSameBackingMutationsAndRelocation",
@@ -73798,7 +73798,7 @@
         {
           "name": "Concrete consequence/mutex query owner members and exact full-literal std::pair member with separate source stopped destruction and owning abort",
           "status": "partial",
-          "go_target": "pkg/sat/sat_solver_mutex_pair_vector.go",
+          "go_target": "pkg/sat/sat_solver_binary_pair.go",
           "tests": [
             "TestAllThreeVertexMutexGraphs",
             "TestNegatedLiteralPartition",
@@ -73810,14 +73810,14 @@
             "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
             "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
             "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-            "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
+            "TestSATSolverInspectionBinaryOutputNativeGrowth"
           ],
           "go_targets": [
             "pkg/util/cliques/cliques_test.go",
             "pkg/sat/sat_solver_max_cliques_test.go",
             "pkg/sat/sat_solver_mutex_fault_test.go",
             "pkg/sat/sat_solver_mutex_pair_set_test.go",
-            "pkg/sat/sat_solver_mutex_pair_vector_test.go"
+            "pkg/sat/sat_solver_binary_pair_test.go"
           ]
         },
         {
@@ -73865,7 +73865,7 @@
           "go_target": "pkg/sat/sat_solver_inspection.go",
           "tests": [
             "TestSATSolverInspectionBinaryCollectionAppendsOriginalAndLearned",
-            "TestSATSolverInspectionBinaryOutputEveryActualReservation"
+            "TestSATSolverInspectionBinaryOutputNativeGrowth"
           ]
         },
         {
@@ -73892,7 +73892,7 @@
             "TestSATSolverInspectionExactSourceWatchDisplay",
             "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
             "TestSATSolverInspectionWarmOutputAndOwnerGuards",
-            "TestSATSolverInspectionBinaryOutputEveryActualReservation"
+            "TestSATSolverInspectionBinaryOutputNativeGrowth"
           ]
         },
         {
@@ -73946,7 +73946,7 @@
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
         "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
         "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call.",
-        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Constructor sweep73 real refusals, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
+        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Binary-clause pairs use native typed slices in solver, inspection and tactic recovery; output append returns the completed prefix on error. Simulated buffer allocation and destructor failures are removed. Constructor sweeps of actual retained reservations, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
@@ -74095,8 +74095,8 @@
         "pkg/sat/sat_solver_literal_set.go",
         "pkg/sat/sat_solver_probing_assigned.go",
         "pkg/sat/sat_solver_mus_set.go",
-        "pkg/sat/sat_solver_mutex_pair_vector.go",
-        "pkg/sat/sat_solver_mutex_pair_vector_test.go",
+        "pkg/sat/sat_solver_binary_pair.go",
+        "pkg/sat/sat_solver_binary_pair_test.go",
         "pkg/sat/sat_solver_stat_display.go",
         "pkg/sat/sat_solver_stat_display_test.go"
       ],
@@ -74169,7 +74169,7 @@
         "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
         "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor",
+        "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestSATSolverStatDisplaySourceConditionalFields",
         "TestSATSolverStatDisplayEmptySourceMembers",
         "TestSATSolverStatDisplayEveryReservationPrefix",
@@ -74738,10 +74738,10 @@
         {
           "name": "Selected full-width literal members of solver std::pair, distinct learned-bit bin_clause specialization preserved",
           "status": "ported",
-          "go_target": "pkg/sat/sat_solver_mutex_pair_vector.go",
+          "go_target": "pkg/sat/sat_solver_binary_pair.go",
           "tests": [
             "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-            "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
+            "TestSATSolverInspectionBinaryOutputNativeGrowth"
           ]
         },
         {
@@ -149304,8 +149304,8 @@
         "pkg/math/polynomial/polynomial_variable_helpers_physical_test.go",
         "pkg/sat/sat_solver_literal_rows.go",
         "pkg/sat/sat_solver_literal_rows_test.go",
-        "pkg/sat/sat_solver_mutex_pair_vector.go",
-        "pkg/sat/sat_solver_mutex_pair_vector_test.go",
+        "pkg/sat/sat_solver_binary_pair.go",
+        "pkg/sat/sat_solver_binary_pair_test.go",
         "pkg/math/polynomial/polynomial_som.go",
         "pkg/math/polynomial/polynomial_som_owner.go",
         "pkg/math/polynomial/polynomial_som_vector.go",
@@ -149532,7 +149532,7 @@
         "TestSATSolverLiteralRowsStoppedSourceFinalizePreservesCauseAndNamedAbort",
         "TestSATSolverLiteralRowsExpansionReadsActualOldPointer",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-        "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor",
+        "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestPolynomialSOMVectorDefaultOwnerAndSourceMembers",
         "TestPolynomialSOMVectorActualColdChildRefusal",
         "TestPolynomialSOMVectorAtEveryReservation",
@@ -149996,11 +149996,11 @@
             "TestSATSolverLiteralRowsStoppedSourceFinalizePreservesCauseAndNamedAbort",
             "TestSATSolverLiteralRowsExpansionReadsActualOldPointer",
             "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-            "TestSATSolverBinaryPairPostphysicalSourceStopRetainsOwningCursor"
+            "TestSATSolverInspectionBinaryOutputNativeGrowth"
           ],
           "go_targets": [
             "pkg/sat/sat_solver_literal_rows_test.go",
-            "pkg/sat/sat_solver_mutex_pair_vector_test.go"
+            "pkg/sat/sat_solver_binary_pair_test.go"
           ]
         },
         {

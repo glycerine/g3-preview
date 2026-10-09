@@ -100,9 +100,7 @@ func (s *Solver) collectMutexBins(learned bool) error {
 			if l.index() > l2.index() {
 				continue
 			}
-			if e = s.userBinClauses.Push(newSATSolverBinPair(l, l2)); e != nil {
-				return e
-			}
+			s.userBinClauses = append(s.userBinClauses, newSATSolverBinPair(l, l2))
 		}
 	}
 	return nil
@@ -119,9 +117,7 @@ func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result 
 	}
 	defer func() { err = s.mutexDrop(f, err) }()
 	graph := cliques.New()
-	if err = s.userBinClauses.Reset(); err != nil {
-		return lbool.Undef, err
-	}
+	s.userBinClauses = s.userBinClauses[:0]
 	// Existing concrete empty/member graph reset. Actual owning rows destroy in
 	// ascending order; retained outer cold backing is not a source malloc ticket.
 	for i := range s.binaryClauseGraph {
@@ -141,18 +137,7 @@ func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result 
 		return lbool.Undef, err
 	}
 	f.seenComplete = true
-	for i := uint32(0); ; i++ {
-		n, e := s.userBinClauses.Size()
-		if e != nil {
-			return lbool.Undef, e
-		}
-		if i >= n {
-			break
-		}
-		bc, e := s.userBinClauses.Get(i)
-		if e != nil {
-			return lbool.Undef, e
-		}
+	for _, bc := range s.userBinClauses {
 		a, b := bc.Literal1().index(), bc.Literal2().index()
 		yes, e := f.seen.contains(a, b)
 		if e != nil {

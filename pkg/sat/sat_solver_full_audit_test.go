@@ -32,9 +32,6 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 	p := s.probing
 	c := s.conflict
 	a := s.analysis
-	if s.userBinClauses != nil {
-		raw(&s.userBinClauses.raw)
-	}
 	add(p.cache.block)
 	add(p.cache.pending)
 	add(p.cache.retired)

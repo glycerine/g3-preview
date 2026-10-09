@@ -144,9 +144,7 @@ func (s *Solver) maxVarClauses(cs []StoredClauseRef, v uint32) (uint32, error) {
 	return v, nil
 }
 func (s *Solver) maxVarBins(learned bool, v uint32) (uint32, error) {
-	if e := s.userBinClauses.Reset(); e != nil {
-		return v, e
-	}
+	s.userBinClauses = s.userBinClauses[:0]
 	for idx, r := range s.Variables.watches.lists {
 		l := Literal(idx).Negated()
 		n, e := s.Variables.watches.store.Size(r)
@@ -177,23 +175,10 @@ func (s *Solver) maxVarBins(learned bool, v uint32) (uint32, error) {
 			if l.index() > l2.index() {
 				continue
 			}
-			if e = s.userBinClauses.Push(newSATSolverBinPair(l, l2)); e != nil {
-				return v, e
-			}
+			s.userBinClauses = append(s.userBinClauses, newSATSolverBinPair(l, l2))
 		}
 	}
-	for i := uint32(0); ; i++ {
-		n, e := s.userBinClauses.Size()
-		if e != nil {
-			return v, e
-		}
-		if i >= n {
-			break
-		}
-		c, e := s.userBinClauses.Get(i)
-		if e != nil {
-			return v, e
-		}
+	for _, c := range s.userBinClauses {
 		if uint32(c.Literal1().variable()) > v {
 			v = uint32(c.Literal1().variable())
 		}

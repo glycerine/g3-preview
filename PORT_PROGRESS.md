@@ -30848,3 +30848,15 @@ and Runtime; Natural output keeps its current configuration. Constructor and
 close no longer acquire/release the unused owner, and numeric statistics and
 physical-root tests no longer report its permanently empty payload count.
 Real cell, allocation, publication, borrowed-runtime, and cleanup checks remain.
+
+### Native SAT binary literal pairs
+
+Replaced BinClauseBuffer with concrete `[]sat.BinaryLiteralPair` at its solver
+and tactic consumers. `CollectBinClauses` appends to a caller slice and returns
+the completed slice with any error. Source watch traversal order and filtering
+remain unchanged; the pair preserves both full uint32 literal indices.
+Removed copied Runtime vector growth, raw storage reads, allocation receipts,
+and buffer-only teardown failure states. Native growth is verified with Runtime
+allocation reservations disabled. Complete SAT/tactic tests, focused checked
+and debug profiles, module compilation, vet, and manifest validation cover the
+change.
