@@ -32,8 +32,8 @@ func (m *MultivariatePolynomialManager) gcdIntoWithReceipt(u, v Polynomial, r *p
 	if receipt != nil {
 		*receipt = polynomialGCDInvocationReceipt{m, s, s.invocation}
 	}
-	s.constructBuffer(c, 0)
-	s.constructBuffer(c, 1)
+	s.constructPowers(0)
+	s.constructPowers(1)
 	defer func() {
 		s.bodyCause = err
 		m.gcdDepth--
@@ -104,19 +104,15 @@ func (m *MultivariatePolynomialManager) gcdIntoWithReceipt(u, v Polynomial, r *p
 	if e = m.variableDegrees(u, &s.powers[0], true); e != nil {
 		return e
 	}
-	if e = s.powers[0].sortVariables(); e != nil {
-		return e
-	}
+	s.powers[0].sortVariables()
 	if e = m.variableDegrees(v, &s.powers[1], true); e != nil {
 		return e
 	}
-	if e = s.powers[1].sortVariables(); e != nil {
-		return e
-	}
+	s.powers[1].sortVariables()
 	x := ^uint32(0)
 	uFound, vFound := false, false
 	i := uint32(0)
-	uSize, vSize := s.powers[0].size, s.powers[1].size
+	uSize, vSize := uint32(len(s.powers[0])), uint32(len(s.powers[1]))
 	size := uSize
 	if vSize < size {
 		size = vSize

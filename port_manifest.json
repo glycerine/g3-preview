@@ -36916,7 +36916,9 @@
         "TestPolynomialFactorResetSETOneEveryFieldReservationPrefix",
         "TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody",
         "TestPolynomialFactorMinimumVariableLiteralEncounterTie",
-        "TestPolynomialFactorMinimumVariableEveryActualConstructorPrefix"
+        "TestPolynomialFactorMinimumVariableEveryActualConstructorPrefix",
+        "TestPolynomialGCDPowersNativeGrowthAndReuse",
+        "TestPolynomialGCDVariableDegreesNativeCache"
       ],
       "conditionals": [
         {
@@ -40962,7 +40964,8 @@
         "FactorHigher literal TODO at polynomial.cpp:6727-6735 is preserved; this is the original degree dispatcher rather than a dense or degree-specific replacement. Default generator pointer selection prime_generator.cpp:99-107 is explicit borrowed Go config, with a guarded DefaultPrimeService accessor; no hidden global generator. tst_mfact is dormant after polynomial.cpp test driver return at1825: active original-driver credit remains0. Signed-host TLS DEBUG destructor fixtures qualify owner primitives; guard-copy and returning Go callbacks are separate domains. Broader polynomial/NLSAT units remain partial/unported.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
-        "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit."
+        "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
+        "GCD variable/degree pairs and their persistent variable-to-position cache now use concrete Go slices. The power-pair sbuffer inline/spill capacity, raw/pending Runtime blocks, copied/initialized masks, source buffer free failures and hand-translated heapsort are removed. Go sort.Slice applies the original ascending unsigned variable-only or degree-only comparator; equal-key library comparison/swap order is not a fidelity requirement. Degree collection retains first occurrence, Max/Min selection and sentinel reset. Native source/owning cleanup releases slices in the existing enclosing scope order, and physical audits exclude them. Tests cover large cold growth with Runtime reservations disabled, unsigned pair sorting, equal-degree multiplicities, warmed append reuse and repeated degree cache reset; actual numeral/reference allocations and source lifetime guards remain live. No whole-unit completion credit is added."
       ]
     },
     {
@@ -111370,7 +111373,9 @@
         "TestNaturalNativeDivisionResizeClearsRegrowth",
         "TestNaturalNativeAddbackUnderRuntimeRefusal",
         "TestNaturalNativeScratchExcludedFromRuntimeStats",
-        "TestFastFloatDecimalNativeDivisionWithoutReservations"
+        "TestFastFloatDecimalNativeDivisionWithoutReservations",
+        "TestPolynomialGCDPowersNativeGrowthAndReuse",
+        "TestPolynomialGCDVariableDegreesNativeCache"
       ],
       "conditionals": [
         {
@@ -111536,7 +111541,7 @@
           ]
         },
         {
-          "name": "Concrete inline128 unsigned, inline32 power and inline16 var specializations; actual expanded backing/source destructor versus owning pending abort",
+          "name": "Concrete native GCD power-pair slice and Go sorting; unsigned/variable buffer specializations retain their current allocation model",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_gcd_power_buffer.go",
           "tests": [
@@ -111548,7 +111553,9 @@
             "TestPolynomialGCDInvocationReceiptRejectsReusedFrame",
             "TestPolynomialNormalizeInvocationReceiptRejectsReusedFrame",
             "TestPolynomialICCPExpandedFilterEveryActualReservation",
-            "TestPolynomialICCPRetainsActualPendingGCDInvocation"
+            "TestPolynomialICCPRetainsActualPendingGCDInvocation",
+            "TestPolynomialGCDPowersNativeGrowthAndReuse",
+            "TestPolynomialGCDVariableDegreesNativeCache"
           ]
         },
         {
@@ -111612,7 +111619,8 @@
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit.",
         "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
-        "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit."
+        "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
+        "GCD variable/degree pairs and their persistent variable-to-position cache now use concrete Go slices. The power-pair sbuffer inline/spill capacity, raw/pending Runtime blocks, copied/initialized masks, source buffer free failures and hand-translated heapsort are removed. Go sort.Slice applies the original ascending unsigned variable-only or degree-only comparator; equal-key library comparison/swap order is not a fidelity requirement. Degree collection retains first occurrence, Max/Min selection and sentinel reset. Native source/owning cleanup releases slices in the existing enclosing scope order, and physical audits exclude them. Tests cover large cold growth with Runtime reservations disabled, unsigned pair sorting, equal-degree multiplicities, warmed append reuse and repeated degree cache reset; actual numeral/reference allocations and source lifetime guards remain live. No whole-unit completion credit is added."
       ]
     },
     {
@@ -148780,7 +148788,9 @@
         "pkg/ast/ast_handle_containers_test.go",
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/ast/ast_ref_cache_resize.go",
-        "pkg/util/runtime_uint32_view.go"
+        "pkg/util/runtime_uint32_view.go",
+        "pkg/math/polynomial/polynomial_gcd_power_buffer.go",
+        "pkg/math/polynomial/polynomial_gcd_power_buffer_source_test.go"
       ],
       "tests": [
         "TestParamDescrsNativeStorageAndWarmDuplicate",
@@ -149026,7 +149036,9 @@
         "TestPointerVectorSourceGrowthAndErase",
         "TestASTHandleVectorNativeGrowthAndEraseClearing",
         "TestASTLiteralVectorNativeBorrowGrowthAndNonowningReset",
-        "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards"
+        "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards",
+        "TestPolynomialGCDPowersNativeGrowthAndReuse",
+        "TestPolynomialGCDVariableDegreesNativeCache"
       ],
       "conditionals": [
         {
@@ -149634,7 +149646,8 @@
         "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
         "Source remark equal-degree limitation and checked assertions retained. Default registered PSC dispatch uses optimized chain; dormant alternative gains zero active-driver credit. Pointer resize evidence covers only reached growth after completed reset, not ref_vector shrink. Signed-host TLS source release proof is an owner-primitive profile, not ordinary mathematical OOM. Actual mpz.h:156-163 old-TMP destruction before failing replacement leaves tmp[i]==0; only that literal dangling-pointer guard domain expects ErrInvalidSlot on retry. No scratch repair.",
         "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
-        "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence."
+        "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence.",
+        "GCD variable/degree pairs and their persistent variable-to-position cache now use concrete Go slices. The power-pair sbuffer inline/spill capacity, raw/pending Runtime blocks, copied/initialized masks, source buffer free failures and hand-translated heapsort are removed. Go sort.Slice applies the original ascending unsigned variable-only or degree-only comparator; equal-key library comparison/swap order is not a fidelity requirement. Degree collection retains first occurrence, Max/Min selection and sentinel reset. Native source/owning cleanup releases slices in the existing enclosing scope order, and physical audits exclude them. Tests cover large cold growth with Runtime reservations disabled, unsigned pair sorting, equal-degree multiplicities, warmed append reuse and repeated degree cache reset; actual numeral/reference allocations and source lifetime guards remain live. No whole-unit completion credit is added."
       ]
     },
     {

@@ -249,12 +249,12 @@ func TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop(t *testing.
 	})
 	outer, e := full.beginGCDFunction()
 	serviceMust(t, e)
-	outer.constructBuffer(c, 0)
-	outer.constructBuffer(c, 1)
+	outer.constructPowers(0)
+	outer.constructPowers(1)
 	for i := uint32(0); i < 33; i++ {
 		serviceMust(t, outer.powers[0].push(i, 1))
 	}
-	olderRaw := outer.powers[0].raw
+	olderStorage := &outer.powers[0][0]
 	outerLeft := false
 	defer func() {
 		if !outerLeft {
@@ -302,7 +302,7 @@ func TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop(t *testing.
 	if full.gcdMayCatchSparse(outer, body) {
 		t.Fatal("source catch swallowed actual younger destructor stop", body)
 	}
-	if stopped := full.finishGCDFunctionSource(outer); !errors.Is(stopped, arena.ErrInvalidSlot) || outer.depth != 2 || outer.powers[0].raw != olderRaw {
+	if stopped := full.finishGCDFunctionSource(outer); !errors.Is(stopped, arena.ErrInvalidSlot) || outer.depth != 2 || &outer.powers[0][0] != olderStorage {
 		t.Fatal("older source buffers crossed stopped sparse destructor", stopped)
 	}
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{factor, left, right, square, newU, newV, r.root.value}, []*util.Int{&large}, ur.header+vr.header+r.header+sr.header)

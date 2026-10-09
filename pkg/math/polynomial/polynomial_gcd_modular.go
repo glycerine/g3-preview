@@ -74,7 +74,7 @@ func (m *MultivariatePolynomialManager) modularGCDImage(s *polynomialGCDFunction
 	}
 	return false, s.refs[5].root.assign(c, q)
 }
-func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomialGCDPowerBuffer, r *polynomialReference) (err error) {
+func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomialGCDPowers, r *polynomialReference) (err error) {
 	c := m.core
 	if e := m.newton.SetOwner(c); e != nil {
 		return e
@@ -87,11 +87,11 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 		if field {
 			return ErrPolynomialAssertion
 		}
-		if ud.size != vd.size {
+		if uint32(len(*ud)) != uint32(len(*vd)) {
 			return ErrPolynomialAssertion
 		}
 	}
-	size := ud.size
+	size := uint32(len(*ud))
 	if polynomialSourceDebug && size <= 1 {
 		return ErrPolynomialAssertion
 	}
@@ -102,7 +102,7 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 	s.vars.construct(c.memory)
 	s.stack[s.depth] = gcdVariablesId
 	s.depth++
-	s.constructBuffer(c, 0)
+	s.constructPowers(0)
 	defer func() {
 		s.bodyCause = err
 		m.gcdDepth--
@@ -142,9 +142,7 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 			return e
 		}
 	}
-	if e = s.powers[0].sortDegrees(); e != nil {
-		return e
-	}
+	s.powers[0].sortDegrees()
 	if e = m.skeletons.Reset(); e != nil {
 		return e
 	}

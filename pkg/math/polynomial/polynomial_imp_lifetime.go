@@ -90,7 +90,7 @@ func (m *MultivariatePolynomialManager) destroyMembers() error {
 			case 5:
 				e = m.iccp.SourceFinalize()
 			case 6:
-				e = polynomialImpRawSource(m.core, &m.varDegrees)
+				m.varDegrees = nil
 			case 7:
 				e = m.core.substitution.found.sourceFinalize()
 			case 8:

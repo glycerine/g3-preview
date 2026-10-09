@@ -85,7 +85,7 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 						e = s.zp.cleanup()
 					}
 				case id < gcdNumeralBase:
-					e = s.powers[id].closePhase(true, false)
+					s.powers[id] = nil
 				case id < gcdReferenceBase:
 					e = c.deleteNumeral(&s.nums[id-gcdNumeralBase])
 				default:
@@ -172,9 +172,7 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 			return e
 		}
 		for j := range s.powers {
-			if e := s.powers[j].close(true); e != nil {
-				return e
-			}
+			s.powers[j] = nil
 		}
 		if e := s.numeric.cleanup(c.integer); e != nil {
 			return e

@@ -29,7 +29,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	refvectors := []*PolynomialRefVector{}
 	lazy := []*PolynomialNewtonVector{&full.newton}
 	handlers := []*PolynomialDeletionHandler{}
-	external := []util.Block{m.tmp1.raw, m.tmp1.pending, full.degree2pos.raw, full.degree2pos.pending, full.lexPermutation.raw, full.lexPermutation.pending, full.varDegrees.raw, full.varDegrees.pending, m.substitution.found.raw, m.substitution.found.pending}
+	external := []util.Block{m.tmp1.raw, m.tmp1.pending, full.degree2pos.raw, full.degree2pos.pending, full.lexPermutation.raw, full.lexPermutation.pending, m.substitution.found.raw, m.substitution.found.pending}
 	external = append(external, extraRaw...)
 	external = append(external, full.lexBuckets.data.raw, full.lexBuckets.data.pending, full.lexBuckets.data.old)
 	for i := range full.lexBuckets.children {
@@ -130,9 +130,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		}
 		for i := range f.refs {
 			references = append(references, &f.refs[i])
-		}
-		for i := range f.powers {
-			external = append(external, f.powers[i].raw, f.powers[i].pending)
 		}
 		external = append(external, f.vars.raw, f.vars.pending, f.monomialBuffer.raw, f.monomialBuffer.pending)
 	}

@@ -43,7 +43,7 @@ type polynomialGCDFunctionScope struct {
 	refs                    [14]PolynomialRef
 	monomials               [2]polynomialDivisionReference
 	nums                    [10]util.Int
-	powers                  [2]polynomialGCDPowerBuffer
+	powers                  [2]polynomialGCDPowers
 	stack                   [20]uint8
 	depth                   uint8
 	active, topOwner        bool
@@ -85,8 +85,8 @@ func (s *polynomialGCDFunctionScope) constructMonomial(i uint8) {
 	s.stack[s.depth] = gcdMonomialBase + i
 	s.depth++
 }
-func (s *polynomialGCDFunctionScope) constructBuffer(c *MultivariatePolynomialCore, i uint8) {
-	s.powers[i].construct(c.memory)
+func (s *polynomialGCDFunctionScope) constructPowers(i uint8) {
+	s.powers[i] = nil
 	s.stack[s.depth] = gcdBufferBase + i
 	s.depth++
 }
@@ -245,7 +245,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 		case id == gcdZPId:
 			e = s.zp.sourceEnd()
 		case id < gcdNumeralBase:
-			e = s.powers[id].close(false)
+			s.powers[id] = nil
 		case id < gcdReferenceBase:
 			_, e = util.SourceNumeralDel(m.core.integer, &s.nums[id-gcdNumeralBase])
 		default:
@@ -274,9 +274,6 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	pending = pending || s.numeric.PendingObject().OwnerID() != 0
 	for _, p := range s.numeric.PendingAllocatorBlocks() {
 		pending = pending || p.OwnerID() != 0
-	}
-	for i := range s.powers {
-		pending = pending || s.powers[i].pending.OwnerID() != 0
 	}
 	if !pending {
 		h := s.header

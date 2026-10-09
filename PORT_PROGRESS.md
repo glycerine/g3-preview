@@ -31288,3 +31288,27 @@ passed for that pruning. No new full-module execution or broad checked
 polynomial sweep was run; the latest full native module checkpoint remains
 19:07–19:12 UTC. Manifest counts remain 2102 units / 677 APIs, with no new
 whole-unit completion credit.
+
+## Native polynomial GCD degree workspace
+
+Replaced GCD power-pair buffer emulation with a concrete `[]MonomialPower`
+collection, removed its Runtime roots/pending cleanup, and replaced the custom
+heapsort adapter with Go `sort.Slice`. Preserved unsigned variable-only and
+degree-only comparisons. The persistent variable-to-position cache now uses
+`[]uint32`; degree collection keeps original first-occurrence, Max/Min and
+sentinel reset behavior. Source and owning cleanup release native storage at
+existing scope/member boundaries.
+
+New tests exercise cold growth without Runtime reservations, unsigned pairs,
+equal-degree multiplicities, warm append reuse and repeated Max/Min/cache reset.
+The reused-receipt GCD fixture now registers its forty variables: its previous
+cache allocation refusal had masked an invalid variable namespace. Its actual
+stale/foreign scope protection remains, as does recursive younger-resource stop
+coverage. No whole-unit completion claim is added.
+
+Validation: full native polynomial (35.97s), final checked/debug GCD/ICCP/manager
+checks, module-wide test compilation, polynomial vet and portcheck passed.
+The hourly full native module checkpoint remains 19:07–19:12 UTC; no additional
+whole-module run or broad checked sweep was needed for this feature conversion.
+Manifest counts remain 2102 units / 677 APIs, with 63 ported, 284 partial,
+1727 unported and two dead/deleted.

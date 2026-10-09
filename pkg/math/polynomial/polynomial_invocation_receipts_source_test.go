@@ -53,6 +53,8 @@ func TestPolynomialGCDInvocationReceiptRejectsReusedFrame(t *testing.T) {
 	c := m.core
 	powers := make([]MonomialPower, 40)
 	for j := range powers {
+		_, e := c.monomials.MkVar()
+		serviceMust(t, e)
 		powers[j] = MonomialPower{uint32(j), 1}
 	}
 	p := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{powers, nil})
@@ -64,8 +66,8 @@ func TestPolynomialGCDInvocationReceiptRejectsReusedFrame(t *testing.T) {
 	v := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, nil})
 	c.integer.Budget().FailAfter(0)
 	e := m.gcdIntoWithReceipt(p, v, &r, &current)
-	// The constant-content route constructs source numerals without a buffer grow;
-	// use the actual nonconstant distinct input to reach variable-degree backing.
+	// Distinct nonconstant inputs reach actual downstream GCD allocations. The
+	// degree cache and power pairs themselves use native storage.
 	if e == nil {
 		serviceMust(t, r.close(c))
 		c.integer.Budget().FailAfter(-1)

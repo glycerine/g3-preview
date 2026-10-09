@@ -321,7 +321,7 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 				e = m.iccp.CloseChecked()
 			}
 		case 6:
-			e = m.varDegrees.close(m.core)
+			m.varDegrees = nil
 		case 7:
 			if m.constructed >= 5 {
 				e = m.core.substitution.found.close()

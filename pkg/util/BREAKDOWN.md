@@ -1272,3 +1272,31 @@ passed for that pruning. No new full-module execution or broad checked
 polynomial sweep was run; the latest full native module checkpoint remains
 19:07–19:12 UTC. Manifest counts remain 2102 units / 677 APIs, with no new
 whole-unit completion credit.
+
+## Native polynomial GCD degree workspace
+
+GCD's power pairs now use the concrete `polynomialGCDPowers` slice of
+`MonomialPower`, and its variable-to-position cache is `[]uint32`. Neither
+retains a buffer/vector allocation header, inline payload, pending growth block,
+initialized mask or Runtime allocation event. The existing GCD scope stack
+releases native pairs in source order; manager source/owning close clears the
+cache. Variable collection retains first occurrence, maximum/minimum selection
+and reset to the maximum-unsigned sentinel after each successful collection.
+
+Go `sort.Slice` replaces the copied heapsort used to adapt `std::sort`. It uses
+the same ascending unsigned variable-only and degree-only comparisons. Pair
+identity and duplicate-key multiplicity are tested without requiring a C++
+standard-library swap schedule. Large cold append and warmed reuse tests run
+with Runtime reservations disabled. Recursive source-stop tests preserve older
+native backing while a younger owned resource blocks cleanup.
+
+The adjacent ICCP unsigned filters, GCD variable list, monomial reference buffer,
+and polynomial vectors remain separate remaining conversions. No generic
+buffer layer is introduced.
+
+Validation: full native polynomial (35.97s), final checked/debug GCD/ICCP/manager
+checks, module-wide test compilation, polynomial vet and portcheck passed.
+The hourly full native module checkpoint remains 19:07–19:12 UTC; no additional
+whole-module run or broad checked sweep was needed for this feature conversion.
+Manifest counts remain 2102 units / 677 APIs, with 63 ported, 284 partial,
+1727 unported and two dead/deleted.
