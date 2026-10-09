@@ -757,6 +757,10 @@ The live `buffer<rational,16>` specialization used by AST polynomial rewriting n
 
 Small-object allocator consolidation now gathers and sorts allocation IDs in concrete `[]uint32` scratch. Its two copied pointer-vector headers and Runtime blocks, vector growth/failure surface, and retained lexical scratch roots have been removed; only actual allocator chunks and pending allocations remain in Runtime ownership.
 
+Consolidation now operates directly on those slices and uses Go `sort.Slice`
+for scalar-address ordering. The custom vector wrapper, handwritten heapsort,
+and no-op lexical destruction adapters have been deleted.
+
 The concrete scoped integer, rational, and binary-rational vectors now use typed Go slices. Their elements still receive explicit deep copies and ordered deletion because they own numeric resources, while wrapper/backing arena charges and the C++ vector capacity schedule are gone. This keeps source-visible copy-failure prefixes and lifetime behavior without treating Go-managed slice storage as numeric arena memory.
 
 The rational service's power-of-two cache now grows with native `append`. Cache entries remain concrete owned `Rational` values and are still destroyed in ascending order, but the copied `vector.h` growth routine, moved-from backing mutations, and `CacheBytes` arena accounting have been removed.

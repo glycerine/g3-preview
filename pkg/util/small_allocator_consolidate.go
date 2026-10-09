@@ -3,9 +3,10 @@ package util
 
 import (
 	"math"
+	"sort"
 )
 
-func (a *SmallAllocator) Consolidate() (err error) {
+func (a *SmallAllocator) Consolidate() error {
 	if e := a.open(); e != nil {
 		return e
 	}
@@ -15,28 +16,13 @@ func (a *SmallAllocator) Consolidate() (err error) {
 	if e := a.verbose(false); e != nil {
 		return e
 	}
-	chunks := smallObjectPointerVector{owner: a}
-	freeObjs := smallObjectPointerVector{owner: a}
-	defer func() {
-		if e := chunks.close(); err == nil {
-			err = e
-		}
-	}()
-	defer func() {
-		if e := freeObjs.close(); err == nil {
-			err = e
-		}
-	}()
+	var chunks, freeObjs []uint32
 	for slot := uint32(1); slot < a.slots(); slot++ {
 		if a.free[slot] == 0 {
 			continue
 		}
-		if e := chunks.reset(); e != nil {
-			return e
-		}
-		if e := freeObjs.reset(); e != nil {
-			return e
-		}
+		chunks = chunks[:0]
+		freeObjs = freeObjs[:0]
 		id := a.chunks[slot]
 		steps := 0
 		for id != 0 {
@@ -44,9 +30,7 @@ func (a *SmallAllocator) Consolidate() (err error) {
 				return ErrAllocatorNonterminating
 			}
 			steps++
-			if e := chunks.push(id); e != nil {
-				return e
-			}
+			chunks = append(chunks, id)
 			c, e := a.location(id)
 			if e != nil {
 				return e
@@ -67,9 +51,7 @@ func (a *SmallAllocator) Consolidate() (err error) {
 				return ErrAllocatorNonterminating
 			}
 			steps++
-			if e := freeObjs.push(id); e != nil {
-				return e
-			}
+			freeObjs = append(freeObjs, id)
 			obj, e := a.location(id)
 			if e != nil {
 				return e
@@ -85,24 +67,23 @@ func (a *SmallAllocator) Consolidate() (err error) {
 		}
 		objectSize := uint32(a.pointerBytes()) * slot
 		perChunk := (8192 - 2*uint32(a.pointerBytes())) / objectSize
-		if uint32(len(freeObjs.values)) < perChunk {
+		if uint32(len(freeObjs)) < perChunk {
 			continue
 		}
-		if e := a.sourceAssert(len(chunks.values) != 0); e != nil {
+		if e := a.sourceAssert(len(chunks) != 0); e != nil {
 			return e
 		}
-		if e := chunks.sort(); e != nil {
-			return e
-		}
-		if e := freeObjs.sort(); e != nil {
-			return e
-		}
+		// Gathering validated every ID. Sort by the same scalar addresses used
+		// by the source consolidation algorithm.
+		sort.Slice(chunks, func(i, j int) bool {
+			return a.locations[chunks[i]-1].address < a.locations[chunks[j]-1].address
+		})
+		sort.Slice(freeObjs, func(i, j int) bool {
+			return a.locations[freeObjs[i]-1].address < a.locations[freeObjs[j]-1].address
+		})
 		var lastChunk, lastFree, objectIndex uint32
-		for chunkIndex := uint32(0); chunkIndex < uint32(len(chunks.values)); chunkIndex++ {
-			chunkID, e := chunks.get(chunkIndex)
-			if e != nil {
-				return e
-			}
+		for chunkIndex := uint32(0); chunkIndex < uint32(len(chunks)); chunkIndex++ {
+			chunkID := chunks[chunkIndex]
 			chunk, e := a.location(chunkID)
 			if e != nil {
 				return e
@@ -110,11 +91,8 @@ func (a *SmallAllocator) Consolidate() (err error) {
 			end := chunk.address + 8192
 			saved := objectIndex
 			var count uint32
-			for objectIndex < uint32(len(freeObjs.values)) {
-				objectID, e := freeObjs.get(objectIndex)
-				if e != nil {
-					return e
-				}
+			for objectIndex < uint32(len(freeObjs)) {
+				objectID := freeObjs[objectIndex]
 				obj, e := a.location(objectID)
 				if e != nil {
 					return e
@@ -141,10 +119,7 @@ func (a *SmallAllocator) Consolidate() (err error) {
 				}
 				lastChunk = chunkID
 				for i := saved; i < objectIndex; i++ {
-					objectID, e := freeObjs.get(i)
-					if e != nil {
-						return e
-					}
+					objectID := freeObjs[i]
 					obj, e := a.location(objectID)
 					if e != nil {
 						return e
@@ -159,7 +134,6 @@ func (a *SmallAllocator) Consolidate() (err error) {
 		a.chunks[slot] = lastChunk
 		a.free[slot] = lastFree
 	}
-	// Source end diagnostics occur BEFORE lexical scratch destructors.
 	a.cleanupChunksNeeded = false
 	return a.verbose(true)
 }
