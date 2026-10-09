@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func mignotteDirectFixture(t *testing.T) (*util.RationalManager, *UPolynomialFactorizationService) {
@@ -22,7 +23,7 @@ func henselDirectFixtureWithConfig(t *testing.T, checkpoint func() bool, debugTa
 	serviceMust(t, e)
 	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: checkpoint, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	s, e := NewUPolynomialFactorizationService(u, UPolynomialFactorizationConfig{Primes: primes, FactorizationDebugTag: debugTag})
 	serviceMust(t, e)

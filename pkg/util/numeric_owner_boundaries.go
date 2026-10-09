@@ -63,7 +63,6 @@ func (m *IntegerManager) SourceReady() error {
 func (m *IntegerModularManager) BorrowModulus() *Int { return &m.P }
 func (m *IntegerModularManager) IntegerMode() bool   { return m.z }
 func IsIntegerRational(a *Rational) bool             { return isIntegerRational(a) }
-func (m *PrimeGenerator) Check() error               { return m.check() }
 func IsOneInteger(a *Int) bool                       { return isOneInteger(a) }
 
 func (m *BinaryIntervalManager) Open() error { return m.open() }

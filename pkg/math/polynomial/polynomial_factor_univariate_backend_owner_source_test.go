@@ -5,12 +5,12 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestPolynomialFactorUnivariateActualBackendOutputCloseRefusal(t *testing.T) {
 	full := polynomialPSCFullFixtureWithLimit(t, 2<<20)
-	primes, e := util.NewPrimeGenerator(full.originalBudget)
+	primes, e := primegen.NewGenerator(full.originalBudget)
 	serviceMust(t, e)
 	full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}
 	p := polynomialQueryTerms(t, full.core, []int32{-1, 1}, [][]MonomialPower{{}, {{0, 2}}})

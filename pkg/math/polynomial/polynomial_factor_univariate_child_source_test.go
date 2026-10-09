@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestPolynomialFactorUnivariateActualYoungerBackendDTProtectsLocals(t *testing.T) {
@@ -24,7 +25,7 @@ func TestPolynomialFactorUnivariateActualYoungerBackendDTProtectsLocals(t *testi
 	serviceMust(t, e)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}, Factorization: UPolynomialFactorizationConfig{Primes: primes, FactorizationDebugTag: true}})
 	serviceMust(t, e)

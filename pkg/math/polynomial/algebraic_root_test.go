@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 // Observable bounded unit hooks; main-package source fixtures bind real
@@ -33,7 +34,7 @@ func algebraicControlledFixture(t *testing.T) (*AlgebraicRootCore, *UPolynomialM
 	control := &algebraicTestControl{limit: 1000000}
 	p, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: control.checkpoint, Cooperation: control.cooperate})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(s.Manager.BudgetField)
+	primes, e := primegen.NewGenerator(s.Manager.BudgetField)
 	serviceMust(t, e)
 	f, e := NewUPolynomialFactorizationService(p, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)

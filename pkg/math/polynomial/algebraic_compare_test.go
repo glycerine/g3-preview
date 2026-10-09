@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 type algebraicCompareControl struct {
@@ -44,7 +45,7 @@ func algebraicCompareFixtureProfile(t *testing.T, guardProfile bool) (*Algebraic
 	control := &algebraicCompareControl{allow: true}
 	p, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: func() bool { control.checks++; return control.allow }, Cooperation: func() error { control.cooperations++; return nil }})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(s.Manager.BudgetField)
+	primes, e := primegen.NewGenerator(s.Manager.BudgetField)
 	serviceMust(t, e)
 	f, e := NewUPolynomialFactorizationService(p, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)

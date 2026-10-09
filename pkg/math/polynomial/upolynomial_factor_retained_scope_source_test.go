@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestUPolynomialFactorRetainedLexicalCleanup(t *testing.T) {
@@ -19,7 +20,7 @@ func TestUPolynomialFactorRetainedLexicalCleanup(t *testing.T) {
 		m, _, b := upolySourceOwner(t)
 		profile := testFieldBySourceName(testFieldBySourceName(testFieldBySourceName(reflect.ValueOf(m.IntegerManager()).Elem(), "allocator").Elem(), "config"), "Profile")
 		directDebug = testFieldBySourceName(profile, "Debug").Bool() && !testFieldBySourceName(profile, "Windows").Bool()
-		primes, e := util.NewPrimeGenerator(b)
+		primes, e := primegen.NewGenerator(b)
 		if e != nil {
 			t.Fatal(e)
 		}

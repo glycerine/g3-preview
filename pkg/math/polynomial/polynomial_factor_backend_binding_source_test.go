@@ -5,7 +5,7 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestPolynomialFactorBackendActualBorrowedBinding(t *testing.T) {
@@ -16,7 +16,7 @@ func TestPolynomialFactorBackendActualBorrowedBinding(t *testing.T) {
 	if _, e := full.factorizationService(); e != ErrUPolynomialOwner {
 		t.Fatal("unbound reached backend guard", e)
 	}
-	primes, e := util.NewPrimeGenerator(full.core.integer.Budget())
+	primes, e := primegen.NewGenerator(full.core.integer.Budget())
 	serviceMust(t, e)
 	full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}
 	service, e := full.factorizationService()
@@ -37,7 +37,7 @@ func TestPolynomialFactorBackendActualBorrowedBinding(t *testing.T) {
 
 func TestPolynomialFactorBackendConfigBorrowsUntilActualOwnerEnd(t *testing.T) {
 	q, b := rationalManager(t, false)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}, Factorization: UPolynomialFactorizationConfig{Primes: primes}})
 	serviceMust(t, e)
@@ -50,7 +50,7 @@ func TestPolynomialFactorBackendConfigBorrowsUntilActualOwnerEnd(t *testing.T) {
 		t.Fatal("copied or recreated borrowed generator")
 	}
 	serviceMust(t, full.CloseChecked())
-	if !service.closed || primes.Closed {
+	if !service.closed || primes.Closed() {
 		t.Fatal("actual enclosing owner closes service, not borrowed generator")
 	}
 	serviceMust(t, primes.Close())

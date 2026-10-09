@@ -5,13 +5,14 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestUPolynomialFactorFullAlgorithmImmediateFailureRoots(t *testing.T) {
 	failures, successes := 0, 0
 	for ordinal := int64(0); ordinal < 2048; ordinal++ {
 		m, _, b := upolySourceOwner(t)
-		primes, e := util.NewPrimeGenerator(b)
+		primes, e := primegen.NewGenerator(b)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -89,7 +90,7 @@ func TestUPolynomialFactorFullAlgorithmImmediateFailureRoots(t *testing.T) {
 }
 func TestUPolynomialFactorCancellationAndConstantPrefix(t *testing.T) {
 	m, _, b, limit, _ := upolySourceOwnerServices(t)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	if e != nil {
 		t.Fatal(e)
 	}

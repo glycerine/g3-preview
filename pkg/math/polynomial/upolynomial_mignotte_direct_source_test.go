@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 // Real Copy destroys the old BIG cell before refusing its replacement. This
@@ -15,7 +16,7 @@ import (
 // mathematical reachability of a dangling Mignotte temporary.
 func TestUPolynomialMignotteActualYoungerNUMStopsOlderFields(t *testing.T) {
 	m, p, _ := polynomialEvalFixture(t, nil)
-	primes, e := util.NewPrimeGenerator(m.originalBudget)
+	primes, e := primegen.NewGenerator(m.originalBudget)
 	serviceMust(t, e)
 	defer func() { serviceMust(t, primes.Close()) }()
 	s, e := NewUPolynomialFactorizationService(m.upm, UPolynomialFactorizationConfig{Primes: primes})

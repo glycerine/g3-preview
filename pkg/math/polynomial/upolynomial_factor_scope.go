@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 var ErrUPolynomialCleanupPending = util.ErrNumericCleanupPending
@@ -23,7 +24,7 @@ type upolyFactorSquareFreeScope struct {
 	executing, sourceExecuting, ownExecuting, retired bool
 	bodyCause, sourceCause, ownCause                  error
 	primePreparation                                  upolyFactorPrimePreparationScope
-	iterator                                          util.PrimeIterator
+	iterator                                          primegen.Iterator
 	hensel                                            upolyHenselCallerScope
 	trialHelper                                       upolyRecombinationTrialScope
 	recombinationStep                                 upolyRecombinationStepScope

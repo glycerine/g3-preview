@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes(t *testing.T) {
@@ -118,7 +119,7 @@ func TestDefaultPrimeLocalAndCachedWarmSourceRoutes(t *testing.T) {
 	s, e := NewDefaultPrimeService(b)
 	smallObjectMust(t, e)
 	defer s.Close()
-	local, e := NewPrimeGenerator(b)
+	local, e := primegen.NewGenerator(b)
 	smallObjectMust(t, e)
 	defer local.Close()
 	it, e := NewPrimeServiceIterator(nil, local)
@@ -195,7 +196,7 @@ func TestDefaultPrimeIndexWrapAndActualGrowthRefusal(t *testing.T) {
 	smallObjectMust(t, e)
 	it.index = ^uint32(0)
 	_, e = it.Next()
-	if !errors.Is(e, ErrPrimeCapacity) || it.index != 0 {
+	if !errors.Is(e, primegen.ErrCapacity) || it.index != 0 {
 		t.Fatal(e, it.index)
 	}
 	p, e := it.Next()

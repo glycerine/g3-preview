@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 var ErrDefaultPrimeServiceOwner = errors.New("g3: invalid default prime service owner")
@@ -17,14 +18,14 @@ var ErrDefaultPrimeServiceOwner = errors.New("g3: invalid default prime service 
 // process wiring remain separate obligations.
 type DefaultPrimeService struct {
 	self      *DefaultPrimeService
-	generator *PrimeGenerator
+	generator *primegen.Generator
 	budget    *arena.Budget
 	header    uint64
 	closed    bool
 }
 type DefaultPrimeServiceStats struct {
 	OwnerBytes, TotalBytes uint64
-	Generator              PrimeGeneratorStats
+	Generator              primegen.Stats
 }
 
 func NewDefaultPrimeService(b *arena.Budget) (*DefaultPrimeService, error) {
@@ -32,7 +33,7 @@ func NewDefaultPrimeService(b *arena.Budget) (*DefaultPrimeService, error) {
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	g, e := NewPrimeGenerator(b)
+	g, e := primegen.NewGenerator(b)
 	if e != nil {
 		b.Release(n)
 		return nil, e
@@ -82,12 +83,12 @@ func (s *DefaultPrimeService) Close() error {
 // does not read the unused default service or the supplied generator contents.
 type PrimeServiceIterator struct {
 	service   *DefaultPrimeService
-	generator *PrimeGenerator
+	generator *primegen.Generator
 	index     uint32
 	global    bool
 }
 
-func NewPrimeServiceIterator(s *DefaultPrimeService, g *PrimeGenerator) (PrimeServiceIterator, error) {
+func NewPrimeServiceIterator(s *DefaultPrimeService, g *primegen.Generator) (PrimeServiceIterator, error) {
 	if g != nil {
 		return PrimeServiceIterator{generator: g}, nil
 	}
@@ -114,7 +115,7 @@ func (it *PrimeServiceIterator) Next() (uint64, error) {
 // BorrowGenerator is an explicit Go binding for the default pointer selected
 // by prime_generator.cpp:99-107. It preserves the actual eager object, including
 // the empty-vector state after Finalize; the caller does not own the generator.
-func (s *DefaultPrimeService) BorrowGenerator() (*PrimeGenerator, error) {
+func (s *DefaultPrimeService) BorrowGenerator() (*primegen.Generator, error) {
 	if e := s.open(); e != nil {
 		return nil, e
 	}

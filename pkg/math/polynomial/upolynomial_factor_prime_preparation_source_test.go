@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 // Actual first loop checkpoint follows gcd_tmp construction. It is not a
@@ -56,7 +57,7 @@ func primePreparationCheckpointOwnerRefusal(t *testing.T, mode string) {
 		return true
 	}, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
@@ -107,7 +108,7 @@ func TestUPolynomialFactorPrimePreparationActualGCDLeafOwning(t *testing.T) {
 		return true
 	}, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
@@ -495,7 +496,7 @@ func TestUPolynomialFactorPrimePreparationActualNumeralDestructorHistory(t *test
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: zq.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
-			primes, e := util.NewPrimeGenerator(b)
+			primes, e := primegen.NewGenerator(b)
 			serviceMust(t, e)
 			s, e := NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 			serviceMust(t, e)
@@ -597,7 +598,7 @@ func TestUPolynomialFactorPrimePreparationActualRelatedDestructorHistory(t *test
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: zq.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
-			primes, e := util.NewPrimeGenerator(b)
+			primes, e := primegen.NewGenerator(b)
 			serviceMust(t, e)
 			s, e := NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 			serviceMust(t, e)

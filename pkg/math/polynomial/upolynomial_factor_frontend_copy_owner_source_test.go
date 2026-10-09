@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestUPolynomialFactorFrontendActualCopyIntegerOwnerTransport(t *testing.T) {
@@ -68,7 +69,7 @@ func frontendCopyIntegerOwnerTransport(t *testing.T, mode string, erased ...bool
 	z = q.Integers()
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: z, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	s, e := NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)

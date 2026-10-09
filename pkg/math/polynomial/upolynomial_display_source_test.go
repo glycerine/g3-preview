@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 // The driver prints these values without ENSUREs. These exact stream checks
@@ -595,7 +596,7 @@ func TestUPolynomialDisplayActualStoppedCharacterSuffix(t *testing.T) {
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: r.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
-			primes, e := util.NewPrimeGenerator(b)
+			primes, e := primegen.NewGenerator(b)
 			serviceMust(t, e)
 			s, e := NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 			serviceMust(t, e)

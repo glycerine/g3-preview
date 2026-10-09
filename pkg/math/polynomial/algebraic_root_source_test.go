@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 type algebraicSourceCohort struct {
@@ -39,7 +40,7 @@ func algebraicSourceFixture(t *testing.T) *algebraicSourceCohort {
 	p, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: func() bool { f.polynomialTicks++; return limit.Inc() }, Cooperation: func() error { return cooperation.Cooperate("upolynomial") }})
 	algebraicSourceMust(t, e)
 	f.polynomial = p
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	algebraicSourceMust(t, e)
 	factors, e := NewUPolynomialFactorizationService(p, UPolynomialFactorizationConfig{Primes: primes})
 	algebraicSourceMust(t, e)

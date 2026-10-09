@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func polynomialFactorAssertReconstruction(t *testing.T, full *MultivariatePolynomialManager, p Polynomial, out *PolynomialFactors, want uint32) {
@@ -47,10 +48,10 @@ func TestPolynomialFactorCoreLiteralRepeatedAndDispatcherCases(t *testing.T) {
 			} else {
 				full = polynomialPSCFullFixture(t)
 			}
-			var primes *util.PrimeGenerator
+			var primes *primegen.Generator
 			if entry.name == "univariate" {
 				var e error
-				primes, e = util.NewPrimeGenerator(full.originalBudget)
+				primes, e = primegen.NewGenerator(full.originalBudget)
 				serviceMust(t, e)
 				full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}
 				t.Cleanup(func() { serviceMust(t, primes.Close()) })

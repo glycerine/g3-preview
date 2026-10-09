@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 // Qualified compiled lexical-storage profile: a real completed caller owns
@@ -25,7 +26,7 @@ func TestUPolynomialFactorLiftPreparationFactorsSourceCursorAndOwnHistory(t *tes
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: z.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
-			primes, e := util.NewPrimeGenerator(b)
+			primes, e := primegen.NewGenerator(b)
 			serviceMust(t, e)
 			s, e := NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 			serviceMust(t, e)

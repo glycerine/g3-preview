@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 var upolyFactorRegisteredFixtures = []struct {
@@ -54,7 +55,7 @@ var upolyFactorRegisteredFixtures = []struct {
 
 func TestUPolynomialFactorRegisteredThirtySevenNumericFixtures(t *testing.T) {
 	primeBudget := arena.NewBudget(1 << 27)
-	primes, e := util.NewPrimeGenerator(primeBudget)
+	primes, e := primegen.NewGenerator(primeBudget)
 	if e != nil {
 		t.Fatal(e)
 	}

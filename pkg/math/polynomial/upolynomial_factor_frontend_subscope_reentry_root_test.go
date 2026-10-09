@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestUPolynomialFactorFrontendReachedSubscopeReentry(t *testing.T) {
@@ -41,7 +42,7 @@ func TestUPolynomialFactorFrontendReachedSubscopeReentry(t *testing.T) {
 		return true
 	}})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
@@ -117,7 +118,7 @@ func TestUPolynomialFactorFrontendReachedSubscopeOwningReentry(t *testing.T) {
 		return true
 	}})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)

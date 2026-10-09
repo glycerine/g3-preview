@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 // ErrorTransport is an actual supported Go callback profile; this does not
@@ -47,7 +48,7 @@ func TestUPolynomialHenselSourceContinuationCannotReenterExecutingPair(t *testin
 			serviceMust(t, e)
 			u, e = NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
-			primes, e := util.NewPrimeGenerator(b)
+			primes, e := primegen.NewGenerator(b)
 			serviceMust(t, e)
 			s, e = NewUPolynomialFactorizationService(u, UPolynomialFactorizationConfig{Primes: primes})
 			serviceMust(t, e)

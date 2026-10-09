@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func algebraicCellSourceFixture(t *testing.T) (*AlgebraicRootCore, *UPolynomialManager) {
@@ -46,7 +47,7 @@ func algebraicCellSourceFixtureProfile(t *testing.T, directTLS bool) (*Algebraic
 		Cooperation: func() error { t.Fatal("cell operation visited source cooperation"); return nil },
 	})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(s.Manager.BudgetField)
+	primes, e := primegen.NewGenerator(s.Manager.BudgetField)
 	serviceMust(t, e)
 	f, e := NewUPolynomialFactorizationService(p, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)

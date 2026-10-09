@@ -7,11 +7,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestPolynomialFactorUnivariateLiteralSquareFreeBackend(t *testing.T) {
 	full := polynomialPSCFullFixtureWithLimit(t, 2<<20)
-	primes, e := util.NewPrimeGenerator(full.core.integer.Budget())
+	primes, e := primegen.NewGenerator(full.core.integer.Budget())
 	serviceMust(t, e)
 	full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}
 	p := polynomialQueryTerms(t, full.core, []int32{-1, 1}, [][]MonomialPower{{}, {{0, 2}}})
@@ -36,7 +37,7 @@ func TestPolynomialFactorUnivariateEveryActualReservationPrefix(t *testing.T) {
 	for prefix := int64(0); prefix < 240 && !success; prefix++ {
 		t.Run(strconv.FormatInt(prefix, 10), func(t *testing.T) {
 			full := polynomialPSCFullFixtureWithLimit(t, 2<<20)
-			primes, e := util.NewPrimeGenerator(full.core.integer.Budget())
+			primes, e := primegen.NewGenerator(full.core.integer.Budget())
 			serviceMust(t, e)
 			full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}
 			p := polynomialQueryTerms(t, full.core, []int32{-1, 1}, [][]MonomialPower{{}, {{0, 2}}})
@@ -86,7 +87,7 @@ func TestPolynomialFactorUnivariateLiteralSignParity(t *testing.T) {
 	for _, k := range []uint32{1, 2, 3} {
 		t.Run(strconv.FormatUint(uint64(k), 10), func(t *testing.T) {
 			full := polynomialPSCFullFixtureWithLimit(t, 2<<20)
-			primes, e := util.NewPrimeGenerator(full.core.integer.Budget())
+			primes, e := primegen.NewGenerator(full.core.integer.Budget())
 			serviceMust(t, e)
 			full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}
 			p := polynomialQueryTerms(t, full.core, []int32{1, -1}, [][]MonomialPower{{}, {{0, 2}}})

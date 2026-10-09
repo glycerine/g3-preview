@@ -4,14 +4,14 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestPolynomialFactorUnivariateCheckpointProtectsOutputOwner(t *testing.T) {
 	for _, operation := range []string{"source", "close", "cleanup", "fullSource", "fullClose", "typedSource", "typedOwn"} {
 		t.Run(operation, func(t *testing.T) {
 			full := polynomialPSCFullFixtureWithLimit(t, 2<<20)
-			primes, e := util.NewPrimeGenerator(full.core.integer.Budget())
+			primes, e := primegen.NewGenerator(full.core.integer.Budget())
 			serviceMust(t, e)
 			full.factorConfig = UPolynomialFactorizationConfig{Primes: primes}
 			p := polynomialQueryTerms(t, full.core, []int32{-1, 1}, [][]MonomialPower{{}, {{0, 2}}})

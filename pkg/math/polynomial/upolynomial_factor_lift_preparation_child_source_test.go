@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 // Qualified compiled checker profile uses the actual nested helper and captured
@@ -39,7 +40,7 @@ func TestUPolynomialFactorLiftPreparationCapturedCheckerSourceStop(t *testing.T)
 		return true
 	}})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	s, e := NewUPolynomialFactorizationService(u, UPolynomialFactorizationConfig{Primes: primes, FactorizationDebugTag: true})
 	serviceMust(t, e)

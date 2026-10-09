@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func upolyHenselPhysicalFixture(t *testing.T) (*UPolynomialManager, *UPolynomialManager, *UPolynomialManager, *UPolynomialManager, *UPolynomialFactors, *UPolynomialFactors, *UPolynomialFactorizationService, UPolynomialView, UPolynomialView, *arena.Budget) {
@@ -33,7 +34,7 @@ func upolyHenselPhysicalFixture(t *testing.T) (*UPolynomialManager, *UPolynomial
 	if e := prime.SetZPUint64(5); e != nil {
 		t.Fatal(e)
 	}
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	if e != nil {
 		t.Fatal(e)
 	}

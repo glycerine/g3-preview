@@ -2,7 +2,7 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 // Metadata begins before p's real constructor. No NUM is created by this adapter.
@@ -51,7 +51,7 @@ func (s *UPolynomialFactorizationService) preparePrimeSearch(fs *UPolynomialFact
 	if e = c.ds.init(best); e != nil {
 		return e
 	}
-	iterator, e := util.NewPrimeIterator(s.config.Primes)
+	iterator, e := primegen.NewIterator(s.config.Primes)
 	if e != nil {
 		return e
 	}

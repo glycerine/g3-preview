@@ -5,6 +5,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestUPolynomialFactorEmptyServiceOwnHeaderCleanup(t *testing.T) {
@@ -17,7 +18,7 @@ func TestUPolynomialFactorEmptyServiceOwnHeaderCleanup(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	if e != nil {
 		t.Fatal(e)
 	}

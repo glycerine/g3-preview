@@ -1,4 +1,4 @@
-package util
+package prime
 
 import (
 	"errors"
@@ -11,9 +11,9 @@ func TestPrimeGeneratorSparseReadAndReversedLoopPrefixes(t *testing.T) {
 	for _, f := range []struct {
 		idx, count uint32
 		want       error
-	}{{500, 191, arena.ErrBounds}, {191, 2016, ErrPrimeNontermination}} {
+	}{{500, 191, arena.ErrBounds}, {191, 2016, ErrNontermination}} {
 		budget := arena.NewBudget(1 << 24)
-		g, e := NewPrimeGenerator(budget)
+		g, e := NewGenerator(budget)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -37,16 +37,16 @@ func TestPrimeGeneratorSparseReadAndReversedLoopPrefixes(t *testing.T) {
 }
 func TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner(t *testing.T) {
 	budget := arena.NewBudget(1 << 20)
-	g, e := NewPrimeGenerator(budget)
+	g, e := NewGenerator(budget)
 	if e != nil {
 		t.Fatal(e)
 	}
-	it, e := NewPrimeIterator(g)
+	it, e := NewIterator(g)
 	if e != nil {
 		t.Fatal(e)
 	}
 	it.Index = ^uint32(0)
-	if _, e = it.Next(); !errors.Is(e, ErrPrimeCapacity) || it.Index != 0 {
+	if _, e = it.Next(); !errors.Is(e, ErrCapacity) || it.Index != 0 {
 		t.Fatal("source increment/wrap BEFORE capacity exception", it.Index, e)
 	}
 	p, e := it.Next()
@@ -82,7 +82,7 @@ func TestPrimeGeneratorConstructorAndSparseFailureAccounting(t *testing.T) {
 	for ordinal := int64(0); ordinal < 80; ordinal++ {
 		b := arena.NewBudget(1 << 24)
 		b.FailAfter(ordinal)
-		g, e := NewPrimeGenerator(b)
+		g, e := NewGenerator(b)
 		if e != nil {
 			refused++
 			if !errors.Is(e, arena.ErrInjectedFailure) || g != nil || b.Used() != 0 {
@@ -105,7 +105,7 @@ func TestPrimeGeneratorConstructorAndSparseFailureAccounting(t *testing.T) {
 	late, finished := 0, 0
 	for ordinal := int64(0); ordinal < 160; ordinal++ {
 		b := arena.NewBudget(1 << 24)
-		g, e := NewPrimeGenerator(b)
+		g, e := NewGenerator(b)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -115,13 +115,13 @@ func TestPrimeGeneratorConstructorAndSparseFailureAccounting(t *testing.T) {
 		if b.Used() != st.TotalBytes || st.TotalBytes != st.OwnerBytes+st.BackingBytes {
 			t.Fatal("temporary todo refunded immediately", ordinal, e, st, b.Used())
 		}
-		if e != nil && !errors.Is(e, ErrPrimeNontermination) && !errors.Is(e, arena.ErrInjectedFailure) {
+		if e != nil && !errors.Is(e, ErrNontermination) && !errors.Is(e, arena.ErrInjectedFailure) {
 			t.Fatal(ordinal, e)
 		}
 		if st.Count > 191 && errors.Is(e, arena.ErrInjectedFailure) {
 			late++
 		}
-		if errors.Is(e, ErrPrimeNontermination) {
+		if errors.Is(e, ErrNontermination) {
 			finished++
 		}
 		// Independent primality oracle checks every actually published prefix.
@@ -153,7 +153,7 @@ func TestPrimeGeneratorConstructorAndSparseFailureAccounting(t *testing.T) {
 }
 func TestPrimeGeneratorWarmCachedReadAndFinalizeDomain(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	g, e := NewPrimeGenerator(b)
+	g, e := NewGenerator(b)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -188,7 +188,7 @@ func TestPrimeGeneratorWarmCachedReadAndFinalizeDomain(t *testing.T) {
 	if _, e = g.At(0); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
 	}
-	var zero PrimeGenerator
+	var zero Generator
 	if e = zero.Close(); !errors.Is(e, arena.ErrConfig) {
 		t.Fatal(e)
 	}

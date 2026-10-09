@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot(t *testing.T) {
@@ -13,7 +14,7 @@ func TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	gen, e := NewPrimeGenerator(budget)
+	gen, e := primegen.NewGenerator(budget)
 	if e != nil {
 		t.Fatal(e)
 	}

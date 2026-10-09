@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func algebraicNegTLSFixture(t *testing.T, transport util.ErrorTransport) (*AlgebraicRootCore, *UPolynomialManager, *util.Runtime) {
@@ -24,7 +25,7 @@ func algebraicNegTLSFixture(t *testing.T, transport util.ErrorTransport) (*Algeb
 	serviceMust(t, e)
 	p, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(budget)
+	primes, e := primegen.NewGenerator(budget)
 	serviceMust(t, e)
 	f, e := NewUPolynomialFactorizationService(p, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)

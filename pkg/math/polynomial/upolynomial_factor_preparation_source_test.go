@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestUPolynomialFactorPreparationActualCopyTransport(t *testing.T) {
@@ -52,7 +53,7 @@ func preparationActualCopyTransport(t *testing.T, mode string) {
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
@@ -150,7 +151,7 @@ func preparationDiagnosticBeforeParentTransport(t *testing.T, mode string) {
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	s, e = NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)
@@ -322,7 +323,7 @@ func TestUPolynomialFactorPreparationActualConditionalDestructorHistory(t *testi
 			serviceMust(t, e)
 			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: zq.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 			serviceMust(t, e)
-			primes, e := util.NewPrimeGenerator(b)
+			primes, e := primegen.NewGenerator(b)
 			serviceMust(t, e)
 			s, e := NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 			serviceMust(t, e)
@@ -575,7 +576,7 @@ func preparationPhysicalFixture(t *testing.T) (*util.RationalManager, *UPolynomi
 	serviceMust(t, e)
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
 	serviceMust(t, e)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	serviceMust(t, e)
 	s, e := NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
 	serviceMust(t, e)

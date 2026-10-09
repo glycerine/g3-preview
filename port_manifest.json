@@ -107863,8 +107863,8 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "pkg/util/prime_generator.go",
-        "pkg/util/prime_generator_test.go",
+        "pkg/util/prime/generator.go",
+        "pkg/util/prime/generator_test.go",
         "pkg/util/prime_generator_source_test.go"
       ],
       "tests": [
@@ -107887,7 +107887,7 @@
         {
           "name": "Explicit-owner constructor, exact odd/filter/append loops, cache lookup and literal reversed growth guard, finalization, borrowed iterator increment-before-lookup",
           "status": "partial",
-          "go_target": "pkg/util/prime_generator.go",
+          "go_target": "pkg/util/prime/generator.go",
           "tests": [
             "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
             "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
@@ -141540,8 +141540,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/prime_generator.go",
-        "pkg/util/prime_generator_test.go",
+        "pkg/util/prime/generator.go",
+        "pkg/util/prime/generator_test.go",
         "pkg/util/prime_generator_source_test.go",
         "pkg/util/util_default_prime_service.go",
         "pkg/util/util_default_prime_service_test.go",
@@ -141576,7 +141576,7 @@
         {
           "name": "Explicit-owner constructor, exact odd/filter/append loops, cache lookup and literal reversed growth guard, finalization, borrowed iterator increment-before-lookup",
           "status": "partial",
-          "go_target": "pkg/util/prime_generator.go",
+          "go_target": "pkg/util/prime/generator.go",
           "tests": [
             "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
             "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",
@@ -141636,8 +141636,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/prime_generator.go",
-        "pkg/util/prime_generator_test.go",
+        "pkg/util/prime/generator.go",
+        "pkg/util/prime/generator_test.go",
         "pkg/util/prime_generator_source_test.go",
         "pkg/util/util_default_prime_service.go",
         "pkg/util/util_default_prime_service_test.go"
@@ -141672,7 +141672,7 @@
         {
           "name": "Explicit-owner constructor, exact odd/filter/append loops, cache lookup and literal reversed growth guard, finalization, borrowed iterator increment-before-lookup",
           "status": "partial",
-          "go_target": "pkg/util/prime_generator.go",
+          "go_target": "pkg/util/prime/generator.go",
           "tests": [
             "TestPrimeGeneratorSparseReadAndReversedLoopPrefixes",
             "TestPrimeIteratorIndexBeforeRefusalWrapAndColdOwner",

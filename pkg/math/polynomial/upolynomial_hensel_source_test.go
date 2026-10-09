@@ -4,11 +4,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestUPolynomialHenselPairExactSourceActions(t *testing.T) {
 	m, _, b := upolySourceOwner(t)
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -72,7 +73,7 @@ func TestUPolynomialHenselMultipleFactorsAndActualModulus(t *testing.T) {
 	if e = primeCore.SetZPUint64(5); e != nil {
 		t.Fatal(e)
 	}
-	primes, e := util.NewPrimeGenerator(b)
+	primes, e := primegen.NewGenerator(b)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -190,7 +191,7 @@ func TestUPolynomialHenselIndependentStoresActualSourceTransfers(t *testing.T) {
 	if e = prime.SetZPUint64(5); e != nil {
 		t.Fatal(e)
 	}
-	pgen, e := util.NewPrimeGenerator(b)
+	pgen, e := primegen.NewGenerator(b)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -264,7 +265,7 @@ func TestUPolynomialHenselActualTaggedDiagnostics(t *testing.T) {
 	if e = prime.SetZPUint64(5); e != nil {
 		t.Fatal(e)
 	}
-	pgen, e := util.NewPrimeGenerator(b)
+	pgen, e := primegen.NewGenerator(b)
 	if e != nil {
 		t.Fatal(e)
 	}

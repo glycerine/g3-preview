@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 type UPolynomialFactorParams struct{ MaxPrime, PrimeTrials, MaxSearchSize uint32 }
@@ -17,7 +17,7 @@ func DefaultUPolynomialFactorParams() UPolynomialFactorParams {
 }
 
 type UPolynomialFactorizationConfig struct {
-	Primes                *util.PrimeGenerator
+	Primes                *primegen.Generator
 	FactorizationDebugTag bool
 }
 type UPolynomialFactorizationService struct {
