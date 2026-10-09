@@ -309,7 +309,7 @@ func TestPolynomialSOMBufferAddMulEveryReservation(t *testing.T) {
 	sawCallee := false
 	for ordinal := int64(0); ordinal < 100 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m := polynomialCellFixture(t)
+			m := polynomialCellDirectObjectFixture(t)
 			v, e := NewPolynomialSOMVector(m)
 			serviceMust(t, e)
 			serviceMust(t, v.SetOwner(m))

@@ -6,8 +6,10 @@ import (
 	"testing"
 )
 
+// A warm scalar Neg may now succeed at ordinal zero: its locator directory
+// uses native append, and it needs no new numeric or pooled-object allocation.
 func TestPolynomialNegDirectActualAppendFactoryEveryPrefix(t *testing.T) {
-	success, pendingFactory := false, false
+	success := false
 	for ordinal := int64(0); ordinal < 192 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			full := polynomialPSCFullFixture(t)
@@ -15,13 +17,6 @@ func TestPolynomialNegDirectActualAppendFactoryEveryPrefix(t *testing.T) {
 			p := polynomialICCPUnownedTerms(t, c, []int32{7, 11}, [][]MonomialPower{{{0, 2}}, {{0, 1}}})
 			p = polynomialCaller(t, c, p)
 			named := []Polynomial{p}
-			// Fill real cold location capacity with retained caller polynomials.
-			// The next actual factory object acquisition precedes this growth.
-			for len(c.locations) < cap(c.locations) {
-				filler := polynomialICCPUnownedTerms(t, c, []int32{13}, [][]MonomialPower{{{0, 1}}})
-				filler = polynomialCaller(t, c, filler)
-				named = append(named, filler)
-			}
 			var receipt polynomialNegInvocationReceipt
 			c.integer.Budget().FailAfter(ordinal)
 			result, cause := c.negWithReceipt(p, &receipt)
@@ -35,9 +30,6 @@ func TestPolynomialNegDirectActualAppendFactoryEveryPrefix(t *testing.T) {
 			ms, e := c.cheap.ms.size(c)
 			serviceMust(t, e)
 			factory := c.factoryInvocation.result
-			if c.matchesFactoryInvocation(&c.negFactory) && (c.pending.raw.OwnerID() != 0 || factory != (Polynomial{})) {
-				pendingFactory = true
-			}
 			firstCause := c.negInvocationSourceCause(&receipt)
 			serviceMust(t, c.cleanupNegInvocation(&receipt, false))
 			audit()
@@ -73,7 +65,7 @@ func TestPolynomialNegDirectActualAppendFactoryEveryPrefix(t *testing.T) {
 			}
 		})
 	}
-	if !success || !pendingFactory {
-		t.Fatal("actual source factory acquisition/first success not reached", success, pendingFactory)
+	if !success {
+		t.Fatal("actual source first success not reached")
 	}
 }

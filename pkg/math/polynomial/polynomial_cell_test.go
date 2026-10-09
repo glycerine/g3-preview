@@ -12,9 +12,21 @@ import (
 // construction and subresultant dependencies are not established by these tests.
 func polynomialCellFixture(t *testing.T) *MultivariatePolynomialCore {
 	t.Helper()
+	return polynomialCellFixtureWithProfile(t, util.SmallAllocatorProfile{})
+}
+
+// Explicit direct object allocation keeps real factory-failure coverage after
+// native locator growth ceases to reserve artificial container storage.
+func polynomialCellDirectObjectFixture(t *testing.T) *MultivariatePolynomialCore {
+	t.Helper()
+	return polynomialCellFixtureWithProfile(t, util.SmallAllocatorProfile{PointerBits: 64, Debug: true})
+}
+
+func polynomialCellFixtureWithProfile(t *testing.T, profile util.SmallAllocatorProfile) *MultivariatePolynomialCore {
+	t.Helper()
 	q, b := rationalManager(t, false)
 	z := q.Integers()
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: z.RuntimeOwner()})
+	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: z.RuntimeOwner(), Profile: profile})
 	serviceMust(t, e)
 	serviceMust(t, mm.IncManagerRef())
 	var visits uint32

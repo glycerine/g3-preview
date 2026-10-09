@@ -32245,3 +32245,53 @@ history/orphan collections and sexpr argument storage. Continue auditing/removin
 those container mechanics, then retained AST/SAT collections and text consumers.
 Internal util numeric/text/parameter cycles still need resolution before splitting
 root util files into actual subpackages.
+
+## Native monomial and polynomial locator directories
+
+Both locator directories now use native Go append. Removed geometric growth,
+container overlap reservations/refunds and final capacity charges. Scalar
+slot/generation validation, retired slots, real SmallAllocator object storage,
+construction receipts and numerical ownership remain. Physical audits exclude
+native locator capacity while continuing to enumerate real objects and roots.
+
+New TestPolynomialNativeLocatorGrowthAndGeneration retains 4097 real polynomial
+and monomial objects across directory growth, checks exact coefficients and
+powers, and verifies recycled generations reject both stale handles. At actual
+capacity boundaries, directory append succeeds with reservations disabled and
+leaves Budget usage and actual allocator statistics unchanged. Real object
+allocation remains a separate operation with reservations enabled.
+
+Retired five tests whose only qualifying frontier was the removed injected
+locator-capacity failure after successful object allocation:
+TestPolynomialCompositionOwnsActualSingletonAcquisition,
+TestPolynomialCompositionSingletonForeignReplacement,
+TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller,
+TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind and
+TestPolynomialPSCMatchingPlacementPreservesLaterSingleton. Removed those exact
+names from manifest evidence; no source/API status was promoted. Existing
+composition/derivative/PSC numeric-failure, receipt identity and cleanup tests
+remain. Neg's full prefix/math audit no longer requires that obsolete frontier;
+a warm scalar operation can succeed without a reservation. GCD callback tests
+now also verify that a successfully published foreign polynomial remains live
+and intact after outer cancellation cleanup.
+
+Tests that require actual factory/object failures now explicitly select the
+supported direct SmallAllocator profile, independently of native container
+capacity: regular product, skeleton, SOM, expired PSC factory and substitution
+replacement campaigns. Their exact ownership, physical census and stale-receipt
+checks remain. Ordinary fixtures retain their default pooled allocator profile.
+
+Validation: native locator test passed (0.133s); focused real factory/generation
+campaigns passed; full native polynomial passed (32.794s). Focused g3debug locator,
+factory and cleanup groups passed (0.186s, 2.310s, 0.006s). Module-wide compilation,
+polynomial vet, portcheck, gofmt and diff checks passed. Manifest remains 2102
+units/677 APIs, with 63 ported, 284 partial, 1727 unported and two dead/deleted.
+The 22:43–22:45 UTC native full-module checkpoint remains current; another full
+module run was not needed before the next hourly checkpoint.
+
+The overall util knot/split remains active. Next polynomial collections include
+evaluation-frame pointer directories, retained history/orphan collections and
+sexpr arguments, followed by retained AST/SAT collections and text streams.
+Root util still has internal numeric/text/parameter cycles; the fresh file graph
+continues to show 287 files, 104 components and a largest 164-file component.
+Do not treat the locator conversion as proof of package-split readiness.

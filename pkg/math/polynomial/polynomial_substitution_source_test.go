@@ -460,7 +460,7 @@ func TestPolynomialSubstitutionCohortReservationPrecedesFactory(t *testing.T) {
 }
 
 func TestPolynomialSubstitutionReceiptRejectsReplacementFactory(t *testing.T) {
-	m := polynomialCellFixture(t)
+	m := polynomialCellDirectObjectFixture(t)
 	r := polynomialQueryTerms(t, m, []int32{3, 5, 7}, [][]MonomialPower{{{0, 3}, {1, 1}}, {{0, 2}}, nil})
 	p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{1, 1}}, nil})
 	out, e := NewPolynomialRef(m)
@@ -492,7 +492,7 @@ func TestPolynomialSubstitutionReceiptRejectsReplacementFactory(t *testing.T) {
 func TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement(t *testing.T) {
 	reached := false
 	for fault := int64(0); fault < 64 && !reached; fault++ {
-		m := polynomialCellFixture(t)
+		m := polynomialCellDirectObjectFixture(t)
 		p := polynomialQueryTerms(t, m, []int32{1}, [][]MonomialPower{{{0, 1}, {1, 19}, {2, 23}}})
 		one := util.NewInt(1)
 		m.integer.Budget().FailAfter(fault)

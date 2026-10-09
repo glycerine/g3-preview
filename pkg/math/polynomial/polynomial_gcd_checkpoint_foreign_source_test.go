@@ -50,7 +50,7 @@ func TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation(t *testi
 				t.Fatal("actual callback source allocation", callbackError)
 			}
 			before := c.pending
-			if before.raw == (util.ObjectRef{}) && before.value == (Polynomial{}) {
+			if before.raw == (util.ObjectRef{}) && before.value == (Polynomial{}) && returned == (Polynomial{}) {
 				return
 			}
 			seen = true
@@ -59,11 +59,18 @@ func TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation(t *testi
 			if c.pending != before {
 				t.Fatal("GCD cleanup swept actual checkpoint-owned primitive placement", ordinal, before, c.pending)
 			}
+			if returned != (Polynomial{}) {
+				info, e := c.Info(returned)
+				serviceMust(t, e)
+				if info.Size != 1 {
+					t.Fatal("callback published value lost", info)
+				}
+			}
 			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, r.root.value, returned}, nil, r.header)
 		})
 	}
 	if !seen {
-		t.Fatal("no actual checkpoint placement prefix")
+		t.Fatal("no actual callback construction prefix")
 	}
 }
 
@@ -108,7 +115,7 @@ func TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation(t *test
 				t.Fatal("actual callback source allocation", callbackError)
 			}
 			before := c.pending
-			if before.raw == (util.ObjectRef{}) && before.value == (Polynomial{}) {
+			if before.raw == (util.ObjectRef{}) && before.value == (Polynomial{}) && returned == (Polynomial{}) {
 				return
 			}
 			seen = true
@@ -117,10 +124,17 @@ func TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation(t *test
 			if c.pending != before {
 				t.Fatal("GCD cleanup swept actual checkpoint-owned primitive placement", ordinal, before, c.pending)
 			}
+			if returned != (Polynomial{}) {
+				info, e := c.Info(returned)
+				serviceMust(t, e)
+				if info.Size != 1 {
+					t.Fatal("callback published value lost", info)
+				}
+			}
 			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, q, r.root.value, returned}, nil, r.header)
 		})
 	}
 	if !seen {
-		t.Fatal("no actual checkpoint placement prefix")
+		t.Fatal("no actual callback construction prefix")
 	}
 }

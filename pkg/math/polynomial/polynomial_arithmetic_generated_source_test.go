@@ -10,7 +10,7 @@ import (
 func TestPolynomialRegularProductActualCalleeAcquisition(t *testing.T) {
 	saw := false
 	for ordinal := int64(0); ordinal < 80; ordinal++ {
-		full := polynomialArithmeticDirectNumericFixture(t)
+		full := polynomialArithmeticDirectObjectFixture(t)
 		c := full.core
 		mm := c.monomials
 		_, e := mm.MkVar()
@@ -57,7 +57,7 @@ func TestPolynomialRegularProductActualCalleeAcquisition(t *testing.T) {
 // An actual created product is transferred or consumed at its real leaf.
 func TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope(t *testing.T) {
 	for ordinal := int64(0); ordinal < 80; ordinal++ {
-		full := polynomialArithmeticDirectNumericFixture(t)
+		full := polynomialArithmeticDirectObjectFixture(t)
 		c, mm := full.core, full.core.monomials
 		for i := 0; i < 2; i++ {
 			_, e := mm.MkVar()
@@ -109,7 +109,7 @@ func TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope
 }
 
 func TestPolynomialRegularCreatedProductActualINCTransfersExactScope(t *testing.T) {
-	full := polynomialArithmeticDirectNumericFixture(t)
+	full := polynomialArithmeticDirectObjectFixture(t)
 	c, mm := full.core, full.core.monomials
 	for i := 0; i < 2; i++ {
 		_, e := mm.MkVar()

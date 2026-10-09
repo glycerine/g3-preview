@@ -8,7 +8,7 @@ import (
 )
 
 func TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower(t *testing.T) {
-	m := polynomialCellFixture(t)
+	m := polynomialCellDirectObjectFixture(t)
 	r := polynomialQueryTerms(t, m, []int32{3}, [][]MonomialPower{{{0, 2}, {1, 1}}})
 	p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{1, 1}}, nil})
 	q := polynomialQueryTerms(t, m, []int32{2}, [][]MonomialPower{nil})

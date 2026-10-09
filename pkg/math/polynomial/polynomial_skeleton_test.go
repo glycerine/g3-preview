@@ -106,7 +106,7 @@ func TestPolynomialSkeletonConstructorEveryReservation(t *testing.T) {
 	failedRetained := false
 	for ordinal := int64(0); ordinal < 100 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m := polynomialCellFixture(t)
+			m := polynomialCellDirectObjectFixture(t)
 			p, orig := polynomialSkeletonInput(t, m)
 			baseline := make([]uint32, len(orig))
 			for i, a := range orig {

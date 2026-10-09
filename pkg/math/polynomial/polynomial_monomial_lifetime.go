@@ -2,8 +2,6 @@
 package polynomial
 
 import (
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
@@ -262,7 +260,6 @@ func (m *MonomialManager) CloseChecked() error {
 			return e
 		}
 	}
-	m.config.Budget.Release(uint64(cap(m.locations)) * uint64(reflect.TypeOf(monomialLocation{}).Size()))
 	m.locations = nil
 	m.config.Budget.Release(m.header)
 	m.header = 0

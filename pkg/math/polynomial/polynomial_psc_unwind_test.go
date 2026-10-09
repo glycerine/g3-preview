@@ -52,7 +52,7 @@ func TestPolynomialPSCBufferDestructorStopsOlderSourceLocals(t *testing.T) {
 
 func TestPolynomialPSCExpiredFactoryReceiptPreservesForeignReplacement(t *testing.T) {
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
-		m := polynomialCellFixture(t)
+		m := polynomialCellDirectObjectFixture(t)
 		p := polynomialQueryTerms(t, m, []int32{1, 1, 1, 2}, [][]MonomialPower{{{0, 1}, {1, 2}}, {{0, 1}, {1, 1}}, {{1, 1}}, nil})
 		q := polynomialQueryTerms(t, m, []int32{1, 3}, [][]MonomialPower{{{0, 1}, {1, 1}}, nil})
 		S, e := NewPolynomialRefVector(m)

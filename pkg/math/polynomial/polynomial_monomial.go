@@ -340,25 +340,8 @@ func (m *MonomialManager) prepareLocation() (uint32, error) {
 	if uint64(len(m.locations)) == uint64(math.MaxUint32) {
 		return 0, arena.ErrSlotLimit
 	}
-	if len(m.locations) == cap(m.locations) {
-		n := uint64(cap(m.locations)) * 3 / 2
-		if n == 0 {
-			n = 2
-		}
-		if n <= uint64(cap(m.locations)) {
-			n = uint64(cap(m.locations)) + 1
-		}
-		stride := uint64(reflect.TypeOf(monomialLocation{}).Size())
-		if n > uint64(^uint(0)>>1)/stride {
-			return 0, arena.ErrBounds
-		}
-		if e := m.config.Budget.Reserve(n * stride); e != nil {
-			return 0, e
-		}
-		next := make([]monomialLocation, len(m.locations), int(n))
-		copy(next, m.locations)
-		m.config.Budget.Release(uint64(cap(m.locations)) * stride)
-		m.locations = next
+	if len(m.locations) == int(^uint(0)>>1) {
+		return 0, arena.ErrBounds
 	}
 	m.locations = append(m.locations, monomialLocation{generation: 1})
 	return uint32(len(m.locations)), nil

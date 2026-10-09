@@ -77,10 +77,27 @@ func TestPolynomialRegularSetActualDefaultSlotNumericAcquisition(t *testing.T) {
 // the ordinary pooled source operation remains covered separately.
 func polynomialArithmeticDirectNumericFixture(t *testing.T) *MultivariatePolynomialManager {
 	t.Helper()
+	return polynomialArithmeticAllocatorFixture(t, false)
+}
+
+// The monomial/product tests require an actual object-allocation refusal,
+// independently of numeric copies and native locator directory growth.
+func polynomialArithmeticDirectObjectFixture(t *testing.T) *MultivariatePolynomialManager {
+	t.Helper()
+	return polynomialArithmeticAllocatorFixture(t, true)
+}
+
+func polynomialArithmeticAllocatorFixture(t *testing.T, directObjects bool) *MultivariatePolynomialManager {
+	t.Helper()
 	budget := arena.NewBudget(1 << 24)
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
-	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
+	var mm *MonomialManager
+	if directObjects {
+		mm, e = NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: q.Integers().RuntimeOwner(), Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		serviceMust(t, e)
+	}
+	full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, full.CloseChecked())

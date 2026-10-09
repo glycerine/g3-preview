@@ -36324,7 +36324,6 @@
         "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
         "TestPolynomialDerivativeEveryReservationNamedPrefix",
         "TestPolynomialNativeRenameKeepsActualAllCells",
-        "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
         "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
         "TestPolynomialDerivativeNumericPendingIdentity",
         "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
@@ -36338,7 +36337,6 @@
         "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
         "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
-        "TestPolynomialPSCMatchingPlacementPreservesLaterSingleton",
         "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
         "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
         "TestPolynomialPSCEveryCheckpointCancellationFrontier",
@@ -36371,10 +36369,8 @@
         "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
         "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
         "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
-        "TestPolynomialCompositionOwnsActualSingletonAcquisition",
         "TestPolynomialCompositionEveryReservation",
         "TestPolynomialCompositionBigScalarOverloadEveryReservation",
-        "TestPolynomialCompositionSingletonForeignReplacement",
         "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
         "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
         "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
@@ -36501,7 +36497,6 @@
         "TestPolynomialGCDDefaultUnivariateModularImages",
         "TestPolynomialGCDScalarProductSourceIndependentOrder",
         "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor",
-        "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
         "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
         "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop",
         "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
@@ -36894,6 +36889,7 @@
         "TestMonomialNativeTableGrowthRenameAndOrder",
         "TestMonomialNativeTableCollisionsAndTemporaryPublication",
         "TestMonomialNativeTableSourceCleanupPendingCreation",
+        "TestPolynomialNativeLocatorGrowthAndGeneration",
         "TestMonomialNativeRenamePowerSorting",
         "TestPolynomialVarsNativeFailureRetainsVisitedPrefix"
       ],
@@ -38216,6 +38212,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38253,6 +38250,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38290,6 +38288,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38327,6 +38326,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38364,6 +38364,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38401,6 +38402,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38438,6 +38440,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38476,6 +38479,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38514,6 +38518,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38551,6 +38556,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38588,6 +38594,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38625,6 +38632,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38662,6 +38670,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38699,6 +38708,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38737,6 +38747,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -38774,6 +38785,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -39382,7 +39394,6 @@
             "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
             "TestPolynomialDerivativeEveryReservationNamedPrefix",
             "TestPolynomialNativeRenameKeepsActualAllCells",
-            "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
             "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
             "TestPolynomialDerivativeNumericPendingIdentity",
             "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
@@ -39403,7 +39414,6 @@
             "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
             "TestPolynomialPSCNextHeapBufferIndependentRemainder",
             "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
-            "TestPolynomialPSCMatchingPlacementPreservesLaterSingleton",
             "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
             "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
             "TestPolynomialPSCEveryCheckpointCancellationFrontier",
@@ -39452,10 +39462,8 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
-            "TestPolynomialCompositionOwnsActualSingletonAcquisition",
             "TestPolynomialCompositionEveryReservation",
             "TestPolynomialCompositionBigScalarOverloadEveryReservation",
-            "TestPolynomialCompositionSingletonForeignReplacement",
             "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
             "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
             "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
@@ -39707,7 +39715,6 @@
             "TestPolynomialGCDDefaultIntegerCRAReconstruction",
             "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS",
             "TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix",
-            "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
             "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
             "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop"
           ]
@@ -41451,7 +41458,6 @@
         "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
         "TestPolynomialDerivativeEveryReservationNamedPrefix",
         "TestPolynomialNativeRenameKeepsActualAllCells",
-        "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
         "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
         "TestPolynomialDerivativeNumericPendingIdentity",
         "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
@@ -41465,7 +41471,6 @@
         "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
         "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
-        "TestPolynomialPSCMatchingPlacementPreservesLaterSingleton",
         "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
         "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
         "TestPolynomialPSCEveryCheckpointCancellationFrontier",
@@ -41498,10 +41503,8 @@
         "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
         "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
         "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
-        "TestPolynomialCompositionOwnsActualSingletonAcquisition",
         "TestPolynomialCompositionEveryReservation",
         "TestPolynomialCompositionBigScalarOverloadEveryReservation",
-        "TestPolynomialCompositionSingletonForeignReplacement",
         "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
         "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
         "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
@@ -41602,7 +41605,6 @@
         "TestPolynomialGCDDefaultUnivariateModularImages",
         "TestPolynomialGCDScalarProductSourceIndependentOrder",
         "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor",
-        "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
         "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
         "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop",
         "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
@@ -41777,6 +41779,7 @@
         "TestMonomialNativeTableGrowthRenameAndOrder",
         "TestMonomialNativeTableCollisionsAndTemporaryPublication",
         "TestMonomialNativeTableSourceCleanupPendingCreation",
+        "TestPolynomialNativeLocatorGrowthAndGeneration",
         "TestMonomialNativeRenamePowerSorting",
         "TestPolynomialVarsNativeFailureRetainsVisitedPrefix"
       ],
@@ -41871,6 +41874,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -41908,6 +41912,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -41945,6 +41950,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -41982,6 +41988,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42019,6 +42026,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42056,6 +42064,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42093,6 +42102,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42131,6 +42141,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42169,6 +42180,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42206,6 +42218,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42243,6 +42256,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42280,6 +42294,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42317,6 +42332,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42354,6 +42370,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42392,6 +42409,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42429,6 +42447,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -42977,7 +42996,6 @@
             "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
             "TestPolynomialDerivativeEveryReservationNamedPrefix",
             "TestPolynomialNativeRenameKeepsActualAllCells",
-            "TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller",
             "TestMonomialUnitConsumedDropSourceStopAndOwningAbort",
             "TestPolynomialDerivativeNumericPendingIdentity",
             "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
@@ -42998,7 +43016,6 @@
             "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
             "TestPolynomialPSCNextHeapBufferIndependentRemainder",
             "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
-            "TestPolynomialPSCMatchingPlacementPreservesLaterSingleton",
             "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
             "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
             "TestPolynomialPSCEveryCheckpointCancellationFrontier",
@@ -43047,10 +43064,8 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
-            "TestPolynomialCompositionOwnsActualSingletonAcquisition",
             "TestPolynomialCompositionEveryReservation",
             "TestPolynomialCompositionBigScalarOverloadEveryReservation",
-            "TestPolynomialCompositionSingletonForeignReplacement",
             "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
             "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
             "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
@@ -43220,7 +43235,6 @@
             "TestPolynomialGCDDefaultUnivariateModularImages",
             "TestPolynomialGCDScalarProductSourceIndependentOrder",
             "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor",
-            "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
             "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
             "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop",
             "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
@@ -106659,10 +106673,8 @@
         "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
         "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
         "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
-        "TestPolynomialCompositionOwnsActualSingletonAcquisition",
         "TestPolynomialCompositionEveryReservation",
         "TestPolynomialCompositionBigScalarOverloadEveryReservation",
-        "TestPolynomialCompositionSingletonForeignReplacement",
         "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
         "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
         "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
@@ -106716,6 +106728,7 @@
         "TestMonomialNativeTableGrowthRenameAndOrder",
         "TestMonomialNativeTableCollisionsAndTemporaryPublication",
         "TestMonomialNativeTableSourceCleanupPendingCreation",
+        "TestPolynomialNativeLocatorGrowthAndGeneration",
         "TestMonomialNativeRenamePowerSorting",
         "TestPolynomialVarsNativeFailureRetainsVisitedPrefix"
       ],
@@ -107101,6 +107114,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -107147,10 +107161,8 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
-            "TestPolynomialCompositionOwnsActualSingletonAcquisition",
             "TestPolynomialCompositionEveryReservation",
             "TestPolynomialCompositionBigScalarOverloadEveryReservation",
-            "TestPolynomialCompositionSingletonForeignReplacement",
             "TestPolynomialCompositionRawZeroCohortAndBorrowedExisting",
             "TestPolynomialCompositionCancellationRestoresActualDegreeMap",
             "TestPolynomialCompositionSameVariableBigCopyEveryReservation",
@@ -111784,6 +111796,7 @@
         "TestMonomialNativeTableGrowthRenameAndOrder",
         "TestMonomialNativeTableCollisionsAndTemporaryPublication",
         "TestMonomialNativeTableSourceCleanupPendingCreation",
+        "TestPolynomialNativeLocatorGrowthAndGeneration",
         "TestMonomialNativeRenamePowerSorting"
       ],
       "conditionals": [
@@ -112095,6 +112108,7 @@
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
             "TestMonomialNativeTableSourceCleanupPendingCreation",
+            "TestPolynomialNativeLocatorGrowthAndGeneration",
             "TestMonomialNativeRenamePowerSorting"
           ]
         },
@@ -143618,7 +143632,6 @@
         "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
         "TestPolynomialEvaluationWarmInlineSourceLocals",
         "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
-        "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
         "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
         "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop",
         "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",
@@ -143810,7 +143823,6 @@
           "go_target": "pkg/math/polynomial/polynomial_gcd_scope.go",
           "tests": [
             "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
-            "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
             "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
             "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop",
             "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",

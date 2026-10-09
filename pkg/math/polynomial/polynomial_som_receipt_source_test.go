@@ -8,7 +8,7 @@ import (
 )
 
 func TestPolynomialSOMStoppedCalleeReplacementIdentity(t *testing.T) {
-	m := polynomialCellFixture(t)
+	m := polynomialCellDirectObjectFixture(t)
 	v, e := NewPolynomialSOMVector(m)
 	serviceMust(t, e)
 	serviceMust(t, v.SetOwner(m))

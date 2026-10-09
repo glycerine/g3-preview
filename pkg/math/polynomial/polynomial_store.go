@@ -4,7 +4,6 @@ package polynomial
 import (
 	"errors"
 	"math"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
@@ -97,27 +96,11 @@ func (m *MultivariatePolynomialCore) prepareLocation() (uint32, error) {
 	if uint64(len(m.locations)) >= math.MaxUint32 {
 		return 0, arena.ErrSlotLimit
 	}
-	n := len(m.locations) + 1
-	if n > cap(m.locations) {
-		old := cap(m.locations)
-		c := old + old/2 + 1
-		stride := uint64(reflect.TypeOf(polynomialLocation{}).Size())
-		if uint64(c) > uint64(^uint(0)>>1)/stride {
-			return 0, arena.ErrBounds
-		}
-		bytes := uint64(c) * stride
-		if e := m.integer.Budget().Reserve(bytes); e != nil {
-			return 0, e
-		}
-		a := make([]polynomialLocation, n, c)
-		copy(a, m.locations)
-		m.locations = a
-		m.integer.Budget().Release(uint64(old) * stride)
-	} else {
-		m.locations = m.locations[:n]
+	if len(m.locations) == int(^uint(0)>>1) {
+		return 0, arena.ErrBounds
 	}
-	m.locations[n-1].generation = 1
-	return uint32(n), nil
+	m.locations = append(m.locations, polynomialLocation{generation: 1})
+	return uint32(len(m.locations)), nil
 }
 
 // The source directory is an ID-indexed, nonowning collection of live handles.
