@@ -37,13 +37,9 @@ func TestFastFloatDecimalBuffersAreLexical(t *testing.T) {
 	m := fastManager(t, 5)
 	var a FastFloat
 	serviceMust(t, m.SetFraction32(&a, 1, 3))
-	before := m.words.Stats().Live
 	var dst [64]byte
 	_, e := m.FormatDecimalInto(&a, 8, 128, dst[:])
 	serviceMust(t, e)
-	if m.words.Stats().Live != before {
-		t.Fatal("source local arrays must not publish retained Words", before, m.words.Stats().Live)
-	}
 	serviceMust(t, m.Del(&a))
 }
 

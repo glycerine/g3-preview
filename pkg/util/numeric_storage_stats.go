@@ -2,7 +2,7 @@
 package util
 
 type NumericStorageStats struct {
-	LiveCells, CellSlots, RetiredCells, WordsRefs, CachedCells, NaturalWordsRefs uint32
+	LiveCells, CellSlots, RetiredCells, WordsRefs, CachedCells uint32
 }
 
 func (z *IntegerManager) StorageStats() (s NumericStorageStats) {
@@ -22,18 +22,6 @@ func (z *IntegerManager) StorageStats() (s NumericStorageStats) {
 	for _, a := range [2]Int{z.IntMin, z.Two64} {
 		if ValidNumericRef(z.Cells, a.Cell) {
 			s.CachedCells++
-		}
-	}
-	if z.Natural != nil {
-		for _, ref := range z.Natural.divScratch {
-			if ref.Slot != 0 {
-				s.NaturalWordsRefs++
-			}
-		}
-		for _, ref := range z.Natural.FormatScratch {
-			if ref.Slot != 0 {
-				s.NaturalWordsRefs++
-			}
 		}
 	}
 	return s

@@ -205,8 +205,6 @@ func testExportedFieldNames(name string) (string, string) {
 		return "Format", ""
 	case "formatScopes":
 		return "FormatScopes", ""
-	case "formatScratch":
-		return "FormatScratch", ""
 	case "formattedSetHistories":
 		return "FormattedSetHistories", ""
 	case "formatting":

@@ -38,27 +38,6 @@ func fastAudit(t *testing.T, m *FastFloatManager, values ...*FastFloat) {
 	if active != m.live || active != uint32(len(roots)) {
 		t.Fatal("live mismatch", active, m.live, len(roots))
 	}
-	refs := map[arena.VectorRef]bool{}
-	add := func(r arena.VectorRef) {
-		if r != (arena.VectorRef{}) {
-			if refs[r] {
-				t.Fatal("duplicate workspace")
-			}
-			refs[r] = true
-		}
-	}
-	for _, r := range m.natural.divScratch {
-		add(r)
-	}
-	for _, r := range m.natural.FormatScratch {
-		add(r)
-	}
-	if uint64(len(refs)) != uint64(m.words.Stats().Live) {
-		t.Fatal("unrooted Words", len(refs), m.words.Stats())
-	}
-	if m.natural.words != m.words || m.natural.ownsWords {
-		t.Fatal("invalid nested Words ownership")
-	}
 	if m.natural.Text != nil {
 		live := uint32(0)
 		if m.natural.textRef != (arena.SmallBytesRef{}) {
@@ -470,9 +449,7 @@ func TestFastFloatDivisionSourceDiagnosticPrefix(t *testing.T) {
 }
 
 func fastOwnedBytes(m *FastFloatManager) uint64 {
-	s := m.words.Stats()
-	d := s.Descriptors
-	n := m.natural.RuntimeOwner().Stats().TotalBytes + m.headerBytes + m.natural.HeaderBytes + s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+	n := m.natural.RuntimeOwner().Stats().TotalBytes + m.headerBytes + m.natural.HeaderBytes
 	if m.natural.Text != nil {
 		b := m.natural.Text.Stats()
 		n += b.OwnerBytes + b.PayloadBytes + b.MetadataBytes + b.DirectoryBytes
@@ -482,8 +459,8 @@ func fastOwnedBytes(m *FastFloatManager) uint64 {
 func TestFastFloatActualWholeGraphCharges(t *testing.T) {
 	m := fastManager(t, 5)
 	budget := m.config.Storage.Descriptors.Budget
-	if m.words.Stats().Live != 0 || m.capacity != 1024 || m.live != 1 {
-		t.Fatal("cold graph", m.words.Stats(), m.capacity, m.live)
+	if m.capacity != 1024 || m.live != 1 {
+		t.Fatal("cold graph", m.capacity, m.live)
 	}
 	if budget.Used() != fastOwnedBytes(m) {
 		t.Fatal("cold charge", budget.Used(), fastOwnedBytes(m))

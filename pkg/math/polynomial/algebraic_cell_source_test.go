@@ -276,14 +276,6 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 		serviceMust(t, e)
 	}
 	words := map[arena.VectorRef]bool{}
-	for _, ref := range z.Naturals().FormatScratch {
-		if ref != (arena.VectorRef{}) {
-			if !z.Words.IsLive(ref) {
-				t.Fatal("named formatting Words root stale")
-			}
-			words[ref] = true
-		}
-	}
 	if uint32(len(words)) != z.Words.Stats().Live {
 		t.Fatal("unnamed live Words payload", len(words), z.Words.Stats().Live)
 	}

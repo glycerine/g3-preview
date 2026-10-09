@@ -7923,6 +7923,9 @@ certify HEAD/current drafts.
 > implementation; current ownership and tests are recorded in
 > `port_manifest.json` and `pkg/util/BREAKDOWN.md`. Numeric algorithms, logical
 > slot capacity, generation advancement and checked handle validation remain.
+> NaturalManager and MPFF also no longer hold an unused Words service. The
+> permanently empty Natural scratch references, capacity mirrors and dead
+> Words-backed limb-view branch are removed; actual Runtime buffers remain.
 >
 > The manager charges its actual header, one owned arena.Words header/descriptor/pages, one private NaturalManager header borrowing those Words, contiguous significands, four 2*precision buffers, ID recycle storage, validity/generation sidecar, lazy set buffer and every persistent decimal/format workspace. The cold actual Words graph has11 live vector roots: significands, metadata, recycle, four MPFF buffers and four Natural scratch vectors. The manager's scalar one owns one block. Actual whole-graph byte tests sum nested physical stats without counting referenced Words twice. Caller conversion managers are borrowed and never closed by MPFF.
 >

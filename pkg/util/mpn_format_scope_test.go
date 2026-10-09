@@ -33,7 +33,7 @@ func TestNaturalFormattingLexicalSourceLocals(t *testing.T) {
 			}
 		}
 	}
-	if m.runtime.Stats().LiveBlocks != before.LiveBlocks+2 || m.words.Stats().Live != 0 || m.overflowPayloads() != 2 {
+	if m.runtime.Stats().LiveBlocks != before.LiveBlocks+2 || m.overflowPayloads() != 2 {
 		t.Fatal("actual lexical roots")
 	}
 	if e = m.finishFormattingLocals(); e != nil {
@@ -99,8 +99,7 @@ func TestNaturalFormattingFailedConstructorRetainsRealRoot(t *testing.T) {
 			if roots != m.runtime.Stats().LiveBlocks {
 				t.Fatal("immediate named root graph", fault, roots, m.runtime.Stats())
 			}
-			ws := m.words.Stats()
-			owned := m.HeaderBytes + m.runtime.Stats().TotalBytes + ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes
+			owned := m.HeaderBytes + m.runtime.Stats().TotalBytes
 			if owned != b.Used() {
 				t.Fatal("immediate real charge graph", fault, owned, b.Used())
 			}
@@ -201,7 +200,7 @@ func TestNaturalFormattingReusableInlineScopeWarm(t *testing.T) {
 	var problem error
 	allocations := testing.AllocsPerRun(100, func() { _, problem = m.FormatInto(input, dst) })
 	after, e := m.runtime.AllocationCount()
-	if problem != nil || e != nil || allocations != 0 || used != m.budget.Used() || count != after || m.words.Stats().Live != 0 || m.Formatting.Active || m.Formatting.PendingField {
+	if problem != nil || e != nil || allocations != 0 || used != m.budget.Used() || count != after || m.Formatting.Active || m.Formatting.PendingField {
 		t.Fatal("warm actual inline scope", problem, e, allocations, count, after)
 	}
 }
@@ -288,11 +287,7 @@ func TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation(t *testing.T) {
 		t.Fatal(e)
 	}
 	c := arena.VectorConfig{Descriptors: arena.Config{Budget: b}}
-	words, e := arena.NewWords(c)
-	if e != nil {
-		t.Fatal(e)
-	}
-	m, e := newNaturalManagerWithMemory(c, words, true, rt)
+	m, e := newNaturalManagerWithMemory(c, rt)
 	if e != nil {
 		t.Fatal(e)
 	}

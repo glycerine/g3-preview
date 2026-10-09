@@ -51,7 +51,6 @@ var ErrFastFloatOwner = errors.New("mpnum: invalid MPFF owner or dead significan
 // conversion managers are borrowed only for their individual operation.
 type FastFloatManager struct {
 	self                                       *FastFloatManager
-	words                                      *arena.Words
 	natural                                    *NaturalManager
 	config                                     FastFloatConfig
 	precision, bits, capacity, next, live      uint32
@@ -83,12 +82,7 @@ func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
 	m := &FastFloatManager{config: c, precision: c.PrecisionWords, bits: c.PrecisionWords * 32, capacity: c.InitialCapacity, headerBytes: h}
 	m.self = m
 	var e error
-	m.words, e = arena.NewWords(c.Storage)
-	if e != nil {
-		m.Close()
-		return nil, e
-	}
-	m.natural, e = newNaturalManagerWithMemory(c.Storage, m.words, false, c.Memory)
+	m.natural, e = newNaturalManagerWithMemory(c.Storage, c.Memory)
 	if e != nil {
 		m.Close()
 		return nil, e
@@ -291,7 +285,7 @@ func (m *FastFloatManager) CloseChecked() error {
 			return e
 		}
 	}
-	if m.words != nil {
+	if m.natural != nil {
 		if m.one.index() != 0 { // Del needs the intact owner during this final action.
 			m.closing = false
 			e := m.Del(&m.one)
@@ -301,12 +295,9 @@ func (m *FastFloatManager) CloseChecked() error {
 			}
 			m.one = FastFloat{}
 		}
-		if m.natural != nil {
-			if e := m.natural.CloseChecked(); e != nil {
-				return e
-			}
+		if e := m.natural.CloseChecked(); e != nil {
+			return e
 		}
-		m.words.Close()
 	}
 	m.significands, m.metadata, m.freeIDs, m.setBuffer = nil, nil, nil, nil
 	m.buffers = [4][]uint32{}

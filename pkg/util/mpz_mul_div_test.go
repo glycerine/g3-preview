@@ -369,15 +369,6 @@ func TestIntegerMulDivisionWarmAllocations(t *testing.T) {
 	if operationError != nil || allocations != 0 {
 		t.Fatal("warmed arithmetic allocates", allocations, operationError)
 	}
-	for _, ref := range m.Natural.divScratch {
-		if ref == (arena.VectorRef{}) {
-			continue
-		}
-		capacity, e := m.Words.Cap(ref)
-		if e != nil || capacity < 16 {
-			t.Fatal("source scratch initial capacity", capacity, e)
-		}
-	}
 }
 
 func TestIntegerEuclideanStagedFailurePointsAndAliases(t *testing.T) {

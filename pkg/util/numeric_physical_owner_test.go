@@ -401,31 +401,11 @@ func numericAuditPhysical(t *testing.T, manager *IntegerManager, extras ...numer
 			}
 		}
 	}
-	// Words belongs to Natural scratch only. Check each scalar generation against
-	// its actual descriptor, rather than inferring one Words root per numeral.
+	// Numeral and Natural storage no longer publish Words descriptors.
 	words := testFieldBySourceName(testFieldBySourceName(z, "words").Elem(), "descriptors").Elem()
-	wordPages := testFieldBySourceName(words, "pages")
-	wordPageSize := testFieldBySourceName(testFieldBySourceName(words, "config"), "PageSize").Uint()
-	wordRoots := map[[2]uint64]bool{}
-	natural := testFieldBySourceName(z, "natural").Elem()
-	for _, field := range []string{"divScratch", "formatScratch"} {
-		refs := testFieldBySourceName(natural, field)
-		for i := 0; i < refs.Len(); i++ {
-			r := refs.Index(i)
-			slot, gen := testFieldBySourceName(r, "Slot").Uint(), testFieldBySourceName(r, "Generation").Uint()
-			if slot == 0 {
-				continue
-			}
-			state := testFieldBySourceName(wordPages.Index(int((slot-1)/wordPageSize)), "meta").Index(int((slot - 1) % wordPageSize))
-			if !testFieldBySourceName(state, "live").Bool() || testFieldBySourceName(state, "generation").Uint() != gen {
-				t.Fatal("Natural scratch word lifetime", slot, gen)
-			}
-			wordRoots[[2]uint64{slot, gen}] = true
-		}
-	}
-	graph.Words = uint32(len(wordRoots))
+	graph.Words = 0
 	if uint64(graph.Words) != testFieldBySourceName(words, "live").Uint() {
-		t.Fatal("anonymous Natural word descriptor", graph.Words, testFieldBySourceName(words, "live").Uint())
+		t.Fatal("unexpected numeric Words descriptor", graph.Words, testFieldBySourceName(words, "live").Uint())
 	}
 	return graph
 }

@@ -901,3 +901,13 @@ these slices directly; shared MPN resources remain separate. A focused test grow
 through multiple pool sizes with arena allocation disabled, verifies retained
 values, and verifies generation advancement after numeric slot reuse, including stale
 handle rejection in the checked profile.
+
+NaturalManager's Words storage dependency is gone. Neither arithmetic nor
+formatting populated the legacy Words scratch fields; their actual resources
+live in the existing Runtime buffers. The permanently empty scratch arrays,
+duplicate capacity mirrors, unused growth/read helpers, and Words-backed
+limb-view branch have been deleted. MPFF likewise no longer creates an unused
+Words service. Physical ownership audits now inspect the remaining numeric
+resources directly, and nested-owner tests verify that child cleanup preserves
+the borrowed parent Runtime and its caller allocation. This removes dead
+storage infrastructure without changing the remaining arithmetic buffers.

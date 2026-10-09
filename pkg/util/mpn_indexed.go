@@ -7,7 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// limbView is ephemeral: external buffers are borrowed; Words stays indexed.
+// limbView is ephemeral: external buffers are borrowed; numeric blocks stay indexed.
 // No view is persisted in a manager or exposes an arena backing slice.
 type limbView struct {
 	external  []uint32
@@ -15,8 +15,6 @@ type limbView struct {
 	source    *SourceLimbBuffer
 	allocator *SmallAllocator
 	backing   SourceCellBacking
-	words     *arena.Words
-	ref       arena.VectorRef
 	size      uint32
 }
 
@@ -38,14 +36,7 @@ func (v limbView) read(i uint32) uint32 {
 		}
 		return n
 	}
-	if v.words == nil {
-		return v.external[i]
-	}
-	n, e := v.words.Read(v.ref, i)
-	if e != nil {
-		panic(e)
-	}
-	return n
+	return v.external[i]
 }
 func (v limbView) write(i, n uint32) {
 	if i >= v.size {
@@ -63,13 +54,7 @@ func (v limbView) write(i, n uint32) {
 		}
 		return
 	}
-	if v.words == nil {
-		v.external[i] = n
-		return
-	}
-	if e := v.words.Write(v.ref, i, n); e != nil {
-		panic(e)
-	}
+	v.external[i] = n
 }
 
 // Div retains the source branch boolean. Invalid source buffer preconditions

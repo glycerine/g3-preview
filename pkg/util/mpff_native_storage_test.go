@@ -38,8 +38,8 @@ func TestFastFloatNativeStorageGrowthAndRecycledGeneration(t *testing.T) {
 	if ffGeneration(stale.bits) != 0 && !errors.Is(m.check(&stale), ErrFastFloatOwner) {
 		t.Fatal("checked profile accepted stale handle")
 	}
-	if budget.Used() != before || m.words.Stats().Live != 0 {
-		t.Fatal("Go storage charged as arena allocation", before, budget.Used(), m.words.Stats())
+	if budget.Used() != before {
+		t.Fatal("Go storage charged as arena allocation", before, budget.Used())
 	}
 	for i := range values {
 		serviceMust(t, m.Del(&values[i]))

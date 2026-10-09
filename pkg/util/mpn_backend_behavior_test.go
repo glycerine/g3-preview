@@ -32,8 +32,8 @@ func TestNaturalSourceNoAddbackDoesNotPrepareAb(t *testing.T) {
 	}
 	// mpn.cpp:341–344 initializes/grows ab only AFTER a borrow and quotient
 	// decrement. This fixture never borrows: ab remains its source inline16.
-	if n.divCapacity[3] != 16 {
-		t.Fatal("unconditional source add-back allocation", n.divCapacity)
+	if n.Division[3].capacity() != 16 {
+		t.Fatal("unconditional source add-back allocation", naturalDivisionCapacities(n))
 	}
 }
 
@@ -211,8 +211,8 @@ func TestNaturalSourceAddbackRefusalAfterQuotientDecrement(t *testing.T) {
 			t.Fatal("actual modular subtraction prefix", i, got, want)
 		}
 	}
-	if n.divCapacity != [4]uint32{16, 16, 16, 16} || n.Division[3].size() != 16 || n.RuntimeOwner().Stats().LiveBlocks != 0 || budget.Used() != baseline {
-		t.Fatal("failed source ab first expansion roots", n.divCapacity, n.RuntimeOwner().Stats())
+	if naturalDivisionCapacities(n) != [4]uint32{16, 16, 16, 16} || n.Division[3].size() != 16 || n.RuntimeOwner().Stats().LiveBlocks != 0 || budget.Used() != baseline {
+		t.Fatal("failed source ab first expansion roots", naturalDivisionCapacities(n), n.RuntimeOwner().Stats())
 	}
 	if e = n.CloseChecked(); e != nil {
 		t.Fatal(e)

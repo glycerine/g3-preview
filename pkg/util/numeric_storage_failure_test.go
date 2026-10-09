@@ -90,17 +90,6 @@ func numericServiceScratchRoots(t *testing.T, q *RationalService) (uint32, uint3
 			t.Fatal("invalid named scratch generation", ref)
 		}
 	}
-	natural := testFieldBySourceName(z, "natural").Elem()
-	words := make(map[[2]uint64]bool)
-	for _, name := range []string{"divScratch", "formatScratch"} {
-		a := testFieldBySourceName(natural, name)
-		for i := 0; i < a.Len(); i++ {
-			r := a.Index(i)
-			slot := testFieldBySourceName(r, "Slot").Uint()
-			if slot != 0 {
-				words[[2]uint64{slot, testFieldBySourceName(r, "Generation").Uint()}] = true
-			}
-		}
-	}
-	return uint32(len(refs)), uint32(len(words))
+	// No retained numeric scratch owns a Words descriptor.
+	return uint32(len(refs)), 0
 }

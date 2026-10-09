@@ -64,11 +64,11 @@ func (m *UPolynomialManager) borrowedModulus() (*util.Int, error) {
 }
 
 type UPolynomialStats struct {
-	StoreOwnerBytes                                                                                                                           uint64
-	ExclusiveBytes, SharedStoreBytes                                                                                                          uint64
-	OwnerBytes, DirectoryBytes, PageBytes, BackingBytes, ModularBytes, TotalBytes                                                             uint64
-	IntegerCellSlots, IntegerLiveCells, IntegerRetiredCells, IntegerWordsRefs, IntegerNaturalWordsRefs, IntegerCachedCells, OwnedNumeralCells uint32
-	LivePolynomials, LiveBackings                                                                                                             uint32
+	StoreOwnerBytes                                                                                                  uint64
+	ExclusiveBytes, SharedStoreBytes                                                                                 uint64
+	OwnerBytes, DirectoryBytes, PageBytes, BackingBytes, ModularBytes, TotalBytes                                    uint64
+	IntegerCellSlots, IntegerLiveCells, IntegerRetiredCells, IntegerWordsRefs, IntegerCachedCells, OwnedNumeralCells uint32
+	LivePolynomials, LiveBackings                                                                                    uint32
 }
 
 // Stats accounts the concrete physical storage graph; numeral cell payloads
@@ -92,7 +92,7 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 	z := m.config.Integer
 	numeric := z.StorageStats()
 	s.IntegerLiveCells, s.IntegerCellSlots, s.IntegerRetiredCells = numeric.LiveCells, numeric.CellSlots, numeric.RetiredCells
-	s.IntegerWordsRefs, s.IntegerCachedCells, s.IntegerNaturalWordsRefs = numeric.WordsRefs, numeric.CachedCells, numeric.NaturalWordsRefs
+	s.IntegerWordsRefs, s.IntegerCachedCells = numeric.WordsRefs, numeric.CachedCells
 	if z.IsLiveCellToken(m.display.numeral.NativeCellToken()) {
 		s.OwnedNumeralCells++
 	}

@@ -171,7 +171,7 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	if e != nil {
 		return fail(e)
 	}
-	m.Natural, e = newNaturalManagerWithMemory(config.Words, m.Words, false, m.Memory)
+	m.Natural, e = newNaturalManagerWithMemory(config.Words, m.Memory)
 	if e != nil {
 		return fail(e)
 	}

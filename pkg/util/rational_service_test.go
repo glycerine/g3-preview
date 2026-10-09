@@ -418,21 +418,6 @@ func TestRationalServiceConcurrentCacheAndClose(t *testing.T) {
 	}
 }
 
-func serviceScratchRefs(s *RationalService) uint32 {
-	var n uint32
-	for _, r := range s.Manager.Z.Natural.divScratch {
-		if r != (arena.VectorRef{}) {
-			n++
-		}
-	}
-	for _, r := range s.Manager.Z.Natural.FormatScratch {
-		if r != (arena.VectorRef{}) {
-			n++
-		}
-	}
-	return n
-}
-
 func TestRationalServiceCrossOwnerFailureAndSameOwnerCopy(t *testing.T) {
 	source, _ := serviceNew(t)
 	input := serviceValue(t, source, "123456789012345678901234567891/99887766554433221101")

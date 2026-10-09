@@ -23,12 +23,12 @@ func TestNaturalOwnedConstructorAndClose(t *testing.T) {
 			}
 			continue
 		}
-		if m.words.Stats().Live != 0 || m.RuntimeOwner().Stats().LiveBlocks != 0 {
+		if m.RuntimeOwner().Stats().LiveBlocks != 0 {
 			t.Fatal("source inline constructor allocated payload")
 		}
 		for i := range m.Division {
 			buffer := &m.Division[i]
-			if buffer.capacity() != 16 || buffer.size() != 0 || buffer.Raw != (Block{}) || buffer.Pending != (Block{}) || m.divScratch[i] != (arena.VectorRef{}) || m.divCapacity[i] != 16 {
+			if buffer.capacity() != 16 || buffer.size() != 0 || buffer.Raw != (Block{}) || buffer.Pending != (Block{}) {
 				t.Fatal("actual source inline constructor", i, buffer)
 			}
 		}
@@ -186,9 +186,9 @@ func TestNaturalBorrowedDivisionFailureAtomic(t *testing.T) {
 				}
 			}
 		}
-		ws, rs := m.words.Stats(), m.runtime.Stats()
-		owned := m.HeaderBytes + rs.TotalBytes + ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes
-		if rs.LiveBlocks != uint32(len(roots)) || ws.Live != 0 || owned != budget.Used() {
+		rs := m.runtime.Stats()
+		owned := m.HeaderBytes + rs.TotalBytes
+		if rs.LiveBlocks != uint32(len(roots)) || owned != budget.Used() {
 			t.Fatal("unnamed borrowed-division storage", fault, rs, len(roots), owned, budget.Used())
 		}
 		if e != nil {
@@ -382,24 +382,21 @@ func TestIntegerSmallAndRawRationalFormatting(t *testing.T) {
 func TestNaturalNestedOwnerAccounting(t *testing.T) {
 	b := arena.NewBudget(1 << 23)
 	c := arena.VectorConfig{PageSize: 32, Descriptors: arena.Config{PageSize: 2, Budget: b}}
-	words, e := arena.NewWords(c)
-	if e != nil {
-		t.Fatal(e)
-	}
-	m, e := newNaturalManager(c, words, false)
-	if e != nil {
-		t.Fatal(e)
-	}
-	if m.ownsWords || m.words != words || m.budget != b {
+	parent, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	serviceMust(t, e)
+	caller, e := parent.Allocate(4)
+	serviceMust(t, e)
+	serviceMust(t, parent.WriteUint32(caller, 0, 123))
+	m, e := newNaturalManagerWithMemory(c, parent)
+	serviceMust(t, e)
+	if m.runtime != parent || m.ownsRuntime || m.budget != b {
 		t.Fatal("nested ownership")
 	}
 	dst := make([]byte, 1000)
-	if _, e = m.FormatInto([]uint32{0xffffffff, 0xffffffff, 1}, dst); e != nil {
-		t.Fatal(e)
-	}
-	ws := words.Stats()
+	_, e = m.FormatInto([]uint32{0xffffffff, 0xffffffff, 1}, dst)
+	serviceMust(t, e)
 	bs := m.Text.Stats()
-	measured := m.RuntimeOwner().Stats().TotalBytes + m.HeaderBytes + ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes + bs.OwnerBytes + bs.PayloadBytes + bs.MetadataBytes + bs.DirectoryBytes
+	measured := parent.Stats().TotalBytes + m.HeaderBytes + bs.OwnerBytes + bs.PayloadBytes + bs.MetadataBytes + bs.DirectoryBytes
 	if measured != b.Used() {
 		t.Fatal("complete owner graph", measured, b.Used())
 	}
@@ -407,18 +404,14 @@ func TestNaturalNestedOwnerAccounting(t *testing.T) {
 		t.Fatal("natural header")
 	}
 	m.Close()
-	if words.Stats().Live != 0 {
-		t.Fatal("child scratch not freed")
+	// Ending the child leaves the caller's Runtime and allocation intact.
+	if value, err := parent.ReadUint32(caller, 0); err != nil || value != 123 {
+		t.Fatal("parent lifetime", value, err)
 	}
-	// Child close preserves the parent's Words service and its retained pool.
-	ref, e := words.Allocate(1, 1)
-	if e != nil {
-		t.Fatal(e)
-	}
-	words.Free(ref)
-	words.Close()
+	serviceMust(t, parent.Deallocate(&caller))
+	serviceMust(t, parent.Close())
 	if b.Used() != 0 {
-		t.Fatal("parent close", b.Used())
+		t.Fatal("complete refund", b.Used())
 	}
 }
 
@@ -481,8 +474,8 @@ func TestNaturalPreparedAddBackStorageAdaptation(t *testing.T) {
 	}
 	wq, wr := new(big.Int), new(big.Int)
 	wq.QuoRem(oracle(a), oracle(b), wr)
-	if oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 || m.divCapacity != ([4]uint32{64, 32, 32, 16}) || m.budget.Used() <= before {
-		t.Fatal("prepared requested capacities", m.divCapacity)
+	if oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 || naturalDivisionCapacities(m) != ([4]uint32{64, 32, 32, 16}) || m.budget.Used() <= before {
+		t.Fatal("prepared requested capacities", naturalDivisionCapacities(m))
 	}
 	ab := &m.Division[3]
 	if ab.pos != 0 || ab.initialized != 0 || ab.Raw != (Block{}) || ab.Pending != (Block{}) {

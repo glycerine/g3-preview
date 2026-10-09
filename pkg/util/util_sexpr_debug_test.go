@@ -162,14 +162,6 @@ func sexprAuditNumericRoots(t *testing.T, q *RationalService, value *OwnedRation
 	}
 	natural := testFieldBySourceName(integer, "natural").Elem()
 	payloads := uint32(len(cells))
-	for _, name := range []string{"divScratch", "formatScratch"} {
-		refs := testFieldBySourceName(natural, name)
-		for i := 0; i < refs.Len(); i++ {
-			if testFieldBySourceName(refs.Index(i), "Slot").Uint() != 0 {
-				payloads++
-			}
-		}
-	}
 	// Division overflow owns actual Runtime blocks rather than Words vectors.
 	// Enumerate only the four source division buffers and active debug verifier.
 	buffers := testFieldBySourceName(natural, "division")

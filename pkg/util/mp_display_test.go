@@ -174,15 +174,6 @@ func TestNumericDisplayShortBufferAndLifecycle(t *testing.T) {
 	}
 }
 
-func displayFormatterRefs(m *NaturalManager) uint32 {
-	var count uint32
-	for _, ref := range m.FormatScratch {
-		if ref != (arena.VectorRef{}) {
-			count++
-		}
-	}
-	return count
-}
 func TestNumericDisplayReservationFailureCleanup(t *testing.T) {
 	for _, synch := range []bool{false, true} {
 		for operation := 0; operation < 3; operation++ {

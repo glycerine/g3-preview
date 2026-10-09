@@ -60,9 +60,7 @@ func readDecimalLimb(v limbView, i uint32) (uint32, error) {
 	if v.allocator != nil {
 		return v.backing.ReadWord(v.allocator, 8+4*uint64(i))
 	}
-	if v.words != nil {
-		return v.words.Read(v.ref, i)
-	}
+
 	if uint64(i) >= uint64(len(v.external)) {
 		return 0, arena.ErrBounds
 	}

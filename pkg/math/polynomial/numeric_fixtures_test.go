@@ -340,18 +340,8 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 			t.Fatal("invalid pending object", e)
 		}
 	}
-	words := map[arena.VectorRef]bool{}
-	for _, r := range m.Natural.FormatScratch {
-		if r == (arena.VectorRef{}) {
-			continue
-		}
-		if !m.Words.IsLive(r) {
-			t.Fatal("invalid format Words root")
-		}
-		words[r] = true
-	}
-	if uint32(len(words)) != m.Words.Stats().Live {
-		t.Fatal("unnamed real formatting Words root", len(words), m.Words.Stats().Live)
+	if m.Words.Stats().Live != 0 {
+		t.Fatal("unexpected numeric Words descriptor", m.Words.Stats().Live)
 	}
 	raw := map[util.Block]bool{}
 	if parent := m.MpfParent; parent != nil {

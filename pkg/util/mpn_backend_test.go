@@ -15,12 +15,12 @@ func TestNaturalMandatoryInlineConstructorAndRuntime(t *testing.T) {
 		t.Fatal(e)
 	}
 	runtime := n.RuntimeOwner()
-	if runtime == nil || runtime.Stats().LiveBlocks != 0 || n.words.Stats().Live != 0 {
+	if runtime == nil || runtime.Stats().LiveBlocks != 0 {
 		t.Fatal("inline construction allocated division payload")
 	}
 	for i := range n.Division {
 		s := &n.Division[i]
-		if s.capacity() != 16 || s.size() != 0 || s.Raw != (Block{}) || s.Pending != (Block{}) || n.divScratch[i] != (arena.VectorRef{}) {
+		if s.capacity() != 16 || s.size() != 0 || s.Raw != (Block{}) || s.Pending != (Block{}) {
 			t.Fatal("source inline constructor", i, s)
 		}
 	}
@@ -89,4 +89,11 @@ func TestNaturalMandatoryActualOverflowAndShrink(t *testing.T) {
 	if b.Used() != 0 {
 		t.Fatal("overflow destructor leak")
 	}
+}
+
+func naturalDivisionCapacities(m *NaturalManager) (capacities [4]uint32) {
+	for i := range m.Division {
+		capacities[i] = m.Division[i].capacity()
+	}
+	return
 }
