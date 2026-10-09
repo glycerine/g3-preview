@@ -112218,7 +112218,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_cancel_handler.go"
+        "pkg/util/control/cancel_handler.go"
       ],
       "tests": [
         "TestCancelHandlerSourceLifetime",
@@ -112241,7 +112241,7 @@
         {
           "name": "reslimit cancellation specialization constructor/destructor",
           "status": "ported",
-          "go_target": "pkg/util/util_cancel_handler.go",
+          "go_target": "pkg/util/control/cancel_handler.go",
           "tests": [
             "TestCancelHandlerSourceLifetime",
             "TestCancelHandlerSourceNestedAndReset",
@@ -112251,7 +112251,7 @@
         {
           "name": "reslimit cancellation specialization invoke/canceled",
           "status": "ported",
-          "go_target": "pkg/util/util_cancel_handler.go",
+          "go_target": "pkg/util/control/cancel_handler.go",
           "tests": [
             "TestCancelHandlerSourceLifetime",
             "TestCancelHandlerSourceNestedAndReset",
@@ -112261,7 +112261,7 @@
         {
           "name": "event caller enum/caller_id metadata",
           "status": "ported",
-          "go_target": "pkg/util/util_cancel_handler.go",
+          "go_target": "pkg/util/control/cancel_handler.go",
           "tests": [
             "TestCancelHandlerSourceLifetime",
             "TestCancelHandlerSourceNestedAndReset",
@@ -114390,7 +114390,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_cancel_handler.go"
+        "pkg/util/control/cancel_handler.go"
       ],
       "tests": [
         "TestCancelHandlerSourceLifetime",
@@ -114413,7 +114413,7 @@
         {
           "name": "reslimit cancellation specialization constructor/destructor",
           "status": "ported",
-          "go_target": "pkg/util/util_cancel_handler.go",
+          "go_target": "pkg/util/control/cancel_handler.go",
           "tests": [
             "TestCancelHandlerSourceLifetime",
             "TestCancelHandlerSourceNestedAndReset",
@@ -114423,7 +114423,7 @@
         {
           "name": "reslimit cancellation specialization invoke/canceled",
           "status": "ported",
-          "go_target": "pkg/util/util_cancel_handler.go",
+          "go_target": "pkg/util/control/cancel_handler.go",
           "tests": [
             "TestCancelHandlerSourceLifetime",
             "TestCancelHandlerSourceNestedAndReset",
@@ -114433,7 +114433,7 @@
         {
           "name": "event caller enum/caller_id metadata",
           "status": "ported",
-          "go_target": "pkg/util/util_cancel_handler.go",
+          "go_target": "pkg/util/control/cancel_handler.go",
           "tests": [
             "TestCancelHandlerSourceLifetime",
             "TestCancelHandlerSourceNestedAndReset",
@@ -144324,7 +144324,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_rlimit.go",
+        "pkg/util/control/rlimit.go",
         "pkg/util/messages/messages.go",
         "pkg/util/messages/messages_test.go"
       ],
@@ -144345,7 +144345,7 @@
         {
           "name": "constructor/destruction",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144360,7 +144360,7 @@
         {
           "name": "inc()/inc(unsigned)/count",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144375,7 +144375,7 @@
         {
           "name": "push/pop",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144390,7 +144390,7 @@
         {
           "name": "push_child/pop_child",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144405,7 +144405,7 @@
         {
           "name": "get_cancel_flag/get_cancel_msg",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144420,7 +144420,7 @@
         {
           "name": "cancel/reset_cancel/inc_cancel/dec_cancel/set_cancel",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144435,7 +144435,7 @@
         {
           "name": "scoped_rlimit/scoped_suspend_rlimit/scoped_limits",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144450,7 +144450,7 @@
         {
           "name": "cancel_msg rlimit.cpp:62-68 reads actual shared message binding",
           "status": "partial",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": []
         }
       ],
@@ -144468,7 +144468,7 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_rlimit.go"
+        "pkg/util/control/rlimit.go"
       ],
       "tests": [
         "TestResourceLimitSourceScopes",
@@ -144496,7 +144496,7 @@
         {
           "name": "constructor/destruction",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144511,7 +144511,7 @@
         {
           "name": "inc()/inc(unsigned)/count",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144526,7 +144526,7 @@
         {
           "name": "push/pop",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144541,7 +144541,7 @@
         {
           "name": "push_child/pop_child",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144556,7 +144556,7 @@
         {
           "name": "get_cancel_flag/get_cancel_msg",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144571,7 +144571,7 @@
         {
           "name": "cancel/reset_cancel/inc_cancel/dec_cancel/set_cancel",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144586,7 +144586,7 @@
         {
           "name": "scoped_rlimit/scoped_suspend_rlimit/scoped_limits",
           "status": "ported",
-          "go_target": "pkg/util/util_rlimit.go",
+          "go_target": "pkg/util/control/rlimit.go",
           "tests": [
             "TestResourceLimitSourceScopes",
             "TestResourceLimitSourceCancellation",
@@ -144703,8 +144703,8 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/scoped_ctrl_c.go",
-        "pkg/util/scoped_ctrl_c_test.go"
+        "pkg/util/control/scoped_ctrl_c.go",
+        "pkg/util/control/scoped_ctrl_c_test.go"
       ],
       "tests": [
         "TestScopedCtrlCReceivesProcessInterrupt",
@@ -144719,7 +144719,7 @@
         {
           "name": "scoped_ctrl_c::on_ctrl_c first delivery, repeated delivery and once-mode forwarding",
           "status": "ported",
-          "go_target": "pkg/util/scoped_ctrl_c.go",
+          "go_target": "pkg/util/control/scoped_ctrl_c.go",
           "tests": [
             "TestScopedCtrlCReceivesProcessInterrupt",
             "TestScopedCtrlCOnceResetAndForwardState",
@@ -144729,7 +144729,7 @@
         {
           "name": "scoped_ctrl_c construction and destruction install and restore nested process handlers",
           "status": "ported",
-          "go_target": "pkg/util/scoped_ctrl_c.go",
+          "go_target": "pkg/util/control/scoped_ctrl_c.go",
           "tests": [
             "TestScopedCtrlCReceivesProcessInterrupt",
             "TestScopedCtrlCNestedLIFOAndRestoration",
@@ -144750,8 +144750,8 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/scoped_ctrl_c.go",
-        "pkg/util/scoped_ctrl_c_test.go"
+        "pkg/util/control/scoped_ctrl_c.go",
+        "pkg/util/control/scoped_ctrl_c_test.go"
       ],
       "tests": [
         "TestScopedCtrlCReceivesProcessInterrupt",
@@ -144776,7 +144776,7 @@
         {
           "name": "scoped_ctrl_c constructor, destructor and reset",
           "status": "ported",
-          "go_target": "pkg/util/scoped_ctrl_c.go",
+          "go_target": "pkg/util/control/scoped_ctrl_c.go",
           "tests": [
             "TestScopedCtrlCReceivesProcessInterrupt",
             "TestScopedCtrlCOnceResetAndForwardState",
@@ -145443,8 +145443,8 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_scoped_timer.go",
-        "pkg/util/util_scoped_timer_test.go"
+        "pkg/util/control/scoped_timer.go",
+        "pkg/util/control/scoped_timer_test.go"
       ],
       "tests": [
         "TestScopedTimerFiresWithTimeoutCaller",
@@ -145593,7 +145593,7 @@
         {
           "name": "scoped_timer constructor, disabled intervals, asynchronous timeout dispatch and destructor",
           "status": "ported",
-          "go_target": "pkg/util/util_scoped_timer.go",
+          "go_target": "pkg/util/control/scoped_timer.go",
           "tests": [
             "TestScopedTimerFiresWithTimeoutCaller",
             "TestScopedTimerDisabledIntervalsAndClose",
@@ -145614,8 +145614,8 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_scoped_timer.go",
-        "pkg/util/util_scoped_timer_test.go"
+        "pkg/util/control/scoped_timer.go",
+        "pkg/util/control/scoped_timer_test.go"
       ],
       "tests": [
         "TestScopedTimerFiresWithTimeoutCaller",
@@ -145638,7 +145638,7 @@
         {
           "name": "scoped_timer(unsigned,event_handler*) and destructor",
           "status": "ported",
-          "go_target": "pkg/util/util_scoped_timer.go",
+          "go_target": "pkg/util/control/scoped_timer.go",
           "tests": [
             "TestScopedTimerFiresWithTimeoutCaller",
             "TestScopedTimerDisabledIntervalsAndClose",

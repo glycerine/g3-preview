@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 )
 
@@ -15,7 +16,7 @@ type algebraicSourceCohort struct {
 	core                            *AlgebraicRootCore
 	binary                          *util.BinaryRationalManager
 	budget                          *arena.Budget
-	limit                           *util.Reslimit
+	limit                           *control.Reslimit
 	algebraicTicks, polynomialTicks uint64
 }
 
@@ -30,7 +31,7 @@ func algebraicSourceFixture(t *testing.T) *algebraicSourceCohort {
 	b := arena.NewBudget(1 << 27)
 	s, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}}})
 	algebraicSourceMust(t, e)
-	limit, e := util.NewReslimit(b)
+	limit, e := control.NewReslimit(b)
 	algebraicSourceMust(t, e)
 	cooperation, e := cooperate.NewCooperation(b)
 	algebraicSourceMust(t, e)

@@ -1,10 +1,12 @@
 package api
 
 import (
+	"testing"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/util"
-	"testing"
+	"github.com/glycerine/g3/pkg/util/control"
 )
 
 func satSolverCheckFixture(t *testing.T) (*sat.Solver, *util.ParamsContext, util.ParamsRef) {
@@ -16,7 +18,7 @@ func satSolverCheckFixture(t *testing.T) (*sat.Solver, *util.ParamsContext, util
 	runtime, e := sat.NewRuntime(sat.RuntimeConfig{Budget: ctx.BudgetField, ParamsContext: ctx})
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, runtime.Close()) })
-	limit, e := util.NewReslimit(ctx.BudgetField)
+	limit, e := control.NewReslimit(ctx.BudgetField)
 	satOK(t, e)
 	t.Cleanup(limit.Close)
 	s, e := sat.NewSATSolver(sat.SolverConfig{ParamsContext: ctx, Params: p, RLimit: limit, Budget: ctx.BudgetField, Runtime: runtime})

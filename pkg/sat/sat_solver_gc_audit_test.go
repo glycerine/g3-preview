@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 )
 
 func satGCAudit(t *testing.T, g *satSolverGC) {
@@ -59,7 +60,7 @@ func satGCAudit(t *testing.T, g *satSolverGC) {
 	mc := p.converter
 	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes + mc.store.directoryBytes + satWatchGraphBytes(mc.store.words.Stats())
 	r := p.limit
-	want += uint64(reflect.TypeOf(util.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*util.Reslimit)(nil)).Size())*uint64(cap(r.Children)) + p.memory.Stats().TotalBytes
+	want += uint64(reflect.TypeOf(control.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*control.Reslimit)(nil)).Size())*uint64(cap(r.Children)) + p.memory.Stats().TotalBytes
 	if want != analysis.budget.Used() {
 		t.Fatal("exact named once-only graph", want, analysis.budget.Used())
 	}

@@ -3,10 +3,10 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/random"
 )
 
@@ -22,7 +22,7 @@ func TestSATSolverSourceUserScopeFiniteCycle(t *testing.T) {
 	runtime, err := NewRuntime(RuntimeConfig{Budget: ctx.BudgetField, ParamsContext: ctx})
 	paramsMust(t, err)
 	t.Cleanup(func() { paramsMust(t, runtime.Close()) })
-	limit, err := util.NewReslimit(ctx.BudgetField)
+	limit, err := control.NewReslimit(ctx.BudgetField)
 	paramsMust(t, err)
 	t.Cleanup(limit.Close)
 	config := SolverConfig{ParamsContext: ctx, Params: p, RLimit: limit, Budget: ctx.BudgetField, Runtime: runtime}
@@ -41,7 +41,7 @@ func TestSATSolverSourceUserScopeFiniteCycle(t *testing.T) {
 	checks, clauses := 0, 0
 	check := func() {
 		t.Helper()
-		freshLimit, err := util.NewReslimit(ctx.BudgetField)
+		freshLimit, err := control.NewReslimit(ctx.BudgetField)
 		paramsMust(t, err)
 		defer freshLimit.Close()
 		freshConfig := config

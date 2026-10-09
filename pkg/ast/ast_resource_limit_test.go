@@ -3,13 +3,12 @@
 package ast_test
 
 import (
-	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
-
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/messages"
 )
 
@@ -25,7 +24,7 @@ func TestASTResourceLimitSourceCanceledCountsAndScopes(t *testing.T) {
 			t.Fatal("unlimited source canceled() must still increment", canceled, m.Limit.Count())
 		}
 	}
-	scope, e := util.NewLimitScope(&m.Limit, 2)
+	scope, e := control.NewLimitScope(&m.Limit, 2)
 	astTestMust(t, e)
 	for i, want := range []bool{false, false, true} {
 		got, e := m.Canceled()
@@ -44,7 +43,7 @@ func TestASTResourceLimitSourceCanceledCountsAndScopes(t *testing.T) {
 	if !canceled || m.Limit.Count() != 6 {
 		t.Fatal("source canceled() skipped increment under cancellation")
 	}
-	suspend := util.NewSuspendLimit(&m.Limit)
+	suspend := control.NewSuspendLimit(&m.Limit)
 	canceled, e = m.Canceled()
 	astTestMust(t, e)
 	if canceled {
@@ -63,7 +62,7 @@ func TestASTResourceLimitOwnedStorageAndIndependentFormat(t *testing.T) {
 	for _, sourceFinalize := range []bool{false, true} {
 		t.Run(map[bool]string{false: "close", true: "source-finalize"}[sourceFinalize], func(t *testing.T) {
 			m := astTestManager(t)
-			child, e := util.NewReslimit(m.BudgetField)
+			child, e := control.NewReslimit(m.BudgetField)
 			astTestMust(t, e)
 			defer child.Close()
 			before := m.BudgetField.Used() - m.Stats().AllocatedBytes

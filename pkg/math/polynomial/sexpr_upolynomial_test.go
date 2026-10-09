@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 )
 
@@ -14,7 +15,7 @@ func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *util.SexprManager, *
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	sx, sy, q := sxOwner(t, b)
-	limit, e := util.NewReslimit(b)
+	limit, e := control.NewReslimit(b)
 	sxMust(t, e)
 	coop, e := cooperate.NewCooperation(b)
 	sxMust(t, e)

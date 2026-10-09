@@ -1,14 +1,15 @@
 package tactic_test
 
 import (
+	"fmt"
 	"testing"
 
-	"fmt"
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 )
 
 func goalTestNew(t *testing.T, m *ast.ASTManager, proofs, cores bool) *tactic.Goal {
@@ -40,7 +41,7 @@ func satSolverCheckFixture(t *testing.T) (*sat.Solver, *util.ParamsContext, util
 	runtime, e := sat.NewRuntime(sat.RuntimeConfig{Budget: ctx.BudgetField, ParamsContext: ctx})
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, runtime.Close()) })
-	limit, e := util.NewReslimit(ctx.BudgetField)
+	limit, e := control.NewReslimit(ctx.BudgetField)
 	satOK(t, e)
 	t.Cleanup(limit.Close)
 	s, e := sat.NewSATSolver(sat.SolverConfig{ParamsContext: ctx, Params: p, RLimit: limit, Budget: ctx.BudgetField, Runtime: runtime})

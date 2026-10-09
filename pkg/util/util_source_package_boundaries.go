@@ -3,7 +3,6 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"reflect"
 )
 
 // SymbolWords encodes the pointer-free identity in source aggregate storage.
@@ -50,10 +49,6 @@ func (g *GlobalParamsService) CheckOwner(c *ParamsContext, b *arena.Budget) erro
 	}
 	return nil
 }
-func (r *Reslimit) InitEmbedded(b *arena.Budget) { r.budget = b }
-func (r *Reslimit) StorageBytes() uint64 {
-	return uint64(cap(r.Limits))*8 + uint64(cap(r.Children))*uint64(reflect.TypeOf((*Reslimit)(nil)).Size())
-}
 func (g *GlobalParamsService) CheckBudget(b *arena.Budget) error {
 	if g == nil || g.self != g || g.Config.Budget != b {
 		return ErrGlobalParamsOwner
@@ -86,4 +81,3 @@ func (r ParamsRef) Initialized() bool { return r.Owner != 0 }
 func (g *GlobalParams) CheckOpen() error        { return g.open() }
 func (g *GlobalParams) Context() *ParamsContext { return g.ContextField }
 func (g *GlobalParams) Symbols() *SymbolManager { return g.SymbolsField }
-func (r *Reslimit) Closed() bool                { return r.ClosedField }

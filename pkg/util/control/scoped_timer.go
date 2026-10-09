@@ -1,5 +1,5 @@
 // Source: src/util/scoped_timer.h:24-30; src/util/scoped_timer.cpp:56-267.
-package util
+package control
 
 import (
 	"math"
@@ -31,10 +31,10 @@ type ScopedTimer struct {
 
 func NewScopedTimer(milliseconds uint32, handler EventHandler) (*ScopedTimer, error) {
 	if handler == nil {
-		return nil, ErrParamsPrecondition
+		return nil, ErrPrecondition
 	}
 	if f, ok := handler.(EventHandlerFunc); ok && f == nil {
-		return nil, ErrParamsPrecondition
+		return nil, ErrPrecondition
 	}
 	s := &ScopedTimer{handler: handler}
 	s.self = s
@@ -58,7 +58,7 @@ func (s *ScopedTimer) fire() {
 
 func (s *ScopedTimer) Close() error {
 	if s == nil || s.self != s {
-		return ErrParamsOwner
+		return ErrOwner
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()

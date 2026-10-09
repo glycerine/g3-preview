@@ -4,12 +4,13 @@ package sat
 import (
 	"errors"
 	"fmt"
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func satProbingAudit(t *testing.T, s *satSolverProbing, analysis *satSolverConflictAnalysis, d *satSolverDynamicSubsumption, external ...util.Block) {
@@ -70,7 +71,7 @@ func satProbingAudit(t *testing.T, s *satSolverProbing, analysis *satSolverConfl
 	mc := p.converter
 	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes + mc.store.directoryBytes + satWatchGraphBytes(mc.store.words.Stats())
 	r := p.limit
-	want += uint64(reflect.TypeOf(util.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*util.Reslimit)(nil)).Size())*uint64(cap(r.Children))
+	want += uint64(reflect.TypeOf(control.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*control.Reslimit)(nil)).Size())*uint64(cap(r.Children))
 	want += p.memory.Stats().TotalBytes
 	if want != s.budget.Used() {
 		t.Fatal("named once-only physical graph", want, s.budget.Used())
@@ -324,7 +325,7 @@ func TestSATSolverProbingTLSPostAllocationPendingCache(t *testing.T) {
 	satOK(t, e)
 	converter, e := newSATModelConverter(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}})
 	satOK(t, e)
-	limit, e := util.NewReslimit(b)
+	limit, e := control.NewReslimit(b)
 	satOK(t, e)
 	ctx, _, g, cb := satMainConfigTestRuntime(t)
 	params, e := ctx.NewValue()

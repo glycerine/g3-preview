@@ -1,5 +1,5 @@
 // Source: src/util/scoped_timer.h:24-30; src/util/scoped_timer.cpp:56-267.
-package util
+package control
 
 import (
 	"errors"
@@ -55,11 +55,11 @@ func TestScopedTimerDisabledIntervalsAndClose(t *testing.T) {
 }
 
 func TestScopedTimerAuthorityAndRunningCallbackClose(t *testing.T) {
-	if timer, err := NewScopedTimer(1, nil); timer != nil || !errors.Is(err, ErrParamsPrecondition) {
+	if timer, err := NewScopedTimer(1, nil); timer != nil || !errors.Is(err, ErrPrecondition) {
 		t.Fatal("nil handler", timer, err)
 	}
 	var nilFunc EventHandlerFunc
-	if timer, err := NewScopedTimer(1, nilFunc); timer != nil || !errors.Is(err, ErrParamsPrecondition) {
+	if timer, err := NewScopedTimer(1, nilFunc); timer != nil || !errors.Is(err, ErrPrecondition) {
 		t.Fatal("typed nil handler", timer, err)
 	}
 
@@ -82,11 +82,11 @@ func TestScopedTimerAuthorityAndRunningCallbackClose(t *testing.T) {
 		t.Fatal("closed state")
 	}
 	copy := ScopedTimer{self: timer}
-	if !errors.Is(copy.Close(), ErrParamsOwner) {
+	if !errors.Is(copy.Close(), ErrOwner) {
 		t.Fatal("copied owner")
 	}
 	var absent *ScopedTimer
-	if !errors.Is(absent.Close(), ErrParamsOwner) {
+	if !errors.Is(absent.Close(), ErrOwner) {
 		t.Fatal("nil owner")
 	}
 	close(release)

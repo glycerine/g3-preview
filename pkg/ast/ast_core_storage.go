@@ -12,6 +12,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/idgen"
 )
 
@@ -243,7 +244,7 @@ type ASTManager struct {
 	recFun                                                                                             util.Symbol
 	numerals                                                                                           *util.RationalService
 	families                                                                                           *FamilyManager
-	Limit                                                                                              util.Reslimit // source inline member, charged in the ASTManager header
+	Limit                                                                                              control.Reslimit // source inline member, charged in the ASTManager header
 	allocator                                                                                          *arena.SmallBytes
 	vectorAllocator                                                                                    *arena.SmallBytes
 	Format                                                                                             *ASTManager

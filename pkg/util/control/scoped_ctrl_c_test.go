@@ -1,5 +1,5 @@
 // Source: src/util/scoped_ctrl_c.h:24-41; src/util/scoped_ctrl_c.cpp:24-66.
-package util
+package control
 
 import (
 	"errors"
@@ -85,7 +85,7 @@ func TestScopedCtrlCNestedLIFOAndRestoration(t *testing.T) {
 	var calls []string
 	outer, _ := NewScopedCtrlC(EventHandlerFunc(func(EventCaller) { calls = append(calls, "outer") }), false, true)
 	inner, _ := NewScopedCtrlC(EventHandlerFunc(func(EventCaller) { calls = append(calls, "inner") }), false, true)
-	if err := outer.Close(); !errors.Is(err, ErrParamsPrecondition) {
+	if err := outer.Close(); !errors.Is(err, ErrPrecondition) {
 		t.Fatalf("out-of-order close = %v", err)
 	}
 	if dispatchScopedControlC() || !reflect.DeepEqual(calls, []string{"inner"}) {
@@ -103,22 +103,22 @@ func TestScopedCtrlCNestedLIFOAndRestoration(t *testing.T) {
 }
 
 func TestScopedCtrlCHandlerAndOwnerPreconditions(t *testing.T) {
-	if scope, err := NewScopedCtrlC(nil, true, true); scope != nil || !errors.Is(err, ErrParamsPrecondition) {
+	if scope, err := NewScopedCtrlC(nil, true, true); scope != nil || !errors.Is(err, ErrPrecondition) {
 		t.Fatalf("nil handler = %#v, %v", scope, err)
 	}
 	var nilFunction EventHandlerFunc
-	if scope, err := NewScopedCtrlC(nilFunction, true, false); scope != nil || !errors.Is(err, ErrParamsPrecondition) {
+	if scope, err := NewScopedCtrlC(nilFunction, true, false); scope != nil || !errors.Is(err, ErrPrecondition) {
 		t.Fatalf("nil function = %#v, %v", scope, err)
 	}
 	scope, _ := NewScopedCtrlC(EventHandlerFunc(func(EventCaller) {}), true, false)
 	copyOfScope := *scope
-	if !errors.Is(copyOfScope.Reset(), ErrParamsOwner) || !errors.Is(copyOfScope.Close(), ErrParamsOwner) {
+	if !errors.Is(copyOfScope.Reset(), ErrOwner) || !errors.Is(copyOfScope.Close(), ErrOwner) {
 		t.Fatal("copied owner accepted")
 	}
 	if err := scope.Close(); err != nil || !scope.Closed() {
 		t.Fatal("close", err)
 	}
-	if err := scope.Close(); err != nil || !errors.Is(scope.Reset(), ErrParamsOwner) {
+	if err := scope.Close(); err != nil || !errors.Is(scope.Reset(), ErrOwner) {
 		t.Fatal("closed scope behavior", err)
 	}
 }

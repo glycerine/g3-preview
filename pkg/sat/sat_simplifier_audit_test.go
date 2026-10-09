@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 )
 
 func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
@@ -74,7 +75,7 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 	mc := p.converter
 	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes + mc.store.directoryBytes + satWatchGraphBytes(mc.store.words.Stats())
 	r := p.limit
-	want += uint64(reflect.TypeOf(util.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*util.Reslimit)(nil)).Size())*uint64(cap(r.Children)) + p.memory.Stats().TotalBytes
+	want += uint64(reflect.TypeOf(control.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*control.Reslimit)(nil)).Size())*uint64(cap(r.Children)) + p.memory.Stats().TotalBytes
 	want += simplifier.ownerBytes + satOuterUseOwnedBytes(simplifier.useList) + simplifier.kernel.ownerBytes + simplifier.kernel.backingBytes
 	set := simplifier.subTodo
 	want += set.ownerBytes + 4*uint64(cap(set.ids)) + uint64(cap(set.refs))*uint64(reflect.TypeOf(StoredClauseRef{}).Size())

@@ -9,19 +9,20 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 )
 
 // Real source services; cooperation is a coordinator-owned prerequisite.
 // No successful default callback substitutes for reslimit/cooperation.
-func upolySourceOwnerServices(t *testing.T) (*UPolynomialManager, *util.RationalManager, *arena.Budget, *util.Reslimit, *cooperate.Cooperation) {
+func upolySourceOwnerServices(t *testing.T) (*UPolynomialManager, *util.RationalManager, *arena.Budget, *control.Reslimit, *cooperate.Cooperation) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}}})
 	if e != nil {
 		t.Fatal(e)
 	}
-	limit, e := util.NewReslimit(b)
+	limit, e := control.NewReslimit(b)
 	if e != nil {
 		t.Fatal(e)
 	}

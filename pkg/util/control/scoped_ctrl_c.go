@@ -1,5 +1,5 @@
 // Source: src/util/scoped_ctrl_c.h:24-41; src/util/scoped_ctrl_c.cpp:24-66.
-package util
+package control
 
 import (
 	"os"
@@ -31,10 +31,10 @@ type ScopedCtrlC struct {
 // NewScopedCtrlC constructs and optionally installs a scoped interrupt handler.
 func NewScopedCtrlC(handler EventHandler, once, enabled bool) (*ScopedCtrlC, error) {
 	if handler == nil {
-		return nil, ErrParamsPrecondition
+		return nil, ErrPrecondition
 	}
 	if function, ok := handler.(EventHandlerFunc); ok && function == nil {
-		return nil, ErrParamsPrecondition
+		return nil, ErrPrecondition
 	}
 	scope := &ScopedCtrlC{handler: handler, once: once, first: true, enabled: enabled}
 	scope.self = scope
@@ -120,12 +120,12 @@ func forwardScopedControlC(signals chan os.Signal, stop chan struct{}) {
 // Reset allows a once scope to handle the next interrupt as its first one.
 func (scope *ScopedCtrlC) Reset() error {
 	if scope == nil || scope.self != scope {
-		return ErrParamsOwner
+		return ErrOwner
 	}
 	scopedControlCState.Lock()
 	defer scopedControlCState.Unlock()
 	if scope.closed {
-		return ErrParamsOwner
+		return ErrOwner
 	}
 	scope.first = true
 	return nil
@@ -134,7 +134,7 @@ func (scope *ScopedCtrlC) Reset() error {
 // Close restores the previously active scoped handler.
 func (scope *ScopedCtrlC) Close() error {
 	if scope == nil || scope.self != scope {
-		return ErrParamsOwner
+		return ErrOwner
 	}
 	scopedControlCState.Lock()
 	defer scopedControlCState.Unlock()
@@ -142,7 +142,7 @@ func (scope *ScopedCtrlC) Close() error {
 		return nil
 	}
 	if scope.enabled && scopedControlCState.top != scope {
-		return ErrParamsPrecondition
+		return ErrPrecondition
 	}
 	if scope.enabled {
 		scopedControlCState.top = scope.old

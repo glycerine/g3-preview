@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 )
 
@@ -33,7 +34,7 @@ type GoalTranslator struct {
 	manager *ast.ASTManager
 	solver  *sat.Solver
 	// Borrow the AST manager's original resource limit for translation checkpoints.
-	Limit                                     *util.Reslimit
+	Limit                                     *control.Reslimit
 	cooperation                               *cooperate.Cooperation
 	cache, Atoms, interfaces                  satGoalASTMap
 	dependencies                              satGoalASTMap

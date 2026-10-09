@@ -7,12 +7,13 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 )
 
 type SolverConfig struct {
 	ParamsContext *util.ParamsContext
 	Params        util.ParamsRef
-	RLimit        *util.Reslimit
+	RLimit        *control.Reslimit
 	Budget        *arena.Budget
 	Runtime       *Runtime
 }
@@ -26,7 +27,7 @@ type Solver struct {
 	self                         *Solver
 	runtime                      *Runtime
 	context                      *util.ParamsContext
-	Limit                        *util.Reslimit
+	Limit                        *control.Reslimit
 	budget                       *arena.Budget
 	config                       *satMainConfig
 	Clauses                      *ClauseAllocator

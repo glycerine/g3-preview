@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/random"
 )
 
@@ -18,7 +19,7 @@ func satSolverCheckFixture(t *testing.T) (*Solver, *util.ParamsContext, util.Par
 	runtime, e := NewRuntime(RuntimeConfig{Budget: ctx.BudgetField, ParamsContext: ctx})
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, runtime.Close()) })
-	limit, e := util.NewReslimit(ctx.BudgetField)
+	limit, e := control.NewReslimit(ctx.BudgetField)
 	satOK(t, e)
 	t.Cleanup(limit.Close)
 	s, e := NewSATSolver(SolverConfig{ParamsContext: ctx, Params: p, RLimit: limit, Budget: ctx.BudgetField, Runtime: runtime})

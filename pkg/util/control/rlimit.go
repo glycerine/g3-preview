@@ -1,5 +1,5 @@
-// Translation of src/util/rlimit.h/.cpp, Nikolaj Bjorner, 2015-09-28.
-package util
+// Source: src/util/rlimit.h; src/util/rlimit.cpp.
+package control
 
 import (
 	"reflect"
@@ -34,6 +34,12 @@ func NewReslimit(budget *arena.Budget) (*Reslimit, error) {
 	}
 	return &Reslimit{budget: budget, HeaderCharged: true}, nil
 }
+
+func (r *Reslimit) InitEmbedded(budget *arena.Budget) { r.budget = budget }
+func (r *Reslimit) StorageBytes() uint64 {
+	return uint64(cap(r.Limits))*8 + uint64(cap(r.Children))*uint64(reflect.TypeOf((*Reslimit)(nil)).Size())
+}
+func (r *Reslimit) Closed() bool { return r.ClosedField }
 
 func utilLimitCapacity(old int, width uint64) (int, error) {
 	next := uint64(2)
@@ -97,7 +103,8 @@ func (r *Reslimit) Pop() {
 	r.Limits = r.Limits[:len(r.Limits)-1]
 	r.cancelCount.Store(0)
 }
-func (r *Reslimit) CancelFlag() bool { return r.cancelCount.Load() > 0 && !r.suspended }
+func (r *Reslimit) CancelFlag() bool    { return r.cancelCount.Load() > 0 && !r.suspended }
+func (r *Reslimit) CancelCount() uint32 { return r.cancelCount.Load() }
 func (r *Reslimit) CancelMessage() string {
 	if r.cancelCount.Load() > 0 {
 		return messages.Canceled

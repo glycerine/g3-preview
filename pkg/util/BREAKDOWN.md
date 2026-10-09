@@ -26,8 +26,8 @@ one package per C++ header. If a facility has no production C++ consumer,
 delete or defer the port instead of giving dead code a new home.
 
 The extraction work now includes `util/filepath`, `util/approx`,
-`util/messages`, `util/natset`, `util/stack`, `util/bitset`, `util/luby`, and
-`util/statistics`.
+`util/messages`, `util/natset`, `util/stack`, `util/bitset`, `util/luby`,
+`util/statistics`, and `util/control`.
 The bitset
 package owns the native variable-width, fast-reset, fixed-width, and unsigned
 set implementations. It imports `arena` directly for fixed-width pooled
@@ -227,9 +227,10 @@ These should follow after the first independent moves:
   consumers use `Stopwatch` directly. There is no root compatibility facade.
 * `util/cooperate` now owns the selected single-threaded `cooperate.h/.cpp`
   profile and imports only `arena`. Current consumers import it directly.
-* `util/control` can own cancellation, event handlers, resource limits,
-  timeouts, timers, and scoped control-C handling. These
-  form a behavioral subsystem even though they are not one C++ include cycle.
+* `util/control` now owns cancellation, event handlers, resource limits,
+  timeouts, timers, and scoped control-C handling. The leaf imports only
+  `arena` and `util/messages`; AST, SAT, tactics, and polynomial fixtures import
+  it directly, with no root compatibility facade.
 
 These APIs have broad consumers, so moving them will touch many packages. They
 are valuable boundaries, but poor first experiments for the mechanical package

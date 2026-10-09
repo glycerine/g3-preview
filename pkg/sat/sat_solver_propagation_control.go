@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/z3exception"
@@ -32,7 +33,7 @@ type satSolverPropagationState struct {
 	variables                                                                   *satSolverVariableState
 	clauses                                                                     *ClauseAllocator
 	converter                                                                   *satModelConverter
-	limit                                                                       *util.Reslimit
+	limit                                                                       *control.Reslimit
 	memory                                                                      *util.Runtime
 	config                                                                      *satMainConfig
 	budget                                                                      *arena.Budget
@@ -45,7 +46,7 @@ type satSolverPropagationState struct {
 	inconsistent, checkpointEnabled, extensionPresent, closed                   bool
 }
 
-func newSATSolverPropagationState(v *satSolverVariableState, a *ClauseAllocator, mc *satModelConverter, r *util.Reslimit, mem *util.Runtime, cfg *satMainConfig, b *arena.Budget) (*satSolverPropagationState, error) {
+func newSATSolverPropagationState(v *satSolverVariableState, a *ClauseAllocator, mc *satModelConverter, r *control.Reslimit, mem *util.Runtime, cfg *satMainConfig, b *arena.Budget) (*satSolverPropagationState, error) {
 	if e := v.constructionBorrow(); e != nil {
 		return nil, e
 	}

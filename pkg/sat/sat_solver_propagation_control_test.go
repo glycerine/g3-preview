@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -26,7 +26,7 @@ func satPropagationFixtureWithBudget(t *testing.T, n uint32, b *arena.Budget) (*
 	satOK(t, e)
 	mc, e := newSATModelConverter(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}})
 	satOK(t, e)
-	r, e := util.NewReslimit(b)
+	r, e := control.NewReslimit(b)
 	satOK(t, e)
 	mem := v.memory
 	ctx, _, g, cb := satMainConfigTestRuntime(t)
@@ -90,7 +90,7 @@ func satPropagationAssertGraph(t *testing.T, s *satSolverPropagationState) {
 	mc := s.converter
 	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes + mc.store.directoryBytes + satWatchGraphBytes(mc.store.words.Stats())
 	r := s.limit
-	want += uint64(reflect.TypeOf(util.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*util.Reslimit)(nil)).Size())*uint64(cap(r.Children))
+	want += uint64(reflect.TypeOf(control.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*control.Reslimit)(nil)).Size())*uint64(cap(r.Children))
 	want += s.memory.Stats().TotalBytes
 	if b.Used() != want {
 		t.Fatalf("actual once-only borrowed owner graph %d != %d", b.Used(), want)

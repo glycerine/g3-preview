@@ -6,10 +6,11 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 )
 
-func upolyAdoptionOther(t *testing.T, q *util.RationalManager, limit *util.Reslimit, coop *cooperate.Cooperation) *UPolynomialManager {
+func upolyAdoptionOther(t *testing.T, q *util.RationalManager, limit *control.Reslimit, coop *cooperate.Cooperation) *UPolynomialManager {
 	t.Helper()
 	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: limit.Inc, Cooperation: func() error { return coop.Cooperate("upolynomial") }})
 	if e != nil {

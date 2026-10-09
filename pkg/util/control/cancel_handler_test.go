@@ -1,4 +1,4 @@
-package util
+package control
 
 import (
 	"testing"
@@ -15,7 +15,7 @@ func TestCancelHandlerSourceLifetime(t *testing.T) {
 	}
 	h.invoke(utilTimeoutCaller)
 	h.invoke(utilAPIInterruptCaller)
-	if !h.canceled() || h.callerID() != utilTimeoutCaller || r.cancelCount.Load() != 1 {
+	if !h.canceled() || h.callerID() != utilTimeoutCaller || r.CancelCount() != 1 {
 		t.Fatal("first invocation only")
 	}
 	h.close()
@@ -42,11 +42,11 @@ func TestCancelHandlerSourceNestedAndReset(t *testing.T) {
 	a, b := newUtilCancelHandler(&r), newUtilCancelHandler(&r)
 	a.invoke(utilControlCCaller)
 	b.invoke(utilResourceLimitCaller)
-	if child.cancelCount.Load() != 2 {
+	if child.CancelCount() != 2 {
 		t.Fatal("nested propagation")
 	}
 	a.close()
-	if child.cancelCount.Load() != 1 || b.callerID() != utilResourceLimitCaller {
+	if child.CancelCount() != 1 || b.callerID() != utilResourceLimitCaller {
 		t.Fatal("nested cleanup")
 	}
 	r.ResetCancel()
