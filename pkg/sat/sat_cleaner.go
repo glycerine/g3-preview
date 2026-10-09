@@ -2,12 +2,12 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 // Actual source cleaner member. Dependencies are borrowed and must outlive it.
@@ -107,7 +107,7 @@ func (c *satCleaner) run(force bool) (done bool, err error) {
 		return false, nil
 	}
 	// Source report starts only after all early exits; original error wins on Stop.
-	var report util.Stopwatch
+	var report stopwatch.Stopwatch
 	if e = report.Start(); e != nil {
 		return false, e
 	}

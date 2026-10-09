@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/statistics"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 type satSCC struct {
@@ -18,7 +19,7 @@ type satSCC struct {
 	numElim, nextIndex                                    uint32
 	header                                                uint64
 	bodyCause, cleanupCause                               error
-	report                                                util.Stopwatch
+	report                                                stopwatch.Stopwatch
 	reportActive                                          bool
 	enabled, active, closing, closed, debugInvariant      bool
 }
@@ -214,7 +215,7 @@ func (c *satSCC) run() (count uint32, err error) {
 			return 0, e
 		}
 	}
-	c.report = util.Stopwatch{}
+	c.report = stopwatch.Stopwatch{}
 	if e := c.report.Start(); e != nil {
 		return 0, e
 	}

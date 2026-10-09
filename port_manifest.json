@@ -148514,10 +148514,10 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/stopwatch.go",
-        "pkg/util/clock_linux.go",
-        "pkg/util/clock_portable.go",
-        "pkg/util/stopwatch_test.go"
+        "pkg/util/stopwatch/stopwatch.go",
+        "pkg/util/stopwatch/clock_linux.go",
+        "pkg/util/stopwatch/clock_portable.go",
+        "pkg/util/stopwatch/stopwatch_test.go"
       ],
       "tests": [
         "TestStopwatchSourceControls",
@@ -148567,7 +148567,7 @@
         {
           "name": "POSIX stopwatch start/stop/reset/add/get_seconds control with explicit Go clock adapter",
           "status": "ported",
-          "go_target": "pkg/util/stopwatch.go",
+          "go_target": "pkg/util/stopwatch/stopwatch.go",
           "tests": [
             "TestStopwatchSourceControls",
             "TestStopwatchActualClock",
@@ -148578,7 +148578,7 @@
         {
           "name": "get_seconds and get_current_seconds exported query surface (src/util/stopwatch.h:114-128,173-187)",
           "status": "ported",
-          "go_target": "pkg/util/stopwatch.go",
+          "go_target": "pkg/util/stopwatch/stopwatch.go",
           "tests": [
             "TestStopwatchSourceControls",
             "TestStopwatchNamedQueriesAndScopedWatch"
@@ -148587,7 +148587,7 @@
         {
           "name": "scoped_watch constructor reset/start and destructor stop (src/util/stopwatch.h:193-202)",
           "status": "ported",
-          "go_target": "pkg/util/stopwatch.go",
+          "go_target": "pkg/util/stopwatch/stopwatch.go",
           "tests": [
             "TestStopwatchNamedQueriesAndScopedWatch",
             "TestScopedWatchPreconditionsAndFailure"

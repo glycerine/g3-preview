@@ -55,7 +55,7 @@ func TestTimerOriginalStartQueriesAndStrictTimeouts(t *testing.T) {
 	}
 	w, e := p.readWatch()
 	memoryRuntimeRequire(t, e)
-	if !w.Running() || w.ElapsedNanoseconds() != 2_000_000_001 || w.start != now {
+	if !w.Running() || w.ElapsedNanoseconds() != 2_000_000_001 || w.State().Start != now {
 		t.Fatal(w)
 	}
 	q, e := NewTimer(TimerConfig{Runtime: r, Clock: func() (uint64, error) { return now, nil }})
@@ -113,7 +113,7 @@ func TestTimerClockFailureAndReentryPrefixes(t *testing.T) {
 			}
 			w, e := p.readWatch()
 			memoryRuntimeRequire(t, e)
-			if refuse == 2 && (!w.Running() || w.ElapsedNanoseconds() != 0 || w.start != 100) {
+			if refuse == 2 && (!w.Running() || w.ElapsedNanoseconds() != 0 || w.State().Start != 100) {
 				t.Fatal("stop failure prefix", w)
 			}
 			if refuse == 3 && (w.Running() || w.ElapsedNanoseconds() != 100) {
@@ -135,10 +135,10 @@ func TestTimerClockFailureAndReentryPrefixes(t *testing.T) {
 			}
 			w, e := p.readWatch()
 			memoryRuntimeRequire(t, e)
-			if calls == 2 && (!w.Running() || w.elapsed != 0) {
+			if calls == 2 && (!w.Running() || w.ElapsedNanoseconds() != 0) {
 				t.Fatal("stop clock prefix", w)
 			}
-			if calls == 3 && (w.Running() || w.elapsed != 100) {
+			if calls == 3 && (w.Running() || w.ElapsedNanoseconds() != 100) {
 				t.Fatal("restart clock prefix", w)
 			}
 		}

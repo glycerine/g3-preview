@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/statistics"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 type satAsymmBranch struct {
@@ -17,7 +18,7 @@ type satAsymmBranch struct {
 	enabled                                                                               bool
 	rounds, limit, elimLiterals                                                           uint32
 	savedPhase                                                                            RuntimeVectorColumn
-	report                                                                                util.Stopwatch
+	report                                                                                stopwatch.Stopwatch
 	debugPropagate, debugMissed                                                           bool
 	phaseRestoreStopped, savedConstructed                                                 bool
 	reportActive, closing, closed, debugInvariant, running, interrupted                   bool

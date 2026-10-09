@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 var ErrTimeitOwner = errors.New("g3: invalid timeit owner")
@@ -93,7 +94,7 @@ func (p *Timeit) Construct(enable bool, config TimeitConfig) (cause error) {
 	if e = watch.writeUint64(48, math.Float64bits(float64(bytes)/(1024*1024))); e != nil {
 		return e
 	}
-	w := Stopwatch{clock: config.Clock}
+	w := stopwatch.New(config.Clock)
 	if e = w.Start(); e != nil {
 		return e
 	}

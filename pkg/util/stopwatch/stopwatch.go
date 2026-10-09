@@ -1,6 +1,6 @@
 // Source: src/util/stopwatch.h.
 // Translation of src/util/stopwatch.h's POSIX control flow.
-package util
+package stopwatch
 
 import "errors"
 
@@ -13,6 +13,22 @@ type Stopwatch struct {
 	elapsed, start uint64
 	running        bool
 	clock          func() (uint64, error) // nil selects the actual platform clock.
+}
+
+type State struct {
+	Elapsed uint64
+	Start   uint64
+	Running bool
+}
+
+func New(clock func() (uint64, error)) Stopwatch { return Stopwatch{clock: clock} }
+
+func FromState(state State, clock func() (uint64, error)) Stopwatch {
+	return Stopwatch{elapsed: state.Elapsed, start: state.Start, running: state.Running, clock: clock}
+}
+
+func (w *Stopwatch) State() State {
+	return State{Elapsed: w.elapsed, Start: w.start, Running: w.running}
 }
 
 func (w *Stopwatch) read() (uint64, error) {

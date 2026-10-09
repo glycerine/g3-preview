@@ -2,8 +2,8 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 func (s *satSolverProbing) tryLit(l Literal, updateCache bool) (bool, error) {
@@ -304,7 +304,7 @@ func (s *satSolverProbing) run(force bool) (answer bool, err error) {
 		}
 	}
 	// Source lexical report starts here and stops on every normal/error unwind.
-	var watch util.Stopwatch
+	var watch stopwatch.Stopwatch
 	if e := watch.Start(); e != nil {
 		return false, e
 	}

@@ -1,5 +1,5 @@
 // Source: src/util/stopwatch.h.
-package util
+package stopwatch
 
 import (
 	"errors"

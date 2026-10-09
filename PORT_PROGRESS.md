@@ -1,5 +1,11 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
+`src/util/stopwatch.h` and its Go platform clock adapters now live in the
+independent `pkg/util/stopwatch` leaf. SAT reporting imports the leaf directly;
+root Timer and Timeit use its public constructor and typed persistence snapshot.
+The former root implementation and tests were removed, with no compatibility
+facade or import back to root `util`.
+
 The test-only `ScopedFastFloatVector` translation was removed.
 `scoped_mpff_vector` is instantiated only by `src/test/mpff.cpp`; production
 Z3 and Go code use scalar `scoped_mpff` values. Scalar ownership and arithmetic

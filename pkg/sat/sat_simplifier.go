@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 // Concrete source member owner. Solver services are real borrowed owners; this
@@ -37,7 +38,7 @@ type satSimplifier struct {
 	occRanges, litRanges                                                         [3]uint32
 	clsCutoffs                                                                   [2]uint32
 	numBlocked, numSubsumed, numElimVars, numSubRes, numElimLits, oldNumElimVars uint32
-	subReport, blockedReport, elimReport                                         util.Stopwatch
+	subReport, blockedReport, elimReport                                         stopwatch.Stopwatch
 	ownerBytes                                                                   uint64
 	closeStage                                                                   uint32
 	constructed                                                                  bool

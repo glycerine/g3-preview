@@ -217,6 +217,10 @@ These should follow after the first independent moves:
   C-string, vector, arena, and hash-table simulations. The package has no root
   `util` dependency. The separate source `stats` unit can join it when ported
   if its consumers need the same boundary.
+* `util/stopwatch` now owns `stopwatch.h` and its platform clock adapters.
+  It depends only on the standard library. Timer and time-reporting consumers
+  exchange a typed `State` snapshot when they must persist the watch; all other
+  consumers use `Stopwatch` directly. There is no root compatibility facade.
 * `util/control` can own cancellation, event handlers, resource limits,
   timeouts, timers, scoped control-C handling, and cooperation checks. These
   form a behavioral subsystem even though they are not one C++ include cycle.
@@ -550,7 +554,7 @@ pool                   prime_generator         scoped_ctrl_c
 scoped_numeral_buffer
 scoped_ptr_vector      scoped_vector           sexpr
 sorting_network        stack                   statistics
-                       symbol_table            timeit
+stopwatch              symbol_table            timeit
 timeout
 timer                  top_sort                union_find
 version
@@ -701,3 +705,9 @@ while the same source functionality is already present in the typed native
 four isolated `Runtime`/`Block` ownership graphs and their allocation-layout,
 interrupted-destruction, and malformed-header tests without removing a live Go
 consumer.
+
+`util/stopwatch` owns `Stopwatch`, `ScopedWatch`, and the Linux/portable clock
+adapters. SAT reporting imports the leaf directly. Root `Timer` and `Timeit`
+retain their existing persistence behavior through the leaf's typed `State`
+snapshot and constructor, without exposing stopwatch fields or retaining a
+root alias. The leaf has no project-package dependency.

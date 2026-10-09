@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 var ErrTimerOwner = errors.New("g3: invalid timer owner")
@@ -58,7 +59,7 @@ func NewTimer(config TimerConfig) (*Timer, error) {
 			e = config.Runtime.Write(p.watch, 8, 0)
 		}
 		if e == nil {
-			w := Stopwatch{clock: config.Clock}
+			w := stopwatch.New(config.Clock)
 			e = w.Start()
 			if e == nil {
 				e = p.writeWatch(&w)
@@ -105,40 +106,40 @@ func (p *Timer) writeUint64(offset, value uint64) error {
 	}
 	return nil
 }
-func (p *Timer) readWatch() (Stopwatch, error) {
-	w := Stopwatch{clock: p.config.Clock}
-	var e error
-	w.elapsed, e = p.readUint64(0)
+func (p *Timer) readWatch() (stopwatch.Stopwatch, error) {
+	elapsed, e := p.readUint64(0)
 	if e != nil {
-		return w, e
+		return stopwatch.Stopwatch{}, e
 	}
-	running, e := p.config.Runtime.Read(p.watch, 8)
+	runningByte, e := p.config.Runtime.Read(p.watch, 8)
 	if e != nil {
-		return w, e
+		return stopwatch.Stopwatch{}, e
 	}
-	w.running = running != 0
-	if w.running {
-		sec, e := p.readUint64(16)
-		if e != nil {
-			return w, e
+	state := stopwatch.State{Elapsed: elapsed, Running: runningByte != 0}
+	if state.Running {
+		sec, readErr := p.readUint64(16)
+		if readErr != nil {
+			return stopwatch.Stopwatch{}, readErr
 		}
-		nsec, e := p.readUint64(24)
-		if e != nil {
-			return w, e
+		nsec, readErr := p.readUint64(24)
+		if readErr != nil {
+			return stopwatch.Stopwatch{}, readErr
 		}
-		w.start = sec*1e9 + nsec
+		state.Start = sec*1e9 + nsec
 	}
-	return w, nil
+	return stopwatch.FromState(state, p.config.Clock), nil
 }
-func (p *Timer) writeWatch(w *Stopwatch) error {
-	if e := p.writeUint64(0, w.elapsed); e != nil {
+
+func (p *Timer) writeWatch(w *stopwatch.Stopwatch) error {
+	state := w.State()
+	if e := p.writeUint64(0, state.Elapsed); e != nil {
 		return e
 	}
-	if w.running {
-		if e := p.writeUint64(16, w.start/1e9); e != nil {
+	if state.Running {
+		if e := p.writeUint64(16, state.Start/1e9); e != nil {
 			return e
 		}
-		if e := p.writeUint64(24, w.start%1e9); e != nil {
+		if e := p.writeUint64(24, state.Start%1e9); e != nil {
 			return e
 		}
 		return p.config.Runtime.Write(p.watch, 8, 1)
@@ -173,7 +174,7 @@ func (p *Timer) GetSeconds() (float64, error) {
 	if e != nil {
 		return 0, e
 	}
-	if w.running {
+	if w.Running() {
 		e = w.Stop()
 		if writeErr := p.writeWatch(&w); writeErr != nil {
 			return 0, writeErr
@@ -190,7 +191,7 @@ func (p *Timer) GetSeconds() (float64, error) {
 			return 0, e
 		}
 	}
-	return float64(w.elapsed) / 1e9, nil
+	return float64(w.ElapsedNanoseconds()) / 1e9, nil
 }
 
 func (p *Timer) Timeout(seconds uint32) (bool, error) {

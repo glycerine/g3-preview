@@ -1,7 +1,7 @@
 //go:build !linux
 
 // Source: src/util/stopwatch.h.
-package util
+package stopwatch
 
 import (
 	"time"

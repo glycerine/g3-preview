@@ -3,13 +3,13 @@ package sat
 
 import (
 	"errors"
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"math"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/luby"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 var ErrSATGCUninitialized = errors.New("sat: source GC field is indeterminate before initialization")
@@ -25,7 +25,7 @@ type satSolverGC struct {
 	ownerBytes                                                                               uint64
 	gcThreshold, restartThreshold, lubyIndex, restarts, restartStat, numFrozen, gcClauseStat uint32
 	minDTk                                                                                   float64
-	watch                                                                                    util.Stopwatch
+	watch                                                                                    stopwatch.Stopwatch
 	initialized, closed, closing, running, interrupted, debugInvariant                       bool
 	cursor, out, end, drainPrefix, drainSuffix                                               uint32
 	scratch                                                                                  []StoredClauseRef
