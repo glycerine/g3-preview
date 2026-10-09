@@ -571,8 +571,9 @@ For each package extraction:
 7. Record package test times before and after the move. The purpose is both a
    clearer dependency graph and faster focused verification.
 
-The best proof of the approach is a small first extraction such as `lbool`. It
-has real consumers, no numerical ownership complications, and no reason to
-depend on the remaining root package. Once that move is green, the same process
-can be applied to cliques, union-find/backtracking, sorting networks, and then
-the larger numeric boundary.
+The first extraction is `util/lbool`. Its implementation now lives in the leaf
+package with no dependency on root `util`; root exports temporary aliases while
+consumer packages migrate to the leaf API. Once those aliases are no longer
+used, the compatibility file can be deleted. The same process can then be
+applied to cliques, union-find/backtracking, sorting networks, and the larger
+numeric boundary.
