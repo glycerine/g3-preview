@@ -42,9 +42,6 @@ func IsSMT2QuotedCString(text *string) bool {
 	}
 	return false
 }
-func smt2SymbolByte(m *SymbolManager, s Symbol, i uint32) (byte, error) {
-	return m.region.Read(arena.BytesRegionRef{Slot: arena.Slot(s.Value), Generation: s.Generation}, m.pointerWidth+i)
-}
 func smt2QuotedSymbolLocked(m *SymbolManager, s Symbol) (bool, error) {
 	if e := m.checkPlain(s); e != nil {
 		return false, e
@@ -52,57 +49,11 @@ func smt2QuotedSymbolLocked(m *SymbolManager, s Symbol) (bool, error) {
 	if s.IsNumerical() || s.Value == 0 {
 		return false, nil
 	}
-	k, e := m.key(s)
+	text, e := m.spelling(s)
 	if e != nil {
 		return false, e
 	}
-	n := uint64(k.Length())
-	if n == 0 {
-		return false, nil
-	}
-	first, e := smt2SymbolByte(m, s, 0)
-	if e != nil {
-		return false, e
-	}
-	if first >= '0' && first <= '9' {
-		return true, nil
-	}
-	last, e := smt2SymbolByte(m, s, uint32(n-1))
-	if e != nil {
-		return false, e
-	}
-	if n >= 2 && first == '|' && last == '|' {
-		for i := uint64(1); i+1 < n; i++ {
-			c, e := smt2SymbolByte(m, s, uint32(i))
-			if e != nil {
-				return false, e
-			}
-			if c == '\\' && i+2 < n {
-				next, e := smt2SymbolByte(m, s, uint32(i+1))
-				if e != nil {
-					return false, e
-				}
-				if next == '\\' || next == '|' {
-					i++
-					continue
-				}
-			}
-			if c == '\\' || c == '|' {
-				return true, nil
-			}
-		}
-		return false, nil
-	}
-	for i := uint64(0); i < n; i++ {
-		c, e := smt2SymbolByte(m, s, uint32(i))
-		if e != nil {
-			return false, e
-		}
-		if !IsSMT2SimpleSymbolChar(c) {
-			return true, nil
-		}
-	}
-	return false, nil
+	return IsSMT2QuotedCString(&text), nil
 }
 func IsSMT2QuotedSymbol(m *SymbolManager, s Symbol) (bool, error) {
 	if m == nil {
@@ -138,15 +89,12 @@ func MkSMT2QuotedSymbol(m *SymbolManager, s Symbol, budget *arena.Budget) (strin
 	if e = b.State.AppendByte(b.Inline[:], '|'); e != nil {
 		return "", e
 	}
-	k, e := m.key(s)
+	text, e := m.spelling(s)
 	if e != nil {
 		return "", e
 	}
-	for i := uint64(0); i < uint64(k.Length()); i++ {
-		c, e := smt2SymbolByte(m, s, uint32(i))
-		if e != nil {
-			return "", e
-		}
+	for i := 0; i < len(text); i++ {
+		c := text[i]
 		if c == '|' || c == '\\' {
 			if e = b.State.AppendByte(b.Inline[:], '\\'); e != nil {
 				return "", e

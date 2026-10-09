@@ -6,6 +6,7 @@ import (
 	"math"
 	"reflect"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -77,6 +78,7 @@ type SymbolManager struct {
 	mu           sync.Mutex
 	region       *arena.BytesRegion
 	byText       map[string]arena.BytesRegionRef
+	byRef        map[arena.BytesRegionRef]string
 	Budget       *arena.Budget
 	owner        uint64
 	pointerWidth uint32
@@ -97,7 +99,7 @@ func NewSymbolManager(c SymbolConfig) (*SymbolManager, error) {
 		c.Budget.Release(header)
 		return nil, e
 	}
-	return &SymbolManager{region: r, byText: make(map[string]arena.BytesRegionRef), Budget: c.Budget, owner: r.OwnerID(), pointerWidth: width}, nil
+	return &SymbolManager{region: r, byText: make(map[string]arena.BytesRegionRef), byRef: make(map[arena.BytesRegionRef]string), Budget: c.Budget, owner: r.OwnerID(), pointerWidth: width}, nil
 }
 func cSymbolLength(text string) int {
 	for i := 0; i < len(text); i++ {
@@ -193,6 +195,7 @@ func (m *SymbolManager) intern(text string) (Symbol, error) {
 		return Symbol{}, e
 	}
 	m.byText[text] = r
+	m.byRef[r] = text
 	return m.symbol(r), nil
 }
 
@@ -222,8 +225,13 @@ func (m *SymbolManager) FromToken(t SymbolToken) (Symbol, error) {
 	}
 	return t.symbol, nil
 }
-func (m *SymbolManager) key(s Symbol) (StrKey, error) {
-	return BorrowCString(m.region, arena.BytesRegionRef{Slot: arena.Slot(s.Value), Generation: s.Generation}, m.pointerWidth)
+func (m *SymbolManager) spelling(s Symbol) (string, error) {
+	ref := arena.BytesRegionRef{Slot: arena.Slot(s.Value), Generation: s.Generation}
+	text, ok := m.byRef[ref]
+	if !ok {
+		return "", arena.ErrInvalidSlot
+	}
+	return text, nil
 }
 func (m *SymbolManager) text(s Symbol, display bool) (string, error) {
 	if e := m.checkPlain(s); e != nil {
@@ -238,23 +246,7 @@ func (m *SymbolManager) text(s Symbol, display bool) (string, error) {
 		}
 		return "<null>", nil
 	}
-	k, e := m.key(s)
-	if e != nil {
-		return "", e
-	}
-	return m.symbolText(k)
-}
-
-func (m *SymbolManager) symbolText(k StrKey) (string, error) {
-	b := make([]byte, k.Length())
-	for i := range b {
-		v, e := m.region.Read(k.Allocation(), k.Offset()+uint32(i))
-		if e != nil {
-			return "", e
-		}
-		b[i] = v
-	}
-	return string(b), nil
+	return m.spelling(s)
 }
 func (m *SymbolManager) String(s Symbol) (string, error) {
 	m.mu.Lock()
@@ -281,12 +273,8 @@ func (m *SymbolManager) BareString(s Symbol) (text string, present bool, err err
 	if s.Value == 0 {
 		return "", false, nil
 	}
-	k, e := m.key(s)
-	if e != nil {
-		return "", false, e
-	}
-	text, e = m.symbolText(k)
-	return text, e == nil, e
+	text, err = m.spelling(s)
+	return text, err == nil, err
 }
 func (m *SymbolManager) Hash(s Symbol) (uint32, error) {
 	m.mu.Lock()
@@ -323,20 +311,11 @@ func (m *SymbolManager) Contains(s Symbol, ch byte) (bool, error) {
 	if s.Value == 0 {
 		return false, ErrInvalidSymbol
 	}
-	k, e := m.key(s)
+	text, e := m.spelling(s)
 	if e != nil {
 		return false, e
 	}
-	for i := uint32(0); i <= k.Length(); i++ {
-		b, e := m.region.Read(k.Allocation(), k.Offset()+i)
-		if e != nil {
-			return false, e
-		}
-		if b == ch {
-			return true, nil
-		}
-	}
-	return false, nil
+	return ch == 0 || strings.IndexByte(text, ch) >= 0, nil
 }
 func (m *SymbolManager) Size(s Symbol) (uint32, error) {
 	m.mu.Lock()
@@ -355,8 +334,8 @@ func (m *SymbolManager) Size(s Symbol) (uint32, error) {
 	if s.Value == 0 {
 		return 0, ErrInvalidSymbol
 	}
-	k, e := m.key(s)
-	return k.Length(), e
+	text, e := m.spelling(s)
+	return uint32(len(text)), e
 }
 func (m *SymbolManager) EqualString(s Symbol, text *string) (bool, error) {
 	m.mu.Lock()
@@ -375,23 +354,11 @@ func (m *SymbolManager) EqualString(s Symbol, text *string) (bool, error) {
 		rendered, e := m.text(s, false)
 		return rendered == v, e
 	}
-	k, e := m.key(s)
+	spelling, e := m.spelling(s)
 	if e != nil {
 		return false, e
 	}
-	if uint64(k.Length()) != uint64(len(v)) {
-		return false, nil
-	}
-	for i := uint32(0); i < k.Length(); i++ {
-		b, e := m.region.Read(k.Allocation(), k.Offset()+i)
-		if e != nil {
-			return false, e
-		}
-		if b != v[i] {
-			return false, nil
-		}
-	}
-	return true, nil
+	return spelling == v, nil
 }
 func (m *SymbolManager) Less(a, b Symbol) (bool, error) {
 	m.mu.Lock()
@@ -420,22 +387,21 @@ func (m *SymbolManager) Less(a, b Symbol) (bool, error) {
 	if a.Value == 0 || b.Value == 0 {
 		return false, ErrInvalidSymbol
 	}
-	x, e := m.key(a)
+	x, e := m.spelling(a)
 	if e != nil {
 		return false, e
 	}
-	y, e := m.key(b)
+	y, e := m.spelling(b)
 	if e != nil {
 		return false, e
 	}
-	for i := uint32(0); ; i++ {
-		p, e := m.region.Read(x.Allocation(), x.Offset()+i)
-		if e != nil {
-			return false, e
+	for i := 0; ; i++ {
+		var p, q byte
+		if i < len(x) {
+			p = x[i]
 		}
-		q, e := m.region.Read(y.Allocation(), y.Offset()+i)
-		if e != nil {
-			return false, e
+		if i < len(y) {
+			q = y[i]
 		}
 		if int8(p) < int8(q) {
 			return true, nil
@@ -443,19 +409,10 @@ func (m *SymbolManager) Less(a, b Symbol) (bool, error) {
 		if p != q {
 			return false, nil
 		}
-		// Different interned strings cannot have equal complete spellings.
-		nextX, e := m.region.Read(x.Allocation(), x.Offset()+i+1)
-		if e != nil {
-			return false, e
-		}
-		if nextX == 0 {
+		if i+1 >= len(x) {
 			return true, nil
 		}
-		nextY, e := m.region.Read(y.Allocation(), y.Offset()+i+1)
-		if e != nil {
-			return false, e
-		}
-		if nextY == 0 {
+		if i+1 >= len(y) {
 			return false, nil
 		}
 	}
@@ -482,6 +439,7 @@ func (m *SymbolManager) Close() error {
 	}
 	m.Budget.Release(uint64(reflect.TypeOf(SymbolManager{}).Size()))
 	m.byText = nil
+	m.byRef = nil
 	m.closed = true
 	return nil
 }

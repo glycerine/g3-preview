@@ -47,7 +47,7 @@ func (m *ASTManager) formatBVCharacters(b *astBVCharBuffer16) (ASTHandle, error)
 	defer f.unlockFormat()
 	var name util.Symbol
 	if b.cap == 0 {
-		name, e = f.Symbols.InternCStringSource(util.BorrowInitializedBytesCString(b.inline[:], &b.initialized))
+		name, e = f.Symbols.InternInitializedBytes(b.inline[:], b.initialized)
 	} else {
 		name, e = f.Symbols.InternRuntimeCString(m.numerals.RuntimeOwner(), b.raw, 0, uint64(b.capacity()))
 	}

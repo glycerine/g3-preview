@@ -3,8 +3,6 @@ package util
 
 import (
 	"strings"
-
-	"github.com/glycerine/g3/pkg/arena"
 )
 
 func paramNameByte(value byte) byte {
@@ -59,34 +57,23 @@ func NormParamSymbolName(manager *SymbolManager, name Symbol) (string, error) {
 	if name.Value == 0 {
 		return "_", nil
 	}
-	key, err := manager.key(name)
+	text, err := manager.spelling(name)
 	if err != nil {
 		return "", err
 	}
-	length, start := key.Length(), uint32(0)
+	length, start := len(text), 0
 	if length != 0 {
-		first, err := manager.region.Read(key.Allocation(), key.Offset())
-		if err != nil {
-			return "", err
-		}
-		if first == ':' {
+		if text[0] == ':' {
 			start = 1
 		}
 	}
 	if start == length {
 		return "_", nil
 	}
-	if uint64(length-start) > uint64(^uint(0)>>1) {
-		return "", arena.ErrBounds
-	}
 	var output strings.Builder
-	output.Grow(int(length - start))
+	output.Grow(length - start)
 	for i := start; i < length; i++ {
-		value, err := manager.region.Read(key.Allocation(), key.Offset()+i)
-		if err != nil {
-			return "", err
-		}
-		output.WriteByte(paramNameByte(value))
+		output.WriteByte(paramNameByte(text[i]))
 	}
 	return output.String(), nil
 }

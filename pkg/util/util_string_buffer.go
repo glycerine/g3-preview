@@ -198,11 +198,11 @@ func (s *StringBufferState) Symbol(inline []byte, m *SymbolManager, k Symbol) er
 	if k.Value == 0 {
 		return s.AppendCString(inline, "null")
 	}
-	key, e := m.key(k)
+	text, e := m.spelling(k)
 	if e != nil {
 		return e
 	}
-	n := uint64(key.Length())
+	n := uint64(len(text))
 	if n > ^uint64(0)-s.Pos {
 		return arena.ErrBounds
 	}
@@ -212,14 +212,7 @@ func (s *StringBufferState) Symbol(inline []byte, m *SymbolManager, k Symbol) er
 			return e
 		}
 	}
-	r := arena.BytesRegionRef{Slot: arena.Slot(k.Value), Generation: k.Generation}
-	for i := uint32(0); uint64(i) < n; i++ {
-		b, e := m.region.Read(r, m.pointerWidth+i)
-		if e != nil {
-			return e
-		}
-		s.Data(inline)[s.Pos+uint64(i)] = b
-	}
+	copy(s.Data(inline)[s.Pos:next], text)
 	s.Pos = next
 	return nil
 }

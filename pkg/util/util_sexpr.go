@@ -766,16 +766,12 @@ func (m *SexprManager) formatSymbol(s Symbol, n *uint32) error {
 	if s.Value == 0 {
 		return m.literal(n, "null")
 	}
-	key, e := owner.key(s)
+	text, e := owner.spelling(s)
 	if e != nil {
 		return e
 	}
-	for i := uint32(0); i < key.Length(); i++ {
-		c, e := owner.region.Read(key.Allocation(), key.Offset()+i)
-		if e != nil {
-			return e
-		}
-		if e = m.put(n, c); e != nil {
+	for i := 0; i < len(text); i++ {
+		if e = m.put(n, text[i]); e != nil {
 			return e
 		}
 	}
