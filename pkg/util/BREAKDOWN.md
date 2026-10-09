@@ -40,6 +40,11 @@ live numeric ports already use `math/bits`, typed slices, and their concrete
 arithmetic. `obj_mark` already lives in its concrete typed AST specializations,
 so no generic utility wrapper remains to extract.
 
+`util/checkedint` now contains the concrete checked `int64` specialization.
+Overflowing multiplication uses native checked arithmetic, so the leaf no
+longer imports rational ownership or numeric stream machinery merely to test
+whether a product fits. Unchecked source instantiations use plain Go `int64`.
+
 ## Method and terminology
 
 The graph was built from quoted includes in every direct `.h` and `.cpp` file
