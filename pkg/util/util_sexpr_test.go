@@ -717,39 +717,15 @@ func TestSexprAccessorsAndScalarIterator(t *testing.T) {
 	sxRender(t, m, null, "null", ErrSexprDisplayContinuation)
 }
 
-func TestSexprBVSourceInlineBufferAndTemporaryLifetime(t *testing.T) {
-	b := arena.NewBudget(95)
-	buf := sexprBVBuffer{budget: b}
-	for i := 0; i < 16; i++ {
-		sxMust(t, buf.push(byte(i)))
-	}
-	if b.Used() != 0 || buf.capacity() != 16 {
-		t.Fatal("source inline16", b.Used(), buf.capacity())
-	}
-	sxMust(t, buf.push(16))
-	if b.Used() != 32 || buf.capacity() != 32 {
-		t.Fatal("source first doubling", b.Used(), buf.capacity())
-	}
-	for i := 17; i < 32; i++ {
-		sxMust(t, buf.push(byte(i)))
-	}
-	if e := buf.push(32); !errors.Is(e, arena.ErrBudget) {
-		t.Fatal("source old32+new64 peak", e)
-	}
-	if b.Used() != 32 || buf.size != 32 || buf.read(31) != 31 {
-		t.Fatal("failed growth mutated buffer")
-	}
-	buf.close()
-	if b.Used() != 0 {
-		t.Fatal("source temporary destructor", b.Used())
-	}
+func TestSexprBVGoScratchAndNumeralLifetime(t *testing.T) {
 	m, _, q := sxOwner(t, arena.NewBudget(1<<24))
-	sxMust(t, m.byteCapacity(&m.output, 200))
+	sxMust(t, m.byteCapacity(&m.output, 2048))
 	zero := sxNumber(t, q, "0")
-	var handles [3]SexprHandle
-	for i, w := range []uint32{60, 64, 128} {
+	widths := []uint32{60, 64, 128, 1025, 8}
+	handles := make([]SexprHandle, len(widths))
+	for i, width := range widths {
 		var e error
-		handles[i], e = m.MkBVNumeral(&zero, w, 0, 0)
+		handles[i], e = m.MkBVNumeral(&zero, width, 0, 0)
 		sxMust(t, e)
 	}
 	sxMust(t, q.Del(&zero))
@@ -757,37 +733,26 @@ func TestSexprBVSourceInlineBufferAndTemporaryLifetime(t *testing.T) {
 	roots, e := q.Stats()
 	sxMust(t, e)
 	m.Config.Budget.FailAfter(0)
-	got, e := m.DisplayAtom(handles[0])
-	if e != nil || got != "#x"+strings.Repeat("0", 15) {
-		t.Fatal("15digits+NUL remain inline", got, e)
+	for i, width := range widths {
+		prefix, count := "#b", int(width)
+		if width%4 == 0 {
+			prefix, count = "#x", int(width/4)
+		}
+		got, err := m.DisplayAtom(handles[i])
+		if want := prefix + strings.Repeat("0", count); err != nil || got != want {
+			t.Fatal(width, got, err, want)
+		}
+		if m.Config.Budget.Used() != before || len(m.bvDigits) != 0 {
+			t.Fatal("Go scratch changed numeric budget or retained logical digits", width)
+		}
 	}
-	if m.Config.Budget.Used() != before {
-		t.Fatal("inline buffer heap allocation")
-	}
-	got, e = m.DisplayAtom(handles[1])
-	if !errors.Is(e, arena.ErrInjectedFailure) || got != "#x" {
-		t.Fatal("16digits+NUL first spill", got, e)
-	}
-	if m.Config.Budget.Used() != before {
-		t.Fatal("spill failure retained storage")
-	}
-	m.Config.Budget.FailAfter(1)
-	got, e = m.DisplayAtom(handles[2])
-	if !errors.Is(e, arena.ErrInjectedFailure) || got != "#x" {
-		t.Fatal("32digits+NUL second spill", got, e)
-	}
-	after, err := q.Stats()
-	sxMust(t, err)
-	if roots.LiveCells != after.LiveCells || roots.LivePayloads != after.LivePayloads || m.Config.Budget.Used() != before {
-		t.Fatal("temporary failure cleanup", roots, after, before, m.Config.Budget.Used())
-	}
-	m.Config.Budget.FailAfter(-1)
-	got, e = m.DisplayAtom(handles[2])
+	after, e := q.Stats()
 	sxMust(t, e)
-	if got != "#x"+strings.Repeat("0", 32) || m.Config.Budget.Used() != before {
-		t.Fatal("successful temporary destruction", got, m.Config.Budget.Used(), before)
+	if roots.LiveCells != after.LiveCells || roots.LivePayloads != after.LivePayloads {
+		t.Fatal("temporary numeral leaked", roots, after)
 	}
 	if n := testing.AllocsPerRun(50, func() { _, e = m.DisplayAtom(handles[0]) }); n != 1 || e != nil {
-		t.Fatal("inline source buffer must add no heap allocation", n, e)
+		t.Fatal("warm display allocates only its returned string", n, e)
 	}
+	m.Config.Budget.FailAfter(-1)
 }

@@ -449,6 +449,13 @@ and released on explicit cleanup or close; these Go allocations are outside
 arena accounting. Shared MPN character buffers and division workspaces remain
 for subsequent migration.
 
+S-expression bit-vector display now uses reusable Go byte scratch instead of
+a copied inline-16/spill character buffer. Digit extraction, zero padding,
+hexadecimal/binary selection, and values wider than the declared width retain
+the source behavior. The printer emits the collected digits in reverse order
+directly, without a temporary C terminator, custom growth policy, or arena
+charges for Go bytes. Numeric temporaries still receive explicit deletion.
+
 ### Dissolution order
 
 1. Stop creating new `Runtime`, `Block`, custom vector, custom buffer, and

@@ -85,6 +85,7 @@ type SexprManager struct {
 	deletion                    []SexprHandle
 	frames                      []sexprFrame
 	output, stage               []byte
+	bvDigits                    []byte
 	closed                      bool
 }
 
@@ -859,6 +860,8 @@ func (m *SexprManager) bvDigit(val *OwnedRational, hex bool) (byte, OwnedRationa
 	keep = true
 	return 'a' + byte(digit-10), c, nil
 }
+
+// Source: src/util/sexpr.cpp:142-194.
 func (m *SexprManager) displayBV(r *sexprRecord, n *uint32) error {
 	if e := m.put(n, '#'); e != nil {
 		return e
@@ -872,8 +875,8 @@ func (m *SexprManager) displayBV(r *sexprRecord, n *uint32) error {
 	if e = q.Copy(&val, &r.Numeral); e != nil {
 		return e
 	}
-	buf := sexprBVBuffer{budget: m.Config.Budget}
-	defer buf.close() // before val destructor
+	m.bvDigits = m.bvDigits[:0]
+	defer func() { m.bvDigits = m.bvDigits[:0] }()
 	hex := r.width%4 == 0
 	prefix := byte('b')
 	step := uint32(1)
@@ -897,26 +900,16 @@ func (m *SexprManager) displayBV(r *sexprRecord, n *uint32) error {
 		if e != nil {
 			return e
 		}
-		e = buf.push(digit)
-		q.Del(&c) // source c survives push_back, including an exceptional push
-		if e != nil {
-			return e
-		}
+		m.bvDigits = append(m.bvDigits, digit)
+		q.Del(&c)
 		size += step
 	}
 	for size < r.width {
-		if e = buf.push('0'); e != nil {
-			return e
-		}
+		m.bvDigits = append(m.bvDigits, '0')
 		size += step
 	}
-	buf.reverse()
-	count := buf.size
-	if e = buf.push(0); e != nil {
-		return e
-	}
-	for i := uint32(0); i < count; i++ {
-		if e = m.put(n, buf.read(i)); e != nil {
+	for i := len(m.bvDigits); i > 0; i-- {
+		if e = m.put(n, m.bvDigits[i-1]); e != nil {
 			return e
 		}
 	}
@@ -1090,6 +1083,7 @@ func (m *SexprManager) Close() error {
 	m.frames = nil
 	m.output = nil
 	m.stage = nil
+	m.bvDigits = nil
 	m.recordBytes = 0
 	m.directoryBytes = 0
 	m.live = 0
@@ -1839,71 +1833,4 @@ func (v *SexprRefVector) IteratorNext(i SexprVectorIterator) (SexprVectorIterato
 	}
 	i.index++
 	return i, nil
-}
-
-// Exact instantiated source sbuffer<char> = buffer<char,false,16>. Its inline
-// storage is a function-local stack value; only overflow arrays reserve bytes.
-type sexprBVBuffer struct {
-	inline   [16]byte
-	overflow []byte
-	size     uint32
-	budget   *arena.Budget
-}
-
-func (b *sexprBVBuffer) capacity() uint32 {
-	if b.overflow == nil {
-		return 16
-	}
-	return uint32(len(b.overflow))
-}
-func (b *sexprBVBuffer) read(i uint32) byte {
-	if b.overflow == nil {
-		return b.inline[i]
-	}
-	return b.overflow[i]
-}
-func (b *sexprBVBuffer) write(i uint32, v byte) {
-	if b.overflow == nil {
-		b.inline[i] = v
-	} else {
-		b.overflow[i] = v
-	}
-}
-func (b *sexprBVBuffer) push(v byte) error {
-	if b.size == b.capacity() {
-		c := b.capacity()
-		if c > math.MaxUint32/2 {
-			return arena.ErrBounds
-		}
-		next := c * 2
-		bytes, e := sxSize(uint64(next), 1)
-		if e != nil {
-			return e
-		}
-		if e = b.budget.Reserve(bytes); e != nil {
-			return e
-		}
-		storage := make([]byte, next)
-		for i := uint32(0); i < b.size; i++ {
-			storage[i] = b.read(i)
-		}
-		b.budget.Release(uint64(len(b.overflow)))
-		b.overflow = storage
-	}
-	b.write(b.size, v)
-	b.size++
-	return nil
-}
-func (b *sexprBVBuffer) reverse() {
-	for i := uint32(0); i < b.size/2; i++ {
-		j := b.size - i - 1
-		a, z := b.read(i), b.read(j)
-		b.write(i, z)
-		b.write(j, a)
-	}
-}
-func (b *sexprBVBuffer) close() {
-	b.budget.Release(uint64(len(b.overflow)))
-	b.overflow = nil
-	b.size = 0
 }
