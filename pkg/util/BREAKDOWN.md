@@ -522,7 +522,7 @@ pool                   prime_generator         scoped_ctrl_c
 scoped_numeral_buffer
 scoped_ptr_vector      scoped_vector           sexpr
 sorting_network        stack                   statistics
-stats                  symbol_table            timeit
+                       symbol_table            timeit
 timeout
 timer                  top_sort                union_find
 version
@@ -546,6 +546,11 @@ It retains the signed32 value and lexicographic infinitesimal algebra used by SM
 arithmetic and difference logic. Rational conversion stays at the future numeric
 consumer boundary; C++ operator, functor, stream, and unused text-parser
 compatibility surfaces are omitted.
+
+`stats.h` has no live function call in the complete Z3 source tree. Several
+translation units include it, but neither inline `print_stat` overload is ever
+called. Its self-tested Go translation was removed instead of creating a
+package for dead source.
 
 ### Small units requiring a Go-native shape before packaging
 

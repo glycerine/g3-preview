@@ -30389,7 +30389,10 @@ Focused native and g3debug machine checks pass (0.004s each). Util vet, ledger a
 
 ### util file: stats.h
 
-Ported print_stat and print_stat_f as exported PrintStat and PrintStatFloat helpers over io.Writer. The positive-only conditions are preserved, including suppression of zero, negative floats and NaN. Message strings stop at their first NUL with strings.IndexByte. strconv supplies unsigned decimal and six-significant-digit float32 formatting; Go write errors return to the caller instead of becoming ostream state. Tests cover the complete gate, C-string boundary, finite/subnormal/max/infinite formatting, and reached versus skipped writer errors.
+Not ported. A complete-source symbol scan found no call to either inline
+`print_stat` overload. Some translation units include the header, but the
+functions themselves are dead; the earlier self-tested Go translation was
+deleted.
 
 Focused native and g3debug statistics checks pass (0.005s each). Util vet, ledger and diff checks pass; inventory is now2102 units,677 APIs:57 ported,287 partial,1757 unported, plus the separately classified sstream platform replacement. No new full suite was needed after the21:37 UTC checkpoint.
 
