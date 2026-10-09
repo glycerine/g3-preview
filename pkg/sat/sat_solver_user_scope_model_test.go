@@ -72,8 +72,13 @@ func TestSATSolverNativeFlagsScopeTruncationAndRegrowth(t *testing.T) {
 		v.external[i] = true
 		v.assignedSinceGC[i] = true
 		v.eliminated[i] = i >= 2
+		v.phase[i] = int8(i % 2)
+		v.previousPhase[i] = int8((i + 1) % 2)
 	}
 	satOK(t, s.UserPop(1))
+	if len(v.phase) != 2 || len(v.previousPhase) != 2 {
+		t.Fatal("scope phase lengths", len(v.phase), len(v.previousPhase))
+	}
 	if len(v.mark) != 2 || len(v.literalMark) != 4 {
 		t.Fatal("scope mark lengths", len(v.mark), len(v.literalMark))
 	}
@@ -88,6 +93,9 @@ func TestSATSolverNativeFlagsScopeTruncationAndRegrowth(t *testing.T) {
 		}
 	}
 	for i := 0; i < 2; i++ {
+		if v.phase[i] != int8(i%2) || v.previousPhase[i] != int8((i+1)%2) {
+			t.Fatal("scope changed retained polarities", i)
+		}
 		if v.decision[i] || !v.external[i] || !v.assignedSinceGC[i] || v.eliminated[i] {
 			t.Fatal("scope changed retained flags", i)
 		}
@@ -96,6 +104,9 @@ func TestSATSolverNativeFlagsScopeTruncationAndRegrowth(t *testing.T) {
 	satOK(t, e)
 	if variable != 2 || len(v.mark) != 3 || len(v.literalMark) != 6 || v.mark[2] || v.literalMark[4] || v.literalMark[5] {
 		t.Fatal("new variable inherited removed marks", variable, v.mark, v.literalMark)
+	}
+	if v.phase[2] != 2 || v.previousPhase[2] != 2 {
+		t.Fatal("regrowth inherited removed polarities", v.phase, v.previousPhase)
 	}
 	if !v.decision[2] || v.external[2] || v.eliminated[2] || v.assignedSinceGC[2] {
 		t.Fatal("regrowth inherited removed flags")

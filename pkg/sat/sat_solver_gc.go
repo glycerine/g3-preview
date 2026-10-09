@@ -217,7 +217,7 @@ func (g *satSolverGC) psm(r StoredClauseRef) (uint32, error) {
 		if e != nil {
 			return result, e
 		}
-		phase, e := p.variables.phase.Read(uint32(l.variable()))
+		phase, e := p.variables.phaseAt(l.variable())
 		if e != nil {
 			return result, e
 		}

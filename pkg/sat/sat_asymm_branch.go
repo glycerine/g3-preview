@@ -17,10 +17,9 @@ type satAsymmBranch struct {
 	ownerBytes                                                                            uint64
 	enabled                                                                               bool
 	rounds, limit, elimLiterals                                                           uint32
-	savedPhase                                                                            RuntimeVectorColumn
+	savedPhase                                                                            []int8
 	report                                                                                stopwatch.Stopwatch
 	debugPropagate, debugMissed                                                           bool
-	phaseRestoreStopped, savedConstructed                                                 bool
 	reportActive, closing, closed, debugInvariant, running, interrupted                   bool
 	cursor, out, end, drainPrefix, drainSuffix                                            uint32
 	detachedClause, discardedClause                                                       StoredClauseRef
@@ -42,7 +41,6 @@ func newSATAsymmBranch(l *satSolverClauseLifecycle, p *util.ParamsRef) (*satAsym
 	}
 	a := &satAsymmBranch{lifecycle: l, ownerBytes: n}
 	a.self = a
-	a.savedPhase.Bind(l.propagation.memory)
 	l.propagation.asymmCounter = 0
 	if e := a.Update(p); e != nil {
 		l.budget.Release(n)
@@ -55,7 +53,7 @@ func (a *satAsymmBranch) constructionBorrow() error {
 	if a == nil || a.self != a {
 		return ErrSATOwner
 	}
-	if a.closed || a.closing || a.reportActive || a.savedConstructed || a.interrupted || a.sorting || a.detachActive || a.phaseRestoreStopped || a.savedPhase.Block != (util.Block{}) || a.savedPhase.Pending != (util.Block{}) {
+	if a.closed || a.closing || a.reportActive || a.interrupted || a.sorting || a.detachActive || a.savedPhase != nil {
 		return arena.ErrClosed
 	}
 	return a.lifecycle.constructionBorrow()
@@ -64,7 +62,7 @@ func (a *satAsymmBranch) open() error {
 	if a == nil || a.self != a {
 		return ErrSATOwner
 	}
-	if a.closed || a.closing || a.reportActive || a.savedConstructed || a.interrupted || a.sorting || a.detachActive || a.phaseRestoreStopped || a.savedPhase.Block != (util.Block{}) || a.savedPhase.Pending != (util.Block{}) {
+	if a.closed || a.closing || a.reportActive || a.interrupted || a.sorting || a.detachActive || a.savedPhase != nil {
 		return arena.ErrClosed
 	}
 	return a.lifecycle.open()
@@ -182,12 +180,7 @@ func (a *satAsymmBranch) run(force bool) (err error) {
 	a.bodyCause = nil
 	a.cleanupCause = nil
 	defer func() { err = a.finishRun(err) }()
-	a.savedPhase = RuntimeVectorColumn{}
-	a.savedPhase.Bind(p.memory)
-	if e := a.copyPhase(&a.savedPhase, &p.variables.phase); e != nil {
-		return e
-	}
-	a.savedConstructed = true
+	a.savedPhase = append([]int8(nil), p.variables.phase...)
 	p.asymmCounter = 0
 	limit := -int32(a.limit)
 	if e := a.sortOriginal(); e != nil {
@@ -249,15 +242,9 @@ func (a *satAsymmBranch) run(force bool) (err error) {
 	if e := a.negateCounter(); e != nil {
 		return e
 	}
-	// vector::operator= destroys old storage before source copy_core publication.
-	a.phaseRestoreStopped = true
-	if e := p.variables.phase.Release(&p.variables.phase.Block); e != nil {
-		return e
-	}
-	if e := a.copyPhase(&p.variables.phase, &a.savedPhase); e != nil {
-		return e
-	}
-	a.phaseRestoreStopped = false
+	// Only normal completion restores the saved polarities. Exception paths
+	// retain the phase changes made by the interrupted source algorithm.
+	p.variables.phase = append(p.variables.phase[:0], a.savedPhase...)
 	return a.invariant()
 }
 func (a *satAsymmBranch) beginCompaction() error {
@@ -287,60 +274,11 @@ func (a *satAsymmBranch) finishCompaction() {
 	a.interrupted = false
 	a.lifecycle.asymmContinuation = nil
 }
-func (a *satAsymmBranch) copyPhase(dst, src *RuntimeVectorColumn) error {
-	if src.Block == (util.Block{}) {
-		dst.Block = util.Block{}
-		return nil
-	}
-	n, e := src.Size()
-	if e != nil {
-		return e
-	}
-	c, e := src.Capacity()
-	if e != nil {
-		return e
-	}
-	h, e := src.Runtime.Allocate(uint64(c) + 8)
-	if e != nil {
-		dst.Pending = h
-		return e
-	}
-	dst.Pending = h
-	if e = WriteRuntimeWord(src.Runtime, h, 0, c); e != nil {
-		return e
-	}
-	if e = WriteRuntimeWord(src.Runtime, h, 4, n); e != nil {
-		return e
-	}
-	dst.Block = h
-	dst.Pending = util.Block{}
-	for i := uint32(0); i < n; i++ {
-		v, e := src.Read(i)
-		if e != nil {
-			return e
-		}
-		if e = src.Runtime.Write(h, 8+uint64(i), byte(v)); e != nil {
-			return e
-		}
-	}
-	return nil
-}
 
-// Completed locals unwind in reverse construction order. A failed copy ctor
-// has no source vector destructor: only the older report unwinds here; its
-// actual partial allocation remains for the separate owning-abort Close path.
+// Drop the native snapshot before finishing the timed report.
 func (a *satAsymmBranch) finishRun(cause error) error {
 	a.bodyCause = cause
-	if a.savedConstructed {
-		if e := a.savedPhase.Finalize(); e != nil {
-			a.cleanupCause = e
-			if cause == nil {
-				return e
-			}
-			return errors.Join(cause, e)
-		}
-		a.savedConstructed = false
-	}
+	a.savedPhase = nil
 	if a.reportActive {
 		if e := a.report.Stop(); e != nil {
 			if cause == nil {
@@ -371,12 +309,6 @@ func (a *satAsymmBranch) Close() error {
 			return e
 		}
 		a.discardedClause = StoredClauseRef{}
-	}
-
-	// Only owning cleanup destroys a failed constructor's partial allocation,
-	// after the older source report has completed its exception unwind.
-	if e := a.savedPhase.Finalize(); e != nil {
-		return e
 	}
 
 	a.lifecycle.budget.Release(a.ownerBytes)

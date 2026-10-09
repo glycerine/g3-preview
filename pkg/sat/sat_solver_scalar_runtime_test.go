@@ -16,7 +16,7 @@ func TestSATSolverScalarColumnsReachSameRuntime(t *testing.T) {
 	satOK(t, e)
 	amount, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if amount != 134+24+576 || v.memory.Stats().LiveBlocks != 8 {
+	if amount != 98+24+576 || v.memory.Stats().LiveBlocks != 6 {
 		t.Fatal("all actual scalar source allocations", amount, v.memory.Stats())
 	}
 }
@@ -37,7 +37,7 @@ func satScalarTestUintSize(t *testing.T, c *RuntimeUintColumn) uint32 {
 func satScalarAuditRoots(t *testing.T, v *satSolverVariableState, external ...util.Block) {
 	t.Helper()
 	roots := append([]util.Block{}, external...)
-	for _, c := range []*RuntimeVectorColumn{&v.phase, &v.previousPhase, &v.level.Raw, &v.activity.values.Raw, &v.trail.values.Raw, &v.justification.raw} {
+	for _, c := range []*RuntimeVectorColumn{&v.level.Raw, &v.activity.values.Raw, &v.trail.values.Raw, &v.justification.raw} {
 		if !c.PendingReplaces && c.Block != (util.Block{}) {
 			roots = append(roots, c.Block)
 		}
@@ -71,25 +71,6 @@ func TestSATSolverScalarSourceBytesAndRetainedSlots(t *testing.T) {
 	v, _, _ := satVariableStateFixture(t)
 	_, e := v.mkVar(true, true)
 	satOK(t, e)
-	for _, test := range []struct {
-		c    *RuntimeVectorColumn
-		want byte
-		size uint32
-	}{{&v.phase, 2, 1}, {&v.previousPhase, 2, 1}} {
-		if satAssignmentTestSize(t, test.c) != test.size {
-			t.Fatal("source size")
-		}
-		raw, e := v.memory.Size(test.c.Block)
-		satOK(t, e)
-		if raw != 10 {
-			t.Fatal(raw)
-		}
-		x, e := v.memory.Read(test.c.Block, 8)
-		satOK(t, e)
-		if x != test.want {
-			t.Fatal(x, test.want)
-		}
-	}
 	raw, e := v.memory.Size(v.level.Raw.Block)
 	satOK(t, e)
 	if raw != 16 {
@@ -193,7 +174,7 @@ func TestSATSolverScalarReverseMemberRawDestruction(t *testing.T) {
 	satOK(t, e)
 	// Actual Runtime release cursors verify source reverse declaration order;
 	// other arena-only members introduce no invented Runtime release events.
-	order := []util.Block{v.queue.runtimeIndices.Raw.Block, v.queue.runtimeValues.Raw.Block, v.previousPhase.Block, v.phase.Block, v.activity.values.Raw.Block, v.level.Raw.Block, v.justification.raw.Block, v.assignment.Block}
+	order := []util.Block{v.queue.runtimeIndices.Raw.Block, v.queue.runtimeValues.Raw.Block, v.activity.values.Raw.Block, v.level.Raw.Block, v.justification.raw.Block, v.assignment.Block}
 	satOK(t, v.Close())
 	records := testFieldBySourceName(reflect.ValueOf(v.memory).Elem(), "blocks")
 	for i, h := range order {

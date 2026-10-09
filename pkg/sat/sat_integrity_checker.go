@@ -408,14 +408,8 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		if activitySize != n {
 			return false, ErrSATAssertion
 		}
-		for _, col := range [2]*RuntimeVectorColumn{&v.phase, &v.previousPhase} {
-			size, e = col.Size()
-			if e != nil {
-				return false, e
-			}
-			if size != n {
-				return false, ErrSATAssertion
-			}
+		if uint64(len(v.phase)) != uint64(n) || uint64(len(v.previousPhase)) != uint64(n) {
+			return false, ErrSATAssertion
 		}
 	}
 	for variable := uint32(0); ; variable++ {

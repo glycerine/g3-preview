@@ -18,7 +18,7 @@ type satSolverVariableState struct {
 	watches                                         *satSolverWatchLists
 	assignment                                      RuntimeVectorColumn
 	memory                                          *util.Runtime
-	phase, previousPhase                            RuntimeVectorColumn
+	phase, previousPhase                            []int8
 	decision, eliminated, external, assignedSinceGC []bool
 	mark, literalMark                               []bool
 	justification                                   satSolverRuntimeJustificationColumn
@@ -62,9 +62,6 @@ func newSATColdVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.Ve
 	s.memory = raw
 	s.assignment.Bind(raw)
 	s.justification.bind(raw, b)
-	for _, col := range []*RuntimeVectorColumn{&s.phase, &s.previousPhase} {
-		col.Bind(raw)
-	}
 	s.level.Bind(raw)
 	return s, nil
 }
@@ -150,12 +147,8 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 	}
 	s.mark = append(s.mark, false)
 	s.literalMark = append(s.literalMark, false, false)
-	if e := s.phase.Push(2); e != nil {
-		return v, e
-	}
-	if e := s.previousPhase.Push(2); e != nil {
-		return v, e
-	}
+	s.phase = append(s.phase, 2)
+	s.previousPhase = append(s.previousPhase, 2)
 	s.assignedSinceGC = append(s.assignedSinceGC, false)
 	if e := s.queue.MkVar(v); e != nil {
 		return v, e
@@ -265,6 +258,49 @@ func (s *satSolverVariableState) setGCAssigned(v BoolVar, value bool) error {
 	s.assignedSinceGC[v] = value
 	return nil
 }
+
+// phaseAt returns the saved polarity: 0 or 1, with 2 meaning undefined.
+func (s *satSolverVariableState) phaseAt(v BoolVar) (int8, error) {
+	if e := s.open(); e != nil {
+		return 0, e
+	}
+	if uint64(v) >= uint64(len(s.phase)) {
+		if satStorageSourceDebug {
+			return 0, ErrSATAssertion
+		}
+		return 0, arena.ErrBounds
+	}
+	return s.phase[v], nil
+}
+func (s *satSolverVariableState) setPhase(v BoolVar, value int8) error {
+	if _, e := s.phaseAt(v); e != nil {
+		return e
+	}
+	s.phase[v] = value
+	return nil
+}
+
+// previousPhaseAt returns the saved polarity: 0 or 1, with 2 meaning undefined.
+func (s *satSolverVariableState) previousPhaseAt(v BoolVar) (int8, error) {
+	if e := s.open(); e != nil {
+		return 0, e
+	}
+	if uint64(v) >= uint64(len(s.previousPhase)) {
+		if satStorageSourceDebug {
+			return 0, ErrSATAssertion
+		}
+		return 0, arena.ErrBounds
+	}
+	return s.previousPhase[v], nil
+}
+func (s *satSolverVariableState) setPreviousPhase(v BoolVar, value int8) error {
+	if _, e := s.previousPhaseAt(v); e != nil {
+		return e
+	}
+	s.previousPhase[v] = value
+	return nil
+}
+
 func (s *satSolverVariableState) trailPush(l Literal) error {
 	if e := s.open(); e != nil {
 		return e
@@ -389,12 +425,8 @@ func (s *satSolverVariableState) finalizeColumnsWatches() error {
 		return ErrSATOwner
 	}
 	s.assignedSinceGC = nil
-	if e := s.previousPhase.Finalize(); e != nil {
-		return e
-	}
-	if e := s.phase.Finalize(); e != nil {
-		return e
-	}
+	s.previousPhase = nil
+	s.phase = nil
 	if s.activity != nil {
 		if e := s.activity.Close(); e != nil {
 			return e

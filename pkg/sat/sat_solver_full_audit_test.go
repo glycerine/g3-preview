@@ -49,7 +49,6 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 			col(&f.vector)
 		}
 	}
-	raw(&s.asymm.savedPhase)
 	for _, v := range []*satSCCVector{&s.scc.index, &s.scc.lowlink, &s.scc.stack, &s.scc.inStack, &s.scc.roots, &s.scc.frames, &s.scc.toElim} {
 		add(v.raw)
 		add(v.pending)

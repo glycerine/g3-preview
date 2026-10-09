@@ -181,12 +181,12 @@ func (d *satSolverDecision) decide() (bool, error) {
 	case satPhaseCaching:
 		phase = lbool.False
 		if d.conflict.phaseCacheOn {
-			cached, e := p.variables.phase.Read(uint32(next))
+			cached, e := p.variables.phaseAt(next)
 			if e != nil {
 				return false, e
 			}
 			if cached != 2 {
-				cached, e = p.variables.phase.Read(uint32(next))
+				cached, e = p.variables.phaseAt(next)
 				if e != nil {
 					return false, e
 				}

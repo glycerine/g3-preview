@@ -62,7 +62,7 @@ func (s *satSolverPropagationState) assignCore(l Literal, j satJustification) er
 	if l.sign() {
 		phase = 1
 	}
-	if e := v.phase.Write(id, phase); e != nil {
+	if e := v.setPhase(BoolVar(id), phase); e != nil {
 		return e
 	}
 	if e := v.setGCAssigned(BoolVar(id), true); e != nil {
@@ -81,7 +81,7 @@ func (s *satSolverPropagationState) assignCore(l Literal, j satJustification) er
 		}
 	}
 	if satStorageSourceDebug {
-		p, e := v.phase.Read(id)
+		p, e := v.phaseAt(BoolVar(id))
 		if e != nil {
 			return e
 		}

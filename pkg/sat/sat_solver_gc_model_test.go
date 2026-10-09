@@ -323,8 +323,8 @@ func TestSATSolverGCFrozenTrueAndInactiveDelete(t *testing.T) {
 	// No assignments since GC: d_tk=vars+1 must not raise retained minimum0.
 	g.minDTk = 0
 	for i := uint32(0); i < 3; i++ {
-		satOK(t, p.variables.phase.Write(i, 0))
-		satOK(t, p.variables.previousPhase.Write(i, 0))
+		satOK(t, p.variables.setPhase(BoolVar(i), 0))
+		satOK(t, p.variables.setPreviousPhase(BoolVar(i), 0))
 	}
 	s.conflictsSinceGC = g.gcThreshold + 1
 	satOK(t, g.gc())

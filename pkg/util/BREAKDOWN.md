@@ -1080,3 +1080,25 @@ Go slice operations. Scope pop/regrowth preserves retained flags and initializes
 new variables from their requested decision/external flags and false defaults.
 Only assignment and the two three-state phase arrays still use Runtime byte
 columns in variable state; asymmetric branching also retains its phase snapshot.
+
+## Native SAT saved polarities
+
+The two three-state phase arrays now use concrete `[]int8` fields, with the
+source values 0, 1, and 2 (undefined). Assignment, decision selection, conflict
+analysis, and dynamic GC use typed variable-state operations. Scope truncation
+preserves retained polarities and initializes recreated variables to undefined.
+Asymmetric branching takes an independent native snapshot and restores it only
+on normal completion, matching `src/sat/sat_asymm_branch.cpp:70-113`. Cancellation
+continues to retain the interrupted algorithm's phase changes. Snapshot cleanup
+has no Runtime allocation/destruction or partial vector-constructor state.
+
+Only assignment remains a Runtime byte column in SAT variable state; typed
+level, activity, trail, justification, and queue columns remain separate work.
+Native backing is outside arena accounting. The physical ownership tests now
+count only the real remaining Runtime blocks.
+
+Validation: complete SAT suites passed in native (1.06s) and checked/debug
+(1.24s) builds, including phase scope truncation/regrowth, normal restoration,
+cancellation, and allocation refusal campaigns. Module-wide test compilation,
+SAT vet, and portcheck passed. The latest full native checkpoint remains the
+18:07–18:12 UTC run; it was not repeated for this focused change.

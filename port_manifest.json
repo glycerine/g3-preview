@@ -66473,10 +66473,7 @@
         "TestSATAsymmEveryActualRefusalPrefix",
         "TestSATAsymmActualNewUnitAndCounterLimit",
         "TestSATAsymmParametersStatsAndColdRefusal",
-        "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
         "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
-        "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
-        "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport",
         "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
         "TestSATIntegrityOriginalFrozenCountSourceQuirk",
         "TestSATIntegrityClauseVerifyAndErasedVectorCall",
@@ -66485,7 +66482,8 @@
         "TestSATIntegrityActualEnabledConsumerBindings",
         "TestSATIntegrityDisjointFreshSetEveryRefusal",
         "TestSATIntegrityNaryBlockedAndReinitProfiles",
-        "TestSATIntegrityAsymmActualEnabledWrapperSites"
+        "TestSATIntegrityAsymmActualEnabledWrapperSites",
+        "TestSATAsymmNativeSnapshotCleanupPreservesBodyError"
       ],
       "conditionals": [
         {
@@ -66591,10 +66589,8 @@
             "TestSATAsymmEveryActualRefusalPrefix",
             "TestSATAsymmActualNewUnitAndCounterLimit",
             "TestSATAsymmParametersStatsAndColdRefusal",
-            "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
             "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
-            "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
-            "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+            "TestSATAsymmNativeSnapshotCleanupPreservesBodyError"
           ]
         },
         {
@@ -66615,7 +66611,7 @@
         }
       ],
       "ownership": [
-        "Actual sole propagation.asymmCounter; real Runtime saved phase clone and restore; source scoped detach before push; disjoint stable merge and clause compaction owners. Saved copy constructor completion and lexical destructor progress are distinct from separate failed-constructor owning abort. Every allocation refusal 0 through 7 audited immediately before fault disable; first success 8."
+        "Actual sole propagation.asymmCounter; independent native []int8 phase snapshot, restored only on normal completion; source scoped detach before push; disjoint stable merge and clause compaction owners. Native snapshot cleanup preserves body errors without Runtime allocation or destruction. Actual remaining allocation refusals are audited immediately before fault disable."
       ],
       "deviations": [
         "Full solver scheduler/constructor/search, enabled integrity and propagation-wrapper diagnostic bindings, TRACE/verbose and complete generated registration/default-empty parameter binding remain open. Concrete stable merge preserves descending size and equal ties, not C++ standard-library allocation topology or invocation schedule. Source exceptional scope is not popped automatically; only actual solver_exception triggers source suffix compaction and counter negation. Protocol stale-token and signed-overflow TLS fixtures do not claim ordinary valid-domain allocation failures. No whole solver/API/registered assertion completion credit."
@@ -66643,10 +66639,8 @@
         "TestSATAsymmEveryActualRefusalPrefix",
         "TestSATAsymmActualNewUnitAndCounterLimit",
         "TestSATAsymmParametersStatsAndColdRefusal",
-        "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
         "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
-        "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
-        "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+        "TestSATAsymmNativeSnapshotCleanupPreservesBodyError"
       ],
       "conditionals": [
         {
@@ -66674,15 +66668,13 @@
             "TestSATAsymmEveryActualRefusalPrefix",
             "TestSATAsymmActualNewUnitAndCounterLimit",
             "TestSATAsymmParametersStatsAndColdRefusal",
-            "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
             "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
-            "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
-            "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+            "TestSATAsymmNativeSnapshotCleanupPreservesBodyError"
           ]
         }
       ],
       "ownership": [
-        "Actual sole propagation.asymmCounter; real Runtime saved phase clone and restore; source scoped detach before push; disjoint stable merge and clause compaction owners. Saved copy constructor completion and lexical destructor progress are distinct from separate failed-constructor owning abort. Every allocation refusal 0 through 7 audited immediately before fault disable; first success 8."
+        "Actual sole propagation.asymmCounter; independent native []int8 phase snapshot, restored only on normal completion; source scoped detach before push; disjoint stable merge and clause compaction owners. Native snapshot cleanup preserves body errors without Runtime allocation or destruction. Actual remaining allocation refusals are audited immediately before fault disable."
       ],
       "deviations": [
         "Full solver scheduler/constructor/search, enabled integrity and propagation-wrapper diagnostic bindings, TRACE/verbose and complete generated registration/default-empty parameter binding remain open. Concrete stable merge preserves descending size and equal ties, not C++ standard-library allocation topology or invocation schedule. Source exceptional scope is not popped automatically; only actual solver_exception triggers source suffix compaction and counter negation. Protocol stale-token and signed-overflow TLS fixtures do not claim ordinary valid-domain allocation failures. No whole solver/API/registered assertion completion credit."
@@ -66762,10 +66754,8 @@
         "TestSATAsymmEveryActualRefusalPrefix",
         "TestSATAsymmActualNewUnitAndCounterLimit",
         "TestSATAsymmParametersStatsAndColdRefusal",
-        "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
         "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
-        "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
-        "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+        "TestSATAsymmNativeSnapshotCleanupPreservesBodyError"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -66783,15 +66773,13 @@
             "TestSATAsymmEveryActualRefusalPrefix",
             "TestSATAsymmActualNewUnitAndCounterLimit",
             "TestSATAsymmParametersStatsAndColdRefusal",
-            "TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort",
             "TestSATAsymmDebugScopeAssertionPrecedesTrailRead",
-            "TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport",
-            "TestSATAsymmPostphysicalLocalFreeRetainsOlderReport"
+            "TestSATAsymmNativeSnapshotCleanupPreservesBodyError"
           ]
         }
       ],
       "ownership": [
-        "Actual sole propagation.asymmCounter; real Runtime saved phase clone and restore; source scoped detach before push; disjoint stable merge and clause compaction owners. Saved copy constructor completion and lexical destructor progress are distinct from separate failed-constructor owning abort. Every allocation refusal 0 through 7 audited immediately before fault disable; first success 8."
+        "Actual sole propagation.asymmCounter; independent native []int8 phase snapshot, restored only on normal completion; source scoped detach before push; disjoint stable merge and clause compaction owners. Native snapshot cleanup preserves body errors without Runtime allocation or destruction. Actual remaining allocation refusals are audited immediately before fault disable."
       ],
       "deviations": [
         "Full solver scheduler/constructor/search, enabled integrity and propagation-wrapper diagnostic bindings, TRACE/verbose and complete generated registration/default-empty parameter binding remain open. Concrete stable merge preserves descending size and equal ties, not C++ standard-library allocation topology or invocation schedule. Source exceptional scope is not popped automatically; only actual solver_exception triggers source suffix compaction and counter negation. Protocol stale-token and signed-overflow TLS fixtures do not claim ordinary valid-domain allocation failures. No whole solver/API/registered assertion completion credit."

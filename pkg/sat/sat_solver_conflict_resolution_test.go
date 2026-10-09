@@ -159,7 +159,7 @@ func TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix(t *testing.T) {
 		t.Fatal("on400")
 	}
 	satOK(t, s.forgetPhaseOfVars(2))
-	x, e := v.phase.Read(1)
+	x, e := v.phaseAt(BoolVar(1))
 	satOK(t, e)
 	if x != 2 {
 		t.Fatal(x)

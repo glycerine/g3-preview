@@ -31088,3 +31088,20 @@ Validation: the full native module suite passed at the 18:07–18:12 UTC checkpo
 (polynomial 225.5s, util 135.7s, AST 29.8s). Complete checked/debug SAT tests passed
 (1.13s), and the renamed native scope-regrowth regression passed. SAT vet and
 portcheck passed. This is the latest full-suite checkpoint for subsequent work.
+
+## Use native SAT phase arrays and asymmetric-branch snapshot
+
+Replaced both three-state phase columns with concrete `[]int8` storage and
+converted assignment, decision, conflict, and GC consumers to typed operations.
+Removed asymmetric branching's copied vector allocation/copy/destruction
+machinery in favor of an independent native snapshot. Normal completion restores
+the snapshot; cancellation/error paths retain phase mutations as in
+`src/sat/sat_asymm_branch.cpp:70-113`. Native cleanup drops the snapshot and
+preserves body errors before stopping the report. Removed tests for eliminated
+vector constructors/destructors and added a cleanup/error regression. Extended
+the existing scope-pop/regrowth regression to retained and fresh polarities.
+Updated the remaining physical allocation census and manifest evidence.
+
+Validation: complete native SAT tests passed (1.06s), checked/debug SAT tests
+passed (1.24s), module-wide test compilation passed, and SAT vet/portcheck passed.
+The latest full native checkpoint remains 18:07–18:12 UTC.

@@ -142,8 +142,8 @@ func TestSATSolverGCDynamicFreezeActivateAndInactivity(t *testing.T) {
 	cfg.Initialized |= satConfigGCSmallLBDMask | satConfigGCKMask
 	r := satGCClause(t, g, []Literal{0, 2, 4}, 5)
 	for i := uint32(0); i < 4; i++ {
-		satOK(t, p.variables.phase.Write(i, 0))
-		satOK(t, p.variables.previousPhase.Write(i, 0))
+		satOK(t, p.variables.setPhase(BoolVar(i), 0))
+		satOK(t, p.variables.setPreviousPhase(BoolVar(i), 0))
 		satOK(t, p.variables.setGCAssigned(BoolVar(i), true))
 	}
 	s.conflictsSinceGC = g.gcThreshold + 1
@@ -155,8 +155,8 @@ func TestSATSolverGCDynamicFreezeActivateAndInactivity(t *testing.T) {
 	}
 	// PSM becomes zero; source unfreezes and actually reattaches.
 	for i := uint32(0); i < 4; i++ {
-		satOK(t, p.variables.phase.Write(i, 1))
-		satOK(t, p.variables.previousPhase.Write(i, 1))
+		satOK(t, p.variables.setPhase(BoolVar(i), 1))
+		satOK(t, p.variables.setPreviousPhase(BoolVar(i), 1))
 		satOK(t, p.variables.setGCAssigned(BoolVar(i), true))
 	}
 	s.conflictsSinceGC = g.gcThreshold + 1

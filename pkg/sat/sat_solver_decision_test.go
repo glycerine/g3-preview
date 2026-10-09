@@ -243,7 +243,7 @@ func TestSATSolverDecisionAllPhasePolicies(t *testing.T) {
 		p.config.state.RandomFreq = 0
 		p.config.state.Phase = tc.mode
 		d.conflict.phaseCacheOn = tc.cache
-		satOK(t, p.variables.phase.Write(0, tc.saved))
+		satOK(t, p.variables.setPhase(BoolVar(0), tc.saved))
 		ok, e := d.decide()
 		satOK(t, e)
 		l, e := p.variables.trailRead(0)

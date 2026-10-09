@@ -28,7 +28,7 @@ func TestSATIntegrityAsymmActualEnabledWrapperSites(t *testing.T) {
 	if p.limit.Count()-before != want {
 		t.Fatal("actual three enabled source checker sites", p.limit.Count()-before, want)
 	}
-	if a.reportActive || a.savedConstructed {
+	if a.reportActive || a.savedPhase != nil {
 		t.Fatal("completed source locals")
 	}
 }

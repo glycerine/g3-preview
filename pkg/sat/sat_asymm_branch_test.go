@@ -5,12 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/util/lbool"
-	"math"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satAsymmFixture(t *testing.T, n uint32) (*satAsymmBranch, *satSolverClauseLifecycle) {
@@ -179,7 +177,7 @@ func TestSATAsymmSourceSolverCatchAndNoPhaseRestoration(t *testing.T) {
 	if !errors.Is(e, ErrSATSolverCanceled) || p.variables.scopeLevel != 1 || a.detachActive || a.interrupted {
 		t.Fatal("source exception no automatic pop", e, p.variables.scopeLevel)
 	}
-	value, e := p.variables.phase.Read(0)
+	value, e := p.variables.phaseAt(BoolVar(0))
 	satOK(t, e)
 	if value != 1 {
 		t.Fatal("catch skips saved-phase restore", value)
@@ -212,14 +210,6 @@ func TestSATAsymmEveryActualRefusalPrefix(t *testing.T) {
 				}
 			}
 			satAsymmAudit(t, a) // exact scalar owners BEFORE fault disable or cleanup
-			if e != nil && !a.interrupted && !a.sorting && p.variables.phase.Block == (util.Block{}) {
-				// Source assignment already destroyed the old phase vector before
-				// allocation refusal. A new operator invocation must not silently
-				// treat that interrupted assignment as a fresh empty phase owner.
-				if next := a.run(true); !errors.Is(next, arena.ErrClosed) {
-					t.Fatal("interrupted phase assignment guard", next)
-				}
-			}
 			l.budget.FailAfter(-1)
 			if a.interrupted || a.sorting {
 				satOK(t, l.Close())
@@ -243,18 +233,14 @@ func TestSATAsymmActualNewUnitAndCounterLimit(t *testing.T) {
 		satOK(t, e)
 	}
 	r := satAsymmClause(t, l, []Literal{0, 2, 4})
-	before := p.variables.phase.Block
 	satOK(t, a.run(true))
 	value, e := p.variables.valueLiteral(0)
 	satOK(t, e)
 	if value != lbool.True || p.clauses.IsLive(r) || a.elimLiterals != 2 || len(l.Original) != 0 || p.variables.scopeLevel != 0 {
 		t.Fatal("actual first-assumption conflict creates new root unit")
 	}
-	if p.variables.phase.Block == before {
-		t.Fatal("source assignment destroys old phase before copied restore")
-	}
 	for i := uint32(0); i < 3; i++ {
-		x, e := p.variables.phase.Read(i)
+		x, e := p.variables.phaseAt(BoolVar(i))
 		satOK(t, e)
 		if x != 2 {
 			t.Fatal("normal exit restores lexical phase", i, x)
@@ -344,38 +330,6 @@ func TestSATAsymmParametersStatsAndColdRefusal(t *testing.T) {
 	}
 }
 
-// A source-undefined malformed char payload reaches copy_core's ascending read
-// after allocating and publishing the destination. A failed constructor has no
-// source destructor; its retained bytes are drained only by owning Close.
-func TestSATAsymmFailedPhaseConstructorUnwindsReportBeforeOwningAbort(t *testing.T) {
-	a, l := satAsymmFixture(t, 3)
-	phase := &l.propagation.variables.phase
-	satOK(t, phase.Release(&phase.Block))
-	h, e := phase.Runtime.Allocate(12)
-	satOK(t, e)
-	phase.Block = h
-	satOK(t, WriteRuntimeWord(phase.Runtime, h, 0, 4))
-	satOK(t, WriteRuntimeWord(phase.Runtime, h, 4, 3))
-	satOK(t, phase.Runtime.Write(h, 8, 1))
-	e = a.run(true)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
-		t.Fatalf("actual constructor read guard: %v", e)
-	}
-	if a.reportActive || a.savedPhase.Block == (util.Block{}) {
-		t.Fatal("failed constructor must stop older report and retain partial owning copy", a.reportActive, a.savedPhase.Block)
-	}
-	if x, e := phase.Runtime.Read(a.savedPhase.Block, 8); e != nil || x != 1 {
-		t.Fatal("completed ascending copy prefix", x, e)
-	}
-	if _, e := phase.Runtime.Read(a.savedPhase.Block, 9); !errors.Is(e, util.ErrRuntimeUninitialized) {
-		t.Fatal("unconstructed copy suffix", e)
-	}
-	if !errors.Is(a.run(true), arena.ErrClosed) {
-		t.Fatal("partial constructor owning root must reject reuse")
-	}
-	satOK(t, a.Close())
-}
-
 func TestSATAsymmDebugScopeAssertionPrecedesTrailRead(t *testing.T) {
 	if !satStorageSourceDebug {
 		return
@@ -398,77 +352,18 @@ func TestSATAsymmDebugScopeAssertionPrecedesTrailRead(t *testing.T) {
 	}
 }
 
-func TestSATAsymmCompletedLocalDestructionStopsBeforeOlderReport(t *testing.T) {
+func TestSATAsymmNativeSnapshotCleanupPreservesBodyError(t *testing.T) {
 	a, l := satAsymmFixture(t, 3)
-	h, e := l.propagation.memory.Allocate(12)
-	satOK(t, e)
-	stale := h
-	satOK(t, l.propagation.memory.Deallocate(&h))
-	a.savedPhase.Block = stale
-	a.savedConstructed = true
+	cause := errors.New("interrupted asymmetric branch")
+	a.savedPhase = []int8{0, 1, 2}
 	satOK(t, a.report.Start())
 	a.reportActive = true
-	e = a.finishRun(nil)
-	if e == nil || !a.reportActive || !a.savedConstructed || a.savedPhase.Block != stale {
-		t.Fatal("actual stale-token destruction must retain older report and source-local cursor", e)
+	before := l.budget.Used()
+	l.budget.FailAfter(0)
+	e := a.finishRun(cause)
+	l.budget.FailAfter(-1)
+	if !errors.Is(e, cause) || a.savedPhase != nil || a.reportActive || l.budget.Used() != before {
+		t.Fatal("native snapshot cleanup must preserve the body error without allocator work", e)
 	}
-	if !errors.Is(a.run(true), arena.ErrClosed) {
-		t.Fatal("stopped lexical unwind cannot enter source body")
-	}
-	// Explicit acknowledgment of the externally freed token, not source repair.
-	a.savedPhase.Block = util.Block{}
-	satOK(t, a.Close())
-	if a.reportActive {
-		t.Fatal("owning Close must acknowledge local before report")
-	}
-}
-
-// Protocol fixture over a real completed local and real public TLS operations.
-// The source signed-overflow domain is undefined; the checked free physically
-// completes before refusing TLS synchronization. No private counter is written.
-func TestSATAsymmPostphysicalLocalFreeRetainsOlderReport(t *testing.T) {
-	a, l := satAsymmFixture(t, 3)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: l.budget, SizeTBits: 64, ThreadLocal: true})
-	satOK(t, e)
-	a.savedPhase = RuntimeVectorColumn{}
-	a.savedPhase.Bind(rt)
-	h, e := rt.Allocate(100001)
-	satOK(t, e)
-	a.savedPhase.Block = h
-	a.savedConstructed = true
-	first, e := rt.Allocate(8)
-	satOK(t, e)
-	second, e := rt.Allocate(8)
-	satOK(t, e)
-	delta := int64(-1000000)
-	if e = rt.Reallocate(&first, uint64(16)+uint64(delta)-8); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("actual first host extent", e)
-	}
-	satOK(t, rt.Deallocate(&first))
-	st := rt.State()
-	if st.LocalSize != 0 || st.GlobalSize >= 0 {
-		t.Fatal("actual first synchronization", st)
-	}
-	target := int64(math.MinInt64) + 1000 - st.GlobalSize + 16
-	if e = rt.Reallocate(&second, uint64(target)+16-8); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("actual second host extent", e)
-	}
-	satOK(t, rt.Deallocate(&second))
-	if st = rt.State(); st.GlobalSize != math.MinInt64+1000 || st.LocalSize != 0 {
-		t.Fatal("real near-minimum TLS prefix", st)
-	}
-	satOK(t, a.report.Start())
-	a.reportActive = true
-	e = a.finishRun(nil)
-	if !errors.Is(e, arena.ErrBounds) || a.savedPhase.Block != (util.Block{}) || rt.Stats().LiveBlocks != 0 || !a.savedConstructed || !a.reportActive {
-		t.Fatal("postphysical completion must retain lexical acknowledgment and older report", e, rt.Stats(), a.savedConstructed, a.reportActive)
-	}
-	if !errors.Is(a.run(true), arena.ErrClosed) {
-		t.Fatal("stopped report cannot be reused")
-	}
-	satOK(t, a.Close())
-	if a.reportActive || a.savedConstructed {
-		t.Fatal("explicit owning cleanup acknowledgment")
-	}
-	satOK(t, rt.Close())
+	satOK(t, a.run(true))
 }

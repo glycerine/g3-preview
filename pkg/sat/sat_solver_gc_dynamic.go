@@ -26,21 +26,21 @@ func (g *satSolverGC) gcDynPSM() error {
 				return e
 			}
 		}
-		x, e := v.phase.Read(i)
+		x, e := v.phaseAt(BoolVar(i))
 		if e != nil {
 			return e
 		}
-		old, e := v.previousPhase.Read(i)
+		old, e := v.previousPhaseAt(BoolVar(i))
 		if e != nil {
 			return e
 		}
 		if x != old {
 			h++
-			x, e = v.phase.Read(i)
+			x, e = v.phaseAt(BoolVar(i))
 			if e != nil {
 				return e
 			}
-			if e = v.previousPhase.Write(i, x); e != nil {
+			if e = v.setPreviousPhase(BoolVar(i), x); e != nil {
 				return e
 			}
 		}

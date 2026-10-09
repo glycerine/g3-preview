@@ -17,13 +17,13 @@ func TestSATSolverActivityAndLiteralTrailUseActualRuntime(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 134+600 || v.memory.Stats().LiveBlocks != 8 {
+	if n != 98+600 || v.memory.Stats().LiveBlocks != 6 {
 		t.Fatal("actual activity source allocation missing", n, v.memory.Stats())
 	}
 	satOK(t, v.trailPush(MakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 158+600 || v.memory.Stats().LiveBlocks != 9 {
+	if n != 122+600 || v.memory.Stats().LiveBlocks != 7 {
 		t.Fatal("actual literal32 trail allocation missing", n, v.memory.Stats())
 	}
 }
@@ -169,7 +169,7 @@ func TestSATSolverRuntimeTrailAllActualRefusalPrefixes(t *testing.T) {
 			e := s.assignCore(0, satJustification{})
 			satScalarAuditRoots(t, v)
 			satPropagationAssertGraph(t, s)
-			if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 0 || !v.assignedSinceGC[0] {
+			if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || v.phase[0] != 0 || !v.assignedSinceGC[0] {
 				t.Fatal("source scalar prefix before trail")
 			}
 			n, x := v.trail.Size(v.trailRef)

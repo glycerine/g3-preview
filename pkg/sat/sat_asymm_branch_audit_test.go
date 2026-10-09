@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
 )
 
@@ -74,11 +73,5 @@ func satAsymmAudit(t *testing.T, c *satAsymmBranch) {
 	if want != l.budget.Used() {
 		t.Fatal("whole named once-only physical graph", want, l.budget.Used())
 	}
-	roots := []util.Block{}
-	for _, h := range [2]util.Block{c.savedPhase.Block, c.savedPhase.Pending} {
-		if h != (util.Block{}) {
-			roots = append(roots, h)
-		}
-	}
-	satScalarAuditRoots(t, v, roots...)
+	satScalarAuditRoots(t, v)
 }
