@@ -456,6 +456,13 @@ the source behavior. The printer emits the collected digits in reverse order
 directly, without a temporary C terminator, custom growth policy, or arena
 charges for Go bytes. Numeric temporaries still receive explicit deletion.
 
+The S-expression manager also uses native slices for its traversal/deletion
+stacks and output/string staging. Deletion retains the source LIFO order but
+no longer preallocates one cleanup slot per record. Formatting grows with Go
+append/make, and no scratch growth consumes the numeric arena budget. Paged
+records, child handles, text payloads, and owned numerals retain their actual
+arena/resource lifetimes.
+
 ### Dissolution order
 
 1. Stop creating new `Runtime`, `Block`, custom vector, custom buffer, and

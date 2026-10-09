@@ -458,7 +458,7 @@ func TestSexprFailurePrefixesImmediateOwnership(t *testing.T) {
 				break
 			}
 		}
-		if !success || failures == 0 {
+		if !success || op != 3 && failures == 0 {
 			t.Fatal(op, success, failures)
 		}
 	}
@@ -719,7 +719,7 @@ func TestSexprAccessorsAndScalarIterator(t *testing.T) {
 
 func TestSexprBVGoScratchAndNumeralLifetime(t *testing.T) {
 	m, _, q := sxOwner(t, arena.NewBudget(1<<24))
-	sxMust(t, m.byteCapacity(&m.output, 2048))
+	m.output = make([]byte, 2048)
 	zero := sxNumber(t, q, "0")
 	widths := []uint32{60, 64, 128, 1025, 8}
 	handles := make([]SexprHandle, len(widths))
@@ -755,4 +755,45 @@ func TestSexprBVGoScratchAndNumeralLifetime(t *testing.T) {
 		t.Fatal("warm display allocates only its returned string", n, e)
 	}
 	m.Config.Budget.FailAfter(-1)
+}
+
+func TestSexprGoTraversalScratchUnderBudgetRefusal(t *testing.T) {
+	budget := arena.NewBudget(1 << 24)
+	m, _, _ := sxOwner(t, budget)
+	const count = 256
+	children := make([]SexprHandle, count)
+	for i := range children {
+		var e error
+		children[i], e = m.MkString("x", 0, 0)
+		sxMust(t, e)
+	}
+	wide, e := m.MkComposite(children, 0, 0)
+	sxMust(t, e)
+	deep, e := m.MkString("y", 0, 0)
+	sxMust(t, e)
+	for i := 0; i < count; i++ {
+		deep, e = m.MkComposite([]SexprHandle{deep}, 0, 0)
+		sxMust(t, e)
+	}
+	root, e := m.MkComposite([]SexprHandle{wide, deep}, 0, 0)
+	sxMust(t, e)
+	sxMust(t, m.IncRef(root))
+	before := budget.Used()
+	budget.FailAfter(0)
+	text, e := m.String(children[0])
+	sxMust(t, e)
+	if text != "x" {
+		t.Fatal(text)
+	}
+	wantWide := "(" + strings.Repeat("\"x\" ", count-1) + "\"x\")"
+	wantDeep := strings.Repeat("(", count) + "\"y\"" + strings.Repeat(")", count)
+	sxRender(t, m, root, "("+wantWide+" "+wantDeep+")", nil)
+	if budget.Used() != before {
+		t.Fatal("Go output or traversal scratch charged the arena", budget.Used(), before)
+	}
+	sxMust(t, m.DecRef(root))
+	if m.Stats().Live != 0 || len(m.deletion) != 0 {
+		t.Fatal("wide/deep deletion left live records or pending work", m.Stats())
+	}
+	budget.FailAfter(-1)
 }

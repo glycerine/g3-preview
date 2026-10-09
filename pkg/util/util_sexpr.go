@@ -61,6 +61,8 @@ type sexprFrame struct {
 	h     SexprHandle
 	index uint32
 }
+
+// SexprStats reports arena-owned storage; reusable Go scratch is excluded.
 type SexprStats struct {
 	Live, Slots, Retired, Pages                           uint32
 	OwnerBytes, RecordBytes, DirectoryBytes, ScratchBytes uint64
@@ -186,21 +188,15 @@ func (m *SexprManager) growPage() error {
 	if e != nil {
 		return e
 	}
-	cleanup, e := sxSize(total, reflect.TypeOf(SexprHandle{}).Size())
-	if e != nil {
-		return e
-	}
-	charge := dir + records + cleanup
+	charge := dir + records
 	if e = m.Config.Budget.Reserve(charge); e != nil {
 		return e
 	}
 	pages := make([]sexprPage, int(count))
 	copy(pages, m.Pages)
 	pages[len(pages)-1].Nodes = make([]sexprRecord, m.Config.PageSize)
-	deletion := make([]SexprHandle, int(total))
-	old := m.directoryBytes + uint64(len(m.deletion))*uint64(reflect.TypeOf(SexprHandle{}).Size())
+	old := m.directoryBytes
 	m.Pages = pages
-	m.deletion = deletion
 	m.directoryBytes = dir
 	m.recordBytes += records
 	m.Config.Budget.Release(old)
@@ -265,11 +261,12 @@ func (m *SexprManager) dec(h SexprHandle) error {
 	if r.refs != 0 {
 		return nil
 	}
-	m.deletion[0] = h
-	size := 1
-	for size > 0 {
-		size--
-		curr := m.deletion[size]
+	m.deletion = append(m.deletion[:0], h)
+	defer func() { m.deletion = m.deletion[:0] }()
+	for len(m.deletion) > 0 {
+		last := len(m.deletion) - 1
+		curr := m.deletion[last]
+		m.deletion = m.deletion[:last]
 		n, e := m.record(curr)
 		if e != nil {
 			return e
@@ -290,11 +287,7 @@ func (m *SexprManager) dec(h SexprHandle) error {
 				}
 				c.refs--
 				if c.refs == 0 {
-					if size == len(m.deletion) {
-						return arena.ErrBounds
-					}
-					m.deletion[size] = child
-					size++
+					m.deletion = append(m.deletion, child)
 				}
 			}
 			if e = m.children.Free(n.children); e != nil {
@@ -557,8 +550,8 @@ func (m *SexprManager) String(h SexprHandle) (string, error) {
 	if r.Kind != SexprString {
 		return "", ErrSexprKind
 	}
-	if e = m.byteCapacity(&m.stage, r.length); e != nil {
-		return "", e
+	if uint64(len(m.stage)) < uint64(r.length) {
+		m.stage = make([]byte, r.length)
 	}
 	for i := uint32(0); i < r.length; i++ {
 		v, _ := m.text.Read(r.text, i)
@@ -644,36 +637,15 @@ func sxCapacity(old, needed uint32) (uint32, error) {
 	}
 	return c, nil
 }
-func (m *SexprManager) byteCapacity(dst *[]byte, needed uint32) error {
-	if uint64(needed) <= uint64(len(*dst)) {
-		return nil
-	}
-	capacity, e := sxCapacity(uint32(len(*dst)), needed)
-	if e != nil {
-		return e
-	}
-	charge, e := sxSize(uint64(capacity), 1)
-	if e != nil {
-		return e
-	}
-	if e = m.Config.Budget.Reserve(charge); e != nil {
-		return e
-	}
-	next := make([]byte, capacity)
-	copy(next, *dst)
-	old := uint64(len(*dst))
-	*dst = next
-	m.Config.Budget.Release(old)
-	return nil
-}
 func (m *SexprManager) put(n *uint32, v byte) error {
 	if *n == math.MaxUint32 {
 		return arena.ErrBounds
 	}
-	if e := m.byteCapacity(&m.output, *n+1); e != nil {
-		return e
+	if uint64(*n) == uint64(len(m.output)) {
+		m.output = append(m.output, v)
+	} else {
+		m.output[*n] = v
 	}
-	m.output[*n] = v
 	*n++
 	return nil
 }
@@ -685,27 +657,6 @@ func (m *SexprManager) literal(n *uint32, s string) error {
 	}
 	return nil
 }
-func (m *SexprManager) framesCapacity(needed uint32) error {
-	if uint64(needed) <= uint64(len(m.frames)) {
-		return nil
-	}
-	c, e := sxCapacity(uint32(len(m.frames)), needed)
-	if e != nil {
-		return e
-	}
-	size, e := sxSize(uint64(c), reflect.TypeOf(sexprFrame{}).Size())
-	if e != nil {
-		return e
-	}
-	if e = m.Config.Budget.Reserve(size); e != nil {
-		return e
-	}
-	next := make([]sexprFrame, c)
-	copy(next, m.frames)
-	m.Config.Budget.Release(uint64(len(m.frames)) * uint64(reflect.TypeOf(sexprFrame{}).Size()))
-	m.frames = next
-	return nil
-}
 func (m *SexprManager) formatNumeral(v *OwnedRational, n *uint32) error {
 	q := m.Config.Rationals
 	length, e := q.FormatInto(v, m.stage)
@@ -713,9 +664,7 @@ func (m *SexprManager) formatNumeral(v *OwnedRational, n *uint32) error {
 		if uint64(length) > math.MaxUint32 {
 			return arena.ErrBounds
 		}
-		if e = m.byteCapacity(&m.stage, uint32(length)); e != nil {
-			return e
-		}
+		m.stage = make([]byte, length)
 		length, e = q.FormatInto(v, m.stage)
 	}
 	if e != nil {
@@ -983,11 +932,11 @@ func (m *SexprManager) Display(h SexprHandle) (string, error) {
 		}
 		return string(m.output[:n]), e
 	}
-	e = m.framesCapacity(1)
-	if e != nil {
-		return "", e
+	if len(m.frames) == 0 {
+		m.frames = append(m.frames, sexprFrame{h: h})
+	} else {
+		m.frames[0] = sexprFrame{h: h}
 	}
-	m.frames[0] = sexprFrame{h: h}
 	size := uint32(1)
 	for size > 0 {
 		frame := &m.frames[size-1]
@@ -1022,10 +971,11 @@ func (m *SexprManager) Display(h SexprHandle) (string, error) {
 				e = arena.ErrBounds
 				break
 			}
-			if e = m.framesCapacity(size + 1); e != nil {
-				break
+			if uint64(size) == uint64(len(m.frames)) {
+				m.frames = append(m.frames, sexprFrame{h: child})
+			} else {
+				m.frames[size] = sexprFrame{h: child}
 			}
-			m.frames[size] = sexprFrame{h: child}
 			size++
 		} else {
 			if e = m.displayAtom(child, &n); e != nil {
@@ -1045,7 +995,6 @@ func (m *SexprManager) Stats() SexprStats {
 	if !m.closed {
 		s.OwnerBytes = uint64(reflect.TypeOf(SexprManager{}).Size())
 	}
-	s.ScratchBytes = uint64(len(m.deletion))*uint64(reflect.TypeOf(SexprHandle{}).Size()) + uint64(len(m.frames))*uint64(reflect.TypeOf(sexprFrame{}).Size()) + uint64(len(m.output)+len(m.stage))
 	s.Children = m.children.Stats()
 	s.Text = m.text.Stats()
 	return s
@@ -1077,7 +1026,7 @@ func (m *SexprManager) Close() error {
 	}
 	m.children.Close()
 	m.text.Close()
-	m.Config.Budget.Release(uint64(reflect.TypeOf(SexprManager{}).Size()) + m.directoryBytes + m.recordBytes + uint64(len(m.deletion))*uint64(reflect.TypeOf(SexprHandle{}).Size()) + uint64(len(m.frames))*uint64(reflect.TypeOf(sexprFrame{}).Size()) + uint64(len(m.output)+len(m.stage)))
+	m.Config.Budget.Release(uint64(reflect.TypeOf(SexprManager{}).Size()) + m.directoryBytes + m.recordBytes)
 	m.Pages = nil
 	m.deletion = nil
 	m.frames = nil
