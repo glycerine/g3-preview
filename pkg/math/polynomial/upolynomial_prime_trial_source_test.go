@@ -127,7 +127,7 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolyn
 	c := s.scope
 	managers := []*UPolynomialManager{s.manager}
 	if c != nil {
-		n += c.header + uint64(cap(c.ds.words))*4 + uint64(cap(c.primeTrial.degrees.words))*4 + uint64(cap(c.it.current))*4 + uint64(cap(c.it.enabled))
+		n += c.header + uint64(cap(c.ds.words))*4 + uint64(cap(c.primeTrial.degrees.words))*4
 		managers = append(managers, c.zp, c.zpe)
 		for _, m := range c.hensel.numericOwners() {
 			if m == nil || m.closed {

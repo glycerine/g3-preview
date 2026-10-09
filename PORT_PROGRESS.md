@@ -32054,3 +32054,33 @@ binary-rational vectors, sequence begin/size metadata and factor index vectors.
 AST activity/FPA/node-chain containers, SAT scalar collections and external text
 consumers also remain. Finish those native consumers, then break internal util
 numeric/text/parameter cycles before splitting root util into actual subpackages.
+
+## Native factor combination and Berlekamp indices
+
+Factor-combination enabled/current indices now use native Go slices. Removed
+source geometric capacity and header arithmetic, container reservations/refunds
+and old/new overlap accounting. Reinitialization fills the exact live extent with
+true flags and the factor-count sentinel. The project combination search,
+selection/removal order, degree filtering and left/right materialization remain
+in their existing concrete algorithms. Actual public iterator owner allocation
+remains charged; its independent exact-order/product fixture now permits exactly
+that one reservation before constructing both native index slices.
+
+Berlekamp row/column pivot indices likewise use native append and reslicing.
+Removed their Budget parameter and buffer reservations/refunds. New entries keep
+the algorithm's -1 sentinel; shrink/reextend preserves only the retained prefix.
+A replacement test checks independently calculated retained values through
+0/1/2/3/4/6/70/4097 extents and shrink/reextension. Deleted the source-capacity
+and fabricated third-growth-refusal assertions. Exact factor-service physical
+censuses exclude both native combination slices; numeral/owner audits remain.
+
+Validation: full native polynomial passed (34.115s); focused g3debug Berlekamp,
+combination, prime-trial and recombination checks passed (0.469s). Module-wide
+compilation, polynomial vet, portcheck, gofmt and diff checks passed. Manifest
+counts/statuses remain unchanged. The 22:43–22:45 UTC full native module
+checkpoint is still current; another full-module run was not needed.
+
+The full util knot/split remains open. Continue with sequence/multiplicity unsigned
+metadata, factor outer collections/degree sets and binary-rational vectors, then
+retained AST/SAT containers and text consumers. Internal util numeric/text/params
+cycles must also be removed before moving root files into actual subpackages.

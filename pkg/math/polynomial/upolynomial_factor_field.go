@@ -68,9 +68,7 @@ func (q *upolyBerlekampMatrix) close() {
 	// Source destructor body deletes matrix numerals ascending, then implicit
 	// member destructors release row, column and matrix physical storage.
 	m.reset(&q.values)
-	m.config.Integer.Budget().Release(uint64(cap(q.row)) * 4)
 	q.row = nil
-	m.config.Integer.Budget().Release(uint64(cap(q.column)) * 4)
 	q.column = nil
 	m.freeBacking(&q.values)
 }
@@ -90,10 +88,10 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 	q.size = upolyViewDegree(f)
 	q.nullRow = 1
 	n := q.size
-	if e := upolyFactorInt32Resize(&q.column, n, -1, m.config.Integer.Budget()); e != nil {
+	if e := upolyFactorInt32Resize(&q.column, n, -1); e != nil {
 		return e
 	}
-	if e := upolyFactorInt32Resize(&q.row, n, -1, m.config.Integer.Budget()); e != nil {
+	if e := upolyFactorInt32Resize(&q.row, n, -1); e != nil {
 		return e
 	}
 	p, e := m.factorPrime()

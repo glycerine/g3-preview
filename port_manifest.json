@@ -46348,7 +46348,11 @@
         "pkg/math/polynomial/upolynomial_factor_squarefree_invocation_source_test.go",
         "pkg/math/polynomial/upolynomial_factor_squarefree_splice_source_test.go",
         "pkg/math/polynomial/upolynomial_native_directories_test.go",
-        "pkg/math/polynomial/upolynomial_native_coefficients_test.go"
+        "pkg/math/polynomial/upolynomial_native_coefficients_test.go",
+        "pkg/math/polynomial/upolynomial_factor_int32.go",
+        "pkg/math/polynomial/upolynomial_factor_field.go",
+        "pkg/math/polynomial/upolynomial_factor_storage_test.go",
+        "pkg/math/polynomial/upolynomial_factor_degree_source_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -46450,7 +46454,9 @@
         "TestUPolynomialFactorSquareFreeExactInvocationPrefixes",
         "TestUPolynomialFactorSquareFreeCallerCheckpointGuardsAndHistory",
         "TestUPolynomialFactorSquareFreeIssuedHistoryAndArchiveRefusal",
-        "TestUPolynomialFactorSquareFreeRejectsSplicedDiagnosticAcquisition"
+        "TestUPolynomialFactorSquareFreeRejectsSplicedDiagnosticAcquisition",
+        "TestUPolynomialBerlekampNativePivotResize",
+        "TestUPolynomialFactorCombinationExactOrderRemovalAndProducts"
       ],
       "conditionals": [
         {
@@ -46840,7 +46846,8 @@
         "upolynomial_factorization.cpp:1058-1094: explicit adapter storage is charged once in reflected parent header; no whole Factor/finite-field factorization completion claim. TLS release proofs are qualified signed-host owner-primitive guard profiles; foreign descriptor proof uses genuine held NUMs consuming source-recycled descriptor slots.",
         "upolynomial_factorization.cpp:1153-1175: compiled eligible GF7 caller profile validates every actual helper reservation and independent lifted product; qualified signed-host TLS/compiled checker profiles test exact source destruction stops. These profiles do not claim a new ordinary allocation seam between publication actions. The source constant DEL follows successful SET1 and its valid output is inline; no fabricated BIG constant DEL failure is introduced. Whole factorization/recombination topology remains partial.",
         "upolynomial_factorization.cpp:1153-1175: CapturedCheckerSourceStop is an explicitly compiled/seeded retirement-engine transport proof. ActualHelperCheckerSourceStop separately invokes prepareFactorLift with eligible uint32 GF7 and BIG primitive square-free input, literal Mignotte exponent32, actual captured debug checker and signed TLS source stop. The release profile erases that conditional checker and constructs no checker NUM. RetainedLexicalCleanup preserves original unmatched core/SetZ assertions and counts only actual returned InvalidSlot, stopped class cursor, live core.SetZ with identical graph and immutable tuple/cause after new exact owning rescue.",
-        "upolynomial_factorization.cpp:1019-1299: additional reflected Go lifetime headers/nonwrapping tokens and charged diagnostic history model exception retention; native malloc count parity is not claimed. Literal conditional checker uses the existing selected debug/tag profile. Actual whole-input checker and owning release proof uses the qualified signed TLS accounting guard, not ordinary malloc failure. Whole factorization unit and multivariate parent remain partial."
+        "upolynomial_factorization.cpp:1019-1299: additional reflected Go lifetime headers/nonwrapping tokens and charged diagnostic history model exception retention; native malloc count parity is not claimed. Literal conditional checker uses the existing selected debug/tag profile. Actual whole-input checker and owning release proof uses the qualified signed TLS accounting guard, not ordinary malloc failure. Whole factorization unit and multivariate parent remain partial.",
+        "Berlekamp pivot row/column indices and factor-combination enabled/current indices now use native Go slices. C++ vector growth arithmetic and container-only allocation faults/reservations are removed; actual iterator owner allocation, sentinel initialization, combination traversal/removal and numeric product operations remain."
       ]
     },
     {
@@ -46874,13 +46881,19 @@
       "go_targets": [
         "pkg/math/polynomial/upolynomial_factor_hensel.go",
         "pkg/math/polynomial/upolynomial_prime_trial_invocation.go",
-        "pkg/math/polynomial/upolynomial_factor_combination.go"
+        "pkg/math/polynomial/upolynomial_factor_combination.go",
+        "pkg/math/polynomial/upolynomial_factor_int32.go",
+        "pkg/math/polynomial/upolynomial_factor_field.go",
+        "pkg/math/polynomial/upolynomial_factor_storage_test.go",
+        "pkg/math/polynomial/upolynomial_factor_degree_source_test.go"
       ],
       "tests": [
         "TestUPolynomialPrimeTrialToZPRawEveryPrefix",
         "TestUPolynomialPrimeToZPNativePushAndPublishedRaw",
         "TestUPolynomialRecombinationTrialEveryActualBranchPrefix",
-        "TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix"
+        "TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix",
+        "TestUPolynomialBerlekampNativePivotResize",
+        "TestUPolynomialFactorCombinationExactOrderRemovalAndProducts"
       ],
       "conditionals": [
         {
@@ -46961,7 +46974,8 @@
         "upolynomial_factorization_int.h:345-413: source dynamic index/header reads and scalar/vector operation order remain in the same engines; erased divisibility branch materializes no trial vector. Iterator topology outside the selected caller remains partial."
       ],
       "deviations": [
-        "Only the actual prime receipt route is closed; generic nil helper and pair-Hensel lexical lifetime remain open."
+        "Only the actual prime receipt route is closed; generic nil helper and pair-Hensel lexical lifetime remain open.",
+        "Berlekamp pivot row/column indices and factor-combination enabled/current indices now use native Go slices. C++ vector growth arithmetic and container-only allocation faults/reservations are removed; actual iterator owner allocation, sentinel initialization, combination traversal/removal and numeric product operations remain."
       ]
     },
     {

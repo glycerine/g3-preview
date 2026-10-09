@@ -19,24 +19,8 @@ type upolyFactorCombinationState struct {
 }
 
 func (s *upolyFactorCombinationState) close() {
-	b := s.factors.manager.config.Integer.Budget()
-	b.Release(uint64(cap(s.current)) * 4)
 	s.current = nil
-	b.Release(uint64(cap(s.enabled)))
 	s.enabled = nil
-}
-func upolyCombinationCapacity(old, stride uint32) (uint32, error) {
-	n := uint32(2)
-	if old != 0 {
-		n = (3*old + 1) >> 1
-		if n <= old || n*stride+8 <= old*stride+8 {
-			return 0, arena.ErrBounds
-		}
-	}
-	if uint64(n)*uint64(stride)+8 > math.MaxUint32 || uint64(n) > uint64(int(^uint(0)>>1))/uint64(stride) {
-		return 0, arena.ErrBounds
-	}
-	return n, nil
 }
 func (s *upolyFactorCombinationState) init(fs *UPolynomialFactors, ds *upolyFactorDegreeState) error {
 	s.factors = fs
@@ -49,40 +33,23 @@ func (s *upolyFactorCombinationState) init(fs *UPolynomialFactors, ds *upolyFact
 	if fs.count > math.MaxInt32 {
 		return arena.ErrBounds
 	}
-	b := fs.manager.config.Integer.Budget()
-	for uint32(cap(s.enabled)) < fs.count {
-		n, e := upolyCombinationCapacity(uint32(cap(s.enabled)), 1)
-		if e != nil {
-			return e
-		}
-		if e = b.Reserve(uint64(n)); e != nil {
-			return e
-		}
-		next := make([]bool, n)
-		copy(next, s.enabled)
-		b.Release(uint64(cap(s.enabled)))
-		s.enabled = next
-	}
-	for i := uint32(0); i < fs.count; i++ {
-		s.enabled[i] = true
-	}
-	if fs.count == math.MaxUint32 {
+	if uint64(fs.count)+1 > uint64(^uint(0)>>1) {
 		return arena.ErrBounds
 	}
-	for uint32(cap(s.current)) < fs.count+1 {
-		n, e := upolyCombinationCapacity(uint32(cap(s.current)), 4)
-		if e != nil {
-			return e
-		}
-		if e = b.Reserve(uint64(n) * 4); e != nil {
-			return e
-		}
-		next := make([]int32, n)
-		copy(next, s.current)
-		b.Release(uint64(cap(s.current)) * 4)
-		s.current = next
+	if int(fs.count) > len(s.enabled) {
+		s.enabled = append(s.enabled, make([]bool, int(fs.count)-len(s.enabled))...)
+	} else {
+		s.enabled = s.enabled[:fs.count]
 	}
-	for i := uint32(0); i < fs.count+1; i++ {
+	for i := range s.enabled {
+		s.enabled[i] = true
+	}
+	if int(fs.count)+1 > len(s.current) {
+		s.current = append(s.current, make([]int32, int(fs.count)+1-len(s.current))...)
+	} else {
+		s.current = s.current[:int(fs.count)+1]
+	}
+	for i := range s.current {
 		s.current[i] = int32(fs.count)
 	}
 	s.size = 0

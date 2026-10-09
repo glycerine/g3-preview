@@ -112,7 +112,7 @@ func polynomialFactorBackendNamedRoots(t *testing.T, full *MultivariatePolynomia
 		factors(c.best)
 		factors(c.lifted)
 		factors(c.primeTrial.current)
-		bytes += uint64(cap(c.ds.words)+cap(c.primeTrial.degrees.words))*4 + uint64(cap(c.it.enabled)) + uint64(cap(c.it.current))*4
+		bytes += uint64(cap(c.ds.words)+cap(c.primeTrial.degrees.words)) * 4
 		h := &c.hensel
 		addManager(h.related)
 		addManager(h.prime)

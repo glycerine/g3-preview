@@ -85,7 +85,7 @@ func TestUPolynomialFactorDegreeSetEmptyConstructorAndIntersections(t *testing.T
 }
 
 func TestUPolynomialFactorCombinationExactOrderRemovalAndProducts(t *testing.T) {
-	m, _, _ := upolySourceOwner(t)
+	m, _, budget := upolySourceOwner(t)
 	fs, e := m.NewFactors()
 	if e != nil {
 		t.Fatal(e)
@@ -110,7 +110,10 @@ func TestUPolynomialFactorCombinationExactOrderRemovalAndProducts(t *testing.T) 
 			t.Error(e)
 		}
 	}()
+	// Permit the actual iterator owner only; both index slices grow natively.
+	budget.FailAfter(1)
 	it, e := NewUPolynomialFactorCombination(fs, ds)
+	budget.FailAfter(-1)
 	if e != nil {
 		t.Fatal(e)
 	}

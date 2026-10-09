@@ -1,49 +1,41 @@
 package polynomial
 
-import (
-	"errors"
-	"testing"
+import "testing"
 
-	"github.com/glycerine/g3/pkg/arena"
-)
-
-func TestUPolynomialBerlekampPivotSourceResizeConstructor(t *testing.T) {
-	for _, tc := range []struct{ n, capacity uint32 }{{0, 0}, {1, 2}, {2, 2}, {3, 3}, {4, 5}, {6, 8}, {70, 93}} {
-		b := arena.NewBudget(1024)
-		var values []int32
-		if e := upolyFactorInt32Resize(&values, tc.n, -1, b); e != nil {
-			t.Fatal(tc, e)
-		}
-		if uint32(cap(values)) != tc.capacity || b.Used() != uint64(tc.capacity)*4 {
-			t.Fatal("source vector(SZ,elem) resize growth", tc, cap(values), b.Used())
-		}
-		for i := uint32(0); i < tc.n; i++ {
-			if values[i] != -1 {
-				t.Fatal(i, values[i])
-			}
-		}
-		b.Release(uint64(cap(values)) * 4)
-	}
-	b := arena.NewBudget(1024)
-	b.FailAfter(2)
+func TestUPolynomialBerlekampNativePivotResize(t *testing.T) {
 	var values []int32
-	if e := upolyFactorInt32Resize(&values, 4, -1, b); !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	if len(values) != 0 || cap(values) != 3 || b.Used() != 12 {
-		t.Fatal("third growth fails before source logical/default publication", len(values), cap(values), b.Used())
-	}
-	for _, v := range values {
-		if v != 0 {
-			t.Fatal("fill must wait until all capacity expansions", v)
+	for _, n := range []uint32{0, 1, 2, 3, 4, 6, 70, 4097} {
+		old := len(values)
+		if e := upolyFactorInt32Resize(&values, n, -1); e != nil {
+			t.Fatal(n, e)
+		}
+		if len(values) != int(n) {
+			t.Fatal(n, len(values))
+		}
+		for i := range values {
+			want := int32(-1)
+			if i < old {
+				want = int32(i*37 - 128)
+			}
+			if values[i] != want {
+				t.Fatal(n, i, values[i], want)
+			}
+			values[i] = int32(i*37 - 128)
 		}
 	}
-	b.FailAfter(-1)
-	b.Release(12)
-	// resize(0) performs no reserve, including a zero-byte reserve callback.
-	b.FailAfter(0)
-	values = nil
-	if e := upolyFactorInt32Resize(&values, 0, -1, b); e != nil {
+	if e := upolyFactorInt32Resize(&values, 3, -1); e != nil {
 		t.Fatal(e)
+	}
+	if e := upolyFactorInt32Resize(&values, 70, -1); e != nil {
+		t.Fatal(e)
+	}
+	for i, v := range values {
+		want := int32(-1)
+		if i < 3 {
+			want = int32(i*37 - 128)
+		}
+		if v != want {
+			t.Fatal(i, v, want)
+		}
 	}
 }
