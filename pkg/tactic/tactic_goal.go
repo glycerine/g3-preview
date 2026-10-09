@@ -320,51 +320,15 @@ type tacticGoalPolarity struct {
 	term     ast.ASTHandle
 	positive bool
 }
-type tacticGoalTodo struct {
-	inline [64]tacticGoalPolarity
-	heap   []tacticGoalPolarity
-	size   int
-}
+type tacticGoalTodo struct{ values []tacticGoalPolarity }
 
-func (v *tacticGoalTodo) at(i int) tacticGoalPolarity {
-	if v.heap == nil {
-		return v.inline[i]
-	}
-	return v.heap[i]
-}
-func (v *tacticGoalTodo) push(m *ast.ASTManager, p tacticGoalPolarity) error {
-	capacity := 64
-	if v.heap != nil {
-		capacity = len(v.heap)
-	}
-	if v.size == capacity {
-		stride := uint64(reflect.TypeOf(p).Size())
-		n := uint64(capacity) * 2
-		if n > uint64(^uint(0)>>1)/stride {
-			return arena.ErrBounds
-		}
-		if e := m.Budget().Reserve(n * stride); e != nil {
-			return e
-		}
-		next := make([]tacticGoalPolarity, int(n))
-		for i := 0; i < v.size; i++ {
-			next[i] = v.at(i)
-		}
-		m.Budget().Release(uint64(len(v.heap)) * stride)
-		v.heap = next
-	}
-	if v.heap == nil {
-		v.inline[v.size] = p
-	} else {
-		v.heap[v.size] = p
-	}
-	v.size++
+func (v *tacticGoalTodo) push(_ *ast.ASTManager, p tacticGoalPolarity) error {
+	v.values = append(v.values, p)
 	return nil
 }
-func (v *tacticGoalTodo) close(m *ast.ASTManager) {
-	m.Budget().Release(uint64(len(v.heap)) * uint64(reflect.TypeOf(tacticGoalPolarity{}).Size()))
-	v.heap = nil
-	v.size = 0
+func (v *tacticGoalTodo) close(_ *ast.ASTManager) {
+	clear(v.values)
+	v.values = nil
 }
 func (g *Goal) quickProcess(saveFirst bool, f ast.ASTHandle, d ast.ASTDependency) (out ast.ASTHandle, err error) {
 	out = f
@@ -398,12 +362,14 @@ func (g *Goal) quickProcess(saveFirst bool, f ast.ASTHandle, d ast.ASTDependency
 	if err = todo.push(m, tacticGoalPolarity{f, true}); err != nil {
 		return out, err
 	}
-	for todo.size != 0 {
+	for len(todo.values) != 0 {
 		if g.inconsistent {
 			return out, nil
 		}
-		todo.size--
-		p := todo.at(todo.size)
+		last := len(todo.values) - 1
+		p := todo.values[last]
+		todo.values[last] = tacticGoalPolarity{}
+		todo.values = todo.values[:last]
 		curr := p.term
 		split, err := g.isOp(curr, ast.ASTOpAnd)
 		if err != nil {

@@ -766,3 +766,5 @@ The rational service's power-of-two cache now grows with native `append`. Cache 
 `ast.ASTHandleBuffer` now uses the same native typed-slice representation for borrowed handles. Its inline-16/spill split, doubling logic, and AST-budget backing charge have been removed; reset and pop clear vacated handles while retaining ordinary Go slice capacity.
 
 Stored-model label snapshots in `tactic` now use `[]util.Symbol`. The inline-16/spill buffer and its arena accounting are gone; construction still copies caller labels, application preserves insertion order, and close clears retained symbols.
+
+The goal flattener's polarity worklist in `tactic` now uses a concrete slice as a LIFO stack. Its inline-64/spill representation, doubling code, and arena backing charges have been removed; popped and closed entries are cleared.
