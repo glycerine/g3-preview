@@ -274,6 +274,13 @@ The probing array, tombstones, cached hash values, iterator implementation, and
 tests of the C++ table layout have been deleted. This removes one member of the
 infrastructure knot rather than moving it into a child package.
 
+The unused `UintPtrMap` template stand-in has also been deleted. Although the
+source `uint_map<T>` template has live C++ instantiations, the Go wrapper had no
+production consumer and stored every pointer as `any`, then used reflection to
+recover a weak runtime type check. Each future consumer should use its concrete
+pointer slice directly; the source operation is only indexed slice growth,
+lookup, clearing, and reset.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before
