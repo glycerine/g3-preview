@@ -617,3 +617,13 @@ directly.
 recycling tests. It imports `arena` directly, has no dependency on root `util`,
 and exposes no compatibility facade; the future SMT2 parser port should import
 this leaf.
+
+The redundant Runtime-backed bit containers have been deleted:
+`RuntimeBitVector`, `RuntimeFastResetBitVector`,
+`RuntimeFixedBitVectorManager`, and `RuntimeUintSet`. A production-reference
+scan found that each family was used only by its own implementation and tests,
+while the same source functionality is already present in the typed native
+`Vector`/`FastReset`, `FixedManager`, and `UintSet` implementations. This removes
+four isolated `Runtime`/`Block` ownership graphs and their allocation-layout,
+interrupted-destruction, and malformed-header tests without removing a live Go
+consumer.

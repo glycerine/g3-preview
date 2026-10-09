@@ -9,6 +9,25 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
+var permutationStreamRefusal = errors.New("permutation test stream refusal")
+
+type permutationPrefixWriter struct {
+	remaining int
+	bytes     []byte
+}
+
+func (w *permutationPrefixWriter) Write(p []byte) (int, error) {
+	if len(p) > w.remaining {
+		n := w.remaining
+		w.bytes = append(w.bytes, p[:n]...)
+		w.remaining = 0
+		return n, permutationStreamRefusal
+	}
+	w.bytes = append(w.bytes, p...)
+	w.remaining -= len(p)
+	return len(p), nil
+}
+
 func utilityRuntimePermutationFixture(t *testing.T, n uint32) (*RuntimePermutation, *Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
@@ -133,9 +152,9 @@ func TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes(t *testing.T)
 		t.Fatal(out.String())
 	}
 	for n := 0; n < len(want); n++ {
-		w := &uintSetPrefixWriter{remaining: n}
+		w := &permutationPrefixWriter{remaining: n}
 		e := p.Display(w)
-		if !errors.Is(e, uintSetStreamRefusal) || string(w.bytes) != want[:n] {
+		if !errors.Is(e, permutationStreamRefusal) || string(w.bytes) != want[:n] {
 			t.Fatal(n, e, string(w.bytes))
 		}
 		permutationPhysical(t, p, r, b)
