@@ -32,7 +32,7 @@ func TestNaturalFormattingLexicalSourceLocals(t *testing.T) {
 			}
 		}
 	}
-	if m.runtime.Stats().LiveBlocks != before.LiveBlocks || m.overflowPayloads() != 0 {
+	if m.runtime.Stats().LiveBlocks != before.LiveBlocks {
 		t.Fatal("actual lexical roots")
 	}
 	if e = m.finishFormattingLocals(); e != nil {
@@ -95,49 +95,6 @@ func TestNaturalFormattingEmptyGuardAfterLocalActions(t *testing.T) {
 	_, e := m.FormatInto(nil, dst)
 	if !errors.Is(e, arena.ErrBounds) || string(dst) != "!!" || m.Formatting.Active || m.Formatting.PendingField || m.runtime.Stats().LiveBlocks != 0 {
 		t.Fatal("explicit guard then unwind", e, dst)
-	}
-}
-
-func TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation(t *testing.T) {
-	b := arena.NewBudget(1 << 23)
-	rt, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
-	if e != nil {
-		t.Fatal(e)
-	}
-	c := arena.VectorConfig{Descriptors: arena.Config{Budget: b}}
-	m, e := newNaturalManagerWithMemory(c, rt)
-	if e != nil {
-		t.Fatal(e)
-	}
-	if e = rt.SetMaxCount(1); e != nil {
-		t.Fatal(e)
-	}
-	e = m.Division[0].resize(rt, 40000)
-	var refusal Failure
-	if !errors.As(e, &refusal) || refusal.Kind != FailureAllocExceeded || m.Division[0].Raw == (Block{}) || m.Division[0].Pending == (Block{}) || rt.Stats().LiveBlocks != 2 {
-		t.Fatal("actual late TLS allocation prefix", e, rt.Stats())
-	}
-	published, pending := m.Division[0].Raw, m.Division[0].Pending
-	if e = m.SourceFinalize(); e != nil {
-		t.Fatal(e)
-	}
-	if rt.Stats().LiveBlocks != 1 || m.Division[0].Pending != pending || m.HeaderBytes == 0 {
-		t.Fatal("source destructor consumed orphan allocation", rt.Stats())
-	}
-	if _, e = rt.ReadUint32(published, 0); e == nil {
-		t.Fatal("published buffer survived")
-	}
-	if _, e = rt.ReadUint32(pending, 0); !errors.Is(e, ErrRuntimeUninitialized) {
-		t.Fatal("actual pending digit init", e)
-	}
-	if e = m.CloseChecked(); e != nil {
-		t.Fatal(e)
-	}
-	if rt.Stats().LiveBlocks != 0 || b.Used() != rt.Stats().TotalBytes {
-		t.Fatal("owning roots", b.Used(), rt.Stats())
-	}
-	if e = rt.Close(); e != nil || b.Used() != 0 {
-		t.Fatal(e, b.Used())
 	}
 }
 

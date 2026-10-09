@@ -188,7 +188,6 @@ type upolyFactorFrontendScope struct {
 	quadratic       upolyFactorQuadraticScope
 	flip            upolyFactorFlipScope
 	result          *UPolynomialFactors
-	buffers         [4]util.NaturalBufferReceipt
 
 	primitive                                        upolyFactorPrimitiveScope
 	divisibility                                     upolyFactorDivisibilityScope
@@ -428,11 +427,6 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 			return e
 		}
 
-		for i := range q.buffers {
-			if e := q.buffers[i].Cleanup(); e != nil {
-				return e
-			}
-		}
 		if e := q.divisibility.own(true); e != nil {
 			return e
 		}
@@ -481,11 +475,6 @@ func (q *upolyFactorFrontendScope) hasUnjoined() bool {
 		return true
 	}
 
-	for i := range q.buffers {
-		if q.buffers[i].Pending() != (util.Block{}) {
-			return true
-		}
-	}
 	if z.MatchesDividesNumeralInvocation(&q.boolNumeral) || z.MatchesAddMulInvocation(&q.addMul) || z.MatchesAddMulInvocation(&q.divisibility.addMul) {
 		return true
 	}

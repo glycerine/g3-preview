@@ -7,7 +7,6 @@ type integerMPFSqrtHelperScope struct {
 	hooks                          NumericInvocationHooks
 	integerBinding, naturalBinding NumericCallerBinding
 	numeric                        NumericAllocationRoots
-	buffers                        [4]NaturalBufferReceipt
 
 	copy                         integerCopyAllocationReceipt
 	values                       [5]Int
@@ -33,15 +32,6 @@ func (s *integerMPFSqrtHelperScope) NumericRoots(z *IntegerManager, local *Numer
 		return local
 	}
 	return &s.numeric
-}
-func (s *integerMPFSqrtHelperScope) NumericBuffer(n *NaturalManager, index int) *NaturalBufferReceipt {
-	if !s.NumericBound(true) || n != s.manager.Natural || index < 0 || index >= len(s.buffers) {
-		return nil
-	}
-	if e := n.BindCallerBuffer(&s.buffers[index], index, s.invocation, &s.hooks); e != nil {
-		return nil
-	}
-	return &s.buffers[index]
 }
 
 func (s *integerMPFSqrtHelperScope) context() integerAllocationInvocationContext {
@@ -91,9 +81,7 @@ func (m *IntegerManager) finishMyMPZSqrtSource() error {
 		}
 	}
 	s.active = s.bodyCause != nil || NumericAllocationPending(&s.numeric)
-	for i := range s.buffers {
-		s.active = s.active || s.buffers[i].PendingField != (Block{})
-	}
+
 	return nil
 }
 
@@ -134,11 +122,6 @@ func (m *IntegerManager) CleanupMyMPZSqrt() (cause error) {
 		return e
 	}
 
-	for i := len(s.buffers) - 1; i >= 0; i-- {
-		if e := s.buffers[i].Cleanup(); e != nil {
-			return e
-		}
-	}
 	if e := s.numeric.Cleanup(z); e != nil {
 		return e
 	}

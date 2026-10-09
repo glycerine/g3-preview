@@ -60,12 +60,7 @@ func TestArbitraryFloatRoundSqrtColdPowerAndNumericPrefixes(t *testing.T) {
 				}
 			}
 		}
-		for i := range m.integer.Natural.Division {
-			p := m.integer.Natural.Division[i].Pending
-			if body != nil && p != (Block{}) && s.buffers[i].PendingField != p {
-				t.Fatal("actual Natural division buffer prefix uncaptured", ordinal, body, i, p)
-			}
-		}
+
 		b.FailAfter(-1)
 		serviceMust(t, m.CleanupRoundSqrt())
 		serviceMust(t, m.Del(&x))

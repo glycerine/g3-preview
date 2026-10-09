@@ -18,7 +18,6 @@ type polynomialSOMNormalizeScope struct {
 	receipt                                polynomialSOMNormalizeInvocationReceipt
 	normalize                              util.IntegerNormalizeInvocationReceipt
 	gcdRaw, divisionRaw, extendedRaw       util.IntegerRawInvocationReceipt
-	buffers                                [4]util.NaturalBufferReceipt
 
 	sourceCause, ownCause error
 }
@@ -131,11 +130,7 @@ func numericIntegerManager_cleanupSOMNormalizationNumeric(m *util.IntegerManager
 	}
 
 	if abort {
-		for i := len(s.buffers) - 1; i >= 0; i-- {
-			if e := s.buffers[i].Cleanup(); e != nil {
-				return e
-			}
-		}
+
 		return r.buffer.gcdNumeric.cleanup(m)
 	}
 	return nil

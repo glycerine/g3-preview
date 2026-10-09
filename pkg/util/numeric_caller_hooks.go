@@ -15,7 +15,6 @@ type NumericInvocationHooks struct {
 	Roots   func(*IntegerManager, *NumericAllocationRoots) *NumericAllocationRoots
 	Prepare func(*IntegerManager, string) error
 	Record  func(*IntegerManager, string, NumericInvocationReceipt)
-	Buffer  func(*NaturalManager, int) *NaturalBufferReceipt
 
 	ScalarRaw   func(*IntegerManager, string) (*IntegerScalarRawScope, error)
 	Normalize   func(*IntegerModularManager, Int) (Int, error)
@@ -33,7 +32,6 @@ type NumericAllocationContext = integerAllocationInvocationContext
 type IntegerRawInvocationReceipt = integerRawInvocationReceipt
 type IntegerDividesNumeralInvocationReceipt = integerDividesNumeralInvocationReceipt
 type IntegerPerfectSquareInvocationReceipt = integerPerfectSquareInvocationReceipt
-type NaturalBufferReceipt = naturalPNBufferReceipt
 
 type IntegerScalarRawScope = integerScalarRawScope
 
@@ -127,35 +125,6 @@ type NumericCharacterCaller struct {
 }
 type IntegerCharacterScope = integerCharacterScope
 type NaturalFormattingScope = naturalFormattingScope
-
-// BindCallerBuffer attaches a higher caller's receipt to the actual persistent
-// Natural division buffer. Bound validates the caller's receipt address and
-// invocation, so copies and expired generations cannot acquire pending storage.
-func (m *NaturalManager) BindCallerBuffer(r *NaturalBufferReceipt, index int, invocation uint64, h *NumericInvocationHooks) error {
-	if m == nil || m.self != m || r == nil || h == nil || !h.callBound(true) || invocation == 0 {
-		return ErrNumericOwner
-	}
-	if m.ClosedField {
-		return arena.ErrClosed
-	}
-	if index < 0 || index >= len(m.Division) {
-		return arena.ErrBounds
-	}
-	if r.Owner != nil {
-		if r.Owner != m || r.Buffer != &m.Division[index] || r.Invocation != invocation || r.Caller != h {
-			return ErrNumericOwner
-		}
-		return nil
-	}
-	*r = naturalPNBufferReceipt{CallerSelf: r, Owner: m, Buffer: &m.Division[index], Invocation: invocation, Caller: h}
-	return nil
-}
-func (r *naturalPNBufferReceipt) Cleanup() error {
-	if r == nil {
-		return nil
-	}
-	return r.cleanup()
-}
 
 func (m *IntegerModularManager) SetCallerExecutionGuard(guard func() bool) error {
 	if m == nil || m.self != m {

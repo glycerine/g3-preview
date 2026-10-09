@@ -17,7 +17,6 @@ type polynomialNormalizeScope struct {
 	sourceCause                      error
 	normalize                        util.IntegerNormalizeInvocationReceipt
 	gcdRaw, divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
-	buffers                          [4]util.NaturalBufferReceipt
 
 	append  polynomialCheapAppendInvocationReceipt
 	factory polynomialFactoryInvocationReceipt
@@ -61,11 +60,7 @@ func (s *polynomialNormalizeScope) directPending(m *MultivariatePolynomialManage
 	if polynomialNegNumericPending(&s.numeric) || c.integer.MatchesRawInvocation(&s.gcdRaw) || c.integer.MatchesRawInvocation(&s.divisionRaw) || c.integer.MatchesRawInvocation(&s.extendedRaw) || c.modular.MatchesPNormalizeInvocation(&s.normalize) || c.cheap.matchesAppendInvocation(&s.append) || c.matchesFactoryInvocation(&s.factory) {
 		return true
 	}
-	for i := range s.buffers {
-		if s.buffers[i].Pending().OwnerID() != 0 {
-			return true
-		}
-	}
+
 	return c.hasSOMNormalizeInvocationHistory(&s.som) && s.som.frame.active
 }
 func (m *MultivariatePolynomialManager) finishNormalizationSource() error {

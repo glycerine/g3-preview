@@ -19,14 +19,13 @@ type NaturalManager struct {
 	self                              *NaturalManager
 	runtime                           *Runtime
 	ownsRuntime                       bool
-	Division                          [4]SourceLimbBuffer
+	Division                          [4][]uint32
 	verificationScratch               []uint32
 	Formatting                        naturalFormattingScope
 	CharFormatting                    integerCharacterScope
 	characterCalls                    *integerCharacterScope
 	SourceFinalizing, sourceFinalized bool
 	SourceStage                       uint8
-	sourceCause                       error
 	originalCause, cleanupCause       error
 	text                              []byte
 	budget                            *arena.Budget
@@ -34,7 +33,7 @@ type NaturalManager struct {
 	ClosedField, Closing              bool
 }
 
-// NewNaturalManager owns a real memory runtime and the source four inline16
+// NewNaturalManager owns a memory runtime and reusable native division
 // buffers. Formatting locals own reusable Go slices; retained text
 // is an output assembly adapter and character scratch uses native Go bytes.
 func NewNaturalManager(c arena.VectorConfig) (*NaturalManager, error) {
@@ -134,11 +133,7 @@ func (m *NaturalManager) CloseChecked() error {
 			return fail(e)
 		}
 
-		for i := 3; i >= 0; i-- {
-			if e := m.Division[i].Finalize(m.runtime); e != nil {
-				return fail(e)
-			}
-		}
+		m.Division = [4][]uint32{}
 	}
 	m.text = nil
 	m.verificationScratch = nil
@@ -153,45 +148,26 @@ func (m *NaturalManager) CloseChecked() error {
 	m.cleanupCause = nil
 	return nil
 }
-func (m *NaturalManager) ResizeDiv(i int, n uint32) error { return m.resizeDivWithPNReceipt(i, n, nil) }
-func (m *NaturalManager) resizeDivWithPNReceipt(i int, n uint32, pn *integerPNormalizeScope) error {
-	return m.resizeDivWithAllocationContext(i, n, pnAllocationContext(pn))
-}
-func (m *NaturalManager) resizeDivWithAllocationContext(i int, n uint32, context integerAllocationInvocationContext) error {
+func (m *NaturalManager) ResizeDiv(i int, n uint32) error {
 	if i < 0 || i >= 4 {
 		return arena.ErrBounds
 	}
-	e := m.Division[i].resizeWithPNReceipt(m.runtime, n, m.DivisionBufferReceipt(context, i))
-	return e
+	old := len(m.Division[i])
+	if uint64(cap(m.Division[i])) < uint64(n) {
+		v := make([]uint32, n)
+		copy(v, m.Division[i])
+		m.Division[i] = v
+	} else {
+		m.Division[i] = m.Division[i][:n]
+		if int(n) > old {
+			clear(m.Division[i][old:])
+		}
+	}
+	return nil
 }
 func (m *NaturalManager) sourceDivRead(r int, i uint32) uint32 {
-	v, e := m.Division[r].read(m.runtime, i)
-	if e != nil {
-		panic(e)
-	}
-	return v
+	return m.Division[r][i]
 }
 func (m *NaturalManager) sourceDivWrite(r int, i, v uint32) {
-	if e := m.Division[r].write(m.runtime, i, v); e != nil {
-		panic(e)
-	}
-}
-
-// overflowPayloads counts actual live/pending source allocations. Inline16
-// buffers have no physical payload, and released Runtime blocks clear tokens.
-func (m *NaturalManager) overflowPayloads() uint32 {
-	if m == nil || m.self != m || m.ClosedField {
-		return 0
-	}
-	var count uint32
-	for i := range m.Division {
-		if m.Division[i].Raw != (Block{}) {
-			count++
-		}
-		if m.Division[i].Pending != (Block{}) {
-			count++
-		}
-	}
-
-	return count
+	m.Division[r][i] = v
 }

@@ -287,12 +287,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 	for _, block := range raw {
 		addRaw(block)
 	}
-	buffers := []*util.SourceLimbBuffer{&z.Naturals().Division[0], &z.Naturals().Division[1], &z.Naturals().Division[2], &z.Naturals().Division[3]}
 
-	for _, buffer := range buffers {
-		addRaw(buffer.Raw)
-		addRaw(buffer.Pending)
-	}
 	numeric, cells := z.Allocator.Stats(), c.config.Allocator.Stats()
 	want := numeric.Chunks + numeric.DirectObjects + numeric.PendingBlocks + cells.Chunks + cells.DirectObjects + cells.PendingBlocks + uint32(len(rawRoots))
 	if want != z.RuntimeOwner().Stats().LiveBlocks {

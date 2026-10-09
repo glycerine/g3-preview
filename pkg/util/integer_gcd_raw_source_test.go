@@ -188,10 +188,10 @@ func TestIntegerGCDRawActualBindingAndReusedContext(t *testing.T) {
 	second, e := m.beginRawInvocation(s, 5)
 	serviceMust(t, e)
 	current := (integerAllocationInvocationContext{}).withRawInvocation(second)
-	if old.roots(m) != nil || m.Natural.DivisionBufferReceipt(old, 0) != nil {
+	if old.roots(m) != nil {
 		t.Fatal("old context retargeted reused embedded receipt")
 	}
-	if current.roots(m) == nil || m.Natural.DivisionBufferReceipt(current, 0) == nil {
+	if current.roots(m) == nil {
 		t.Fatal("current actual context absent")
 	}
 	s.executing = false

@@ -6,7 +6,7 @@ import (
 )
 
 // SourceFinalize performs only the actual completed manager's source member
-// destructors. Unpublished division member expansion blocks remain in the charged owner for separate explicit owning CloseChecked.
+// destructors. Native division workspace is released without Runtime events.
 
 func (m *NaturalManager) SourceFinalize() error {
 	if m.numericCallerExecuting() {
@@ -31,19 +31,9 @@ func (m *NaturalManager) sourceFinalizeMembers() error {
 		return arena.ErrInvalidSlot
 	}
 	m.SourceFinalizing = true
-	for m.SourceStage < 4 {
-		b := &m.Division[3-int(m.SourceStage)]
-		if b.Raw != (Block{}) {
-			// Runtime updates the real token after physical free, even if its later
-			// TLS synchronization fails. Retry acknowledges that completed prefix.
-			if e := m.runtime.Deallocate(&b.Raw); e != nil {
-				m.sourceCause = e
-				return e
-			}
-		}
-		m.SourceStage++
-	}
+	m.Division = [4][]uint32{}
+	m.verificationScratch = nil
+	m.SourceStage = 4
 	m.sourceFinalized = true
-	m.sourceCause = nil
 	return nil
 }

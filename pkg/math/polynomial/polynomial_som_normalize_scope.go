@@ -81,9 +81,7 @@ func (b *polynomialSOM) finishNormalizeNumeralPhase(owning, abort bool) (err err
 		}
 	}
 	pending := polynomialNegNumericPending(&b.gcdNumeric) || m.integer.MatchesRawInvocation(&s.gcdRaw) || m.integer.MatchesRawInvocation(&s.divisionRaw) || m.integer.MatchesRawInvocation(&s.extendedRaw) || m.modular.MatchesPNormalizeInvocation(&s.normalize)
-	for i := range s.buffers {
-		pending = pending || s.buffers[i].Pending().OwnerID() != 0
-	}
+
 	if !pending {
 		b.gcdActive = false
 		s.active = false

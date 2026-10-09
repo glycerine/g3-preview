@@ -24,11 +24,6 @@ func rootUpperActualGraph(t *testing.T, c *AlgebraicRootCore, p *UPolynomialMana
 			}
 		}
 	}
-	for _, r := range q.buffers {
-		if r.Pending() != (util.Block{}) {
-			raw = append(raw, r.Pending())
-		}
-	}
 
 	algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, extra, raw)
 }
@@ -80,7 +75,7 @@ func TestUPolynomialRootUpperBoundEveryActualReservationPrefix(t *testing.T) {
 					if polynomialNegNumericPending(&q.numeric) {
 						acquired = true
 					}
-					if q.buffers[0].Owner != nil {
+					if len(z.Naturals().Division[0]) != 0 {
 						division = true
 					}
 					if q.history != nil {

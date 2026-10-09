@@ -33,7 +33,6 @@ type upolyFactorPrimePreparationScope struct {
 	numeric                                          polynomialNumericRoots
 	normalize                                        [3]util.IntegerNormalizeInvocationReceipt
 	divisionRaw, extendedRaw, gcdRaw                 util.IntegerRawInvocationReceipt
-	buffers                                          [4]util.NaturalBufferReceipt
 
 	bodyCause, sourceCause, ownCause error
 }
@@ -125,11 +124,7 @@ func (q *upolyFactorPrimePreparationScope) pending() bool {
 			return true
 		}
 	}
-	for i := range q.buffers {
-		if q.buffers[i].Pending() != (util.Block{}) {
-			return true
-		}
-	}
+
 	for i, m := range q.managers() {
 		if m == nil {
 			continue
@@ -201,11 +196,6 @@ func (q *upolyFactorPrimePreparationScope) own(r *upolyFactorPrimePreparationInv
 			}
 		}
 
-		for i := range q.buffers {
-			if e := q.buffers[i].Cleanup(); e != nil {
-				return e
-			}
-		}
 		for i, m := range q.managers() {
 			if m == nil {
 				continue

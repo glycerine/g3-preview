@@ -160,29 +160,7 @@ func sexprAuditNumericRoots(t *testing.T, q *RationalService, value *OwnedRation
 	for i := range filler {
 		public(&filler[i])
 	}
-	natural := testFieldBySourceName(integer, "natural").Elem()
 	payloads := uint32(len(cells))
-	// Division overflow owns actual Runtime blocks rather than Words vectors.
-	// Enumerate only the four source division buffers and active debug verifier.
-	buffers := testFieldBySourceName(natural, "division")
-	raw := make(map[[3]uint64]bool)
-	addRaw := func(buffer reflect.Value) {
-		for _, name := range []string{"raw", "pending"} {
-			block := testFieldBySourceName(buffer, name)
-			key := [3]uint64{testFieldBySourceName(block, "origin").Uint(), testFieldBySourceName(block, "slot").Uint(), testFieldBySourceName(block, "generation").Uint()}
-			if key == [3]uint64{} {
-				continue
-			}
-			if raw[key] {
-				t.Fatal("duplicate Natural physical root", key)
-			}
-			raw[key] = true
-		}
-	}
-	for i := 0; i < buffers.Len(); i++ {
-		addRaw(buffers.Index(i))
-	}
-	payloads += uint32(len(raw))
 	pending := testFieldBySourceName(testFieldBySourceName(integer, "pendingCell"), "object")
 	if testFieldBySourceName(pending, "owner").Uint() != 0 {
 		payloads++

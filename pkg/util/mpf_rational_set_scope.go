@@ -8,7 +8,6 @@ type arbitraryFloatRationalSetScope struct {
 	plainInvocation uint64
 	receipt         *ArbitraryFloatRationalSetReceipt
 	history         *arbitraryFloatRationalSetHistory
-	buffers         [4]naturalPNBufferReceipt
 
 	roundChild                                               ArbitraryFloatRoundReceipt
 	roundFrame                                               *ArbitraryFloatRoundScope
@@ -79,11 +78,6 @@ func (m *ArbitraryFloatManager) finishRationalSetSource() error {
 
 	s.active = false
 
-	for i := range s.buffers {
-		if s.buffers[i].PendingField != (Block{}) {
-			s.active = true
-		}
-	}
 	if m.integer.MatchesRawInvocation(&s.extended) || m.integer.MatchesRawInvocation(&s.division) || m.integer.MatchesRawInvocation(&s.gcd) {
 		s.active = true
 	}

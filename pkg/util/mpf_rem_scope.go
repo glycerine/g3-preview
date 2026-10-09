@@ -7,7 +7,6 @@ type arbitraryFloatRemScope struct {
 	hooks                          NumericInvocationHooks
 	integerBinding, naturalBinding NumericCallerBinding
 	numeric                        NumericAllocationRoots
-	buffers                        [4]NaturalBufferReceipt
 
 	copyA, copyB                 ArbitraryFloatValueCopyReceipt
 	roundFrame                   *ArbitraryFloatRoundScope
@@ -40,15 +39,6 @@ func (s *arbitraryFloatRemScope) NumericRoots(z *IntegerManager, local *NumericA
 		return local
 	}
 	return &s.numeric
-}
-func (s *arbitraryFloatRemScope) NumericBuffer(n *NaturalManager, index int) *NaturalBufferReceipt {
-	if !s.NumericBound(true) || n != s.manager.integer.Natural || index < 0 || index >= len(s.buffers) {
-		return nil
-	}
-	if e := n.BindCallerBuffer(&s.buffers[index], index, s.invocation, &s.hooks); e != nil {
-		return nil
-	}
-	return &s.buffers[index]
 }
 
 func (s *arbitraryFloatRemScope) context() integerAllocationInvocationContext {
@@ -127,9 +117,7 @@ func (m *ArbitraryFloatManager) finishRemSource() error {
 		}
 	}
 	s.active = s.bodyCause != nil || NumericAllocationPending(&s.numeric) || s.roundFrame != nil && s.roundFrame.active
-	for i := range s.buffers {
-		s.active = s.active || s.buffers[i].PendingField != (Block{})
-	}
+
 	return nil
 }
 
@@ -204,11 +192,6 @@ func (m *ArbitraryFloatManager) CleanupRem() (cause error) {
 		return e
 	}
 
-	for i := len(s.buffers) - 1; i >= 0; i-- {
-		if e := s.buffers[i].Cleanup(); e != nil {
-			return e
-		}
-	}
 	if e := s.numeric.Cleanup(z); e != nil {
 		return e
 	}

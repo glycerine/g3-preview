@@ -59,15 +59,7 @@ func TestArbitraryFloatRoundSqrtActualTLSAllocationReceipt(t *testing.T) {
 			}
 		}
 	}
-	for i := range m.integer.Natural.Division {
-		p := m.integer.Natural.Division[i].Pending
-		if p != (Block{}) {
-			retained = true
-			if s.buffers[i].PendingField != p {
-				t.Fatal("actual reached Natural buffer lacks round child", body, p)
-			}
-		}
-	}
+
 	if !retained {
 		t.Fatal("recipe did not reach actual pending prefix", body)
 	}

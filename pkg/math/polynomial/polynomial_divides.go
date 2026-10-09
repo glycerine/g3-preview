@@ -18,7 +18,6 @@ type polynomialDividesScope struct {
 	boolNumeral              util.IntegerDividesNumeralInvocationReceipt
 	normalize                util.IntegerNormalizeInvocationReceipt
 	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
-	buffers                  [4]util.NaturalBufferReceipt
 
 	directReceipt           polynomialDividesInvocationReceipt
 	monomial                polynomialDivisionReference

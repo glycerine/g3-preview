@@ -150,7 +150,6 @@ func fastSharedRuntimeAudit(t *testing.T, r *Runtime, owners []*FastFloatManager
 		if m.RuntimeOwner() != r || m.natural.ownsRuntime {
 			t.Fatal("wrong runtime identity")
 		}
-		fastFormattingNamedRoots(m, add)
 		owned += fastOwnedBytes(m) - r.Stats().TotalBytes
 	}
 	for _, v := range caller {

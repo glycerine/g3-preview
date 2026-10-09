@@ -26,7 +26,6 @@ type upolyHenselPairScope struct {
 	amBodyCause, amSourceCause      error
 	ownManagerStage                 uint8
 	ownManagerIndex                 uint32
-	buffers                         [4]util.NaturalBufferReceipt
 
 	rootPrevious, rmPrevious                   *upolyHenselPairScope
 	ownExecuting                               bool
@@ -405,11 +404,7 @@ func (h *upolyHenselPairScope) cleanupNumeric(abort bool) error {
 	}
 
 	if abort {
-		for i := len(h.buffers) - 1; i >= 0; i-- {
-			if e := h.buffers[i].Cleanup(); e != nil {
-				return e
-			}
-		}
+
 		return h.numeric.cleanup(z)
 	}
 	return nil

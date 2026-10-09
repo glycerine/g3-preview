@@ -89,11 +89,7 @@ func numericIntegerManager_cleanupScalarExactDivNumeric(m *util.IntegerManager, 
 	}
 
 	if abort {
-		for i := len(s.buffers) - 1; i >= 0; i-- {
-			if e := s.buffers[i].Cleanup(); e != nil {
-				return e
-			}
-		}
+
 		return s.numeric.cleanup(m)
 	}
 	return nil

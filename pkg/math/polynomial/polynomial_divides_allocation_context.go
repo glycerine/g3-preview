@@ -99,11 +99,7 @@ func numericIntegerManager_cleanupDividesNumeric(m *util.IntegerManager, r *poly
 	}
 
 	if abort {
-		for i := len(s.buffers) - 1; i >= 0; i-- {
-			if e := s.buffers[i].Cleanup(); e != nil {
-				return e
-			}
-		}
+
 		return s.numeric.cleanup(m)
 	}
 	return nil
@@ -136,10 +132,6 @@ func numericIntegerManager_dividesNumericPending(m *util.IntegerManager, r *poly
 	if r.core.modular.MatchesPNormalizeInvocation(&s.normalize) {
 		return true
 	}
-	for i := range s.buffers {
-		if s.buffers[i].Pending() != (util.Block{}) {
-			return true
-		}
-	}
+
 	return false
 }

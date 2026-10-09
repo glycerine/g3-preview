@@ -31,8 +31,8 @@ func TestNaturalSourceNoAddbackDoesNotPrepareAb(t *testing.T) {
 		t.Fatal("independent exact division")
 	}
 	// mpn.cpp:341–344 initializes/grows ab only AFTER a borrow and quotient
-	// decrement. This fixture never borrows: ab remains its source inline16.
-	if n.Division[3].capacity() != 16 {
+	// decrement. This fixture never borrows: ab remains unused.
+	if n.Division[3] != nil {
 		t.Fatal("unconditional source add-back allocation", naturalDivisionCapacities(n))
 	}
 }
@@ -133,7 +133,7 @@ func TestNaturalSourceUnsignedQuotientGuardAtWrite(t *testing.T) {
 	}
 }
 
-func TestNaturalSourceStatsCountsActualOverflowOnly(t *testing.T) {
+func TestNaturalNativeScratchExcludedFromRuntimeStats(t *testing.T) {
 	s, _ := serviceNew(t)
 	before, e := s.Stats()
 	if e != nil {
@@ -155,15 +155,15 @@ func TestNaturalSourceStatsCountsActualOverflowOnly(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if after.NaturalPayloads != before.NaturalPayloads+3 || after.LivePayloads != before.LivePayloads+3 {
-		t.Fatal("actual u/v/ms overflow roots absent from Stats", before, after)
+	if after.NaturalPayloads != 0 || after.LivePayloads != before.LivePayloads {
+		t.Fatal("native scratch changed Runtime payload statistics", before, after)
 	}
-	if n.Division[3].Raw != (Block{}) {
-		t.Fatal("inline or obsolete Words counted as actual overflow")
+	if n.Division[3] != nil {
+		t.Fatal("unused add-back workspace allocated")
 	}
 }
 
-func TestNaturalSourceAddbackRefusalAfterQuotientDecrement(t *testing.T) {
+func TestNaturalNativeAddbackUnderRuntimeRefusal(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
 	n, e := NewNaturalManager(arena.VectorConfig{Descriptors: arena.Config{Budget: budget}})
 	if e != nil {
@@ -171,7 +171,7 @@ func TestNaturalSourceAddbackRefusalAfterQuotientDecrement(t *testing.T) {
 	}
 	defer n.Close()
 	// Scale the fixed three-limb subtraction/add-back source fixture by B^12.
-	// u(16), v(15), ms(16) remain inline; only conditional ab(17) allocates.
+	// The conditional add-back requires seventeen limbs of native workspace.
 	var a, d [15]uint32
 	a[12] = 1
 	d[12] = 2
@@ -186,26 +186,11 @@ func TestNaturalSourceAddbackRefusalAfterQuotientDecrement(t *testing.T) {
 	budget.FailAfter(0)
 	_, e = n.Div(a[:], d[:], q[:], r[:])
 	budget.FailAfter(-1)
-	failure, ok := e.(Failure)
-	if !ok || failure.ErrorCode() != 101 || q[0] != 0 {
-		t.Fatal("quotient estimate then decrement must precede real ab allocation", e, q)
+	if e != nil || q[0] != 0 || n.Division[3] == nil || n.RuntimeOwner().Stats().LiveBlocks != 0 || budget.Used() != baseline {
+		t.Fatal("native conditional add-back", e, q)
 	}
-	for _, v := range r {
-		if v != 99 {
-			t.Fatal("remainder published before failed add-back", r)
-		}
-	}
-	for i := uint32(0); i < 16; i++ {
-		want := uint32(0)
-		if i >= 12 {
-			want = ^uint32(0)
-		}
-		if got := n.sourceDivRead(0, i); got != want {
-			t.Fatal("actual modular subtraction prefix", i, got, want)
-		}
-	}
-	if naturalDivisionCapacities(n) != [4]uint32{16, 16, 16, 16} || n.Division[3].size() != 16 || n.RuntimeOwner().Stats().LiveBlocks != 0 || budget.Used() != baseline {
-		t.Fatal("failed source ab first expansion roots", naturalDivisionCapacities(n), n.RuntimeOwner().Stats())
+	if oracle(r[:]).Cmp(oracle(a[:])) != 0 {
+		t.Fatal("add-back remainder", r)
 	}
 	if e = n.CloseChecked(); e != nil {
 		t.Fatal(e)

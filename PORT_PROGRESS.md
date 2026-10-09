@@ -31261,3 +31261,30 @@ caller run exposed one obsolete expectation of verification allocation failure;
 the test now checks successful PN ownership in both profiles, and its focused
 rerun passed. The broad checked polynomial sweep was canceled; no full checked
 polynomial pass is claimed.
+
+## Native MPN Algorithm D workspace
+
+Converted all four persistent division workspaces to reusable `[]uint32`.
+Retained the original arithmetic and lazy conditional add-back. Resize preserves
+the live prefix and clears regrowth; source and owning close release capacity.
+Deleted `SourceLimbBuffer`, its storage/fault tests, buffer receipts and identity,
+primitive buffer policies/hooks, and PN/RAW/MPF/polynomial pending acquisition,
+history and cleanup transport. Actual numeral/RAW/cell lifetime coverage remains.
+The former division-buffer Runtime refusal phases no longer exist; cold and
+warm division work under an armed Runtime allocation refusal. Runtime payload
+statistics and physical-root audits exclude native scratch.
+
+New deterministic ChaCha8 test vectors compare one/many-limb division against
+math/big across varying sizes and normalization shifts. Tests also cover cleared
+scratch regrowth, lazy add-back, release on close and zero warmed allocations.
+
+Validation: full native util (96.70s), full native polynomial (36.34s), AST
+floating-point checks (0.07s), checked/debug division and affected callers
+(util 1.07s, polynomial 0.53s), checked/debug fast-float (29.54s) and targeted
+lifecycle/sexpr checks passed. The final dead pending-buffer predicates and
+Natural source-cause field were pruned after the broad runs started; final
+focused checks, module-wide compilation, affected-package vet and portcheck
+passed for that pruning. No new full-module execution or broad checked
+polynomial sweep was run; the latest full native module checkpoint remains
+19:07–19:12 UTC. Manifest counts remain 2102 units / 677 APIs, with no new
+whole-unit completion credit.

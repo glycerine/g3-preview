@@ -513,10 +513,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		put(v.pending)
 		put(v.old)
 	}
-	for _, s := range z.Naturals().Division {
-		put(s.Raw)
-		put(s.Pending)
-	}
 
 	za := z.SourceAllocator().Stats()
 	ma := util.AllocatorStats{}

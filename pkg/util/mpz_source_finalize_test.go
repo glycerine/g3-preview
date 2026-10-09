@@ -106,18 +106,12 @@ func TestIntegerSourceFinalizeReverseNaturalUnderAllocationLimit(t *testing.T) {
 		t.Fatal(e)
 	}
 	natural := m.Natural
-	var raws [4]Block
 	for i := range natural.Division {
-		if e = natural.Division[i].resize(rt, 40000); e != nil {
+		if e = natural.ResizeDiv(i, 40000); e != nil {
 			t.Fatal(e)
 		}
-		raws[i] = natural.Division[i].Raw
-		if raws[i] == (Block{}) || natural.Division[i].capacity() != 65536 {
-			t.Fatal("real source overflow not established", i)
-		}
 	}
-	// Source synchronize(...,allocating=false) ignores allocation limits.
-	// These real >100000-byte overflow blocks exercise TLS deallocation sync.
+	// Source destruction releases native scratch even with Runtime limits armed.
 	if e = rt.SetMaxCount(1); e != nil {
 		t.Fatal(e)
 	}
@@ -129,12 +123,9 @@ func TestIntegerSourceFinalizeReverseNaturalUnderAllocationLimit(t *testing.T) {
 			t.Fatal("source private cell survived destruction", i)
 		}
 	}
-	for i, raw := range raws {
-		if natural.Division[i].Raw != (Block{}) {
-			t.Fatal("Natural member raw root retained", i)
-		}
-		if _, e = rt.ReadUint32(raw, 0); e == nil {
-			t.Fatal("Natural overflow not physically destroyed", i)
+	for i := range natural.Division {
+		if natural.Division[i] != nil {
+			t.Fatal("scratch retained", i)
 		}
 	}
 	if rt.Stats().LiveBlocks != 1 || rt.State().OutOfMemory {

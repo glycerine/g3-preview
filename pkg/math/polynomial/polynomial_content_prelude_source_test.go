@@ -186,7 +186,7 @@ func TestPolynomialContentPreludeActualFrameAndSavedContextGuards(t *testing.T) 
 	*s = polynomialContentScope{invocation: 2, active: true, executing: true}
 	current := polynomialContentInvocationReceipt{c, s, 2}
 	s.receipt = current
-	if (context.roots(z)) != nil || z.Naturals().DivisionBufferReceipt(context.utility(z), 0) != nil {
+	if (context.roots(z)) != nil {
 		t.Fatal("old saved context retargeted")
 	}
 	if (numericIntegerManager_contentAllocationRoots(z, &current)) != (&s.numeric) {
@@ -198,32 +198,6 @@ func TestPolynomialContentPreludeActualFrameAndSavedContextGuards(t *testing.T) 
 	}
 	s.executing = false
 	serviceMust(t, c.cleanupContentInvocation(&current, true))
-}
-
-func TestPolynomialContentPreludeNilParentBufferGuard(t *testing.T) {
-	full := polynomialPSCFullFixture(t)
-	r := polynomialContentInvocationReceipt{}
-	context := integerAllocationInvocationContext{content: &r, contentInvocation: 1}
-	if full.core.integer.Naturals().DivisionBufferReceipt(context.utility(full.core.integer), 0) != nil {
-		t.Fatal("absent parent acquired buffer")
-	}
-	// Invalid Go metadata: even a matching embedded buffer cannot acquire
-	// authority if its actual core's Integer owner is absent.
-	c, z := full.core, full.core.integer
-	s := &c.contentLocal
-	*s = polynomialContentScope{invocation: 1, active: true, executing: true}
-	r = polynomialContentInvocationReceipt{c, s, 1}
-	s.buffers[0] = util.NaturalBufferReceipt{Owner: z.Naturals(), Invocation: 1, Buffer: &z.Naturals().Division[0]}
-	s.numeric.caller = context
-	s.numeric.integer = z
-	s.numeric.hooks.Policy = &s.numeric
-	s.buffers[0].Caller = &s.numeric.hooks
-	s.buffers[0].CallerSelf = &s.buffers[0]
-	defer func() { c.integer = z; s.executing = false; serviceMust(t, c.CleanupIntegerContent()) }()
-	c.integer = nil
-	if s.buffers[0].Bound(false) {
-		t.Fatal("absent Integer owner bound private buffer")
-	}
 }
 
 // Signed-host TLS owner-primitive domain: actual GCD output precedes its RAW

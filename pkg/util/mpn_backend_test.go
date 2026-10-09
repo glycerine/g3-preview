@@ -2,7 +2,6 @@
 package util
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -19,13 +18,9 @@ func TestNaturalMandatoryInlineConstructorAndRuntime(t *testing.T) {
 		t.Fatal("inline construction allocated division payload")
 	}
 	for i := range n.Division {
-		s := &n.Division[i]
-		if s.capacity() != 16 || s.size() != 0 || s.Raw != (Block{}) || s.Pending != (Block{}) {
-			t.Fatal("source inline constructor", i, s)
+		if n.Division[i] != nil {
+			t.Fatal("eager division scratch", i)
 		}
-	}
-	if e = arena.ValidateRecordType(reflect.TypeOf(n.Division[0])); e != nil {
-		t.Fatal(e)
 	}
 	if e = n.CloseChecked(); e != nil {
 		t.Fatal(e)
@@ -62,23 +57,21 @@ func TestNaturalMandatoryActualOverflowAndShrink(t *testing.T) {
 	if e = n.ResizeDiv(0, 17); e != nil {
 		t.Fatal(e)
 	}
-	s := &n.Division[0]
-	if s.capacity() != 32 || s.size() != 17 || r.Stats().LiveBlocks != 1 || r.Stats().PhysicalBytes != 128+uint64(r.SizeTBits()/8) {
-		t.Fatal("source 16->32 actual backing", s, r.Stats())
+	if len(n.Division[0]) != 17 || r.Stats().LiveBlocks != 0 {
+		t.Fatal("native division workspace")
 	}
-	for i := uint32(0); i < 17; i++ {
-		if v, e := s.read(r, i); e != nil || v != 0 {
-			t.Fatal("source resize initializes only pushed elements", i, v, e)
+	for _, v := range n.Division[0] {
+		if v != 0 {
+			t.Fatal("new scratch not zeroed")
 		}
 	}
-	raw := s.Raw
-	before := r.Stats()
-	charge := b.Used()
+	backing := &n.Division[0][0]
+	before, charge := r.Stats(), b.Used()
 	if e = n.ResizeDiv(0, 4); e != nil {
 		t.Fatal(e)
 	}
-	if s.Raw != raw || s.capacity() != 32 || s.size() != 4 || r.Stats() != before || b.Used() != charge {
-		t.Fatal("shrink changed actual source backing")
+	if &n.Division[0][0] != backing || len(n.Division[0]) != 4 || r.Stats() != before || b.Used() != charge {
+		t.Fatal("shrink changed workspace")
 	}
 	if e = n.CloseChecked(); e != nil {
 		t.Fatal(e)
@@ -90,7 +83,7 @@ func TestNaturalMandatoryActualOverflowAndShrink(t *testing.T) {
 
 func naturalDivisionCapacities(m *NaturalManager) (capacities [4]uint32) {
 	for i := range m.Division {
-		capacities[i] = m.Division[i].capacity()
+		capacities[i] = uint32(cap(m.Division[i]))
 	}
 	return
 }

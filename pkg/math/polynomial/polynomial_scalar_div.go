@@ -10,7 +10,6 @@ type polynomialScalarDivScope struct {
 	returned                 Polynomial
 	active, ended, executing bool
 	normalize                util.IntegerNormalizeInvocationReceipt
-	buffers                  [4]util.NaturalBufferReceipt
 
 	transport              util.Int
 	transportBuffer        *polynomialSOM
@@ -112,11 +111,7 @@ func (m *MultivariatePolynomialCore) cleanupScalarDivPhase(abort bool) error {
 		if e := s.extended.Cleanup(true); e != nil {
 			return e
 		}
-		for i := len(s.buffers) - 1; i >= 0; i-- {
-			if e := s.buffers[i].Cleanup(); e != nil {
-				return e
-			}
-		}
+
 		if s.returned != (Polynomial{}) {
 			if e := m.CleanupValue(&s.returned); e != nil {
 				return e
@@ -202,10 +197,6 @@ func (s *polynomialScalarDivScope) directPending(m *MultivariatePolynomialCore) 
 	if s.transportBound || polynomialNegNumericPending(&s.numeric) || s.division.Active() || s.extended.Active() || m.modular.MatchesPNormalizeInvocation(&s.normalize) {
 		return true
 	}
-	for i := range s.buffers {
-		if s.buffers[i].Pending() != (util.Block{}) {
-			return true
-		}
-	}
+
 	return false
 }

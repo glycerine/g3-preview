@@ -376,14 +376,8 @@ func TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse(t *testin
 	if old.roots(m) != nil {
 		t.Fatal("old context silently followed reused embedded receipt")
 	}
-	if m.Natural.DivisionBufferReceipt(old, 0) != nil {
-		t.Fatal("old context acquired Natural buffer binding")
-	}
 	if current.roots(m) == nil {
 		t.Fatal("new actual context absent")
-	}
-	if b := m.Natural.DivisionBufferReceipt(current, 0); b == nil || !b.Bound(true) {
-		t.Fatal("actual new Natural member binding absent")
 	}
 
 	integerPhysicalAudit(t, m)

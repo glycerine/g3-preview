@@ -20,7 +20,6 @@ type upolyRootUpperBoundScope struct {
 	numeric                  polynomialNumericRoots
 	normalize                util.IntegerNormalizeInvocationReceipt
 	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
-	buffers                  [4]util.NaturalBufferReceipt
 
 	sourceRemaining, ownRemaining            uint8
 	active, executing, finishing, ownStarted bool
@@ -38,7 +37,6 @@ type upolyRootUpperBoundHistory struct {
 	normalize                util.IntegerNormalizeInvocationReceipt
 	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
 
-	buffers                          [4]upolyRootUpperBufferHistory
 	bodyCause, sourceCause, ownCause error
 	sourceRemaining                  uint8
 }
@@ -84,9 +82,6 @@ func (q *upolyRootUpperBoundScope) updateHistory() {
 		h.divisionRaw = q.divisionRaw
 		h.extendedRaw = q.extendedRaw
 
-		for i, r := range q.buffers {
-			h.buffers[i] = r.Identity()
-		}
 		h.bodyCause = q.bodyCause
 		h.sourceCause = q.sourceCause
 		h.ownCause = q.ownCause
@@ -96,7 +91,7 @@ func (q *upolyRootUpperBoundScope) updateHistory() {
 func (q *upolyRootUpperBoundScope) pending() bool {
 	z := q.owner.config.Integer
 	mm := q.owner.modular
-	return q.sourceRemaining != 0 || polynomialNegNumericPending(&q.numeric) || mm.MatchesPNormalizeInvocation(&q.normalize) || z.MatchesRawInvocation(&q.divisionRaw) || z.MatchesRawInvocation(&q.extendedRaw) || q.pendingBuffers()
+	return q.sourceRemaining != 0 || polynomialNegNumericPending(&q.numeric) || mm.MatchesPNormalizeInvocation(&q.normalize) || z.MatchesRawInvocation(&q.divisionRaw) || z.MatchesRawInvocation(&q.extendedRaw)
 }
 func (q *upolyRootUpperBoundScope) finish(body error) error {
 	if q.owner == nil || q.owner.self != q.owner || q != &q.owner.rootUpperBound || q.executing || q.finishing {
@@ -232,18 +227,8 @@ func (m *UPolynomialManager) beginRootUpperBound() (*upolyRootUpperBoundScope, e
 	return q, nil
 }
 
-type upolyRootUpperBufferHistory = util.NaturalBufferIdentity
-
 func (q *upolyRootUpperBoundScope) matches() bool {
 	return q != nil && q.owner != nil && q.owner.self == q.owner && q == &q.owner.rootUpperBound && q.invocation != 0 && (q.history == nil || (q.history.owner == q.owner && q.history.frame == q && q.history.invocation == q.invocation))
-}
-func (q *upolyRootUpperBoundScope) pendingBuffers() bool {
-	for _, r := range q.buffers {
-		if r.Pending() != (util.Block{}) {
-			return true
-		}
-	}
-	return false
 }
 func (q *upolyRootUpperBoundScope) numericChildCause() error {
 	z := q.owner.config.Integer
@@ -262,13 +247,6 @@ func (q *upolyRootUpperBoundScope) cleanupNumericChildren(abort bool) error {
 		}
 	}
 
-	if abort {
-		for i := len(q.buffers) - 1; i >= 0; i-- {
-			if e := q.buffers[i].Cleanup(); e != nil {
-				return e
-			}
-		}
-	}
 	return nil
 }
 func (c integerAllocationInvocationContext) recordRootUpperRaw(z *util.IntegerManager, r *util.IntegerRawInvocationReceipt) {

@@ -28,7 +28,6 @@ type ArbitraryFloatFormatInvocation struct {
 	cellRetired                                   bool
 	Transferred                                   SmallAllocatorPendingAllocation
 	gcd, division, extended                       integerRawInvocationReceipt
-	buffers                                       [4]naturalPNBufferReceipt
 
 	Decimal                          rationalDecimalScope
 	bodyCause, sourceCause, ownCause error

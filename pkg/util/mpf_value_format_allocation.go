@@ -62,11 +62,7 @@ func (m *ArbitraryFloatManager) cleanupFormatChildren(s *ArbitraryFloatFormatInv
 	}
 
 	if abort {
-		for i := len(s.buffers) - 1; i >= 0; i-- {
-			if e := s.buffers[i].cleanup(); e != nil {
-				return e
-			}
-		}
+
 		return z.cleanupFormatAllocation(&s.Numeric, &s.Transferred, &s.cellRetired)
 	}
 	return nil

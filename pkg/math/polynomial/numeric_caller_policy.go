@@ -5,113 +5,102 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// bufferOwner validates the saved higher invocation without requiring it to
-// execute. Pending primitive buffers remain releasable after the source body.
-func (r *polynomialNumericRoots) bufferOwner() (*[4]util.NaturalBufferReceipt, uint64) {
+// invocationBound validates the saved higher invocation without requiring it
+// to execute. Actual numeral receipts remain releasable after the source body.
+func (r *polynomialNumericRoots) invocationBound() bool {
 	if r == nil || r.integer == nil || !r.integer.ValidOwner() {
-		return nil, 0
+		return false
 	}
 	c, z := r.caller, r.integer
 	if q := c.factorFrontend; q != nil {
 		if !(c.factorFrontendHistoryFrame(z) == q) || q.service.manager.config.Integer != r.integer || q.invocation == 0 || q.invocation != c.factorFrontendInvocation || &q.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.buffers, q.invocation
+		return true
 	}
 	if q := c.rootUpperBound; q != nil {
 		if !(q.matches()) || q.owner.config.Integer != r.integer || q.invocation == 0 || q.invocation != c.rootUpperBoundInvocation || &q.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.buffers, q.invocation
+		return true
 	}
 	if q := c.removeOneHalfRoot; q != nil {
 		if !(q.matches()) || q.owner.config.Integer != r.integer || q.invocation == 0 || q.invocation != c.removeOneHalfRootInvocation || &q.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.buffers, q.invocation
+		return true
 	}
 	if q := c.primePreparation; q != nil {
 		if !(q.matches()) || q.owner.manager.config.Integer != r.integer || q.invocation == 0 || q.invocation != c.primePreparationInvocation || &q.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.buffers, q.invocation
+		return true
 	}
 	if q := c.recombination; q != nil {
 		if !(q.matches()) || q.owner.manager.config.Integer != r.integer || q.invocation == 0 || q.invocation != c.recombinationInvocation || &q.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.buffers, q.invocation
+		return true
 	}
 	if q := c.henselCaller; q != nil {
 		if !(q.matches()) || q.owner.manager.config.Integer != r.integer || q.invocation == 0 || q.invocation != c.henselCallerInvocation || &q.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.buffers, q.invocation
+		return true
 	}
 	if q := c.henselPair; q != nil {
 		if !(q.service != nil && q.service.matchesHenselPairInvocation(q)) || q.service.manager.config.Integer != r.integer || q.invocation == 0 || q.invocation != c.henselPairInvocation || &q.frame.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.frame.buffers, q.invocation
+		return true
 	}
 	if q := c.divides; q != nil {
 		if !(q.core != nil && q.core.self == q.core && q.core.matchesDividesInvocation(q)) || q.core.integer != r.integer || q.invocation == 0 || q.invocation != c.dividesInvocation || &q.frame.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.frame.buffers, q.invocation
+		return true
 	}
 	if q := c.scalarExact; q != nil {
 		if !(q.core != nil && q.core.self == q.core && q.core.matchesScalarExactDivInvocation(q)) || q.core.integer != r.integer || q.invocation == 0 || q.invocation != c.scalarExactInvocation || &q.frame.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.frame.buffers, q.invocation
+		return true
 	}
 	if q := c.exactDiv; q != nil {
 		if !(q.core != nil && q.core.self == q.core && q.core.matchesExactDivInvocation(q)) || q.core.integer != r.integer || q.invocation == 0 || q.invocation != c.exactDivInvocation || &q.frame.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.frame.buffers, q.invocation
+		return true
 	}
 	if q := c.somNormalize; q != nil {
 		if !(q.manager != nil && q.manager.hasSOMNormalizeInvocationHistory(q) && q.frame.active) || q.manager.integer != r.integer || q.invocation == 0 || q.invocation != c.somNormalizeInvocation || &q.buffer.gcdNumeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.frame.buffers, q.invocation
+		return true
 	}
 	if q := c.normalization; q != nil {
 		if !(q.manager != nil && q.manager.hasNormalizeInvocationHistory(q) && q.frame.active) || q.manager.core.integer != r.integer || q.invocation == 0 || q.invocation != c.normalizationInvocation || &q.frame.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.frame.buffers, q.invocation
+		return true
 	}
 	if q := c.content; q != nil {
 		if !(q.manager != nil && q.manager.matchesContentInvocation(q)) || q.manager.integer != r.integer || q.invocation == 0 || q.invocation != c.contentInvocation || &q.frame.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.frame.buffers, q.invocation
+		return true
 	}
 	if q := c.scalarDiv; q != nil {
 		if !(q.manager != nil && q.manager.self == q.manager && q.manager.matchesScalarDivInvocation(q)) || q.manager.integer != r.integer || q.invocation == 0 || q.invocation != c.scalarDiv.invocation || &q.frame.numeric != r {
-			return nil, 0
+			return false
 		}
-		return &q.frame.buffers, q.invocation
+		return true
 	}
-	return nil, 0
+	return false
 }
 func (r *polynomialNumericRoots) NumericBound(executing bool) bool {
-	buffers, _ := r.bufferOwner()
-	return buffers != nil && (!executing || r.caller.roots(r.integer) == r)
-}
-func (r *polynomialNumericRoots) NumericBuffer(n *util.NaturalManager, index int) *util.NaturalBufferReceipt {
-	if !r.NumericBound(true) || r.integer.Naturals() != n || index < 0 || index >= 4 {
-		return nil
-	}
-	buffers, inv := r.bufferOwner()
-	b := &buffers[index]
-	if n.BindCallerBuffer(b, index, inv, &r.hooks) != nil {
-		return nil
-	}
-	return b
+	valid := r.invocationBound()
+	return valid && (!executing || r.caller.roots(r.integer) == r)
 }
 
 func (r *polynomialNumericRoots) NumericPrepare(z *util.IntegerManager, phase string) error {
@@ -203,11 +192,6 @@ func (r *polynomialNumericRoots) NumericRecord(z *util.IntegerManager, event str
 		c.recordNormalizationRaw(z, raw)
 		c.recordSOMNormalizationRaw(z, raw)
 	}
-}
-
-func (r *polynomialNumericRoots) NumericBufferEnabled() bool {
-	buffers, _ := r.bufferOwner()
-	return buffers != nil
 }
 
 func (r *polynomialNumericRoots) NumericScalarRawEnabled() bool {

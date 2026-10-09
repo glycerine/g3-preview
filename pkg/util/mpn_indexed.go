@@ -11,8 +11,6 @@ import (
 // No view is persisted in a manager or exposes an arena backing slice.
 type limbView struct {
 	external  []uint32
-	runtime   *Runtime
-	source    *SourceLimbBuffer
 	allocator *SmallAllocator
 	backing   SourceCellBacking
 	size      uint32
@@ -21,13 +19,6 @@ type limbView struct {
 func (v limbView) read(i uint32) uint32 {
 	if i >= v.size {
 		panic(arena.ErrBounds)
-	}
-	if v.source != nil {
-		n, e := v.source.read(v.runtime, i)
-		if e != nil {
-			panic(e)
-		}
-		return n
 	}
 	if v.allocator != nil {
 		n, e := v.backing.ReadWord(v.allocator, 8+4*uint64(i))
@@ -42,12 +33,6 @@ func (v limbView) write(i, n uint32) {
 	if i >= v.size {
 		panic(arena.ErrBounds)
 	}
-	if v.source != nil {
-		if e := v.source.write(v.runtime, i, n); e != nil {
-			panic(e)
-		}
-		return
-	}
 	if v.allocator != nil {
 		if e := v.backing.writeWord(v.allocator, 8+4*uint64(i), n); e != nil {
 			panic(e)
@@ -61,8 +46,8 @@ func (v limbView) write(i, n uint32) {
 // panic. len(a)>=len(b), the denominator is normalized/nonzero, q has
 // len(a)-len(b)+1 limbs, and r has len(b). Neither output overlaps an input
 // or the other output. The integer manager stages its own permitted aliases.
-// Division scratch preserves source allocation order. Checked verification
-// uses a reusable native slice after quotient and remainder publication.
+// Division and checked verification use reusable native slices. The source
+// arithmetic and quotient/remainder publication order are preserved.
 func (m *NaturalManager) Div(a, b, q, r []uint32) (bool, error) {
 	if len(b) == 0 || len(a) < len(b) || b[len(b)-1] == 0 || len(q) != len(a)-len(b)+1 || len(r) != len(b) {
 		panic("mpnum: invalid division operands or buffers")
@@ -75,12 +60,6 @@ func (m *NaturalManager) Div(a, b, q, r []uint32) (bool, error) {
 
 // divide is shared source Algorithm D over concrete ephemeral limb views.
 func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
-	return m.divideWithPNReceipt(a, b, q, r, nil)
-}
-func (m *NaturalManager) divideWithPNReceipt(a, b, q, r limbView, pn *integerPNormalizeScope) (bool, error) {
-	return m.divideWithAllocationContext(a, b, q, r, pnAllocationContext(pn))
-}
-func (m *NaturalManager) divideWithAllocationContext(a, b, q, r limbView, context integerAllocationInvocationContext) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
@@ -130,10 +109,10 @@ func (m *NaturalManager) divideWithAllocationContext(a, b, q, r limbView, contex
 	for b.read(nb-1)<<d&0x80000000 == 0 {
 		d++
 	}
-	if e := m.resizeDivWithAllocationContext(0, na+1, context); e != nil {
+	if e := m.ResizeDiv(0, na+1); e != nil {
 		return false, e
 	}
-	if e := m.resizeDivWithAllocationContext(1, nb, context); e != nil {
+	if e := m.ResizeDiv(1, nb); e != nil {
 		return false, e
 	}
 	u, v := 0, 1
@@ -157,9 +136,9 @@ func (m *NaturalManager) divideWithAllocationContext(a, b, q, r limbView, contex
 		m.sourceDivWrite(v, 0, b.read(0)<<d)
 	}
 	if nb == 1 {
-		divideViewOne(limbView{runtime: m.runtime, source: &m.Division[u], size: na + 1}, m.sourceDivRead(v, 0), q)
+		divideViewOne(limbView{external: m.Division[u], size: na + 1}, m.sourceDivRead(v, 0), q)
 	} else {
-		if e := m.divideManyWithAllocationContext(na+1, nb, q, context); e != nil {
+		if e := m.divideMany(na+1, nb, q); e != nil {
 			return false, e
 		}
 	}
@@ -199,16 +178,10 @@ func divideViewOne(a limbView, b uint32, q limbView) {
 // divideMany is source Knuth Algorithm D, including estimate correction,
 // single-limb multiplication, modular subtraction, and conditional add-back.
 func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
-	return m.divideManyWithPNReceipt(size, n, q, nil)
-}
-func (m *NaturalManager) divideManyWithPNReceipt(size, n uint32, q limbView, pn *integerPNormalizeScope) error {
-	return m.divideManyWithAllocationContext(size, n, q, pnAllocationContext(pn))
-}
-func (m *NaturalManager) divideManyWithAllocationContext(size, n uint32, q limbView, context integerAllocationInvocationContext) error {
 	if n > math.MaxUint32-2 {
 		return arena.ErrBounds
 	}
-	if e := m.resizeDivWithAllocationContext(2, n+1, context); e != nil {
+	if e := m.ResizeDiv(2, n+1); e != nil {
 		return e
 	}
 	u, v, ms := 0, 1, 2
@@ -261,7 +234,7 @@ func (m *NaturalManager) divideManyWithAllocationContext(size, n uint32, q limbV
 		q.write(j, small)
 		if borrow != 0 {
 			q.write(j, small-1)
-			if e := m.resizeDivWithAllocationContext(3, n+2, context); e != nil {
+			if e := m.ResizeDiv(3, n+2); e != nil {
 				return e
 			}
 			ab := 3

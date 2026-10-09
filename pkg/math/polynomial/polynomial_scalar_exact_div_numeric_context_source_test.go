@@ -64,23 +64,12 @@ func TestScalarExactDivNumericActualFrameAndImmutableContext(t *testing.T) {
 		t.Fatal("actual RAW child not acquired")
 	}
 	serviceMust(t, c.integer.CleanupRawInvocation(&s.divisionRaw, true))
-	bound := c.integer.Naturals().DivisionBufferReceipt(context.utility(c.integer), 0)
-	if bound == nil || !bound.Bound(true) {
-		t.Fatal("actual Natural member binding absent")
-	}
-	copiedBuffer := *bound
-	if copiedBuffer.Bound(true) || copiedBuffer.Bound(false) {
-		t.Fatal("copied Natural receipt accepted")
-	}
 	// Embedded direct receipt may be rewritten only by a new actual invocation;
 	// an earlier captured context must retain its old immutable generation.
 	s.scalarReceipt = r
 	old := numericIntegerModularManager_scalarExactAllocationContext(c.modular, &s.scalarReceipt)
 	s.invocation = 2
 	s.scalarReceipt.invocation = 2
-	if bound.Bound(true) || bound.Bound(false) {
-		t.Fatal("old Natural receipt retargeted")
-	}
 	if (old.roots(c.integer)) != nil {
 		t.Fatal("old context retargeted")
 	}

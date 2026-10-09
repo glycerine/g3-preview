@@ -452,7 +452,7 @@ func (s *RationalService) Stats() (RationalServiceStats, error) {
 	}
 	defer s.mu.Unlock()
 	z := s.Manager.Z
-	stats := RationalServiceStats{CacheLength: uint32(len(s.Cache)), CacheCapacity: uint32(cap(s.Cache)), HeaderBytes: s.HeaderBytes, LiveCells: z.Cells.Stats().Live, NaturalPayloads: z.Natural.overflowPayloads()}
+	stats := RationalServiceStats{CacheLength: uint32(len(s.Cache)), CacheCapacity: uint32(cap(s.Cache)), HeaderBytes: s.HeaderBytes, LiveCells: z.Cells.Stats().Live}
 	for n := uint64(1); n <= uint64(z.Cells.Stats().Slots); n++ {
 		c, e := z.Cells.Read(arena.Slot(n))
 		if e != nil {

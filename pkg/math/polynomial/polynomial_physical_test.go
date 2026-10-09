@@ -172,10 +172,6 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 		put(v.pending)
 		put(v.old)
 	}
-	for _, s := range z.Naturals().Division {
-		put(s.Raw)
-		put(s.Pending)
-	}
 
 	za, ma := z.SourceAllocator().Stats(), mm.allocator.Stats()
 	if uint32(len(raw))+za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {

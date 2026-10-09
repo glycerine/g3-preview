@@ -96,14 +96,6 @@ func TestIntegerDividesScopedNUMCopiedAndRetargetedContextsRefuse(t *testing.T) 
 	if old.roots(m) != &r.Frame.Numeric {
 		t.Fatal("current actual scoped invocation")
 	}
-	buffer := m.Natural.DivisionBufferReceipt(old, 0)
-	if buffer == nil || !buffer.Bound(true) {
-		t.Fatal("current actual Natural member binding")
-	}
-	copyBuffer := *buffer
-	if copyBuffer.Bound(true) || copyBuffer.Bound(false) {
-		t.Fatal("copied buffer has no authority")
-	}
 	copyFrame := *r.Frame
 	copied := integerDividesNumeralInvocationReceipt{m, &copyFrame, r.Invocation}
 	before := r.Frame.Numeral
@@ -122,7 +114,7 @@ func TestIntegerDividesScopedNUMCopiedAndRetargetedContextsRefuse(t *testing.T) 
 	next, e := m.BeginDividesNumeralInvocation(integerAllocationInvocationContext{})
 	serviceMust(t, e)
 	current := integerAllocationInvocationContext{BoolDivides: next, BoolDividesInvocation: next.Invocation}
-	if old.BoolDivides != current.BoolDivides || old.BoolDividesInvocation == current.BoolDividesInvocation || old.roots(m) != nil || m.Natural.DivisionBufferReceipt(old, 0) != nil || current.roots(m) != &next.Frame.Numeric {
+	if old.BoolDivides != current.BoolDivides || old.BoolDividesInvocation == current.BoolDividesInvocation || old.roots(m) != nil || current.roots(m) != &next.Frame.Numeric {
 		t.Fatal("saved embedded pointer retargeted invocation")
 	}
 	next.Frame.Executing = false
@@ -226,11 +218,7 @@ func TestIntegerDividesScopedNUMEveryActualRemPrefix(t *testing.T) {
 				t.Fatal("actual pending leaf missing scoped NUM tuple", prefix)
 			}
 		}
-		for i := range s.Buffers {
-			if s.Buffers[i].PendingField != m.Natural.Division[i].Pending && m.Natural.Division[i].Pending != (naturalPNBufferReceipt{}).PendingField {
-				t.Fatal("actual Rem shared-buffer pending missing child", prefix, i)
-			}
-		}
+
 		budget.FailAfter(-1)
 		serviceMust(t, m.CleanupDividesNumeralInvocation(&s.Receipt, false))
 		serviceMust(t, m.CleanupDividesNumeralInvocation(&s.Receipt, true))

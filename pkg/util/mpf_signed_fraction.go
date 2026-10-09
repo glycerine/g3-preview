@@ -67,7 +67,6 @@ type arbitraryFloatSignedFractionScope struct {
 	hooks                                            NumericInvocationHooks
 	numeric                                          NumericAllocationRoots
 	gcd, division                                    integerRawInvocationReceipt
-	buffers                                          [4]NaturalBufferReceipt
 
 	integerBinding, naturalBinding NumericCallerBinding
 	active, executing, finishing   bool
@@ -103,15 +102,6 @@ func (s *arbitraryFloatSignedFractionScope) NumericRecord(z *IntegerManager, eve
 		s.division = *r.Raw
 	}
 }
-func (s *arbitraryFloatSignedFractionScope) NumericBuffer(n *NaturalManager, index int) *NaturalBufferReceipt {
-	if !s.NumericBound(true) || n != s.manager.integer.Natural || index < 0 || index >= len(s.buffers) {
-		return nil
-	}
-	if e := n.BindCallerBuffer(&s.buffers[index], index, s.invocation, &s.hooks); e != nil {
-		return nil
-	}
-	return &s.buffers[index]
-}
 
 func (s *arbitraryFloatSignedFractionScope) bind() error {
 	z := s.manager.integer
@@ -135,11 +125,7 @@ func (s *arbitraryFloatSignedFractionScope) cleanupNormalization() error {
 	if e := z.CleanupRawInvocation(&s.gcd, true); e != nil {
 		return e
 	}
-	for i := len(s.buffers) - 1; i >= 0; i-- {
-		if e := s.buffers[i].Cleanup(); e != nil {
-			return e
-		}
-	}
+
 	return s.numeric.Cleanup(z)
 }
 func (s *arbitraryFloatSignedFractionScope) childSource() error {

@@ -252,6 +252,6 @@ func (m *IntegerManager) divideCellsWithPNReceipt(a, b NumericCellRef, pn *integ
 func (m *IntegerManager) divideCellsWithAllocationContext(a, b NumericCellRef, context integerAllocationInvocationContext) error {
 	ca, cb := m.Cell(a), m.Cell(b)
 	cq, cr := m.Cell(m.Tmp[0]), m.Cell(m.Tmp[1])
-	_, e := m.Natural.divideWithAllocationContext(limbView{allocator: m.Allocator, backing: ca.Backing, size: ca.Size}, limbView{allocator: m.Allocator, backing: cb.Backing, size: cb.Size}, limbView{allocator: m.Allocator, backing: cq.Backing, size: cq.span}, limbView{allocator: m.Allocator, backing: cr.Backing, size: cr.span}, context)
+	_, e := m.Natural.divide(limbView{allocator: m.Allocator, backing: ca.Backing, size: ca.Size}, limbView{allocator: m.Allocator, backing: cb.Backing, size: cb.Size}, limbView{allocator: m.Allocator, backing: cq.Backing, size: cq.span}, limbView{allocator: m.Allocator, backing: cr.Backing, size: cr.span})
 	return e
 }

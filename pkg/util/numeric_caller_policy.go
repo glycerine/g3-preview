@@ -18,9 +18,6 @@ type NumericCallerPreparePolicy interface {
 type NumericCallerRecordPolicy interface {
 	NumericRecord(*IntegerManager, string, NumericInvocationReceipt)
 }
-type NumericCallerBufferPolicy interface {
-	NumericBuffer(*NaturalManager, int) *NaturalBufferReceipt
-}
 
 type NumericCallerScalarPolicy interface {
 	NumericScalarRaw(*IntegerManager, string) (*IntegerScalarRawScope, error)
@@ -62,16 +59,6 @@ func (h *NumericInvocationHooks) callRecord(m *IntegerManager, event string, r N
 	if h.Record != nil {
 		h.Record(m, event, r)
 	}
-}
-func (h *NumericInvocationHooks) hasBuffer() bool {
-	_, ok := h.Policy.(NumericCallerBufferPolicy)
-	return ok && h.bufferEnabled() || h.Buffer != nil
-}
-func (h *NumericInvocationHooks) callBuffer(m *NaturalManager, i int) *NaturalBufferReceipt {
-	if p, ok := h.Policy.(NumericCallerBufferPolicy); ok && h.bufferEnabled() {
-		return p.NumericBuffer(m, i)
-	}
-	return h.Buffer(m, i)
 }
 
 func (h *NumericInvocationHooks) hasScalarRaw() bool {
@@ -118,16 +105,8 @@ func (h *NumericInvocationHooks) callSourceCause(m *IntegerManager) error {
 
 // Optional capability predicates select only reached caller specializations.
 // Other calls retain the primitive implementation's ordinary lexical scopes.
-type NumericCallerBufferEnabledPolicy interface{ NumericBufferEnabled() bool }
 
 type NumericCallerScalarEnabledPolicy interface{ NumericScalarRawEnabled() bool }
-
-func (h *NumericInvocationHooks) bufferEnabled() bool {
-	if p, ok := h.Policy.(NumericCallerBufferEnabledPolicy); ok {
-		return p.NumericBufferEnabled()
-	}
-	return true
-}
 
 func (h *NumericInvocationHooks) scalarEnabled() bool {
 	if p, ok := h.Policy.(NumericCallerScalarEnabledPolicy); ok {

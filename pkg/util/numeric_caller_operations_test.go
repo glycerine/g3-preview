@@ -18,8 +18,6 @@ func TestNumericCallerDivisionUsesCallerStorageAndRejectsExpiredOwner(t *testing
 	var roots NumericAllocationRoots
 	var raw IntegerScalarRawScope
 	var h *NumericInvocationHooks
-	var buffers [4]NaturalBufferReceipt
-	bufferCalls := 0
 	h = &NumericInvocationHooks{
 		Roots: func(owner *IntegerManager, local *NumericAllocationRoots) *NumericAllocationRoots {
 			if owner != m || generation != expected || !active {
@@ -37,14 +35,6 @@ func TestNumericCallerDivisionUsesCallerStorageAndRejectsExpiredOwner(t *testing
 			}
 			return &raw, nil
 		},
-	}
-	h.Buffer = func(owner *NaturalManager, index int) *NaturalBufferReceipt {
-		if owner != m.Natural {
-			t.Fatal("foreign buffer owner")
-		}
-		serviceMust(t, owner.BindCallerBuffer(&buffers[index], index, generation, h))
-		bufferCalls++
-		return &buffers[index]
 	}
 
 	serviceMust(t, m.SetCallerExecutionGuard(func() bool { return active }))
@@ -65,12 +55,7 @@ func TestNumericCallerDivisionUsesCallerStorageAndRejectsExpiredOwner(t *testing
 		t.Fatal("copied caller storage accepted", e)
 	}
 	serviceMust(t, raw.Cleanup(true))
-	for i := range buffers {
-		serviceMust(t, buffers[i].Cleanup())
-	}
-	if bufferCalls == 0 {
-		t.Fatal("caller buffers/verification bypassed", bufferCalls)
-	}
+
 	before := integerString(t, m, &out)
 	generation++
 	if e := ops.SetInt64(&out, 7); !errors.Is(e, ErrNumericOwner) {

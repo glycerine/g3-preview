@@ -15,23 +15,23 @@ type arbitraryFloatRationalSetHistory struct {
 	plainInvocation                                 uint64
 	plainBodyCause, plainSourceCause, plainOwnCause error
 	plainExpFinished                                bool
-	naturalOriginal                                 [4]Block
-	issued                                          ArbitraryFloatRationalSetReceipt
-	gcd, division, extended                         integerRawInvocationReceipt
-	roundChild                                      ArbitraryFloatRoundReceipt
-	roundFrame                                      *ArbitraryFloatRoundScope
-	roundInvocation                                 uint64
-	Self                                            *arbitraryFloatRationalSetHistory
-	Manager                                         *ArbitraryFloatManager
-	Next                                            *arbitraryFloatRationalSetHistory
-	Invocation, header                              uint64
-	Numeric                                         NumericAllocationRoots
-	Transferred                                     SmallAllocatorPendingAllocation
-	cellRetired, owned                              bool
-	originalCell                                    SourceCellBacking
-	originalPending                                 Block
-	prevSourceCause                                 error
-	bodyCause, sourceCause, ownCause                error
+
+	issued                           ArbitraryFloatRationalSetReceipt
+	gcd, division, extended          integerRawInvocationReceipt
+	roundChild                       ArbitraryFloatRoundReceipt
+	roundFrame                       *ArbitraryFloatRoundScope
+	roundInvocation                  uint64
+	Self                             *arbitraryFloatRationalSetHistory
+	Manager                          *ArbitraryFloatManager
+	Next                             *arbitraryFloatRationalSetHistory
+	Invocation, header               uint64
+	Numeric                          NumericAllocationRoots
+	Transferred                      SmallAllocatorPendingAllocation
+	cellRetired, owned               bool
+	originalCell                     SourceCellBacking
+	originalPending                  Block
+	prevSourceCause                  error
+	bodyCause, sourceCause, ownCause error
 }
 
 func (s *arbitraryFloatRationalSetScope) allocationContext() integerAllocationInvocationContext {
@@ -156,13 +156,6 @@ func (m *ArbitraryFloatManager) cleanupRationalSetChildren(s *arbitraryFloatRati
 		return e
 	}
 
-	if abort {
-		for i := len(s.buffers) - 1; i >= 0; i-- {
-			if e := s.buffers[i].cleanup(); e != nil {
-				return e
-			}
-		}
-	}
 	if e := m.integer.CleanupRawInvocation(&s.extended, abort); e != nil {
 		return e
 	}

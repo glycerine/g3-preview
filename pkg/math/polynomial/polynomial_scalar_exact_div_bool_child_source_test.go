@@ -75,18 +75,6 @@ func TestPolynomialScalarExactDivCompiledAssertionBIGRefusalPrefixes(t *testing.
 			}
 		}
 
-		for i := range child.Buffers {
-			r := &child.Buffers[i]
-			if r.PendingField != (util.Block{}) {
-				if !r.Bound(false) || r.Buffer.Pending != r.PendingField || r.BoolDivides != s.boolNumeral {
-					t.Fatal("actual failed remainder buffer ownership", prefix, i)
-				}
-				copied := *r
-				if copied.Bound(false) {
-					t.Fatal("copied buffer gained cleanup authority", prefix, i)
-				}
-			}
-		}
 		if !errors.Is(body, ErrPolynomialAssertion) && !numericPhysicalReservationRefusal(body) {
 			t.Fatal("actual refusal or source assertion required", prefix, body)
 		}

@@ -73,7 +73,6 @@ type polynomialExactDivisionScope struct {
 	numeric                  polynomialNumericRoots
 	normalize                util.IntegerNormalizeInvocationReceipt
 	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
-	buffers                  [4]util.NaturalBufferReceipt
 
 	boolNumeral                          util.IntegerDividesNumeralInvocationReceipt
 	scalarReceipt                        polynomialScalarExactDivInvocationReceipt
@@ -401,11 +400,7 @@ func (m *MultivariatePolynomialCore) exactDivDirectPending(s *polynomialExactDiv
 	if m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesRawInvocation(&s.divisionRaw) || m.integer.MatchesRawInvocation(&s.extendedRaw) {
 		return true
 	}
-	for i := range s.buffers {
-		if s.buffers[i].Pending() != (util.Block{}) {
-			return true
-		}
-	}
+
 	return false
 }
 

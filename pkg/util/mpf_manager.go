@@ -545,13 +545,6 @@ func (m *ArbitraryFloatManager) formatFrameUnfinished(f *ArbitraryFloatFormatInv
 	if NumericAllocationPending(&f.Decimal.Numeric) || f.Decimal.Transferred.Block() != (Block{}) {
 		return true
 	}
-	for _, buffers := range [][4]naturalPNBufferReceipt{f.buffers, f.Decimal.buffers} {
-		for _, b := range buffers {
-			if b.PendingField != (naturalPNBufferReceipt{}).PendingField {
-				return true
-			}
-		}
-	}
 
 	if f.Decimal.insertion.active && (!f.Decimal.insertion.sourceDone || f.Decimal.insertion.characterOwned || f.Decimal.insertion.formattingOwned) {
 		return true

@@ -1238,5 +1238,37 @@ Tests requiring verification allocation/release refusal are retired; real
 integer/RAW and division allocation failure coverage remains. New tests cover
 sizes crossing the former inline boundary, assertion cleanup, reuse and close.
 
-`SourceLimbBuffer` now serves only the four division buffers. Removing their
-Runtime allocation/receipt machinery remains the next MPN storage boundary.
+`SourceLimbBuffer` served only the four division buffers after this chunk.
+The following Algorithm D conversion removes it and its receipt machinery.
+
+## Native Algorithm D workspace
+
+All four division buffers now use `[4][]uint32`; `SourceLimbBuffer` is deleted.
+Resize preserves the live prefix, clears newly exposed limbs, and retains
+capacity on shrink. Algorithm D still performs the original normalization,
+quotient estimation/correction, product, modular subtraction, conditional
+add-back and remainder publication. The add-back workspace remains lazy.
+Source and owning close release all native slices without Runtime events.
+
+Removed the buffer receipt/identity types, primitive caller buffer capabilities,
+PN/RAW/MPF/polynomial pending-buffer fields, acquisition histories and cleanup
+loops. Actual numeral/cell/RAW ownership remains. Runtime physical-root audits
+exclude Go scratch; RationalService's legacy `NaturalPayloads` statistic is
+zero. Tests of C++ inline/doubling/failed expansion states are retired; independent
+arithmetic, conditional add-back, cleared regrowth, close and zero warm allocation
+checks cover the native representation.
+
+MPN workspace no longer contributes a Runtime buffer dependency. Numeric cells,
+allocator-backed numeral storage and the remaining concrete polynomial/container
+buffers are still pending work for dissolving the infrastructure knot.
+
+Validation: full native util (96.70s), full native polynomial (36.34s), AST
+floating-point checks (0.07s), checked/debug division and affected callers
+(util 1.07s, polynomial 0.53s), checked/debug fast-float (29.54s) and targeted
+lifecycle/sexpr checks passed. The final dead pending-buffer predicates and
+Natural source-cause field were pruned after the broad runs started; final
+focused checks, module-wide compilation, affected-package vet and portcheck
+passed for that pruning. No new full-module execution or broad checked
+polynomial sweep was run; the latest full native module checkpoint remains
+19:07–19:12 UTC. Manifest counts remain 2102 units / 677 APIs, with no new
+whole-unit completion credit.

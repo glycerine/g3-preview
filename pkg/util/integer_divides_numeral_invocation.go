@@ -12,7 +12,6 @@ type integerDividesNumeralScope struct {
 	Active, Executing, Constructed, Ended, owned bool
 	Numeral                                      Int
 	Numeric                                      NumericAllocationRoots
-	Buffers                                      [4]naturalPNBufferReceipt
 
 	BodyCause, sourceCause error
 }
@@ -96,11 +95,7 @@ func (s *integerDividesNumeralScope) Pending(m *IntegerManager) bool {
 	if NumericAllocationPending(&s.Numeric) {
 		return true
 	}
-	for i := range s.Buffers {
-		if s.Buffers[i].PendingField != (naturalPNBufferReceipt{}).PendingField {
-			return true
-		}
-	}
+
 	return false
 }
 func (m *IntegerManager) CleanupDividesNumeralInvocation(r *integerDividesNumeralInvocationReceipt, abort bool) error {
@@ -120,11 +115,6 @@ func (m *IntegerManager) CleanupDividesNumeralInvocation(r *integerDividesNumera
 	}
 	if abort {
 
-		for i := len(s.Buffers) - 1; i >= 0; i-- {
-			if e := s.Buffers[i].cleanup(); e != nil {
-				return e
-			}
-		}
 		if e := s.Numeric.Cleanup(m); e != nil {
 			return e
 		}

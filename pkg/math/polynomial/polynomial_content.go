@@ -6,8 +6,6 @@ import (
 )
 
 type polynomialContentScope struct {
-	buffers [4]util.NaturalBufferReceipt
-
 	invocation                uint64
 	executing                 bool
 	receipt                   polynomialContentInvocationReceipt
@@ -102,11 +100,7 @@ func (m *MultivariatePolynomialCore) finishIntegerContentPhase(owning, abort boo
 		if e = m.integer.CleanupRawInvocation(&s.extended, true); e != nil {
 			return e
 		}
-		for j := len(s.buffers) - 1; j >= 0; j-- {
-			if e = s.buffers[j].Cleanup(); e != nil {
-				return e
-			}
-		}
+
 		if e = m.cleanupFactoryInvocation(&s.factory, true); e != nil {
 			return e
 		}
@@ -120,9 +114,7 @@ func (m *MultivariatePolynomialCore) finishIntegerContentPhase(owning, abort boo
 		return nil
 	}
 	pending := m.integer.MatchesRawInvocation(&s.gcd) || m.integer.MatchesRawInvocation(&s.division) || m.integer.MatchesRawInvocation(&s.extended) || polynomialNegNumericPending(&s.numeric)
-	for j := range s.buffers {
-		pending = pending || s.buffers[j].Pending() != (util.Block{})
-	}
+
 	pending = pending || m.cheap.matchesAppendInvocation(&s.append) || m.matchesFactoryInvocation(&s.factory) || s.bodyCause != nil
 	pending = pending || s.numeric.PendingObject().OwnerID() != 0
 	for _, p := range s.numeric.PendingAllocatorBlocks() {

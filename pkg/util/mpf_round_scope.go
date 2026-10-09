@@ -11,7 +11,6 @@ type ArbitraryFloatRoundScope struct {
 	history            *arbitraryFloatRoundHistory
 	Transferred        SmallAllocatorPendingAllocation
 	cellRetired        bool
-	buffers            [4]naturalPNBufferReceipt
 
 	Manager                                             *ArbitraryFloatManager
 	Invocation                                          uint64
@@ -56,11 +55,6 @@ func (m *ArbitraryFloatManager) finishRoundScopeSource(s *ArbitraryFloatRoundSco
 		}
 	}
 	s.active = NumericAllocationPending(&s.Numeric) || s.Transferred.Block() != (Block{})
-	for i := range s.buffers {
-		if s.buffers[i].PendingField != (Block{}) {
-			s.active = true
-		}
-	}
 
 	if !s.active && s.history != nil {
 		s.history.owned = true
@@ -142,14 +136,6 @@ func (m *ArbitraryFloatManager) cleanupRoundScope(s *ArbitraryFloatRoundScope, r
 		return nil
 	}
 
-	for i := len(s.buffers) - 1; i >= 0; i-- {
-		if e := s.buffers[i].cleanup(); e != nil {
-			if s.ownCause == nil {
-				s.ownCause = e
-			}
-			return e
-		}
-	}
 	if e := m.integer.cleanupFormatAllocation(&s.Numeric, &s.Transferred, &s.cellRetired); e != nil {
 		if s.ownCause == nil {
 			s.ownCause = e

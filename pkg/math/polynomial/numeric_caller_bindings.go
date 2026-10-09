@@ -42,22 +42,3 @@ type integerRawScopePolynomialBindings struct {
 type integerAddMulScopePolynomialBindings struct {
 	parent polynomialArithmeticInvocationReceipt
 }
-type naturalPNBufferReceiptPolynomialBindings struct {
-	rootUpperBound          *upolyRootUpperBoundScope
-	removeOneHalfRoot       *upolyRemoveOneHalfRootScope
-	rootUpperInvocation     uint64
-	removeOneHalfInvocation uint64
-	factorFrontendContext   integerAllocationInvocationContext
-	primePreparationContext integerAllocationInvocationContext
-	henselCallerContext     integerAllocationInvocationContext
-	recombinationContext    integerAllocationInvocationContext
-	henselPair              upolyHenselPairInvocationReceipt
-	henselManager           *UPolynomialManager
-	divides                 polynomialDividesInvocationReceipt
-	scalarExact             polynomialScalarExactDivInvocationReceipt
-	exactDiv                polynomialExactDivInvocationReceipt
-	scalar                  polynomialScalarDivInvocationReceipt
-	content                 polynomialContentInvocationReceipt
-	somNormalize            polynomialSOMNormalizeInvocationReceipt
-	normalization           polynomialNormalizeInvocationReceipt
-}

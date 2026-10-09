@@ -416,23 +416,6 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 		}
 	}
 
-	buffers := []*SourceLimbBuffer{&m.Natural.Division[0], &m.Natural.Division[1], &m.Natural.Division[2], &m.Natural.Division[3]}
-
-	for _, s := range buffers {
-		for _, r := range []Block{s.Raw, s.Pending} {
-			if r == (Block{}) {
-				continue
-			}
-			if raw[r] {
-				t.Fatal("duplicate actual Natural raw root")
-			}
-			raw[r] = true
-			if _, e := m.Memory.ReadUint32(r, 0); e != nil && !errors.Is(e, ErrRuntimeUninitialized) {
-				t.Fatal("invalid Natural raw root", e)
-			}
-		}
-	}
-
 	for _, block := range external {
 		if block == (Block{}) || raw[block] {
 			t.Fatal("duplicate or empty named external block", block)

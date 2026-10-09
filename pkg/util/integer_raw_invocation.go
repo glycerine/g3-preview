@@ -19,7 +19,6 @@ type IntegerRawScope struct {
 	Values                                         [6]Int
 	Count, cursor                                  uint8
 	Numeric                                        NumericAllocationRoots
-	buffers                                        [4]naturalPNBufferReceipt
 
 	BodyCause, sourceCause error
 }
@@ -120,11 +119,7 @@ func (s *IntegerRawScope) pending(m *IntegerManager) bool {
 	if m.MatchesAddMulInvocation(&s.AddMul) || NumericAllocationPending(&s.Numeric) {
 		return true
 	}
-	for i := range s.buffers {
-		if s.buffers[i].PendingField != (naturalPNBufferReceipt{}).PendingField {
-			return true
-		}
-	}
+
 	return false
 }
 func (m *IntegerManager) CleanupRawInvocation(r *integerRawInvocationReceipt, abort bool) error {
@@ -155,11 +150,6 @@ func (m *IntegerManager) CleanupRawInvocation(r *integerRawInvocationReceipt, ab
 		return e
 	}
 
-	for i := len(s.buffers) - 1; i >= 0; i-- {
-		if e := s.buffers[i].cleanup(); e != nil {
-			return e
-		}
-	}
 	if e := s.Numeric.Cleanup(m); e != nil {
 		return e
 	}

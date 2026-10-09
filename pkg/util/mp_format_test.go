@@ -27,11 +27,11 @@ func TestNaturalOwnedConstructorAndClose(t *testing.T) {
 			t.Fatal("source inline constructor allocated payload")
 		}
 		for i := range m.Division {
-			buffer := &m.Division[i]
-			if buffer.capacity() != 16 || buffer.size() != 0 || buffer.Raw != (Block{}) || buffer.Pending != (Block{}) {
-				t.Fatal("actual source inline constructor", i, buffer)
+			if m.Division[i] != nil {
+				t.Fatal("eager scratch", i)
 			}
 		}
+
 		m.Close()
 		m.Close()
 		if b.Used() != 0 {
@@ -117,115 +117,6 @@ func TestIntegerRationalCombinedFormat(t *testing.T) {
 	_, e = m.FormatInto(&a, dst[:len(want)-1])
 	if !errors.Is(e, ErrShortBuffer) || !bytes.Equal(before, dst) {
 		t.Fatal(e)
-	}
-}
-
-func TestNaturalBorrowedDivisionFailureAtomic(t *testing.T) {
-	a := make([]uint32, 40)
-	b := make([]uint32, 19)
-	for i := range a {
-		a[i] = 0xfedcba98
-	}
-	for i := range b {
-		b[i] = 0x12345678
-	}
-	b[len(b)-1] = 0x80000000
-	wq, wr := new(big.Int), new(big.Int)
-	wq.QuoRem(oracle(a), oracle(b), wr)
-	completed := false
-	beforeOutputFailures := 0
-	for fault := int64(0); fault < 128; fault++ {
-		budget := arena.NewBudget(1 << 22)
-		m, e := NewNaturalManager(arena.VectorConfig{PageSize: 32, Descriptors: arena.Config{PageSize: 2, Budget: budget}})
-		if e != nil {
-			t.Fatal(e)
-		}
-		q, r := make([]uint32, len(a)-len(b)+1), make([]uint32, len(b))
-		for i := range q {
-			q[i] = 123
-		}
-		for i := range r {
-			r[i] = 456
-		}
-		budget.FailAfter(fault)
-		_, e = m.Div(a, b, q, r)
-		// Source verification runs after quotient/remainder publication; its
-		// native scratch adds no Runtime allocation-refusal phase.
-		if m.Division[3].size() != 0 {
-			t.Fatal("fixture unexpectedly entered conditional add-back", fault)
-		}
-		roots := map[Block]bool{}
-		buffers := []*SourceLimbBuffer{&m.Division[0], &m.Division[1], &m.Division[2], &m.Division[3]}
-
-		for _, buf := range buffers {
-			for _, ref := range []Block{buf.Raw, buf.Pending} {
-				if ref == (Block{}) {
-					continue
-				}
-				if roots[ref] {
-					t.Fatal("duplicated actual borrowed-division root", fault)
-				}
-				roots[ref] = true
-				if _, err := m.runtime.ReadUint32(ref, 0); err != nil && !errors.Is(err, ErrRuntimeUninitialized) {
-					t.Fatal("invalid physical division root", fault, err)
-				}
-			}
-		}
-		rs := m.runtime.Stats()
-		owned := m.HeaderBytes + rs.TotalBytes
-		if rs.LiveBlocks != uint32(len(roots)) || owned != budget.Used() {
-			t.Fatal("unnamed borrowed-division storage", fault, rs, len(roots), owned, budget.Used())
-		}
-		if e != nil {
-			if !numericPhysicalReservationRefusal(e) {
-				t.Fatal("unexpected division refusal", fault, e)
-			}
-
-			{
-				beforeOutputFailures++
-				for _, v := range q {
-					if v != 123 {
-						t.Fatal(fault, "early quotient publication")
-					}
-				}
-				for _, v := range r {
-					if v != 456 {
-						t.Fatal(fault, "early remainder publication")
-					}
-				}
-			}
-		} else {
-			if oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 {
-				t.Fatal("division oracle")
-			}
-			completed = true
-		}
-		for i, v := range a {
-			if v != 0xfedcba98 {
-				t.Fatal("borrowed numerator mutated", i)
-			}
-		}
-		for i, v := range b {
-			want := uint32(0x12345678)
-			if i == len(b)-1 {
-				want = 0x80000000
-			}
-			if v != want {
-				t.Fatal("borrowed denominator mutated", i)
-			}
-		}
-		budget.FailAfter(-1)
-
-		m.Close()
-		if budget.Used() != 0 {
-			t.Fatal("scratch leak", fault, budget.Used())
-		}
-		if completed {
-			break
-		}
-	}
-	if !completed || beforeOutputFailures == 0 {
-		t.Fatal("division source-phase sweep incomplete", completed, beforeOutputFailures)
 	}
 }
 
@@ -447,12 +338,11 @@ func TestNaturalPreparedAddBackStorageAdaptation(t *testing.T) {
 	}
 	wq, wr := new(big.Int), new(big.Int)
 	wq.QuoRem(oracle(a), oracle(b), wr)
-	if oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 || naturalDivisionCapacities(m) != ([4]uint32{64, 32, 32, 16}) || m.budget.Used() <= before {
+	if oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 || m.budget.Used() != before {
 		t.Fatal("prepared requested capacities", naturalDivisionCapacities(m))
 	}
-	ab := &m.Division[3]
-	if ab.pos != 0 || ab.initialized != 0 || ab.Raw != (Block{}) || ab.Pending != (Block{}) {
-		t.Fatal("unused ab must remain uninitialized inline", ab)
+	if m.Division[3] != nil {
+		t.Fatal("unused add-back allocated")
 	}
 	baseline := m.RuntimeOwner().Stats()
 	charge := m.budget.Used()

@@ -30,7 +30,6 @@ type upolyRecombinationStepScope struct {
 	boolNumeral                                      util.IntegerDividesNumeralInvocationReceipt
 	addMul                                           util.IntegerAddMulInvocationReceipt
 	divisionRaw, extendedRaw, gcdRaw                 util.IntegerRawInvocationReceipt
-	buffers                                          [4]util.NaturalBufferReceipt
 
 	bodyCause, sourceCause, ownCause error
 }
@@ -119,11 +118,7 @@ func (q *upolyRecombinationStepScope) pending() bool {
 			return true
 		}
 	}
-	for i := range q.buffers {
-		if q.buffers[i].Pending() != (util.Block{}) {
-			return true
-		}
-	}
+
 	for i, m := range q.managers() {
 		if m.modular.MatchesPNormalizeInvocation(&q.normalize[i]) {
 			return true
@@ -179,11 +174,6 @@ func (q *upolyRecombinationStepScope) own(r *upolyRecombinationStepInvocationRec
 			}
 		}
 
-		for i := range q.buffers {
-			if e := q.buffers[i].Cleanup(); e != nil {
-				return e
-			}
-		}
 		for i, m := range q.managers() {
 			if e := m.modular.CleanupPNormalizeInvocation(&q.normalize[i], true); e != nil {
 				return e

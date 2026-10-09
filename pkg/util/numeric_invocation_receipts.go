@@ -76,27 +76,6 @@ func (r *integerRawInvocationReceipt) Kind() IntegerRawKind {
 	return IntegerRawUnknown
 }
 
-// NaturalBufferIdentity is a comparable diagnostic tuple. It conveys no
-// authority to mutate or release the utility manager's persistent buffer.
-type NaturalBufferIdentity struct {
-	owner      *NaturalManager
-	buffer     *SourceLimbBuffer
-	invocation uint64
-}
-
-func (r *naturalPNBufferReceipt) Identity() NaturalBufferIdentity {
-	if r == nil {
-		return NaturalBufferIdentity{}
-	}
-	return NaturalBufferIdentity{r.Owner, r.Buffer, r.Invocation}
-}
-func (r *naturalPNBufferReceipt) Pending() Block {
-	if r == nil {
-		return Block{}
-	}
-	return r.PendingField
-}
-
 func (r *integerDividesNumeralInvocationReceipt) Pending() bool {
 	if r == nil || r.Manager == nil || !r.Manager.MatchesDividesNumeralInvocation(r) {
 		return false

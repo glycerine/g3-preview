@@ -289,15 +289,6 @@ func astFloatingPointRawGraphSourceOwners(t *testing.T, q *util.RationalService,
 				t.Fatal("descriptor bijection", named, testFieldBySourceName(s, "live").Uint())
 			}
 		}
-		natural := testFieldBySourceName(z, "natural")
-		if !natural.IsNil() {
-			n := natural.Elem()
-			division := testFieldBySourceName(n, "division")
-			for i := 0; i < division.Len(); i++ {
-				raw(testFieldBySourceName(division.Index(i), "raw"))
-				raw(testFieldBySourceName(division.Index(i), "pending"))
-			}
-		}
 		raw(testFieldBySourceName(testFieldBySourceName(z, "pendingCell"), "raw"))
 		a := testFieldBySourceName(z, "allocator")
 		if !a.IsNil() {

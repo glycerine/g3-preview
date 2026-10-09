@@ -8,7 +8,6 @@ type rationalDecimalScope struct {
 	originalCell    SourceCellBacking
 	cellRetired     bool
 	Transferred     SmallAllocatorPendingAllocation
-	buffers         [4]naturalPNBufferReceipt
 
 	Parent                                 *ArbitraryFloatFormatInvocation
 	Values                                 [4]Int // ten,n1,d1,v1: source end-label DEL order
@@ -171,11 +170,6 @@ func (m *ArbitraryFloatManager) cleanupFormatDecimal(d *rationalDecimalScope, ab
 		return e
 	}
 
-	for i := len(d.buffers) - 1; i >= 0; i-- {
-		if e := d.buffers[i].cleanup(); e != nil {
-			return e
-		}
-	}
 	if e := m.integer.cleanupFormatAllocation(&d.Numeric, &d.Transferred, &d.cellRetired); e != nil {
 		return e
 	}

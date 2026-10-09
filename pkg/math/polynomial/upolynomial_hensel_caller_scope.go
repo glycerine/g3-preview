@@ -52,7 +52,6 @@ type upolyHenselCallerScope struct {
 	addMul                          util.IntegerAddMulInvocationReceipt
 	divisionRaw, extendedRaw        util.IntegerRawInvocationReceipt
 	boolNumeral                     util.IntegerDividesNumeralInvocationReceipt
-	buffers                         [4]util.NaturalBufferReceipt
 
 	owner                                                              *upolyFactorSquareFreeScope
 	active                                                             bool
@@ -350,11 +349,7 @@ func (h *upolyHenselCallerScope) cleanupNumeric(abort bool) error {
 	}
 
 	if abort {
-		for i := len(h.buffers) - 1; i >= 0; i-- {
-			if e := h.buffers[i].Cleanup(); e != nil {
-				return e
-			}
-		}
+
 		return h.numeric.cleanup(z)
 	}
 	return nil

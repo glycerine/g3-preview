@@ -13,7 +13,6 @@ type integerStringSetScope struct {
 	negative                                                  bool
 	hooks                                                     NumericInvocationHooks
 	numeric                                                   NumericAllocationRoots
-	buffers                                                   [4]NaturalBufferReceipt
 
 	integerBinding, naturalBinding   NumericCallerBinding
 	active, executing, finishing     bool
@@ -38,15 +37,6 @@ func (s *integerStringSetScope) NumericRoots(z *IntegerManager, local *NumericAl
 	}
 	return &s.numeric
 }
-func (s *integerStringSetScope) NumericBuffer(n *NaturalManager, index int) *NaturalBufferReceipt {
-	if !s.NumericBound(true) || n != s.manager.Natural || index < 0 || index >= len(s.buffers) {
-		return nil
-	}
-	if e := n.BindCallerBuffer(&s.buffers[index], index, s.invocation, &s.hooks); e != nil {
-		return nil
-	}
-	return &s.buffers[index]
-}
 
 func (s *integerStringSetScope) bind() error {
 	z := s.manager
@@ -64,11 +54,6 @@ func (s *integerStringSetScope) unbind() error {
 func (s *integerStringSetScope) cleanupArithmetic() error {
 	z := s.manager
 
-	for i := len(s.buffers) - 1; i >= 0; i-- {
-		if e := s.buffers[i].Cleanup(); e != nil {
-			return e
-		}
-	}
 	return s.numeric.Cleanup(z)
 }
 func (m *IntegerManager) stringSetTransportActive() bool {

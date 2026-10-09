@@ -110,7 +110,6 @@ type rationalDecimalStreamScope struct {
 	hooks                          NumericInvocationHooks
 	numeric                        NumericAllocationRoots
 	division                       integerRawInvocationReceipt
-	buffers                        [4]NaturalBufferReceipt
 
 	insertion                                   NumeralInsertionReceipt
 	integerBinding, naturalBinding              NumericCallerBinding
@@ -140,15 +139,6 @@ func (s *rationalDecimalStreamScope) NumericRecord(z *IntegerManager, event stri
 	if s.NumericBound(true) && z == s.manager.Z && event == "division" && r.Raw != nil {
 		s.division = *r.Raw
 	}
-}
-func (s *rationalDecimalStreamScope) NumericBuffer(n *NaturalManager, index int) *NaturalBufferReceipt {
-	if !s.NumericBound(true) || n != s.manager.Z.Natural || index < 0 || index >= len(s.buffers) {
-		return nil
-	}
-	if e := n.BindCallerBuffer(&s.buffers[index], index, s.invocation, &s.hooks); e != nil {
-		return nil
-	}
-	return &s.buffers[index]
 }
 
 func (s *rationalDecimalStreamScope) bind() error {
@@ -238,11 +228,7 @@ func (m *RationalManager) CleanupDecimalStream() (cause error) {
 		}
 		s.ownCursor++
 	}
-	for i := len(s.buffers) - 1; i >= 0; i-- {
-		if e := s.buffers[i].Cleanup(); e != nil {
-			return e
-		}
-	}
+
 	if e := s.numeric.Cleanup(z); e != nil {
 		return e
 	}

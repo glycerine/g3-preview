@@ -42,47 +42,13 @@ func TestFastFloatDecimalBuffersAreLexical(t *testing.T) {
 	serviceMust(t, m.Del(&a))
 }
 
-// Immediate actual raw-root and cold/backing charge audit; no formatting or
-// teardown is used to infer ownership. Runtime.Size validates real tokens.
+// Native formatting/division scratch contributes no Runtime payload blocks.
 func fastFormattingPhysicalAudit(t *testing.T, m *FastFloatManager) {
 	t.Helper()
-	raw := map[Block]bool{}
-	var physical, initialization uint64
-	add := func(r Block) {
-		if r == (Block{}) {
-			return
-		}
-		if raw[r] {
-			t.Fatal("duplicate physical formatting root")
-		}
-		raw[r] = true
-		n, e := m.natural.runtime.Size(r)
-		if e != nil {
-			t.Fatal("stale physical root", e)
-		}
-		extent := n + uint64(m.natural.runtime.SizeTBits()/8)
-		physical += extent
-		initialization += ((extent + 63) / 64) * 8
-	}
-	fastFormattingNamedRoots(m, add)
-	if uint32(len(raw)) != m.natural.runtime.Stats().LiveBlocks {
-		t.Fatal("unnamed actual runtime root", len(raw), m.natural.runtime.Stats())
-	}
 	stats := m.natural.runtime.Stats()
-	if stats.PhysicalBytes != physical || stats.InitializationBytes != initialization {
-		t.Fatal("actual named runtime backing bytes", physical, initialization, stats)
+	if stats.LiveBlocks != 0 || stats.PhysicalBytes != 0 || stats.InitializationBytes != 0 {
+		t.Fatal("native formatting allocated Runtime payload", stats)
 	}
-
-}
-
-// Names only this owner's actual roots. Shared runtime censuses must add every
-// participant and explicitly retained caller block before comparing totals.
-func fastFormattingNamedRoots(m *FastFloatManager, add func(Block)) {
-	for i := range m.natural.Division {
-		add(m.natural.Division[i].Raw)
-		add(m.natural.Division[i].Pending)
-	}
-
 }
 
 func TestFastFloatNativeFullPrecisionFormattingWithoutReservations(t *testing.T) {
@@ -194,60 +160,6 @@ func TestFastFloatDecimalLargePrecision(t *testing.T) {
 	}
 }
 
-func TestFastFloatDecimalEveryDivisionAllocationPrefix(t *testing.T) {
-	success := false
-	refused := false
-	for fault := int64(0); fault < 192; fault++ {
-		b := arena.NewBudget(1 << 25)
-		c := DefaultFastFloatConfig(serviceConfig(b).Integers.Words)
-		c.PrecisionWords = 1025
-		c.InitialCapacity = 2
-		m, e := NewFastFloatManager(c)
-		serviceMust(t, e)
-		var a FastFloat
-		serviceMust(t, m.SetFraction32(&a, 3, 2))
-		serviceMust(t, m.natural.reserveText(4096))
-		b.FailAfter(fault)
-		var dst [32]byte
-		for i := range dst {
-			dst[i] = '!'
-		}
-		n, e := m.FormatDecimalInto(&a, 2, 128, dst[:])
-		if e != nil {
-			if !numericPhysicalReservationRefusal(e) {
-				t.Fatal(fault, e)
-			}
-			for _, v := range dst {
-				if v != '!' {
-					t.Fatal("early caller publication", fault)
-				}
-			}
-			refused = true
-			if m.natural.CharFormatting.pending || m.natural.Formatting.PendingField {
-				t.Fatal("native scratch retained allocation failure")
-			}
-		} else {
-			if string(dst[:n]) != "1.5" {
-				t.Fatal(n, dst)
-			}
-			success = true
-		}
-		fastAudit(t, m, &a)
-		fastStandaloneBudgetAudit(t, m)
-		b.FailAfter(-1)
-		serviceMust(t, m.CloseChecked())
-		if b.Used() != 0 {
-			t.Fatal("whole real graph cleanup", fault, b.Used())
-		}
-		if success {
-			break
-		}
-	}
-	if !success || !refused {
-		t.Fatal("complete division allocation sweep", success, refused)
-	}
-}
-
 func TestFastFloatFullPrecisionWarmNativeScratch(t *testing.T) {
 	m := fastManager(t, 96)
 	var a FastFloat
@@ -275,5 +187,36 @@ func fastStandaloneBudgetAudit(t *testing.T, m *FastFloatManager) {
 	t.Helper()
 	if got, want := m.config.Storage.Descriptors.Budget.Used(), fastOwnedBytes(m); got != want {
 		t.Fatal("standalone actual owned graph", got, want)
+	}
+}
+
+func TestFastFloatDecimalNativeDivisionWithoutReservations(t *testing.T) {
+	b := arena.NewBudget(1 << 25)
+	c := DefaultFastFloatConfig(serviceConfig(b).Integers.Words)
+	c.PrecisionWords, c.InitialCapacity = 1025, 2
+	m, e := NewFastFloatManager(c)
+	serviceMust(t, e)
+	var a FastFloat
+	serviceMust(t, m.SetFraction32(&a, 3, 2))
+	state, stats, used := m.natural.runtime.State(), m.natural.runtime.Stats(), b.Used()
+	b.FailAfter(0)
+	var dst [32]byte
+	n, e := m.FormatDecimalInto(&a, 2, 128, dst[:])
+	if e != nil || string(dst[:n]) != "1.5" {
+		t.Fatal("native cold decimal division", n, e, dst)
+	}
+	allocations := testing.AllocsPerRun(20, func() { n, e = m.FormatDecimalInto(&a, 2, 128, dst[:]) })
+	if e != nil || allocations != 0 || string(dst[:n]) != "1.5" {
+		t.Fatal("native warm decimal division", allocations, e)
+	}
+	if m.natural.runtime.State() != state || m.natural.runtime.Stats() != stats || b.Used() != used {
+		t.Fatal("decimal workspace entered Runtime")
+	}
+	fastAudit(t, m, &a)
+	fastStandaloneBudgetAudit(t, m)
+	b.FailAfter(-1)
+	serviceMust(t, m.CloseChecked())
+	if b.Used() != 0 {
+		t.Fatal("owner cleanup", b.Used())
 	}
 }

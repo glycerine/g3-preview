@@ -109,7 +109,6 @@ type arbitraryFloatHexfloatComponentsScope struct {
 	hooks            NumericInvocationHooks
 	numeric          NumericAllocationRoots
 	division         integerRawInvocationReceipt
-	buffers          [4]NaturalBufferReceipt
 
 	integerBinding, naturalBinding NumericCallerBinding
 	active, executing, finishing   bool
@@ -145,15 +144,6 @@ func (s *arbitraryFloatHexfloatComponentsScope) NumericRecord(z *IntegerManager,
 	if s.NumericBound(true) && z == s.manager.integer && event == "division" && r.Raw != nil {
 		s.division = *r.Raw
 	}
-}
-func (s *arbitraryFloatHexfloatComponentsScope) NumericBuffer(n *NaturalManager, index int) *NaturalBufferReceipt {
-	if !s.NumericBound(true) || n != s.manager.integer.Natural || index < 0 || index >= len(s.buffers) {
-		return nil
-	}
-	if e := n.BindCallerBuffer(&s.buffers[index], index, s.invocation, &s.hooks); e != nil {
-		return nil
-	}
-	return &s.buffers[index]
 }
 
 func (s *arbitraryFloatHexfloatComponentsScope) bind() error {
@@ -267,11 +257,7 @@ func (m *ArbitraryFloatManager) CleanupHexfloatComponents() (cause error) {
 		}
 		s.qLive = false
 	}
-	for i := len(s.buffers) - 1; i >= 0; i-- {
-		if e := s.buffers[i].Cleanup(); e != nil {
-			return e
-		}
-	}
+
 	if e := s.numeric.Cleanup(z); e != nil {
 		return e
 	}
