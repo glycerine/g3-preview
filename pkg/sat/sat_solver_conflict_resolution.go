@@ -48,7 +48,6 @@ func newSATSolverConflictResolution(a *satSolverConflictAnalysis, d *satSolverDy
 	for _, c := range []*RuntimeUintColumn{&s.assumptions, &s.userScopeLiterals, &s.core, &s.minCore} {
 		c.Bind(a.propagation.memory)
 	}
-	s.assumptionSet.bind(a.propagation.memory)
 	return s, nil
 }
 func (s *satSolverConflictResolution) constructionBorrow() error {
@@ -90,9 +89,7 @@ func (s *satSolverConflictResolution) Close() error {
 			return e
 		}
 	}
-	if e := s.assumptionSet.Close(); e != nil {
-		return e
-	}
+	s.assumptionSet.Finalize()
 	for _, c := range []*RuntimeUintColumn{&s.assumptions} {
 		if e := c.Finalize(); e != nil {
 			return e

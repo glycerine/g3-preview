@@ -426,7 +426,7 @@ func (s *Solver) closeMembers() error {
 			}
 		case 16:
 			if s.conflict != nil {
-				e = s.conflict.assumptionSet.Close()
+				s.conflict.assumptionSet.Finalize()
 			}
 		case 17:
 			if s.conflict != nil {

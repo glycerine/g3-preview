@@ -70,7 +70,8 @@ func (s *Solver) resetAssumptions() error {
 	if e := s.conflict.assumptions.Shrink(0); e != nil {
 		return e
 	}
-	return s.conflict.assumptionSet.Reset()
+	s.conflict.assumptionSet.Reset()
+	return nil
 }
 func (s *Solver) popToBase() error {
 	if e := s.resetAssumptions(); e != nil {

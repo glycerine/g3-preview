@@ -47,7 +47,6 @@ func newSATColdProbing(l *satSolverClauseLifecycle, b *arena.Budget) (*satSolver
 	s.self = s
 	s.toAssert.Bind(l.propagation.memory)
 	s.cacheWork.Bind(l.propagation.memory)
-	s.assigned.bind(l.propagation.memory)
 	return s, nil
 }
 func (s *satSolverProbing) initializeSource(c *util.ParamsContext, v *util.ParamsRef) error {
@@ -248,9 +247,7 @@ func (s *satSolverProbing) resetCache(l Literal) error {
 	return e
 }
 func (s *satSolverProbing) finalize() error {
-	if e := s.assigned.Finalize(); e != nil {
-		return e
-	}
+	s.assigned.Finalize()
 	if e := s.toAssert.Finalize(); e != nil {
 		return e
 	}
@@ -273,9 +270,7 @@ func (s *satSolverProbing) Close() error {
 	if e := s.toAssert.Finalize(); e != nil {
 		return e
 	}
-	if e := s.assigned.Close(); e != nil {
-		return e
-	}
+	s.assigned.Finalize()
 	s.budget.Release(s.ownerBytes)
 	s.ownerBytes = 0
 	s.closed = true

@@ -34,10 +34,7 @@ func (s *satSolverProbing) tryLit(l Literal, updateCache bool) (bool, error) {
 			if e != nil {
 				return false, e
 			}
-			member, e := s.assigned.contains(x)
-			if e != nil {
-				return false, e
-			}
+			member := s.assigned.contains(x)
 			if member {
 				// Source dereferences the captured iterator again for assign.
 				x, e = implied.readCaptured(block, i)
@@ -89,10 +86,7 @@ func (s *satSolverProbing) tryLit(l Literal, updateCache bool) (bool, error) {
 			if e != nil {
 				return false, e
 			}
-			member, e := s.assigned.contains(x)
-			if e != nil {
-				return false, e
-			}
+			member := s.assigned.contains(x)
 			if member {
 				x, e = v.trailRead(i)
 				if e != nil {
@@ -171,9 +165,7 @@ func (s *satSolverProbing) processCore(id BoolVar) error {
 		s.numAssigned++
 		return nil
 	}
-	if e = s.assigned.Reset(); e != nil {
-		return e
-	}
+	s.assigned.Reset()
 	end, e := v.trail.Size(v.trailRef)
 	if e != nil {
 		return e

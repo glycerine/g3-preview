@@ -17,7 +17,7 @@ func (s *satSolverConflictResolution) isAssumption(l Literal) (bool, error) {
 	if e != nil || !yes {
 		return false, e
 	}
-	return s.assumptionSet.contains(l)
+	return s.assumptionSet.contains(l), nil
 }
 func (s *satSolverConflictResolution) exchangeParallel() error {
 	// Source constructor m_par=nullptr, independently of configured num_threads.

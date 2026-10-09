@@ -41,7 +41,7 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 		}
 		add(row.pending)
 	}
-	for _, v := range []*RuntimeUintColumn{&p.toAssert, &p.cacheWork, &p.assigned.values, &c.assumptions, &c.userScopeLiterals, &c.core, &c.minCore, &c.assumptionSet.values, &a.lemma, &a.extAntecedents, &a.minStack, &a.unmark, &s.auxLiterals, &s.todoAntecedents, &s.model, &s.mus.core, &s.mus.mus, &s.mus.model, &s.simplifier.elimination.vars} {
+	for _, v := range []*RuntimeUintColumn{&p.toAssert, &p.cacheWork, &c.assumptions, &c.userScopeLiterals, &c.core, &c.minCore, &a.lemma, &a.extAntecedents, &a.minStack, &a.unmark, &s.auxLiterals, &s.todoAntecedents, &s.model, &s.mus.core, &s.mus.mus, &s.mus.model, &s.simplifier.elimination.vars} {
 		col(v)
 	}
 	for f := s.mus.frames; f != nil; f = f.next {
@@ -53,8 +53,6 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 			col(&f.sets[i].values)
 		}
 	}
-	raw(&p.assigned.membership)
-	raw(&c.assumptionSet.membership)
 	raw(&s.asymm.savedPhase)
 	for _, v := range []*satSCCVector{&s.scc.index, &s.scc.lowlink, &s.scc.stack, &s.scc.inStack, &s.scc.roots, &s.scc.frames, &s.scc.toElim} {
 		add(v.raw)

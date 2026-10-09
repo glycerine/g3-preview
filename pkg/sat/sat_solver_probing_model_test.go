@@ -35,11 +35,6 @@ func satProbingAudit(t *testing.T, s *satSolverProbing, analysis *satSolverConfl
 	}
 	addColumn(&s.toAssert)
 	addColumn(&s.cacheWork)
-	addColumn(&s.assigned.values)
-	if !s.assigned.membership.PendingReplaces {
-		add(s.assigned.membership.Block)
-	}
-	add(s.assigned.membership.Pending)
 	for _, row := range s.cache.rows {
 		if !row.pendingReplaces {
 			add(row.block)

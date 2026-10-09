@@ -40,14 +40,8 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 	add(s.cache.block)
 	add(s.cache.pending)
 	add(s.cache.retired)
-	for _, x := range []*RuntimeUintColumn{&s.toAssert, &s.cacheWork, &s.assigned.values, &analysis.lemma, &analysis.extAntecedents, &analysis.unmark, &analysis.minStack, &c.assumptions, &c.userScopeLiterals, &c.core, &c.minCore, &c.assumptionSet.values} {
+	for _, x := range []*RuntimeUintColumn{&s.toAssert, &s.cacheWork, &analysis.lemma, &analysis.extAntecedents, &analysis.unmark, &analysis.minStack, &c.assumptions, &c.userScopeLiterals, &c.core, &c.minCore} {
 		col(x)
-	}
-	for _, x := range []*RuntimeVectorColumn{&s.assigned.membership, &c.assumptionSet.membership} {
-		if !x.PendingReplaces {
-			add(x.Block)
-		}
-		add(x.Pending)
 	}
 	for _, row := range s.cache.rows {
 		if !row.pendingReplaces {

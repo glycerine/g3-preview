@@ -30860,3 +30860,14 @@ and buffer-only teardown failure states. Native growth is verified with Runtime
 allocation reservations disabled. Complete SAT/tactic tests, focused checked
 and debug profiles, module compilation, vet, and manifest validation cover the
 change.
+
+### Native probing and assumption literal sets
+
+Converted the concrete literal set used by probing and conflict assumptions
+from Runtime vector columns to bool/literal slices. Membership, insertion order,
+deduplication, reset, and reuse remain explicit. Removed unused bind, raw growth,
+physical-root entries, and simulated set allocation/destruction failure states.
+The retained Runtime cache-memory cutoff excludes these Go-managed slices; this
+is an intentional storage-policy change, covered separately from cache logic.
+Complete SAT and SAT tactic tests, focused checked/debug tests, compilation,
+vet, and manifest validation verify the conversion.

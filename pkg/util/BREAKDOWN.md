@@ -927,3 +927,12 @@ wrapper, Runtime vector column, realloc tokens, standalone owner charge, and
 stopped-destructor adapter are gone for this specialization. Watch traversal
 order, original/learned filtering, caller-prefix appending, and full literal
 bits remain covered by focused SAT tests.
+
+Probing's assigned-literal set and conflict assumption membership now use
+concrete `[]bool` and `[]sat.Literal` storage. Membership lookup and unique
+first-insertion order are retained; reset reuses backing and finalize releases
+the slices. These owners no longer bind shared Runtime vector columns. The
+probing cache still applies its existing strict cutoff to Runtime allocations,
+so Go-managed set memory is outside that cutoff and arena accounting. Focused
+tests cover native growth, duplicates, reset/regrowth, the invalid wrapped
+literal, finalization/reuse, and the retained cache-limit policy.

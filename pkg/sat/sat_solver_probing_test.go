@@ -73,8 +73,7 @@ func TestSATSolverProbingCommonConsequenceAndNormalFinalize(t *testing.T) {
 	if v != lbool.True || s.numAssigned != 1 || life.propagation.variables.scopeLevel != 0 {
 		t.Fatal(v, s.numAssigned)
 	}
-	size, e := s.assigned.size()
-	satOK(t, e)
+	size := s.assigned.size()
 	if s.cache.blockLive() || size != 0 {
 		t.Fatal("normal source finalize")
 	}
