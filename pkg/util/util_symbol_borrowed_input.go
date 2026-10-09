@@ -21,17 +21,5 @@ func (m *SymbolManager) InternBorrowedSymbolCString(s Symbol) (Symbol, error) {
 	if s.Value == 0 {
 		return Symbol{}, ErrInvalidSymbol
 	} // actual null char-pointer guard
-	key, e := m.key(s)
-	if e != nil {
-		return Symbol{}, e
-	}
-	_, entry, e := m.Table.InsertIfNotThereCore(key)
-	if e != nil {
-		return Symbol{}, e
-	}
-	result, e := entry.Key()
-	if e != nil {
-		return Symbol{}, e
-	}
-	return m.Symbol(result), nil
+	return s, nil
 }

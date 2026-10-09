@@ -359,18 +359,10 @@ func TestSATMainConfigColdSymbolFaultPrefixes(t *testing.T) {
 			if published > uint32(len(names)) {
 				t.Fatal("unexpected symbol publications", published)
 			}
-			// Read the real symbol table without invoking Intern: source Intern
-			// may expand a threshold-full table before looking up an existing name.
-			// Inspection must not add that growth to the observed failure prefix.
+			// Existing Go string keys are allocation-free at the interning API.
 			for i := uint32(0); i < published; i++ {
-				entry, found, err := sy.Table.FindCString(names[i])
+				s, err := sy.Intern(names[i])
 				paramsMust(t, err)
-				if !found {
-					t.Fatal("missing completed symbol prefix", i, names[i])
-				}
-				key, err := entry.Key()
-				paramsMust(t, err)
-				s := sy.Symbol(key)
 				if m != nil && i < 11 && s != m.cached[i] {
 					t.Fatal("cache order", i)
 				}

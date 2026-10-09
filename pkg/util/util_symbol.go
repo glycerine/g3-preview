@@ -76,7 +76,7 @@ type SymbolStats struct {
 type SymbolManager struct {
 	mu           sync.Mutex
 	region       *arena.BytesRegion
-	Table        *StrHashtable
+	byText       map[string]arena.BytesRegionRef
 	Budget       *arena.Budget
 	owner        uint64
 	pointerWidth uint32
@@ -97,13 +97,7 @@ func NewSymbolManager(c SymbolConfig) (*SymbolManager, error) {
 		c.Budget.Release(header)
 		return nil, e
 	}
-	h, e := NewStrHashtable(r, StrHashtableConfig{Budget: c.Budget})
-	if e != nil {
-		r.Close()
-		c.Budget.Release(header)
-		return nil, e
-	}
-	return &SymbolManager{region: r, Table: h, Budget: c.Budget, owner: r.OwnerID(), pointerWidth: width}, nil
+	return &SymbolManager{region: r, byText: make(map[string]arena.BytesRegionRef), Budget: c.Budget, owner: r.OwnerID(), pointerWidth: width}, nil
 }
 func cSymbolLength(text string) int {
 	for i := 0; i < len(text); i++ {
@@ -149,8 +143,7 @@ func (m *SymbolManager) checkPlain(s Symbol) error {
 	}
 	return nil
 }
-func (m *SymbolManager) Symbol(k StrKey) Symbol {
-	r := k.Allocation()
+func (m *SymbolManager) symbol(r arena.BytesRegionRef) Symbol {
 	return Symbol{owner: m.owner, Value: uint32(r.Slot), Generation: r.Generation}
 }
 
@@ -161,21 +154,17 @@ func (m *SymbolManager) Symbol(k StrKey) Symbol {
 func (m *SymbolManager) Intern(text string) (Symbol, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	return m.intern(text)
+}
+
+func (m *SymbolManager) intern(text string) (Symbol, error) {
 	if m.closed {
 		return Symbol{}, arena.ErrClosed
 	}
 	length := cSymbolLength(text)
 	text = text[:length]
-	entry, found, e := m.Table.PrepareFindCString(text)
-	if e != nil {
-		return Symbol{}, e
-	}
-	if found {
-		k, e := entry.Key()
-		if e != nil {
-			return Symbol{}, e
-		}
-		return m.Symbol(k), nil
+	if r, found := m.byText[text]; found {
+		return m.symbol(r), nil
 	}
 	wide := uint64(length) + 1 + uint64(m.pointerWidth)
 	if wide > math.MaxUint32 {
@@ -203,19 +192,8 @@ func (m *SymbolManager) Intern(text string) (Symbol, error) {
 	if e := m.region.Write(r, m.pointerWidth+uint32(length), 0); e != nil {
 		return Symbol{}, e
 	}
-	k, e := m.Table.CString(r, m.pointerWidth)
-	if e != nil {
-		return Symbol{}, e
-	}
-	_, entry, e = m.Table.InsertIfNotThereCore(k)
-	if e != nil {
-		return Symbol{}, e
-	}
-	k, e = entry.Key()
-	if e != nil {
-		return Symbol{}, e
-	}
-	return m.Symbol(k), nil
+	m.byText[text] = r
+	return m.symbol(r), nil
 }
 
 // A null constructor needs no interned spelling, as in the source.
@@ -245,7 +223,7 @@ func (m *SymbolManager) FromToken(t SymbolToken) (Symbol, error) {
 	return t.symbol, nil
 }
 func (m *SymbolManager) key(s Symbol) (StrKey, error) {
-	return m.Table.CString(arena.BytesRegionRef{Slot: arena.Slot(s.Value), Generation: s.Generation}, m.pointerWidth)
+	return BorrowCString(m.region, arena.BytesRegionRef{Slot: arena.Slot(s.Value), Generation: s.Generation}, m.pointerWidth)
 }
 func (m *SymbolManager) text(s Symbol, display bool) (string, error) {
 	if e := m.checkPlain(s); e != nil {
@@ -264,7 +242,19 @@ func (m *SymbolManager) text(s Symbol, display bool) (string, error) {
 	if e != nil {
 		return "", e
 	}
-	return m.Table.Text(k)
+	return m.symbolText(k)
+}
+
+func (m *SymbolManager) symbolText(k StrKey) (string, error) {
+	b := make([]byte, k.Length())
+	for i := range b {
+		v, e := m.region.Read(k.Allocation(), k.Offset()+uint32(i))
+		if e != nil {
+			return "", e
+		}
+		b[i] = v
+	}
+	return string(b), nil
 }
 func (m *SymbolManager) String(s Symbol) (string, error) {
 	m.mu.Lock()
@@ -295,7 +285,7 @@ func (m *SymbolManager) BareString(s Symbol) (text string, present bool, err err
 	if e != nil {
 		return "", false, e
 	}
-	text, e = m.Table.Text(k)
+	text, e = m.symbolText(k)
 	return text, e == nil, e
 }
 func (m *SymbolManager) Hash(s Symbol) (uint32, error) {
@@ -473,10 +463,11 @@ func (m *SymbolManager) Less(a, b Symbol) (bool, error) {
 func (m *SymbolManager) Stats() SymbolStats {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	s := SymbolStats{Region: m.region.Stats(), Table: m.Table.Stats()}
+	s := SymbolStats{Region: m.region.Stats()}
 	if !m.closed {
 		s.OwnerBytes = uint64(reflect.TypeOf(SymbolManager{}).Size())
-		s.Symbols = m.Table.Size()
+		s.Symbols = uint32(len(m.byText))
+		s.Table.Size = s.Symbols
 	}
 	return s
 }
@@ -486,11 +477,11 @@ func (m *SymbolManager) Close() error {
 	if m.closed {
 		return nil
 	}
-	m.Table.Close()
 	if e := m.region.Close(); e != nil {
 		return e
 	}
 	m.Budget.Release(uint64(reflect.TypeOf(SymbolManager{}).Size()))
+	m.byText = nil
 	m.closed = true
 	return nil
 }

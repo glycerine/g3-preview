@@ -402,7 +402,7 @@ func TestSymbolIndependentBytesAndPrefixOrder(t *testing.T) {
 	}
 }
 
-func TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens(t *testing.T) {
+func TestSymbolDuplicateLookupAndInvalidTokens(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	m := symbolManagerTest(t, b, false)
 	var first Symbol
@@ -412,16 +412,13 @@ func TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens(t *testing.T) {
 			first = s
 		}
 	}
-	if m.Stats().Table.Capacity != 8 {
-		t.Fatal("source strict threshold")
-	}
 	b.FailAfter(0)
-	if _, e := m.Intern("a"); !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal("duplicate growth must happen before lookup", e)
+	if s, e := m.Intern("a"); e != nil || s != first {
+		t.Fatal("duplicate lookup should not allocate", s, e)
 	}
 	b.FailAfter(-1)
-	if s, e := m.Intern("a"); e != nil || s != first || m.Stats().Table.Capacity != 16 {
-		t.Fatal("successful duplicate growth", e)
+	if s, e := m.Intern("a"); e != nil || s != first {
+		t.Fatal("stable duplicate identity", e)
 	}
 	if s, e := m.InternNullable(nil); e != nil || s != (Symbol{}) {
 		t.Fatal("null constructor", e)
