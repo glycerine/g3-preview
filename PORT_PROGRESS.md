@@ -30792,3 +30792,13 @@ is now `dead_deleted`, distinct from a platform replacement or a completed port,
 and records the whole-tree evidence for the deletion. The former Go
 resource-limit implementation was also deleted after the consumer audit found
 no callers. The live `Reslimit` service is unrelated.
+
+### SAT nested literal rows ownership
+
+Moved the live nested unsigned-row owner from root `util` into `sat`, its only
+production consumer. `satSolverLiteralRows` now directly owns the checked
+Runtime blocks and concrete `RuntimeUintColumn` rows used by consequence and
+mutex extraction; its diagnostic views remain private to SAT tests. This
+removes the exported `RuntimeUnsignedRows` adapter and its duplicate util-only
+test surface while retaining SAT's allocation-refusal, partial-move, source
+finalization, and root-census campaigns.

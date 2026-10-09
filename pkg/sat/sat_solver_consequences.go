@@ -9,7 +9,7 @@ func (s *Solver) consequenceEntry(out *satSolverLiteralRows) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	return out.storage().CheckRuntime(s.runtime.memory)
+	return out.checkRuntime(s.runtime.memory)
 }
 func (s *Solver) getConsequences(asms []Literal, vars []BoolVar, out *satSolverLiteralRows) (lbool.LBool, error) {
 	return s.getConsequencesInputs(satConsequenceLiterals(asms), satConsequenceInput{variables: vars, count: uint32(len(vars))}, out)

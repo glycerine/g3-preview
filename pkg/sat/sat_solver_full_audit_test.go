@@ -98,7 +98,7 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 		}
 	}
 	for _, out := range outputs {
-		for _, h := range out.storage().OwningRoots() {
+		for _, h := range out.owningRoots() {
 			add(h)
 		}
 	}

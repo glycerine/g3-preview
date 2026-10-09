@@ -735,3 +735,9 @@ root alias. The leaf has no project-package dependency.
 debug/release assertion profiles. It imports only `arena`; model evaluation,
 SAT goal translation, and current test fixtures import it directly without a
 root facade.
+
+`RuntimeUnsignedRows` has left root `util`. Its sole production consumer was
+SAT consequence/mutex output, so the concrete owner now lives privately in
+`sat` as `satSolverLiteralRows`. SAT's existing fault campaigns retain the
+observable partial-copy, outer-growth, source-finalization, and ownership-root
+coverage; the util-only public facade and representation tests were removed.

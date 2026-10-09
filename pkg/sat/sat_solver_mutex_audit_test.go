@@ -9,7 +9,7 @@ func satMutexRowsRoots(o *satSolverLiteralRows) []util.Block {
 	if o == nil {
 		return nil
 	}
-	return o.storage().OwningRoots()
+	return o.owningRoots()
 }
 func satMutexColumnRoots(c *RuntimeUintColumn) []util.Block {
 	r := []util.Block{c.Raw.Pending}
