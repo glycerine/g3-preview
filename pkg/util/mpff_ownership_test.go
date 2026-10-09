@@ -506,8 +506,7 @@ func TestFastFloatActualWholeGraphCharges(t *testing.T) {
 		t.Fatal("completed source lexical locals", m.formatting.completed)
 	}
 	for i := range m.formatting.large {
-		v := &m.formatting.large[i]
-		if v.capacity() != 1024 || v.raw != (Block{}) || v.pending != (Block{}) {
+		if len(m.formatting.large[i]) != 0 {
 			t.Fatal("source local destructor", i)
 		}
 	}

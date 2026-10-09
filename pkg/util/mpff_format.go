@@ -1,4 +1,4 @@
-// Source all MPFF displays.
+// Source: src/util/mpff.cpp:1173-1378.
 package util
 
 func (m *FastFloatManager) appendText(n uint32, s string) (uint32, error) {
@@ -207,30 +207,25 @@ func (m *FastFloatManager) prepareDecimal(a *FastFloat, prec, maxPower uint32) (
 		return 0, e
 	}
 	defer func() { err = m.endFastFormatting(err) }()
-	// Source positive branch: a completed default unsigned1024 buffer, followed
-	// by the parameterized character constructor. The is_int fast path above
-	// makes this branch unreachable for canonical public finite values.
+	// Source positive branch: scratch limbs followed by character formatting.
+	// The is_int fast path above makes it unreachable for canonical finite values.
 	if exp >= 0 {
 		m.formatting.completed = 1
 		buffer := &m.formatting.large[0]
 		extra := uint32(1 + exp/32)
 		shift := uint32(32 - exp%32)
 		for i := uint32(0); i < extra; i++ {
-			if e = buffer.push(m.natural.runtime, 0); e != nil {
-				return 0, e
-			}
+			*buffer = append(*buffer, 0)
 		}
 		sig := m.sig(a)
 		for i := uint32(0); i < m.precision; i++ {
-			if e = buffer.push(m.natural.runtime, sig.read(i)); e != nil {
-				return 0, e
-			}
+			*buffer = append(*buffer, sig.read(i))
 		}
-		v := m.formatView(0, buffer.pos)
+		v := m.formatView(0, uint32(len(*buffer)))
 		ffShift(v, v, shift, false)
 		return m.beginFastCharacters(v, n)
 	}
-	// buffer1,buffer2,buffer3 are default-constructed before interleaved pushes.
+	// Keep the source limb layout and interleaved initialization order.
 	m.formatting.completed = 7
 	exp = -exp
 	numWords := uint32(1 + exp/32)
@@ -240,29 +235,24 @@ func (m *FastFloatManager) prepareDecimal(a *FastFloat, prec, maxPower uint32) (
 	}
 	sig := m.sig(a)
 	for i := uint32(0); i < m.precision; i++ {
-		if e = m.formatting.large[0].push(m.natural.runtime, sig.read(i)); e != nil {
-			return 0, e
-		}
-		if e = m.formatting.large[1].push(m.natural.runtime, 0); e != nil {
-			return 0, e
-		}
+		m.formatting.large[0] = append(m.formatting.large[0], sig.read(i))
+		m.formatting.large[1] = append(m.formatting.large[1], 0)
 		if e = m.formatting.small.push(m.natural.runtime, 0); e != nil {
 			return 0, e
 		}
 	}
 	for i := uint32(0); i < extra; i++ {
-		if e = m.formatting.large[0].push(m.natural.runtime, 0); e != nil {
-			return 0, e
-		}
-		if e = m.formatting.large[1].push(m.natural.runtime, 0); e != nil {
-			return 0, e
-		}
+		m.formatting.large[0] = append(m.formatting.large[0], 0)
+		m.formatting.large[1] = append(m.formatting.large[1], 0)
 	}
-	m.formatting.completed |= 8 // pw default construction before its resize
-	if e = m.formatting.large[2].resize(m.natural.runtime, numWords); e != nil {
-		return 0, e
+	m.formatting.completed |= 8
+	if uint64(cap(m.formatting.large[2])) < uint64(numWords) {
+		m.formatting.large[2] = make([]uint32, numWords)
+	} else {
+		m.formatting.large[2] = m.formatting.large[2][:numWords]
+		clear(m.formatting.large[2])
 	}
-	sz := m.formatting.large[0].pos
+	sz := uint32(len(m.formatting.large[0]))
 	b1, b2, b3, pw := m.formatView(0, sz), m.formatView(1, sz), m.formatView(2, m.precision), m.formatView(3, numWords)
 	pw.write(0, 1)
 	ffShift(pw, pw, uint32(exp), true)

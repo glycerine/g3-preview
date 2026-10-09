@@ -50,9 +50,6 @@ func readDecimalLimb(v limbView, i uint32) (uint32, error) {
 	if i >= v.size {
 		return 0, arena.ErrBounds
 	}
-	if v.source1024 != nil {
-		return v.source1024.read(v.runtime, i)
-	}
 	if v.source != nil {
 		return v.source.read(v.runtime, i)
 	}

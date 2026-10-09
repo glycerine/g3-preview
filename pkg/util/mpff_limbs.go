@@ -7,7 +7,7 @@ import (
 
 type ffLimbView struct {
 	runtime      *Runtime
-	source1024   *sourceLimbBuffer1024
+	external     []uint32
 	source16     *SourceLimbBuffer
 	m            *FastFloatManager
 	v            *ffVector
@@ -16,12 +16,8 @@ type ffLimbView struct {
 }
 
 func (v ffLimbView) read(i uint32) uint32 {
-	if v.source1024 != nil {
-		n, e := v.source1024.read(v.runtime, v.offset+i)
-		if e != nil {
-			panic(e)
-		}
-		return n
+	if v.external != nil {
+		return v.external[v.offset+i]
 	}
 	if v.source16 != nil {
 		n, e := v.source16.read(v.runtime, v.offset+i)
@@ -39,10 +35,8 @@ func (v ffLimbView) read(i uint32) uint32 {
 	return v.m.read(v.v, v.offset+i)
 }
 func (v ffLimbView) write(i, n uint32) {
-	if v.source1024 != nil {
-		if e := v.source1024.write(v.runtime, v.offset+i, n); e != nil {
-			panic(e)
-		}
+	if v.external != nil {
+		v.external[v.offset+i] = n
 		return
 	}
 	if v.source16 != nil {

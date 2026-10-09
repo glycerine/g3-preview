@@ -95,10 +95,6 @@ func fastFormattingNamedRoots(m *FastFloatManager, add func(Block)) {
 	}
 	add(m.natural.CharFormatting.Buffer.Raw)
 	add(m.natural.CharFormatting.Buffer.PendingField)
-	for i := range m.formatting.large {
-		add(m.formatting.large[i].raw)
-		add(m.formatting.large[i].pending)
-	}
 	add(m.formatting.small.Raw)
 	add(m.formatting.small.Pending)
 }
@@ -206,10 +202,10 @@ func TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal(t *testing.T) {
 	m.formatting.completed = 7
 	r := m.natural.runtime
 	// The three default constructors completed before their body pushes.
-	serviceMust(t, m.formatting.large[0].resize(r, 1025))
-	serviceMust(t, m.formatting.large[1].resize(r, 1025))
+	m.formatting.large[0] = make([]uint32, 1025)
+	m.formatting.large[1] = make([]uint32, 1025)
 	serviceMust(t, m.formatting.small.resize(r, 32))
-	first, second, small := m.formatting.large[0].raw, m.formatting.large[1].raw, m.formatting.small.Raw
+	small := m.formatting.small.Raw
 	b.FailAfter(0)
 	e := m.formatting.small.push(r, 7)
 	if !numericPhysicalReservationRefusal(e) || m.formatting.completed != 7 {
@@ -218,10 +214,11 @@ func TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal(t *testing.T) {
 	if e2 := m.endFastFormatting(e); e2 != e {
 		t.Fatal("original action cause", e2, e)
 	}
-	for _, raw := range []Block{first, second, small} {
-		if _, e = r.Size(raw); e == nil {
-			t.Fatal("completed source destructor omitted raw")
-		}
+	if _, e = r.Size(small); e == nil {
+		t.Fatal("completed source destructor omitted raw")
+	}
+	if len(m.formatting.large[0]) != 0 || len(m.formatting.large[1]) != 0 {
+		t.Fatal("decimal scratch not reset after formatting")
 	}
 	fastAudit(t, m)
 	fastStandaloneBudgetAudit(t, m)
@@ -251,43 +248,36 @@ func TestFastFloatFormattingScopeGuardsAndInlineWarm(t *testing.T) {
 	serviceMust(t, m.Del(&a))
 }
 
-func TestFastFloatUnsigned1024SourceBoundaries(t *testing.T) {
-	m := fastManager(t, 2)
-	r := m.natural.runtime
-	for _, n := range []uint32{1023, 1024, 1025, 2049} {
-		serviceMust(t, m.beginFastFormatting())
-		m.formatting.completed = 1
-		s := &m.formatting.large[0]
-		before, e := r.AllocationCount()
-		serviceMust(t, e)
-		serviceMust(t, s.resize(r, n))
-		serviceMust(t, s.write(r, n-1, 0xdeadbeef))
-		for i := uint32(0); i < n; i++ {
-			v, e := s.read(r, i)
+// Cross the former inline-storage boundary with finite and recurring fractions.
+// Expected decimal text is independent of the scratch-storage representation.
+func TestFastFloatDecimalLargePrecision(t *testing.T) {
+	for _, precision := range []uint32{1023, 1024, 1025, 2049} {
+		m := fastManager(t, precision)
+		for _, tc := range []struct {
+			numerator   int32
+			denominator uint32
+			want        string
+		}{{3, 2, "1.5"}, {-5, 8, "-0.625"}, {1, 3, "0.33333?"}} {
+			var value FastFloat
+			serviceMust(t, m.SetFraction32(&value, tc.numerator, tc.denominator))
+			var dst [32]byte
+			n, e := m.FormatDecimalInto(&value, 5, 128, dst[:])
 			serviceMust(t, e)
-			want := uint32(0)
-			if i == n-1 {
-				want = 0xdeadbeef
+			if got := string(dst[:n]); got != tc.want {
+				t.Fatal(precision, tc.numerator, tc.denominator, got, tc.want)
 			}
-			if v != want {
-				t.Fatal(n, i, v)
+			for _, scratch := range m.formatting.large {
+				if len(scratch) != 0 {
+					t.Fatal("decimal scratch not reset after output", precision)
+				}
 			}
+			serviceMust(t, m.Del(&value))
 		}
-		capacity, events := uint32(1024), uint64(0)
-		for capacity < n {
-			capacity *= 2
-			events++
-		}
-		after, e := r.AllocationCount()
-		serviceMust(t, e)
-		if s.capacity() != capacity || after-before != events {
-			t.Fatal(n, s.capacity(), after-before)
-		}
-		serviceMust(t, m.endFastFormatting(nil))
-		fastAudit(t, m)
-		fastStandaloneBudgetAudit(t, m)
-		if r.Stats().LiveBlocks != 0 {
-			t.Fatal("completed local destructor", n)
+		serviceMust(t, m.CleanupFormatting())
+		for _, scratch := range m.formatting.large {
+			if scratch != nil {
+				t.Fatal("explicit cleanup retained scratch capacity", precision)
+			}
 		}
 	}
 }

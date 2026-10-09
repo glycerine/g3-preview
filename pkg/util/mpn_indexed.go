@@ -10,27 +10,19 @@ import (
 // limbView is ephemeral: external buffers are borrowed; Words stays indexed.
 // No view is persisted in a manager or exposes an arena backing slice.
 type limbView struct {
-	external   []uint32
-	runtime    *Runtime
-	source     *SourceLimbBuffer
-	source1024 *sourceLimbBuffer1024
-	allocator  *SmallAllocator
-	backing    SourceCellBacking
-	words      *arena.Words
-	ref        arena.VectorRef
-	size       uint32
+	external  []uint32
+	runtime   *Runtime
+	source    *SourceLimbBuffer
+	allocator *SmallAllocator
+	backing   SourceCellBacking
+	words     *arena.Words
+	ref       arena.VectorRef
+	size      uint32
 }
 
 func (v limbView) read(i uint32) uint32 {
 	if i >= v.size {
 		panic(arena.ErrBounds)
-	}
-	if v.source1024 != nil {
-		n, e := v.source1024.read(v.runtime, i)
-		if e != nil {
-			panic(e)
-		}
-		return n
 	}
 	if v.source != nil {
 		n, e := v.source.read(v.runtime, i)
@@ -58,12 +50,6 @@ func (v limbView) read(i uint32) uint32 {
 func (v limbView) write(i, n uint32) {
 	if i >= v.size {
 		panic(arena.ErrBounds)
-	}
-	if v.source1024 != nil {
-		if e := v.source1024.write(v.runtime, i, n); e != nil {
-			panic(e)
-		}
-		return
 	}
 	if v.source != nil {
 		if e := v.source.write(v.runtime, i, n); e != nil {

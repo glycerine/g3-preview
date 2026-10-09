@@ -111750,7 +111750,6 @@
         "pkg/util/mpn_cstring.go",
         "pkg/util/mpff_format_scope.go",
         "pkg/util/mpff_format_scope_test.go",
-        "pkg/util/mpff_source_buffer.go",
         "pkg/math/polynomial/polynomial_psc_buffer.go",
         "pkg/math/polynomial/polynomial_psc_buffer_test.go",
         "pkg/math/polynomial/polynomial_psc_unwind_test.go",
@@ -111809,7 +111808,7 @@
         "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
         "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
-        "TestFastFloatUnsigned1024SourceBoundaries",
+        "TestFastFloatDecimalLargePrecision",
         "TestFastFloatDecimalEveryLargeLocalPrefix",
         "TestFastFloatFullPrecisionWarmSourceEvents",
         "TestPolynomialPSCBufferInlineAndUnjoinedPush",
@@ -111973,7 +111972,7 @@
           ]
         },
         {
-          "name": "Selected MPFF full-precision character and unsigned1024/16 lexical display buffers, completed-default unwind and explicit failed storage cleanup; broader storage/runtime profiles remain open",
+          "name": "MPFF full-precision character formatting and typed Go decimal scratch slices; remaining unsigned16 Runtime buffer retains explicit failure cleanup",
           "status": "partial",
           "go_target": "pkg/util/mpff_format_scope.go",
           "tests": [
@@ -111983,7 +111982,7 @@
             "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
             "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
-            "TestFastFloatUnsigned1024SourceBoundaries",
+            "TestFastFloatDecimalLargePrecision",
             "TestFastFloatDecimalEveryLargeLocalPrefix",
             "TestFastFloatFullPrecisionWarmSourceEvents"
           ]
@@ -128159,7 +128158,6 @@
         "pkg/util/scoped_fast_float.go",
         "pkg/util/mpff_format_scope.go",
         "pkg/util/mpff_format_scope_test.go",
-        "pkg/util/mpff_source_buffer.go",
         "pkg/util/mpff_runtime_scope_test.go"
       ],
       "tests": [
@@ -128189,7 +128187,7 @@
         "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
         "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
-        "TestFastFloatUnsigned1024SourceBoundaries",
+        "TestFastFloatDecimalLargePrecision",
         "TestFastFloatDecimalEveryLargeLocalPrefix",
         "TestFastFloatFullPrecisionWarmSourceEvents",
         "TestFastFloatBorrowedRuntimeIdentityAndGuards",
@@ -128763,7 +128761,7 @@
           "tests": []
         },
         {
-          "name": "Selected MPFF full-precision character and unsigned1024/16 lexical display buffers, completed-default unwind and explicit failed storage cleanup; broader storage/runtime profiles remain open",
+          "name": "MPFF full-precision character formatting and typed Go decimal scratch slices; remaining unsigned16 Runtime buffer retains explicit failure cleanup",
           "status": "partial",
           "go_target": "pkg/util/mpff_format_scope.go",
           "tests": [
@@ -128773,7 +128771,7 @@
             "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
             "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
-            "TestFastFloatUnsigned1024SourceBoundaries",
+            "TestFastFloatDecimalLargePrecision",
             "TestFastFloatDecimalEveryLargeLocalPrefix",
             "TestFastFloatFullPrecisionWarmSourceEvents"
           ]
@@ -128817,7 +128815,6 @@
         "pkg/util/scoped_fast_float.go",
         "pkg/util/mpff_format_scope.go",
         "pkg/util/mpff_format_scope_test.go",
-        "pkg/util/mpff_source_buffer.go",
         "pkg/util/mpff_runtime_scope_test.go"
       ],
       "tests": [
@@ -128847,7 +128844,7 @@
         "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
         "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
-        "TestFastFloatUnsigned1024SourceBoundaries",
+        "TestFastFloatDecimalLargePrecision",
         "TestFastFloatDecimalEveryLargeLocalPrefix",
         "TestFastFloatFullPrecisionWarmSourceEvents",
         "TestFastFloatBorrowedRuntimeIdentityAndGuards",
@@ -129045,7 +129042,7 @@
           "tests": []
         },
         {
-          "name": "Selected MPFF full-precision character and unsigned1024/16 lexical display buffers, completed-default unwind and explicit failed storage cleanup; broader storage/runtime profiles remain open",
+          "name": "MPFF full-precision character formatting and typed Go decimal scratch slices; remaining unsigned16 Runtime buffer retains explicit failure cleanup",
           "status": "partial",
           "go_target": "pkg/util/mpff_format_scope.go",
           "tests": [
@@ -129055,7 +129052,7 @@
             "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
             "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
-            "TestFastFloatUnsigned1024SourceBoundaries",
+            "TestFastFloatDecimalLargePrecision",
             "TestFastFloatDecimalEveryLargeLocalPrefix",
             "TestFastFloatFullPrecisionWarmSourceEvents"
           ]

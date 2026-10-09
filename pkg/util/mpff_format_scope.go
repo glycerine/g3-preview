@@ -1,16 +1,14 @@
-// Source mpff.cpp display locals.
+// Source: src/util/mpff.cpp:1229-1342.
 package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// Three actual unsigned1024 and one unsigned16 inline owners, charged in the
-// FastFloatManager header. Completed defaults are distinct from failed char
-// constructors. Pending blocks are explicit Go owning continuations.
-
+// Decimal scratch limbs use typed Go slices. The remaining small source buffer
+// and character formatting retain their explicit Runtime cleanup.
 type fastFormattingScope struct {
-	large                       [3]sourceLimbBuffer1024
+	large                       [3][]uint32
 	small                       SourceLimbBuffer
 	completed                   uint8
 	active, pending             bool
@@ -22,7 +20,7 @@ func (m *FastFloatManager) beginFastFormatting() error {
 	if s.active || s.pending {
 		return arena.ErrInvalidSlot
 	}
-	*s = fastFormattingScope{active: true}
+	*s = fastFormattingScope{large: s.large, active: true}
 	return nil
 }
 func (m *FastFloatManager) formatView(i int, n uint32) ffLimbView {
@@ -33,14 +31,14 @@ func (m *FastFloatManager) formatView(i int, n uint32) ffLimbView {
 	if i == 3 {
 		j = 2
 	}
-	return ffLimbView{runtime: m.natural.runtime, source1024: &m.formatting.large[j], size: n}
+	return ffLimbView{runtime: m.natural.runtime, external: m.formatting.large[j], size: n}
 }
 func fastNaturalView(v ffLimbView) limbView {
 	if v.source16 != nil {
 		return limbView{runtime: v.runtime, source: v.source16, size: v.size}
 	}
-	if v.source1024 != nil {
-		return limbView{runtime: v.runtime, source1024: v.source1024, size: v.size}
+	if v.external != nil {
+		return limbView{external: v.external[v.offset:], size: v.size}
 	}
 	return limbView{words: v.m.words, ref: v.v.ref, size: v.size}
 }
@@ -88,25 +86,14 @@ func (m *FastFloatManager) finishFastFormatting() error {
 			if i == 3 {
 				j = 2
 			}
-			b := &s.large[j]
-			if b.raw != (Block{}) {
-				if e := m.natural.runtime.Deallocate(&b.raw); e != nil {
-					return e
-				}
-			}
-			b.pos = 0
-			b.cap = 0
-			b.initialized = [16]uint64{}
+			s.large[j] = s.large[j][:0]
 		}
 		s.completed &^= bit
 	}
 	s.active = false
 	s.pending = m.natural.Formatting.PendingField || m.natural.CharFormatting.pending || s.small.Pending != (Block{})
-	for i := range s.large {
-		s.pending = s.pending || s.large[i].pending != (Block{})
-	}
 	if !s.pending {
-		*s = fastFormattingScope{}
+		*s = fastFormattingScope{large: s.large}
 	}
 	return nil
 }
@@ -141,10 +128,8 @@ func (m *FastFloatManager) CleanupFormatting() error {
 	if e := m.natural.cleanupOutputFormatting(); e != nil {
 		return e
 	}
-	for i := 2; i >= 0; i-- {
-		if e := m.formatting.large[i].finalize(m.natural.runtime); e != nil {
-			return e
-		}
+	for i := range m.formatting.large {
+		m.formatting.large[i] = nil
 	}
 	if e := m.formatting.small.Finalize(m.natural.runtime); e != nil {
 		return e

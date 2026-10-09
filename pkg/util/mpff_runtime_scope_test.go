@@ -206,12 +206,11 @@ func TestFastFloatSharedRuntimeProfileAndClose(t *testing.T) {
 				}
 			}
 
-			// Two independently completed source defaults now own simultaneous actual
-			// overflow arrays in the same Runtime. Closing one owner must not free the
-			// other's backing or the caller's block.
+			// Independent formatting scopes own Go scratch and Runtime storage.
+			// Closing one must preserve the other and the caller block.
 			serviceMust(t, first.beginFastFormatting())
 			first.formatting.completed = 1
-			serviceMust(t, first.formatting.large[0].resize(r, 1025))
+			first.formatting.large[0] = make([]uint32, 1025)
 			serviceMust(t, second.beginFastFormatting())
 			second.formatting.completed = 4
 			serviceMust(t, second.formatting.small.resize(r, 32))
@@ -317,7 +316,7 @@ func TestFastFloatBorrowedTLSCompletedDefaultsAfterLateAllocationFailure(t *test
 	b := arena.NewBudget(1 << 28)
 	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
-	m, e := NewFastFloatManager(fastRuntimeConfig(b, r, 9000))
+	m, e := NewFastFloatManager(fastRuntimeConfig(b, r, 17000))
 	serviceMust(t, e)
 	caller, e := r.Allocate(17)
 	serviceMust(t, e)
@@ -341,16 +340,9 @@ func TestFastFloatBorrowedTLSCompletedDefaultsAfterLateAllocationFailure(t *test
 		t.Fatal("completed destructor cursor", m.formatting.completed, m.formatting.pending, m.formatting.originalCause, m.formatting.cleanupCause)
 	}
 	var pending Block
-	for i := range m.formatting.large {
-		v := &m.formatting.large[i]
-		if v.raw != (Block{}) || v.pos != 0 || v.capacity() != 1024 {
-			t.Fatal("source completed buffer destroyed", i)
-		}
-		if v.pending != (Block{}) {
-			if pending != (Block{}) {
-				t.Fatal("two failed allocations")
-			}
-			pending = v.pending
+	for i, limbs := range m.formatting.large {
+		if len(limbs) != 0 {
+			t.Fatal("decimal scratch not reset after failure", i)
 		}
 	}
 	if m.formatting.small.Raw != (Block{}) || m.formatting.small.pos != 0 || m.formatting.small.capacity() != 16 {
@@ -437,9 +429,9 @@ func TestFastFloatBorrowedTLSGuardedLateFreeCursor(t *testing.T) {
 	serviceMust(t, r.Write(first, 0, 13))
 	serviceMust(t, r.Write(second, 0, 17))
 	serviceMust(t, m.beginFastFormatting())
-	m.formatting.completed = 1
-	serviceMust(t, m.formatting.large[0].resize(r, 32768))
-	sourceRaw := m.formatting.large[0].raw
+	m.formatting.completed = 4
+	serviceMust(t, m.formatting.small.resize(r, 32768))
+	sourceRaw := m.formatting.small.Raw
 	n, e := r.Size(sourceRaw)
 	serviceMust(t, e)
 	if n != 131072 {
@@ -500,7 +492,7 @@ func TestFastFloatBorrowedTLSGuardedLateFreeCursor(t *testing.T) {
 	if stopped.GlobalSize != near.GlobalSize || stopped.LocalSize != -131080 || stopped.GlobalCount != near.GlobalCount || stopped.LocalCount != near.LocalCount {
 		t.Fatal("actual overflow stopped at sync addition", near, stopped)
 	}
-	if m.formatting.large[0].raw != (Block{}) || m.formatting.completed != 1 || m.formatting.active || !m.formatting.pending || m.formatting.cleanupCause != arena.ErrBounds || m.formatting.originalCause != nil {
+	if m.formatting.small.Raw != (Block{}) || m.formatting.completed != 4 || m.formatting.active || !m.formatting.pending || m.formatting.cleanupCause != arena.ErrBounds || m.formatting.originalCause != nil {
 		t.Fatal("real completed physical free cursor", m.formatting.completed, m.formatting.pending, m.formatting.cleanupCause)
 	}
 	if _, e = r.Size(sourceRaw); e != ErrRuntimeOwner {
