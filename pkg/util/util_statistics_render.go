@@ -6,153 +6,62 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/insdict"
 )
 
-type statisticsMapEntry struct {
-	key            StatisticsKey
-	hash, state, u uint32
-	d              float64
+type statisticsUintValue struct {
+	key   StatisticsKey
+	value uint32
 }
-type statisticsMap struct {
-	owner      *Statistics
-	entries    []statisticsMapEntry
-	size       uint32
-	double     bool
-	ownerBytes uint64
+type statisticsDoubleValue struct {
+	key   StatisticsKey
+	value float64
 }
 
-func newStatisticsMap(s *Statistics, d bool) (*statisticsMap, error) {
-	n := uint64(reflect.TypeOf(statisticsMap{}).Size())
-	if e := s.budget.Reserve(n); e != nil {
-		return nil, e
+func (s *Statistics) keyString(k StatisticsKey) (string, error) {
+	n, e := s.keyLength(k)
+	if e != nil {
+		return "", e
 	}
-	m := &statisticsMap{owner: s, double: d, ownerBytes: n}
-	if e := m.grow(8); e != nil {
-		s.budget.Release(n)
-		return nil, e
+	if uint64(n) > uint64(^uint(0)>>1) {
+		return "", arena.ErrBounds
 	}
-	return m, nil
-}
-func (m *statisticsMap) close() {
-	m.owner.budget.Release(m.ownerBytes + uint64(len(m.entries))*uint64(reflect.TypeOf(statisticsMapEntry{}).Size()))
-	m.entries = nil
-	m.ownerBytes = 0
-}
-func (m *statisticsMap) grow(n uint64) error {
-	stride := uint64(reflect.TypeOf(statisticsMapEntry{}).Size())
-	if n > uint64(^uint32(0)) || n > uint64(^uint(0)>>1)/stride {
-		return arena.ErrBounds
-	}
-	if e := m.owner.budget.Reserve(n * stride); e != nil {
-		return e
-	}
-	v := make([]statisticsMapEntry, int(n))
-	for _, entry := range m.entries {
-		if entry.state == 2 {
-			i := uint64(entry.hash) & (n - 1)
-			for v[i].state == 2 {
-				i = (i + 1) & (n - 1)
-			}
-			v[i] = entry
+	buf := make([]byte, int(n))
+	for i := range buf {
+		buf[i], e = s.keyByte(k, uint32(i))
+		if e != nil {
+			return "", e
 		}
 	}
-	m.owner.budget.Release(uint64(len(m.entries)) * stride)
-	m.entries = v
-	return nil
+	return string(buf), nil
 }
-func (m *statisticsMap) find(k StatisticsKey) (int, bool, error) {
-	h, e := m.owner.keyHash(k)
-	if e != nil {
-		return 0, false, e
-	}
-	mask := uint32(len(m.entries) - 1)
-	i := h & mask
-	for steps := 0; steps < len(m.entries); steps++ {
-		v := m.entries[i]
-		if v.state == 0 {
-			return int(i), false, nil
-		}
-		if v.state == 2 && v.hash == h {
-			cmp, e := m.owner.keyCompare(v.key, k)
-			if e != nil {
-				return 0, false, e
-			}
-			if cmp == 0 {
-				return int(i), true, nil
-			}
-		}
-		i = (i + 1) & mask
-	}
-	return 0, false, arena.ErrBounds
-}
-func (m *statisticsMap) insert(k StatisticsKey, u uint32, d float64) error {
-	if m.size<<2 > uint32(len(m.entries))*3 {
-		if e := m.grow(2 * uint64(len(m.entries))); e != nil {
-			return e
-		}
-	}
-	h, e := m.owner.keyHash(k)
-	if e != nil {
-		return e
-	}
-	i, found, e := m.find(k)
-	if e != nil {
-		return e
-	}
-	if !found {
-		m.size++
-	}
-	m.entries[i] = statisticsMapEntry{k, h, 2, u, d}
-	return nil
-}
-func (s *Statistics) maps() (u, d *statisticsMap, e error) {
-	u, e = newStatisticsMap(s, false)
-	if e != nil {
-		return
-	}
-	d, e = newStatisticsMap(s, true)
-	if e != nil {
-		u.close()
-		u = nil
-		return
-	}
+
+func (s *Statistics) maps() (u *insdict.Dict[string, statisticsUintValue], d *insdict.Dict[string, statisticsDoubleValue], e error) {
+	u = insdict.NewDictSize[string, statisticsUintValue](len(s.U))
+	d = insdict.NewDictSize[string, statisticsDoubleValue](len(s.d))
 	for _, v := range s.U {
-		idx, found, err := u.find(v.Key)
+		name, err := s.keyString(v.Key)
 		if err != nil {
-			e = err
-			break
+			return nil, nil, err
 		}
 		n := v.Value
-		if found {
-			n += u.entries[idx].u
+		if old, found := u.Get2(name); found {
+			n += old.value
 		}
-		if e = u.insert(v.Key, n, 0); e != nil {
-			break
+		u.Put(name, statisticsUintValue{key: v.Key, value: n})
+	}
+	for _, v := range s.d {
+		name, err := s.keyString(v.key)
+		if err != nil {
+			return nil, nil, err
 		}
-	}
-	if e == nil {
-		for _, v := range s.d {
-			idx, found, err := d.find(v.key)
-			if err != nil {
-				e = err
-				break
-			}
-			n := v.value
-			if found {
-				n = n + d.entries[idx].d
-			}
-			if e = d.insert(v.key, 0, n); e != nil {
-				break
-			}
+		n := v.value
+		if old, found := d.Get2(name); found {
+			n += old.value
 		}
+		d.Put(name, statisticsDoubleValue{key: v.key, value: n})
 	}
-	if e != nil {
-		d.close()
-		u.close()
-		u = nil
-		d = nil
-	}
-	return
+	return u, d, nil
 }
 
 type statisticsKeyBuffer struct {
@@ -280,8 +189,6 @@ func (s *Statistics) display(out *NumericTextStream, mode uint32) error {
 	if e != nil {
 		return e
 	}
-	defer u.close()
-	defer d.close()
 	if mode == 2 {
 		return s.internalMap(out, u, d)
 	}
@@ -290,13 +197,14 @@ func (s *Statistics) display(out *NumericTextStream, mode uint32) error {
 		return e
 	}
 	defer keys.close()
-	for _, m := range []*statisticsMap{u, d} {
-		for _, entry := range m.entries {
-			if entry.state == 2 {
-				if e = keys.push(entry.key); e != nil {
-					return e
-				}
-			}
+	for _, entry := range u.All() {
+		if e = keys.push(entry.key); e != nil {
+			return e
+		}
+	}
+	for _, entry := range d.All() {
+		if e = keys.push(entry.key); e != nil {
+			return e
 		}
 	}
 	if e = keys.sort(); e != nil {
@@ -325,18 +233,16 @@ func (s *Statistics) display(out *NumericTextStream, mode uint32) error {
 		}
 	}
 	for i, k := range keys.data()[:keys.length] {
-		idx, found, e := u.find(k)
+		name, e := s.keyString(k)
 		if e != nil {
 			return e
 		}
+		uv, found := u.Get2(name)
 		var dv float64
 		if !found {
-			j, ok, e := d.find(k)
-			if e != nil {
-				return e
-			}
+			dvEntry, ok := d.Get2(name)
 			if ok {
-				dv = d.entries[j].d
+				dv = dvEntry.value
 			}
 		}
 		n, e := s.keyLength(k)
@@ -391,7 +297,7 @@ func (s *Statistics) display(out *NumericTextStream, mode uint32) error {
 			return e
 		}
 		if found {
-			if e = out.AppendUint32(u.entries[idx].u); e != nil {
+			if e = out.AppendUint32(uv.value); e != nil {
 				return e
 			}
 		} else {
@@ -416,39 +322,53 @@ func (s *Statistics) display(out *NumericTextStream, mode uint32) error {
 	}
 	return nil
 }
-func (s *Statistics) internalMap(out *NumericTextStream, u, d *statisticsMap) error {
-	for _, m := range []*statisticsMap{u, d} {
-		for _, entry := range m.entries {
-			if entry.state != 2 {
-				continue
-			}
-			c, e := s.keyByte(entry.key, 0)
+func (s *Statistics) internalMap(out *NumericTextStream, u *insdict.Dict[string, statisticsUintValue], d *insdict.Dict[string, statisticsDoubleValue]) error {
+	for _, entry := range u.All() {
+		c, e := s.keyByte(entry.key, 0)
+		if e != nil {
+			return e
+		}
+		if c == ':' {
+			c, e = s.keyByte(entry.key, 1)
 			if e != nil {
 				return e
 			}
-			if c == ':' {
-				c, e = s.keyByte(entry.key, 1)
-				if e != nil {
-					return e
-				}
-			}
-			if c != 0 {
-				return ErrStatisticsNonterminating
-			}
-			if e = out.AppendCString(" "); e != nil {
-				return e
-			}
-			if m.double {
-				e = out.AppendFloat64(entry.d)
-			} else {
-				e = out.AppendUint32(entry.u)
-			}
+		}
+		if c != 0 {
+			return ErrStatisticsNonterminating
+		}
+		if e = out.AppendCString(" "); e != nil {
+			return e
+		}
+		if e = out.AppendUint32(entry.value); e != nil {
+			return e
+		}
+		if e = out.AppendCString("\n"); e != nil {
+			return e
+		}
+	}
+	for _, entry := range d.All() {
+		c, e := s.keyByte(entry.key, 0)
+		if e != nil {
+			return e
+		}
+		if c == ':' {
+			c, e = s.keyByte(entry.key, 1)
 			if e != nil {
 				return e
 			}
-			if e = out.AppendCString("\n"); e != nil {
-				return e
-			}
+		}
+		if c != 0 {
+			return ErrStatisticsNonterminating
+		}
+		if e = out.AppendCString(" "); e != nil {
+			return e
+		}
+		if e = out.AppendFloat64(entry.value); e != nil {
+			return e
+		}
+		if e = out.AppendCString("\n"); e != nil {
+			return e
 		}
 	}
 	return nil

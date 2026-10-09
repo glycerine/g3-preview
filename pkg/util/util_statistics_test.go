@@ -488,7 +488,7 @@ func TestStatisticsRealRlimitThresholdAndLiteralOwnership(t *testing.T) {
 		t.Fatal("borrowed literal freed")
 	}
 }
-func TestStatisticsHashMapGrowthAndIndependentRawModel(t *testing.T) {
+func TestStatisticsIndependentRawModelAndSourceHash(t *testing.T) {
 	s, r := statFixture(t, nil)
 	keys := make([]StatisticsKey, 40)
 	for i := range keys {
@@ -515,27 +515,10 @@ func TestStatisticsHashMapGrowthAndIndependentRawModel(t *testing.T) {
 			}
 		}
 	}
-	m, e := newStatisticsMap(s, false)
-	if e != nil {
-		t.Fatal(e)
-	}
-	defer m.close()
 	for i, k := range keys {
-		if e = m.insert(k, uint32(i), 0); e != nil {
-			t.Fatal(e)
-		}
 		h, e := s.keyHash(k)
 		if e != nil || h != String(string([]byte{byte(128 + i), 'a'}), 17) {
 			t.Fatal(h, e)
-		}
-	}
-	if len(m.entries) != 64 {
-		t.Fatal(len(m.entries))
-	}
-	for i, k := range keys {
-		idx, ok, e := m.find(k)
-		if e != nil || !ok || m.entries[idx].u != uint32(i) {
-			t.Fatal(i, e)
 		}
 	}
 }
@@ -718,34 +701,32 @@ func TestStatisticsConstructorAssignmentMemberFailureAndPeak(t *testing.T) {
 		t.Fatal("growth overlaps complete old and new", e)
 	}
 }
-func TestStatisticsMapOverwriteGrowthIdentityAndInternalPrefix(t *testing.T) {
+func TestStatisticsTextAggregationOrderIdentityAndInternalPrefix(t *testing.T) {
 	s, r := statFixture(t, nil)
-	m, e := newStatisticsMap(s, false)
-	if e != nil {
-		t.Fatal(e)
-	}
-	defer m.close()
 	keys := make([]StatisticsKey, 7)
 	for i := range keys {
 		keys[i] = statKey(t, r, string(byte('a'+i)))
-		if e = m.insert(keys[i], uint32(i+1), 0); e != nil {
-			t.Fatal(e)
-		}
-	}
-	if len(m.entries) != 8 {
-		t.Fatal(len(m.entries))
+		statUint(t, s, keys[i], uint32(i+1))
 	}
 	equal := statKey(t, r, "a")
-	if e = m.insert(equal, 99, 0); e != nil {
+	statUint(t, s, equal, 99)
+	u, _, e := s.maps()
+	if e != nil {
 		t.Fatal(e)
 	}
-	if len(m.entries) != 16 {
-		t.Fatal("grow before overwrite", len(m.entries))
+	entry, ok := u.Get2("a")
+	if !ok || u.Len() != 7 || entry.key != equal || entry.value != 100 {
+		t.Fatal("aggregate by text and retain latest key identity", ok, u.Len(), entry)
 	}
-	idx, ok, e := m.find(keys[0])
-	if e != nil || !ok || m.entries[idx].key != equal || m.entries[idx].u != 99 {
-		t.Fatal("replace incoming key identity", idx, ok, e)
+	first := ""
+	for name := range u.All() {
+		first = name
+		break
 	}
+	if first != "a" {
+		t.Fatal("first insertion order", first)
+	}
+	s.Reset()
 	empty := ""
 	if String(":", 17)&7 < String("", 17)&7 {
 		empty = ":"
@@ -810,15 +791,14 @@ func TestStatisticsMergedExactIndependentOracleAndShadowState(t *testing.T) {
 		statUint(t, s, keys[j], v)
 		expected[j] += v
 	}
-	u, d, e := s.maps()
+	u, _, e := s.maps()
 	if e != nil {
 		t.Fatal(e)
 	}
-	defer u.close()
-	defer d.close()
 	for i, k := range keys {
-		idx, ok, e := u.find(k)
-		if e != nil || !ok || u.entries[idx].u != expected[i] {
+		name, e := s.keyString(k)
+		entry, ok := u.Get2(name)
+		if e != nil || !ok || entry.value != expected[i] {
 			t.Fatal(i, expected[i], e)
 		}
 	}
@@ -969,7 +949,7 @@ func TestStatisticsBindingBackingHostBounds(t *testing.T) {
 	if _, e := statisticsBackingBytes(math.MaxUint64, 16, math.MaxUint64); !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("source element count bound", e)
 	}
-	for _, typ := range []reflect.Type{reflect.TypeOf(StatisticsKey{}), reflect.TypeOf(statisticsUintContribution{}), reflect.TypeOf(statisticsDoubleContribution{}), reflect.TypeOf(statisticsMapEntry{})} {
+	for _, typ := range []reflect.Type{reflect.TypeOf(StatisticsKey{}), reflect.TypeOf(statisticsUintContribution{}), reflect.TypeOf(statisticsDoubleContribution{})} {
 		if e := arena.ValidateRecordType(typ); e != nil {
 			t.Fatal(typ, e)
 		}

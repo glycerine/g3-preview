@@ -328,6 +328,14 @@ domain/range enumeration now follows stable registration order. The dedicated
 probing table, scoped copy/rollback machinery unused by the family manager,
 physical bucket accounting, and layout tests have been deleted.
 
+The transient custom `statisticsMap` has been replaced in place with two
+concrete `insdict.Dict` values keyed by ordinary Go strings. String value
+equality preserves aggregation across distinct borrowed keys with the same
+spelling, while insertion order gives deterministic internal rendering. The
+probing array, cached hashes, growth code, and tests of physical bucket counts
+have been deleted; normal and SMT2 rendering still sort keys explicitly because
+those output formats require canonical order.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before
