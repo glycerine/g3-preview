@@ -3,7 +3,6 @@
 package polynomial
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
@@ -71,7 +70,7 @@ func polynomialFactorBackendNamedRoots(t *testing.T, full *MultivariatePolynomia
 		if !fs.closed {
 			bytes += fs.header
 		}
-		bytes += uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size())
+
 		roots = append(roots, &fs.constant)
 		for i := range fs.factors {
 			vector(fs.manager, &fs.factors[i])
@@ -112,7 +111,7 @@ func polynomialFactorBackendNamedRoots(t *testing.T, full *MultivariatePolynomia
 		factors(c.best)
 		factors(c.lifted)
 		factors(c.primeTrial.current)
-		bytes += uint64(cap(c.ds.words)+cap(c.primeTrial.degrees.words)) * 4
+
 		h := &c.hensel
 		addManager(h.related)
 		addManager(h.prime)

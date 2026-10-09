@@ -5,7 +5,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
@@ -110,7 +109,7 @@ func (s *UPolynomialFactorizationService) cleanupPrimeTrialInvocation(r *upolyPr
 	q.enterCall()
 	defer q.leaveCall()
 	if q.degreesStarted {
-		q.degrees.close(q.zp.config.Integer.Budget())
+		q.degrees.close()
 		q.degreesStarted = false
 	}
 	if q.current != nil {
@@ -194,6 +193,7 @@ func (s *UPolynomialFactorizationService) finishPrimeCurrentSource(q *upolyPrime
 				m.freeBacking(&fs.factors[i])
 			}
 			fs.count = 0
+			fs.factors = fs.factors[:0]
 			fs.degrees = fs.degrees[:0]
 			q.factorStage++
 		case 2:
@@ -218,7 +218,6 @@ func (s *UPolynomialFactorizationService) finishPrimeCurrentSource(q *upolyPrime
 		case 4:
 			b := z.Budget()
 			fs.degrees = nil
-			b.Release(uint64(cap(fs.factors)) * upolyFactorVectorStride())
 			fs.factors = nil
 			b.Release(fs.header)
 			m.liveFactors--
@@ -245,7 +244,7 @@ func (s *UPolynomialFactorizationService) finishPrimeTrialSource(r *upolyPrimeTr
 	}
 
 	if q.degreesStarted {
-		q.degrees.close(q.zp.config.Integer.Budget())
+		q.degrees.close()
 		q.degreesStarted = false
 	}
 	if e := s.finishPrimeCurrentSource(q); e != nil {
@@ -284,8 +283,6 @@ func (q *upolyPrimeTrialScope) leaveCall() {
 		}
 	}
 }
-
-func upolyFactorVectorStride() uint64 { return uint64(reflect.TypeOf(upolyVectorState{}).Size()) }
 
 func (s *UPolynomialFactorizationService) primeTrialInvocationSourceCause(r *upolyPrimeTrialInvocationReceipt) error {
 	if !s.matchesPrimeTrialHistory(r) {

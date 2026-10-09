@@ -24,8 +24,8 @@ func TestUPolynomialFactorsLifecycleCopySwapCountersAndMultiply(t *testing.T) {
 	}
 	p := upolySourceNew(t, m, []int32{1, 1})
 	v := mustUPolyView(t, m, p)
-	// Only the outer factor owner buffer is still charged; multiplicities are native.
-	budget.FailAfter(1)
+	// Both factor owners and multiplicities grow through native slices.
+	budget.FailAfter(0)
 	e = fs.PushCopy(v, 3)
 	budget.FailAfter(-1)
 	if e != nil {

@@ -2,10 +2,6 @@
 // Concrete FS class destruction shared by its actual captured callers.
 package polynomial
 
-import (
-	"reflect"
-)
-
 func (fs *UPolynomialFactors) closeWithSourceContext(st *upolyPreparedFactorCursor, source bool, context integerAllocationInvocationContext) error {
 	if fs == nil || fs.self != fs || fs.manager == nil || st == nil {
 		return ErrUPolynomialOwner
@@ -47,6 +43,7 @@ func (fs *UPolynomialFactors) closeWithSourceContext(st *upolyPreparedFactorCurs
 				m.freeBacking(&fs.factors[i])
 			}
 			fs.count = 0
+			fs.factors = fs.factors[:0]
 			fs.degrees = fs.degrees[:0]
 			st.stage = 2
 		}
@@ -67,7 +64,6 @@ func (fs *UPolynomialFactors) closeWithSourceContext(st *upolyPreparedFactorCurs
 		if !fs.closed {
 			budget := z.Budget()
 			fs.degrees = nil
-			budget.Release(uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size()))
 			fs.factors = nil
 			budget.Release(fs.header)
 			m.liveFactors--
@@ -104,7 +100,6 @@ func (fs *UPolynomialFactors) closeWithSourceContext(st *upolyPreparedFactorCurs
 	if !fs.closed {
 		b := z.Budget()
 		fs.degrees = nil
-		b.Release(uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size()))
 		fs.factors = nil
 		b.Release(fs.header)
 		m.liveFactors--

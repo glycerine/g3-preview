@@ -182,7 +182,7 @@ func (c *upolyFactorSquareFreeScope) cleanupMembersPhase(source bool) error {
 				e = m.modular.Del(&c.gcdTmp)
 			}
 		case 6:
-			c.ds.close(m.config.Integer.Budget())
+			c.ds.close()
 			c.ds = upolyFactorDegreeState{}
 		case 5:
 			if source {

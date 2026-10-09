@@ -4,7 +4,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -127,7 +126,7 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolyn
 	c := s.scope
 	managers := []*UPolynomialManager{s.manager}
 	if c != nil {
-		n += c.header + uint64(cap(c.ds.words))*4 + uint64(cap(c.primeTrial.degrees.words))*4
+		n += c.header
 		managers = append(managers, c.zp, c.zpe)
 		for _, m := range c.hensel.numericOwners() {
 			if m == nil || m.closed {
@@ -260,7 +259,7 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolyn
 			continue
 		}
 		namedFactors[fs] = true
-		n += fs.header + uint64(cap(fs.factors))*uint64(reflect.TypeOf(upolyVectorState{}).Size())
+		n += fs.header
 		roots = append(roots, &fs.constant)
 		for i := uint32(0); i < fs.count; i++ {
 			appendState(fs.manager, &fs.factors[i])

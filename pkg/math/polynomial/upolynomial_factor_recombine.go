@@ -146,7 +146,7 @@ func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManage
 		return 0, e
 	}
 	q.constructed = 3
-	if ds.bits-1 == 0 {
+	if uint32(len(ds.values))-1 == 0 {
 		*ds, *imageDegrees = *imageDegrees, *ds
 	} else {
 		if e = ds.intersect(imageDegrees); e != nil {

@@ -77,47 +77,18 @@ func (fs *UPolynomialFactors) check() error {
 	}
 	return fs.manager.check()
 }
-func upolyFactorNextCapacity(old uint32, host uint64) (uint32, uint64, error) {
-	var n uint32
-	if old == 0 {
-		n = 2
-	} else {
-		n = (3*old + 1) >> 1
-		if n <= old || 8*n+8 <= 8*old+8 {
-			return 0, 0, arena.ErrBounds
-		}
-	}
-	stride := uint64(reflect.TypeOf(upolyVectorState{}).Size())
-	if uint64(n)*8+8 > math.MaxUint32 || uint64(n) > host/stride {
-		return 0, 0, arena.ErrBounds
-	}
-	return n, uint64(n) * stride, nil
-}
 func (fs *UPolynomialFactors) pushEmpty() (*upolyVectorState, error) {
-	if fs.count == math.MaxUint32 {
+	if fs.count == math.MaxUint32 || uint64(fs.count) >= uint64(^uint(0)>>1) {
 		return nil, arena.ErrBounds
 	}
-	if uint64(fs.count) == uint64(cap(fs.factors)) {
-		n, bytes, e := upolyFactorNextCapacity(uint32(cap(fs.factors)), uint64(int(^uint(0)>>1)))
-		if e != nil {
-			return nil, e
-		}
-		b := fs.manager.config.Integer.Budget()
-		if e = b.Reserve(bytes); e != nil {
-			return nil, e
-		}
-		next := make([]upolyVectorState, n)
-		for i := uint32(0); i < fs.count; i++ {
-			next[i] = fs.factors[i]
-			fs.factors[i] = upolyVectorState{}
-		}
-		b.Release(uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size()))
-		fs.factors = next
+	old := fs.factors
+	fs.factors = append(fs.factors, upolyVectorState{})
+	if len(old) != 0 && &old[0] != &fs.factors[0] {
+		// Transfer owning records once; a relocated old slice owns no backings.
+		clear(old)
 	}
-	i := fs.count
-	fs.factors[i] = upolyVectorState{}
 	fs.count++
-	return &fs.factors[i], nil
+	return &fs.factors[fs.count-1], nil
 }
 func (fs *UPolynomialFactors) factor(index uint32) (*upolyVectorState, error) {
 	if e := fs.check(); e != nil {
@@ -367,6 +338,7 @@ func (fs *UPolynomialFactors) clearBody() error {
 		m.freeBacking(&fs.factors[i])
 	}
 	fs.count = 0
+	fs.factors = fs.factors[:0]
 	fs.degrees = fs.degrees[:0]
 	if e := m.modular.SetInt32(&fs.constant, 1); e != nil {
 		return e
@@ -396,7 +368,6 @@ func (fs *UPolynomialFactors) Close() error {
 	// Reverse source member destruction after destructor body: degrees, factors.
 	b := m.config.Integer.Budget()
 	fs.degrees = nil
-	b.Release(uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size()))
 	fs.factors = nil
 	b.Release(fs.header)
 	m.liveFactors--
@@ -475,7 +446,7 @@ func (fs *UPolynomialFactors) Stats() UPolynomialFactorsStats {
 	if fs == nil || fs.self != fs || fs.closed || fs.manager == nil || fs.manager.closed {
 		return UPolynomialFactorsStats{}
 	}
-	st := UPolynomialFactorsStats{OwnerBytes: fs.header, Count: fs.count, MultiplicityCount: uint32(len(fs.degrees)), Capacity: uint32(cap(fs.factors)), MultiplicityCapacity: uint32(cap(fs.degrees)), OuterBytes: uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size()), MultiplicityBytes: 0}
+	st := UPolynomialFactorsStats{OwnerBytes: fs.header, Count: fs.count, MultiplicityCount: uint32(len(fs.degrees)), Capacity: uint32(cap(fs.factors)), MultiplicityCapacity: uint32(cap(fs.degrees)), OuterBytes: 0, MultiplicityBytes: 0}
 	z := fs.manager.config.Integer
 	if z.IsLiveCellToken(fs.constant.NativeCellToken()) {
 		st.OwnedNumeralCells++

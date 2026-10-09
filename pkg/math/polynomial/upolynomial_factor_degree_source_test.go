@@ -30,8 +30,8 @@ func TestUPolynomialFactorDegreeSetEmptyConstructorAndIntersections(t *testing.T
 	if yes, e := ds.InSet(0); e != nil || !yes {
 		t.Fatal(yes, e)
 	}
-	if ds.Stats().WordBytes != 8 {
-		t.Fatal("source push defaultcapacity2words", ds.Stats())
+	if ds.Stats().WordBytes != 0 {
+		t.Fatal("native degree flags are not charged", ds.Stats())
 	}
 	fs, e := m.NewFactors()
 	if e != nil {

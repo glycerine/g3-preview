@@ -32120,3 +32120,44 @@ The full util knot/split goal remains open. Next remove factor outer owner-vecto
 and degree-set container machinery, then binary-rational vectors, retained AST/SAT
 containers and text consumers. Internal root-util numeric/text/parameter cycles
 also need resolution before splitting those files into actual subpackages.
+
+## Native factor owners and subset degrees
+
+Factor outer owner records now grow through native Go append. Removed source
+capacity/header arithmetic, old/new buffer reservations/refunds and stride-only
+adapters. Real relocated owning records are cleared once after append transfers
+them; their coefficient-store bindings and borrowed views survive. Clear/source
+cleanup reslices the actual emptied records and multiplicities; destruction drops
+native references. Stats/physical censuses exclude native outer storage while
+retaining actual factor owner headers and every numeral root.
+
+Factor degree subsets now use []bool. A descending subset-sum update retains each
+existing possible degree and includes that degree plus the new factor degree,
+without using a factor twice. Removed bit-vector word allocation, geometric growth,
+clone/shift/OR storage machinery and cross-budget capacity transfers on swap.
+Intersection keeps the left degree extent, and removal/triviality/iterator degree
+filtering remain. Public cold degree owners retain their real reservation. Native
+flags contribute no WordBytes; CapacityWords is a logical 32-degree grouping of
+native flag capacity, not physical packed storage.
+
+New independent map-oracle checks cover subset degrees 0/1/31/32/33/65/129/4097
+and a repeated 65, checking every degree after each inclusion under disabled
+reservations. Public empty degree construction permits exactly its real owner
+reservation. Another test grows 4097 scalar factor rows under disabled reservations,
+checks every multiplicity/value, proves old relocated records are empty, preserves
+the same live BIG numeral token and captured coefficient view, and confirms Clear
+ends that token. Existing factor lifecycle cold insertion now succeeds with no
+buffer reservations; degree intersections, exact iterator order/products and real
+numeric/source cleanup campaigns remain.
+
+Validation: full native polynomial passed (34.121s); new native factor/degree
+checks passed (0.016s); focused g3debug factor, degree, prime-trial and recombination
+checks passed (27.697s). Module-wide compilation, polynomial vet, portcheck, gofmt
+and diff checks passed. Manifest counts/statuses remain unchanged. The 22:43–22:45
+UTC full native module checkpoint remains current; no additional full-module run
+was needed.
+
+The util knot/split goal remains open. Continue with binary-rational vectors and
+remaining isolation storage, then retained AST/SAT collections and text consumers.
+Internal root-util numeric/text/parameter cycles still need resolution before the
+subpackage split.

@@ -44181,7 +44181,10 @@
         "pkg/math/polynomial/upolynomial_remove_one_half_prefix_source_test.go",
         "pkg/math/polynomial/upolynomial_remove_one_half_source_test.go",
         "pkg/math/polynomial/upolynomial_native_directories_test.go",
-        "pkg/math/polynomial/upolynomial_native_coefficients_test.go"
+        "pkg/math/polynomial/upolynomial_native_coefficients_test.go",
+        "pkg/math/polynomial/upolynomial_factor_degree.go",
+        "pkg/math/polynomial/upolynomial_factors.go",
+        "pkg/math/polynomial/upolynomial_native_factor_storage_test.go"
       ],
       "tests": [
         "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
@@ -44379,7 +44382,9 @@
         "TestUPolynomialRemoveOneHalfRootFieldEveryActualPrefix",
         "TestUPolynomialRemoveOneHalfRootIndependentLiteralCases",
         "TestUPolynomialNativeDescriptorAndBackingDirectories",
-        "TestUPolynomialNativeBorrowedStoreDirectory"
+        "TestUPolynomialNativeBorrowedStoreDirectory",
+        "TestUPolynomialNativeDegreeSubsetOracle",
+        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews"
       ],
       "conditionals": [
         {
@@ -45593,7 +45598,8 @@
         "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
         "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added.",
         "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked.",
-        "Sequence row offsets/sizes and factor multiplicities now use direct []uint32 slices with native append, reslicing on reset and nil on destruction. Removed unsigned-vector capacity/header arithmetic, size/initialized masks, container-only reservation faults and metadata backing-byte charges. Actual sequence/factor owners and numeral allocation/copy/destruction remain explicit; uint32 index bounds remain checked."
+        "Sequence row offsets/sizes and factor multiplicities now use direct []uint32 slices with native append, reslicing on reset and nil on destruction. Removed unsigned-vector capacity/header arithmetic, size/initialized masks, container-only reservation faults and metadata backing-byte charges. Actual sequence/factor owners and numeral allocation/copy/destruction remain explicit; uint32 index bounds remain checked.",
+        "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit."
       ]
     },
     {
@@ -45654,7 +45660,10 @@
         "pkg/math/polynomial/polynomial_to_numeral_variable_source_test.go",
         "pkg/math/polynomial/polynomial_numeral_slice_test.go",
         "pkg/math/polynomial/upolynomial_native_directories_test.go",
-        "pkg/math/polynomial/upolynomial_native_coefficients_test.go"
+        "pkg/math/polynomial/upolynomial_native_coefficients_test.go",
+        "pkg/math/polynomial/upolynomial_factor_degree.go",
+        "pkg/math/polynomial/upolynomial_factors.go",
+        "pkg/math/polynomial/upolynomial_native_factor_storage_test.go"
       ],
       "tests": [
         "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
@@ -45764,7 +45773,9 @@
         "TestPolynomialNativeNumeralGrowthResetAndBounds",
         "TestPolynomialNativeNumeralResetRetainsActualBIG",
         "TestUPolynomialNativeDescriptorAndBackingDirectories",
-        "TestUPolynomialNativeBorrowedStoreDirectory"
+        "TestUPolynomialNativeBorrowedStoreDirectory",
+        "TestUPolynomialNativeDegreeSubsetOracle",
+        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews"
       ],
       "conditionals": [
         {
@@ -46232,7 +46243,8 @@
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
         "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added.",
         "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked.",
-        "Sequence row offsets/sizes and factor multiplicities now use direct []uint32 slices with native append, reslicing on reset and nil on destruction. Removed unsigned-vector capacity/header arithmetic, size/initialized masks, container-only reservation faults and metadata backing-byte charges. Actual sequence/factor owners and numeral allocation/copy/destruction remain explicit; uint32 index bounds remain checked."
+        "Sequence row offsets/sizes and factor multiplicities now use direct []uint32 slices with native append, reslicing on reset and nil on destruction. Removed unsigned-vector capacity/header arithmetic, size/initialized masks, container-only reservation faults and metadata backing-byte charges. Actual sequence/factor owners and numeral allocation/copy/destruction remain explicit; uint32 index bounds remain checked.",
+        "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit."
       ]
     },
     {
@@ -46350,7 +46362,9 @@
         "pkg/math/polynomial/upolynomial_factor_int32.go",
         "pkg/math/polynomial/upolynomial_factor_field.go",
         "pkg/math/polynomial/upolynomial_factor_storage_test.go",
-        "pkg/math/polynomial/upolynomial_factor_degree_source_test.go"
+        "pkg/math/polynomial/upolynomial_factor_degree_source_test.go",
+        "pkg/math/polynomial/upolynomial_native_factor_storage_test.go",
+        "pkg/math/polynomial/upolynomial_factor_degree.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -46454,7 +46468,9 @@
         "TestUPolynomialFactorSquareFreeIssuedHistoryAndArchiveRefusal",
         "TestUPolynomialFactorSquareFreeRejectsSplicedDiagnosticAcquisition",
         "TestUPolynomialBerlekampNativePivotResize",
-        "TestUPolynomialFactorCombinationExactOrderRemovalAndProducts"
+        "TestUPolynomialFactorCombinationExactOrderRemovalAndProducts",
+        "TestUPolynomialNativeDegreeSubsetOracle",
+        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews"
       ],
       "conditionals": [
         {
@@ -46845,7 +46861,8 @@
         "upolynomial_factorization.cpp:1153-1175: compiled eligible GF7 caller profile validates every actual helper reservation and independent lifted product; qualified signed-host TLS/compiled checker profiles test exact source destruction stops. These profiles do not claim a new ordinary allocation seam between publication actions. The source constant DEL follows successful SET1 and its valid output is inline; no fabricated BIG constant DEL failure is introduced. Whole factorization/recombination topology remains partial.",
         "upolynomial_factorization.cpp:1153-1175: CapturedCheckerSourceStop is an explicitly compiled/seeded retirement-engine transport proof. ActualHelperCheckerSourceStop separately invokes prepareFactorLift with eligible uint32 GF7 and BIG primitive square-free input, literal Mignotte exponent32, actual captured debug checker and signed TLS source stop. The release profile erases that conditional checker and constructs no checker NUM. RetainedLexicalCleanup preserves original unmatched core/SetZ assertions and counts only actual returned InvalidSlot, stopped class cursor, live core.SetZ with identical graph and immutable tuple/cause after new exact owning rescue.",
         "upolynomial_factorization.cpp:1019-1299: additional reflected Go lifetime headers/nonwrapping tokens and charged diagnostic history model exception retention; native malloc count parity is not claimed. Literal conditional checker uses the existing selected debug/tag profile. Actual whole-input checker and owning release proof uses the qualified signed TLS accounting guard, not ordinary malloc failure. Whole factorization unit and multivariate parent remain partial.",
-        "Berlekamp pivot row/column indices and factor-combination enabled/current indices now use native Go slices. C++ vector growth arithmetic and container-only allocation faults/reservations are removed; actual iterator owner allocation, sentinel initialization, combination traversal/removal and numeric product operations remain."
+        "Berlekamp pivot row/column indices and factor-combination enabled/current indices now use native Go slices. C++ vector growth arithmetic and container-only allocation faults/reservations are removed; actual iterator owner allocation, sentinel initialization, combination traversal/removal and numeric product operations remain.",
+        "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit."
       ]
     },
     {
@@ -46883,7 +46900,10 @@
         "pkg/math/polynomial/upolynomial_factor_int32.go",
         "pkg/math/polynomial/upolynomial_factor_field.go",
         "pkg/math/polynomial/upolynomial_factor_storage_test.go",
-        "pkg/math/polynomial/upolynomial_factor_degree_source_test.go"
+        "pkg/math/polynomial/upolynomial_factor_degree_source_test.go",
+        "pkg/math/polynomial/upolynomial_factor_degree.go",
+        "pkg/math/polynomial/upolynomial_factors.go",
+        "pkg/math/polynomial/upolynomial_native_factor_storage_test.go"
       ],
       "tests": [
         "TestUPolynomialPrimeTrialToZPRawEveryPrefix",
@@ -46891,7 +46911,9 @@
         "TestUPolynomialRecombinationTrialEveryActualBranchPrefix",
         "TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix",
         "TestUPolynomialBerlekampNativePivotResize",
-        "TestUPolynomialFactorCombinationExactOrderRemovalAndProducts"
+        "TestUPolynomialFactorCombinationExactOrderRemovalAndProducts",
+        "TestUPolynomialNativeDegreeSubsetOracle",
+        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews"
       ],
       "conditionals": [
         {
@@ -46973,7 +46995,8 @@
       ],
       "deviations": [
         "Only the actual prime receipt route is closed; generic nil helper and pair-Hensel lexical lifetime remain open.",
-        "Berlekamp pivot row/column indices and factor-combination enabled/current indices now use native Go slices. C++ vector growth arithmetic and container-only allocation faults/reservations are removed; actual iterator owner allocation, sentinel initialization, combination traversal/removal and numeric product operations remain."
+        "Berlekamp pivot row/column indices and factor-combination enabled/current indices now use native Go slices. C++ vector growth arithmetic and container-only allocation faults/reservations are removed; actual iterator owner allocation, sentinel initialization, combination traversal/removal and numeric product operations remain.",
+        "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit."
       ]
     },
     {
