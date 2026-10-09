@@ -73,8 +73,6 @@ func testExportedFieldNames(name string) (string, string) {
 		return "Buffers", ""
 	case "cache":
 		return "Cache", ""
-	case "cacheBytes":
-		return "CacheBytes", ""
 	case "caller":
 		return "Caller", ""
 	case "callerExecuting":

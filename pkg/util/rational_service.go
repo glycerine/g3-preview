@@ -29,7 +29,7 @@ type OwnedRational struct {
 type RationalServiceConfig struct{ Integers IntegerConfig }
 type RationalServiceStats struct {
 	CacheLength, CacheCapacity uint32
-	HeaderBytes, CacheBytes    uint64
+	HeaderBytes                uint64
 	LiveCells, LivePayloads    uint32
 	// LivePayloads includes actual numeric objects (including a pending cell)
 	// and genuine Natural buffers. It is not a count of raw allocator blocks.
@@ -57,7 +57,7 @@ type RationalService struct {
 	InfZeroField, InfOneField, InfMinusOneField          OwnedInfRational
 	InfIntZeroField, InfIntOneField, InfIntMinusOneField OwnedInfIntRational
 	Cache                                                []Rational
-	CacheBytes, HeaderBytes                              uint64
+	HeaderBytes                                          uint64
 	closed                                               bool
 	originalCause, cleanupCause                          error
 	cleanupStage                                         uint8
@@ -357,33 +357,6 @@ func (s *RationalService) MinusOne() (OwnedRational, error) {
 	defer s.mu.Unlock()
 	return s.copyOutput(&s.MinusOneField)
 }
-func (s *RationalService) growCache() error {
-	old := uint64(cap(s.Cache))
-	next := uint64(2)
-	if old != 0 {
-		next = (3*old + 1) / 2
-	}
-	bytes := next * uint64(reflect.TypeOf(Rational{}).Size())
-	if next <= old || next > math.MaxUint32 || bytes > uint64(^uint(0)>>1) {
-		return arena.ErrBounds
-	}
-	if e := s.Manager.BudgetField.Reserve(bytes); e != nil {
-		return e
-	}
-	data := make([]Rational, len(s.Cache), int(next))
-	// Source vector moves each element then destroys that moved-from wrapper.
-	// Transfer the handles, retain old m_val history, then run its no-ref Del.
-	for i := range s.Cache {
-		data[i] = s.Cache[i]
-		s.Cache[i].Num.Cell = 0
-		s.Cache[i].Den.Cell = 0
-		s.Manager.Del(&s.Cache[i])
-	}
-	s.Cache = data
-	s.Manager.BudgetField.Release(s.CacheBytes)
-	s.CacheBytes = bytes
-	return nil
-}
 func (s *RationalService) pushCache(v *Rational) (_lexErr error) {
 	return s.pushCacheWithInvocation(v, nil)
 }
@@ -392,17 +365,12 @@ func (s *RationalService) pushCacheWithInvocation(v *Rational, c *RationalServic
 		return e
 	}
 	defer s.endLexicalError(&_lexErr)
-	if len(s.Cache) == cap(s.Cache) {
-		if e := s.growCache(); e != nil {
-			return e
-		}
-	}
 	item := NewRational()
 	if e := s.Manager.copyWithAllocationContext(&item, v, c.allocationContext()); e != nil {
 		s.abortLexicalRational(&item)
 		return e
 	}
-	// Placement-copy completes before source vector size is incremented.
+	// Complete the owned numeric copy before publishing it in Go-managed storage.
 	s.Cache = append(s.Cache, item)
 	return nil
 }
@@ -484,7 +452,7 @@ func (s *RationalService) Stats() (RationalServiceStats, error) {
 	}
 	defer s.mu.Unlock()
 	z := s.Manager.Z
-	stats := RationalServiceStats{CacheLength: uint32(len(s.Cache)), CacheCapacity: uint32(cap(s.Cache)), HeaderBytes: s.HeaderBytes, CacheBytes: s.CacheBytes, LiveCells: z.Cells.Stats().Live, NaturalPayloads: z.Words.Stats().Live + z.Natural.overflowPayloads()}
+	stats := RationalServiceStats{CacheLength: uint32(len(s.Cache)), CacheCapacity: uint32(cap(s.Cache)), HeaderBytes: s.HeaderBytes, LiveCells: z.Cells.Stats().Live, NaturalPayloads: z.Words.Stats().Live + z.Natural.overflowPayloads()}
 	for n := uint64(1); n <= uint64(z.Cells.Stats().Slots); n++ {
 		c, e := z.Cells.Read(arena.Slot(n))
 		if e != nil {
@@ -512,8 +480,6 @@ func (s *RationalService) destroyCache() {
 		s.Manager.Del(&s.Cache[i])
 	}
 	s.Cache = nil
-	s.Manager.BudgetField.Release(s.CacheBytes)
-	s.CacheBytes = 0
 }
 
 // The two source finalizer hooks run before the powers vector is destroyed.

@@ -71,7 +71,7 @@ func TestRationalServiceInvocationEveryPowerReservation(t *testing.T) {
 			roots = append(roots, &call.scope.Roots[i].Num, &call.scope.Roots[i].Den)
 		}
 		integerPhysicalAudit(t, s.Manager.Z, roots...)
-		if want := s.HeaderBytes + s.CacheBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
+		if want := s.HeaderBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
 			t.Fatal("before-lift actual cold graph", ordinal, b.Used(), want)
 		}
 		if body != nil && !numericPhysicalReservationRefusal(body) {
@@ -125,7 +125,7 @@ func TestRationalServiceInvocationDetachedCellSourceEnd(t *testing.T) {
 				roots = append(roots, &call.scope.Roots[i].Num, &call.scope.Roots[i].Den)
 			}
 			integerPhysicalAudit(t, s.Manager.Z, roots...)
-			if want := s.HeaderBytes + s.CacheBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
+			if want := s.HeaderBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
 				t.Fatal("immediate detached frontier", debug, ordinal, b.Used(), want)
 			}
 			b.FailAfter(-1)
@@ -187,7 +187,7 @@ func TestRationalServiceCopyInvocationEveryActualReservation(t *testing.T) {
 				t.Fatal("exact detached copy backing", e)
 			}
 		}
-		if want := s.HeaderBytes + s.CacheBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
+		if want := s.HeaderBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
 			t.Fatal("immediate Copy cold graph", ordinal, b.Used(), want)
 		}
 		if body != nil && !numericPhysicalReservationRefusal(body) {

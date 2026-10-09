@@ -24,7 +24,7 @@ func polynomialEvaluationIntervalAudit(t *testing.T, m *MultivariatePolynomialMa
 	for i := range s.Cache {
 		inputs = append(inputs, &s.Cache[i].Num, &s.Cache[i].Den)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, inputs, s.HeaderBytes+s.CacheBytes+b.HeaderBytes+vm.HeaderBytes)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, inputs, s.HeaderBytes+b.HeaderBytes+vm.HeaderBytes)
 }
 func TestPolynomialEvaluationIntervalEveryReservation(t *testing.T) {
 	failed := 0

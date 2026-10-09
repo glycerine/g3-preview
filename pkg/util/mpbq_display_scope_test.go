@@ -24,7 +24,7 @@ func binaryDisplayDiagnosticBytes(m *BinaryRationalManager) uint64 {
 	if s == nil || s.closed {
 		return 0
 	}
-	return integerActualOwnedBytes(s.Manager.Z) + s.Manager.HeaderBytes + s.HeaderBytes + s.CacheBytes
+	return integerActualOwnedBytes(s.Manager.Z) + s.Manager.HeaderBytes + s.HeaderBytes
 }
 
 func TestBinaryDecimalErrorDoesNotExecuteSourceEndLabel(t *testing.T) {

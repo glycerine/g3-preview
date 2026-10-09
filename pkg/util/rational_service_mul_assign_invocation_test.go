@@ -101,7 +101,7 @@ func TestRationalServiceMulAssignInvocationEveryActualReservation(t *testing.T) 
 						extra = append(extra, block)
 					}
 					integerPhysicalAuditWithRaw(t, s.Manager.Z, extra, roots...)
-					if want := s.HeaderBytes + s.CacheBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); budget.Used() != want {
+					if want := s.HeaderBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); budget.Used() != want {
 						t.Fatal("actual multiplication graph", budget.Used(), want)
 					}
 					if body != nil {

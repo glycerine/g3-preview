@@ -16,7 +16,7 @@ func astFormatterRationalColdBytes(t *testing.T, q *util.RationalService) uint64
 	if testFieldBySourceName(s, "self").Pointer() != reflect.ValueOf(q).Pointer() {
 		t.Fatal("foreign numerical service")
 	}
-	n := testFieldBySourceName(s, "headerBytes").Uint() + testFieldBySourceName(s, "cacheBytes").Uint()
+	n := testFieldBySourceName(s, "headerBytes").Uint()
 	m := testFieldBySourceName(s, "manager").Elem()
 	n += testFieldBySourceName(m, "headerBytes").Uint()
 	z := testFieldBySourceName(m, "z").Elem()

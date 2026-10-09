@@ -120,7 +120,7 @@ func paramsDecAuditColdGraph(t *testing.T, q *util.RationalService, m *polynomia
 	z := reflect.ValueOf(m.IntegerManager()).Elem()
 	// Polynomial metadata and coefficient backings belong to the polynomial
 	// manager; its borrowed integer storage is counted separately below.
-	n := m.Stats().TotalBytes + r.Stats().TotalBytes + testFieldBySourceName(qv, "headerBytes").Uint() + testFieldBySourceName(qv, "cacheBytes").Uint() + testFieldBySourceName(qm, "headerBytes").Uint() + testFieldBySourceName(z, "headerBytes").Uint()
+	n := m.Stats().TotalBytes + r.Stats().TotalBytes + testFieldBySourceName(qv, "headerBytes").Uint() + testFieldBySourceName(qm, "headerBytes").Uint() + testFieldBySourceName(z, "headerBytes").Uint()
 	a := testFieldBySourceName(z, "allocator").Elem()
 	locations := testFieldBySourceName(a, "locations")
 	n += uint64(a.Type().Size()) + uint64(locations.Cap())*uint64(locations.Type().Elem().Size())

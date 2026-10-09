@@ -342,7 +342,7 @@ func paramsDecAuditColdGraph(t *testing.T, q *RationalService, m *IntegerManager
 	qv := reflect.ValueOf(q).Elem()
 	qm := testFieldBySourceName(qv, "manager").Elem()
 	z := reflect.ValueOf(m).Elem()
-	n := r.Stats().TotalBytes + testFieldBySourceName(qv, "headerBytes").Uint() + testFieldBySourceName(qv, "cacheBytes").Uint() + testFieldBySourceName(qm, "headerBytes").Uint() + testFieldBySourceName(z, "headerBytes").Uint()
+	n := r.Stats().TotalBytes + testFieldBySourceName(qv, "headerBytes").Uint() + testFieldBySourceName(qm, "headerBytes").Uint() + testFieldBySourceName(z, "headerBytes").Uint()
 	a := testFieldBySourceName(z, "allocator").Elem()
 	locations := testFieldBySourceName(a, "locations")
 	n += uint64(a.Type().Size()) + uint64(locations.Cap())*uint64(locations.Type().Elem().Size())

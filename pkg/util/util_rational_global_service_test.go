@@ -173,7 +173,7 @@ func rationalGlobalColdGraph(t *testing.T, g *RationalGlobalService, r *Runtime)
 	t.Helper()
 	n := r.Stats().TotalBytes + g.header
 	sv := reflect.ValueOf(g.service).Elem()
-	n += testFieldBySourceName(sv, "headerBytes").Uint() + testFieldBySourceName(sv, "cacheBytes").Uint()
+	n += testFieldBySourceName(sv, "headerBytes").Uint()
 	seen := map[uintptr]bool{}
 	slab := func(v reflect.Value) uint64 {
 		if v.IsNil() {

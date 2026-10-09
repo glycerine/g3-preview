@@ -72,7 +72,7 @@ func TestRationalServiceNegAssignInvocationEveryIntMinReservation(t *testing.T) 
 				extra = append(extra, block)
 			}
 			integerPhysicalAuditWithRaw(t, s.Manager.Z, extra, roots...)
-			if b.Used() != s.HeaderBytes+s.CacheBytes+s.Manager.HeaderBytes+integerActualOwnedBytes(s.Manager.Z) {
+			if b.Used() != s.HeaderBytes+s.Manager.HeaderBytes+integerActualOwnedBytes(s.Manager.Z) {
 				t.Fatal("uncharged physical graph")
 			}
 			if a.Raw.Den != den {

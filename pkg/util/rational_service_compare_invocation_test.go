@@ -84,7 +84,7 @@ func TestRationalServiceComparisonInvocationEveryActualReservation(t *testing.T)
 						t.Fatal("comparison modified operands")
 					}
 					qopsAuditLiveOwnership(t, s.Manager, []*Int{&a.Raw.Num, &a.Raw.Den, &b.Raw.Num, &b.Raw.Den})
-					if want := s.HeaderBytes + s.CacheBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); budget.Used() != want {
+					if want := s.HeaderBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); budget.Used() != want {
 						t.Fatal("actual comparison graph", budget.Used(), want)
 					}
 					if body != nil {

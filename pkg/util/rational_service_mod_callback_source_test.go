@@ -81,7 +81,7 @@ func TestRationalServiceModActualTransportRefusesHeldOwner(t *testing.T) {
 		roots = append(roots, &s.Lexical.Roots[i].Num, &s.Lexical.Roots[i].Den)
 	}
 	integerPhysicalAuditWithRaw(t, s.Manager.Z, []Block{held}, roots...)
-	if want := s.HeaderBytes + s.CacheBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
+	if want := s.HeaderBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
 		t.Fatal("actual cold graph before limit lift", b.Used(), want)
 	}
 	serviceMust(t, rt.SetMaxSize(0))

@@ -133,7 +133,7 @@ func TestRationalServiceConstantsSettersAndMoveHistory(t *testing.T) {
 
 func TestRationalServicePowerCacheSourceModel(t *testing.T) {
 	s, _ := serviceNew(t)
-	length, capacity := uint32(0), uint32(0)
+	length := uint32(0)
 	for _, k := range []uint32{0, 1, 2, 4, 3, 9, 31, 63, 127, 255, 128} {
 		v, e := s.PowerOfTwo(k)
 		serviceMust(t, e)
@@ -142,17 +142,10 @@ func TestRationalServicePowerCacheSourceModel(t *testing.T) {
 		if k >= length {
 			length = k + 2
 		}
-		for capacity < length {
-			if capacity == 0 {
-				capacity = 2
-			} else {
-				capacity = (3*capacity + 1) / 2
-			}
-		}
 		stats, e := s.Stats()
 		serviceMust(t, e)
-		if stats.CacheLength != length || stats.CacheCapacity != capacity || stats.CacheBytes != uint64(capacity)*uint64(reflect.TypeOf(Rational{}).Size()) {
-			t.Fatal(k, stats, length, capacity)
+		if stats.CacheLength != length || stats.CacheCapacity < length {
+			t.Fatal(k, stats, length)
 		}
 		serviceMust(t, s.SetInt64(&v, 7))
 		serviceMust(t, s.Del(&v))
@@ -284,10 +277,8 @@ func TestRationalServiceCacheFailurePrefixes(t *testing.T) {
 			serviceText(t, s, &v, new(big.Int).Lsh(big.NewInt(1), 67).String())
 			serviceMust(t, s.Del(&v))
 		}
-		// Cache growth is a committed source prefix. Temporary curr/two/result values
-		// must already be gone, before owner Close could mask any leaked numeral.
-		// Source ensure_tmp can free its old buffer before failing: cached roots
-		// are added to the ACTUAL remaining manager graph, not a fixed-six baseline.
+		// Temporary curr/two/result values must already be gone before owner Close
+		// could mask any leaked numeral. Cached roots remain part of the actual graph.
 		for i := range s.Cache {
 			got, err := s.Manager.String(&s.Cache[i])
 			if err != nil || got != new(big.Int).Lsh(big.NewInt(1), uint(i)).String() {
@@ -370,35 +361,23 @@ func TestRationalServiceCopyFailureAndWarmReuse(t *testing.T) {
 	serviceMust(t, s.Del(&dst))
 }
 
-func TestRationalServiceCacheBackingPeakAndBounds(t *testing.T) {
+func TestRationalServiceCacheNativeStorageAndBounds(t *testing.T) {
 	s, b := serviceNew(t)
 	v, e := s.PowerOfTwo(0)
 	serviceMust(t, e)
 	serviceMust(t, s.Del(&v))
 	before := b.Used()
-	stats, _ := s.Stats()
-	if stats.CacheCapacity != 2 {
-		t.Fatal(stats)
-	}
-	// Small powers need no numeral payload growth: precisely the entire new
-	// five-element array must fit alongside the intermediate three-element array.
-	bytes := uint64(reflect.TypeOf(Rational{}).Size()) * 6
-	hold := b.Limit() - before - bytes + 1
-	serviceMust(t, b.Reserve(hold))
-	_, e = s.PowerOfTwo(2)
-	if !errors.Is(e, arena.ErrBudget) || len(s.Cache) != 3 || cap(s.Cache) != 3 {
-		t.Fatal(e, len(s.Cache), cap(s.Cache))
-	}
-	b.Release(1)
 	v, e = s.PowerOfTwo(3)
 	serviceMust(t, e)
 	serviceMust(t, s.Del(&v))
-	b.Release(hold - 1)
 	if len(s.Cache) != 5 {
 		t.Fatal("inclusive extra entry", len(s.Cache))
 	}
+	if b.Used() != before {
+		t.Fatal("Go cache backing charged to numeric arena", b.Used(), before)
+	}
 	before = b.Used()
-	stats, _ = s.Stats()
+	stats, _ := s.Stats()
 	_, e = s.PowerOfTwo(math.MaxUint32)
 	if !errors.Is(e, arena.ErrBounds) || b.Used() != before {
 		t.Fatal(e, b.Used(), before)
@@ -561,14 +540,13 @@ func TestRationalServiceCacheRelocationMoveAndDestruction(t *testing.T) {
 		refs[i] = old[i].Num.Cell
 		vals[i] = old[i].Num.Val
 	}
-	// Force source expansion by requesting the first index past current capacity.
-	// The old backing is retained only by this cold test observer.
+	// Force native slice expansion by requesting the first index past capacity.
 	v, e = s.PowerOfTwo(uint32(cap(old)))
 	serviceMust(t, e)
 	serviceMust(t, s.Del(&v))
 	for i := range old {
-		if old[i].Num.Cell != 0 || old[i].Den.Cell != 0 || old[i].Num.Val != vals[i] || s.Cache[i].Num.Cell != refs[i] {
-			t.Fatal("relocation deep-copied/recycled source handles or lost moved-from history", i)
+		if old[i].Num.Val != vals[i] || s.Cache[i].Num.Cell != refs[i] {
+			t.Fatal("slice relocation changed owned numeric identity", i)
 		}
 	}
 	// Isolate source ascending cache destructor order through real LIFO slot
@@ -582,7 +560,7 @@ func TestRationalServiceCacheRelocationMoveAndDestruction(t *testing.T) {
 	s.mu.Lock()
 	s.destroyCache()
 	s.mu.Unlock()
-	if s.Cache != nil || s.CacheBytes != 0 {
+	if s.Cache != nil {
 		t.Fatal("production cache destructor retained backing")
 	}
 	var reused []OwnedRational

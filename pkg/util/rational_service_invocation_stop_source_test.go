@@ -74,7 +74,7 @@ func TestRationalServiceInvocationCompletedSourceStopAndOwnHistory(t *testing.T)
 		extra = append(extra, block)
 	}
 	integerPhysicalAuditWithRaw(t, s.Manager.Z, extra, roots...)
-	if want := s.HeaderBytes + s.CacheBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
+	if want := s.HeaderBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); b.Used() != want {
 		t.Fatal("source-stop cold graph before recovery", b.Used(), want)
 	}
 	tuple, original, source := call.invocation, call.bodyCause, call.sourceCause

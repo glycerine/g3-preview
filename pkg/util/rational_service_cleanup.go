@@ -81,8 +81,6 @@ func (s *RationalService) CloseChecked() error {
 	}
 	if s.sourceGuard {
 		s.Cache = nil
-		s.Manager.BudgetField.Release(s.CacheBytes)
-		s.CacheBytes = 0
 		s.InfZeroField = OwnedInfRational{}
 		s.InfOneField = OwnedInfRational{}
 		s.InfMinusOneField = OwnedInfRational{}
@@ -161,8 +159,6 @@ func (s *RationalService) cleanupOuter(source bool) error {
 			}
 		}
 		s.Cache = nil
-		s.Manager.BudgetField.Release(s.CacheBytes)
-		s.CacheBytes = 0
 		s.cleanupStage++
 	}
 	constants := [6]*Int{&s.ZeroField.Num, &s.ZeroField.Den, &s.OneField.Num, &s.OneField.Den, &s.MinusOneField.Num, &s.MinusOneField.Den}

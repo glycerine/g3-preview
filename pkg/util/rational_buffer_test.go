@@ -175,7 +175,7 @@ func TestRationalBuffer16EveryActualCopyReservation(t *testing.T) {
 				roots = append(roots, &b.appendCall.scope.Roots[i].Num, &b.appendCall.scope.Roots[i].Den)
 			}
 			integerPhysicalAudit(t, s.Manager.Z, roots...)
-			if wantBytes := s.HeaderBytes + s.CacheBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); budget.Used() != wantBytes {
+			if wantBytes := s.HeaderBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); budget.Used() != wantBytes {
 				t.Fatal("actual owner graph", ordinal, budget.Used(), wantBytes)
 			}
 			if body != nil {

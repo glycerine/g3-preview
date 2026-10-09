@@ -127,7 +127,7 @@ func TestTransitiveSourceFinalizeActualDiagnosticPrefix(t *testing.T) {
 			if m.cleanupStage != 9 || m.SourceFinalized || m.Z.SourceFinalizeStage != 7 || rt.Stats().LiveBlocks != 1 || (m.Z.Natural == nil || !m.Z.Natural.sourceFinalized || m.Z.Natural.SourceStage != 4 || m.Z.Natural.HeaderBytes == 0) || m.HeaderBytes == 0 {
 				t.Fatal("source diagnostic prefix lost")
 			}
-			if s != nil && (s.cleanupStage != 25 || s.sourceFinalized || s.CacheBytes != 0) {
+			if s != nil && (s.cleanupStage != 25 || s.sourceFinalized) {
 				t.Fatal("service outer prefix lost")
 			}
 			transitiveSourceAudit(t, m, s, b, &caller.Num, &caller.Den)
@@ -227,7 +227,7 @@ func TestServiceSourceFinalizeActualCacheDenominatorGuard(t *testing.T) {
 	if e = s.SourceFinalize(); !errors.Is(e, arena.ErrInvalidSlot) {
 		t.Fatal(e)
 	}
-	if !s.sourceGuard || s.cleanupStage != 18 || s.cleanupCacheIndex != 1 || s.cleanupComponent != 1 || s.CacheBytes == 0 || m.SourceFinalizing {
+	if !s.sourceGuard || s.cleanupStage != 18 || s.cleanupCacheIndex != 1 || s.cleanupComponent != 1 || m.SourceFinalizing {
 		t.Fatal("cache NUM/DEN source prefix")
 	}
 	for _, raw := range raws {
@@ -399,7 +399,7 @@ func transitiveSourceAudit(t *testing.T, m *RationalManager, s *RationalService,
 		}
 	}
 	if s != nil {
-		owned += s.HeaderBytes + s.CacheBytes
+		owned += s.HeaderBytes
 	}
 	if b.Used() != owned {
 		t.Fatal("retained complete physical/cold graph", b.Used(), owned)
