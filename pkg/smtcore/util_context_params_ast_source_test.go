@@ -41,7 +41,7 @@ func TestContextParamsMkASTManagerActualTraceProofCoercionAndDebugActions(t *tes
 	id, e := m.GetASTID(v)
 	paramsMust(t, e)
 	paramsMust(t, m.DecRef(v))
-	if !m.DebugFreeIndices.Contains(id) {
+	if _, found := m.DebugFreeIndices[id]; !found {
 		t.Fatal("debug flag never reached actual deletion map")
 	}
 	paramsMust(t, m.SourceFinalize())

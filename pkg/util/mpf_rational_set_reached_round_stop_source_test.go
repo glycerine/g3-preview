@@ -63,8 +63,7 @@ func TestArbitraryFloatExponentRationalSetReachedRoundNUMStop(t *testing.T) {
 			}
 			before := *s
 			used := b.Used()
-			maps := m.completedMaps
-			if e = m.SourceFinalize(); e != r.sourceCause || *s != before || b.Used() != used || m.completedMaps != maps || m.sourceEnded {
+			if e = m.SourceFinalize(); e != r.sourceCause || *s != before || b.Used() != used || m.sourceEnded {
 				t.Fatal("young child crossed older caller/class suffix", e)
 			}
 			recovery, e := rt.Allocate(200000)

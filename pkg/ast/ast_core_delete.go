@@ -111,7 +111,8 @@ func (m *ASTManager) deleteNode(first astNodeRef) error {
 		if e := m.deletionAfter(current); e != nil {
 			return e
 		}
-		if ASTSourceDebug && m.DebugRefCount && m.DebugFreeIndices.Contains(n.id) {
+		_, alreadyFreed := m.DebugFreeIndices[n.id]
+		if ASTSourceDebug && m.DebugRefCount && alreadyFreed {
 			return ErrASTDomain
 		}
 		n = m.nodeAt(current.slot)
@@ -195,9 +196,7 @@ func (m *ASTManager) deleteNode(first astNodeRef) error {
 		}
 		n.deletePhase = 3
 		if m.DebugRefCount {
-			if e := m.DebugFreeIndices.Insert(n.id, 0); e != nil {
-				return e
-			}
+			m.DebugFreeIndices[n.id] = struct{}{}
 		}
 		if e := m.freeNodeStorage(current); e != nil {
 			return e

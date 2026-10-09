@@ -140,9 +140,6 @@ func TestArbitraryFloatEveryCopyReservationAndLiteralFieldPrefix(t *testing.T) {
 			// Name the actual caller numerals and retained leaf before lifting.
 			integerPhysicalAudit(t, m.integer, &source, &input.significand, &out.significand)
 			var maps uint64
-			for i := range m.powers {
-				maps += m.powers[i].StorageBytes()
-			}
 			if want := m.header + m.ValueCopyHistoryBytes() + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps; b.Used() != want {
 				t.Fatal(copyValue, ordinal, "actual physical/cold graph", b.Used(), want)
 			}

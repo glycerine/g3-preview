@@ -92,9 +92,6 @@ func TestArbitraryFloatSignCopyAllocationPrefixes(t *testing.T) {
 			}
 			integerPhysicalAuditWithRaw(t, m.integer, nil, &source.significand, &out.significand)
 			var maps uint64
-			for i := range m.powers {
-				maps += m.powers[i].StorageBytes()
-			}
 			want := m.header + m.ValueCopyHistoryBytes() + m.powerWrapperBytes + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps
 			if b.Used() != want {
 				t.Fatal("before-lift physical/cold graph", neg, prefix, b.Used(), want)

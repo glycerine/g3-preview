@@ -19,7 +19,6 @@ func TestArbitraryFloatRoundSqrtActualTransportOwnerGuards(t *testing.T) {
 			calls++
 			before := x
 			used := b.Used()
-			stage := m.completedMaps
 			source, own := m.sourceCause, m.ownCause
 			scope := m.RoundSqrtScope
 			oldContext = integerAllocationInvocationContext{mpfRoundSqrt: &m.RoundSqrtScope, mpfRoundSqrtInvocation: m.RoundSqrtScope.Invocation}
@@ -35,7 +34,7 @@ func TestArbitraryFloatRoundSqrtActualTransportOwnerGuards(t *testing.T) {
 					t.Fatal("callback owner guard", err)
 				}
 			}
-			if x != before || b.Used() != used || m.completedMaps != stage || m.sourceCause != source || m.ownCause != own || m.RoundSqrtScope != scope {
+			if x != before || b.Used() != used || m.sourceCause != source || m.ownCause != own || m.RoundSqrtScope != scope {
 				t.Fatal("callback changed older state")
 			}
 		}

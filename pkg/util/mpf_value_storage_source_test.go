@@ -41,7 +41,7 @@ func TestArbitraryFloatVectorGrowthActualTransportProtectsOwnedMembers(t *testin
 		t.Fatal("actual returned unjoined value backing", call, calls, raw)
 	}
 	integerPhysicalAuditWithRaw(t, m.integer, []Block{padding, raw})
-	if b.Used() != m.header+m.rational.HeaderBytes+integerActualOwnedBytes(m.integer)+m.powers[0].StorageBytes()+m.powers[1].StorageBytes()+m.powers[2].StorageBytes()+m.powers[3].StorageBytes() {
+	if b.Used() != m.header+m.rational.HeaderBytes+integerActualOwnedBytes(m.integer) {
 		t.Fatal("immediate exact cold/raw graph", b.Used())
 	}
 	serviceMust(t, r.SetMaxSize(0))

@@ -78,9 +78,6 @@ func TestArbitraryFloatPhysicalRowPublishesAtActualCopyCallback(t *testing.T) {
 		}
 		integerPhysicalAuditWithRaw(t, m.integer, []Block{row, padding}, &source, &input.significand, &out.significand)
 		var maps uint64
-		for i := range m.powers {
-			maps += m.powers[i].StorageBytes()
-		}
 		if want := m.header + m.ValueCopyHistoryBytes() + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps; b.Used() != want {
 			t.Fatal("immediate cold/physical graph", b.Used(), want)
 		}
@@ -168,9 +165,6 @@ func TestArbitraryFloatFreshInlineRowWhileOlderCopyRetainsRoots(t *testing.T) {
 		}
 		integerPhysicalAuditWithRaw(t, m.integer, []Block{row, padding}, &source, &input.significand, &out.significand)
 		var maps uint64
-		for i := range m.powers {
-			maps += m.powers[i].StorageBytes()
-		}
 		if want := m.header + m.ValueCopyHistoryBytes() + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps; b.Used() != want {
 			t.Fatal("immediate cold/physical graph", b.Used(), want)
 		}

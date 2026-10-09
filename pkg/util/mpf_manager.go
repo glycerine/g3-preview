@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/insdict"
 )
 
 // This is the actual MPF constructor/destructor dependency, distinct from the
@@ -60,8 +61,8 @@ type ArbitraryFloatManager struct {
 	powerWrapperBytes                                       uint64
 	self                                                    *ArbitraryFloatManager
 	rational                                                *RationalManager
-	integer                                                 *IntegerManager // source reference to the exact same mpq base
-	powers                                                  [4]UintMap      // p, pn, pm1, pm1n; actual inline owners
+	integer                                                 *IntegerManager                 // source reference to the exact same mpq base
+	powers                                                  [4]insdict.Dict[uint32, uint32] // p, pn, pm1, pm1n
 	memory                                                  *Runtime
 	budget                                                  *arena.Budget
 	valueExecuting                                          bool
@@ -73,7 +74,6 @@ type ArbitraryFloatManager struct {
 	failedChild                                             error
 	bodyCause, sourceCause, ownCause                        error
 	header                                                  uint64
-	completedMaps                                           uint8
 	rationalReady, constructorComplete, sourceEnded, closed bool
 }
 
@@ -104,23 +104,6 @@ func NewArbitraryFloatManager(c IntegerConfig) (*ArbitraryFloatManager, error) {
 	q.mpfParent = m
 	m.integer.MpfParent = m
 	m.rationalReady = true
-	for i := range m.powers {
-		if e = InitializeInlineUintMap(&m.powers[i], UintMapConfig{Budget: b}); e != nil {
-			m.bodyCause = e
-			// Only completed source members unwind; no powers2 destructor BODY is
-			// invoked on this incomplete object. Map members unwind in reverse.
-			for j := int(m.completedMaps) - 1; j >= 0; j-- {
-				m.powers[j].Close()
-			}
-			if dt := q.SourceFinalize(); dt != nil {
-				m.sourceCause = dt
-			} else {
-				m.rationalReady = false
-			}
-			return nil, m
-		}
-		m.completedMaps++
-	}
 	m.constructorComplete = true
 	return m, nil
 }
@@ -335,7 +318,7 @@ func (m *ArbitraryFloatManager) SourceFinalize() error {
 		return e
 	}
 	for i := 3; i >= 0; i-- {
-		m.powers[i].Close()
+		m.powers[i].Clear()
 	}
 	if e := m.rational.SourceFinalize(); e != nil {
 		m.sourceCause = e
@@ -494,8 +477,8 @@ func (m *ArbitraryFloatManager) Close() error {
 	if e := m.destroyPowerWrappers(true); e != nil {
 		return stop(e)
 	}
-	for i := int(m.completedMaps) - 1; i >= 0; i-- {
-		m.powers[i].Close()
+	for i := range m.powers {
+		m.powers[i].Clear()
 	}
 	if m.rational != nil {
 		if e := m.rational.CloseChecked(); e != nil {
@@ -553,9 +536,6 @@ func (m *ArbitraryFloatManager) OwnedStorageBytes() uint64 {
 				n += s.OwnerBytes + s.PayloadBytes + s.MetadataBytes + s.DirectoryBytes
 			}
 		}
-	}
-	for i := range m.powers {
-		n += m.powers[i].StorageBytes()
 	}
 	return n
 }

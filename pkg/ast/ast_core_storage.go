@@ -262,7 +262,7 @@ type ASTManager struct {
 	LowLevel                                                                                           astLowLevelFrame
 	traceExecuting                                                                                     bool
 	DebugRefCount                                                                                      bool
-	DebugFreeIndices                                                                                   util.UintMap
+	DebugFreeIndices                                                                                   map[uint32]struct{}
 	debugFreeComplete                                                                                  bool
 	ExprIDs, declIDs                                                                                   util.IDGen
 	nodes                                                                                              []*astNodePage

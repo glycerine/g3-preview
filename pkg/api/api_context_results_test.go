@@ -222,7 +222,7 @@ func (o *apiResultsTestObject) apiDestroy() error {
 	return nil
 }
 
-func TestAPIContextObjectTeardownRestartsOriginalHashIterator(t *testing.T) {
+func TestAPIContextObjectTeardownUsesStableInsertionOrder(t *testing.T) {
 	_, c := apiResultsFixture(t, false)
 	var events []uint32
 	var objs []*apiResultsTestObject
@@ -247,7 +247,7 @@ func TestAPIContextObjectTeardownRestartsOriginalHashIterator(t *testing.T) {
 		}
 	}
 	if !reflect.DeepEqual(events, want) {
-		t.Fatal("source bucket order/restarted destructor iteration", events, want)
+		t.Fatal("stable insertion order/restarted destructor iteration", events, want)
 	}
 	for _, o := range objs {
 		if !o.object.closed || o.object.ownerBytes != 0 {
@@ -264,7 +264,8 @@ func TestAPIContextObjectCloseRetainsRefusedFreeListPrefix(t *testing.T) {
 	m.BudgetField.FailAfter(0)
 	e = c.Close()
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || o.object.references != 0 || o.object.closed || !c.allocated.Contains(o.object.id) || c.lastObject != &o.object {
+	_, allocated := c.allocated.Get2(o.object.id)
+	if !errors.Is(e, arena.ErrInjectedFailure) || o.object.references != 0 || o.object.closed || !allocated || c.lastObject != &o.object {
 		t.Fatal("ref decrement/free-list refusal did not preserve its exact prefix", e)
 	}
 	astTestMust(t, c.Close())

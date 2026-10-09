@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/insdict"
 )
 
 var errAPIObjectOwner = errors.New("api: invalid, copied or retired context result/object owner")
@@ -16,14 +17,15 @@ var errAPIObjectOwner = errors.New("api: invalid, copied or retired context resu
 // This is the result/object member portion of api::context, borrowing the real
 // AST manager. It is not a replacement for the unported context constructor,
 // which must also own its services, plugin utilities and tactic registry.
-// The scalar u_map preserves source bucket order; its values index a cold
-// directory of API wrappers, never an interface in each hash-table entry.
+// The insertion-ordered dictionary gives deterministic teardown without
+// reproducing the source hash table's physical buckets. Values index a cold
+// directory of API wrappers.
 type apiContextResults struct {
 	self                          *apiContextResults
 	manager                       *ast.ASTManager
 	lastResult, astTrail          ast.ASTRefVector
 	lastObject, pendingDestroy    *apiObject
-	allocated                     util.UintMap
+	allocated                     insdict.Dict[uint32, uint32]
 	objects                       []*apiObject
 	freeIDs                       []uint32
 	ownerBytes                    uint64
@@ -62,11 +64,6 @@ func newAPIContextResults(m *ast.ASTManager, rc bool) (c *apiContextResults, err
 	}
 	if c.astTrail, err = m.NewRefVector(); err != nil {
 		cleanup := m.DelRefVector(&c.lastResult)
-		m.Budget().Release(n)
-		return nil, errors.Join(err, cleanup)
-	}
-	if err = util.InitializeInlineUintMap(&c.allocated, util.UintMapConfig{Budget: m.Budget(), OutOfMemory: m.IsOutOfMemory}); err != nil {
-		cleanup := errors.Join(m.DelRefVector(&c.astTrail), m.DelRefVector(&c.lastResult))
 		m.Budget().Release(n)
 		return nil, errors.Join(err, cleanup)
 	}
@@ -179,7 +176,7 @@ func (c *apiContextResults) addObject(o *apiObject) (uint32, error) {
 	if e := c.open(); e != nil {
 		return 0, e
 	}
-	id := c.allocated.Size()
+	id := uint32(c.allocated.Len())
 	if n := len(c.freeIDs); n != 0 {
 		id = c.freeIDs[n-1]
 		c.freeIDs = c.freeIDs[:n-1]
@@ -187,9 +184,7 @@ func (c *apiContextResults) addObject(o *apiObject) (uint32, error) {
 	if e := c.growObjectDirectory(id); e != nil {
 		return 0, e
 	}
-	if e := c.allocated.Insert(id, id); e != nil {
-		return 0, e
-	}
+	c.allocated.Put(id, id)
 	c.objects[id] = o
 	return id, nil
 }
@@ -218,9 +213,7 @@ func (c *apiContextResults) delObject(o *apiObject) error {
 		return e
 	}
 	c.pendingDestroy = o
-	if e := c.allocated.Remove(o.id); e != nil {
-		return e
-	}
+	c.allocated.Del(o.id)
 	return c.destroyObject(o)
 }
 
@@ -239,7 +232,8 @@ func (o *apiObject) open() error {
 	if o == nil || o.self != o || o.closed || o.context == nil || o.context.self != o.context || o.context.closed {
 		return errAPIObjectOwner
 	}
-	if uint64(o.id) >= uint64(len(o.context.objects)) || o.context.objects[o.id] != o || !o.context.allocated.Contains(o.id) {
+	_, allocated := o.context.allocated.Get2(o.id)
+	if uint64(o.id) >= uint64(len(o.context.objects)) || o.context.objects[o.id] != o || !allocated {
 		return errAPIObjectOwner
 	}
 	return nil
@@ -301,23 +295,22 @@ func (c *apiContextResults) Close() error {
 	}
 	// Restart begin after each removal: a derived destructor may release other
 	// registered objects, and the source hash table can compact during removal.
-	for !c.allocated.Empty() {
-		entry, e := c.allocated.Begin().Entry()
-		if e != nil {
-			return e
+	for c.allocated.Len() != 0 {
+		var id uint32
+		for key := range c.allocated.All() {
+			id = key
+			break
 		}
-		o := c.objects[entry.Value]
+		o := c.objects[id]
 		c.pendingDestroy = o
-		if e = c.allocated.Remove(entry.Key); e != nil {
-			return e
-		}
-		if e = c.destroyObject(o); e != nil {
-			return e
+		c.allocated.Del(id)
+		if err := c.destroyObject(o); err != nil {
+			return err
 		}
 	}
 	c.manager.Budget().Release(uint64(cap(c.freeIDs)) * 4)
 	c.freeIDs = nil
-	c.allocated.Close()
+	c.allocated.Clear()
 	c.manager.Budget().Release(uint64(cap(c.objects)) * uint64(reflect.TypeOf((*apiObject)(nil)).Size()))
 	c.objects = nil
 	if c.astTrail != (ast.ASTRefVector{}) {

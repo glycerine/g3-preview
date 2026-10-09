@@ -81,7 +81,7 @@ func (m *ArbitraryFloatManager) powerWrapper(n uint32, minusOne, negated bool) (
 	if negated {
 		index++
 	}
-	if id, found := m.powers[index].Find(n); found {
+	if id, found := m.powers[index].Get2(n); found {
 		w := m.powerWrapperByID(id)
 		if w == nil {
 			return nil, ErrRuntimeOwner
@@ -121,9 +121,7 @@ func (m *ArbitraryFloatManager) powerWrapper(n uint32, minusOne, negated bool) (
 		}
 	}
 	w.Initialized = true
-	if e = m.powers[index].Insert(n, w.id); e != nil {
-		return fail(e)
-	}
+	m.powers[index].Put(n, w.id)
 	w.published = true
 	out, e := w.Capture()
 	if e != nil {
@@ -253,16 +251,12 @@ func (m *ArbitraryFloatManager) destroyPowerWrappers(own bool) error {
 		return nil
 	}
 	for i := range m.powers {
-		for it, end := m.powers[i].Begin(), m.powers[i].End(); !it.Equal(end); it.Next() {
-			pair, e := it.Entry()
-			if e != nil {
-				return e
-			}
-			w := m.powerWrapperByID(pair.Value)
+		for _, id := range m.powers[i].All() {
+			w := m.powerWrapperByID(id)
 			if w == nil {
 				return ErrRuntimeOwner
 			}
-			if e = w.destroy(false); e != nil {
+			if e := w.destroy(false); e != nil {
 				return e
 			}
 		}

@@ -53,8 +53,8 @@ func signedFractionYoungerSourceStop(t *testing.T, childFirst bool) {
 				t.Fatal("younger source stop crossed rational", ordinal, body, s.sourceCause, c.sourceCause, s.qCursor)
 			}
 			signedFractionPhysicalAudit(t, m, &out, []Block{lane})
-			before, child, plain, used, maps := *s, *c, m.plainRationalSet, b.Used(), m.completedMaps
-			if e = m.SourceFinalize(); !errors.Is(e, arena.ErrBounds) || s.q != before.q || s.qLive != before.qLive || s.qCursor != before.qCursor || s.sourceCause != before.sourceCause || s.child != before.child || *c != child || m.plainRationalSet != plain || b.Used() != used || m.completedMaps != maps || m.sourceEnded {
+			before, child, plain, used := *s, *c, m.plainRationalSet, b.Used()
+			if e = m.SourceFinalize(); !errors.Is(e, arena.ErrBounds) || s.q != before.q || s.qLive != before.qLive || s.qCursor != before.qCursor || s.sourceCause != before.sourceCause || s.child != before.child || *c != child || m.plainRationalSet != plain || b.Used() != used || m.sourceEnded {
 				t.Fatal("source stop crossed older class", e)
 			}
 			recovery, e := r.Allocate(200000)

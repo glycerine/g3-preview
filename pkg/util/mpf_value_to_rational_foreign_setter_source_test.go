@@ -29,9 +29,6 @@ func TestArbitraryFloatToRationalForeignSetterOwnsDescriptorPrefix(t *testing.T)
 		integerPhysicalAuditWithRaw(t, m.integer, nil, &a.significand, &s.a.significand, &s.n, &s.d, &m.rational.NTmp)
 		integerPhysicalAuditWithRaw(t, qm.Z, nil, &out.Num, &out.Den, &qm.NTmp)
 		maps := uint64(0)
-		for i := range m.powers {
-			maps += m.powers[i].StorageBytes()
-		}
 		want := m.header + m.RationalConversionHistoryBytes() + m.ValueCopyHistoryBytes() + m.powerWrapperBytes + m.rational.HeaderBytes + maps + integerActualOwnedBytes(m.integer) + qm.HeaderBytes + integerActualOwnedBytes(qm.Z)
 		if b.Used() != want {
 			t.Fatal("immediate actual conversion/source/output cold graph", ordinal, b.Used(), want)

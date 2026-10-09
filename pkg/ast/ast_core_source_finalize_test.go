@@ -22,7 +22,7 @@ func TestASTSourceFinalizeStoppedEOFProtectsAutomaticMembersAndOwnsFileUntilACK(
 	if e == nil || m.sourceDTCause != e || !m.traceEOFReached || m.sourceDTCompleted {
 		t.Fatal("actual reached EOF lifetime stop", e)
 	}
-	if !m.debugFreeComplete || m.DebugFreeIndices.StorageBytes() == 0 || m.allocator == nil || m.families == nil {
+	if !m.debugFreeComplete || m.DebugFreeIndices == nil || m.allocator == nil || m.families == nil {
 		t.Fatal("EOF body stop destroyed older automatic members")
 	}
 	if m.TraceFile != f || f.Closed || f.stream.File != fd || !m.traceOwner {

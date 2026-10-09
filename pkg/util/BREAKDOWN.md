@@ -258,6 +258,22 @@ The existing port has already spread the C++ storage model well beyond the
 * `UintMap`, the direct custom-hashtable specialization, has only two production
   consumers outside `pkg/util`.
 
+### Implementation progress
+
+The direct `UintMap` specialization has now been removed. Its three live uses
+were replaced according to their actual semantics:
+
+* the API object registry uses `insdict.Dict[uint32, uint32]` because object
+  destruction traverses the registry and needs a stable order;
+* the floating-point power caches use `insdict.Dict[uint32, uint32]` because
+  cache teardown traverses their entries; and
+* the AST debug freed-ID set uses `map[uint32]struct{}` because it only performs
+  membership checks.
+
+The probing array, tombstones, cached hash values, iterator implementation, and
+tests of the C++ table layout have been deleted. This removes one member of the
+infrastructure knot rather than moving it into a child package.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before

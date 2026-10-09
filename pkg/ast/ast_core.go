@@ -95,9 +95,7 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFi
 		return fail(e)
 	}
 	m.constructorMembers |= astCtorTable | astCtorIDGenerators
-	if e = util.InitializeInlineUintMap(&m.DebugFreeIndices, util.UintMapConfig{Budget: c.Budget, OutOfMemory: c.OutOfMemory}); e != nil {
-		return fail(e)
-	}
+	m.DebugFreeIndices = make(map[uint32]struct{})
 	m.debugFreeComplete = true
 	m.constructorMembers |= astCtorDebugFree
 	m.recFun, e = m.Symbols.Intern(":rec-fun")
@@ -495,7 +493,7 @@ func (m *ASTManager) closeCore(source bool) error {
 		}
 	}
 	if m.debugFreeComplete {
-		m.DebugFreeIndices.Close()
+		m.DebugFreeIndices = nil
 		m.debugFreeComplete = false
 	}
 	m.declIDs.Cleanup(1 << 31)

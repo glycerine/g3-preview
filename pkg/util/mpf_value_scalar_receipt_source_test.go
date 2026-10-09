@@ -27,9 +27,6 @@ func TestArbitraryFloatScalarCopyReceiptEveryPrefix(t *testing.T) {
 		body := m.CopyWithReceipt(&out, &input, &child)
 		integerPhysicalAudit(t, m.integer, &sig, &input.significand, &out.significand)
 		var maps uint64
-		for i := range m.powers {
-			maps += m.powers[i].StorageBytes()
-		}
 		if want := m.header + m.ValueCopyHistoryBytes() + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps; b.Used() != want {
 			t.Fatal(ordinal, b.Used(), want)
 		}

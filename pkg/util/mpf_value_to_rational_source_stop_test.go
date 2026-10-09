@@ -37,9 +37,6 @@ func TestArbitraryFloatToRationalGCDSourceStopsOlderLocals(t *testing.T) {
 	s := &m.rationalConversion
 	integerPhysicalAuditWithRaw(t, m.integer, []Block{lane}, &x.significand, &out.Num, &out.Den, &m.rational.NTmp, &s.a.significand, &s.n, &s.d)
 	var maps uint64
-	for i := range m.powers {
-		maps += m.powers[i].StorageBytes()
-	}
 	want := m.header + m.ValueCopyHistoryBytes() + m.RationalConversionHistoryBytes() + m.powerWrapperBytes + m.rational.HeaderBytes + maps + integerActualOwnedBytes(m.integer)
 	if b.Used() != want {
 		t.Fatal("immediate named conversion physical/cold graph", b.Used(), want)

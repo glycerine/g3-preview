@@ -4,8 +4,8 @@ package util
 import "reflect"
 
 // UintPtrMap maps uint32 indices to non-nil pointer-like Go values using a
-// dense slice. Its distinct name avoids collision with UintMap, the existing
-// concrete port of source u_map<unsigned> from map.h.
+// dense slice. The distinct name records that values are pointers rather than
+// integer IDs.
 type UintPtrMap struct {
 	values []uintPtrMapSlot
 }

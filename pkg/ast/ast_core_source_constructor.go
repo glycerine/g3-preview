@@ -51,7 +51,7 @@ func (m *ASTManager) unwindConstructorMembers() error {
 	if m.constructorMemberStage == 0 {
 		m.plugins.close(m.BudgetField)
 		if m.debugFreeComplete {
-			m.DebugFreeIndices.Close()
+			m.DebugFreeIndices = nil
 			m.debugFreeComplete = false
 		}
 		m.constructorMemberStage = 1

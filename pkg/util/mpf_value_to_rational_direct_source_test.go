@@ -31,9 +31,6 @@ func TestArbitraryFloatToRationalDirectOutputAfterSourceEnd(t *testing.T) {
 		integerPhysicalAudit(t, m.integer, &x.significand, &s.a.significand, &s.n, &s.d)
 		integerPhysicalAudit(t, qm.Z, &out.Num, &out.Den, &qm.NTmp)
 		var maps uint64
-		for i := range m.powers {
-			maps += m.powers[i].StorageBytes()
-		}
 		want := m.header + m.RationalConversionHistoryBytes() + m.ValueCopyHistoryBytes() + m.powerWrapperBytes + m.rational.HeaderBytes + maps + integerActualOwnedBytes(m.integer) + qm.HeaderBytes + integerActualOwnedBytes(qm.Z)
 		if b.Used() != want {
 			t.Fatal("immediate direct conversion graph", ordinal, b.Used(), want)

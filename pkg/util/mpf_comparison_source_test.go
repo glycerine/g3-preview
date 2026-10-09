@@ -64,9 +64,6 @@ func TestArbitraryFloatComparisonColdCachePrefixes(t *testing.T) {
 		}
 		integerPhysicalAuditWithRaw(t, m.integer, nil, &x.significand, &y.significand)
 		var maps uint64
-		for i := range m.powers {
-			maps += m.powers[i].StorageBytes()
-		}
 		want := m.header + m.powerWrapperBytes + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps
 		if b.Used() != want {
 			t.Fatal("cold cache before-lift equation", prefix, b.Used(), want)

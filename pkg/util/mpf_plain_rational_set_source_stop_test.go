@@ -74,8 +74,7 @@ func TestArbitraryFloatPlainRationalSetYoungerSourceStop(t *testing.T) {
 			parentBefore := m.plainRationalSet
 			before := *s
 			used := b.Used()
-			maps := m.completedMaps
-			if e = m.SourceFinalize(); e != s.prevSourceCause || *s != before || b.Used() != used || m.completedMaps != maps || m.sourceEnded || m.plainRationalSet != parentBefore {
+			if e = m.SourceFinalize(); e != s.prevSourceCause || *s != before || b.Used() != used || m.sourceEnded || m.plainRationalSet != parentBefore {
 				t.Fatal("young child crossed older caller/class suffix", e)
 			}
 			recovery, e := rt.Allocate(200000)

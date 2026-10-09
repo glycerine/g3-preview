@@ -26,9 +26,6 @@ func TestArbitraryFloatPooledDescriptorAfterSourceEnd(t *testing.T) {
 			t.Log("actual pooled descriptor refusal", ordinal, body, r.Child.Frame.Roots.Cell)
 			integerPhysicalAuditWithRaw(t, m.integer, nil, &source, &a.significand)
 			var maps uint64
-			for i := range m.powers {
-				maps += m.powers[i].StorageBytes()
-			}
 			if want := m.header + m.ValueCopyHistoryBytes() + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps; b.Used() != want {
 				t.Fatal("actual cold and physical graph before fault lift", b.Used(), want)
 			}
@@ -80,9 +77,6 @@ func TestArbitraryFloatDirectDescriptorAfterSourceEnd(t *testing.T) {
 			t.Log("actual direct descriptor refusal", ordinal, body, r.Child.Frame.Roots.Cell)
 			integerPhysicalAuditWithRaw(t, m.integer, nil, &source, &a.significand)
 			var maps uint64
-			for i := range m.powers {
-				maps += m.powers[i].StorageBytes()
-			}
 			if want := m.header + m.ValueCopyHistoryBytes() + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps; b.Used() != want {
 				t.Fatal("actual cold and physical graph before fault lift", b.Used(), want)
 			}
@@ -136,9 +130,6 @@ func TestArbitraryFloatPooledDescriptorAfterPartialSourceEnd(t *testing.T) {
 			t.Log("actual pooled descriptor refusal", ordinal, body, r.Child.Frame.Roots.Cell)
 			integerPhysicalAuditWithRaw(t, m.integer, nil, &source, &a.significand)
 			var maps uint64
-			for i := range m.powers {
-				maps += m.powers[i].StorageBytes()
-			}
 			if want := m.header + m.ValueCopyHistoryBytes() + m.rational.HeaderBytes + integerActualOwnedBytes(m.integer) + maps; b.Used() != want {
 				t.Fatal("actual cold and physical graph before fault lift", b.Used(), want)
 			}

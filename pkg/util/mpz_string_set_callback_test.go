@@ -83,11 +83,11 @@ func TestIntegerStringSetSourceResetReleaseBeforeDeclarations(t *testing.T) {
 	if !errors.Is(body, arena.ErrBounds) || s.sourceCause == nil || a != old || !z.Cell(a.Cell).Released || s.declared || s.ten != NewInt(0) || s.tmp != NewInt(0) || s.endReached || s.index != 0 {
 		t.Fatal("RESET release crossed declarations", body, a, s.declared)
 	}
-	used, state, inv, maps := b.Used(), r.State(), s.invocation, m.completedMaps
+	used, state, inv := b.Used(), r.State(), s.invocation
 	if e = z.SetString(&a, "1"); e != arena.ErrInvalidSlot || a != old || b.Used() != used || r.State() != state || s.invocation != inv {
 		t.Fatal("released RESET replay", e)
 	}
-	if e = m.SourceFinalize(); !errors.Is(e, arena.ErrBounds) || m.completedMaps != maps || m.sourceCause != s.sourceCause || z.SourceFinalizing || b.Used() != used {
+	if e = m.SourceFinalize(); !errors.Is(e, arena.ErrBounds) || m.sourceCause != s.sourceCause || z.SourceFinalizing || b.Used() != used {
 		t.Fatal("RESET stop crossed older class", e)
 	}
 	integerPhysicalAuditWithRaw(t, z, []Block{lane}, &a)

@@ -12,7 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestArbitraryFloatSourceConstructorActualFourPowerMaps(t *testing.T) {
+func TestArbitraryFloatSourceConstructorUsesNativePowerDictionaries(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
 	if e != nil {
@@ -26,16 +26,14 @@ func TestArbitraryFloatSourceConstructorActualFourPowerMaps(t *testing.T) {
 	if m.integer != m.rational.Z || m.rational.Synchronized {
 		t.Fatal("actual unsynchronized mpq and borrowed same mpz", m)
 	}
-	var maps uint64
 	for i := range m.powers {
 		p := &m.powers[i]
-		if p.Capacity() != 8 || !p.Empty() {
-			t.Fatal("actual default unsigned-pointer map", i, p.Capacity(), p.Size())
+		if p.Len() != 0 {
+			t.Fatal("native power dictionary was not empty", i, p.Len())
 		}
-		maps += p.StorageBytes()
 	}
-	if b.Used() != m.header+m.rational.HeaderBytes+integerActualOwnedBytes(m.integer)+maps {
-		t.Fatal("exact constructor physical/cold graph", b.Used(), m.header, maps)
+	if b.Used() != m.header+m.rational.HeaderBytes+integerActualOwnedBytes(m.integer) {
+		t.Fatal("constructor owner graph", b.Used(), m.header)
 	}
 	if e = m.Close(); e != nil {
 		t.Fatal(e)
@@ -85,12 +83,9 @@ func arbitraryFloatSourceCold(t *testing.T, m *ArbitraryFloatManager, r *Runtime
 			sourcePreparedEarlyIntegerPhysical(t, z)
 		}
 	}
-	for i := range m.powers {
-		n += m.powers[i].StorageBytes()
-	}
 	return n
 }
-func TestArbitraryFloatEveryActualManagerAndMapConstructorPrefix(t *testing.T) {
+func TestArbitraryFloatEveryManagerConstructorPrefix(t *testing.T) {
 	done, failed := false, false
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		b := arena.NewBudget(1 << 28)

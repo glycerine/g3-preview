@@ -59,11 +59,10 @@ func formattedSetRoundNUMStopRecipe(t *testing.T, offset int64) bool {
 	}
 	if matched {
 		used := b.Used()
-		stage := m.completedMaps
 		sourceEnded := m.sourceEnded
 		scope := m.formattedSet
 		round := m.RoundScope
-		if e = m.SourceFinalize(); e != s.sourceCause || m.completedMaps != stage || m.sourceEnded != sourceEnded || b.Used() != used || m.formattedSet != scope || m.RoundScope != round {
+		if e = m.SourceFinalize(); e != s.sourceCause || m.sourceEnded != sourceEnded || b.Used() != used || m.formattedSet != scope || m.RoundScope != round {
 			t.Fatal("younger stop crossed older owner", e)
 		}
 	}

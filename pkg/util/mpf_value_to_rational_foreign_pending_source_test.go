@@ -59,9 +59,6 @@ func TestArbitraryFloatToRationalOwnACKPreservesLaterForeignDescriptor(t *testin
 			integerPhysicalAudit(t, m.integer, named...)
 			integerPhysicalAudit(t, qm.Z, &out.Num, &out.Den, &qm.NTmp)
 			var maps uint64
-			for i := range m.powers {
-				maps += m.powers[i].StorageBytes()
-			}
 			want := m.header + m.ValueCopyHistoryBytes() + m.RationalConversionHistoryBytes() + m.powerWrapperBytes + m.rational.HeaderBytes + maps + integerActualOwnedBytes(m.integer) + qm.HeaderBytes + integerActualOwnedBytes(qm.Z)
 			if b.Used() != want {
 				t.Fatal("before-lift later foreign graph", b.Used(), want)

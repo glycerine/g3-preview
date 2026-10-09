@@ -166,9 +166,6 @@ func TestArbitraryFloatToStringEveryNumericalReservationPrefix(t *testing.T) {
 		view, body := m.ToStringInto(&a, text)
 		integerPhysicalAuditWithRaw(t, m.integer, nil, &a.significand, &m.rational.NTmp)
 		var maps uint64
-		for i := range m.powers {
-			maps += m.powers[i].StorageBytes()
-		}
 		if want := m.header + m.ValueCopyHistoryBytes() + m.powerWrapperBytes + m.rational.HeaderBytes + maps + integerActualOwnedBytes(m.integer); b.Used() != want {
 			t.Fatal("numerical cold graph before fault lift", ordinal, b.Used(), want)
 		}
