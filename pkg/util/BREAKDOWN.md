@@ -607,3 +607,8 @@ whole-source scan found no reassignment of the corresponding C++ static pointer
 bindings, so the root mutable globals and tests of pointer rebinding were
 deleted. Resource limits, SAT, rewriting, and model evaluation import the leaf
 directly.
+
+`util/natset` owns the fixed-domain timestamp set and depends only on the
+standard library. It uses a concrete `[]uint32`, has no root facade, and is
+ready for the future pattern-inference and arithmetic consumers to import
+directly.
