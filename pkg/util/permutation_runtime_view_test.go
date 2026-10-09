@@ -178,7 +178,7 @@ func TestRuntimePermutationPointerReachedAssertionBoundsAndRestorationPrefix(t *
 		runtimePermutationMust(t, p.Write(0, 2))
 		runtimePermutationMust(t, p.Write(1, 0))
 		e = ApplyPermutationCoreRuntimeUint32(2, RuntimeUint32View{}, p)
-		if !errors.Is(e, ErrBitAssertion) {
+		if !errors.Is(e, ErrPermutationAssertion) {
 			t.Fatal("p_j assertion before data/marker", e)
 		}
 		x, e = p.Read(0)

@@ -100925,13 +100925,7 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "pkg/util/bit_vector.go",
-        "pkg/util/util_bit_vector_runtime_lifetime_test.go",
-        "pkg/util/util_bit_vector_runtime_registered_test.go",
-        "pkg/util/util_bit_vector_runtime_source_test.go",
-        "pkg/util/util_bit_vector_runtime_test.go",
-        "pkg/util/util_fr_bit_vector_runtime_source_test.go",
-        "pkg/util/util_bit_vector_runtime_query_source_test.go"
+        "pkg/util/bitset/vector.go"
       ],
       "tests": [
         "TestSourceResizeCrash",
@@ -100939,33 +100933,7 @@
         "TestSourceAnd",
         "TestSourceReset",
         "TestSourceEq",
-        "TestBoundedOperationOracle",
-        "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
-        "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
-        "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
-        "TestBitVectorRuntimeCapturedRawSpanConstructor",
-        "TestBitVectorRuntimeRegisteredOrAndEquality",
-        "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
-        "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
-        "TestBitVectorRuntimeEveryActualRefusal",
-        "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
-        "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
-        "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
-        "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
-        "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
-        "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
-        "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
-        "TestBitVectorRuntimeRegisteredCrashAndReset",
-        "TestBitVectorRuntimeIndependentWorldsAndShift",
-        "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
-        "TestFastResetBitVectorRuntimeSourceListBeforeBase",
-        "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
-        "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
-        "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
-        "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
-        "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
-        "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
-        "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
+        "TestBoundedOperationOracle"
       ],
       "assertions": [
         {
@@ -101167,41 +101135,7 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [
-        {
-          "name": "Registered crash/shift/or/and/reset/equality driver: 36 active ENSURE sites, 7255 dynamic expressions; source early return leaves tst1/tst2 inactive",
-          "status": "partial",
-          "go_target": "pkg/util/util_bit_vector_runtime_registered_test.go",
-          "tests": [
-            "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
-            "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
-            "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
-            "TestBitVectorRuntimeCapturedRawSpanConstructor",
-            "TestBitVectorRuntimeRegisteredOrAndEquality",
-            "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
-            "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
-            "TestBitVectorRuntimeEveryActualRefusal",
-            "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
-            "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
-            "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
-            "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
-            "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
-            "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
-            "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
-            "TestBitVectorRuntimeRegisteredCrashAndReset",
-            "TestBitVectorRuntimeIndependentWorldsAndShift",
-            "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
-            "TestFastResetBitVectorRuntimeSourceListBeforeBase",
-            "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
-            "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
-            "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
-            "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
-            "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
-            "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
-            "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
-          ]
-        }
-      ],
+      "methods": [],
       "ownership": [
         "Vector owns word storage; Clone/Assign copy, Swap transfers, source growth and stale bits retained. Full audit and test mapping pending package report."
       ],
@@ -101213,26 +101147,9 @@
       "path": "src/test/bits.cpp",
       "component": "test",
       "role": "test",
-      "status": "partial",
-      "go_targets": [
-        "pkg/util/bit_util.go",
-        "pkg/util/bit_util_finite_test.go",
-        "pkg/util/bit_util_test.go",
-        "pkg/util/debug_off.go",
-        "pkg/util/debug_on.go"
-      ],
-      "tests": [
-        "TestBitsFiniteScalarAndCarryOracle",
-        "TestBitsFiniteWholeShiftMatrix",
-        "TestBitsRegisteredFixedSourceAssertions",
-        "TestBitsRegisteredFullRandomCampaign",
-        "TestBitsSourceNonGNUScalarBranches",
-        "TestBitsSourceOverlapAndReachedAccess",
-        "TestBitsSourceZeroShiftBoundary",
-        "TestBitsWholeUtilityArithmeticAndBitPositions",
-        "TestBitsSourceLeftZeroShiftReachedOperand",
-        "TestBitsSourceRightZeroShiftReachedOperand"
-      ],
+      "status": "reference_only",
+      "go_targets": [],
+      "tests": [],
       "assertions": [
         {
           "line": 30,
@@ -101263,71 +101180,12 @@
           "text": "ENSURE(m.is_uint64(tmp) && m.get_uint64(tmp) < UINT_MAX);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [
-        {
-          "name": "tst_shl fixed/helper",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util_test.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "tst_shr fixed/helper",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util_test.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "tst_shl_rand: all100000 trials and original assertion sites",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util_test.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "Global assertion-switch binding and source test diagnostic/dispatch integration",
-          "status": "unported",
-          "tests": []
-        }
-      ],
-      "ownership": [
-        "Utility methods borrow actual caller-owned uint32 words with explicit source uint32 counts; no allocation or overlapping-range clone. Reached reads/writes preserve source successful prefixes and unread-tail short circuits."
-      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "Host libc rand uses explicit deterministic31-bit test adapter retaining every draw site/modulo/zero correction; independent test-only math/big supplies expected words. Console and source runner dispatch remain open."
+        "These tests exercise the erased standalone C++ bit_util layer. Numeric and bitset behavior is tested through the typed Go consumers that replace that layer."
       ]
     },
     {
@@ -102744,8 +102602,7 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "pkg/util/fixed_bit_vector.go",
-        "pkg/util/util_fixed_bit_vector_runtime_registered_test.go"
+        "pkg/util/bitset/fixed.go"
       ],
       "tests": [
         "TestFixedSourceTst1",
@@ -102755,8 +102612,7 @@
         "TestFixedOwnershipAndLifetime",
         "TestFixedSourceHash",
         "TestFixedBoundedOracle",
-        "TestFixedBudgetsAndReuse",
-        "TestFixedBitVectorRuntimeRegisteredAssertions"
+        "TestFixedBudgetsAndReuse"
       ],
       "assertions": [
         {
@@ -102822,7 +102678,7 @@
         {
           "name": "fixed_bit_vector access/masks/set/unset/get",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -102837,7 +102693,7 @@
         {
           "name": "manager construction/root/reset/deallocate/destruction",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -102852,7 +102708,7 @@
         {
           "name": "allocate/allocate0/allocate1/allocate(copy)",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -102867,7 +102723,7 @@
         {
           "name": "fill0/fill1/copy/assign/range copy",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -102882,7 +102738,7 @@
         {
           "name": "AND/OR/XOR/NOT/equals/contains",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -102897,7 +102753,7 @@
         {
           "name": "hash/word/last_word/display",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -102907,14 +102763,6 @@
             "TestFixedSourceHash",
             "TestFixedBoundedOracle",
             "TestFixedBudgetsAndReuse"
-          ]
-        },
-        {
-          "name": "Registered tst1/or/eq source14 ENSURE sites and62 dynamic expressions; tst_and empty, native ostream not completed",
-          "status": "partial",
-          "go_target": "pkg/util/util_fixed_bit_vector_runtime_registered_test.go",
-          "tests": [
-            "TestFixedBitVectorRuntimeRegisteredAssertions"
           ]
         }
       ],
@@ -110657,13 +110505,8 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "pkg/util/uint_set.go",
+        "pkg/util/bitset/uint_set.go",
         "pkg/util/uint_set_map.go",
-        "pkg/util/util_uint_set_runtime.go",
-        "pkg/util/util_uint_set_runtime_test.go",
-        "pkg/util/util_uint_set_runtime_constructor_source_test.go",
-        "pkg/util/util_uint_set_runtime_swap_source_test.go",
-        "pkg/util/util_uint_set_runtime_distinct_budget_source_test.go",
         "pkg/test/uint_set_test.go"
       ],
       "tests": [
@@ -110687,27 +110530,7 @@
         "TestUintSetMapGrowthTombstonesAndReset",
         "TestUintSetMapCleanupAndOutOfMemory",
         "TestUintSetMapCopyAssignmentShapeAndIterator",
-        "TestUintSetMapRehashFailureAndTemporaryCopies",
-        "TestUintSetRuntimeSourceBoundary",
-        "TestUintSetRuntimeIndependentWorlds",
-        "TestUintSetRuntimeEveryActualRefusal",
-        "TestUintSetRuntimeLiveIteratorAndCopyCapacity",
-        "TestUintSetRuntimeOwnerGuardsAndWarmPlateau",
-        "TestUintSetRuntimeSourceDestructorAndOwningAbort",
-        "TestUintSetRuntimeSourceRandomCampaign",
-        "TestUintSetRuntimeHashDisplayAndStreamPrefixes",
-        "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
-        "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase",
-        "TestUintSetRuntimeSwapActualProviderProvenance",
-        "TestUintSetRuntimeSwapEmptyProviderLifetime",
-        "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
-        "TestUintSetRuntimeSwapWarmNoEvents",
-        "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
-        "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
-        "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
-        "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
-        "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
-        "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
+        "TestUintSetMapRehashFailureAndTemporaryCopies"
       ],
       "assertions": [
         {
@@ -110901,42 +110724,7 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [
-        {
-          "name": "Selected concrete Runtime uint_set full scalar body, live-owner iterator, weighted hash/display, destructive exact-copy assignment and completed-base constructor failure destruction",
-          "status": "partial",
-          "go_target": "pkg/util/util_uint_set_runtime.go",
-          "tests": [
-            "TestUintSetRuntimeSourceBoundary",
-            "TestUintSetRuntimeIndependentWorlds",
-            "TestUintSetRuntimeEveryActualRefusal",
-            "TestUintSetRuntimeLiveIteratorAndCopyCapacity",
-            "TestUintSetRuntimeOwnerGuardsAndWarmPlateau",
-            "TestUintSetRuntimeSourceDestructorAndOwningAbort",
-            "TestUintSetRuntimeSourceRandomCampaign",
-            "TestUintSetRuntimeHashDisplayAndStreamPrefixes",
-            "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
-            "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase"
-          ]
-        },
-        {
-          "name": "Selected Runtime uint_set pointer Swap across actual providers and distinct Budgets; cached iterator dereference and source assertion-before-owner-read order",
-          "status": "partial",
-          "go_target": "pkg/util/util_uint_set_runtime.go",
-          "tests": [
-            "TestUintSetRuntimeSwapActualProviderProvenance",
-            "TestUintSetRuntimeSwapEmptyProviderLifetime",
-            "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
-            "TestUintSetRuntimeSwapWarmNoEvents",
-            "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
-            "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
-            "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
-            "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
-            "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
-            "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
-          ]
-        }
-      ],
+      "methods": [],
       "ownership": [
         "Concrete owned uint32 words; source capacity, copy and ascending traversal preserved. UintSet-key map tst5 integration is now translated by bitset.UintSetMap. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
@@ -112112,26 +111900,9 @@
       "path": "src/util/bit_util.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
-      "go_targets": [
-        "pkg/util/bit_util.go",
-        "pkg/util/bit_util_finite_test.go",
-        "pkg/util/bit_util_test.go",
-        "pkg/util/debug_off.go",
-        "pkg/util/debug_on.go"
-      ],
-      "tests": [
-        "TestBitsFiniteScalarAndCarryOracle",
-        "TestBitsFiniteWholeShiftMatrix",
-        "TestBitsRegisteredFixedSourceAssertions",
-        "TestBitsRegisteredFullRandomCampaign",
-        "TestBitsSourceNonGNUScalarBranches",
-        "TestBitsSourceOverlapAndReachedAccess",
-        "TestBitsSourceZeroShiftBoundary",
-        "TestBitsWholeUtilityArithmeticAndBitPositions",
-        "TestBitsSourceLeftZeroShiftReachedOperand",
-        "TestBitsSourceRightZeroShiftReachedOperand"
-      ],
+      "status": "platform_replacement",
+      "go_targets": [],
+      "tests": [],
       "conditionals": [
         {
           "line": 28,
@@ -112236,339 +112007,21 @@
           "text": "SASSERT(sz != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [
-        {
-          "name": "slow_msb_pos",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "msb_pos",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "nlz_core GNU and non-GNU",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "nlz",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "ntz_core GNU and non-GNU",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "ntz",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "copy",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "is_zero",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "reset",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "shl",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "shr same-size",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "shr differing-size",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "has_one_at_first_k_bits",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "inc",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "dec",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "lt",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "add",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "Global assertion-switch binding and source test diagnostic/dispatch integration",
-          "status": "unported",
-          "tests": []
-        }
-      ],
-      "ownership": [
-        "Utility methods borrow actual caller-owned uint32 words with explicit source uint32 counts; no allocation or overlapping-range clone. Reached reads/writes preserve source successful prefixes and unread-tail short circuits."
-      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "Global automatic SASSERT assertion-switch binding remains open; sourceDebug controls selected profile with assertions enabled.",
-        "TRACE/console and source test runner timing/registration dispatch are not implemented by mathematical helper tests.",
-        "libc rand replaced by explicit hermetic31-bit adapter, all100000 trials/call order/zero corrections retained.",
-        "Slices are actual borrowed caller-owned uint32 words; no source allocation occurs in utility methods. Runtime byte-codec caller adapters may be needed at future consumers.",
-        "Fixed32-bit arithmetic and signed-cast profile; reached native undefined shifts/INT_MIN negation guarded, no native undefined-memory continuation claim."
+        "Go numeric consumers use math/bits, typed slices, and their concrete numeric implementations. The standalone C++ limb-utility translation was deleted after a module-wide scan found no production Go caller."
       ]
     },
     {
       "path": "src/util/bit_util.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
-      "go_targets": [
-        "pkg/util/bit_util.go",
-        "pkg/util/bit_util_finite_test.go",
-        "pkg/util/bit_util_test.go",
-        "pkg/util/debug_off.go",
-        "pkg/util/debug_on.go"
-      ],
-      "tests": [
-        "TestBitsFiniteScalarAndCarryOracle",
-        "TestBitsFiniteWholeShiftMatrix",
-        "TestBitsRegisteredFixedSourceAssertions",
-        "TestBitsRegisteredFullRandomCampaign",
-        "TestBitsSourceNonGNUScalarBranches",
-        "TestBitsSourceOverlapAndReachedAccess",
-        "TestBitsSourceZeroShiftBoundary",
-        "TestBitsWholeUtilityArithmeticAndBitPositions",
-        "TestBitsSourceLeftZeroShiftReachedOperand",
-        "TestBitsSourceRightZeroShiftReachedOperand"
-      ],
+      "status": "platform_replacement",
+      "go_targets": [],
+      "tests": [],
       "conditionals": [
         {
           "line": 19,
@@ -112579,313 +112032,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [
-        {
-          "name": "slow_msb_pos",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "msb_pos",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "nlz_core GNU and non-GNU",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "nlz",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "ntz_core GNU and non-GNU",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "ntz",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "copy",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "is_zero",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "reset",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "shl",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "shr same-size",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "shr differing-size",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "has_one_at_first_k_bits",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "inc",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "dec",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "lt",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "add",
-          "status": "ported",
-          "go_target": "pkg/util/bit_util.go",
-          "tests": [
-            "TestBitsFiniteScalarAndCarryOracle",
-            "TestBitsFiniteWholeShiftMatrix",
-            "TestBitsRegisteredFixedSourceAssertions",
-            "TestBitsRegisteredFullRandomCampaign",
-            "TestBitsSourceNonGNUScalarBranches",
-            "TestBitsSourceOverlapAndReachedAccess",
-            "TestBitsSourceZeroShiftBoundary",
-            "TestBitsWholeUtilityArithmeticAndBitPositions",
-            "TestBitsSourceLeftZeroShiftReachedOperand",
-            "TestBitsSourceRightZeroShiftReachedOperand"
-          ]
-        },
-        {
-          "name": "Global assertion-switch binding and source test diagnostic/dispatch integration",
-          "status": "unported",
-          "tests": []
-        }
-      ],
-      "ownership": [
-        "Utility methods borrow actual caller-owned uint32 words with explicit source uint32 counts; no allocation or overlapping-range clone. Reached reads/writes preserve source successful prefixes and unread-tail short circuits."
-      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "Global automatic SASSERT assertion-switch binding remains open; sourceDebug controls selected profile with assertions enabled.",
-        "TRACE/console and source test runner timing/registration dispatch are not implemented by mathematical helper tests.",
-        "libc rand replaced by explicit hermetic31-bit adapter, all100000 trials/call order/zero corrections retained.",
-        "Slices are actual borrowed caller-owned uint32 words; no source allocation occurs in utility methods. Runtime byte-codec caller adapters may be needed at future consumers.",
-        "Fixed32-bit arithmetic and signed-cast profile; reached native undefined shifts/INT_MIN negation guarded, no native undefined-memory continuation claim."
+        "Go numeric consumers use math/bits, typed slices, and their concrete numeric implementations. The standalone C++ limb-utility translation was deleted after a module-wide scan found no production Go caller."
       ]
     },
     {
@@ -112899,16 +112051,7 @@
         "pkg/ast/ast_mark_fast.go",
         "pkg/ast/ast_mark_node.go",
         "pkg/ast/ast_mark_scoped.go",
-        "pkg/util/bit_vector.go",
-        "pkg/util/util_bit_vector_runtime.go",
-        "pkg/util/util_bit_vector_runtime_lifetime_test.go",
-        "pkg/util/util_bit_vector_runtime_ops.go",
-        "pkg/util/util_bit_vector_runtime_registered_test.go",
-        "pkg/util/util_bit_vector_runtime_source_test.go",
-        "pkg/util/util_bit_vector_runtime_test.go",
-        "pkg/util/util_fr_bit_vector_runtime.go",
-        "pkg/util/util_fr_bit_vector_runtime_source_test.go",
-        "pkg/util/util_bit_vector_runtime_query_source_test.go"
+        "pkg/util/bitset/vector.go"
       ],
       "tests": [
         "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
@@ -112932,33 +112075,7 @@
         "TestSourceEq",
         "TestSourceOr",
         "TestSourceReset",
-        "TestSourceResizeCrash",
-        "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
-        "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
-        "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
-        "TestBitVectorRuntimeCapturedRawSpanConstructor",
-        "TestBitVectorRuntimeRegisteredOrAndEquality",
-        "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
-        "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
-        "TestBitVectorRuntimeEveryActualRefusal",
-        "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
-        "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
-        "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
-        "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
-        "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
-        "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
-        "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
-        "TestBitVectorRuntimeRegisteredCrashAndReset",
-        "TestBitVectorRuntimeIndependentWorldsAndShift",
-        "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
-        "TestFastResetBitVectorRuntimeSourceListBeforeBase",
-        "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
-        "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
-        "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
-        "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
-        "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
-        "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
-        "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
+        "TestSourceResizeCrash"
       ],
       "conditionals": [
         {
@@ -113015,36 +112132,16 @@
           ]
         },
         {
-          "name": "Concrete Runtime bit_vector/fr_bit_vector selected source bodies, physical source lifetime and separate owning abort; completed-object scalar queries and reached-byte hash after body refusal",
-          "status": "partial",
-          "go_target": "pkg/util/util_bit_vector_runtime.go",
+          "name": "native variable-width bit vector and fast-reset specialization",
+          "status": "ported",
+          "go_target": "pkg/util/bitset/vector.go",
           "tests": [
-            "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
-            "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
-            "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
-            "TestBitVectorRuntimeCapturedRawSpanConstructor",
-            "TestBitVectorRuntimeRegisteredOrAndEquality",
-            "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
-            "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
-            "TestBitVectorRuntimeEveryActualRefusal",
-            "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
-            "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
-            "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
-            "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
-            "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
-            "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
-            "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
-            "TestBitVectorRuntimeRegisteredCrashAndReset",
-            "TestBitVectorRuntimeIndependentWorldsAndShift",
-            "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
-            "TestFastResetBitVectorRuntimeSourceListBeforeBase",
-            "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
-            "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
-            "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
-            "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
-            "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
-            "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
-            "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
+            "TestSourceResizeCrash",
+            "TestSourceOr",
+            "TestSourceAnd",
+            "TestSourceEq",
+            "TestSourceReset",
+            "TestBoundedOperationOracle"
           ]
         }
       ],
@@ -113065,13 +112162,10 @@
         "nonzero Hash propagates reached raw guard instead of substituting sticky body cause; zero bytes never dereference provider"
       ],
       "deviations": [
-        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
         "Legacy bitset.Vector Go-slice profile remains partial and unchanged",
         "Actual global DebugContext assertion enable/tag and process-global memory wiring remain open; selected default source g3debug assertions execute",
-        "Go io.Writer synchronous refusal/ascending memcpy word guards classify checked/stream adapter; native ostream flag transport/allocation and raw memcpy schedule not claimed",
         "inactive display #else and inactive tst1/tst2 not executed",
-        "source-overflow/malformed raw counts/capacities are typed reached guards; no source-undefined native continuation/termination promise",
-        "explicit split-provider Runtime ownership versus source single global allocator; no pointer-ABI ticket/shadow array"
+        "The redundant Runtime/Block translation was deleted; native typed storage lives in util/bitset and AST mark specializations retain their own typed storage."
       ]
     },
     {
@@ -113085,16 +112179,7 @@
         "pkg/ast/ast_mark_fast.go",
         "pkg/ast/ast_mark_node.go",
         "pkg/ast/ast_mark_scoped.go",
-        "pkg/util/bit_vector.go",
-        "pkg/util/util_bit_vector_runtime.go",
-        "pkg/util/util_bit_vector_runtime_lifetime_test.go",
-        "pkg/util/util_bit_vector_runtime_ops.go",
-        "pkg/util/util_bit_vector_runtime_registered_test.go",
-        "pkg/util/util_bit_vector_runtime_source_test.go",
-        "pkg/util/util_bit_vector_runtime_test.go",
-        "pkg/util/util_fr_bit_vector_runtime.go",
-        "pkg/util/util_fr_bit_vector_runtime_source_test.go",
-        "pkg/util/util_bit_vector_runtime_query_source_test.go"
+        "pkg/util/bitset/vector.go"
       ],
       "tests": [
         "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
@@ -113118,33 +112203,7 @@
         "TestSourceEq",
         "TestSourceOr",
         "TestSourceReset",
-        "TestSourceResizeCrash",
-        "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
-        "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
-        "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
-        "TestBitVectorRuntimeCapturedRawSpanConstructor",
-        "TestBitVectorRuntimeRegisteredOrAndEquality",
-        "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
-        "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
-        "TestBitVectorRuntimeEveryActualRefusal",
-        "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
-        "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
-        "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
-        "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
-        "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
-        "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
-        "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
-        "TestBitVectorRuntimeRegisteredCrashAndReset",
-        "TestBitVectorRuntimeIndependentWorldsAndShift",
-        "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
-        "TestFastResetBitVectorRuntimeSourceListBeforeBase",
-        "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
-        "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
-        "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
-        "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
-        "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
-        "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
-        "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
+        "TestSourceResizeCrash"
       ],
       "conditionals": [
         {
@@ -113221,36 +112280,16 @@
           ]
         },
         {
-          "name": "Concrete Runtime bit_vector/fr_bit_vector selected source bodies, physical source lifetime and separate owning abort; completed-object scalar queries and reached-byte hash after body refusal",
-          "status": "partial",
-          "go_target": "pkg/util/util_bit_vector_runtime.go",
+          "name": "native variable-width bit vector and fast-reset specialization",
+          "status": "ported",
+          "go_target": "pkg/util/bitset/vector.go",
           "tests": [
-            "TestBitVectorRuntimeHashCutoffAndEveryStreamPrefix",
-            "TestBitVectorRuntimeDistinctProviderSwapFieldsAndColdGuards",
-            "TestBitVectorRuntimeWarmZeroAllocAndPhysicalPlateau",
-            "TestBitVectorRuntimeCapturedRawSpanConstructor",
-            "TestBitVectorRuntimeRegisteredOrAndEquality",
-            "TestBitVectorRuntimeRawLayoutUnsignedAndNullAssignment",
-            "TestBitVectorRuntimeIncompleteConstructorHasNoSourceDestructor",
-            "TestBitVectorRuntimeEveryActualRefusal",
-            "TestBitVectorRuntimeReleaseLogicalGuardsAndScalarReads",
-            "TestBitVectorRuntimeSourceDestructorPostPhysicalAndOwningAbort",
-            "TestBitVectorRuntimeAllLiteralScalarAndBoundaryRoutes",
-            "TestBitVectorRuntimeSizeTRequestsAndReachedWrappedExpansion",
-            "TestBitVectorRuntimeColdSelfZeroAndClosedGuards",
-            "TestBitVectorRuntimeTLSConstructorPendingActualHeaderCleanup",
-            "TestBitVectorRuntimeSignedRawConstructorWrappedZeroWords",
-            "TestBitVectorRuntimeRegisteredCrashAndReset",
-            "TestBitVectorRuntimeIndependentWorldsAndShift",
-            "TestBitVectorRuntimePushPublishesBitsBeforeAllocation",
-            "TestFastResetBitVectorRuntimeSourceListBeforeBase",
-            "TestBitVectorRuntimeUnequalLengthsIndependentWordBoundaries",
-            "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
-            "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
-            "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
-            "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
-            "TestBitVectorRuntimeScalarAndZeroHashAfterActualTLSPushRefusal",
-            "TestBitVectorRuntimeScalarAndReachedHashAfterDestructiveAssignRefusal"
+            "TestSourceResizeCrash",
+            "TestSourceOr",
+            "TestSourceAnd",
+            "TestSourceEq",
+            "TestSourceReset",
+            "TestBoundedOperationOracle"
           ]
         }
       ],
@@ -113271,13 +112310,10 @@
         "nonzero Hash propagates reached raw guard instead of substituting sticky body cause; zero bytes never dereference provider"
       ],
       "deviations": [
-        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
         "Legacy bitset.Vector Go-slice profile remains partial and unchanged",
         "Actual global DebugContext assertion enable/tag and process-global memory wiring remain open; selected default source g3debug assertions execute",
-        "Go io.Writer synchronous refusal/ascending memcpy word guards classify checked/stream adapter; native ostream flag transport/allocation and raw memcpy schedule not claimed",
         "inactive display #else and inactive tst1/tst2 not executed",
-        "source-overflow/malformed raw counts/capacities are typed reached guards; no source-undefined native continuation/termination promise",
-        "explicit split-provider Runtime ownership versus source single global allocator; no pointer-ABI ticket/shadow array"
+        "The redundant Runtime/Block translation was deleted; native typed storage lives in util/bitset and AST mark specializations retain their own typed storage."
       ]
     },
     {
@@ -116578,16 +115614,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/fixed_bit_vector.go",
-        "pkg/util/util_fixed_bit_vector_runtime.go",
-        "pkg/util/util_fixed_bit_vector_runtime_ops.go",
-        "pkg/util/util_fixed_bit_vector_runtime_view.go",
-        "pkg/util/util_fixed_bit_vector_runtime_registered_test.go",
-        "pkg/util/util_fixed_bit_vector_runtime_source_test.go",
-        "pkg/util/util_fixed_bit_vector_runtime_lifetime_test.go",
-        "pkg/util/util_fixed_bit_vector_runtime_view_test.go",
-        "pkg/util/util_fixed_bit_vector_runtime_deallocation.go",
-        "pkg/util/util_fixed_bit_vector_runtime_deallocation_test.go"
+        "pkg/util/bitset/fixed.go"
       ],
       "tests": [
         "TestFixedSourceTst1",
@@ -116597,34 +115624,7 @@
         "TestFixedOwnershipAndLifetime",
         "TestFixedSourceHash",
         "TestFixedBoundedOracle",
-        "TestFixedBudgetsAndReuse",
-        "TestFixedBitVectorRuntimeRegisteredAssertions",
-        "TestFixedBitVectorRuntimeIndependentWorldsAndRange",
-        "TestFixedBitVectorRuntimeUninitializedInlineAndUnsignedWrap",
-        "TestFixedBitVectorRuntimeAllocateCopyRetainsReachedCandidate",
-        "TestFixedBitVectorRuntimeEveryActualAllocationRefusal",
-        "TestFixedBitVectorRuntimeHashAndDisplayPrefixes",
-        "TestFixedBitVectorRuntimePaddingMasksResetValueAndShortCircuits",
-        "TestFixedBitVectorRuntimePooledEveryActualRefusalAndFreelistBytes",
-        "TestFixedBitVectorRuntimeRealProfilesResetAndCapturedLifetime",
-        "TestFixedBitVectorRuntimeDirectPostCloseCallerAndProvider",
-        "TestFixedBitVectorRuntimeActualDiagnosticStopOwningAcknowledgment",
-        "TestFixedBitVectorRuntimeColdCopyForeignAndWarmPlateau",
-        "TestFixedBitVectorRuntimeActualTLSUnpublishedAllocationRoot",
-        "TestFixedBitVectorRuntimeActualPostPhysicalDirectDeallocation",
-        "TestFixedBitVectorRuntimeBorrowedForeignDestinationAndQueries",
-        "TestFixedBitVectorRuntimeBorrowedReceiverAssertionsAndUnusedViews",
-        "TestFixedBitVectorRuntimeBorrowedCopyActualExtentPrefix",
-        "TestFixedBitVectorRuntimeBorrowedInlineActualColdHash",
-        "TestFixedBitVectorRuntimeForeignInlineFillInitializesActualBytes",
-        "TestFixedBitVectorRuntimeForeignInlinePartialCopyByteInitialization",
-        "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
-        "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads",
-        "TestFixedBitVectorRuntimeForeignDirectReceiverDeallocation",
-        "TestFixedBitVectorRuntimeForeignPostPhysicalReleaseReceipt",
-        "TestFixedBitVectorRuntimeForeignDirectDeallocationAfterDonorClose",
-        "TestFixedBitVectorRuntimeStoppedRawInvocationExplicitOwningAbort",
-        "TestFixedBitVectorRuntimeHeaderlessRawAbortRetainsCallerAllocation"
+        "TestFixedBudgetsAndReuse"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -116632,7 +115632,7 @@
         {
           "name": "fixed_bit_vector access/masks/set/unset/get",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116647,7 +115647,7 @@
         {
           "name": "manager construction/root/reset/deallocate/destruction",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116662,7 +115662,7 @@
         {
           "name": "allocate/allocate0/allocate1/allocate(copy)",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116677,7 +115677,7 @@
         {
           "name": "fill0/fill1/copy/assign/range copy",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116692,7 +115692,7 @@
         {
           "name": "AND/OR/XOR/NOT/equals/contains",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116707,7 +115707,7 @@
         {
           "name": "hash/word/last_word/display",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116718,47 +115718,6 @@
             "TestFixedBoundedOracle",
             "TestFixedBudgetsAndReuse"
           ]
-        },
-        {
-          "name": "Concrete Runtime fixed-bit-vector selected source bodies, reached receiver word/byte loops, raw address equality, actual cold m0 and source allocator destruction; foreign raw-pointer deallocation covered by subsequent DeallocateView evidence",
-          "status": "partial",
-          "go_target": "pkg/util/util_fixed_bit_vector_runtime.go",
-          "tests": [
-            "TestFixedBitVectorRuntimeRegisteredAssertions",
-            "TestFixedBitVectorRuntimeIndependentWorldsAndRange",
-            "TestFixedBitVectorRuntimeUninitializedInlineAndUnsignedWrap",
-            "TestFixedBitVectorRuntimeAllocateCopyRetainsReachedCandidate",
-            "TestFixedBitVectorRuntimeEveryActualAllocationRefusal",
-            "TestFixedBitVectorRuntimeHashAndDisplayPrefixes",
-            "TestFixedBitVectorRuntimePaddingMasksResetValueAndShortCircuits",
-            "TestFixedBitVectorRuntimePooledEveryActualRefusalAndFreelistBytes",
-            "TestFixedBitVectorRuntimeRealProfilesResetAndCapturedLifetime",
-            "TestFixedBitVectorRuntimeDirectPostCloseCallerAndProvider",
-            "TestFixedBitVectorRuntimeActualDiagnosticStopOwningAcknowledgment",
-            "TestFixedBitVectorRuntimeColdCopyForeignAndWarmPlateau",
-            "TestFixedBitVectorRuntimeActualTLSUnpublishedAllocationRoot",
-            "TestFixedBitVectorRuntimeActualPostPhysicalDirectDeallocation",
-            "TestFixedBitVectorRuntimeBorrowedForeignDestinationAndQueries",
-            "TestFixedBitVectorRuntimeBorrowedReceiverAssertionsAndUnusedViews",
-            "TestFixedBitVectorRuntimeBorrowedCopyActualExtentPrefix",
-            "TestFixedBitVectorRuntimeBorrowedInlineActualColdHash",
-            "TestFixedBitVectorRuntimeForeignInlineFillInitializesActualBytes",
-            "TestFixedBitVectorRuntimeForeignInlinePartialCopyByteInitialization",
-            "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
-            "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads"
-          ]
-        },
-        {
-          "name": "Source deallocate cpp78-80 concrete receiver-count/raw-pointer DeallocateView and explicit stopped own cleanup",
-          "status": "partial",
-          "go_target": "pkg/util/util_fixed_bit_vector_runtime_deallocation.go",
-          "tests": [
-            "TestFixedBitVectorRuntimeForeignDirectReceiverDeallocation",
-            "TestFixedBitVectorRuntimeForeignPostPhysicalReleaseReceipt",
-            "TestFixedBitVectorRuntimeForeignDirectDeallocationAfterDonorClose",
-            "TestFixedBitVectorRuntimeStoppedRawInvocationExplicitOwningAbort",
-            "TestFixedBitVectorRuntimeHeaderlessRawAbortRetainsCallerAllocation"
-          ]
         }
       ],
       "ownership": [
@@ -116767,8 +115726,7 @@
         "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data."
       ],
       "deviations": [
-        "Registered62 dynamic assertions and24 new total Runtime/hash groups cover selected profiles and every real reservation prefix. Existing checked Deallocate handles originating manager only. Source-defined foreign direct and pooled pointer deallocation and receiver counter/borrowed freelist behavior are covered by the subsequent raw facade evidence for its selected Runtime profiles; ReleaseDirect is caller raw Runtime action, not a replacement for manager deallocate. Native pointer/ABI/global assertions/TRACE/ostream and remaining lifetime domains remain partial.",
-        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 truncation beforezero/bypass fixed in raw overload; existing generic ObjectRef size preflight remains partial. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
+        "The redundant Runtime/Block translation was deleted; the typed fixed-width manager imports arena directly."
       ]
     },
     {
@@ -116777,16 +115735,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/fixed_bit_vector.go",
-        "pkg/util/util_fixed_bit_vector_runtime.go",
-        "pkg/util/util_fixed_bit_vector_runtime_ops.go",
-        "pkg/util/util_fixed_bit_vector_runtime_view.go",
-        "pkg/util/util_fixed_bit_vector_runtime_registered_test.go",
-        "pkg/util/util_fixed_bit_vector_runtime_source_test.go",
-        "pkg/util/util_fixed_bit_vector_runtime_lifetime_test.go",
-        "pkg/util/util_fixed_bit_vector_runtime_view_test.go",
-        "pkg/util/util_fixed_bit_vector_runtime_deallocation.go",
-        "pkg/util/util_fixed_bit_vector_runtime_deallocation_test.go"
+        "pkg/util/bitset/fixed.go"
       ],
       "tests": [
         "TestFixedSourceTst1",
@@ -116796,34 +115745,7 @@
         "TestFixedOwnershipAndLifetime",
         "TestFixedSourceHash",
         "TestFixedBoundedOracle",
-        "TestFixedBudgetsAndReuse",
-        "TestFixedBitVectorRuntimeRegisteredAssertions",
-        "TestFixedBitVectorRuntimeIndependentWorldsAndRange",
-        "TestFixedBitVectorRuntimeUninitializedInlineAndUnsignedWrap",
-        "TestFixedBitVectorRuntimeAllocateCopyRetainsReachedCandidate",
-        "TestFixedBitVectorRuntimeEveryActualAllocationRefusal",
-        "TestFixedBitVectorRuntimeHashAndDisplayPrefixes",
-        "TestFixedBitVectorRuntimePaddingMasksResetValueAndShortCircuits",
-        "TestFixedBitVectorRuntimePooledEveryActualRefusalAndFreelistBytes",
-        "TestFixedBitVectorRuntimeRealProfilesResetAndCapturedLifetime",
-        "TestFixedBitVectorRuntimeDirectPostCloseCallerAndProvider",
-        "TestFixedBitVectorRuntimeActualDiagnosticStopOwningAcknowledgment",
-        "TestFixedBitVectorRuntimeColdCopyForeignAndWarmPlateau",
-        "TestFixedBitVectorRuntimeActualTLSUnpublishedAllocationRoot",
-        "TestFixedBitVectorRuntimeActualPostPhysicalDirectDeallocation",
-        "TestFixedBitVectorRuntimeBorrowedForeignDestinationAndQueries",
-        "TestFixedBitVectorRuntimeBorrowedReceiverAssertionsAndUnusedViews",
-        "TestFixedBitVectorRuntimeBorrowedCopyActualExtentPrefix",
-        "TestFixedBitVectorRuntimeBorrowedInlineActualColdHash",
-        "TestFixedBitVectorRuntimeForeignInlineFillInitializesActualBytes",
-        "TestFixedBitVectorRuntimeForeignInlinePartialCopyByteInitialization",
-        "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
-        "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads",
-        "TestFixedBitVectorRuntimeForeignDirectReceiverDeallocation",
-        "TestFixedBitVectorRuntimeForeignPostPhysicalReleaseReceipt",
-        "TestFixedBitVectorRuntimeForeignDirectDeallocationAfterDonorClose",
-        "TestFixedBitVectorRuntimeStoppedRawInvocationExplicitOwningAbort",
-        "TestFixedBitVectorRuntimeHeaderlessRawAbortRetainsCallerAllocation"
+        "TestFixedBudgetsAndReuse"
       ],
       "conditionals": [
         {
@@ -116859,7 +115781,7 @@
         {
           "name": "fixed_bit_vector access/masks/set/unset/get",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116874,7 +115796,7 @@
         {
           "name": "manager construction/root/reset/deallocate/destruction",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116889,7 +115811,7 @@
         {
           "name": "allocate/allocate0/allocate1/allocate(copy)",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116904,7 +115826,7 @@
         {
           "name": "fill0/fill1/copy/assign/range copy",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116919,7 +115841,7 @@
         {
           "name": "AND/OR/XOR/NOT/equals/contains",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116934,7 +115856,7 @@
         {
           "name": "hash/word/last_word/display",
           "status": "ported",
-          "go_target": "pkg/util/fixed_bit_vector.go",
+          "go_target": "pkg/util/bitset/fixed.go",
           "tests": [
             "TestFixedSourceTst1",
             "TestFixedSourceOr",
@@ -116945,47 +115867,6 @@
             "TestFixedBoundedOracle",
             "TestFixedBudgetsAndReuse"
           ]
-        },
-        {
-          "name": "Concrete Runtime fixed-bit-vector selected source bodies, reached receiver word/byte loops, raw address equality, actual cold m0 and source allocator destruction; foreign raw-pointer deallocation covered by subsequent DeallocateView evidence",
-          "status": "partial",
-          "go_target": "pkg/util/util_fixed_bit_vector_runtime.go",
-          "tests": [
-            "TestFixedBitVectorRuntimeRegisteredAssertions",
-            "TestFixedBitVectorRuntimeIndependentWorldsAndRange",
-            "TestFixedBitVectorRuntimeUninitializedInlineAndUnsignedWrap",
-            "TestFixedBitVectorRuntimeAllocateCopyRetainsReachedCandidate",
-            "TestFixedBitVectorRuntimeEveryActualAllocationRefusal",
-            "TestFixedBitVectorRuntimeHashAndDisplayPrefixes",
-            "TestFixedBitVectorRuntimePaddingMasksResetValueAndShortCircuits",
-            "TestFixedBitVectorRuntimePooledEveryActualRefusalAndFreelistBytes",
-            "TestFixedBitVectorRuntimeRealProfilesResetAndCapturedLifetime",
-            "TestFixedBitVectorRuntimeDirectPostCloseCallerAndProvider",
-            "TestFixedBitVectorRuntimeActualDiagnosticStopOwningAcknowledgment",
-            "TestFixedBitVectorRuntimeColdCopyForeignAndWarmPlateau",
-            "TestFixedBitVectorRuntimeActualTLSUnpublishedAllocationRoot",
-            "TestFixedBitVectorRuntimeActualPostPhysicalDirectDeallocation",
-            "TestFixedBitVectorRuntimeBorrowedForeignDestinationAndQueries",
-            "TestFixedBitVectorRuntimeBorrowedReceiverAssertionsAndUnusedViews",
-            "TestFixedBitVectorRuntimeBorrowedCopyActualExtentPrefix",
-            "TestFixedBitVectorRuntimeBorrowedInlineActualColdHash",
-            "TestFixedBitVectorRuntimeForeignInlineFillInitializesActualBytes",
-            "TestFixedBitVectorRuntimeForeignInlinePartialCopyByteInitialization",
-            "TestFixedBitVectorRuntimeCapturedDirectViewAfterDonorClose",
-            "TestFixedBitVectorRuntimeRawAddressIdentityBeforePayloadReads"
-          ]
-        },
-        {
-          "name": "Source deallocate cpp78-80 concrete receiver-count/raw-pointer DeallocateView and explicit stopped own cleanup",
-          "status": "partial",
-          "go_target": "pkg/util/util_fixed_bit_vector_runtime_deallocation.go",
-          "tests": [
-            "TestFixedBitVectorRuntimeForeignDirectReceiverDeallocation",
-            "TestFixedBitVectorRuntimeForeignPostPhysicalReleaseReceipt",
-            "TestFixedBitVectorRuntimeForeignDirectDeallocationAfterDonorClose",
-            "TestFixedBitVectorRuntimeStoppedRawInvocationExplicitOwningAbort",
-            "TestFixedBitVectorRuntimeHeaderlessRawAbortRetainsCallerAllocation"
-          ]
         }
       ],
       "ownership": [
@@ -116994,8 +115875,7 @@
         "Supplied Runtime/block/offset is a borrowed source address; receiver counter/class/freelist selects actions, no donor chunk adoption. Actual pointer codec sidecars belong to receiver, donor payload/page remains caller-owned. Exact raw invocation serial/stage/count and matching active ObjectRef release guard prevent duplicate owning continuation. SourceFinalize stays sticky; only explicit CleanupStopped discards the current stopped invocation via AbortRawInvocation, preserving source count/history and all donor/provider data."
       ],
       "deviations": [
-        "Registered62 dynamic assertions and24 new total Runtime/hash groups cover selected profiles and every real reservation prefix. Existing checked Deallocate handles originating manager only. Source-defined foreign direct and pooled pointer deallocation and receiver counter/borrowed freelist behavior are covered by the subsequent raw facade evidence for its selected Runtime profiles; ReleaseDirect is caller raw Runtime action, not a replacement for manager deallocate. Native pointer/ABI/global assertions/TRACE/ostream and remaining lifetime domains remain partial.",
-        "Same Runtime provider/profile only; source global allocator and native pointer ABI remain open. SizeT32 truncation beforezero/bypass fixed in raw overload; existing generic ObjectRef size preflight remains partial. Raw retry is an explicit Go continuation, not native exception resumption. Actual public pool metadata refusal/ownabort proof preserves donor/caller roots; headerless wrapped realloc is guarded source-undefined domain only. Direct release stage2-to-physical has no fallible point, no fabricated failure credit. Whole units remain partial."
+        "The redundant Runtime/Block translation was deleted; the typed fixed-width manager imports arena directly."
       ]
     },
     {
@@ -153390,15 +152270,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/uint_set.go",
+        "pkg/util/bitset/uint_set.go",
         "pkg/util/uint_set_map.go",
         "pkg/util/negated_literal_cliques_set.go",
         "pkg/sat/sat_solver_max_cliques_test.go",
-        "pkg/util/util_uint_set_runtime.go",
-        "pkg/util/util_uint_set_runtime_test.go",
-        "pkg/util/util_uint_set_runtime_constructor_source_test.go",
-        "pkg/util/util_uint_set_runtime_swap_source_test.go",
-        "pkg/util/util_uint_set_runtime_distinct_budget_source_test.go",
         "pkg/test/uint_set_test.go",
         "pkg/util/negated_literal_cliques_model_test.go",
         "pkg/util/negated_literal_cliques_rows_test.go",
@@ -153435,27 +152310,7 @@
         "TestNegatedLiteralCliquesWarmedSameQueryPhysicalPlateauAndScalarExtent",
         "TestNegatedLiteralCliquesWrappedExtentReachesSecondReserveBeforeSourceRead",
         "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
-        "TestNegatedLiteralCliquesStoppedLexicalContextRejectsOverwrite",
-        "TestUintSetRuntimeSourceBoundary",
-        "TestUintSetRuntimeIndependentWorlds",
-        "TestUintSetRuntimeEveryActualRefusal",
-        "TestUintSetRuntimeLiveIteratorAndCopyCapacity",
-        "TestUintSetRuntimeOwnerGuardsAndWarmPlateau",
-        "TestUintSetRuntimeSourceDestructorAndOwningAbort",
-        "TestUintSetRuntimeSourceRandomCampaign",
-        "TestUintSetRuntimeHashDisplayAndStreamPrefixes",
-        "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
-        "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase",
-        "TestUintSetRuntimeSwapActualProviderProvenance",
-        "TestUintSetRuntimeSwapEmptyProviderLifetime",
-        "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
-        "TestUintSetRuntimeSwapWarmNoEvents",
-        "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
-        "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
-        "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
-        "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
-        "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
-        "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
+        "TestNegatedLiteralCliquesStoppedLexicalContextRejectsOverwrite"
       ],
       "conditionals": [
         {
@@ -153503,7 +152358,7 @@
         {
           "name": "constructors/destructor/copy assignment/swap/reset",
           "status": "partial",
-          "go_target": "pkg/util/uint_set.go",
+          "go_target": "pkg/util/bitset/uint_set.go",
           "tests": [
             "TestUintSetSourceTst1",
             "TestUintSetSourceTst2",
@@ -153524,7 +152379,7 @@
         {
           "name": "get_max_elem/empty/insert/remove/contains/num_elems",
           "status": "partial",
-          "go_target": "pkg/util/uint_set.go",
+          "go_target": "pkg/util/bitset/uint_set.go",
           "tests": [
             "TestUintSetSourceTst1",
             "TestUintSetSourceTst2",
@@ -153545,7 +152400,7 @@
         {
           "name": "union/intersection/equality/subset_of",
           "status": "ported",
-          "go_target": "pkg/util/uint_set.go",
+          "go_target": "pkg/util/bitset/uint_set.go",
           "tests": [
             "TestUintSetSourceTst1",
             "TestUintSetSourceTst2",
@@ -153564,9 +152419,9 @@
           ]
         },
         {
-          "name": "iterator construction/scan/dereference/increments/comparison/assignment",
+          "name": "typed ascending ForEach traversal with early stop",
           "status": "ported",
-          "go_target": "pkg/util/uint_set.go",
+          "go_target": "pkg/util/bitset/uint_set.go",
           "tests": [
             "TestUintSetSourceTst1",
             "TestUintSetSourceTst2",
@@ -153585,9 +152440,9 @@
           ]
         },
         {
-          "name": "get_hash/hash functor/equality functor/display",
+          "name": "weighted hash and display",
           "status": "ported",
-          "go_target": "pkg/util/uint_set.go",
+          "go_target": "pkg/util/bitset/uint_set.go",
           "tests": [
             "TestUintSetSourceTst1",
             "TestUintSetSourceTst2",
@@ -153627,40 +152482,6 @@
             "pkg/util/negated_literal_cliques_test.go",
             "pkg/sat/sat_solver_max_cliques_test.go"
           ]
-        },
-        {
-          "name": "Selected concrete Runtime uint_set full scalar body, live-owner iterator, weighted hash/display, destructive exact-copy assignment and completed-base constructor failure destruction",
-          "status": "partial",
-          "go_target": "pkg/util/util_uint_set_runtime.go",
-          "tests": [
-            "TestUintSetRuntimeSourceBoundary",
-            "TestUintSetRuntimeIndependentWorlds",
-            "TestUintSetRuntimeEveryActualRefusal",
-            "TestUintSetRuntimeLiveIteratorAndCopyCapacity",
-            "TestUintSetRuntimeOwnerGuardsAndWarmPlateau",
-            "TestUintSetRuntimeSourceDestructorAndOwningAbort",
-            "TestUintSetRuntimeSourceRandomCampaign",
-            "TestUintSetRuntimeHashDisplayAndStreamPrefixes",
-            "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
-            "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase"
-          ]
-        },
-        {
-          "name": "Selected Runtime uint_set pointer Swap across actual providers and distinct Budgets; cached iterator dereference and source assertion-before-owner-read order",
-          "status": "partial",
-          "go_target": "pkg/util/util_uint_set_runtime.go",
-          "tests": [
-            "TestUintSetRuntimeSwapActualProviderProvenance",
-            "TestUintSetRuntimeSwapEmptyProviderLifetime",
-            "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
-            "TestUintSetRuntimeSwapWarmNoEvents",
-            "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
-            "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
-            "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
-            "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
-            "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
-            "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
-          ]
         }
       ],
       "ownership": [
@@ -153673,7 +152494,7 @@
         "Invalid extent/capacity overflow diagnosed before growth; source get_max_elem would wrap.",
         "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
         "Selected explicit-provider/default-enabled assertion profile; process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial.",
-        "Legacy bitset.Assign allocates/copies before replacing old Go backing, and resize rejects wrapped endpoints before source growth. Those legacy method groups remain partial; new Runtime specialization supplies literal destruction/publication for its selected physical profile without silently promoting the legacy algorithm."
+        "The copied C++ iterator and hash/equality functor wrappers were replaced by typed ascending ForEach traversal plus direct Equal and Hash methods. The redundant Runtime/Block translation was deleted."
       ]
     },
     {
@@ -154287,13 +153108,6 @@
         "pkg/util/util_int_heap_bounds_source_test.go",
         "pkg/util/util_int_heap_debug_runtime.go",
         "pkg/util/util_int_heap_debug_source_test.go",
-        "pkg/util/util_uint_set_runtime.go",
-        "pkg/util/util_uint_set_runtime_test.go",
-        "pkg/util/util_uint_set_runtime_constructor_source_test.go",
-        "pkg/util/util_uint_set_runtime_swap_source_test.go",
-        "pkg/util/util_uint_set_runtime_distinct_budget_source_test.go",
-        "pkg/util/util_fr_bit_vector_runtime.go",
-        "pkg/util/util_fr_bit_vector_runtime_source_test.go",
         "pkg/util/util_unsigned_vector_runtime.go",
         "pkg/util/util_unsigned_vector_runtime_test.go",
         "pkg/util/util_permutation_runtime.go",
@@ -154617,30 +153431,6 @@
         "TestIntHeapDebugFinalizeReinitializeAndCopiedBorrow",
         "TestIntHeapDebugSwapFourAssertionSitesInSourceOrder",
         "TestIntHeapDebugBorrowedOwnerSeparateBudgetGraph",
-        "TestUintSetRuntimeSourceBoundary",
-        "TestUintSetRuntimeIndependentWorlds",
-        "TestUintSetRuntimeEveryActualRefusal",
-        "TestUintSetRuntimeLiveIteratorAndCopyCapacity",
-        "TestUintSetRuntimeOwnerGuardsAndWarmPlateau",
-        "TestUintSetRuntimeSourceDestructorAndOwningAbort",
-        "TestUintSetRuntimeSourceRandomCampaign",
-        "TestUintSetRuntimeHashDisplayAndStreamPrefixes",
-        "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
-        "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase",
-        "TestUintSetRuntimeSwapActualProviderProvenance",
-        "TestUintSetRuntimeSwapEmptyProviderLifetime",
-        "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
-        "TestUintSetRuntimeSwapWarmNoEvents",
-        "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
-        "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
-        "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
-        "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
-        "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
-        "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead",
-        "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
-        "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
-        "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
-        "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor",
         "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
         "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
         "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
@@ -155261,51 +154051,6 @@
             "TestIntHeapDebugFinalizeReinitializeAndCopiedBorrow",
             "TestIntHeapDebugSwapFourAssertionSitesInSourceOrder",
             "TestIntHeapDebugBorrowedOwnerSeparateBudgetGraph"
-          ]
-        },
-        {
-          "name": "Selected concrete Runtime uint_set full scalar body, live-owner iterator, weighted hash/display, destructive exact-copy assignment and completed-base constructor failure destruction",
-          "status": "partial",
-          "go_target": "pkg/util/util_uint_set_runtime.go",
-          "tests": [
-            "TestUintSetRuntimeSourceBoundary",
-            "TestUintSetRuntimeIndependentWorlds",
-            "TestUintSetRuntimeEveryActualRefusal",
-            "TestUintSetRuntimeLiveIteratorAndCopyCapacity",
-            "TestUintSetRuntimeOwnerGuardsAndWarmPlateau",
-            "TestUintSetRuntimeSourceDestructorAndOwningAbort",
-            "TestUintSetRuntimeSourceRandomCampaign",
-            "TestUintSetRuntimeHashDisplayAndStreamPrefixes",
-            "TestUintSetRuntimeIteratorResetAndEndSourceProfiles",
-            "TestUintSetRuntimeCopyConstructorUnwindsCompletedBase"
-          ]
-        },
-        {
-          "name": "Selected Runtime uint_set pointer Swap across actual providers and distinct Budgets; cached iterator dereference and source assertion-before-owner-read order",
-          "status": "partial",
-          "go_target": "pkg/util/util_uint_set_runtime.go",
-          "tests": [
-            "TestUintSetRuntimeSwapActualProviderProvenance",
-            "TestUintSetRuntimeSwapEmptyProviderLifetime",
-            "TestUintSetRuntimeSwappedGrowthEveryActualRefusal",
-            "TestUintSetRuntimeSwapWarmNoEvents",
-            "TestUintSetRuntimeSwapDistinctBudgetsEveryEmptyCombination",
-            "TestUintSetRuntimeAdoptedGrowthRefusesPhysicalBudgetOnly",
-            "TestUintSetRuntimeAdoptedAssignAndCloneEveryActualRefusal",
-            "TestUintSetRuntimeSwapDistinctBudgetsWarmAndEmptyLifetime",
-            "TestUintSetRuntimeIteratorCachedValueDoesNotReadDeadOwner",
-            "TestUintSetRuntimeIteratorIncrementAssertionBeforeDeadOwnerRead"
-          ]
-        },
-        {
-          "name": "Concrete unsigned-vector member copy/assignment used by fr_bit_vector; completed base unwind and reverse member destruction",
-          "status": "partial",
-          "go_target": "pkg/util/util_fr_bit_vector_runtime.go",
-          "tests": [
-            "TestFastResetBitVectorRuntimeCopyAssignmentAndEveryRefusal",
-            "TestFastResetBitVectorRuntimeSelfAssignmentSourceMemberGuard",
-            "TestFastResetBitVectorRuntimeReverseMemberDestructorStop",
-            "TestFastResetBitVectorRuntimeFailedAssignmentStillReachesSourceDestructor"
           ]
         },
         {

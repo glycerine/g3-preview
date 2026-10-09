@@ -33,7 +33,11 @@ storage and keeps its source-compatible hash routine private beside its two
 hash consumers. The unsigned set exposes typed ascending `ForEach` traversal;
 the copied C++ iterator and hash-functor wrappers were removed. The redundant
 `Runtime`/`Block` bit-container translations were deleted after a module-wide
-consumer scan found no production user.
+consumer scan found no production user. The standalone `bit_util` translation
+and its copied source tests were subsequently deleted for the same reason: the
+live numeric ports already use `math/bits`, typed slices, and their concrete
+arithmetic. `obj_mark` already lives in its concrete typed AST specializations,
+so no generic utility wrapper remains to extract.
 
 ## Method and terminology
 
@@ -149,7 +153,7 @@ self-contained in Go or depend only on `arena` or the standard library.
 | `util/natset` | `nat_set` | Self-contained live representation and a natural package leaf. |
 | `util/approx` | `approx_nat`, `approx_set` | Cohesive approximate-number/set functionality. Their display methods currently touch shared numeric formatting; replace that edge with ordinary `fmt`/`io` behavior or a narrow formatter. |
 | `util/backtrack` | `trail`, `union_find`, selected backtracking containers | `union_find` is widely used upstream. Keep trail ownership and undo behavior together. Specialize `backtrackable_set` for its actual consumer instead of keeping `any`. |
-| `util/bitset` | `bit_vector`, `fixed_bit_vector`, `uint_set` | Extracted. Native typed storage; fixed-width vectors import `arena` directly. `bit_util` and `obj_mark` remain for separate consumer-led work. |
+| `util/bitset` | `bit_vector`, `fixed_bit_vector`, `uint_set` | Extracted. Native typed storage; fixed-width vectors import `arena` directly. `bit_util` is a Go platform replacement and `obj_mark` is represented by concrete AST specializations. |
 | `util/cliques` | `max_cliques`, its set helpers | Already has SAT consumers. A focused package would isolate the algorithm and its tests. |
 | `util/sortnet` | `sorting_network` | Standalone algorithm with production consumers outside `util`. |
 | `util/permutation` | live declarations from `permutation.h` | Only move the live free permutation operations. `permutation.cpp` itself has no production caller. |

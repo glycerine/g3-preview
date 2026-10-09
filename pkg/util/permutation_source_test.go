@@ -60,7 +60,7 @@ func TestPermutationCyclesExhaustiveIndependentCopy(t *testing.T) {
 func TestPermutationCyclesActualMarkBeforeReachedDataFailure(t *testing.T) {
 	p := []uint32{1, 0, 2}
 	data := []uint32{11}
-	if e := ApplyPermutationUint32(2, data, p); !errors.Is(e, ErrBitBounds) {
+	if e := ApplyPermutationUint32(2, data, p); !errors.Is(e, ErrPermutationBounds) {
 		t.Fatal(e)
 	}
 	if !reflect.DeepEqual(p, []uint32{^uint32(1), 0, 2}) || data[0] != 11 {
@@ -68,7 +68,7 @@ func TestPermutationCyclesActualMarkBeforeReachedDataFailure(t *testing.T) {
 	}
 	// The preserving wrapper cannot restore after its child stops.
 	p = []uint32{0}
-	if e := ApplyPermutationUint32(2, nil, p); !errors.Is(e, ErrBitBounds) {
+	if e := ApplyPermutationUint32(2, nil, p); !errors.Is(e, ErrPermutationBounds) {
 		t.Fatal(e)
 	}
 	if p[0] != ^uint32(0) {
@@ -86,7 +86,7 @@ func TestPermutationCyclesUnreadAndSignedCountBranches(t *testing.T) {
 	if e := ApplyPermutationCoreUint32(0x80000000, nil, nil); e != nil {
 		t.Fatal(e)
 	}
-	if e := ApplyPermutationUint32(0x80000000, nil, nil); !errors.Is(e, ErrBitBounds) {
+	if e := ApplyPermutationUint32(0x80000000, nil, nil); !errors.Is(e, ErrPermutationBounds) {
 		t.Fatal(e)
 	}
 	// Pre-marked entries skip without reading data. Restoration is literal,
@@ -129,11 +129,11 @@ func TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle(t *testing.T) 
 	p := []uint32{3, 0}
 	e := ApplyPermutationCoreUint32(2, nil, p)
 	if sourceDebug {
-		if !errors.Is(e, ErrBitAssertion) || !reflect.DeepEqual(p, []uint32{3, 0}) {
+		if !errors.Is(e, ErrPermutationAssertion) || !reflect.DeepEqual(p, []uint32{3, 0}) {
 			t.Fatal(e, p)
 		}
 	} else {
-		if !errors.Is(e, ErrBitBounds) || !reflect.DeepEqual(p, []uint32{^uint32(3), 0}) {
+		if !errors.Is(e, ErrPermutationBounds) || !reflect.DeepEqual(p, []uint32{^uint32(3), 0}) {
 			t.Fatal(e, p)
 		}
 	}
@@ -144,11 +144,11 @@ func TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle(t *testing.T) 
 		t.Fatal(data)
 	}
 	if sourceDebug {
-		if !errors.Is(e, ErrBitAssertion) || !reflect.DeepEqual(p, []uint32{^uint32(1), ^uint32(1)}) {
+		if !errors.Is(e, ErrPermutationAssertion) || !reflect.DeepEqual(p, []uint32{^uint32(1), ^uint32(1)}) {
 			t.Fatal(e, p)
 		}
 	} else {
-		if !errors.Is(e, ErrBitBounds) || !reflect.DeepEqual(p, []uint32{^uint32(1), 1}) {
+		if !errors.Is(e, ErrPermutationBounds) || !reflect.DeepEqual(p, []uint32{^uint32(1), 1}) {
 			t.Fatal(e, p)
 		}
 	}
