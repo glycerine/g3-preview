@@ -30577,27 +30577,11 @@ The implementation borrows the shared EventHandler interface already used by Sco
 
 Five focused tests cover a real process interrupt, once/reset/forward transitions without sending a terminating second signal, repeated mode, disabled scopes, nested restoration, LIFO enforcement, nil handlers, copied owners and closed owners. Focused native and g3debug checks pass (0.005s each). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 83 ported, 282 partial, 1728 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.
 
-### util file: scoped_numeral.h
+### util files: scoped_numeral.h, scoped_numeral_buffer.h and scoped_numeral_vector.h
 
-Completed the manager-independent template contract as exported ScopedNumeral and ScopedNumeralManager APIs alongside the existing typed ScopedInt, ScopedRational, ScopedBinary and ScopedFastFloat specializations. The manager template becomes a non-generic callback table covering numeral construction/deletion, set/int-set/reset, five arithmetic operations, negation, absolute value, comparison, sign and display. ScopedNumeral supplies mutable numeral and manager access, deep clone/assignment, raw and scoped swaps, compound and copy arithmetic, all six comparisons, all five sign predicates, abs-copy, negation, display and explicit destruction.
+Removed the unused manager-independent Go adapters ScopedNumeralManager, ScopedNumeral, ScopedNumeralBuffer and ScopedNumeralVector. Those adapters stored numerals in any values behind callback tables and existed only to satisfy their own tests; no production Go caller used them. They weakened compile-time type checking and made slice backing pointer-scannable.
 
-The dynamically typed wrapper retains the source distinction between the manager object and numeral value while avoiding Go generics. Assignment uses the destination manager callback and swap exchanges numeral values directly, so distinct manager instances remain valid when their shared manager contract accepts the numeral representation. Explicit Close replaces RAII, rejects shallow owner copies and publishes closure only after successful deletion. Concrete numerical wrappers retain their stronger allocator-provenance checks where Go managers own separate backing arenas.
-
-Three new focused tests exercise every generic operation, exact results, copy independence, distinct-manager assignment/swap, mutable access, manager identity, destructor values, incomplete callback tables, nil/copied/closed owners and failed-delete retry. The existing comprehensive typed numeral tests remain green. Focused native and g3debug checks pass (0.042s/0.044s). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 84 ported, 281 partial, 1728 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.
-
-### util file: scoped_numeral_buffer.h
-
-Completed the manager-independent buffer as exported ScopedNumeralBuffer using the same non-generic ScopedNumeralManager adapter. It exposes construction, borrowed manager access, size/empty, mutable indexed and slice access, deep-copy PushBack, forward-order Reset and Shrink, zero-initializing Resize and explicit Close. PushBack publishes a default numeral before the manager copy, matching the source failure prefix; Reset retains slice capacity, while Close releases it after all owned numerals are deleted.
-
-Go slices replace sbuffer with the source default initial capacity of 16, without porting the C++ buffer implementation. The existing private polynomial specialization continues to preserve its distinct inline128 physical layout and runtime allocation evidence. Owner identity rejects shallow copies, bounds are explicit errors, and failed deletion leaves the buffer open for owning retry.
-
-Three focused tests cover deep-copy publication and failure prefix, live mutable access, manager identity, initial capacity, forward deletion order, capacity-preserving reset, zero growth, both shrink paths, bounds, nil/incomplete managers, copied owners and closed owners. Focused native and g3debug checks pass (0.005s each). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 85 ported, 280 partial, 1728 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.
-
-### util file: scoped_numeral_vector.h
-
-Completed the general vector class as exported ScopedNumeralVector in its own one-to-one Go file. The struct borrows ScopedNumeralManager and composes the completed numeral-buffer ownership core while preserving the source vector's zero initial capacity. It exposes manager, size/capacity/empty, mutable indexed and slice access, deep-copy PushBack, PopBack through one-element Shrink, forward-order Reset/Shrink, zero-initializing Resize and explicit Close.
-
-Two focused tests cover construction, growth, mutable borrows, pop, shrink, resize, exact forward deletion order, reset, failed-copy publication, bounds, empty pop, nil manager, copied owner and closed owner. Existing integer, rational, binary-rational, fast-float and polynomial specialization evidence remains attached. Focused native and g3debug checks pass (0.006s/0.005s). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 86 ported, 279 partial, 1728 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.
+The retained implementations are concrete source instantiations: ScopedInt and ScopedRational with their typed vectors, ScopedBinary with its typed vector, ScopedFastFloat with its typed vector, and the polynomial mpzzp inline128 buffer/vector paths. Their numeral backing uses concrete Int, Rational, BinaryRational or FastFloat elements. Source template instantiations without a live Go caller remain partial and will receive a concrete type when that caller is ported. The three manifest entries are corrected from ported to partial.
 
 ### util files: small_object_allocator.cpp and small_object_allocator.h
 

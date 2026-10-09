@@ -149220,7 +149220,7 @@
       "path": "src/util/scoped_numeral.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/util/scoped_numeral.go",
         "pkg/util/scoped_binary.go",
@@ -149237,9 +149237,6 @@
         "pkg/math/polynomial/polynomial_neg_source_guard_test.go"
       ],
       "tests": [
-        "TestGenericScopedNumeralCompleteOperations",
-        "TestGenericScopedNumeralCopyAssignmentAndSwap",
-        "TestGenericScopedNumeralOwnerAndManagerFailures",
         "TestScopedNumeralSourceTstScoped",
         "TestScopedNumeralResizeFailurePrefixesAndBudget",
         "TestScopedNumeralMoveAndAscendingCleanup",
@@ -149319,16 +149316,6 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {
-          "name": "complete non-generic _scoped_numeral manager adapter, construction/copy/destruction, mutable access, assignment, reset/swap, compound and copy arithmetic, comparisons, predicates, abs/neg and display",
-          "status": "ported",
-          "go_target": "pkg/util/scoped_numeral.go",
-          "tests": [
-            "TestGenericScopedNumeralCompleteOperations",
-            "TestGenericScopedNumeralCopyAssignmentAndSwap",
-            "TestGenericScopedNumeralOwnerAndManagerFailures"
-          ]
-        },
         {
           "name": "selected Int/Rational constructor, destructor, get/m borrow and deep copy/assignment",
           "status": "ported",
@@ -149508,7 +149495,6 @@
         }
       ],
       "ownership": [
-        "ScopedNumeral borrows one immutable callback manager and owns exactly one dynamically typed numeral returned by its New callback. Clone and copy arithmetic acquire independent numerals; Close invokes Delete exactly once. Mutable Get and SwapValue are explicit live borrows into that ownership slot.",
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See PORT_PROGRESS.md#audit-scoped-numeral-port-status-md.",
         "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See PORT_PROGRESS.md#audit-mpbq-port-status-md.",
         "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See PORT_PROGRESS.md#audit-mpff-port-status-md.",
@@ -149518,9 +149504,8 @@
         "scoped_numeral.h:31-33 actual Neg minus_a source destructor precedes factory result exposure; stopped source history remains distinct from exact owning acknowledgment."
       ],
       "deviations": [
-        "The Manager template becomes the non-generic ScopedNumeralManager callback table and numeral values use any slots. Concrete typed wrappers remain for the integer, rational, binary-rational and fast-float managers. Explicit Close substitutes RAII and self identity rejects shallow Go owner copies.",
-        "Concrete MPBQ wrappers expose only operations supported by that manager; the complete generic adapter exposes div/rem/abs when its supplied manager callbacks support them. Display returns a Go string instead of recreating C++ ostream insertion.",
-        "Concrete MPFF types retain explicit Close and provenance/self-copy checks. Borrowed indexed Go pointers have documented lifetime limits.",
+        "Only concrete source instantiations are represented in Go. Integer, rational, binary-rational and fast-float owners use their concrete numeral and manager types; the unused any-valued callback adapter was removed.",
+        "Explicit Close substitutes RAII for the retained concrete owners. Display returns Go strings instead of recreating C++ ostream insertion.",
         "TLS signed-host overflow fixtures test an explicitly guarded source-undefined domain, not ordinary exhaustion or an end-to-end recursive arithmetic claim."
       ]
     },
@@ -149528,16 +149513,13 @@
       "path": "src/util/scoped_numeral_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/util/scoped_numeral_buffer.go",
         "pkg/util/scoped_numeral_buffer_source_test.go",
         "pkg/util/scoped_numeral_buffer_review_test.go"
       ],
       "tests": [
-        "TestGenericScopedNumeralBufferPushResetAndLiveAccess",
-        "TestGenericScopedNumeralBufferResizeShrinkAndFailurePrefix",
-        "TestGenericScopedNumeralBufferOwnerPreconditions",
         "TestScopedNumeralBufferInlineGrowthResetAndResize",
         "TestScopedNumeralBufferBigCopiesAndFieldNormalization",
         "TestScopedNumeralBufferEveryActualReservationPrefix",
@@ -149565,16 +149547,6 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "complete non-generic _scoped_numeral_buffer construction/destruction, manager and mutable access, push, reset, shrink and resize",
-          "status": "ported",
-          "go_target": "pkg/util/scoped_numeral_buffer.go",
-          "tests": [
-            "TestGenericScopedNumeralBufferPushResetAndLiveAccess",
-            "TestGenericScopedNumeralBufferResizeShrinkAndFailurePrefix",
-            "TestGenericScopedNumeralBufferOwnerPreconditions"
-          ]
-        },
-        {
           "name": "Concrete mpzzp128 ctor/manager/reset/push/shrink/resize/dtor with actual inline and Runtime-expanded backing",
           "status": "ported",
           "go_target": "pkg/util/scoped_numeral_buffer.go",
@@ -149595,11 +149567,10 @@
         }
       ],
       "ownership": [
-        "ScopedNumeralBuffer owns every dynamically typed numeral in its Go slice and borrows one ScopedNumeralManager. Push publishes a default slot before deep copy, shrink/reset/Close delete removed numerals from first to last, and Close releases the slice only after successful reset.",
         "The concrete inline128 NUM fields reside once in the reflected enclosing header; expanded12-byte scalar codec relocates owning references without NUM Copy. Ascending source Del stops before older elements and pending backing; own abort matches exact physical receipts. Borrowed views are actual source fields, not a clone."
       ],
       "deviations": [
-        "The Manager and inline-size templates become the non-generic ScopedNumeralManager adapter and a Go slice with initial capacity 16. The existing polynomial mpzzp specialization retains its source inline128 layout. Go slice allocation replaces sbuffer; no C++ buffer implementation is ported.",
+        "The live polynomial mpzzp inline128 specialization is concrete and pointer-free in its numeral storage. Other source instantiations remain partial until their real Go callers need concrete typed buffers; no any-valued universal buffer is retained.",
         "Expanded const-reference alias after source old-buffer destruction is undefined and not promoted as supported."
       ]
     },
@@ -149607,10 +149578,8 @@
       "path": "src/util/scoped_numeral_vector.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
-        "pkg/util/scoped_numeral_vector.go",
-        "pkg/util/scoped_numeral_vector_test.go",
         "pkg/util/scoped_numeral.go",
         "pkg/util/scoped_binary.go",
         "pkg/util/scoped_fast_float_vector.go",
@@ -149618,8 +149587,6 @@
         "pkg/math/polynomial/upolynomial_source_test.go"
       ],
       "tests": [
-        "TestGenericScopedNumeralVectorCompleteLifecycle",
-        "TestGenericScopedNumeralVectorFailureAndOwnerPreconditions",
         "TestScopedNumeralSourceTstScoped",
         "TestScopedNumeralResizeFailurePrefixesAndBudget",
         "TestScopedNumeralMoveAndAscendingCleanup",
@@ -149702,15 +149669,6 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {
-          "name": "complete non-generic _scoped_numeral_vector construction/destruction, manager/indexed access, reset, push/pop, shrink and resize",
-          "status": "ported",
-          "go_target": "pkg/util/scoped_numeral_vector.go",
-          "tests": [
-            "TestGenericScopedNumeralVectorCompleteLifecycle",
-            "TestGenericScopedNumeralVectorFailureAndOwnerPreconditions"
-          ]
-        },
         {
           "name": "selected Int/Rational borrowed manager and noncopyable vector lifetime",
           "status": "ported",
@@ -149839,15 +149797,14 @@
         }
       ],
       "ownership": [
-        "ScopedNumeralVector owns each numeral through its composed buffer core and borrows one ScopedNumeralManager. Push publishes a default slot before copy; Pop delegates to one-element Shrink; shrink/reset/Close delete removed values from first to last.",
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See PORT_PROGRESS.md#audit-scoped-numeral-port-status-md.",
         "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See PORT_PROGRESS.md#audit-mpbq-port-status-md.",
         "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See PORT_PROGRESS.md#audit-mpff-port-status-md.",
         "Scalar external polynomial owners and actual Int arrays preserve source numeral callbacks and publication prefixes. See PORT_PROGRESS.md#audit-upolynomial-port-status-md."
       ],
       "deviations": [
-        "The Manager template becomes ScopedNumeralManager and svector storage becomes a zero-capacity Go slice managed through ScopedNumeralBuffer ownership operations. Explicit Close substitutes RAII and self identity rejects shallow Go owner copies; no C++ vector implementation is ported.",
-        "Concrete MPBQ and MPFF specializations retain their manager-specific allocator, provenance and unsupported-operation qualifications. The general vector contract is available through the callback manager."
+        "Concrete Int, Rational, MPBQ, MPFF and mpzzp vectors retain manager-specific storage, ownership and failure behavior. Remaining source instantiations stay partial until a live caller is ported; the unused any-valued callback vector was removed.",
+        "Explicit Close substitutes RAII for retained concrete owners; no C++ vector implementation is ported."
       ]
     },
     {

@@ -20,3 +20,8 @@ are an explicitly approved exception to the general no-generics rule.
 
 Never port any of the C++ standard library. Use Go standard-library string
 handling exclusively; fidelity applies to project algorithms, not STL internals.
+
+Port only C++ code reached by retained source consumers. Do not port dead C++
+code or add universal Go adapters merely to represent an unused template. For
+live template instantiations, use concrete typed Go implementations for the
+actual numeral, pointer, or value types instead of any-valued callback layers.
