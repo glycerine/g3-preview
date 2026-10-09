@@ -15,7 +15,7 @@ func TestASTQuantifierSourcePatternDiagnosticBeforeAllocation(t *testing.T) {
 	spec := ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: truth, Patterns: []ASTHandle{truth}}
 	before := m.Stats()
 	next := m.nextNode
-	ids := m.ExprIDs.Next
+	ids := m.ExprIDs.Range()
 	rc, e := m.GetRefCount(truth)
 	astTestMust(t, e)
 	q, e := m.MkQuantifier(spec)
@@ -23,7 +23,7 @@ func TestASTQuantifierSourcePatternDiagnosticBeforeAllocation(t *testing.T) {
 		if e != ErrASTDomain {
 			t.Fatal("source is_pattern diagnostic missing", e)
 		}
-		if m.Stats() != before || m.nextNode != next || m.ExprIDs.Next != ids {
+		if m.Stats() != before || m.nextNode != next || m.ExprIDs.Range() != ids {
 			t.Fatal("diagnostic happened after candidate allocation")
 		}
 		after, e := m.GetRefCount(truth)

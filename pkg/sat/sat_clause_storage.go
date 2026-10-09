@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/idgen"
 )
 
 var (
@@ -47,7 +48,7 @@ type ClauseAllocator struct {
 	self                                   *ClauseAllocator
 	origin                                 uint64
 	storage                                *arena.SmallBytes
-	ids                                    util.IDGen
+	ids                                    idgen.Generator
 	runtimeIDs                             util.Generator
 	idRuntime                              *util.Runtime
 	closing                                bool
@@ -89,7 +90,7 @@ func newSATClauseAllocator(c satClauseAllocatorConfig, tmp bool) (*ClauseAllocat
 		b.Release(n)
 		return nil, e
 	}
-	a := &ClauseAllocator{origin: id, storage: store, budget: b, ids: util.NewBudgetedIDGen(0, b, c.OutOfMemory), ownerBytes: n, temporary: tmp}
+	a := &ClauseAllocator{origin: id, storage: store, budget: b, ids: idgen.NewBudgeted(0, b, c.OutOfMemory), ownerBytes: n, temporary: tmp}
 	a.self = a
 	if c.IDRuntime != nil {
 		if e := a.runtimeIDs.Init(0, c.IDRuntime); e != nil {

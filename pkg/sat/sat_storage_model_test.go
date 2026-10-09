@@ -380,7 +380,7 @@ func TestSATStorageOwnerIdentityExhaustionAndOOMRecycle(t *testing.T) {
 	defer a.Close()
 	r := satMk(t, a, satLs(0, 2), false)
 	satOK(t, a.Delete(r))
-	if a.IsLive(r) || len(a.ids.Free) != 0 {
+	if a.IsLive(r) || a.ids.FreeLen() != 0 {
 		t.Fatal("OOM skips only source ID recycle, not physical release")
 	}
 	next := satMk(t, a, satLs(2, 4), false)

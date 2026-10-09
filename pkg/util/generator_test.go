@@ -3,7 +3,6 @@ package util
 
 import (
 	"errors"
-	"strconv"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -227,7 +226,7 @@ func TestGeneratorWarmRawStorage(t *testing.T) {
 	}
 }
 
-func TestGeneratorDebugSourceScanAndHash(t *testing.T) {
+func TestGeneratorDebugSourceScan(t *testing.T) {
 	r, e := NewRuntime(RuntimeConfig{})
 	if e != nil {
 		t.Fatal(e)
@@ -244,21 +243,8 @@ func TestGeneratorDebugSourceScanAndHash(t *testing.T) {
 	if v, e := g.SetNextID(3); e != nil || v != 5 {
 		t.Fatal(v, e)
 	}
-	var sink idTestText
-	if e = g.DisplayFreeIDs(&sink); e != nil || sink.text != "3 4 6 67305985 4278058235" {
-		t.Fatal(sink.text, e)
-	}
-	// Independent literal byte fixture; high bytes exercise signed-char tails.
-	bytes := string([]byte{3, 0, 0, 0, 4, 0, 0, 0, 6, 0, 0, 0, 1, 2, 3, 4, 0xfb, 0xfc, 0xfd, 0xfe})
-	if v, e := g.ShowHash(); e != nil || v != UintPair(String(bytes, 17), 5) {
-		t.Fatal(v, e)
-	}
 	if e = g.Reset(99); e != nil {
 		t.Fatal(e)
-	}
-	// Explicit empty &free_ids[0] diagnostic adapter avoids source invalid access.
-	if v, e := g.ShowHash(); e != nil || v != UintPair(String("", 17), 99) {
-		t.Fatal(v, e)
 	}
 	if e = g.Recycle(^uint32(0)); e != nil {
 		t.Fatal(e)
@@ -275,14 +261,6 @@ func TestGeneratorDebugSourceScanAndHash(t *testing.T) {
 	if e = r.Close(); e != nil {
 		t.Fatal(e)
 	}
-}
-
-type idTestText struct{ text string }
-
-func (s *idTestText) WriteLiteral(v string) error { s.text += v; return nil }
-func (s *idTestText) WriteUnsigned(v uint32) error {
-	s.text += strconv.FormatUint(uint64(v), 10)
-	return nil
 }
 
 func TestGeneratorBorrowedRuntimeLifetime(t *testing.T) {

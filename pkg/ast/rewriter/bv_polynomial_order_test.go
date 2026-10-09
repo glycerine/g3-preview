@@ -168,7 +168,7 @@ func TestBVPolynomialMonomialOrdinalSignedIDConversion(t *testing.T) {
 	s, e := m.BitVectorSort(8)
 	astTestMust(t, e)
 	// Original ordinal returns int from an unsigned ID on the 32-bit-int source profile.
-	m.ExprIDs.Next = uint32(1) << 31
+	m.ExprIDs.SetNextID(uint32(1) << 31)
 	h, e := m.MkVar(23, s)
 	astTestMust(t, e)
 	astTestPin(t, m, h)

@@ -288,7 +288,7 @@ func TestSATClauseWideExtentAndBudgetRefusal(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	a := satStore(t, b)
 	base := b.Used()
-	if _, e := a.MkClauseN(math.MaxUint32, nil, false); !errors.Is(e, arena.ErrBudget) || b.Used() != base || a.ids.IdRange() != 0 {
+	if _, e := a.MkClauseN(math.MaxUint32, nil, false); !errors.Is(e, arena.ErrBudget) || b.Used() != base || a.ids.Range() != 0 {
 		t.Fatal("wide refusal before ID/copy", e, b.Used(), base)
 	}
 	for _, typ := range []reflect.Type{reflect.TypeOf(StoredClauseRef{}), reflect.TypeOf(satClauseOffset{}), reflect.TypeOf(satClauseHotHeader{})} {

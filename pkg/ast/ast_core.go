@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/idgen"
 )
 
 func NewASTManager(c ASTManagerConfig) (*ASTManager, error)       { return newASTManager(c, false) }
@@ -61,8 +62,8 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFi
 	for i := range m.nextKind {
 		m.nextKind[i] = 1
 	}
-	m.ExprIDs = util.NewBudgetedIDGen(0, c.Budget, c.OutOfMemory)
-	m.declIDs = util.NewBudgetedIDGen(1<<31, c.Budget, c.OutOfMemory)
+	m.ExprIDs = idgen.NewBudgeted(0, c.Budget, c.OutOfMemory)
+	m.declIDs = idgen.NewBudgeted(1<<31, c.Budget, c.OutOfMemory)
 	// Completed constructor prefixes are owned immediately and unwound by the
 	// same real destructor actions, without touching caller-owned services.
 	fail := func(e error) (*ASTManager, error) {

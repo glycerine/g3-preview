@@ -116961,7 +116961,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_id_gen.go",
+        "pkg/util/idgen/generator.go",
         "pkg/util/generator.go",
         "pkg/sat/sat_clause_storage.go",
         "pkg/sat/sat_solver_clause_runtime_ids_test.go"
@@ -116969,7 +116969,6 @@
       "tests": [
         "TestIDGeneratorSourceOrder",
         "TestIDGeneratorDebugAndWrap",
-        "TestIDGeneratorHash",
         "TestIDGeneratorFiniteUniqueness",
         "TestIDGeneratorBudgetSourceGrowthAndReset",
         "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
@@ -116980,7 +116979,7 @@
         "TestSourceVectorGrowthWidths",
         "TestGeneratorPendingPublicationAndOwnerGuards",
         "TestGeneratorWarmRawStorage",
-        "TestGeneratorDebugSourceScanAndHash",
+        "TestGeneratorDebugSourceScan",
         "TestGeneratorBorrowedRuntimeLifetime",
         "TestGeneratorWrappedReallocPhysicalCleanup",
         "TestGeneratorNonNullZeroCapacitySourceBranch",
@@ -117007,106 +117006,87 @@
         {
           "name": "id_gen constructor",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorSourceOrder",
             "TestIDGeneratorDebugAndWrap",
-            "TestIDGeneratorHash",
             "TestIDGeneratorFiniteUniqueness"
           ]
         },
         {
           "name": "mk",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorSourceOrder",
             "TestIDGeneratorDebugAndWrap",
-            "TestIDGeneratorHash",
             "TestIDGeneratorFiniteUniqueness"
           ]
         },
         {
           "name": "recycle",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorSourceOrder",
             "TestIDGeneratorDebugAndWrap",
-            "TestIDGeneratorHash",
             "TestIDGeneratorFiniteUniqueness"
           ]
         },
         {
           "name": "reset",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorSourceOrder",
             "TestIDGeneratorDebugAndWrap",
-            "TestIDGeneratorHash",
             "TestIDGeneratorFiniteUniqueness"
           ]
         },
         {
           "name": "cleanup",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorSourceOrder",
             "TestIDGeneratorDebugAndWrap",
-            "TestIDGeneratorHash",
             "TestIDGeneratorFiniteUniqueness"
           ]
         },
         {
           "name": "show_hash",
-          "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
-          "tests": [
-            "TestIDGeneratorSourceOrder",
-            "TestIDGeneratorDebugAndWrap",
-            "TestIDGeneratorHash",
-            "TestIDGeneratorFiniteUniqueness"
-          ]
+          "status": "dead_deleted",
+          "tests": []
         },
         {
           "name": "get_id_range",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorSourceOrder",
             "TestIDGeneratorDebugAndWrap",
-            "TestIDGeneratorHash",
             "TestIDGeneratorFiniteUniqueness"
           ]
         },
         {
           "name": "set_next_id",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorSourceOrder",
             "TestIDGeneratorDebugAndWrap",
-            "TestIDGeneratorHash",
             "TestIDGeneratorFiniteUniqueness"
           ]
         },
         {
           "name": "display_free_ids",
-          "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
-          "tests": [
-            "TestIDGeneratorSourceOrder",
-            "TestIDGeneratorDebugAndWrap",
-            "TestIDGeneratorHash",
-            "TestIDGeneratorFiniteUniqueness"
-          ]
+          "status": "dead_deleted",
+          "tests": []
         },
         {
           "name": "budgeted embedded constructor and source free-list capacity growth",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorBudgetSourceGrowthAndReset",
             "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
@@ -117117,7 +117097,7 @@
         {
           "name": "recycle reservation error and source OOM skip before allocation",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorBudgetSourceGrowthAndReset",
             "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
@@ -117128,7 +117108,7 @@
         {
           "name": "reset retains charged capacity; cleanup refunds actual free-ID backing",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorBudgetSourceGrowthAndReset",
             "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
@@ -117139,7 +117119,7 @@
         {
           "name": "preflight reclamation workspace with retained physical failure prefix",
           "status": "ported",
-          "go_target": "pkg/util/util_id_gen.go",
+          "go_target": "pkg/util/idgen/generator.go",
           "tests": [
             "TestIDGeneratorBudgetSourceGrowthAndReset",
             "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
@@ -117148,7 +117128,7 @@
           ]
         },
         {
-          "name": "Runtime-backed embedded unsigned-vector specialization: mk, recycle, reset, cleanup, range, debug ascending scan/hash/display",
+          "name": "Runtime-backed embedded unsigned-vector specialization: mk, recycle, reset, cleanup, range and debug ascending scan",
           "status": "ported",
           "go_target": "pkg/util/generator.go",
           "tests": [
@@ -117157,7 +117137,7 @@
             "TestSourceVectorGrowthWidths",
             "TestGeneratorPendingPublicationAndOwnerGuards",
             "TestGeneratorWarmRawStorage",
-            "TestGeneratorDebugSourceScanAndHash",
+            "TestGeneratorDebugSourceScan",
             "TestGeneratorBorrowedRuntimeLifetime",
             "TestGeneratorWrappedReallocPhysicalCleanup",
             "TestGeneratorNonNullZeroCapacitySourceBranch"
@@ -117198,7 +117178,8 @@
       ],
       "deviations": [
         "Budgeted recycle reports predictable allocation failure; reserveFreeIDs lets the future AST owner preflight reclamation before publication without changing logical IDs. The nil budget constructor remains unlimited. Host diagnostic free-ID rendering remains unbudgeted; actual AST printer is not credited.",
-        "Main Go-typed free vector remains explicit legacy adapter sharing actual source counter/LIFO/growth/debug-scan algorithms. Runtime specialization uses actual memory OOM, not Budget refusal callback. Empty show_hash has an explicit defined diagnostic profile instead of invalid source &free_ids[0]; cold TextSink replaces ostream, source signed-char hashing retained. Source uint32 growth overflow category is preserved in raw specialization, mapped to existing ErrBounds in legacy API."
+        "Main Go-typed free vector remains explicit legacy adapter sharing actual source counter/LIFO/growth/debug-scan algorithm. Runtime specialization uses actual memory OOM, not Budget refusal callback. Empty show_hash has an explicit defined diagnostic profile instead of invalid source &free_ids[0]; Source uint32 growth overflow category is preserved in raw specialization, mapped to existing ErrBounds in legacy API.",
+        "show_hash and display_free_ids were deleted after a whole-source scan found no caller; ast_manager show_id_gen and display_free_ids are themselves uncalled diagnostics."
       ]
     },
     {

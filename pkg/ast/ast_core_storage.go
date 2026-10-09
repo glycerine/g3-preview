@@ -12,6 +12,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/idgen"
 )
 
 var ErrASTHandle = errors.New("g3: invalid AST owner, kind or lifetime")
@@ -264,7 +265,7 @@ type ASTManager struct {
 	DebugRefCount                                                                                      bool
 	DebugFreeIndices                                                                                   map[uint32]struct{}
 	debugFreeComplete                                                                                  bool
-	ExprIDs, declIDs                                                                                   util.IDGen
+	ExprIDs, declIDs                                                                                   idgen.Generator
 	nodes                                                                                              []*astNodePage
 	sorts                                                                                              []*astSortPage
 	decls                                                                                              []*astFuncDeclPage

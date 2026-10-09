@@ -1,0 +1,137 @@
+// Source: src/util/id_gen.h:25-85; src/util/vector.h.
+package idgen
+
+import (
+	"math"
+
+	"github.com/glycerine/g3/pkg/arena"
+)
+
+// Generator assigns monotonically increasing IDs and reuses released IDs in
+// LIFO order. The free list is owned by the generator; copying a generator
+// after first use aliases that storage.
+type Generator struct {
+	next        uint32
+	free        []uint32
+	outOfMemory func() bool
+	budget      *arena.Budget
+}
+
+func New(start uint32, outOfMemory func() bool) Generator {
+	return Generator{next: start, outOfMemory: outOfMemory}
+}
+
+// NewBudgeted charges free-list backing storage to budget. The generator's
+// inline metadata belongs to its enclosing owner and is charged there.
+func NewBudgeted(start uint32, budget *arena.Budget, outOfMemory func() bool) Generator {
+	return Generator{next: start, budget: budget, outOfMemory: outOfMemory}
+}
+
+func freeGrowth(old uint32) (uint32, error) {
+	var next uint32
+	if old == 0 {
+		next = 2
+	} else {
+		next = (3*old + 1) >> 1
+		oldBytes := 4*old + 8
+		newBytes := 4*next + 8
+		if next <= old || newBytes <= oldBytes {
+			return 0, arena.ErrBounds
+		}
+	}
+	if uint64(next)*4 > uint64(^uint(0)>>1) {
+		return 0, arena.ErrBounds
+	}
+	return next, nil
+}
+
+// Reserve ensures that at least needed released IDs can be retained. A
+// successful growth prefix remains available if a later growth fails.
+func (g *Generator) Reserve(needed uint32) error {
+	if uint64(cap(g.free)) > math.MaxUint32 {
+		return arena.ErrBounds
+	}
+	for uint64(cap(g.free)) < uint64(needed) {
+		capacity, err := freeGrowth(uint32(cap(g.free)))
+		if err != nil {
+			return err
+		}
+		if err = g.budget.Reserve(uint64(capacity) * 4); err != nil {
+			return err
+		}
+		next := make([]uint32, len(g.free), capacity)
+		copy(next, g.free)
+		oldBytes := uint64(cap(g.free)) * 4
+		g.free = next
+		g.budget.Release(oldBytes)
+	}
+	return nil
+}
+
+// Mk returns the most recently recycled ID, or a fresh ID when none is free.
+func (g *Generator) Mk() uint32 {
+	if len(g.free) == 0 {
+		id := g.next
+		g.next++
+		return id
+	}
+	last := len(g.free) - 1
+	id := g.free[last]
+	g.free = g.free[:last]
+	return id
+}
+
+func (g *Generator) Recycle(id uint32) error {
+	if g.outOfMemory != nil && g.outOfMemory() {
+		return nil
+	}
+	if uint64(len(g.free)) >= math.MaxUint32 {
+		return arena.ErrBounds
+	}
+	if err := g.Reserve(uint32(len(g.free)) + 1); err != nil {
+		return err
+	}
+	g.free = append(g.free, id)
+	return nil
+}
+
+func (g *Generator) Reset(start uint32) {
+	g.next = start
+	g.free = g.free[:0]
+}
+
+func (g *Generator) Cleanup(start uint32) {
+	g.next = start
+	g.budget.Release(uint64(cap(g.free)) * 4)
+	g.free = nil
+}
+
+func (g *Generator) Range() uint32         { return g.next }
+func (g *Generator) FreeCapacity() int     { return cap(g.free) }
+func (g *Generator) FreeLen() int          { return len(g.free) }
+func (g *Generator) Budget() *arena.Budget { return g.budget }
+func (g *Generator) IsOutOfMemory() bool {
+	return g.outOfMemory != nil && g.outOfMemory()
+}
+
+// FreeIDs returns a borrowed, read-only view for owner diagnostics.
+func (g *Generator) FreeIDs() []uint32 { return g.free }
+
+// SetNextID supports the source repro/debug path. It finds the first ID at or
+// above id that is absent from the free list without consuming that list.
+func (g *Generator) SetNextID(id uint32) uint32 {
+	g.next = id
+	for {
+		found := false
+		for _, free := range g.free {
+			if free == g.next {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return g.next
+		}
+		g.next++
+	}
+}

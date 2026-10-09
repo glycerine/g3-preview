@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/idgen"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -25,7 +26,7 @@ type astFloatingPointPluginOwner struct {
 	owner                                                       *ASTManager
 	numeric                                                     *util.ArbitraryFloatManager
 	failedNumeric                                               error
-	ids                                                         util.IDGen
+	ids                                                         idgen.Generator
 	values                                                      astScopedFloatVector
 	table                                                       astFloatValueTable
 	real, integer                                               astNodeRef
@@ -85,7 +86,7 @@ func (m *ASTManager) registerFloatingPointPlugin() (FamilyID, error) {
 		return NullFamilyID, e
 	}
 	p.numericReady = true
-	p.ids = util.NewBudgetedIDGen(0, m.BudgetField, p.outOfMemory)
+	p.ids = idgen.NewBudgeted(0, m.BudgetField, p.outOfMemory)
 	p.values.bind(p)
 	if e = p.table.construct(m.BudgetField); e != nil {
 		p.bodyCause = e

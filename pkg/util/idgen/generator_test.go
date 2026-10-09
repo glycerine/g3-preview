@@ -1,4 +1,4 @@
-package util
+package idgen
 
 import (
 	"math"
@@ -9,8 +9,8 @@ import (
 // expectations preserve source recycling, resource checks and debug ID resets.
 func TestIDGeneratorSourceOrder(t *testing.T) {
 	outOfMemory := false
-	g := NewIDGen(10, func() bool { return outOfMemory })
-	if g.Mk() != 10 || g.Mk() != 11 || g.IdRange() != 12 {
+	g := New(10, func() bool { return outOfMemory })
+	if g.Mk() != 10 || g.Mk() != 11 || g.Range() != 12 {
 		t.Fatal("fresh IDs")
 	}
 	g.Recycle(10)
@@ -26,25 +26,25 @@ func TestIDGeneratorSourceOrder(t *testing.T) {
 	outOfMemory = false
 	g.Recycle(13)
 	g.Reset(40)
-	if g.Mk() != 40 || len(g.Free) != 0 {
+	if g.Mk() != 40 || len(g.free) != 0 {
 		t.Fatal("reset")
 	}
 	g.Recycle(40)
 	g.Cleanup(50)
-	if g.Free != nil || g.Mk() != 50 {
+	if g.free != nil || g.Mk() != 50 {
 		t.Fatal("cleanup")
 	}
 }
 func TestIDGeneratorDebugAndWrap(t *testing.T) {
-	g := NewIDGen(0, nil)
+	g := New(0, nil)
 	for _, v := range []uint32{3, 4, 6} {
 		g.Recycle(v)
 	}
-	if got := g.SetNextID(3); got != 5 || g.IdRange() != 5 {
+	if got := g.SetNextID(3); got != 5 || g.Range() != 5 {
 		t.Fatal(got)
 	}
-	if g.DisplayFreeIDs() != "3 4 6" {
-		t.Fatal(g.DisplayFreeIDs())
+	if got := g.FreeIDs(); len(got) != 3 || got[0] != 3 || got[1] != 4 || got[2] != 6 {
+		t.Fatal(got)
 	}
 	if g.Mk() != 6 || g.Mk() != 4 || g.Mk() != 3 || g.Mk() != 5 {
 		t.Fatal("debug range should leave free IDs intact")
@@ -59,21 +59,8 @@ func TestIDGeneratorDebugAndWrap(t *testing.T) {
 		t.Fatal("source does not deduplicate recycle")
 	}
 }
-func TestIDGeneratorHash(t *testing.T) {
-	g := NewIDGen(17, nil)
-	if got, want := g.ShowHash(), UintPair(String("", 17), 17); got != want {
-		t.Fatal(got, want)
-	}
-	g.Recycle(0x04030201)
-	g.Recycle(0xfefdfcfb)
-	// Construct bytes independently of the generator's uint32 free-ID storage.
-	bytes := string([]byte{1, 2, 3, 4, 0xfb, 0xfc, 0xfd, 0xfe})
-	if got, want := g.ShowHash(), UintPair(String(bytes, 17), 17); got != want {
-		t.Fatal(got, want)
-	}
-}
 func TestIDGeneratorFiniteUniqueness(t *testing.T) {
-	g := NewIDGen(0, nil)
+	g := New(0, nil)
 	live := map[uint32]bool{}
 	state := uint32(1)
 	for i := 0; i < 3000; i++ {
@@ -87,7 +74,7 @@ func TestIDGeneratorFiniteUniqueness(t *testing.T) {
 			continue
 		}
 		// Pick deterministically by value, independent of Go map traversal.
-		for id := uint32(0); id < g.IdRange(); id++ {
+		for id := uint32(0); id < g.Range(); id++ {
 			if live[id] {
 				delete(live, id)
 				g.Recycle(id)

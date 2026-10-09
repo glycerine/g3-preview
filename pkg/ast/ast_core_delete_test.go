@@ -23,7 +23,7 @@ func TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder(t *testing.T) {
 		astTestMust(t, e)
 		ref, e := m.NewRef(h)
 		astTestMust(t, e)
-		before := len(m.ExprIDs.Free)
+		before := m.ExprIDs.FreeLen()
 		if fail {
 			m.BudgetField.FailAfter(0)
 		}
@@ -36,7 +36,7 @@ func TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder(t *testing.T) {
 			astTestMust(t, e)
 		}
 		m.BudgetField.FailAfter(-1)
-		got := m.ExprIDs.Free[before:]
+		got := m.ExprIDs.FreeIDs()[before:]
 		if len(got) != 33 || got[0] != id {
 			t.Fatal("source parent recycled before children", got, id)
 		}

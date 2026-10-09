@@ -56,7 +56,7 @@ func satCleanerAudit(t *testing.T, c *satCleaner, extra ...StoredClauseRef) {
 	want += p.ownerBytes + uint64(cap(p.diffLevels.data)) + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes + uint64(cap(todo.inSet)) + 4*uint64(cap(todo.values))
-	want += a.ownerBytes + 4*uint64(cap(a.ids.Free)) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
+	want += a.ownerBytes + 4*uint64(a.ids.FreeCapacity()) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
 	mc := p.converter
 	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes + mc.store.directoryBytes + satWatchGraphBytes(mc.store.words.Stats())
 	r := p.limit
@@ -72,7 +72,7 @@ func TestSATCleanerDeletionThenAttachRefusalRetainsRanges(t *testing.T) {
 	a := p.clauses
 	dead := satCleanerClause(t, l, []Literal{0, 4, 6}, false, false)
 	kept := satCleanerClause(t, l, []Literal{1, 2, 4, 6}, false, false)
-	satOK(t, a.ids.ReserveFreeIDs(2))
+	satOK(t, a.ids.Reserve(2))
 	satOK(t, p.assign(0, satJustification{}))
 	satOK(t, c.cleanupWatches())
 	l.budget.FailAfter(0)
@@ -345,7 +345,7 @@ func TestSATCleanerStoppedLedgerRejectsNewOwningPublication(t *testing.T) {
 	p := l.propagation
 	satCleanerClause(t, l, []Literal{0, 4, 6}, false, false)
 	satCleanerClause(t, l, []Literal{1, 2, 4, 6}, false, false)
-	satOK(t, p.clauses.ids.ReserveFreeIDs(4))
+	satOK(t, p.clauses.ids.Reserve(4))
 	satOK(t, p.assign(0, satJustification{}))
 	l.budget.FailAfter(0)
 	e := c.cleanupClauses(false)

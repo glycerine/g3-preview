@@ -120,7 +120,7 @@ func TestSATSolverGCRefusalRootsAndReactivationPrefix(t *testing.T) {
 			satOK(t, p.assign(3, satJustification{}))
 			_, e := p.propagateCore(false)
 			satOK(t, e)
-			satOK(t, p.clauses.ids.ReserveFreeIDs(3))
+			satOK(t, p.clauses.ids.Reserve(3))
 			s.conflictsSinceGC = g.gcThreshold + 1
 			g.budget().FailAfter(fault)
 			e = g.gc()
@@ -364,7 +364,7 @@ func TestSATSolverGCMergeOwnershipProtocol(t *testing.T) {
 			for i := 0; i < 4; i++ {
 				satGCClause(t, g, []Literal{0, 2, 4}, uint32(i))
 			}
-			satOK(t, l.propagation.clauses.ids.ReserveFreeIDs(4))
+			satOK(t, l.propagation.clauses.ids.Reserve(4))
 			g.scratchBytes = 4 * uint64(reflect.TypeOf(StoredClauseRef{}).Size())
 			satOK(t, g.budget().Reserve(g.scratchBytes))
 			g.scratch = make([]StoredClauseRef, 4)

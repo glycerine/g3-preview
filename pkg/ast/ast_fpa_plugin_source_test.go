@@ -23,7 +23,7 @@ func TestASTFloatingPointActualConstructorRegistrationAndSorts(t *testing.T) {
 	if p == nil || !p.published || !p.completed || p.numeric == nil || p.table.capacity != 10 || p.real.slot == 0 || p.integer.slot == 0 || p.bitvector != m.bitVectorPlugin {
 		t.Fatal("actual completed members/publication/set_manager", p)
 	}
-	if p.ids.Next != 0 || len(p.ids.Free) != 0 || p.ids.Budget != m.BudgetField || p.values.manager != p.numeric || p.values.raw.Self != &p.values.raw || p.values.raw.Runtime != p.numeric.RuntimeOwner() || p.values.raw.Block != (util.Block{}) {
+	if p.ids.Range() != 0 || p.ids.FreeLen() != 0 || p.ids.Budget() != m.BudgetField || p.values.manager != p.numeric || p.values.raw.Self != &p.values.raw || p.values.raw.Runtime != p.numeric.RuntimeOwner() || p.values.raw.Block != (util.Block{}) {
 		t.Fatal("actual initially-empty ID generator and scoped MPF vector members")
 	}
 	for _, tc := range []struct {

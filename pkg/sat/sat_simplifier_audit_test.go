@@ -70,7 +70,7 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 	want += todo.ownerBytes + uint64(cap(todo.inSet)) + 4*uint64(cap(todo.values))
 	a := p.clauses
 	small := a.storage.Stats()
-	want += a.ownerBytes + 4*uint64(cap(a.ids.Free)) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
+	want += a.ownerBytes + 4*uint64(a.ids.FreeCapacity()) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
 	mc := p.converter
 	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes + mc.store.directoryBytes + satWatchGraphBytes(mc.store.words.Stats())
 	r := p.limit
@@ -86,7 +86,7 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 	dummy := simplifier.dummy
 	da := dummy.owner
 	ds := da.storage.Stats()
-	want += dummy.ownerBytes + da.ownerBytes + 4*uint64(cap(da.ids.Free)) + da.largeBytes + da.largeDirectory + ds.OwnerBytes + ds.PayloadBytes + ds.MetadataBytes + ds.DirectoryBytes
+	want += dummy.ownerBytes + da.ownerBytes + 4*uint64(da.ids.FreeCapacity()) + da.largeBytes + da.largeDirectory + ds.OwnerBytes + ds.PayloadBytes + ds.MetadataBytes + ds.DirectoryBytes
 	want += simplifier.clauseSort.bytes + 8*uint64(cap(simplifier.elimination.costs)+cap(simplifier.elimination.sortScratch))
 	if q := simplifier.blocked.queue; q != nil {
 		want += q.ownerBytes + 4*uint64(cap(q.values)+cap(q.indices))

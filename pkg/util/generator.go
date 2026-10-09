@@ -305,61 +305,6 @@ func (g *Generator) SetNextID(id uint32) (uint32, error) {
 	return SkipFree(&g.next, n, func(i uint32) (uint32, error) { return g.read(8 + 4*uint64(i)) })
 }
 
-// ShowHash defines an empty free-list diagnostic profile rather than reproducing
-// source &free_ids[0] undefined access. Nonempty hashing uses actual source bytes.
-func (g *Generator) ShowHash() (uint32, error) {
-	n, e := g.Size()
-	if e != nil {
-		return 0, e
-	}
-	var readError error
-	h := WordReader(n*4, 17, func(i uint32) uint32 {
-		if readError != nil {
-			return 0
-		}
-		v, e := g.read(8 + 4*uint64(i))
-		if e != nil {
-			readError = e
-		}
-		return v
-	})
-	if readError != nil {
-		return 0, readError
-	}
-	return UintPair(h, g.next), nil
-}
-
-// TextSink is borrowed cold output state; no interface is stored per ID.
-type TextSink interface {
-	WriteLiteral(string) error
-	WriteUnsigned(uint32) error
-}
-
-func (g *Generator) DisplayFreeIDs(out TextSink) error {
-	n, e := g.Size()
-	if e != nil {
-		return e
-	}
-	if out == nil {
-		return arena.ErrConfig
-	}
-	for i := uint32(0); i < n; i++ {
-		if i != 0 {
-			if e = out.WriteLiteral(" "); e != nil {
-				return e
-			}
-		}
-		v, e := g.read(8 + 4*uint64(i))
-		if e != nil {
-			return e
-		}
-		if e = out.WriteUnsigned(v); e != nil {
-			return e
-		}
-	}
-	return nil
-}
-
 // SourceFinalize is the literal source vector destructor: only published m_data
 // is deallocated. Initial lexical mem is outside that destructor's authority.
 // Normal API entry stops before destructor actions; owning Cleanup remains

@@ -102,9 +102,9 @@ func (m *ASTManager) infoParameter(r *astInfoRecord, i uint32) (ASTParameter, er
 }
 func (m *ASTManager) growInfoParameters(slot uint32) error {
 	r := m.infoAt(slot)
-	n, e := util.IDFreeGrowth(r.capacity)
+	n, _, e := util.VectorGrowth(r.capacity)
 	if e != nil {
-		return e
+		return arena.ErrBounds
 	}
 	bytes := uint64(n)*8 + 8
 	if bytes > math.MaxUint32 {

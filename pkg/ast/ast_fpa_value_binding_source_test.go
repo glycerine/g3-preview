@@ -64,10 +64,10 @@ func TestASTFloatingPointValueIDLiteralCanonicalization(t *testing.T) {
 	if first != again {
 		t.Fatal("actual MPF canonical id", first, again)
 	}
-	if len(p.ids.Free) != 1 || p.ids.Free[0] == first {
-		t.Fatal("duplicate source id not recycled", p.ids.Free)
+	if p.ids.FreeLen() != 1 || p.ids.FreeIDs()[0] == first {
+		t.Fatal("duplicate source id not recycled", p.ids.FreeIDs())
 	}
-	duplicate := p.ids.Free[0]
+	duplicate := p.ids.FreeIDs()[0]
 	row, e := p.values.at(duplicate)
 	astTestMust(t, e)
 	words, e := p.numeric.ValueWords(&row)
@@ -109,8 +109,8 @@ func TestASTFloatingPointValueIDEveryActualReservationPrefix(t *testing.T) {
 		if m.BudgetField.Used() != base+m.Stats().AllocatedBytes+m.numerals.RuntimeOwner().Stats().TotalBytes {
 			t.Fatal("before-lift actual named cold graph", ordinal, call)
 		}
-		if p.ids.Next != 1 {
-			t.Fatal("source ID acquisition rolled back", ordinal, p.ids.Next)
+		if p.ids.Range() != 1 {
+			t.Fatal("source ID acquisition rolled back", ordinal, p.ids.Range())
 		}
 		if call == nil {
 			completed = true

@@ -54,8 +54,6 @@ func (r *Reslimit) InitEmbedded(b *arena.Budget) { r.budget = b }
 func (r *Reslimit) StorageBytes() uint64 {
 	return uint64(cap(r.Limits))*8 + uint64(cap(r.Children))*uint64(reflect.TypeOf((*Reslimit)(nil)).Size())
 }
-func (g *IDGen) FreeCapacity() int   { return cap(g.Free) }
-func (g *IDGen) IsOutOfMemory() bool { return g.OutOfMemory != nil && g.OutOfMemory() }
 func (g *GlobalParamsService) CheckBudget(b *arena.Budget) error {
 	if g == nil || g.self != g || g.Config.Budget != b {
 		return ErrGlobalParamsOwner

@@ -244,7 +244,7 @@ func TestASTDependencyActualLIFOCallbacksNormalAndIntrusiveFailure(t *testing.T)
 		root, e := m.DependencyJoin(da, db)
 		astTestMust(t, e)
 		astTestMust(t, m.DependencyInc(root))
-		start := len(m.ExprIDs.Free)
+		start := m.ExprIDs.FreeLen()
 		if fail {
 			m.BudgetField.FailAfter(0)
 		}
@@ -257,7 +257,7 @@ func TestASTDependencyActualLIFOCallbacksNormalAndIntrusiveFailure(t *testing.T)
 		} else {
 			astTestMust(t, e)
 		}
-		ids := m.ExprIDs.Free[start:]
+		ids := m.ExprIDs.FreeIDs()[start:]
 		if len(ids) != 2 || ids[0] != ib || ids[1] != ia {
 			t.Fatal("source left-then-right push => right-then-left actual AST DEC", fail, ids, ia, ib)
 		}

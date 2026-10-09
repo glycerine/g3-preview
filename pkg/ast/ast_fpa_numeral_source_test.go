@@ -59,8 +59,8 @@ func TestASTFloatingPointNumeralLiteralDeclarationsAndExternalDeletion(t *testin
 			astTestMust(t, m.incNode(app))
 			_, e = m.decNode(app)
 			astTestMust(t, e)
-			if len(p.ids.Free) != 1 || p.ids.Free[0] != id {
-				t.Fatal("actual attached external DEL did not recycle", id, p.ids.Free)
+			if p.ids.FreeLen() != 1 || p.ids.FreeIDs()[0] != id {
+				t.Fatal("actual attached external DEL did not recycle", id, p.ids.FreeIDs())
 			}
 		}
 		astTestMust(t, p.numeric.Del(&value))
@@ -92,8 +92,8 @@ func TestASTFloatingPointNumeralDeclarationEveryReservationPrefix(t *testing.T) 
 		}
 		if call == nil {
 			completed = true
-			if decl.slot == 0 || p.ids.Next != 1 {
-				t.Fatal("actual source declaration publication", decl, p.ids.Next)
+			if decl.slot == 0 || p.ids.Range() != 1 {
+				t.Fatal("actual source declaration publication", decl, p.ids.Range())
 			}
 		}
 		b.FailAfter(-1)

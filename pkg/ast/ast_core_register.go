@@ -166,7 +166,7 @@ func (m *ASTManager) registerNode(r astNodeRef) (astNodeRef, error) {
 	if m.nodeAt(r.slot).kind == ASTSort || m.nodeAt(r.slot).kind == ASTFuncDecl {
 		generator = &m.declIDs
 	}
-	if e = generator.ReserveFreeIDs(m.liveNodes); e != nil {
+	if e = generator.Reserve(m.liveNodes); e != nil {
 		m.tableEraseIdentity(r)
 		m.freeNodeStorage(r)
 		return astNodeRef{}, e
