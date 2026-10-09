@@ -336,9 +336,6 @@ func NewScopedBinaryVector(m *BinaryRationalManager) (*ScopedBinaryVector, error
 	if e := m.open(); e != nil {
 		return nil, e
 	}
-	if e := m.Z.BudgetField.Reserve(uint64(reflect.TypeOf(ScopedBinaryVector{}).Size())); e != nil {
-		return nil, e
-	}
 	v := &ScopedBinaryVector{manager: m}
 	v.self = v
 	return v, nil
@@ -379,25 +376,6 @@ func (v *ScopedBinaryVector) Manager() (*BinaryRationalManager, error) {
 	}
 	return v.manager, nil
 }
-func (v *ScopedBinaryVector) grow() error {
-	width := uint64(reflect.TypeOf(BinaryRational{}).Size())
-	n, e := scopedCapacity(cap(v.data), width)
-	if e != nil {
-		return e
-	}
-	if e = v.manager.Z.BudgetField.Reserve(uint64(n) * width); e != nil {
-		return e
-	}
-	next := make([]BinaryRational, len(v.data), n)
-	copy(next, v.data)
-	old := v.data
-	v.data = next
-	for i := range old {
-		old[i].Num.Cell = 0
-	}
-	v.manager.Z.BudgetField.Release(uint64(cap(old)) * width)
-	return nil
-}
 func (v *ScopedBinaryVector) Push(a *BinaryRational) error {
 	if e := v.open(); e != nil {
 		return e
@@ -405,13 +383,11 @@ func (v *ScopedBinaryVector) Push(a *BinaryRational) error {
 	if e := v.manager.check(a); e != nil {
 		return e
 	}
-	// A caller may refer to an element that growth transfers. Save only its
-	// nonowning scalar view; the old storage remains a read input until Copy.
+	// A caller may refer to an element whose append relocates the slice. Save its
+	// nonowning scalar view while the old storage remains a valid Copy input.
 	input := *a
-	if len(v.data) == cap(v.data) {
-		if e := v.grow(); e != nil {
-			return e
-		}
+	if uint64(len(v.data)) >= uint64(^uint32(0)) {
+		return arena.ErrBounds
 	}
 	v.data = append(v.data, BinaryRational{})
 	return v.manager.Copy(&v.data[len(v.data)-1], &input)
@@ -448,14 +424,19 @@ func (v *ScopedBinaryVector) Resize(n uint32) error {
 	if uint64(n) <= uint64(len(v.data)) {
 		return v.Shrink(n)
 	}
-	for uint64(n) > uint64(cap(v.data)) {
-		if e := v.grow(); e != nil {
-			return e
-		}
+	if uint64(n) > uint64(int(^uint(0)>>1)) {
+		return arena.ErrBounds
 	}
-	old := len(v.data)
-	v.data = v.data[:n]
-	for i := old; i < len(v.data); i++ {
+	oldLen := len(v.data)
+	newLen := int(n)
+	if newLen > cap(v.data) {
+		next := make([]BinaryRational, newLen)
+		copy(next, v.data)
+		v.data = next
+	} else {
+		v.data = v.data[:newLen]
+	}
+	for i := oldLen; i < newLen; i++ {
 		v.data[i] = BinaryRational{}
 	}
 	return nil
@@ -470,9 +451,7 @@ func (v *ScopedBinaryVector) Close() error {
 	if e := v.Reset(); e != nil {
 		return e
 	}
-	v.manager.Z.BudgetField.Release(uint64(cap(v.data)) * uint64(reflect.TypeOf(BinaryRational{}).Size()))
 	v.data = nil
-	v.manager.Z.BudgetField.Release(uint64(reflect.TypeOf(ScopedBinaryVector{}).Size()))
 	v.closed = true
 	return nil
 }

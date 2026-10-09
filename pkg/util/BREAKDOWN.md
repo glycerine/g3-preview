@@ -756,3 +756,5 @@ Only the currently consumed `StringBuffer64` specialization remains; the 32/128 
 The live `buffer<rational,16>` specialization used by AST polynomial rewriting now uses a concrete `[]OwnedRational`. Numerical element construction and ordered cleanup remain explicit because the elements own real resources; inline storage, doubling rules, relocation bookkeeping, and arena charges for the Go slice are gone.
 
 Small-object allocator consolidation now gathers and sorts allocation IDs in concrete `[]uint32` scratch. Its two copied pointer-vector headers and Runtime blocks, vector growth/failure surface, and retained lexical scratch roots have been removed; only actual allocator chunks and pending allocations remain in Runtime ownership.
+
+The concrete scoped integer, rational, and binary-rational vectors now use typed Go slices. Their elements still receive explicit deep copies and ordered deletion because they own numeric resources, while wrapper/backing arena charges and the C++ vector capacity schedule are gone. This keeps source-visible copy-failure prefixes and lifetime behavior without treating Go-managed slice storage as numeric arena memory.

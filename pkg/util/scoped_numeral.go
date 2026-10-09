@@ -3,7 +3,6 @@ package util
 
 import (
 	"errors"
-	"math"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -461,9 +460,6 @@ func NewScopedIntVector(m *IntegerManager) (*ScopedIntVector, error) {
 	if m.closed {
 		return nil, arena.ErrClosed
 	}
-	if e := m.BudgetField.Reserve(uint64(reflect.TypeOf(ScopedIntVector{}).Size())); e != nil {
-		return nil, e
-	}
 	v := &ScopedIntVector{manager: m}
 	v.self = v
 	return v, nil
@@ -474,9 +470,6 @@ func NewScopedRationalVector(m *RationalManager) (*ScopedRationalVector, error) 
 	}
 	if m.closed {
 		return nil, arena.ErrClosed
-	}
-	if e := m.BudgetField.Reserve(uint64(reflect.TypeOf(ScopedRationalVector{}).Size())); e != nil {
-		return nil, e
 	}
 	v := &ScopedRationalVector{manager: m}
 	v.self = v
@@ -498,53 +491,6 @@ func (v *ScopedRationalVector) open() error {
 	if v.closed || v.manager.closed {
 		return arena.ErrClosed
 	}
-	return nil
-}
-func scopedCapacity(old int, width uint64) (int, error) {
-	n := uint64(2)
-	if old > 0 {
-		n = (3*uint64(old) + 1) / 2
-	}
-	if n > math.MaxUint32 || n <= uint64(old) || n > uint64(int(^uint(0)>>1))/width {
-		return 0, arena.ErrBounds
-	}
-	return int(n), nil
-}
-func (v *ScopedIntVector) grow() error {
-	width := uint64(reflect.TypeOf(Int{}).Size())
-	n, e := scopedCapacity(cap(v.data), width)
-	if e != nil {
-		return e
-	}
-	if e = v.manager.BudgetField.Reserve(uint64(n) * width); e != nil {
-		return e
-	}
-	next := make([]Int, len(v.data), n)
-	copy(next, v.data)
-	for i := range v.data {
-		v.data[i].Cell = 0
-	} // source moved-from m_val survives
-	v.manager.BudgetField.Release(uint64(cap(v.data)) * width)
-	v.data = next
-	return nil
-}
-func (v *ScopedRationalVector) grow() error {
-	width := uint64(reflect.TypeOf(Rational{}).Size())
-	n, e := scopedCapacity(cap(v.data), width)
-	if e != nil {
-		return e
-	}
-	if e = v.manager.BudgetField.Reserve(uint64(n) * width); e != nil {
-		return e
-	}
-	next := make([]Rational, len(v.data), n)
-	copy(next, v.data)
-	for i := range v.data {
-		v.data[i].Num.Cell = 0
-		v.data[i].Den.Cell = 0
-	}
-	v.manager.BudgetField.Release(uint64(cap(v.data)) * width)
-	v.data = next
 	return nil
 }
 func (v *ScopedIntVector) Size() uint32 {
@@ -620,9 +566,9 @@ func (v *ScopedRationalVector) Set(i uint32, num *Rational) error {
 	return v.manager.Copy(&v.data[i], num)
 }
 
-// Source prefix: grow backing, publish a default element, then deep set. A
-// failed copy retains the appended default element. Invalid operands are
-// rejected before source actions, unlike raw source undefined references.
+// Publish a default element before the deep copy. A failed copy retains that
+// element, matching the observable source prefix. Invalid operands are rejected
+// before either action, unlike raw source undefined references.
 func (v *ScopedIntVector) Push(num *Int) error {
 	if e := v.open(); e != nil {
 		return e
@@ -630,13 +576,12 @@ func (v *ScopedIntVector) Push(num *Int) error {
 	if e := v.manager.check(num); e != nil {
 		return e
 	}
-	if len(v.data) == cap(v.data) {
-		if e := v.grow(); e != nil {
-			return e
-		}
+	if uint64(len(v.data)) >= uint64(^uint32(0)) {
+		return arena.ErrBounds
 	}
+	input := *num
 	v.data = append(v.data, Int{})
-	return v.manager.Copy(&v.data[len(v.data)-1], num)
+	return v.manager.Copy(&v.data[len(v.data)-1], &input)
 }
 func (v *ScopedRationalVector) Push(num *Rational) error {
 	if e := v.open(); e != nil {
@@ -645,13 +590,12 @@ func (v *ScopedRationalVector) Push(num *Rational) error {
 	if e := v.manager.check(num); e != nil {
 		return e
 	}
-	if len(v.data) == cap(v.data) {
-		if e := v.grow(); e != nil {
-			return e
-		}
+	if uint64(len(v.data)) >= uint64(^uint32(0)) {
+		return arena.ErrBounds
 	}
+	input := *num
 	v.data = append(v.data, NewRational())
-	return v.manager.Copy(&v.data[len(v.data)-1], num)
+	return v.manager.Copy(&v.data[len(v.data)-1], &input)
 }
 func (v *ScopedIntVector) Shrink(n uint32) error {
 	if e := v.open(); e != nil {
@@ -708,14 +652,19 @@ func (v *ScopedIntVector) Resize(n uint32) error {
 	if uint64(n) <= uint64(len(v.data)) {
 		return v.Shrink(n)
 	}
-	for uint64(n) > uint64(cap(v.data)) {
-		if e := v.grow(); e != nil {
-			return e
-		}
+	if uint64(n) > uint64(int(^uint(0)>>1)) {
+		return arena.ErrBounds
 	}
-	old := len(v.data)
-	v.data = v.data[:n]
-	for i := old; i < len(v.data); i++ {
+	oldLen := len(v.data)
+	newLen := int(n)
+	if newLen > cap(v.data) {
+		next := make([]Int, newLen)
+		copy(next, v.data)
+		v.data = next
+	} else {
+		v.data = v.data[:newLen]
+	}
+	for i := oldLen; i < newLen; i++ {
 		v.data[i] = Int{}
 	}
 	return nil
@@ -727,14 +676,19 @@ func (v *ScopedRationalVector) Resize(n uint32) error {
 	if uint64(n) <= uint64(len(v.data)) {
 		return v.Shrink(n)
 	}
-	for uint64(n) > uint64(cap(v.data)) {
-		if e := v.grow(); e != nil {
-			return e
-		}
+	if uint64(n) > uint64(int(^uint(0)>>1)) {
+		return arena.ErrBounds
 	}
-	old := len(v.data)
-	v.data = v.data[:n]
-	for i := old; i < len(v.data); i++ {
+	oldLen := len(v.data)
+	newLen := int(n)
+	if newLen > cap(v.data) {
+		next := make([]Rational, newLen)
+		copy(next, v.data)
+		v.data = next
+	} else {
+		v.data = v.data[:newLen]
+	}
+	for i := oldLen; i < newLen; i++ {
 		v.data[i] = NewRational()
 	}
 	return nil
@@ -757,7 +711,6 @@ func (v *ScopedIntVector) Close() error {
 	if e != nil && !v.manager.closed {
 		return e
 	}
-	v.manager.BudgetField.Release(uint64(reflect.TypeOf(ScopedIntVector{}).Size()) + uint64(cap(v.data))*uint64(reflect.TypeOf(Int{}).Size()))
 	v.data = nil
 	v.closed = true
 	return e
@@ -778,7 +731,6 @@ func (v *ScopedRationalVector) Close() error {
 	if e != nil && !v.manager.closed {
 		return e
 	}
-	v.manager.BudgetField.Release(uint64(reflect.TypeOf(ScopedRationalVector{}).Size()) + uint64(cap(v.data))*uint64(reflect.TypeOf(Rational{}).Size()))
 	v.data = nil
 	v.closed = true
 	return e

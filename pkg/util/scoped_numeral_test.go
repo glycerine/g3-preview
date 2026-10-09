@@ -58,49 +58,24 @@ func TestScopedNumeralSourceTstScoped(t *testing.T) {
 	}
 }
 
-func TestScopedNumeralResizeFailurePrefixesAndBudget(t *testing.T) {
-	for prefix := int64(0); prefix < 4; prefix++ {
-		m, b := integerManager(t)
-		base := b.Used()
-		v, e := NewScopedIntVector(m)
-		if e != nil {
-			t.Fatal(e)
-		}
-		header := uint64(reflect.TypeOf(ScopedIntVector{}).Size())
-		width := uint64(reflect.TypeOf(Int{}).Size())
-		if b.Used() != base+header {
-			t.Fatal("owner header charge")
-		}
-		b.FailAfter(prefix)
-		e = v.Resize(5)
-		wantCap := []uint32{0, 2, 3, 5}[prefix]
-		if prefix < 3 {
-			if !errors.Is(e, arena.ErrInjectedFailure) || v.Size() != 0 {
-				t.Fatal("source retained growth prefix", prefix, e)
-			}
-		} else if e != nil || v.Size() != 5 {
-			t.Fatal("completed resize", e)
-		}
-		if v.Capacity() != wantCap || b.Used() != base+header+uint64(wantCap)*width {
-			t.Fatal("immediate backing charge", prefix, b.Used(), v.Capacity())
-		}
-		b.FailAfter(-1)
-		v.Close()
-		if b.Used() != base {
-			t.Fatal("backing/header release")
-		}
-	}
-	// Old+new backing is simultaneously charged at each source growth.
+func TestScopedNumeralResizeUsesGoSliceStorage(t *testing.T) {
 	m, b := integerManager(t)
-	v, _ := NewScopedIntVector(m)
-	v.Resize(2)
-	before := b.Used()
+	base := b.Used()
 	b.FailAfter(0)
-	if e := v.Resize(3); !errors.Is(e, arena.ErrInjectedFailure) || v.Capacity() != 2 || b.Used() != before {
-		t.Fatal("growth prepare", e)
+	v, e := NewScopedIntVector(m)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e = v.Resize(5); e != nil || v.Size() != 5 || v.Capacity() < 5 {
+		t.Fatal("native slice resize", e, v.Size(), v.Capacity())
+	}
+	if b.Used() != base {
+		t.Fatal("Go wrapper or slice charged to numeric arena", b.Used(), base)
 	}
 	b.FailAfter(-1)
-	v.Close()
+	if e = v.Close(); e != nil || b.Used() != base {
+		t.Fatal("native slice close", e, b.Used(), base)
+	}
 }
 
 func TestScopedNumeralMoveAndAscendingCleanup(t *testing.T) {
@@ -111,13 +86,12 @@ func TestScopedNumeralMoveAndAscendingCleanup(t *testing.T) {
 	m.SetUint64(&x, 1<<63)
 	v.Push(&x)
 	v.Push(&x)
-	old := v.data
-	first := old[0].Cell
-	second := old[1].Cell
+	first := v.data[0].Cell
+	second := v.data[1].Cell
 	live := m.Cells.Stats().Live
 	v.Push(&x)
-	if old[0].Cell != 0 || old[1].Cell != 0 || old[0].Val != 1 || old[1].Val != 1 || v.data[0].Cell != first || v.data[1].Cell != second || m.Cells.Stats().Live != live+1 {
-		t.Fatal("source element move ownership")
+	if v.data[0].Cell != first || v.data[1].Cell != second || m.Cells.Stats().Live != live+1 {
+		t.Fatal("slice growth changed element ownership")
 	}
 	third := v.data[2].Cell
 	v.Shrink(0)
@@ -368,21 +342,10 @@ func TestScopedNumeralVectorIndependentLifecycle(t *testing.T) {
 	defer v.Close()
 	rng := rand.New(rand.NewSource(1709))
 	var model []int32
-	capacity := uint32(0)
-	grow := func(n uint32) {
-		for capacity < n {
-			if capacity == 0 {
-				capacity = 2
-			} else {
-				capacity = (3*capacity + 1) / 2
-			}
-		}
-	}
 	for step := 0; step < 1000; step++ {
 		switch rng.Intn(5) {
 		case 0:
 			x := NewInt(int32(rng.Intn(100) - 50))
-			grow(uint32(len(model) + 1))
 			if e := v.Push(&x); e != nil {
 				t.Fatal(e)
 			}
@@ -396,7 +359,6 @@ func TestScopedNumeralVectorIndependentLifecycle(t *testing.T) {
 			}
 		case 2:
 			n := uint32(rng.Intn(20))
-			grow(n)
 			if e := v.Resize(n); e != nil {
 				t.Fatal(e)
 			}
@@ -416,8 +378,8 @@ func TestScopedNumeralVectorIndependentLifecycle(t *testing.T) {
 				model[i] = x.Val
 			}
 		}
-		if v.Size() != uint32(len(model)) || v.Capacity() != capacity {
-			t.Fatal("source size/capacity", step, v.Size(), v.Capacity(), len(model), capacity)
+		if v.Size() != uint32(len(model)) || v.Capacity() < v.Size() {
+			t.Fatal("slice size/capacity", step, v.Size(), v.Capacity(), len(model))
 		}
 		for i, w := range model {
 			var out Int
@@ -521,7 +483,7 @@ func TestScopedNumeralHeadersFailuresAndSourcePushPrefix(t *testing.T) {
 	wordsLive := m.Words.Stats().Live
 	usedBefore := b.Used()
 	b.FailAfter(0)
-	if e = v.Push(&big); !errors.Is(e, arena.ErrInjectedFailure) || v.Size() != 1 || v.Capacity() != 2 {
+	if e = v.Push(&big); !errors.Is(e, arena.ErrInjectedFailure) || v.Size() != 1 || v.Capacity() < 1 {
 		t.Fatal("source default appended before copy", e, v.Size())
 	}
 	integerPhysicalAudit(t, m, roots...)
@@ -529,7 +491,7 @@ func TestScopedNumeralHeadersFailuresAndSourcePushPrefix(t *testing.T) {
 		t.Fatal("failed push leaked a temporary cell")
 	}
 	if m.Words.Stats().Live != wordsLive || b.Used() != usedBefore {
-		t.Fatal("failed push leaked live payload or backing charge")
+		t.Fatal("failed push leaked live payload or arena charge")
 	}
 	b.FailAfter(-1)
 	var out Int
@@ -544,7 +506,7 @@ func TestScopedNumeralHeadersFailuresAndSourcePushPrefix(t *testing.T) {
 	}
 	m.Close()
 	if b.Used() != 0 {
-		t.Fatal("header/backing cleanup")
+		t.Fatal("owner cleanup")
 	}
 }
 
@@ -565,16 +527,6 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 		}
 		rng := rand.New(rand.NewSource(933))
 		var model []uint8
-		capacity := uint32(0)
-		grow := func(n uint32) {
-			for capacity < n {
-				if capacity == 0 {
-					capacity = 2
-				} else {
-					capacity = (3*capacity + 1) / 2
-				}
-			}
-		}
 		for step := 0; step < 400; step++ {
 			switch rng.Intn(5) {
 			case 0:
@@ -583,7 +535,6 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 				if code == 2 {
 					num = &big
 				}
-				grow(uint32(len(model) + 1))
 				if e := v.Push(num); e != nil {
 					t.Fatal(e)
 				}
@@ -595,7 +546,6 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 				}
 			case 2:
 				n := uint32(rng.Intn(16))
-				grow(n)
 				if e := v.Resize(n); e != nil {
 					t.Fatal(e)
 				}
@@ -614,7 +564,7 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 					model[i] = 2
 				}
 			}
-			if v.Size() != uint32(len(model)) || v.Capacity() != capacity {
+			if v.Size() != uint32(len(model)) || v.Capacity() < v.Size() {
 				t.Fatal("rational vector size/capacity")
 			}
 			bigCount := uint32(0)
@@ -671,11 +621,10 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 		if m.Z.Cells.Stats().Live != live+published || m.Z.Words.Stats().Live != payloads {
 			t.Fatal("actual source copy descriptors", m.Z.Cells.Stats().Live, live, published)
 		}
-		// The source object allocation can complete before descriptor refusal;
-		// retained physical objects/metadata must remain fully charged and named.
-		vectorCharge := uint64(reflect.TypeOf(ScopedRationalVector{}).Size()) + uint64(cap(v.data))*uint64(reflect.TypeOf(Rational{}).Size())
-		if b.Used() != m.HeaderBytes+integerActualOwnedBytes(m.Z)+vectorCharge {
-			t.Fatal("actual rational vector physical graph", b.Used(), integerActualOwnedBytes(m.Z), m.HeaderBytes, vectorCharge)
+		// The numeric arena accounts for owned numerals and manager state. The Go
+		// wrapper and its typed slice are ordinary Go storage.
+		if b.Used() != m.HeaderBytes+integerActualOwnedBytes(m.Z) {
+			t.Fatal("actual rational vector physical graph", b.Used(), integerActualOwnedBytes(m.Z), m.HeaderBytes)
 		}
 		b.FailAfter(-1)
 		qopsMust(t, m.Z.CleanupPendingAllocation()) // explicit unassigned-object cleanup, after immediate source audit
@@ -684,12 +633,11 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 		}
 		beforeClose := b.Used()
 		integerBefore := integerActualOwnedBytes(m.Z)
-		coldCharge := uint64(reflect.TypeOf(ScopedRationalVector{}).Size()) + uint64(cap(v.data))*uint64(reflect.TypeOf(Rational{}).Size())
 		if e := v.Close(); e != nil {
 			t.Fatal("actual failed-component vector Close", e)
 		}
-		if beforeClose-b.Used() != coldCharge+integerBefore-integerActualOwnedBytes(m.Z) {
-			t.Fatal("vector physical header/backing refund", beforeClose, b.Used(), coldCharge)
+		if beforeClose-b.Used() != integerBefore-integerActualOwnedBytes(m.Z) {
+			t.Fatal("vector numeral refund", beforeClose, b.Used())
 		}
 		if m.Z.Cells.Stats().Live != baseCells || m.Z.Words.Stats().Live != baseWords {
 			t.Fatal("rational close live graph")
@@ -699,7 +647,7 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 	}
 }
 
-func TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak(t *testing.T) {
+func TestScopedNumeralDeepCloneFailureCleanup(t *testing.T) {
 	failed, passed := 0, 0
 	for prefix := int64(0); prefix < 24; prefix++ {
 		m, b := rationalManager(t, true)
@@ -761,52 +709,5 @@ func TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak(t *testing.T) {
 	}
 	if failed == 0 || passed == 0 {
 		t.Fatal("clone sweep endpoints", failed, passed)
-	}
-	baseManager, baseBudget := integerManager(t)
-	base := baseBudget.Used()
-	baseManager.Close()
-	header := uint64(reflect.TypeOf(ScopedIntVector{}).Size())
-	width := uint64(reflect.TypeOf(Int{}).Size())
-	// Caller-owned charged backing is reserved after manager construction:
-	// construction has its own larger transient peaks, independent of this
-	// vector's precise old+new boundary. The actual buffer keeps those separate.
-	callerBacking := make([]byte, 1<<16)
-	peak := base + uint64(len(callerBacking)) + header + 5*width
-	for _, limit := range []uint64{peak - 1, peak} {
-		b := arena.NewBudget(limit)
-		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
-		if e != nil {
-			t.Fatal(e)
-		}
-		if e := b.Reserve(uint64(len(callerBacking))); e != nil {
-			t.Fatal(e)
-		}
-		v, e := NewScopedIntVector(m)
-		if e != nil {
-			t.Fatal(e)
-		}
-		if e = v.Resize(2); e != nil {
-			t.Fatal(e)
-		}
-		before := b.Used()
-		cellLive := m.Cells.Stats().Live
-		wordLive := m.Words.Stats().Live
-		e = v.Resize(3)
-		if limit < peak {
-			if !errors.Is(e, arena.ErrBudget) || v.Size() != 2 || v.Capacity() != 2 || b.Used() != before || m.Cells.Stats().Live != cellLive || m.Words.Stats().Live != wordLive {
-				t.Fatal("backing peak failure", e)
-			}
-		} else if e != nil || v.Size() != 3 || v.Capacity() != 3 || b.Used() != base+uint64(len(callerBacking))+header+3*width {
-			t.Fatal("exact backing peak success", e, b.Used())
-		}
-		v.Close()
-		b.Release(uint64(len(callerBacking)))
-		m.Close()
-		if b.Used() != 0 {
-			t.Fatal("peak lifetime")
-		}
-	}
-	if _, e := scopedCapacity(int(uint64(^uint32(0))), uint64(reflect.TypeOf(Int{}).Size())); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("source capacity overflow", e)
 	}
 }

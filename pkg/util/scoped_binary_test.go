@@ -55,12 +55,8 @@ func TestBinaryOwnerConstructorAndScopedVector(t *testing.T) {
 	defer m.Del(&a)
 	for i := 0; i < 8; i++ {
 		serviceMust(t, v.Push(&a))
-		want := uint32(2)
-		for want < uint32(i+1) {
-			want = (3*want + 1) / 2
-		}
-		if v.Capacity() != want {
-			t.Fatal(i, v.Capacity(), want)
+		if v.Capacity() < v.Size() {
+			t.Fatal(i, v.Size(), v.Capacity())
 		}
 	}
 	roots := []*BinaryRational{&a}
