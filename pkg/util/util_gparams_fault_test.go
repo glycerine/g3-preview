@@ -13,7 +13,7 @@ func gparamsVectorGraph(s arena.VectorStats) uint64 {
 	return s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 }
 func gparamsGraph(g *GlobalParams) uint64 {
-	n := g.OwnerBytes + uint64(cap(g.Workspace)) + uint64(cap(g.Bindings))*uint64(reflect.TypeOf(GparamsRegionBinding{}).Size()) + uint64(cap(g.Cells))*uint64(reflect.TypeOf((*GparamsRefCell)(nil)).Size()) + uint64(cap(g.Descriptors))*uint64(reflect.TypeOf((*ParamDescrs)(nil)).Size())
+	n := g.OwnerBytes + uint64(cap(g.Bindings))*uint64(reflect.TypeOf(GparamsRegionBinding{}).Size()) + uint64(cap(g.Cells))*uint64(reflect.TypeOf((*GparamsRefCell)(nil)).Size()) + uint64(cap(g.Descriptors))*uint64(reflect.TypeOf((*ParamDescrs)(nil)).Size())
 	for _, x := range g.Cells {
 		if x != nil {
 			n += uint64(reflect.TypeOf(*x).Size())

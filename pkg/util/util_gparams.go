@@ -464,7 +464,7 @@ func (g *GlobalParams) closeLegacy() error {
 	g.ModuleParams.close()
 	g.ModuleDescriptions.close()
 	g.ModuleDescriptors.close()
-	g.Budget.Release(uint64(cap(g.Cells))*uint64(reflect.TypeOf((*GparamsRefCell)(nil)).Size()) + uint64(cap(g.Descriptors))*uint64(reflect.TypeOf((*ParamDescrs)(nil)).Size()) + uint64(cap(g.Bindings))*uint64(reflect.TypeOf(GparamsRegionBinding{}).Size()) + uint64(cap(g.Workspace)) + g.OwnerBytes)
+	g.Budget.Release(uint64(cap(g.Cells))*uint64(reflect.TypeOf((*GparamsRefCell)(nil)).Size()) + uint64(cap(g.Descriptors))*uint64(reflect.TypeOf((*ParamDescrs)(nil)).Size()) + uint64(cap(g.Bindings))*uint64(reflect.TypeOf(GparamsRegionBinding{}).Size()) + g.OwnerBytes)
 	g.Cells = nil
 	g.Descriptors = nil
 	g.Bindings = nil

@@ -349,6 +349,8 @@ traverses modules in stable registration order. Module parameter cells and
 module descriptions use built-in maps because they are lookup-only. Destruction
 walks the existing indexed owner slices, so cached hashes, tombstones, bucket
 geometry, table allocation accounting, and shrink-failure states are gone.
+Name-normalization scratch and its temporary string bridge are ordinary Go
+storage and no longer consume the arena budget.
 
 The live parameter-descriptor dictionary now uses
 `insdict.Dict[Symbol, paramDescrInfo]`. Copy traversal follows stable insertion

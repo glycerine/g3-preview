@@ -4,8 +4,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// Actual mutable normalization scratch; retained capacity is an explicit cold
-// Go workspace adapter. Every backing/overlap is charged, no hot strings kept.
+// Mutable normalization scratch is ordinary Go storage retained for reuse.
 
 func (g *GlobalParams) reserveWorkspace(n int) error {
 	if n < 0 {
@@ -25,30 +24,14 @@ func (g *GlobalParams) reserveWorkspace(n int) error {
 		}
 		next *= 2
 	}
-	if e := g.Budget.Reserve(uint64(next)); e != nil {
-		return e
-	}
 	b := make([]byte, len(g.Workspace), next)
 	copy(b, g.Workspace)
-	g.Budget.Release(uint64(cap(g.Workspace)))
 	g.Workspace = b
 	return nil
 }
 
-// Go conversion can allocate a transient immutable copy in addition to actual
-// mutable scratch; reserve its exact byte extent before conversion and refund
-// it after interning. No hidden name string survives this temporary scope.
 func (g *GlobalParams) internWorkspace(b []byte) (Symbol, error) {
-	if len(b) == 0 {
-		return g.SymbolsField.Intern("")
-	}
-	if e := g.Budget.Reserve(uint64(len(b))); e != nil {
-		return Symbol{}, e
-	}
-	text := string(b)
-	k, e := g.SymbolsField.Intern(text)
-	g.Budget.Release(uint64(len(b)))
-	return k, e
+	return g.SymbolsField.Intern(string(b))
 }
 func (g *GlobalParams) normalizeWorkspace() (Symbol, Symbol, error) {
 	n := uint32(len(g.Workspace)) // source unsigned narrowing, before both loops
