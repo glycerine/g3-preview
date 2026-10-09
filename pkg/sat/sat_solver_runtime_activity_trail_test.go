@@ -17,13 +17,13 @@ func TestSATSolverActivityAndLiteralTrailUseActualRuntime(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 242+600 || v.memory.Stats().LiveBlocks != 14 {
+	if n != 206+600 || v.memory.Stats().LiveBlocks != 12 {
 		t.Fatal("actual activity source allocation missing", n, v.memory.Stats())
 	}
 	satOK(t, v.trailPush(MakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 266+600 || v.memory.Stats().LiveBlocks != 15 {
+	if n != 230+600 || v.memory.Stats().LiveBlocks != 13 {
 		t.Fatal("actual literal32 trail allocation missing", n, v.memory.Stats())
 	}
 }
@@ -236,9 +236,9 @@ func TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix(t *testing.T) {
 	satOK(t, e)
 	_, e = v.mkVar(false, true)
 	satOK(t, e)
-	// Real prior extents842 + this block99158 reach100000 exactly; trail24
-	// crosses the actual TLS threshold after owned physical publication.
-	prefix, e := r.Allocate(99150)
+	// Reach the actual TLS checkpoint using the retained Runtime extent.
+	// Native mark slices are outside this accounting.
+	prefix, e := r.Allocate(uint64(100000 - r.State().LocalSize - 8))
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
 	e = v.trailPush(MakeLiteral(0, true))

@@ -371,10 +371,7 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		if size != n*2 {
 			return false, ErrSATAssertion
 		}
-		size, e = v.literalMark.Size()
-		if e != nil {
-			return false, e
-		}
+		size = uint32(len(v.literalMark))
 		if size != n*2 {
 			return false, ErrSATAssertion
 		}
@@ -401,10 +398,7 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		if size != n {
 			return false, ErrSATAssertion
 		}
-		size, e = v.mark.Size()
-		if e != nil {
-			return false, e
-		}
+		size = uint32(len(v.mark))
 		if size != n {
 			return false, ErrSATAssertion
 		}

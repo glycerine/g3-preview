@@ -280,12 +280,22 @@ func (s *Solver) gcVar(v uint32) error {
 	if e = x.level.Shrink(v); e != nil {
 		return e
 	}
-	if e = x.mark.Shrink(v); e != nil {
-		return e
+	if uint64(v) > uint64(len(x.mark)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
+		return arena.ErrBounds
 	}
-	if e = x.literalMark.Shrink(2 * v); e != nil {
-		return e
+	clear(x.mark[v:])
+	x.mark = x.mark[:v]
+	if uint64(2*v) > uint64(len(x.literalMark)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
+		return arena.ErrBounds
 	}
+	clear(x.literalMark[2*v:])
+	x.literalMark = x.literalMark[:2*v]
 	if e = x.phase.Shrink(v); e != nil {
 		return e
 	}

@@ -80,7 +80,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 
 func satVariableAssertFirstPrefix(t *testing.T, s *satSolverVariableState) {
 	t.Helper()
-	sizes := []int{len(s.watches.lists), int(satAssignmentTestSize(t, &s.assignment)), int(satJustificationTestSize(t, &s.justification)), int(satAssignmentTestSize(t, &s.decision)), int(satAssignmentTestSize(t, &s.eliminated)), int(satAssignmentTestSize(t, &s.external)), int(s.activity.Size()), int(satScalarTestUintSize(t, &s.level)), int(satAssignmentTestSize(t, &s.mark)), int(satAssignmentTestSize(t, &s.literalMark)), int(satAssignmentTestSize(t, &s.phase)), int(satAssignmentTestSize(t, &s.previousPhase)), int(satAssignmentTestSize(t, &s.assignedSinceGC))}
+	sizes := []int{len(s.watches.lists), int(satAssignmentTestSize(t, &s.assignment)), int(satJustificationTestSize(t, &s.justification)), int(satAssignmentTestSize(t, &s.decision)), int(satAssignmentTestSize(t, &s.eliminated)), int(satAssignmentTestSize(t, &s.external)), int(s.activity.Size()), int(satScalarTestUintSize(t, &s.level)), len(s.mark), len(s.literalMark), int(satAssignmentTestSize(t, &s.phase)), int(satAssignmentTestSize(t, &s.previousPhase)), int(satAssignmentTestSize(t, &s.assignedSinceGC))}
 	want := []int{2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1}
 	unfinished := false
 	for i, n := range sizes {

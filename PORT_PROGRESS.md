@@ -31047,3 +31047,23 @@ chunking, output, and fault-campaign tests passed with g3checked,g3debug.
 Module-wide test compilation, SAT vet, and portcheck passed. The native row
 input test also covers a malformed maximal source size without allocating
 from that size. The costly full native suite was not repeated for this change.
+
+## Replace SAT variable and literal mark columns with Boolean slices
+
+Converted the two live source char-vector mark arrays to `[]bool`. Conflict
+analysis, lemma minimization, and dynamic subsumption use direct Boolean reads
+and writes; duplicate-mark/unmark assertions, first-failure prefixes, retained
+marks after algorithm-owner close, and independent DAG results remain covered.
+Variable creation preserves action order, scope truncation clears removed flags,
+and variable-owner cleanup drops the slices. Removed the two Runtime bindings
+and allocation/destruction records from scalar ownership audits. Numeric/solver
+allocations stay separately checked; TLS refusal fixtures derive their actual
+checkpoint from retained Runtime usage.
+
+Tests inspect native marks directly. Added a scope pop/regrowth check proving
+that retained marks survive and removed marks do not transfer to newly created
+variables. Phase and assignment columns remain separate live conversion work.
+
+Validation: complete SAT suites passed in native (1.17s) and g3checked,g3debug
+(1.35s) builds. The new scope mark regression passed separately in both profiles.
+Module-wide test compilation, SAT vet, and portcheck passed.

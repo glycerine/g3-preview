@@ -1053,3 +1053,18 @@ finalization/reuse invalidates old views, and close releases the charged owner
 header. Go slice backing is outside arena accounting. Solver consequence and
 mutex refusal campaigns continue to audit real solver-owned allocations and
 verify that previously published output rows remain unchanged.
+
+## Native SAT Boolean marks
+
+SAT variable marks and literal marks now use concrete `[]bool` fields in the
+variable state. Conflict analysis and dynamic subsumption read and change those
+flags directly, preserving duplicate-mark/unmark assertions and reached bounds
+errors. Variable creation appends false defaults in its original action order.
+Scope truncation clears removed flags, and newly created variables begin
+unmarked when the backing slice is reused. Finalization drops both slices.
+Neither array owns Runtime blocks or has copied C++ capacity/accounting state;
+physical ownership audits count only the remaining real Runtime consumers.
+
+Phase storage remains a distinct three-state byte representation; its live
+assignment/decision/GC and asymmetric-branch snapshot consumers still require
+conversion. The shared Runtime vector therefore remains live.

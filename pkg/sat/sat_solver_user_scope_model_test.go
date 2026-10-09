@@ -46,3 +46,45 @@ func TestSATSolverOwningWatchShrinkRetainsOuterCapacity(t *testing.T) {
 		t.Fatal("destroyed slot placement")
 	}
 }
+
+// Source: src/sat/sat_solver.cpp:135-160,2818-2841.
+func TestSATSolverNativeMarksScopeTruncationAndRegrowth(t *testing.T) {
+	s, _, _ := satSolverCheckFixture(t)
+	for i := 0; i < 2; i++ {
+		_, e := s.MkVar(false, true)
+		satOK(t, e)
+	}
+	satOK(t, s.MkClause([]Literal{0, 2}))
+	satOK(t, s.UserPush())
+	for i := 0; i < 2; i++ {
+		_, e := s.MkVar(false, true)
+		satOK(t, e)
+	}
+	v := s.Variables
+	for i := range v.mark {
+		v.mark[i] = true
+	}
+	for i := range v.literalMark {
+		v.literalMark[i] = true
+	}
+	satOK(t, s.UserPop(1))
+	if len(v.mark) != 2 || len(v.literalMark) != 4 {
+		t.Fatal("scope mark lengths", len(v.mark), len(v.literalMark))
+	}
+	for _, mark := range v.mark {
+		if !mark {
+			t.Fatal("scope changed retained variable mark")
+		}
+	}
+	for _, mark := range v.literalMark {
+		if !mark {
+			t.Fatal("scope changed retained literal mark")
+		}
+	}
+	variable, e := s.MkVar(false, true)
+	satOK(t, e)
+	if variable != 2 || len(v.mark) != 3 || len(v.literalMark) != 6 || v.mark[2] || v.literalMark[4] || v.literalMark[5] {
+		t.Fatal("new variable inherited removed marks", variable, v.mark, v.literalMark)
+	}
+	satFullSolverRuntimeAudit(t, s)
+}

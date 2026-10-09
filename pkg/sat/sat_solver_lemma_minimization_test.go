@@ -30,7 +30,7 @@ func TestSATSolverLemmaMinimizationIndependentFiniteDAG(t *testing.T) {
 				}
 				satOK(t, p.assignCore(MakeLiteral(BoolVar(id), false), j))
 			}
-			satOK(t, v.mark.Write(1, 1))
+			v.mark[1] = true
 			s.levelSet.insert(1)
 			var implied func(uint32) bool
 			implied = func(id uint32) bool {
@@ -54,7 +54,7 @@ func TestSATSolverLemmaMinimizationIndependentFiniteDAG(t *testing.T) {
 					t.Fatal("independent decision-leaf reachability", id, got, parents)
 				}
 				satOK(t, s.resetUnmark(0))
-				if satAssignmentTestValue(t, &v.mark, 1) != 1 {
+				if !v.mark[1] {
 					t.Fatal("preexisting anchor mark")
 				}
 			}
@@ -80,7 +80,7 @@ func TestSATSolverLemmaMinimizationSourceCompactionAndApproxCollision(t *testing
 		satOK(t, p.assignCore(MakeLiteral(BoolVar(id), false), j))
 	}
 	for _, id := range []uint32{1, 2, 3, 5} {
-		satOK(t, v.mark.Write(id, 1))
+		v.mark[id] = true
 	}
 	for _, id := range []uint32{0, 1, 2, 3, 5} {
 		satOK(t, s.lemma.Push(uint32(MakeLiteral(BoolVar(id), true))))
@@ -101,7 +101,7 @@ func TestSATSolverLemmaMinimizationSourceCompactionAndApproxCollision(t *testing
 	}
 	// level33 collides with1 but its unmarked decision4 must still be visited,
 	// so var5 stays essential. Removed var2/basevar3 are unmarked ascending.
-	if satAssignmentTestValue(t, &v.mark, 2) != 0 || satAssignmentTestValue(t, &v.mark, 3) != 0 || satAssignmentTestValue(t, &v.mark, 1) != 1 || satAssignmentTestValue(t, &v.mark, 5) != 1 {
+	if v.mark[2] || v.mark[3] || !v.mark[1] || !v.mark[5] {
 		t.Fatal("source mark cleanup")
 	}
 	satOK(t, s.resetLemmaVarMarks())
@@ -128,7 +128,7 @@ func TestSATSolverLemmaMinimizationClauseBranchesAndRejectedSuffix(t *testing.T)
 				satOK(t, p.assignCore(MakeLiteral(BoolVar(id), false), j))
 			}
 			s.levelSet.insert(1)
-			satOK(t, v.mark.Write(1, 1))
+			v.mark[1] = true
 			satOK(t, s.unmark.Push(1))
 			got, e := s.impliedByMarked(8)
 			satOK(t, e)
@@ -137,7 +137,7 @@ func TestSATSolverLemmaMinimizationClauseBranchesAndRejectedSuffix(t *testing.T)
 			}
 			n, e := s.unmark.Size()
 			satOK(t, e)
-			if n != 1 || satAssignmentTestValue(t, &v.mark, 2) != 0 || satAssignmentTestValue(t, &v.mark, 3) != 0 || satAssignmentTestValue(t, &v.mark, 1) != 1 {
+			if n != 1 || v.mark[2] || v.mark[3] || !v.mark[1] {
 				t.Fatal("only attempted suffix reset")
 			}
 			satLemmaAudit(t, s)
@@ -202,7 +202,7 @@ func TestSATSolverLemmaMinimizationWarmPhysicalPlateau(t *testing.T) {
 		}
 		satOK(t, p.assignCore(MakeLiteral(BoolVar(id), false), j))
 	}
-	satOK(t, v.mark.Write(1, 1))
+	v.mark[1] = true
 	s.levelSet.insert(1)
 	got, e := s.impliedByMarked(4)
 	satOK(t, e)
@@ -252,7 +252,7 @@ func TestSATSolverLemmaMinimizationClauseDebugSiteAndStaleBorrow(t *testing.T) {
 			t.Fatal("source release first antecedent missing level", got)
 		}
 	}
-	if satAssignmentTestValue(t, &v.mark, 1) != 0 || satAssignmentTestValue(t, &v.mark, 2) != 0 {
+	if v.mark[1] || v.mark[2] {
 		t.Fatal("no mark before source assertion/reject")
 	}
 	n, e := s.minStack.Size()
@@ -300,20 +300,20 @@ func TestSATSolverLemmaMinimizationEmptyAndFirstUIPDebugRoutes(t *testing.T) {
 		s, _, v, _ := satLemmaFixture(t, 2)
 		satOK(t, s.lemma.Push(0))
 		satOK(t, s.lemma.Push(2))
-		satOK(t, v.mark.Write(0, 1))
-		satOK(t, v.mark.Write(1, 1))
+		v.mark[0] = true
+		v.mark[1] = true
 		e := s.resetLemmaVarMarks()
 		if satStorageSourceDebug {
-			if !errors.Is(e, ErrSATAssertion) || satAssignmentTestValue(t, &v.mark, 1) != 1 {
+			if !errors.Is(e, ErrSATAssertion) || !v.mark[1] {
 				t.Fatal("firstUIP assertion before suffix reset", e)
 			}
 		} else {
 			satOK(t, e)
-			if satAssignmentTestValue(t, &v.mark, 1) != 0 {
+			if v.mark[1] {
 				t.Fatal("release actual suffix reset")
 			}
 		}
-		if satAssignmentTestValue(t, &v.mark, 0) != 1 {
+		if !v.mark[0] {
 			t.Fatal("does not reset firstUIP")
 		}
 		satLemmaAudit(t, s)

@@ -37,9 +37,7 @@ func TestSATSolverDynamicSubsumptionBinaryAndFUIP(t *testing.T) {
 		}
 	}
 	for i := uint32(0); i < 6; i++ {
-		x, e := life.propagation.variables.literalMark.Read(i)
-		satOK(t, e)
-		if x != 0 {
+		if life.propagation.variables.literalMark[i] {
 			t.Fatal("source ascending cleanup", i)
 		}
 	}
@@ -113,7 +111,7 @@ func TestSATSolverDynamicSubsumptionIndependentTernaryResolution(t *testing.T) {
 					}
 				}
 				for i := uint32(0); i < 8; i++ {
-					if satAssignmentTestValue(t, &life.propagation.variables.literalMark, i) != 0 {
+					if life.propagation.variables.literalMark[i] {
 						t.Fatal("mark cleanup", i)
 					}
 				}
@@ -168,11 +166,11 @@ func TestSATSolverDynamicSubsumptionDuplicateMarkFailureAndRetainedEmpty(t *test
 	satOK(t, a.lemma.Push(0))
 	e = d.run()
 	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATAssertion) || satAssignmentTestValue(t, &life.propagation.variables.literalMark, 0) != 1 || satScalarTestUintSize(t, &a.lemma) != 2 {
+		if !errors.Is(e, ErrSATAssertion) || !life.propagation.variables.literalMark[0] || satScalarTestUintSize(t, &a.lemma) != 2 {
 			t.Fatal("mark failure prefix", e)
 		}
 		// Explicit caller cleanup of the actually retained bit, not algorithm repair.
-		satOK(t, life.propagation.variables.literalMark.Write(0, 0))
+		life.propagation.variables.literalMark[0] = false
 	} else {
 		satOK(t, e)
 		if satScalarTestUintSize(t, &a.lemma) != 1 {
@@ -261,9 +259,9 @@ func TestSATSolverDynamicSubsumptionMarkWriteFailurePrefix(t *testing.T) {
 			t.Fatal(e)
 		}
 	}
-	if satAssignmentTestValue(t, &life.propagation.variables.literalMark, 0) != 1 || satScalarTestUintSize(t, &a.lemma) != 2 || d.eliminated != 0 {
+	if !life.propagation.variables.literalMark[0] || satScalarTestUintSize(t, &a.lemma) != 2 || d.eliminated != 0 {
 		t.Fatal("completed first mark retained")
 	}
 	satProbingAudit(t, probe, a, d)
-	satOK(t, life.propagation.variables.literalMark.Write(0, 0)) // explicit caller unwind.
+	life.propagation.variables.literalMark[0] = false // explicit caller unwind.
 }

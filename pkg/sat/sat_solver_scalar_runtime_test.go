@@ -16,7 +16,7 @@ func TestSATSolverScalarColumnsReachSameRuntime(t *testing.T) {
 	satOK(t, e)
 	amount, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if amount != 242+24+576 || v.memory.Stats().LiveBlocks != 14 {
+	if amount != 206+24+576 || v.memory.Stats().LiveBlocks != 12 {
 		t.Fatal("all actual scalar source allocations", amount, v.memory.Stats())
 	}
 }
@@ -37,7 +37,7 @@ func satScalarTestUintSize(t *testing.T, c *RuntimeUintColumn) uint32 {
 func satScalarAuditRoots(t *testing.T, v *satSolverVariableState, external ...util.Block) {
 	t.Helper()
 	roots := append([]util.Block{}, external...)
-	for _, c := range []*RuntimeVectorColumn{&v.decision, &v.mark, &v.literalMark, &v.eliminated, &v.external, &v.phase, &v.previousPhase, &v.assignedSinceGC, &v.level.Raw, &v.activity.values.Raw, &v.trail.values.Raw, &v.justification.raw} {
+	for _, c := range []*RuntimeVectorColumn{&v.decision, &v.eliminated, &v.external, &v.phase, &v.previousPhase, &v.assignedSinceGC, &v.level.Raw, &v.activity.values.Raw, &v.trail.values.Raw, &v.justification.raw} {
 		if !c.PendingReplaces && c.Block != (util.Block{}) {
 			roots = append(roots, c.Block)
 		}
@@ -75,7 +75,7 @@ func TestSATSolverScalarSourceBytesAndRetainedSlots(t *testing.T) {
 		c    *RuntimeVectorColumn
 		want byte
 		size uint32
-	}{{&v.decision, 1, 1}, {&v.mark, 0, 1}, {&v.literalMark, 0, 2}, {&v.eliminated, 0, 1}, {&v.external, 1, 1}, {&v.phase, 2, 1}, {&v.previousPhase, 2, 1}, {&v.assignedSinceGC, 0, 1}} {
+	}{{&v.decision, 1, 1}, {&v.eliminated, 0, 1}, {&v.external, 1, 1}, {&v.phase, 2, 1}, {&v.previousPhase, 2, 1}, {&v.assignedSinceGC, 0, 1}} {
 		if satAssignmentTestSize(t, test.c) != test.size {
 			t.Fatal("source size")
 		}
@@ -172,7 +172,7 @@ func TestSATSolverScalarLevelTLSFailureRetainsNamedPendingAndPrefix(t *testing.T
 	if !satAssignmentActualRefusal(r, e) || v.level.Raw.Pending == (util.Block{}) || v.level.Raw.Block != (util.Block{}) {
 		t.Fatal("actual level pre-publication refusal", e, r.State())
 	}
-	if satAssignmentTestSize(t, &v.assignment) != 2 || satAssignmentTestSize(t, &v.external) != 1 || v.activity.Size() != 1 || satScalarTestUintSize(t, &v.level) != 0 || satAssignmentTestSize(t, &v.mark) != 0 {
+	if satAssignmentTestSize(t, &v.assignment) != 2 || satAssignmentTestSize(t, &v.external) != 1 || v.activity.Size() != 1 || satScalarTestUintSize(t, &v.level) != 0 || len(v.mark) != 0 {
 		t.Fatal("literal source prefix")
 	}
 	satScalarAuditOwner(t, v, prefix)
@@ -193,7 +193,7 @@ func TestSATSolverScalarReverseMemberRawDestruction(t *testing.T) {
 	satOK(t, e)
 	// Actual Runtime release cursors verify source reverse declaration order;
 	// other arena-only members introduce no invented Runtime release events.
-	order := []util.Block{v.queue.runtimeIndices.Raw.Block, v.queue.runtimeValues.Raw.Block, v.assignedSinceGC.Block, v.previousPhase.Block, v.phase.Block, v.activity.values.Raw.Block, v.level.Raw.Block, v.external.Block, v.eliminated.Block, v.literalMark.Block, v.mark.Block, v.decision.Block, v.justification.raw.Block, v.assignment.Block}
+	order := []util.Block{v.queue.runtimeIndices.Raw.Block, v.queue.runtimeValues.Raw.Block, v.assignedSinceGC.Block, v.previousPhase.Block, v.phase.Block, v.activity.values.Raw.Block, v.level.Raw.Block, v.external.Block, v.eliminated.Block, v.decision.Block, v.justification.raw.Block, v.assignment.Block}
 	satOK(t, v.Close())
 	records := testFieldBySourceName(reflect.ValueOf(v.memory).Elem(), "blocks")
 	for i, h := range order {

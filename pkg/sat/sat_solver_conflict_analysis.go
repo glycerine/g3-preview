@@ -82,32 +82,36 @@ func (s *satSolverConflictAnalysis) Close() error {
 // Private source member helpers below require an already checked open owner.
 // Their algorithm entry points call open before the first source action.
 func (s *satSolverConflictAnalysis) marked(v uint32) (bool, error) {
-	x, e := s.propagation.variables.mark.Read(v)
-	return x != 0, e
+	marks := s.propagation.variables.mark
+	if uint64(v) >= uint64(len(marks)) {
+		if satStorageSourceDebug {
+			return false, ErrSATAssertion
+		}
+		return false, arena.ErrBounds
+	}
+	return marks[v], nil
 }
 func (s *satSolverConflictAnalysis) mark(v uint32) error {
-	if satStorageSourceDebug {
-		yes, e := s.marked(v)
-		if e != nil {
-			return e
-		}
-		if yes {
-			return ErrSATAssertion
-		}
+	yes, e := s.marked(v)
+	if e != nil {
+		return e
 	}
-	return s.propagation.variables.mark.Write(v, 1)
+	if satStorageSourceDebug && yes {
+		return ErrSATAssertion
+	}
+	s.propagation.variables.mark[v] = true
+	return nil
 }
 func (s *satSolverConflictAnalysis) resetMark(v uint32) error {
-	if satStorageSourceDebug {
-		yes, e := s.marked(v)
-		if e != nil {
-			return e
-		}
-		if !yes {
-			return ErrSATAssertion
-		}
+	yes, e := s.marked(v)
+	if e != nil {
+		return e
 	}
-	return s.propagation.variables.mark.Write(v, 0)
+	if satStorageSourceDebug && !yes {
+		return ErrSATAssertion
+	}
+	s.propagation.variables.mark[v] = false
+	return nil
 }
 func (s *satSolverConflictAnalysis) fillExtAntecedents(consequent Literal, j satJustification) error {
 	if satStorageSourceDebug && (!j.External() || !s.propagation.extensionPresent) {

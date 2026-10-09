@@ -88,12 +88,12 @@ func TestSATSolverLemmaAntecedentActualAllocationPrefixes(t *testing.T) {
 			s.levelSet.insert(1)
 			b.FailAfter(fault)
 			got, e := s.processAntecedentForMinimization(MakeLiteral(1, false))
-			mark := satAssignmentTestValue(t, &v.mark, 1)
+			mark := v.mark[1]
 			un, e1 := s.unmark.Size()
 			satOK(t, e1)
 			st, e1 := s.minStack.Size()
 			satOK(t, e1)
-			if mark != 1 || un > 1 || st > un {
+			if !mark || un > 1 || st > un {
 				t.Fatal("source mark then unmark then stack", mark, un, st)
 			}
 			if e != nil {
@@ -111,7 +111,7 @@ func TestSATSolverLemmaAntecedentActualAllocationPrefixes(t *testing.T) {
 			satLemmaAudit(t, s) // exact physical graph BEFORE disabling refusal/Close
 			b.FailAfter(-1)
 			satOK(t, s.Close())
-			if satAssignmentTestValue(t, &v.mark, 1) != 1 {
+			if !v.mark[1] {
 				t.Fatal("Close must not repair source-retained mark")
 			}
 		})
@@ -143,7 +143,7 @@ func TestSATSolverLemmaMinimizationWholeOperationFaultPublication(t *testing.T) 
 				satOK(t, p.assignCore(MakeLiteral(BoolVar(id), false), j))
 			}
 			for _, id := range []uint32{1, 2, 3, 5} {
-				satOK(t, v.mark.Write(id, 1))
+				v.mark[id] = true
 			}
 			for _, id := range []uint32{0, 1, 2, 3, 5} {
 				satOK(t, s.lemma.Push(2*id+1))
@@ -177,11 +177,11 @@ func TestSATSolverLemmaMinimizationWholeOperationFaultPublication(t *testing.T) 
 				for i := uint32(0); i < un; i++ {
 					id, e1 := s.unmark.Read(i)
 					satOK(t, e1)
-					if satAssignmentTestValue(t, &v.mark, id) != 1 {
+					if !v.mark[id] {
 						t.Fatal("live recorded source mark before interrupted cleanup", id)
 					}
 				}
-				if satAssignmentTestValue(t, &v.mark, 0) != 0 || satAssignmentTestValue(t, &v.mark, 1) != 1 || satAssignmentTestValue(t, &v.mark, 3) != 1 {
+				if v.mark[0] || !v.mark[1] || !v.mark[3] {
 					t.Fatal("firstUIP/essential marks")
 				}
 			} else {
@@ -198,7 +198,7 @@ func TestSATSolverLemmaMinimizationWholeOperationFaultPublication(t *testing.T) 
 					}
 				}
 				for _, id := range []uint32{2, 4, 5} {
-					if satAssignmentTestValue(t, &v.mark, id) != 0 {
+					if v.mark[id] {
 						t.Fatal("completed source reset", id)
 					}
 				}
@@ -268,7 +268,7 @@ func TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes(t *testing.T) {
 				}
 				satOK(t, p.assignCore(MakeLiteral(BoolVar(id), false), j))
 			}
-			satOK(t, v.mark.Write(7, 1))
+			v.mark[7] = true
 			satOK(t, s.lemma.Push(1))
 			satOK(t, s.lemma.Push(15))
 			b.FailAfter(fault)
@@ -294,8 +294,8 @@ func TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes(t *testing.T) {
 				marks := uint32(0)
 				gap := false
 				for id := uint32(1); id <= 6; id++ {
-					m := satAssignmentTestValue(t, &v.mark, id)
-					if m == 0 {
+					m := v.mark[id]
+					if !m {
 						gap = true
 					} else {
 						if gap {
@@ -323,12 +323,12 @@ func TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes(t *testing.T) {
 					t.Fatal("rejected decision resets complete new suffix", un)
 				}
 				for id := uint32(1); id <= 6; id++ {
-					if satAssignmentTestValue(t, &v.mark, id) != 0 {
+					if v.mark[id] {
 						t.Fatal(id)
 					}
 				}
 			}
-			if satAssignmentTestValue(t, &v.mark, 7) != 1 {
+			if !v.mark[7] {
 				t.Fatal("original lemma mark retained")
 			}
 			b.FailAfter(-1)

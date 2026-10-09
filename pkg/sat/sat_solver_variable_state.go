@@ -13,22 +13,23 @@ import (
 // actual columns/queue/trail directly to that owner. Elimination todo is the
 // simplifier's real borrowed set. No callback supplies missing solver behavior.
 type satSolverVariableState struct {
-	self                                                                                     *satSolverVariableState
-	budget                                                                                   *arena.Budget
-	watches                                                                                  *satSolverWatchLists
-	assignment                                                                               RuntimeVectorColumn
-	memory                                                                                   *util.Runtime
-	decision, mark, literalMark, eliminated, external, phase, previousPhase, assignedSinceGC RuntimeVectorColumn
-	justification                                                                            satSolverRuntimeJustificationColumn
-	level                                                                                    RuntimeUintColumn
-	activity                                                                                 *satSolverRuntimeActivity
-	queue                                                                                    *satVarQueue
-	trail                                                                                    *satSolverRuntimeTrail
-	trailRef                                                                                 satSolverLiteralListRef
-	elimTodo                                                                                 *satSolverUintSet
-	ownerBytes                                                                               uint64
-	mkVarCount, qhead, scopeLevel, activityInc                                               uint32
-	modelIsCurrent, modelKnown, closed                                                       bool
+	self                                                                  *satSolverVariableState
+	budget                                                                *arena.Budget
+	watches                                                               *satSolverWatchLists
+	assignment                                                            RuntimeVectorColumn
+	memory                                                                *util.Runtime
+	decision, eliminated, external, phase, previousPhase, assignedSinceGC RuntimeVectorColumn
+	mark, literalMark                                                     []bool
+	justification                                                         satSolverRuntimeJustificationColumn
+	level                                                                 RuntimeUintColumn
+	activity                                                              *satSolverRuntimeActivity
+	queue                                                                 *satVarQueue
+	trail                                                                 *satSolverRuntimeTrail
+	trailRef                                                              satSolverLiteralListRef
+	elimTodo                                                              *satSolverUintSet
+	ownerBytes                                                            uint64
+	mkVarCount, qhead, scopeLevel, activityInc                            uint32
+	modelIsCurrent, modelKnown, closed                                    bool
 }
 type satSolverVariableStats struct {
 	OwnerBytes, ColumnBytes, WatchBytes, ActivityBytes, QueueBytes, TrailBytes, TotalBytes uint64
@@ -60,7 +61,7 @@ func newSATColdVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.Ve
 	s.memory = raw
 	s.assignment.Bind(raw)
 	s.justification.bind(raw, b)
-	for _, col := range []*RuntimeVectorColumn{&s.decision, &s.mark, &s.literalMark, &s.eliminated, &s.external, &s.phase, &s.previousPhase, &s.assignedSinceGC} {
+	for _, col := range []*RuntimeVectorColumn{&s.decision, &s.eliminated, &s.external, &s.phase, &s.previousPhase, &s.assignedSinceGC} {
 		col.Bind(raw)
 	}
 	s.level.Bind(raw)
@@ -160,15 +161,8 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 	if e := s.level.Push(^uint32(0)); e != nil {
 		return v, e
 	}
-	if e := s.mark.Push(0); e != nil {
-		return v, e
-	}
-	if e := s.literalMark.Push(0); e != nil {
-		return v, e
-	}
-	if e := s.literalMark.Push(0); e != nil {
-		return v, e
-	}
+	s.mark = append(s.mark, false)
+	s.literalMark = append(s.literalMark, false, false)
 	if e := s.phase.Push(2); e != nil {
 		return v, e
 	}
@@ -378,12 +372,8 @@ func (s *satSolverVariableState) finalizeColumnsWatches() error {
 	if e := s.eliminated.Finalize(); e != nil {
 		return e
 	}
-	if e := s.literalMark.Finalize(); e != nil {
-		return e
-	}
-	if e := s.mark.Finalize(); e != nil {
-		return e
-	}
+	s.literalMark = nil
+	s.mark = nil
 	if e := s.decision.Finalize(); e != nil {
 		return e
 	}

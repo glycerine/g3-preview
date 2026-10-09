@@ -71431,6 +71431,7 @@
         "TestSATSolverOptionalDispatchGuardFollowsRealPopToBase",
         "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
         "TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula",
+        "TestSATSolverNativeMarksScopeTruncationAndRegrowth",
         "TestSATSolverOwningWatchShrinkRetainsOuterCapacity",
         "TestSATSolverSourceUserScopeFiniteCycle",
         "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph",
@@ -72462,6 +72463,7 @@
           "tests": [
             "TestSATSolverSourceUserScopeFiniteCycle",
             "TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula",
+            "TestSATSolverNativeMarksScopeTruncationAndRegrowth",
             "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
             "TestSATSolverOwningWatchShrinkRetainsOuterCapacity"
           ]
@@ -72875,7 +72877,8 @@
         "Cleaner interruption continuation is charged in the lifecycle header; owning Close drains only retained prefix and unread suffix with actual cursors. Source callbacks run while active; stopped lifecycle and direct pushClause reject later owning publication.",
         "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
         "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call.",
-        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Binary-clause pairs use native typed slices in solver, inspection and tactic recovery; output append returns the completed prefix on error. Simulated buffer allocation and destructor failures are removed. Constructor sweeps of actual retained reservations, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
+        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Binary-clause pairs use native typed slices in solver, inspection and tactic recovery; output append returns the completed prefix on error. Simulated buffer allocation and destructor failures are removed. Constructor sweeps of actual retained reservations, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success.",
+        "Variable and literal marks use concrete Go Boolean slices. Native backing is outside arena/Runtime accounting; creation order, duplicate-mark assertions, scope truncation/regrowth, and retained algorithm marks remain covered."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
@@ -73239,6 +73242,7 @@
         "TestSATSolverOptionalDispatchGuardFollowsRealPopToBase",
         "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
         "TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula",
+        "TestSATSolverNativeMarksScopeTruncationAndRegrowth",
         "TestSATSolverOwningWatchShrinkRetainsOuterCapacity",
         "TestSATSolverSourceUserScopeFiniteCycle",
         "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph",
@@ -73727,6 +73731,7 @@
           "tests": [
             "TestSATSolverSourceUserScopeFiniteCycle",
             "TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula",
+            "TestSATSolverNativeMarksScopeTruncationAndRegrowth",
             "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
             "TestSATSolverOwningWatchShrinkRetainsOuterCapacity"
           ]
@@ -73922,7 +73927,8 @@
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
         "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
         "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call.",
-        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Binary-clause pairs use native typed slices in solver, inspection and tactic recovery; output append returns the completed prefix on error. Simulated buffer allocation and destructor failures are removed. Constructor sweeps of actual retained reservations, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
+        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Binary-clause pairs use native typed slices in solver, inspection and tactic recovery; output append returns the completed prefix on error. Simulated buffer allocation and destructor failures are removed. Constructor sweeps of actual retained reservations, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success.",
+        "Variable and literal marks use concrete Go Boolean slices. Native backing is outside arena/Runtime accounting; creation order, duplicate-mark assertions, scope truncation/regrowth, and retained algorithm marks remain covered."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",

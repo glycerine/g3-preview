@@ -73,32 +73,36 @@ func (d *satSolverDynamicSubsumption) Close() error {
 	return nil
 }
 func (d *satSolverDynamicSubsumption) marked(l Literal) (bool, error) {
-	n, e := d.analysis.propagation.variables.literalMark.Read(l.index())
-	return n != 0, e
+	marks := d.analysis.propagation.variables.literalMark
+	if uint64(l.index()) >= uint64(len(marks)) {
+		if satStorageSourceDebug {
+			return false, ErrSATAssertion
+		}
+		return false, arena.ErrBounds
+	}
+	return marks[l.index()], nil
 }
 func (d *satSolverDynamicSubsumption) mark(l Literal) error {
-	if satStorageSourceDebug {
-		yes, e := d.marked(l)
-		if e != nil {
-			return e
-		}
-		if yes {
-			return ErrSATAssertion
-		}
+	yes, e := d.marked(l)
+	if e != nil {
+		return e
 	}
-	return d.analysis.propagation.variables.literalMark.Write(l.index(), 1)
+	if satStorageSourceDebug && yes {
+		return ErrSATAssertion
+	}
+	d.analysis.propagation.variables.literalMark[l.index()] = true
+	return nil
 }
 func (d *satSolverDynamicSubsumption) unmark(l Literal) error {
-	if satStorageSourceDebug {
-		yes, e := d.marked(l)
-		if e != nil {
-			return e
-		}
-		if !yes {
-			return ErrSATAssertion
-		}
+	yes, e := d.marked(l)
+	if e != nil {
+		return e
 	}
-	return d.analysis.propagation.variables.literalMark.Write(l.index(), 0)
+	if satStorageSourceDebug && !yes {
+		return ErrSATAssertion
+	}
+	d.analysis.propagation.variables.literalMark[l.index()] = false
+	return nil
 }
 func (d *satSolverDynamicSubsumption) eliminateIfMarked(l, fuip Literal) error {
 	yes, e := d.marked(l)
