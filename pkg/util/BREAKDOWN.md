@@ -374,7 +374,8 @@ vectors, heaps, parameter services, AST utilities, and assertion handling use
 it. Future warning and trace entry points should be introduced with their first
 real consumer and should use `fmt`, `io.Writer`, and ordinary string sets. The
 deleted formatter was a manual C `printf`/`va_list` simulation and must not be
-reintroduced.
+reintroduced. The unused `DebugContext` tag-runtime pointer and binding API
+have also been removed; tag operations use the Go map directly.
 
 Two more actual table implementations have been removed. The concrete
 `Int32ChainTable`/`Int32ChainMap` port represented `chashtable`/`cmap`

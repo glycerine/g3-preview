@@ -26,7 +26,6 @@ var ErrDebugContextOwner = errors.New("g3: invalid debug context owner")
 type DebugContext struct {
 	Self             *DebugContext
 	BudgetField      *arena.Budget
-	TagRuntime       *Runtime
 	Tags             map[string]struct{}
 	region           *arena.BytesRegion
 	assertionStreams *MemoryStandardStreams
@@ -132,24 +131,4 @@ func (d *DebugContext) ConditionalAssertionEnabled(tag string) (bool, error) {
 		return false, e
 	}
 	return d.IsDebugEnabled(tag)
-}
-
-func (d *DebugContext) canBindTagRuntime(r *Runtime) error {
-	if e := d.open(); e != nil {
-		return e
-	}
-	if r == nil || r.Budget() != d.BudgetField {
-		return arena.ErrConfig
-	}
-	if d.TagRuntime != nil && d.TagRuntime != r {
-		return arena.ErrConfig
-	}
-	return nil
-}
-func (d *DebugContext) BindTagRuntime(r *Runtime) error {
-	if e := d.canBindTagRuntime(r); e != nil {
-		return e
-	}
-	d.TagRuntime = r
-	return nil
 }

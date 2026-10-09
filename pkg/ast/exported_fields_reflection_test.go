@@ -497,8 +497,6 @@ func testExportedFieldNames(name string) (string, string) {
 		return "Table", ""
 	case "tag":
 		return "Tag", ""
-	case "tagRuntime":
-		return "TagRuntime", ""
 	case "tags":
 		return "Tags", ""
 	case "temporary":
