@@ -47,12 +47,6 @@ func fastAudit(t *testing.T, m *FastFloatManager, values ...*FastFloat) {
 			refs[r] = true
 		}
 	}
-	for _, v := range []ffVector{m.significands, m.metadata, m.freeIDs, m.setBuffer} {
-		add(v.ref)
-	}
-	for _, v := range m.buffers {
-		add(v.ref)
-	}
 	for _, r := range m.natural.divScratch {
 		add(r)
 	}
@@ -488,7 +482,7 @@ func fastOwnedBytes(m *FastFloatManager) uint64 {
 func TestFastFloatActualWholeGraphCharges(t *testing.T) {
 	m := fastManager(t, 5)
 	budget := m.config.Storage.Descriptors.Budget
-	if m.words.Stats().Live != 7 || m.capacity != 1024 || m.live != 1 {
+	if m.words.Stats().Live != 0 || m.capacity != 1024 || m.live != 1 {
 		t.Fatal("cold graph", m.words.Stats(), m.capacity, m.live)
 	}
 	if budget.Used() != fastOwnedBytes(m) {

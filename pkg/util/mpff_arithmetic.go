@@ -345,10 +345,10 @@ func (m *FastFloatManager) Div(a, b, c *FastFloat) error {
 	if SourceExtendedGCDDebug && !(!ffIsZero(m.buffer(0, 2*m.precision)) && !ffIsZero(m.sig(b)) && ffNLZ(m.buffer(0, 2*m.precision)) == 0) {
 		return ErrFastFloatInvariant
 	}
-	av := limbView{words: m.words, ref: m.buffers[0].ref, size: 2 * m.precision}
-	bv := limbView{words: m.words, ref: m.buffers[3].ref, size: m.precision}
-	qv := limbView{words: m.words, ref: m.buffers[1].ref, size: m.precision + 1}
-	rv := limbView{words: m.words, ref: m.buffers[2].ref, size: m.precision}
+	av := limbView{external: m.buffers[0], size: 2 * m.precision}
+	bv := limbView{external: m.buffers[3], size: m.precision}
+	qv := limbView{external: m.buffers[1], size: m.precision + 1}
+	rv := limbView{external: m.buffers[2], size: m.precision}
 	if _, e := m.natural.divide(av, bv, qv, rv); e != nil {
 		return e
 	}

@@ -225,5 +225,5 @@ func (m *FastFloatManager) Stats() (FastFloatStats, error) {
 	if e := m.open(); e != nil {
 		return FastFloatStats{}, e
 	}
-	return FastFloatStats{m.headerBytes, m.precision, m.capacity, m.significands.capacity, m.next, m.live, m.freeIDs.size}, nil
+	return FastFloatStats{m.headerBytes, m.precision, m.capacity, uint32(cap(m.significands)), m.next, m.live, uint32(len(m.freeIDs))}, nil
 }

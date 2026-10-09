@@ -28,7 +28,7 @@ func fastNaturalView(v ffLimbView) limbView {
 	if v.external != nil {
 		return limbView{external: v.external[v.offset:], size: v.size}
 	}
-	return limbView{words: v.m.words, ref: v.v.ref, size: v.size}
+	return limbView{external: (*v.v)[v.offset:], size: v.size}
 }
 func (m *FastFloatManager) beginFastCharacters(v ffLimbView, offset uint32) (uint32, error) {
 	n := v.size

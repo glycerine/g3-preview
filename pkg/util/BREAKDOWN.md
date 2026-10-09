@@ -891,3 +891,13 @@ explicit resource ownership and failure cleanup; they are a separate remaining
 step. AST and polynomial physical-root audits now count only those real numeric
 allocations, and retained tests cover output, bounds, stale views, inner numeric
 failures, and cleanup.
+
+MPFF's retained significands, handle metadata, recycled-ID stack, conversion
+scratch, and arithmetic scratch now use concrete `[]uint32` storage. Native Go
+growth replaces the copied vector capacity schedule and its arena descriptors.
+Generation checks, numeric slot recycling, original arithmetic/rounding, and
+manager cleanup remain explicit. The division and decimal bridges now borrow
+these slices directly; shared MPN resources remain separate. A focused test grows
+through multiple pool sizes with arena allocation disabled, verifies retained
+values, and verifies generation advancement after numeric slot reuse, including stale
+handle rejection in the checked profile.

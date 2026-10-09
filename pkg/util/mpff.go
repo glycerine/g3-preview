@@ -47,11 +47,6 @@ var ErrFastFloatInvariant = errors.New("mpnum: MPFF source invariant")
 var ErrFastFloatPowerDomain = errors.New("mpnum: MPFF power mask wrapped into nontermination")
 var ErrFastFloatOwner = errors.New("mpnum: invalid MPFF owner or dead significand")
 
-type ffVector struct {
-	ref            arena.VectorRef
-	size, capacity uint32
-}
-
 // Cold owner: owns its buffers and services, borrowing a configured Runtime; caller numerical
 // conversion managers are borrowed only for their individual operation.
 type FastFloatManager struct {
@@ -62,8 +57,8 @@ type FastFloatManager struct {
 	precision, bits, capacity, next, live      uint32
 	toPlus, closed                             bool
 	headerBytes                                uint64
-	significands, metadata, freeIDs, setBuffer ffVector
-	buffers                                    [4]ffVector
+	significands, metadata, freeIDs, setBuffer []uint32
+	buffers                                    [4][]uint32
 	formatting                                 fastFormattingScope
 	closing                                    bool
 	one                                        FastFloat
@@ -167,62 +162,37 @@ func (m *FastFloatManager) triple(a, b, c *FastFloat) error {
 	}
 	return m.check(c)
 }
-func (m *FastFloatManager) read(v *ffVector, i uint32) uint32 {
-	n, e := m.words.Read(v.ref, i)
-	if e != nil {
-		panic(e)
+func (m *FastFloatManager) read(v *[]uint32, i uint32) uint32 { return (*v)[i] }
+func (m *FastFloatManager) write(v *[]uint32, i, n uint32)    { (*v)[i] = n }
+func (m *FastFloatManager) reserve(v *[]uint32, n uint32) error {
+	if uint64(n) > uint64(^uint(0)>>1) {
+		return arena.ErrBounds
 	}
-	return n
-}
-func (m *FastFloatManager) write(v *ffVector, i, n uint32) {
-	if e := m.words.Write(v.ref, i, n); e != nil {
-		panic(e)
-	}
-}
-func (m *FastFloatManager) reserve(v *ffVector, n uint32) error {
-	for v.capacity < n {
-		c := uint64(2)
-		if v.capacity != 0 {
-			c = (3*uint64(v.capacity) + 1) / 2
-		}
-		if c > uint64(^uint32(0))/4 || c <= uint64(v.capacity) {
-			return arena.ErrBounds
-		}
-		var r arena.VectorRef
-		var e error
-		if v.ref == (arena.VectorRef{}) {
-			r, e = m.words.Allocate(v.size, uint32(c))
-		} else {
-			r, e = m.words.Reserve(v.ref, uint32(c))
-		}
-		if e != nil {
-			return e
-		}
-		v.ref = r
-		v.capacity = uint32(c)
+	if int(n) > cap(*v) {
+		old := len(*v)
+		*v = append(*v, make([]uint32, int(n)-old)...)
+		*v = (*v)[:old]
 	}
 	return nil
 }
-func (m *FastFloatManager) resize(v *ffVector, n uint32) error {
+func (m *FastFloatManager) resize(v *[]uint32, n uint32) error {
 	if e := m.reserve(v, n); e != nil {
 		return e
 	}
-	if n == 0 && v.ref == (arena.VectorRef{}) {
-		v.size = 0
-		return nil
+	old := len(*v)
+	if int(n) < old {
+		clear((*v)[n:])
 	}
-	r, e := m.words.Resize(v.ref, n)
-	if e != nil {
-		return e
+	*v = (*v)[:n]
+	if int(n) > old {
+		clear((*v)[old:])
 	}
-	v.ref = r
-	v.size = n
 	return nil
 }
 func (m *FastFloatManager) mkID() uint32 {
-	if m.freeIDs.size != 0 {
-		i := m.read(&m.freeIDs, m.freeIDs.size-1)
-		m.resize(&m.freeIDs, m.freeIDs.size-1)
+	if len(m.freeIDs) != 0 {
+		i := m.read(&m.freeIDs, uint32(len(m.freeIDs))-1)
+		m.resize(&m.freeIDs, uint32(len(m.freeIDs))-1)
 		return i
 	}
 	i := m.next
@@ -250,9 +220,8 @@ func (m *FastFloatManager) allocate(a *FastFloat) error {
 		}
 		m.capacity = uint32(c)
 	}
-	// Real capacity preflight ensures every live block can be lexically reclaimed
-	// without Reserve even under the failure that caused its caller to unwind.
-	needed := uint64(m.freeIDs.size) + uint64(m.live) + 1
+	// Reserve native recycled-ID storage before publishing the new live block.
+	needed := uint64(len(m.freeIDs)) + uint64(m.live) + 1
 	if needed > uint64(^uint32(0)) {
 		return arena.ErrBounds
 	}
@@ -289,7 +258,7 @@ func (m *FastFloatManager) Del(a *FastFloat) error {
 	}
 	g := m.read(&m.metadata, 2*i+1)
 	if g != ^uint32(0) {
-		n := m.freeIDs.size
+		n := uint32(len(m.freeIDs))
 		if e := m.resize(&m.freeIDs, n+1); e != nil {
 			return e
 		}
@@ -339,6 +308,8 @@ func (m *FastFloatManager) CloseChecked() error {
 		}
 		m.words.Close()
 	}
+	m.significands, m.metadata, m.freeIDs, m.setBuffer = nil, nil, nil, nil
+	m.buffers = [4][]uint32{}
 	m.config.Storage.Descriptors.Budget.Release(m.headerBytes)
 	m.headerBytes = 0
 	m.closed = true

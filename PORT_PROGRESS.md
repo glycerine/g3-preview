@@ -7916,6 +7916,14 @@ certify HEAD/current drafts.
 >
 > Config is explicit FastFloatConfig{PrecisionWords,InitialCapacity,Storage}; DefaultFastFloatConfig uses source2/1024/minus-infinity. Accept precision>=2 including finite odd3/5; explicit little-endian limb composition replaces alignment-dependent uint64 reinterpret casts. Reject width0/1 and signed-bit/byte/offset/host-index overflow as checked-domain adapters; no parity cap. Borrowed Budget must exist. Owners are confined, not concurrent.
 >
+> Storage update (2026-10-09): MPFF's significands, metadata, recycled IDs,
+> conversion scratch and arithmetic scratch now use native `[]uint32`.
+> Their copied vector growth, Words descriptors and arena backing charges are
+> removed. The physical vector topology described below records the earlier
+> implementation; current ownership and tests are recorded in
+> `port_manifest.json` and `pkg/util/BREAKDOWN.md`. Numeric algorithms, logical
+> slot capacity, generation advancement and checked handle validation remain.
+>
 > The manager charges its actual header, one owned arena.Words header/descriptor/pages, one private NaturalManager header borrowing those Words, contiguous significands, four 2*precision buffers, ID recycle storage, validity/generation sidecar, lazy set buffer and every persistent decimal/format workspace. The cold actual Words graph has11 live vector roots: significands, metadata, recycle, four MPFF buffers and four Natural scratch vectors. The manager's scalar one owns one block. Actual whole-graph byte tests sum nested physical stats without counting referenced Words twice. Caller conversion managers are borrowed and never closed by MPFF.
 >
 > Source logical block capacity doubles; physical significand/vector requested backing grows2→(3n+1)/2 separately from arena geometry. Publication of logical capacity occurs after backing preparation; typed allocation failure retains completed physical growth and consumed source ID gaps. Allocation preflights actual free-ID backing BEFORE publishing each live block. This is a storage/failure adaptation ensuring lexical Del cannot allocate under an exhausted Budget. Source LIFO recycling and stale scalar bits after Del are preserved; Reset is separate. All builds own a real charged validity/generation sidecar; checked ffRef64 includes generation upper32, release ffRef32 retains packed sign/index31. Generation-exhausted slots retire. Raw numerical handles have implicit manager ownership; scalar handles do not promise detection of every cross-manager/recycled-release misuse. Cold scopes validate explicit provenance/self-copy before actions.

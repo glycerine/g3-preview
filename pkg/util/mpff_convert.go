@@ -105,13 +105,13 @@ func (m *FastFloatManager) SetInteger(a *FastFloat, z *IntegerManager, v *Int) e
 		return e
 	}
 	a.sign(negative)
-	for m.setBuffer.size < m.precision {
-		if e = m.resize(&m.setBuffer, m.setBuffer.size+1); e != nil {
+	for uint32(len(m.setBuffer)) < m.precision {
+		if e = m.resize(&m.setBuffer, uint32(len(m.setBuffer))+1); e != nil {
 			return e
 		}
-		m.write(&m.setBuffer, m.setBuffer.size-1, 0)
+		m.write(&m.setBuffer, uint32(len(m.setBuffer))-1, 0)
 	}
-	w := ffLimbView{m: m, v: &m.setBuffer, size: m.setBuffer.size}
+	w := ffLimbView{m: m, v: &m.setBuffer, size: uint32(len(m.setBuffer))}
 	lz := ffNLZ(w)
 	if SourceExtendedGCDDebug && !(lz != 0) {
 		return ErrFastFloatInvariant

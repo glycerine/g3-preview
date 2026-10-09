@@ -8,7 +8,7 @@ import (
 type ffLimbView struct {
 	external     []uint32
 	m            *FastFloatManager
-	v            *ffVector
+	v            *[]uint32
 	offset, size uint32
 	literal      uint32
 }

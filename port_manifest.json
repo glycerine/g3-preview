@@ -128151,7 +128151,8 @@
         "pkg/util/scoped_fast_float.go",
         "pkg/util/mpff_format_scope.go",
         "pkg/util/mpff_format_scope_test.go",
-        "pkg/util/mpff_runtime_scope_test.go"
+        "pkg/util/mpff_runtime_scope_test.go",
+        "pkg/util/mpff_native_storage_test.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -128185,7 +128186,8 @@
         "TestFastFloatBorrowedRuntimeIdentityAndGuards",
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
         "TestFastFloatSharedRuntimeProfileAndClose",
-        "TestFastFloatBorrowedRuntimeInlineWarmScope"
+        "TestFastFloatBorrowedRuntimeInlineWarmScope",
+        "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
       ],
       "conditionals": [
         {
@@ -128606,7 +128608,8 @@
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
             "TestFastFloatOwnerProvenance",
-            "TestFastFloatNeighborAndThinRoutes"
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
           ]
         },
         {
@@ -128660,7 +128663,8 @@
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
             "TestFastFloatOwnerProvenance",
-            "TestFastFloatNeighborAndThinRoutes"
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
           ]
         },
         {
@@ -128772,15 +128776,17 @@
             "TestFastFloatBorrowedRuntimeIdentityAndGuards",
             "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
             "TestFastFloatSharedRuntimeProfileAndClose",
-            "TestFastFloatBorrowedRuntimeInlineWarmScope"
+            "TestFastFloatBorrowedRuntimeInlineWarmScope",
+            "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
           ]
         }
       ],
       "ownership": [
-        "Actual owner header, Words/Natural services, significand blocks, validity/generation metadata, recycle and eleven live vector roots plus retained text workspaces charged. Source statement and alias prefixes survive failure; lexical temporaries release with injector armed. Raw handles retain implicit manager provenance limits. See PORT_PROGRESS.md#audit-mpff-port-status-md."
+        "MPFF owns native typed slices for significands, validity/generation metadata, recycled IDs and scratch. These Go-managed backing arrays are not charged to arena. The actual owner header, Words/Natural services, real MPN resources and retained text workspaces keep their existing accounting. Source arithmetic and alias prefixes survive failure; lexical numeral temporaries release with the injector armed. Raw handles retain implicit manager provenance limits. See PORT_PROGRESS.md#audit-mpff-port-status-md."
       ],
       "deviations": [
-        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence."
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
+        "MPFF significands, handle metadata, recycled IDs, conversion scratch and arithmetic scratch use concrete Go uint32 slices. Copied vector growth, arena descriptors and storage reservation failures are removed. Numeric handle generation/recycling, arithmetic and rounding algorithms remain explicit; shared MPN workspaces retain their separate ownership."
       ]
     },
     {
@@ -128800,7 +128806,8 @@
         "pkg/util/scoped_fast_float.go",
         "pkg/util/mpff_format_scope.go",
         "pkg/util/mpff_format_scope_test.go",
-        "pkg/util/mpff_runtime_scope_test.go"
+        "pkg/util/mpff_runtime_scope_test.go",
+        "pkg/util/mpff_native_storage_test.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -128834,7 +128841,8 @@
         "TestFastFloatBorrowedRuntimeIdentityAndGuards",
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
         "TestFastFloatSharedRuntimeProfileAndClose",
-        "TestFastFloatBorrowedRuntimeInlineWarmScope"
+        "TestFastFloatBorrowedRuntimeInlineWarmScope",
+        "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
       ],
       "conditionals": [
         {
@@ -128879,7 +128887,8 @@
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
             "TestFastFloatOwnerProvenance",
-            "TestFastFloatNeighborAndThinRoutes"
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
           ]
         },
         {
@@ -128933,7 +128942,8 @@
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
             "TestFastFloatOwnerProvenance",
-            "TestFastFloatNeighborAndThinRoutes"
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
           ]
         },
         {
@@ -129045,15 +129055,17 @@
             "TestFastFloatBorrowedRuntimeIdentityAndGuards",
             "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
             "TestFastFloatSharedRuntimeProfileAndClose",
-            "TestFastFloatBorrowedRuntimeInlineWarmScope"
+            "TestFastFloatBorrowedRuntimeInlineWarmScope",
+            "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
           ]
         }
       ],
       "ownership": [
-        "Actual owner header, Words/Natural services, significand blocks, validity/generation metadata, recycle and eleven live vector roots plus retained text workspaces charged. Source statement and alias prefixes survive failure; lexical temporaries release with injector armed. Raw handles retain implicit manager provenance limits. See PORT_PROGRESS.md#audit-mpff-port-status-md."
+        "MPFF owns native typed slices for significands, validity/generation metadata, recycled IDs and scratch. These Go-managed backing arrays are not charged to arena. The actual owner header, Words/Natural services, real MPN resources and retained text workspaces keep their existing accounting. Source arithmetic and alias prefixes survive failure; lexical numeral temporaries release with the injector armed. Raw handles retain implicit manager provenance limits. See PORT_PROGRESS.md#audit-mpff-port-status-md."
       ],
       "deviations": [
-        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence."
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
+        "MPFF significands, handle metadata, recycled IDs, conversion scratch and arithmetic scratch use concrete Go uint32 slices. Copied vector growth, arena descriptors and storage reservation failures are removed. Numeric handle generation/recycling, arithmetic and rounding algorithms remain explicit; shared MPN workspaces retain their separate ownership."
       ]
     },
     {
