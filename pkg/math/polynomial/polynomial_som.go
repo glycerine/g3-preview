@@ -27,7 +27,7 @@ type polynomialSOM struct {
 	removePrefix, removeSuffix                  uint32
 	owner                                       *MultivariatePolynomialCore
 	positions                                   MonomialPositions
-	as                                          polynomialVector
+	as                                          polynomialNumerals
 	ms                                          polynomialMonomials
 	gcd                                         util.Int
 	gcdActive                                   bool
@@ -50,7 +50,7 @@ type polynomialSOM struct {
 func (b *polynomialSOM) init(m *MultivariatePolynomialCore, cheap bool) {
 	b.owner = m
 	b.cheap = cheap
-	b.as.width = 12
+
 	b.positions.manager = m.monomials
 	b.positions.self = &b.positions
 }
@@ -163,11 +163,6 @@ func (b *polynomialSOM) addConsumedScalarNegEngine(a *util.Int, term Monomial, t
 	}
 	if b.appendScope.active {
 		if e = b.prepareAppendTags(n + 1); e != nil {
-			return e
-		}
-	}
-	if b.retirementOwner != nil {
-		if e = b.retirementOwner.prepareRetirement(n + 1); e != nil {
 			return e
 		}
 	}
@@ -452,11 +447,6 @@ func (b *polynomialSOM) addSourceInputWithArithmeticReceipt(a *util.Int, term Mo
 			}
 			if b.appendScope.active {
 				if e = b.prepareAppendTags(n + 1); e != nil {
-					return e
-				}
-			}
-			if b.retirementOwner != nil {
-				if e = b.retirementOwner.prepareRetirement(n + 1); e != nil {
 					return e
 				}
 			}
@@ -860,7 +850,7 @@ func (b *polynomialSOM) normalizeWithOwner(parent *polynomialNormalizeScope) (re
 			result = errors.Join(result, cleanup)
 		}
 	}()
-	e = numericIntegerModularManager_gcdManyIndexedWithSOMNormalizeReceipt(m.modular, util.IntegerArrayView{Runtime: m.memory, Raw: b.as.raw, Count: n, Offset: 8, Stride: 12}, &b.gcd, &b.normalizeScope.receipt)
+	e = numericIntegerModularManager_gcdManyIndexedWithSOMNormalizeReceipt(m.modular, util.IntegerArrayView{Values: b.as.values, Count: n}, &b.gcd, &b.normalizeScope.receipt)
 	if e != nil {
 		return e
 	}
@@ -964,9 +954,6 @@ func (b *polynomialSOM) close() error {
 	as, e := b.as.size(m)
 	if e != nil {
 		return e
-	}
-	if b.as.interrupted && as > b.as.initialized {
-		as = b.as.initialized
 	}
 	// An interrupted source reset has already consumed the preceding actual
 	// monomial fields. Owning cleanup resumes known fields, never replays reset.

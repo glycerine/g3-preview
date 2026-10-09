@@ -12,8 +12,7 @@ func TestPolynomialIndexedArrayGCDEarlyOneLeavesTailUnread(t *testing.T) {
 	v := &m.linearTerms
 	serviceMust(t, v.appendCoefficient(m, util.NewInt(1)))
 	serviceMust(t, v.appendCoefficient(m, util.NewInt(1)))
-	serviceMust(t, v.expand(m))
-	view := util.IntegerArrayView{Runtime: m.memory, Raw: v.raw, Count: 3, Offset: 8, Stride: 12}
+	view := util.IntegerArrayView{Values: v.values, Count: 3}
 	var g util.Int
 	serviceMust(t, m.modular.GCDManyIndexed(view, &g))
 	if g != util.NewInt(1) {

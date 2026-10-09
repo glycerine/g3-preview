@@ -11,8 +11,8 @@ import (
 
 func TestPolynomialTermsIndexedNativeSliceAndResetBeforeRead(t *testing.T) {
 	m := polynomialCellFixture(t)
-	var as polynomialVector
-	as.width = 12
+	var as polynomialNumerals
+
 	serviceMust(t, as.appendCoefficient(m, util.NewInt(3)))
 	unit, e := m.monomials.Unit()
 	serviceMust(t, e)
@@ -41,8 +41,8 @@ func TestPolynomialTermsIndexedNativeSliceAndResetBeforeRead(t *testing.T) {
 
 func TestPolynomialTermsIndexedNativeSliceAndUnreachedTail(t *testing.T) {
 	m := polynomialCellFixture(t)
-	var as polynomialVector
-	as.width = 12
+	var as polynomialNumerals
+
 	serviceMust(t, as.appendCoefficient(m, util.NewInt(5)))
 	unit, e := m.monomials.Unit()
 	serviceMust(t, e)

@@ -44,7 +44,7 @@ func (c integerAllocationInvocationContext) prepareFactorHistory(z *util.Integer
 		return prepareConverterParentHistory(z, &r.frame.converterHistoryParent)
 	}
 	if r := c.somNormalizeReceipt(z); r != nil {
-		return r.manager.prepareNormalizationConverterHistoryAtAllocation(nil, nil, r)
+		return r.manager.prepareNormalizationConverterHistoryAtAllocation(nil, r)
 	}
 	if r := c.factorConstant; r != nil && numericIntegerManager_factorConstantContextRoots(z, c) != nil {
 		return r.manager.archiveFactorConstantHistory()
@@ -97,7 +97,7 @@ func prepareConverterParentHistory(z *util.IntegerManager, r *polynomialFactorNu
 
 // Diagnostic-only allocation records follow concrete reached normalization
 // child tuples. They never acquire NUM, reference, vector or factory authority.
-func (c *MultivariatePolynomialCore) prepareNormalizationConverterHistoryAtAllocation(v *polynomialVector, f *polynomialFactoryInvocationReceipt, som *polynomialSOMNormalizeInvocationReceipt) error {
+func (c *MultivariatePolynomialCore) prepareNormalizationConverterHistoryAtAllocation(f *polynomialFactoryInvocationReceipt, som *polynomialSOMNormalizeInvocationReceipt) error {
 	if c == nil || c.self != c || c.callbackDepth != 0 {
 		return nil
 	}
@@ -107,9 +107,6 @@ func (c *MultivariatePolynomialCore) prepareNormalizationConverterHistoryAtAlloc
 	}
 	s := r.frame
 	reached := false
-	if v != nil && v == &c.cheap.as && c.cheap.matchesAppendInvocation(&s.append) {
-		reached = true
-	}
 	if f != nil && c.matchesFactoryInvocation(f) && *f == s.factory {
 		reached = true
 	}

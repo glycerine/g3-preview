@@ -127,7 +127,7 @@ type MultivariatePolynomialCore struct {
 	zero, unit                                                   Polynomial
 	zeroNumeral                                                  util.Int
 	minusOne, constantCopy                                       util.Int
-	rationalTerms, linearTerms                                   polynomialVector
+	rationalTerms, linearTerms                                   polynomialNumerals
 	linearMonomials                                              []Monomial
 	origin, header                                               uint64
 	live                                                         uint32
@@ -223,8 +223,7 @@ func (m *MultivariatePolynomialCore) initializePolynomialCoreBody() error {
 		return e
 	}
 	m.monomialRetained = true
-	m.rationalTerms.width = 12
-	m.linearTerms.width = 12
+
 	m.som.init(m, false)
 	m.som2.init(m, false)
 	m.cheap.init(m, true)
@@ -643,7 +642,7 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 		}
 		m.closeStage++
 	}
-	for _, v := range [2]*polynomialVector{&m.rationalTerms, &m.linearTerms} {
+	for _, v := range [2]*polynomialNumerals{&m.rationalTerms, &m.linearTerms} {
 		if e := v.close(m); e != nil {
 			return e
 		}

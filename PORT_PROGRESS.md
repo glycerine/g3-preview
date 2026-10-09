@@ -31802,3 +31802,48 @@ and portcheck passed. Counts remain 2102 units / 677 APIs: 63 ported, 284 partia
 The overall knot/split goal remains open. Polynomial SOM/core numeral vectors
 and SAT scalar/map/vector collections still require native conversion, followed
 by internal util numeric/text/parameter dependency seams and the package split.
+
+## Native shared polynomial numeral collections
+
+All four core SOM coefficient collections, rational/linear constructor workspaces
+and standalone SOM sorting scratch now use concrete native []util.Int storage.
+Removed the shared byte vector codec, cap/size headers, 3/2 growth, old/pending
+relocation, initialized high-water fields and container release failures. Native
+shrink/reset retain only actual discarded BIG tokens in a native owning slice;
+inline scalars and zero fields need no retirement. Real numeric Del/refusal and
+stopped destructor continuation remain. Full-manager source destruction retains
+these same fields rather than creating six charged retirement directories.
+
+Native borrowed inputs use actual slice element pointers. Removed the vector
+variant from univariate input views, mkUnivariateVector and the separate vector
+route/writeback of linear inputs. Normalize GCD borrows the actual native fields;
+division reads the reached remainder after its original product/divisor guards.
+Sorting moves actual numeral handles with their monomials; abandoned BIG locals
+are retained for owning cleanup without retaining zero rows or charging capacity.
+
+Independent growth/reset/shrink/bounds fixtures cover all six core collections
+through 4097 rows under disabled Runtime reservations. A BIG fixture verifies
+the exact discarded token survives reset/regrowth and is consumed by owning
+cleanup. The 129-power permutation verifies every independently calculated
+coefficient with the complete sort under disabled reservations; another sort
+fixture moves actual BIG coefficients with unchanged Runtime accounting.
+
+Five tests of removed container topology/failure paths are retired, including
+the corrupted-vector-header normalization read. Existing real normalization
+numeric/destructor campaigns remain. Regular row acquisition now checks the
+completed INC and coefficient slot before a genuine large numeric Copy failure.
+SOM add/multiply and scalar transport fixtures use larger actual numeral inputs
+to reach real allocation faults after removing container traffic. Failed source
+scratch replacement remains a stopped numeric lifetime and is not repaired for
+retry. Cheap reset now verifies real BIG deletion rather than reading discarded
+inline scalar bytes through spare capacity. Native bounds replace those reads.
+
+Validation: full native polynomial package passed (36.760s); focused g3debug
+constructor/SOM/native numeral/normalization/divides/GCD/imp/factory/scalar checks
+passed (5.484s). Module-wide test compilation, polynomial vet, gofmt/diff checks
+and portcheck passed. Counts unchanged. The full native module checkpoint at
+21:43–21:45 UTC remains the last complete module run.
+
+The full knot/split goal remains open. Continue auditing retained container
+consumers, including remaining monomial scratch/table storage and SAT collections,
+then resolve internal util numeric/text/parameter seams before the package split.

@@ -3,80 +3,8 @@
 package polynomial
 
 import (
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/util"
 )
-
-type polynomialImpRetirement struct {
-	fields          []util.Int
-	captured, drain uint32
-	consumed        bool
-}
-
-func (m *MultivariatePolynomialManager) sourceVectorIndex(v *polynomialVector) int {
-	for i, p := range [6]*polynomialVector{&m.core.cheap2.as, &m.core.cheap.as, &m.core.som2.as, &m.core.som.as, &m.core.linearTerms, &m.core.rationalTerms} {
-		if v == p {
-			return i
-		}
-	}
-	return -1
-}
-func (m *MultivariatePolynomialManager) retireSourceNumeralVector(v *polynomialVector) error {
-	i := m.sourceVectorIndex(v)
-	if i < 0 {
-		return ErrPolynomialOwner
-	}
-	r := &m.retirements[i]
-	if r.consumed {
-		return nil
-	}
-	for r.captured < v.initialized {
-		a, e := v.coefficient(m.core, r.captured)
-		if e != nil {
-			return e
-		}
-		if len(r.fields) == cap(r.fields) {
-			old := cap(r.fields)
-			c := old + old/2 + 1
-			stride := uint64(reflect.TypeOf(util.Int{}).Size())
-			if e = m.core.integer.Budget().Reserve(uint64(c) * stride); e != nil {
-				return e
-			}
-			next := make([]util.Int, len(r.fields), c)
-			copy(next, r.fields)
-			r.fields = next
-			m.core.integer.Budget().Release(uint64(old) * stride)
-		}
-		r.fields = append(r.fields, a)
-		r.captured++
-	}
-	if v.raw != (util.Block{}) {
-		e := m.core.memory.Deallocate(&v.raw)
-		if v.raw == (util.Block{}) {
-			r.consumed = true
-		}
-		return e
-	}
-	r.consumed = true
-	return nil
-}
-func (m *MultivariatePolynomialManager) cleanupRetirement(i int) error {
-	r := &m.retirements[i]
-	if r.consumed {
-		for r.drain < uint32(len(r.fields)) {
-			if e := m.core.integer.Del(&r.fields[r.drain]); e != nil {
-				return e
-			}
-			r.drain++
-		}
-		v := [6]*polynomialVector{&m.core.cheap2.as, &m.core.cheap.as, &m.core.som2.as, &m.core.som.as, &m.core.linearTerms, &m.core.rationalTerms}[i]
-		v.initialized = 0
-	}
-	m.core.integer.Budget().Release(uint64(cap(r.fields)) * uint64(reflect.TypeOf(util.Int{}).Size()))
-	r.fields = nil
-	return nil
-}
 
 // Returns actual named owning fields; a directory is never swept to recover
 // caller values. Repeat traversal is cold and allocation-free.
@@ -342,12 +270,6 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 			return e
 		}
 		m.cleanupStage++
-	}
-	for i := range m.retirements {
-		if e := m.cleanupRetirement(i); e != nil {
-			m.cleanupCause = e
-			return e
-		}
 	}
 	if m.factorService != nil && !m.factorService.closed {
 		if e := m.factorService.Close(); e != nil {

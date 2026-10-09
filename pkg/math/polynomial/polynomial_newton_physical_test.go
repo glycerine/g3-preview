@@ -91,7 +91,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		serviceMust(t, e)
 		cell(m.pending.value, l.initializedCoefficients)
 	}
-	vectors := []*polynomialVector{&m.rationalTerms, &m.linearTerms}
+	vectors := []*polynomialNumerals{&m.rationalTerms, &m.linearTerms}
 	extraBytes := adapterBytes
 	addPolynomial := func(p Polynomial) {
 		if p == (Polynomial{}) {
@@ -180,26 +180,11 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		vectors = append(vectors, &b.as)
 	}
 	for _, v := range vectors {
-		if v.width != 12 {
-			continue
+		for _, a := range v.values {
+			add(a)
 		}
-		if v.raw != (util.Block{}) {
-			for i := uint32(0); i < v.initialized; i++ {
-				a, e := v.coefficient(m, i)
-				serviceMust(t, e)
-				add(a)
-			}
-		}
-		if v.old != (util.Block{}) {
-			old := polynomialVector{raw: v.old, width: 12}
-			for i := v.moved; i < v.oldInitialized; i++ {
-				a, e := old.coefficient(m, i)
-				serviceMust(t, e)
-				add(a)
-			}
-		}
-		for i := uint32(0); i < v.retiredActive; i++ {
-			add(v.retired[i])
+		for _, a := range v.retired {
+			add(a)
 		}
 	}
 	for slot := uint64(1); slot <= uint64(z.Cells.Stats().Slots); slot++ {
@@ -249,11 +234,6 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		put(tmp.raw)
 		put(tmp.pending)
 	}
-	for _, v := range vectors {
-		put(v.raw)
-		put(v.pending)
-		put(v.old)
-	}
 
 	za, ma := z.SourceAllocator().Stats(), mm.allocator.Stats()
 	if uint32(len(raw))+za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
@@ -265,9 +245,6 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 	}
 	if q != nil {
 		bytes += q.HeaderBytes
-	}
-	for _, v := range vectors {
-		bytes += uint64(cap(v.retired)) * uint64(reflect.TypeOf(util.Int{}).Size())
 	}
 	for _, h := range handlers {
 		if h == nil || h.self != h || h.budget != z.Budget() {

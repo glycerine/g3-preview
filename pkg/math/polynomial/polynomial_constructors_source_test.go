@@ -31,10 +31,14 @@ func TestPolynomialRationalArraySourceResetAssertionAndRetainedTail(t *testing.T
 	if n != want {
 		t.Fatal("actual source reset prefix", n, want)
 	}
-	v, e := m.rationalTerms.coefficient(m, 0)
-	serviceMust(t, e)
-	if v != util.NewInt(4) {
-		t.Fatal("actual initialized source tail retained", v)
+	if polynomialSourceDebug {
+		v, e := m.rationalTerms.coefficient(m, 0)
+		serviceMust(t, e)
+		if v != util.NewInt(4) {
+			t.Fatal("active conversion value", v)
+		}
+	} else if len(m.rationalTerms.values) != 0 || len(m.rationalTerms.retired) != 0 {
+		t.Fatal("native reset retained nonowning scalar fields")
 	}
 	polynomialPhysicalAudit(t, m)
 }
@@ -52,13 +56,10 @@ func TestPolynomialRationalUnivariateConsumesActualConversionFields(t *testing.T
 	if n != 0 {
 		t.Fatal(n)
 	}
-	for i := uint32(0); i < 3; i++ {
-		a, e := m.rationalTerms.coefficient(m, i)
-		serviceMust(t, e)
-		if a != (util.Int{}) {
-			t.Fatal("source add_reset/zeroDel", i, a)
-		}
+	if len(m.rationalTerms.values) != 0 || len(m.rationalTerms.retired) != 0 {
+		t.Fatal("consumed conversion retains no numeral resources")
 	}
+
 	info, e := m.Info(p)
 	serviceMust(t, e)
 	if info.Size != 2 {
@@ -91,11 +92,10 @@ func TestPolynomialLinearSourceSwapCopiesAndRetainedBigTail(t *testing.T) {
 	}
 	size, e := m.linearTerms.size(m)
 	serviceMust(t, e)
-	if size != 0 || m.linearTerms.initialized != 3 {
-		t.Fatal(size, m.linearTerms.initialized)
+	if size != 0 || len(m.linearTerms.retired) != 1 {
+		t.Fatal(size, len(m.linearTerms.retired))
 	}
-	tail, e := m.linearTerms.coefficient(m, 0)
-	serviceMust(t, e)
+	tail := m.linearTerms.retired[0]
 	got, e := m.integer.Int64(&tail)
 	serviceMust(t, e)
 	if got != 1<<40 {
@@ -129,13 +129,10 @@ func TestPolynomialRationalLinearSourceConsumesCopiedFieldsOnly(t *testing.T) {
 			t.Fatal("const input changed", a)
 		}
 	}
-	for i := uint32(0); i < 2; i++ {
-		a, e := m.rationalTerms.coefficient(m, i)
-		serviceMust(t, e)
-		if a != (util.Int{}) {
-			t.Fatal("actual converted array swaps", i, a)
-		}
+	if len(m.rationalTerms.values) != 0 || len(m.rationalTerms.retired) != 0 {
+		t.Fatal("conversion fields did not transfer")
 	}
+
 	if m.linearConstant != (util.Int{}) || m.linearConstantActive {
 		t.Fatal("source tmp_c zero at lexical end", m.linearConstant, m.linearConstantActive)
 	}

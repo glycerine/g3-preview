@@ -10,147 +10,49 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// Remaining concrete numeral vector codec. Monomial and polynomial handles
-// use native slices; only the retained numeral fields still inhabit Runtime bytes.
-type polynomialVector struct {
-	raw, pending, old                                            util.Block
-	initialized, oldInitialized, oldSize, moved, oldCleanupIndex uint32
-	retired                                                      []util.Int
-	retirementStart, retiredActive                               uint32
-	width                                                        uint32
-	interrupted                                                  bool
+// Active numerals use native storage. Discarded BIG values remain actual
+// owning resources until explicit cleanup; Go backing capacity is never charged.
+type polynomialNumerals struct {
+	values  []util.Int
+	retired []util.Int
 }
 
-func (v *polynomialVector) size(m *MultivariatePolynomialCore) (uint32, error) {
-	if v.raw == (util.Block{}) {
-		return 0, nil
-	}
-	return m.memory.ReadUint32(v.raw, 4)
+func (v *polynomialNumerals) size(m *MultivariatePolynomialCore) (uint32, error) {
+	return uint32(len(v.values)), nil
 }
-func (v *polynomialVector) capacity(m *MultivariatePolynomialCore) (uint32, error) {
-	if v.raw == (util.Block{}) {
-		return 0, nil
+func (v *polynomialNumerals) coefficient(m *MultivariatePolynomialCore, i uint32) (util.Int, error) {
+	if uint64(i) >= uint64(len(v.values)) {
+		return util.Int{}, arena.ErrBounds
 	}
-	return m.memory.ReadUint32(v.raw, 0)
+	return v.values[i], nil
 }
-func (v *polynomialVector) expand(m *MultivariatePolynomialCore) error {
-	if v.interrupted || v.pending != (util.Block{}) {
-		return ErrPolynomialPending
+func (v *polynomialNumerals) putCoefficient(m *MultivariatePolynomialCore, i uint32, a util.Int) error {
+	if uint64(i) >= uint64(len(v.values)) {
+		return arena.ErrBounds
 	}
-	old, e := v.capacity(m)
-	if e != nil {
-		return e
-	}
-	n := uint32(2)
-	if v.raw != (util.Block{}) {
-		n = (3*old + 1) >> 1
-	}
-	bytes := v.width*n + 8
-	oldBytes := v.width*old + 8
-	if v.raw != (util.Block{}) && (old == 0 || n <= old || bytes <= oldBytes) {
-		return util.Failure{Kind: util.FailureVectorOverflow}
-	}
-	if e := m.prepareNormalizationConverterHistoryAtAllocation(v, nil, nil); e != nil {
-		return e
-	}
-	if v.raw == (util.Block{}) {
-		v.pending, e = m.memory.Allocate(uint64(bytes))
-		if e != nil {
-			return e
-		}
-		if e = m.memory.WriteUint32(v.pending, 0, n); e != nil {
-			return e
-		}
-		if e = m.memory.WriteUint32(v.pending, 4, 0); e != nil {
-			return e
-		}
-		v.raw = v.pending
-		v.pending = util.Block{}
-		return nil
-	}
-	return v.expandNumerals(m, n, bytes)
+	v.values[i] = a
+	return nil
 }
-func (v *polynomialVector) appendSlot(m *MultivariatePolynomialCore) (uint32, error) {
-	n, e := v.size(m)
-	if e != nil {
-		return 0, e
+func (v *polynomialNumerals) publishSize(m *MultivariatePolynomialCore, n uint32) error {
+	if uint64(n) > uint64(len(v.values)) {
+		return arena.ErrBounds
 	}
-	c, e := v.capacity(m)
-	if e != nil {
-		return 0, e
-	}
-	if n >= c {
-		if e = v.expand(m); e != nil {
-			return 0, e
+	for _, a := range v.values[n:] {
+		if a.NativeCellToken() != 0 {
+			v.retired = append(v.retired, a)
 		}
 	}
-	return n, nil
+	clear(v.values[n:])
+	v.values = v.values[:n]
+	return nil
 }
-func (v *polynomialVector) publishSize(m *MultivariatePolynomialCore, n uint32) error {
-	return m.memory.WriteUint32(v.raw, 4, n)
-}
-func (v *polynomialVector) reset(m *MultivariatePolynomialCore) error {
-	if v.raw == (util.Block{}) {
-		return nil
-	}
-	return v.publishSize(m, 0)
-}
-func (v *polynomialVector) read64(m *MultivariatePolynomialCore, o uint64) (uint64, error) {
-	a, e := m.memory.ReadUint32(v.raw, o)
-	if e != nil {
-		return 0, e
-	}
-	b, e := m.memory.ReadUint32(v.raw, o+4)
-	return uint64(a) | uint64(b)<<32, e
-}
-func (v *polynomialVector) write64(m *MultivariatePolynomialCore, o, x uint64) error {
-	if e := m.memory.WriteUint32(v.raw, o, uint32(x)); e != nil {
-		return e
-	}
-	return m.memory.WriteUint32(v.raw, o+4, uint32(x>>32))
-}
-func (v *polynomialVector) coefficient(m *MultivariatePolynomialCore, i uint32) (util.Int, error) {
-	o := uint64(8) + uint64(i)*12
-	a, e := m.memory.ReadUint32(v.raw, o)
-	if e != nil {
-		return util.Int{}, e
-	}
-	r, e := v.read64(m, o+4)
-	return util.IntFromNativeWords([3]uint32{uint32(a), uint32(r), uint32(uint64(r) >> 32)}), e
-}
-func (v *polynomialVector) putCoefficient(m *MultivariatePolynomialCore, i uint32, a util.Int) error {
-	o := uint64(8) + uint64(i)*12
-	if e := m.memory.WriteUint32(v.raw, o, uint32(a.NativeScalar())); e != nil {
-		return e
-	}
-	return v.write64(m, o+4, uint64(a.NativeCellToken()))
-}
-func (v *polynomialVector) appendCoefficient(m *MultivariatePolynomialCore, a util.Int) error {
+func (v *polynomialNumerals) reset(m *MultivariatePolynomialCore) error { return v.publishSize(m, 0) }
+func (v *polynomialNumerals) appendCoefficient(m *MultivariatePolynomialCore, a util.Int) error {
 	return v.appendCoefficientWithAppendScope(m, a, nil, false)
 }
-func (v *polynomialVector) appendCoefficientWithAppendScope(m *MultivariatePolynomialCore, a util.Int, scope *polynomialCheapAppendScope, owned bool) error {
-	i, e := v.appendSlot(m)
-	if e != nil {
-		return e
-	}
-	if i < v.initialized {
-		old, e := v.coefficient(m, i)
-		if e != nil {
-			return e
-		}
-		if old.NativeCellToken() != 0 {
-			if e = v.retainNumeral(m, old); e != nil {
-				return e
-			}
-		}
-	}
-	if e = v.putCoefficient(m, i, a); e != nil {
-		return e
-	}
-	v.retiredActive = uint32(len(v.retired))
-	if i >= v.initialized {
-		v.initialized = i + 1
-	}
+func (v *polynomialNumerals) appendCoefficientWithAppendScope(m *MultivariatePolynomialCore, a util.Int, scope *polynomialCheapAppendScope, owned bool) error {
+	i := uint32(len(v.values))
+	v.values = append(v.values, a)
 	// The actual zero NUM slot exists before vector-size publication and the
 	// subsequent SET. A stopped SET still belongs to this constructed row.
 	if scope != nil {
@@ -167,24 +69,21 @@ func (v *polynomialVector) appendCoefficientWithAppendScope(m *MultivariatePolyn
 			}
 		}
 	}
-	return v.publishSize(m, i+1)
+	return nil
 }
-func (v *polynomialVector) close(m *MultivariatePolynomialCore) error {
-	if e := v.cleanupNumerals(m); e != nil {
-		return e
-	}
-	if v.pending != (util.Block{}) {
-		if e := m.memory.Deallocate(&v.pending); e != nil {
+func (v *polynomialNumerals) close(m *MultivariatePolynomialCore) error {
+	for i := range v.retired {
+		if e := m.deleteNumeral(&v.retired[i]); e != nil {
 			return e
 		}
 	}
-	if v.raw != (util.Block{}) {
-		e := m.memory.Deallocate(&v.raw)
-		if e != nil {
+	v.retired = nil
+	for i := range v.values {
+		if e := m.deleteNumeral(&v.values[i]); e != nil {
 			return e
 		}
 	}
-	v.interrupted = false
+	v.values = nil
 	return nil
 }
 func (m *MultivariatePolynomialCore) prepareLocation() (uint32, error) {
@@ -316,7 +215,7 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int,
 	var e error
 	if outcome := m.factoryAllocationOutcome(receipt); outcome != nil {
 		var started bool
-		if e := m.prepareNormalizationConverterHistoryAtAllocation(nil, receipt, nil); e != nil {
+		if e := m.prepareNormalizationConverterHistoryAtAllocation(receipt, nil); e != nil {
 			return Polynomial{}, e
 		}
 		raw, started, e = m.monomials.allocator.AllocateWithOutcomeStarted(uint64(requested), outcome)

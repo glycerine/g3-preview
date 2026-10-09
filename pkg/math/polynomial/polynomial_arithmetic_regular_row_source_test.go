@@ -7,11 +7,14 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction(t *testing.T) {
+func TestPolynomialRegularActualINCBindsRowBeforeNumericFailure(t *testing.T) {
 	for prefix := int64(0); prefix < 32; prefix++ {
 		full := polynomialArithmeticDirectNumericFixture(t)
 		c := full.core
-		seven := util.NewInt(7)
+		var seven util.Int
+		words := make([]uint32, 2048)
+		words[len(words)-1] = 1
+		serviceMust(t, c.integer.SetLimbs(&seven, words))
 		p, e := c.MkConstantTakeCopy(&seven)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
@@ -21,16 +24,16 @@ func TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction(t *test
 		serviceMust(t, e)
 		one := util.NewInt(1)
 		c.integer.Budget().FailAfter(prefix)
-		e = (c.som).addMulWithArithmeticReceipt(&one, c.monomials.unit, p, &r)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
+		e = c.som.addSourceInputWithArithmeticReceipt(&one, c.monomials.unit, polynomialSOMInput{polynomial: p}, false, &r)
+		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&seven}, 0)
 		ms, x := c.som.ms.size(c)
 		serviceMust(t, x)
 		as, x := c.som.as.size(c)
 		serviceMust(t, x)
 		after, x := c.monomialRefCount(c.monomials.unit)
 		serviceMust(t, x)
-		t.Log("regular actual prefix", prefix, e, "columns", ms, as, "unitRC", before, after)
-		if e != nil && ms == 1 && as == 0 && after == before+1 {
+
+		if e != nil && ms == 1 && as == 1 && after == before+1 {
 			if !c.som.matchesAppendInvocation(&r.frame.append) || len(c.som.monomialOwners) == 0 || c.som.monomialOwners[0] != r.frame.append.invocation || r.frame.append.frame.monomialClaims != 1 {
 				t.Fatal("reached source INC lacks exact per-slot authority", prefix, e)
 			}
@@ -43,15 +46,17 @@ func TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction(t *test
 			if afterOwn != before || position != ^uint32(0) {
 				t.Fatal("matched regular row abort retained source position/INC", afterOwn, position)
 			}
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&seven}, 0)
 			serviceMust(t, c.som.addMul(&one, c.monomials.unit, p))
 			serviceMust(t, c.som.close())
 			serviceMust(t, c.DecRef(p))
+			serviceMust(t, c.integer.Del(&seven))
 			return
 		}
 		c.integer.Budget().FailAfter(-1)
 		serviceMust(t, c.som.close())
 		serviceMust(t, c.DecRef(p))
+		serviceMust(t, c.integer.Del(&seven))
 	}
-	t.Fatal("did not reach actual regular ms-push/INC before coefficient ctor")
+	t.Fatal("did not reach actual regular ms-push/INC before actual numeric Copy/Mul failure")
 }

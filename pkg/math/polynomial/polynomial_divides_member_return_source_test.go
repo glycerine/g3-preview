@@ -35,7 +35,7 @@ func TestPolynomialDividesPersistentMemberReturnDoesNotConsumeRows(t *testing.T)
 	serviceMust(t, e)
 	foreignRC, e := c.monomialRefCount(fm)
 	serviceMust(t, e)
-	rawAs, rawMs, used := c.som.as.raw, append([]Monomial(nil), c.som.ms...), c.integer.Budget().Used()
+	rawAs, rawMs, used := append([]util.Int(nil), c.som.as.values...), append([]Monomial(nil), c.som.ms...), c.integer.Budget().Used()
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, foreign}, nil, 0)
 	copyReceipt := receipt
 	copyFrame := *receipt.frame
@@ -57,7 +57,7 @@ func TestPolynomialDividesPersistentMemberReturnDoesNotConsumeRows(t *testing.T)
 	serviceMust(t, e)
 	frc, e := c.monomialRefCount(fm)
 	serviceMust(t, e)
-	if as != beforeAs || ms != beforeMs || rc != unitRC || frc != foreignRC || c.som.as.raw != rawAs || !polynomialEqualMonomials(c.som.ms, rawMs) || c.integer.Budget().Used() != used {
+	if as != beforeAs || ms != beforeMs || rc != unitRC || frc != foreignRC || !polynomialEqualNumerals(c.som.as.values, rawAs) || !polynomialEqualMonomials(c.som.ms, rawMs) || c.integer.Budget().Used() != used {
 		t.Fatal("tag handoff mutated actual member or foreign rows")
 	}
 	v, e := c.som.as.coefficient(c, 0)

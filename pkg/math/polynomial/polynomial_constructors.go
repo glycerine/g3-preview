@@ -64,7 +64,7 @@ func (m *MultivariatePolynomialCore) resetRationalTerms() error {
 	}
 	return m.rationalTerms.reset(m)
 }
-func (m *MultivariatePolynomialCore) mkTermsIndexed(as *polynomialVector, ms monomialArrayView) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) mkTermsIndexed(as *polynomialNumerals, ms monomialArrayView) (Polynomial, error) {
 	if e := m.som.reset(); e != nil {
 		return Polynomial{}, e
 	}
@@ -72,7 +72,7 @@ func (m *MultivariatePolynomialCore) mkTermsIndexed(as *polynomialVector, ms mon
 	if e != nil {
 		return Polynomial{}, e
 	}
-	return m.mkTermsSource(n, polynomialUnivariateCoefficients{vector: as}, ms)
+	return m.mkTermsSource(n, polynomialUnivariateCoefficients{values: as.values}, ms)
 }
 func (m *MultivariatePolynomialCore) mkTermsSource(n uint32, as polynomialUnivariateCoefficients, ms monomialArrayView) (Polynomial, error) {
 	return m.mkTermsSourceLinear(n, as, ms, false)
@@ -123,9 +123,6 @@ func (m *MultivariatePolynomialCore) MkRationalTerms(as []util.Rational, ms []Mo
 	m.overloadResult = Polynomial{}
 	return p, nil
 }
-func (m *MultivariatePolynomialCore) mkUnivariateVector(v, n uint32, as *polynomialVector) (Polynomial, error) {
-	return m.mkUnivariateSource(v, n, polynomialUnivariateCoefficients{vector: as})
-}
 func (m *MultivariatePolynomialCore) MkRationalUnivariate(v, n uint32, as []util.Rational) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
@@ -139,7 +136,7 @@ func (m *MultivariatePolynomialCore) MkRationalUnivariate(v, n uint32, as []util
 	if e := m.rational2Numeral(as, n+1); e != nil {
 		return Polynomial{}, e
 	}
-	p, e := m.mkUnivariateVector(v, n, &m.rationalTerms)
+	p, e := m.mkUnivariateSource(v, n, polynomialUnivariateCoefficients{values: m.rationalTerms.values})
 	if e != nil {
 		return Polynomial{}, e
 	}
@@ -165,26 +162,15 @@ func (m *MultivariatePolynomialCore) MkLinearTake(as []util.Int, xs []uint32, c 
 	if polynomialSourceDebug && (an != 0 || mn != 0) {
 		return Polynomial{}, ErrPolynomialAssertion
 	}
-	return m.mkLinearInput(as, nil, uint32(len(as)), xs, c)
+	return m.mkLinearInput(as, uint32(len(as)), xs, c)
 }
-func (m *MultivariatePolynomialCore) mkLinearInput(as []util.Int, source *polynomialVector, count uint32, xs []uint32, c *util.Int) (Polynomial, error) {
+func (m *MultivariatePolynomialCore) mkLinearInput(as []util.Int, count uint32, xs []uint32, c *util.Int) (Polynomial, error) {
 	var e error
 	for i := uint32(0); i < count; i++ {
-		var original *util.Int
-		var borrowed util.Int
-		if source != nil {
-			var e error
-			borrowed, e = source.coefficient(m, i)
-			if e != nil {
-				return Polynomial{}, e
-			}
-			original = &borrowed
-		} else {
-			if uint64(i) >= uint64(len(as)) {
-				return Polynomial{}, arena.ErrBounds
-			}
-			original = &as[i]
+		if uint64(i) >= uint64(len(as)) {
+			return Polynomial{}, arena.ErrBounds
 		}
+		original := &as[i]
 		zero, e := m.modular.IsZero(original)
 		if e != nil {
 			return Polynomial{}, e
@@ -208,11 +194,6 @@ func (m *MultivariatePolynomialCore) mkLinearInput(as []util.Int, source *polyno
 		}
 		if e = m.linearTerms.putCoefficient(m, n-1, a); e != nil {
 			return Polynomial{}, e
-		}
-		if source != nil {
-			if e = source.putCoefficient(m, i, *original); e != nil {
-				return Polynomial{}, e
-			}
 		}
 		if uint64(i) >= uint64(len(xs)) {
 			return Polynomial{}, arena.ErrBounds
@@ -262,7 +243,7 @@ func (m *MultivariatePolynomialCore) mkLinearInput(as []util.Int, source *polyno
 	if e != nil {
 		return Polynomial{}, e
 	}
-	p, e := m.mkTermsSourceLinear(n, polynomialUnivariateCoefficients{vector: &m.linearTerms}, monomialArrayView{values: m.linearMonomials, count: uint32(len(m.linearMonomials))}, true)
+	p, e := m.mkTermsSourceLinear(n, polynomialUnivariateCoefficients{values: m.linearTerms.values}, monomialArrayView{values: m.linearMonomials, count: uint32(len(m.linearMonomials))}, true)
 	if e != nil {
 		return Polynomial{}, e
 	}
@@ -308,7 +289,7 @@ func (m *MultivariatePolynomialCore) MkRationalLinear(as []util.Rational, xs []u
 	if polynomialSourceDebug && (an != 0 || mn != 0) {
 		return Polynomial{}, ErrPolynomialAssertion
 	}
-	p, e := m.mkLinearInput(nil, &m.rationalTerms, uint32(len(as)), xs, &m.linearConstant)
+	p, e := m.mkLinearInput(m.rationalTerms.values, uint32(len(as)), xs, &m.linearConstant)
 	if e != nil {
 		return Polynomial{}, e
 	}

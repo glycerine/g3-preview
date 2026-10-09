@@ -4,6 +4,7 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -41,8 +42,8 @@ func TestPolynomialSOMVectorDefaultOwnerAndSourceMembers(t *testing.T) {
 	if value32 != 7 {
 		t.Fatal("actual modular coefficient", value32)
 	}
-	// Implicit som_buffer member destructors free pointer/numeral/position
-	// raw backing only. They must not perform Reset or release leaked INCs.
+	// Implicit som_buffer destruction releases native storage without DEC.
+	// Only actual BIG numeral resources require separate owning retirement.
 	info, e := m.monomials.headerCore(x)
 	serviceMust(t, e)
 	before := info.RefCount
@@ -54,8 +55,8 @@ func TestPolynomialSOMVectorDefaultOwnerAndSourceMembers(t *testing.T) {
 	if before != after || after != 1 {
 		t.Fatal("implicit source child dtor invented DEC", before, after)
 	}
-	if !b.sourceFinalized || b.closed || b.retiredMonomialCount != 1 || b.retiredNumeralCount != 1 {
-		t.Fatal("actual owned fields retained before source raw free")
+	if !b.sourceFinalized || b.closed || b.retiredMonomialCount != 1 || b.retiredNumeralCount != 0 {
+		t.Fatal("actual reference retained without scalar container retirement")
 	}
 	if _, e = v.At(0); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal("source finalized vector entry", e)
@@ -140,7 +141,7 @@ func TestPolynomialSOMBufferAddEveryReservation(t *testing.T) {
 			x, e := m.monomials.MkVariable(0, 2)
 			serviceMust(t, e)
 			var a util.Int
-			serviceMust(t, m.integer.SetString(&a, "123456789012345678901234567890123456789012345678901234567890"))
+			serviceMust(t, m.integer.SetString(&a, "1"+strings.Repeat("0", 4096)))
 			m.integer.Budget().FailAfter(ordinal)
 			e = b.Add(&a, x)
 			if e == nil {
@@ -305,7 +306,7 @@ func TestPolynomialSOMBufferAddMulIndependentFiniteModel(t *testing.T) {
 
 func TestPolynomialSOMBufferAddMulEveryReservation(t *testing.T) {
 	success, failures := false, 0
-	sawGenerated, sawCallee := false, false
+	sawCallee := false
 	for ordinal := int64(0); ordinal < 100 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m := polynomialCellFixture(t)
@@ -320,7 +321,7 @@ func TestPolynomialSOMBufferAddMulEveryReservation(t *testing.T) {
 			serviceMust(t, e)
 			polynomialCaller(t, m, p)
 			var a util.Int
-			serviceMust(t, m.integer.SetString(&a, "123456789012345678901234567890123456789012345678901234567890"))
+			serviceMust(t, m.integer.SetString(&a, "1"+strings.Repeat("0", 4096)))
 			m.integer.Budget().FailAfter(ordinal)
 			e = b.AddMul(&a, x, p)
 			if e == nil {
@@ -330,9 +331,6 @@ func TestPolynomialSOMBufferAddMulEveryReservation(t *testing.T) {
 				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal("actual addmul prefix category", e)
 				}
-			}
-			if b.generatedCall {
-				sawGenerated = true
 			}
 			if b.calleeCall {
 				sawCallee = true
@@ -352,8 +350,8 @@ func TestPolynomialSOMBufferAddMulEveryReservation(t *testing.T) {
 			polynomialOperationMonomialAudit(t, m, []Polynomial{p}, nil)
 		})
 	}
-	if !success || failures == 0 || !sawGenerated || !sawCallee {
-		t.Fatal("real product/local/INC prefix campaign", success, failures, sawGenerated, sawCallee)
+	if !success || failures == 0 || !sawCallee {
+		t.Fatal("real product/local/INC prefix campaign", success, failures, sawCallee)
 	}
 }
 
@@ -487,56 +485,51 @@ func TestPolynomialSOMBufferSourceSortMovesCoefficients(t *testing.T) {
 	polynomialPhysicalAudit(t, m)
 }
 
-func TestPolynomialSOMBufferSourceSortEveryReservation(t *testing.T) {
-	success, failures := false, 0
-	sawMoved := false
-	for ordinal := int64(0); ordinal < 100 && !success; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m := polynomialCellFixture(t)
-			v, e := NewPolynomialSOMVector(m)
-			serviceMust(t, e)
-			serviceMust(t, v.SetOwner(m))
-			b, e := v.At(0)
-			serviceMust(t, e)
-			var input util.Int
-			serviceMust(t, m.integer.SetString(&input, "12345678901234567890123456789012345678901234567890"))
-			for _, degree := range []uint32{1, 0, 4, 2} {
-				var term Monomial
-				if degree == 0 {
-					term, e = m.monomials.Unit()
-				} else {
-					term, e = m.monomials.MkVariable(0, degree)
-				}
-				serviceMust(t, e)
-				serviceMust(t, b.Add(&input, term))
-			}
-			m.integer.Budget().FailAfter(ordinal)
-			e = b.SortGradedLex()
-			if e == nil {
-				success = true
-			} else {
-				failures++
-				if !numericPhysicalReservationRefusal(e) {
-					t.Fatal("actual lexical source vector refusal", e)
-				}
-			}
-			if b.retiredNumeralCount > 0 {
-				sawMoved = true
-			}
-			polynomialSOMPhysicalAudit(t, m, v, nil, &input)
-			serviceMust(t, v.SourceFinalize())
-			polynomialSOMPhysicalAudit(t, m, v, nil, &input)
-			m.integer.Budget().FailAfter(-1)
-			serviceMust(t, v.CloseChecked())
-			serviceMust(t, m.integer.CleanupPendingAllocation())
-			serviceMust(t, m.integer.Del(&input))
-			polynomialPhysicalAudit(t, m)
-			polynomialOperationMonomialAudit(t, m, nil, nil)
-		})
+func TestPolynomialSOMBufferNativeSortBIGMoves(t *testing.T) {
+	m := polynomialCellFixture(t)
+	v, e := NewPolynomialSOMVector(m)
+	serviceMust(t, e)
+	serviceMust(t, v.SetOwner(m))
+	b, e := v.At(0)
+	serviceMust(t, e)
+	var input util.Int
+	serviceMust(t, m.integer.SetString(&input, "12345678901234567890123456789012345678901234567890"))
+	t.Cleanup(func() {
+		m.integer.Budget().FailAfter(-1)
+		serviceMust(t, v.CloseChecked())
+		serviceMust(t, m.integer.Del(&input))
+	})
+	for _, degree := range []uint32{1, 0, 4, 2} {
+		term, e := m.monomials.MkVariable(0, degree)
+		serviceMust(t, e)
+		serviceMust(t, b.Add(&input, term))
 	}
-	if !success || failures == 0 || !sawMoved {
-		t.Fatal("bounded actual sort move/source suffix sweep", success, failures, sawMoved)
+	before, used := m.memory.Stats(), m.integer.Budget().Used()
+	m.integer.Budget().FailAfter(0)
+	serviceMust(t, b.SortGradedLex())
+	if b.sortActive || m.memory.Stats() != before || m.integer.Budget().Used() != used {
+		t.Fatal("native numeral sort changed Runtime storage")
 	}
+	for i, want := range []uint32{4, 2, 1, 0} {
+		term, e := b.Monomial(uint32(i))
+		serviceMust(t, e)
+		degree, e := m.monomials.DegreeOf(term, 0)
+		serviceMust(t, e)
+		a, e := b.Coefficient(uint32(i))
+		serviceMust(t, e)
+		same, e := m.integer.Equal(&a, &input)
+		serviceMust(t, e)
+		if degree != want || !same {
+			t.Fatal("BIG coefficient move", i, degree, same)
+		}
+	}
+	polynomialSOMPhysicalAudit(t, m, v, nil, &input)
+	serviceMust(t, v.SourceFinalize())
+	polynomialSOMPhysicalAudit(t, m, v, nil, &input)
+	m.integer.Budget().FailAfter(-1)
+	serviceMust(t, v.CloseChecked())
+	serviceMust(t, m.integer.Del(&input))
+	polynomialPhysicalAudit(t, m)
 }
 
 func TestPolynomialSOMBufferActualModDAndScalarOverloads(t *testing.T) {
@@ -661,89 +654,6 @@ func TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient(t *test
 	polynomialPhysicalAudit(t, m)
 }
 
-func TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation(t *testing.T) {
-	budget := arena.NewBudget(1 << 26)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
-	serviceMust(t, e)
-	profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Profile: profile, Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: budget}}}})
-	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: rt, Profile: profile})
-	serviceMust(t, e)
-	serviceMust(t, mm.IncManagerRef())
-	m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { t.Fatal("SOM checkpoint"); return false }, Cooperation: func() error { t.Fatal("SOM cooperation"); return nil }})
-	serviceMust(t, e)
-	v, e := NewPolynomialSOMVector(m)
-	serviceMust(t, e)
-	serviceMust(t, v.SetOwner(m))
-	b, e := v.At(0)
-	serviceMust(t, e)
-	_, e = mm.MkVar()
-	serviceMust(t, e)
-	x, e := mm.MkVariable(0, 1)
-	serviceMust(t, e)
-	two := util.NewInt(2)
-	serviceMust(t, b.Add(&two, x))
-	var prep util.Block
-	defer func() {
-		serviceMust(t, rt.SetMaxSize(0))
-		serviceMust(t, v.CloseChecked())
-		serviceMust(t, rt.Deallocate(&prep))
-		serviceMust(t, m.CloseChecked())
-		serviceMust(t, mm.DecManagerRef())
-		serviceMust(t, q.CloseChecked())
-		serviceMust(t, rt.Close())
-		if budget.Used() != 0 {
-			t.Fatal("actual retained owner cleanup", budget.Used())
-		}
-	}()
-	local := rt.State().LocalSize
-	if local < 0 || local >= 99972 {
-		t.Fatal("actual setup lane", rt.State())
-	}
-	prep, e = rt.Allocate(uint64(99980 - local - 8))
-	serviceMust(t, e)
-	before := rt.Stats()
-	serviceMust(t, rt.SetMaxSize(1))
-	e = b.SortGradedLex()
-	var refusal util.Failure
-	if !errors.As(e, &refusal) || refusal.Kind != util.FailureMemout || !b.sortActive || b.sortNumerals.pending == (util.Block{}) || b.sortNumerals.raw != (util.Block{}) || rt.Stats().LiveBlocks != before.LiveBlocks+1 {
-		t.Fatal("actual returned default-local allocation", e, rt.State())
-	}
-	polynomialSOMPhysicalWithExternal(t, m, v, nil, []util.Block{prep}) // BEFORE lifting actual limit.
-	oldMS, oldAS := append([]Monomial(nil), b.buffer.ms...), b.buffer.as.raw
-	one := util.NewInt(1)
-	if e = b.Add(&one, x); e != ErrPolynomialPending {
-		t.Fatal("stopped lexical context allowed ordinary mutation", e)
-	}
-	if !polynomialEqualMonomials(b.buffer.ms, oldMS) || b.buffer.as.raw != oldAS {
-		t.Fatal("owning guard modified original raw fields")
-	}
-	// Identity-only physical reads verify the actual old coefficient, without
-	// going through the ordinary stopped-owner API.
-	value, e := b.buffer.as.coefficient(m, 0)
-	serviceMust(t, e)
-	got, e := m.integer.Int64(&value)
-	serviceMust(t, e)
-	if got != 2 {
-		t.Fatal("guard came after mutation", got)
-	}
-	if e = b.Reset(); e != ErrPolynomialPending {
-		t.Fatal("stopped reset", e)
-	}
-	if _, e = b.Mk(false); e != ErrPolynomialPending {
-		t.Fatal("stopped construction", e)
-	}
-	if e = b.SortGradedLex(); e != ErrPolynomialPending {
-		t.Fatal("stopped scope reuse", e)
-	}
-	peer, e := v.At(1)
-	serviceMust(t, e)
-	zero := util.NewInt(0)
-	serviceMust(t, peer.Add(&zero, x)) // another actual owner is not poisoned.
-	polynomialSOMPhysicalWithExternal(t, m, v, nil, []util.Block{prep})
-}
-
 func TestPolynomialSOMNativeMonomialSortIndependentPowers(t *testing.T) {
 	m := polynomialCellFixture(t)
 	b, e := NewPolynomialSOMBuffer(m)
@@ -771,10 +681,12 @@ func TestPolynomialSOMNativeMonomialSortIndependentPowers(t *testing.T) {
 			t.Fatal("independent descending power order", i, degree)
 		}
 	}
-	m.integer.Budget().FailAfter(-1)
-	// The lexical numeral vector remains separate. Its actual source swaps use
+	// The lexical numeral slice remains separate. Its actual source swaps use
 	// the pre-sort position map to move each coefficient with its monomial.
 	serviceMust(t, b.SortGradedLex())
+	if m.integer.Budget().Used() != beforeBytes || m.memory.Stats() != beforeStats {
+		t.Fatal("native paired sort changed Runtime storage")
+	}
 	for i := uint32(0); i < n; i++ {
 		a, e := b.Coefficient(i)
 		serviceMust(t, e)
@@ -786,6 +698,7 @@ func TestPolynomialSOMNativeMonomialSortIndependentPowers(t *testing.T) {
 	if b.buffer.ms != nil || b.retiredMonomialCount != n {
 		t.Fatal("implicit source destruction lost actual references")
 	}
+	m.integer.Budget().FailAfter(-1)
 	serviceMust(t, b.CloseChecked())
 	polynomialPhysicalAudit(t, m)
 }

@@ -11,17 +11,11 @@ import (
 
 type polynomialUnivariateCoefficients struct {
 	values  []util.Int
-	vector  *polynomialVector
 	array   util.IntegerArrayView
 	indexed bool
 }
 
 func (as polynomialUnivariateCoefficients) reference(m *MultivariatePolynomialCore, k uint32, local *util.Int) (*util.Int, error) {
-	if as.vector != nil {
-		v, e := as.vector.coefficient(m, k)
-		*local = v
-		return local, e
-	}
 	if as.indexed {
 		return as.array.Reference(k, local)
 	}
@@ -31,9 +25,6 @@ func (as polynomialUnivariateCoefficients) reference(m *MultivariatePolynomialCo
 	return &as.values[k], nil
 }
 func (as polynomialUnivariateCoefficients) store(m *MultivariatePolynomialCore, k uint32, a *util.Int) error {
-	if as.vector != nil {
-		return as.vector.putCoefficient(m, k, *a)
-	}
 	if as.indexed {
 		return as.array.Store(k, *a)
 	}

@@ -122,11 +122,10 @@ func TestPolynomialSOMModDSourceLogicalAssertionAndZeroReadMask(t *testing.T) {
 		if !errors.Is(e, ErrPolynomialAssertion) {
 			t.Fatal("source operator[] logical assertion", e)
 		}
-	} else {
-		serviceMust(t, e)
+	} else if !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("native logical bounds", e)
 	}
-	serviceMust(t, m.som.as.publishSize(m, 1))
-	serviceMust(t, m.som.as.putCoefficient(m, 0, util.Int{}))
+	serviceMust(t, m.som.as.appendCoefficient(m, util.Int{}))
 	// Actual cold map is finalized; NUM0 must avoid both monomial and map reads.
 	d := polynomialDegreeMap(t, m)
 	serviceMust(t, d.SourceFinalize())

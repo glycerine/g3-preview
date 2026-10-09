@@ -119,11 +119,14 @@ func (m *MultivariatePolynomialManager) destroyMembers() error {
 	return nil
 }
 
-// Literal vector<mpz> destruction has no mpz destructor/Del. Actual discarded
-// initialized fields need separately charged Go owning retention before the raw
-// member disappears; this is an owning adaptation, not a source free event.
-func (m *MultivariatePolynomialManager) sourceNumeralVector(v *polynomialVector) error {
-	return m.retireSourceNumeralVector(v)
+// Source mpz has no destructor. Native reset retains discarded BIG resources
+// in this same owner for explicit owning cleanup without freeing them early.
+func (m *MultivariatePolynomialManager) sourceNumeralVector(v *polynomialNumerals) error {
+	if e := v.reset(m.core); e != nil {
+		return e
+	}
+	v.values = nil
+	return nil
 }
 func (m *MultivariatePolynomialManager) sourceBufferMembers(b *polynomialSOM, positions bool) error {
 	b.ms = nil

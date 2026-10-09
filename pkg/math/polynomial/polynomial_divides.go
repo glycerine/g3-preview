@@ -238,7 +238,6 @@ func (m *MultivariatePolynomialCore) dividesWithReceipt(q, p Polynomial, receipt
 				return false, ErrPolynomialAssertion
 			}
 		}
-		ar := util.IntegerArrayView{Runtime: m.memory, Raw: m.som.as.raw, Count: 1, Offset: 8 + uint64(maxR)*12, Stride: 12}
 		quotient, divides, e := m.dividesCreatedQuotient(mr, mq, &s.directReceipt)
 		if e != nil {
 			return false, e
@@ -253,7 +252,7 @@ func (m *MultivariatePolynomialCore) dividesWithReceipt(q, p Polynomial, receipt
 		if e != nil {
 			return false, e
 		}
-		remainder, e := ar.CheckedAt(m.memory, 0)
+		remainder, e := m.som.as.coefficient(m, maxR)
 		if e != nil {
 			return false, e
 		}
@@ -264,7 +263,7 @@ func (m *MultivariatePolynomialCore) dividesWithReceipt(q, p Polynomial, receipt
 		if !ok {
 			return false, nil
 		}
-		remainder, e = ar.CheckedAt(m.memory, 0)
+		remainder, e = m.som.as.coefficient(m, maxR)
 		if e != nil {
 			return false, e
 		}

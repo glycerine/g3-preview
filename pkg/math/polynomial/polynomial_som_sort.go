@@ -2,8 +2,9 @@
 package polynomial
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	"sort"
+
+	"github.com/glycerine/g3/pkg/util"
 )
 
 // std::sort contributes its descending graded-lex order, not library internals.
@@ -20,67 +21,21 @@ func (b *PolynomialSOMBuffer) sortMonomials() error {
 	return cause
 }
 
-// Owning abort resumes only actual untransferred local fields, separately from
-// the sticky source raw-destructor history. No source cleanup is retried here.
-func (b *PolynomialSOMBuffer) cleanupSortNumerals() error {
-	v := &b.sortNumerals
-	if b.sortCleanupIndex < b.sortTransferred {
-		b.sortCleanupIndex = b.sortTransferred
-	}
-	for b.sortCleanupIndex < v.initialized {
-		a, e := v.coefficient(b.storage, b.sortCleanupIndex)
-		if e != nil {
-			return e
-		}
-		e = b.storage.integer.Del(&a)
-		if w := v.putCoefficient(b.storage, b.sortCleanupIndex, a); w != nil {
-			return w
-		}
-		if e != nil {
-			return e
-		}
-		b.sortCleanupIndex++
-	}
-	v.initialized = 0
-	return nil
-}
+// Source mpz has no destructor. Retain actual abandoned numeric fields for
+// explicit owning cleanup, without emulating a raw container destructor.
 func (b *PolynomialSOMBuffer) finishSortSource() error {
 	if !b.sortActive {
 		return nil
 	}
-	if b.sortSourceCause != nil {
-		return b.sortSourceCause
-	}
-	v := &b.sortNumerals
-	// Actual initialized published fields transfer before their raw destructor.
-	// The source mpz element has no destructor; no Del is invented here.
-	for b.sortTransferred < v.initialized {
-		a, e := v.coefficient(b.storage, b.sortTransferred)
-		if e != nil {
-			b.sortSourceCause = e
-			return e
-		}
-		if a != (util.Int{}) {
-			if b.retiredNumeralCount >= uint32(len(b.retiredNumerals)) {
-				return ErrPolynomialPending
-			}
-			b.retiredNumerals[b.retiredNumeralCount] = a
-			b.retiredNumeralCount++
-		}
-		b.sortTransferred++
-	}
-	v.initialized = 0 // ownership moved; physical source size/header is unchanged.
-	if v.raw != (util.Block{}) {
-		if e := b.storage.memory.Deallocate(&v.raw); e != nil {
-			b.sortSourceCause = e
-			return e
+	b.retiredNumerals = append(b.retiredNumerals, b.sortNumerals.retired...)
+	for _, a := range b.sortNumerals.values {
+		if a.NativeCellToken() != 0 {
+			b.retiredNumerals = append(b.retiredNumerals, a)
 		}
 	}
-	if v.pending == (util.Block{}) && v.old == (util.Block{}) && v.retiredActive == 0 {
-		*v = polynomialVector{width: 12}
-		b.sortActive = false
-		b.sortTransferred = 0
-	}
+	b.retiredNumeralCount = uint32(len(b.retiredNumerals))
+	b.sortNumerals = polynomialNumerals{}
+	b.sortActive = false
 	return nil
 }
 func (b *PolynomialSOMBuffer) SortGradedLex() (result error) {
@@ -99,11 +54,8 @@ func (b *PolynomialSOMBuffer) SortGradedLex() (result error) {
 		return ErrPolynomialPending
 	}
 	b.sortActive = true
-	b.sortTransferred = 0
-	b.sortCleanupIndex = 0
 	b.sortOriginalCause = nil
-	b.sortSourceCause = nil
-	b.sortNumerals = polynomialVector{width: 12}
+	b.sortNumerals = polynomialNumerals{}
 	defer func() {
 		b.sortOriginalCause = result
 		e := b.finishSortSource()
@@ -113,12 +65,6 @@ func (b *PolynomialSOMBuffer) SortGradedLex() (result error) {
 	}()
 	n, e := b.buffer.ms.size(b.storage)
 	if e != nil {
-		return e
-	}
-	if n > ^uint32(0)/2 {
-		return ErrPolynomialPending
-	}
-	if e = b.prepareRetirement(b.retiredNumeralCount + 2*n); e != nil {
 		return e
 	}
 	for i := uint32(0); i < n; i++ {

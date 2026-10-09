@@ -81,7 +81,7 @@ func (b *polynomialSOM) acquireArithmeticInvocationWithCoefficient(r *polynomial
 	if e := m.check(); e != nil {
 		return e
 	}
-	if b.arithmeticScope.active || b.appendScope.active || b.resetActive || b.removeActive || b.hasPendingReference || b.borrowedAppend || b.as.interrupted || b.as.pending != (util.Block{}) || m.arithmeticInvocation == ^uint64(0) {
+	if b.arithmeticScope.active || b.appendScope.active || b.resetActive || b.removeActive || b.hasPendingReference || b.borrowedAppend || m.arithmeticInvocation == ^uint64(0) {
 		return ErrPolynomialPending
 	}
 	n, e := b.ms.size(m)

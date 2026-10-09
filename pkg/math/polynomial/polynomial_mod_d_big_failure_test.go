@@ -44,7 +44,7 @@ func TestPolynomialModDBigCoefficientEveryActualRefusal(t *testing.T) {
 					t.Fatal("actual reservation cause", e)
 				}
 			}
-			for i := uint32(0); i < m.cheap.as.initialized; i++ {
+			for i := uint32(0); i < uint32(len(m.cheap.as.values)); i++ {
 				a, e := m.cheap.as.coefficient(m, i)
 				serviceMust(t, e)
 				if (a).Cell == m.integer.FailedNullRef {

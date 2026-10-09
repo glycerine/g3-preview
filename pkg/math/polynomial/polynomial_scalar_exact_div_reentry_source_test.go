@@ -38,11 +38,11 @@ func TestPolynomialScalarExactDivActualTransportGuardsWholeOwner(t *testing.T) {
 	serviceMust(t, e)
 	c := full.core
 	var modulus util.Int
-	words := make([]uint32, 17)
+	words := make([]uint32, 2048)
 	for i := range words {
 		words[i] = ^uint32(0)
 	}
-	words[16] = 511
+	words[len(words)-1] = 511
 	serviceMust(t, c.integer.SetLimbs(&modulus, words))
 	serviceMust(t, c.modular.SetZP(&modulus))
 	pad := int64(99996) - rt.State().LocalSize - 8

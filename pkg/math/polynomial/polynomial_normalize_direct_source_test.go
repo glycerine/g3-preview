@@ -334,12 +334,12 @@ func TestPolynomialSOMNormalizeStandaloneSourceOwnerProtectsActualChild(t *testi
 	serviceMust(t, b.Add(&c.integer.Two64, c.monomials.unit))
 	serviceMust(t, b.buffer.beginNormalizeNumeral(nil))
 	serviceMust(t, c.integer.Copy(&b.buffer.gcd, &c.integer.Two64))
-	beforeRaw, beforeStage, beforeNUM := b.buffer.as.raw, b.sourceStage, b.buffer.gcd
+	beforeRaw, beforeStage, beforeNUM := append([]util.Int(nil), b.buffer.as.values...), b.sourceStage, b.buffer.gcd
 	beforeRuntime := c.memory.State()
 	if e = b.SourceFinalize(); !errors.Is(e, ErrPolynomialPending) {
 		t.Error("source owner passed retained younger method NUM", e)
 	}
-	if b.buffer.as.raw != beforeRaw || b.sourceStage != beforeStage || b.sourceStarted || b.buffer.gcd != beforeNUM || c.memory.State() != beforeRuntime {
+	if !polynomialEqualNumerals(b.buffer.as.values, beforeRaw) || b.sourceStage != beforeStage || b.sourceStarted || b.buffer.gcd != beforeNUM || c.memory.State() != beforeRuntime {
 		t.Error("older class source prefix mutated")
 	}
 	serviceMust(t, b.CloseChecked())

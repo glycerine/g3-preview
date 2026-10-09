@@ -4,38 +4,8 @@ package polynomial
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
-
-// The endangered third physical read is reached after the real big GCD was
-// published. The completed default scoped numeral must unwind on that guard;
-// this is not a failed numeral constructor or a fabricated free refusal.
-func TestPolynomialNormalizeCompletedLocalGuardUnwind(t *testing.T) {
-	m := polynomialCellFixture(t)
-	b := &m.som
-	for _, v := range []int64{1 << 40, 3 << 40} {
-		serviceMust(t, b.as.appendCoefficient(m, util.Int{}))
-		i, e := b.as.size(m)
-		serviceMust(t, e)
-		a, e := b.as.coefficient(m, i-1)
-		serviceMust(t, e)
-		serviceMust(t, m.integer.SetInt64(&a, v))
-		serviceMust(t, b.as.putCoefficient(m, i-1, a))
-	}
-	serviceMust(t, b.as.publishSize(m, 3))
-	e := b.normalize()
-	if e != arena.ErrBounds {
-		t.Fatal("actual third field guard", e)
-	}
-	if (b.gcd).Cell != 0 {
-		t.Error("completed source scoped GCD survived body guard", b.gcd)
-	}
-	// No ownership repair: restore only the deliberately endangered SIZE after
-	// checking the scoped destructor result, then independently census roots.
-	serviceMust(t, b.as.publishSize(m, 2))
-	polynomialPhysicalAudit(t, m)
-}
 
 func TestPolynomialNegCompletedLocalGuardUnwind(t *testing.T) {
 	m := polynomialCellFixture(t)

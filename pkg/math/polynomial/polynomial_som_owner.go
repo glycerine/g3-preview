@@ -29,10 +29,9 @@ type PolynomialSOMBuffer struct {
 	sourceCause, cleanupCause                       error
 	sourceStage                                     uint8
 	sourceStarted, sourceFinalized, closing, closed bool
-	sortNumerals                                    polynomialVector
+	sortNumerals                                    polynomialNumerals
 	sortActive                                      bool
-	sortTransferred, sortCleanupIndex               uint32
-	sortOriginalCause, sortSourceCause              error
+	sortOriginalCause                               error
 	generatedCall, calleeCall                       bool
 	calleeGeneration                                uint64
 	generatedValue                                  Monomial
@@ -48,7 +47,7 @@ func NewPolynomialSOMBuffer(m *MultivariatePolynomialCore) (*PolynomialSOMBuffer
 	}
 	b := &PolynomialSOMBuffer{storage: m, header: h}
 	b.self = b
-	b.buffer.as.width = 12
+
 	b.buffer.positions.self = &b.buffer.positions
 	// Borrowed transport is not source m_owner. The latter stays null until
 	// the actual set_owner call, and empty Reset never dereferences it.
@@ -229,29 +228,6 @@ func (b *PolynomialSOMBuffer) Mk(normalize bool) (Polynomial, error) {
 	return b.buffer.mk(normalize)
 }
 
-// Cold retention is prepared at the source nonzero add branch before actual
-// INC/owning writes. There is no malloc-counter event for these real Go slices.
-func (b *PolynomialSOMBuffer) prepareRetirement(need uint32) error {
-	if need > uint32(len(b.retiredNumerals)) {
-		old := len(b.retiredNumerals)
-		n := old + old/2 + 1
-		if uint64(n) < uint64(need) {
-			n = int(need)
-		}
-		stride := uint64(reflect.TypeOf(util.Int{}).Size())
-		if uint64(n) > uint64(^uint(0)>>1)/stride {
-			return arena.ErrBounds
-		}
-		if e := b.storage.integer.Budget().Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		a := make([]util.Int, n)
-		copy(a, b.retiredNumerals)
-		b.retiredNumerals = a
-		b.storage.integer.Budget().Release(uint64(old) * stride)
-	}
-	return nil
-}
 func (b *PolynomialSOMBuffer) ownsMonomial(i uint32) bool {
 	a := &b.buffer
 	if b.generatedCall && b.storage.generatedActive && b.storage.generatedBuffer == a && b.storage.generatedIndex == i {
@@ -292,16 +268,15 @@ func (b *PolynomialSOMBuffer) retireMonomials() error {
 }
 func (b *PolynomialSOMBuffer) retireNumerals() error {
 	a := &b.buffer.as
-	for b.numeralTransferred < a.initialized {
-		if b.retiredNumeralCount >= uint32(len(b.retiredNumerals)) {
-			return ErrPolynomialPending
-		}
+	for b.numeralTransferred < uint32(len(a.values)) {
 		v, e := a.coefficient(b.storage, b.numeralTransferred)
 		if e != nil {
 			return e
 		}
-		b.retiredNumerals[b.retiredNumeralCount] = v
-		b.retiredNumeralCount++
+		if v.NativeCellToken() != 0 {
+			b.retiredNumerals = append(b.retiredNumerals, v)
+			b.retiredNumeralCount++
+		}
 		b.numeralTransferred++
 	}
 	return nil
@@ -338,11 +313,7 @@ func (b *PolynomialSOMBuffer) SourceFinalize() error {
 		if e := b.retireNumerals(); e != nil {
 			return fail(e)
 		}
-		if b.buffer.as.raw != (util.Block{}) {
-			if e := b.storage.memory.Deallocate(&b.buffer.as.raw); e != nil {
-				return fail(e)
-			}
-		}
+		b.buffer.as.values = nil
 		b.sourceStage++
 	}
 	if b.sourceStage == 2 {
@@ -390,7 +361,8 @@ func (b *PolynomialSOMBuffer) CloseChecked() error {
 			n = a
 		}
 		b.buffer.cleanupIndex = n
-		b.buffer.as.initialized = 0
+		clear(b.buffer.as.values)
+		b.buffer.as.values = nil
 	}
 	for b.numeralCursor < b.retiredNumeralCount {
 		if e := b.storage.integer.Del(&b.retiredNumerals[b.numeralCursor]); e != nil {
@@ -420,9 +392,6 @@ func (b *PolynomialSOMBuffer) CloseChecked() error {
 		b.monomialCursor++
 	}
 
-	if e := b.cleanupSortNumerals(); e != nil {
-		return e
-	}
 	if e := b.sortNumerals.close(b.storage); e != nil {
 		return e
 	}
@@ -443,7 +412,7 @@ func (b *PolynomialSOMBuffer) CloseChecked() error {
 			return e
 		}
 	}
-	b.storage.integer.Budget().Release(b.header + uint64(cap(b.retiredNumerals))*uint64(reflect.TypeOf(util.Int{}).Size()))
+	b.storage.integer.Budget().Release(b.header)
 	b.header = 0
 	b.retiredNumerals = nil
 	b.retiredMonomials = nil

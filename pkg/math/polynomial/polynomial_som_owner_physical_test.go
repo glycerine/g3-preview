@@ -2,7 +2,6 @@
 package polynomial
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
@@ -49,11 +48,6 @@ func polynomialSOMNamedRoots(t *testing.T, m *MultivariatePolynomialCore, vector
 	vectors = append(vectors, &m.translateBuffers)
 	seenVectors := map[*PolynomialSOMVector]bool{}
 	var buffers []*PolynomialSOMBuffer
-	addRaw := func(a util.Block) {
-		if a != (util.Block{}) {
-			raw = append(raw, a)
-		}
-	}
 	for _, v := range vectors {
 		if v != nil && !seenVectors[v] {
 			seenVectors[v] = true
@@ -78,55 +72,12 @@ func polynomialSOMNamedRoots(t *testing.T, m *MultivariatePolynomialCore, vector
 	}
 	for _, b := range buffers {
 		a := &b.buffer
-		extra += b.header + uint64(cap(b.retiredNumerals))*uint64(reflect.TypeOf(util.Int{}).Size())
-		extra += a.positions.header + uint64(cap(a.as.retired))*uint64(reflect.TypeOf(util.Int{}).Size()) + uint64(cap(b.sortNumerals.retired))*uint64(reflect.TypeOf(util.Int{}).Size())
-		for _, s := range []*polynomialVector{&a.as, &b.sortNumerals} {
-			addRaw(s.raw)
-			addRaw(s.pending)
-			addRaw(s.old)
-		}
-		sv := &b.sortNumerals
-		start := b.sortTransferred
-		if start < b.sortCleanupIndex {
-			start = b.sortCleanupIndex
-		}
-		for i := start; i < sv.initialized; i++ {
-			value, e := sv.coefficient(m, i)
-			serviceMust(t, e)
-			values = append(values, value)
-		}
-		if sv.old != (util.Block{}) {
-			old := polynomialVector{raw: sv.old, width: 12}
-			start := sv.oldCleanupIndex
-			if start < sv.moved {
-				start = sv.moved
-			}
-			for i := start; i < sv.oldInitialized; i++ {
-				value, e := old.coefficient(m, i)
-				serviceMust(t, e)
-				values = append(values, value)
-			}
-		}
-		values = append(values, sv.retired[:sv.retiredActive]...)
+		extra += b.header + a.positions.header
+		values = append(values, b.sortNumerals.values...)
+		values = append(values, b.sortNumerals.retired...)
 		values = append(values, a.gcd)
-		for i := b.numeralTransferred; i < a.as.initialized; i++ {
-			v, e := a.as.coefficient(m, i)
-			serviceMust(t, e)
-			values = append(values, v)
-		}
-		if a.as.old != (util.Block{}) {
-			old := polynomialVector{raw: a.as.old, width: 12}
-			start := a.as.oldCleanupIndex
-			if start < a.as.moved {
-				start = a.as.moved
-			}
-			for i := start; i < a.as.oldInitialized; i++ {
-				v, e := old.coefficient(m, i)
-				serviceMust(t, e)
-				values = append(values, v)
-			}
-		}
-		values = append(values, a.as.retired[:a.as.retiredActive]...)
+		values = append(values, a.as.values...)
+		values = append(values, a.as.retired...)
 		values = append(values, b.retiredNumerals[b.numeralCursor:b.retiredNumeralCount]...)
 		n, e := a.ms.size(m)
 		serviceMust(t, e)

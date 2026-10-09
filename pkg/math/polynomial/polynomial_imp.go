@@ -60,7 +60,6 @@ type MultivariatePolynomialManager struct {
 	newton                                                     PolynomialNewtonVector
 	skeletons                                                  PolynomialSkeletonVector
 	originalBudget                                             *arena.Budget
-	retirements                                                [6]polynomialImpRetirement
 	header                                                     uint64
 	constructed                                                uint8
 	memberStage, bodyStage, cleanupStage                       uint8
@@ -127,8 +126,7 @@ func NewMultivariatePolynomialManager(c MultivariatePolynomialManagerConfig) (*M
 	}
 	m.constructed = 3
 	// Source declaration order: directory, ID, m2pos, then actual imp tmp1.
-	m.core.rationalTerms.width = 12
-	m.core.linearTerms.width = 12
+
 	if e = monomialTempConstruct(m.core.memory, &m.core.tmp1); e != nil {
 		return fail(e)
 	}

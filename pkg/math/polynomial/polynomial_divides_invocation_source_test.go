@@ -92,7 +92,7 @@ func TestPolynomialDividesFalseReturnKeepsPersistentRAndNormalReuse(t *testing.T
 	if !equal {
 		t.Fatal("source false return changed R coefficient")
 	}
-	used, rawAs, rawMs := c.integer.Budget().Used(), c.som.as.raw, append([]Monomial(nil), c.som.ms...)
+	used, rawAs, rawMs := c.integer.Budget().Used(), append([]util.Int(nil), c.som.as.values...), append([]Monomial(nil), c.som.ms...)
 	unitRC, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
 	polynomialImpPhysicalAuditValues(t, full, []Polynomial{p, q})
@@ -100,7 +100,7 @@ func TestPolynomialDividesFalseReturnKeepsPersistentRAndNormalReuse(t *testing.T
 	serviceMust(t, c.cleanupDividesInvocation(&receipt, true))
 	after, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
-	if c.integer.Budget().Used() != used || c.som.as.raw != rawAs || !polynomialEqualMonomials(c.som.ms, rawMs) || after != unitRC {
+	if c.integer.Budget().Used() != used || !polynomialEqualNumerals(c.som.as.values, rawAs) || !polynomialEqualMonomials(c.som.ms, rawMs) || after != unitRC {
 		t.Fatal("completed receipt consumed member rows")
 	}
 	polynomialImpPhysicalAuditValues(t, full, []Polynomial{p, q})

@@ -25,18 +25,24 @@ func TestPolynomialCheapDuplicateAssertionBeforeZero(t *testing.T) {
 		serviceMust(t, e)
 	}
 }
-func TestPolynomialCheapResetUsesDel(t *testing.T) {
+func TestPolynomialCheapResetReleasesBIG(t *testing.T) {
 	m := polynomialCellFixture(t)
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
-	a := util.NewInt(-3)
+	var a util.Int
+	serviceMust(t, m.integer.SetInt64(&a, -1<<40))
+	t.Cleanup(func() { serviceMust(t, m.integer.Del(&a)) })
 	serviceMust(t, m.cheap.add(&a, u, false))
-	serviceMust(t, m.cheap.reset())
-	got, e := m.cheap.as.coefficient(m, 0)
+	owned, e := m.cheap.as.coefficient(m, 0)
 	serviceMust(t, e)
-	if got != util.NewInt(-3) {
-		t.Fatal("source Del retains inline m_val, unlike Reset", got)
+	if owned.NativeCellToken() == 0 || owned.NativeCellToken() == a.NativeCellToken() {
+		t.Fatal("source owns copied BIG", owned, a)
 	}
+	serviceMust(t, m.cheap.reset())
+	if m.integer.IsLiveCellToken(owned.NativeCellToken()) || len(m.cheap.as.values) != 0 || len(m.cheap.as.retired) != 0 {
+		t.Fatal("reset retained deleted BIG")
+	}
+	polynomialPhysicalAudit(t, m, &a)
 }
 
 // Genuine public Runtime signed-overflow guard evidence: the second actual

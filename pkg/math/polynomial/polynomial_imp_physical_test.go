@@ -174,24 +174,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		polys = append(polys, full.factorUnivariate.f.value, full.factorUnivariate.f.incoming)
 	}
 
-	for i := range full.retirements {
-		r := &full.retirements[i]
-		adapterBytes += uint64(cap(r.fields)) * uint64(reflect.TypeOf(util.Int{}).Size())
-		if r.consumed {
-			for j := r.drain; j < uint32(len(r.fields)); j++ {
-				public = append(public, &r.fields[j])
-			}
-		} else {
-			v := [6]*polynomialVector{&m.cheap2.as, &m.cheap.as, &m.som2.as, &m.som.as, &m.linearTerms, &m.rationalTerms}[i]
-			for j := uint32(0); j < r.captured; j++ {
-				a, e := v.coefficient(m, j)
-				serviceMust(t, e)
-				if a != r.fields[j] {
-					t.Fatal("tentative retirement does not match actual still-owning source field")
-				}
-			}
-		}
-	}
 	z := m.integer
 	refs := map[util.NumericCellRef]bool{}
 	add := func(a util.Int) {
@@ -287,7 +269,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		cell(m.pending.value, l.initializedCoefficients)
 	}
 
-	vectors := []*polynomialVector{&m.rationalTerms, &m.linearTerms}
+	vectors := []*polynomialNumerals{&m.rationalTerms, &m.linearTerms}
 	adapterBytes += full.skeletons.header
 	seenSkeleton := map[*PolynomialSkeleton]bool{}
 	addSkeleton := func(sk *PolynomialSkeleton) {
@@ -424,26 +406,11 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		vectors = append(vectors, &b.as)
 	}
 	for _, v := range vectors {
-		if v.width != 12 {
-			continue
+		for _, a := range v.values {
+			add(a)
 		}
-		if v.raw != (util.Block{}) {
-			for i := uint32(0); i < v.initialized; i++ {
-				a, e := v.coefficient(m, i)
-				serviceMust(t, e)
-				add(a)
-			}
-		}
-		if v.old != (util.Block{}) {
-			old := polynomialVector{raw: v.old, width: 12}
-			for i := v.moved; i < v.oldInitialized; i++ {
-				a, e := old.coefficient(m, i)
-				serviceMust(t, e)
-				add(a)
-			}
-		}
-		for i := uint32(0); i < v.retiredActive; i++ {
-			add(v.retired[i])
+		for _, a := range v.retired {
+			add(a)
 		}
 	}
 	if uint32(len(refs)) != z.Cells.Stats().Live {
@@ -488,11 +455,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			put(tmp.pending)
 		}
 	}
-	for _, v := range vectors {
-		put(v.raw)
-		put(v.pending)
-		put(v.old)
-	}
 
 	za := z.SourceAllocator().Stats()
 	ma := util.AllocatorStats{}
@@ -526,9 +488,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
 		bytes += uint64(cap(b.coefficientOwners)+cap(b.monomialOwners)+cap(b.coefficientTransferred)+cap(b.monomialTransferred)) * 8
-	}
-	for _, v := range vectors {
-		bytes += uint64(cap(v.retired)) * uint64(reflect.TypeOf(util.Int{}).Size())
 	}
 	for _, h := range handlers {
 		if h == nil || h.self != h || h.budget != z.Budget() {
