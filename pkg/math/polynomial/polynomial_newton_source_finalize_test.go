@@ -111,10 +111,8 @@ func TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix(t *testing
 	for _, p := range constants {
 		serviceMust(t, m.DecRef(p))
 	}
-	idSize, e := m.ids.Size()
-	serviceMust(t, e)
-	idCap, e := m.ids.Capacity()
-	serviceMust(t, e)
+	idSize := m.ids.FreeLen()
+	idCap := m.ids.FreeCapacity()
 	if idSize != 6 || idCap < idSize+2 {
 		t.Fatal("actual polynomial freelist room", idSize, idCap)
 	}
@@ -124,10 +122,8 @@ func TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix(t *testing
 	serviceMust(t, e)
 	serviceMust(t, mm.IncRef(mon))
 	serviceMust(t, mm.DecRef(mon))
-	monoSize, e := mm.ids.Size()
-	serviceMust(t, e)
-	monoCap, e := mm.ids.Capacity()
-	serviceMust(t, e)
+	monoSize := mm.ids.FreeLen()
+	monoCap := mm.ids.FreeCapacity()
 	if monoSize != 1 || monoCap < 2 {
 		t.Fatal("actual monomial freelist room", monoSize, monoCap)
 	}

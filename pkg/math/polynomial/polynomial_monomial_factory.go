@@ -198,10 +198,7 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 		return Monomial{}, e
 	}
 	m.creation.stage = 3
-	id, e := m.ids.Next()
-	if e != nil {
-		return Monomial{}, e
-	}
+	id := m.ids.Mk()
 	m.creation.id = id
 	m.creation.idConsumed = true
 	l.id = id

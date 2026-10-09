@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/idgen"
 )
 
 var ErrPolynomialOwner = util.ErrNumericOwner
@@ -114,7 +115,7 @@ type MultivariatePolynomialCore struct {
 	modular                                                      *util.IntegerModularManager
 	monomials                                                    *MonomialManager
 	memory                                                       *util.Runtime
-	ids                                                          util.Generator
+	ids                                                          idgen.Generator
 	polynomials                                                  polynomialVector
 	locations                                                    []polynomialLocation
 	squareRootOwner                                              *polynomialSquareRootScope
@@ -213,9 +214,7 @@ func preparePolynomialCore(c MultivariatePolynomialConfig, requireMonomials bool
 func (m *MultivariatePolynomialCore) constructPolynomialCoreDefaults() error {
 	m.polynomials.width = 16
 	m.directoryInitialized = true
-	if e := m.ids.Init(0, m.memory); e != nil {
-		return e
-	}
+	m.ids = idgen.NewBudgeted(0, m.integer.Budget(), func() bool { return m.memory.State().OutOfMemory })
 	m.idsInitialized = true
 	return nil
 }
@@ -653,9 +652,7 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 		}
 	}
 	if m.idsInitialized || m.idsSourceDestroyed {
-		if e := m.ids.CloseChecked(); e != nil {
-			return e
-		}
+		m.ids.Cleanup(0)
 		m.idsInitialized = false
 	}
 	if e := m.translateBuffers.CloseChecked(); e != nil {

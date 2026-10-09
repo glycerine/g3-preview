@@ -446,10 +446,7 @@ func (m *MultivariatePolynomialCore) mkCellWithReceipts(n uint32, as []util.Int,
 	if e != nil {
 		return Polynomial{}, e
 	}
-	id, e := m.ids.Next()
-	if e != nil {
-		return Polynomial{}, e
-	}
+	id := m.ids.Mk()
 	m.pending.id = id
 	m.pending.idConsumed = true
 	slot, e := m.prepareLocation()

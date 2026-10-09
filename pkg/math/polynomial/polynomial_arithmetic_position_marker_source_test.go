@@ -288,8 +288,7 @@ func TestPolynomialRegularPositionMarkerPostphysicalMapRelease(t *testing.T) {
 			_, e = c.monomials.MkVar()
 			serviceMust(t, e)
 			for i := 0; i < 30000; i++ {
-				_, e = c.monomials.ids.Next()
-				serviceMust(t, e)
+				_ = c.monomials.ids.Mk()
 			}
 			term, e := c.monomials.MkVariable(0, 1)
 			serviceMust(t, e)

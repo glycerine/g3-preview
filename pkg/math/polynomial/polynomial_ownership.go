@@ -102,7 +102,7 @@ func (m *MultivariatePolynomialCore) cleanupPendingCreation() error {
 	}
 	if p.idConsumed {
 		if !m.idsSourceDestroyed {
-			if e := m.ids.Recycle(p.id); e != nil {
+			if e := m.recycleID(p.id); e != nil {
 				return e
 			}
 		}

@@ -514,12 +514,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			put(tmp.raw)
 			put(tmp.pending)
 		}
-		for _, r := range mm.ids.RawRoots() {
-			put(r)
-		}
-	}
-	for _, r := range m.ids.RawRoots() {
-		put(r)
 	}
 	for _, v := range vectors {
 		put(v.raw)
@@ -566,7 +560,10 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	if uint32(len(raw))+za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
 		t.Fatal("unnamed Runtime root", len(raw), za, ma, m.memory.Stats())
 	}
-	bytes := uint64(cap(m.linearGenerated)) + integerActualOwnedBytes(z) + m.header + mmBytes + uint64(cap(m.locations))*uint64(reflect.TypeOf(polynomialLocation{}).Size())
+	bytes := uint64(cap(m.linearGenerated)) + uint64(m.ids.FreeCapacity())*4 + integerActualOwnedBytes(z) + m.header + mmBytes + uint64(cap(m.locations))*uint64(reflect.TypeOf(polynomialLocation{}).Size())
+	if mm != nil {
+		bytes += uint64(mm.ids.FreeCapacity()) * 4
+	}
 	if m.modular != nil && !m.modular.Closed() {
 		bytes += m.modular.Header
 	}

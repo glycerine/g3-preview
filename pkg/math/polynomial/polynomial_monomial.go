@@ -11,6 +11,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/idgen"
 )
 
 var ErrMonomialOwner = errors.New("mpnum: invalid monomial owner")
@@ -81,7 +82,7 @@ type MonomialManager struct {
 	config                                                                    MonomialManagerConfig
 	memory                                                                    *util.Runtime
 	allocator                                                                 *util.SmallAllocator
-	ids                                                                       util.Generator
+	ids                                                                       idgen.Generator
 	table                                                                     monomialTable
 	temps                                                                     [4]monomialTemp
 	powers                                                                    monomialPowerVector
@@ -173,9 +174,7 @@ func NewMonomialManager(c MonomialManagerConfig) (*MonomialManager, error) {
 	if e := m.table.construct(m, 8, 2); e != nil {
 		return fail(e)
 	}
-	if e := m.ids.Init(0, r); e != nil {
-		return fail(e)
-	}
+	m.ids = idgen.NewBudgeted(0, c.Budget, func() bool { return r.State().OutOfMemory })
 	m.idsInitialized = true
 	for i := range m.temps {
 		if e := m.tempConstruct(&m.temps[i]); e != nil {
@@ -485,7 +484,7 @@ func (m *MonomialManager) deleteCore(a Monomial, l *monomialLocation) error {
 			return e
 		}
 		l.id = id
-		if e := m.ids.Recycle(l.id); e != nil {
+		if e := m.recycleID(l.id); e != nil {
 			return e
 		}
 		l.stage = 2

@@ -22,9 +22,7 @@ func (m *MonomialManager) constructorUnwind() error {
 		m.completedTemps--
 	}
 	if m.idsInitialized {
-		if e := m.ids.SourceFinalize(); e != nil {
-			return e
-		}
+		m.ids.Cleanup(0)
 	}
 	if m.table.completed {
 		if m.table.raw != (util.Block{}) {
@@ -116,10 +114,7 @@ func (m *MonomialManager) SourceFinalize() error {
 	}
 	if m.sourceStage == 8 {
 		if m.idsInitialized {
-			if e := m.ids.SourceFinalize(); e != nil {
-				return e
-			}
-
+			m.ids.Cleanup(0)
 		}
 		m.sourceStage++
 	}
@@ -276,9 +271,7 @@ func (m *MonomialManager) CloseChecked() error {
 		}
 	}
 	if m.idsInitialized {
-		if e := m.ids.CloseChecked(); e != nil {
-			return e
-		}
+		m.ids.Cleanup(0)
 		m.idsInitialized = false
 	}
 	if e := m.table.cleanup(m); e != nil {

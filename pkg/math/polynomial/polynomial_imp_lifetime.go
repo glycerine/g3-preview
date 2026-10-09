@@ -150,10 +150,8 @@ func (m *MultivariatePolynomialManager) destroyMembers() error {
 				}
 			case 20:
 				m.core.idsSourceDestroyed = true
-				e = m.core.ids.SourceFinalize()
-				if e == nil {
-					m.core.idsInitialized = false
-				}
+				m.core.ids.Cleanup(0)
+				m.core.idsInitialized = false
 			case 21:
 				m.core.directorySourceDestroyed = true
 				e = polynomialImpRawSource(m.core, &m.core.polynomials)

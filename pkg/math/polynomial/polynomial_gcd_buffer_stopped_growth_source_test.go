@@ -137,13 +137,13 @@ func polynomialTLSCloseFull(t *testing.T, m *MultivariatePolynomialManager, r *u
 					t.Fatal("old directory not physically consumed")
 				}
 			}
-			if roots := m.core.ids.RawRoots(); roots[0] == (util.Block{}) {
-				t.Fatal("actual new ID backing missing", roots)
+			if m.core.ids.FreeCapacity() == 0 {
+				t.Fatal("actual new ID backing missing")
 			}
 			polynomialImpPhysicalAuditNamedRaw(t, m, nil, nil, 0, nil)
 		}
 		if !consumed && r.Stats().LiveBlocks >= live {
-			t.Fatal("no reached physical owning progress", e, m.cleanupStage, m.core.closeStage, m.core.zero, m.core.unit, m.core.ids.RawRoots(), oldDirectory, m.core.polynomials.raw, live, r.Stats().LiveBlocks)
+			t.Fatal("no reached physical owning progress", e, m.cleanupStage, m.core.closeStage, m.core.zero, m.core.unit, m.core.ids.FreeCapacity(), oldDirectory, m.core.polynomials.raw, live, r.Stats().LiveBlocks)
 		}
 	}
 }

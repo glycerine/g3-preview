@@ -68,16 +68,14 @@ func TestPolynomialSOMResetStoppedAfterPhysicalFreeOwningCursor(t *testing.T) {
 		serviceMust(t, mm.DecRef(x))
 	}
 	for i := 0; i < 3; i++ {
-		_, e := mm.ids.Next()
-		serviceMust(t, e)
+		_ = mm.ids.Mk()
 	}
 	tmp := util.NewInt(2)
 	p, e := m.MkConstantTake(&tmp)
 	serviceMust(t, e)
 	serviceMust(t, m.IncRef(p))
 	serviceMust(t, m.DecRef(p))
-	_, e = m.ids.Next()
-	serviceMust(t, e)
+	_ = m.ids.Mk()
 	small, e := mm.MkMonomial([]MonomialPower{{0, 1}})
 	serviceMust(t, e)
 	powers := make([]MonomialPower, 20000)
@@ -92,8 +90,8 @@ func TestPolynomialSOMResetStoppedAfterPhysicalFreeOwningCursor(t *testing.T) {
 	serviceMust(t, m.som.add(&a, large, false))
 	contextTLSNearMinimum(t, r)
 	before := r.Stats().LiveBlocks
-	if cap, e := mm.ids.Capacity(); e != nil || cap < 3 {
-		t.Fatal("actual ID preparation", cap, e)
+	if capacity := mm.ids.FreeCapacity(); capacity < 3 {
+		t.Fatal("actual ID preparation", capacity)
 	}
 	e = m.som.reset()
 	if !errors.Is(e, arena.ErrBounds) || r.Stats().LiveBlocks+2 != before {

@@ -357,7 +357,7 @@ func (m *MultivariatePolynomialCore) deleteCoreMode(p Polynomial, owning bool) e
 			return e
 		}
 		if !m.idsSourceDestroyed {
-			if e = m.ids.Recycle(f & 0x7fffffff); e != nil {
+			if e = m.recycleID(f & 0x7fffffff); e != nil {
 				return e
 			}
 		}

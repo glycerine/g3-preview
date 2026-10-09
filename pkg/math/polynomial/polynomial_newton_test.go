@@ -448,8 +448,7 @@ func TestPolynomialNewtonStoppedReferenceBeforeOwningAbort(t *testing.T) {
 		serviceMust(t, m.DecRef(p))
 	}
 	for range warms {
-		_, e = m.ids.Next()
-		serviceMust(t, e)
+		_ = m.ids.Mk()
 	}
 	mmwarm := [4]Monomial{}
 	for i := range mmwarm {
@@ -462,8 +461,7 @@ func TestPolynomialNewtonStoppedReferenceBeforeOwningAbort(t *testing.T) {
 		serviceMust(t, mm.DecRef(a))
 	}
 	for range mmwarm {
-		_, e = mm.ids.Next()
-		serviceMust(t, e)
+		_ = mm.ids.Mk()
 	}
 	contextTLSNearMinimum(t, runtime)
 	e = n.scope.auxPoly.assign(m, incoming)

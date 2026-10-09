@@ -448,7 +448,7 @@ func TestMonomialSourceInternTemporaryPublicationBeforeStorage(t *testing.T) {
 	m := monomialFixture(t)
 	_, e := m.MkVar()
 	serviceMust(t, e)
-	before, _ := m.ids.Range()
+	before := m.ids.Range()
 	m.config.Budget.FailAfter(0)
 	_, e = m.MkVariable(0, 1)
 	if !numericPhysicalReservationRefusal(e) {
@@ -462,7 +462,7 @@ func TestMonomialSourceInternTemporaryPublicationBeforeStorage(t *testing.T) {
 	if key.kind != monomialTemporaryKey || key.slot != 0 {
 		t.Fatal("source temporary key must precede permanent object", key)
 	}
-	after, _ := m.ids.Range()
+	after := m.ids.Range()
 	if after != before {
 		t.Fatal("ID consumed before refused source storage", after, before)
 	}
@@ -729,10 +729,6 @@ func TestMonomialSourceTempPostphysicalReleaseAcknowledgment(t *testing.T) {
 		t.Fatal("no actual completed physical frees")
 	}
 	e = m.SourceFinalize()
-	if !errors.Is(e, arena.ErrBounds) || m.sourceStage != 8 {
-		t.Fatal("next actual ID-vector free retains separate TLS error", e, m.sourceStage)
-	}
-	e = m.SourceFinalize()
 	if !errors.Is(e, arena.ErrBounds) || m.sourceStage != 9 || m.table.raw != (util.Block{}) {
 		t.Fatal("next actual table free retains separate TLS error", e, m.sourceStage)
 	}
@@ -850,45 +846,6 @@ func TestMonomialOwningCloseAfterUnitIDRefusal(t *testing.T) {
 	}
 	b.FailAfter(-1)
 	serviceMust(t, m.CloseChecked())
-	serviceMust(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
-	}
-}
-
-func TestMonomialOwningCloseRetainsPostphysicalIDLocal(t *testing.T) {
-	b := arena.NewBudget(1 << 22)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true})
-	serviceMust(t, e)
-	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
-	serviceMust(t, e)
-	s := r.State()
-	if s.LocalSize <= 0 || s.LocalSize >= 100000 {
-		t.Fatal(s)
-	}
-	padding, e := r.Allocate(uint64(100000-s.LocalSize) - 8)
-	serviceMust(t, e)
-	if r.State().LocalSize != 100000 {
-		t.Fatal("strict source TLS threshold", r.State())
-	}
-	serviceMust(t, r.SetMaxCount(1))
-	before := r.Stats()
-	e = m.CloseChecked()
-	var failure util.Failure
-	if !errors.As(e, &failure) || failure.Kind != util.FailureAllocExceeded || failure.ErrorCode() != 113 {
-		t.Fatal("postphysical ID allocation-count refusal", e)
-	}
-	roots := m.ids.RawRoots()
-	if roots[1] == (util.Block{}) || roots[0] != (util.Block{}) || r.Stats().LiveBlocks != before.LiveBlocks+1 {
-		t.Fatal("unpublished actual ID vector local", roots, before, r.Stats())
-	}
-	monomialPhysicalAudit(t, m, padding)
-	if !m.closing || m.unit == (Monomial{}) {
-		t.Fatal("actual stopped private unit", m.closing, m.unit)
-	}
-	serviceMust(t, r.SetMaxCount(0))
-	serviceMust(t, m.CloseChecked())
-	serviceMust(t, r.Deallocate(&padding))
 	serviceMust(t, r.Close())
 	if b.Used() != 0 {
 		t.Fatal(b.Used())

@@ -22,9 +22,7 @@ func (m *MultivariatePolynomialCore) unwindConstructorMembers() error {
 	if m.constructorUnwindStage == 0 {
 		if m.idsInitialized {
 			m.idsSourceDestroyed = true
-			if e := m.ids.SourceFinalize(); e != nil {
-				return e
-			}
+			m.ids.Cleanup(0)
 			m.idsInitialized = false
 		}
 		m.constructorUnwindStage++

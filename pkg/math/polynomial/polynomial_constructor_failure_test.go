@@ -117,8 +117,8 @@ func TestPolynomialConstructorCompletedMembersUnwindBeforeReturn(t *testing.T) {
 			// The body-created zero is not an automatic destructor root. Completed
 			// ID then directory members unwind independently, while that cell and the
 			// actual body MM retain remain named for explicit owning abort.
-			if _, x := m.ids.Range(); x != util.ErrOwner {
-				t.Errorf("source ID destructor missing: %v", x)
+			if m.ids.FreeLen() != 0 || m.ids.FreeCapacity() != 0 {
+				t.Errorf("source ID destructor retained backing")
 			}
 			if m.constructorUnwindStage != 3 || m.constructorUnwinding || m.cleanupCause != nil || !m.idsSourceDestroyed || !m.directorySourceDestroyed || !m.modularSourceDestroyed || m.constructorModularIndex != 7 {
 				t.Error("actual completed selected-member cursor and original-only cause")
