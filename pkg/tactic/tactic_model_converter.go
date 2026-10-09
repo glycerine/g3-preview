@@ -89,8 +89,8 @@ func (r *ModelRef) Close() error {
 	return nil
 }
 
-// Concrete labels_vec/svector<symbol>. It owns scalar backing and borrows
-// symbol identities, which stay valid with the source symbol manager.
+// ModelLabels borrows symbol identities, which stay valid with the source
+// symbol manager. Its typed slice is ordinary Go-managed storage.
 type ModelLabels struct {
 	Values []util.Symbol
 	Budget *arena.Budget
@@ -100,20 +100,6 @@ func (l *ModelLabels) Append(value util.Symbol) error {
 	if l == nil {
 		return ErrModelConverterOwner
 	}
-	if len(l.Values) == cap(l.Values) {
-		stride := uint64(reflect.TypeOf(util.Symbol{}).Size())
-		n, e := util.SourceVectorCapacity(cap(l.Values), stride)
-		if e != nil {
-			return e
-		}
-		if e = l.Budget.Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		next := make([]util.Symbol, len(l.Values), n)
-		copy(next, l.Values)
-		l.Budget.Release(uint64(cap(l.Values)) * stride)
-		l.Values = next
-	}
 	l.Values = append(l.Values, value)
 	return nil
 }
@@ -121,7 +107,7 @@ func (l *ModelLabels) Close() {
 	if l == nil {
 		return
 	}
-	l.Budget.Release(uint64(cap(l.Values)) * uint64(reflect.TypeOf(util.Symbol{}).Size()))
+	clear(l.Values)
 	l.Values = nil
 }
 
@@ -289,37 +275,10 @@ type tacticConcatStarModelConverter struct {
 }
 
 func (c *tacticConcatStarModelConverter) pushSecond(value ModelConverter) error {
-	if len(c.seconds) == cap(c.seconds) {
-		stride := uint64(reflect.TypeOf((*ModelConverter)(nil)).Elem().Size())
-		n, e := util.SourceVectorCapacity(cap(c.seconds), stride)
-		if e != nil {
-			return e
-		}
-		if e = c.budget.Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		next := make([]ModelConverter, len(c.seconds), n)
-		copy(next, c.seconds)
-		c.budget.Release(uint64(cap(c.seconds)) * stride)
-		c.seconds = next
-	}
 	c.seconds = append(c.seconds, value)
 	return nil
 }
 func (c *tacticConcatStarModelConverter) pushSize(size uint32) error {
-	if len(c.sizes) == cap(c.sizes) {
-		n, e := util.SourceVectorCapacity(cap(c.sizes), 4)
-		if e != nil {
-			return e
-		}
-		if e = c.budget.Reserve(uint64(n) * 4); e != nil {
-			return e
-		}
-		next := make([]uint32, len(c.sizes), n)
-		copy(next, c.sizes)
-		c.budget.Release(uint64(cap(c.sizes)) * 4)
-		c.sizes = next
-	}
 	c.sizes = append(c.sizes, size)
 	return nil
 }
@@ -472,9 +431,7 @@ func (c *tacticConcatStarModelConverter) Close() error {
 		}
 		c.pending = nil
 	}
-	c.budget.Release(uint64(cap(c.sizes)) * 4)
 	c.sizes = nil
-	c.budget.Release(uint64(cap(c.seconds)) * uint64(reflect.TypeOf((*ModelConverter)(nil)).Elem().Size()))
 	c.seconds = nil
 	if c.first != nil {
 		if e := c.first.DecRef(); e != nil {

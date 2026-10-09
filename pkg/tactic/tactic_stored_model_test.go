@@ -8,8 +8,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
-
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -53,7 +51,7 @@ func TestTacticStoredModelLabelsSnapshotAndAppend(t *testing.T) {
 	}
 }
 
-func TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix(t *testing.T) {
+func TestTacticStoredModelLabelAppendUsesNativeSliceStorage(t *testing.T) {
 	m := astTestManager(t)
 	md := modelTestCore(t, m)
 	labels := []util.Symbol{astTestSymbol(t, m, "first"), astTestSymbol(t, m, "second"), astTestSymbol(t, m, "third")}
@@ -67,11 +65,11 @@ func TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix(t *testing.T) {
 	m.BudgetField.FailAfter(0)
 	t.Cleanup(func() { m.BudgetField.FailAfter(-1) })
 	e = c.ApplyLabels(&out, 0)
-	if e != arena.ErrInjectedFailure {
-		t.Fatal("destination growth refusal lost", e)
+	if e != nil {
+		t.Fatal(e)
 	}
-	if !reflect.DeepEqual(out.Values, []util.Symbol{prefix, labels[0]}) {
-		t.Fatal("source elementwise append prefix lost", out.Values)
+	if !reflect.DeepEqual(out.Values, []util.Symbol{prefix, labels[0], labels[1], labels[2]}) {
+		t.Fatal("label order", out.Values)
 	}
 	if md.References != 1 || md.Closed {
 		t.Fatal("label refusal changed stored-model ownership")
