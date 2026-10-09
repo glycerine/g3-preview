@@ -25,6 +25,16 @@ enforceable boundary. Package by functionality rather than mechanically making
 one package per C++ header. If a facility has no production C++ consumer,
 delete or defer the port instead of giving dead code a new home.
 
+The extraction work now includes `util/filepath`, `util/approx`,
+`util/messages`, `util/natset`, `util/stack`, and `util/bitset`. The bitset
+package owns the native variable-width, fast-reset, fixed-width, and unsigned
+set implementations. It imports `arena` directly for fixed-width pooled
+storage and keeps its source-compatible hash routine private beside its two
+hash consumers. The unsigned set exposes typed ascending `ForEach` traversal;
+the copied C++ iterator and hash-functor wrappers were removed. The redundant
+`Runtime`/`Block` bit-container translations were deleted after a module-wide
+consumer scan found no production user.
+
 ## Method and terminology
 
 The graph was built from quoted includes in every direct `.h` and `.cpp` file
@@ -139,7 +149,7 @@ self-contained in Go or depend only on `arena` or the standard library.
 | `util/natset` | `nat_set` | Self-contained live representation and a natural package leaf. |
 | `util/approx` | `approx_nat`, `approx_set` | Cohesive approximate-number/set functionality. Their display methods currently touch shared numeric formatting; replace that edge with ordinary `fmt`/`io` behavior or a narrow formatter. |
 | `util/backtrack` | `trail`, `union_find`, selected backtracking containers | `union_find` is widely used upstream. Keep trail ownership and undo behavior together. Specialize `backtrackable_set` for its actual consumer instead of keeping `any`. |
-| `util/bitset` | `bit_util`, `bit_vector`, `fixed_bit_vector`, `obj_mark` | Natural bit-oriented cluster. Check whether fixed-width manager state needs the shared allocator before moving it. |
+| `util/bitset` | `bit_vector`, `fixed_bit_vector`, `uint_set` | Extracted. Native typed storage; fixed-width vectors import `arena` directly. `bit_util` and `obj_mark` remain for separate consumer-led work. |
 | `util/cliques` | `max_cliques`, its set helpers | Already has SAT consumers. A focused package would isolate the algorithm and its tests. |
 | `util/sortnet` | `sorting_network` | Standalone algorithm with production consumers outside `util`. |
 | `util/permutation` | live declarations from `permutation.h` | Only move the live free permutation operations. `permutation.cpp` itself has no production caller. |

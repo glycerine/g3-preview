@@ -1,5 +1,5 @@
 // Translation of src/util/fixed_bit_vector.h and fixed_bit_vector.cpp.
-package util
+package bitset
 
 import (
 	"reflect"
@@ -386,7 +386,7 @@ func (m *FixedManager) Hash(r FixedRef) (uint32, error) {
 		return 0, e
 	}
 	var err error
-	h := WordReader(m.numBits/8, m.numBits, func(i uint32) uint32 {
+	h := wordReader(m.numBits/8, m.numBits, func(i uint32) uint32 {
 		w, e := m.words.Read(r, i)
 		if e != nil && err == nil {
 			err = e

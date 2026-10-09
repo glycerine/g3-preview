@@ -1,5 +1,5 @@
 // Translation of src/util/uint_set.h, Leonardo de Moura, 2006-12-07.
-package util
+package bitset
 
 import (
 	"math/bits"
@@ -190,13 +190,6 @@ func (s *UintSet) Hash() uint32 {
 	return h
 }
 
-type UintSetEqual struct{}
-
-func (UintSetEqual) Equal(a, b *UintSet) bool { return a.Equal(b) }
-
-type UintSetHasher struct{}
-
-func (UintSetHasher) Hash(s *UintSet) uint32 { return s.Hash() }
 func (s *UintSet) String() string {
 	var out strings.Builder
 	out.WriteByte('{')
@@ -216,56 +209,15 @@ func (s *UintSet) String() string {
 	return out.String()
 }
 
-// UintSetIterator borrows its set and scans source words/bits in ascending order.
-// Mutation of the set during traversal is outside the source iterator contract.
-// Equality intentionally compares indices only, including different owners.
-type UintSetIterator struct {
-	set         *UintSet
-	index, last uint32
-}
-
-func (s *UintSet) Begin() UintSetIterator { return s.iterator(false) }
-func (s *UintSet) End() UintSetIterator   { return s.iterator(true) }
-func (s *UintSet) iterator(atEnd bool) UintSetIterator {
-	it := UintSetIterator{set: s, last: s.MaxElem()}
-	if atEnd {
-		it.index = it.last
+// ForEach visits members in ascending order. Returning false stops traversal.
+func (s *UintSet) ForEach(yield func(uint32) bool) {
+	for wi, word := range s.words {
+		for word != 0 {
+			bit := uint32(bits.TrailingZeros32(word))
+			if !yield(uint32(wi)*32 + bit) {
+				return
+			}
+			word &^= uint32(1) << bit
+		}
 	}
-	it.scan()
-	return it
-}
-func (it UintSetIterator) AtEnd() bool                      { return it.index == it.last }
-func (it UintSetIterator) Value() uint32                    { return it.index }
-func (it UintSetIterator) Equal(other UintSetIterator) bool { return it.index == other.index }
-func (it *UintSetIterator) Assign(other UintSetIterator)    { *it = other }
-func (it *UintSetIterator) Next() {
-	if it.AtEnd() {
-		panic("bitset: increment end iterator")
-	}
-	it.index++
-	it.scan()
-}
-func (it *UintSetIterator) PostNext() UintSetIterator { old := *it; it.Next(); return old }
-func (it *UintSetIterator) scanIndex() {
-	for !it.AtEnd() && !it.set.Contains(it.index) && it.index&31 != 0 {
-		it.index++
-	}
-}
-func (it *UintSetIterator) scanWord() {
-	i := it.index >> 5
-	for !it.AtEnd() && it.set.words[i] == 0 {
-		i++
-		it.index += 32
-	}
-}
-func (it *UintSetIterator) scan() {
-	it.scanIndex()
-	if it.set.Contains(it.index) || it.AtEnd() {
-		return
-	}
-	it.scanWord()
-	if !it.AtEnd() && !it.set.Contains(it.index) {
-		it.index++
-	}
-	it.scanIndex()
 }

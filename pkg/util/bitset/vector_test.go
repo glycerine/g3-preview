@@ -1,5 +1,5 @@
 // Assertions translated from src/test/bit_vector.cpp.
-package util
+package bitset
 
 import (
 	_ "embed"

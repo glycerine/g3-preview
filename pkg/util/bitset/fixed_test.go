@@ -1,5 +1,5 @@
 // Tests translated from src/test/fixed_bit_vector.cpp, Nikolaj Bjorner.
-package util
+package bitset
 
 import (
 	_ "embed"

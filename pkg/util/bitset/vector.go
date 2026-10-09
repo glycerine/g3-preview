@@ -1,5 +1,5 @@
 // Translation of src/util/bit_vector.h and bit_vector.cpp.
-package util
+package bitset
 
 import (
 	"strings"
@@ -257,7 +257,7 @@ func (v *Vector) String() string {
 
 // Hash preserves get_hash's floor(size/8) byte length, including omission of
 // incomplete final bytes. Word bytes follow the source little-endian baseline.
-func (v *Vector) Hash() uint32 { return WordBytes(v.words, v.size/8, 0) }
+func (v *Vector) Hash() uint32 { return wordBytes(v.words, v.size/8, 0) }
 
 // FastReset records every set-to-one operation, including duplicates, and clears
 // those bits on Reset without changing the logical length.

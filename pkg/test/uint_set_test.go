@@ -4,7 +4,7 @@ package test
 import (
 	_ "embed"
 	"encoding/json"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/bitset"
 	rand "math/rand/v2"
 
 	"testing"
@@ -17,7 +17,7 @@ func TestUintSetSourceTst1(t *testing.T) {
 	r := rand.New(rand.NewPCG(72, 93))
 	for run := 0; run < 100; run++ {
 		for _, n := range []int{1 + r.IntN(31), 1 + r.IntN(100)} {
-			var s util.UintSet
+			var s bitset.UintSet
 			ref := make([]bool, n)
 			count := uint32(0)
 			operations := r.IntN(1000)
@@ -53,7 +53,7 @@ func TestUintSetSourceTst2(t *testing.T) {
 	r := rand.New(rand.NewPCG(5, 8))
 	for run := 0; run < 1000; run++ {
 		for _, n := range []uint32{1, 10, 31, 32, 100} {
-			var s util.UintSet
+			var s bitset.UintSet
 			if !s.Empty() {
 				t.Fatal("empty constructor")
 			}
@@ -77,7 +77,7 @@ func TestUintSetSourceTst2(t *testing.T) {
 }
 func TestUintSetSourceTst3(t *testing.T) {
 	for _, n := range []uint32{12, 100} {
-		var a, b util.UintSet
+		var a, b bitset.UintSet
 		if !a.Equal(&b) {
 			t.Fatal("initial equality")
 		}
@@ -114,7 +114,7 @@ func TestUintSetSourceTst3(t *testing.T) {
 			t.Fatal("copy b")
 		}
 		for i := uint32(0); i < n; i++ {
-			var singleton util.UintSet
+			var singleton bitset.UintSet
 			singleton.Insert(i)
 			if a.Contains(i) != singleton.SubsetOf(&a) {
 				t.Fatal(n, i)
@@ -123,7 +123,7 @@ func TestUintSetSourceTst3(t *testing.T) {
 	}
 }
 func TestUintSetSourceTst4(t *testing.T) {
-	var s util.UintSet
+	var s bitset.UintSet
 	s.Insert(32)
 	if !s.Contains(32) || s.Contains(31) || s.Contains(0) {
 		t.Fatal("word boundary insert")
@@ -141,7 +141,7 @@ func TestUintSetSourceTst5PrintedExpectations(t *testing.T) {
 	if e := json.Unmarshal(uintSetPrintsJSON, &fixtures); e != nil {
 		t.Fatal(e)
 	}
-	var s util.UintSet
+	var s bitset.UintSet
 	for step := 0; step < 5; step++ {
 		if step > 0 {
 			s.Insert([]uint32{1, 2, 44, 4}[step-1])
@@ -157,7 +157,7 @@ func TestUintSetSourceTst5PrintedExpectations(t *testing.T) {
 	}
 }
 func TestUintSetSourcePaddingCapacityAndCopies(t *testing.T) {
-	var a, b util.UintSet
+	var a, b bitset.UintSet
 	b.Insert(96)
 	if b.MaxElem() != 128 || b.CapacityWords() != 5 {
 		t.Fatal("word extent/capacity", b.MaxElem(), b.CapacityWords())
@@ -166,7 +166,7 @@ func TestUintSetSourcePaddingCapacityAndCopies(t *testing.T) {
 	if a.MaxElem() != 160 || a.CapacityWords() != 5 || !a.Equal(&b) || a.Hash() != b.Hash() {
 		t.Fatal("source_size+1 union padding", a.MaxElem())
 	}
-	b.Intersect(&util.UintSet{})
+	b.Intersect(&bitset.UintSet{})
 	if b.MaxElem() != 0 || b.CapacityWords() != 5 {
 		t.Fatal("intersection retains capacity")
 	}
@@ -174,7 +174,7 @@ func TestUintSetSourcePaddingCapacityAndCopies(t *testing.T) {
 	if clone.CapacityWords() != 0 || clone.MaxElem() != 0 {
 		t.Fatal("copy ctor only pushes logical words")
 	}
-	var dst util.UintSet
+	var dst bitset.UintSet
 	dst.Assign(&b)
 	if dst.CapacityWords() != 5 || !dst.Empty() {
 		t.Fatal("assignment copies source capacity")
@@ -200,50 +200,36 @@ func TestUintSetSourcePaddingCapacityAndCopies(t *testing.T) {
 		t.Fatal("destructor replacement")
 	}
 }
-func TestUintSetIteratorMethods(t *testing.T) {
-	var s util.UintSet
+func TestUintSetTraversal(t *testing.T) {
+	var s bitset.UintSet
 	for _, v := range []uint32{130, 0, 31, 32, 65, 97} {
 		s.Insert(v)
 	}
 	want := []uint32{0, 31, 32, 65, 97, 130}
-	it, end := s.Begin(), s.End()
-	for i, w := range want {
-		if it.Equal(end) || it.Value() != w {
-			t.Fatal(i, it.Value(), w)
+	var got []uint32
+	s.ForEach(func(v uint32) bool {
+		got = append(got, v)
+		return true
+	})
+	if len(got) != len(want) {
+		t.Fatal("traversal length", got)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatal(i, got[i], want[i])
 		}
-		old := it.PostNext()
-		if old.Value() != w {
-			t.Fatal("postincrement")
-		}
 	}
-	if !it.Equal(end) || !it.AtEnd() {
-		t.Fatal("iterator end")
-	}
-	first := s.Begin()
-	it.Assign(first)
-	if it.Value() != 0 {
-		t.Fatal("iterator assignment")
-	}
-	it.Next()
-	if it.Value() != 31 {
-		t.Fatal("preincrement")
-	}
-	var other util.UintSet
-	other.Insert(31)
-	oi := other.Begin()
-	if !it.Equal(oi) {
-		t.Fatal("source iterator equality compares index only")
-	}
-	var empty util.UintSet
-	if !empty.Begin().Equal(empty.End()) {
-		t.Fatal("empty iteration")
-	}
-	if !(util.UintSetEqual{}).Equal(&s, &s) || (util.UintSetHasher{}).Hash(&s) != s.Hash() {
-		t.Fatal("source functor wrappers")
+	var stopped []uint32
+	s.ForEach(func(v uint32) bool {
+		stopped = append(stopped, v)
+		return len(stopped) < 2
+	})
+	if len(stopped) != 2 || stopped[1] != 31 {
+		t.Fatal("early stop", stopped)
 	}
 }
 func TestUintSetWeightedHashWrap(t *testing.T) {
-	var s util.UintSet
+	var s bitset.UintSet
 	s.Insert(31)
 	s.Insert(63)
 	if s.Hash() != 2147483648 {
@@ -256,7 +242,7 @@ func TestUintSetWeightedHashWrap(t *testing.T) {
 }
 func TestUintSetIndependentBoundedOracle(t *testing.T) {
 	r := rand.New(rand.NewPCG(772, 993))
-	var a, b util.UintSet
+	var a, b bitset.UintSet
 	var aa, bb [192]bool
 	for step := 0; step < 3000; step++ {
 		switch r.IntN(8) {
@@ -309,20 +295,23 @@ func TestUintSetIndependentBoundedOracle(t *testing.T) {
 		if a.NumElems() != count || a.Empty() != (count == 0) || a.Equal(&b) != equal || a.SubsetOf(&b) != subset {
 			t.Fatal(step, "relations")
 		}
-		it := a.Begin()
-		for _, w := range ordered {
-			if it.AtEnd() || it.Value() != w {
-				t.Fatal(step, "iterator")
-			}
-			it.Next()
+		var got []uint32
+		a.ForEach(func(v uint32) bool {
+			got = append(got, v)
+			return true
+		})
+		if len(got) != len(ordered) {
+			t.Fatal(step, "traversal length")
 		}
-		if !it.AtEnd() {
-			t.Fatal(step, "iterator excess")
+		for i := range ordered {
+			if got[i] != ordered[i] {
+				t.Fatal(step, "traversal", i)
+			}
 		}
 	}
 }
 func TestUintSetWarmOperationsNoAllocation(t *testing.T) {
-	var a, b util.UintSet
+	var a, b bitset.UintSet
 	a.Insert(255)
 	b.Insert(129)
 	if n := testing.AllocsPerRun(100, func() {
@@ -332,15 +321,13 @@ func TestUintSetWarmOperationsNoAllocation(t *testing.T) {
 		a.Hash()
 		a.Union(&b)
 		a.Intersect(&b)
-		for it := a.Begin(); !it.AtEnd(); it.Next() {
-			it.Value()
-		}
+		a.ForEach(func(uint32) bool { return true })
 	}); n != 0 {
 		t.Fatal("warmed word operations allocated", n)
 	}
 }
 func TestUintSetOverflowRejectedBeforeGrowth(t *testing.T) {
-	var s util.UintSet
+	var s bitset.UintSet
 	s.Insert(3)
 	before := s.CapacityWords()
 	func() {
