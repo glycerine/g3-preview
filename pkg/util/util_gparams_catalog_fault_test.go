@@ -85,7 +85,7 @@ func TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription(t *testing.T)
 		b.FailAfter(-1)
 		ok := e == nil
 		pending := c.Pending != nil
-		late := !ok && g.ModuleDescriptors.size == 19 && c.Pending == nil
+		late := !ok && g.ModuleDescriptors.size() == 19 && c.Pending == nil
 		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
 			t.Fatal(prefix, e)
 		}

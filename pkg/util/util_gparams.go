@@ -125,13 +125,9 @@ func newSourceGlobalParams(s *SymbolManager, p *ParamsContext, c GlobalParamsCon
 		}
 		return g, e
 	}
-	if e := g.ModuleDescriptors.allocate(c.Budget, 8); e != nil {
-		return fail(e)
-	}
+	g.ModuleDescriptors.init()
 	g.constructorCompleted = 1
-	if e := g.ModuleDescriptions.allocate(c.Budget, 8); e != nil {
-		return fail(e)
-	}
+	g.ModuleDescriptions.init()
 	g.constructorCompleted = 2
 	d, e := newSourceParamDescrs(s, ParamDescrsConfig{Budget: c.Budget, Text: arena.VectorConfig{PageSize: c.DescriptorWordsPageSize, Descriptors: arena.Config{PageSize: c.DescriptorPageSize, Budget: c.Budget}}})
 	if e != nil {
@@ -140,9 +136,7 @@ func newSourceGlobalParams(s *SymbolManager, p *ParamsContext, c GlobalParamsCon
 	}
 	g.GlobalDescriptors = d
 	g.constructorCompleted = 3
-	if e = g.ModuleParams.allocate(c.Budget, 8); e != nil {
-		return fail(e)
-	}
+	g.ModuleParams.init()
 	g.constructorCompleted = 4
 	g.globalParams, e = p.NewValue()
 	if e != nil {
@@ -188,15 +182,13 @@ func (g *GlobalParams) moduleDescriptor(k Symbol) (*ParamDescrs, error) {
 	if e := g.ensureRegistered(); e != nil {
 		return nil, e
 	}
-	h, e := g.SymbolsField.Hash(k)
-	if e != nil {
+	if _, e := g.SymbolsField.Hash(k); e != nil {
 		return nil, e
 	}
-	i := g.ModuleDescriptors.find(k, h)
-	if i < 0 {
+	n, ok := g.ModuleDescriptors.get(k)
+	if !ok {
 		return nil, ErrGlobalParamsOwner
 	}
-	n := g.ModuleDescriptors.Entries[i].descriptor
 	if n == 0 || int(n) > len(g.Descriptors) || g.Descriptors[n-1] == nil {
 		return nil, ErrGlobalParamsOwner
 	}
@@ -237,13 +229,11 @@ func (g *GlobalParams) registerModule(name string, d *ParamDescrs) error {
 	if e != nil {
 		return e
 	}
-	h, e := g.SymbolsField.Hash(k)
-	if e != nil {
+	if _, e := g.SymbolsField.Hash(k); e != nil {
 		return e
 	}
-	i := g.ModuleDescriptors.find(k, h)
-	if i >= 0 {
-		old := g.Descriptors[g.ModuleDescriptors.Entries[i].descriptor-1]
+	if descriptor, ok := g.ModuleDescriptors.get(k); ok {
+		old := g.Descriptors[descriptor-1]
 		if old == d {
 			return ErrGlobalParamsOwner
 		}
@@ -259,9 +249,7 @@ func (g *GlobalParams) registerModule(name string, d *ParamDescrs) error {
 		return e
 	}
 	slot := uint32(len(g.Descriptors) + 1)
-	if e = g.ModuleDescriptors.insert(g.Budget, GparamsDescriptorEntry{key: k, hash: h, descriptor: slot}); e != nil {
-		return e
-	}
+	g.ModuleDescriptors.set(k, slot)
 	g.Descriptors = append(g.Descriptors, d)
 	return nil
 }
@@ -309,22 +297,20 @@ func (g *GlobalParams) GetParams(k Symbol) (*ParamsRef, error) {
 	if e := g.open(); e != nil {
 		return nil, e
 	}
-	h, e := g.SymbolsField.Hash(k)
-	if e != nil {
+	if _, e := g.SymbolsField.Hash(k); e != nil {
 		return nil, e
 	}
 	if k == (Symbol{}) {
 		return &g.globalParams, nil
 	}
-	if i := g.ModuleParams.find(k, h); i >= 0 {
-		n := g.ModuleParams.Entries[i].cell
+	if n, ok := g.ModuleParams.get(k); ok {
 		if n == 0 || int(n) > len(g.Cells) || g.Cells[n-1] == nil {
 			return nil, ErrGlobalParamsOwner
 		}
 		return &g.Cells[n-1].value, nil
 	}
 	bytes := uint64(reflect.TypeOf(GparamsRefCell{}).Size())
-	if e = g.Budget.Reserve(bytes); e != nil {
+	if e := g.Budget.Reserve(bytes); e != nil {
 		return nil, e
 	}
 	v, e := g.ContextField.NewValue()
@@ -353,10 +339,7 @@ func (g *GlobalParams) GetParams(k Symbol) (*ParamsRef, error) {
 		}
 	}
 	n := uint32(slot + 1)
-	if e = g.ModuleParams.insert(g.Budget, GparamsRefEntry{key: k, hash: h, cell: n}); e != nil {
-		g.Budget.Release(bytes)
-		return nil, e
-	}
+	g.ModuleParams.set(k, n)
 	if slot == len(g.Cells) {
 		g.Cells = append(g.Cells, cell)
 	} else {
@@ -368,16 +351,14 @@ func (g *GlobalParams) getModule(k Symbol) (ParamsRef, error) {
 	if e := g.open(); e != nil {
 		return ParamsRef{}, e
 	}
-	h, e := g.SymbolsField.Hash(k)
-	if e != nil {
+	if _, e := g.SymbolsField.Hash(k); e != nil {
 		return ParamsRef{}, e
 	}
 	v, e := g.ContextField.NewValue()
 	if e != nil {
 		return ParamsRef{}, e
 	}
-	if i := g.ModuleParams.find(k, h); i >= 0 {
-		n := g.ModuleParams.Entries[i].cell
+	if n, ok := g.ModuleParams.get(k); ok {
 		if n == 0 || int(n) > len(g.Cells) || g.Cells[n-1] == nil {
 			return ParamsRef{}, ErrGlobalParamsOwner
 		}
@@ -416,11 +397,7 @@ func (g *GlobalParams) reset() error {
 			return e
 		}
 	}
-	for _, x := range g.ModuleParams.Entries {
-		if x.state != 2 {
-			continue
-		}
-		i := x.cell
+	for _, i := range g.ModuleParams.values {
 		if i == 0 || int(i) > len(g.Cells) || g.Cells[i-1] == nil {
 			return ErrGlobalParamsOwner
 		}
@@ -431,7 +408,8 @@ func (g *GlobalParams) reset() error {
 		g.Budget.Release(uint64(reflect.TypeOf(*cell).Size()))
 		g.Cells[i-1] = nil
 	}
-	return g.ModuleParams.reset(g.Budget)
+	g.ModuleParams.reset()
+	return nil
 }
 func (g *GlobalParams) Reset() error {
 	if g == nil {
@@ -462,15 +440,13 @@ func (g *GlobalParams) closeLegacy() error {
 	if e := g.reset(); e != nil {
 		return e
 	}
-	for _, x := range g.ModuleDescriptors.Entries {
-		if x.state == 2 {
-			d := g.Descriptors[x.descriptor-1]
-			if d != nil {
-				if e := d.Close(); e != nil {
-					return e
-				}
-				g.Descriptors[x.descriptor-1] = nil
+	for _, descriptor := range g.ModuleDescriptors.values.All() {
+		d := g.Descriptors[descriptor-1]
+		if d != nil {
+			if e := d.Close(); e != nil {
+				return e
 			}
+			g.Descriptors[descriptor-1] = nil
 		}
 	}
 	if g.GlobalDescriptors != nil {
@@ -485,9 +461,9 @@ func (g *GlobalParams) closeLegacy() error {
 			return e
 		}
 	}
-	g.ModuleParams.close(g.Budget)
-	g.ModuleDescriptions.close(g.Budget)
-	g.ModuleDescriptors.close(g.Budget)
+	g.ModuleParams.close()
+	g.ModuleDescriptions.close()
+	g.ModuleDescriptors.close()
 	g.Budget.Release(uint64(cap(g.Cells))*uint64(reflect.TypeOf((*GparamsRefCell)(nil)).Size()) + uint64(cap(g.Descriptors))*uint64(reflect.TypeOf((*ParamDescrs)(nil)).Size()) + uint64(cap(g.Bindings))*uint64(reflect.TypeOf(GparamsRegionBinding{}).Size()) + uint64(cap(g.Workspace)) + g.OwnerBytes)
 	g.Cells = nil
 	g.Descriptors = nil

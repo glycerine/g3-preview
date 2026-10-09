@@ -265,15 +265,13 @@ func (g *GlobalParams) findModuleDescriptor(k Symbol) (*ParamDescrs, bool, error
 	if e := g.ensureRegistered(); e != nil {
 		return nil, false, e
 	}
-	h, e := g.SymbolsField.Hash(k)
-	if e != nil {
+	if _, e := g.SymbolsField.Hash(k); e != nil {
 		return nil, false, e
 	}
-	i := g.ModuleDescriptors.find(k, h)
-	if i < 0 {
+	n, ok := g.ModuleDescriptors.get(k)
+	if !ok {
 		return nil, false, nil
 	}
-	n := g.ModuleDescriptors.Entries[i].descriptor
 	if n == 0 || int(n) > len(g.Descriptors) || g.Descriptors[n-1] == nil {
 		return nil, false, ErrGlobalParamsOwner
 	}
@@ -436,12 +434,10 @@ func (g *GlobalParams) getValue(module, k Symbol) (string, error) {
 		}
 		return g.getDefault(g.GlobalDescriptors, k, module)
 	}
-	h, e := g.SymbolsField.Hash(module)
-	if e != nil {
+	if _, e := g.SymbolsField.Hash(module); e != nil {
 		return "", e
 	}
-	if i := g.ModuleParams.find(module, h); i >= 0 {
-		n := g.ModuleParams.Entries[i].cell
+	if n, ok := g.ModuleParams.get(module); ok {
 		if n == 0 || int(n) > len(g.Cells) || g.Cells[n-1] == nil {
 			return "", ErrGlobalParamsOwner
 		}

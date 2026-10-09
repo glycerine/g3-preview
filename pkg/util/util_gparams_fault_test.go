@@ -14,7 +14,6 @@ func gparamsVectorGraph(s arena.VectorStats) uint64 {
 }
 func gparamsGraph(g *GlobalParams) uint64 {
 	n := g.OwnerBytes + uint64(cap(g.Workspace)) + uint64(cap(g.Bindings))*uint64(reflect.TypeOf(GparamsRegionBinding{}).Size()) + uint64(cap(g.Cells))*uint64(reflect.TypeOf((*GparamsRefCell)(nil)).Size()) + uint64(cap(g.Descriptors))*uint64(reflect.TypeOf((*ParamDescrs)(nil)).Size())
-	n += uint64(len(g.ModuleDescriptors.Entries))*uint64(reflect.TypeOf(GparamsDescriptorEntry{}).Size()) + uint64(len(g.ModuleDescriptions.Entries))*uint64(reflect.TypeOf(GparamsDescriptionEntry{}).Size()) + uint64(len(g.ModuleParams.Entries))*uint64(reflect.TypeOf(GparamsRefEntry{}).Size())
 	for _, x := range g.Cells {
 		if x != nil {
 			n += uint64(reflect.TypeOf(*x).Size())
@@ -175,7 +174,7 @@ func TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner(t *testing.T) {
 		t.Fatal(failed, passed)
 	}
 }
-func TestGlobalParamsDescriptionBindingThenFailedTablePublication(t *testing.T) {
+func TestGlobalParamsDescriptionBindingAndMapPublication(t *testing.T) {
 	g, _, sy, b := gparamsRealRegistry(t)
 	paramsMust(t, g.ensureRegistered())
 	for _, name := range []string{"a", "b", "c", "d", "e", "f", "g"} {
@@ -185,23 +184,17 @@ func TestGlobalParamsDescriptionBindingThenFailedTablePublication(t *testing.T) 
 	paramsMust(t, e)
 	defer r.Close()
 	ref := gparamsDescriptionBytes(t, r, "actual borrowed text")
-	// Successful binding reserve is retained; the source map's subsequent
-	// grow-before-insert failure does not publish the new description.
+	// The binding is budgeted; publication into the Go map adds no simulated
+	// C++ table-allocation failure point.
 	b.FailAfter(1)
 	e = g.RegisterModuleDescription("sat", r, ref, 0)
 	b.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || len(g.Bindings) != 1 || g.ModuleDescriptions.size != 7 {
-		t.Fatal(e, g.Bindings, g.ModuleDescriptions.size)
+	if e != nil || len(g.Bindings) != 1 || g.ModuleDescriptions.size() != 8 {
+		t.Fatal(e, g.Bindings, g.ModuleDescriptions.size())
 	}
 	key, e := sy.Intern("sat")
 	paramsMust(t, e)
-	hash, e := sy.Hash(key)
-	paramsMust(t, e)
-	if g.ModuleDescriptions.find(key, hash) >= 0 || b.Used() != gparamsGraph(g) {
-		t.Fatal("publication/ownership prefix", b.Used(), gparamsGraph(g))
-	}
-	paramsMust(t, g.RegisterModuleDescription("sat", r, ref, 0))
-	if g.ModuleDescriptions.size != 8 || len(g.Bindings) != 1 || b.Used() != gparamsGraph(g) {
-		t.Fatal("retry", g.ModuleDescriptions.size, b.Used(), gparamsGraph(g))
+	if _, ok := g.ModuleDescriptions.get(key); !ok || b.Used() != gparamsGraph(g) {
+		t.Fatal("publication/ownership", ok, b.Used(), gparamsGraph(g))
 	}
 }

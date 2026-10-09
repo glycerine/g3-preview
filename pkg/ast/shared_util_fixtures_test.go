@@ -31,7 +31,6 @@ func catalogGraph(c *util.GlobalParamsCatalog) uint64 {
 }
 func gparamsGraph(g *util.GlobalParams) uint64 {
 	n := g.OwnerBytes + uint64(cap(g.Workspace)) + uint64(cap(g.Bindings))*uint64(reflect.TypeOf(util.GparamsRegionBinding{}).Size()) + uint64(cap(g.Cells))*uint64(reflect.TypeOf((*util.GparamsRefCell)(nil)).Size()) + uint64(cap(g.Descriptors))*uint64(reflect.TypeOf((*util.ParamDescrs)(nil)).Size())
-	n += uint64(len(g.ModuleDescriptors.Entries))*uint64(reflect.TypeOf(util.GparamsDescriptorEntry{}).Size()) + uint64(len(g.ModuleDescriptions.Entries))*uint64(reflect.TypeOf(util.GparamsDescriptionEntry{}).Size()) + uint64(len(g.ModuleParams.Entries))*uint64(reflect.TypeOf(util.GparamsRefEntry{}).Size())
 	for _, x := range g.Cells {
 		if x != nil {
 			n += uint64(reflect.TypeOf(*x).Size())

@@ -50,8 +50,7 @@ func (g *GlobalParams) registerModuleDescription(name string, r *arena.BytesRegi
 	if e != nil {
 		return e
 	}
-	hash, e := g.SymbolsField.Hash(key)
-	if e != nil {
+	if _, e := g.SymbolsField.Hash(key); e != nil {
 		return e
 	}
 	var text GlobalParamCString
@@ -61,7 +60,8 @@ func (g *GlobalParams) registerModuleDescription(name string, r *arena.BytesRegi
 		}
 		text = GlobalParamCString{Origin: r.OwnerID(), Ref: ref, Offset: offset, Present: true}
 	}
-	return g.ModuleDescriptions.insert(g.Budget, GparamsDescriptionEntry{key: key, hash: hash, text: text})
+	g.ModuleDescriptions.set(key, text)
+	return nil
 }
 func (r GlobalParamsRegistrar) RegisterModuleDescription(name string, region *arena.BytesRegion, ref arena.BytesRegionRef, offset uint32) error {
 	if r.owner == nil || !r.owner.registering {
@@ -117,22 +117,20 @@ func (g *GlobalParams) moduleHeaderInto(out *StringBuffer64, key Symbol) error {
 	if e := out.AppendSymbol(g.SymbolsField, key); e != nil {
 		return e
 	}
-	h, e := g.SymbolsField.Hash(key)
-	if e != nil {
+	if _, e := g.SymbolsField.Hash(key); e != nil {
 		return e
 	}
-	if i := g.ModuleDescriptions.find(key, h); i >= 0 {
-		if e = out.AppendCString(", description: "); e != nil {
+	if text, ok := g.ModuleDescriptions.get(key); ok {
+		if e := out.AppendCString(", description: "); e != nil {
 			return e
 		}
-		if e = g.descriptionInto(out, g.ModuleDescriptions.Entries[i].text); e != nil {
+		if e := g.descriptionInto(out, text); e != nil {
 			return e
 		}
 	}
 	return out.AppendByte('\n')
 }
-func (g *GlobalParams) descriptorEntry(x GparamsDescriptorEntry) (*ParamDescrs, error) {
-	n := x.descriptor
+func (g *GlobalParams) descriptorEntry(n uint32) (*ParamDescrs, error) {
 	if n == 0 || uint64(n) > uint64(len(g.Descriptors)) || g.Descriptors[n-1] == nil {
 		return nil, ErrGlobalParamsOwner
 	}
@@ -167,14 +165,11 @@ func (g *GlobalParams) DisplayInto(out *StringBuffer64, indent uint32, smt2, inc
 			return e
 		}
 	}
-	for _, x := range g.ModuleDescriptors.Entries {
-		if x.state != 2 {
-			continue
-		}
-		if e := g.moduleHeaderInto(out, x.key); e != nil {
+	for key, descriptor := range g.ModuleDescriptors.values.All() {
+		if e := g.moduleHeaderInto(out, key); e != nil {
 			return e
 		}
-		d, e := g.descriptorEntry(x)
+		d, e := g.descriptorEntry(descriptor)
 		if e != nil {
 			return e
 		}
@@ -193,11 +188,9 @@ func (g *GlobalParams) DisplayModulesInto(out *StringBuffer64) error {
 	if e := g.ensureRegistered(); e != nil {
 		return e
 	}
-	for _, x := range g.ModuleDescriptors.Entries {
-		if x.state == 2 {
-			if e := g.moduleHeaderInto(out, x.key); e != nil {
-				return e
-			}
+	for key := range g.ModuleDescriptors.values.All() {
+		if e := g.moduleHeaderInto(out, key); e != nil {
+			return e
 		}
 	}
 	return nil

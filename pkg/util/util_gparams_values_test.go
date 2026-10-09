@@ -110,11 +110,11 @@ func TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule(t *testing.T)
 			t.Fatal(x, e)
 		}
 	}
-	if g.ModuleParams.size != 0 {
+	if g.ModuleParams.size() != 0 {
 		t.Fatal("validation precedes get_params publication")
 	}
 	e := g.SetName("sat.not_known", "1")
-	if e == nil || g.ModuleParams.size != 1 {
+	if e == nil || g.ModuleParams.size() != 1 {
 		t.Fatal("invalid kind must keep newly published empty module", e)
 	}
 	mod, e := sy.Intern("sat")

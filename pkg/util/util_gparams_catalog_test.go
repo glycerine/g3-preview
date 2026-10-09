@@ -66,8 +66,8 @@ func TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher(t *testing.T) {
 			t.Fatal(row, mod, present)
 		}
 	}
-	if len(catalogSourceMetadata) != 458 || global != 20 || module != 430 || g.ModuleDescriptors.size != 19 || g.ModuleDescriptions.size != 15 {
-		t.Fatal(len(catalogSourceMetadata), global, module, g.ModuleDescriptors.size, g.ModuleDescriptions.size)
+	if len(catalogSourceMetadata) != 458 || global != 20 || module != 430 || g.ModuleDescriptors.size() != 19 || g.ModuleDescriptions.size() != 15 {
+		t.Fatal(len(catalogSourceMetadata), global, module, g.ModuleDescriptors.size(), g.ModuleDescriptions.size())
 	}
 	// Source new-module publication order, distinct from hash bucket order.
 	modules := []string{"ackermannization", "rewriter", "nnf", "pi", "pp", "interp", "algebraic", "rcf", "model_evaluator", "model", "fixedpoint", "nlsat", "opt", "parser", "sat", "smt", "combined_solver", "sls", "lp"}
@@ -77,10 +77,8 @@ func TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher(t *testing.T) {
 	for i, moduleName := range modules {
 		key, e := sy.Intern(moduleName)
 		paramsMust(t, e)
-		hash, e := sy.Hash(key)
-		paramsMust(t, e)
-		bucket := g.ModuleDescriptors.find(key, hash)
-		if bucket < 0 || g.ModuleDescriptors.Entries[bucket].descriptor != uint32(i+1) {
+		descriptor, ok := g.ModuleDescriptors.get(key)
+		if !ok || descriptor != uint32(i+1) {
 			t.Fatal("source publication order", i, moduleName)
 		}
 	}
@@ -94,15 +92,13 @@ func TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher(t *testing.T) {
 		}
 		key, e := sy.Intern(row.module)
 		paramsMust(t, e)
-		hash, e := sy.Hash(key)
-		paramsMust(t, e)
-		i := g.ModuleDescriptions.find(key, hash)
-		if i < 0 {
+		entry, ok := g.ModuleDescriptions.get(key)
+		if !ok {
 			t.Fatal(row)
 		}
 		out, e := NewStringBuffer64(StringBufferConfig{Budget: b})
 		paramsMust(t, e)
-		paramsMust(t, g.descriptionInto(out, g.ModuleDescriptions.Entries[i].text))
+		paramsMust(t, g.descriptionInto(out, entry))
 		text, e := out.CStr()
 		paramsMust(t, e)
 		paramsMust(t, out.Close())
@@ -168,10 +164,11 @@ func TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix(t *t
 	defer out.Close()
 	key, e := sy.Intern("ackermannization")
 	paramsMust(t, e)
-	hash, e := sy.Hash(key)
-	paramsMust(t, e)
-	i := g.ModuleDescriptions.find(key, hash)
-	paramsMust(t, g.descriptionInto(out, g.ModuleDescriptions.Entries[i].text))
+	entry, ok := g.ModuleDescriptions.get(key)
+	if !ok {
+		t.Fatal("missing module description")
+	}
+	paramsMust(t, g.descriptionInto(out, entry))
 	text, e := out.CStr()
 	paramsMust(t, e)
 	if text != "Tactics based on solving UF-theories via ackermannization (see also ackr module)" {
@@ -194,8 +191,8 @@ func TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix(t *t
 	other, e := NewGlobalParams(sy, ctx, GlobalParamsConfig{Budget: b, Catalog: c2})
 	paramsMust(t, e)
 	paramsMust(t, c2.Close())
-	if e = other.ensureRegistered(); !errors.Is(e, arena.ErrClosed) || !other.modulesRegistered || other.ModuleDescriptors.size != 0 {
-		t.Fatal(e, other.modulesRegistered, other.ModuleDescriptors.size)
+	if e = other.ensureRegistered(); !errors.Is(e, arena.ErrClosed) || !other.modulesRegistered || other.ModuleDescriptors.size() != 0 {
+		t.Fatal(e, other.modulesRegistered, other.ModuleDescriptors.size())
 	}
 	paramsMust(t, other.Close())
 }

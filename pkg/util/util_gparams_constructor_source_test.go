@@ -29,7 +29,7 @@ func TestGlobalParamsSourceConstructorAllActualNestedPrefixes(t *testing.T) {
 					if g.constructorPendingDescriptor != nil && g.GlobalDescriptors != nil {
 						t.Fatal("failed descriptor published as completed member")
 					}
-					if g.constructorUnwind != 0 || len(g.ModuleDescriptors.Entries) != 0 || len(g.ModuleDescriptions.Entries) != 0 || len(g.ModuleParams.Entries) != 0 || g.GlobalDescriptors != nil {
+					if g.constructorUnwind != 0 || g.ModuleDescriptors.size() != 0 || g.ModuleDescriptions.size() != 0 || g.ModuleParams.size() != 0 || g.GlobalDescriptors != nil {
 						t.Fatal("source completed members did not unwind before failed ctor return", g.constructorCompleted, g.constructorUnwind)
 					}
 					t.Logf("failed ctor source completed=%d, unfinished descriptor=%v", g.constructorCompleted, g.constructorPendingDescriptor != nil)

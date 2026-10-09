@@ -343,6 +343,13 @@ at dictionary operations, while bucket storage, tombstone cleanup, cached
 hashes, simulated table allocation, and out-of-memory callbacks have been
 removed.
 
+The three global-parameter dictionaries have also shed their copied probing
+tables. Module descriptors use `insdict.Dict[Symbol, uint32]` because display
+traverses modules in stable registration order. Module parameter cells and
+module descriptions use built-in maps because they are lookup-only. Destruction
+walks the existing indexed owner slices, so cached hashes, tombstones, bucket
+geometry, table allocation accounting, and shrink-failure states are gone.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before

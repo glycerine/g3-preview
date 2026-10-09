@@ -49,40 +49,30 @@ func (g *GlobalParams) sourceFinalizeBody(owning bool) error {
 			}
 			g.sourceStage = 1
 		case 1:
-			for g.sourceIndex < uint32(len(g.ModuleParams.Entries)) {
-				x := g.ModuleParams.Entries[g.sourceIndex]
-				if x.state == 2 {
-					if x.cell == 0 || int(x.cell) > len(g.Cells) || g.Cells[x.cell-1] == nil {
-						return ErrGlobalParamsOwner
-					}
-					cell := g.Cells[x.cell-1]
+			for g.sourceIndex < uint32(len(g.Cells)) {
+				cell := g.Cells[g.sourceIndex]
+				if cell != nil {
 					if e := g.sourceDecrementValue(&cell.value, owning); e != nil {
 						return e
 					}
 					g.Budget.Release(uint64(reflect.TypeOf(*cell).Size()))
-					g.Cells[x.cell-1] = nil
+					g.Cells[g.sourceIndex] = nil
 				}
 				g.sourceIndex++
 			}
 			g.sourceStage = 2
 			g.sourceIndex = 0
 		case 2:
-			if e := g.ModuleParams.reset(g.Budget); e != nil {
-				return e
-			}
+			g.ModuleParams.reset()
 			g.sourceStage = 3
 		case 3:
-			for g.sourceIndex < uint32(len(g.ModuleDescriptors.Entries)) {
-				x := g.ModuleDescriptors.Entries[g.sourceIndex]
-				if x.state == 2 {
-					if x.descriptor == 0 || int(x.descriptor) > len(g.Descriptors) || g.Descriptors[x.descriptor-1] == nil {
-						return ErrGlobalParamsOwner
-					}
-					d := g.Descriptors[x.descriptor-1]
+			for g.sourceIndex < uint32(len(g.Descriptors)) {
+				d := g.Descriptors[g.sourceIndex]
+				if d != nil {
 					if e := d.sourceFinalizeMembers(); e != nil {
 						return e
 					}
-					g.Descriptors[x.descriptor-1] = nil
+					g.Descriptors[g.sourceIndex] = nil
 				}
 				g.sourceIndex++
 			}
@@ -96,7 +86,7 @@ func (g *GlobalParams) sourceFinalizeBody(owning bool) error {
 			}
 			g.sourceStage = 5
 		case 5:
-			g.ModuleParams.close(g.Budget)
+			g.ModuleParams.close()
 			g.sourceStage = 6
 		case 6:
 			if g.GlobalDescriptors != nil {
@@ -107,10 +97,10 @@ func (g *GlobalParams) sourceFinalizeBody(owning bool) error {
 			}
 			g.sourceStage = 7
 		case 7:
-			g.ModuleDescriptions.close(g.Budget)
+			g.ModuleDescriptions.close()
 			g.sourceStage = 8
 		case 8:
-			g.ModuleDescriptors.close(g.Budget)
+			g.ModuleDescriptors.close()
 			g.sourceStage = 9
 		case 9:
 			// Cold directories/text workspace are additional actual Go ownership.
@@ -172,9 +162,6 @@ func (g *GlobalParams) CleanupStopped() error {
 			if g.sourceDecrement.InvocationField == 0 {
 				return g.sourceCause
 			}
-		case 2:
-			g.ModuleParams.close(g.Budget)
-			g.sourceStage = 3
 		default:
 			return g.sourceCause
 		}

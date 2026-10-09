@@ -176,66 +176,6 @@ func TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders(t *testi
 		t.Fatal("actual source constructor did not succeed")
 	}
 }
-func TestGlobalParamsServiceFinalizePointerAfterActualSparseShrinkStop(t *testing.T) {
-	ctx, sy, _ := paramsTestOwner(t)
-	b := arena.NewBudget(1 << 26)
-	cb := arena.NewBudget(1 << 26)
-	catalog, e := NewGlobalParamsCatalog(sy, catalogTestConfig(cb))
-	paramsMust(t, e)
-	defer func() {
-		paramsMust(t, catalog.Close())
-		if cb.Used() != 0 {
-			t.Fatal("catalog roots")
-		}
-	}()
-	cfg := gparamsTestConfig(b)
-	cfg.Catalog = catalog
-	s, e := NewGlobalParamsService(sy, ctx, cfg)
-	paramsMust(t, e)
-	defer func() {
-		b.FailAfter(-1)
-		paramsMust(t, s.Close())
-		if b.Used() != 0 {
-			t.Fatal("service roots")
-		}
-	}()
-	paramsMust(t, s.InitializeSource())
-	g, e := s.Manager()
-	paramsMust(t, e)
-	for i := 0; i < 40; i++ {
-		k, e := sy.Intern("actual-module-" + strconv.Itoa(i))
-		paramsMust(t, e)
-		_, e = g.GetParams(k)
-		paramsMust(t, e)
-	}
-	if len(g.ModuleParams.Entries) != 64 {
-		t.Fatal("actual dictionary geometry", len(g.ModuleParams.Entries))
-	}
-	paramsMust(t, g.Reset()) // dense reset retains capacity; next sparse reset shrinks
-	k, e := sy.Intern("actual-sparse-module")
-	paramsMust(t, e)
-	_, e = g.GetParams(k)
-	paramsMust(t, e)
-	gparamsServiceAudit(t, s, b)
-	b.FailAfter(0)
-	e = s.FinalizeSource()
-	if !errors.Is(e, arena.ErrInjectedFailure) || s.Current != g || g.sourceStage != 2 || g.sourceCompleted || g.closed || len(g.ModuleParams.Entries) != 0 {
-		t.Fatal("source pointer cleared before actual dealloc completed", e, g.sourceStage)
-	}
-	gparamsServiceAudit(t, s, b)
-	cause := g.sourceCause
-	if e = s.FinalizeSource(); e != cause || s.Current != g {
-		t.Fatal("source stop silently resumed", e)
-	}
-	paramsMust(t, s.Close()) // explicit owning close acknowledges consumed table
-	if s.Current != nil || !g.closed || g.sourceCompleted || g.sourceCause != cause {
-		t.Fatal("owning acknowledgment invented source completion")
-	}
-	if e = s.InitializeSource(); !errors.Is(e, arena.ErrClosed) {
-		t.Fatal("closed global service")
-	}
-}
-
 func TestGlobalParamsServiceFinalizeRetainsCurrentBeforeActualConsumedNUMStop(t *testing.T) {
 	bn := arena.NewBudget(1 << 26)
 	bc := arena.NewBudget(1 << 24)

@@ -82,7 +82,7 @@ func (g *GlobalParams) unwindConstructor() error {
 				return e
 			}
 		case 4:
-			g.ModuleParams.close(g.Budget)
+			g.ModuleParams.close()
 		case 3:
 			if g.GlobalDescriptors != nil {
 				if e := g.GlobalDescriptors.sourceFinalizeMembers(); e != nil {
@@ -91,9 +91,9 @@ func (g *GlobalParams) unwindConstructor() error {
 				g.GlobalDescriptors = nil
 			}
 		case 2:
-			g.ModuleDescriptions.close(g.Budget)
+			g.ModuleDescriptions.close()
 		case 1:
-			g.ModuleDescriptors.close(g.Budget)
+			g.ModuleDescriptors.close()
 		default:
 			return ErrGlobalParamsOwner
 		}
