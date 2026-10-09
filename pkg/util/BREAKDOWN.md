@@ -774,3 +774,5 @@ Bit-vector polynomial multiplication now stores its unsigned coordinates and bor
 The multiplication-hoist validity mask now uses `[]bool`; its inline-16/spill buffer, doubling path, and arena charge have been removed.
 
 The model package's function-entry directory, function-interpretation entries, universe directory, array-expansion rows, and lexical function arguments now use native typed slices. Their shared `SourceVectorCapacity` calls and arena capacity counters have been removed; AST/model objects within those slices retain their existing ownership and cleanup.
+
+The API object directory and recycled-ID stack now use native typed slices. Stable destruction order remains in the approved insertion-ordered dictionary; the auxiliary slices no longer use `SourceVectorCapacity` or AST-budget backing charges.

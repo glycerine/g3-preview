@@ -8,7 +8,6 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/insdict"
 )
 
@@ -154,21 +153,17 @@ func (c *apiContextResults) growObjectDirectory(id uint32) error {
 	if uint64(id) < uint64(len(c.objects)) {
 		return nil
 	}
-	stride := uint64(reflect.TypeOf((*apiObject)(nil)).Size())
-	for uint64(id) >= uint64(cap(c.objects)) {
-		n, e := util.SourceVectorCapacity(cap(c.objects), stride)
-		if e != nil {
-			return e
-		}
-		if e = c.manager.Budget().Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		v := make([]*apiObject, len(c.objects), n)
-		copy(v, c.objects)
-		c.manager.Budget().Release(uint64(cap(c.objects)) * stride)
-		c.objects = v
+	if uint64(id)+1 > uint64(int(^uint(0)>>1)) {
+		return arena.ErrBounds
 	}
-	c.objects = c.objects[:int(id)+1]
+	newLen := int(id) + 1
+	if newLen > cap(c.objects) {
+		v := make([]*apiObject, newLen)
+		copy(v, c.objects)
+		c.objects = v
+	} else {
+		c.objects = c.objects[:newLen]
+	}
 	return nil
 }
 
@@ -190,19 +185,6 @@ func (c *apiContextResults) addObject(o *apiObject) (uint32, error) {
 }
 
 func (c *apiContextResults) pushFreeID(id uint32) error {
-	if len(c.freeIDs) == cap(c.freeIDs) {
-		n, e := util.SourceVectorCapacity(cap(c.freeIDs), 4)
-		if e != nil {
-			return e
-		}
-		if e = c.manager.Budget().Reserve(uint64(n) * 4); e != nil {
-			return e
-		}
-		v := make([]uint32, len(c.freeIDs), n)
-		copy(v, c.freeIDs)
-		c.manager.Budget().Release(uint64(cap(c.freeIDs)) * 4)
-		c.freeIDs = v
-	}
 	c.freeIDs = append(c.freeIDs, id)
 	return nil
 }
@@ -308,10 +290,8 @@ func (c *apiContextResults) Close() error {
 			return err
 		}
 	}
-	c.manager.Budget().Release(uint64(cap(c.freeIDs)) * 4)
 	c.freeIDs = nil
 	c.allocated.Clear()
-	c.manager.Budget().Release(uint64(cap(c.objects)) * uint64(reflect.TypeOf((*apiObject)(nil)).Size()))
 	c.objects = nil
 	if c.astTrail != (ast.ASTRefVector{}) {
 		if e := c.manager.DelRefVector(&c.astTrail); e != nil {

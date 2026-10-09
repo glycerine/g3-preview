@@ -4,14 +4,13 @@ package api
 
 import (
 	"errors"
-	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func apiResultsFixture(t *testing.T, rc bool) (*ast.ASTManager, *apiContextResults) {
@@ -256,7 +255,7 @@ func TestAPIContextObjectTeardownUsesStableInsertionOrder(t *testing.T) {
 	}
 }
 
-func TestAPIContextObjectCloseRetainsRefusedFreeListPrefix(t *testing.T) {
+func TestAPIContextObjectCloseUsesNativeFreeIDStorage(t *testing.T) {
 	m, c := apiResultsFixture(t, true)
 	o, e := newAPIGoalObject(c)
 	astTestMust(t, e)
@@ -265,8 +264,8 @@ func TestAPIContextObjectCloseRetainsRefusedFreeListPrefix(t *testing.T) {
 	e = c.Close()
 	m.BudgetField.FailAfter(-1)
 	_, allocated := c.allocated.Get2(o.object.id)
-	if !errors.Is(e, arena.ErrInjectedFailure) || o.object.references != 0 || o.object.closed || !allocated || c.lastObject != &o.object {
-		t.Fatal("ref decrement/free-list refusal did not preserve its exact prefix", e)
+	if e != nil || o.object.references != 0 || !o.object.closed || allocated || c.lastObject != nil {
+		t.Fatal("native free-ID close", e)
 	}
 	astTestMust(t, c.Close())
 	if !o.object.closed {
