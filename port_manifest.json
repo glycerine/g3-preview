@@ -69464,9 +69464,9 @@
       ],
       "tests": [
         "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSLiteralSetNativeGrowthAndCopy",
         "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
         "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
         "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -69494,9 +69494,9 @@
           "go_target": "pkg/sat/sat_solver_mus.go",
           "tests": [
             "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSLiteralSetNativeGrowthAndCopy",
             "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
             "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
             "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -69512,7 +69512,7 @@
         }
       ],
       "ownership": [
-        "Concrete Runtime char membership/unsigned literal and model vectors, header cap0/size4/payload8. Actual reached dynamic lexical frames have reflected charged cold headers and separately named physical blocks; borrowed recursion inputs do not duplicate ownership.",
+        "MUS and consequence literal sets use native bool/literal slices and deep assignment. Set growth and destruction no longer acquire Runtime storage or expose physical failure states. Retained unsigned/model result vectors still use Runtime storage. Dynamic lexical frames retain charged cold headers and named roots for those remaining allocations; borrowed recursion inputs do not duplicate ownership.",
         "Source full-expression result vector is destroyed before nested Check; completed inner core before older scoped_append, reverse flet restoration, exact stopped cleanup roots retained for explicit owning abort."
       ],
       "deviations": [
@@ -69530,9 +69530,9 @@
       ],
       "tests": [
         "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSLiteralSetNativeGrowthAndCopy",
         "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
         "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
         "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -69564,9 +69564,9 @@
           "go_target": "pkg/sat/sat_solver_mus.go",
           "tests": [
             "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSLiteralSetNativeGrowthAndCopy",
             "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
             "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
             "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -69582,7 +69582,7 @@
         }
       ],
       "ownership": [
-        "Concrete Runtime char membership/unsigned literal and model vectors, header cap0/size4/payload8. Actual reached dynamic lexical frames have reflected charged cold headers and separately named physical blocks; borrowed recursion inputs do not duplicate ownership.",
+        "MUS and consequence literal sets use native bool/literal slices and deep assignment. Set growth and destruction no longer acquire Runtime storage or expose physical failure states. Retained unsigned/model result vectors still use Runtime storage. Dynamic lexical frames retain charged cold headers and named roots for those remaining allocations; borrowed recursion inputs do not duplicate ownership.",
         "Source full-expression result vector is destroyed before nested Check; completed inner core before older scoped_append, reverse flet restoration, exact stopped cleanup roots retained for explicit owning abort."
       ],
       "deviations": [
@@ -69773,7 +69773,7 @@
       "go_targets": [
         "pkg/sat/sat_solver_probing.go",
         "pkg/sat/sat_solver_probing_algorithm.go",
-        "pkg/sat/sat_solver_probing_assigned.go",
+        "pkg/sat/sat_solver_literal_set_storage.go",
         "pkg/sat/sat_solver_probing_cache.go",
         "pkg/sat/sat_solver_probing_diagnostics.go"
       ],
@@ -69943,7 +69943,7 @@
       "go_targets": [
         "pkg/sat/sat_solver_probing.go",
         "pkg/sat/sat_solver_probing_algorithm.go",
-        "pkg/sat/sat_solver_probing_assigned.go",
+        "pkg/sat/sat_solver_literal_set_storage.go",
         "pkg/sat/sat_solver_probing_cache.go",
         "pkg/sat/sat_solver_probing_diagnostics.go"
       ],
@@ -71456,9 +71456,9 @@
         "TestSATSolverSourceUserScopeFiniteCycle",
         "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph",
         "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSLiteralSetNativeGrowthAndCopy",
         "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
         "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
         "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -72512,9 +72512,9 @@
           "go_target": "pkg/sat/sat_solver_mus.go",
           "tests": [
             "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSLiteralSetNativeGrowthAndCopy",
             "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
             "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
             "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -73266,9 +73266,9 @@
         "TestSATSolverSourceUserScopeFiniteCycle",
         "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph",
         "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSLiteralSetNativeGrowthAndCopy",
         "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
         "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
         "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -73779,9 +73779,9 @@
           "go_target": "pkg/sat/sat_solver.go",
           "tests": [
             "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSLiteralSetNativeGrowthAndCopy",
             "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
             "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
             "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -74093,7 +74093,7 @@
         "pkg/sat/sat_solver_uint_set.go",
         "pkg/sat/sat_types.go",
         "pkg/sat/sat_solver_literal_set.go",
-        "pkg/sat/sat_solver_probing_assigned.go",
+        "pkg/sat/sat_solver_literal_set_storage.go",
         "pkg/sat/sat_solver_mus_set.go",
         "pkg/sat/sat_solver_binary_pair.go",
         "pkg/sat/sat_solver_binary_pair_test.go",
@@ -74154,9 +74154,9 @@
         "TestSATSolverProbingWarmProcessAndUnsignedDec",
         "TestSATSolverProbingZeroQuotaAndActualCancellation",
         "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSLiteralSetNativeGrowthAndCopy",
         "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
         "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
         "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -74675,9 +74675,9 @@
           ]
         },
         {
-          "name": "Probing-used literal_set/uint_set actual same Runtime Insert/Contains/Size/Reset/Finalize with char membership and uint values",
+          "name": "Probing-used literal_set/uint_set native typed Insert/Contains/Size/Reset/Finalize with bool membership and literal values",
           "status": "ported",
-          "go_target": "pkg/sat/sat_solver_probing_assigned.go",
+          "go_target": "pkg/sat/sat_solver_literal_set_storage.go",
           "tests": [
             "TestSATSolverDynamicSubsumptionBinaryAndFUIP",
             "TestSATSolverDynamicSubsumptionCachedImplicationAndFUIP",
@@ -74714,14 +74714,14 @@
           ]
         },
         {
-          "name": "Same-Runtime MUS literal_set insert/reset/size/contains/intersection/union/copy assignment and captured iteration; named to_vector ABI move adapter",
+          "name": "Native typed MUS/consequence literal_set insert/reset/size/contains/intersection/union/deep assignment and captured slice iteration; named to_vector ABI move adapter",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_mus_set.go",
           "tests": [
             "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSLiteralSetNativeGrowthAndCopy",
             "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
             "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
             "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -149466,9 +149466,9 @@
         "TestMonomialPositionsColdChargeAndWarm",
         "TestMonomialPositionsScalarIDOnlyAndRejectedWrap",
         "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-        "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+        "TestSATMUSLiteralSetNativeGrowthAndCopy",
         "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-        "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+        "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
         "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
         "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
@@ -149903,9 +149903,9 @@
           "go_target": "pkg/sat/sat_solver_mus_set.go",
           "tests": [
             "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
-            "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
+            "TestSATMUSLiteralSetNativeGrowthAndCopy",
             "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
-            "TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend",
+            "TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend",
             "TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration",
             "TestSATMUSScopedAppendDestructorValueInitializesGrownSuffix",
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",

@@ -3,14 +3,14 @@ package sat
 
 import "github.com/glycerine/g3/pkg/arena"
 
-// satProbingAssigned is the concrete literal set shared by probing and
-// assumption tracking. Values retain first insertion order. Go owns storage.
-type satProbingAssigned struct {
+// satLiteralSetStorage holds the concrete literals used by probing,
+// assumption tracking, MUS and consequence sets. Values retain first insertion order. Go owns storage.
+type satLiteralSetStorage struct {
 	membership []bool
 	values     []Literal
 }
 
-func (s *satProbingAssigned) Insert(l Literal) error {
+func (s *satLiteralSetStorage) Insert(l Literal) error {
 	v := l.index()
 	// Source v+1 wraps at the invalid all-ones literal index. Guard that
 	// source-undefined access before allocating or publishing membership.
@@ -27,15 +27,15 @@ func (s *satProbingAssigned) Insert(l Literal) error {
 	}
 	return nil
 }
-func (s *satProbingAssigned) contains(l Literal) bool {
+func (s *satLiteralSetStorage) contains(l Literal) bool {
 	return uint64(l.index()) < uint64(len(s.membership)) && s.membership[l.index()]
 }
-func (s *satProbingAssigned) size() uint32 { return uint32(len(s.values)) }
-func (s *satProbingAssigned) Reset() {
+func (s *satLiteralSetStorage) size() uint32 { return uint32(len(s.values)) }
+func (s *satLiteralSetStorage) Reset() {
 	s.membership = s.membership[:0]
 	s.values = s.values[:0]
 }
-func (s *satProbingAssigned) Finalize() {
+func (s *satLiteralSetStorage) Finalize() {
 	s.membership = nil
 	s.values = nil
 }

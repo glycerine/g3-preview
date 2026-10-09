@@ -180,10 +180,7 @@ func (s *Solver) extractFixedConsequence1(lit Literal, assumptions, unfixed *sat
 	if yes {
 		return true, nil
 	}
-	yes, e = assumptions.contains(lit)
-	if e != nil {
-		return false, e
-	}
+	yes = assumptions.contains(lit)
 	if yes {
 		if err = f.index.insert(lit.index()); err != nil {
 			return false, err
@@ -212,10 +209,7 @@ func (s *Solver) extractFixedConsequence1(lit Literal, assumptions, unfixed *sat
 	if err = s.antecedents.insert(uint32(lit.variable()), &f.index); err != nil {
 		return false, err
 	}
-	yes, e = unfixed.contains(Literal(uint32(lit.variable())))
-	if e != nil {
-		return false, e
-	}
+	yes = unfixed.contains(Literal(uint32(lit.variable())))
 	if yes {
 		if err = f.vector(s, 0, nil); err != nil {
 			return false, err
@@ -293,11 +287,8 @@ func (s *Solver) extractFixedConsequence(lit Literal, assumptions, unfixed *satM
 	}
 }
 func (s *Solver) extractFixedSet(lits, assumptions, unfixed *satMUSLiteralSet, out *satSolverLiteralRows) error {
-	span := satConflictRuntimeSpan(&lits.values)
-	n, e := lits.size()
-	if e != nil {
-		return e
-	}
+	span := satSolverLiteralSpan{literals: lits.values}
+	n := lits.size()
 	for i := uint32(0); i < n; i++ {
 		l, e := span.literal(i)
 		if e != nil {
@@ -362,11 +353,8 @@ func (s *Solver) deleteUnfixed(lits, vars *satMUSLiteralSet) (err error) {
 	if err = f.set(s, 0, nil); err != nil {
 		return err
 	}
-	span := satConflictRuntimeSpan(&lits.values)
-	n, e := lits.size()
-	if e != nil {
-		return e
-	}
+	span := satSolverLiteralSpan{literals: lits.values}
+	n := lits.size()
 	for i := uint32(0); i < n; i++ {
 		l, e := span.literal(i)
 		if e != nil {
@@ -386,7 +374,8 @@ func (s *Solver) deleteUnfixed(lits, vars *satMUSLiteralSet) (err error) {
 			}
 		}
 	}
-	return lits.assign(&f.sets[0])
+	lits.assign(&f.sets[0])
+	return nil
 }
 func (s *Solver) updateUnfixed(lits, vars *satMUSLiteralSet) (err error) {
 	f, e := s.consequenceFrame()
@@ -397,20 +386,14 @@ func (s *Solver) updateUnfixed(lits, vars *satMUSLiteralSet) (err error) {
 	if err = f.vector(s, 0, nil); err != nil {
 		return err
 	}
-	span := satConflictRuntimeSpan(&lits.values)
-	n, e := lits.size()
-	if e != nil {
-		return e
-	}
+	span := satSolverLiteralSpan{literals: lits.values}
+	n := lits.size()
 	for i := uint32(0); i < n; i++ {
 		l, e := span.literal(i)
 		if e != nil {
 			return e
 		}
-		yes, e := vars.contains(Literal(uint32(l.variable())))
-		if e != nil {
-			return e
-		}
+		yes := vars.contains(Literal(uint32(l.variable())))
 		if !yes {
 			if err = f.vectors[0].Push(l.index()); err != nil {
 				return err

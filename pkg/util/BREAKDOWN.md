@@ -936,3 +936,12 @@ probing cache still applies its existing strict cutoff to Runtime allocations,
 so Go-managed set memory is outside that cutoff and arena accounting. Focused
 tests cover native growth, duplicates, reset/regrowth, the invalid wrapped
 literal, finalization/reuse, and the retained cache-limit policy.
+
+MUS and consequence literal sets now reuse the same concrete native literal
+storage as probing. Intersection compacts in the original order, union appends
+unseen values in source order, assignment clones membership and values, and
+removal swaps the last value into the removed position. Captured set iteration
+borrows a Go slice. Runtime vector copy remains only at still-live unsigned
+column consumers; the MUS-named forwarding wrapper and unused request helpers
+have been removed. Physical allocation/destruction tests for the converted sets
+are replaced by order, independent-copy, native-growth, and scoped-cleanup tests.

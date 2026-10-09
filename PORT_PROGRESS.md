@@ -30871,3 +30871,14 @@ The retained Runtime cache-memory cutoff excludes these Go-managed slices; this
 is an intentional storage-policy change, covered separately from cache logic.
 Complete SAT and SAT tactic tests, focused checked/debug tests, compilation,
 vet, and manifest validation verify the conversion.
+
+### Native MUS and consequence literal sets
+
+Replaced Runtime membership/value columns with concrete native literal storage
+shared with probing. Preserved union/intersection order, independent assignment,
+swap-last removal, empty-recursion guards, and scoped append restoration.
+Removed set-only realloc/destructor failure states and the unused MUS copy
+request arithmetic helpers; remaining unsigned Runtime consumers call their
+existing concrete copy implementation directly. Complete SAT/tactic tests,
+focused checked/debug checks, module compilation, vet, and manifest validation
+cover the conversion.

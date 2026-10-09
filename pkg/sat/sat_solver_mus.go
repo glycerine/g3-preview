@@ -36,9 +36,6 @@ func (m *satSolverMUSMembers) frame(sets uint32, vector bool) (*satMUSFrame, err
 		return nil, e
 	}
 	f := &satMUSFrame{next: m.frames, setsUsed: sets, vectorUsed: vector, bytes: n}
-	for i := uint32(0); i < sets; i++ {
-		f.sets[i].bind(s.runtime.memory)
-	}
 	f.vector.Bind(s.runtime.memory)
 	m.frames = f
 	return f, nil
@@ -63,9 +60,7 @@ func (m *satSolverMUSMembers) drop(f *satMUSFrame, cause error) error {
 		f.vectorUsed = false
 	}
 	if f.innerCoreCompleted {
-		if e := f.sets[0].close(); e != nil {
-			return errors.Join(cause, e)
-		}
+		f.sets[0].close()
 		f.innerCoreCompleted = false
 		f.setsUsed = 0
 	}
@@ -77,9 +72,7 @@ func (m *satSolverMUSMembers) drop(f *satMUSFrame, cause error) error {
 	}
 	for f.drain < f.setsUsed {
 		i := f.setsUsed - 1 - f.drain
-		if e := f.sets[i].close(); e != nil {
-			return errors.Join(cause, e)
-		}
+		f.sets[i].close()
 		f.drain++
 	}
 	if m.frames != f {
@@ -408,11 +401,8 @@ func (m *satSolverMUSMembers) setFromColumn(dst *satMUSLiteralSet, src *RuntimeU
 func (m *satSolverMUSMembers) toVector(set *satMUSLiteralSet, dst *RuntimeUintColumn) error {
 	// Named return-value move is explicit: one source result vector, whose
 	// lexical caller owns its destruction. Captured begin/end never rebind.
-	n, e := set.size()
-	if e != nil {
-		return e
-	}
-	span := satConflictRuntimeSpan(&set.values)
+	n := set.size()
+	span := satSolverLiteralSpan{literals: set.values}
 	for i := uint32(0); i < n; i++ {
 		l, e := span.literal(i)
 		if e != nil {
@@ -450,17 +440,14 @@ func (m *satSolverMUSMembers) mus2() (r lbool.LBool, e error) {
 	return r, e
 }
 func (m *satSolverMUSMembers) split(a, b *satMUSLiteralSet) (e error) {
-	n, e := a.size()
-	if e != nil {
-		return e
-	}
+	n := a.size()
 	half := n / 2
 	f, e := m.frame(1, false)
 	if e != nil {
 		return e
 	}
 	defer func() { e = m.drop(f, e) }()
-	span := satConflictRuntimeSpan(&a.values)
+	span := satSolverLiteralSpan{literals: a.values}
 	for i := uint32(0); i < n; i++ {
 		v, e := span.literal(i)
 		if e != nil {
@@ -474,7 +461,8 @@ func (m *satSolverMUSMembers) split(a, b *satMUSLiteralSet) (e error) {
 			return e
 		}
 	}
-	return a.assign(&f.sets[0])
+	a.assign(&f.sets[0])
+	return nil
 }
 func (m *satSolverMUSMembers) unsplit(a, b *satMUSLiteralSet) (e error) {
 	f, e := m.frame(2, false)
@@ -482,20 +470,14 @@ func (m *satSolverMUSMembers) unsplit(a, b *satMUSLiteralSet) (e error) {
 		return e
 	}
 	defer func() { e = m.drop(f, e) }()
-	n, e := a.size()
-	if e != nil {
-		return e
-	}
-	span := satConflictRuntimeSpan(&a.values)
+	n := a.size()
+	span := satSolverLiteralSpan{literals: a.values}
 	for i := uint32(0); i < n; i++ {
 		v, e := span.literal(i)
 		if e != nil {
 			return e
 		}
-		yes, e := b.contains(v)
-		if e != nil {
-			return e
-		}
+		yes := b.contains(v)
 		idx := 0
 		if yes {
 			idx = 1
@@ -504,10 +486,9 @@ func (m *satSolverMUSMembers) unsplit(a, b *satMUSLiteralSet) (e error) {
 			return e
 		}
 	}
-	if e = a.assign(&f.sets[0]); e != nil {
-		return e
-	}
-	return b.assign(&f.sets[1])
+	a.assign(&f.sets[0])
+	b.assign(&f.sets[1])
+	return nil
 }
 func (m *satSolverMUSMembers) qx(a, b *satMUSLiteralSet, support bool) (r lbool.LBool, e error) {
 	r = lbool.True
@@ -523,10 +504,7 @@ func (m *satSolverMUSMembers) qx(a, b *satMUSLiteralSet, support bool) (r lbool.
 			return r, nil
 		}
 	}
-	n, e := a.size()
-	if e != nil {
-		return lbool.Undef, e
-	}
+	n := a.size()
 	if n == 1 {
 		return lbool.True, nil
 	}
@@ -542,15 +520,9 @@ func (m *satSolverMUSMembers) qx(a, b *satMUSLiteralSet, support bool) (r lbool.
 	if e = b.union(a); e != nil {
 		return lbool.Undef, e
 	}
-	n, e = a.size()
-	if e != nil {
-		return lbool.Undef, e
-	}
+	n = a.size()
 	if n == 0 {
-		second, e := a2.size()
-		if e != nil {
-			return lbool.Undef, e
-		}
+		second := a2.size()
 		// The first split and union have completed. The next identical empty
 		// recursive call has no finite source continuation; preserve that prefix.
 		if second == 0 {
@@ -570,10 +542,7 @@ func (m *satSolverMUSMembers) qx(a, b *satMUSLiteralSet, support bool) (r lbool.
 	if e = b.union(a2); e != nil {
 		return lbool.Undef, e
 	}
-	n, e = a2.size()
-	if e != nil {
-		return lbool.Undef, e
-	}
+	n = a2.size()
 	r, e = m.qx(a, b, n != 0)
 	if e != nil {
 		return r, e
@@ -621,17 +590,12 @@ func (m *satSolverMUSMembers) qxCheck(a, b *satMUSLiteralSet) (r lbool.LBool, e 
 	switch r {
 	case lbool.False:
 		f.setsUsed = 1
-		f.sets[0].bind(m.solver.runtime.memory)
 		if e = m.setFromColumn(&f.sets[0], &m.solver.conflict.core); e != nil {
 			return lbool.Undef, e
 		}
 		f.innerCoreCompleted = true
-		if e = b.intersect(&f.sets[0]); e != nil {
-			return lbool.Undef, e
-		}
-		if e = a.reset(); e != nil {
-			return lbool.Undef, e
-		}
+		b.intersect(&f.sets[0])
+		a.reset()
 		return lbool.False, nil
 	case lbool.True:
 		if e = m.updateModel(); e != nil {

@@ -190,10 +190,7 @@ func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out 
 		return lbool.Undef, err
 	}
 	for {
-		n, e := unfixed.size()
-		if e != nil {
-			return lbool.Undef, e
-		}
+		n := unfixed.size()
 		if n == 0 {
 			return lbool.True, nil
 		}
@@ -209,11 +206,8 @@ func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out 
 		if err = s.propagation.checkpoint(); err != nil {
 			return lbool.Undef, err
 		}
-		span := satConflictRuntimeSpan(&unfixed.values)
-		n, e = unfixed.size()
-		if e != nil {
-			return lbool.Undef, e
-		}
+		span := satSolverLiteralSpan{literals: unfixed.values}
+		n = unfixed.size()
 		resolves := uint32(0)
 		fixed := uint32(0)
 		assigned := uint32(0)
@@ -307,10 +301,7 @@ func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out 
 		if err = s.updateUnfixed(unfixed, vars); err != nil {
 			return lbool.Undef, err
 		}
-		n, e = unfixed.size()
-		if e != nil {
-			return lbool.Undef, e
-		}
+		n = unfixed.size()
 		if n != 0 {
 			cfg, e := s.config.State()
 			if e != nil {

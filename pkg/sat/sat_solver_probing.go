@@ -19,7 +19,7 @@ type satSolverProbing struct {
 	self                                      *satSolverProbing
 	lifecycle                                 *satSolverClauseLifecycle
 	budget                                    *arena.Budget
-	assigned                                  satProbingAssigned
+	assigned                                  satLiteralSetStorage
 	toAssert                                  RuntimeUintColumn
 	cacheWork                                 RuntimeUintColumn // charged cold workspace; scalar tokens move back on return.
 	cache                                     satProbingCache

@@ -48,10 +48,6 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 		if f.vectorUsed {
 			col(&f.vector)
 		}
-		for i := uint32(0); i < f.setsUsed; i++ {
-			raw(&f.sets[i].membership)
-			col(&f.sets[i].values)
-		}
 	}
 	raw(&s.asymm.savedPhase)
 	for _, v := range []*satSCCVector{&s.scc.index, &s.scc.lowlink, &s.scc.stack, &s.scc.inStack, &s.scc.roots, &s.scc.frames, &s.scc.toElim} {
@@ -61,12 +57,9 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 	for f := s.consequenceFrames; f != nil; f = f.next {
 		for i := uint32(0); i < f.used; i++ {
 			tag := f.order[i]
-			if tag < 3 {
-				raw(&f.sets[tag].membership)
-				col(&f.sets[tag].values)
-			} else if tag < 6 {
+			if tag >= 3 && tag < 6 {
 				col(&f.vectors[tag-3])
-			} else {
+			} else if tag == 6 {
 				add(f.index.raw)
 				add(f.index.pending)
 			}

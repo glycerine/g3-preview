@@ -63,7 +63,7 @@ func TestSATSolverProbingSourceFinalizePermitsNextRound(t *testing.T) {
 }
 
 func TestSATSolverProbingAssignedResetAndReuse(t *testing.T) {
-	var set satProbingAssigned
+	var set satLiteralSetStorage
 	for _, l := range []Literal{14, 2, 7, 14, 0} {
 		satOK(t, set.Insert(l))
 	}

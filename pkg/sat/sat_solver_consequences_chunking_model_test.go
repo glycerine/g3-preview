@@ -38,7 +38,7 @@ func TestSATConsequenceChunkIndependentBinaryCNFs(t *testing.T) {
 				}
 				var mdl RuntimeUintColumn
 				mdl.Bind(s.runtime.memory)
-				satOK(t, satMUSCopyColumn(&mdl.Raw, &s.model.Raw, 4))
+				satOK(t, copyRuntimeVectorColumn(&mdl.Raw, &s.model.Raw, 4))
 				defer func() { satOK(t, mdl.Finalize()) }()
 				out, e := newSATSolverLiteralRows(s.runtime.memory, s.budget)
 				satOK(t, e)

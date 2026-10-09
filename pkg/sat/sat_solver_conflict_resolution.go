@@ -21,7 +21,7 @@ type satSolverConflictResolution struct {
 	analysis                                                                        *satSolverConflictAnalysis
 	dynamic                                                                         *satSolverDynamicSubsumption
 	assumptions, userScopeLiterals, core, minCore                                   RuntimeUintColumn
-	assumptionSet                                                                   satProbingAssigned
+	assumptionSet                                                                   satLiteralSetStorage
 	conflictLevel, conflictStat, conflicts, conflictsSinceRestart, conflictsSinceGC uint32
 	phaseCounter                                                                    uint32
 	phaseCacheOn, minCoreValid, parallelPresent, debugCheckMarks                    bool

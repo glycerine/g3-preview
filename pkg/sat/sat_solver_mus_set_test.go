@@ -3,6 +3,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -10,48 +11,70 @@ import (
 )
 
 func TestSATMUSLiteralSetActualCopyIntersectionUnionAndCapturedIteration(t *testing.T) {
-	s, _, _ := satSolverCheckFixture(t)
 	var a, b satMUSLiteralSet
-	a.bind(s.runtime.memory)
-	b.bind(s.runtime.memory)
-	t.Cleanup(func() { satOK(t, b.close()); satOK(t, a.close()) })
 	for _, l := range []Literal{6, 0, 4, 2, 6} {
 		satOK(t, a.insert(l))
 	}
 	for _, l := range []Literal{4, 8, 0} {
 		satOK(t, b.insert(l))
 	}
-	satOK(t, a.intersect(&b))
-	n, e := a.size()
-	satOK(t, e)
-	if n != 2 {
-		t.Fatal(n)
-	}
-	for i, want := range []uint32{0, 4} {
-		got, e := a.values.Read(uint32(i))
-		satOK(t, e)
-		if got != want {
-			t.Fatal(got, want)
-		}
+	a.intersect(&b)
+	if !reflect.DeepEqual(a.values, []Literal{0, 4}) {
+		t.Fatal(a.values)
 	}
 	satOK(t, a.union(&b))
-	for i, want := range []uint32{0, 4, 8} {
-		got, e := a.values.Read(uint32(i))
-		satOK(t, e)
-		if got != want {
-			t.Fatal(got, want)
-		}
+	if !reflect.DeepEqual(a.values, []Literal{0, 4, 8}) {
+		t.Fatal(a.values)
 	}
-	satOK(t, b.assign(&a))
-	satOK(t, a.reset())
-	for i, want := range []uint32{0, 4, 8} {
-		got, e := b.values.Read(uint32(i))
-		satOK(t, e)
-		if got != want {
-			t.Fatal("copy owns distinct storage", got, want)
-		}
+	b.assign(&a)
+	a.reset()
+	satOK(t, a.insert(2))
+	if !reflect.DeepEqual(b.values, []Literal{0, 4, 8}) || b.contains(2) {
+		t.Fatal("copy aliases source", b.values)
 	}
+	b.assign(&b)
+	b.intersect(&b)
+	satOK(t, b.union(&b))
+	if !reflect.DeepEqual(b.values, []Literal{0, 4, 8}) {
+		t.Fatal("self operations changed order", b.values)
+	}
+	satOK(t, satConsequenceSetRemove(&b, 0))
+	if !reflect.DeepEqual(b.values, []Literal{8, 4}) || b.contains(0) {
+		t.Fatal("remove must swap last", b.values)
+	}
+	a.close()
+	b.close()
 }
+func TestSATMUSLiteralSetNativeGrowthAndCopy(t *testing.T) {
+	s, _, _ := satSolverCheckFixture(t)
+	before, used := s.runtime.memory.Stats(), s.budget.Used()
+	s.budget.FailAfter(0)
+	defer s.budget.FailAfter(-1)
+	var a, b, copy satMUSLiteralSet
+	for i := Literal(0); i < 1024; i++ {
+		satOK(t, a.insert(i))
+		if i&1 != 0 {
+			satOK(t, b.insert(i))
+		}
+	}
+	copy.assign(&a)
+	a.intersect(&b)
+	if a.size() != 512 || copy.size() != 1024 || a.contains(0) || !copy.contains(0) {
+		t.Fatal("independent copy/intersection")
+	}
+	satOK(t, a.union(&copy))
+	if a.size() != 1024 || a.values[0] != 1 || a.values[511] != 1023 || a.values[512] != 0 || a.values[1023] != 1022 {
+		t.Fatal("union insertion order")
+	}
+	a.close()
+	b.close()
+	copy.close()
+	if s.runtime.memory.Stats() != before || s.budget.Used() != used {
+		t.Fatal("native set operation acquired Runtime storage")
+	}
+	satFullSolverRuntimeAudit(t, s)
+}
+
 func TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
 	for i := 0; i < 2; i++ {
@@ -68,22 +91,6 @@ func TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer(t *testing.T) {
 	satOK(t, e)
 	if r != lbool.False {
 		t.Fatal(r)
-	}
-}
-
-// copy_core multiplies sizeof(T) (size_t), unlike expand_vector's explicitly
-// unsigned32 byte-extent temporaries. No enormous allocation is performed.
-func TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion(t *testing.T) {
-	for _, test := range []struct {
-		capacity, stride uint32
-		request          uint64
-	}{
-		{0, 4, 8}, {2, 4, 16}, {^uint32(0), 1, 4294967303}, {^uint32(0), 4, 17179869188}, {1 << 30, 4, 4294967304},
-	} {
-		got := satMUSCopyRequest(test.capacity, test.stride)
-		if got != test.request {
-			t.Fatal(test, got)
-		}
 	}
 }
 
@@ -111,7 +118,7 @@ func TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix(t *testing.T)
 	satOK(t, r.WriteUint32(src.Block, 0, 0x40000000))
 	satOK(t, r.WriteUint32(src.Block, 4, 0))
 	before := r.State()
-	e = satMUSCopyColumn(&dst, &src, 4)
+	e = copyRuntimeVectorColumn(&dst, &src, 4)
 	if e != nil {
 		t.Fatal("source32 request wraps to8 before Runtime entry", e)
 	}
@@ -125,13 +132,5 @@ func TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix(t *testing.T)
 	after := r.State()
 	if after.GlobalSize-before.GlobalSize != 12 {
 		t.Fatal("actual8request plus4mallocheader", before, after)
-	}
-	for _, test := range []struct {
-		c, stride uint32
-		want      uint64
-	}{{0x40000000, 4, 8}, {^uint32(0), 1, 7}, {^uint32(0), 4, 4}} {
-		if got := satMUSCopyRequestFor(test.c, test.stride, 32); got != test.want {
-			t.Fatal(test, got)
-		}
 	}
 }

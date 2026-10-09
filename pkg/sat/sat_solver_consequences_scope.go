@@ -96,7 +96,7 @@ func (s *Solver) consequenceDrop(f *satConsequenceFrame, cause error) error {
 			tag := f.order[i]
 			var e error
 			if tag < 3 {
-				e = f.sets[tag].close()
+				f.sets[tag].close()
 			} else if tag < 6 {
 				e = f.vectors[tag-3].Finalize()
 			} else {
@@ -130,7 +130,6 @@ func (f *satConsequenceFrame) set(s *Solver, i uint8, input *satConsequenceInput
 	f.completed[f.used] = true
 	f.used++
 	set := &f.sets[i]
-	set.bind(s.runtime.memory)
 	if input == nil {
 		return nil
 	}
@@ -158,7 +157,7 @@ func (f *satConsequenceFrame) vector(s *Solver, i uint8, copy *RuntimeUintColumn
 	f.used++
 	f.vectors[i].Bind(s.runtime.memory)
 	if copy != nil {
-		if e := satMUSCopyColumn(&f.vectors[i].Raw, &copy.Raw, 4); e != nil {
+		if e := copyRuntimeVectorColumn(&f.vectors[i].Raw, &copy.Raw, 4); e != nil {
 			return e
 		}
 		f.completed[k] = true
@@ -176,47 +175,16 @@ func (f *satConsequenceFrame) indexSet(s *Solver) error {
 	return nil
 }
 func satConsequenceSetRemove(s *satMUSLiteralSet, v uint32) error {
-	yes, e := s.contains(Literal(v))
-	if e != nil || !yes {
-		return e
+	if !s.contains(Literal(v)) {
+		return nil
 	}
-	if e = s.membership.Write(v, 0); e != nil {
-		return e
-	}
-	i := uint32(0)
-	for {
-		n, e := s.values.Size()
-		if e != nil {
-			return e
+	s.membership[v] = false
+	for i, l := range s.values {
+		if l.index() == v {
+			s.values[i] = s.values[len(s.values)-1]
+			s.values = s.values[:len(s.values)-1]
+			return nil
 		}
-		if i >= n {
-			break
-		}
-		x, e := s.values.Read(i)
-		if e != nil {
-			return e
-		}
-		if x == v {
-			break
-		}
-		i++
 	}
-	n, e := s.values.Size()
-	if e != nil {
-		return e
-	}
-	if satStorageSourceDebug && i >= n {
-		return ErrSATAssertion
-	}
-	if n == 0 {
-		return arena.ErrBounds
-	}
-	back, e := s.values.Read(n - 1)
-	if e != nil {
-		return e
-	}
-	if e = s.values.Write(i, back); e != nil {
-		return e
-	}
-	return s.values.Shrink(n - 1)
+	return ErrSATAssertion
 }

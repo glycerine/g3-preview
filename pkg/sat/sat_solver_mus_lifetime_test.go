@@ -4,33 +4,22 @@ package sat
 import (
 	"errors"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
 	var a, b satMUSLiteralSet
-	a.bind(s.runtime.memory)
-	b.bind(s.runtime.memory)
-	t.Cleanup(func() { satOK(t, b.close()); satOK(t, a.close()) })
+	t.Cleanup(func() { b.close(); a.close() })
 	satOK(t, a.insert(2))
-	satOK(t, a.reset())
-	oldMembership, oldValues := a.membership.Block, a.values.Raw.Block
+	a.reset()
 	_, e := s.mus.qx(&a, &b, false)
 	if !errors.Is(e, ErrSATMUSEmptyRecursion) {
 		t.Fatal(e)
 	}
 	// Empty qx does NOT succeed. Its first split assigns an empty temporary to
 	// assignment before recursive repetition: old buffers are already destroyed.
-	if a.membership.Block != (util.Block{}) || a.values.Raw.Block != (util.Block{}) {
+	if len(a.membership) != 0 || len(a.values) != 0 {
 		t.Fatal("source split publication skipped")
-	}
-	if _, e = s.runtime.memory.Read(oldMembership, 0); e == nil {
-		t.Fatal("old membership survives source assignment")
-	}
-	if _, e = s.runtime.memory.Read(oldValues, 0); e == nil {
-		t.Fatal("old values survive source assignment")
 	}
 	if s.mus.frames != nil {
 		t.Fatal("guard loses lexical cleanup")
@@ -38,9 +27,7 @@ func TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication(t *testing.T) {
 	satFullSolverRuntimeAudit(t, s)
 }
 
-// Checked-domain protocol fixture: caller actually frees the reached inner
-// membership block. It is no ordinary source solver state or malloc failure.
-func TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend(t *testing.T) {
+func TestSATMUSInnerCoreNativeCleanupRestoresScopedAppend(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
 	f, e := s.mus.frame(1, false)
 	satOK(t, e)
@@ -50,33 +37,11 @@ func TestSATMUSInnerCoreReleaseGuardRetainsOlderScopedAppend(t *testing.T) {
 	f.appendActive = true
 	f.appendOld = 0
 	f.innerCoreCompleted = true
-	oldValues := f.sets[0].values.Raw.Block
-	actual := f.sets[0].membership.Block
-	satOK(t, s.runtime.memory.Deallocate(&actual))
-	before := s.budget.Used()
-	e = s.mus.drop(f, nil)
-	if e == nil {
-		t.Fatal("actual stale inner release accepted")
-	}
+	satOK(t, s.mus.drop(f, nil))
 	n, e := s.mus.mus.Size()
 	satOK(t, e)
-	if n != 2 || !f.appendActive || s.mus.frames != f {
-		t.Fatal("older scoped_append released before stopped inner core", n)
-	}
-	if _, e = s.runtime.memory.Read(oldValues, 0); e == nil {
-		t.Fatal("completed inner values release was replayed or omitted")
-	}
-	if s.budget.Used() >= before {
-		t.Fatal("source completed inner free prefix absent")
-	}
-	// Explicit caller acknowledgment of its already completed physical free.
-	// Owning continuation consumes remaining fields, not reconstructed bytes.
-	f.sets[0].membership.Block = util.Block{}
-	satOK(t, s.mus.cleanup())
-	n, e = s.mus.mus.Size()
-	satOK(t, e)
-	if n != 0 || s.mus.frames != nil {
-		t.Fatal("scoped continuation", n)
+	if n != 0 || s.mus.frames != nil || f.sets[0].values != nil || f.sets[0].membership != nil {
+		t.Fatal("native inner cleanup/scoped append", n)
 	}
 	satFullSolverRuntimeAudit(t, s)
 }
