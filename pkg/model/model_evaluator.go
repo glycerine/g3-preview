@@ -4,12 +4,14 @@ package model
 
 import (
 	"errors"
+	"reflect"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/messages"
-	"reflect"
 )
 
 var ErrModelEvaluatorTheory = errors.New("g3: model evaluator theory reducer is not ported")
@@ -22,7 +24,7 @@ type ModelEvaluatorConfig struct {
 	Globals     *util.GlobalParamsService
 	Params      *util.ParamsRef
 	Memory      *util.Runtime
-	Cooperation *util.Cooperation
+	Cooperation *cooperate.Cooperation
 }
 
 // ModelEvaluator runs the original no-proof traversal and selected evaluator_cfg

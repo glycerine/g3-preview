@@ -1,4 +1,4 @@
-package util
+package cooperate
 
 import (
 	"errors"

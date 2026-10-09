@@ -1,5 +1,5 @@
 //go:build !g3debug
 
-package util
+package cooperate
 
 const cooperationSourceDebug = false

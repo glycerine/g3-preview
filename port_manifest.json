@@ -113066,10 +113066,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_cooperate.go",
-        "pkg/util/util_cooperate_debug.go",
-        "pkg/util/util_cooperate_nodebug.go",
-        "pkg/util/util_cooperate_test.go"
+        "pkg/util/cooperate/cooperate.go",
+        "pkg/util/cooperate/cooperate_debug.go",
+        "pkg/util/cooperate/cooperate_nodebug.go",
+        "pkg/util/cooperate/cooperate_test.go"
       ],
       "tests": [
         "TestCooperationNoOMPSourceCheckpointAndSection",
@@ -113111,7 +113111,7 @@
         {
           "name": "actual _NO_OMP_ enabled/checkpoint/cooperate and section/task constructors/destructors",
           "status": "ported",
-          "go_target": "pkg/util/util_cooperate.go",
+          "go_target": "pkg/util/cooperate/cooperate.go",
           "tests": [
             "TestCooperationNoOMPSourceCheckpointAndSection",
             "TestCooperationNoOMPSourceAssertionSites",
@@ -113141,10 +113141,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_cooperate.go",
-        "pkg/util/util_cooperate_debug.go",
-        "pkg/util/util_cooperate_nodebug.go",
-        "pkg/util/util_cooperate_test.go"
+        "pkg/util/cooperate/cooperate.go",
+        "pkg/util/cooperate/cooperate_debug.go",
+        "pkg/util/cooperate/cooperate_nodebug.go",
+        "pkg/util/cooperate/cooperate_test.go"
       ],
       "tests": [
         "TestCooperationNoOMPSourceCheckpointAndSection",
@@ -113170,7 +113170,7 @@
         {
           "name": "actual _NO_OMP_ enabled/checkpoint/cooperate and section/task constructors/destructors",
           "status": "ported",
-          "go_target": "pkg/util/util_cooperate.go",
+          "go_target": "pkg/util/cooperate/cooperate.go",
           "tests": [
             "TestCooperationNoOMPSourceCheckpointAndSection",
             "TestCooperationNoOMPSourceAssertionSites",
@@ -152264,8 +152264,8 @@
       "role": "production",
       "status": "platform_replacement",
       "go_targets": [
-        "pkg/util/util_cooperate.go",
-        "pkg/util/util_cooperate_test.go"
+        "pkg/util/cooperate/cooperate.go",
+        "pkg/util/cooperate/cooperate_test.go"
       ],
       "tests": [
         "TestCooperationNoOMPSourceCheckpointAndSection",
@@ -152302,7 +152302,7 @@
         "The header owns no storage in the selected _NO_OMP_ profile. Concrete Go owners retain their own state and use ordinary Go synchronization only where their already-ported behavior requires it."
       ],
       "deviations": [
-        "z3_omp.h is an OpenMP compatibility shim, not a project algorithm. The current single-goroutine Go port selects the source _NO_OMP_ behavior: omp_in_parallel is false, thread number is zero, processor count is one, and nested-lock operations are no-ops. No Go mirror of omp.h, omp_nest_lock_t, or the C preprocessor macros is created. util_cooperate.go directly implements the only source control flow that observes these values. Future parallel Go code must use Go runtime and synchronization facilities at its concrete call sites."
+        "z3_omp.h is an OpenMP compatibility shim, not a project algorithm. The current single-goroutine Go port selects the source _NO_OMP_ behavior: omp_in_parallel is false, thread number is zero, processor count is one, and nested-lock operations are no-ops. No Go mirror of omp.h, omp_nest_lock_t, or the C preprocessor macros is created. pkg/util/cooperate/cooperate.go directly implements the only source control flow that observes these values. Future parallel Go code must use Go runtime and synchronization facilities at its concrete call sites."
       ]
     }
   ],

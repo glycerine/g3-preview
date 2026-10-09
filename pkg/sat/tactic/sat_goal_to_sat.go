@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 )
 
 var ErrSATGoalUnsupported = errors.New("operator not supported, apply simplifier before invoking translator")
@@ -33,7 +34,7 @@ type GoalTranslator struct {
 	solver  *sat.Solver
 	// Borrow the AST manager's original resource limit for translation checkpoints.
 	Limit                                     *util.Reslimit
-	cooperation                               *util.Cooperation
+	cooperation                               *cooperate.Cooperation
 	cache, Atoms, interfaces                  satGoalASTMap
 	dependencies                              satGoalASTMap
 	dependencyTrail                           []ast.ASTHandle
@@ -76,7 +77,7 @@ func NewGoalTranslator(m *ast.ASTManager, s *sat.Solver) (tr *GoalTranslator, er
 			return tr, err
 		}
 	}
-	if tr.cooperation, err = util.NewCooperation(s.Budget()); err != nil {
+	if tr.cooperation, err = cooperate.NewCooperation(s.Budget()); err != nil {
 		return tr, err
 	}
 	name := "ite_extra"

@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 )
 
 type algebraicSourceCohort struct {
@@ -31,7 +32,7 @@ func algebraicSourceFixture(t *testing.T) *algebraicSourceCohort {
 	algebraicSourceMust(t, e)
 	limit, e := util.NewReslimit(b)
 	algebraicSourceMust(t, e)
-	cooperation, e := util.NewCooperation(b)
+	cooperation, e := cooperate.NewCooperation(b)
 	algebraicSourceMust(t, e)
 	f := &algebraicSourceCohort{service: s, budget: b, limit: limit}
 	p, e := NewUPolynomialManagerFromRationalService(s, UPolynomialConfig{Checkpoint: func() bool { f.polynomialTicks++; return limit.Inc() }, Cooperation: func() error { return cooperation.Cooperate("upolynomial") }})

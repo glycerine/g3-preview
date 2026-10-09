@@ -2,12 +2,14 @@
 package model_test
 
 import (
+	"testing"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/messages"
-	"testing"
 )
 
 func evaluatorFixture(t *testing.T) (*ast.ASTManager, *model.Model, *model.ModelEvaluator, *util.ParamsContext, *util.ParamsRef, model.ModelEvaluatorConfig) {
@@ -22,7 +24,7 @@ func evaluatorFixture(t *testing.T) (*ast.ASTManager, *model.Model, *model.Model
 	astTestMust(t, e)
 	memory, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
 	astTestMust(t, e)
-	cooperate, e := util.NewCooperation(b)
+	cooperate, e := cooperate.NewCooperation(b)
 	astTestMust(t, e)
 	t.Cleanup(func() {
 		astTestMust(t, cooperate.Close())

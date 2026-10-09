@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 )
 
 func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *util.SexprManager, *util.SymbolManager, *util.RationalService, *UPolynomialManager, UPolynomial) {
@@ -15,7 +16,7 @@ func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *util.SexprManager, *
 	sx, sy, q := sxOwner(t, b)
 	limit, e := util.NewReslimit(b)
 	sxMust(t, e)
-	coop, e := util.NewCooperation(b)
+	coop, e := cooperate.NewCooperation(b)
 	sxMust(t, e)
 	p, e := NewUPolynomialManagerFromRationalService(q, UPolynomialConfig{Checkpoint: limit.Inc, Cooperation: func() error { return coop.Cooperate("upolynomial") }})
 	sxMust(t, e)

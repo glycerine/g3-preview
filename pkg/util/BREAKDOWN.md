@@ -221,8 +221,10 @@ These should follow after the first independent moves:
   It depends only on the standard library. Timer and time-reporting consumers
   exchange a typed `State` snapshot when they must persist the watch; all other
   consumers use `Stopwatch` directly. There is no root compatibility facade.
+* `util/cooperate` now owns the selected single-threaded `cooperate.h/.cpp`
+  profile and imports only `arena`. Current consumers import it directly.
 * `util/control` can own cancellation, event handlers, resource limits,
-  timeouts, timers, scoped control-C handling, and cooperation checks. These
+  timeouts, timers, and scoped control-C handling. These
   form a behavioral subsystem even though they are not one C++ include cycle.
 
 These APIs have broad consumers, so moving them will touch many packages. They
@@ -717,3 +719,8 @@ adapters. SAT reporting imports the leaf directly. Root `Timer` and `Timeit`
 retain their existing persistence behavior through the leaf's typed `State`
 snapshot and constructor, without exposing stopwatch fields or retaining a
 root alias. The leaf has no project-package dependency.
+
+`util/cooperate` owns the no-OpenMP cooperation section/task state and its
+debug/release assertion profiles. It imports only `arena`; model evaluation,
+SAT goal translation, and current test fixtures import it directly without a
+root facade.

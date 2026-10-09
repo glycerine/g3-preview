@@ -3,11 +3,13 @@
 package tactic
 
 import (
+	"testing"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util"
-	"testing"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 )
 
 func extensionFixture(t *testing.T) (*ast.ASTManager, *model.Model, *ModelRef, model.ModelEvaluatorConfig) {
@@ -20,7 +22,7 @@ func extensionFixture(t *testing.T) (*ast.ASTManager, *model.Model, *ModelRef, m
 	satOK(t, globals.InitializeSource())
 	memory, e := util.NewRuntime(util.RuntimeConfig{Budget: budget})
 	satOK(t, e)
-	cooperate, e := util.NewCooperation(budget)
+	cooperate, e := cooperate.NewCooperation(budget)
 	satOK(t, e)
 	t.Cleanup(func() {
 		satOK(t, cooperate.Close())
