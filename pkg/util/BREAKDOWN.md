@@ -1009,3 +1009,12 @@ service, word packing, uint32 text-length codec, and text-only arena failures.
 Entry/receipt arrays remain separately budgeted; native text is outside arena
 accounting. Root util now has no Words owner; fixed-width bitset storage in its
 already-separated child package remains an independent arena consumer.
+
+The datatype plugin's constructor-only copied definition table, nine utility
+object-table shells, and empty Runtime reference/trail vectors were consumed
+only by their own representation tests. Removed that Go scaffolding after a
+module-wide scan; retained actual plugin registration, family lookup, header
+ownership, and finalization. C++ datatype definitions and utility operations
+remain live and unported. Concrete native maps/slices should be introduced only
+when their functional Go consumers are ported; empty source templates do not
+justify another dependency on the container infrastructure.

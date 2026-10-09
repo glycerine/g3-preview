@@ -30972,3 +30972,18 @@ preserve ErrClosed versus ErrInvalidSlot. The complete AST rerun passes, as do
 complete SAT/smtcore tests, module compilation, affected-package vet, and
 portcheck. Native context construction no longer requires a phantom Words
 configuration, while conflicting budget configurations remain rejected.
+
+### Remove unused datatype container scaffolding
+
+A complete pkg/ consumer scan found no production construction of
+astDatatypeUtility and no populated datatype definition-table path. Removed
+its nine empty copied object maps, Runtime reference/trail vectors, and the
+plugin's empty definition-table/vector shells. Actual plugin registration,
+family identity, registration-header refusal/ownership, source finalization,
+and owning history cleanup remain. Replaced representation-only allocation
+tests with registration identity and cleanup checks. The upstream datatype
+classes are live and unported; this change does not classify them as dead or
+claim datatype algorithm completion.
+
+Validation: complete AST and smtcore tests pass, as do focused checked/debug
+constructor/finalization tests, module-wide compilation, AST vet, and portcheck.

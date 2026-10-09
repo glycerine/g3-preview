@@ -13824,8 +13824,7 @@
         "pkg/ast/ast_datatype_plugin_source_test.go"
       ],
       "tests": [
-        "TestASTDatatypeActualPluginAndUtilityMembers",
-        "TestASTDatatypeUtilityEveryActualMapConstructorPrefix"
+        "TestASTDatatypeRegistrationLifecycle"
       ],
       "assertions": [
         {
@@ -13941,20 +13940,19 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "ast_datatype_plugin concrete reached source counterpart (datatype_decl_plugin.cpp:150-162,739-750)",
+          "name": "Datatype plugin registration and empty-definition lifecycle (datatype_decl_plugin.cpp:150-162)",
           "status": "partial",
           "go_target": "pkg/ast/ast_datatype_plugin.go",
           "tests": [
-            "TestASTDatatypeActualPluginAndUtilityMembers",
-            "TestASTDatatypeUtilityEveryActualMapConstructorPrefix"
+            "TestASTDatatypeRegistrationLifecycle"
           ]
         }
       ],
       "ownership": [
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Only the actual plugin registration header and registry/family acquisitions are retained. Definition tables, utility caches, and vectors had no production Go consumers and have been removed rather than allocating empty copied C++ containers. Registration, repeated lookup, source finalization, and owning history cleanup remain covered."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Datatype definitions and utility operations remain live upstream and unported; their removed Go storage is not classified as dead C++. Future consumers must use concrete native maps/slices. No datatype construction/reduction, native container allocation ABI, or registered upstream-driver credit is claimed."
       ]
     },
     {
