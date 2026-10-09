@@ -27,7 +27,6 @@ type polynomialArithmeticScope struct {
 	transport                                         util.Int
 	transportSlot                                     uint32
 	transportBound                                    bool
-	positionBlock                                     util.Block
 	positionID, positionValue                         uint32
 	positionTerm                                      Monomial
 	positionPublished                                 bool

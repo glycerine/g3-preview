@@ -141,14 +141,7 @@ func polynomialPseudoPhysical(t *testing.T, m *MultivariatePolynomialCore, q, r 
 	if q != nil {
 		refs = append(refs, q)
 	}
-	raw := []util.Block{}
-	if m.queryPositions.raw != (util.Block{}) {
-		raw = append(raw, m.queryPositions.raw)
-	}
-	if m.queryPositions.pending != (util.Block{}) {
-		raw = append(raw, m.queryPositions.pending)
-	}
-	polynomialNewtonPhysicalWithRaw(t, m, nil, refs, nil, nil, polys, nil, raw, public...)
+	polynomialNewtonPhysicalWithRaw(t, m, nil, refs, nil, nil, polys, nil, nil, public...)
 	// Ref outputs are real named polynomial roots, not inferred directory entries.
 	for _, ref := range refs {
 		polys = append(polys, ref.root.value, ref.root.incoming)

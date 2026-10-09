@@ -15,7 +15,7 @@ func polynomialSparsePhysical(t *testing.T, s *PolynomialSparseInterpolator, out
 	full := s.owner
 	m := full.core
 	sk := s.skeleton
-	raw := []util.Block{m.queryPositions.raw, m.queryPositions.pending}
+	raw := []util.Block{}
 	public := []*util.Int{&s.interpolation.aux}
 	public = append(public, extraNum...)
 	extra := full.header + full.upm.header + full.upm.modular.Header + full.upm.store.header + s.header

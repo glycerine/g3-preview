@@ -172,10 +172,6 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 		put(v.pending)
 		put(v.old)
 	}
-	for _, b := range buffers {
-		put(b.positions.raw)
-		put(b.positions.pending)
-	}
 	for _, s := range z.Naturals().Division {
 		put(s.Raw)
 		put(s.Pending)

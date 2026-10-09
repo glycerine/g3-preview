@@ -34,12 +34,6 @@ func polynomialVariablePhysical(t *testing.T, m *MultivariatePolynomialCore, max
 			headers += s.header
 		}
 	}
-	if m.queryPositions.raw != (util.Block{}) {
-		external = append(external, m.queryPositions.raw)
-	}
-	if m.queryPositions.pending != (util.Block{}) {
-		external = append(external, m.queryPositions.pending)
-	}
 	polynomialVariablePhysicalCore(t, m, nil, nil, nil, nil, polys, nil, external, fields, headers)
 	polynomialOperationMonomialAudit(t, m, polys, nil)
 }

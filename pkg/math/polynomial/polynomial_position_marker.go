@@ -1,10 +1,6 @@
 // Source: src/math/polynomial/polynomial.cpp:454-481,1988-2039.
 package polynomial
 
-import (
-	"github.com/glycerine/g3/pkg/util"
-)
-
 // This token owns only the actual unsigned position write. It owns no RC of
 // the borrowed monomial whose ID was read before source publication.
 func (p *MonomialPositions) acceptsArithmeticMarker(r *polynomialArithmeticInvocationReceipt) bool {
@@ -18,7 +14,6 @@ func (p *MonomialPositions) acknowledgeMarkerWrite(id uint32) {
 	if s != nil && s.positionID == id && s.positionPublished && s.invocation == p.markerInvocation && s.buffer != nil && &s.buffer.positions == p && s.buffer.owner != nil && s.buffer.owner.matchesArithmeticInvocation(&polynomialArithmeticInvocationReceipt{manager: s.buffer.owner, frame: s, invocation: p.markerInvocation}) {
 		s.positionPublished = false
 		s.positionTerm = Monomial{}
-		s.positionBlock = util.Block{}
 		p.markerFrame = nil
 		p.markerInvocation = 0
 	}
@@ -36,9 +31,6 @@ func (p *MonomialPositions) cleanupArithmeticMarker(r *polynomialArithmeticInvoc
 		return e
 	}
 	s := r.frame
-	if p.raw != s.positionBlock {
-		return ErrPolynomialPending
-	}
 	value, e := p.read(s.positionID)
 	if e != nil {
 		return e
@@ -46,22 +38,18 @@ func (p *MonomialPositions) cleanupArithmeticMarker(r *polynomialArithmeticInvoc
 	if value != s.positionValue {
 		return ErrPolynomialPending
 	}
-	if e = p.manager.memory.WriteUint32(p.raw, 8+uint64(s.positionID)*4, ^uint32(0)); e != nil {
-		return e
-	}
+	p.values[s.positionID] = ^uint32(0)
 	p.acknowledgeMarkerWrite(s.positionID)
 	return nil
 }
 
-// The actual map destructor has consumed every row of this exact backing.
-// A consumed-with-error release still retires its write token; a refused
-// physical release leaves both block and marker intact for explicit retry.
-func (p *MonomialPositions) acknowledgeReleasedMarker(block util.Block) {
-	if p == nil || p.self != p || block == (util.Block{}) {
+// Releasing the map consumes every row and therefore retires its write token.
+func (p *MonomialPositions) acknowledgeReleasedMarker() {
+	if p == nil || p.self != p {
 		return
 	}
 	s := p.markerFrame
-	if s == nil || s.positionBlock != block || s.buffer == nil || s.buffer.owner == nil {
+	if s == nil || s.buffer == nil || s.buffer.owner == nil {
 		return
 	}
 	r := polynomialArithmeticInvocationReceipt{manager: s.buffer.owner, frame: s, invocation: p.markerInvocation}

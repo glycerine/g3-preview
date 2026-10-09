@@ -36113,12 +36113,9 @@
         "TestMonomialOrderSourceDegreeShortCircuit",
         "TestMonomialPositionsSourceMapping",
         "TestMonomialPositionsAssertionsAndOwners",
-        "TestMonomialPositionsRefusalPrefixes",
+        "TestMonomialPositionsNativeGrowthIgnoresArenaFailure",
         "TestMonomialPositionsColdChargeAndWarm",
-        "TestMonomialPositionsScalarIDOnlyAndWrap",
-        "TestMonomialPositionsTLSUnpublishedOwnership",
-        "TestMonomialPositionsNullCapacitySourceOverflow",
-        "TestMonomialPositionsWrappedHeaderSourceAndOwningCleanup",
+        "TestMonomialPositionsScalarIDOnlyAndRejectedWrap",
         "TestMonomialSourceConstructorAndInterning",
         "TestMonomialIndependentProductDivisionGCD",
         "TestMonomialSourceVariableSortPowerAndDerivative",
@@ -36229,7 +36226,7 @@
         "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
         "TestPolynomialQueryReachedFieldReadProfiles",
         "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-        "TestPolynomialQueryEqualScratchPhysicalFailures",
+        "TestPolynomialQueryEqualNativeScratch",
         "TestPolynomialExactDivIndependentProductAndScalar",
         "TestPolynomialExactDivScalarRawLocalFailurePrefixes",
         "TestPolynomialExactDivScalarDiagnosticsAndTruncation",
@@ -36795,7 +36792,6 @@
         "TestPolynomialRegularPositionMarkerCallbackWritePreserved",
         "TestPolynomialRegularPositionMarkerRejectsCopiedAndStaleAcquisition",
         "TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken",
-        "TestPolynomialRegularPositionMarkerPostphysicalMapRelease",
         "TestPolynomialPseudoActualCoefficientChildPrefixes",
         "TestPolynomialPseudoReceiptActualFrameAndReuse",
         "TestPolynomialPseudoActualMinusANumericAcquisition",
@@ -38232,18 +38228,15 @@
           "tests": []
         },
         {
-          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
+          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set over native []uint32 storage and concrete borrowed monomial-array template loops",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_positions.go",
           "tests": [
             "TestMonomialPositionsSourceMapping",
             "TestMonomialPositionsAssertionsAndOwners",
-            "TestMonomialPositionsRefusalPrefixes",
+            "TestMonomialPositionsNativeGrowthIgnoresArenaFailure",
             "TestMonomialPositionsColdChargeAndWarm",
-            "TestMonomialPositionsScalarIDOnlyAndWrap",
-            "TestMonomialPositionsTLSUnpublishedOwnership",
-            "TestMonomialPositionsNullCapacitySourceOverflow",
-            "TestMonomialPositionsWrappedHeaderSourceAndOwningCleanup"
+            "TestMonomialPositionsScalarIDOnlyAndRejectedWrap"
           ]
         },
         {
@@ -38980,7 +38973,7 @@
             "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
             "TestPolynomialQueryReachedFieldReadProfiles",
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-            "TestPolynomialQueryEqualScratchPhysicalFailures"
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
@@ -38995,7 +38988,7 @@
             "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
             "TestPolynomialQueryReachedFieldReadProfiles",
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-            "TestPolynomialQueryEqualScratchPhysicalFailures"
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
@@ -39010,7 +39003,7 @@
             "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
             "TestPolynomialQueryReachedFieldReadProfiles",
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-            "TestPolynomialQueryEqualScratchPhysicalFailures"
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
@@ -39025,7 +39018,7 @@
             "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
             "TestPolynomialQueryReachedFieldReadProfiles",
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-            "TestPolynomialQueryEqualScratchPhysicalFailures"
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
@@ -40431,7 +40424,7 @@
           ]
         },
         {
-          "name": "polynomial.cpp:454-481 monomial2pos Set/Reset actual write token and regular borrowed-before-INC owning continuation",
+          "name": "polynomial.cpp:454-481 monomial2pos Set/Reset row write token and regular borrowed-before-INC owning continuation",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_position_marker.go",
           "tests": [
@@ -40439,8 +40432,7 @@
             "TestPolynomialRegularPositionMarkerPreservesRecycledForeignWrite",
             "TestPolynomialRegularPositionMarkerCallbackWritePreserved",
             "TestPolynomialRegularPositionMarkerRejectsCopiedAndStaleAcquisition",
-            "TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken",
-            "TestPolynomialRegularPositionMarkerPostphysicalMapRelease"
+            "TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken"
           ]
         },
         {
@@ -41312,12 +41304,9 @@
         "TestMonomialOrderSourceDegreeShortCircuit",
         "TestMonomialPositionsSourceMapping",
         "TestMonomialPositionsAssertionsAndOwners",
-        "TestMonomialPositionsRefusalPrefixes",
+        "TestMonomialPositionsNativeGrowthIgnoresArenaFailure",
         "TestMonomialPositionsColdChargeAndWarm",
-        "TestMonomialPositionsScalarIDOnlyAndWrap",
-        "TestMonomialPositionsTLSUnpublishedOwnership",
-        "TestMonomialPositionsNullCapacitySourceOverflow",
-        "TestMonomialPositionsWrappedHeaderSourceAndOwningCleanup",
+        "TestMonomialPositionsScalarIDOnlyAndRejectedWrap",
         "TestMonomialSourceConstructorAndInterning",
         "TestMonomialIndependentProductDivisionGCD",
         "TestMonomialSourceVariableSortPowerAndDerivative",
@@ -41428,7 +41417,7 @@
         "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
         "TestPolynomialQueryReachedFieldReadProfiles",
         "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-        "TestPolynomialQueryEqualScratchPhysicalFailures",
+        "TestPolynomialQueryEqualNativeScratch",
         "TestPolynomialExactDivIndependentProductAndScalar",
         "TestPolynomialExactDivScalarRawLocalFailurePrefixes",
         "TestPolynomialExactDivScalarDiagnosticsAndTruncation",
@@ -41932,18 +41921,15 @@
           "tests": []
         },
         {
-          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
+          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set over native []uint32 storage and concrete borrowed monomial-array template loops",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_positions.go",
           "tests": [
             "TestMonomialPositionsSourceMapping",
             "TestMonomialPositionsAssertionsAndOwners",
-            "TestMonomialPositionsRefusalPrefixes",
+            "TestMonomialPositionsNativeGrowthIgnoresArenaFailure",
             "TestMonomialPositionsColdChargeAndWarm",
-            "TestMonomialPositionsScalarIDOnlyAndWrap",
-            "TestMonomialPositionsTLSUnpublishedOwnership",
-            "TestMonomialPositionsNullCapacitySourceOverflow",
-            "TestMonomialPositionsWrappedHeaderSourceAndOwningCleanup"
+            "TestMonomialPositionsScalarIDOnlyAndRejectedWrap"
           ]
         },
         {
@@ -42680,7 +42666,7 @@
             "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
             "TestPolynomialQueryReachedFieldReadProfiles",
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-            "TestPolynomialQueryEqualScratchPhysicalFailures"
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
@@ -42695,7 +42681,7 @@
             "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
             "TestPolynomialQueryReachedFieldReadProfiles",
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-            "TestPolynomialQueryEqualScratchPhysicalFailures"
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
@@ -42710,7 +42696,7 @@
             "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
             "TestPolynomialQueryReachedFieldReadProfiles",
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-            "TestPolynomialQueryEqualScratchPhysicalFailures"
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
@@ -42725,7 +42711,7 @@
             "TestPolynomialQueryUnivariateLinearAndScalarCoefficient",
             "TestPolynomialQueryReachedFieldReadProfiles",
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
-            "TestPolynomialQueryEqualScratchPhysicalFailures"
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
@@ -149513,12 +149499,9 @@
         "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
         "TestMonomialPositionsSourceMapping",
         "TestMonomialPositionsAssertionsAndOwners",
-        "TestMonomialPositionsRefusalPrefixes",
+        "TestMonomialPositionsNativeGrowthIgnoresArenaFailure",
         "TestMonomialPositionsColdChargeAndWarm",
-        "TestMonomialPositionsScalarIDOnlyAndWrap",
-        "TestMonomialPositionsTLSUnpublishedOwnership",
-        "TestMonomialPositionsNullCapacitySourceOverflow",
-        "TestMonomialPositionsWrappedHeaderSourceAndOwningCleanup",
+        "TestMonomialPositionsScalarIDOnlyAndRejectedWrap",
         "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
         "TestSATMUSCopyCoreRequestUsesSourceSizeTPromotion",
         "TestSATMUSEmptyRecursionGuardPreservesFirstSplitPublication",
@@ -149940,18 +149923,15 @@
           ]
         },
         {
-          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
+          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set over native []uint32 storage and concrete borrowed monomial-array template loops",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_positions.go",
           "tests": [
             "TestMonomialPositionsSourceMapping",
             "TestMonomialPositionsAssertionsAndOwners",
-            "TestMonomialPositionsRefusalPrefixes",
+            "TestMonomialPositionsNativeGrowthIgnoresArenaFailure",
             "TestMonomialPositionsColdChargeAndWarm",
-            "TestMonomialPositionsScalarIDOnlyAndWrap",
-            "TestMonomialPositionsTLSUnpublishedOwnership",
-            "TestMonomialPositionsNullCapacitySourceOverflow",
-            "TestMonomialPositionsWrappedHeaderSourceAndOwningCleanup"
+            "TestMonomialPositionsScalarIDOnlyAndRejectedWrap"
           ]
         },
         {

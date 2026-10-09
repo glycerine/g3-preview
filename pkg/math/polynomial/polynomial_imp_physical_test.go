@@ -31,7 +31,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	handlers := []*PolynomialDeletionHandler{}
 	external := []util.Block{m.tmp1.raw, m.tmp1.pending, full.degree2pos.raw, full.degree2pos.pending, full.lexPermutation.raw, full.lexPermutation.pending, full.varDegrees.raw, full.varDegrees.pending, m.substitution.found.raw, m.substitution.found.pending}
 	external = append(external, extraRaw...)
-	external = append(external, m.queryPositions.raw, m.queryPositions.pending)
 	external = append(external, full.lexBuckets.data.raw, full.lexBuckets.data.pending, full.lexBuckets.data.old)
 	for i := range full.lexBuckets.children {
 		v := &full.lexBuckets.children[i]
@@ -519,10 +518,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		put(v.raw)
 		put(v.pending)
 		put(v.old)
-	}
-	for _, b := range buffers {
-		put(b.positions.raw)
-		put(b.positions.pending)
 	}
 	for _, s := range z.Naturals().Division {
 		put(s.Raw)

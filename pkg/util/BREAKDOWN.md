@@ -801,3 +801,9 @@ reset, and display behavior remain explicit. C++ vector capacity growth,
 `size_t` conversion, pending Runtime blocks, and arena failure states for these
 Go-managed slices have been removed, along with the tests that existed only to
 validate those representations.
+
+Polynomial monomial-to-position maps now also use concrete `[]uint32` storage.
+The arithmetic continuation still binds an unfinished write to its exact owner,
+invocation, row, and value, while native slice relocation no longer appears as
+observable block identity. This removed the final production use of the copied
+`VectorGrowth` arithmetic, so that helper and its representation test are gone.

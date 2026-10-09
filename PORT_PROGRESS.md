@@ -24363,9 +24363,9 @@ the source counter, LIFO reuse, unsigned wrap, growth, reset, cleanup, and OOM
 skip behavior using `[]uint32`. Enclosing Runtime-backed owners translate a
 budget growth refusal through their existing sticky OOM transport. Raw vector
 headers, pending allocation tokens, malformed-header tests, and duplicate
-generator lifecycle code were representation artifacts and are gone. The
-source uint32 growth arithmetic still used by other Runtime vector ports lives
-separately in `util/vector_growth.go`.
+generator lifecycle code were representation artifacts and are gone. The last
+consumer of the shared source uint32 growth helper has since moved to native Go
+slice storage, so `util/vector_growth.go` is gone as well.
 
 `utiltime/stopwatch.go` preserves POSIX start/stop idempotence, reset-only-elapsed,
 add, unsigned accumulation/borrow guard, and running query stop/start control.

@@ -2,10 +2,8 @@
 package polynomial
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -188,7 +186,7 @@ func TestPolynomialRegularPositionMarkerRejectsCopiedAndStaleAcquisition(t *test
 	bad.frame = &copied
 	r.frame.executing = true
 	before := c.integer.Budget().Used()
-	raw := c.som.positions.raw
+	beforeLen := len(c.som.positions.values)
 	if e := c.som.positions.setWithArithmeticReceipt(c.monomials.unit, 7, &bad); e != ErrPolynomialOwner {
 		t.Fatal("copied frame accepted", e)
 	}
@@ -201,7 +199,7 @@ func TestPolynomialRegularPositionMarkerRejectsCopiedAndStaleAcquisition(t *test
 		t.Fatal("callback receipt acquired", e)
 	}
 	c.callbackDepth--
-	if raw != c.som.positions.raw || before != c.integer.Budget().Used() || r.frame.positionPublished {
+	if beforeLen != len(c.som.positions.values) || before != c.integer.Budget().Used() || r.frame.positionPublished {
 		t.Fatal("rejected marker acquired storage/authority")
 	}
 	serviceMust(t, c.som.positions.setWithArithmeticReceipt(c.monomials.unit, 7, &r))
@@ -242,15 +240,17 @@ func TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken(t *tes
 				polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
 				c.integer.Budget().FailAfter(-1)
 				if body != nil && r.frame.positionPublished {
-					before := r.frame.positionBlock
+					if len(c.som.positions.values) == 0 {
+						t.Fatal("published marker has no position storage")
+					}
 					if own {
 						e = c.som.positions.CloseChecked()
 					} else {
 						e = c.som.positions.SourceFinalize()
 					}
 					serviceMust(t, e)
-					if c.som.positions.raw == before {
-						t.Fatal("real block was not consumed")
+					if c.som.positions.values != nil {
+						t.Fatal("native position storage was not consumed")
 					}
 					polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
 					if e = c.cleanupArithmeticInvocation(&r, true); e != nil {
@@ -266,75 +266,6 @@ func TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken(t *tes
 				serviceMust(t, c.DecRef(p))
 			}
 			t.Fatal("actual mapping acquisition frontier absent")
-		})
-	}
-}
-
-// Actual source unsigned-vector release physically completes before the signed
-// TLS synchronization guard. This is a guarded owner-primitive profile.
-func TestPolynomialRegularPositionMarkerPostphysicalMapRelease(t *testing.T) {
-	for _, own := range []bool{false, true} {
-		t.Run(map[bool]string{false: "source", true: "owning"}[own], func(t *testing.T) {
-			budget := arena.NewBudget(1 << 26)
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
-			serviceMust(t, e)
-			cfg := serviceConfig(budget).Integers
-			cfg.Memory = rt
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
-			serviceMust(t, e)
-			full, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
-			serviceMust(t, e)
-			c := full.core
-			_, e = c.monomials.MkVar()
-			serviceMust(t, e)
-			for i := 0; i < 30000; i++ {
-				_ = c.monomials.ids.Mk()
-			}
-			term, e := c.monomials.MkVariable(0, 1)
-			serviceMust(t, e)
-			serviceMust(t, c.monomials.IncRef(term))
-			var r polynomialArithmeticInvocationReceipt
-			serviceMust(t, c.som.acquireArithmeticInvocation(&r))
-			r.frame.executing = true
-			serviceMust(t, c.som.positions.setWithArithmeticReceipt(term, 7, &r))
-			r.frame.executing = false
-			block := c.som.positions.raw
-			extent, e := rt.Size(block)
-			serviceMust(t, e)
-			if extent < 100000 {
-				t.Fatal("source vector below actual synchronization threshold", extent)
-			}
-			contextTLSNearMinimum(t, rt)
-			before := rt.Stats().LiveBlocks
-			polynomialImpPhysicalAuditNamed(t, full, nil, nil, 0)
-			if own {
-				e = c.som.positions.CloseChecked()
-			} else {
-				e = c.som.positions.SourceFinalize()
-			}
-			returned := e
-			if !errors.Is(e, arena.ErrBounds) || c.som.positions.raw != (util.Block{}) || rt.Stats().LiveBlocks != before-1 {
-				t.Fatal("actual postphysical source release required", e, rt.State(), c.som.positions.raw)
-			}
-			polynomialImpPhysicalAuditNamed(t, full, nil, nil, 0)
-			serviceMust(t, c.cleanupArithmeticInvocation(&r, true))
-			if r.frame.positionPublished || c.som.positions.markerFrame != nil || !errors.Is(returned, arena.ErrBounds) {
-				t.Fatal("consumed map token/error lost")
-			}
-			polynomialImpPhysicalAuditNamed(t, full, nil, nil, 0)
-			recovery, e := rt.Allocate(400000)
-			serviceMust(t, e)
-			serviceMust(t, c.monomials.DecRef(term))
-			contextTLSFinish(t, rt, full.CloseChecked)
-			contextTLSFinish(t, rt, q.CloseChecked)
-			e = rt.Deallocate(&recovery)
-			if e != nil && (!errors.Is(e, arena.ErrBounds) || recovery != (util.Block{})) {
-				t.Fatal("actual recovery release", e, recovery)
-			}
-			serviceMust(t, rt.Close())
-			if budget.Used() != 0 {
-				t.Fatal("actual final graph", budget.Used())
-			}
 		})
 	}
 }

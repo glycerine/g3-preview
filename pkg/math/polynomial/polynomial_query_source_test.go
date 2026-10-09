@@ -399,47 +399,22 @@ func TestPolynomialQueryCoefficientPhysicalFailurePrefixes(t *testing.T) {
 	}
 }
 
-func TestPolynomialQueryEqualScratchPhysicalFailures(t *testing.T) {
-	failures, success := 0, false
-	for ordinal := int64(0); ordinal < 32; ordinal++ {
-		reached := false
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m := polynomialCellFixture(t)
-			p := polynomialQueryTerms(t, m, []int32{3, 7}, [][]MonomialPower{{{1, 2}}, nil})
-			q := polynomialQueryTerms(t, m, []int32{5, 7}, [][]MonomialPower{{{1, 2}}, nil})
-			b := m.integer.Budget()
-			b.FailAfter(ordinal)
-			equal, e := m.Equal(p, q)
-			raw := []util.Block{}
-			if m.queryPositions.raw != (util.Block{}) {
-				raw = append(raw, m.queryPositions.raw)
-			}
-			if m.queryPositions.pending != (util.Block{}) {
-				raw = append(raw, m.queryPositions.pending)
-			}
-			polynomialNewtonPhysicalWithRaw(t, m, nil, nil, nil, nil, []Polynomial{p, q}, nil, raw)
-			polynomialOperationMonomialAudit(t, m, []Polynomial{p, q}, nil)
-			polynomialQueryExpect(t, m, p, map[[3]uint32]int64{{0, 2, 0}: 3, {}: 7})
-			polynomialQueryExpect(t, m, q, map[[3]uint32]int64{{0, 2, 0}: 5, {}: 7})
-			if e != nil {
-				if !numericPhysicalReservationRefusal(e) {
-					t.Fatal("scratch allocation category", e)
-				}
-				failures++
-			} else {
-				if equal {
-					t.Fatal("independent unequal coefficients")
-				}
-				reached = true
-			}
-			b.FailAfter(-1)
-		})
-		if reached {
-			success = true
-			break
-		}
+func TestPolynomialQueryEqualNativeScratch(t *testing.T) {
+	m := polynomialCellFixture(t)
+	p := polynomialQueryTerms(t, m, []int32{3, 7}, [][]MonomialPower{{{1, 2}}, nil})
+	q := polynomialQueryTerms(t, m, []int32{5, 7}, [][]MonomialPower{{{1, 2}}, nil})
+	b := m.integer.Budget()
+	beforeUsed, beforeStats := b.Used(), m.memory.Stats()
+	b.FailAfter(0)
+	equal, e := m.Equal(p, q)
+	b.FailAfter(-1)
+	serviceMust(t, e)
+	if equal {
+		t.Fatal("independent unequal coefficients")
 	}
-	if failures == 0 || !success {
-		t.Fatal(failures, success)
+	if b.Used() != beforeUsed || m.memory.Stats() != beforeStats || len(m.queryPositions.values) == 0 {
+		t.Fatal("native equality scratch changed Runtime storage", beforeUsed, b.Used(), beforeStats, m.memory.Stats())
 	}
+	polynomialQueryExpect(t, m, p, map[[3]uint32]int64{{0, 2, 0}: 3, {}: 7})
+	polynomialQueryExpect(t, m, q, map[[3]uint32]int64{{0, 2, 0}: 5, {}: 7})
 }

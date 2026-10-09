@@ -88,8 +88,6 @@ func polynomialSOMNamedRoots(t *testing.T, m *MultivariatePolynomialCore, vector
 			addRaw(s.pending)
 			addRaw(s.old)
 		}
-		addRaw(a.positions.raw)
-		addRaw(a.positions.pending)
 		sv := &b.sortNumerals
 		start := b.sortTransferred
 		if start < b.sortCleanupIndex {

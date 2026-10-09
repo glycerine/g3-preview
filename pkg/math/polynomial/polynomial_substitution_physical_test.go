@@ -15,11 +15,6 @@ func polynomialSubstitutionPhysicalWithHandlers(t *testing.T, m *MultivariatePol
 	d := &m.substitution
 	s := &d.scope
 	degrees := []*PolynomialVariableDegrees{}
-	for _, b := range []util.Block{m.queryPositions.raw, m.queryPositions.pending} {
-		if b != (util.Block{}) {
-			external = append(external, b)
-		}
-	}
 	values = append(values, &s.newA, &s.tmp)
 	for _, r := range []*polynomialReference{&s.p1, &s.q1, &s.product} {
 		polys = append(polys, r.value, r.incoming)

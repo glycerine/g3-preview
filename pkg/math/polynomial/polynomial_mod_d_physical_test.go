@@ -7,8 +7,8 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// This independent named census additionally accounts the actual map cold owner
-// and its published/pending Runtime vector. No frozen shared helper is edited.
+// This independent named census additionally accounts the map's cold owner.
+// Its Go-managed degree slice is outside the Runtime block graph.
 func polynomialModDPhysical(t *testing.T, m *MultivariatePolynomialCore, q, r *PolynomialRef, d *PolynomialVariableDegrees, polys []Polynomial, public ...*util.Int) {
 	t.Helper()
 	s := &m.pseudoDivision
@@ -28,12 +28,6 @@ func polynomialModDPhysical(t *testing.T, m *MultivariatePolynomialCore, q, r *P
 		refs = append(refs, q)
 	}
 	raw := []util.Block{}
-	if m.queryPositions.raw != (util.Block{}) {
-		raw = append(raw, m.queryPositions.raw)
-	}
-	if m.queryPositions.pending != (util.Block{}) {
-		raw = append(raw, m.queryPositions.pending)
-	}
 	polynomialModDNewtonPhysicalWithRaw(t, m, nil, refs, nil, nil, polys, nil, raw, []*PolynomialVariableDegrees{d}, append(public, &s.numeral)...)
 	monos := []Monomial{s.monomial.value, s.monomial.incoming}
 	// Ref outputs are real named polynomial roots, not inferred directory entries.

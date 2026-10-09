@@ -145,9 +145,7 @@ func (m *MultivariatePolynomialManager) destroyMembers() error {
 			var e error
 			switch m.memberStage {
 			case 19:
-				if m.core.queryPositions.raw != (util.Block{}) {
-					e = m.core.memory.Deallocate(&m.core.queryPositions.raw)
-				}
+				m.core.queryPositions.releaseValues()
 			case 20:
 				m.core.idsSourceDestroyed = true
 				m.core.ids.Cleanup(0)
@@ -190,8 +188,8 @@ func (m *MultivariatePolynomialManager) sourceBufferMembers(b *polynomialSOM, po
 	if e := m.sourceNumeralVector(&b.as); e != nil {
 		return e
 	}
-	if positions && b.positions.raw != (util.Block{}) {
-		return m.core.memory.Deallocate(&b.positions.raw)
+	if positions {
+		b.positions.releaseValues()
 	}
 	return nil
 }

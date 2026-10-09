@@ -330,7 +330,7 @@ func (b *PolynomialSOMBuffer) retireNumerals() error {
 }
 
 // som_buffer has an implicit destructor: no Reset, no numeral Del and no
-// monomial DEC. Its reverse raw members are ms, as, then monomial2pos.
+// monomial DEC. Its reverse members are ms, as, then monomial2pos.
 func (b *PolynomialSOMBuffer) SourceFinalize() error {
 	if b == nil || b.self != b {
 		return ErrPolynomialOwner
