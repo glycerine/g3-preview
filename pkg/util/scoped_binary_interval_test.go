@@ -193,7 +193,8 @@ func TestBinaryIntervalFormattingAndWarmStorage(t *testing.T) {
 		t.Fatal("warm owner", alloc, used, m.bounds.Z.BudgetField.Used())
 	}
 	intervalAudit(t, m, &a, &b, &c)
-	// Force formatter growth and ensure unpublished caller output on refusal.
+	// Native scratch can grow with reservations disabled; a short caller
+	// destination must still leave its bytes unchanged.
 	var n Int
 	two := NewInt(2)
 	serviceMust(t, m.bounds.Z.Power(&two, 1000, &n))
@@ -203,7 +204,7 @@ func TestBinaryIntervalFormattingAndWarmStorage(t *testing.T) {
 	m.bounds.Z.BudgetField.FailAfter(0)
 	_, e := m.FormatInto(&a, dst[:])
 	m.bounds.Z.BudgetField.FailAfter(-1)
-	if !numericPhysicalReservationRefusal(e) || dst != before {
+	if !errors.Is(e, ErrShortBuffer) || dst != before {
 		t.Fatal("format growth publication", e)
 	}
 	intervalAudit(t, m, &a, &b, &c)

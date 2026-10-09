@@ -9823,8 +9823,7 @@
         "TestASTSourceConstructorCopyAndBorrowedNamespaceGuardsPreserveActualOwners",
         "TestASTTraceAppPostRegistrationAllocationCatchFreesLiteralNodeWithoutTableRepair",
         "TestASTTraceCatchCapturesEachSuccessfulINCAndNeverFreesLaterSlotGeneration",
-        "TestASTSourceFinalizeKeepsFailedNumeralConstructorForExactOwnClose",
-        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
+        "TestASTLowLevelPrinterNativeLargeNumeralFormatting",
         "TestASTBorrowedFormatTraceCatchUsesReachedStreamWithoutFileOwnership",
         "TestASTIncompleteBorrowedFormatConstructorRetainsCaughtHistoryUntilOwnAbort",
         "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
@@ -10955,7 +10954,8 @@
         "AppArgumentView exposes borrowed application storage to the evaluator. Indexed reads validate the application handle and support factory callbacks under the manager lock without public-manager reentry; original application ownership must outlive the view.",
         "The selected original Int/Real coercion pass is now implemented for associative and ordinary arithmetic domains, including other-family declarations such as array select/store. Cast direction follows the expected sort kind, calls the actual arithmetic OP_TO_REAL/OP_TO_INT declaration dispatch and leaves nonarithmetic mismatches for check_args rejection. The explicit Go returning-error continuation names unpublished INCs and qualifies cleanup refusal; native allocation/exception/TRACE and complete owner/representation audits remain open.",
         "DecRefConsumed exposes the existing Go deletion transport consumption result so extraction cache owners retire acquired references on later deletion failure. The original DecRef API retains its behavior. This is a checked Go ownership adapter, not an added native algorithm or whole-unit pointer/destructor/ABI audit credit.",
-        "The concrete AppArguments suffix reader avoids an extra pointer-buffer copy when extraction propagation removes a complete leading concat segment. Existing family fallback domain construction is shared without changing its numerical sort/declaration/application order or existing failure-cleanup qualifications. Borrowed suffix tests check mixed-width output, hash-cons identity, domain growth and source-application expiry; propagation every-reservation campaigns cover both suffix and shortened-head paths."
+        "The concrete AppArguments suffix reader avoids an extra pointer-buffer copy when extraction propagation removes a complete leading concat segment. Existing family fallback domain construction is shared without changing its numerical sort/declaration/application order or existing failure-cleanup qualifications. Borrowed suffix tests check mixed-width output, hash-cons identity, domain growth and source-application expiry; propagation every-reservation campaigns cover both suffix and shortened-head paths.",
+        "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised."
       ]
     },
     {
@@ -12115,8 +12115,7 @@
       "tests": [
         "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
         "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex",
-        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
-        "TestASTSourceFinalizeKeepsFailedNumeralConstructorForExactOwnClose"
+        "TestASTLowLevelPrinterNativeLargeNumeralFormatting"
       ],
       "conditionals": [
         {
@@ -12137,8 +12136,7 @@
           "go_target": "pkg/ast/ast_low_level_printer.go",
           "tests": [
             "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
-            "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex",
-            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+            "TestASTLowLevelPrinterDeclarationMarksUseActualDeclarationIndex"
           ]
         },
         {
@@ -12146,8 +12144,7 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_low_level_printer.go",
           "tests": [
-            "TestASTSourceFinalizeKeepsFailedNumeralConstructorForExactOwnClose",
-            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+            "TestASTLowLevelPrinterNativeLargeNumeralFormatting"
           ]
         }
       ],
@@ -12155,7 +12152,8 @@
         "Two actual declaration/expression mark stores, exact nonowning raw traversal stack and acquired numeral. Younger reached source DT stop protects older NUM/stack/marks; own continuation consumes only actual retained tokens. Bounded/root overloads and AST_LL_PP_SHOW_FAMILY_NAME remain separate."
       ],
       "deviations": [
-        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
+        "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised."
       ]
     },
     {
@@ -14905,8 +14903,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_for_each_expr.go",
-        "pkg/ast/ast_for_each_expr_source_test.go",
-        "pkg/ast/ast_for_each_expr_close_source_test.go"
+        "pkg/ast/ast_for_each_expr_source_test.go"
       ],
       "tests": [
         "TestASTExprVisitorSourceCountSharedAndAllMarks",
@@ -14920,8 +14917,7 @@
         "TestASTExprVisitorSourceFinalizeEndsNodesWithoutAdoptingUnlistedMark",
         "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
         "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
-        "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild",
-        "TestASTExprVisitorHistorySurvivesActualLaterNumeralCloseStop"
+        "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -14942,8 +14938,7 @@
             "TestASTExprVisitorSourceFinalizeEndsNodesWithoutAdoptingUnlistedMark",
             "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
             "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
-            "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild",
-            "TestASTExprVisitorHistorySurvivesActualLaterNumeralCloseStop"
+            "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild"
           ]
         }
       ],
@@ -14962,8 +14957,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_for_each_expr.go",
-        "pkg/ast/ast_for_each_expr_source_test.go",
-        "pkg/ast/ast_for_each_expr_close_source_test.go"
+        "pkg/ast/ast_for_each_expr_source_test.go"
       ],
       "tests": [
         "TestASTExprVisitorSourceCountSharedAndAllMarks",
@@ -14977,8 +14971,7 @@
         "TestASTExprVisitorSourceFinalizeEndsNodesWithoutAdoptingUnlistedMark",
         "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
         "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
-        "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild",
-        "TestASTExprVisitorHistorySurvivesActualLaterNumeralCloseStop"
+        "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild"
       ],
       "conditionals": [
         {
@@ -15009,8 +15002,7 @@
             "TestASTExprVisitorSourceFinalizeEndsNodesWithoutAdoptingUnlistedMark",
             "TestASTExprVisitorSourcePendingMarkCannotClearForeignActualMark",
             "TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack",
-            "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild",
-            "TestASTExprVisitorHistorySurvivesActualLaterNumeralCloseStop"
+            "TestASTExprVisitorSourceSkolemParentProcFollowsDeepChild"
           ]
         }
       ],
@@ -15019,7 +15011,8 @@
         "Concrete counter/skolem visitors preserve shared-only versus all-mark schedules, source unsigned associativity arithmetic, body/pattern/no-pattern order, and found early exit. Lexical inline16 pair storage is embedded in the charged manager header; separately owned dynamic entries are 12-byte Go scalar records, not native pointer ABI.",
         "Actual marked-before-fast-trail-append refusal retains the exact unlisted mark action. Source clears only its completed trail; Go archive reservation before lexical frame reuse preserves original mark token, generation, owner and invocation. Release retry observes the old mark; existing checked mark-owner guards remain typed Go source-assertion adapters without bound C/T transport credit.",
         "Source completed lexical stack/marks cleanup is separate from exact manager-owned pending-mark cleanup. Mark-owner scalar metadata is stamped at actual leaves in both profiles for owning authority; release source reads remain bit-only. No arbitrary proc specialization, IgnorePatterns=true, for_each_expr_args ptr-vector helper, caller asserted_formulas/goal driver or whole source-unit completion credit.",
-        "Real public AST Close may acknowledge younger lexical marks then stop on an older NUM formatting destructor. Original archived tuples/body/source/first-own causes remain charged and attached after ACK; retries skip the acknowledged leaf without reading later foreign marks. Exact history metadata is refunded only by actual final owning manager storage/header teardown. Current unlisted diagnostics remain in the charged header, and a later call archives source-ended acknowledged diagnostics before overwriting lexical storage. Independent fresh-context ordinal campaigns preserve every original source mark-trail reservation; private child ACK is not represented as enclosing owner end."
+        "Real public AST Close may acknowledge younger lexical marks then stop on an older NUM formatting destructor. Original archived tuples/body/source/first-own causes remain charged and attached after ACK; retries skip the acknowledged leaf without reading later foreign marks. Exact history metadata is refunded only by actual final owning manager storage/header teardown. Current unlisted diagnostics remain in the charged header, and a later call archives source-ended acknowledged diagnostics before overwriting lexical storage. Independent fresh-context ordinal campaigns preserve every original source mark-trail reservation; private child ACK is not represented as enclosing owner end.",
+        "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised."
       ]
     },
     {
@@ -71484,7 +71477,6 @@
         "TestSATSolverInspectionExactSourceWatchDisplay",
         "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
         "TestSATSolverInspectionWarmOutputAndOwnerGuards",
-        "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestSATSolverReportEveryStatusStreamReservationAndStatePrefix",
         "TestSATSolverReportEveryDescriptorOwnerReservationPrefix",
         "TestSATSolverReportWarmPhysicalPlateauAndLifetime",
@@ -73263,7 +73255,6 @@
         "TestSATSolverInspectionExactSourceWatchDisplay",
         "TestSATSolverInspectionEveryActualStreamRefusalPrefix",
         "TestSATSolverInspectionWarmOutputAndOwnerGuards",
-        "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestSATSolverBorrowedModelCoreCurrentMembers",
         "TestSATSolverBorrowedScalarSourceAuthorities",
         "TestSATSolverClauseIteratorSameBackingMutationsAndRelocation",
@@ -111384,17 +111375,17 @@
         "TestASTSparseSharedExpressionDomainsAndASTWideVisited",
         "TestSourceCStringBoundedBytesAndLbuf",
         "TestIntegerCharacterNativeScratchAndCleanup",
-        "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+        "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
         "TestFastFloatFormattingRetainsSourcePrecision",
         "TestFastFloatDecimalBuffersAreLexical",
-        "TestFastFloatFormattingEveryConstructorPrefix",
+        "TestFastFloatNativeFullPrecisionFormattingWithoutReservations",
         "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
-        "TestFastFloatDecimalEveryLargeLocalPrefix",
-        "TestFastFloatFullPrecisionWarmSourceEvents",
+        "TestFastFloatDecimalEveryDivisionAllocationPrefix",
+        "TestFastFloatFullPrecisionWarmNativeScratch",
         "TestPolynomialPSCBufferInlineAndUnjoinedPush",
         "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
         "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
@@ -111546,7 +111537,7 @@
           "tests": [
             "TestSourceCStringBoundedBytesAndLbuf",
             "TestIntegerCharacterNativeScratchAndCleanup",
-            "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+            "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
             "TestIntegerCharacterNativeScratchGrowthAndLifetime"
@@ -111559,12 +111550,12 @@
           "tests": [
             "TestFastFloatFormattingRetainsSourcePrecision",
             "TestFastFloatDecimalBuffersAreLexical",
-            "TestFastFloatFormattingEveryConstructorPrefix",
+            "TestFastFloatNativeFullPrecisionFormattingWithoutReservations",
             "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
-            "TestFastFloatDecimalEveryLargeLocalPrefix",
-            "TestFastFloatFullPrecisionWarmSourceEvents"
+            "TestFastFloatDecimalEveryDivisionAllocationPrefix",
+            "TestFastFloatFullPrecisionWarmNativeScratch"
           ]
         },
         {
@@ -111664,7 +111655,8 @@
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
         "RationalBuffer16 is the nongeneric concrete buffer<rational> dependency for polynomial coefficient collection, with sixteen raw inline slots and double-capacity relocation without numeric copies/destructors. Each appended value is copy-constructed into its physical slot through an exact invocation embedded in the charged header, and count advances only after construction returns. Expanded storage and the reflected Go owner are charged through Budget rather than claiming native allocation/layout/stack/pointer ABI. At borrows an address only until expansion/end; aliases retained across expansion are outside the source consumer contract. Successful source scopes explicitly run SourceEnd in ascending element order before backing release. Failed body calls retain their actual partial slot/child and stop; SourceEnd rejects simulated native unwinding, while explicit two-phase Go cleanup consumes the real fields without altering failure history. The stale-element DT test proves the checked boundary traversal prefix, not native fatal/exception resumability. General buffer APIs/reset/finalize and integration into the whole polynomial current-sort/mark/core owner remain required; no whole-unit completion is credited.",
         "ASTHandleBuffer.PopBack supplies the selected scalar non-destructing pop operation for the polynomial todo stack. It retains spilled capacity, acquires/releases no AST references and reports empty-pop as a checked Go bounds error. Native assertion/underflow/layout/allocator ABI and general template-buffer completion remain uncredited.",
-        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
+        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit."
       ]
     },
     {
@@ -125847,7 +125839,7 @@
         "TestArbitraryFloatPublicExponentBoundsSignedBoundary",
         "TestArbitraryFloatPublicExponentBoundsEveryColdReservation",
         "TestArbitraryFloatPublicExponentBoundsCacheTransportGuards",
-        "TestArbitraryFloatRawStringDisplayTransportGuards",
+        "TestArbitraryFloatRawStringNormalClassificationTransportGuards",
         "TestArbitraryFloatRawStringEveryColdReservation",
         "TestArbitraryFloatRawStringWarmStreamReservation",
         "TestArbitraryFloatRawStringLiteralClassification",
@@ -126665,7 +126657,7 @@
           "status": "ported",
           "go_target": "pkg/util/mpf_raw_string.go",
           "tests": [
-            "TestArbitraryFloatRawStringDisplayTransportGuards",
+            "TestArbitraryFloatRawStringNormalClassificationTransportGuards",
             "TestArbitraryFloatRawStringEveryColdReservation",
             "TestArbitraryFloatRawStringWarmStreamReservation",
             "TestArbitraryFloatRawStringLiteralClassification"
@@ -127159,7 +127151,7 @@
         "TestArbitraryFloatPublicExponentBoundsSignedBoundary",
         "TestArbitraryFloatPublicExponentBoundsEveryColdReservation",
         "TestArbitraryFloatPublicExponentBoundsCacheTransportGuards",
-        "TestArbitraryFloatRawStringDisplayTransportGuards",
+        "TestArbitraryFloatRawStringNormalClassificationTransportGuards",
         "TestArbitraryFloatRawStringEveryColdReservation",
         "TestArbitraryFloatRawStringWarmStreamReservation",
         "TestArbitraryFloatRawStringLiteralClassification",
@@ -127556,7 +127548,7 @@
           "status": "ported",
           "go_target": "pkg/util/mpf_raw_string.go",
           "tests": [
-            "TestArbitraryFloatRawStringDisplayTransportGuards",
+            "TestArbitraryFloatRawStringNormalClassificationTransportGuards",
             "TestArbitraryFloatRawStringEveryColdReservation",
             "TestArbitraryFloatRawStringWarmStreamReservation",
             "TestArbitraryFloatRawStringLiteralClassification"
@@ -127765,12 +127757,12 @@
         "TestFastFloatNeighborAndThinRoutes",
         "TestFastFloatFormattingRetainsSourcePrecision",
         "TestFastFloatDecimalBuffersAreLexical",
-        "TestFastFloatFormattingEveryConstructorPrefix",
+        "TestFastFloatNativeFullPrecisionFormattingWithoutReservations",
         "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
-        "TestFastFloatDecimalEveryLargeLocalPrefix",
-        "TestFastFloatFullPrecisionWarmSourceEvents",
+        "TestFastFloatDecimalEveryDivisionAllocationPrefix",
+        "TestFastFloatFullPrecisionWarmNativeScratch",
         "TestFastFloatBorrowedRuntimeIdentityAndGuards",
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
         "TestFastFloatSharedRuntimeProfileAndClose",
@@ -128348,12 +128340,12 @@
           "tests": [
             "TestFastFloatFormattingRetainsSourcePrecision",
             "TestFastFloatDecimalBuffersAreLexical",
-            "TestFastFloatFormattingEveryConstructorPrefix",
+            "TestFastFloatNativeFullPrecisionFormattingWithoutReservations",
             "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
-            "TestFastFloatDecimalEveryLargeLocalPrefix",
-            "TestFastFloatFullPrecisionWarmSourceEvents"
+            "TestFastFloatDecimalEveryDivisionAllocationPrefix",
+            "TestFastFloatFullPrecisionWarmNativeScratch"
           ]
         },
         {
@@ -128375,7 +128367,8 @@
       "deviations": [
         "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
         "MPFF significands, handle metadata, recycled IDs, conversion scratch and arithmetic scratch use concrete Go uint32 slices. Copied vector growth, arena descriptors and storage reservation failures are removed. Numeric handle generation/recycling, arithmetic and rounding algorithms remain explicit; shared MPN workspaces retain their separate ownership.",
-        "NaturalManager no longer owns or borrows an arena.Words service: division and formatting use their actual Runtime buffers. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation."
+        "NaturalManager no longer owns or borrows an arena.Words service: division uses actual Runtime buffers and formatting uses native slices. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
+        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit."
       ]
     },
     {
@@ -128421,12 +128414,12 @@
         "TestFastFloatNeighborAndThinRoutes",
         "TestFastFloatFormattingRetainsSourcePrecision",
         "TestFastFloatDecimalBuffersAreLexical",
-        "TestFastFloatFormattingEveryConstructorPrefix",
+        "TestFastFloatNativeFullPrecisionFormattingWithoutReservations",
         "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
-        "TestFastFloatDecimalEveryLargeLocalPrefix",
-        "TestFastFloatFullPrecisionWarmSourceEvents",
+        "TestFastFloatDecimalEveryDivisionAllocationPrefix",
+        "TestFastFloatFullPrecisionWarmNativeScratch",
         "TestFastFloatBorrowedRuntimeIdentityAndGuards",
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
         "TestFastFloatSharedRuntimeProfileAndClose",
@@ -128628,12 +128621,12 @@
           "tests": [
             "TestFastFloatFormattingRetainsSourcePrecision",
             "TestFastFloatDecimalBuffersAreLexical",
-            "TestFastFloatFormattingEveryConstructorPrefix",
+            "TestFastFloatNativeFullPrecisionFormattingWithoutReservations",
             "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
-            "TestFastFloatDecimalEveryLargeLocalPrefix",
-            "TestFastFloatFullPrecisionWarmSourceEvents"
+            "TestFastFloatDecimalEveryDivisionAllocationPrefix",
+            "TestFastFloatFullPrecisionWarmNativeScratch"
           ]
         },
         {
@@ -128967,7 +128960,7 @@
         "TestOwnedDecimalFormatAndPublication",
         "TestIntegerRationalCombinedFormat",
         "TestNaturalBorrowedDivisionFailureAtomic",
-        "TestFormattingBudgetFailuresAndLifetime",
+        "TestFormattingNativeScratchAndLifetime",
         "TestIntegerSmallAndRawRationalFormatting",
         "TestNaturalNestedOwnerAccounting",
         "TestNaturalDivisionWarmNoAllocations",
@@ -128976,20 +128969,17 @@
         "TestOwnedTextNativeGrowthPreservesPrefix",
         "TestNumericStringHostOwnershipBoundary",
         "TestNaturalFormattingLexicalSourceLocals",
-        "TestNaturalFormattingFailedConstructorRetainsRealRoot",
-        "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+        "TestNaturalFormattingNativeScratchReuseAndCleanup",
         "TestNaturalFormattingLeadingZeroSourceDomain",
-        "TestNaturalFormattingReusableInlineScopeWarm",
+        "TestNaturalFormattingReusableNativeScopeWarm",
         "TestNaturalFormattingEmptyGuardAfterLocalActions",
-        "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
-        "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
         "TestNaturalSourceFinalizeColdLifecycleGuards",
         "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
         "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot",
         "TestSourceCStringBoundedBytesAndLbuf",
         "TestIntegerCharacterNativeScratchAndCleanup",
-        "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+        "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
         "TestPolynomialDisplayLiteralSourceQuirks",
@@ -129039,7 +129029,6 @@
         "TestDividesNumericLowerActualPrefixes",
         "TestDividesNumericActualBoolChildAndErasedFieldRoute",
         "TestNumericRationalSourceInsertionPreservesActualFieldChains",
-        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
         "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
         "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
       ],
@@ -129151,7 +129140,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129174,7 +129163,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129197,7 +129186,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129220,7 +129209,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129243,7 +129232,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129268,7 +129257,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129291,7 +129280,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129314,7 +129303,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129337,7 +129326,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129360,7 +129349,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129379,7 +129368,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129410,19 +129399,16 @@
           "tests": []
         },
         {
-          "name": "Actual Natural reverse published-member SourceFinalize, parent source integration and separate owning cleanup retain failed lexical/unpublished expansion roots; cold guards at reached owners",
+          "name": "Natural reverse published-member SourceFinalize and separate unpublished expansion cleanup; native formatting scratch has no failed constructor roots",
           "status": "ported",
           "go_target": "pkg/util/mpn_source_finalize.go",
           "tests": [
             "TestNaturalFormattingLexicalSourceLocals",
-            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
-            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingNativeScratchReuseAndCleanup",
             "TestNaturalFormattingLeadingZeroSourceDomain",
-            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingReusableNativeScopeWarm",
             "TestNaturalFormattingEmptyGuardAfterLocalActions",
-            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
             "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
-            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
             "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
         },
@@ -129432,14 +129418,11 @@
           "go_target": "pkg/util/mpn_format_scope.go",
           "tests": [
             "TestNaturalFormattingLexicalSourceLocals",
-            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
-            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingNativeScratchReuseAndCleanup",
             "TestNaturalFormattingLeadingZeroSourceDomain",
-            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingReusableNativeScopeWarm",
             "TestNaturalFormattingEmptyGuardAfterLocalActions",
-            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
             "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
-            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
             "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
         },
@@ -129459,7 +129442,7 @@
           "tests": [
             "TestSourceCStringBoundedBytesAndLbuf",
             "TestIntegerCharacterNativeScratchAndCleanup",
-            "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+            "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
             "TestIntegerCharacterNativeScratchGrowthAndLifetime"
@@ -129564,8 +129547,7 @@
           "status": "partial",
           "go_target": "pkg/util/util_numeric_rational_source.go",
           "tests": [
-            "TestNumericRationalSourceInsertionPreservesActualFieldChains",
-            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+            "TestNumericRationalSourceInsertionPreservesActualFieldChains"
           ],
           "go_targets": [
             "pkg/ast/ast_low_level_printer_source_test.go"
@@ -129582,7 +129564,7 @@
         }
       ],
       "ownership": [
-        "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Budget/runtime without double ownership. Retained output assembly is a native Go byte slice outside arena accounting; publication copies into caller bytes or an independent Go string. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
+        "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded reusable native formatting scratch. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Budget/runtime without double ownership. Retained output assembly is a native Go byte slice outside arena accounting; publication copies into caller bytes or an independent Go string. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact.",
         "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
@@ -129600,7 +129582,8 @@
         "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit.",
         "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
-        "NaturalManager no longer owns or borrows an arena.Words service: division and formatting use their actual Runtime buffers. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation."
+        "NaturalManager no longer owns or borrows an arena.Words service: division uses actual Runtime buffers and formatting uses native slices. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
+        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit."
       ]
     },
     {
@@ -129633,7 +129616,7 @@
         "TestOwnedDecimalFormatAndPublication",
         "TestIntegerRationalCombinedFormat",
         "TestNaturalBorrowedDivisionFailureAtomic",
-        "TestFormattingBudgetFailuresAndLifetime",
+        "TestFormattingNativeScratchAndLifetime",
         "TestIntegerSmallAndRawRationalFormatting",
         "TestNaturalNestedOwnerAccounting",
         "TestNaturalDivisionWarmNoAllocations",
@@ -129642,20 +129625,17 @@
         "TestOwnedTextNativeGrowthPreservesPrefix",
         "TestNumericStringHostOwnershipBoundary",
         "TestNaturalFormattingLexicalSourceLocals",
-        "TestNaturalFormattingFailedConstructorRetainsRealRoot",
-        "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+        "TestNaturalFormattingNativeScratchReuseAndCleanup",
         "TestNaturalFormattingLeadingZeroSourceDomain",
-        "TestNaturalFormattingReusableInlineScopeWarm",
+        "TestNaturalFormattingReusableNativeScopeWarm",
         "TestNaturalFormattingEmptyGuardAfterLocalActions",
-        "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
-        "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
         "TestNaturalSourceFinalizeColdLifecycleGuards",
         "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
         "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot",
         "TestSourceCStringBoundedBytesAndLbuf",
         "TestIntegerCharacterNativeScratchAndCleanup",
-        "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+        "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
         "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
@@ -129717,7 +129697,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129740,7 +129720,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129763,7 +129743,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129786,7 +129766,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129809,7 +129789,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129834,7 +129814,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129857,7 +129837,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129880,7 +129860,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129903,7 +129883,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129926,7 +129906,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129945,7 +129925,7 @@
             "TestOwnedDecimalFormatAndPublication",
             "TestIntegerRationalCombinedFormat",
             "TestNaturalBorrowedDivisionFailureAtomic",
-            "TestFormattingBudgetFailuresAndLifetime",
+            "TestFormattingNativeScratchAndLifetime",
             "TestIntegerSmallAndRawRationalFormatting",
             "TestNaturalNestedOwnerAccounting",
             "TestNaturalDivisionWarmNoAllocations",
@@ -129976,19 +129956,16 @@
           "tests": []
         },
         {
-          "name": "Actual Natural reverse published-member SourceFinalize, parent source integration and separate owning cleanup retain failed lexical/unpublished expansion roots; cold guards at reached owners",
+          "name": "Natural reverse published-member SourceFinalize and separate unpublished expansion cleanup; native formatting scratch has no failed constructor roots",
           "status": "ported",
           "go_target": "pkg/util/mpn_source_finalize.go",
           "tests": [
             "TestNaturalFormattingLexicalSourceLocals",
-            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
-            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingNativeScratchReuseAndCleanup",
             "TestNaturalFormattingLeadingZeroSourceDomain",
-            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingReusableNativeScopeWarm",
             "TestNaturalFormattingEmptyGuardAfterLocalActions",
-            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
             "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
-            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
             "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
         },
@@ -129998,14 +129975,11 @@
           "go_target": "pkg/util/mpn_format_scope.go",
           "tests": [
             "TestNaturalFormattingLexicalSourceLocals",
-            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
-            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingNativeScratchReuseAndCleanup",
             "TestNaturalFormattingLeadingZeroSourceDomain",
-            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingReusableNativeScopeWarm",
             "TestNaturalFormattingEmptyGuardAfterLocalActions",
-            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
             "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
-            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
             "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
         },
@@ -130025,7 +129999,7 @@
           "tests": [
             "TestSourceCStringBoundedBytesAndLbuf",
             "TestIntegerCharacterNativeScratchAndCleanup",
-            "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+            "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
             "TestIntegerCharacterNativeScratchGrowthAndLifetime"
@@ -130062,7 +130036,7 @@
         }
       ],
       "ownership": [
-        "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Budget/runtime without double ownership. Retained output assembly is a native Go byte slice outside arena accounting; publication copies into caller bytes or an independent Go string. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
+        "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded reusable native formatting scratch. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Budget/runtime without double ownership. Retained output assembly is a native Go byte slice outside arena accounting; publication copies into caller bytes or an independent Go string. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
         "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161)."
@@ -130072,7 +130046,8 @@
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
-        "NaturalManager no longer owns or borrows an arena.Words service: division and formatting use their actual Runtime buffers. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation."
+        "NaturalManager no longer owns or borrows an arena.Words service: division uses actual Runtime buffers and formatting uses native slices. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
+        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit."
       ]
     },
     {
@@ -130170,7 +130145,7 @@
         "TestOwnedDecimalFormatAndPublication",
         "TestIntegerRationalCombinedFormat",
         "TestNaturalBorrowedDivisionFailureAtomic",
-        "TestFormattingBudgetFailuresAndLifetime",
+        "TestFormattingNativeScratchAndLifetime",
         "TestIntegerSmallAndRawRationalFormatting",
         "TestNaturalNestedOwnerAccounting",
         "TestNaturalDivisionWarmNoAllocations",
@@ -130280,7 +130255,6 @@
         "TestPolynomialEvaluationRawGroupIdentity",
         "TestPolynomialEvaluationEveryReservationOwnedRaw",
         "TestNumericRationalSourceInsertionPreservesActualFieldChains",
-        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
         "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
         "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards",
         "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
@@ -130297,7 +130271,7 @@
         "TestRationalServicePowerInvocationOriginalSequenceAndReturn",
         "TestRationalServicePowerInvocationEveryActualReservation",
         "TestRationalServicePowerInvocationFinalUnusedSquareAndMaskWrap",
-        "TestRationalOwnedStringDenominatorTransportGuards",
+        "TestRationalOwnedStringNativeDenominatorScratch",
         "TestRationalOwnedStringEveryColdReservation",
         "TestRationalOwnedStringWarmInlineAndReturnOwnership",
         "TestRationalOwnedStringLiteralNumerals",
@@ -130838,8 +130812,7 @@
           "status": "partial",
           "go_target": "pkg/util/util_numeric_rational_source.go",
           "tests": [
-            "TestNumericRationalSourceInsertionPreservesActualFieldChains",
-            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+            "TestNumericRationalSourceInsertionPreservesActualFieldChains"
           ],
           "go_targets": [
             "pkg/ast/ast_low_level_printer_source_test.go"
@@ -130890,7 +130863,7 @@
           "status": "ported",
           "go_target": "pkg/util/mpq_owned_string.go",
           "tests": [
-            "TestRationalOwnedStringDenominatorTransportGuards",
+            "TestRationalOwnedStringNativeDenominatorScratch",
             "TestRationalOwnedStringEveryColdReservation",
             "TestRationalOwnedStringWarmInlineAndReturnOwnership",
             "TestRationalOwnedStringLiteralNumerals"
@@ -131089,7 +131062,7 @@
         "TestOwnedDecimalFormatAndPublication",
         "TestIntegerRationalCombinedFormat",
         "TestNaturalBorrowedDivisionFailureAtomic",
-        "TestFormattingBudgetFailuresAndLifetime",
+        "TestFormattingNativeScratchAndLifetime",
         "TestIntegerSmallAndRawRationalFormatting",
         "TestNaturalNestedOwnerAccounting",
         "TestNaturalDivisionWarmNoAllocations",
@@ -131299,7 +131272,7 @@
         "TestRationalServiceBinaryBitwiseEveryActualReservation",
         "TestRationalServiceBinaryBitwiseGenerationIsolation",
         "TestRationalServiceBinaryBitwiseExecutingRawGuard",
-        "TestRationalOwnedStringDenominatorTransportGuards",
+        "TestRationalOwnedStringNativeDenominatorScratch",
         "TestRationalOwnedStringEveryColdReservation",
         "TestRationalOwnedStringWarmInlineAndReturnOwnership",
         "TestRationalOwnedStringLiteralNumerals",
@@ -132439,7 +132412,7 @@
           "status": "ported",
           "go_target": "pkg/util/mpq_owned_string.go",
           "tests": [
-            "TestRationalOwnedStringDenominatorTransportGuards",
+            "TestRationalOwnedStringNativeDenominatorScratch",
             "TestRationalOwnedStringEveryColdReservation",
             "TestRationalOwnedStringWarmInlineAndReturnOwnership",
             "TestRationalOwnedStringLiteralNumerals"
@@ -132837,7 +132810,7 @@
         "TestOwnedDecimalFormatAndPublication",
         "TestIntegerRationalCombinedFormat",
         "TestNaturalBorrowedDivisionFailureAtomic",
-        "TestFormattingBudgetFailuresAndLifetime",
+        "TestFormattingNativeScratchAndLifetime",
         "TestIntegerSmallAndRawRationalFormatting",
         "TestNaturalNestedOwnerAccounting",
         "TestNaturalDivisionWarmNoAllocations",
@@ -132968,18 +132941,15 @@
         "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
         "TestScalarProjectionInvalidOwnershipAndWarmGraph",
         "TestNaturalFormattingLexicalSourceLocals",
-        "TestNaturalFormattingFailedConstructorRetainsRealRoot",
-        "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+        "TestNaturalFormattingNativeScratchReuseAndCleanup",
         "TestNaturalFormattingLeadingZeroSourceDomain",
-        "TestNaturalFormattingReusableInlineScopeWarm",
+        "TestNaturalFormattingReusableNativeScopeWarm",
         "TestNaturalFormattingEmptyGuardAfterLocalActions",
-        "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
-        "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
         "TestNaturalSourceFinalizeColdLifecycleGuards",
         "TestSourceCStringBoundedBytesAndLbuf",
         "TestIntegerCharacterNativeScratchAndCleanup",
-        "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+        "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
         "TestSMT2FreshDefaultCopyFailureNullDestructor",
@@ -133064,7 +133034,6 @@
         "TestUPolynomialHenselConditionalVerificationEveryReachedPrefix",
         "TestUPolynomialHenselActualConditionalChildStopsOlderPair",
         "TestNumericRationalSourceInsertionPreservesActualFieldChains",
-        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
         "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
         "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards",
         "TestPolynomialNormalizeActualTransportOwnerSourceRefusal",
@@ -134711,19 +134680,16 @@
           ]
         },
         {
-          "name": "Actual Natural reverse published-member SourceFinalize, parent source integration and separate owning cleanup retain failed lexical/unpublished expansion roots; cold guards at reached owners",
+          "name": "Natural reverse published-member SourceFinalize and separate unpublished expansion cleanup; native formatting scratch has no failed constructor roots",
           "status": "ported",
           "go_target": "pkg/util/mpn_source_finalize.go",
           "tests": [
             "TestNaturalFormattingLexicalSourceLocals",
-            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
-            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingNativeScratchReuseAndCleanup",
             "TestNaturalFormattingLeadingZeroSourceDomain",
-            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingReusableNativeScopeWarm",
             "TestNaturalFormattingEmptyGuardAfterLocalActions",
-            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
             "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
-            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
             "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
         },
@@ -134734,7 +134700,7 @@
           "tests": [
             "TestSourceCStringBoundedBytesAndLbuf",
             "TestIntegerCharacterNativeScratchAndCleanup",
-            "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+            "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
             "TestIntegerCharacterNativeScratchGrowthAndLifetime"
@@ -134991,8 +134957,7 @@
           "status": "partial",
           "go_target": "pkg/util/util_numeric_rational_source.go",
           "tests": [
-            "TestNumericRationalSourceInsertionPreservesActualFieldChains",
-            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+            "TestNumericRationalSourceInsertionPreservesActualFieldChains"
           ],
           "go_targets": [
             "pkg/ast/ast_low_level_printer_source_test.go"
@@ -135160,7 +135125,8 @@
         "The former staged Integer parser contradicted mpz.cpp:283-303 and has been replaced in the primary SetString API. Allocation failure now retains actual caller digit prefixes rather than the old destination. The old transactional failure assertion was replaced with independent prefix and failed-publication checks. Six dedicated groups prove the first BIG reservation prefix, every selected cold reservation including an actually published BIG Mul temporary retained before Add failure, independent permissive/NUL byte semantics, warm inline and entry capture/owner/counter authority, real allocation transport and real checked TLS RESET release failure before either RAW declaration. Existing original tst1/bug1/int_min_bug assertions and literal inventories are rerun. Separate stopped RAW end-DEL refinement is not newly credited. Checked signed overflow is not defined native behavior; no native fatal resumability or whole MPZ/util completion is claimed.",
         "Numeric text buffering and returned text use Go strings.Builder, strconv.FormatInt, strings.IndexByte and Go-managed counted bytes. Removed emulation of string-buffer capacity, put-pointer/high-water distinction, arena growth failures and returned C++ string storage. Project numeral allocation failures, checked source views, decimal output and returned text lifetime remain tested.",
         "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
-        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
+        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit."
       ]
     },
     {
@@ -135300,7 +135266,7 @@
         "TestOwnedDecimalFormatAndPublication",
         "TestIntegerRationalCombinedFormat",
         "TestNaturalBorrowedDivisionFailureAtomic",
-        "TestFormattingBudgetFailuresAndLifetime",
+        "TestFormattingNativeScratchAndLifetime",
         "TestIntegerSmallAndRawRationalFormatting",
         "TestNaturalNestedOwnerAccounting",
         "TestNaturalDivisionWarmNoAllocations",
@@ -135432,18 +135398,15 @@
         "TestScalarProjectionFloatRawIEEEAndDebugAssertion",
         "TestScalarProjectionInvalidOwnershipAndWarmGraph",
         "TestNaturalFormattingLexicalSourceLocals",
-        "TestNaturalFormattingFailedConstructorRetainsRealRoot",
-        "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+        "TestNaturalFormattingNativeScratchReuseAndCleanup",
         "TestNaturalFormattingLeadingZeroSourceDomain",
-        "TestNaturalFormattingReusableInlineScopeWarm",
+        "TestNaturalFormattingReusableNativeScopeWarm",
         "TestNaturalFormattingEmptyGuardAfterLocalActions",
-        "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
-        "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
         "TestNaturalSourceFinalizeColdLifecycleGuards",
         "TestSourceCStringBoundedBytesAndLbuf",
         "TestIntegerCharacterNativeScratchAndCleanup",
-        "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+        "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
         "TestIntegerSourceFailureTwoChargedSentinels",
@@ -136757,19 +136720,16 @@
           ]
         },
         {
-          "name": "Actual Natural reverse published-member SourceFinalize, parent source integration and separate owning cleanup retain failed lexical/unpublished expansion roots; cold guards at reached owners",
+          "name": "Natural reverse published-member SourceFinalize and separate unpublished expansion cleanup; native formatting scratch has no failed constructor roots",
           "status": "ported",
           "go_target": "pkg/util/mpn_source_finalize.go",
           "tests": [
             "TestNaturalFormattingLexicalSourceLocals",
-            "TestNaturalFormattingFailedConstructorRetainsRealRoot",
-            "TestNaturalFormattingPendingLocalDoesNotBlockDivision",
+            "TestNaturalFormattingNativeScratchReuseAndCleanup",
             "TestNaturalFormattingLeadingZeroSourceDomain",
-            "TestNaturalFormattingReusableInlineScopeWarm",
+            "TestNaturalFormattingReusableNativeScopeWarm",
             "TestNaturalFormattingEmptyGuardAfterLocalActions",
-            "TestNaturalSourceFinalizeRetainsFailedLexicalLocal",
             "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
-            "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
             "TestNaturalSourceFinalizeColdLifecycleGuards"
           ]
         },
@@ -136780,7 +136740,7 @@
           "tests": [
             "TestSourceCStringBoundedBytesAndLbuf",
             "TestIntegerCharacterNativeScratchAndCleanup",
-            "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
+            "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
             "TestIntegerCharacterNativeScratchGrowthAndLifetime"
@@ -140732,7 +140692,6 @@
         "TestRationalServiceSourceGlobalSlotExactPublicationAndStaticEnd",
         "TestRationalGlobalAcquiredConstructorNamedPhysicalPrefixes",
         "TestNumericRationalSourceInsertionPreservesActualFieldChains",
-        "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame",
         "TestRationalServiceInvocationInlineHistoryAndExactOwner",
         "TestRationalServiceInvocationEveryPowerReservation",
         "TestRationalServiceInvocationDetachedCellSourceEnd",
@@ -140884,8 +140843,7 @@
           "status": "partial",
           "go_target": "pkg/util/util_numeric_rational_source.go",
           "tests": [
-            "TestNumericRationalSourceInsertionPreservesActualFieldChains",
-            "TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame"
+            "TestNumericRationalSourceInsertionPreservesActualFieldChains"
           ],
           "go_targets": [
             "pkg/ast/ast_low_level_printer_source_test.go"

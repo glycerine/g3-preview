@@ -208,15 +208,6 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolyn
 		appendDisplay := func(f *upolyDisplayScope) {
 			n += f.header
 			roots = append(roots, &f.numeral)
-			for i := range f.characterFormatting.Locals {
-				b := &f.characterFormatting.Locals[i]
-				if b.Raw != (util.Block{}) {
-					external = append(external, b.Raw)
-				}
-				if b.Pending != (util.Block{}) {
-					external = append(external, b.Pending)
-				}
-			}
 		}
 		for f := m.displayFrames; f != nil; f = f.next {
 			appendDisplay(f)

@@ -144,9 +144,9 @@ func (m *NaturalManager) sourceCStringBody(a limbView, dst sourceDecimalDestinat
 	return m.sourceCStringBodyScoped(a, dst, &m.Formatting)
 }
 func (m *NaturalManager) sourceCStringBodyScoped(a limbView, dst sourceDecimalDestination, scope *naturalFormattingScope) error {
-	temp := limbView{runtime: m.runtime, source: &scope.Locals[0], size: a.size}
-	numer := limbView{runtime: m.runtime, source: &scope.Locals[1], size: a.size + 1}
-	denom := limbView{runtime: m.runtime, source: &scope.Locals[2], size: 1}
+	temp := limbView{external: scope.Locals[0], size: a.size}
+	numer := limbView{external: scope.Locals[1], size: a.size + 1}
+	denom := limbView{external: scope.Locals[2], size: 1}
 	for i := uint32(0); i < a.size; i++ {
 		v, e := readDecimalLimb(a, i)
 		if e != nil {
@@ -159,7 +159,6 @@ func (m *NaturalManager) sourceCStringBodyScoped(a limbView, dst sourceDecimalDe
 	var j uint64
 	for temp.size > 0 && (temp.size > 1 || temp.read(0) != 0) {
 		numer.size = temp.size + 1
-		numer.source.pos = numer.size
 		numer.write(temp.size, temp.read(temp.size-1)>>(32-d))
 		for i := temp.size - 1; i > 0; i-- {
 			numer.write(i, temp.read(i)<<d|temp.read(i-1)>>(32-d))
@@ -175,7 +174,6 @@ func (m *NaturalManager) sourceCStringBodyScoped(a limbView, dst sourceDecimalDe
 		}
 		for temp.size > 0 && temp.read(temp.size-1) == 0 {
 			temp.size--
-			temp.source.pos = temp.size
 		}
 	}
 	if e := dst.write(j, 0); e != nil {

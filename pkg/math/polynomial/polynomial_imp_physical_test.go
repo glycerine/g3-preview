@@ -158,9 +158,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	adapterBytes += uint64(cap(m.display.frames))*uint64(reflect.TypeOf((*polynomialDisplayFrame)(nil)).Size()) + uint64(len(m.display.frames))*uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size())
 	for _, f := range m.display.frames {
 		public = append(public, &f.numeral)
-		for _, b := range f.limbs.Locals {
-			external = append(external, b.Raw, b.Pending)
-		}
 	}
 	es := &full.evaluation
 	adapterBytes += uint64(cap(es.rationalFrames))*uint64(reflect.TypeOf((*polynomialEvalRationalFrame)(nil)).Size()) + uint64(len(es.rationalFrames))*uint64(reflect.TypeOf(polynomialEvalRationalFrame{}).Size())
@@ -523,12 +520,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	if z.Naturals().VerificationActive {
 		put(z.Naturals().Verification.Raw)
 		put(z.Naturals().Verification.Pending)
-	}
-	if z.Naturals().Formatting.Active || z.Naturals().Formatting.PendingField {
-		for _, s := range z.Naturals().Formatting.Locals {
-			put(s.Raw)
-			put(s.Pending)
-		}
 	}
 	za := z.SourceAllocator().Stats()
 	ma := util.AllocatorStats{}

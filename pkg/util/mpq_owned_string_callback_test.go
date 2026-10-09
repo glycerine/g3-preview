@@ -2,13 +2,13 @@
 package util
 
 import (
-	"errors"
+	"math/big"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestRationalOwnedStringDenominatorTransportGuards(t *testing.T) {
+func TestRationalOwnedStringNativeDenominatorScratch(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
 	a := Rational{Num: NewInt(3), Den: NewInt(1)}
@@ -17,21 +17,9 @@ func TestRationalOwnedStringDenominatorTransportGuards(t *testing.T) {
 	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
 		if armed {
 			calls++
-			s := &m.rational.stringScope
-			if !s.executing || !s.denominatorStreamLive || !s.outLive || s.out != &out || !out.Matches("3/") {
-				t.Fatal("transport must follow numerator/slash publication", s, out)
-			}
-			before, used := a, b.Used()
-			var later OwnedString
-			for i, e := range []error{m.rational.ToOwnedString(&a, &later), m.rational.CleanupOwnedString(), m.rational.Neg(&a), m.rational.Del(&a), m.integer.SetInt32(&a.Num, 7), m.rational.CloseChecked(), m.rational.SourceFinalize(), m.Close(), m.SourceFinalize(), m.integer.CloseChecked(), m.integer.SourceFinalize()} {
-				if !errors.Is(e, ErrNumericPending) {
-					t.Fatal("actual denominator callback guard", i, e)
-				}
-			}
-			if a != before || b.Used() != used || !out.Matches("3/") {
-				t.Fatal("transport changed stopped rational string")
-			}
+			t.Fatal("native denominator formatting entered Runtime transport")
 		}
+
 		return f
 	}})
 	serviceMust(t, e)
@@ -44,8 +32,8 @@ func TestRationalOwnedStringDenominatorTransportGuards(t *testing.T) {
 	armed = true
 	body := m.rational.ToOwnedString(&a, &out)
 	armed = false
-	if !errors.Is(body, Failure{Kind: FailureMemout}) || calls != 1 || !m.rational.stringScope.active {
-		t.Fatal("actual denominator transport missing", body, calls)
+	if body != nil || calls != 0 || m.rational.stringScope.active || !out.Matches("3/"+new(big.Int).Lsh(big.NewInt(1), 8192).String()) {
+		t.Fatal("native denominator formatting", body, calls)
 	}
 	integerPhysicalAuditWithRaw(t, m.integer, []Block{pad}, &a.Num, &a.Den)
 	if b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes {

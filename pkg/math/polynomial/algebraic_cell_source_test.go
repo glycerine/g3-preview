@@ -291,11 +291,6 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 	if z.Naturals().VerificationActive {
 		buffers = append(buffers, &z.Naturals().Verification)
 	}
-	if z.Naturals().Formatting.Active || z.Naturals().Formatting.PendingField {
-		for i := range z.Naturals().Formatting.Locals {
-			buffers = append(buffers, &z.Naturals().Formatting.Locals[i])
-		}
-	}
 	for _, buffer := range buffers {
 		addRaw(buffer.Raw)
 		addRaw(buffer.Pending)

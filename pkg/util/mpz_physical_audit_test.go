@@ -420,11 +420,6 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 	if m.Natural.VerificationActive {
 		buffers = append(buffers, &m.Natural.Verification)
 	}
-	if m.Natural.Formatting.Active || m.Natural.Formatting.PendingField {
-		for i := range m.Natural.Formatting.Locals {
-			buffers = append(buffers, &m.Natural.Formatting.Locals[i])
-		}
-	}
 	for _, s := range buffers {
 		for _, r := range []Block{s.Raw, s.Pending} {
 			if r == (Block{}) {

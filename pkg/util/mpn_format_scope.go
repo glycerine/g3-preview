@@ -7,15 +7,12 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// Embedded cold ownership is charged by NaturalManager's actual header. Each
-// invocation starts fresh scalar buffer lifetimes, without allocating a Go
-// scope. Failed constructors do not run the source object's destructor.
-// Their actual raw/pending blocks survive for explicitly named owning cleanup.
+// Each invocation borrows reusable, concrete Go scratch slices. Numeral cells
+// remain owned by their managers; these temporary words need no Runtime blocks.
 type naturalFormattingScope struct {
 	invocation                  uint64
-	Locals                      [3]SourceLimbBuffer
+	Locals                      [3][]uint32
 	CompletedField              uint8
-	failedLocal                 uint8
 	Active, PendingField        bool
 	originalCause, cleanupCause error
 }
@@ -33,56 +30,34 @@ func (m *NaturalManager) beginFormattingScopeTracked(s *naturalFormattingScope, 
 	if s.Active || s.PendingField {
 		return arena.ErrInvalidSlot
 	}
-	if s.invocation == math.MaxUint64 {
+	if s.invocation == math.MaxUint64 || n == math.MaxUint32 {
 		return arena.ErrBounds
 	}
-	*s = naturalFormattingScope{Active: true, invocation: s.invocation + 1}
+	*s = naturalFormattingScope{Locals: s.Locals, Active: true, invocation: s.invocation + 1}
 	if receipt != nil {
 		receipt.formatting = s
 		receipt.formattingOwned = true
 		receipt.formattingInvocation = s.invocation
 	}
-	sizes := [3]uint32{n, n + 1, 1} // source size_t addition narrowed by mpn_sbuffer
-	for i, size := range sizes {
-		if e := s.Locals[i].resize(m.runtime, size); e != nil {
-			s.failedLocal = uint8(i)
-			s.originalCause = e
-			s.Active = false
-			s.PendingField = true
-			// Only previously completed local objects have source destructors.
-			if cleanup := m.unwindFormattingScope(s); cleanup != nil {
-				s.cleanupCause = cleanup
-				return &NumeralSourceFailure{BodyCause: e, DestructorCause: cleanup}
-			}
-			return e
+	for i, size := range [3]uint32{n, n + 1, 1} {
+		if uint64(cap(s.Locals[i])) < uint64(size) {
+			s.Locals[i] = make([]uint32, size)
+		} else {
+			s.Locals[i] = s.Locals[i][:size]
+			clear(s.Locals[i])
 		}
 		s.CompletedField |= 1 << uint(i)
 	}
 	return nil
 }
-
 func (m *NaturalManager) unwindFormattingLocals() error {
 	return m.unwindFormattingScope(&m.Formatting)
 }
 func (m *NaturalManager) unwindFormattingScope(s *naturalFormattingScope) error {
-	for i := 2; i >= 0; i-- {
-		bit := uint8(1) << uint(i)
-		if s.CompletedField&bit == 0 {
-			continue
-		}
-		// A completed destructor only frees the published source buffer. A
-		// partially constructed allocation is reserved for owning cleanup below.
-		b := &s.Locals[i]
-		if b.Raw != (Block{}) {
-			if e := m.runtime.Deallocate(&b.Raw); e != nil {
-				return e
-			}
-		}
-		b.cap = 0
-		b.pos = 0
-		b.initialized = 0
-		s.CompletedField &^= bit
+	for i := range s.Locals {
+		s.Locals[i] = s.Locals[i][:0]
 	}
+	s.CompletedField = 0
 	return nil
 }
 func (m *NaturalManager) finishFormattingLocals() error {
@@ -90,26 +65,13 @@ func (m *NaturalManager) finishFormattingLocals() error {
 }
 func (m *NaturalManager) finishFormattingScope(s *naturalFormattingScope) error {
 	if e := m.unwindFormattingScope(s); e != nil {
-		s.Active = false
-		s.PendingField = true
-		s.originalCause = e
-		return &NumeralSourceFailure{DestructorCause: e}
+		return e
 	}
-	for i := range s.Locals {
-		if s.Locals[i].Pending != (Block{}) {
-			// The source destructor frees its published buffer, not an
-			// unpublished allocation retained by the Go continuation.
-			s.Active = false
-			s.PendingField = true
-			return arena.ErrInvalidSlot
-		}
-	}
-	*s = naturalFormattingScope{invocation: s.invocation}
+	*s = naturalFormattingScope{Locals: s.Locals, invocation: s.invocation}
 	return nil
 }
 
-// CleanupFormatting is explicit Go recovery of actual retained physical roots;
-// it neither reexecutes a failed constructor's destructor nor repairs input.
+// CleanupFormatting drops cached scratch after ending the active invocation.
 func (m *NaturalManager) CleanupFormatting() error {
 	if m == nil || m.self != m {
 		return ErrRuntimeOwner
@@ -122,19 +84,6 @@ func (m *NaturalManager) CleanupFormatting() error {
 func (m *NaturalManager) cleanupFormattingScope(s *naturalFormattingScope) error {
 	if s.Active {
 		return arena.ErrInvalidSlot
-	}
-	if !s.PendingField {
-		return nil
-	}
-	if e := m.unwindFormattingScope(s); e != nil {
-		s.cleanupCause = e
-		return e
-	}
-	for i := 2; i >= 0; i-- {
-		if e := s.Locals[i].Finalize(m.runtime); e != nil {
-			s.cleanupCause = e
-			return e
-		}
 	}
 	*s = naturalFormattingScope{invocation: s.invocation}
 	return nil

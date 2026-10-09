@@ -37,7 +37,7 @@ type NaturalManager struct {
 }
 
 // NewNaturalManager owns a real memory runtime and the source four inline16
-// buffers. Formatting locals own separate Runtime buffers; retained text
+// buffers. Formatting locals own reusable Go slices; retained text
 // is an output assembly adapter and character scratch uses native Go bytes.
 func NewNaturalManager(c arena.VectorConfig) (*NaturalManager, error) {
 	return newNaturalManagerWithMemory(c, nil)
@@ -195,14 +195,6 @@ func (m *NaturalManager) overflowPayloads() uint32 {
 			count++
 		}
 		if m.Division[i].Pending != (Block{}) {
-			count++
-		}
-	}
-	for i := range m.Formatting.Locals {
-		if m.Formatting.Locals[i].Raw != (Block{}) {
-			count++
-		}
-		if m.Formatting.Locals[i].Pending != (Block{}) {
 			count++
 		}
 	}

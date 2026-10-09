@@ -100,28 +100,15 @@ func TestIntegerRationalCombinedFormat(t *testing.T) {
 	if e != nil || s != want {
 		t.Fatal(e)
 	}
-	// Each conversion constructs MPN temp(lng) and numer(lng+1).
-	// Character scratch uses reusable Go storage, outside Runtime accounting.
-	var events uint64
-	for _, bits := range []int{numerator.BitLen(), denominator.BitLen()} {
-		limbs := (bits + 31) / 32
-		for _, size := range []int{limbs, limbs + 1} {
-			for capacity := 16; capacity < size; capacity *= 2 {
-				events++
-			}
-		}
-	}
-	if events != 14 {
-		t.Fatal("source constructor fixture changed", events)
-	}
+	// Both numeral conversions reuse native scratch without Runtime events.
 	beforeWarm := numericWarmProfileSnapshot(t, m.Z, m.Z.BudgetField)
 	var formatError error
 	allocations := testing.AllocsPerRun(10, func() { _, formatError = m.FormatInto(&a, dst[:len(want)]) })
 	afterWarm := numericWarmProfileSnapshot(t, m.Z, m.Z.BudgetField)
-	if formatError != nil || afterWarm.count-beforeWarm.count != events*11 || allocations != 2*float64(events) || m.Z.Natural.Formatting.Active || m.Z.Natural.Formatting.PendingField {
-		t.Fatal("actual source lexical allocations", allocations, events, afterWarm.count-beforeWarm.count, formatError)
+	if formatError != nil || afterWarm.count != beforeWarm.count || allocations != 0 || m.Z.Natural.Formatting.Active || m.Z.Natural.Formatting.PendingField {
+		t.Fatal("native reusable scratch", allocations, afterWarm.count-beforeWarm.count, formatError)
 	}
-	numericWarmProfileAudit(t, m.Z, m.Z.BudgetField, beforeWarm, allocations, true)
+	numericWarmProfileAudit(t, m.Z, m.Z.BudgetField, beforeWarm, allocations, false)
 	if string(dst[:len(want)]) != want {
 		t.Fatal("warm output value")
 	}
@@ -248,91 +235,84 @@ func TestNaturalBorrowedDivisionFailureAtomic(t *testing.T) {
 	}
 }
 
-func TestFormattingBudgetFailuresAndLifetime(t *testing.T) {
-	// Every service reservation prefix is exercised both cold and after a small
-	// format. Retained scratch on failure is owner-owned and fully released by
-	// Close, while caller output and numeral inputs remain untouched.
+func TestFormattingNativeScratchAndLifetime(t *testing.T) {
+	// Cold and warm formatting borrow numeral inputs and publish exact decimal
+	// text while all Runtime reservations are disabled.
 	for kind := 0; kind < 3; kind++ {
 		for _, warm := range []bool{false, true} {
-			completed, failures := false, 0
-			for fault := int64(0); fault < 128; fault++ {
-				budget := arena.NewBudget(1 << 24)
-				c := arena.VectorConfig{PageSize: 32, Descriptors: arena.Config{PageSize: 2, Budget: budget}}
-				a := make([]uint32, 130)
-				for i := range a {
-					a[i] = 0x12345678
-				}
-				a[len(a)-1] = 1
-				original := append([]uint32(nil), a...)
-				dst := bytes.Repeat([]byte{'!'}, 3000)
-				before := append([]byte(nil), dst...)
-				var call func() (int, error)
-				var closeOwner func()
-				var nm *NaturalManager
-				if kind == 0 {
-					var e error
-					nm, e = NewNaturalManager(c)
-					if e != nil {
-						t.Fatal(e)
-					}
-					call = func() (int, error) { return nm.FormatInto(a, dst) }
-					closeOwner = nm.Close
-				} else {
-					rm, e := NewRationalManager(RationalConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: c}})
-					if e != nil {
-						t.Fatal(e)
-					}
-					r := NewRational()
-					if e = rm.Z.SetLimbs(&r.Num, a); e != nil {
-						t.Fatal(e)
-					}
-					if e = rm.Z.Neg(&r.Num); e != nil {
-						t.Fatal(e)
-					}
-					if kind == 1 {
-						call = func() (int, error) { return rm.Z.FormatInto(&r.Num, dst) }
-					} else {
-						if e = rm.Z.SetLimbs(&r.Den, a[:129]); e != nil {
-							t.Fatal(e)
-						}
-						call = func() (int, error) { return rm.FormatInto(&r, dst) }
-					}
-					nm = rm.Z.Natural
-					closeOwner = rm.Close
-				}
-				if warm {
-					if _, e := nm.FormatInto([]uint32{123}, dst[:3]); e != nil {
-						t.Fatal(e)
-					}
-					copy(dst, before)
-				}
-				budget.FailAfter(fault)
-				n, e := call()
-				budget.FailAfter(-1)
-				if e != nil {
-					failures++
-					if !numericPhysicalReservationRefusal(e) || !bytes.Equal(before, dst) {
-						t.Fatal(kind, warm, fault, n, e, "published")
-					}
-				} else {
-					completed = true
-					if n == 0 || dst[n] != '!' {
-						t.Fatal("output length", n)
-					}
-				}
-				if !reflect.DeepEqual(a, original) {
-					t.Fatal("borrowed input changed")
-				}
-				closeOwner()
-				if budget.Used() != 0 {
-					t.Fatal(kind, warm, fault, "format leak", budget.Used())
-				}
-				if completed {
-					break
-				}
+			budget := arena.NewBudget(1 << 24)
+			c := arena.VectorConfig{PageSize: 32, Descriptors: arena.Config{PageSize: 2, Budget: budget}}
+			a := make([]uint32, 130)
+			for i := range a {
+				a[i] = 0x12345678
 			}
-			if !completed || failures == 0 {
-				t.Fatal(kind, warm, "sweep incomplete", failures)
+			a[len(a)-1] = 1
+			original := append([]uint32(nil), a...)
+			dst := bytes.Repeat([]byte{'!'}, 3000)
+			before := append([]byte(nil), dst...)
+			var call func() (int, error)
+			var closeOwner func()
+			var nm *NaturalManager
+			if kind == 0 {
+				var e error
+				nm, e = NewNaturalManager(c)
+				if e != nil {
+					t.Fatal(e)
+				}
+				call = func() (int, error) { return nm.FormatInto(a, dst) }
+				closeOwner = nm.Close
+			} else {
+				rm, e := NewRationalManager(RationalConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: budget}, Words: c}})
+				if e != nil {
+					t.Fatal(e)
+				}
+				r := NewRational()
+				if e = rm.Z.SetLimbs(&r.Num, a); e != nil {
+					t.Fatal(e)
+				}
+				if e = rm.Z.Neg(&r.Num); e != nil {
+					t.Fatal(e)
+				}
+				if kind == 1 {
+					call = func() (int, error) { return rm.Z.FormatInto(&r.Num, dst) }
+				} else {
+					if e = rm.Z.SetLimbs(&r.Den, a[:129]); e != nil {
+						t.Fatal(e)
+					}
+					call = func() (int, error) { return rm.FormatInto(&r, dst) }
+				}
+				nm = rm.Z.Natural
+				closeOwner = rm.Close
+			}
+			if warm {
+				if _, e := nm.FormatInto([]uint32{123}, dst[:3]); e != nil {
+					t.Fatal(e)
+				}
+				copy(dst, before)
+			}
+
+			budget.FailAfter(0)
+			n, e := call()
+			if e != nil {
+				t.Fatal(kind, warm, e)
+			}
+			want := oracle(a).String()
+			if kind != 0 {
+				want = "-" + want
+			}
+			if kind == 2 {
+				want += "/" + oracle(a[:129]).String()
+			}
+			if string(dst[:n]) != want || dst[n] != '!' {
+				t.Fatal(kind, warm, n, "decimal output")
+			}
+			if !reflect.DeepEqual(a, original) {
+				t.Fatal("borrowed input changed")
+			}
+			budget.FailAfter(-1)
+			closeOwner()
+			if budget.Used() != 0 {
+				t.Fatal(kind, warm, "format leak", budget.Used())
 			}
 		}
 	}

@@ -56,56 +56,21 @@ func TestIntegerCharacterNativeScratchAndCleanup(t *testing.T) {
 	}
 }
 
-func TestIntegerCharacterCompletedBeforeFailedInnerConstructor(t *testing.T) {
-	found := [2]bool{}
-	success := false
-	for fault := int64(0); fault < 100; fault++ {
-		b := arena.NewBudget(1 << 24)
-		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64}})
-		if e != nil {
-			t.Fatal(e)
-		}
-		digits := make([]uint32, 130)
-		digits[0], digits[129] = 7, 1
-		var a Int
-		if e = m.SetLimbs(&a, digits); e != nil {
-			t.Fatal(e)
-		}
-		if e = m.Natural.reserveText(4096); e != nil {
-			t.Fatal(e)
-		}
-		b.FailAfter(fault)
-		_, e = m.prepareInteger(&a, 0)
-		if e == nil {
-			success = true
-		} else {
-			if !numericPhysicalReservationRefusal(e) {
-				t.Fatal(fault, e)
-			}
-			if m.Natural.Formatting.PendingField {
-				i := m.Natural.Formatting.failedLocal
-				if i < 2 {
-					found[i] = true
-				}
-				// Completed char is destroyed after completed inner locals;
-				// the failed inner constructor's raw prefix remains owned.
-				if m.Natural.CharFormatting.active || len(m.Natural.CharFormatting.Buffer) != 0 || m.Natural.Formatting.CompletedField != 0 {
-					t.Fatal("wrong unwind prefix", fault, i)
-				}
-			}
-		}
-		integerPhysicalAudit(t, m, &a)
-		b.FailAfter(-1)
-		if e = m.CloseChecked(); e != nil || b.Used() != 0 {
-			t.Fatal(fault, e, b.Used())
-		}
-		if success {
-			break
-		}
+func TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled(t *testing.T) {
+	m, _ := rationalManager(t, false)
+	digits := make([]uint32, 130)
+	digits[0], digits[129] = 7, 1
+	var a Int
+	serviceMust(t, m.Z.SetLimbs(&a, digits))
+	serviceMust(t, m.Z.Natural.reserveText(4096))
+	m.Z.BudgetField.FailAfter(0)
+	_, e := m.Z.prepareInteger(&a, 0)
+	serviceMust(t, e)
+	if m.Z.Natural.CharFormatting.active || m.Z.Natural.Formatting.Active {
+		t.Fatal("formatting scope retained")
 	}
-	if !success || !found[0] || !found[1] {
-		t.Fatal("bounded complete prefix sweep", found, success)
-	}
+	integerPhysicalAudit(t, m.Z, &a)
+	m.Z.BudgetField.FailAfter(-1)
 }
 
 func TestIntegerCharacterUsesActualInitializedSizeHeader(t *testing.T) {
@@ -148,7 +113,7 @@ func TestIntegerCharacterRationalNumeratorBeforeDenominator(t *testing.T) {
 	}
 	b.FailAfter(0)
 	_, e := m.prepareRational(&a)
-	if !numericPhysicalReservationRefusal(e) {
+	if e != nil {
 		t.Fatal(e)
 	}
 	want := []byte("4294967296/")
@@ -157,8 +122,8 @@ func TestIntegerCharacterRationalNumeratorBeforeDenominator(t *testing.T) {
 			t.Fatal("source NUM insertion and slash before DEN ctor", i)
 		}
 	}
-	if m.Z.Natural.CharFormatting.pending || m.Z.Natural.CharFormatting.Completed || !m.Z.Natural.Formatting.PendingField {
-		t.Fatal("DEN numerical workspace refusal must retire native character scope")
+	if m.Z.Natural.CharFormatting.pending || m.Z.Natural.CharFormatting.Completed || m.Z.Natural.Formatting.PendingField {
+		t.Fatal("native denominator formatting must retire character scope")
 	}
 	integerPhysicalAudit(t, m.Z, &a.Num, &a.Den)
 	b.FailAfter(-1)

@@ -3,23 +3,25 @@ package util
 
 import (
 	"errors"
+	"math/big"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestArbitraryFloatRawStringDisplayTransportGuards(t *testing.T) {
+func TestArbitraryFloatRawStringNormalClassificationTransportGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
 	x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, false), significand: NewInt(1)}
 	var out OwnedString
 	armed, calls := false, 0
+	want := "[+ " + new(big.Int).Lsh(big.NewInt(1), 8192).String() + " 0"
 	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f Failure) error {
 		if armed {
 			calls++
 			s := &m.rawString
-			if !s.executing || s.out != &out || !s.numberStreamLive || !out.Matches("[+ ") {
-				t.Fatal("transport must reach nested integer display", s, out)
+			if !s.executing || s.out != &out || s.numberStreamLive || !out.Matches(want) {
+				t.Fatal("transport must follow number and exponent output", s.executing, s.numberStreamLive, out.Matches(want))
 			}
 			before, used := x, b.Used()
 			var later OwnedString
@@ -28,7 +30,7 @@ func TestArbitraryFloatRawStringDisplayTransportGuards(t *testing.T) {
 					t.Fatal("actual display callback guard", i, e)
 				}
 			}
-			if x != before || b.Used() != used || !out.Matches("[+ ") {
+			if x != before || b.Used() != used || !out.Matches(want) {
 				t.Fatal("transport changed stopped raw string")
 			}
 		}

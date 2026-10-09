@@ -23,17 +23,16 @@ func TestNaturalFormattingLexicalSourceLocals(t *testing.T) {
 	}
 	for i, n := range []uint32{33, 34, 1} {
 		s := &m.Formatting.Locals[i]
-		if s.pos != n || s.capacity() != []uint32{64, 64, 16}[i] {
-			t.Fatal(i, s.pos, s.capacity())
+		if uint32(len(*s)) != n {
+			t.Fatal(i, len(*s), n)
 		}
 		for j := uint32(0); j < n; j++ {
-			v, e := s.read(m.runtime, j)
-			if e != nil || v != 0 {
-				t.Fatal(i, j, v, e)
+			if v := (*s)[j]; v != 0 {
+				t.Fatal(i, j, v)
 			}
 		}
 	}
-	if m.runtime.Stats().LiveBlocks != before.LiveBlocks+2 || m.overflowPayloads() != 2 {
+	if m.runtime.Stats().LiveBlocks != before.LiveBlocks || m.overflowPayloads() != 0 {
 		t.Fatal("actual lexical roots")
 	}
 	if e = m.finishFormattingLocals(); e != nil {
@@ -46,130 +45,6 @@ func TestNaturalFormattingLexicalSourceLocals(t *testing.T) {
 	if b.Used() != 0 {
 		t.Fatal(b.Used())
 	}
-}
-
-func TestNaturalFormattingFailedConstructorRetainsRealRoot(t *testing.T) {
-	found := [2]bool{}
-	completed := false
-	for fault := int64(0); fault < 100; fault++ {
-		b := arena.NewBudget(1 << 22)
-		m, e := NewNaturalManager(arena.VectorConfig{Descriptors: arena.Config{Budget: b}})
-		if e != nil {
-			t.Fatal(e)
-		}
-		b.FailAfter(fault)
-		e = m.beginFormattingLocals(65)
-		if e != nil {
-			if !m.Formatting.PendingField || m.Formatting.Active {
-				t.Fatal("retained failed constructor", fault)
-			}
-			// A refused later expansion leaves the failed object's old physical
-			// allocation alive. Its destructor did not run; earlier completed
-			// locals have actually unwound.
-			s := &m.Formatting.Locals[m.Formatting.failedLocal]
-			if s.Raw != (Block{}) {
-				found[m.Formatting.failedLocal] = true
-				if m.runtime.Stats().LiveBlocks == 0 {
-					t.Fatal("failed local raw lost", fault)
-				}
-				if ordinary := m.beginFormattingLocals(1); ordinary == nil {
-					t.Fatal("formatting reuses pending local ownership")
-				}
-			}
-
-			if !numericPhysicalReservationRefusal(e) {
-				t.Fatal("actual refusal category", fault, e)
-			}
-			if m.Formatting.CompletedField != 0 {
-				t.Fatal("earlier source local destructor not completed", fault, m.Formatting.CompletedField)
-			}
-			roots := uint32(0)
-			for i := range m.Formatting.Locals {
-				local := &m.Formatting.Locals[i]
-				if uint8(i) != m.Formatting.failedLocal && (local.Raw != (Block{}) || local.Pending != (Block{})) {
-					t.Fatal("unwound/never constructed root", fault, i)
-				}
-				if local.Raw != (Block{}) {
-					roots++
-				}
-				if local.Pending != (Block{}) {
-					roots++
-				}
-			}
-			if roots != m.runtime.Stats().LiveBlocks {
-				t.Fatal("immediate named root graph", fault, roots, m.runtime.Stats())
-			}
-			owned := m.HeaderBytes + m.runtime.Stats().TotalBytes
-			if owned != b.Used() {
-				t.Fatal("immediate real charge graph", fault, owned, b.Used())
-			}
-		} else {
-			completed = true
-			if e = m.finishFormattingLocals(); e != nil {
-				t.Fatal(e)
-			}
-		}
-		count, counterError := m.runtime.AllocationCount()
-		if counterError != nil {
-			t.Fatal(counterError)
-		}
-		b.FailAfter(-1)
-		if e = m.CleanupFormatting(); e != nil {
-			t.Fatal(fault, e)
-		}
-		after, counterError := m.runtime.AllocationCount()
-		if counterError != nil || after != count {
-			t.Fatal("cleanup invented source allocation", count, after, counterError)
-		}
-		if m.runtime.Stats().LiveBlocks != 0 {
-			t.Fatal("cleanup actual roots", fault)
-		}
-		m.Close()
-		if b.Used() != 0 {
-			t.Fatal("refund", fault, b.Used())
-		}
-		if found[0] && found[1] && completed {
-			break
-		}
-	}
-	if !found[0] || !found[1] || !completed {
-		t.Fatal("no later expansion refusal exercised")
-	}
-}
-
-func TestNaturalFormattingPendingLocalDoesNotBlockDivision(t *testing.T) {
-	for fault := int64(0); fault < 50; fault++ {
-		b := arena.NewBudget(1 << 22)
-		m, e := NewNaturalManager(arena.VectorConfig{Descriptors: arena.Config{Budget: b}})
-		if e != nil {
-			t.Fatal(e)
-		}
-		b.FailAfter(fault)
-		e = m.beginFormattingLocals(65)
-		retained := e != nil && m.Formatting.PendingField && m.Formatting.Locals[m.Formatting.failedLocal].Raw != (Block{})
-		b.FailAfter(-1)
-		if retained {
-			root := m.Formatting.Locals[m.Formatting.failedLocal].Raw
-			q, r := [1]uint32{}, [1]uint32{}
-			_, e = m.Div([]uint32{10}, []uint32{2}, q[:], r[:])
-			if e != nil || q[0] != 5 || r[0] != 0 || m.Formatting.Locals[m.Formatting.failedLocal].Raw != root || !m.Formatting.PendingField {
-				t.Fatal("unrelated source division with retained lexical root", e, q, r)
-			}
-		}
-		if m.Formatting.Active {
-			if e = m.finishFormattingLocals(); e != nil {
-				t.Fatal(e)
-			}
-		}
-		m.Close()
-		if b.Used() != 0 {
-			t.Fatal("actual owning cleanup", b.Used())
-		}
-		if retained {
-			return
-		}
-	}
-	t.Fatal("no actual retained failed local")
 }
 
 func TestNaturalFormattingLeadingZeroSourceDomain(t *testing.T) {
@@ -185,7 +60,7 @@ func TestNaturalFormattingLeadingZeroSourceDomain(t *testing.T) {
 	}
 }
 
-func TestNaturalFormattingReusableInlineScopeWarm(t *testing.T) {
+func TestNaturalFormattingReusableNativeScopeWarm(t *testing.T) {
 	m := naturalManager(t)
 	input := []uint32{1, 2, 3, 4}
 	dst := make([]byte, 100)
@@ -201,7 +76,7 @@ func TestNaturalFormattingReusableInlineScopeWarm(t *testing.T) {
 	allocations := testing.AllocsPerRun(100, func() { _, problem = m.FormatInto(input, dst) })
 	after, e := m.runtime.AllocationCount()
 	if problem != nil || e != nil || allocations != 0 || used != m.budget.Used() || count != after || m.Formatting.Active || m.Formatting.PendingField {
-		t.Fatal("warm actual inline scope", problem, e, allocations, count, after)
+		t.Fatal("warm reusable native scope", problem, e, allocations, count, after)
 	}
 }
 func TestNaturalFormattingEmptyGuardAfterLocalActions(t *testing.T) {
@@ -209,7 +84,7 @@ func TestNaturalFormattingEmptyGuardAfterLocalActions(t *testing.T) {
 	if e := m.beginFormattingLocals(0); e != nil {
 		t.Fatal(e)
 	}
-	if e := formattingReversalGuard(0); !errors.Is(e, arena.ErrBounds) || !m.Formatting.Active || m.Formatting.CompletedField != 7 || m.Formatting.Locals[1].pos != 1 || m.Formatting.Locals[2].pos != 1 {
+	if e := formattingReversalGuard(0); !errors.Is(e, arena.ErrBounds) || !m.Formatting.Active || m.Formatting.CompletedField != 7 || len(m.Formatting.Locals[1]) != 1 || len(m.Formatting.Locals[2]) != 1 {
 		t.Fatal("guard while completed locals live", e, m.Formatting)
 	}
 	// Source lexical exception unwind is subsequent to the guarded access.
@@ -220,63 +95,6 @@ func TestNaturalFormattingEmptyGuardAfterLocalActions(t *testing.T) {
 	_, e := m.FormatInto(nil, dst)
 	if !errors.Is(e, arena.ErrBounds) || string(dst) != "!!" || m.Formatting.Active || m.Formatting.PendingField || m.runtime.Stats().LiveBlocks != 0 {
 		t.Fatal("explicit guard then unwind", e, dst)
-	}
-}
-
-func TestNaturalSourceFinalizeRetainsFailedLexicalLocal(t *testing.T) {
-	found := false
-	for fault := int64(0); fault < 50; fault++ {
-		b := arena.NewBudget(1 << 22)
-		m, e := NewNaturalManager(arena.VectorConfig{Descriptors: arena.Config{Budget: b}})
-		if e != nil {
-			t.Fatal(e)
-		}
-		if e = m.Division[0].resize(m.runtime, 33); e != nil {
-			t.Fatal(e)
-		}
-		member := m.Division[0].Raw
-		b.FailAfter(fault)
-		e = m.beginFormattingLocals(65)
-		if e == nil {
-			if e = m.finishFormattingLocals(); e != nil {
-				t.Fatal(e)
-			}
-		}
-		retained := m.Formatting.PendingField && m.Formatting.Locals[m.Formatting.failedLocal].Raw != (Block{})
-		b.FailAfter(-1)
-		if retained {
-			found = true
-			failed := m.Formatting.Locals[m.Formatting.failedLocal].Raw
-			if e = m.SourceFinalize(); e != nil {
-				t.Fatal(e)
-			}
-			if !m.sourceFinalized || m.HeaderBytes == 0 || !m.Formatting.PendingField || m.runtime.Stats().LiveBlocks != 1 {
-				t.Fatal("source member destruction consumed failed local", m.runtime.Stats())
-			}
-			if _, e = m.runtime.ReadUint32(member, 0); e == nil {
-				t.Fatal("published member survived")
-			}
-			if _, e = m.runtime.ReadUint32(failed, 0); e != nil {
-				t.Fatal("failed ctor oldraw consumed", e)
-			}
-			state := m.runtime.State()
-			if e = m.SourceFinalize(); e != nil || m.runtime.State() != state {
-				t.Fatal("source repeat", e)
-			}
-			if e = m.check(); !errors.Is(e, arena.ErrClosed) {
-				t.Fatal("source destroyed readiness", e)
-			}
-		}
-		m.Close()
-		if b.Used() != 0 {
-			t.Fatal("owning physical cleanup", b.Used())
-		}
-		if found {
-			break
-		}
-	}
-	if !found {
-		t.Fatal("no failed ctor root")
 	}
 }
 
@@ -323,58 +141,6 @@ func TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation(t *testing.T) {
 	}
 }
 
-func TestIntegerSourceFinalizeRetainsFailedNaturalFormatting(t *testing.T) {
-	found := false
-	for fault := int64(0); fault < 50; fault++ {
-		b := arena.NewBudget(1 << 23)
-		m, e := NewIntegerManager(IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: SmallAllocatorProfile{PointerBits: 64}})
-		if e != nil {
-			t.Fatal(e)
-		}
-		n := m.Natural
-		b.FailAfter(fault)
-		e = n.beginFormattingLocals(65)
-		if e == nil {
-			if e = n.finishFormattingLocals(); e != nil {
-				t.Fatal(e)
-			}
-		}
-		retained := n.Formatting.PendingField && n.Formatting.Locals[n.Formatting.failedLocal].Raw != (Block{})
-		b.FailAfter(-1)
-		if retained {
-			found = true
-			failed := n.Formatting.Locals[n.Formatting.failedLocal].Raw
-			if e = m.SourceFinalize(); e != nil {
-				t.Fatal(e)
-			}
-			if m.Natural != n || !n.sourceFinalized || n.SourceStage != 4 || n.HeaderBytes == 0 || !n.Formatting.PendingField || m.Memory.Stats().LiveBlocks != 1 {
-				t.Fatal("parent lost real lexical cleanup owner", m.Memory.Stats())
-			}
-			if _, e = m.Memory.ReadUint32(failed, 0); e != nil {
-				t.Fatal("source allocator consumed independent failed local", e)
-			}
-			value := NewInt(1)
-			if e = m.check(&value); !errors.Is(e, arena.ErrClosed) {
-				t.Fatal("destroyed parent remains readable", e)
-			}
-			state := m.Memory.State()
-			used := b.Used()
-			if e = m.SourceFinalize(); e != nil || state != m.Memory.State() || used != b.Used() {
-				t.Fatal("source repeated retained scope cleanup", e)
-			}
-		}
-		if e = m.CloseChecked(); e != nil || b.Used() != 0 {
-			t.Fatal("actual owning cleanup", e, b.Used())
-		}
-		if found {
-			break
-		}
-	}
-	if !found {
-		t.Fatal("missing real failed constructor parent path")
-	}
-}
-
 func TestNaturalSourceFinalizeColdLifecycleGuards(t *testing.T) {
 	var absent *NaturalManager
 	if e := absent.SourceFinalize(); !errors.Is(e, ErrRuntimeOwner) {
@@ -407,4 +173,46 @@ func TestNaturalSourceFinalizeColdLifecycleGuards(t *testing.T) {
 	if e := m.SourceFinalize(); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal("closed source owner", e)
 	}
+}
+
+// Reuse must clear old scratch, and a guarded output failure must leave the
+// formatter ready for the next invocation. Runtime allocation faults do not
+// apply to native scratch storage.
+func TestNaturalFormattingNativeScratchReuseAndCleanup(t *testing.T) {
+	m := naturalManager(t)
+	before := m.runtime.State()
+	used := m.budget.Used()
+	m.budget.FailAfter(0)
+	for _, n := range []uint32{65, 2, 129, 33} {
+		serviceMust(t, m.beginFormattingLocals(n))
+		for _, words := range m.Formatting.Locals {
+			for i, v := range words {
+				if v != 0 {
+					t.Fatal("stale scratch", n, i, v)
+				}
+				words[i] = 0xffffffff
+			}
+		}
+		serviceMust(t, m.finishFormattingLocals())
+	}
+	if m.runtime.State() != before || m.budget.Used() != used {
+		t.Fatal("native scratch changed runtime accounting")
+	}
+	serviceMust(t, m.CleanupFormatting())
+	for _, words := range m.Formatting.Locals {
+		if words != nil {
+			t.Fatal("explicit cleanup retained capacity")
+		}
+	}
+	// Bounded destination writes fail after inner scratch construction.
+	e := m.sourceToCString(limbView{external: []uint32{0, 1}, size: 2}, sourceDecimalDestination{external: []byte{'!'}}, 100)
+	if !errors.Is(e, arena.ErrBounds) || m.Formatting.Active || m.Formatting.PendingField {
+		t.Fatal("failure cleanup", e)
+	}
+	var dst [32]byte
+	serviceMust(t, m.sourceToCString(limbView{external: []uint32{0, 1}, size: 2}, sourceDecimalDestination{external: dst[:]}, uint64(len(dst))))
+	if string(dst[:10]) != "4294967296" || dst[10] != 0 {
+		t.Fatal(dst)
+	}
+	m.budget.FailAfter(-1)
 }

@@ -25,9 +25,8 @@ func TestFastFloatFormattingRetainsSourcePrecision(t *testing.T) {
 	}
 	after, e := m.natural.runtime.AllocationCount()
 	serviceMust(t, e)
-	// Go character scratch adds no Runtime events. The remaining temp96 and
-	// numer97 workspaces each expand 16→32→64→128, despite leading zeros.
-	if after-before != 6 {
+	// Full-precision scratch is native and adds no Runtime events.
+	if after != before {
 		t.Fatal("source full-precision lexical events", before, after)
 	}
 	serviceMust(t, m.Del(&a))
@@ -85,61 +84,27 @@ func fastFormattingNamedRoots(m *FastFloatManager, add func(Block)) {
 	}
 	add(m.natural.Verification.Raw)
 	add(m.natural.Verification.Pending)
-	for i := range m.natural.Formatting.Locals {
-		add(m.natural.Formatting.Locals[i].Raw)
-		add(m.natural.Formatting.Locals[i].Pending)
-	}
+
 }
 
-func TestFastFloatFormattingEveryConstructorPrefix(t *testing.T) {
-	success, foundChar, foundInner := false, false, false
-	for fault := int64(0); fault < 80; fault++ {
-		m := fastManager(t, 96)
-		b := m.config.Storage.Descriptors.Budget
-		var a FastFloat
-		serviceMust(t, m.SetInt32(&a, -1))
-		m.toBuffer(0, &a, true, false)
-		serviceMust(t, m.natural.reserveText(2048))
-		b.FailAfter(fault)
-		var dst [16]byte
-		for i := range dst {
-			dst[i] = '!'
-		}
-		n, e := m.FormatInto(&a, dst[:])
-		if e != nil {
-			if !numericPhysicalReservationRefusal(e) {
-				t.Fatal(fault, e)
-			}
-			for _, v := range dst {
-				if v != '!' {
-					t.Fatal("published caller bytes")
-				}
-			}
-			if m.natural.textRead(0) != '-' {
-				t.Fatal("negative source prefix")
-			}
-			foundChar = foundChar || m.natural.CharFormatting.pending
-			foundInner = foundInner || m.natural.Formatting.PendingField
-		} else {
-			if string(dst[:n]) != "-1" {
-				t.Fatal(n, dst)
-			}
-			success = true
-		}
-		fastAudit(t, m, &a)
-		fastStandaloneBudgetAudit(t, m)
-		b.FailAfter(-1)
-		serviceMust(t, m.CloseChecked())
-		if b.Used() != 0 {
-			t.Fatal("retained owner cleanup", fault, b.Used())
-		}
-		if success {
-			break
-		}
+func TestFastFloatNativeFullPrecisionFormattingWithoutReservations(t *testing.T) {
+	m := fastManager(t, 96)
+	b := m.config.Storage.Descriptors.Budget
+	var a FastFloat
+	serviceMust(t, m.SetInt32(&a, -1))
+	m.toBuffer(0, &a, true, false)
+	serviceMust(t, m.natural.reserveText(2048))
+	b.FailAfter(0)
+	var dst [16]byte
+	n, e := m.FormatInto(&a, dst[:])
+	serviceMust(t, e)
+	if string(dst[:n]) != "-1" {
+		t.Fatal(n, dst)
 	}
-	if !success || foundChar || !foundInner {
-		t.Fatal("complete meaningful sweep", success, foundChar, foundInner)
-	}
+	fastAudit(t, m, &a)
+	fastStandaloneBudgetAudit(t, m)
+	b.FailAfter(-1)
+	serviceMust(t, m.Del(&a))
 }
 
 func TestFastFloatDecimalScratchResetsAfterFormattingFailure(t *testing.T) {
@@ -231,9 +196,9 @@ func TestFastFloatDecimalLargePrecision(t *testing.T) {
 	}
 }
 
-func TestFastFloatDecimalEveryLargeLocalPrefix(t *testing.T) {
+func TestFastFloatDecimalEveryDivisionAllocationPrefix(t *testing.T) {
 	success := false
-	charRefusal, innerRefusal := false, false
+	refused := false
 	for fault := int64(0); fault < 192; fault++ {
 		b := arena.NewBudget(1 << 25)
 		c := DefaultFastFloatConfig(serviceConfig(b).Integers.Words)
@@ -259,8 +224,10 @@ func TestFastFloatDecimalEveryLargeLocalPrefix(t *testing.T) {
 					t.Fatal("early caller publication", fault)
 				}
 			}
-			charRefusal = charRefusal || m.natural.CharFormatting.pending
-			innerRefusal = innerRefusal || m.natural.Formatting.PendingField
+			refused = true
+			if m.natural.CharFormatting.pending || m.natural.Formatting.PendingField {
+				t.Fatal("native scratch retained allocation failure")
+			}
 		} else {
 			if string(dst[:n]) != "1.5" {
 				t.Fatal(n, dst)
@@ -278,12 +245,12 @@ func TestFastFloatDecimalEveryLargeLocalPrefix(t *testing.T) {
 			break
 		}
 	}
-	if !success || charRefusal || !innerRefusal {
-		t.Fatal("complete large local sweep", success, charRefusal, innerRefusal)
+	if !success || !refused {
+		t.Fatal("complete division allocation sweep", success, refused)
 	}
 }
 
-func TestFastFloatFullPrecisionWarmSourceEvents(t *testing.T) {
+func TestFastFloatFullPrecisionWarmNativeScratch(t *testing.T) {
 	m := fastManager(t, 96)
 	var a FastFloat
 	serviceMust(t, m.SetInt32(&a, 1))
@@ -298,8 +265,8 @@ func TestFastFloatFullPrecisionWarmSourceEvents(t *testing.T) {
 	allocations := testing.AllocsPerRun(10, func() { _, problem = m.FormatInto(&a, dst[:]) })
 	after, e := m.natural.runtime.AllocationCount()
 	serviceMust(t, e)
-	if problem != nil || allocations != 12 || after-before != 6*11 || budget.Used() != beforeUsed || fastOwnedBytes(m) != beforeOwned {
-		t.Fatal("real fresh scopes/data+init buffers", allocations, after-before, problem)
+	if problem != nil || allocations != 0 || after != before || budget.Used() != beforeUsed || fastOwnedBytes(m) != beforeOwned {
+		t.Fatal("reusable native scratch", allocations, after-before, problem)
 	}
 	fastAudit(t, m, &a)
 	fastStandaloneBudgetAudit(t, m)

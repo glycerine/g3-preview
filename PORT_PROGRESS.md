@@ -31207,3 +31207,32 @@ for variable state. Updated manifest evidence and its implementation targets.
 Validation: full native SAT (0.99s) and checked/debug SAT (1.20s) passed, as did
 module-wide test compilation, SAT vet, and portcheck. Latest full native module
 checkpoint remains 18:07–18:12 UTC.
+
+## Native decimal MPN formatting scratch
+
+Replaced decimal temp/numerator/denominator `SourceLimbBuffer` storage with
+three reusable concrete Go uint32 slices. Begin clears each requested span;
+end truncates it; explicit cleanup releases capacity. The original conversion
+arithmetic, full-precision spans, bounded writes and output publication remain.
+Deleted C++ scratch growth/failure-state tests and added native reuse, zero
+Runtime reservation, error cleanup and subsequent successful formatting checks.
+Warm rational and full-precision float checks now require zero Go allocations
+and zero Runtime events. Division/verification still use Runtime and retain
+real allocation fault campaigns. Updated polynomial/AST physical-root audits
+and manifest evidence for the changed representation.
+
+The wider regression pass also removes AST scenarios whose only later stop was
+an eliminated formatting-buffer allocation. Independent big-numeral output,
+frame lifetime and source/own teardown now cover native low-level printing;
+existing visitor mark/history tests remain. Raw float string transport is now
+exercised at its actual remaining normal-classification allocation, after the
+number/exponent prefix, rather than at nonexistent integer display scratch.
+The SMT2 late-free test uses a real bounded-write body guard, avoiding an
+unnecessary million-bit decimal conversion. Shared Runtime counts now exclude
+formatting scratch, and short caller buffers retain atomic publication checks.
+
+Validation: full native util (110.33s), full native AST (29.23s), focused native
+polynomial display (0.29s), checked/debug feature and display checks (util
+107.26s, AST 0.01s, polynomial 0.06s), module-wide test compilation, affected
+package vet, and portcheck passed. The latest full native module checkpoint
+remains 18:07–18:12 UTC; this change used affected-package checks.

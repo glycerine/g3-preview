@@ -90,8 +90,8 @@ func TestInfFormatSignedZeroAndDomain(t *testing.T) {
 
 // Every failure is inspected before further formatting or cleanup can mask a
 // leaked absolute-value temporary. Operands exceed the numerical inline
-// workspace, so the sweep reaches real numeric allocations after native text
-// growth stopped generating arena reservations.
+// workspace. InfString still allocates its absolute-value numeral temporary;
+// InfIntString formats borrowed numerals using only native scratch.
 func TestInfFormatFailurePrefixesImmediateRoots(t *testing.T) {
 	for kind := 0; kind < 2; kind++ {
 		failures := 0
@@ -146,7 +146,7 @@ func TestInfFormatFailurePrefixesImmediateRoots(t *testing.T) {
 				break
 			}
 		}
-		if !success || failures == 0 {
+		if !success || (kind == 0 && failures == 0) {
 			t.Fatal(kind, success, failures)
 		}
 	}

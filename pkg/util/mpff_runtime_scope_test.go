@@ -196,11 +196,11 @@ func TestFastFloatSharedRuntimeProfileAndClose(t *testing.T) {
 			state := r.State()
 			extent := int64(17 + bits/8)
 			if tls {
-				if state.GlobalSize != 0 || state.GlobalCount != 0 || state.LocalSize != extent || state.LocalCount != 7 {
+				if state.GlobalSize != 0 || state.GlobalCount != 0 || state.LocalSize != extent || state.LocalCount != 1 {
 					t.Fatal("TLS getters do not flush", bits, state)
 				}
 			} else {
-				if state.GlobalSize != extent || state.GlobalCount != 7 || state.LocalSize != 0 || state.LocalCount != 0 {
+				if state.GlobalSize != extent || state.GlobalCount != 1 || state.LocalSize != 0 || state.LocalCount != 0 {
 					t.Fatal("nonTLS accounting", bits, state)
 				}
 			}

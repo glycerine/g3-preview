@@ -1197,3 +1197,28 @@ Runtime allocations in variable state belong to justification, trail, and queue.
 Validation: full native (0.99s) and checked/debug (1.20s) SAT suites, module-wide
 compilation, SAT vet, and portcheck passed. The full native module checkpoint
 remains 18:07–18:12 UTC; no new whole-module execution was needed for this change.
+
+## Native decimal MPN scratch
+
+The three decimal-formatting limb buffers in `mpn_format_scope.go` now use
+`[3][]uint32`. Invocation entry clears the requested spans; normal/error exit
+truncates them for reuse, and explicit cleanup drops capacity. `mpn_cstring.go`
+borrows these slices through the existing concrete limb view and retains the
+original digit conversion arithmetic and full-precision operand sizes.
+
+Formatting scratch no longer uses `SourceLimbBuffer`, inline16 growth policy,
+Runtime blocks, initialized-byte maps, or partial C++ constructor/destructor
+allocation states. Warm integer/rational and full-precision float formatting
+require zero Go allocations and zero Runtime allocation events. The remaining
+`SourceLimbBuffer` users are division and checked verification; those buffers
+still have real allocation/failure ownership and are a separate next boundary.
+Polynomial and AST physical-root test helpers count only those remaining blocks.
+
+Downstream fault tests tied exclusively to removed scratch allocations are
+retired. Real numeral-copy, division and normal-classification allocation tests
+remain. AST low-level printing independently checks large numeral text and
+clean frame teardown; general visitor mark/history regression coverage remains.
+
+Validation: full native util/AST, focused native polynomial display,
+checked/debug affected features, module-wide compilation, affected-package vet,
+and portcheck passed.
