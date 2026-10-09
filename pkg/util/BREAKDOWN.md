@@ -19,10 +19,11 @@ cohesive package, after extracting the few low-level facilities it needs. Do not
 try to split `mpn`, `mpz`, `mpq`, and `mpf` into separate Go packages in the
 same operation.
 
-Tiny C++ headers are not automatically good Go packages. If a facility has one
-consumer, prefer putting a concrete implementation with that consumer. If it
-has no production consumer, delete or defer the port instead of giving dead
-code a new home.
+Each live functional leaf should become a Go package leaf, even when small.
+That makes consumers visible in the import graph and gives the facility an
+enforceable boundary. Package by functionality rather than mechanically making
+one package per C++ header. If a facility has no production C++ consumer,
+delete or defer the port instead of giving dead code a new home.
 
 ## Method and terminology
 
@@ -76,6 +77,12 @@ This is the infrastructure knot. `str_hashtable` should not be reproduced in
 Go: Go strings and maps replace it. Its presence in the C++ cycle explains the
 C++ graph, not a desired Go abstraction.
 
+The knot should be dissolved rather than moved intact. Most of its members are
+C++ implementation machinery that Go already supplies. The C++ classes can
+disappear, while the few observable behaviors they carry move into small,
+one-way Go packages. The detailed replacement analysis is in
+[Dissolving the 11-unit knot](#dissolving-the-11-unit-knot).
+
 The highest fan-in units also show where package boundaries will be expensive:
 
 | C++ unit | Direct `src/util` consumers |
@@ -103,7 +110,7 @@ The dependency direction should remain one-way:
 arena
   |
   v
-small runtime and memory primitives
+memory-limit policy and true shared primitives
   |
   +-------------------+-------------------+
   v                   v                   v
@@ -127,9 +134,9 @@ self-contained in Go or depend only on `arena` or the standard library.
 | Proposed package | C++ units | Recommendation |
 | --- | --- | --- |
 | `util/lbool` | `lbool` | High-value first move. The value type has no internal C++ dependency and already has many Go consumers. |
-| `util/mincut` | `min_cut` | Self-contained algorithm. Move when its `muz` consumer is ported; there is no current production Go consumer. |
+| `util/mincut` | `min_cut` | Self-contained live algorithm. Make it a package leaf even though its `muz` consumer has not yet been ported. |
 | `util/toposort` | `top_sort` | Live in the AST code. Specialize the present `any`-based Go API for its real node type rather than preserving a generic C++ template shape. |
-| `util/natset` | `nat_set` | Self-contained representation. Move only with a live consumer. |
+| `util/natset` | `nat_set` | Self-contained live representation and a natural package leaf. |
 | `util/approx` | `approx_nat`, `approx_set` | Cohesive approximate-number/set functionality. Their display methods currently touch shared numeric formatting; replace that edge with ordinary `fmt`/`io` behavior or a narrow formatter. |
 | `util/backtrack` | `trail`, `union_find`, selected backtracking containers | `union_find` is widely used upstream. Keep trail ownership and undo behavior together. Specialize `backtrackable_set` for its actual consumer instead of keeping `any`. |
 | `util/bitset` | `bit_util`, `bit_vector`, `fixed_bit_vector`, `obj_mark` | Natural bit-oriented cluster. Check whether fixed-width manager state needs the shared allocator before moving it. |
@@ -138,15 +145,19 @@ self-contained in Go or depend only on `arena` or the standard library.
 | `util/permutation` | live declarations from `permutation.h` | Only move the live free permutation operations. `permutation.cpp` itself has no production caller. |
 | `util/stack` | `stack` | Put the arena-backed implementation in a package that imports `pkg/arena` directly. |
 
-Very small facilities such as `file_path`, `luby`, and `version` do not justify
-a package merely because they are graph leaves. Put them with their consumers,
-or leave them in a small root package until several related facilities form a
-coherent boundary.
+Very small leaf facilities such as `file_path`, `luby`, and `version` should
+still become distinct Go package leaves. This makes their consumers visible in
+the import graph, gives them an enforceable boundary, and makes later deletion
+straightforward. Package size alone is not a reason to leave unrelated code in
+root `util`.
 
 The current Go versions of `list`, `scoped_vector`, and `backtrackable_set` use
 `any`. Each C++ template has a small set of concrete production instantiations.
-When their consumers arrive, specialize them there or create concrete packages.
-Do not preserve unbounded template generality in the port.
+That use of `any` was an earlier porting mistake and should be eliminated.
+Replace these containers with concrete slices, Go maps, or
+`insdict.Dict` at v0.10.1 when insertion order is required. When a wrapper still
+has meaningful behavior, specialize it for its real element type. Do not
+preserve unbounded template generality in the port.
 
 ### 2. Symbols, parameters, statistics, and control
 
@@ -167,17 +178,115 @@ These APIs have broad consumers, so moving them will touch many packages. They
 are valuable boundaries, but poor first experiments for the mechanical package
 move process.
 
-### 3. Runtime and memory primitives
+### 3. Memory-limit policy, without a C++ allocator model
 
-The allocator, failure, exception-equivalent, and buffer code needs a narrow
-home below all feature packages. A possible package is `util/mem`, importing
-[`pkg/arena`](../arena) and the standard library only. Its public surface should
-represent Go ownership and failure behavior rather than C++ allocation syntax.
+Do not retain a general C++-style allocator, raw block, initialized-byte bitmap,
+or vector-layout model as a foundation package. Native Go objects, slices, maps,
+and [`pkg/arena`](../arena) should own actual storage.
 
-Do not turn the entire 11-unit C++ cycle into a permanent `util/base` package.
-That would reproduce the current junk drawer under another name. Standard Go
-maps, slices, strings, errors, logging, and testing should replace the C++
-container and platform wrappers where their semantics are sufficient.
+Some source behavior remains visible: configured memory and allocation limits,
+peak/current usage reporting, out-of-memory classification, and fatal-versus-
+returned failure policy. If these behaviors are required by a ported consumer,
+put only that policy and accounting in a small leaf such as `util/memlimit`.
+Callers can reserve and release semantic amounts through `arena.Budget`; they
+should not expose C++ addresses or allocation headers.
+
+Exact C++ `malloc` sizes and failure points cannot be reproduced naturally by
+the Go runtime. Treating them as a conformance surface forces every native data
+structure back into a C++ memory simulator. Tests for externally visible limit
+and failure behavior should remain; tests whose sole purpose is to reproduce an
+internal C++ allocation layout should be retired as the relevant owner is
+converted.
+
+Do not turn the 11-unit C++ cycle into a permanent `util/base` package. That
+would reproduce the current junk drawer under another name.
+
+## Dissolving the 11-unit knot
+
+The proposal is viable. All 11 units can disappear as C++ abstractions. A few
+behaviors must survive in much smaller Go-native leaves, but none requires the
+old dependency cycle.
+
+| C++ unit | Go replacement | What, if anything, must survive |
+| --- | --- | --- |
+| `buffer` | Concrete slices for typed scratch storage; `[]byte` or `bytes.Buffer` for mutable bytes; `strings.Builder` for text | Explicit cleanup only when elements own a real resource. The inline C++ storage optimization, placement construction, capacity header, and destructor template disappear. |
+| `vector` | Concrete slices with `append`, `copy`, and type-specific helpers | Preserve an algorithm's logical size and order. Do not preserve the universal vector class, growth formula, allocation header, or iterator classes. |
+| `hashtable` | Built-in maps for unordered lookup; `insdict.Dict` v0.10.1 only for insertion-ordered iteration | Custom equality becomes a comparable key, stable ID, or canonical key. Cached hash slots, tombstones, probing, and rehash code disappear. |
+| `str_hashtable` | `map[string]struct{}` | Nothing else. Go strings own their bytes and have value equality. |
+| `memory_manager` | Go allocation, slices/maps, `arena`, and an optional small `memlimit` policy package | Preserve configured limits, usage statistics, and error/fatal policy where consumers expose them. Remove raw blocks, allocation headers, byte-initialization maps, placement construction, and C++ realloc emulation. |
+| `debug` | Ordinary condition checks, `panic` or returned errors, and an optional tag set | Preserve user-facing assertion/debug toggles only if live consumers need them. Do not port debugger invocation, deliberate segmentation faults, macro expansion, or arena accounting for a tag map. |
+| `trace` | A narrow `io.Writer`-based tracer, the later cross-language tracer, or no code when tracing is disabled | Preserve tag filtering and emitted records only where tracing is a supported feature. The lazy global C++ table and `.z3-trace` stream mechanics disappear. |
+| `util` | Split functions among their consumers and standard packages such as `math/bits`, `io`, `strconv`, and `strings` | Preserve verbosity/fatal policy as small explicit services if live. There should be no Go package that corresponds to the miscellaneous C++ `util.h`. |
+| `warning` | `fmt.Fprintf` to an `io.Writer`; `bytes.Buffer` or `strings.Builder` only when a complete message must be assembled first | Preserve enable/disable, destination selection, prefixes, and write errors if observable. Delete the C `va_list` formatter and custom character vector. |
+| `z3_exception` | Go errors, sentinel errors, wrapping, and a small typed error-code value | Preserve public Z3 error codes and messages. Delete the C++ exception hierarchy and formatted exception constructor. |
+| `hash` | A standalone leaf of pure functions, or local functions beside their consumers | Retain only explicitly requested Z3 hash computations. Go map hashing replaces hashes used solely to implement a table, but it does not replace AST/numeral hashes used as data or to guide algorithms. |
+
+`bytes.Buffer` is not a general replacement for `vector<T>` or `buffer<T>`.
+Use it for byte streams. A concrete slice is the direct replacement for typed
+contiguous storage, and `strings.Builder` is appropriate for write-only text.
+`bufio.Writer` supplies buffering around an `io.Writer` when output batching is
+the actual requirement.
+
+### Map order and hash behavior
+
+Built-in Go map iteration is deliberately unspecified. Use it when an algorithm
+only needs membership or lookup. Use `insdict.Dict` when the required order is
+the insertion order. Do not use `insdict` automatically for every C++ hash
+table: Z3's open-addressed table iterates in bucket order, which is not insertion
+order. If that bucket order affects a solver choice or serialized result, either
+make the Go algorithm's order explicit and deterministic or retain a small
+specialized compatibility sequence for that one use. Sorting keys is often a
+better answer for canonical output.
+
+Likewise, `hash/maphash` and the runtime's internal map hash do not replace an
+explicit Z3 hash value. They are intentionally seeded and their values are not
+available as a stable source-compatible result. The current pure operations
+such as `Combine`, `Mix`, string hashing, and composite hashing can live in a
+small `util/hash` leaf with no imports from the rest of `util`. Hash helpers
+used only by deleted custom tables should be deleted.
+
+### Current Go obstacle
+
+The existing port has already spread the C++ storage model well beyond the
+11 source units. At this audit point:
+
+* 128 production files in `pkg/util` mention `Runtime` or `Block`.
+* Outside `pkg/util`, `util.Block` appears in 82 production files and
+  `util.Runtime` in 37. `util.Block` has 487 selector uses in those files.
+* `TraceContext`, `WarningContext`, `PrintfFormatter`, `MemoryProcess`,
+  `DebugGlobalService`, and `VerboseContext` currently have no production Go
+  consumer outside `pkg/util`.
+* `UintMap`, the direct custom-hashtable specialization, has only two production
+  consumers outside `pkg/util`.
+
+The first two counts make wholesale deletion unsafe. They describe migration
+cost, not a reason to preserve the design. The latter two observations identify
+good early simplifications, subject to checking future C++ consumers before
+deleting functionality that has not yet reached Go.
+
+### Dissolution order
+
+1. Stop creating new `Runtime`, `Block`, custom vector, custom buffer, and
+   custom table users. New ports use concrete slices/maps and native I/O.
+2. Replace `str_hashtable`, trace/debug tag tables, and ordinary table consumers
+   with `map` or `insdict.Dict` according to their required iteration order.
+3. Replace warning, formatting, and text-buffer paths with `io.Writer`, `fmt`,
+   `bytes.Buffer`, `strings.Builder`, and `bufio` as appropriate.
+4. Move explicit stable hash functions into an import-independent `util/hash`
+   leaf and delete hashes that existed only for custom tables.
+5. Convert one owning feature package at a time from `Runtime`/`Block` storage
+   to concrete fields and slices. Move its focused tests at the same time.
+6. Reduce memory management to `arena` plus a narrow limit/error policy. Remove
+   allocation-layout and initialized-byte tests as their simulated owner goes
+   away.
+7. Replace the exception hierarchy with Go errors and move error codes to their
+   API-facing leaf. Remove the final compatibility imports among the old knot
+   units.
+
+This order permits frequent green commits. It also prevents a second generic
+container layer from forming: each converted feature declares its concrete data
+types, and no new Go generics are required. The approved generic implementation
+inside `insdict` remains the single exception.
 
 ### 4. The numerical subsystem
 
@@ -221,13 +330,16 @@ The Go port currently adds ownership edges that make a finer split unsafe:
 * `RationalManager` owns or refers back to integer and arbitrary-float managers.
 * Arbitrary floats contain integer values whose representation is currently
   accessed across manager code.
-* Numeric cells and allocation policy depend on `arena` and shared runtime
-  failure behavior.
+* Numeric cells and allocation policy currently depend on `arena` and the
+  shared C++-layout runtime simulation.
 
 The first move should therefore be one package, tentatively `util/num`, holding
 the live integer, rational, floating-point, interval, and numeral-lifetime code.
-It should import `arena`, the narrow memory/runtime package, and independently
-extracted bit primitives. It must not import the parent `util` package.
+It should import `arena`, the narrow memory-limit policy if needed, and
+independently extracted bit primitives. It must not import the parent `util`
+package. Its `Runtime`/`Block` users should then be replaced internally with
+native representations without exposing those compatibility types in the new
+package API.
 
 After that package is stable, a later audit can decide whether the manager
 back-pointers can be removed cleanly enough for layers such as `num/core`,
@@ -289,7 +401,7 @@ AST, SAT, SMT, tactic, solver, shell, or `muz` code. For example, `lbool`,
 `statistics`, cancellation/cooperation, `heap`, and `union_find` all have broad
 upstream use. Package boundaries must preserve that outward API.
 
-### Small units best placed with a consumer or cohesive neighbor
+### Small units requiring a Go-native shape before packaging
 
 ```text
 array                  array_map               container_util
@@ -301,8 +413,9 @@ sstream                stream_buffer
 ```
 
 These are often C++ templates, ownership wrappers, or compatibility helpers.
-Their Go form should be a concrete consumer-owned type, an ordinary slice/map,
-or part of a larger behavioral package.
+If live, their functionality should still have a visible package boundary, but
+their Go form should be a concrete type, an ordinary slice/map, or a cohesive
+package rather than a copied generic wrapper.
 
 ### Dead, test-only, or requiring proof before retention
 
