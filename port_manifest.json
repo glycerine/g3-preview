@@ -109469,7 +109469,7 @@
         "pkg/util/util_string_buffer.go"
       ],
       "tests": [
-        "TestStringBufferSourceThreeAssertions"
+        "TestStringBuffer64TextNumbersAndReset"
       ],
       "assertions": [
         {
@@ -109493,7 +109493,7 @@
           "status": "ported",
           "go_target": "pkg/util/util_string_buffer.go",
           "tests": [
-            "TestStringBufferSourceThreeAssertions"
+            "TestStringBuffer64TextNumbersAndReset"
           ]
         },
         {
@@ -109501,7 +109501,7 @@
           "status": "ported",
           "go_target": "pkg/util/util_string_buffer.go",
           "tests": [
-            "TestStringBufferSourceThreeAssertions"
+            "TestStringBuffer64TextNumbersAndReset"
           ]
         },
         {
@@ -109509,7 +109509,7 @@
           "status": "ported",
           "go_target": "pkg/util/util_string_buffer.go",
           "tests": [
-            "TestStringBufferSourceThreeAssertions"
+            "TestStringBuffer64TextNumbersAndReset"
           ]
         }
       ],
@@ -147280,16 +147280,9 @@
         "pkg/util/util_string_buffer.go"
       ],
       "tests": [
-        "TestStringBufferSourceThreeAssertions",
-        "TestStringBufferInlineTerminatorResetAndBytes",
-        "TestStringBufferNumericUnsignedAdapterAndLongDomains",
-        "TestStringBufferFailureCapacityPrefixesAndImmediateBudgets",
-        "TestStringBufferNineRoutesSourceCStrFirstAndSelfCases",
-        "TestStringBufferSymbolBulkAndNumericPrefixFailure",
-        "TestStringBufferIndependentByteModelAndWarmAllocations",
-        "TestStringBufferPhysicalInlineOwnerChargesAndExactPeak",
-        "TestStringBufferSourceFailureBeforeDestAndReturnedTextLifetime",
-        "TestStringBufferOwnerConfigurationAndSymbolGuards"
+        "TestStringBuffer64TextNumbersAndReset",
+        "TestStringBuffer64AppendAndEmbeddedNUL",
+        "TestStringBuffer64LifecycleAndLongProfile"
       ],
       "conditionals": [
         {
@@ -147341,14 +147334,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "INITIAL_SIZE32/64/128 fields, constructor, destructor and expand (lines31-58)",
-          "status": "ported",
+          "name": "live INITIAL_SIZE64 fields, constructor, destructor and expand (lines31-58)",
+          "status": "partial",
           "go_target": "pkg/util/util_string_buffer.go",
           "tests": [
-            "TestStringBufferInlineTerminatorResetAndBytes",
-            "TestStringBufferFailureCapacityPrefixesAndImmediateBudgets",
-            "TestStringBufferPhysicalInlineOwnerChargesAndExactPeak",
-            "TestStringBufferOwnerConfigurationAndSymbolGuards"
+            "TestStringBuffer64AppendAndEmbeddedNUL",
+            "TestStringBuffer64LifecycleAndLongProfile"
           ]
         },
         {
@@ -147356,11 +147347,8 @@
           "status": "ported",
           "go_target": "pkg/util/util_string_buffer.go",
           "tests": [
-            "TestStringBufferSourceThreeAssertions",
-            "TestStringBufferInlineTerminatorResetAndBytes",
-            "TestStringBufferFailureCapacityPrefixesAndImmediateBudgets",
-            "TestStringBufferIndependentByteModelAndWarmAllocations",
-            "TestStringBufferSourceFailureBeforeDestAndReturnedTextLifetime"
+            "TestStringBuffer64TextNumbersAndReset",
+            "TestStringBuffer64AppendAndEmbeddedNUL"
           ]
         },
         {
@@ -147368,9 +147356,7 @@
           "status": "ported",
           "go_target": "pkg/util/util_string_buffer.go",
           "tests": [
-            "TestStringBufferSourceThreeAssertions",
-            "TestStringBufferNumericUnsignedAdapterAndLongDomains",
-            "TestStringBufferIndependentByteModelAndWarmAllocations"
+            "TestStringBuffer64TextNumbersAndReset"
           ]
         },
         {
@@ -147378,9 +147364,7 @@
           "status": "ported",
           "go_target": "pkg/util/util_string_buffer.go",
           "tests": [
-            "TestStringBufferInlineTerminatorResetAndBytes",
-            "TestStringBufferFailureCapacityPrefixesAndImmediateBudgets",
-            "TestStringBufferSourceFailureBeforeDestAndReturnedTextLifetime"
+            "TestStringBuffer64AppendAndEmbeddedNUL"
           ]
         },
         {
@@ -147388,19 +147372,16 @@
           "status": "ported",
           "go_target": "pkg/util/util_string_buffer.go",
           "tests": [
-            "TestStringBufferSourceThreeAssertions",
-            "TestStringBufferNumericUnsignedAdapterAndLongDomains",
-            "TestStringBufferIndependentByteModelAndWarmAllocations"
+            "TestStringBuffer64TextNumbersAndReset"
           ]
         },
         {
-          "name": "nine concrete cross-buffer insertion routes (lines175-179)",
-          "status": "ported",
+          "name": "live INITIAL_SIZE64 self-type buffer insertion (lines175-179)",
+          "status": "partial",
           "go_target": "pkg/util/util_string_buffer.go",
           "tests": [
-            "TestStringBufferSourceThreeAssertions",
-            "TestStringBufferNineRoutesSourceCStrFirstAndSelfCases",
-            "TestStringBufferSourceFailureBeforeDestAndReturnedTextLifetime"
+            "TestStringBuffer64TextNumbersAndReset",
+            "TestStringBuffer64AppendAndEmbeddedNUL"
           ]
         },
         {
@@ -147415,12 +147396,10 @@
         }
       ],
       "ownership": [
-        "Concrete cold owner physically embeds32/64/128 pointer-free inline bytes and charges the complete reflect-size once. Overflow bytes reserve full new doubled capacity while old capacity remains charged, then copy pos bytes and release old heap. Reset retains capacity; Close releases overflow and header. CStr exposes only one caller-owned immutable copy; no backing slice escapes. Bulk growth publishes successful capacity prefixes before copy/pos publication. See PORT_PROGRESS.md#audit-string-buffer-port-status-md."
+        "The retained Go implementation is only the live INITIAL_SIZE64 specialization. INITIAL_SIZE32 and INITIAL_SIZE128 had no production Go consumers and were removed with their representation-only tests. The remaining owner still uses the earlier explicit inline/overflow storage pending conversion to bytes.Buffer."
       ],
       "deviations": [
-        "Finite concrete sizes cover every actual fork instantiation; arbitrary template sizes remain open. No Go generics or implicit shallow ownership copy are exported.",
-        "Source unsigned sprintf(%d,unsigned) high-bit mismatch is an explicit observed AMD64 signed32-bit adaptation, not portable defined C semantics. LongBits32 rejects out-of-domain values; Windows secure-CRT error state is not claimed.",
-        "Typed bounds/owner/closed guards replace invalid arithmetic or pointer access. Nonfull heap self append that would free its source pointer is rejected before mutation; valid inline/full-heap self paths preserve source CStr-first actions. Cold locking is a Go synchronization adapter."
+        "Current Go production consumers use only INITIAL_SIZE64. Other live upstream specializations remain deferred until their consumers are ported and should use native Go text buffers rather than restoring template-width variants."
       ]
     },
     {
@@ -147618,8 +147597,8 @@
         "TestSymbolConcurrentInternIdentity",
         "TestSymbolIndependentBytesAndPrefixOrder",
         "TestSymbolDuplicateLookupAndInvalidTokens",
-        "TestStringBufferSymbolBulkAndNumericPrefixFailure",
-        "TestStringBufferOwnerConfigurationAndSymbolGuards",
+        "TestStringBuffer64TextNumbersAndReset",
+        "TestStringBuffer64LifecycleAndLongProfile",
         "TestSymbolServiceSourcePublicationAndReinitialize",
         "TestSymbolServiceSourceEveryConstructorReservation",
         "TestSymbolServiceSourceCopiedOwnerAndPrepareFailure",
@@ -147772,8 +147751,8 @@
           "status": "ported",
           "go_target": "pkg/util/util_string_buffer.go",
           "tests": [
-            "TestStringBufferSymbolBulkAndNumericPrefixFailure",
-            "TestStringBufferOwnerConfigurationAndSymbolGuards"
+            "TestStringBuffer64TextNumbersAndReset",
+            "TestStringBuffer64LifecycleAndLongProfile"
           ]
         },
         {

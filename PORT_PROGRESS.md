@@ -30818,3 +30818,13 @@ production consumer in the unported `src/math/interval` subsystem; the other
 consumer is `src/test/ext_numeral.cpp`. The interval port should implement its
 actual concrete numeral type locally rather than restoring a generic root-util
 manager interface.
+
+
+### Remove unused string-buffer widths
+
+Removed `StringBuffer32` and `StringBuffer128`, their cross-width
+append matrix, and tests of inline-array sizes and simulated capacity accounting.
+Only `StringBuffer64` has production Go consumers. Focused tests now cover the
+live text, numeric, reset, embedded-NUL, same-type append, lifecycle, and long
+width behavior. The retained 64-byte implementation remains the next target for
+replacement with a native Go text buffer.

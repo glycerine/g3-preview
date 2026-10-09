@@ -749,3 +749,6 @@ The concrete unsigned32 Runtime column and its copy specialization are likewise
 SAT-only and now live in `sat_solver_scalar_runtime.go`. Root
 `RuntimeVectorColumn` remains in `util` because both AST and SAT use its common
 checked byte-vector storage and growth protocol.
+
+
+Only the currently consumed `StringBuffer64` specialization remains; the 32/128 variants and cross-width test matrix were removed. Replace the remaining explicit inline/overflow storage with `bytes.Buffer` as the next text-buffer step.
