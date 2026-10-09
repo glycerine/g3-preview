@@ -87,8 +87,13 @@ func CheckNoGenerics(root string) error {
 					}
 				}
 			case *ast.IndexListExpr:
-				fail(x)
+				if !approvedGenericInstantiation(x.X, imports) {
+					fail(x)
+				}
 			case *ast.IndexExpr:
+				if approvedGenericInstantiation(x.X, imports) {
+					break
+				}
 				// A known type in an index position denotes a single type argument.
 				if id, ok := x.Index.(*ast.Ident); ok {
 					if (id.Obj != nil && id.Obj.Kind == ast.Typ) || builtinType(id.Name) {
@@ -116,6 +121,16 @@ func CheckNoGenerics(root string) error {
 		return problem
 	})
 }
+
+func approvedGenericInstantiation(expr ast.Expr, imports map[string]string) bool {
+	selector, ok := expr.(*ast.SelectorExpr)
+	if !ok {
+		return false
+	}
+	qualifier, ok := selector.X.(*ast.Ident)
+	return ok && imports[qualifier.Name] == "github.com/glycerine/insdict"
+}
+
 func builtinType(name string) bool {
 	switch name {
 	case "bool", "string", "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "byte", "rune", "float32", "float64", "complex64", "complex128", "any":

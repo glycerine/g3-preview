@@ -21,9 +21,18 @@ func TestNoGenericsAudit(t *testing.T) {
 	}
 	root := t.TempDir()
 	source(t, root, "ok.go", "package p\ntype Box struct { Value uint32 }\nfunc At(xs []uint32, i int) uint32 { return xs[i] }\n")
+	source(t, root, "dict.go", "package p\nimport ordered \"github.com/glycerine/insdict\"\nvar d ordered.Dict[uint32,string]\n")
 	source(t, root, ".cache/ignored.go", "not Go")
 	if err := CheckNoGenerics(root); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestNoGenericsRejectsUnapprovedExternalInstantiation(t *testing.T) {
+	root := t.TempDir()
+	source(t, root, "bad.go", "package p\nimport external \"example.com/generic\"\nvar d external.Dict[uint32,string]\n")
+	if err := CheckNoGenerics(root); err == nil {
+		t.Fatal("generic from unapproved dependency bypassed audit")
 	}
 }
 
