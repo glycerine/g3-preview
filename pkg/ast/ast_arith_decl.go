@@ -1,7 +1,9 @@
 // Source: src/ast/arith_decl_plugin.cpp:342-382,392-398,451-509.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import (
+	"github.com/glycerine/g3/pkg/util/z3exception"
+)
 
 func arithmeticUsesCoercion(k int32) bool {
 	return k == 6 || k == 7 || k == 9 || k == 18 || k == 2 || k == 3 || k == 4 || k == 5 || k == 8
@@ -49,7 +51,7 @@ func (m *ASTManager) arithmeticOperatorDecl(k int32, arity int, real bool) astNo
 }
 func arithmeticCheckArguments(k int32, arity int) error {
 	if arity == 0 && k != 31 && k != 32 {
-		return ASTException{util.NewDefaultException("no arguments supplied to arithmetical operator")}
+		return ASTException{z3exception.NewDefaultException("no arguments supplied to arithmetical operator")}
 	}
 	return nil
 }

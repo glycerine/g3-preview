@@ -2,8 +2,8 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func (s *Solver) mkModel() error {
@@ -47,7 +47,7 @@ func (s *Solver) mkModel() error {
 		return e
 	}
 	if !good {
-		return &SATSolverException{DefaultException: util.NewDefaultException("check model failed")}
+		return &SATSolverException{DefaultException: z3exception.NewDefaultException("check model failed")}
 	}
 	return nil
 }

@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Source m_fm owns its distinct unsynchronized mpq; the AST and original
@@ -241,10 +242,10 @@ func (m *ASTManager) mkFloatSort(ebits, sbits uint32) (astNodeRef, error) {
 	p := m.floatingPointPlugin
 	// The unsigned conversion occurs at the call boundary before these checks.
 	if sbits < 2 {
-		return astNodeRef{}, ASTException{util.NewDefaultException("minimum number of significand bits is 1")}
+		return astNodeRef{}, ASTException{z3exception.NewDefaultException("minimum number of significand bits is 1")}
 	}
 	if ebits < 2 {
-		return astNodeRef{}, ASTException{util.NewDefaultException("minimum number of exponent bits is 2")}
+		return astNodeRef{}, ASTException{z3exception.NewDefaultException("minimum number of exponent bits is 2")}
 	}
 	a, b := astParameterRecord{Kind: ASTParameterInt, integer: int32(ebits)}, astParameterRecord{Kind: ASTParameterInt, integer: int32(sbits)}
 	name, e := m.Symbols.Intern("FloatingPoint")

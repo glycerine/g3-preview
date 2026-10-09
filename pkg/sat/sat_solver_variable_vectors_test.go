@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots(t *testing.T) {
@@ -75,7 +75,7 @@ func TestSATSolverVariableColumnGrowthFailureAndScalarBounds(t *testing.T) {
 	if _, _, e := satVariableNextCapacity(^uint32(0), 1, 1, ^uint64(0)); e == nil {
 		t.Fatal("source overflow")
 	} else {
-		var source util.DefaultException
+		var source z3exception.DefaultException
 		if !errors.As(e, &source) || source.Message() != "Overflow encountered when expanding vector" {
 			t.Fatal("source class/message", e)
 		}

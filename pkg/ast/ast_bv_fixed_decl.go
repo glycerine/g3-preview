@@ -4,7 +4,7 @@ package ast
 import (
 	"math"
 
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // The order after bcomp follows finalize(), rather than enum order.
@@ -197,7 +197,7 @@ func (m *ASTManager) bitVectorDecl(k int32, ps []ASTParameter, domain []ASTHandl
 		return m.bitVectorMKBV(domain)
 	}
 	fail := func(message string) (astNodeRef, error) {
-		return astNodeRef{}, ASTException{util.NewDefaultException(message)}
+		return astNodeRef{}, ASTException{z3exception.NewDefaultException(message)}
 	}
 	if len(domain) == 0 {
 		return fail("no arguments supplied to bit-vector operator")

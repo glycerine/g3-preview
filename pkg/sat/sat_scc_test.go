@@ -3,12 +3,13 @@ package sat
 
 import (
 	"errors"
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func satSCCFixture(t *testing.T, n uint32) (*satSCC, *satSolverClauseLifecycle) {
@@ -529,7 +530,7 @@ func TestSATSCCVectorSourceGeometryAndConstructorPublication(t *testing.T) {
 		satOK(t, r.WriteUint32(v.raw, 0, ^uint32(0)))
 		before := satSCCAllocationCount(t, c)
 		err = v.grow(r)
-		var ex util.DefaultException
+		var ex z3exception.DefaultException
 		if !errors.As(err, &ex) || ex.Message() != "Overflow encountered when expanding vector" || satSCCAllocationCount(t, c) != before {
 			t.Fatal(width, err)
 		}
@@ -569,7 +570,7 @@ func TestSATSCCVectorDebugCapacityAssertionBeforeOverflow(t *testing.T) {
 			t.Fatal("source capacity SASSERT before growth", err)
 		}
 	} else {
-		var ex util.DefaultException
+		var ex z3exception.DefaultException
 		if !errors.As(err, &ex) || ex.Message() != "Overflow encountered when expanding vector" {
 			t.Fatal(err)
 		}

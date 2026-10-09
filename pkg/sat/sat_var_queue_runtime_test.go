@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSATCaseSplitHeapConstructorRealRuntimeAccounting(t *testing.T) {
@@ -487,7 +488,7 @@ func TestSATCaseSplitHeapReachedRawHeaderGuards(t *testing.T) {
 			t.Fatal(e)
 		}
 	} else {
-		var source util.DefaultException
+		var source z3exception.DefaultException
 		if !errors.As(e, &source) || source.Error() != "Overflow encountered when expanding vector" {
 			t.Fatal(e)
 		}

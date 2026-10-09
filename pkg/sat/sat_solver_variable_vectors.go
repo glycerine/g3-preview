@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Source capacity/byte arithmetic is unsigned32, independently of actual Go
@@ -17,7 +17,7 @@ func satVariableNextCapacity(old uint32, actualStride, sourceStride, hostMax uin
 		oldBytes := uint32(sourceStride)*old + 8
 		newBytes := uint32(sourceStride)*n + 8
 		if n <= old || newBytes <= oldBytes {
-			return 0, 0, util.NewDefaultException("Overflow encountered when expanding vector")
+			return 0, 0, z3exception.NewDefaultException("Overflow encountered when expanding vector")
 		}
 	}
 	if actualStride == 0 || sourceStride == 0 || uint64(n) > (uint64(^uint32(0))-8)/sourceStride || uint64(n) > hostMax/actualStride {

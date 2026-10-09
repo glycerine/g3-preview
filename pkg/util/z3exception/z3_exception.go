@@ -1,8 +1,9 @@
 // Concrete error classification and nonformatted util/z3_exception values.
-package util
+package z3exception
 
 import (
 	"errors"
+	"strings"
 )
 
 type ErrorCode uint32
@@ -41,6 +42,14 @@ func NewZ3Error(code ErrorCode) (Z3Error, error) {
 		return Z3Error{}, ErrExceptionPrecondition
 	}
 	return Z3Error{code}, nil
+}
+
+func MustZ3Error(code ErrorCode) Z3Error {
+	errValue, err := NewZ3Error(code)
+	if err != nil {
+		panic(err)
+	}
+	return errValue
 }
 func (e Z3Error) Message() string {
 	switch e.code {
@@ -83,7 +92,14 @@ func (e Z3Error) HasErrorCode() bool   { return e.ErrorCode() != ErrorOK }
 type DefaultException struct{ MessageField string }
 
 func NewDefaultException(message string) DefaultException { return DefaultException{message} }
-func (e DefaultException) Message() string                { return e.MessageField[:cSymbolLength(e.MessageField)] }
+func (e DefaultException) Message() string                { return e.MessageField[:cStringLength(e.MessageField)] }
 func (e DefaultException) Error() string                  { return e.Message() }
 func (e DefaultException) ErrorCode() ErrorCode           { return ErrorOK }
 func (e DefaultException) HasErrorCode() bool             { return e.ErrorCode() != ErrorOK }
+
+func cStringLength(value string) int {
+	if index := strings.IndexByte(value, 0); index >= 0 {
+		return index
+	}
+	return len(value)
+}

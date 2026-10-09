@@ -2,6 +2,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // These are the concrete generated sat_params accessors. Each uses the real
@@ -89,7 +90,7 @@ func (m *satMainConfig) Update(p *util.ParamsRef) (err error) {
 	} else if s == m.cached[4] {
 		m.state.Restart = satRestartGeometric
 	} else {
-		return util.NewDefaultException("invalid restart strategy")
+		return z3exception.NewDefaultException("invalid restart strategy")
 	}
 	m.state.Initialized |= satConfigRestartMask
 	s, e = m.symbol(p, &g, "phase", "caching")
@@ -105,7 +106,7 @@ func (m *satMainConfig) Update(p *util.ParamsRef) (err error) {
 	} else if s == m.cached[3] {
 		m.state.Phase = satPhaseRandom
 	} else {
-		return util.NewDefaultException("invalid phase selection strategy")
+		return z3exception.NewDefaultException("invalid phase selection strategy")
 	}
 	m.state.Initialized |= satConfigPhaseMask
 	if e = m.uint(p, &g, "phase.caching.on", 400, &m.state.PhaseCachingOn, satConfigPhaseCachingOnMask); e != nil {
@@ -184,7 +185,7 @@ func (m *satMainConfig) Update(p *util.ParamsRef) (err error) {
 		} else if s == m.cached[10] {
 			m.state.GCStrategy = satGCPSMGlue
 		} else {
-			return util.NewDefaultException("invalid gc strategy")
+			return z3exception.NewDefaultException("invalid gc strategy")
 		}
 		m.state.Initialized |= satConfigGCStrategyMask
 		if e = m.uint(p, &g, "gc.initial", 20000, &m.state.GCInitial, satConfigGCInitialMask); e != nil {

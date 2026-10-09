@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestDebugMacroUnreachableIgnoresAssertionSwitch(t *testing.T) {
@@ -20,7 +21,7 @@ func TestDebugMacroUnreachableIgnoresAssertionSwitch(t *testing.T) {
 	paramsMust(t, d.EnableAssertions(false))
 	e := d.UnreachableSource("macro_fixture.cpp", 41)
 	if sourceDebug {
-		var ex DefaultException
+		var ex z3exception.DefaultException
 		if !errors.As(e, &ex) {
 			t.Fatal(e)
 		}
@@ -79,7 +80,7 @@ func TestDebugMacroXAssertionLiteralExtraBeforeAction(t *testing.T) {
 			// EXTRA can change the switch; invoke_gdb itself does not read it.
 			paramsMust(t, d.EnableAssertions(false))
 			e = d.InvokeAssertionDebugger()
-			var ex DefaultException
+			var ex z3exception.DefaultException
 			if !errors.As(e, &ex) {
 				t.Fatal(e)
 			}
@@ -366,7 +367,7 @@ func TestDebugMacroHeapFalseTagThrowPrecedesValuePublication(t *testing.T) {
 	paramsMust(t, h.Insert(1))
 	e = h.Insert(1)
 	if sourceDebug {
-		var ex DefaultException
+		var ex z3exception.DefaultException
 		if !errors.As(e, &ex) {
 			t.Fatal(e)
 		}
@@ -388,7 +389,7 @@ func TestDebugMacroHeapNonInsertFalseMinReachesSourceNotification(t *testing.T) 
 	t.Cleanup(func() { paramsMust(t, h.Close()) })
 	_, e = h.Min()
 	if sourceDebug {
-		var ex DefaultException
+		var ex z3exception.DefaultException
 		if !errors.As(e, &ex) {
 			t.Fatal("actual heap.h:169 false site must invoke bound T", e)
 		}
@@ -458,7 +459,7 @@ func TestDebugMacroHeapRemainingFalseLeavesThrowBeforeBody(t *testing.T) {
 				e = h.Increased(1)
 			}
 			if sourceDebug {
-				var ex DefaultException
+				var ex z3exception.DefaultException
 				if !errors.As(e, &ex) {
 					t.Fatal(e)
 				}

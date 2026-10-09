@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // The lexical rational parameter stays at this address if cleanup stops.
@@ -88,7 +89,7 @@ func (m *ASTManager) mkArithmeticNumeralCaptured(value *util.OwnedRational, inte
 			return result, e
 		}
 		if !isInt {
-			return result, ASTException{util.NewDefaultException("invalid rational value passed as an integer")}
+			return result, ASTException{z3exception.NewDefaultException("invalid rational value passed as an integer")}
 		}
 	}
 	u, cached := uint32(0), zero
@@ -196,7 +197,7 @@ func (m *ASTManager) ArithmeticNumeral(value *util.OwnedRational, integer bool) 
 
 func (m *ASTManager) arithmeticNumeralDecl(ps []ASTParameter, arity int) (astNodeRef, error) {
 	if len(ps) != 2 || arity != 0 {
-		return astNodeRef{}, ASTException{util.NewDefaultException("invalid numeral declaration")}
+		return astNodeRef{}, ASTException{z3exception.NewDefaultException("invalid numeral declaration")}
 	}
 	v, e := m.parameter(ps[0])
 	if e != nil {
@@ -207,7 +208,7 @@ func (m *ASTManager) arithmeticNumeralDecl(ps []ASTParameter, arity int) (astNod
 		return astNodeRef{}, e
 	}
 	if v.Kind != ASTParameterRational || flag.Kind != ASTParameterInt {
-		return astNodeRef{}, ASTException{util.NewDefaultException("invalid numeral declaration")}
+		return astNodeRef{}, ASTException{z3exception.NewDefaultException("invalid numeral declaration")}
 	}
 	p := m.arithmeticPlugin
 	name, sort := p.names[1], p.fields[0]

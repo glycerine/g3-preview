@@ -12,6 +12,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // The actual lexical parameter RATIONALs and full-expression temporaries.
@@ -371,7 +372,7 @@ func (m *ASTManager) bitVectorNumeralDeclCore(f *astBVNumeralFrame, value *util.
 	var e error
 	// The inner plugin checks parameter kinds/count before unsigned width.
 	if bits == 0 {
-		return astNodeRef{}, ASTException{util.NewDefaultException("bit-vector size must be greater than zero")}
+		return astNodeRef{}, ASTException{z3exception.NewDefaultException("bit-vector size must be greater than zero")}
 	}
 	q := m.numerals
 	f.values[1], e = q.PowerOfTwoWithInvocation(bits, &f.children[0])

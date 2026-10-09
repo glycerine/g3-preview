@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func psortActionFixture(t *testing.T, text string) (*PsortASTNetwork, *util.DebugContext, *util.NumericCharInput, *os.File) {
@@ -58,7 +59,7 @@ func TestPsortASTNetworkBoundContinueThenThrowActualSourcePrefix(t *testing.T) {
 	state, e := input.State()
 	astTestMust(t, e)
 	if util.RuntimeVectorSourceDebug {
-		var exception util.DefaultException
+		var exception z3exception.DefaultException
 		if !errors.As(cause, &exception) || !strings.Contains(string(data), "Line: 983\nm <= n\n") || !strings.Contains(string(data), "Line: 1019\nk + offset <= n\n") || state.Position != 2 {
 			t.Fatal("source bound action chain", cause, string(data), state)
 		}

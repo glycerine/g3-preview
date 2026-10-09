@@ -3,24 +3,25 @@ package sat
 
 import (
 	"errors"
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/messages"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 var ErrSATMissingSourceExtBinding = errors.New("g3: missing source SAT extension binding")
 
-// Promoted Z3Exception methods preserve the source base behavior; Unwrap
+// Promoted exception methods preserve the source base behavior; Unwrap
 // supplies the existing Go errors.As adapter for a base-class catch.
-type SATSolverException struct{ util.DefaultException }
+type SATSolverException struct{ z3exception.DefaultException }
 
 func (e SATSolverException) Unwrap() error { return e.DefaultException }
 
-var ErrSATSolverCanceled = SATSolverException{util.NewDefaultException("canceled")}
-var ErrSATSolverMaxMemory = SATSolverException{util.NewDefaultException("max. memory exceeded")}
+var ErrSATSolverCanceled = SATSolverException{z3exception.NewDefaultException("canceled")}
+var ErrSATSolverMaxMemory = SATSolverException{z3exception.NewDefaultException("max. memory exceeded")}
 var ErrSATSignedCounterDomain = errors.New("g3: undefined source signed SAT counter decrement")
 
 // This actual member-state grouping does not construct the full solver or child
@@ -121,7 +122,7 @@ func (s *satSolverPropagationState) checkpoint() error {
 		}
 		s.variables.modelIsCurrent = false
 		s.variables.modelKnown = true
-		return SATSolverException{util.NewDefaultException(messages.Canceled)}
+		return SATSolverException{z3exception.NewDefaultException(messages.Canceled)}
 	}
 	s.numCheckpoints++
 	if s.numCheckpoints < 10 {
@@ -137,7 +138,7 @@ func (s *satSolverPropagationState) checkpoint() error {
 		return e
 	}
 	if n > cfg.MaxMemory {
-		return SATSolverException{util.NewDefaultException(messages.MaxMemory)}
+		return SATSolverException{z3exception.NewDefaultException(messages.MaxMemory)}
 	}
 	return nil
 }

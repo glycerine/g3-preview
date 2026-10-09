@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func satPropagationFixture(t *testing.T, n uint32) (*satSolverPropagationState, *satSolverVariableState, *arena.Budget) {
@@ -119,10 +120,10 @@ func TestSATSolverPropagationConcreteExceptionAndResizePrefix(t *testing.T) {
 	satPropagationAssertGraph(t, s)
 	b.FailAfter(-1)
 	var ex SATSolverException
-	if !errors.As(ErrSATSolverCanceled, &ex) || ex.ErrorCode() != util.ErrorOK || ex.Message() != "canceled" {
+	if !errors.As(ErrSATSolverCanceled, &ex) || ex.ErrorCode() != z3exception.ErrorOK || ex.Message() != "canceled" {
 		t.Fatal("source solver_exception category")
 	}
-	var base util.DefaultException
+	var base z3exception.DefaultException
 	if !errors.As(ErrSATSolverCanceled, &base) || base.Message() != "canceled" {
 		t.Fatal("base exception catch")
 	}

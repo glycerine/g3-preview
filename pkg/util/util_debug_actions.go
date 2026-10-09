@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 type DebugActionProfile uint8
@@ -131,7 +132,7 @@ func (a *DebugActionContext) InvokeDebugger() error {
 		case 'S', 's':
 			return a.hostStop()
 		case 'T', 't':
-			return NewDefaultException("assertion violation")
+			return z3exception.NewDefaultException("assertion violation")
 		case 'G', 'g':
 			command, e := a.hostCommand()
 			if e != nil {

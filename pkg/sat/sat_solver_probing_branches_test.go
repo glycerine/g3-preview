@@ -4,12 +4,12 @@ package sat
 import (
 	"errors"
 	"fmt"
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSATSolverProbingCachedTryLitAndFailedBranchStatistic(t *testing.T) {
@@ -253,7 +253,7 @@ func TestSATSolverProbingCacheSourceGrowthAndHostBounds(t *testing.T) {
 		t.Fatal(e)
 	}
 	_, _, _, e = satProbingCacheNext(^uint32(0), ^uint64(0))
-	var ex util.DefaultException
+	var ex z3exception.DefaultException
 	if !errors.As(e, &ex) || ex.Message() != "Overflow encountered when expanding vector" {
 		t.Fatal(e)
 	}

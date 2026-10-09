@@ -3,12 +3,13 @@ package sat
 
 import (
 	"errors"
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSATSolverAssignmentAllocationReachesActualCheckpoint(t *testing.T) {
@@ -299,7 +300,7 @@ func TestSATSolverAssignmentSourceUnsignedGrowthException(t *testing.T) {
 		}
 	}
 	_, _, e := RuntimeByteColumnNext(0x80000000)
-	var d util.DefaultException
+	var d z3exception.DefaultException
 	if !errors.As(e, &d) || d.Error() != "Overflow encountered when expanding vector" {
 		t.Fatal("source default_exception", e)
 	}
@@ -320,7 +321,7 @@ func TestSATSolverAssignmentNonNullZeroCapacityActualExpandRoute(t *testing.T) {
 			t.Fatal("nonnull source capacity assertion", e)
 		}
 	} else {
-		var d util.DefaultException
+		var d z3exception.DefaultException
 		if !errors.As(e, &d) || d.Error() != "Overflow encountered when expanding vector" {
 			t.Fatal("nonnull literal overflow", e)
 		}

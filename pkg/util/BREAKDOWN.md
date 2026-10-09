@@ -178,6 +178,12 @@ deleted; the concrete implementations and tests live only in the leaf.
 The root version-constant facade was likewise unused and has been deleted;
 generated version values live only in `util/version`.
 
+The `z3_exception` boundary now lives in `util/z3exception`. All current root
+utility, AST, SAT, and SMT consumers import it directly. Ordinary Go error
+values, wrapping, and caller-side formatting replace the source virtual
+exception hierarchy and varargs/iostream constructor; immutable strings own
+message storage.
+
 Very small leaf facilities such as `file_path`, `luby`, and `version` should
 still become distinct Go package leaves. This makes their consumers visible in
 the import graph, gives them an enforceable boundary, and makes later deletion

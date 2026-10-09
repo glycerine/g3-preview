@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestCmdExceptionSourceConstructorRoutesAndLocationGuards(t *testing.T) {
@@ -17,16 +18,16 @@ func TestCmdExceptionSourceConstructorRoutesAndLocationGuards(t *testing.T) {
 		if a.MessageField != text || b.MessageField != strings.SplitN(text, "\x00", 2)[0] || a.HasPos() || b.HasPos() {
 			t.Fatal(a, b)
 		}
-		if _, e := a.Line(); e != util.ErrExceptionPrecondition {
+		if _, e := a.Line(); e != z3exception.ErrExceptionPrecondition {
 			t.Fatal(e)
 		}
-		if _, e := a.Pos(); e != util.ErrExceptionPrecondition {
+		if _, e := a.Pos(); e != z3exception.ErrExceptionPrecondition {
 			t.Fatal(e)
 		}
 		for _, line := range []int32{-2147483648, -1, 0, 1, 2147483647} {
 			for _, pos := range []int32{-2147483648, -1, 0, 5, 2147483647} {
 				x := NewCmdExceptionAt(text, line, pos)
-				if x.HasPos() != (line >= 0) || x.ErrorCode() != util.ErrorOK || x.HasErrorCode() {
+				if x.HasPos() != (line >= 0) || x.ErrorCode() != z3exception.ErrorOK || x.HasErrorCode() {
 					t.Fatal(x)
 				}
 				l, le := x.Line()
@@ -35,7 +36,7 @@ func TestCmdExceptionSourceConstructorRoutesAndLocationGuards(t *testing.T) {
 					if le != nil || pe != nil || l != line || p != pos {
 						t.Fatal(x, l, p, le, pe)
 					}
-				} else if le != util.ErrExceptionPrecondition || pe != util.ErrExceptionPrecondition {
+				} else if le != z3exception.ErrExceptionPrecondition || pe != z3exception.ErrExceptionPrecondition {
 					t.Fatal(le, pe)
 				}
 			}
@@ -46,7 +47,7 @@ func TestCmdExceptionSourceConstructorRoutesAndLocationGuards(t *testing.T) {
 	if !errors.As(err, &stop) {
 		t.Fatal(err)
 	}
-	var def util.DefaultException
+	var def z3exception.DefaultException
 	if errors.As(err, &def) {
 		t.Fatal("stop parser distinct")
 	}
@@ -80,7 +81,7 @@ func TestCmdExceptionSourceSymbolCompositionAndBorrowedLifetime(t *testing.T) {
 	if _, e := NewCmdExceptionSymbol(m, "x", util.DummySymbol()); e != util.ErrInvalidSymbol {
 		t.Fatal(e)
 	}
-	if _, e := NewCmdExceptionSymbol(nil, "x", util.Symbol{}); e != util.ErrExceptionPrecondition {
+	if _, e := NewCmdExceptionSymbol(nil, "x", util.Symbol{}); e != z3exception.ErrExceptionPrecondition {
 		t.Fatal(e)
 	}
 	x, e := NewCmdExceptionSymbol(m, "owner:", internSymbol(t, m, "alive"))

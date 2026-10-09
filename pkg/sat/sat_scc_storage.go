@@ -4,6 +4,7 @@ package sat
 import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Actual scalar Runtime backing; widths replace host pointer layout explicitly.
@@ -43,7 +44,7 @@ func (v *satSCCVector) grow(r *util.Runtime) error {
 	}
 	bytes := n*v.width + 8
 	if v.raw != (util.Block{}) && (n <= old || bytes <= old*v.width+8) {
-		return util.NewDefaultException("Overflow encountered when expanding vector")
+		return z3exception.NewDefaultException("Overflow encountered when expanding vector")
 	}
 	if v.raw == (util.Block{}) {
 		v.pending, e = r.Allocate(uint64(bytes))

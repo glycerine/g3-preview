@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func permutationActionFixture(t *testing.T, text string) (*RuntimePermutation, *DebugContext, *DebugActionContext, *NumericCharInput, *MemoryStandardStreams) {
@@ -93,7 +94,7 @@ func TestPermutationBoundThrowAndDisabledUnreadClosedAction(t *testing.T) {
 	paramsMust(t, p.forward.Reset())
 	_, e := p.CheckInvariant()
 	if sourceDebug {
-		var ex DefaultException
+		var ex z3exception.DefaultException
 		if !errors.As(e, &ex) || ex.Message() != "assertion violation" {
 			t.Fatal(e)
 		}

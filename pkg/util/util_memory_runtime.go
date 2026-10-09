@@ -3,6 +3,8 @@
 // Main compatibility/error bridge to the single concrete lower runtime.
 package util
 
+import "github.com/glycerine/g3/pkg/util/z3exception"
+
 type utilMemoryRuntime = Runtime
 type utilMemoryRuntimeConfig = RuntimeConfig
 type utilMemoryBlock = Block
@@ -16,11 +18,11 @@ var ErrMemoryRuntimeUninitialized = ErrRuntimeUninitialized
 func memoryErrorTransport(f Failure) error {
 	switch f.Kind {
 	case FailureMemout:
-		return Z3Error{ErrorMemout}
+		return z3exception.MustZ3Error(z3exception.ErrorMemout)
 	case FailureAllocExceeded:
-		return Z3Error{ErrorAllocExceeded}
+		return z3exception.MustZ3Error(z3exception.ErrorAllocExceeded)
 	case FailureVectorOverflow:
-		return NewDefaultException(f.Message())
+		return z3exception.NewDefaultException(f.Message())
 	}
 	return ErrFailureTransport
 }

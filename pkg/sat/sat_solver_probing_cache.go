@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Scalar provenance is separate from the source LP64 cache_entry bytes. Actual
@@ -60,7 +61,7 @@ func (c *satProbingCache) expand(p *satSolverProbing) error {
 		if satStorageSourceDebug {
 			return ErrSATAssertion
 		}
-		return util.NewDefaultException("Overflow encountered when expanding vector")
+		return z3exception.NewDefaultException("Overflow encountered when expanding vector")
 	}
 	n, request, _, e := satProbingCacheNext(old, uint64(^uint(0)>>1))
 	if e != nil {

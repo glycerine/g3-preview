@@ -1,4 +1,4 @@
-package util
+package z3exception
 
 import (
 	"errors"

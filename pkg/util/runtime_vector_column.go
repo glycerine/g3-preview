@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // RuntimeVectorGrowthOwner supplies caller-specific ownership tracking while
@@ -88,7 +89,7 @@ func RuntimeScalarColumnNext(old, stride uint32) (uint32, uint32, error) {
 	n := (3*old + 1) >> 1
 	before, after := old*stride+8, n*stride+8
 	if n <= old || after <= before {
-		return 0, 0, NewDefaultException("Overflow encountered when expanding vector")
+		return 0, 0, z3exception.NewDefaultException("Overflow encountered when expanding vector")
 	}
 	return n, after, nil
 }
@@ -150,7 +151,7 @@ func (c *RuntimeVectorColumn) expandStrideConcreteOwners(stride uint32, debug *D
 	// Non-null source m_data takes the geometric branch even when a raw
 	// corrupted capacity is zero: DEBUG assertion, otherwise literal overflow.
 	if c.Block != (Block{}) && old == 0 {
-		return NewDefaultException("Overflow encountered when expanding vector")
+		return z3exception.NewDefaultException("Overflow encountered when expanding vector")
 	}
 	n, request, e := RuntimeScalarColumnNext(old, stride)
 	if e != nil {

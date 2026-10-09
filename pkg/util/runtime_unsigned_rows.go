@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Actual vector<unsigned_vector>. The outer source8-byte pointer is a scalar
@@ -87,7 +88,7 @@ func (o *RuntimeUnsignedRows) expand() error {
 		return ErrRuntimeVectorAssertion
 	}
 	if o.raw != (Block{}) && old == 0 {
-		return NewDefaultException("Overflow encountered when expanding vector")
+		return z3exception.NewDefaultException("Overflow encountered when expanding vector")
 	}
 	var n, request uint32
 	if o.raw == (Block{}) {
@@ -98,7 +99,7 @@ func (o *RuntimeUnsignedRows) expand() error {
 			return e
 		}
 		if n <= old {
-			return NewDefaultException("Overflow encountered when expanding vector")
+			return z3exception.NewDefaultException("Overflow encountered when expanding vector")
 		}
 	}
 	bytes := uint64(n) * uint64(reflect.TypeOf(RuntimeUintColumn{}).Size())

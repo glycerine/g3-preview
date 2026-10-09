@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestUnsignedSortingNetworkLiteralExchangeAndSortActions(t *testing.T) {
@@ -34,7 +35,7 @@ func TestUnsignedSortingNetworkLiteralExchangeAndSortActions(t *testing.T) {
 						t.Fatal(e, line, state, string(output))
 					}
 					if action == "T" {
-						var ex DefaultException
+						var ex z3exception.DefaultException
 						if !errors.As(e, &ex) {
 							t.Fatal(e)
 						}
@@ -105,7 +106,7 @@ func TestUnsignedSortingNetworkCapturedExchangeOperandsAndSetSourceOrder(t *test
 	}
 	e = sn.exchange(0, 2, out)
 	if sourceDebug {
-		var ex DefaultException
+		var ex z3exception.DefaultException
 		if !errors.As(e, &ex) {
 			t.Fatal(e)
 		}

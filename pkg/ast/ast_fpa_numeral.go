@@ -5,11 +5,12 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Source: src/ast/ast.h:70-73; src/ast/ast.cpp:1515-1517.
 // Immutable Go exception text follows the existing default_exception adapter.
-type ASTException struct{ util.DefaultException }
+type ASTException struct{ z3exception.DefaultException }
 
 const (
 	astFPANum       int32 = 5

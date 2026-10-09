@@ -7,15 +7,16 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 type CmdException struct {
-	util.DefaultException
+	z3exception.DefaultException
 	line, pos int32
 }
 
 func NewCmdException(message string) CmdException {
-	return CmdException{util.NewDefaultException(message), -1, -1}
+	return CmdException{z3exception.NewDefaultException(message), -1, -1}
 }
 func NewCmdExceptionCString(message string) CmdException {
 	if i := strings.IndexByte(message, 0); i >= 0 {
@@ -24,7 +25,7 @@ func NewCmdExceptionCString(message string) CmdException {
 	return NewCmdException(message)
 }
 func NewCmdExceptionAt(message string, line, pos int32) CmdException {
-	return CmdException{util.NewDefaultException(message), line, pos}
+	return CmdException{z3exception.NewDefaultException(message), line, pos}
 }
 func NewCmdExceptionSymbol(m *util.SymbolManager, message string, s util.Symbol) (CmdException, error) {
 	return NewCmdExceptionSymbolAt(m, message, s, -1, -1)
@@ -35,7 +36,7 @@ func NewCmdExceptionSymbol(m *util.SymbolManager, message string, s util.Symbol)
 // owner mutation/charge occurs. Returned exceptions survive manager Close.
 func NewCmdExceptionSymbolAt(m *util.SymbolManager, message string, s util.Symbol, line, pos int32) (CmdException, error) {
 	if m == nil {
-		return CmdException{}, util.ErrExceptionPrecondition
+		return CmdException{}, z3exception.ErrExceptionPrecondition
 	}
 	if _, e := m.FromToken(s.Token()); e != nil {
 		return CmdException{}, e
@@ -95,18 +96,18 @@ func NewCmdExceptionSymbolAt(m *util.SymbolManager, message string, s util.Symbo
 func (e CmdException) HasPos() bool { return e.line >= 0 }
 func (e CmdException) Line() (int32, error) {
 	if !e.HasPos() {
-		return 0, util.ErrExceptionPrecondition
+		return 0, z3exception.ErrExceptionPrecondition
 	}
 	return e.line, nil
 }
 func (e CmdException) Pos() (int32, error) {
 	if !e.HasPos() {
-		return 0, util.ErrExceptionPrecondition
+		return 0, z3exception.ErrExceptionPrecondition
 	}
 	return e.pos, nil
 }
 
-// StopParserException has no source message/code and is not a Z3Exception. Its
+// StopParserException has no source message/code and is not a z3_exception. Its
 // Error method supplies a Go-only transport label for this distinct signal.
 type StopParserException struct{}
 

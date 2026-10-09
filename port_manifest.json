@@ -114589,7 +114589,7 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_z3_exception.go",
+        "pkg/util/z3exception/z3_exception.go",
         "pkg/util/util_memory_fatal_policy.go",
         "pkg/util/util_memory_fatal_policy_test.go"
       ],
@@ -114615,7 +114615,7 @@
         {
           "name": "all fourteen error-code macros as fixed uint32 constants",
           "status": "ported",
-          "go_target": "pkg/util/util_z3_exception.go",
+          "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
             "TestZ3ExceptionSourceCodesAndLabels",
             "TestDefaultExceptionSourceStringAndEmbeddedNUL"
@@ -152414,9 +152414,9 @@
       "path": "src/util/z3_exception.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/util/util_z3_exception.go"
+        "pkg/util/z3exception/z3_exception.go"
       ],
       "tests": [
         "TestZ3ExceptionSourceCodesAndLabels",
@@ -152428,13 +152428,13 @@
           "text": "SASSERT(error_code != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "exact error-code constants and z3_error labels/code/nonzero guard",
           "status": "ported",
-          "go_target": "pkg/util/util_z3_exception.go",
+          "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
             "TestZ3ExceptionSourceCodesAndLabels",
             "TestDefaultExceptionSourceStringAndEmbeddedNUL"
@@ -152443,17 +152443,19 @@
         {
           "name": "base error_code/has_error_code and default_exception std::string constructor/msg",
           "status": "ported",
-          "go_target": "pkg/util/util_z3_exception.go",
+          "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
             "TestZ3ExceptionSourceCodesAndLabels",
             "TestDefaultExceptionSourceStringAndEmbeddedNUL"
           ]
         },
         {
-          "name": "default_exception fmt/va_list constructor and source printf formatter dependency",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "name": "formatted exception construction through ordinary Go formatting at call sites",
+          "status": "ported",
+          "go_target": "pkg/util/z3exception/z3_exception.go",
+          "tests": [
+            "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+          ]
         }
       ],
       "ownership": [
@@ -152461,16 +152463,16 @@
         "Formatted values use the selected budgeted integer/C-string formatter before caller-owned immutable exception construction. See PORT_PROGRESS.md#audit-printf-port-status-md."
       ],
       "deviations": [
-        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Formatted constructor selected integer/string profiles are implemented; broader C printf and Windows domains remain open."
+        "Go error values replace virtual exception transport. Go callers format messages with fmt before constructing DefaultException; the C++ varargs/iostream formatter and exception hierarchy are not reproduced. Immutable Go strings own message bytes, and Message preserves the source first-NUL observation."
       ]
     },
     {
       "path": "src/util/z3_exception.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/util/util_z3_exception.go",
+        "pkg/util/z3exception/z3_exception.go",
         "pkg/util/util_memory_fatal_policy.go",
         "pkg/util/util_memory_fatal_policy_test.go"
       ],
@@ -152490,13 +152492,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "exact error-code constants and z3_error labels/code/nonzero guard",
           "status": "ported",
-          "go_target": "pkg/util/util_z3_exception.go",
+          "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
             "TestZ3ExceptionSourceCodesAndLabels",
             "TestDefaultExceptionSourceStringAndEmbeddedNUL"
@@ -152505,21 +152507,23 @@
         {
           "name": "base error_code/has_error_code and default_exception std::string constructor/msg",
           "status": "ported",
-          "go_target": "pkg/util/util_z3_exception.go",
+          "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
             "TestZ3ExceptionSourceCodesAndLabels",
             "TestDefaultExceptionSourceStringAndEmbeddedNUL"
           ]
         },
         {
-          "name": "default_exception fmt/va_list constructor and source printf formatter dependency",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "name": "formatted exception construction through ordinary Go formatting at call sites",
+          "status": "ported",
+          "go_target": "pkg/util/z3exception/z3_exception.go",
+          "tests": [
+            "TestDefaultExceptionSourceStringAndEmbeddedNUL"
+          ]
         },
         {
           "name": "ERR_MEMOUT101/ERR_ALLOC_EXCEEDED113 actual fatal dispatch and out_of_memory_error -> z3_error derived/base Go catch adaptation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/util_memory_fatal_policy.go",
           "tests": [
             "TestMemoryFatalNonExitExceptionCatch",
@@ -152532,7 +152536,7 @@
         "Formatted values use the selected budgeted integer/C-string formatter before caller-owned immutable exception construction. See PORT_PROGRESS.md#audit-printf-port-status-md."
       ],
       "deviations": [
-        "Go cold error interfaces replace virtual throw transport; source nonzero/location assertions use classified guard errors. Formatted constructor selected integer/string profiles are implemented; broader C printf and Windows domains remain open."
+        "Go error values replace virtual exception transport. Go callers format messages with fmt before constructing DefaultException; the C++ varargs/iostream formatter and exception hierarchy are not reproduced. Immutable Go strings own message bytes, and Message preserves the source first-NUL observation."
       ]
     },
     {

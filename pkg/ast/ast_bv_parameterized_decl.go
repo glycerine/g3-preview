@@ -2,11 +2,14 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
 	"math"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-func bvDeclarationError(message string) error { return ASTException{util.NewDefaultException(message)} }
+func bvDeclarationError(message string) error {
+	return ASTException{z3exception.NewDefaultException(message)}
+}
 
 func (m *ASTManager) bitVectorSortWidth(fid FamilyID, h ASTHandle) (int32, bool, error) {
 	r, e := m.requireKind(h, ASTSort)

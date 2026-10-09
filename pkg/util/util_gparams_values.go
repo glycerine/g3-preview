@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Mutable normalization scratch is ordinary Go storage retained for reuse.
@@ -138,7 +139,7 @@ func (g *GlobalParams) exception(parts ...gparamsErrorPart) error {
 			out.WriteString(p.text)
 		}
 	}
-	return NewDefaultException(out.String())
+	return z3exception.NewDefaultException(out.String())
 }
 func (g *GlobalParams) oldName(k Symbol) (bool, error) {
 	for _, name := range gparamsOldNames {
@@ -205,7 +206,7 @@ func (g *GlobalParams) unknownParameter(k Symbol, d *ParamDescrs, module Symbol)
 		return e
 	}
 	out.WriteString(legal)
-	return NewDefaultException(out.String())
+	return z3exception.NewDefaultException(out.String())
 }
 func (g *GlobalParams) findModuleDescriptor(k Symbol) (*ParamDescrs, bool, error) {
 	if e := g.ensureRegistered(); e != nil {

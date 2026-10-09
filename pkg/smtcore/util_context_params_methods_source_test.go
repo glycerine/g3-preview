@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing(t *testing.T) {
@@ -47,7 +48,7 @@ func TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing(t *test
 		old := s.state
 		k = "MoDeL"
 		e = s.Set(&k, &bad)
-		var ex util.DefaultException
+		var ex z3exception.DefaultException
 		want := "invalid value '" + bad + "' for Boolean parameter 'MoDeL'"
 		if !errors.As(e, &ex) || ex.Message() != want || s.state != old {
 			t.Fatal("original name/value exception, no field publication", bad, e)
@@ -57,7 +58,7 @@ func TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing(t *test
 		old := s.state
 		k = "TIMEOUT"
 		e = s.Set(&k, &bad)
-		var ex util.DefaultException
+		var ex z3exception.DefaultException
 		if !errors.As(e, &ex) || ex.Message() != "invalid value '"+bad+"' for unsigned int parameter 'TIMEOUT'" || s.state != old {
 			t.Fatal("scan all digits then reject", bad, e)
 		}
@@ -71,7 +72,7 @@ func TestContextParamsUnknownSetNormalizedKeyLeavesUnusedValueUnreadAndListsExac
 	defer func() { paramsMust(t, s.Close()) }()
 	key := "UNKNOWN-OPTION"
 	e = s.Set(&key, nil)
-	var ex util.DefaultException
+	var ex z3exception.DefaultException
 	if !errors.As(e, &ex) || !strings.HasPrefix(ex.Message(), "unknown parameter 'unknown_option'\nLegal parameters are:\n") {
 		t.Fatal("unknown name branch does not dereference unused value", e)
 	}
@@ -189,7 +190,7 @@ func TestContextParamsEveryUnknownDescriptorAndErrorBufferReservation(t *testing
 		b.FailAfter(ordinal)
 		e = s.Set(&key, nil)
 		contextMethodsCold(t, s, g, b)
-		var ex util.DefaultException
+		var ex z3exception.DefaultException
 		if errors.As(e, &ex) {
 			success = int(ordinal)
 			if !strings.Contains(ex.Message(), "unknown parameter 'an_actual_unknown_parameter_with_external_string_storage'") {
@@ -553,7 +554,7 @@ func TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime(t *tes
 		t.Fatal("reached stale value must fail before bool publication", e)
 	}
 	e = s.SetViews(util.LiteralParamsStringView("unknown"), view)
-	var ex util.DefaultException
+	var ex z3exception.DefaultException
 	if !errors.As(e, &ex) {
 		t.Fatal("unknown branch must leave stale unused value unread", e)
 	}
@@ -579,7 +580,7 @@ func TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation(t *test
 			if s.state != old {
 				t.Fatal("diagnostic never publishes scalar")
 			}
-			var ex util.DefaultException
+			var ex z3exception.DefaultException
 			if errors.As(e, &ex) {
 				kind := "Boolean"
 				if key == "TIMEOUT" {

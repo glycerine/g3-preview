@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Explicit standard-stream service. Go writes emit directly; native ostream
@@ -91,7 +92,7 @@ func (s *MemoryStandardStreams) Close() error {
 }
 
 // Unwrap represents the C++ out_of_memory_error -> z3_error base catch relation.
-type OutOfMemoryError struct{ Z3Error }
+type OutOfMemoryError struct{ z3exception.Z3Error }
 
 func (e OutOfMemoryError) Unwrap() error { return e.Z3Error }
 
@@ -172,7 +173,7 @@ func (s *MemoryFatalContext) HandleMemoryFailure(r *Runtime, f Failure) error {
 	switch f.Kind {
 	case FailureMemout:
 		if !s.exitOOM {
-			return OutOfMemoryError{Z3Error{ErrorMemout}}
+			return OutOfMemoryError{z3exception.MustZ3Error(z3exception.ErrorMemout)}
 		}
 		out, e := s.streams.Stderr()
 		if e != nil {

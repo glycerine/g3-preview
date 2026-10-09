@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Independent bounded modular arithmetic and radix spelling; the production
@@ -304,7 +305,7 @@ func TestASTSMT2BitVectorFalseNumeralActualActionAndErasure(t *testing.T) {
 					t.Fatal("actual false site/action", string(data), state)
 				}
 				if command == "T" {
-					var ex util.DefaultException
+					var ex z3exception.DefaultException
 					if !errors.As(body, &ex) || !got.IsNull() {
 						t.Fatal("actual thrown action", got, body)
 					}

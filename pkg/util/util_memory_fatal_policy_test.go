@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestMemoryFatalStandardStreamsColdGraph(t *testing.T) {
@@ -55,8 +56,8 @@ func TestMemoryFatalNonExitExceptionCatch(t *testing.T) {
 	b.FailAfter(0)
 	h, e := r.Allocate(1)
 	var derived OutOfMemoryError
-	var base Z3Error
-	if !errors.As(e, &derived) || !errors.As(e, &base) || base.ErrorCode() != ErrorMemout || !r.State().OutOfMemory || h != (Block{}) || b.Used() != used {
+	var base z3exception.Z3Error
+	if !errors.As(e, &derived) || !errors.As(e, &base) || base.ErrorCode() != z3exception.ErrorMemout || !r.State().OutOfMemory || h != (Block{}) || b.Used() != used {
 		t.Fatal(h, e, r.State(), b.Used(), used)
 	}
 	b.FailAfter(-1)

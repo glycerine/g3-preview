@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestIntHeapDebugSourceConstructorGate(t *testing.T) {
@@ -119,7 +120,7 @@ func TestIntHeapDebugDisabledExpansionAssertionUsesLiteralOverflow(t *testing.T)
 	c := &h.runtimeQueue.runtimeIndices.Raw
 	heapMust(t, WriteRuntimeWord(r, c.Block, 0, 0))
 	e = h.SetBounds(5)
-	var overflow DefaultException
+	var overflow z3exception.DefaultException
 	if !errors.As(e, &overflow) || overflow.Error() != "Overflow encountered when expanding vector" {
 		t.Fatal("disabled nonnull-capacity SASSERT must reach literal geometric overflow", e)
 	}

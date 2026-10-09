@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 const DebugSourcePrompt = "(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
@@ -46,8 +47,8 @@ func TestDebugActionSubprocessHelper(t *testing.T) {
 	b.FailAfter(0)
 	e = action.InvokeDebugger()
 	if route == "throw" {
-		var ex DefaultException
-		var base Z3Exception
+		var ex z3exception.DefaultException
+		var base z3exception.Z3Exception
 		if !errors.As(e, &ex) || !errors.As(e, &base) || ex.Message() != "assertion violation" || base.HasErrorCode() {
 			os.Exit(95)
 		}
@@ -240,7 +241,7 @@ func TestDebugActionClosedOutputBadbitStillReachesInputAndThrow(t *testing.T) {
 	before := b.Used()
 	b.FailAfter(0)
 	e = a.InvokeDebugger()
-	var ex DefaultException
+	var ex z3exception.DefaultException
 	if !errors.As(e, &ex) || ex.Message() != "assertion violation" {
 		t.Fatal(e)
 	}

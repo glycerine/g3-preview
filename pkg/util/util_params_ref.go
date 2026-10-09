@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 var ErrParamsOwner = errors.New("g3: parameters owner or lifetime mismatch")
@@ -1465,7 +1466,7 @@ func (c *ParamsContext) Validate(v *ParamsRef, d *ParamDescrs) error {
 				return e
 			}
 		}
-		return NewDefaultException(string(c.workspace))
+		return z3exception.NewDefaultException(string(c.workspace))
 	}
 	return nil
 }

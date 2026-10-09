@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 type contextParamsFrame struct {
@@ -271,7 +272,7 @@ func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result err
 	if e != nil {
 		return e
 	}
-	return util.NewDefaultException(text)
+	return z3exception.NewDefaultException(text)
 }
 
 func (f *contextParamsFrame) initBuffer(b *arena.Budget) {
@@ -397,7 +398,7 @@ func (s *ContextParams) sourceInvalidValue(f *contextParamsFrame, kind string, p
 	if e != nil {
 		return e
 	}
-	return util.NewDefaultException(text)
+	return z3exception.NewDefaultException(text)
 }
 
 // The returned value is one actually acquired reference; callers own its Del.
