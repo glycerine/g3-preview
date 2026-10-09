@@ -612,3 +612,8 @@ directly.
 standard library. It uses a concrete `[]uint32`, has no root facade, and is
 ready for the future pattern-inference and arithmetic consumers to import
 directly.
+
+`util/stack` owns the live low-level LIFO byte allocator and its focused page
+recycling tests. It imports `arena` directly, has no dependency on root `util`,
+and exposes no compatibility facade; the future SMT2 parser port should import
+this leaf.

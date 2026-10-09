@@ -1,5 +1,5 @@
 // Source: src/util/stack.h:24-49; src/util/stack.cpp:24-137.
-package util
+package stack
 
 import (
 	"errors"
