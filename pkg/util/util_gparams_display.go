@@ -1,11 +1,7 @@
 // Source: src/util/gparams.cpp:150-160,446-550,623-627; src/util/gparams.h.
 package util
 
-import (
-	"reflect"
-
-	"github.com/glycerine/g3/pkg/arena"
-)
+import "github.com/glycerine/g3/pkg/arena"
 
 // Region bindings are cold borrowed owners. The source stores char* without
 // reading it at registration; closed/stale referents fail only at output.
@@ -21,23 +17,6 @@ func (g *GlobalParams) bindDescriptionRegion(r *arena.BytesRegion) error {
 			}
 			return nil
 		}
-	}
-	if len(g.Bindings) == cap(g.Bindings) {
-		n, e := pdGrowth(cap(g.Bindings))
-		if e != nil {
-			return e
-		}
-		stride := uint64(reflect.TypeOf(GparamsRegionBinding{}).Size())
-		if uint64(n) > uint64(^uint(0)>>1)/stride {
-			return arena.ErrBounds
-		}
-		if e = g.Budget.Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		next := make([]GparamsRegionBinding, len(g.Bindings), n)
-		copy(next, g.Bindings)
-		g.Budget.Release(uint64(cap(g.Bindings)) * stride)
-		g.Bindings = next
 	}
 	g.Bindings = append(g.Bindings, GparamsRegionBinding{origin, r})
 	return nil

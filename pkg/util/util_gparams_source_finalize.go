@@ -1,11 +1,7 @@
 // Source: src/util/gparams.cpp:81-123,633-644; src/util/params.cpp:59-86.
 package util
 
-import (
-	"reflect"
-
-	"github.com/glycerine/g3/pkg/arena"
-)
+import "github.com/glycerine/g3/pkg/arena"
 
 // SourceFinalize executes imp's destructor body and reverse members. A reached
 // error is sticky; only the separate owning adapter may acknowledge its prefix.
@@ -55,7 +51,6 @@ func (g *GlobalParams) sourceFinalizeBody(owning bool) error {
 					if e := g.sourceDecrementValue(&cell.value, owning); e != nil {
 						return e
 					}
-					g.Budget.Release(uint64(reflect.TypeOf(*cell).Size()))
 					g.Cells[g.sourceIndex] = nil
 				}
 				g.sourceIndex++
@@ -103,7 +98,7 @@ func (g *GlobalParams) sourceFinalizeBody(owning bool) error {
 			g.ModuleDescriptors.close()
 			g.sourceStage = 9
 		case 9:
-			g.Budget.Release(uint64(cap(g.Cells))*uint64(reflect.TypeOf((*GparamsRefCell)(nil)).Size()) + uint64(cap(g.Descriptors))*uint64(reflect.TypeOf((*ParamDescrs)(nil)).Size()) + uint64(cap(g.Bindings))*uint64(reflect.TypeOf(GparamsRegionBinding{}).Size()) + g.OwnerBytes)
+			g.Budget.Release(g.OwnerBytes)
 			g.Cells = nil
 			g.Descriptors = nil
 			g.Bindings = nil

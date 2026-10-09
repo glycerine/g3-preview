@@ -2,7 +2,6 @@ package util
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -13,12 +12,7 @@ func gparamsVectorGraph(s arena.VectorStats) uint64 {
 	return s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 }
 func gparamsGraph(g *GlobalParams) uint64 {
-	n := g.OwnerBytes + uint64(cap(g.Bindings))*uint64(reflect.TypeOf(GparamsRegionBinding{}).Size()) + uint64(cap(g.Cells))*uint64(reflect.TypeOf((*GparamsRefCell)(nil)).Size()) + uint64(cap(g.Descriptors))*uint64(reflect.TypeOf((*ParamDescrs)(nil)).Size())
-	for _, x := range g.Cells {
-		if x != nil {
-			n += uint64(reflect.TypeOf(*x).Size())
-		}
-	}
+	n := g.OwnerBytes
 	count := func(d *ParamDescrs) uint64 {
 		if d == nil || d.Budget != g.Budget {
 			return 0
@@ -32,8 +26,8 @@ func gparamsGraph(g *GlobalParams) uint64 {
 	}
 	return n
 }
-func TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph(t *testing.T) {
-	failures, successes := 0, 0
+func TestGlobalParamsSetterUsesGoNormalizationStorage(t *testing.T) {
+	successes := 0
 	for prefix := int64(0); prefix < 45; prefix++ {
 		g, ctx, sy, b := gparamsRealRegistry(t)
 		paramsMust(t, g.ensureRegistered())
@@ -45,13 +39,9 @@ func TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph(t *testing.T) {
 		e = g.SetName("sat.text", "a genuinely borrowed string")
 		b.FailAfter(-1)
 		if e != nil {
-			if !errors.Is(e, arena.ErrInjectedFailure) {
-				t.Fatal(prefix, e)
-			}
-			failures++
-		} else {
-			successes++
+			t.Fatal(prefix, e)
 		}
+		successes++
 		if b.Used() != gparamsGraph(g) {
 			t.Fatalf("prefix%d owned%d actual%d", prefix, gparamsGraph(g), b.Used())
 		}
@@ -70,8 +60,8 @@ func TestGlobalParamsSetterFaultPrefixesImmediateOwnedGraph(t *testing.T) {
 			t.Fatal(prefix, b.Used())
 		}
 	}
-	if failures == 0 || successes == 0 {
-		t.Fatal(failures, successes)
+	if successes != 45 {
+		t.Fatal(successes)
 	}
 }
 func TestGlobalParamsActualSATCollectorCurrentSharedRegistry(t *testing.T) {
@@ -184,9 +174,8 @@ func TestGlobalParamsDescriptionBindingAndMapPublication(t *testing.T) {
 	paramsMust(t, e)
 	defer r.Close()
 	ref := gparamsDescriptionBytes(t, r, "actual borrowed text")
-	// The binding is budgeted; publication into the Go map adds no simulated
-	// C++ table-allocation failure point.
-	b.FailAfter(1)
+	// The borrowed binding and map publication are ordinary Go storage.
+	b.FailAfter(0)
 	e = g.RegisterModuleDescription("sat", r, ref, 0)
 	b.FailAfter(-1)
 	if e != nil || len(g.Bindings) != 1 || g.ModuleDescriptions.size() != 8 {

@@ -350,7 +350,10 @@ module descriptions use built-in maps because they are lookup-only. Destruction
 walks the existing indexed owner slices, so cached hashes, tombstones, bucket
 geometry, table allocation accounting, and shrink-failure states are gone.
 Name-normalization scratch and its temporary string bridge are ordinary Go
-storage and no longer consume the arena budget.
+storage and no longer consume the arena budget. The descriptor directory,
+stable parameter cells, and borrowed description-region bindings also use
+ordinary Go slices and heap objects; only their arena-owned descendants remain
+in explicit memory accounting.
 
 The live parameter-descriptor dictionary now uses
 `insdict.Dict[Symbol, paramDescrInfo]`. Copy traversal follows stable insertion

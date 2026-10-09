@@ -194,27 +194,6 @@ func (g *GlobalParams) moduleDescriptor(k Symbol) (*ParamDescrs, error) {
 	}
 	return g.Descriptors[n-1], nil
 }
-func (g *GlobalParams) growDescriptors() error {
-	if len(g.Descriptors) < cap(g.Descriptors) {
-		return nil
-	}
-	n, e := pdGrowth(cap(g.Descriptors))
-	if e != nil {
-		return e
-	}
-	stride := uint64(reflect.TypeOf((*ParamDescrs)(nil)).Size())
-	if uint64(n) > uint64(^uint(0)>>1)/stride {
-		return arena.ErrBounds
-	}
-	if e = g.Budget.Reserve(uint64(n) * stride); e != nil {
-		return e
-	}
-	next := make([]*ParamDescrs, len(g.Descriptors), n)
-	copy(next, g.Descriptors)
-	g.Budget.Release(uint64(cap(g.Descriptors)) * stride)
-	g.Descriptors = next
-	return nil
-}
 func (g *GlobalParams) registerModule(name string, d *ParamDescrs) error {
 	if e := g.open(); e != nil {
 		return e
@@ -245,9 +224,6 @@ func (g *GlobalParams) registerModule(name string, d *ParamDescrs) error {
 	if uint64(len(g.Descriptors)) >= uint64(^uint32(0)) {
 		return arena.ErrBounds
 	}
-	if e = g.growDescriptors(); e != nil {
-		return e
-	}
 	slot := uint32(len(g.Descriptors) + 1)
 	g.ModuleDescriptors.set(k, slot)
 	g.Descriptors = append(g.Descriptors, d)
@@ -272,27 +248,6 @@ func (g *GlobalParams) RegisterGlobal(d *ParamDescrs) error {
 	}
 	return g.GlobalDescriptors.Copy(d)
 }
-func (g *GlobalParams) growCells() error {
-	if len(g.Cells) < cap(g.Cells) {
-		return nil
-	}
-	n, e := pdGrowth(cap(g.Cells))
-	if e != nil {
-		return e
-	}
-	stride := uint64(reflect.TypeOf((*GparamsRefCell)(nil)).Size())
-	if uint64(n) > uint64(^uint(0)>>1)/stride {
-		return arena.ErrBounds
-	}
-	if e = g.Budget.Reserve(uint64(n) * stride); e != nil {
-		return e
-	}
-	next := make([]*GparamsRefCell, len(g.Cells), n)
-	copy(next, g.Cells)
-	g.Budget.Release(uint64(cap(g.Cells)) * stride)
-	g.Cells = next
-	return nil
-}
 func (g *GlobalParams) GetParams(k Symbol) (*ParamsRef, error) {
 	if e := g.open(); e != nil {
 		return nil, e
@@ -309,13 +264,8 @@ func (g *GlobalParams) GetParams(k Symbol) (*ParamsRef, error) {
 		}
 		return &g.Cells[n-1].value, nil
 	}
-	bytes := uint64(reflect.TypeOf(GparamsRefCell{}).Size())
-	if e := g.Budget.Reserve(bytes); e != nil {
-		return nil, e
-	}
 	v, e := g.ContextField.NewValue()
 	if e != nil {
-		g.Budget.Release(bytes)
 		return nil, e
 	}
 	cell := &GparamsRefCell{v}
@@ -329,14 +279,8 @@ func (g *GlobalParams) GetParams(k Symbol) (*ParamsRef, error) {
 		}
 	}
 	if uint64(slot) >= uint64(^uint32(0)) {
-		g.Budget.Release(bytes)
+		_ = g.ContextField.Del(&v)
 		return nil, arena.ErrBounds
-	}
-	if slot == len(g.Cells) {
-		if e = g.growCells(); e != nil {
-			g.Budget.Release(bytes)
-			return nil, e
-		}
 	}
 	n := uint32(slot + 1)
 	g.ModuleParams.set(k, n)
@@ -405,7 +349,6 @@ func (g *GlobalParams) reset() error {
 		if e := g.ContextField.Del(&cell.value); e != nil {
 			return e
 		}
-		g.Budget.Release(uint64(reflect.TypeOf(*cell).Size()))
 		g.Cells[i-1] = nil
 	}
 	g.ModuleParams.reset()
@@ -464,7 +407,7 @@ func (g *GlobalParams) closeLegacy() error {
 	g.ModuleParams.close()
 	g.ModuleDescriptions.close()
 	g.ModuleDescriptors.close()
-	g.Budget.Release(uint64(cap(g.Cells))*uint64(reflect.TypeOf((*GparamsRefCell)(nil)).Size()) + uint64(cap(g.Descriptors))*uint64(reflect.TypeOf((*ParamDescrs)(nil)).Size()) + uint64(cap(g.Bindings))*uint64(reflect.TypeOf(GparamsRegionBinding{}).Size()) + g.OwnerBytes)
+	g.Budget.Release(g.OwnerBytes)
 	g.Cells = nil
 	g.Descriptors = nil
 	g.Bindings = nil

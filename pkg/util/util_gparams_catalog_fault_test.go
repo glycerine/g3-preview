@@ -70,11 +70,11 @@ func TestGlobalParamsCatalogConstructorFailureAndDomains(t *testing.T) {
 		t.Fatal(e)
 	}
 }
-func TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription(t *testing.T) {
+func TestGlobalParamsCatalogDispatcherFaultRoots(t *testing.T) {
 	ctx, sy, _ := paramsTestOwner(t)
 	// Actual complete dispatcher reservation threshold, discovered by bounded
 	// doubling then binary search. No mock callback or budget-counter bypass.
-	run := func(prefix int64, inspect bool) (bool, bool, bool) {
+	run := func(prefix int64, inspect bool) (bool, bool) {
 		b := arena.NewBudget(^uint64(0))
 		c, e := NewGlobalParamsCatalog(sy, catalogTestConfig(b))
 		paramsMust(t, e)
@@ -85,7 +85,6 @@ func TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription(t *testing.T)
 		b.FailAfter(-1)
 		ok := e == nil
 		pending := c.Pending != nil
-		late := !ok && g.ModuleDescriptors.size() == 19 && c.Pending == nil
 		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
 			t.Fatal(prefix, e)
 		}
@@ -116,11 +115,11 @@ func TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription(t *testing.T)
 		if b.Used() != 0 {
 			t.Fatal(prefix, b.Used())
 		}
-		return ok, pending, late
+		return ok, pending
 	}
 	lo, hi := int64(-1), int64(1)
 	for {
-		ok, _, _ := run(hi, false)
+		ok, _ := run(hi, false)
 		if ok {
 			break
 		}
@@ -132,7 +131,7 @@ func TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription(t *testing.T)
 	}
 	for hi-lo > 1 {
 		mid := (hi + lo) / 2
-		ok, _, _ := run(mid, false)
+		ok, _ := run(mid, false)
 		if ok {
 			hi = mid
 		} else {
@@ -140,17 +139,16 @@ func TestGlobalParamsCatalogDispatcherFaultRootsAndLateDescription(t *testing.T)
 		}
 	}
 	total := hi
-	pending, late := false, false
+	pending := false
 	for _, prefix := range []int64{0, 1, 2, 3, 4, total / 8, total / 4, total / 2, 3 * total / 4, total - 2, total - 1, total} {
-		ok, p, l := run(prefix, true)
+		ok, p := run(prefix, true)
 		pending = pending || p
-		late = late || l
 		if (prefix == total) != ok {
 			t.Fatal("threshold", prefix, total, ok)
 		}
 	}
-	if !pending || !late {
-		t.Fatal("missing actual module and late-description prefix", total, pending, late)
+	if !pending {
+		t.Fatal("missing actual module descriptor prefix", total)
 	}
 	t.Log("actual complete registration reserve threshold", total)
 }
