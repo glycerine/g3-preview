@@ -143,7 +143,7 @@ func TestUPolynomialHenselImportedBindingFailurePrefixes(t *testing.T) {
 				t.Fatal("cold refusal changed factor ownership", pf.Stats(), lf.Stats())
 			}
 			immediate := m.Stats()
-			if immediate.IntegerLiveCells != beforeNumeric.IntegerLiveCells || immediate.IntegerWordsRefs != beforeNumeric.IntegerWordsRefs {
+			if immediate.IntegerLiveCells != beforeNumeric.IntegerLiveCells {
 				t.Fatal("cold prefix changed numeric roots", immediate, beforeNumeric)
 			}
 			v, e := pf.FactorView(0)

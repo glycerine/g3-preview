@@ -275,10 +275,6 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 		_, e := z.Allocator.ObjectExtent(z.PendingCell.Object)
 		serviceMust(t, e)
 	}
-	words := map[arena.VectorRef]bool{}
-	if uint32(len(words)) != z.Words.Stats().Live {
-		t.Fatal("unnamed live Words payload", len(words), z.Words.Stats().Live)
-	}
 	rawRoots := map[util.Block]bool{}
 	addRaw := func(block util.Block) {
 		if block != (util.Block{}) {

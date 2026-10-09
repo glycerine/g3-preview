@@ -193,8 +193,8 @@ func TestIntegerSourceSentinelSlotLimitReachedAllocation(t *testing.T) {
 		t.Fatal("pending capacity/root", cap, len(actual))
 	}
 	// The borrowed runtime and the real cold adapters are counted once each.
-	ws := z.Words.Stats()
-	owned := z.HeaderBytes + r.Stats().TotalBytes + z.Allocator.Stats().TotalBytes + cs.OwnerBytes + cs.RecordBytes + cs.MetadataBytes + cs.DirectoryBytes + ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes
+
+	owned := z.HeaderBytes + r.Stats().TotalBytes + z.Allocator.Stats().TotalBytes + cs.OwnerBytes + cs.RecordBytes + cs.MetadataBytes + cs.DirectoryBytes
 	if z.Natural != nil || owned != b.Used() {
 		t.Fatal("actual immediate retained graph", owned, b.Used())
 	}

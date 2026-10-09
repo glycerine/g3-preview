@@ -2,13 +2,12 @@
 package util
 
 type NumericStorageStats struct {
-	LiveCells, CellSlots, RetiredCells, WordsRefs, CachedCells uint32
+	LiveCells, CellSlots, RetiredCells, CachedCells uint32
 }
 
 func (z *IntegerManager) StorageStats() (s NumericStorageStats) {
 	cells := z.Cells.Stats()
 	s.LiveCells, s.CellSlots, s.RetiredCells = cells.Live, cells.Slots, cells.Retired
-	s.WordsRefs = z.Words.Stats().Live
 	for _, ref := range z.Tmp {
 		if ValidNumericRef(z.Cells, ref) {
 			s.CachedCells++

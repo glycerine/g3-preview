@@ -94,7 +94,7 @@ func upolyHenselPhysicalFixture(t *testing.T) (*UPolynomialManager, *UPolynomial
 	return m, prime, lift, donor, pf, lf, service, mustUPolyView(t, m, f), captured, b
 }
 
-type upolyHenselPhysicalGraph struct{ Named, Unpublished, Cleanup, Pending, Objects, Words uint32 }
+type upolyHenselPhysicalGraph struct{ Named, Unpublished, Cleanup, Pending, Objects uint32 }
 
 // Read-only independent physical ownership audit. Reflection reads scalar
 // metadata; it neither borrows mutable payloads nor repairs failed numerals.
@@ -411,11 +411,6 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*UPolynomialManager, factors
 		}
 	}
 	// Numeral and Natural storage no longer publish Words descriptors.
-	words := testFieldBySourceName(testFieldBySourceName(z, "words").Elem(), "descriptors").Elem()
-	graph.Words = 0
-	if uint64(graph.Words) != testFieldBySourceName(words, "live").Uint() {
-		t.Fatal("unexpected numeric Words descriptor", graph.Words, testFieldBySourceName(words, "live").Uint())
-	}
 	return graph
 }
 

@@ -425,13 +425,13 @@ func TestRationalServiceCrossOwnerFailureAndSameOwnerCopy(t *testing.T) {
 	for n := int64(0); n < 70; n++ {
 		dest, b := serviceNew(t)
 		out := serviceValue(t, dest, "3")
-		cells, words := dest.Manager.Z.Cells.Stats().Live, dest.Manager.Z.Words.Stats().Live
+		cells := dest.Manager.Z.Cells.Stats().Live
 		b.FailAfter(n)
 		e := dest.CopyFrom(&out, source, &input)
 		b.FailAfter(-1)
 		if e != nil {
 			failures++
-			if !numericPhysicalReservationRefusal(e) || dest.Manager.Z.Cells.Stats().Live != cells || dest.Manager.Z.Words.Stats().Live != words {
+			if !numericPhysicalReservationRefusal(e) || dest.Manager.Z.Cells.Stats().Live != cells {
 				t.Fatal(n, e, "immediate temporary ownership leak")
 			}
 			serviceText(t, dest, &out, "3")

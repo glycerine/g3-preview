@@ -525,10 +525,6 @@ func (m *ArbitraryFloatManager) OwnedStorageBytes() uint64 {
 			s := z.Cells.Stats()
 			n += s.OwnerBytes + s.RecordBytes + s.MetadataBytes + s.DirectoryBytes
 		}
-		if z.Words != nil {
-			s := z.Words.Stats()
-			n += s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + s.Descriptors.OwnerBytes + s.Descriptors.RecordBytes + s.Descriptors.MetadataBytes + s.Descriptors.DirectoryBytes
-		}
 		if z.Natural != nil {
 			n += z.Natural.HeaderBytes
 			if z.Natural.Text != nil {

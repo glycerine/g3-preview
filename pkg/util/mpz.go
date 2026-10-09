@@ -42,7 +42,7 @@ type IntegerConfig struct {
 // IntegerManager owns all persistent source cells, two reusable result
 // cells, two one-limb argument cells, and the source intMin/two64 constants.
 // Single-owner confinement replaces the source synchronized OpenMP variant.
-// Cells, transitional Natural Words and the actual memory backend share one Budget.
+// Cells, Natural output configuration and the memory backend share one Budget.
 // Close invalidates every live numeral; a supplied Runtime is borrowed.
 type IntegerManager struct {
 	stringSet       integerStringSetScope
@@ -72,10 +72,9 @@ type IntegerManager struct {
 	PendingCell                            SourceCellBacking
 	originalCause, CleanupCauseField       error
 	Cells                                  *numericCellSlab
-	Words                                  *arena.Words
 	Tmp, Arg                               [2]NumericCellRef
 	FailedRef, FailedNullRef               NumericCellRef  // permanently dead, charged auxiliary descriptor
-	Natural                                *NaturalManager // child borrows this manager's Words and Budget
+	Natural                                *NaturalManager // child borrows this manager's Runtime and Budget
 	IntMin, Two64                          Int
 	PowerRaw                               integerPowerScope
 	powerGeneration                        uint64
@@ -165,12 +164,6 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 		return nil, m // the already charged owner retains the actual cold roots
 	}
 	m.FailedNullRef = MakeNumericRef(slot, gen)
-	// Actual Natural Words scratch is retained only during the staged backend
-	// migration. It does not hold numeric cells or duplicate physical digits.
-	m.Words, e = arena.NewWords(config.Words)
-	if e != nil {
-		return fail(e)
-	}
 	m.Natural, e = newNaturalManagerWithMemory(config.Words, m.Memory)
 	if e != nil {
 		return fail(e)
@@ -626,9 +619,6 @@ func (m *IntegerManager) CloseChecked() error {
 			return fail(e)
 		}
 		m.Natural = nil
-	}
-	if m.Words != nil {
-		m.Words.Close()
 	}
 	if m.Allocator != nil {
 		if e := m.Allocator.CleanupPending(); e != nil {

@@ -165,7 +165,7 @@ func TestNaturalSourceStatsCountsActualOverflowOnly(t *testing.T) {
 	if after.NaturalPayloads != before.NaturalPayloads+3 || after.LivePayloads != before.LivePayloads+3 {
 		t.Fatal("actual u/v/ms overflow roots absent from Stats", before, after)
 	}
-	if n.Division[3].Raw != (Block{}) || s.Manager.Z.Words.Stats().Live != 0 {
+	if n.Division[3].Raw != (Block{}) {
 		t.Fatal("inline or obsolete Words counted as actual overflow")
 	}
 }

@@ -360,13 +360,6 @@ func paramsDecAuditColdGraph(t *testing.T, q *RationalService, m *IntegerManager
 		return bytes
 	}
 	n += slabBytes(testFieldBySourceName(z, "cells").Elem())
-	words := testFieldBySourceName(z, "words").Elem()
-	n += uint64(words.Type().Size()) + slabBytes(testFieldBySourceName(words, "descriptors").Elem()) + testFieldBySourceName(words, "directoryBytes").Uint()
-	pages := testFieldBySourceName(words, "pages")
-	for i := 0; i < pages.Len(); i++ {
-		page := pages.Index(i)
-		n += uint64(testFieldBySourceName(page, "data").Len())*4 + uint64(testFieldBySourceName(page, "next").Len())*4
-	}
 	nat := testFieldBySourceName(z, "natural").Elem()
 	n += testFieldBySourceName(nat, "headerBytes").Uint()
 	if !testFieldBySourceName(nat, "text").IsNil() {

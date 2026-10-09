@@ -148,9 +148,6 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 			t.Fatal("invalid pending object", e)
 		}
 	}
-	if m.Words.Stats().Live != 0 {
-		t.Fatal("unexpected numeric Words descriptor", m.Words.Stats().Live)
-	}
 	raw := map[Block]bool{}
 	if parent := m.MpfParent; parent != nil {
 		for s := parent.FormatScopes; s != nil; s = s.Next {
@@ -459,10 +456,10 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []Blo
 }
 
 func integerActualOwnedBytes(m *IntegerManager) uint64 {
-	cs, ws := m.Cells.Stats(), m.Words.Stats()
+	cs := m.Cells.Stats()
 	n := m.HeaderBytes + m.Natural.HeaderBytes + m.Memory.Stats().TotalBytes + m.Allocator.Stats().TotalBytes
 	n += cs.OwnerBytes + cs.RecordBytes + cs.MetadataBytes + cs.DirectoryBytes
-	n += ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes
+
 	if m.Natural.Text != nil {
 		s := m.Natural.Text.Stats()
 		n += s.OwnerBytes + s.PayloadBytes + s.MetadataBytes + s.DirectoryBytes
@@ -477,7 +474,7 @@ type numericWarmSnapshot struct {
 	used, owned, size, count uint64
 	runtime                  RuntimeStats
 	allocator                AllocatorStats
-	cells, words             uint32
+	cells                    uint32
 }
 
 func numericWarmProfileSnapshot(t *testing.T, m *IntegerManager, b *arena.Budget) numericWarmSnapshot {
@@ -490,12 +487,12 @@ func numericWarmProfileSnapshot(t *testing.T, m *IntegerManager, b *arena.Budget
 	if e != nil {
 		t.Fatal(e)
 	}
-	return numericWarmSnapshot{b.Used(), integerActualOwnedBytes(m), size, count, m.Memory.Stats(), m.Allocator.Stats(), m.Cells.Stats().Live, m.Words.Stats().Live}
+	return numericWarmSnapshot{b.Used(), integerActualOwnedBytes(m), size, count, m.Memory.Stats(), m.Allocator.Stats(), m.Cells.Stats().Live}
 }
 func numericWarmProfileAudit(t *testing.T, m *IntegerManager, b *arena.Budget, before numericWarmSnapshot, goAllocs float64, sourceEvents bool) {
 	t.Helper()
 	after := numericWarmProfileSnapshot(t, m, b)
-	if after.used != before.used || after.owned != before.owned || after.size != before.size || after.runtime != before.runtime || after.allocator != before.allocator || after.cells != before.cells || after.words != before.words {
+	if after.used != before.used || after.owned != before.owned || after.size != before.size || after.runtime != before.runtime || after.allocator != before.allocator || after.cells != before.cells {
 		t.Fatal("warmed actual physical graph changed", before, after)
 	}
 	if sourceEvents {

@@ -73,16 +73,13 @@ func TestRationalServiceInfinitesimalFinalizerTraversal(t *testing.T) {
 		serviceMust(t, s.Manager.SetString(component, "123456789012345678901234567891/99887766554433221101"))
 		refs = append(refs, component.Num.Cell, component.Den.Cell)
 	}
-	cells, words := s.Manager.Z.Cells.Stats().Live, s.Manager.Z.Words.Stats().Live
+	cells := s.Manager.Z.Cells.Stats().Live
 	s.mu.Lock()
 	s.destroyInfinitesimalConstants()
 	s.mu.Unlock()
 	// Audit before any formatting, caller cleanup, or manager Close.
 	if got := s.Manager.Z.Cells.Stats().Live; got != cells-uint32(len(refs)) {
 		t.Fatalf("constant cells: %d, want %d", got, cells-uint32(len(refs)))
-	}
-	if got := s.Manager.Z.Words.Stats().Live; got != words {
-		t.Fatalf("retained actual formatter payloads: %d, want %d", got, words)
 	}
 	serviceAuditRationalRoots(t, s)
 	if len(s.Cache) != cacheLen || s.Cache[40].Num.Cell != cacheRef {

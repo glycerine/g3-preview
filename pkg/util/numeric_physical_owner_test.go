@@ -186,7 +186,7 @@ func numericPhysicalExtraNumerals(extras []numericPhysicalExtraOwners, addInt fu
 	}
 }
 
-type numericPhysicalGraph struct{ Named, Unpublished, Cleanup, Pending, Objects, Words uint32 }
+type numericPhysicalGraph struct{ Named, Unpublished, Cleanup, Pending, Objects uint32 }
 
 // Read-only independent physical ownership audit. Reflection reads scalar
 // metadata; it neither borrows mutable payloads nor repairs failed numerals.
@@ -402,10 +402,5 @@ func numericAuditPhysical(t *testing.T, manager *IntegerManager, extras ...numer
 		}
 	}
 	// Numeral and Natural storage no longer publish Words descriptors.
-	words := testFieldBySourceName(testFieldBySourceName(z, "words").Elem(), "descriptors").Elem()
-	graph.Words = 0
-	if uint64(graph.Words) != testFieldBySourceName(words, "live").Uint() {
-		t.Fatal("unexpected numeric Words descriptor", graph.Words, testFieldBySourceName(words, "live").Uint())
-	}
 	return graph
 }

@@ -127,10 +127,6 @@ func constructionFailureOwningCleanup(t *testing.T, e error, b *arena.Budget) {
 			}
 		}
 	}
-	if m.Words != nil {
-		s := m.Words.Stats()
-		owned += s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + s.Descriptors.OwnerBytes + s.Descriptors.RecordBytes + s.Descriptors.MetadataBytes + s.Descriptors.DirectoryBytes
-	}
 	if m.Natural != nil {
 		t.Fatal("member unwind did not destroy Natural before allocator refusal")
 	}

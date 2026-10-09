@@ -44,7 +44,7 @@ func TestRationalServiceStatsCountsActualNumericPayloads(t *testing.T) {
 		seen[id] = true
 		objects++
 	}
-	if objects != after.LiveCells || after.LiveNumericObjects != objects || after.PendingCellObjects != 0 || after.RetainedCellDescriptors != 0 || after.NaturalPayloads != z.Words.Stats().Live || after.LivePayloads != objects+z.Words.Stats().Live {
+	if objects != after.LiveCells || after.LiveNumericObjects != objects || after.PendingCellObjects != 0 || after.RetainedCellDescriptors != 0 || after.NaturalPayloads != 0 || after.LivePayloads != objects {
 		t.Fatal("payload graph must include actual cells and genuine Natural buffers", objects, after)
 	}
 }

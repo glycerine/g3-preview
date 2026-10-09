@@ -68,10 +68,6 @@ func arbitraryFloatSourceCold(t *testing.T, m *ArbitraryFloatManager, r *Runtime
 			v := z.Cells.Stats()
 			n += v.OwnerBytes + v.RecordBytes + v.MetadataBytes + v.DirectoryBytes
 		}
-		if z.Words != nil {
-			v := z.Words.Stats()
-			n += v.OwnerBytes + v.PayloadBytes + v.BlockMetadataBytes + v.DirectoryBytes + v.Descriptors.OwnerBytes + v.Descriptors.RecordBytes + v.Descriptors.MetadataBytes + v.Descriptors.DirectoryBytes
-		}
 		if z.Natural != nil {
 			n += z.Natural.HeaderBytes
 			if z.Natural.Text != nil {

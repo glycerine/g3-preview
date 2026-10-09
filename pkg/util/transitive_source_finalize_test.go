@@ -378,8 +378,7 @@ func transitiveSourceAudit(t *testing.T, m *RationalManager, s *RationalService,
 	a := z.Allocator.Stats()
 	rawBuffers := map[Block]bool{}
 	owned := m.HeaderBytes + z.HeaderBytes + z.Memory.Stats().TotalBytes + a.TotalBytes + cs.OwnerBytes + cs.RecordBytes + cs.MetadataBytes + cs.DirectoryBytes
-	ws := z.Words.Stats()
-	owned += ws.OwnerBytes + ws.PayloadBytes + ws.BlockMetadataBytes + ws.DirectoryBytes + ws.Descriptors.OwnerBytes + ws.Descriptors.RecordBytes + ws.Descriptors.MetadataBytes + ws.Descriptors.DirectoryBytes
+
 	if z.Natural != nil {
 		n := z.Natural
 		owned += n.HeaderBytes

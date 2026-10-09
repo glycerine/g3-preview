@@ -174,10 +174,6 @@ func sourcePreparedGraph(t *testing.T, s *RationalService, r *Runtime) {
 			q := z.Cells.Stats()
 			want += q.OwnerBytes + q.RecordBytes + q.MetadataBytes + q.DirectoryBytes
 		}
-		if z.Words != nil {
-			q := z.Words.Stats()
-			want += q.OwnerBytes + q.PayloadBytes + q.BlockMetadataBytes + q.DirectoryBytes + q.Descriptors.OwnerBytes + q.Descriptors.RecordBytes + q.Descriptors.MetadataBytes + q.Descriptors.DirectoryBytes
-		}
 		if z.Natural != nil && z.Natural.Text != nil {
 			q := z.Natural.Text.Stats()
 			want += q.OwnerBytes + q.PayloadBytes + q.MetadataBytes + q.DirectoryBytes
@@ -281,9 +277,6 @@ func sourcePreparedEarlyIntegerPhysical(t *testing.T, m *IntegerManager) {
 		} else if e != nil {
 			t.Fatal("pending constructor extent", e)
 		}
-	}
-	if m.Words != nil && m.Words.Stats().Live != 0 {
-		t.Fatal("unnamed early Words root")
 	}
 	a := m.Allocator.Stats()
 	if m.Memory.Stats().LiveBlocks != a.Chunks+a.DirectObjects+a.PendingBlocks+uint32(len(closedRaw)) {

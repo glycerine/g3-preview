@@ -44,9 +44,6 @@ func TestNaturalMandatoryIntegerBorrowsActualRuntime(t *testing.T) {
 	if z.Natural.RuntimeOwner() != z.RuntimeOwner() {
 		t.Fatal("disconnected numeric Natural runtime")
 	}
-	if z.Words.Stats().Live != 0 {
-		t.Fatal("Natural inline storage still uses Words records")
-	}
 	if e = z.CloseChecked(); e != nil {
 		t.Fatal(e)
 	}

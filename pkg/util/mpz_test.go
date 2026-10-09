@@ -80,7 +80,7 @@ func TestIntegerSourceIntMinSubtraction(t *testing.T) {
 
 func TestIntegerConstructorOwnership(t *testing.T) {
 	m, _ := integerManager(t)
-	if m.Cells.Stats().Live != 6 || m.Words.Stats().Live != 0 {
+	if m.Cells.Stats().Live != 6 {
 		t.Fatal("six actual source objects; four actual inline Natural buffers have no allocated payload")
 	}
 	var objects [6]ObjectRef
@@ -322,14 +322,14 @@ func TestIntegerFailurePublication(t *testing.T) {
 		m, budget := integerManager(t)
 		a := NewInt(17)
 		before := m.Cells.Stats().Live
-		beforeWords := m.Words.Stats().Live
+
 		budget.FailAfter(after)
 		digits := make([]uint32, 33)
 		digits[len(digits)-1] = 1
 		err := m.SetLimbs(&a, digits)
 		budget.FailAfter(-1)
 		if err != nil {
-			if a.Val != 1 || a.Cell != m.FailedNullRef || m.Cells.Stats().Live != before || m.Words.Stats().Live != beforeWords {
+			if a.Val != 1 || a.Cell != m.FailedNullRef || m.Cells.Stats().Live != before {
 				t.Fatalf("source allocation failure %d sign/token/roots", after)
 			}
 			if _, e := m.Int64(&a); e != arena.ErrInvalidSlot {

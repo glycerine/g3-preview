@@ -645,7 +645,7 @@ func TestInfIntRationalIncrementSourceRationalRoute(t *testing.T) {
 			}
 			ab.FailAfter(-1)
 			rb.FailAfter(-1)
-			if (got == nil) != (want == nil) || !errors.Is(got, want) || ab.Used() != rb.Used() || actual.Manager.Z.Cells.Stats().Live != reference.Manager.Z.Cells.Stats().Live || actual.Manager.Z.Words.Stats().Live != reference.Manager.Z.Words.Stats().Live {
+			if (got == nil) != (want == nil) || !errors.Is(got, want) || ab.Used() != rb.Used() || actual.Manager.Z.Cells.Stats().Live != reference.Manager.Z.Cells.Stats().Live {
 				t.Fatalf("source rational route differs dec=%v prefix=%d errors=%v/%v used=%d/%d", dec, n, got, want, ab.Used(), rb.Used())
 			}
 			x, e := actual.Manager.String(&a.First)
@@ -731,13 +731,13 @@ func TestInfIntRationalPostFailureAndGetterIndependence(t *testing.T) {
 	// result's numerical storage or publishing a returned owning token.
 	a.second = math.MinInt32
 	a.First.Num.Val = -1
-	cells, words := s.Manager.Z.Cells.Stats().Live, s.Manager.Z.Words.Stats().Live
+	cells := s.Manager.Z.Cells.Stats().Live
 	neg, e := s.InfIntNegCopy(&a)
-	if !errors.Is(e, ErrInfIntOverflow) || neg.ownerID != 0 || s.Manager.Z.Cells.Stats().Live != cells || s.Manager.Z.Words.Stats().Live != words {
+	if !errors.Is(e, ErrInfIntOverflow) || neg.ownerID != 0 || s.Manager.Z.Cells.Stats().Live != cells {
 		t.Fatal(e)
 	}
 	ab, e := s.InfIntAbs(&a)
-	if !errors.Is(e, ErrInfIntOverflow) || ab.ownerID != 0 || s.Manager.Z.Cells.Stats().Live != cells || s.Manager.Z.Words.Stats().Live != words {
+	if !errors.Is(e, ErrInfIntOverflow) || ab.ownerID != 0 || s.Manager.Z.Cells.Stats().Live != cells {
 		t.Fatal(e)
 	}
 	serviceMust(t, s.InfIntDel(&a))

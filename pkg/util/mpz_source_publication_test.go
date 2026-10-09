@@ -43,14 +43,14 @@ func mpzPublicationOwnerProfile(t *testing.T, profile SmallAllocatorProfile) (*I
 }
 
 type mpzPublicationRoots struct {
-	cells, words uint32
-	bytes        uint64
-	physical     uint64
-	chunks       uint32
+	cells    uint32
+	bytes    uint64
+	physical uint64
+	chunks   uint32
 }
 
 func mpzPublicationSnapshot(m *IntegerManager, b *arena.Budget) mpzPublicationRoots {
-	return mpzPublicationRoots{cells: m.Cells.Stats().Live, words: m.Words.Stats().Live, bytes: b.Used(), physical: m.Memory.Stats().PhysicalBytes, chunks: m.Allocator.Stats().Chunks}
+	return mpzPublicationRoots{cells: m.Cells.Stats().Live, bytes: b.Used(), physical: m.Memory.Stats().PhysicalBytes, chunks: m.Allocator.Stats().Chunks}
 }
 
 func mpzPublicationExpectFreed(t *testing.T, m *IntegerManager, b *arena.Budget, old NumericCellRef, before mpzPublicationRoots) {
@@ -59,7 +59,7 @@ func mpzPublicationExpectFreed(t *testing.T, m *IntegerManager, b *arena.Budget,
 	if ValidNumericRef(m.Cells, old) {
 		t.Error("source old cell is still live after free-before-allocate failure")
 	}
-	if after.cells+1 != before.cells || after.words != before.words {
+	if after.cells+1 != before.cells {
 		t.Errorf("source old ownership not released: before=%+v after=%+v", before, after)
 	}
 	// Release pooling retains the actual chunk. Debug NonWindows allocates
@@ -420,7 +420,7 @@ func TestIntegerSourceTmpUnsignedCapacityGuardAfterOldFree(t *testing.T) {
 			t.Fatal("replacement source size synthesized", err)
 		}
 		after := mpzPublicationSnapshot(m, b)
-		if after.cells != before.cells || after.words != before.words || after.physical != before.physical+8192+uint64(m.Memory.SizeTBits()/8) {
+		if after.cells != before.cells || after.physical != before.physical+8192+uint64(m.Memory.SizeTBits()/8) {
 			t.Fatal("actual new class chunk prefix", before, after)
 		}
 		if e = m.prepareTmpSpan(0, ^uint32(0)); e != arena.ErrBounds {
@@ -429,9 +429,6 @@ func TestIntegerSourceTmpUnsignedCapacityGuardAfterOldFree(t *testing.T) {
 		if m.Tmp[0] != ref || mpzPublicationSnapshot(m, b) != after || m.Cell(ref).span != 0 {
 			t.Fatal("span refusal changed completed roots")
 		}
-	}
-	if m.Words.Stats().Live != before.words {
-		t.Fatal("numeric source allocation fabricated Words root")
 	}
 	if e = m.CloseChecked(); e != nil {
 		t.Fatal("owning physical-prefix cleanup", e)
@@ -558,7 +555,7 @@ func TestIntegerSourcePartialRationalCleanup(t *testing.T) {
 		integerPhysicalAudit(t, q.Z)
 		mpzPublicationExpectFreed(t, q.Z, b, companionRef, before)
 		after := mpzPublicationSnapshot(q.Z, b)
-		if after.cells+1 != before.cells || after.words != before.words || a.Num.Cell != 0 || a.Den.Cell != 0 {
+		if after.cells+1 != before.cells || a.Num.Cell != 0 || a.Den.Cell != 0 {
 			t.Fatal("live companion not released exactly once", before, after, a)
 		}
 		if reset && (a.Num.Val != 0 || a.Den.Val != 1) {
@@ -613,7 +610,7 @@ func TestIntegerSourcePartialBinaryCleanup(t *testing.T) {
 		integerPhysicalAudit(t, z)
 		mpzPublicationExpectFreed(t, z, b, companionRef, before)
 		after := mpzPublicationSnapshot(z, b)
-		if after.cells+1 != before.cells || after.words != before.words || a.lower.Num.Cell != 0 || a.upper.Num.Cell != 0 {
+		if after.cells+1 != before.cells || a.lower.Num.Cell != 0 || a.upper.Num.Cell != 0 {
 			t.Fatal("interval companion not released", before, after, a)
 		}
 		if reset && (a.lower.KField != 0 || a.upper.KField != 0) {
@@ -657,7 +654,7 @@ func TestIntegerSourcePartialOwnedRationalCleanup(t *testing.T) {
 	integerPhysicalAudit(t, s.Manager.Z)
 	mpzPublicationExpectFreed(t, s.Manager.Z, b, companionRef, before)
 	after := mpzPublicationSnapshot(s.Manager.Z, b)
-	if after.cells+1 != before.cells || after.words != before.words || v.ownerID != 0 {
+	if after.cells+1 != before.cells || v.ownerID != 0 {
 		t.Fatal("owned companion cleanup", before, after, v)
 	}
 	b.FailAfter(-1)
@@ -752,7 +749,7 @@ func TestIntegerSourcePartialInfCleanup(t *testing.T) {
 			integerPhysicalAudit(t, s.Manager.Z)
 			mpzPublicationExpectFreed(t, s.Manager.Z, b, companionRef, before)
 			after := mpzPublicationSnapshot(s.Manager.Z, b)
-			if after.cells+1 != before.cells || after.words != before.words {
+			if after.cells+1 != before.cells {
 				t.Fatal("Inf companion cleanup", kind, before, after)
 			}
 			switch kind {

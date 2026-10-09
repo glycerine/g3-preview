@@ -386,11 +386,6 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*polynomial.UPolynomialManag
 		}
 	}
 
-	words := testFieldBySourceName(testFieldBySourceName(z, "words").Elem(), "descriptors").Elem()
-	graph.Words = 0
-	if uint64(graph.Words) != testFieldBySourceName(words, "live").Uint() {
-		t.Fatal("unexpected numeric Words descriptor", graph.Words, testFieldBySourceName(words, "live").Uint())
-	}
 	return graph
 }
 func astTestOwners(t *testing.T) (*usymbol.Manager, *util.RationalService, *arena.Budget) {
@@ -410,7 +405,7 @@ func astTestOwners(t *testing.T) (*usymbol.Manager, *util.RationalService, *aren
 	return s, q, b
 }
 
-type upolyHenselPhysicalGraph struct{ Named, Unpublished, Cleanup, Pending, Objects, Words uint32 }
+type upolyHenselPhysicalGraph struct{ Named, Unpublished, Cleanup, Pending, Objects uint32 }
 
 // Only actual declared retained lexical owner fields are roots. Accessors borrow
 // the charged owners; no live-descriptor registry can manufacture ownership.

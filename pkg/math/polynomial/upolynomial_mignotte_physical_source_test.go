@@ -87,9 +87,6 @@ func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, ext
 			t.Fatal("invalid pending object", e)
 		}
 	}
-	if m.Words.Stats().Live != 0 {
-		t.Fatal("unexpected numeric Words descriptor", m.Words.Stats().Live)
-	}
 	raw := map[util.Block]bool{}
 	if m.SourceFinalized || m.ConstructorUnwound {
 		for ref := range cells {

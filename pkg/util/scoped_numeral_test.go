@@ -480,7 +480,6 @@ func TestScopedNumeralHeadersFailuresAndSourcePushPrefix(t *testing.T) {
 		roots = append(roots, &fillers[i])
 	}
 	live := m.Cells.Stats().Live
-	wordsLive := m.Words.Stats().Live
 	usedBefore := b.Used()
 	b.FailAfter(0)
 	if e = v.Push(&big); !errors.Is(e, arena.ErrInjectedFailure) || v.Size() != 1 || v.Capacity() < 1 {
@@ -490,7 +489,7 @@ func TestScopedNumeralHeadersFailuresAndSourcePushPrefix(t *testing.T) {
 	if m.Cells.Stats().Live != live {
 		t.Fatal("failed push leaked a temporary cell")
 	}
-	if m.Words.Stats().Live != wordsLive || b.Used() != usedBefore {
+	if b.Used() != usedBefore {
 		t.Fatal("failed push leaked live payload or arena charge")
 	}
 	b.FailAfter(-1)
@@ -520,7 +519,6 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 		// Warm caller-output formatting workspace before fixed live-graph oracle.
 		rationalString(t, m, &big)
 		baseCells := m.Z.Cells.Stats().Live
-		baseWords := m.Z.Words.Stats().Live
 		v, e := NewScopedRationalVector(m)
 		if e != nil {
 			t.Fatal(e)
@@ -586,7 +584,7 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 				}
 				m.Del(&out)
 			}
-			if m.Z.Cells.Stats().Live != baseCells+bigCount*2 || m.Z.Words.Stats().Live != baseWords {
+			if m.Z.Cells.Stats().Live != baseCells+bigCount*2 {
 				t.Fatal("immediate rational cell/retained formatter lifecycle oracle", step, m.Z.Cells.Stats().Live, baseCells, bigCount)
 			}
 		}
@@ -601,7 +599,6 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 			fillers = append(fillers, x)
 		}
 		live := m.Z.Cells.Stats().Live
-		payloads := m.Z.Words.Stats().Live
 		b.FailAfter(0)
 		if e := v.Push(&big); !numericPhysicalReservationRefusal(e) || v.Size() != 1 {
 			t.Fatal("rational source append prefix", e)
@@ -618,7 +615,7 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 				published++
 			}
 		}
-		if m.Z.Cells.Stats().Live != live+published || m.Z.Words.Stats().Live != payloads {
+		if m.Z.Cells.Stats().Live != live+published {
 			t.Fatal("actual source copy descriptors", m.Z.Cells.Stats().Live, live, published)
 		}
 		// The numeric arena accounts for owned numerals and manager state. The Go
@@ -639,7 +636,7 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 		if beforeClose-b.Used() != integerBefore-integerActualOwnedBytes(m.Z) {
 			t.Fatal("vector numeral refund", beforeClose, b.Used())
 		}
-		if m.Z.Cells.Stats().Live != baseCells || m.Z.Words.Stats().Live != baseWords {
+		if m.Z.Cells.Stats().Live != baseCells {
 			t.Fatal("rational close live graph")
 		}
 		m.Del(&small)
@@ -663,7 +660,6 @@ func TestScopedNumeralDeepCloneFailureCleanup(t *testing.T) {
 			fillers = append(fillers, x)
 		}
 		cells := m.Z.Cells.Stats().Live
-		words := m.Z.Words.Stats().Live
 		b.FailAfter(prefix)
 		copy, e := s.Clone()
 		roots := []*Int{&num.Num, &num.Den}
@@ -683,7 +679,7 @@ func TestScopedNumeralDeepCloneFailureCleanup(t *testing.T) {
 		}
 		if e != nil {
 			failed++
-			if !numericPhysicalReservationRefusal(e) || copy != nil || m.Z.Cells.Stats().Live != cells || m.Z.Words.Stats().Live != words {
+			if !numericPhysicalReservationRefusal(e) || copy != nil || m.Z.Cells.Stats().Live != cells {
 				t.Fatal("clone immediate cleanup", prefix, e)
 			}
 		} else {
@@ -692,7 +688,7 @@ func TestScopedNumeralDeepCloneFailureCleanup(t *testing.T) {
 			if e := copy.Close(); e != nil {
 				t.Fatal(e)
 			}
-			if m.Z.Cells.Stats().Live != cells || m.Z.Words.Stats().Live != words {
+			if m.Z.Cells.Stats().Live != cells {
 				t.Fatal("clone close immediate graph")
 			}
 		}

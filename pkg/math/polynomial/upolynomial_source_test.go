@@ -654,7 +654,7 @@ func TestUPolynomialSourceCopyAndRationalPrefixes(t *testing.T) {
 		t.Fatal("big coefficient must refuse fresh backing")
 	}
 	now := m.Stats()
-	if now.IntegerLiveCells != base.IntegerLiveCells || now.IntegerWordsRefs != base.IntegerWordsRefs {
+	if now.IntegerLiveCells != base.IntegerLiveCells {
 		t.Fatal("copy failure retained unnamed numerical root", base, now)
 	}
 	b.FailAfter(-1)

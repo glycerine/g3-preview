@@ -30839,3 +30839,12 @@ Only `StringBuffer64` has production Go consumers. Focused tests now cover the
 live text, numeric, reset, embedded-NUL, same-type append, lifecycle, and long
 width behavior. The retained 64-byte implementation remains the next target for
 replacement with a native Go text buffer.
+
+### Remove unused IntegerManager Words service
+
+Removed IntegerManager's empty arena.Words owner after checking production
+consumers throughout pkg/. Numeric values already use the existing allocator
+and Runtime; Natural output keeps its current configuration. Constructor and
+close no longer acquire/release the unused owner, and numeric statistics and
+physical-root tests no longer report its permanently empty payload count.
+Real cell, allocation, publication, borrowed-runtime, and cleanup checks remain.

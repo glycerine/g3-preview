@@ -620,7 +620,7 @@ func TestRationalServiceExtraIntegerBridgeFailureCleanup(t *testing.T) {
 			dst, e := NewScopedInt(m)
 			serviceMust(t, e)
 			serviceMust(t, dst.SetInt64(17))
-			cells, words := m.Cells.Stats().Live, m.Words.Stats().Live
+			cells := m.Cells.Stats().Live
 			budget.FailAfter(fault)
 			if denominator == 0 {
 				e = s.NumeratorToScopedInt(&a, dst)
@@ -630,7 +630,7 @@ func TestRationalServiceExtraIntegerBridgeFailureCleanup(t *testing.T) {
 			budget.FailAfter(-1)
 			if e != nil {
 				failures++
-				if !numericPhysicalReservationRefusal(e) || m.Cells.Stats().Live != cells || m.Words.Stats().Live != words {
+				if !numericPhysicalReservationRefusal(e) || m.Cells.Stats().Live != cells {
 					t.Fatal(denominator, fault, e, "unreachable destination-owner temp")
 				}
 				if dst.num.Val != 17 || !dst.num.IsSmall() {

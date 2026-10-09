@@ -911,3 +911,11 @@ Words service. Physical ownership audits now inspect the remaining numeric
 resources directly, and nested-owner tests verify that child cleanup preserves
 the borrowed parent Runtime and its caller allocation. This removes dead
 storage infrastructure without changing the remaining arithmetic buffers.
+
+IntegerManager likewise no longer constructs an unused Words service. Its real
+limbs already live in the numeric allocator/Runtime; no arithmetic or formatter
+consumer populated the removed service. Constructor, destruction, statistics,
+and physical-root audits now omit that empty owner. The Words field in
+IntegerConfig remains as Natural output configuration, while independent live
+Words users (parameter metadata, S-expression children, and SAT storage) remain
+separate conversion work.

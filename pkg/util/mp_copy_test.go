@@ -173,8 +173,8 @@ func TestNumeralCopyFromFailurePrefixesAndImmediateOwnership(t *testing.T) {
 					fillers = append(fillers, x)
 				}
 				beforeA, beforeB := a, b
-				cells, words := dest.Z.Cells.Stats().Live, dest.Z.Words.Stats().Live
-				sourceCells, sourceWords, sourceUsed := source.Z.Cells.Stats().Live, source.Z.Words.Stats().Live, sourceBudget.Used()
+				cells := dest.Z.Cells.Stats().Live
+				sourceCells, sourceUsed := source.Z.Cells.Stats().Live, sourceBudget.Used()
 				budget.FailAfter(prefix)
 				var e error
 				if rational {
@@ -182,12 +182,12 @@ func TestNumeralCopyFromFailurePrefixesAndImmediateOwnership(t *testing.T) {
 				} else {
 					e = dest.Z.CopyFrom(&b.Num, source.Z, &a.Num)
 				}
-				if a != beforeA || source.Z.Cells.Stats().Live != sourceCells || source.Z.Words.Stats().Live != sourceWords || sourceBudget.Used() != sourceUsed {
+				if a != beforeA || source.Z.Cells.Stats().Live != sourceCells || sourceBudget.Used() != sourceUsed {
 					t.Fatal("source mutation", rational, bigOutput, prefix)
 				}
 				if e != nil {
 					failed = true
-					if !numericPhysicalReservationRefusal(e) || b != beforeB || dest.Z.Cells.Stats().Live != cells || dest.Z.Words.Stats().Live != words {
+					if !numericPhysicalReservationRefusal(e) || b != beforeB || dest.Z.Cells.Stats().Live != cells {
 						t.Fatal("copy failure ownership/publication", rational, bigOutput, prefix, e)
 					}
 				} else {
