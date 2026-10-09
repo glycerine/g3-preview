@@ -22,39 +22,21 @@ func (f *upolyDRSFrame) leftChild() bool        { return f.sizeFlags&(1<<31) != 
 
 type upolyDRSStack struct {
 	values []upolyDRSFrame
-	size   uint32
 }
 
 func (m *UPolynomialManager) pushDRS(s *upolyDRSStack, f upolyDRSFrame) error {
-	if s.size == math.MaxUint32 {
+	if uint64(len(s.values)) >= math.MaxUint32 || len(s.values) == int(^uint(0)>>1) {
 		return arena.ErrBounds
 	}
-	if s.size == uint32(cap(s.values)) {
-		n, bytes, e := upolyIsolationNextCapacity(uint32(cap(s.values)), 8, 8, uint64(int(^uint(0)>>1)))
-		if e != nil {
-			return e
-		}
-		if e = m.config.Integer.Budget().Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]upolyDRSFrame, n)
-		copy(next, s.values[:s.size])
-		m.config.Integer.Budget().Release(uint64(cap(s.values)) * 8)
-		s.values = next
-	}
-	s.values[s.size] = f
-	s.size++
+	s.values = append(s.values, f)
 	return nil
 }
-func (m *UPolynomialManager) dropDRS(s *upolyDRSStack) {
-	m.config.Integer.Budget().Release(uint64(cap(s.values)) * 8)
-	*s = upolyDRSStack{}
-}
+func (m *UPolynomialManager) dropDRS(s *upolyDRSStack) { s.values = nil }
 func (m *UPolynomialManager) popDRS(p *upolyVectorState, s *upolyDRSStack) error {
-	if s.size == 0 {
+	if uint32(len(s.values)) == 0 {
 		return ErrUPolynomialAssertion
 	}
-	n := s.values[s.size-1].polynomialSize()
+	n := s.values[uint32(len(s.values))-1].polynomialSize()
 	if polynomialSourceDebug && n > p.size {
 		return ErrUPolynomialAssertion
 	}
@@ -67,13 +49,13 @@ func (m *UPolynomialManager) popDRS(p *upolyVectorState, s *upolyDRSStack) error
 		}
 		p.size--
 	}
-	s.size--
+	s.values = s.values[:len(s.values)-1]
 	return nil
 }
 func (m *UPolynomialManager) pushDRSChildren(sz uint32, v UPolynomialView, p *upolyVectorState, s *upolyDRSStack) error {
 	parent := uint32(math.MaxUint32)
-	if s.size != 0 {
-		parent = s.size - 1
+	if uint32(len(s.values)) != 0 {
+		parent = uint32(len(s.values)) - 1
 	}
 	aux := &m.push
 	if e := m.setView(aux, v.WithCount(sz)); e != nil {
@@ -141,10 +123,10 @@ func (m *UPolynomialManager) addDRSInterval(s *upolyDRSStack, b *util.BinaryRati
 	lower, upper := util.NewBinaryInt(0), util.NewBinaryInt(1)
 	defer b.Del(&lower)
 	defer b.Del(&upper)
-	i := s.size - 1
+	i := uint32(len(s.values)) - 1
 	one := util.NewInt(1)
 	for i != math.MaxUint32 {
-		if i >= s.size {
+		if i >= uint32(len(s.values)) {
 			return arena.ErrBounds
 		}
 		f := &s.values[i]
@@ -179,10 +161,10 @@ func (m *UPolynomialManager) addDRSInterval(s *upolyDRSStack, b *util.BinaryRati
 func (m *UPolynomialManager) addDRSRoot(s *upolyDRSStack, b *util.BinaryRationalManager, r *BinaryRationalVector) error {
 	value := util.NewBinaryIntPower(1, 1)
 	defer b.Del(&value)
-	i := s.size - 1
+	i := uint32(len(s.values)) - 1
 	one := util.NewInt(1)
 	for i != math.MaxUint32 {
-		if i >= s.size {
+		if i >= uint32(len(s.values)) {
 			return arena.ErrBounds
 		}
 		f := &s.values[i]
@@ -249,14 +231,14 @@ func (m *UPolynomialManager) drsZeroOne(v UPolynomialView, b *util.BinaryRationa
 			return e
 		}
 	}
-	if polynomialSourceDebug && s.size == 0 {
+	if polynomialSourceDebug && uint32(len(s.values)) == 0 {
 		return ErrUPolynomialAssertion
 	}
-	for s.size != 0 {
+	for uint32(len(s.values)) != 0 {
 		if e = m.checkpoint(); e != nil {
 			return e
 		}
-		f := &s.values[s.size-1]
+		f := &s.values[uint32(len(s.values))-1]
 		sz := f.polynomialSize()
 		if polynomialSourceDebug && sz > p.size {
 			return ErrUPolynomialAssertion

@@ -2,7 +2,6 @@ package polynomial
 
 import (
 	"math"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
@@ -14,56 +13,38 @@ type upolySSFrame struct {
 }
 type upolySSStack struct {
 	values []upolySSFrame
-	size   uint32
 }
 
 func numericBinaryRationalManager_pushSS(b *util.BinaryRationalManager, s *upolySSStack) (*upolySSFrame, error) {
-	if s.size == math.MaxUint32 {
+	if uint64(len(s.values)) >= math.MaxUint32 || len(s.values) == int(^uint(0)>>1) {
 		return nil, arena.ErrBounds
 	}
-	if s.size == uint32(cap(s.values)) {
-		stride := uint64(reflect.TypeOf(upolySSFrame{}).Size())
-		n, bytes, e := upolyIsolationNextCapacity(uint32(cap(s.values)), 56, stride, uint64(int(^uint(0)>>1)))
-		if e != nil {
-			return nil, e
-		}
-		if e = b.Integers().Budget().Reserve(bytes); e != nil {
-			return nil, e
-		}
-		old := s.values
-		next := make([]upolySSFrame, n)
-		s.values = next
-		for i := uint32(0); i < s.size; i++ {
-			next[i] = old[i]
-			old[i] = upolySSFrame{}
-		}
-		b.Integers().Budget().Release(uint64(cap(old)) * stride)
+	old := s.values
+	s.values = append(s.values, upolySSFrame{})
+	if len(old) != 0 && &old[0] != &s.values[0] {
+		clear(old)
 	}
-	i := s.size
-	s.values[i] = upolySSFrame{}
-	s.size++
-	return &s.values[i], nil
+	return &s.values[len(s.values)-1], nil
 }
 func numericBinaryRationalManager_popSS(b *util.BinaryRationalManager, s *upolySSStack) error {
-	if s.size == 0 {
+	if uint32(len(s.values)) == 0 {
 		return arena.ErrBounds
 	}
-	f := &s.values[s.size-1]
+	f := &s.values[uint32(len(s.values))-1]
 	if e := b.Del(&f.lower); e != nil {
 		return e
 	}
 	if e := b.Del(&f.upper); e != nil {
 		return e
 	}
-	s.size--
+	s.values = s.values[:len(s.values)-1]
 	return nil
 }
 func numericBinaryRationalManager_dropSS(b *util.BinaryRationalManager, s *upolySSStack) {
-	for i := uint32(0); i < s.size; i++ {
+	for i := uint32(0); i < uint32(len(s.values)); i++ {
 		b.Del(&s.values[i].lower)
 		b.Del(&s.values[i].upper)
 	}
-	b.Integers().Budget().Release(uint64(cap(s.values)) * uint64(reflect.TypeOf(upolySSFrame{}).Size()))
 	*s = upolySSStack{}
 }
 func numericBinaryRationalManager_addSSInterval(b *util.BinaryRationalManager, lower, upper *util.BinaryRational, l, u *BinaryRationalVector) error {
@@ -174,11 +155,11 @@ func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg,
 	if e = m.pushSSFrame(v, b, &s, r, l, u, zeroSV, plus, &zero, &upper); e != nil {
 		return e
 	}
-	for s.size != 0 {
+	for uint32(len(s.values)) != 0 {
 		if e = m.checkpoint(); e != nil {
 			return e
 		}
-		f := &s.values[s.size-1]
+		f := &s.values[uint32(len(s.values))-1]
 		minus, plus = f.lowerSV, f.upperSV
 		if e = b.Swap(&lower, &f.lower); e != nil {
 			return e

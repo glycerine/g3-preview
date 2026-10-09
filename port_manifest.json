@@ -44184,7 +44184,8 @@
         "pkg/math/polynomial/upolynomial_native_coefficients_test.go",
         "pkg/math/polynomial/upolynomial_factor_degree.go",
         "pkg/math/polynomial/upolynomial_factors.go",
-        "pkg/math/polynomial/upolynomial_native_factor_storage_test.go"
+        "pkg/math/polynomial/upolynomial_native_factor_storage_test.go",
+        "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
       ],
       "tests": [
         "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
@@ -44253,13 +44254,13 @@
         "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
         "TestUPolynomialIsolationAllDispatchRoutesIndependent",
         "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
-        "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+        "TestUPolynomialBinaryVectorOwnerRefusalAndNativePush",
         "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
         "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
         "TestUPolynomialIsolationDefinedOutputAliases",
         "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
         "TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication",
-        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
         "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
@@ -44384,7 +44385,9 @@
         "TestUPolynomialNativeDescriptorAndBackingDirectories",
         "TestUPolynomialNativeBorrowedStoreDirectory",
         "TestUPolynomialNativeDegreeSubsetOracle",
-        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews"
+        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews",
+        "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
       ],
       "conditionals": [
         {
@@ -45288,7 +45291,7 @@
             "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
             "TestUPolynomialIsolationAllDispatchRoutesIndependent",
             "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
-            "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+            "TestUPolynomialBinaryVectorOwnerRefusalAndNativePush",
             "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
             "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
             "TestUPolynomialIsolationDefinedOutputAliases",
@@ -45301,7 +45304,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
           "tests": [
-            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
@@ -45599,7 +45602,8 @@
         "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added.",
         "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked.",
         "Sequence row offsets/sizes and factor multiplicities now use direct []uint32 slices with native append, reslicing on reset and nil on destruction. Removed unsigned-vector capacity/header arithmetic, size/initialized masks, container-only reservation faults and metadata backing-byte charges. Actual sequence/factor owners and numeral allocation/copy/destruction remain explicit; uint32 index bounds remain checked.",
-        "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit."
+        "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit.",
+        "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero."
       ]
     },
     {
@@ -45663,7 +45667,8 @@
         "pkg/math/polynomial/upolynomial_native_coefficients_test.go",
         "pkg/math/polynomial/upolynomial_factor_degree.go",
         "pkg/math/polynomial/upolynomial_factors.go",
-        "pkg/math/polynomial/upolynomial_native_factor_storage_test.go"
+        "pkg/math/polynomial/upolynomial_native_factor_storage_test.go",
+        "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
       ],
       "tests": [
         "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
@@ -45732,13 +45737,13 @@
         "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
         "TestUPolynomialIsolationAllDispatchRoutesIndependent",
         "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
-        "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+        "TestUPolynomialBinaryVectorOwnerRefusalAndNativePush",
         "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
         "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
         "TestUPolynomialIsolationDefinedOutputAliases",
         "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
         "TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication",
-        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
         "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
@@ -45775,7 +45780,9 @@
         "TestUPolynomialNativeDescriptorAndBackingDirectories",
         "TestUPolynomialNativeBorrowedStoreDirectory",
         "TestUPolynomialNativeDegreeSubsetOracle",
-        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews"
+        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews",
+        "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
       ],
       "conditionals": [
         {
@@ -46119,7 +46126,7 @@
             "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
             "TestUPolynomialIsolationAllDispatchRoutesIndependent",
             "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
-            "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+            "TestUPolynomialBinaryVectorOwnerRefusalAndNativePush",
             "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
             "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
             "TestUPolynomialIsolationDefinedOutputAliases",
@@ -46132,7 +46139,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
           "tests": [
-            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
@@ -46244,7 +46251,8 @@
         "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added.",
         "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked.",
         "Sequence row offsets/sizes and factor multiplicities now use direct []uint32 slices with native append, reslicing on reset and nil on destruction. Removed unsigned-vector capacity/header arithmetic, size/initialized masks, container-only reservation faults and metadata backing-byte charges. Actual sequence/factor owners and numeral allocation/copy/destruction remain explicit; uint32 index bounds remain checked.",
-        "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit."
+        "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit.",
+        "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero."
       ]
     },
     {
@@ -109803,7 +109811,8 @@
         "pkg/math/polynomial/upolynomial_store_adoption.go",
         "pkg/math/polynomial/upolynomial_coefficient_store_adoption_test.go",
         "pkg/math/polynomial/upolynomial_native_directories_test.go",
-        "pkg/math/polynomial/upolynomial_native_coefficients_test.go"
+        "pkg/math/polynomial/upolynomial_native_coefficients_test.go",
+        "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
       ],
       "tests": [
         "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
@@ -109872,13 +109881,13 @@
         "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
         "TestUPolynomialIsolationAllDispatchRoutesIndependent",
         "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
-        "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+        "TestUPolynomialBinaryVectorOwnerRefusalAndNativePush",
         "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
         "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
         "TestUPolynomialIsolationDefinedOutputAliases",
         "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
         "TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication",
-        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
         "TestUPolynomialStoreRelatedConstructorFailureUnwinds",
@@ -109894,7 +109903,9 @@
         "TestUPolynomialStoreNativeAdoptionAndCohortGraph",
         "TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds",
         "TestUPolynomialNativeDescriptorAndBackingDirectories",
-        "TestUPolynomialNativeBorrowedStoreDirectory"
+        "TestUPolynomialNativeBorrowedStoreDirectory",
+        "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
       ],
       "conditionals": [
         {
@@ -110213,7 +110224,7 @@
             "TestUPolynomialRefinementFaultPrefixesImmediateRoots",
             "TestUPolynomialIsolationAllDispatchRoutesIndependent",
             "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
-            "TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes",
+            "TestUPolynomialBinaryVectorOwnerRefusalAndNativePush",
             "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
             "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
             "TestUPolynomialIsolationDefinedOutputAliases",
@@ -110226,7 +110237,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
           "tests": [
-            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
@@ -110280,7 +110291,8 @@
         "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial.",
         "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
         "Shared coefficient directory is a charged Go lifetime adapter for actual source buffers, without copying coefficients between related cores. Independent pools remain distinct. Prime/factor algorithms and multivariate conversion remain unported in this chunk.",
-        "Cold store-binding adoption is an explicit Go lifetime adapter, with retained successful metadata prefixes before source state swaps. Cross-IntegerManager buffer ownership still requires the real shared MPZ backend. Factor algorithms, multivariate conversion and whole source-unit completion remain open; these three tests add independent ownership evidence, not registered C++ assertions."
+        "Cold store-binding adoption is an explicit Go lifetime adapter, with retained successful metadata prefixes before source state swaps. Cross-IntegerManager buffer ownership still requires the real shared MPZ backend. Factor algorithms, multivariate conversion and whole source-unit completion remain open; these three tests add independent ownership evidence, not registered C++ assertions.",
+        "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero."
       ]
     },
     {
@@ -124604,7 +124616,8 @@
         "pkg/math/polynomial/upolynomial_binary_vector.go",
         "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
         "pkg/util/mpbq_display_scope.go",
-        "pkg/util/mpbq_display_scope_test.go"
+        "pkg/util/mpbq_display_scope_test.go",
+        "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -124621,14 +124634,16 @@
         "TestBinaryOwnerConstructorAndScopedVector",
         "TestBinaryFailureImmediateRoots",
         "TestBinaryVectorFailurePrefixesAndScopedRoutes",
-        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
         "TestBinaryDecimalErrorDoesNotExecuteSourceEndLabel",
         "TestBinaryDisplayScopeAPIAndGuards",
         "TestBinaryRawDisplayAllFaultPrefixesAndOwningAbort",
         "TestBinarySourceEndLabelsAndInlineWarm",
-        "TestBinarySourceEndLabelGuardedPhysicalFreeContinuation"
+        "TestBinarySourceEndLabelGuardedPhysicalFreeContinuation",
+        "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
       ],
       "conditionals": [
         {
@@ -125049,7 +125064,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
           "tests": [
-            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
@@ -125073,7 +125088,8 @@
       ],
       "deviations": [
         "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Open trace/custom ostream integration keeps whole unit partial.",
-        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
+        "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero."
       ]
     },
     {
@@ -125093,7 +125109,8 @@
         "pkg/math/polynomial/upolynomial_binary_vector.go",
         "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
         "pkg/util/mpbq_display_scope.go",
-        "pkg/util/mpbq_display_scope_test.go"
+        "pkg/util/mpbq_display_scope_test.go",
+        "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -125110,14 +125127,16 @@
         "TestBinaryOwnerConstructorAndScopedVector",
         "TestBinaryFailureImmediateRoots",
         "TestBinaryVectorFailurePrefixesAndScopedRoutes",
-        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
         "TestBinaryDecimalErrorDoesNotExecuteSourceEndLabel",
         "TestBinaryDisplayScopeAPIAndGuards",
         "TestBinaryRawDisplayAllFaultPrefixesAndOwningAbort",
         "TestBinarySourceEndLabelsAndInlineWarm",
-        "TestBinarySourceEndLabelGuardedPhysicalFreeContinuation"
+        "TestBinarySourceEndLabelGuardedPhysicalFreeContinuation",
+        "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
       ],
       "conditionals": [
         {
@@ -125289,7 +125308,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
           "tests": [
-            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
@@ -125313,7 +125332,8 @@
       ],
       "deviations": [
         "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Open trace/custom ostream integration keeps whole unit partial.",
-        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open."
+        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
+        "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero."
       ]
     },
     {
@@ -148829,7 +148849,8 @@
         "pkg/math/polynomial/polynomial_gcd_power_buffer_source_test.go",
         "pkg/math/polynomial/polynomial_composition.go",
         "pkg/math/polynomial/polynomial_som_monomials.go",
-        "pkg/math/polynomial/polynomial_numeral_slice_test.go"
+        "pkg/math/polynomial/polynomial_numeral_slice_test.go",
+        "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
       ],
       "tests": [
         "TestParamDescrsNativeStorageAndWarmDuplicate",
@@ -148923,7 +148944,7 @@
         "TestSATSolverModelConverterImplicitCopyUninitializedCapacityGuard",
         "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
         "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy",
-        "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+        "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
         "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
@@ -149078,7 +149099,9 @@
         "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges",
         "TestPolynomialSOMNativeMonomialSortIndependentPowers",
         "TestPolynomialNativeNumeralGrowthResetAndBounds",
-        "TestPolynomialNativeNumeralResetRetainsActualBIG"
+        "TestPolynomialNativeNumeralResetRetainsActualBIG",
+        "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
       ],
       "conditionals": [
         {
@@ -149320,7 +149343,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
           "tests": [
-            "TestUPolynomialIsolationPackedFrameAndScalarExtents",
+            "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
@@ -149694,7 +149717,8 @@
         "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added.",
         "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added.",
         "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added.",
-        "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added."
+        "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
+        "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero."
       ]
     },
     {

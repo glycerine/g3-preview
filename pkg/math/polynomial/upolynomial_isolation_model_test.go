@@ -110,7 +110,7 @@ func TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau(t *testing.T) {
 	}
 	_ = m // real numerical owner is shared; no synthetic callbacks
 }
-func TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes(t *testing.T) {
+func TestUPolynomialBinaryVectorOwnerRefusalAndNativePush(t *testing.T) {
 	m, q, budget := upolySourceOwner(t)
 	b := upolyIsolationBinaryOwner(t, q, budget)
 	before := budget.Used()
@@ -124,13 +124,10 @@ func TestUPolynomialBinaryVectorConstructionAndPushFailurePrefixes(t *testing.T)
 	a := util.NewBinaryInt(1)
 	budget.FailAfter(0)
 	e = v.PushCopy(&a)
-	if !numericStorageReservationRefusal(e) || upolyIsolationSize(t, v) != 0 {
-		t.Fatal("push grow prefix", e)
+	if e != nil || upolyIsolationSize(t, v) != 1 {
+		t.Fatal("native push", e)
 	}
 	budget.FailAfter(-1)
-	if e = v.PushCopy(&a); e != nil {
-		t.Fatal(e)
-	}
 	// Append-only lower-level isolation does not reset an existing exact root.
 	p := upolySourceNew(t, m, []int32{1})
 	lo, hi := upolyIsolationVector(t, b), upolyIsolationVector(t, b)

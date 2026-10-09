@@ -150,7 +150,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 	fields(reflect.ValueOf(c.isRationalTmp))
 	for _, vector := range []*BinaryRationalVector{c.roots, c.lowers, c.uppers} {
 		if vector != nil {
-			for i := uint32(0); i < vector.state.initialized; i++ {
+			for i := uint32(0); i < uint32(len(vector.state.values)); i++ {
 				fields(reflect.ValueOf(vector.state.values[i]))
 			}
 		}

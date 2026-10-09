@@ -8,7 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestUPolynomialIsolationPackedFrameAndScalarExtents(t *testing.T) {
+func TestUPolynomialIsolationPackedFrameFields(t *testing.T) {
 	for _, f := range []struct {
 		size uint32
 		left bool
@@ -19,24 +19,7 @@ func TestUPolynomialIsolationPackedFrameAndScalarExtents(t *testing.T) {
 			t.Fatal(f, frame)
 		}
 	}
-	for _, stride := range []uint32{8, 24, 56} {
-		n, oldExtent, newExtent, e := upolyIsolationSourceCapacity(0, stride)
-		if e != nil || n != 2 || oldExtent != 0 || newExtent != 2*stride+8 {
-			t.Fatal(stride, n, oldExtent, newExtent, e)
-		}
-		n, _, _, e = upolyIsolationSourceCapacity(2, stride)
-		if e != nil || n != 3 {
-			t.Fatal(stride, n, e)
-		}
-		if _, _, e := upolyIsolationNextCapacity(2, stride, uint64(stride), uint64(stride)*3-1); !errors.Is(e, arena.ErrBounds) {
-			t.Fatal("actual host extent", stride, e)
-		}
-	}
-	// Independently fixed unsigned source overflow values, no giant allocation.
-	n, oldExtent, newExtent, e := upolyIsolationSourceCapacity(715827883, 8)
-	if n != 1073741825 || oldExtent != 1431655776 || newExtent != 16 || !errors.Is(e, arena.ErrBounds) {
-		t.Fatal(n, oldExtent, newExtent, e)
-	}
+
 }
 
 func TestUPolynomialBinaryVectorActualAscendingDestruction(t *testing.T) {

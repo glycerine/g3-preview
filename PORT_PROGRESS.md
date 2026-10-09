@@ -32161,3 +32161,45 @@ The util knot/split goal remains open. Continue with binary-rational vectors and
 remaining isolation storage, then retained AST/SAT collections and text consumers.
 Internal root-util numeric/text/parameter cycles still need resolution before the
 subpackage split.
+
+## Native binary-rational fields and isolation stacks
+
+Binary-rational field storage now grows through native Go append. Removed source
+vector capacity/header arithmetic, buffer allocation/refund paths and separate
+initialized masks. Native slice length retains the actual constructed field
+extent; logical active size remains separate for numeric cleanup and source
+borrowed reads. Relocation moves each actual numeral field once and clears old
+owning records. Resize/default construction, ascending reset/shrink destruction,
+real copy failures and actual cold public vector ownership remain. Native buffer
+BackingBytes is zero. Physical and algebraic cell audits enumerate native field
+length instead of the removed initialized mask.
+
+DRS and Sturm isolation stacks likewise use native append and reslicing on pop.
+Removed manual capacity growth, duplicated stack-size fields, buffer reservations
+and refunds. DRS frame parent/packed size/visit/side fields and project traversal
+remain. Sturm relocation transfers real endpoint ownership and clears old frames;
+pop and destruction retain lower-before-upper and ascending frame cleanup order.
+Retired scalar capacity/overflow arithmetic assertions while retaining independent
+packed-frame field tests. The public vector's real cold-owner refusal still has
+zero host allocation; scalar native push now succeeds under disabled reservations.
+
+New tests grow binary fields and both isolation stacks through 4097 entries under
+disabled reservations. They check native defaults, shrink/reset/reextension,
+independent frame fields, unchanged numeric accounting, exact BIG token/exponent
+preservation and zero old owning records after relocation. Reset/pop ends the
+actual BIG tokens. Existing actual ascending numeric-slot reuse, root-isolation
+independent oracles, BIG-copy fault censuses and constructor/cleanup tests remain.
+
+Validation: full native polynomial passed (32.180s); new native binary/stack checks
+passed (0.009s); focused g3debug binary-vector, isolation and native storage checks
+passed (54.922s). Module-wide compilation, polynomial vet, portcheck, gofmt and
+diff checks passed. Manifest counts/statuses remain unchanged. The 22:43–22:45 UTC
+full native module checkpoint remains current; no additional full-module run was
+needed.
+
+The util knot/split remains open. Follow-up production scans still find manual
+container growth in algebraic locator/vector storage, polynomial variable-degree
+and position collections, evaluation-frame directories and retained history/orphan
+collections. Review those actual consumers next, followed by remaining AST/SAT
+collections and text streams. Internal util numeric/text/parameter cycles also
+remain before the root util subpackage split.

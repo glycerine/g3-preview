@@ -232,7 +232,7 @@ func upolyPhysicalExtraNumerals(extras []upolyPhysicalExtraOwners, addInt func(r
 		for _, b := range x.BinaryVectors {
 			state := testFieldBySourceName(reflect.ValueOf(b).Elem(), "state")
 			values := testFieldBySourceName(state, "values")
-			for i := uint64(0); i < testFieldBySourceName(state, "initialized").Uint(); i++ {
+			for i := 0; i < values.Len(); i++ {
 				addInt(testFieldBySourceName(values.Index(int(i)), "num"))
 			}
 		}

@@ -9,8 +9,8 @@ import (
 )
 
 type upolyBinaryVectorState struct {
-	values            []util.BinaryRational
-	size, initialized uint32
+	values []util.BinaryRational
+	size   uint32
 }
 type BinaryRationalVector struct {
 	self    *BinaryRationalVector
@@ -24,28 +24,6 @@ type BinaryRationalVectorStats struct {
 	Size, Capacity, Initialized, OwnedNumeralCells uint32
 }
 
-func upolyIsolationSourceCapacity(old, stride uint32) (n, oldExtent, newExtent uint32, e error) {
-	if old == 0 {
-		return 2, 0, 2*stride + 8, nil
-	}
-	oldExtent = stride*old + 8
-	n = (3*old + 1) >> 1
-	newExtent = stride*n + 8
-	if n <= old || newExtent <= oldExtent {
-		e = arena.ErrBounds
-	}
-	return
-}
-func upolyIsolationNextCapacity(old, sourceStride uint32, actualStride, host uint64) (uint32, uint64, error) {
-	n, _, _, e := upolyIsolationSourceCapacity(old, sourceStride)
-	if e != nil {
-		return 0, 0, e
-	}
-	if uint64(n)*uint64(sourceStride)+8 > math.MaxUint32 || actualStride == 0 || uint64(n) > host/actualStride {
-		return 0, 0, arena.ErrBounds
-	}
-	return n, uint64(n) * actualStride, nil
-}
 func numericBinaryRationalManager_NewVector(m *util.BinaryRationalManager) (*BinaryRationalVector, error) {
 	if e := m.Open(); e != nil {
 		return nil, e
@@ -67,39 +45,31 @@ func (v *BinaryRationalVector) check() error {
 	}
 	return v.manager.Open()
 }
-func numericBinaryRationalManager_growBinaryVector(m *util.BinaryRationalManager, s *upolyBinaryVectorState) error {
-	n, bytes, e := upolyIsolationNextCapacity(uint32(cap(s.values)), 24, uint64(reflect.TypeOf(util.BinaryRational{}).Size()), uint64(int(^uint(0)>>1)))
-	if e != nil {
-		return e
-	}
-	if e = m.Integers().Budget().Reserve(bytes); e != nil {
-		return e
+
+// Native field extent is retained for borrowed reads and owning cleanup;
+// logical size separately records the currently active binary rationals.
+func upolyBinaryExtend(s *upolyBinaryVectorState, n uint32) error {
+	if uint64(n) > uint64(^uint(0)>>1) {
+		return arena.ErrBounds
 	}
 	old := s.values
-	next := make([]util.BinaryRational, n)
-	s.values = next
-	for i := uint32(0); i < s.size; i++ {
-		next[i] = old[i]
-		old[i] = util.BinaryRational{}
+	if int(n) > len(old) {
+		s.values = append(old, make([]util.BinaryRational, int(n)-len(old))...)
+		if len(old) != 0 && &old[0] != &s.values[0] {
+			clear(old)
+		}
 	}
-	m.Integers().Budget().Release(uint64(cap(old)) * uint64(reflect.TypeOf(util.BinaryRational{}).Size()))
-	s.initialized = s.size
+	clear(s.values[s.size:n])
+	s.size = n
 	return nil
 }
 func numericBinaryRationalManager_binaryPushDefault(m *util.BinaryRationalManager, s *upolyBinaryVectorState) (*util.BinaryRational, error) {
 	if s.size == math.MaxUint32 {
 		return nil, arena.ErrBounds
 	}
-	if s.size == uint32(cap(s.values)) {
-		if e := numericBinaryRationalManager_growBinaryVector(m, s); e != nil {
-			return nil, e
-		}
-	}
 	i := s.size
-	s.values[i] = util.NewBinaryRational()
-	s.size++
-	if s.size > s.initialized {
-		s.initialized = s.size
+	if e := upolyBinaryExtend(s, i+1); e != nil {
+		return nil, e
 	}
 	return &s.values[i], nil
 }
@@ -107,7 +77,7 @@ func numericBinaryRationalManager_binarySlot(m *util.BinaryRationalManager, s *u
 	if polynomialSourceDebug && i >= s.size {
 		return nil, ErrUPolynomialAssertion
 	}
-	if i >= s.initialized {
+	if uint64(i) >= uint64(len(s.values)) {
 		return nil, arena.ErrBounds
 	}
 	return &s.values[i], nil
@@ -125,7 +95,6 @@ func numericBinaryRationalManager_binaryDestroy(m *util.BinaryRationalManager, s
 	if e := numericBinaryRationalManager_binaryReset(m, s); e != nil {
 		return e
 	}
-	m.Integers().Budget().Release(uint64(cap(s.values)) * uint64(reflect.TypeOf(util.BinaryRational{}).Size()))
 	*s = upolyBinaryVectorState{}
 	return nil
 }
@@ -193,7 +162,7 @@ func (v *BinaryRationalVector) Shrink(n uint32) error {
 	if polynomialSourceDebug && n > old {
 		return ErrUPolynomialAssertion
 	}
-	if n > v.state.initialized {
+	if uint64(n) > uint64(len(v.state.values)) {
 		return arena.ErrBounds
 	}
 	v.state.size = n
@@ -210,19 +179,7 @@ func (v *BinaryRationalVector) Resize(n uint32) error {
 		}
 		return nil
 	}
-	for n > uint32(cap(v.state.values)) {
-		if e := numericBinaryRationalManager_growBinaryVector(v.manager, &v.state); e != nil {
-			return e
-		}
-	}
-	v.state.size = n
-	for i := old; i < n; i++ {
-		v.state.values[i] = util.NewBinaryInt(0)
-	}
-	if n > v.state.initialized {
-		v.state.initialized = n
-	}
-	return nil
+	return upolyBinaryExtend(&v.state, n)
 }
 
 // Actual vector::reserve grows logical size and default constructs elements.
@@ -252,7 +209,7 @@ func (v *BinaryRationalVector) Stats() BinaryRationalVectorStats {
 		return BinaryRationalVectorStats{}
 	}
 	s := &v.state
-	r := BinaryRationalVectorStats{OwnerBytes: v.header, BackingBytes: uint64(cap(s.values)) * uint64(reflect.TypeOf(util.BinaryRational{}).Size()), Size: s.size, Capacity: uint32(cap(s.values)), Initialized: s.initialized}
+	r := BinaryRationalVectorStats{OwnerBytes: v.header, Size: s.size, Capacity: uint32(cap(s.values)), Initialized: uint32(len(s.values))}
 	r.TotalBytes = r.OwnerBytes + r.BackingBytes
 	for i := uint32(0); i < s.size; i++ {
 		if v.manager.Integers().IsLiveCellToken((*s.values[i].BorrowNumerator()).NativeCellToken()) {
