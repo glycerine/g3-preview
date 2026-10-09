@@ -51,7 +51,7 @@ func (v *RuntimeUnsignedVector) copyCoreDebug(src *RuntimeUnsignedVector, d *Deb
 	// Source it2=begin(), then SASSERT(it2==m_data): both name the
 	// same freshly published destination pointer. No extent validation.
 	it2 := v.Column.Raw.Block
-	on, e := PermutationAssertions(d)
+	on, e := SourceAssertionsEnabled(d)
 	if e != nil {
 		return e
 	}
@@ -85,7 +85,7 @@ func (v *RuntimeUnsignedVector) copyConstructDebug(src *RuntimeUnsignedVector, d
 			return e
 		}
 	}
-	on, e := PermutationAssertions(d)
+	on, e := SourceAssertionsEnabled(d)
 	if e != nil {
 		v.constructorCause = e
 		return e

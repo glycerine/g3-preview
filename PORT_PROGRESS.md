@@ -42,6 +42,14 @@ uncalled `show_hash` and `display_free_ids` diagnostics were removed after a
 whole-source consumer scan. Polynomial, AST, and SAT now use the typed leaf;
 the duplicate Runtime-backed ID vector and its raw-storage tests are gone.
 
+The live free permutation algorithms from `src/util/permutation.h` reside in
+`pkg/util/permutation` as concrete `[]uint32` operations. The separate root
+Runtime-backed `permutation` class had no Go production consumer, while the
+C++ class in `permutation.cpp` has no production source caller. That duplicate
+class and its allocation-layout tests are removed. The borrowed uint32 Runtime
+view still used by AST and polynomial raw vectors now lives independently in
+`runtime_uint32_view.go`.
+
 `src/util/heap.h` now has a native concrete `int32` implementation in
 `pkg/util/heap`. Typed slices hold the heap and inverse indices; the parallel
 Runtime/Block implementation, Runtime-only diagnostic fixtures, and root util

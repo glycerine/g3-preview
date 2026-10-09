@@ -113074,8 +113074,6 @@
         "pkg/util/util_debug_actions_host_other.go",
         "pkg/util/util_debug_actions_source_test.go",
         "pkg/util/util_debug_action_binding.go",
-        "pkg/util/util_debug_action_binding_source_test.go",
-        "pkg/util/util_permutation_word_view.go",
         "pkg/util/util_gparams_service_ops.go"
       ],
       "tests": [
@@ -113100,20 +113098,7 @@
         "TestDebugActionConstructorEveryReservationAndBorrowedClose",
         "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
         "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
-        "TestDebugActionPromptBeforeClosedTieRead",
-        "TestPermutationBoundFalseSizeContinueResumesSourceBody",
-        "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
-        "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
-        "TestPermutationBoundTrueAndBindingOwnerGuards",
-        "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
-        "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
-        "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
-        "TestPermutationBoundSubprocessHelper",
-        "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
-        "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-        "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
-        "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
+        "TestDebugActionPromptBeforeClosedTieRead"
       ],
       "conditionals": [
         {
@@ -113189,38 +113174,13 @@
           "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
           "status": "partial",
           "go_target": "pkg/util/util_debug_action_binding.go",
-          "tests": [
-            "TestPermutationBoundFalseSizeContinueResumesSourceBody",
-            "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
-            "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
-            "TestPermutationBoundTrueAndBindingOwnerGuards",
-            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
-            "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
-            "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
-            "TestPermutationBoundSubprocessHelper",
-            "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
-            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction"
-          ]
-        },
-        {
-          "name": "Captured concrete std::swap word-reference transport at permutation.cpp:35-40/vector.h:303-310: both lvalues acquired before actual payload loads, writes preserve captured provider/block/offset",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_word_view.go",
-          "tests": [
-            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
-            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce"
-          ]
+          "tests": []
         },
         {
           "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
           "status": "partial",
           "go_target": "pkg/util/util_debug_notification.go",
-          "tests": [
-            "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-            "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
-          ]
+          "tests": []
         },
         {
           "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
@@ -113293,8 +113253,6 @@
         "pkg/util/small_allocator_assertions.go",
         "pkg/util/util_small_object_allocator_assertions_test.go",
         "pkg/util/util_small_object_allocator.go",
-        "pkg/util/util_permutation_diagnostics_source.go",
-        "pkg/util/util_permutation_diagnostics_source_test.go",
         "pkg/util/util_debug_notification.go",
         "pkg/util/util_debug_notification_source_test.go",
         "pkg/util/util_numeric_char_input.go",
@@ -113305,21 +113263,11 @@
         "pkg/util/util_debug_actions_host_other.go",
         "pkg/util/util_debug_actions_source_test.go",
         "pkg/util/util_debug_action_binding.go",
-        "pkg/util/util_debug_action_binding_source_test.go",
-        "pkg/util/util_permutation_word_view.go",
         "pkg/util/util_debug_macros.go",
         "pkg/util/util_debug_macro_source_test.go",
         "pkg/util/util_gparams_service_ops.go"
       ],
       "tests": [
-        "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
-        "TestRuntimePermutationClosedAssertionCopyPublication",
-        "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
-        "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
-        "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
-        "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
-        "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation",
         "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
         "TestDebugNotificationBorrowedCStringActualLifetimePrefixes",
         "TestDebugNotificationClosedFileStillReadsLaterBorrowedCondition",
@@ -113342,19 +113290,6 @@
         "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
         "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
         "TestDebugActionPromptBeforeClosedTieRead",
-        "TestPermutationBoundFalseSizeContinueResumesSourceBody",
-        "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
-        "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
-        "TestPermutationBoundTrueAndBindingOwnerGuards",
-        "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
-        "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
-        "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
-        "TestPermutationBoundSubprocessHelper",
-        "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
-        "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-        "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
-        "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration",
         "TestDebugMacroUnreachableIgnoresAssertionSwitch",
         "TestDebugMacroVerifyFalsePrefixAndContinue",
         "TestDebugMacroXAssertionLiteralExtraBeforeAction",
@@ -113492,21 +113427,6 @@
           ]
         },
         {
-          "name": "concrete permutation borrowed assertion switch at actual source macro sites and NumericTextStream formatted display insertion chain",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_diagnostics_source.go",
-          "tests": [
-            "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
-            "TestRuntimePermutationClosedAssertionCopyPublication",
-            "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
-            "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
-            "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
-            "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
-            "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-            "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
-          ]
-        },
-        {
           "name": "notify_assertion_violation source37-42 separate stderr insertion chains with caller format state and borrowed CString reached lifetime",
           "status": "partial",
           "go_target": "pkg/util/util_debug_notification.go",
@@ -113553,38 +113473,13 @@
           "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
           "status": "partial",
           "go_target": "pkg/util/util_debug_action_binding.go",
-          "tests": [
-            "TestPermutationBoundFalseSizeContinueResumesSourceBody",
-            "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
-            "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
-            "TestPermutationBoundTrueAndBindingOwnerGuards",
-            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
-            "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
-            "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
-            "TestPermutationBoundSubprocessHelper",
-            "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
-            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction"
-          ]
-        },
-        {
-          "name": "Captured concrete std::swap word-reference transport at permutation.cpp:35-40/vector.h:303-310: both lvalues acquired before actual payload loads, writes preserve captured provider/block/offset",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_word_view.go",
-          "tests": [
-            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
-            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce"
-          ]
+          "tests": []
         },
         {
           "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
           "status": "partial",
           "go_target": "pkg/util/util_debug_notification.go",
-          "tests": [
-            "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-            "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
-          ]
+          "tests": []
         },
         {
           "name": "Literal source macro false leaves plus concrete Runtime heap constructor/reset/reserve/bounds/insert/move/erase/min/key-update/swap and nested indexed/back/pop/shrink assertion control; src/util/debug.h:63-65; src/util/debug.h:67-78; src/util/debug.h:81-92; src/util/error_codes.h:29; src/util/heap.h:57,61-66,79-92,230-239; src/util/vector.h:303-310; src/util/heap.h:126,138,145,154,162,165,174,191,196,217,260-265; src/util/heap.h:105,169,175-176,181,197,221,226; src/util/vector.h:334,344,391,402; src/util/heap.h:272-282",
@@ -140795,72 +140690,9 @@
       "path": "src/util/permutation.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
-      "go_targets": [
-        "pkg/util/util_unsigned_vector_runtime.go",
-        "pkg/util/util_unsigned_vector_runtime_test.go",
-        "pkg/util/util_permutation_runtime.go",
-        "pkg/util/util_permutation_runtime_test.go",
-        "pkg/util/util_unsigned_vector_copy_source.go",
-        "pkg/util/util_unsigned_vector_copy_source_test.go",
-        "pkg/util/util_permutation_copy_source.go",
-        "pkg/util/util_permutation_copy_source_test.go",
-        "pkg/util/util_unsigned_vector_copy_retire_source_test.go",
-        "pkg/util/util_permutation_diagnostics_source.go",
-        "pkg/util/util_permutation_diagnostics_source_test.go",
-        "pkg/util/util_debug_action_binding_source_test.go",
-        "pkg/util/util_permutation_word_view.go",
-        "pkg/util/util_debug_notification.go"
-      ],
-      "tests": [
-        "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
-        "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
-        "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
-        "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
-        "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
-        "TestRuntimePermutationIndependentResetSwapMove",
-        "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
-        "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
-        "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
-        "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
-        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember",
-        "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
-        "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
-        "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
-        "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
-        "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
-        "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
-        "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
-        "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
-        "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
-        "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
-        "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
-        "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
-        "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
-        "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
-        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation",
-        "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
-        "TestRuntimePermutationClosedAssertionCopyPublication",
-        "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
-        "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
-        "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
-        "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
-        "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation",
-        "TestPermutationBoundFalseSizeContinueResumesSourceBody",
-        "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
-        "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
-        "TestPermutationBoundTrueAndBindingOwnerGuards",
-        "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
-        "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
-        "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
-        "TestPermutationBoundSubprocessHelper",
-        "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
-        "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-        "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
-        "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
-      ],
+      "status": "unported",
+      "go_targets": [],
+      "tests": [],
       "assertions": [
         {
           "line": 54,
@@ -140891,135 +140723,24 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "concrete Runtime unsigned-vector/permutation class selected source reset alternating growth, swap, move_after, display, default-debug invariant and member destruction; exact ranges in cached source map",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_runtime.go",
-          "tests": [
-            "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
-            "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
-            "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
-            "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
-            "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
-            "TestRuntimePermutationIndependentResetSwapMove",
-            "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
-            "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
-            "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
-            "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
-            "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
-          ]
+          "name": "permutation constructor and reset",
+          "status": "unported",
+          "tests": []
         },
         {
-          "name": "concrete unsigned-vector exact-cap deep copy/destructive assignment and permutation forward-then-inverse implicit member copy; actual acquisition history and completed-member constructor unwind",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_copy_source.go",
-          "tests": [
-            "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
-            "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
-            "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
-            "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
-            "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
-            "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
-            "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
-            "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
-            "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
-            "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
-            "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
-            "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
-            "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
-            "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
-            "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
-          ]
+          "name": "swap and move_after",
+          "status": "unported",
+          "tests": []
         },
         {
-          "name": "concrete permutation borrowed assertion switch at actual source macro sites and NumericTextStream formatted display insertion chain",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_diagnostics_source.go",
-          "tests": [
-            "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
-            "TestRuntimePermutationClosedAssertionCopyPublication",
-            "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
-            "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
-            "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
-            "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
-            "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-            "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
-          ]
-        },
-        {
-          "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
-          "status": "partial",
-          "go_target": "pkg/util/util_debug_action_binding.go",
-          "tests": [
-            "TestPermutationBoundFalseSizeContinueResumesSourceBody",
-            "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
-            "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
-            "TestPermutationBoundTrueAndBindingOwnerGuards",
-            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
-            "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
-            "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
-            "TestPermutationBoundSubprocessHelper",
-            "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
-            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction"
-          ]
-        },
-        {
-          "name": "Captured concrete std::swap word-reference transport at permutation.cpp:35-40/vector.h:303-310: both lvalues acquired before actual payload loads, writes preserve captured provider/block/offset",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_word_view.go",
-          "tests": [
-            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
-            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce"
-          ]
-        },
-        {
-          "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
-          "status": "partial",
-          "go_target": "pkg/util/util_debug_notification.go",
-          "tests": [
-            "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-            "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
-          ]
+          "name": "display and check_invariant",
+          "status": "unported",
+          "tests": []
         }
       ],
-      "ownership": [
-        "Two embedded concrete unsigned vectors charge only enclosing reflected permutation header; independent wrapper charges its own reflected header. No shadow slices, tickets, new shared engine mutations.",
-        "Exact named raw block+pending roots validated against live Runtime records by independent existing physical bijection; Budget total Runtime once+actual cold header before faultlift.",
-        "Source ctor failure DT completed inverse then forward before return; no completed outer-object destructor body. Separate owning Close drains actual pending roots/refunds cold header.",
-        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds.",
-        "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
-        "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
-        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
-        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
-        "One borrowed DebugContext pointer included in actual reflected permutation header; no independent provider ownership, shadow switch or assertion reservation. Existing real vector raw/pending/acquisition ownership unchanged; independent named physical bijection and cold sum before every actual constructor/output refusal.",
-        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute.",
-        "DebugContext reflected owner header charges one actual borrowed action pointer; setter validates self/common Budget identity without reading input/file/closed pointed state. Streams and action contexts remain caller-owned.",
-        "Bound invocation under actual FailAfter0 retains exact named Runtime forward/inverse raw bijection plus permutation/copy, debug/region, action/input, standard-service/two-file-stream cold sum before fault lift; no new Budget reservation.",
-        "Source indexed std::swap lvalues acquired once: mutable vector.h:304 checks4 failed forward accesses in completed SIZE0 spare fixture; assignments write through reached lvalues without repeated SASSERT. Actual initialized spare reads/writes remain physically guarded.",
-        "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
-        "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved."
-      ],
+      "ownership": [],
       "deviations": [
-        "Whole vector source family including class copy/assignment/reserve/swap and other element types remains partial; new wrapper selected init/reset/push/resize/index/DT only",
-        "Permutation compiler-generated copy/assignment future obligation; no whole class/native ostream/global debug complete claim",
-        "Existing registered src/test/permutation.cpp tst1 algorithm body is disabled #if0, new class tests independent branch/oracles, not enabled driver assertions",
-        "Go io.Writer left-to-right insertion/refusal adapter, native ostream flags/locale/badbit/global services open",
-        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration",
-        "Dangling destructor after failed nonnull assignment is source-undefined guarded domain",
-        "Public TLS signed-overflow cleanup-stop fixtures are guarded-domain evidence, not ordinary OOM",
-        "Native ostream/global debug/general vector and polynomial consumers remain partial",
-        "Nonwrapping acquisition invocation finite Go domain",
-        "Selected caller-confined assertion flag binding and libstdc++ formatting profile only; notification/debugger/fatal assertion transport, process global binding, arbitrary locale/native ostream buffering/throw masks remain OPEN.",
-        "Source registered permutation driver remains disabled #if0; new independent branch tests give no registered driver credit.",
-        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior.",
-        "Partial concrete source-site binding only: unbound ErrSATAssertion remains legacy explicit Go adapter; no process singleton, broad macro/tag/notify/native ABI completion claim.",
-        "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
-        "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
-        "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
-        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
-        "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
-        "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI."
+        "A whole-source scan found no production caller of the C++ permutation class. The test-only Go Runtime/vector duplicate was deleted; retain the source unit as unported until source-deletion review."
       ]
     },
     {
@@ -141030,29 +140751,11 @@
       "go_targets": [
         "pkg/util/permutation/apply.go",
         "pkg/util/permutation/apply_test.go",
-        "pkg/util/util_unsigned_vector_runtime.go",
-        "pkg/util/util_unsigned_vector_runtime_test.go",
-        "pkg/util/util_permutation_runtime.go",
-        "pkg/util/util_permutation_runtime_test.go",
-        "pkg/util/util_unsigned_vector_copy_source.go",
-        "pkg/util/util_unsigned_vector_copy_source_test.go",
-        "pkg/util/util_permutation_copy_source.go",
-        "pkg/util/util_permutation_copy_source_test.go",
-        "pkg/util/util_unsigned_vector_copy_retire_source_test.go",
-        "pkg/util/permutation_runtime_view.go",
-        "pkg/util/permutation_runtime_view_test.go",
-        "pkg/math/polynomial/polynomial_cell.go",
-        "pkg/math/polynomial/polynomial_store.go",
+        "pkg/util/permutation/debug_off.go",
+        "pkg/util/permutation/debug_on.go",
         "pkg/math/polynomial/polynomial_lex_sort.go",
         "pkg/math/polynomial/polynomial_lex_raw_pointer.go",
-        "pkg/math/polynomial/polynomial_lex_raw_source_test.go",
-        "pkg/util/util_permutation_diagnostics_source.go",
-        "pkg/util/util_permutation_diagnostics_source_test.go",
-        "pkg/util/util_debug_action_binding_source_test.go",
-        "pkg/util/util_permutation_word_view.go",
-        "pkg/util/util_debug_notification.go",
-        "pkg/util/permutation/debug_off.go",
-        "pkg/util/permutation/debug_on.go"
+        "pkg/math/polynomial/polynomial_lex_raw_source_test.go"
       ],
       "tests": [
         "TestPermutationCyclesExhaustiveIndependentCopy",
@@ -141060,36 +140763,6 @@
         "TestPermutationCyclesUnreadAndSignedCountBranches",
         "TestPermutationCyclesOverlappingActualBorrow",
         "TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle",
-        "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
-        "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
-        "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
-        "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
-        "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
-        "TestRuntimePermutationIndependentResetSwapMove",
-        "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
-        "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
-        "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
-        "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
-        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember",
-        "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
-        "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
-        "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
-        "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
-        "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
-        "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
-        "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
-        "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
-        "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
-        "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
-        "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
-        "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
-        "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
-        "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
-        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation",
-        "TestRuntimePermutationPointerCyclesIndependentFiniteOracle",
-        "TestRuntimePermutationPointerMarkBeforeReachedReadAndAliasing",
-        "TestRuntimePermutationPointerUnreadZeroSignedLoopAndLifetime",
-        "TestRuntimePermutationPointerReachedAssertionBoundsAndRestorationPrefix",
         "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
         "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
         "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
@@ -141101,28 +140774,7 @@
         "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
         "TestPolynomialLexSortNestedGrowthEveryReservation",
         "TestPolynomialLexSortActualBigCoefficientOwnership",
-        "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
-        "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
-        "TestRuntimePermutationClosedAssertionCopyPublication",
-        "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
-        "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
-        "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
-        "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
-        "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation",
-        "TestPermutationBoundFalseSizeContinueResumesSourceBody",
-        "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
-        "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
-        "TestPermutationBoundTrueAndBindingOwnerGuards",
-        "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
-        "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
-        "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
-        "TestPermutationBoundSubprocessHelper",
-        "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
-        "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-        "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
-        "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
+        "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
       ],
       "conditionals": [
         {
@@ -141176,57 +140828,6 @@
           ]
         },
         {
-          "name": "concrete Runtime unsigned-vector/permutation class selected source reset alternating growth, swap, move_after, display, default-debug invariant and member destruction; exact ranges in cached source map",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_runtime.go",
-          "tests": [
-            "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
-            "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
-            "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
-            "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
-            "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
-            "TestRuntimePermutationIndependentResetSwapMove",
-            "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
-            "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
-            "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
-            "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
-            "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
-          ]
-        },
-        {
-          "name": "concrete unsigned-vector exact-cap deep copy/destructive assignment and permutation forward-then-inverse implicit member copy; actual acquisition history and completed-member constructor unwind",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_copy_source.go",
-          "tests": [
-            "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
-            "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
-            "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
-            "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
-            "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
-            "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
-            "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
-            "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
-            "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
-            "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
-            "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
-            "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
-            "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
-            "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
-            "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
-          ]
-        },
-        {
-          "name": "concrete borrowed Runtime uint32 apply_permutation_core and restoring wrapper; literal signed loop, marker-before-swap and reached pointer accesses",
-          "status": "partial",
-          "go_target": "pkg/util/permutation_runtime_view.go",
-          "tests": [
-            "TestRuntimePermutationPointerCyclesIndependentFiniteOracle",
-            "TestRuntimePermutationPointerMarkBeforeReachedReadAndAliasing",
-            "TestRuntimePermutationPointerUnreadZeroSignedLoopAndLifetime",
-            "TestRuntimePermutationPointerReachedAssertionBoundsAndRestorationPrefix"
-          ]
-        },
-        {
           "name": "actual polynomial lex recursive raw NUM/monomial cycle consumers and captured Runtime mapping; stable actual allocation layout and literal nested bucket size/append/capacity source reads",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_lex_raw_pointer.go",
@@ -141244,115 +140845,15 @@
             "TestPolynomialLexSortActualBigCoefficientOwnership",
             "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
           ]
-        },
-        {
-          "name": "concrete permutation borrowed assertion switch at actual source macro sites and NumericTextStream formatted display insertion chain",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_diagnostics_source.go",
-          "tests": [
-            "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
-            "TestRuntimePermutationClosedAssertionCopyPublication",
-            "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
-            "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
-            "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
-            "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
-            "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-            "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
-          ]
-        },
-        {
-          "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
-          "status": "partial",
-          "go_target": "pkg/util/util_debug_action_binding.go",
-          "tests": [
-            "TestPermutationBoundFalseSizeContinueResumesSourceBody",
-            "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
-            "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
-            "TestPermutationBoundTrueAndBindingOwnerGuards",
-            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
-            "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
-            "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
-            "TestPermutationBoundSubprocessHelper",
-            "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
-            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction"
-          ]
-        },
-        {
-          "name": "Captured concrete std::swap word-reference transport at permutation.cpp:35-40/vector.h:303-310: both lvalues acquired before actual payload loads, writes preserve captured provider/block/offset",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_word_view.go",
-          "tests": [
-            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
-            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce"
-          ]
-        },
-        {
-          "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
-          "status": "partial",
-          "go_target": "pkg/util/util_debug_notification.go",
-          "tests": [
-            "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-            "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
-          ]
         }
       ],
       "ownership": [
-        "Borrowed actual uint32 data/mapping, inplace signed marks and swaps; no scratch allocation or overlapping-range clone. Reached bounds guards preserve earlier marks and swaps.",
-        "Two embedded concrete unsigned vectors charge only enclosing reflected permutation header; independent wrapper charges its own reflected header. No shadow slices, tickets, new shared engine mutations.",
-        "Exact named raw block+pending roots validated against live Runtime records by independent existing physical bijection; Budget total Runtime once+actual cold header before faultlift.",
-        "Source ctor failure DT completed inverse then forward before return; no completed outer-object destructor body. Separate owning Close drains actual pending roots/refunds cold header.",
-        "Public TLS signed-overflow-domain stop: inverse physical free precedes older forward; ordinary/source cause and cursor sticky, explicit own cleanup frees forward then second attempt acknowledges consumed physical state/refunds.",
-        "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
-        "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
-        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
-        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
-        "Call-local pointer-free borrowed Runtime+Block+offset only. CPtr reads no SIZE/CAP/payload/provider; reached access uses existing actual Runtime word codecs. No allocation, metadata owner, whole-range preflight, clone or shadow. Captured generation invalidates on real realloc/free; same backing changes remain visible. Per-word writes validate physical word extent and initialization read guards before swaps. Caller-named graph unchanged under FailAfter0.",
-        "Actual NUM12 and monomial16 encoded payloads swapped in place with no INC/DEL, clone, replacement allocation or snapshot ownership.",
-        "monomialBase uint64 stamped at real location publication from actual n; reflected cold location directory charged once, independent from mutable SIZE/request uint32 wrap.",
-        "Captured core/Polynomial/ObjectRef/base guard exact live slot/generation and current raw identity at each reached initialized-prefix/allocator word read. No logical SIZE read; same source buffer values/captured mapping pointer.",
-        "Existing actual nested Runtime row backing, raw/moved-prefix/old/pending roots and charged children directory remain; source append rereads other.SIZE per loop, default CAP assertion before expansion overflow/allocation, size read before each source cycle.",
-        "Independent full named polynomial/NUM/monomial/raw/cold census immediate under active fault for every existing reservation before firstsuccess; public higher-variable permutation retained before lower recursive refusal.",
-        "One borrowed DebugContext pointer included in actual reflected permutation header; no independent provider ownership, shadow switch or assertion reservation. Existing real vector raw/pending/acquisition ownership unchanged; independent named physical bijection and cold sum before every actual constructor/output refusal.",
-        "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute.",
-        "DebugContext reflected owner header charges one actual borrowed action pointer; setter validates self/common Budget identity without reading input/file/closed pointed state. Streams and action contexts remain caller-owned.",
-        "Bound invocation under actual FailAfter0 retains exact named Runtime forward/inverse raw bijection plus permutation/copy, debug/region, action/input, standard-service/two-file-stream cold sum before fault lift; no new Budget reservation.",
-        "Source indexed std::swap lvalues acquired once: mutable vector.h:304 checks4 failed forward accesses in completed SIZE0 spare fixture; assignments write through reached lvalues without repeated SASSERT. Actual initialized spare reads/writes remain physically guarded.",
-        "Call-local word views have no allocation or cold owner: pointer acquisition records actual provider/block/offset; retained live backing exchange test names both owner fields and validates complete raw/cold graph; genuine deallocation then makes captured token stale at reached load/store. No debugger mutation callbacks or snapshot authority.",
-        "Both public binding setters enforce the same nonnull interactive standard-service identity without reading pointed closed/input/file state. Actual same-Budget distinct-file services/hex-versus-decimal flags are rejected without pointer or charge mutation; null/unbound and NO_DEBUGGER stream-erasure preserved."
+        "The native uint32 cycle operations borrow caller slices, mark the mapping in place, and allocate no scratch storage. Reached errors preserve earlier marks and swaps.",
+        "Polynomial lex sorting retains its concrete raw coefficient and monomial cycle path until those owners move to native slices."
       ],
       "deviations": [
-        "Concrete uint32 specialization only; permutation class and additional typed consumers remain open, with no Go generics.",
-        "Source tst1 body is disabled by #if0 and its ENSURE loop bound is zero; independent exhaustive checks supply mathematical evidence, not registered source driver credit.",
-        "Explicit int32 cast profile and reached Go bounds/assertion guards cover native undefined access domains; source global assertion-switch/debug continuation remains open.",
-        "Whole vector source family including class copy/assignment/reserve/swap and other element types remains partial; new wrapper selected init/reset/push/resize/index/DT only",
-        "Permutation compiler-generated copy/assignment future obligation; no whole class/native ostream/global debug complete claim",
-        "Existing registered src/test/permutation.cpp tst1 algorithm body is disabled #if0, new class tests independent branch/oracles, not enabled driver assertions",
-        "Go io.Writer left-to-right insertion/refusal adapter, native ostream flags/locale/badbit/global services open",
-        "Reuses concrete main-package Runtime scalar engine; polynomial lex-sort adoption remains future integration",
-        "Dangling destructor after failed nonnull assignment is source-undefined guarded domain",
-        "Public TLS signed-overflow cleanup-stop fixtures are guarded-domain evidence, not ordinary OOM",
-        "Native ostream/global debug/general vector and polynomial consumers remain partial",
-        "Nonwrapping acquisition invocation finite Go domain",
-        "Concrete uint32 cycle payload only; polynomial numeral and monomial handle payload specializations, actual bucket vectors and lex-sort adoption remain OPEN",
-        "Captured token generation is checked Go lifetime domain; no native address/ABI claim",
-        "Default source DEBUG assertions only; full global macro controls/native std::swap variants remain partial",
-        "Existing registered permutation test algorithm remains #if0, independent new branch tests do not claim source driver execution",
-        "ObjectRef/init-prefix checking is explicit Go raw-pointer lifetime/safety domain; malformed header/subrange/reused token tests are not native valid exception claims.",
-        "Concrete actual12/16-byte codecs remain replacement representation, not native NUM/pointer ABI closure.",
-        "Existing registered high-level polynomial driver is not newly credited wholesale; independent branch/oracle and source-consumer tests only.",
-        "Global DEBUG/TRACE/ostream and broad nested-vector/copy/lifecycle source methods remain partial.",
-        "Selected caller-confined assertion flag binding and libstdc++ formatting profile only; notification/debugger/fatal assertion transport, process global binding, arbitrary locale/native ostream buffering/throw masks remain OPEN.",
-        "Source registered permutation driver remains disabled #if0; new independent branch tests give no registered driver credit.",
-        "Closed-provider and completed partial Reset indexed spare fixtures qualify checked lifetime/initialization domains; output buffer refusal is Go transport accounting evidence, not C++ default stream exception behavior.",
-        "Partial concrete source-site binding only: unbound ErrSATAssertion remains legacy explicit Go adapter; no process singleton, broad macro/tag/notify/native ABI completion claim.",
-        "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
-        "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
-        "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
-        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
-        "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
-        "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI."
+        "Only concrete uint32 and polynomial payload consumers are represented; future consumers receive their own typed slice implementation without a generic container wrapper.",
+        "The registered permutation test body is disabled by #if 0, so independent finite tests provide algorithm evidence without registered-driver credit."
       ]
     },
     {
@@ -150061,12 +149562,8 @@
         "pkg/util/heap/owner_test.go",
         "pkg/util/util_unsigned_vector_runtime.go",
         "pkg/util/util_unsigned_vector_runtime_test.go",
-        "pkg/util/util_permutation_runtime.go",
-        "pkg/util/util_permutation_runtime_test.go",
         "pkg/util/util_unsigned_vector_copy_source.go",
         "pkg/util/util_unsigned_vector_copy_source_test.go",
-        "pkg/util/util_permutation_copy_source.go",
-        "pkg/util/util_permutation_copy_source_test.go",
         "pkg/util/util_unsigned_vector_copy_retire_source_test.go",
         "pkg/util/util_unsigned_vector_view_source_test.go",
         "pkg/math/polynomial/polynomial_cell.go",
@@ -150074,10 +149571,6 @@
         "pkg/math/polynomial/polynomial_lex_sort.go",
         "pkg/math/polynomial/polynomial_lex_raw_pointer.go",
         "pkg/math/polynomial/polynomial_lex_raw_source_test.go",
-        "pkg/util/util_permutation_diagnostics_source.go",
-        "pkg/util/util_permutation_diagnostics_source_test.go",
-        "pkg/util/util_debug_action_binding_source_test.go",
-        "pkg/util/util_permutation_word_view.go",
         "pkg/util/util_debug_notification.go",
         "pkg/util/util_debug_macros.go",
         "pkg/util/util_debug_macro_source_test.go",
@@ -150104,7 +149597,8 @@
         "pkg/util/runtime_vector_copy.go",
         "pkg/util/runtime_unsigned_rows_test.go",
         "pkg/ast/ast_ref_cache_resize.go",
-        "pkg/util/runtime_unsigned_rows_helpers_test.go"
+        "pkg/util/runtime_unsigned_rows_helpers_test.go",
+        "pkg/util/runtime_uint32_view.go"
       ],
       "tests": [
         "TestParamDescrsBudgetFailuresAndWarmDuplicate",
@@ -150341,29 +149835,14 @@
         "TestHeapFindLESourceOutputBeforeChildGrowth",
         "TestHeapLegacyCopiedCloseRejectsBeforeRefund",
         "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
-        "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
         "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
         "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
-        "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
-        "TestRuntimePermutationIndependentResetSwapMove",
-        "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
-        "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
-        "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
-        "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
-        "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember",
+        "TestRuntimeUnsignedVectorOwnerAndProviderGuards",
         "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
         "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
         "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
         "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
         "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
-        "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
-        "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
-        "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
-        "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
-        "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
-        "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
-        "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
-        "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
         "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
         "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation",
         "TestRuntimeUnsignedVectorCPtrCapturesPhysicalLifetimeAndSameCapacityMutation",
@@ -150380,27 +149859,6 @@
         "TestPolynomialLexSortNestedGrowthEveryReservation",
         "TestPolynomialLexSortActualBigCoefficientOwnership",
         "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
-        "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
-        "TestRuntimePermutationClosedAssertionCopyPublication",
-        "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
-        "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
-        "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
-        "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
-        "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-        "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation",
-        "TestPermutationBoundFalseSizeContinueResumesSourceBody",
-        "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
-        "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
-        "TestPermutationBoundTrueAndBindingOwnerGuards",
-        "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
-        "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
-        "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
-        "TestPermutationBoundSubprocessHelper",
-        "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
-        "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-        "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
-        "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-        "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration",
         "TestDebugMacroUnreachableIgnoresAssertionSwitch",
         "TestDebugMacroVerifyFalsePrefixAndContinue",
         "TestDebugMacroXAssertionLiteralExtraBeforeAction",
@@ -150896,16 +150354,9 @@
           "go_target": "pkg/util/util_unsigned_vector_runtime.go",
           "tests": [
             "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
-            "TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind",
             "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
             "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
-            "TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards",
-            "TestRuntimePermutationIndependentResetSwapMove",
-            "TestRuntimePermutationMoveNoopLeavesInvalidIndicesUnread",
-            "TestRuntimePermutationSourceResetRetainsActualAlternatingFailurePrefix",
-            "TestRuntimePermutationDisplayExactInsertionAndRefusalPrefixes",
-            "TestRuntimePermutationResetEveryReservationPrefixAndRecovery",
-            "TestRuntimePermutationDestructorStoppedPhysicalReceiptKeepsOlderMember"
+            "TestRuntimeUnsignedVectorOwnerAndProviderGuards"
           ]
         },
         {
@@ -150918,14 +150369,6 @@
             "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
             "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
             "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
-            "TestRuntimePermutationCopyMemberOrderAndIndependentDestination",
-            "TestRuntimePermutationFailedInverseCopyDestructsOnlyCompletedForward",
-            "TestRuntimePermutationCopyEveryReservationAndConstructorUnwind",
-            "TestRuntimePermutationAssignEveryReservationAndLiteralMemberPrefix",
-            "TestRuntimePermutationFailedCopyReadHasNoUncompletedMemberDestructor",
-            "TestRuntimePermutationAssignNullSourceAndSelfUseNoAllocation",
-            "TestRuntimePermutationAssignStoppedDeallocateUsesExactConsumedFieldReceipt",
-            "TestRuntimePermutationFailedSecondCopyReadRetainsUncompletedInverse",
             "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
             "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
           ]
@@ -150959,56 +150402,16 @@
           ]
         },
         {
-          "name": "concrete permutation borrowed assertion switch at actual source macro sites and NumericTextStream formatted display insertion chain",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_diagnostics_source.go",
-          "tests": [
-            "TestRuntimePermutationAssertionsActualPartialResetAndScalarReads",
-            "TestRuntimePermutationClosedAssertionCopyPublication",
-            "TestRuntimePermutationDisplayIntoExactFormattingAndBadbitReads",
-            "TestRuntimePermutationEmptyDisplayLeavesStreamUnread",
-            "TestRuntimePermutationAssertionConstructorReachedGrowthAndUnwind",
-            "TestRuntimePermutationDiagnosticConstructorEveryActualReservation",
-            "TestRuntimePermutationFormattedDisplayEveryOutputReservation",
-            "TestRuntimePermutationBindingRejectsForeignCohortBeforeReservation"
-          ]
-        },
-        {
           "name": "Concrete enabled-false SASSERT notification/action binding: permutation.cpp:67,70-73 and vector.h:70,113,167,304,309; actual C continuation/T exception/exit action sites",
           "status": "partial",
           "go_target": "pkg/util/util_debug_action_binding.go",
-          "tests": [
-            "TestPermutationBoundFalseSizeContinueResumesSourceBody",
-            "TestPermutationBoundIndexedContinueReadsActualInitializedSpare",
-            "TestPermutationBoundThrowAndDisabledUnreadClosedAction",
-            "TestPermutationBoundTrueAndBindingOwnerGuards",
-            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce",
-            "TestPermutationBoundImmediateNamedGraphUnderActualRefusal",
-            "TestPermutationBoundNestedConditionsContinueWithoutReplacingSourceResult",
-            "TestPermutationBoundSubprocessHelper",
-            "TestPermutationBoundActualAbortEOFAndNoDebuggerActions",
-            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction"
-          ]
-        },
-        {
-          "name": "Captured concrete std::swap word-reference transport at permutation.cpp:35-40/vector.h:303-310: both lvalues acquired before actual payload loads, writes preserve captured provider/block/offset",
-          "status": "partial",
-          "go_target": "pkg/util/util_permutation_word_view.go",
-          "tests": [
-            "TestPermutationSwapWordViewsKeepActualCapturedLiveBacking",
-            "TestPermutationAcquiredWordGuardAfterActualBackingDestruction",
-            "TestPermutationBoundSwapCapturesIndexedLvaluesOnlyOnce"
-          ]
+          "tests": []
         },
         {
           "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
           "status": "partial",
           "go_target": "pkg/util/util_debug_notification.go",
-          "tests": [
-            "TestDebugBindingReciprocalPublicSetterKeepsOneActualStreamService",
-            "TestDebugBindingReverseOrderNullAndNoDebuggerConfiguration"
-          ]
+          "tests": []
         },
         {
           "name": "Literal source macro false leaves plus concrete Runtime heap constructor/reset/reserve/bounds/insert/move/erase/min/key-update/swap and nested indexed/back/pop/shrink assertion control; src/util/debug.h:63-65; src/util/debug.h:67-78; src/util/debug.h:81-92; src/util/error_codes.h:29; src/util/heap.h:57,61-66,79-92,230-239; src/util/vector.h:303-310; src/util/heap.h:126,138,145,154,162,165,174,191,196,217,260-265; src/util/heap.h:105,169,175-176,181,197,221,226; src/util/vector.h:334,344,391,402; src/util/heap.h:272-282",

@@ -1,4 +1,4 @@
-// Source: src/util/vector.h:449-451; src/util/permutation.h:56-91.
+// Source: src/util/vector.h:449-451.
 package util
 
 import (
@@ -38,14 +38,7 @@ func TestRuntimeUnsignedVectorCPtrCapturesPhysicalLifetimeAndSameCapacityMutatio
 	}
 	p, e = v.CPtr()
 	paramsMust(t, e)
-	state, used := r.State(), b.Used()
-	b.FailAfter(0)
-	paramsMust(t, ApplyPermutationCoreRuntimeUint32(3, p, p))
-	if r.State() != state || b.Used() != used {
-		t.Fatal("borrowed kernel allocations")
-	}
 	unsignedCopyPhysical(t, r, b, v)
-	b.FailAfter(-1)
 	paramsMust(t, v.Close())
 	if _, e = p.Read(0); !errors.Is(e, ErrRuntimeOwner) {
 		t.Fatal(e)

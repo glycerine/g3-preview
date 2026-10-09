@@ -54,7 +54,7 @@ func (v *RuntimeASTLiteralVector) copyCoreDebug(src *RuntimeASTLiteralVector, d 
 	// Source it2=begin(), then SASSERT(it2==m_data): both name the
 	// same freshly published destination pointer. No extent validation.
 	it2 := v.raw.Block
-	on, e := util.PermutationAssertions(d)
+	on, e := util.SourceAssertionsEnabled(d)
 	if e != nil {
 		return e
 	}
@@ -90,7 +90,7 @@ func (v *RuntimeASTLiteralVector) copyConstructDebug(src *RuntimeASTLiteralVecto
 			return e
 		}
 	}
-	on, e := util.PermutationAssertions(d)
+	on, e := util.SourceAssertionsEnabled(d)
 	if e != nil {
 		v.constructorCause = e
 		return e

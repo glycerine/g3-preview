@@ -8,6 +8,18 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
+// SourceAssertionsEnabled evaluates the selected source assertion profile and
+// an optional borrowed debug context. It is shared by concrete checked ports.
+func SourceAssertionsEnabled(d *DebugContext) (bool, error) {
+	if !sourceDebug {
+		return false, nil
+	}
+	if d == nil {
+		return true, nil
+	}
+	return d.AssertionsEnabled()
+}
+
 var ErrDebugContextOwner = errors.New("g3: invalid debug context owner")
 
 // DebugContext owns enabled debug names as immutable Go strings.

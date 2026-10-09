@@ -9,21 +9,6 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func permutationPhysical(t *testing.T, p *RuntimePermutation, r *Runtime, b *arena.Budget) {
-	t.Helper()
-	roots := []Block{}
-	c := &p.inverse.Column.Raw
-	if !c.PendingReplaces && c.Block != (Block{}) {
-		roots = append(roots, c.Block)
-	}
-	if c.Pending != (Block{}) {
-		roots = append(roots, c.Pending)
-	}
-	runtimeVectorAuditBlocks(t, &p.forward.Column.Raw, roots...)
-	if b.Used() != r.Stats().TotalBytes+p.header {
-		t.Fatal("exact named raw/cold ownership", b.Used(), r.Stats(), p.header)
-	}
-}
 func TestRuntimeUnsignedVectorGeometryResetAndWarmReuse(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	r, e := NewRuntime(RuntimeConfig{Budget: b})
@@ -65,53 +50,6 @@ func TestRuntimeUnsignedVectorGeometryResetAndWarmReuse(t *testing.T) {
 		t.Fatal(b.Used())
 	}
 }
-func TestRuntimePermutationEveryConstructorReservationSourceMemberUnwind(t *testing.T) {
-	success := -1
-	for ordinal := int64(0); ordinal < 100; ordinal++ {
-		b := arena.NewBudget(1 << 20)
-		r, e := NewRuntime(RuntimeConfig{Budget: b})
-		paramsMust(t, e)
-		b.FailAfter(ordinal)
-		p, e := NewRuntimePermutation(r, b, 9)
-		if p != nil {
-			permutationPhysical(t, p, r, b)
-		} else if r.Stats().LiveBlocks != 0 {
-			t.Fatal("constructor header refusal created raw allocation")
-		}
-		if e == nil {
-			success = int(ordinal)
-			permutationExpect(t, p, []uint32{0, 1, 2, 3, 4, 5, 6, 7, 8})
-		} else {
-			if !errors.Is(e, arena.ErrInjectedFailure) {
-				var f Failure
-				if !errors.As(e, &f) || f.ErrorCode() != 101 || !r.State().OutOfMemory {
-					t.Fatal("actual refusal category", ordinal, e)
-				}
-			}
-			if p != nil {
-				if p.destructorStage != 2 || !p.inverse.sourceDone || !p.forward.sourceDone || r.Stats().LiveBlocks != 0 {
-					t.Fatal("failed constructor completed members must destruct inverse before forward", ordinal, p.destructorStage, r.Stats())
-				}
-			}
-		}
-		b.FailAfter(-1)
-		if p != nil {
-			paramsMust(t, p.Close())
-		}
-		paramsMust(t, r.Close())
-		if b.Used() != 0 {
-			t.Fatal("constructor abort leak", ordinal, b.Used())
-		}
-		if success >= 0 {
-			break
-		}
-	}
-	if success < 0 {
-		t.Fatal("did not reach first success")
-	}
-	t.Log("first success reservation", success)
-}
-
 func TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	r, e := NewRuntime(RuntimeConfig{Budget: b})
@@ -179,7 +117,7 @@ func TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady(t *testing.
 	}
 }
 
-func TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards(t *testing.T) {
+func TestRuntimeUnsignedVectorOwnerAndProviderGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	other := arena.NewBudget(1 << 20)
 	r, e := NewRuntime(RuntimeConfig{Budget: b})
@@ -187,9 +125,6 @@ func TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards(t *testing.T)
 	before := b.Used()
 	other.FailAfter(0)
 	if _, e = NewRuntimeUnsignedVector(r, other); !errors.Is(e, arena.ErrConfig) {
-		t.Fatal(e)
-	}
-	if _, e = NewRuntimePermutation(r, other, 2); !errors.Is(e, arena.ErrConfig) {
 		t.Fatal(e)
 	}
 	if b.Used() != before || other.Used() != 0 {
@@ -201,17 +136,10 @@ func TestRuntimeUnsignedVectorAndPermutationOwnerAndProviderGuards(t *testing.T)
 	if e = copyV.Close(); !errors.Is(e, ErrRuntimeVectorOwner) {
 		t.Fatal("copied vector", e)
 	}
-	p, e := NewRuntimePermutation(r, b, 0)
-	paramsMust(t, e)
-	copyP := *p
-	if e = copyP.Close(); !errors.Is(e, ErrRuntimeVectorOwner) {
-		t.Fatal("copied permutation", e)
-	}
 	paramsMust(t, v.Close())
 	if _, e = v.Size(); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal("ended vector", e)
 	}
-	paramsMust(t, p.Close())
 	paramsMust(t, r.Close())
 	if b.Used() != 0 {
 		t.Fatal(b.Used())

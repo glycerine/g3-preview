@@ -263,7 +263,7 @@ func TestASTSMT2BitVectorLiteralWarmInlinePrimaryDoesNotArchive(t *testing.T) {
 func TestASTSMT2BitVectorFalseNumeralActualActionAndErasure(t *testing.T) {
 	for _, command := range []string{"C", "T"} {
 		t.Run(command, func(t *testing.T) {
-			_, d, _, input, streams := permutationActionFixture(t, command)
+			_, d, _, input, streams := debugActionFixture(t, command)
 			b := d.BudgetField
 			sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
 			paramsMust(t, e)

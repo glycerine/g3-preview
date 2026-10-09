@@ -14,7 +14,7 @@ import (
 
 func psortActionFixture(t *testing.T, text string) (*PsortASTNetwork, *util.DebugContext, *util.NumericCharInput, *os.File) {
 	t.Helper()
-	b, r, d, input, streams := astPermutationActionFixture(t, text)
+	b, r, d, input, streams := astDebugActionFixture(t, text)
 	symbols, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
 	astTestMust(t, e)
 	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})

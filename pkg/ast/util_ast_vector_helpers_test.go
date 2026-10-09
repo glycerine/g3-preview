@@ -22,7 +22,7 @@ func astUnsignedGrowthPrime(t *testing.T, r *util.Runtime) util.Block {
 }
 
 // The diagnostic fixture stays with the AST tests and borrows only public utilities.
-func astPermutationActionFixture(t *testing.T, text string) (*arena.Budget, *util.Runtime, *util.DebugContext, *util.NumericCharInput, *os.File) {
+func astDebugActionFixture(t *testing.T, text string) (*arena.Budget, *util.Runtime, *util.DebugContext, *util.NumericCharInput, *os.File) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
@@ -31,11 +31,8 @@ func astPermutationActionFixture(t *testing.T, text string) (*arena.Budget, *uti
 	astTestMust(t, e)
 	d, e := util.NewDebugContext(region, b)
 	astTestMust(t, e)
-	p, e := util.NewRuntimePermutationWithAssertions(r, b, 2, d)
-	astTestMust(t, e)
 	t.Cleanup(func() {
 		b.FailAfter(-1)
-		astTestMust(t, p.Close())
 		astTestMust(t, d.Close())
 		astTestMust(t, region.Close())
 		astTestMust(t, r.Close())
@@ -43,13 +40,13 @@ func astPermutationActionFixture(t *testing.T, text string) (*arena.Budget, *uti
 			t.Fatal("unnamed diagnostic owner", b.Used())
 		}
 	})
-	inputFile, e := os.CreateTemp(t.TempDir(), "permutation-action-input-*")
+	inputFile, e := os.CreateTemp(t.TempDir(), "debug-action-input-*")
 	astTestMust(t, e)
 	_, e = inputFile.WriteString(text)
 	astTestMust(t, e)
 	_, e = inputFile.Seek(0, 0)
 	astTestMust(t, e)
-	out, e := os.CreateTemp(t.TempDir(), "permutation-action-output-*")
+	out, e := os.CreateTemp(t.TempDir(), "debug-action-output-*")
 	astTestMust(t, e)
 	streams, e := util.NewMemoryStandardStreams(util.MemoryStandardStreamsConfig{Budget: b, Stdout: out, Stderr: out})
 	astTestMust(t, e)

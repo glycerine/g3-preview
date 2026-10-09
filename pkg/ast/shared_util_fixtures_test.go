@@ -110,16 +110,16 @@ func gparamsTestConfig(b *arena.Budget) util.GlobalParamsConfig {
 	return util.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}
 }
 
-func permutationActionFixture(t *testing.T, text string) (*util.RuntimePermutation, *util.DebugContext, *util.DebugActionContext, *util.NumericCharInput, *util.MemoryStandardStreams) {
+func debugActionFixture(t *testing.T, text string) (*util.Runtime, *util.DebugContext, *util.DebugActionContext, *util.NumericCharInput, *util.MemoryStandardStreams) {
 	t.Helper()
-	p, d, _, b := permutationDiagnosticFixture(t, 2)
-	inputFile, e := os.CreateTemp(".", "permutation-action-input-*")
+	d, r, b := debugDiagnosticFixture(t)
+	inputFile, e := os.CreateTemp(".", "debug-action-input-*")
 	paramsMust(t, e)
 	_, e = inputFile.WriteString(text)
 	paramsMust(t, e)
 	_, e = inputFile.Seek(0, 0)
 	paramsMust(t, e)
-	out, e := os.CreateTemp(".", "permutation-action-output-*")
+	out, e := os.CreateTemp(".", "debug-action-output-*")
 	paramsMust(t, e)
 	streams, e := util.NewMemoryStandardStreams(util.MemoryStandardStreamsConfig{Budget: b, Stdout: out, Stderr: out})
 	paramsMust(t, e)
@@ -139,7 +139,7 @@ func permutationActionFixture(t *testing.T, text string) (*util.RuntimePermutati
 		os.Remove(inputFile.Name())
 		os.Remove(out.Name())
 	})
-	return p, d, action, input, streams
+	return r, d, action, input, streams
 }
 func gparamsVectorGraph(s arena.VectorStats) uint64 {
 	d := s.Descriptors
@@ -148,7 +148,7 @@ func gparamsVectorGraph(s arena.VectorStats) uint64 {
 
 var _ util.ConstructionFailure = (*util.RationalService)(nil)
 
-func permutationDiagnosticFixture(t *testing.T, n uint32) (*util.RuntimePermutation, *util.DebugContext, *util.Runtime, *arena.Budget) {
+func debugDiagnosticFixture(t *testing.T) (*util.DebugContext, *util.Runtime, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
@@ -157,11 +157,8 @@ func permutationDiagnosticFixture(t *testing.T, n uint32) (*util.RuntimePermutat
 	paramsMust(t, e)
 	d, e := util.NewDebugContext(region, b)
 	paramsMust(t, e)
-	p, e := util.NewRuntimePermutationWithAssertions(r, b, n, d)
-	paramsMust(t, e)
 	t.Cleanup(func() {
 		b.FailAfter(-1)
-		paramsMust(t, p.Close())
 		paramsMust(t, d.Close())
 		paramsMust(t, region.Close())
 		paramsMust(t, r.Close())
@@ -169,7 +166,7 @@ func permutationDiagnosticFixture(t *testing.T, n uint32) (*util.RuntimePermutat
 			t.Fatal("unnamed diagnostic owner", b.Used())
 		}
 	})
-	return p, d, r, b
+	return d, r, b
 }
 
 const DebugSourcePrompt = "(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"

@@ -15,8 +15,50 @@ import (
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
+func debugActionFixture(t *testing.T, text string) (*Runtime, *DebugContext, *DebugActionContext, *NumericCharInput, *MemoryStandardStreams) {
+	t.Helper()
+	b := arena.NewBudget(1 << 24)
+	r, e := NewRuntime(RuntimeConfig{Budget: b})
+	paramsMust(t, e)
+	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
+	paramsMust(t, e)
+	d, e := NewDebugContext(region, b)
+	paramsMust(t, e)
+	inputFile, e := os.CreateTemp(t.TempDir(), "debug-action-input-*")
+	paramsMust(t, e)
+	_, e = inputFile.WriteString(text)
+	paramsMust(t, e)
+	_, e = inputFile.Seek(0, 0)
+	paramsMust(t, e)
+	out, e := os.CreateTemp(t.TempDir(), "debug-action-output-*")
+	paramsMust(t, e)
+	streams, e := NewMemoryStandardStreams(MemoryStandardStreamsConfig{Budget: b, Stdout: out, Stderr: out})
+	paramsMust(t, e)
+	input, e := NewDebuggerCharInput(streams, inputFile)
+	paramsMust(t, e)
+	action, e := NewDebugActionContext(DebugActionConfig{Budget: b, Streams: streams, Input: input})
+	paramsMust(t, e)
+	paramsMust(t, d.BindAssertionStreams(streams))
+	paramsMust(t, d.BindAssertionActions(action))
+	t.Cleanup(func() {
+		b.FailAfter(-1)
+		paramsMust(t, action.Close())
+		paramsMust(t, input.Close())
+		paramsMust(t, streams.Close())
+		paramsMust(t, inputFile.Close())
+		paramsMust(t, out.Close())
+		paramsMust(t, d.Close())
+		paramsMust(t, region.Close())
+		paramsMust(t, r.Close())
+		if b.Used() != 0 {
+			t.Fatal("unnamed debug fixture owner", b.Used())
+		}
+	})
+	return r, d, action, input, streams
+}
+
 func TestDebugMacroUnreachableIgnoresAssertionSwitch(t *testing.T) {
-	_, d, _, in, s := permutationActionFixture(t, "T")
+	_, d, _, in, s := debugActionFixture(t, "T")
 	paramsMust(t, d.EnableAssertions(false))
 	e := d.UnreachableSource("macro_fixture.cpp", 41)
 	if sourceDebug {
@@ -40,7 +82,7 @@ func TestDebugMacroUnreachableIgnoresAssertionSwitch(t *testing.T) {
 	}
 }
 func TestDebugMacroVerifyFalsePrefixAndContinue(t *testing.T) {
-	_, d, _, in, s := permutationActionFixture(t, "C")
+	_, d, _, in, s := debugActionFixture(t, "C")
 	paramsMust(t, d.EnableAssertions(false))
 	e := d.VerifyFailure("macro_fixture.cpp", 52, "value == expected")
 	data, re := os.ReadFile(s.StderrField.File.Name())
@@ -62,11 +104,11 @@ func TestDebugMacroVerifyFalsePrefixAndContinue(t *testing.T) {
 	}
 }
 func TestDebugMacroXAssertionLiteralExtraBeforeAction(t *testing.T) {
-	_, d, _, in, s := permutationActionFixture(t, "T")
+	_, d, _, in, s := debugActionFixture(t, "T")
 	var reached uint32
 	// Exact definition-only expansion: gate, then condition, notify, actual EXTRA,
 	// debugger. No upstream XASSERT invocation exists and no callback is used.
-	on, e := PermutationAssertions(d)
+	on, e := SourceAssertionsEnabled(d)
 	paramsMust(t, e)
 	if on {
 		reached++
@@ -202,8 +244,7 @@ func TestDebugMacroActualEnsureAndNotImplementedExits(t *testing.T) {
 }
 
 func TestDebugMacroCassertLiteralTagShortCircuitAndUninitializedCondition(t *testing.T) {
-	p, d, _, _, _ := permutationActionFixture(t, "C")
-	r := p.forward.Column.Raw.Runtime
+	r, d, _, _, _ := debugActionFixture(t, "C")
 	word, e := r.Allocate(1)
 	paramsMust(t, e)
 	t.Cleanup(func() { paramsMust(t, r.Deallocate(&word)) })
@@ -240,9 +281,8 @@ func TestDebugMacroCassertLiteralTagShortCircuitAndUninitializedCondition(t *tes
 }
 
 func TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch(t *testing.T) {
-	p, d, _, _, _ := permutationActionFixture(t, "C")
+	r, d, _, _, _ := debugActionFixture(t, "C")
 	paramsMust(t, d.EnableAssertions(false))
-	r := p.forward.Column.Raw.Runtime
 	word, e := r.Allocate(4)
 	paramsMust(t, e)
 	t.Cleanup(func() {
