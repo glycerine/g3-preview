@@ -3,7 +3,6 @@ package polynomial
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -55,45 +54,12 @@ func TestPolynomialSkeletonVectorSourceOperations(t *testing.T) {
 	polynomialPhysicalAudit(t, m)
 }
 
-func TestPolynomialSkeletonVectorPushFailureRetainsCaller(t *testing.T) {
-	m := polynomialCellFixture(t)
-	p, _ := polynomialSkeletonInput(t, m)
-	a, e := NewPolynomialSkeleton(m, p, 0)
-	serviceMust(t, e)
-	v, e := NewPolynomialSkeletonVector(m)
-	serviceMust(t, e)
-	// One real cold preparation succeeds; Runtime backing reservation then
-	// refuses. Source push has not published the caller pointer.
-	m.integer.Budget().FailAfter(1)
-	e = v.Push(a)
-	if !numericPhysicalReservationRefusal(e) {
-		t.Fatal("actual pointer backing refusal", e)
-	}
-	if a.sourceStarted || a.closed {
-		t.Fatal("failed push must preserve caller owner")
-	}
-	polynomialSkeletonVectorPhysicalAudit(t, m, v, []*PolynomialSkeleton{a}, p)
-	m.integer.Budget().FailAfter(-1)
-	serviceMust(t, v.CloseChecked())
-	if a.closed {
-		t.Fatal("unpublished pointer is still caller owned")
-	}
-	serviceMust(t, a.CloseChecked())
-	serviceMust(t, m.DecRef(p))
-	polynomialPhysicalAudit(t, m)
-}
-
 func polynomialSkeletonVectorPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, v *PolynomialSkeletonVector, callerSkeletons []*PolynomialSkeleton, callers ...Polynomial) {
 	t.Helper()
 	var raw []util.Block
 	var roots []Monomial
-	extra := v.header + uint64(cap(v.children))*uint64(reflect.TypeOf((*PolynomialSkeleton)(nil)).Size())
-	for _, b := range []util.Block{v.data.raw, v.data.pending, v.data.old} {
-		if b != (util.Block{}) {
-			raw = append(raw, b)
-		}
-	}
-	// Published scalar IDs bind actual owner pointers; callerSkeletons are
+	extra := v.header
+	// Published child contexts are owned; callerSkeletons are
 	// explicitly named independent caller roots, never inferred from liveness.
 	contexts := append([]*PolynomialSkeleton{}, v.children...)
 	for _, s := range callerSkeletons {
@@ -130,52 +96,7 @@ func polynomialSkeletonVectorPhysicalAudit(t *testing.T, m *MultivariatePolynomi
 	polynomialOperationMonomialAudit(t, m, callers, roots)
 }
 
-func TestPolynomialSkeletonVectorPushEveryReservation(t *testing.T) {
-	success := false
-	failures := 0
-	for ordinal := int64(0); ordinal < 100 && !success; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m := polynomialCellFixture(t)
-			p, _ := polynomialSkeletonInput(t, m)
-			a, e := NewPolynomialSkeleton(m, p, 0)
-			serviceMust(t, e)
-			v, e := NewPolynomialSkeletonVector(m)
-			serviceMust(t, e)
-			m.integer.Budget().FailAfter(ordinal)
-			e = v.Push(a)
-			if e == nil {
-				success = true
-				if len(v.children) != 1 || v.children[0] != a {
-					t.Fatal("actual published pointer")
-				}
-			} else {
-				failures++
-				if !numericPhysicalReservationRefusal(e) {
-					t.Fatal("actual reservation refusal", e)
-				}
-				if len(v.children) != 0 || a.sourceStarted || a.closed {
-					t.Fatal("unpublished caller pointer consumed")
-				}
-			}
-			polynomialSkeletonVectorPhysicalAudit(t, m, v, []*PolynomialSkeleton{a}, p)
-			m.integer.Budget().FailAfter(-1)
-			serviceMust(t, v.CloseChecked())
-			if !success {
-				if a.closed {
-					t.Fatal("failed push caller lifetime")
-				}
-				serviceMust(t, a.CloseChecked())
-			}
-			serviceMust(t, m.DecRef(p))
-			polynomialPhysicalAudit(t, m)
-		})
-	}
-	if !success || failures == 0 {
-		t.Fatal("bounded every prefix did not reach success", failures)
-	}
-}
-
-func TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal(t *testing.T) {
+func TestPolynomialSkeletonVectorNativeReplacementPreservesChildOrder(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p, _ := polynomialSkeletonInput(t, m)
 	a, e := NewPolynomialSkeleton(m, m.unit, 0)
@@ -184,28 +105,25 @@ func TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal(t *testin
 	serviceMust(t, e)
 	v, e := NewPolynomialSkeletonVector(m)
 	serviceMust(t, e)
+	defer func() {
+		m.integer.Budget().FailAfter(-1)
+		serviceMust(t, v.CloseChecked())
+		serviceMust(t, m.DecRef(p))
+	}()
 	serviceMust(t, v.Push(a))
-	if len(v.children) != cap(v.children) {
-		t.Fatal("fixture must reach actual cold directory reserve")
-	}
-	blocks := m.memory.Stats().LiveBlocks
 	m.integer.Budget().FailAfter(0)
-	e = v.Set(0, b)
-	if !errors.Is(e, arena.ErrInjectedFailure) || !a.sourceFinalized || a.closed || b.sourceStarted || len(v.children) != 1 || v.children[0] != a || m.memory.Stats().LiveBlocks+3 != blocks {
-		t.Fatal("source old delete before Go replacement metadata", e, blocks, m.memory.Stats().LiveBlocks)
+	serviceMust(t, v.Set(0, b))
+	if !a.sourceFinalized || a.closed || b.sourceStarted || v.data[0] != b || len(v.children) != 2 || v.children[0] != a || v.children[1] != b {
+		t.Fatal("native replacement lost source destruction order or owning history")
 	}
-	polynomialSkeletonVectorPhysicalAudit(t, m, v, []*PolynomialSkeleton{b}, p)
-	cause := v.sourceCause
-	used := m.integer.Budget().Used()
-	if e = v.SourceFinalize(); e != cause || m.integer.Budget().Used() != used {
-		t.Fatal("stopped source history repaired", e, cause)
-	}
+	polynomialSkeletonVectorPhysicalAudit(t, m, v, nil, p)
 	m.integer.Budget().FailAfter(-1)
 	serviceMust(t, v.CloseChecked())
-	serviceMust(t, b.CloseChecked())
-	serviceMust(t, m.DecRef(p))
-	polynomialPhysicalAudit(t, m)
+	if !a.closed || !b.closed {
+		t.Fatal("owning completion missed replaced child")
+	}
 }
+
 func TestPolynomialSkeletonVectorOwnerGuards(t *testing.T) {
 	m := polynomialCellFixture(t)
 	v, e := NewPolynomialSkeletonVector(m)
@@ -228,7 +146,7 @@ func TestPolynomialSkeletonVectorOwnerGuards(t *testing.T) {
 
 // Unlike the unit-only replacement test, x2 is newly owned by the old
 // skeleton. Its last DEC reaches the real cold ID recycle allocation before
-// any pointer replacement metadata. Keep this reached source stop distinct.
+// native pointer replacement. Keep this reached source stop distinct.
 func TestPolynomialSkeletonVectorSetStoppedChildDestructor(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p, _ := polynomialSkeletonInput(t, m)

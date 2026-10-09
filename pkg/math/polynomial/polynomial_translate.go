@@ -24,7 +24,6 @@ func (m *MultivariatePolynomialCore) initTranslationMember() {
 	v := &m.translateBuffers
 	v.self = v
 	v.storage = m
-	v.data.width = 8 // actual source default m_owner=null
 }
 func (m *MultivariatePolynomialCore) beginTranslation() error {
 	if e := m.check(); e != nil {

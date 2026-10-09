@@ -4,7 +4,6 @@ package polynomial
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -85,7 +84,6 @@ func TestPolynomialSOMVectorActualColdChildRefusal(t *testing.T) {
 func TestPolynomialSOMVectorAtEveryReservation(t *testing.T) {
 	success := false
 	failures := 0
-	incoming := false
 	for ordinal := int64(0); ordinal < 100 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m := polynomialCellFixture(t)
@@ -105,7 +103,6 @@ func TestPolynomialSOMVectorAtEveryReservation(t *testing.T) {
 					t.Fatal("actual header/raw refusal", e)
 				}
 				if v.pending != nil {
-					incoming = true
 					if v.pending.sourceStarted || v.pending.closed {
 						t.Fatal("incoming successfully constructed child prematurely deleted")
 					}
@@ -125,8 +122,8 @@ func TestPolynomialSOMVectorAtEveryReservation(t *testing.T) {
 			polynomialPhysicalAudit(t, m)
 		})
 	}
-	if !success || failures == 0 || !incoming {
-		t.Fatal("bounded real class/push campaign", success, failures, incoming)
+	if !success || failures == 0 {
+		t.Fatal("bounded real child construction campaign", success, failures)
 	}
 }
 func TestPolynomialSOMBufferAddEveryReservation(t *testing.T) {
@@ -455,112 +452,6 @@ func TestPolynomialSOMBufferSourceMaxAndDisplay(t *testing.T) {
 	}
 	serviceMust(t, v.CloseChecked())
 	polynomialPhysicalAudit(t, m)
-}
-
-// Public At creates actual empty SOM objects and pointer-vector storage.
-// The public TLS recipe reaches signed-host/source undefined arithmetic;
-// this is stopped postphysical sync evidence, not ordinary OOM/free refusal.
-func TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix(t *testing.T) {
-	const lastChild = 13000
-	// This fixture targets the later pointer-vector TLS release, rather than
-	// setup OOM. Fund the actual reflected child headers independently of the
-	// setup headroom so added cold invocation fields do not prevent that free.
-	childBytes := uint64(lastChild+1) * uint64(reflect.TypeOf(PolynomialSOMBuffer{}).Size())
-	b := arena.NewBudget(childBytes + 1<<27)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
-	serviceMust(t, e)
-	profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Profile: profile, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
-	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: profile})
-	serviceMust(t, e)
-	serviceMust(t, mm.IncManagerRef())
-	m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { panic("unreached") }, Cooperation: func() error { panic("unreached") }})
-	serviceMust(t, e)
-	v, e := NewPolynomialSOMVector(m)
-	serviceMust(t, e)
-	serviceMust(t, v.SetOwner(m))
-	_, e = v.At(lastChild)
-	serviceMust(t, e)
-	// Completed empty SOM children remain source members until the vector dtor.
-	cap, e := v.data.capacity(m)
-	serviceMust(t, e)
-	if uint64(cap)*8+8 < 100000 {
-		t.Fatal("real pointer vector insufficient for TLS sync", cap)
-	}
-	polynomialSOMPhysicalAudit(t, m, v, nil)
-	// Establish real ordinary ID freelist capacity before entering the guarded
-	// signed-overflow domain. This isolates the reached vector-member free;
-	// unprimed ID allocation-before-free refusal is separate evidence.
-	var constants [6]Polynomial
-	for i := range constants {
-		a := util.NewInt(int32(i + 2))
-		constants[i], e = m.MkConstantTake(&a)
-		serviceMust(t, e)
-		serviceMust(t, m.IncRef(constants[i]))
-	}
-	for _, p := range constants {
-		serviceMust(t, m.DecRef(p))
-	}
-	idSize := m.ids.FreeLen()
-	idCap := m.ids.FreeCapacity()
-	if idSize != 6 || idCap < idSize+2 {
-		t.Fatal("actual polynomial freelist room", idSize, idCap)
-	}
-	_, e = mm.MkVar()
-	serviceMust(t, e)
-	mon, e := mm.MkVariable(0, 1)
-	serviceMust(t, e)
-	serviceMust(t, mm.IncRef(mon))
-	serviceMust(t, mm.DecRef(mon))
-	monoSize := mm.ids.FreeLen()
-	monoCap := mm.ids.FreeCapacity()
-	if monoSize != 1 || monoCap < 2 {
-		t.Fatal("actual monomial freelist room", monoSize, monoCap)
-	}
-	polynomialSOMPhysicalAudit(t, m, v, nil)
-	contextTLSNearMinimum(t, r)
-	before := r.Stats().LiveBlocks
-	e = v.SourceFinalize()
-	if !errors.Is(e, arena.ErrBounds) || v.data.raw != (util.Block{}) || v.sourceStage != 1 || v.sourceFinalized || r.Stats().LiveBlocks+1 != before {
-		t.Fatal("actual suffix physical release before stopped sync", e, v.sourceStage, r.State())
-	}
-	cause := v.sourceCause
-	polynomialSOMPhysicalAudit(t, m, v, nil)
-	used := b.Used()
-	count, e := r.AllocationCount()
-	serviceMust(t, e)
-	if e = v.SourceFinalize(); e != cause || b.Used() != used {
-		t.Fatal("literal source retry acknowledged owning release", e, cause)
-	}
-	afterCount, e := r.AllocationCount()
-	serviceMust(t, e)
-	if afterCount != count {
-		t.Fatal("retry fabricated source event")
-	}
-	if _, e = v.Size(); !errors.Is(e, arena.ErrClosed) {
-		t.Fatal("source-stopped ordinary size", e)
-	}
-	serviceMust(t, v.CloseChecked())
-	if v.sourceFinalized || v.sourceCause != cause || v.sourceStage != 1 {
-		t.Fatal("owning abort repaired source history")
-	}
-	contextTLSFinish(t, r, m.CloseChecked)
-	// The source reference decrement executes once. Its stopped destructor
-	// continuation belongs to explicit owning Close, never another DEC.
-	beforeMM := r.Stats().LiveBlocks
-	e = mm.DecManagerRef()
-	if e != nil {
-		if !errors.Is(e, arena.ErrBounds) || mm.managerRefs != 0 || r.Stats().LiveBlocks >= beforeMM {
-			t.Fatal("source MM decrement/destructor prefix", e, mm.managerRefs, r.State())
-		}
-		contextTLSFinish(t, r, mm.CloseChecked)
-	}
-	contextTLSFinish(t, r, q.CloseChecked)
-	serviceMust(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal("actual owning graph retained", b.Used())
-	}
 }
 
 func TestPolynomialSOMBufferSourceSortMovesCoefficients(t *testing.T) {

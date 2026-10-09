@@ -31452,3 +31452,33 @@ Next concrete storage group: skeleton, SOM and Newton class-owner vectors still
 encode child IDs in Runtime vectors while retaining the actual typed children
 in separate directories. Replace that container bookkeeping with native typed
 storage while preserving real child construction and source/owning destruction.
+
+## Native polynomial child collections
+
+SOM, Newton and skeleton owner collections now use typed Go pointer slices.
+Removed child-ID byte vectors, duplicate lookup directories, charged directory
+capacity and their expansion/free failure states. Actual child constructors,
+references, numeral backing and stopped destructor continuation remain.
+SOM keeps its children through source destruction for later owning completion.
+Newton retains a separate slice only for actual unjoined resources left by a
+completed source Flush. Skeletons retain published child contexts after source
+replacement/destruction until their actual owning cleanup completes.
+
+Native slice storage is excluded from Runtime root and custom byte censuses.
+New checks grow skeleton storage through 4098 slots with Runtime reservations
+disabled, verify child association and replacement/shrink lifetime, and confirm
+that 129 lazy SOM children charge only their actual class headers. Real Newton
+constructor failures, unjoined references and stopped child destructors remain
+covered. Retired fixtures requiring eliminated pointer/directory allocations or
+TLS failures in freed pointer-vector backing; updated the inventory accordingly.
+
+Validation: full native polynomial passed (36.09s); final focused native and debug
+owner/lifetime checks including the new growth tests passed (1.16s/1.12s).
+Module-wide test compilation, polynomial vet and portcheck passed. The latest
+full native module checkpoint remains 20:08–20:11 UTC; another hourly run is not
+yet due. Counts remain 2102 units / 677 APIs: 63 ported, 284 partial,
+1727 unported and two dead/deleted. The util knot and package split remain open.
+
+Next: concrete skeleton payload arrays and polynomial reference/numeral vectors
+still use byte-encoded Runtime backing. Replace their container mechanics while
+preserving project algorithms and actual reference/numeral ownership.

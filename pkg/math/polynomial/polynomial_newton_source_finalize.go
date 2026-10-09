@@ -3,14 +3,10 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
-// SourceFinalize executes the real vector destructor body, then the published
-// pointer-vector member destructor. Pending failed children/unjoined INC roots
-// and cold directory/header ownership survive for explicit Close, not source
-// destructor repair. Every stopped source cause is sticky, including after a
-// Runtime free physically consumed its pointer before a lane guard refused.
+// SourceFinalize destroys published children before dropping native active
+// storage. Failed children and genuine unjoined roots await explicit Close.
 func (v *PolynomialNewtonVector) SourceFinalize() error {
 	if v == nil || v.self != v {
 		return ErrPolynomialOwner
@@ -33,12 +29,7 @@ func (v *PolynomialNewtonVector) SourceFinalize() error {
 		v.sourceStage++
 	}
 	if v.sourceStage == 1 {
-		if v.data.raw != (util.Block{}) {
-			if e := v.storage.memory.Deallocate(&v.data.raw); e != nil {
-				v.sourceCause = e
-				return e
-			}
-		}
+		v.children = nil
 		v.sourceStage++
 	}
 	v.sourceFinalized = true

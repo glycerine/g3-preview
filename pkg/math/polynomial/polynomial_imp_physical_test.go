@@ -289,8 +289,8 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		cell(m.pending.value, l.initializedCoefficients)
 	}
 
-	vectors := []*polynomialVector{&m.rationalTerms, &m.linearTerms, &m.linearMonomials, &m.polynomials, &full.skeletons.data}
-	adapterBytes += full.skeletons.header + uint64(cap(full.skeletons.children))*uint64(reflect.TypeOf((*PolynomialSkeleton)(nil)).Size())
+	vectors := []*polynomialVector{&m.rationalTerms, &m.linearTerms, &m.linearMonomials, &m.polynomials}
+	adapterBytes += full.skeletons.header
 	seenSkeleton := map[*PolynomialSkeleton]bool{}
 	addSkeleton := func(sk *PolynomialSkeleton) {
 		if sk == nil || seenSkeleton[sk] {
@@ -384,9 +384,8 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		addPolynomial(v.state.incoming)
 	}
 	for _, v := range lazy {
-		extraBytes += v.header + uint64(cap(v.children))*uint64(reflect.TypeOf((*PolynomialNewtonInterpolator)(nil)).Size())
-		vectors = append(vectors, &v.data)
-		for _, n := range v.children {
+		extraBytes += v.header
+		for _, n := range append(append([]*PolynomialNewtonInterpolator(nil), v.children...), v.orphans...) {
 			if n != nil {
 				owners = append(owners, n)
 			}

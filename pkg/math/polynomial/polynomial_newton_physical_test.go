@@ -136,9 +136,8 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		addPolynomial(v.state.incoming)
 	}
 	for _, v := range lazy {
-		extraBytes += v.header + uint64(cap(v.children))*uint64(reflect.TypeOf((*PolynomialNewtonInterpolator)(nil)).Size())
-		vectors = append(vectors, &v.data)
-		for _, n := range v.children {
+		extraBytes += v.header
+		for _, n := range append(append([]*PolynomialNewtonInterpolator(nil), v.children...), v.orphans...) {
 			if n != nil {
 				owners = append(owners, n)
 			}

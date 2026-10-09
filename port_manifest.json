@@ -36250,14 +36250,11 @@
         "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
         "TestPolynomialSkeletonOverflowConstructorEveryReservation",
         "TestPolynomialSkeletonVectorSourceOperations",
-        "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
-        "TestPolynomialSkeletonVectorPushEveryReservation",
-        "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+        "TestPolynomialSkeletonVectorNativeReplacementPreservesChildOrder",
         "TestPolynomialSkeletonVectorOwnerGuards",
         "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
-        "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+        "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
         "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
-        "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix",
         "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
         "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
         "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
@@ -36280,7 +36277,6 @@
         "TestPolynomialSOMBufferAddMulEveryReservation",
         "TestPolynomialSOMBufferActualOverloadsAndUnreadZero",
         "TestPolynomialSOMBufferSourceMaxAndDisplay",
-        "TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix",
         "TestPolynomialSOMBufferSourceSortMovesCoefficients",
         "TestPolynomialSOMBufferSourceSortEveryReservation",
         "TestPolynomialSOMBufferActualModDAndScalarOverloads",
@@ -36914,7 +36910,9 @@
         "TestPolynomialCompositionNativeDegreeCacheSparseHornerReuse",
         "TestPolynomialLexSortNativeScratchGrowthAndReuse",
         "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
-        "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership"
+        "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership",
+        "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory",
+        "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges"
       ],
       "conditionals": [
         {
@@ -39159,7 +39157,7 @@
           ]
         },
         {
-          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
+          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; native []*PolynomialSkeleton operations with actual published child owning history; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
           "tests": [
@@ -39172,14 +39170,12 @@
             "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
             "TestPolynomialSkeletonOverflowConstructorEveryReservation",
             "TestPolynomialSkeletonVectorSourceOperations",
-            "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
-            "TestPolynomialSkeletonVectorPushEveryReservation",
-            "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+            "TestPolynomialSkeletonVectorNativeReplacementPreservesChildOrder",
             "TestPolynomialSkeletonVectorOwnerGuards",
             "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
-            "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+            "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
             "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
-            "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix"
+            "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory"
           ]
         },
         {
@@ -39216,7 +39212,6 @@
             "TestPolynomialSOMBufferAddMulEveryReservation",
             "TestPolynomialSOMBufferActualOverloadsAndUnreadZero",
             "TestPolynomialSOMBufferSourceMaxAndDisplay",
-            "TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix",
             "TestPolynomialSOMBufferSourceSortMovesCoefficients",
             "TestPolynomialSOMBufferSourceSortEveryReservation",
             "TestPolynomialSOMBufferActualModDAndScalarOverloads",
@@ -39227,7 +39222,7 @@
           ]
         },
         {
-          "name": "som_buffer_vector2159-2214 actual allocated-before-push children, ascending source child destruction, reset/set_owner and wrapped unsigned ensure_capacity(idx+1) before reached child read",
+          "name": "Concrete SOM child collection uses native []*PolynomialSOMBuffer; lazy actual construction/owner binding, reset, wrapped unsigned idx+1 and ordered child source/owning destruction. Numeral-vector internals remain separate.",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_som_vector.go",
           "tests": [
@@ -39241,14 +39236,14 @@
             "TestPolynomialSOMBufferAddMulEveryReservation",
             "TestPolynomialSOMBufferActualOverloadsAndUnreadZero",
             "TestPolynomialSOMBufferSourceMaxAndDisplay",
-            "TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix",
             "TestPolynomialSOMBufferSourceSortMovesCoefficients",
             "TestPolynomialSOMBufferSourceSortEveryReservation",
             "TestPolynomialSOMBufferActualModDAndScalarOverloads",
             "TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation",
             "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
             "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation",
-            "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
+            "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation",
+            "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges"
           ]
         },
         {
@@ -40872,8 +40867,8 @@
         "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md.",
         "This selected source core omits only separately inventoried ModD specialization; full imp hierarchy, PSC/Lazard/subresultants/resultants/general GCD and registered driver credit remain open. TRACE/CTRACE/printers/global assertion bindings remain separate obligations. Malformed SIZE_T32 release metadata fixture is explicitly source undefined and uses caller restoration only after immediate physical census; no native recovery claim.",
         "Selected concrete class and ModD methods only: whole polynomial hierarchy, PSC/Lazard/resultants/GCD/global diagnostic and source-driver assertion bindings remain OPEN. Borrowed cold stream interface binds actual NumericTextStream formatting state, no hot per-variable interface fields or decimal-only surrogate. No additional registered source assertion credit; malformed/wrapped source-undefined vector profiles are typed guards, not native recovery claims.",
-        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
-        "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md.",
+        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Native typed child slices retain actual published objects; child lifetime resources remain independently owned and charged. Whole imp and registered-driver/global diagnostic integration remain open.",
+        "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; native typed child storage, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md.",
         "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md.",
         "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md.",
         "Selected optimized PSC only. IC/ICCP/default general GCD/Resultant, classic alternatives, complete original driver constructors/lifetimes and enabled TRACE/global tags remain OPEN. H uses actual scalar handle16 storage rather than native pointer8 ABI. Original eight coefficient fixtures execute first/second of three static ENSURE sites; the Resultant site remains outstanding.",
@@ -40964,7 +40959,8 @@
         "GCD monomial reference storage now uses a concrete []Monomial slice. Original IncRef-before-publication, generated ownership transfer, ordered DecRef/reset and resumable actual monomial destruction remain. Deleted inline/spill payloads, Runtime expansion blocks, copied/pending growth state and incoming ownership needed only by fallible backing writes. Native append has no custom Runtime refusal event. Duplicate references across growth/reuse, generated transfer, real last-reference destructor refusal/owning continuation and independent GF11[x] content factorization with 33 coefficient monomials are tested. The synthetic consumed-old-growth test is retired; younger reference release before an older source stop remains checked by actual reference counts. No whole-unit completion credit is added.",
         "Composition degree-to-term positions now use a native []uint32 cache initialized with UINT_MAX for absent degrees. Removed vector headers, Runtime expansion/pending storage and destructor refusal for this member. Save/reset retain source term positions, partial-constructor progress on actual polynomial/monomial read failure, scoped cancellation cleanup and the original Horner arithmetic. Source/owning member destruction releases the slice at its existing boundary. Native cache growth/reuse under disabled Runtime reservations and independent sparse p(y^2) composition through degree 257 are checked. The unsigned n+1 wrap test now reports arena.ErrBounds in release mode (source debug assertion unchanged), with no allocation or fabricated constructor completion. No whole-unit completion credit is added.",
         "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added.",
-        "PolynomialFactors stores polynomial handles, unsigned multiplicities and actual reference-destruction progress in concrete native Go slices. Removed byte-encoded pointer/degree vectors, Runtime expansion/pending blocks and custom charged phase-slice growth. Push retains pointer then degree publication, unsigned total update then actual polynomial INC; SetDegree keeps the source index-zero assertion quirk and unsigned wrap. Reset/source destruction/owning cleanup retain real polynomial and constant lifetime order and stopped destructor continuation. Native storage is excluded from Runtime root/byte audits. Cold/warm growth through 4097 references verifies exact counts and multiplicity association under disabled Runtime reservations. Tests requiring a pointer-before-degree allocation failure and its resulting borrowed dangling row are retired; actual numeral/reference allocation and failure campaigns remain. The last shared polynomialUnsigned byte-vector helper is removed. No whole-unit completion credit is added."
+        "PolynomialFactors stores polynomial handles, unsigned multiplicities and actual reference-destruction progress in concrete native Go slices. Removed byte-encoded pointer/degree vectors, Runtime expansion/pending blocks and custom charged phase-slice growth. Push retains pointer then degree publication, unsigned total update then actual polynomial INC; SetDegree keeps the source index-zero assertion quirk and unsigned wrap. Reset/source destruction/owning cleanup retain real polynomial and constant lifetime order and stopped destructor continuation. Native storage is excluded from Runtime root/byte audits. Cold/warm growth through 4097 references verifies exact counts and multiplicity association under disabled Runtime reservations. Tests requiring a pointer-before-degree allocation failure and its resulting borrowed dangling row are retired; actual numeral/reference allocation and failure campaigns remain. The last shared polynomialUnsigned byte-vector helper is removed. No whole-unit completion credit is added.",
+        "SOM, Newton and skeleton child collections now use concrete native Go pointer slices instead of Runtime child-ID vectors and charged duplicate directories. Actual child construction failures, source destructor order, stopped reference/numeral cleanup and owning completion remain. Newton separately retains only actual unjoined child roots after source Flush; skeletons retain actual published contexts for later owning completion after replacement/source destruction. Native slice allocation and release are not Runtime faultpoints or charged blocks; obsolete push/directory/TLS-vector-free failure fixtures are retired. Source and owning physical censuses still enumerate actual child resources. Independent 4098-slot skeleton growth/replacement and 129-child SOM owner-charge checks supplement retained real child failure tests. No whole-unit completion credit is added."
       ]
     },
     {
@@ -41408,14 +41404,11 @@
         "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
         "TestPolynomialSkeletonOverflowConstructorEveryReservation",
         "TestPolynomialSkeletonVectorSourceOperations",
-        "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
-        "TestPolynomialSkeletonVectorPushEveryReservation",
-        "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+        "TestPolynomialSkeletonVectorNativeReplacementPreservesChildOrder",
         "TestPolynomialSkeletonVectorOwnerGuards",
         "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
-        "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+        "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
         "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
-        "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix",
         "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
         "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
         "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
@@ -42834,14 +42827,11 @@
             "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
             "TestPolynomialSkeletonOverflowConstructorEveryReservation",
             "TestPolynomialSkeletonVectorSourceOperations",
-            "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
-            "TestPolynomialSkeletonVectorPushEveryReservation",
-            "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+            "TestPolynomialSkeletonVectorNativeReplacementPreservesChildOrder",
             "TestPolynomialSkeletonVectorOwnerGuards",
             "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
-            "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
-            "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
-            "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix"
+            "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
+            "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild"
           ]
         },
         {
@@ -43530,7 +43520,7 @@
         "Selected exact division and graded maxima only: full imp construction, PSC/GCD, source TRACE/global diagnostics and undefined dangling/fresh-NULL source destruction remain open. False GNU release VERIFY reaches a typed unreachable-domain guard; no registered original assertion completion credit. See PORT_PROGRESS.md.",
         "This selected source core omits only separately inventoried ModD specialization; full imp hierarchy, PSC/Lazard/subresultants/resultants/general GCD and registered driver credit remain open. TRACE/CTRACE/printers/global assertion bindings remain separate obligations. Malformed SIZE_T32 release metadata fixture is explicitly source undefined and uses caller restoration only after immediate physical census; no native recovery claim.",
         "Selected concrete class and ModD methods only: whole polynomial hierarchy, PSC/Lazard/resultants/GCD/global diagnostic and source-driver assertion bindings remain OPEN. Borrowed cold stream interface binds actual NumericTextStream formatting state, no hot per-variable interface fields or decimal-only surrogate. No additional registered source assertion credit; malformed/wrapped source-undefined vector profiles are typed guards, not native recovery claims.",
-        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
+        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Native typed child slices retain actual published objects; child lifetime resources remain independently owned and charged. Whole imp and registered-driver/global diagnostic integration remain open.",
         "Concrete imp wrapper owns the actual core arithmetic object, independent UP and remaining source members. Current core constructor/default/guard/cleanup helpers are preserved; only actual translateBuffers field added. Literal body/MM DEC and completed-member unwind remain separate from owning abort. Enabled TRACE/global allocator/wrapper/control/native class header binding and full arithmetic facade remain OPEN. Reflected Go headers are charged; explicit named retirement copies acquire numeral ownership only after actual source vector raw is consumed. No registry-derived owning roots or registered PSC driver credit. See PORT_PROGRESS.md.",
         "Selected translation/lex methods remain partial source-family evidence, without registered polynomial driver completion. CTRACE poly_bug stream, global diagnostics/control and native class ABI remain open. Coefficient/div_x expressions use permitted coefficient-first evaluation. Runtime bucket bindings and charged cold children are Go storage adaptations; unsigned wrapped degree reaches a typed physical boundary. Broader GCD/PSC/resultants/printing remain open. See PORT_PROGRESS.md.",
         "Selected optimized PSC only. IC/ICCP/default general GCD/Resultant, classic alternatives, complete original driver constructors/lifetimes and enabled TRACE/global tags remain OPEN. H uses actual scalar handle16 storage rather than native pointer8 ABI. Original eight coefficient fixtures execute first/second of three static ENSURE sites; the Resultant site remains outstanding.",
@@ -144047,14 +144037,13 @@
         "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
         "TestPolynomialSkeletonOverflowConstructorEveryReservation",
         "TestPolynomialSkeletonVectorSourceOperations",
-        "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
-        "TestPolynomialSkeletonVectorPushEveryReservation",
-        "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+        "TestPolynomialSkeletonVectorNativeReplacementPreservesChildOrder",
         "TestPolynomialSkeletonVectorOwnerGuards",
         "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
-        "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+        "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
         "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
-        "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix"
+        "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory",
+        "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges"
       ],
       "conditionals": [
         {
@@ -144102,7 +144091,8 @@
       ],
       "ownership": [],
       "deviations": [
-        "No generic scoped pointer vector exists in Go. Current polynomial targets use concrete typed vectors and explicit cleanup; remaining live specializations should be implemented beside their consumers."
+        "No generic scoped pointer vector exists in Go. Current polynomial targets use concrete typed vectors and explicit cleanup; remaining live specializations should be implemented beside their consumers.",
+        "SOM, Newton and skeleton child collections now use concrete native Go pointer slices instead of Runtime child-ID vectors and charged duplicate directories. Actual child construction failures, source destructor order, stopped reference/numeral cleanup and owning completion remain. Newton separately retains only actual unjoined child roots after source Flush; skeletons retain actual published contexts for later owning completion after replacement/source destruction. Native slice allocation and release are not Runtime faultpoints or charged blocks; obsolete push/directory/TLS-vector-free failure fixtures are retired. Source and owning physical censuses still enumerate actual child resources. Independent 4098-slot skeleton growth/replacement and 129-child SOM owner-charge checks supplement retained real child failure tests. No whole-unit completion credit is added."
       ]
     },
     {
@@ -148925,14 +148915,11 @@
         "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
         "TestPolynomialSkeletonOverflowConstructorEveryReservation",
         "TestPolynomialSkeletonVectorSourceOperations",
-        "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
-        "TestPolynomialSkeletonVectorPushEveryReservation",
-        "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+        "TestPolynomialSkeletonVectorNativeReplacementPreservesChildOrder",
         "TestPolynomialSkeletonVectorOwnerGuards",
         "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
-        "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+        "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
         "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
-        "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix",
         "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
         "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
         "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
@@ -148961,7 +148948,6 @@
         "TestPolynomialSOMBufferAddMulEveryReservation",
         "TestPolynomialSOMBufferActualOverloadsAndUnreadZero",
         "TestPolynomialSOMBufferSourceMaxAndDisplay",
-        "TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix",
         "TestPolynomialSOMBufferSourceSortMovesCoefficients",
         "TestPolynomialSOMBufferSourceSortEveryReservation",
         "TestPolynomialSOMBufferActualModDAndScalarOverloads",
@@ -149032,7 +149018,9 @@
         "TestPolynomialLexSortNativeScratchGrowthAndReuse",
         "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
         "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse",
-        "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership"
+        "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership",
+        "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory",
+        "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges"
       ],
       "conditionals": [
         {
@@ -149346,7 +149334,7 @@
           ]
         },
         {
-          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
+          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; native []*PolynomialSkeleton operations with actual published child owning history; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
           "tests": [
@@ -149359,14 +149347,12 @@
             "TestPolynomialSkeletonSourceUnderlyingVectorGuards",
             "TestPolynomialSkeletonOverflowConstructorEveryReservation",
             "TestPolynomialSkeletonVectorSourceOperations",
-            "TestPolynomialSkeletonVectorPushFailureRetainsCaller",
-            "TestPolynomialSkeletonVectorPushEveryReservation",
-            "TestPolynomialSkeletonVectorSetDeleteBeforeColdReplacementRefusal",
+            "TestPolynomialSkeletonVectorNativeReplacementPreservesChildOrder",
             "TestPolynomialSkeletonVectorOwnerGuards",
             "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
-            "TestPolynomialNewtonVectorSourceFinalizePrivateBacking",
+            "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
             "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
-            "TestPolynomialNewtonVectorSourceFinalizeStickyPostPhysicalSuffix"
+            "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory"
           ]
         },
         {
@@ -149406,7 +149392,7 @@
           ]
         },
         {
-          "name": "Selected actual scalar child pointer and fresh nontrivial numeral vector allocation/move/source raw destruction, with unsigned caller extent and actual retained fields",
+          "name": "Concrete SOM child collection uses native []*PolynomialSOMBuffer; lazy actual construction/owner binding, reset, wrapped unsigned idx+1 and ordered child source/owning destruction. Numeral-vector internals remain separate.",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_som_vector.go",
           "tests": [
@@ -149420,14 +149406,14 @@
             "TestPolynomialSOMBufferAddMulEveryReservation",
             "TestPolynomialSOMBufferActualOverloadsAndUnreadZero",
             "TestPolynomialSOMBufferSourceMaxAndDisplay",
-            "TestPolynomialSOMVectorSourceFinalizeStickyPostPhysicalSuffix",
             "TestPolynomialSOMBufferSourceSortMovesCoefficients",
             "TestPolynomialSOMBufferSourceSortEveryReservation",
             "TestPolynomialSOMBufferActualModDAndScalarOverloads",
             "TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation",
             "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
             "TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation",
-            "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
+            "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation",
+            "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges"
           ]
         },
         {
@@ -149594,9 +149580,9 @@
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
         "Actual polynomial imp template overload consumers remain open; concrete borrowed array loops preserve only the template iteration body. Runtime handles replace raw pointer ABI. Source invalid-memory continuation is guarded explicitly. No registered source assertion completion credit.",
         "copy_core sizeof(T) uses actual source size_t width before Runtime call, while expansion retains unsigned32 source extent arithmetic. Oversized capacity/zero-size Runtime32 proof is a malformed source-domain prefix, not valid OOM or a large vector claim.",
-        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open.",
+        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Native typed child slices retain actual published objects; child lifetime resources remain independently owned and charged. Whole imp and registered-driver/global diagnostic integration remain open.",
         "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
-        "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; scalar child ID cold provenance adaptation, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md.",
+        "Standalone SOM buffers/vectors and selected fresh sorting scope added. Authoritative reflected Go class header and charged real retained fields; native typed child storage, no unread native-size ticket or full global malloc/header geometry claim. Heap sort final-order contract only, native comparator schedule/global ostream/full imp remain OPEN. Original source implicit dtor has no Reset/DEC/NUM Del; separate own-abort drains actual named records. See PORT_PROGRESS.md.",
         "Selected concrete Runtime general heap source closure only: full process-global CASSERT/assertion-switch bindings, wrapped physical extents, legacy slice storage/iterator profile, full ostream transport and other template instantiations remain OPEN. Explicit signed TLS/partially initialized source fixtures prove ownership/physical guards in undefined source domains, not ordinary OOM or native recovery. No whole source-unit promotion.",
         "Explicit borrowed context specializes source assertion/tag gates at actual call sites; process-global binding, notify/debugger/TRACE, source global allocation geometry, legacy heap and wrapped extent profiles remain open. Original tst_heap enable_debug(\"heap\") is commented out; new enabled-tag worlds are independent fixtures and do not add registered enabled-tag credit.",
         "Selected explicit-provider/default-enabled assertion profile; process-global assertion binding, endangered wrapped extents, native ostream failbit/libc rand profile and legacy bitset allocation topology remain open. New random campaign executes source assertion expressions with an independent deterministic stream, not the exact libc sequence; broad test driver remains partial.",
@@ -149644,7 +149630,8 @@
         "GCD variable/degree pairs and their persistent variable-to-position cache now use concrete Go slices. The power-pair sbuffer inline/spill capacity, raw/pending Runtime blocks, copied/initialized masks, source buffer free failures and hand-translated heapsort are removed. Go sort.Slice applies the original ascending unsigned variable-only or degree-only comparator; equal-key library comparison/swap order is not a fidelity requirement. Degree collection retains first occurrence, Max/Min selection and sentinel reset. Native source/owning cleanup releases slices in the existing enclosing scope order, and physical audits exclude them. Tests cover large cold growth with Runtime reservations disabled, unsigned pair sorting, equal-degree multiplicities, warmed append reuse and repeated degree cache reset; actual numeral/reference allocations and source lifetime guards remain live. No whole-unit completion credit is added.",
         "Composition degree-to-term positions now use a native []uint32 cache initialized with UINT_MAX for absent degrees. Removed vector headers, Runtime expansion/pending storage and destructor refusal for this member. Save/reset retain source term positions, partial-constructor progress on actual polynomial/monomial read failure, scoped cancellation cleanup and the original Horner arithmetic. Source/owning member destruction releases the slice at its existing boundary. Native cache growth/reuse under disabled Runtime reservations and independent sparse p(y^2) composition through degree 257 are checked. The unsigned n+1 wrap test now reports arena.ErrBounds in release mode (source debug assertion unchanged), with no allocation or fabricated constructor completion. No whole-unit completion credit is added.",
         "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added.",
-        "PolynomialFactors stores polynomial handles, unsigned multiplicities and actual reference-destruction progress in concrete native Go slices. Removed byte-encoded pointer/degree vectors, Runtime expansion/pending blocks and custom charged phase-slice growth. Push retains pointer then degree publication, unsigned total update then actual polynomial INC; SetDegree keeps the source index-zero assertion quirk and unsigned wrap. Reset/source destruction/owning cleanup retain real polynomial and constant lifetime order and stopped destructor continuation. Native storage is excluded from Runtime root/byte audits. Cold/warm growth through 4097 references verifies exact counts and multiplicity association under disabled Runtime reservations. Tests requiring a pointer-before-degree allocation failure and its resulting borrowed dangling row are retired; actual numeral/reference allocation and failure campaigns remain. The last shared polynomialUnsigned byte-vector helper is removed. No whole-unit completion credit is added."
+        "PolynomialFactors stores polynomial handles, unsigned multiplicities and actual reference-destruction progress in concrete native Go slices. Removed byte-encoded pointer/degree vectors, Runtime expansion/pending blocks and custom charged phase-slice growth. Push retains pointer then degree publication, unsigned total update then actual polynomial INC; SetDegree keeps the source index-zero assertion quirk and unsigned wrap. Reset/source destruction/owning cleanup retain real polynomial and constant lifetime order and stopped destructor continuation. Native storage is excluded from Runtime root/byte audits. Cold/warm growth through 4097 references verifies exact counts and multiplicity association under disabled Runtime reservations. Tests requiring a pointer-before-degree allocation failure and its resulting borrowed dangling row are retired; actual numeral/reference allocation and failure campaigns remain. The last shared polynomialUnsigned byte-vector helper is removed. No whole-unit completion credit is added.",
+        "SOM, Newton and skeleton child collections now use concrete native Go pointer slices instead of Runtime child-ID vectors and charged duplicate directories. Actual child construction failures, source destructor order, stopped reference/numeral cleanup and owning completion remain. Newton separately retains only actual unjoined child roots after source Flush; skeletons retain actual published contexts for later owning completion after replacement/source destruction. Native slice allocation and release are not Runtime faultpoints or charged blocks; obsolete push/directory/TLS-vector-free failure fixtures are retired. Source and owning physical censuses still enumerate actual child resources. Independent 4098-slot skeleton growth/replacement and 129-child SOM owner-charge checks supplement retained real child failure tests. No whole-unit completion credit is added."
       ]
     },
     {

@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation(t *testing.T) {
@@ -21,23 +20,18 @@ func TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation(t *testin
 				_, e = v.At(1)
 				serviceMust(t, e)
 			}
-			n, e := v.data.size(m)
-			serviceMust(t, e)
-			oldRaw, oldUsed := v.data.raw, m.integer.Budget().Used()
+			n, oldUsed := len(v.children), m.integer.Budget().Used()
 			m.integer.Budget().FailAfter(0)
 			_, e = v.At(^uint32(0))
 			want := error(arena.ErrBounds)
 			if polynomialSourceDebug {
 				want = ErrPolynomialAssertion
-			} else if !populated {
-				want = util.ErrRuntimeOwner // actual reached NULL payload read.
+
 			}
 			if !errors.Is(e, want) {
 				t.Errorf("source idx+1 wraps to0; reached child guard precedes allocation: got%v want%v", e, want)
 			}
-			got, sizeErr := v.data.size(m)
-			serviceMust(t, sizeErr)
-			if got != n || v.data.raw != oldRaw || v.pending != nil || m.integer.Budget().Used() != oldUsed {
+			if len(v.children) != n || v.pending != nil || m.integer.Budget().Used() != oldUsed {
 				t.Fatal("wrapped capacity request changed actual class/vector prefix")
 			}
 			polynomialSOMPhysicalAudit(t, m, v, nil)

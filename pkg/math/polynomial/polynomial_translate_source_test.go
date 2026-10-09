@@ -66,7 +66,7 @@ func TestPolynomialTranslateSourceShortCircuits(t *testing.T) {
 	zero := util.NewInt(0)
 	r, e = m.Translate(p, 0, &zero)
 	serviceMust(t, e)
-	if r != p || m.translateBuffers.data.raw != (util.Block{}) {
+	if r != p || len(m.translateBuffers.children) != 0 {
 		t.Fatal("zero value touched coefficients")
 	}
 	out, e := NewPolynomialRef(m)

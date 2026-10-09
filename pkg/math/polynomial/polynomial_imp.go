@@ -137,14 +137,11 @@ func NewMultivariatePolynomialManager(c MultivariatePolynomialManagerConfig) (*M
 	for _, v := range [2]*PolynomialSOMVector{&m.iccp, &m.core.translateBuffers} {
 		v.self = v
 		v.storage = m.core
-		v.data.width = 8
 	}
 	m.newton.self = &m.newton
 	m.newton.storage = m.core
-	m.newton.data.width = 8
 	m.skeletons.self = &m.skeletons
 	m.skeletons.owner = m.core
-	m.skeletons.data.width = 8
 	d := &m.core.substitution
 	d.max.self = &d.max
 	d.max.core = m.core

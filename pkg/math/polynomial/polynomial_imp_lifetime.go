@@ -158,10 +158,7 @@ func (v *PolynomialNewtonVector) sourceFinalizeMember() error {
 		v.sourceStage = 1
 	}
 	if v.sourceStage == 1 {
-		if e := polynomialImpRawSource(v.storage, &v.data); e != nil {
-			v.sourceCause = e
-			return e
-		}
+		v.children = nil
 		v.sourceStage = 2
 	}
 	v.sourceFinalized = true

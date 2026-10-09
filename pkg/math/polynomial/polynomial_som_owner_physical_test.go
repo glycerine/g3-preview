@@ -57,10 +57,7 @@ func polynomialSOMNamedRoots(t *testing.T, m *MultivariatePolynomialCore, vector
 	for _, v := range vectors {
 		if v != nil && !seenVectors[v] {
 			seenVectors[v] = true
-			extra += v.header + uint64(cap(v.children))*uint64(reflect.TypeOf((*PolynomialSOMBuffer)(nil)).Size())
-			addRaw(v.data.raw)
-			addRaw(v.data.pending)
-			addRaw(v.data.old)
+			extra += v.header
 			for _, b := range v.children {
 				if b != nil {
 					buffers = append(buffers, b)

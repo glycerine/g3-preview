@@ -5,21 +5,19 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
-// The actual source pointer-vector backing is encoded as Runtime uint64 child
-// IDs; the separate, fully charged cold directory owns genuine child objects.
+// children contains active interpolators; orphans retains only real unjoined
+// child resources left after successful source destruction for owning abort.
 type PolynomialNewtonVector struct {
 	self                              *PolynomialNewtonVector
 	owner, storage                    *MultivariatePolynomialCore
-	data                              polynomialVector
 	children                          []*PolynomialNewtonInterpolator
 	pending                           *PolynomialNewtonInterpolator
 	header                            uint64
 	cursor                            uint32
 	closing, closed                   bool
-	sourceOrphans                     bool
+	orphans                           []*PolynomialNewtonInterpolator
 	sourceFinalizing, sourceFinalized bool
 	sourceStage                       uint8
 	sourceCause                       error
@@ -35,7 +33,6 @@ func NewPolynomialNewtonVector(m *MultivariatePolynomialCore) (*PolynomialNewton
 	}
 	v := &PolynomialNewtonVector{storage: m, header: h}
 	v.self = v
-	v.data.width = 8
 	return v, nil
 }
 func (v *PolynomialNewtonVector) Size() (uint32, error) {
@@ -45,27 +42,9 @@ func (v *PolynomialNewtonVector) Size() (uint32, error) {
 	if v.closed || v.closing || v.sourceFinalizing {
 		return 0, arena.ErrClosed
 	}
-	return v.data.size(v.storage)
+	return uint32(len(v.children)), nil
 }
-func (v *PolynomialNewtonVector) directory() error {
-	if len(v.children) < cap(v.children) {
-		return nil
-	}
-	old := cap(v.children)
-	c := old + old/2 + 1
-	stride := uint64(reflect.TypeOf((*PolynomialNewtonInterpolator)(nil)).Size())
-	if uint64(c) > uint64(^uint(0)>>1)/stride {
-		return arena.ErrBounds
-	}
-	if e := v.storage.integer.Budget().Reserve(uint64(c) * stride); e != nil {
-		return e
-	}
-	a := make([]*PolynomialNewtonInterpolator, len(v.children), c)
-	copy(a, v.children)
-	v.children = a
-	v.storage.integer.Budget().Release(uint64(old) * stride)
-	return nil
-}
+
 func (v *PolynomialNewtonVector) At(i uint32) (*PolynomialNewtonInterpolator, error) {
 	if v == nil || v.self != v {
 		return nil, ErrPolynomialOwner
@@ -76,7 +55,7 @@ func (v *PolynomialNewtonVector) At(i uint32) (*PolynomialNewtonInterpolator, er
 	if e := v.storage.check(); e != nil {
 		return nil, e
 	}
-	if v.pending != nil || v.cursor != 0 || v.sourceOrphans {
+	if v.pending != nil || v.cursor != 0 || len(v.orphans) != 0 {
 		return nil, ErrPolynomialPending
 	}
 	if v.owner == nil {
@@ -85,14 +64,7 @@ func (v *PolynomialNewtonVector) At(i uint32) (*PolynomialNewtonInterpolator, er
 		}
 		return nil, ErrPolynomialOwner
 	}
-	for {
-		size, e := v.data.size(v.storage)
-		if e != nil {
-			return nil, e
-		}
-		if i < size {
-			break
-		}
+	for uint64(i) >= uint64(len(v.children)) {
 		child, e := NewPolynomialNewtonInterpolator(v.owner)
 		if child != nil {
 			v.pending = child
@@ -100,41 +72,10 @@ func (v *PolynomialNewtonVector) At(i uint32) (*PolynomialNewtonInterpolator, er
 		if e != nil {
 			return nil, e
 		}
-		indexCount, e := v.data.size(v.storage)
-		if e != nil {
-			return nil, e
-		}
-		if uint64(indexCount) >= uint64(len(v.children)) {
-			if e = v.directory(); e != nil {
-				return nil, e
-			}
-			v.children = append(v.children, child)
-		} else {
-			v.children[indexCount] = child
-		}
-		index, e := v.data.appendSlot(v.storage)
-		if e != nil {
-			return nil, e
-		}
-		if e = v.data.write64(v.storage, 8+uint64(index)*8, uint64(indexCount+1)); e != nil {
-			return nil, e
-		}
-		if index >= v.data.initialized {
-			v.data.initialized = index + 1
-		}
-		if e = v.data.publishSize(v.storage, index+1); e != nil {
-			return nil, e
-		}
+		v.children = append(v.children, child)
 		v.pending = nil
 	}
-	id, e := v.data.read64(v.storage, 8+uint64(i)*8)
-	if e != nil {
-		return nil, e
-	}
-	if id == 0 || id > uint64(len(v.children)) {
-		return nil, arena.ErrBounds
-	}
-	return v.children[id-1], nil
+	return v.children[i], nil
 }
 func (v *PolynomialNewtonVector) Flush() error {
 	if v == nil || v.self != v {
@@ -152,31 +93,18 @@ func (v *PolynomialNewtonVector) flushMode(owning bool) error {
 	if v.closed {
 		return arena.ErrClosed
 	}
-	n, e := v.data.size(v.storage)
-	if e != nil {
-		return e
-	}
-	for v.cursor < n {
-		id, e := v.data.read64(v.storage, 8+uint64(v.cursor)*8)
-		if e != nil {
+	for uint64(v.cursor) < uint64(len(v.children)) {
+		child := v.children[v.cursor]
+		if e := child.closeMode(owning, false); e != nil {
 			return e
 		}
-		if id == 0 || id > uint64(len(v.children)) {
-			return arena.ErrBounds
+		if !child.closed {
+			v.orphans = append(v.orphans, child)
 		}
-		if e = v.children[id-1].closeMode(owning, false); e != nil {
-			return e
-		}
-		if v.children[id-1].closed {
-			v.children[id-1] = nil
-		} else {
-			v.sourceOrphans = true
-		}
+		v.children[v.cursor] = nil
 		v.cursor++
 	}
-	if e = v.data.reset(v.storage); e != nil {
-		return e
-	}
+	v.children = v.children[:0]
 	v.cursor = 0
 	return nil
 }
@@ -191,33 +119,23 @@ func (v *PolynomialNewtonVector) Close() error {
 	if e := v.flushMode(true); e != nil {
 		return e
 	}
-	// The source pointer-vector member dies after source child destruction.
-	// Retained Go-only unjoined roots are aborted only after that boundary.
-	if v.data.raw != (util.Block{}) {
-		if e := v.storage.memory.Deallocate(&v.data.raw); e != nil {
-			return e
-		}
-	}
-	for i, child := range v.children {
+	// Source child destruction precedes abortion of real unjoined child roots.
+	v.children = nil
+	for i, child := range v.orphans {
 		if child != nil {
 			if e := child.Close(); e != nil {
 				return e
 			}
-			v.children[i] = nil
+			v.orphans[i] = nil
 		}
 	}
+	v.orphans = nil
 	if v.pending != nil {
 		if e := v.pending.Close(); e != nil {
 			return e
 		}
 		v.pending = nil
 	}
-	if e := v.data.close(v.storage); e != nil {
-		return e
-	}
-	v.sourceOrphans = false
-	v.storage.integer.Budget().Release(uint64(cap(v.children)) * uint64(reflect.TypeOf((*PolynomialNewtonInterpolator)(nil)).Size()))
-	v.children = nil
 	v.storage.integer.Budget().Release(v.header)
 	v.header = 0
 	v.closed = true

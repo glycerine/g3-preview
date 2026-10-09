@@ -815,7 +815,7 @@ func TestPolynomialNewtonLazySourceFlushBeforeOwningAbort(t *testing.T) {
 	serviceMust(t, v.Flush())
 	info, e := m.Info(m.unit)
 	serviceMust(t, e)
-	if info.RefCount != 2 || child.closed || v.children[0] != child || newtonVectorCount(t, v) != 0 {
+	if info.RefCount != 2 || child.closed || len(v.orphans) != 1 || v.orphans[0] != child || newtonVectorCount(t, v) != 0 {
 		t.Fatal("source Flush owning-aborted unjoined reference", info, child, v)
 	}
 	polynomialNewtonPhysicalAudit(t, m, nil, nil, nil, []*PolynomialNewtonVector{v}, nil, nil)
