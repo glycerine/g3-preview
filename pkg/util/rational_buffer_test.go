@@ -11,7 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestRationalBuffer16InlineCopiesAndStorageRelocation(t *testing.T) {
+func TestRationalBuffer16CopiesAndSliceGrowth(t *testing.T) {
 	s, budget := serviceNew(t)
 	x := serviceValue(t, s, "123456789012345678901234567890123456789/998877665544332211")
 	defer func() { serviceMust(t, s.Del(&x)) }()
@@ -28,62 +28,34 @@ func TestRationalBuffer16InlineCopiesAndStorageRelocation(t *testing.T) {
 		}
 		raw[i] = v.Raw
 	}
-	if b.capacity != 16 || b.values != nil || b.bytes != 0 {
-		t.Fatal("inline buffer allocated backing")
+	if b.count != 16 || len(b.values) != 16 || cap(b.values) < 16 {
+		t.Fatal("typed slice prefix", b.count, len(b.values), cap(b.values))
 	}
 	serviceMust(t, s.SetInt64(&x, 7))
 	used := budget.Used()
 	budget.FailAfter(0)
 	e = b.PushCopy(&x)
 	budget.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || b.count != 16 || b.capacity != 16 || budget.Used() != used {
-		t.Fatal("growth refusal changed source prefix", e)
-	}
-	// A failed source call is stopped; a fresh owner exercises successful growth.
-	if e = b.PushCopy(&x); !errors.Is(e, ErrRationalLexicalPending) {
-		t.Fatal("failed buffer retried", e)
-	}
-	serviceMust(t, b.Close())
-	b, e = NewRationalBuffer16(s)
-	serviceMust(t, e)
-	serviceMust(t, s.SetString(&x, "123456789012345678901234567890123456789/998877665544332211"))
-	for i := uint32(0); i < 16; i++ {
-		serviceMust(t, b.PushCopy(&x))
-		v, e := b.At(i)
-		serviceMust(t, e)
-		raw[i] = v.Raw
-	}
-	serviceMust(t, s.SetInt64(&x, 7))
-	serviceMust(t, b.PushCopy(&x))
-	if b.capacity != 32 || b.count != 17 || b.values == nil {
-		t.Fatal("buffer did not double")
+	if e != nil || b.count != 17 || len(b.values) != 17 || budget.Used() != used {
+		t.Fatal("Go slice growth touched arena", e, b.count, budget.Used(), used)
 	}
 	for i := uint32(0); i < 16; i++ {
 		v, e := b.At(i)
 		serviceMust(t, e)
-		if v.Raw != raw[i] || b.inline[i] != (OwnedRational{}) {
-			t.Fatal("relocation copied numerals or retained old owners", i)
+		if v.Raw != raw[i] {
+			t.Fatal("slice growth changed numeral", i)
 		}
 		serviceText(t, s, v, "13717421001371742100137174210013717421/110986407282703579")
 	}
 	v, e := b.At(16)
 	serviceMust(t, e)
 	serviceText(t, s, v, "7")
-	// A second expansion relocates heap storage and releases its old charge.
-	budget.FailAfter(0)
 	for i := 17; i < 32; i++ {
 		serviceMust(t, b.PushCopy(&x))
 	}
-	budget.FailAfter(-1)
-	old, oldBytes, before := b.values, b.bytes, budget.Used()
 	serviceMust(t, b.PushCopy(&x))
-	if b.capacity != 64 || b.count != 33 || b.bytes != oldBytes*2 || budget.Used() != before+oldBytes {
-		t.Fatal("heap expansion did not release old backing")
-	}
-	for i := range old {
-		if old[i] != (OwnedRational{}) {
-			t.Fatal("abandoned heap storage retained owning token", i)
-		}
+	if b.count != 33 || len(b.values) != 33 {
+		t.Fatal("second slice growth", b.count, len(b.values))
 	}
 	for i := uint32(0); i < 16; i++ {
 		v, e := b.At(i)
@@ -94,7 +66,7 @@ func TestRationalBuffer16InlineCopiesAndStorageRelocation(t *testing.T) {
 	}
 	serviceMust(t, b.SourceEnd())
 	serviceMust(t, b.SourceEnd())
-	if b.sourceCursor != 33 || b.bytes != 0 || b.values != nil {
+	if b.sourceCursor != 33 || b.values != nil {
 		t.Fatal("source destruction retained buffer")
 	}
 	if _, e = b.At(0); !errors.Is(e, arena.ErrClosed) {
@@ -116,14 +88,14 @@ func TestRationalBuffer16SourceDestructionStopsBeforeLaterElements(t *testing.T)
 	dead := serviceValue(t, s, "200000000000000000000000000000000000003")
 	stale := dead.Raw.Num
 	serviceMust(t, s.Del(&dead))
-	saved := b.inline[1].Raw.Num
-	b.inline[1].Raw.Num = stale
-	third := b.inline[2].Raw
+	saved := b.values[1].Raw.Num
+	b.values[1].Raw.Num = stale
+	third := b.values[2].Raw
 	e = b.SourceEnd()
-	if e == nil || b.sourceCursor != 1 || b.inline[0] != (OwnedRational{}) || b.inline[2].Raw != third {
+	if e == nil || b.sourceCursor != 1 || b.values[0] != (OwnedRational{}) || b.values[2].Raw != third {
 		t.Fatal("source destruction did not stop ascending", e)
 	}
-	b.inline[1].Raw.Num = saved
+	b.values[1].Raw.Num = saved
 	if e2 := b.SourceEnd(); e2 != e {
 		t.Fatal("source failure history changed", e2, e)
 	}
@@ -143,11 +115,9 @@ func TestRationalBuffer16ConstructionAndShallowCopyGuards(t *testing.T) {
 	budget.FailAfter(0)
 	b, e := NewRationalBuffer16(s)
 	budget.FailAfter(-1)
-	if b != nil || !errors.Is(e, arena.ErrInjectedFailure) || budget.Used() != used {
-		t.Fatal("constructor refusal", e)
+	if e != nil || b == nil || budget.Used() != used {
+		t.Fatal("Go slice constructor touched arena", e, budget.Used(), used)
 	}
-	b, e = NewRationalBuffer16(s)
-	serviceMust(t, e)
 	copy := *b
 	if e = copy.Close(); !errors.Is(e, ErrScopedCopy) {
 		t.Fatal("shallow copy accepted", e)
@@ -159,8 +129,8 @@ func TestRationalBuffer16ConstructionAndShallowCopyGuards(t *testing.T) {
 		serviceMust(t, b.PushCopy(&x))
 	}
 	budget.FailAfter(-1)
-	if b.count != 16 || b.bytes != 0 {
-		t.Fatal("inline default numerals reserved memory")
+	if b.count != 16 || len(b.values) != 16 {
+		t.Fatal("default numeral slice")
 	}
 	serviceMust(t, b.SourceEnd())
 	serviceMust(t, b.Close())
@@ -171,8 +141,8 @@ func TestRationalBuffer16ConstructionAndShallowCopyGuards(t *testing.T) {
 	}
 }
 
-func TestRationalBuffer16EveryGrowthAndActualCopyReservation(t *testing.T) {
-	complete, growthFailures, copyFailures := false, 0, 0
+func TestRationalBuffer16EveryActualCopyReservation(t *testing.T) {
+	complete, copyFailures := false, 0
 	n := new(big.Int).Add(new(big.Int).Lsh(big.NewInt(3), 4096), big.NewInt(17))
 	d := new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), 2048), big.NewInt(3))
 	want := new(big.Rat).SetFrac(n, d).String()
@@ -205,7 +175,7 @@ func TestRationalBuffer16EveryGrowthAndActualCopyReservation(t *testing.T) {
 				roots = append(roots, &b.appendCall.scope.Roots[i].Num, &b.appendCall.scope.Roots[i].Den)
 			}
 			integerPhysicalAudit(t, s.Manager.Z, roots...)
-			if wantBytes := b.header + b.bytes + s.HeaderBytes + s.CacheBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); budget.Used() != wantBytes {
+			if wantBytes := s.HeaderBytes + s.CacheBytes + s.Manager.HeaderBytes + integerActualOwnedBytes(s.Manager.Z); budget.Used() != wantBytes {
 				t.Fatal("actual owner graph", ordinal, budget.Used(), wantBytes)
 			}
 			if body != nil {
@@ -215,16 +185,9 @@ func TestRationalBuffer16EveryGrowthAndActualCopyReservation(t *testing.T) {
 				if b.count != 16 {
 					t.Fatal("failed constructor advanced position", b.count)
 				}
-				if b.capacity == 16 {
-					growthFailures++
-					if b.pending || b.appendCall.invocation != 0 {
-						t.Fatal("growth refusal entered copy")
-					}
-				} else {
-					copyFailures++
-					if b.capacity != 32 || !b.pending || b.appendCall.invocation == 0 {
-						t.Fatal("missing exact failed constructor")
-					}
+				copyFailures++
+				if !b.pending || b.appendCall.invocation == 0 || len(b.values) != 17 {
+					t.Fatal("missing exact failed constructor")
 				}
 				if e = b.SourceEnd(); !errors.Is(e, ErrRationalLexicalPending) {
 					t.Fatal("failed body simulated source return", e)
@@ -263,7 +226,7 @@ func TestRationalBuffer16EveryGrowthAndActualCopyReservation(t *testing.T) {
 			}
 		})
 	}
-	if !complete || growthFailures == 0 || copyFailures == 0 {
-		t.Fatal("reservation horizon", complete, growthFailures, copyFailures)
+	if !complete || copyFailures == 0 {
+		t.Fatal("reservation horizon", complete, copyFailures)
 	}
 }

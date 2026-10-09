@@ -3,28 +3,22 @@
 // src/ast/rewriter/poly_rewriter_def.h:570-586.
 package util
 
-import (
-	"reflect"
-
-	"github.com/glycerine/g3/pkg/arena"
-)
+import "github.com/glycerine/g3/pkg/arena"
 
 // RationalBuffer16 specializes the source buffer<rational> operations used by
-// polynomial coefficient collection. The inline slots are initially raw storage,
-// not sixteen constructed rationals. Each successful PushCopy constructs one.
-// The actual Go owner, inline storage and exact append invocation are charged.
+// polynomial coefficient collection. A typed Go slice replaces the source
+// inline/overflow storage; each successful PushCopy still constructs one owned
+// rational and cleanup still follows source order.
 type RationalBuffer16 struct {
-	self                                         *RationalBuffer16
-	service                                      *RationalService
-	inline                                       [16]OwnedRational
-	values                                       []OwnedRational
-	appendCall                                   RationalServiceInvocation
-	count, capacity, sourceCursor, cleanupCursor uint32
-	header, bytes                                uint64
-	pending, stopped, sourceEnded, ownStarted    bool
-	falseDone, trueDone, closed                  bool
-	bodyCause, sourceCause, ownCause             error
-	childSource                                  error
+	self                                      *RationalBuffer16
+	service                                   *RationalService
+	values                                    []OwnedRational
+	appendCall                                RationalServiceInvocation
+	count, sourceCursor, cleanupCursor        uint32
+	pending, stopped, sourceEnded, ownStarted bool
+	falseDone, trueDone, closed               bool
+	bodyCause, sourceCause, ownCause          error
+	childSource                               error
 }
 
 func NewRationalBuffer16(s *RationalService) (*RationalBuffer16, error) {
@@ -32,11 +26,7 @@ func NewRationalBuffer16(s *RationalService) (*RationalBuffer16, error) {
 		return nil, e
 	}
 	s.mu.Unlock()
-	header := uint64(reflect.TypeOf(RationalBuffer16{}).Size())
-	if e := s.Manager.BudgetField.Reserve(header); e != nil {
-		return nil, e
-	}
-	b := &RationalBuffer16{service: s, capacity: 16, header: header}
+	b := &RationalBuffer16{service: s, values: make([]OwnedRational, 0, 16)}
 	b.self = b
 	return b, nil
 }
@@ -65,9 +55,6 @@ func (b *RationalBuffer16) open() error {
 }
 
 func (b *RationalBuffer16) slot(i uint32) *OwnedRational {
-	if b.values == nil {
-		return &b.inline[i]
-	}
 	return &b.values[i]
 }
 
@@ -90,29 +77,6 @@ func (b *RationalBuffer16) At(i uint32) (*OwnedRational, error) {
 	return b.slot(i), nil
 }
 
-func (b *RationalBuffer16) expand() error {
-	capacity := uint64(b.capacity) * 2
-	width := uint64(reflect.TypeOf(OwnedRational{}).Size())
-	if capacity > uint64(^uint32(0)) || capacity > uint64(^uint(0)>>1)/width {
-		return arena.ErrBounds
-	}
-	bytes := capacity * width
-	if e := b.service.Manager.BudgetField.Reserve(bytes); e != nil {
-		return e
-	}
-	values := make([]OwnedRational, int(capacity))
-	// Source memcpy relocates the owning fields. Erase the abandoned Go tokens
-	// without numerical DT/copy/move, leaving exactly one owner for each value.
-	for i := uint32(0); i < b.count; i++ {
-		old := b.slot(i)
-		values[i] = *old
-		*old = OwnedRational{}
-	}
-	b.service.Manager.BudgetField.Release(b.bytes)
-	b.values, b.capacity, b.bytes = values, uint32(capacity), bytes
-	return nil
-}
-
 // PushCopy increments the source position only after the copy constructor
 // returns. A failed constructor retains its physical slot and exact child for
 // owning cleanup, and rejects further body work.
@@ -127,11 +91,10 @@ func (b *RationalBuffer16) PushCopy(value *OwnedRational) (result error) {
 			b.childSource = b.appendCall.SourceReady()
 		}
 	}()
-	if b.count >= b.capacity {
-		if e := b.expand(); e != nil {
-			return e
-		}
+	if b.count == ^uint32(0) {
+		return arena.ErrBounds
 	}
+	b.values = append(b.values, OwnedRational{})
 	v := b.slot(b.count)
 	var e error
 	*v, e = b.service.NewValue()
@@ -193,8 +156,6 @@ func (b *RationalBuffer16) SourceEnd() error {
 }
 
 func (b *RationalBuffer16) releaseBacking() {
-	b.service.Manager.BudgetField.Release(b.bytes)
-	b.bytes = 0
 	b.values = nil
 }
 
@@ -271,8 +232,6 @@ func (b *RationalBuffer16) Close() error {
 		return e
 	}
 	b.releaseBacking()
-	b.service.Manager.BudgetField.Release(b.header)
-	b.header = 0
 	b.closed = true
 	return nil
 }
