@@ -159,6 +159,45 @@ func TestRegionBytesActualAscendingWordsDescendingTailAndZeroUnread(t *testing.T
 		t.Fatal(b.Used())
 	}
 }
+func TestStrInt32MapSharedCStringHashEqualityAndInsertion(t *testing.T) {
+	b := arena.NewBudget(1 << 24)
+	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
+	mapMust(t, e)
+	h, e := NewStrInt32Map(region, StrInt32MapConfig{Budget: b})
+	mapMust(t, e)
+	a := simKey(t, region, "abcdef")
+	other := simKey(t, region, "ab")
+	mapMust(t, region.Write(a.ref, a.offset+2, 0))
+	hash, e := h.Hash(a)
+	mapMust(t, e)
+	if hash != String("ab", 17) {
+		t.Fatal(hash)
+	}
+	same, e := h.Equal(a, other)
+	mapMust(t, e)
+	if !same {
+		t.Fatal("map uses literal common strcmp")
+	}
+	mapMust(t, h.Insert(a, 29))
+	b.FailAfter(0)
+	out, ok, e := h.FindCore(other)
+	mapMust(t, e)
+	if !ok {
+		t.Fatal("map source lookup")
+	}
+	v, e := out.Value()
+	mapMust(t, e)
+	if v != 29 {
+		t.Fatal(v)
+	}
+	b.FailAfter(-1)
+	h.Close()
+	mapMust(t, region.Close())
+	if b.Used() != 0 {
+		t.Fatal(b.Used())
+	}
+}
+
 func TestRegionBytesReachedOffsetOverflowBeforeTokenRead(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	r, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})

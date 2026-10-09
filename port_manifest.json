@@ -35274,7 +35274,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "selected cell construction/copy/source destruction cpp180\u2013218/360\u2013539; unfinished construction guards and distinct owning abort",
+          "name": "selected cell construction/copy/source destruction cpp180–218/360–539; unfinished construction guards and distinct owning abort",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_root.go",
           "tests": [
@@ -35287,7 +35287,7 @@
           ]
         },
         {
-          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
+          "name": "univariate factor/isolate/sort/index selection cpp541–684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation.go",
           "tests": [
@@ -35296,7 +35296,7 @@
           ]
         },
         {
-          "name": "predicates cpp243\u2013335, magnitude/refinement cpp703\u2013781 and saved interval cpp897\u2013929; IsRational temporary-reference lifetime is explicitly adapted",
+          "name": "predicates cpp243–335, magnitude/refinement cpp703–781 and saved interval cpp897–929; IsRational temporary-reference lifetime is explicitly adapted",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_refinement.go",
           "tests": [
@@ -35305,7 +35305,7 @@
           ]
         },
         {
-          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885",
+          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm–Tarski comparison cpp1669–1821/1867–1885",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_compare.go",
           "tests": [
@@ -35341,16 +35341,16 @@
         }
       ],
       "ownership": [
-        "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65\u2013126 or fabricate multivariate x/y.",
+        "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65–126 or fabricate multivariate x/y.",
         "Actual scalar cell fields are encoded in real SmallAllocator payloads; pointer-free locator metadata contains no duplicate owning numerals. Coefficients use actual owning typed UPolynomial backing with declared storage extent/initialization adaptation. Caller/vector values, pending construction, lexical rational/predicate intervals, private factor/isolation vectors and comparison sequence remain distinct named roots.",
         "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
       ],
       "deviations": [
         "Basic24/root56 byte scalar codec and typed UPolynomial coefficient backing are Go storage adaptations, not claims about C++ sizeof or raw coefficient allocator extents.",
         "External std::sort is adapted to concrete heap sort; comparison/refinement/checkpoint order can differ by backend. Source comparison bodies and errors remain actual.",
-        "IsRational cpp292 passes algebraic_cell* through temporary anum (header366\u2013371) into save_intervals numeral const& (cpp897\u2013929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
+        "IsRational cpp292 passes algebraic_cell* through temporary anum (header366–371) into save_intervals numeral const& (cpp897–929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
         "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN.",
-        "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz\u22121 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion.",
+        "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz−1 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion.",
         "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup."
       ]
     },
@@ -35430,7 +35430,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "selected cell construction/copy/source destruction cpp180\u2013218/360\u2013539; unfinished construction guards and distinct owning abort",
+          "name": "selected cell construction/copy/source destruction cpp180–218/360–539; unfinished construction guards and distinct owning abort",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_root.go",
           "tests": [
@@ -35443,7 +35443,7 @@
           ]
         },
         {
-          "name": "univariate factor/isolate/sort/index selection cpp541\u2013684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
+          "name": "univariate factor/isolate/sort/index selection cpp541–684; selected dense-input prerequisite, full multivariate constructor and wrappers OPEN",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation.go",
           "tests": [
@@ -35452,7 +35452,7 @@
           ]
         },
         {
-          "name": "predicates cpp243\u2013335, magnitude/refinement cpp703\u2013781 and saved interval cpp897\u2013929; IsRational temporary-reference lifetime is explicitly adapted",
+          "name": "predicates cpp243–335, magnitude/refinement cpp703–781 and saved interval cpp897–929; IsRational temporary-reference lifetime is explicitly adapted",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_refinement.go",
           "tests": [
@@ -35461,7 +35461,7 @@
           ]
         },
         {
-          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885",
+          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm–Tarski comparison cpp1669–1821/1867–1885",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_compare.go",
           "tests": [
@@ -35497,16 +35497,16 @@
         }
       ],
       "ownership": [
-        "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65\u2013126 or fabricate multivariate x/y.",
+        "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65–126 or fabricate multivariate x/y.",
         "Actual scalar cell fields are encoded in real SmallAllocator payloads; pointer-free locator metadata contains no duplicate owning numerals. Coefficients use actual owning typed UPolynomial backing with declared storage extent/initialization adaptation. Caller/vector values, pending construction, lexical rational/predicate intervals, private factor/isolation vectors and comparison sequence remain distinct named roots.",
         "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
       ],
       "deviations": [
         "Basic24/root56 byte scalar codec and typed UPolynomial coefficient backing are Go storage adaptations, not claims about C++ sizeof or raw coefficient allocator extents.",
         "External std::sort is adapted to concrete heap sort; comparison/refinement/checkpoint order can differ by backend. Source comparison bodies and errors remain actual.",
-        "IsRational cpp292 passes algebraic_cell* through temporary anum (header366\u2013371) into save_intervals numeral const& (cpp897\u2013929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
+        "IsRational cpp292 passes algebraic_cell* through temporary anum (header366–371) into save_intervals numeral const& (cpp897–929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
         "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN.",
-        "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz\u22121 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion.",
+        "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz−1 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion.",
         "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup."
       ]
     },
@@ -38292,7 +38292,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609\u2013764), source reference guards, size/variable reads and reached-only degree reads",
+          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609–764), source reference guards, size/variable reads and reached-only degree reads",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_order.go",
           "tests": [
@@ -38309,7 +38309,7 @@
           "status": "unported"
         },
         {
-          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
+          "name": "monomial2pos cpp456–499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_positions.go",
           "tests": [
@@ -38324,7 +38324,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
@@ -38360,7 +38360,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -38396,7 +38396,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -38432,7 +38432,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
@@ -38468,7 +38468,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
@@ -38504,7 +38504,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_table.go",
           "tests": [
@@ -38540,7 +38540,7 @@
           ]
         },
         {
-          "name": "max/search/is_valid/square queries cpp236\u2013375: PARTIAL precise malformed-field reads: several queries read whole header eagerly. IsValid raw sorted-vars then degree-sum then stored-degree read corrected; source source small-vs-large search branch/results preserved.",
+          "name": "max/search/is_valid/square queries cpp236–375: PARTIAL precise malformed-field reads: several queries read whole header eagerly. IsValid raw sorted-vars then degree-sum then stored-degree read corrected; source source small-vs-large search branch/results preserved.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -38576,7 +38576,7 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
+          "name": "ordinary/SMT2 displays and rename cpp378–445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
@@ -38613,7 +38613,7 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
+          "name": "ordinary/SMT2 displays and rename cpp378–445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -38650,7 +38650,7 @@
           ]
         },
         {
-          "name": "tmp_monomial cpp507\u2013604: Real raw capacity128 source constructor and free-before-grow/copy-before-free paths. Source-only destructor versus explicit pending cleanup distinct; completed postphysical free acknowledged separately from genuine missing pointer hole.",
+          "name": "tmp_monomial cpp507–604: Real raw capacity128 source constructor and free-before-grow/copy-before-free paths. Source-only destructor versus explicit pending cleanup distinct; completed postphysical free acknowledged separately from genuine missing pointer hole.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
@@ -38686,7 +38686,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
@@ -38722,7 +38722,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
@@ -38758,7 +38758,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_lifetime.go",
           "tests": [
@@ -38794,7 +38794,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_vector.go",
           "tests": [
@@ -38830,7 +38830,7 @@
           ]
         },
         {
-          "name": "mul, divides/divide, gcd, unify, power/sqrt/variable division/derivative cpp919\u20131268: Actual temp merge and source reversed GCD remainder reserve quirks preserved. Cached/power degree source assertions preserved on canonical inputs; some partial-record field-read profiles beyond corrected validity/degree helpers remain OPEN. No independent multivariate polynomial substitute.",
+          "name": "mul, divides/divide, gcd, unify, power/sqrt/variable division/derivative cpp919–1268: Actual temp merge and source reversed GCD remainder reserve quirks preserved. Cached/power degree source assertions preserved on canonical inputs; some partial-record field-read profiles beyond corrected validity/degree helpers remain OPEN. No independent multivariate polynomial substitute.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -38867,7 +38867,7 @@
           ]
         },
         {
-          "name": "manager Rename cpp1270\u20131292: Actual DEBUG permutation vector lexical destruction then new chashtable, old bucket/list traversal, each monomial mutation/hash before source preinsert DEBUG contains and insert; swap only at actual end. Heap-sort backend adapter does not claim C++ comparator call sequence. Stopped physical/table roots retain explicit owning cleanup without restoring hashes.",
+          "name": "manager Rename cpp1270–1292: Actual DEBUG permutation vector lexical destruction then new chashtable, old bucket/list traversal, each monomial mutation/hash before source preinsert DEBUG contains and insert; swap only at actual end. Heap-sort backend adapter does not claim C++ comparator call sequence. Stopped physical/table roots retain explicit owning cleanup without restoring hashes.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -38903,7 +38903,7 @@
           ]
         },
         {
-          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
+          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236–375,423–437 with actual get_power DEBUG reference guards",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -38924,7 +38924,7 @@
           ]
         },
         {
-          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378\u2013416",
+          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378–416",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
@@ -38945,7 +38945,7 @@
           ]
         },
         {
-          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439\u2013445; declared concrete heapsort adaptation preserved",
+          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439–445; declared concrete heapsort adaptation preserved",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -38966,7 +38966,7 @@
           ]
         },
         {
-          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",
+          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919–1268",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -39308,7 +39308,7 @@
           ]
         },
         {
-          "name": "Selected concrete preparation/default/body constructor stages and tmp_monomial Runtime placement cpp193/507\u2013544/2308\u20132344; full imp composition remains open",
+          "name": "Selected concrete preparation/default/body constructor stages and tmp_monomial Runtime placement cpp193/507–544/2308–2344; full imp composition remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
@@ -39318,7 +39318,7 @@
           ]
         },
         {
-          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
+          "name": "Concrete polynomial skeleton cpp2958–3068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923–2952. TRACE/global stream binding remains open.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
           "tests": [
@@ -39342,7 +39342,7 @@
           ]
         },
         {
-          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179\u20136232 and var_pos/scoped_var_pos cpp6307\u20136344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
+          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179–6232 and var_pos/scoped_var_pos cpp6307–6344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_variable_helpers.go",
           "tests": [
@@ -39618,7 +39618,7 @@
           ]
         },
         {
-          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition and matched younger constant destructor/source-owning result cleanup",
+          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x±y/x-c composition and matched younger constant destructor/source-owning result cleanup",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
@@ -40924,7 +40924,7 @@
         "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md.",
         "Actual lexical polynomial references and H inline16/ref_buffer heap handles; successful source INC precedes fallible push/placement. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md.",
         "Every recursive invocation constructs its real auxiliary; charged concrete cached frame owners preserve exact lexical destruction, first stopped source cause and explicit owning abort. Matching actual LexSort/RAW generation and newly reached Integer ObjectRef/allocator roots are cleaned without sweeping later foreign calls. Rejected live-caller Close preserves cached frames.",
-        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
+        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral→rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
         "Actual Runtime numeral arrays, inline128 monomial buffer, auxiliary numeral and embedded concrete linear solver; reflected enclosing cold fields charged once, no mirror arrays or per-call solver heap header. Source destruction retains its first cause and stops before older locals; owning abort uses exact generation/numeric ObjectRef/raw receipts.",
         "Content ai and monic inv/newA are actual named cold fields; the three actual retained BIG fixture detects missing root enumeration, without claiming simultaneous mathematical reachability. Direct caller output SET/ref-assignment roots remain caller-owned.",
         "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
@@ -42036,7 +42036,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609\u2013764), source reference guards, size/variable reads and reached-only degree reads",
+          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609–764), source reference guards, size/variable reads and reached-only degree reads",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_order.go",
           "tests": [
@@ -42053,7 +42053,7 @@
           "status": "unported"
         },
         {
-          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
+          "name": "monomial2pos cpp456–499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_positions.go",
           "tests": [
@@ -42068,7 +42068,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
@@ -42104,7 +42104,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -42140,7 +42140,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92–154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -42176,7 +42176,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
@@ -42212,7 +42212,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
@@ -42248,7 +42248,7 @@
           ]
         },
         {
-          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156\u2013234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
+          "name": "monomial header, ctor, refs, hash/equality, and actual get_power cpp156–234: Actual meaningful five-uint32 header plus power bytes. Scalar owner/slot/generation provenance is charged cold adaptation; Info is explicit whole-header convenience.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_table.go",
           "tests": [
@@ -42284,7 +42284,7 @@
           ]
         },
         {
-          "name": "max/search/is_valid/square queries cpp236\u2013375: PARTIAL precise malformed-field reads: several queries read whole header eagerly. IsValid raw sorted-vars then degree-sum then stored-degree read corrected; source source small-vs-large search branch/results preserved.",
+          "name": "max/search/is_valid/square queries cpp236–375: PARTIAL precise malformed-field reads: several queries read whole header eagerly. IsValid raw sorted-vars then degree-sum then stored-degree read corrected; source source small-vs-large search branch/results preserved.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -42320,7 +42320,7 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
+          "name": "ordinary/SMT2 displays and rename cpp378–445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
@@ -42357,7 +42357,7 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
+          "name": "ordinary/SMT2 displays and rename cpp378–445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -42394,7 +42394,7 @@
           ]
         },
         {
-          "name": "tmp_monomial cpp507\u2013604: Real raw capacity128 source constructor and free-before-grow/copy-before-free paths. Source-only destructor versus explicit pending cleanup distinct; completed postphysical free acknowledged separately from genuine missing pointer hole.",
+          "name": "tmp_monomial cpp507–604: Real raw capacity128 source constructor and free-before-grow/copy-before-free paths. Source-only destructor versus explicit pending cleanup distinct; completed postphysical free acknowledged separately from genuine missing pointer hole.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
@@ -42430,7 +42430,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
@@ -42466,7 +42466,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
@@ -42502,7 +42502,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_lifetime.go",
           "tests": [
@@ -42538,7 +42538,7 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
+          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765–918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_vector.go",
           "tests": [
@@ -42574,7 +42574,7 @@
           ]
         },
         {
-          "name": "mul, divides/divide, gcd, unify, power/sqrt/variable division/derivative cpp919\u20131268: Actual temp merge and source reversed GCD remainder reserve quirks preserved. Cached/power degree source assertions preserved on canonical inputs; some partial-record field-read profiles beyond corrected validity/degree helpers remain OPEN. No independent multivariate polynomial substitute.",
+          "name": "mul, divides/divide, gcd, unify, power/sqrt/variable division/derivative cpp919–1268: Actual temp merge and source reversed GCD remainder reserve quirks preserved. Cached/power degree source assertions preserved on canonical inputs; some partial-record field-read profiles beyond corrected validity/degree helpers remain OPEN. No independent multivariate polynomial substitute.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -42611,7 +42611,7 @@
           ]
         },
         {
-          "name": "manager Rename cpp1270\u20131292: Actual DEBUG permutation vector lexical destruction then new chashtable, old bucket/list traversal, each monomial mutation/hash before source preinsert DEBUG contains and insert; swap only at actual end. Heap-sort backend adapter does not claim C++ comparator call sequence. Stopped physical/table roots retain explicit owning cleanup without restoring hashes.",
+          "name": "manager Rename cpp1270–1292: Actual DEBUG permutation vector lexical destruction then new chashtable, old bucket/list traversal, each monomial mutation/hash before source preinsert DEBUG contains and insert; swap only at actual end. Heap-sort backend adapter does not claim C++ comparator call sequence. Stopped physical/table roots retain explicit owning cleanup without restoring hashes.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -42647,7 +42647,7 @@
           ]
         },
         {
-          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
+          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236–375,423–437 with actual get_power DEBUG reference guards",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -42668,7 +42668,7 @@
           ]
         },
         {
-          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378\u2013416",
+          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378–416",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
@@ -42689,7 +42689,7 @@
           ]
         },
         {
-          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439\u2013445; declared concrete heapsort adaptation preserved",
+          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439–445; declared concrete heapsort adaptation preserved",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -42710,7 +42710,7 @@
           ]
         },
         {
-          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",
+          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919–1268",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -43052,7 +43052,7 @@
           ]
         },
         {
-          "name": "Selected concrete preparation/default/body constructor stages and tmp_monomial Runtime placement cpp193/507\u2013544/2308\u20132344; full imp composition remains open",
+          "name": "Selected concrete preparation/default/body constructor stages and tmp_monomial Runtime placement cpp193/507–544/2308–2344; full imp composition remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
@@ -43062,7 +43062,7 @@
           ]
         },
         {
-          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
+          "name": "Concrete polynomial skeleton cpp2958–3068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923–2952. TRACE/global stream binding remains open.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
           "tests": [
@@ -43086,7 +43086,7 @@
           ]
         },
         {
-          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179\u20136232 and var_pos/scoped_var_pos cpp6307\u20136344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
+          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179–6232 and var_pos/scoped_var_pos cpp6307–6344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_variable_helpers.go",
           "tests": [
@@ -43302,7 +43302,7 @@
           ]
         },
         {
-          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition and matched younger constant destructor/source-owning result cleanup",
+          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x±y/x-c composition and matched younger constant destructor/source-owning result cleanup",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
@@ -43725,7 +43725,7 @@
         "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence.",
         "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md.",
         "Actual lexical polynomial references and H inline16/ref_buffer heap handles; successful source INC precedes fallible push/placement. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md.",
-        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
+        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral→rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
         "Actual Runtime numeral arrays, inline128 monomial buffer, auxiliary numeral and embedded concrete linear solver; reflected enclosing cold fields charged once, no mirror arrays or per-call solver heap header. Source destruction retains its first cause and stops before older locals; owning abort uses exact generation/numeric ObjectRef/raw receipts.",
         "Content ai and monic inv/newA are actual named cold fields; the three actual retained BIG fixture detects missing root enumeration, without claiming simultaneous mathematical reachability. Direct caller output SET/ref-assignment roots remain caller-owned.",
         "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
@@ -45598,7 +45598,7 @@
           ]
         },
         {
-          "name": "core_manager and manager destructor bodies cpp138\u2013155/1259\u20131265, reverse numeral-vector members, then mpzzp.h:97\u2013105 actual source Del; explicit caller CleanupPolynomial and separate owning abort",
+          "name": "core_manager and manager destructor bodies cpp138–155/1259–1265, reverse numeral-vector members, then mpzzp.h:97–105 actual source Del; explicit caller CleanupPolynomial and separate owning abort",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_source_finalize.go",
           "tests": [
@@ -46416,7 +46416,7 @@
           ]
         },
         {
-          "name": "core_manager and manager destructor bodies cpp138\u2013155/1259\u20131265, reverse numeral-vector members, then mpzzp.h:97\u2013105 actual source Del; explicit caller CleanupPolynomial and separate owning abort",
+          "name": "core_manager and manager destructor bodies cpp138–155/1259–1265, reverse numeral-vector members, then mpzzp.h:97–105 actual source Del; explicit caller CleanupPolynomial and separate owning abort",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_source_finalize.go",
           "tests": [
@@ -70796,7 +70796,7 @@
           ]
         },
         {
-          "name": "visited state; mark_all_but/unmark_all; min-occurrence, subsumption and collectors; resolve (selected source123,319\u2013420,460\u2013531,1177\u20131215)",
+          "name": "visited state; mark_all_but/unmark_all; min-occurrence, subsumption and collectors; resolve (selected source123,319–420,460–531,1177–1215)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplifier_kernel.go",
           "tests": [
@@ -71015,7 +71015,7 @@
           ]
         },
         {
-          "name": "visited state; mark_all_but/unmark_all; min-occurrence, subsumption and collectors; resolve (selected source123,319\u2013420,460\u2013531,1177\u20131215)",
+          "name": "visited state; mark_all_but/unmark_all; min-occurrence, subsumption and collectors; resolve (selected source123,319–420,460–531,1177–1215)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplifier_kernel.go",
           "tests": [
@@ -72201,7 +72201,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "simplify_clause_core and scope dispatch; select_watch_lit; select_learned_watch_lit (source367\u2013465)",
+          "name": "simplify_clause_core and scope dispatch; select_watch_lit; select_learned_watch_lit (source367–465)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_core.go",
           "tests": [
@@ -72213,7 +72213,7 @@
           ]
         },
         {
-          "name": "Complete source135\u2013160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
+          "name": "Complete source135–160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_variable_state.go",
           "tests": [
@@ -72258,7 +72258,7 @@
           ]
         },
         {
-          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
+          "name": "num_diff_levels source2218–2238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_propagation_control.go",
           "tests": [
@@ -72269,7 +72269,7 @@
           ]
         },
         {
-          "name": "Source185\u2013345/463\u2013493 null-extension clause creation/attach/detach with actual candidate ownership, then2531\u20132616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
+          "name": "Source185–345/463–493 null-extension clause creation/attach/detach with actual candidate ownership, then2531–2616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_clause_lifecycle.go",
           "tests": [
@@ -72369,7 +72369,7 @@
           ]
         },
         {
-          "name": "dyn_sub_res cpp2408\u20132522 captured watch/cache iteration, binary/ternary short circuits, FUIP/ascending compaction/stat publication",
+          "name": "dyn_sub_res cpp2408–2522 captured watch/cache iteration, binary/ternary short circuits, FUIP/ascending compaction/stat publication",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_dynamic_subsumption.go",
           "tests": [
@@ -72408,7 +72408,7 @@
           ]
         },
         {
-          "name": "Actual conditional is_unit/is_empty/check_missed_propagation cpp3022\u20133074 with original/learned clause roots and27 lbool states",
+          "name": "Actual conditional is_unit/is_empty/check_missed_propagation cpp3022–3074 with original/learned clause roots and27 lbool states",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_probing_diagnostics.go",
           "tests": [
@@ -72447,7 +72447,7 @@
           ]
         },
         {
-          "name": "Selected FIRST-UIP resolve_conflict/core cpp1675\u20131820: actual mark/trail/lemma/minimize/dyn-sub pipeline, glue before pop, counters and phase publication; real EXT and complete search remain open",
+          "name": "Selected FIRST-UIP resolve_conflict/core cpp1675–1820: actual mark/trail/lemma/minimize/dyn-sub pipeline, glue before pop, counters and phase publication; real EXT and complete search remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_conflict_resolution.go",
           "tests": [
@@ -72464,7 +72464,7 @@
           ]
         },
         {
-          "name": "Selected max-level, antecedent, trail, phase and init/core reason helpers cpp2091\u20132219: reached clause c0/c1 and source mark/activity-before-push order; EXT dispatch remains explicit missing binding",
+          "name": "Selected max-level, antecedent, trail, phase and init/core reason helpers cpp2091–2219: reached clause c0/c1 and source mark/activity-before-push order; EXT dispatch remains explicit missing binding",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_conflict_helpers.go",
           "tests": [
@@ -72481,7 +72481,7 @@
           ]
         },
         {
-          "name": "Selected actual assumption/core/init/reinit helpers cpp1822\u20132087 and pop\u2192exchange\u2192reinit cpp2545\u20132549; nonnull parallel/MUS dispatch explicitly unported",
+          "name": "Selected actual assumption/core/init/reinit helpers cpp1822–2087 and pop→exchange→reinit cpp2545–2549; nonnull parallel/MUS dispatch explicitly unported",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_conflict_assumptions.go",
           "tests": [
@@ -72552,7 +72552,7 @@
           ]
         },
         {
-          "name": "Selected next_var and decide cpp933\u2013988: actual shared RNG draw order, queue fallback, all phase policies, scope/statistic/assignment publication; full search and extension remain open",
+          "name": "Selected next_var and decide cpp933–988: actual shared RNG draw order, queue fallback, all phase policies, scope/statistic/assignment publication; full search and extension remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_decision.go",
           "tests": [
@@ -72568,7 +72568,7 @@
           ]
         },
         {
-          "name": "Selected check_invariant cpp2845\u20132850, propagate wrapper711\u2013716 and missed propagation3053\u20133075 with actual lifecycle/GC bindings",
+          "name": "Selected check_invariant cpp2845–2850, propagate wrapper711–716 and missed propagation3053–3075 with actual lifecycle/GC bindings",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_integrity.go",
           "tests": [
@@ -73603,7 +73603,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Complete source135\u2013160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
+          "name": "Complete source135–160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_variable_state.go",
           "tests": [
@@ -73648,7 +73648,7 @@
           ]
         },
         {
-          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
+          "name": "num_diff_levels source2218–2238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_propagation_control.go",
           "tests": [
@@ -73659,7 +73659,7 @@
           ]
         },
         {
-          "name": "Source185\u2013345/463\u2013493 null-extension clause creation/attach/detach with actual candidate ownership, then2531\u20132616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
+          "name": "Source185–345/463–493 null-extension clause creation/attach/detach with actual candidate ownership, then2531–2616 push/pop/unassign/reinit; extension, PopReinit and full solver remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_clause_lifecycle.go",
           "tests": [
@@ -73759,7 +73759,7 @@
           ]
         },
         {
-          "name": "Selected FIRST-UIP resolve_conflict/core cpp1675\u20131820: actual mark/trail/lemma/minimize/dyn-sub pipeline, glue before pop, counters and phase publication; real EXT and complete search remain open",
+          "name": "Selected FIRST-UIP resolve_conflict/core cpp1675–1820: actual mark/trail/lemma/minimize/dyn-sub pipeline, glue before pop, counters and phase publication; real EXT and complete search remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_conflict_resolution.go",
           "tests": [
@@ -73776,7 +73776,7 @@
           ]
         },
         {
-          "name": "Selected max-level, antecedent, trail, phase and init/core reason helpers cpp2091\u20132219: reached clause c0/c1 and source mark/activity-before-push order; EXT dispatch remains explicit missing binding",
+          "name": "Selected max-level, antecedent, trail, phase and init/core reason helpers cpp2091–2219: reached clause c0/c1 and source mark/activity-before-push order; EXT dispatch remains explicit missing binding",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_conflict_helpers.go",
           "tests": [
@@ -73793,7 +73793,7 @@
           ]
         },
         {
-          "name": "Selected actual assumption/core/init/reinit helpers cpp1822\u20132087 and pop\u2192exchange\u2192reinit cpp2545\u20132549; nonnull parallel/MUS dispatch explicitly unported",
+          "name": "Selected actual assumption/core/init/reinit helpers cpp1822–2087 and pop→exchange→reinit cpp2545–2549; nonnull parallel/MUS dispatch explicitly unported",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_conflict_assumptions.go",
           "tests": [
@@ -73846,7 +73846,7 @@
           ]
         },
         {
-          "name": "Selected next_var and decide cpp933\u2013988: actual shared RNG draw order, queue fallback, all phase policies, scope/statistic/assignment publication; full search and extension remain open",
+          "name": "Selected next_var and decide cpp933–988: actual shared RNG draw order, queue fallback, all phase policies, scope/statistic/assignment publication; full search and extension remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_decision.go",
           "tests": [
@@ -73862,7 +73862,7 @@
           ]
         },
         {
-          "name": "Selected check_invariant cpp2845\u20132850, propagate wrapper711\u2013716 and missed propagation3053\u20133075 with actual lifecycle/GC bindings",
+          "name": "Selected check_invariant cpp2845–2850, propagate wrapper711–716 and missed propagation3053–3075 with actual lifecycle/GC bindings",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_integrity.go",
           "tests": [
@@ -100685,7 +100685,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "registered tst1 selected root-count inputs cpp57/65/91/107 and tst_wilkinson cpp224\u2013248 count/twenty IsInt actions; dense polynomial construction adapter; remaining arithmetic/print/driver actions OPEN",
+          "name": "registered tst1 selected root-count inputs cpp57/65/91/107 and tst_wilkinson cpp224–248 count/twenty IsInt actions; dense polynomial construction adapter; remaining arithmetic/print/driver actions OPEN",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_root_source_test.go",
           "tests": [
@@ -104932,9 +104932,22 @@
       "path": "src/test/map.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/str_int32_map_test.go"
+      ],
+      "tests": [
+        "TestStrInt32MapSourceMap14Assertions",
+        "TestStrInt32MapForeignBorrowAndMutableValues",
+        "TestStrInt32MapIndependentOracleAndBuckets",
+        "TestStrInt32MapCopyOperatorsAndBudget",
+        "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+        "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+        "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+        "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+        "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+        "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+      ],
       "assertions": [
         {
           "line": 25,
@@ -104995,10 +105008,21 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "tst1 all14 active CString-to-int ENSURE assertions",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map_test.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "Test region owns borrowed source spellings; concrete default-entry map owns only header/table/directory. Fixtures explicitly close both owners."
+      ],
       "deviations": [
-        "Intentionally not ported: this test-only source exercises a CString-to-int template specialization that has no retained production consumer in the Go port."
+        "Original14 assertions are now represented using actual borrowed CString keys and int32 values rather than the earlier unsigned-key projection. Independent bounded models, lifetime/budget and architecture layout checks supplement them."
       ]
     },
     {
@@ -107999,7 +108023,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Dormant tst_lex source21cases84 adapted monomial comparator conditions (cpp1740\u20131790); source registered driver returns before tst_lex",
+          "name": "Dormant tst_lex source21cases84 adapted monomial comparator conditions (cpp1740–1790); source registered driver returns before tst_lex",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_order_test.go",
           "tests": [
@@ -108089,7 +108113,7 @@
           ]
         },
         {
-          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition and matched younger constant destructor/source-owning result cleanup",
+          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x±y/x-c composition and matched younger constant destructor/source-owning result cleanup",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
@@ -108175,7 +108199,7 @@
         }
       ],
       "ownership": [
-        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
+        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral→rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
         "Charged concrete scope owns actual four scoped NUMs, RAW two, monomial_ref, exact created-only cohort and matched callee/factory/physical receipts. Successful incoming INC transfers output before older DEC callback; source destruction is reverse lexical and stops before older fields, separate from explicit owning CleanupSqrt.",
         "polynomial.cpp:3186-3205: actual caller-owned unsigned vector and persistent imp m_found_vars bool vector retain their own direct raw/pending leaves. No source NUM/ref local is declared, no INC/DEC or child receipt is invented. Failed push leaves preceding true flag, and final reset loop runs only after successful body; later source retry skips retained flag without adapter repair.",
         "polynomial.cpp:3186-3205: executing metadata in actual core/output owners refuses returning Runtime ErrorTransport reentry before source/own destruction, output mutation or same-call reset. Reflected existing owner charges include these scalar fields; flags convey no raw/numeric acquisition authority.",
@@ -110068,7 +110092,7 @@
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
         "TestSymbolConcurrentInternIdentity",
         "TestSymbolIndependentBytesAndPrefixOrder",
-        "TestSymbolDuplicateLookupAndInvalidTokens"
+        "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
       ],
       "assertions": [
         {
@@ -110177,7 +110201,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         }
       ],
@@ -115106,7 +115130,7 @@
         "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
         "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
         "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
-        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
+        "Nested invariant fixture corrected2→4 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
         "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
         "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI.",
         "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
@@ -115647,7 +115671,7 @@
         "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
         "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
         "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
-        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
+        "Nested invariant fixture corrected2→4 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
         "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
         "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI.",
         "XASSERT has no upstream invocation: definition-only independent fixture, no invented caller or registered-driver credit",
@@ -117650,6 +117674,7 @@
         "TestStrHashtableCStringBorrowChangedBeforeInsertionQueryEngine",
         "TestStrHashtableCStringFiniteLengthAndEqualityOracle",
         "TestRegionBytesActualAscendingWordsDescendingTailAndZeroUnread",
+        "TestStrInt32MapSharedCStringHashEqualityAndInsertion",
         "TestRegionBytesReachedOffsetOverflowBeforeTokenRead"
       ],
       "assertions": [
@@ -117741,11 +117766,25 @@
             "TestRuntimeBytesBoundedActualReachedLoads",
             "TestInlineWordBytesActualColdAndReadOrder"
           ]
+        },
+        {
+          "name": "Concrete borrowed char-pointer strlen/strcmp Hash/Eq and string/byte query prefixes with actual RegionBytes signed-tail reader (src/util/str_hashtable.h:28-30; src/util/hash.cpp:26-102)",
+          "status": "partial",
+          "go_target": "pkg/util/region_bytes.go",
+          "tests": [
+            "TestStrHashtableCStringHashAndEqualRereadActualUnstoredPointer",
+            "TestStrHashtableCStringBorrowChangedBeforeInsertionQueryEngine",
+            "TestStrHashtableCStringFiniteLengthAndEqualityOracle",
+            "TestRegionBytesActualAscendingWordsDescendingTailAndZeroUnread",
+            "TestStrInt32MapSharedCStringHashEqualityAndInsertion",
+            "TestRegionBytesReachedOffsetOverflowBeforeTokenRead"
+          ]
         }
       ],
       "ownership": [
         "No retained caller data; baseline little-endian/signed-char policy explicit. Generic hash-table/container functors not yet audited; see PORT_PROGRESS.md#audit-utilhash-port-status-md.",
-        "Call-local concrete reader borrows Runtime/block/offset/requested extent or the actual cold word and initialization mask; zero length touches no provider. Actual source12-byte loops and descending signed-char tails share the same engine; no copied byte buffer."
+        "Call-local concrete reader borrows Runtime/block/offset/requested extent or the actual cold word and initialization mask; zero length touches no provider. Actual source12-byte loops and descending signed-char tails share the same engine; no copied byte buffer.",
+        "No allocation or copied spelling is introduced at strlen/strcmp/hash entry. Actual region origin/ref/offset is retained; reached bytes validate provider lifetime and bounds. Forty-one independent signed-byte length/equality cases and related StrInt32Map common consumers execute under active reservation refusal with immediate named Runtime/cold graph."
       ],
       "deviations": [
         "Selected little-endian/signed-char source profile; global/other ABI transport remains open.",
@@ -117888,6 +117927,7 @@
         "pkg/util/uint_set_map.go",
         "pkg/util/str_hashtable.go",
         "pkg/util/util_symbol_table.go",
+        "pkg/util/str_int32_map.go",
         "pkg/util/util_param_descrs.go",
         "pkg/ast/ast_shared_occs_iterator.go",
         "pkg/ast/ast_sparse_mark.go",
@@ -117928,6 +117968,19 @@
         "pkg/util/str_hashtable_legacy_statistics_source_test.go",
         "pkg/util/util_str_hashtable_legacy_statistics_output_source_test.go",
         "pkg/util/str_hashtable_owner_identity_source_test.go",
+        "pkg/util/util_str_int32_map_assertions_source_test.go",
+        "pkg/util/str_int32_map_runtime_reentrant_source_test.go",
+        "pkg/util/str_int32_map_legacy_lifecycle.go",
+        "pkg/util/str_int32_map_legacy_assertions.go",
+        "pkg/util/str_int32_map_lifecycle_source_test.go",
+        "pkg/util/str_int32_map_bytes.go",
+        "pkg/util/str_int32_map_assertions.go",
+        "pkg/util/str_int32_map_runtime_source_test.go",
+        "pkg/util/str_int32_map_statistics_source_test.go",
+        "pkg/util/str_int32_map_statistics.go",
+        "pkg/util/str_int32_map_runtime_destructor_source_test.go",
+        "pkg/util/str_int32_map_runtime.go",
+        "pkg/util/str_int32_map_owner_identity_source_test.go",
         "pkg/model/model_array_tuple_table.go",
         "pkg/ast/rewriter/bv_trailing_table.go"
       ],
@@ -117995,6 +118048,16 @@
         "TestSymbolInt32TableSourceAssignDestinationPolicy",
         "TestSymbolInt32TableCopyFailureSweeps",
         "TestSymbolInt32TableCopyEmptyAndExactPeaks",
+        "TestStrInt32MapSourceMap14Assertions",
+        "TestStrInt32MapForeignBorrowAndMutableValues",
+        "TestStrInt32MapIndependentOracleAndBuckets",
+        "TestStrInt32MapCopyOperatorsAndBudget",
+        "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+        "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+        "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+        "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+        "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+        "TestStrInt32MapConcreteArchitectureLayoutAndBudget",
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
         "TestParamDescrsSourceKindLabelsAndHelpers",
@@ -118116,6 +118179,7 @@
         "TestStrHashtableCStringBorrowChangedBeforeInsertionQueryEngine",
         "TestStrHashtableCStringFiniteLengthAndEqualityOracle",
         "TestRegionBytesActualAscendingWordsDescendingTailAndZeroUnread",
+        "TestStrInt32MapSharedCStringHashEqualityAndInsertion",
         "TestRegionBytesReachedOffsetOverflowBeforeTokenRead",
         "TestStrHashtableLegacyResetFinalizeActualDeleteBeforeReplacementRefusal",
         "TestStrHashtableLegacyCopyCtorForeignBindingRefusalRetainsActualTable",
@@ -118151,6 +118215,26 @@
         "TestStrHashtableLegacyStatisticsDumpIntoBorrowedSpellingRereadAndFileBytes",
         "TestStrHashtableLegacyAccidentalGoCopyCannotOwnSourceActions",
         "TestStrHashtableZeroGoWrapperCannotOwnCleanup",
+        "TestStrInt32MapBoundConstructorActualDefaultEntryContinueThrow",
+        "TestStrInt32MapClosedAssertionOwnerCopyInvariantAndErasedReset",
+        "TestStrInt32MapRuntimeBoundInvariantLiteralContinue",
+        "TestStrInt32MapLegacyGrowthSourceAssertionStopRetainsNewAndOld",
+        "TestStrInt32MapReferenceFindLiteralAssertionAndValueLvalue",
+        "TestStrInt32MapRuntimeAllocationReentrantOwningClose",
+        "TestStrInt32MapRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+        "TestStrInt32MapSourceReplacementConsumesOldBeforeRefusal",
+        "TestStrInt32MapSourceCopyCtorRetainsActualAcquiredDefaultEntries",
+        "TestStrInt32MapRuntimeActualDefaultEntryStateAndKeyOnlyRead",
+        "TestStrInt32MapRuntimeEveryActualReservationAndDefaultEntryValues",
+        "TestStrInt32MapRuntimeIndependentFiniteValueIntersection",
+        "TestStrInt32MapRuntimeKeyOnlyLookupAndCopyReachedValueGuard",
+        "TestStrInt32MapLegacyEveryActualReservationAndDefaultEntryValues",
+        "TestStrInt32MapStatisticsIndependentDefaultEntryProbeCounts",
+        "TestStrInt32MapRuntimeNullReplacementDestructorRetainsUnjoinedNew",
+        "TestStrInt32MapRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
+        "TestStrInt32MapRuntimeReplacementEveryRefusalThenSourceDestructor",
+        "TestStrInt32MapLegacyAccidentalGoCopyCannotOwnSourceActions",
+        "TestStrInt32MapZeroGoWrapperCannotOwnCleanup",
         "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
         "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
         "TestBVTrailingConstructorBorrowsExtractionOwner",
@@ -118613,6 +118697,159 @@
           ]
         },
         {
+          "name": "CString/int32 key_data/default_map_entry constructors/state/hash/data access",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 map constructor/destructor/copy",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 reset/finalize/empty/size/capacity",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 insert/insert-if-absent/find-core/find-output/get/contains",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 reference find/operator[] through checked mutable scalar values",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 begin/end/find_iterator and checked entry access",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 remove/erase",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 cached hash rehash/growth/cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 implicit assignment/union/intersection/swap/invariant/disabled collision count",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
           "name": "descriptor dictionary physical probing/growth/removal/tombstone cleanup specialization",
           "status": "ported",
           "go_target": "pkg/util/util_param_descrs.go",
@@ -118800,6 +119037,19 @@
           ]
         },
         {
+          "name": "Concrete borrowed char-pointer strlen/strcmp Hash/Eq and string/byte query prefixes with actual RegionBytes signed-tail reader (src/util/str_hashtable.h:28-30; src/util/hash.cpp:26-102)",
+          "status": "partial",
+          "go_target": "pkg/util/region_bytes.go",
+          "tests": [
+            "TestStrHashtableCStringHashAndEqualRereadActualUnstoredPointer",
+            "TestStrHashtableCStringBorrowChangedBeforeInsertionQueryEngine",
+            "TestStrHashtableCStringFiniteLengthAndEqualityOracle",
+            "TestRegionBytesActualAscendingWordsDescendingTailAndZeroUnread",
+            "TestStrInt32MapSharedCStringHashEqualityAndInsertion",
+            "TestRegionBytesReachedOffsetOverflowBeforeTokenRead"
+          ]
+        },
+        {
           "name": "Legacy char-pointer destructive Reset/Finalize, null-skipping source DT, retained failed-copy constructor and lexical Intersect ownership (src/util/hashtable.h:146-148,259-275,287-322,613-623; src/util/memory_manager.h:112-119)",
           "status": "partial",
           "go_target": "pkg/util/str_hashtable_legacy_lifecycle.go",
@@ -118883,6 +119133,52 @@
           ]
         },
         {
+          "name": "Concrete char-pointer/int32 default-entry Runtime and legacy source constructor/copy/DT, destructive reset/finalize and lexical intersection (src/util/map.h:24-196; src/util/hashtable.h:44-63,146-230,243-322,610-627)",
+          "status": "partial",
+          "go_target": "pkg/util/str_int32_map_runtime.go",
+          "tests": [
+            "TestStrInt32MapRuntimeAllocationReentrantOwningClose",
+            "TestStrInt32MapRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+            "TestStrInt32MapSourceReplacementConsumesOldBeforeRefusal",
+            "TestStrInt32MapSourceCopyCtorRetainsActualAcquiredDefaultEntries",
+            "TestStrInt32MapRuntimeEveryActualReservationAndDefaultEntryValues",
+            "TestStrInt32MapLegacyEveryActualReservationAndDefaultEntryValues",
+            "TestStrInt32MapRuntimeNullReplacementDestructorRetainsUnjoinedNew",
+            "TestStrInt32MapRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
+            "TestStrInt32MapRuntimeReplacementEveryRefusalThenSourceDestructor"
+          ]
+        },
+        {
+          "name": "Concrete default-entry literal hash,state,key,value copy/move, state-only tombstones, key-only queries and mutable value facade (src/util/map.h:24-38,113-179; src/util/hashtable.h:44-63,353-576)",
+          "status": "partial",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapRuntimeActualDefaultEntryStateAndKeyOnlyRead",
+            "TestStrInt32MapRuntimeKeyOnlyLookupAndCopyReachedValueGuard",
+            "TestStrInt32MapRuntimeIndependentFiniteValueIntersection"
+          ]
+        },
+        {
+          "name": "Concrete source SASSERT/UNREACHABLE erased gates, same DebugContext C/T and reference find lvalue sites (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644; src/util/map.h:149-163)",
+          "status": "partial",
+          "go_target": "pkg/util/util_str_int32_map_assertions_source_test.go",
+          "tests": [
+            "TestStrInt32MapBoundConstructorActualDefaultEntryContinueThrow",
+            "TestStrInt32MapClosedAssertionOwnerCopyInvariantAndErasedReset",
+            "TestStrInt32MapRuntimeBoundInvariantLiteralContinue",
+            "TestStrInt32MapLegacyGrowthSourceAssertionStopRetainsNewAndOld",
+            "TestStrInt32MapReferenceFindLiteralAssertionAndValueLvalue"
+          ]
+        },
+        {
+          "name": "Concrete source HASHTABLE_STATISTICS sole physical/inline counter and independent default-entry collision/copy/swap proof (src/util/hashtable.h:138-140,254-283,359-424,481-543,649-653)",
+          "status": "partial",
+          "go_target": "pkg/util/str_int32_map_statistics.go",
+          "tests": [
+            "TestStrInt32MapStatisticsIndependentDefaultEntryProbeCounts"
+          ]
+        },
+        {
           "name": "selected args_table borrowed AST-row specialization: growth before replacement, last tombstone, physical bucket order, deletion cleanup and reservation refusal (src/util/hashtable.h:183-256,351-403,494-509,546-577)",
           "status": "partial",
           "go_target": "pkg/model/model_array_tuple_table.go",
@@ -118915,6 +119211,7 @@
         "Runtime-backed mode uses its actual 24-byte wrapper and 32-byte pointer-free entry array, with NIL legacy hot slice. Exact acquisition nodes stamp returned Runtime leaves; ascending moves, destructive replacement, source strict destructor and separate owning cleanup retain each genuinely unjoined token. Lexical intersection copy has a concrete inline header, one actual table allocation, and source completed-copy destructor before owning abort.",
         "One cold borrowed assertion-context interface is charged inside the actual reflected table owner/config, never in a hot entry and never a condition callback. Runtime debug tags bind their exact owning DebugContext. SASSERT checks only the assertion flag, without recursively looking up tag storage. Constructor condition follows real wrapper allocation and precedes the real entry array; strict returned allocation/copy/move owners remain named across actual transport refusal.",
         "Enabled Runtime objects own32 physical bytes, default objects retain24; the unsigned64 statistics field is actual payload, while lexical copies use their actual inline scalar words. No mirrored statistics counter. Call-local output method set borrows actual NumericTextStream and actual stored CString region/token/offset; no cloned spelling or custom writer. Every constructor/copy/growth/replacement/output reservation prefix has immediate named physical/cold bijection before fault lift.",
+        "No allocation or copied spelling is introduced at strlen/strcmp/hash entry. Actual region origin/ref/offset is retained; reached bytes validate provider lifetime and bounds. Forty-one independent signed-byte length/equality cases and related StrInt32Map common consumers execute under active reservation refusal with immediate named Runtime/cold graph.",
         "Legacy source capacity is the actual scalar raw.words[2]; Runtime remains actual raw-byte authority. Delete detaches and refunds actual legacy table before replacement allocation; failed copies retain acquired table/header/directory in their actual returned or lexical owner. Completed local destructor consumes only table backing before Go cold cleanup. RetainedBytes reports exact lexical frame/copy storage once; independent physical-Go/cold tree census runs before fault lift at every constructor reservation through first success.",
         "Completed-object SourceFinalize follows actual dealloc_vect null-skip after body replacement refusal; it also destroys actual nonnull OLD after failed growth allocation. Body error history is unchanged. Failed copy complete=false never receives source core DT, and explicit owning abort separately refunds actual cold/header contexts.",
         "Actual legacy growth owns each returned NEW array and charged Go acquisition node before reached move assertion; OLD remains the source current table until delete/publish. Successful transfer retires only completed metadata; stopped NEW arrays remain independently named through completed core DT and separate owning abort. Every actual node/array reservation through first success has immediate independently named cold/backing graph before fault lift. Captured borrowed table/entry addresses survive owner field exchange while actual backing remains owned.",
@@ -120578,7 +120875,7 @@
       ],
       "deviations": [
         "Source const references return owning copies; source scalar assertion domains are typed errors. Mixed equality defect and exact nonsaturating infinity coefficient retained. No actual registered direct source assertion counts invented.",
-        "Source h131\u2013147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
+        "Source h131–147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
         "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
@@ -121033,7 +121330,7 @@
       "deviations": [
         "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
         "No registered source inf_int_rational test exists; independent finite/fault/alias/ownership checks are supplied without inventing source assertion coverage.",
-        "Source h129\u2013137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt.",
+        "Source h129–137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
         "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
@@ -121594,7 +121891,7 @@
       "deviations": [
         "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",
         "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers.",
-        "Source h135\u2013143 component reference projections read only the selected component; InfFirst/InfRational/Infinitesimal still check both denominators and owning Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
+        "Source h135–143 component reference projections read only the selected component; InfFirst/InfRational/Infinitesimal still check both denominators and owning Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
         "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
@@ -127405,13 +127702,27 @@
       "go_targets": [
         "pkg/util/uint_map.go",
         "pkg/util/uint_set_map.go",
+        "pkg/util/str_int32_map.go",
         "pkg/util/util_param_descrs.go",
         "pkg/util/util_gparams_dictionary.go",
         "pkg/sat/sat_solver_index_sets.go",
         "pkg/sat/sat_solver_index_set.go",
         "pkg/sat/sat_solver_index_map.go",
         "pkg/sat/sat_solver_index_set_test.go",
-        "pkg/sat/sat_solver_index_iterator_source_test.go"
+        "pkg/sat/sat_solver_index_iterator_source_test.go",
+        "pkg/util/util_str_int32_map_assertions_source_test.go",
+        "pkg/util/str_int32_map_runtime_reentrant_source_test.go",
+        "pkg/util/str_int32_map_legacy_lifecycle.go",
+        "pkg/util/str_int32_map_legacy_assertions.go",
+        "pkg/util/str_int32_map_lifecycle_source_test.go",
+        "pkg/util/str_int32_map_bytes.go",
+        "pkg/util/str_int32_map_assertions.go",
+        "pkg/util/str_int32_map_runtime_source_test.go",
+        "pkg/util/str_int32_map_statistics_source_test.go",
+        "pkg/util/str_int32_map_statistics.go",
+        "pkg/util/str_int32_map_runtime_destructor_source_test.go",
+        "pkg/util/str_int32_map_runtime.go",
+        "pkg/util/str_int32_map_owner_identity_source_test.go"
       ],
       "tests": [
         "TestUintMapSourceMapAssertions",
@@ -127440,6 +127751,16 @@
         "TestUintSetMapCleanupAndOutOfMemory",
         "TestUintSetMapCopyAssignmentShapeAndIterator",
         "TestUintSetMapRehashFailureAndTemporaryCopies",
+        "TestStrInt32MapSourceMap14Assertions",
+        "TestStrInt32MapForeignBorrowAndMutableValues",
+        "TestStrInt32MapIndependentOracleAndBuckets",
+        "TestStrInt32MapCopyOperatorsAndBudget",
+        "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+        "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+        "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+        "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+        "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+        "TestStrInt32MapConcreteArchitectureLayoutAndBudget",
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
         "TestParamDescrsSourceKindLabelsAndHelpers",
@@ -127482,7 +127803,27 @@
         "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
         "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
         "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
-        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer"
+        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer",
+        "TestStrInt32MapBoundConstructorActualDefaultEntryContinueThrow",
+        "TestStrInt32MapClosedAssertionOwnerCopyInvariantAndErasedReset",
+        "TestStrInt32MapRuntimeBoundInvariantLiteralContinue",
+        "TestStrInt32MapLegacyGrowthSourceAssertionStopRetainsNewAndOld",
+        "TestStrInt32MapReferenceFindLiteralAssertionAndValueLvalue",
+        "TestStrInt32MapRuntimeAllocationReentrantOwningClose",
+        "TestStrInt32MapRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+        "TestStrInt32MapSourceReplacementConsumesOldBeforeRefusal",
+        "TestStrInt32MapSourceCopyCtorRetainsActualAcquiredDefaultEntries",
+        "TestStrInt32MapRuntimeActualDefaultEntryStateAndKeyOnlyRead",
+        "TestStrInt32MapRuntimeEveryActualReservationAndDefaultEntryValues",
+        "TestStrInt32MapRuntimeIndependentFiniteValueIntersection",
+        "TestStrInt32MapRuntimeKeyOnlyLookupAndCopyReachedValueGuard",
+        "TestStrInt32MapLegacyEveryActualReservationAndDefaultEntryValues",
+        "TestStrInt32MapStatisticsIndependentDefaultEntryProbeCounts",
+        "TestStrInt32MapRuntimeNullReplacementDestructorRetainsUnjoinedNew",
+        "TestStrInt32MapRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
+        "TestStrInt32MapRuntimeReplacementEveryRefusalThenSourceDestructor",
+        "TestStrInt32MapLegacyAccidentalGoCopyCannotOwnSourceActions",
+        "TestStrInt32MapZeroGoWrapperCannotOwnCleanup"
       ],
       "conditionals": [
         {
@@ -127703,6 +128044,159 @@
           ]
         },
         {
+          "name": "CString/int32 key_data/default_map_entry constructors/state/hash/data access",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 map constructor/destructor/copy",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 reset/finalize/empty/size/capacity",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 insert/insert-if-absent/find-core/find-output/get/contains",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 reference find/operator[] through checked mutable scalar values",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 begin/end/find_iterator and checked entry access",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 remove/erase",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 cached hash rehash/growth/cleanup",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
+          "name": "CString/int32 implicit assignment/union/intersection/swap/invariant/disabled collision count",
+          "status": "ported",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget"
+          ]
+        },
+        {
           "name": "cached symbol/info default-map entry specialization",
           "status": "ported",
           "go_target": "pkg/util/util_param_descrs.go",
@@ -127764,6 +128258,52 @@
             "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
             "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
             "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer"
+          ]
+        },
+        {
+          "name": "Concrete char-pointer/int32 default-entry Runtime and legacy source constructor/copy/DT, destructive reset/finalize and lexical intersection (src/util/map.h:24-196; src/util/hashtable.h:44-63,146-230,243-322,610-627)",
+          "status": "partial",
+          "go_target": "pkg/util/str_int32_map_runtime.go",
+          "tests": [
+            "TestStrInt32MapRuntimeAllocationReentrantOwningClose",
+            "TestStrInt32MapRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+            "TestStrInt32MapSourceReplacementConsumesOldBeforeRefusal",
+            "TestStrInt32MapSourceCopyCtorRetainsActualAcquiredDefaultEntries",
+            "TestStrInt32MapRuntimeEveryActualReservationAndDefaultEntryValues",
+            "TestStrInt32MapLegacyEveryActualReservationAndDefaultEntryValues",
+            "TestStrInt32MapRuntimeNullReplacementDestructorRetainsUnjoinedNew",
+            "TestStrInt32MapRuntimeBodyReleaseStopReachesOwnDestructorBoundary",
+            "TestStrInt32MapRuntimeReplacementEveryRefusalThenSourceDestructor"
+          ]
+        },
+        {
+          "name": "Concrete default-entry literal hash,state,key,value copy/move, state-only tombstones, key-only queries and mutable value facade (src/util/map.h:24-38,113-179; src/util/hashtable.h:44-63,353-576)",
+          "status": "partial",
+          "go_target": "pkg/util/str_int32_map.go",
+          "tests": [
+            "TestStrInt32MapRuntimeActualDefaultEntryStateAndKeyOnlyRead",
+            "TestStrInt32MapRuntimeKeyOnlyLookupAndCopyReachedValueGuard",
+            "TestStrInt32MapRuntimeIndependentFiniteValueIntersection"
+          ]
+        },
+        {
+          "name": "Concrete source SASSERT/UNREACHABLE erased gates, same DebugContext C/T and reference find lvalue sites (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644; src/util/map.h:149-163)",
+          "status": "partial",
+          "go_target": "pkg/util/util_str_int32_map_assertions_source_test.go",
+          "tests": [
+            "TestStrInt32MapBoundConstructorActualDefaultEntryContinueThrow",
+            "TestStrInt32MapClosedAssertionOwnerCopyInvariantAndErasedReset",
+            "TestStrInt32MapRuntimeBoundInvariantLiteralContinue",
+            "TestStrInt32MapLegacyGrowthSourceAssertionStopRetainsNewAndOld",
+            "TestStrInt32MapReferenceFindLiteralAssertionAndValueLvalue"
+          ]
+        },
+        {
+          "name": "Concrete source HASHTABLE_STATISTICS sole physical/inline counter and independent default-entry collision/copy/swap proof (src/util/hashtable.h:138-140,254-283,359-424,481-543,649-653)",
+          "status": "partial",
+          "go_target": "pkg/util/str_int32_map_statistics.go",
+          "tests": [
+            "TestStrInt32MapStatisticsIndependentDefaultEntryProbeCounts"
           ]
         }
       ],
@@ -136306,7 +136846,7 @@
           ]
         },
         {
-          "name": "Source mpq.h:191\u2013237,562,666\u2013669 same-owner receiver Copy, scalar sign/structural predicates/NUM hash and selected direct component extraction; no whole-pair raw-denominator preflight",
+          "name": "Source mpq.h:191–237,562,666–669 same-owner receiver Copy, scalar sign/structural predicates/NUM hash and selected direct component extraction; no whole-pair raw-denominator preflight",
           "status": "ported",
           "go_target": "pkg/util/mpq_inspect.go",
           "tests": [
@@ -138734,7 +139274,7 @@
           ]
         },
         {
-          "name": "Explicit completed-owner destructor body and reverse members (mpz.cpp:142\u2013161)",
+          "name": "Explicit completed-owner destructor body and reverse members (mpz.cpp:142–161)",
           "status": "ported",
           "go_target": "pkg/util/mpz_source_finalize.go",
           "tests": [
@@ -144754,7 +145294,7 @@
         "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
         "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
         "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
-        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal→successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
         "One borrowed DebugContext pointer included in actual reflected permutation header; no independent provider ownership, shadow switch or assertion reservation. Existing real vector raw/pending/acquisition ownership unchanged; independent named physical bijection and cold sum before every actual constructor/output refusal.",
         "NumericTextStream real file storage borrows os.File without Close/Sync; existing integer local formatter and insertion flags reused, no unused output buffer or preformatted message. Real file write failure sets badbit and returns nil while later argument reads still execute.",
         "DebugContext reflected owner header charges one actual borrowed action pointer; setter validates self/common Budget identity without reading input/file/closed pointed state. Streams and action contexts remain caller-owned.",
@@ -144780,7 +145320,7 @@
         "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
         "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
         "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
-        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
+        "Nested invariant fixture corrected2→4 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
         "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
         "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI."
       ]
@@ -145068,7 +145608,7 @@
         "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
         "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
         "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
-        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal→successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
         "Call-local pointer-free borrowed Runtime+Block+offset only. CPtr reads no SIZE/CAP/payload/provider; reached access uses existing actual Runtime word codecs. No allocation, metadata owner, whole-range preflight, clone or shadow. Captured generation invalidates on real realloc/free; same backing changes remain visible. Per-word writes validate physical word extent and initialization read guards before swaps. Caller-named graph unchanged under FailAfter0.",
         "Actual NUM12 and monomial16 encoded payloads swapped in place with no INC/DEL, clone, replacement allocation or snapshot ownership.",
         "monomialBase uint64 stamped at real location publication from actual n; reflected cold location directory charged once, independent from mutable SIZE/request uint32 wrap.",
@@ -145111,7 +145651,7 @@
         "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
         "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
         "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
-        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
+        "Nested invariant fixture corrected2→4 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
         "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
         "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI."
       ]
@@ -151365,7 +151905,7 @@
           ]
         },
         {
-          "name": "Generated unsigned sorting_network copy constructor: vector members current\u2192next exact-cap copy then original scalar pointer aliases, completed-member reverse unwind and failed-constructor owning abort (src/util/sorting_network.h:28-34,87-94; src/util/vector.h:102-120,159-167,178-189)",
+          "name": "Generated unsigned sorting_network copy constructor: vector members current→next exact-cap copy then original scalar pointer aliases, completed-member reverse unwind and failed-constructor owning abort (src/util/sorting_network.h:28-34,87-94; src/util/vector.h:102-120,159-167,178-189)",
           "status": "ported",
           "go_target": "pkg/util/util_sorting_network_unsigned_copy_source.go",
           "tests": [
@@ -152170,6 +152710,7 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/str_hashtable.go",
+        "pkg/util/str_int32_map.go",
         "pkg/util/str_hashtable_runtime.go",
         "pkg/util/str_hashtable_runtime_source_test.go",
         "pkg/util/str_hashtable_runtime_reentrant_source_test.go",
@@ -152208,6 +152749,16 @@
         "TestStrHashtableSourceInitialCapacity",
         "TestStrHashtablePartialRemovalAndStrictReset",
         "TestStrHashtableEpochExhaustion",
+        "TestStrInt32MapSourceMap14Assertions",
+        "TestStrInt32MapForeignBorrowAndMutableValues",
+        "TestStrInt32MapIndependentOracleAndBuckets",
+        "TestStrInt32MapCopyOperatorsAndBudget",
+        "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+        "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+        "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+        "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+        "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+        "TestStrInt32MapConcreteArchitectureLayoutAndBudget",
         "TestStrHashtableRuntimeActualWrapperTableAndLazyFieldInitialization",
         "TestStrHashtableRuntimeProbeGrowthAndIndependentContents",
         "TestStrHashtableRuntimeResetDestructiveRefusalPrefix",
@@ -152253,6 +152804,7 @@
         "TestStrHashtableCStringBorrowChangedBeforeInsertionQueryEngine",
         "TestStrHashtableCStringFiniteLengthAndEqualityOracle",
         "TestRegionBytesActualAscendingWordsDescendingTailAndZeroUnread",
+        "TestStrInt32MapSharedCStringHashEqualityAndInsertion",
         "TestRegionBytesReachedOffsetOverflowBeforeTokenRead"
       ],
       "conditionals": [
@@ -152286,6 +152838,88 @@
             "TestStrHashtableSourceHashCStringAndEquality",
             "TestStrHashtableIndependentOracleAndCStringLookup",
             "TestStrHashtableCStringFiniteLengthAndEqualityOracle"
+          ]
+        },
+        {
+          "name": "concrete str_hashtable alias over the char-key ptr_hashtable specialization (src/util/str_hashtable.h:31)",
+          "status": "ported",
+          "go_target": "pkg/util/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableBorrowedLifetimeAndReplacement",
+            "TestStrHashtableSourceProbeThresholdAndTombstones",
+            "TestStrHashtableOperationsAndOutput",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableBudgetsSwapAndStaleViews",
+            "TestStrHashtableDumpCStringBytes",
+            "TestStrHashtableKeyOwnerAndStats",
+            "TestStrHashtableMultiOriginQueriesAndAdoption",
+            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
+            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
+            "TestStrHashtableMultiOriginSwapGraphFailures",
+            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
+            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
+            "TestStrHashtableCleanupResetAndFailurePeaks",
+            "TestStrHashtableSourceInitialCapacity",
+            "TestStrHashtablePartialRemovalAndStrictReset",
+            "TestStrHashtableEpochExhaustion",
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget",
+            "TestStrHashtableRuntimeActualWrapperTableAndLazyFieldInitialization",
+            "TestStrHashtableRuntimeProbeGrowthAndIndependentContents",
+            "TestStrHashtableRuntimeResetDestructiveRefusalPrefix",
+            "TestStrHashtableRuntimeEveryConstructorReservationAndCopyPrefixes",
+            "TestStrHashtableRuntimeBorrowRefsCloneSwapAndRemoval",
+            "TestStrHashtableRuntimeEveryGrowthReservationAndRealTLSRetry",
+            "TestStrHashtableRuntimeSourceDestructorPostphysicalStopOwningAcknowledgment",
+            "TestStrHashtableRuntimeLexicalIntersectionHasOnlyTableAllocation",
+            "TestStrHashtableRuntimeUnusedEntryWordsStayUnread",
+            "TestStrHashtableRuntimeRemoveDeletedOOMShortCircuit",
+            "TestStrHashtableRuntimeSizeT32WrappedArrayGuardPrefix",
+            "TestStrHashtableRuntimeEveryResetAndFinalizeReplacementReservation",
+            "TestStrHashtableRuntimeForeignBorrowLifetimeAndTypedObserverGuard",
+            "TestStrHashtableRuntimeEveryLexicalAndDeletedReplacementReservation",
+            "TestStrHashtableRuntimeOrdinaryAllocatorProfiles",
+            "TestStrHashtableRuntimeAllocationReentrantOwningClose",
+            "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
+            "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
+            "TestStrHashtableBoundInvariantContinuesLiteralSites",
+            "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
+            "TestStrHashtableBoundResetExactDeletedPrefixBeforeAssertion",
+            "TestStrHashtableBoundClosedProviderReadOnlyAtReachedMacro",
+            "TestStrHashtableBoundUnreachableIgnoresSwitchAndContinuesSource",
+            "TestStrHashtableBoundMoveAndCopyFlagAfterActualNewTable",
+            "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
+            "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
+            "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
+            "TestStrHashtableBoundEveryConstructorReservationImmediateGraph",
+            "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
+            "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
+            "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate",
+            "TestStrHashtableRuntimeStatisticsActualFieldAndLiteralMissCounts",
+            "TestStrHashtableRuntimeStatisticsEveryConstructorAndCopyReservation",
+            "TestStrHashtableRuntimeStatisticsResetFinalizeInlineAndUnsignedWrap",
+            "TestStrHashtableRuntimeStatisticsEveryReplacementAndGrowthPrefix",
+            "TestStrHashtableRuntimeStatisticsIndependentFiniteProbeCounts",
+            "TestStrHashtableDumpIntoActualFieldFormattingAndCallerWidth",
+            "TestStrHashtableDumpIntoClosedFileStillReachesActualBorrowedCString",
+            "TestStrHashtableDumpIntoEveryOutputReservationAndExactPrefix",
+            "TestStrHashtableDumpIntoActualFileAndEmptyBorrowErasure",
+            "TestStrHashtableDumpIntoBorrowedSpellingRereadAndFileBytes",
+            "TestStrHashtableCStringHashAndEqualRereadActualUnstoredPointer",
+            "TestStrHashtableCStringBorrowChangedBeforeInsertionQueryEngine",
+            "TestStrHashtableCStringFiniteLengthAndEqualityOracle",
+            "TestRegionBytesActualAscendingWordsDescendingTailAndZeroUnread",
+            "TestStrInt32MapSharedCStringHashEqualityAndInsertion",
+            "TestRegionBytesReachedOffsetOverflowBeforeTokenRead"
           ]
         }
       ],
@@ -152490,7 +153124,7 @@
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
         "TestSymbolConcurrentInternIdentity",
         "TestSymbolIndependentBytesAndPrefixOrder",
-        "TestSymbolDuplicateLookupAndInvalidTokens",
+        "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens",
         "TestSymbolServiceSourcePublicationAndReinitialize",
         "TestSymbolServiceSourceEveryConstructorReservation",
         "TestSymbolServiceSourceCopiedOwnerAndPrepareFailure"
@@ -152546,7 +153180,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152559,7 +153193,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152572,7 +153206,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152585,7 +153219,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152598,7 +153232,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152611,7 +153245,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152624,7 +153258,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152670,7 +153304,7 @@
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
         "TestSymbolConcurrentInternIdentity",
         "TestSymbolIndependentBytesAndPrefixOrder",
-        "TestSymbolDuplicateLookupAndInvalidTokens",
+        "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens",
         "TestStringBufferSymbolBulkAndNumericPrefixFailure",
         "TestStringBufferOwnerConfigurationAndSymbolGuards",
         "TestSymbolServiceSourcePublicationAndReinitialize",
@@ -152744,7 +153378,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152757,7 +153391,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152770,7 +153404,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152783,7 +153417,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152796,7 +153430,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152809,7 +153443,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -152822,7 +153456,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
-            "TestSymbolDuplicateLookupAndInvalidTokens"
+            "TestSymbolSourceGrowthBeforeDuplicateAndInvalidTokens"
           ]
         },
         {
@@ -153732,9 +154366,13 @@
         "pkg/util/util_trace_context_test.go"
       ],
       "tests": [
-        "TestTraceContextUsesOwnedGoStrings",
-        "TestTraceContextCopiesCompatibilityKey",
-        "TestTraceContextOwnerAndCloseChecks"
+        "TestTraceContextShortCircuitAndSourceFinalize",
+        "TestTraceContextIndependentBoundedSetModel",
+        "TestTraceContextEveryRealLazyConstructorRefusal",
+        "TestTraceContextForeignBorrowAndOwnerGuards",
+        "TestTraceContextCStringCurrentReadsAndWarmQueries",
+        "TestTraceContextForeignPublicationAndGrowthRefusalPrefixes",
+        "TestTraceContextEraseRehashCompletedPrefix"
       ],
       "conditionals": [
         {
@@ -153770,17 +154408,21 @@
           "status": "partial",
           "go_target": "pkg/util/util_trace_context.go",
           "tests": [
-            "TestTraceContextUsesOwnedGoStrings",
-            "TestTraceContextCopiesCompatibilityKey",
-            "TestTraceContextOwnerAndCloseChecks"
+            "TestTraceContextShortCircuitAndSourceFinalize",
+            "TestTraceContextIndependentBoundedSetModel",
+            "TestTraceContextEveryRealLazyConstructorRefusal",
+            "TestTraceContextForeignBorrowAndOwnerGuards",
+            "TestTraceContextCStringCurrentReadsAndWarmQueries",
+            "TestTraceContextForeignPublicationAndGrowthRefusalPrefixes",
+            "TestTraceContextEraseRehashCompletedPrefix"
           ]
         }
       ],
       "ownership": [
-        "TraceContext owns immutable Go string keys in a built-in map; it does not retain caller byte storage."
+        "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit."
       ],
       "deviations": [
-        "Explicit caller-bound single-lane service; _TRACE output stream and macro wiring remain open. Go strings and a built-in map replace borrowed char pointers and the C++ hashtable. The enable-all flag survives finalization."
+        "Explicit caller-bound single-lane service; source-global shared Runtime allocation and process singleton binding remain open. _TRACE ofstream/macros remain open; enable-all survives finalization."
       ]
     },
     {
@@ -153793,9 +154435,13 @@
         "pkg/util/util_trace_context_test.go"
       ],
       "tests": [
-        "TestTraceContextUsesOwnedGoStrings",
-        "TestTraceContextCopiesCompatibilityKey",
-        "TestTraceContextOwnerAndCloseChecks"
+        "TestTraceContextShortCircuitAndSourceFinalize",
+        "TestTraceContextIndependentBoundedSetModel",
+        "TestTraceContextEveryRealLazyConstructorRefusal",
+        "TestTraceContextForeignBorrowAndOwnerGuards",
+        "TestTraceContextCStringCurrentReadsAndWarmQueries",
+        "TestTraceContextForeignPublicationAndGrowthRefusalPrefixes",
+        "TestTraceContextEraseRehashCompletedPrefix"
       ],
       "conditionals": [
         {
@@ -153843,17 +154489,21 @@
           "status": "partial",
           "go_target": "pkg/util/util_trace_context.go",
           "tests": [
-            "TestTraceContextUsesOwnedGoStrings",
-            "TestTraceContextCopiesCompatibilityKey",
-            "TestTraceContextOwnerAndCloseChecks"
+            "TestTraceContextShortCircuitAndSourceFinalize",
+            "TestTraceContextIndependentBoundedSetModel",
+            "TestTraceContextEveryRealLazyConstructorRefusal",
+            "TestTraceContextForeignBorrowAndOwnerGuards",
+            "TestTraceContextCStringCurrentReadsAndWarmQueries",
+            "TestTraceContextForeignPublicationAndGrowthRefusalPrefixes",
+            "TestTraceContextEraseRehashCompletedPrefix"
           ]
         }
       ],
       "ownership": [
-        "TraceContext owns immutable Go string keys in a built-in map; it does not retain caller byte storage."
+        "Named reflected cold owners and real delegated table/cache storage; all actual constructor/growth/erase refusal prefixes audited before disabling faults; borrowed region/generator lifetimes remain explicit."
       ],
       "deviations": [
-        "Explicit caller-bound single-lane service; _TRACE output stream and macro wiring remain open. Go strings and a built-in map replace borrowed char pointers and the C++ hashtable. The enable-all flag survives finalization."
+        "Explicit caller-bound single-lane service; source-global shared Runtime allocation and process singleton binding remain open. _TRACE ofstream/macros remain open; enable-all survives finalization."
       ]
     },
     {
@@ -155656,7 +156306,7 @@
           ]
         },
         {
-          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
+          "name": "monomial2pos cpp456–499 Get/Reset/Set and concrete borrowed monomial-array template loops, actual unsigned Runtime vector member",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_positions.go",
           "tests": [
@@ -155723,7 +156373,7 @@
           ]
         },
         {
-          "name": "Concrete polynomial skeleton cpp2958\u20133068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923\u20132952. TRACE/global stream binding remains open.",
+          "name": "Concrete polynomial skeleton cpp2958–3068 canonical grouping, actual monomial INC/DEC, inline128 overflow and failed ctor member unwind; scoped_ptr_vector<skeleton> complete operations; selected Newton source vector destruction cpp2923–2952. TRACE/global stream binding remains open.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
           "tests": [
@@ -155747,7 +156397,7 @@
           ]
         },
         {
-          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179\u20136232 and var_pos/scoped_var_pos cpp6307\u20136344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
+          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179–6232 and var_pos/scoped_var_pos cpp6307–6344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_variable_helpers.go",
           "tests": [
@@ -156092,7 +156742,7 @@
           ]
         },
         {
-          "name": "Generated unsigned sorting_network copy constructor: vector members current\u2192next exact-cap copy then original scalar pointer aliases, completed-member reverse unwind and failed-constructor owning abort (src/util/sorting_network.h:28-34,87-94; src/util/vector.h:102-120,159-167,178-189)",
+          "name": "Generated unsigned sorting_network copy constructor: vector members current→next exact-cap copy then original scalar pointer aliases, completed-member reverse unwind and failed-constructor owning abort (src/util/sorting_network.h:28-34,87-94; src/util/vector.h:102-120,159-167,178-189)",
           "status": "partial",
           "go_target": "pkg/util/util_sorting_network_unsigned_copy_source.go",
           "tests": [
@@ -156170,7 +156820,7 @@
         "Actual reflected cold node prepared before each Runtime Allocate; block acquired only from allocator return, transferred only at m_data publication. Native-valid retry retains earlier unjoined roots. Source destructor visits current pointer only; owning cleanup releases actual retained nodes with sticky physical-consumed progress.",
         "Independent caller-named physical Runtime block bijection plus actual wrapper/acquisition reflected cold headers; every reservation before first success retains completed source prefixes before faultlift.",
         "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration.",
-        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal\u2192successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
+        "Only after copyConstruct DEBUG completion/constructed publication or completed Assign. Retire actual published/token-empty nodes via named link; unjoined tokens, incomplete constructor/body frames and sticky source/cleanup owner causes remain. No Runtime allocation/free event for cold header refund. 64 assignments prove exact no-acquisition cold graph every iteration. A completed later operation also retires called/acquired=false/token-null contexts; no actual block was returned, first source cause stays on vector. 32 real prephysical refusal→successful retry cycles prove bounded cold bytes, exact graph before faultlift, actual Code101+same-Runtime OOM and payload after success.",
         "Call-local pointer-free borrowed Runtime+Block+offset only. CPtr reads no SIZE/CAP/payload/provider; reached access uses existing actual Runtime word codecs. No allocation, metadata owner, whole-range preflight, clone or shadow. Captured generation invalidates on real realloc/free; same backing changes remain visible. Per-word writes validate physical word extent and initialization read guards before swaps. Caller-named graph unchanged under FailAfter0.",
         "Actual NUM12 and monomial16 encoded payloads swapped in place with no INC/DEL, clone, replacement allocation or snapshot ownership.",
         "monomialBase uint64 stamped at real location publication from actual n; reflected cold location directory charged once, independent from mutable SIZE/request uint32 wrap.",
@@ -156232,7 +156882,7 @@
         "CASSERT/XASSERT/UNREACHABLE/VERIFY/ENSURE wider consumers remain source obligations; release and disabled SASSERT erase provider/condition reads, unconditional invariant SIZE preserved.",
         "Repository-relative source file spellings represent __FILE__ diagnostics; other compiler path spellings and native formatter/locale/OS profiles remain qualified.",
         "Real bounded child A/EOF/NO_DEBUGGER source exits verified; Linux action context uses real process signal/shell adapter. Source Budget refusal is not proof of zero transient Go host heap allocation; collapsed internal nonzero system status is branch outcome only.",
-        "Nested invariant fixture corrected2\u21924 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
+        "Nested invariant fixture corrected2→4 C commands because two failed predicates per each of two terms; preserved actualEOF110 fixture log, not source algorithm RED.",
         "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
         "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI.",
         "XASSERT has no upstream invocation: definition-only independent fixture, no invented caller or registered-driver credit",

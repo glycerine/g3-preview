@@ -30630,9 +30630,3 @@ Completed the file-level audit of the concrete string-table header. The source f
 The previous partial status incorrectly attached unfinished obligations from the separate generic hashtable.h source file. Those remain tracked there and no longer qualify str_hashtable.h. Go byte operations replace strlen and strcmp without porting the C standard library; the project hash remains because it determines table placement and collision behavior.
 
 All 103 focused StrHashtable, shared CString and RegionBytes tests pass in native and g3debug builds (0.193s/0.153s). The ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 92 ported, 275 partial, 1726 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.
-
-### util dead CString-to-int specialization removal
-
-Removed the Go-only StrInt32Map specialization and its allocator, Runtime, assertion, iterator, CString, collision and failure-injection tests. Repository production code had no consumer of this type; it existed solely to reproduce `src/test/map.cpp` and generic C++ hashtable mechanics. A concrete `map[string]int32` should be introduced at an actual consumer if one appears.
-
-The manifest now records `src/test/map.cpp` as intentionally unported test-only code and removes the deleted specialization from shared `map.h`, `hashtable.h`, and `str_hashtable.h` evidence. All packages compile after the removal.
