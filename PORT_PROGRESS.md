@@ -31003,3 +31003,25 @@ parameters, descriptors, formatting, trace files, and numeric streams; focused
 native SMT2 tests passed. Complete AST, SMT core, and util/text suites passed.
 Module-wide test compilation, affected-package vet, and portcheck passed.
 The expensive full native suite was not repeated for this extraction.
+
+## Replace floating-point plugin Runtime rows with a concrete numeral slice
+
+Converted the live AST floating-point plugin's scoped values to
+`[]util.ArbitraryFloat`. Removed serialized 32-byte rows, Runtime vector growth,
+pending backing acquisitions, allocation-history headers, and C++ capacity
+accounting. Numeral SET, duplicate deletion, ID reuse, and ascending destruction
+operate directly on typed elements. Extended the existing numeric copy chain to
+retain exact allocation receipts for native elements; removed its unconsumed
+Runtime-row methods and the now-unconsumed MPF vector allocator adapter. Numeric
+limb/cell allocations retain their existing ownership and failure protocol.
+
+Updated physical ownership audits to read actual slice elements. Replaced
+backing-layout/refusal/retry tests with native growth, default elements, budget
+independence, and cleanup checks. Kept real copy-failure tests, including two
+retained allocation children and independent borrowed significand ownership.
+
+Validation: complete AST and SMT core suites passed; all TestArbitraryFloat
+native tests passed (33.5s). Focused floating-point/copy tests passed in native
+and g3checked,g3debug builds, including large owned numeral relocation with
+allocation refusal and two retained failed copy children. Module-wide test
+compilation, affected-package vet, and portcheck passed.

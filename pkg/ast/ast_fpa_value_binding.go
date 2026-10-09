@@ -5,7 +5,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// These procedures borrow the actual receiver's sole physical value vector
+// These procedures borrow the actual receiver's concrete value slice
 // and MPF manager at each reached table call. The table stores no closures,
 // mirrored numerals, or manager inferred from a significand token.
 func (p *astFloatingPointPluginOwner) valueTableProcs() astFloatValueTableProcs {
@@ -66,7 +66,7 @@ func (p *astFloatingPointPluginOwner) mkValueID(value *util.ArbitraryFloat) (idR
 		if e = p.ids.Recycle(id); e != nil {
 			return 0, e
 		}
-		if e = p.numeric.DelRuntimeValue(p.values.raw.Block, 8+32*uint64(id)); e != nil {
+		if e = p.values.del(id); e != nil {
 			return 0, e
 		}
 	}

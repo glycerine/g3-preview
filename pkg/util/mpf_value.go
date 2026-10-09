@@ -146,7 +146,10 @@ func (m *ArbitraryFloatManager) CopyWithReceipt(out, source *ArbitraryFloat, rec
 func (m *ArbitraryFloatManager) copyWithValueReceipt(out, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt) error {
 	return m.copyWithValueReceiptAndContext(out, source, receipt, integerAllocationInvocationContext{})
 }
-func (m *ArbitraryFloatManager) copyWithValueReceiptAndContext(out, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt, context integerAllocationInvocationContext) (cause error) {
+func (m *ArbitraryFloatManager) copyWithValueReceiptAndContext(out, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt, context integerAllocationInvocationContext) error {
+	return m.copyWithValueReceiptAndChain(out, source, receipt, context, nil)
+}
+func (m *ArbitraryFloatManager) copyWithValueReceiptAndChain(out, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt, context integerAllocationInvocationContext, chain *ArbitraryFloatValueCopyChain) (cause error) {
 	if e := m.valueGuard(out); e != nil {
 		return e
 	}
@@ -159,6 +162,7 @@ func (m *ArbitraryFloatManager) copyWithValueReceiptAndContext(out, source *Arbi
 		return e
 	}
 	m.valueBinding.conversionContext = context
+	m.valueBinding.chain = chain
 	defer func() { m.finishValueCopyBinding(cause) }()
 	out.format = source.format
 	out.exponent = source.exponent

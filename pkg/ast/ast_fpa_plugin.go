@@ -40,7 +40,7 @@ type astFloatingPointPluginOwner struct {
 
 func (m *ASTManager) floatingPointPluginBytes() uint64 {
 	bytes := func(p *astFloatingPointPluginOwner) uint64 {
-		n := p.header + p.values.acquisitionBytes() + p.literalBytes() + uint64(len(p.table.cells))*8 + uint64(p.ids.FreeCapacity())*4
+		n := p.header + p.literalBytes() + uint64(len(p.table.cells))*8 + uint64(p.ids.FreeCapacity())*4
 		if p.numeric != nil {
 			n += p.numeric.OwnedStorageBytes()
 		} else {
@@ -359,14 +359,12 @@ func (m *ASTManager) destroyFloatingPointMembers(own bool) error {
 func (m *ASTManager) releaseFloatingPointHistory() {
 	if p := m.floatingPointPlugin; p != nil {
 		p.releaseLiteralFrames()
-		p.values.endAcquisitionHistory()
 		m.BudgetField.Release(p.header)
 		p.header = 0
 	}
 	m.floatingPointPlugin = nil
 	for p := m.floatingPointPluginFailed; p != nil; p = p.next {
 		p.releaseLiteralFrames()
-		p.values.endAcquisitionHistory()
 		m.BudgetField.Release(p.header)
 		p.header = 0
 	}

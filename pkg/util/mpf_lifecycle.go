@@ -1,23 +1,5 @@
-// Source: src/util/vector.h:59-100; src/util/mpf.h:65-73;
-// src/util/memory_manager.cpp:274-289.
+// Source: src/util/mpf.h:65-73; src/util/memory_manager.cpp:274-289.
 package util
-
-// GrowRuntimeValueStorage is the concrete source vector allocator leaf. Its
-// returned block is acquired by the calling vector at this actual outcome;
-// this method neither publishes m_data nor infers ownership from counters.
-func (m *ArbitraryFloatManager) GrowRuntimeValueStorage(old Block, request uint64) (Block, error) {
-	if e := m.valueGuard(&ArbitraryFloat{}); e != nil {
-		return old, e
-	}
-	m.valueExecuting = true
-	defer func() { m.valueExecuting = false }()
-	if old == (Block{}) {
-		return m.memory.Allocate(request)
-	}
-	h := old
-	e := m.memory.Reallocate(&h, request)
-	return h, e
-}
 
 // The backlink is borrowed, lifecycle-only cold metadata installed at the
 // actual completed MPQ/Integer member publication. It acquires no value root.

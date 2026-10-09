@@ -74,9 +74,6 @@ func (m *ArbitraryFloatManager) CopyToRuntimeWithReceipt(block Block, offset uin
 // The source MPF is borrowed from an explicitly named owner. Its compressed
 // significand is read by that owner's Integer leaf, never inferred from IDs.
 func (m *ArbitraryFloatManager) CopyToRuntimeFromOwnerWithReceipt(block Block, offset uint64, sourceManager *ArbitraryFloatManager, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt) (cause error) {
-	return m.copyToRuntimeFromOwnerWithReceiptAndChain(block, offset, sourceManager, source, receipt, nil)
-}
-func (m *ArbitraryFloatManager) copyToRuntimeFromOwnerWithReceiptAndChain(block Block, offset uint64, sourceManager *ArbitraryFloatManager, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt, chain *ArbitraryFloatValueCopyChain) (cause error) {
 	out, e := m.captureRuntimeValue(block, offset, false)
 	if e != nil {
 		return e
@@ -95,7 +92,6 @@ func (m *ArbitraryFloatManager) copyToRuntimeFromOwnerWithReceiptAndChain(block 
 	if e := m.beginValueCopyBinding(receipt, sourceManager.integer); e != nil {
 		return e
 	}
-	m.valueBinding.chain = chain
 	defer func() { m.finishValueCopyBinding(cause) }()
 	if e = m.memory.WriteUint32(block, offset, source.format); e != nil {
 		return e

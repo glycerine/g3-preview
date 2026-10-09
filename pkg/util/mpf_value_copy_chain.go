@@ -33,17 +33,18 @@ func (c *ArbitraryFloatValueCopyChain) guard() error {
 	}
 	return nil
 }
-func (c *ArbitraryFloatValueCopyChain) CopyToRuntime(block Block, offset uint64, sourceManager *ArbitraryFloatManager, source *ArbitraryFloat) error {
-	return c.CopyToRuntimeWithReceipt(block, offset, sourceManager, source, nil)
-}
-func (c *ArbitraryFloatValueCopyChain) CopyToRuntimeWithReceipt(block Block, offset uint64, sourceManager *ArbitraryFloatManager, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt) error {
+
+// CopyWithReceipt copies into a concrete Go numeral owned by this chain's
+// manager. The same allocation-leaf receipts protect native slice elements.
+func (c *ArbitraryFloatValueCopyChain) CopyWithReceipt(out, source *ArbitraryFloat, receipt *ArbitraryFloatValueCopyReceipt) error {
 	if e := c.guard(); e != nil {
 		return e
 	}
 	c.executing = true
 	defer func() { c.executing = false }()
-	return c.manager.copyToRuntimeFromOwnerWithReceiptAndChain(block, offset, sourceManager, source, receipt, c)
+	return c.manager.copyWithValueReceiptAndChain(out, source, receipt, integerAllocationInvocationContext{}, c)
 }
+
 func (c *ArbitraryFloatValueCopyChain) Cleanup(abort bool) error {
 	if c != nil && c.self == nil && c.manager == nil && c.head == nil {
 		return nil

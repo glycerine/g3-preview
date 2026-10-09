@@ -11,7 +11,7 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func TestASTFloatingPointScopedValueActualDefaultReserveGeometry(t *testing.T) {
+func TestASTFloatingPointScopedValueNativeGrowthAndDefaults(t *testing.T) {
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	astTestMust(t, e)
@@ -20,80 +20,31 @@ func TestASTFloatingPointScopedValueActualDefaultReserveGeometry(t *testing.T) {
 	_, e = m.RegisterFloatingPointPlugin()
 	astTestMust(t, e)
 	v := &m.floatingPointPlugin.values
-	astTestMust(t, v.reserve(8))
+	before := m.BudgetField.Used()
+	physical := m.numerals.RuntimeOwner().Stats()
+	m.BudgetField.FailAfter(0)
+	astTestMust(t, v.reserve(257))
 	n, e := v.size()
 	astTestMust(t, e)
-	capacity, e := v.raw.Capacity()
-	astTestMust(t, e)
-	extent, e := v.raw.Runtime.Size(v.raw.Block)
-	astTestMust(t, e)
-	if n != 8 || capacity != 8 || extent != 8+32*8 || v.initialized != 8 {
-		t.Fatal("actual 32-byte source vector extent/prefix", n, capacity, extent, v.initialized)
+	if n != 257 || m.BudgetField.Used() != before || m.numerals.RuntimeOwner().Stats() != physical {
+		t.Fatal("Go storage charged numerical arena", n)
 	}
 	for i := uint32(0); i < n; i++ {
 		a, e := v.at(i)
 		astTestMust(t, e)
-		if a.EBits() != 0 || a.SBits() != 0 || a.Sign() || a.Exponent() != 0 {
-			t.Fatal("actual ascending default MPF", i, a)
-		}
-		for k := uint64(0); k < 6; k++ {
-			word, e := v.raw.Runtime.ReadUint32(v.raw.Block, 8+32*uint64(i)+4*k)
-			astTestMust(t, e)
-			if word != 0 {
-				t.Fatal("default codec", i, k, word)
-			}
-		}
-		if _, e := v.raw.Runtime.Read(v.raw.Block, 8+32*uint64(i)+24); e == nil {
-			t.Fatal("unused source padding incorrectly initialized")
+		if a != (util.ArbitraryFloat{}) {
+			t.Fatal("default numeral", i, a)
 		}
 	}
-	raw := v.raw.Block
+	// Smaller reserve preserves values and size, matching source reserve usage.
+	astTestMust(t, v.reserve(8))
+	if len(v.values) != 257 {
+		t.Fatal("reserve shrank values")
+	}
+	m.BudgetField.FailAfter(-1)
 	astTestMust(t, m.SourceFinalize())
-	if !v.sourceDone || v.raw.Block != (util.Block{}) || v.initialized != 0 {
-		t.Fatal("actual scoped DT before older manager", v)
-	}
-	if _, e := v.raw.Runtime.Size(raw); e == nil {
-		t.Fatal("source vector backing survived member DT")
-	}
-}
-
-func TestASTFloatingPointScopedValueEveryActualReservePrefix(t *testing.T) {
-	success := false
-	for ordinal := int64(0); ordinal < 64; ordinal++ {
-		m := astTestManager(t)
-		_, e := m.RegisterArithmeticPlugin()
-		astTestMust(t, e)
-		_, e = m.RegisterBitVectorPlugin()
-		astTestMust(t, e)
-		_, e = m.RegisterFloatingPointPlugin()
-		astTestMust(t, e)
-		p := m.floatingPointPlugin
-		v := &p.values
-		before := m.BudgetField.Used() - m.Stats().AllocatedBytes - m.numerals.RuntimeOwner().Stats().TotalBytes
-		m.BudgetField.FailAfter(ordinal)
-		call := v.reserve(8)
-		astFloatingPointConstructorRawGraph(t, m.numerals, p)
-		if got := m.BudgetField.Used(); got != before+m.Stats().AllocatedBytes+m.numerals.RuntimeOwner().Stats().TotalBytes {
-			t.Fatal("actual immediate reserve cold graph", ordinal, got, before, m.Stats())
-		}
-		if call != nil && v.bodyCause != call {
-			t.Fatal("first actual vector body cause", ordinal, call, v.bodyCause)
-		}
-		if call == nil {
-			success = true
-			if v.initialized != 8 {
-				t.Fatal("actual placement prefix", v.initialized)
-			}
-		}
-		m.BudgetField.FailAfter(-1)
-		astTestMust(t, m.Close())
-		if success {
-			t.Log("first successful actual vector growth prefix", ordinal)
-			break
-		}
-	}
-	if !success {
-		t.Fatal("no reached reserve success")
+	if !v.sourceDone || v.values != nil || v.destructorIndex != 257 {
+		t.Fatal("ordered member destruction", v)
 	}
 }
 
@@ -118,86 +69,26 @@ func TestASTFloatingPointScopedValueActualInlinePushPublication(t *testing.T) {
 	astTestMust(t, e)
 	n, e := v.size()
 	astTestMust(t, e)
-	if !equal || n != 1 || v.initialized != 1 {
-		t.Fatal("actual default-before-SET publication", got, source, n, v.initialized)
+	if !equal || n != 1 || len(v.values) != 1 {
+		t.Fatal("actual default-before-SET publication", got, source, n, len(v.values))
 	}
+	// Native growth relocates scalar handles without copying their numerical
+	// ownership or charging the numeric arena. The original copied row survives.
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	astTestMust(t, v.reserve(257))
+	got, e = v.at(0)
+	astTestMust(t, e)
+	equal, e = p.numeric.EqCore(&source, &got)
+	astTestMust(t, e)
+	if !equal || m.BudgetField.Used() != before {
+		t.Fatal("native growth lost owned value", got)
+	}
+	m.BudgetField.FailAfter(-1)
 	astFloatingPointConstructorRawGraph(t, m.numerals, p)
 	astTestMust(t, p.numeric.Del(&source))
 
 	astTestMust(t, m.Close())
-}
-
-func TestASTFloatingPointScopedValueActualNullGrowthRetryKeepsOlderOutcome(t *testing.T) {
-	b := arena.NewBudget(1 << 28)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
-	astTestMust(t, e)
-	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
-	astTestMust(t, e)
-	sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
-	astTestMust(t, e)
-	m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
-	astTestMust(t, e)
-	defer func() {
-		astTestMust(t, m.Close())
-		astTestMust(t, sy.Close())
-		astTestMust(t, q.Close())
-		astTestMust(t, r.Close())
-		if b.Used() != 0 {
-			t.Error("real owner context end", b.Used())
-		}
-	}()
-	_, e = m.RegisterArithmeticPlugin()
-	astTestMust(t, e)
-	_, e = m.RegisterBitVectorPlugin()
-	astTestMust(t, e)
-	_, e = m.RegisterFloatingPointPlugin()
-	astTestMust(t, e)
-	v := &m.floatingPointPlugin.values
-	padding, e := r.Allocate(uint64(99990 - r.State().LocalSize - 8))
-	astTestMust(t, e)
-	defer func() { astTestMust(t, r.Deallocate(&padding)) }()
-	astTestMust(t, r.SetMaxSize(1))
-	call := v.reserve(1)
-	if call == nil || v.raw.Pending == (util.Block{}) || v.raw.Block != (util.Block{}) {
-		t.Fatal("real postphysical unjoined outcome", call, v.raw)
-	}
-	captured := v.raw.Pending
-	cause := v.bodyCause
-	astFloatingPointRawGraphWithBlocks(t, q, m.floatingPointPlugin, []util.Block{padding})
-	astTestMust(t, r.SetMaxSize(0))
-	beforeCold := b.Used()
-	beforeRuntime := r.Stats()
-	b.FailAfter(0)
-	refusal := v.reserve(1)
-	if refusal == nil || v.raw.Pending != captured || v.history != nil || v.bodyCause != cause || b.Used() != beforeCold || r.Stats() != beforeRuntime {
-		t.Fatal("actual archive reservation preserves exact older token", refusal, v.raw, v.history)
-	}
-	astFloatingPointRawGraphWithBlocks(t, q, m.floatingPointPlugin, []util.Block{padding})
-	b.FailAfter(-1)
-	// memory::allocate never consults the sticky global OOM flag; this NULL
-	// source retry is defined and must not overwrite its old acquired token.
-	retry := v.reserve(1)
-	if retry != nil {
-		t.Errorf("source-valid NULL growth retry: %v", retry)
-		return
-	}
-	if v.raw.Block == (util.Block{}) || v.raw.Block == captured || v.bodyCause != cause {
-		t.Fatal("retry source pointer/history", v.raw, cause, v.bodyCause)
-	}
-	astFloatingPointRawGraphWithBlocks(t, q, m.floatingPointPlugin, []util.Block{padding})
-	a := v.history
-	if a == nil || a.original != captured || a.active != captured || a.bodyCause != cause || a.acknowledged || a.header == 0 {
-		t.Fatal("actual unjoined acquisition tuple", a)
-	}
-	astTestMust(t, m.SourceFinalize())
-	if !v.sourceDone || v.raw.Block != (util.Block{}) || a.active != captured || a.acknowledged || a.header == 0 || v.bodyCause != cause {
-		t.Fatal("source DT protects own-only old acquisition", v, a)
-	}
-	astFloatingPointRawGraphWithBlocks(t, q, m.floatingPointPlugin, []util.Block{padding})
-	astTestMust(t, m.Close())
-	if !a.acknowledged || a.active != (util.Block{}) || a.original != captured || a.bodyCause != cause || a.header != 0 {
-		t.Fatal("exact ACK then enclosing owner end", a)
-	}
 }
 
 func TestASTFloatingPointScopedValueInlineErasesCopyAcquisition(t *testing.T) {
@@ -259,11 +150,33 @@ func TestASTFloatingPointScopedValueTwoRetainedAllocationChildren(t *testing.T) 
 	astTestMust(t, z.Power(&two, 100, &sig))
 	astTestMust(t, v.reserve(3))
 	var initial util.ArbitraryFloatValueCopyReceipt
-	astTestMust(t, p.numeric.SetComponentsToRuntimeFromOwnerWithReceipt(v.raw.Block, 8, 8, 120, false, 3, z, &sig, &initial))
+	// The existing foreign-owner input adapter constructs one owned numeral.
+	// Transfer that numeral out of its temporary input row into the native slice.
+	row, e := r.Allocate(32)
+	astTestMust(t, e)
+	for k := uint64(0); k < 6; k++ {
+		astTestMust(t, r.WriteUint32(row, 4*k, 0))
+	}
+	astTestMust(t, p.numeric.SetComponentsToRuntimeFromOwnerWithReceipt(row, 0, 8, 120, false, 3, z, &sig, &initial))
 	astTestMust(t, p.numeric.CleanupValueCopy(&initial, false))
 	astTestMust(t, p.numeric.CleanupValueCopy(&initial, true))
-	source, e := p.numeric.CaptureRuntimeValue(v.raw.Block, 8)
+	source, e := p.numeric.CaptureRuntimeValue(row, 0)
 	astTestMust(t, e)
+	v.values[0] = source
+	astTestMust(t, r.Deallocate(&row))
+	// Relocate a slice containing a real BIG numeral while all numeric arena
+	// reservations are refused. Native growth must preserve its sole owner.
+	beforeGrowth, physical := b.Used(), r.Stats()
+	b.FailAfter(0)
+	astTestMust(t, v.reserve(257))
+	b.FailAfter(-1)
+	relocated, e := v.at(0)
+	astTestMust(t, e)
+	same, e := p.numeric.EqCore(&source, &relocated)
+	astTestMust(t, e)
+	if !same || b.Used() != beforeGrowth || r.Stats() != physical {
+		t.Fatal("native growth changed BIG numeral ownership")
+	}
 	baseCold := b.Used() - m.Stats().AllocatedBytes - r.Stats().TotalBytes
 	astTestMust(t, r.SetMaxSize(1))
 	first := v.set(1, &source)
@@ -280,7 +193,7 @@ func TestASTFloatingPointScopedValueTwoRetainedAllocationChildren(t *testing.T) 
 	astFloatingPointRawGraphSourceOwners(t, m.numerals, p, nil, nil, []astFloatBorrowedInteger{{z, &sig}})
 	astTestMust(t, r.SetMaxSize(0))
 	astTestMust(t, v.destroy(true))
-	if !v.copyFalseVisited || !v.copyTrueAcknowledged || !v.sourceDone || v.bodyCause != cause || v.destructorIndex != 3 {
+	if !v.copyFalseVisited || !v.copyTrueAcknowledged || !v.sourceDone || v.bodyCause != cause || v.destructorIndex != 257 {
 		t.Fatal("false child ACK, ascending row DT, true child ACK", v)
 	}
 	chain := reflect.ValueOf(&v.copyChain).Elem()

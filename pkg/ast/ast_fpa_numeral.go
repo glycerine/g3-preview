@@ -172,7 +172,7 @@ func (p *astFloatingPointPluginOwner) recycledValueID(id uint32) error {
 	if e = p.ids.Recycle(id); e != nil {
 		return e
 	}
-	return p.numeric.DelRuntimeValue(p.values.raw.Block, 8+32*uint64(id))
+	return p.values.del(id)
 }
 
 // Source: src/ast/fpa_decl_plugin.cpp:94-95. This reaches the same actual

@@ -16890,10 +16890,8 @@
         "pkg/ast/ast_fpa_scoped_values_source_test.go"
       ],
       "tests": [
-        "TestASTFloatingPointScopedValueActualDefaultReserveGeometry",
-        "TestASTFloatingPointScopedValueEveryActualReservePrefix",
+        "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
         "TestASTFloatingPointScopedValueActualInlinePushPublication",
-        "TestASTFloatingPointScopedValueActualNullGrowthRetryKeepsOlderOutcome",
         "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
         "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
       ],
@@ -16953,20 +16951,18 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_fpa_scoped_values.go",
           "tests": [
-            "TestASTFloatingPointScopedValueActualDefaultReserveGeometry",
-            "TestASTFloatingPointScopedValueEveryActualReservePrefix",
+            "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
             "TestASTFloatingPointScopedValueActualInlinePushPublication",
-            "TestASTFloatingPointScopedValueActualNullGrowthRetryKeepsOlderOutcome",
             "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
             "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
           ]
         }
       ],
       "ownership": [
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end. Scoped float values use a concrete Go slice; ascending numerical destruction and exact copy allocation receipts remain, while Go backing is outside arena accounting."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Go slice storage replaces scoped-vector Runtime row serialization and source vector allocation failures. Reflected cold headers remain explicit Go representations, not native ABI equivalence."
       ]
     },
     {

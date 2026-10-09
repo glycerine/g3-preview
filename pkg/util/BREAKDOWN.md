@@ -1029,3 +1029,15 @@ the numerical value in root util, so numerical package extraction can proceed
 without introducing a text-to-numerics dependency. Existing C-string truncation,
 source integer formatting, long-width profiles, and borrowed-value lifetime
 checks remain covered by the buffer and numeric integration tests.
+
+## Floating-point numeral slice
+
+The floating-point plugin's concrete scoped numeral storage now uses
+`[]util.ArbitraryFloat` in `ast`. It no longer consumes RuntimeVectorColumn or
+serializes numerals into 32-byte C++ rows. Native append preserves owned numeral
+handles without acquiring another numeric reference. Copy still operates through
+the numeric manager; source destruction and owning failure cleanup visit elements
+in ascending order. Retained copy receipts protect actual numeral allocations,
+including multiple failed copies. The native copy-chain path replaces its unused
+Runtime-row facade, and the now-unconsumed vector allocator method is removed.
+Numerical cell/limb ownership remains separate from Go slice backing.
