@@ -30808,3 +30808,13 @@ SAT after a module-wide consumer scan found no production use outside that
 package. SAT now owns its concrete unsigned32 column and copy constructor while
 continuing to build on root `util.RuntimeVectorColumn`, which remains shared by
 live AST and SAT consumers.
+
+
+### Deferred extended-numeral template
+
+Removed the unused `ExtNumeralManager` interface translation, its rational
+binding, and its self-test vectors. A complete source scan found the only
+production consumer in the unported `src/math/interval` subsystem; the other
+consumer is `src/test/ext_numeral.cpp`. The interval port should implement its
+actual concrete numeral type locally rather than restoring a generic root-util
+manager interface.

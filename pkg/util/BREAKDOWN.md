@@ -624,6 +624,10 @@ If live, their functionality should still have a visible package boundary, but
 their Go form should be a concrete type, an ordinary slice/map, or a cohesive
 package rather than a copied generic wrapper.
 
+The unused `ExtNumeralManager` translation and its self-tests have been removed.
+Its sole production source consumer is the unported interval subsystem, which
+must receive a concrete typed extended-numeral implementation when it is ported.
+
 ### Dead, test-only, or requiring proof before retention
 
 ```text
