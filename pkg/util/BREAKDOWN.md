@@ -161,7 +161,7 @@ self-contained in Go or depend only on `arena` or the standard library.
 | `util/approx` | `approx_nat`, `approx_set` | Cohesive approximate-number/set functionality. Their display methods currently touch shared numeric formatting; replace that edge with ordinary `fmt`/`io` behavior or a narrow formatter. |
 | `util/backtrack` | `trail`, `union_find`, selected backtracking containers | `union_find` is widely used upstream. Keep trail ownership and undo behavior together. Specialize `backtrackable_set` for its actual consumer instead of keeping `any`. |
 | `util/bitset` | `bit_vector`, `fixed_bit_vector`, `uint_set` | Extracted. Native typed storage; fixed-width vectors import `arena` directly. `bit_util` is a Go platform replacement and `obj_mark` is represented by concrete AST specializations. |
-| `util/cliques` | `max_cliques`, its set helpers | Already has SAT consumers. A focused package would isolate the algorithm and its tests. |
+| `util/cliques` | `max_cliques`, its set helpers | Typed native replacement staged with slice rows and bit sets. Migrate SAT and delete the Runtime-backed root implementation next. |
 | `util/sortnet` | `sorting_network` | Standalone algorithm with production consumers outside `util`. |
 | `util/permutation` | live free operations from `permutation.h` | Extracted as concrete `uint32` slice operations. `permutation.cpp` itself has no production caller. |
 | `util/stack` | `stack` | Put the arena-backed implementation in a package that imports `pkg/arena` directly. |

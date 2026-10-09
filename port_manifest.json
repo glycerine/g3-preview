@@ -124910,6 +124910,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/cliques/cliques.go",
+        "pkg/util/cliques/cliques_test.go",
         "pkg/util/negated_literal_cliques.go",
         "pkg/util/negated_literal_cliques_model_test.go",
         "pkg/util/negated_literal_cliques_rows.go",
@@ -124922,6 +124924,9 @@
         "pkg/util/negated_literal_cliques_helpers_test.go"
       ],
       "tests": [
+        "TestNegatedLiteralPartition",
+        "TestSourceCachePersistsAcrossQueries",
+        "TestLiteralRangeGuard",
         "TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs",
         "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
         "TestNegatedLiteralCliquesNegatedLiteralPartitionAndSourceCache",
@@ -124944,6 +124949,9 @@
           "status": "ported",
           "go_target": "pkg/util/negated_literal_cliques.go",
           "tests": [
+            "TestNegatedLiteralPartition",
+            "TestSourceCachePersistsAcrossQueries",
+            "TestLiteralRangeGuard",
             "TestNegatedLiteralCliquesIndependentAllThreeVertexMutexGraphs",
             "TestNegatedLiteralCliquesNestedResizeRefusalRetainsOldLogicalSize",
             "TestNegatedLiteralCliquesNegatedLiteralPartitionAndSourceCache",
@@ -124959,6 +124967,8 @@
             "TestNegatedLiteralCliquesEveryReservationOwnsAndCloses"
           ],
           "go_targets": [
+            "pkg/util/cliques/cliques.go",
+            "pkg/util/cliques/cliques_test.go",
             "pkg/util/negated_literal_cliques_model_test.go",
             "pkg/util/negated_literal_cliques_rows_test.go",
             "pkg/util/negated_literal_cliques_test.go",

@@ -1,5 +1,12 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
+The typed native replacement for `src/util/max_cliques.h` is staged in
+`pkg/util/cliques`. It uses `[][]uint32`, typed bit sets, and ordinary slices
+while preserving greedy source order and the source's retained transitive-cache
+behavior. SAT migration and deletion of the old Runtime-backed implementation
+are the next checkpoint; both implementations temporarily coexist until that
+consumer conversion is green.
+
 The unused Go translation of `src/util/resource_limit.h` and its self-only tests
 were removed. The prior whole-tree audit already classified the upstream header
 as dead and deleted: no production or test source includes it or uses its three
