@@ -585,7 +585,8 @@ ptr_scoped_buffer      resource_limit          total_order
 
 `dlist` and `resource_limit` are confirmed dead and deleted. Prior whole-tree
 surveys found `ext_gcd`, `object_allocator`, `ptr_scoped_buffer`, and
-`total_order` used only by tests. `critical_flet` and `obj_ref_hashtable` have no
+`total_order` used only by tests. The Go translations of `ext_gcd` and
+`total_order` have been removed. `critical_flet` and `obj_ref_hashtable` have no
 known caller. `permutation.h` has live free-function consumers, while
 `permutation.cpp` does not; retain only the live behavior. Recheck the entire
 C++ tree before deleting a unit because a lack of current Go consumers alone
