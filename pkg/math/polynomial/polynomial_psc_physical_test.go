@@ -7,8 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// Ownership follows actual completed local fields and the unjoined INC.
-// sourceRaw is a nonowning stale-source token after a consumed old free.
+// Ownership follows actual completed local fields and native reference slices.
 func polynomialPSCPhysical(t *testing.T, m *MultivariatePolynomialCore, refs []*PolynomialRef, polys []Polynomial, external []util.Block) {
 	polynomialPSCPhysicalVectors(t, m, refs, nil, polys, external)
 }
@@ -27,20 +26,12 @@ func polynomialPSCPhysicalVectors(t *testing.T, m *MultivariatePolynomialCore, r
 	}
 	if b.constructed {
 		if !b.finalized {
-			for i := b.cursor; i < b.count; i++ {
-				var p Polynomial
-				var e error
-				if b.pendingOwns {
-					p, e = pscReadHandle(m, b.pending, i)
-				} else {
-					p, e = b.physical(m, i)
-				}
+			for i := b.cursor; uint64(i) < uint64(len(b.values)); i++ {
+				p, e := b.physical(m, i)
 				serviceMust(t, e)
 				polys = append(polys, p)
 			}
 		}
-		polys = append(polys, b.incoming)
-		external = append(external, b.raw, b.pending)
 	}
 	if s := &m.lazardLocal; s.active {
 		if s.constructed >= 1 {

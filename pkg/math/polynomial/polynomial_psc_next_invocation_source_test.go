@@ -2,6 +2,7 @@
 package polynomial
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -73,9 +74,10 @@ func TestPolynomialPSCNextBorrowedHCallbackCannotMutateOwnedBuffer(t *testing.T)
 			t.Cleanup(func() { serviceMust(t, m.CleanupPSCNext()); serviceMust(t, out.Close()) })
 			checked := false
 			m.config.Checkpoint = func() bool {
-				if !checked && m.pscNext.executing && m.pscNext.bufferConstructed && m.pscBuffer.count > 0 {
+				if !checked && m.pscNext.executing && m.pscNext.bufferConstructed && len(m.pscBuffer.values) > 0 {
 					checked = true
 					before := m.pscBuffer
+					before.values = append([]Polynomial(nil), before.values...)
 					state := m.memory.State()
 					var err error
 					if operation == "push" {
@@ -83,8 +85,8 @@ func TestPolynomialPSCNextBorrowedHCallbackCannotMutateOwnedBuffer(t *testing.T)
 					} else {
 						err = m.pscBuffer.finalize(m, true)
 					}
-					if err != ErrPolynomialPending || m.pscBuffer != before || m.memory.State() != state {
-						t.Fatalf("borrowed callback mutated actual H: err=%v count=%d prior=%d", err, m.pscBuffer.count, before.count)
+					if err != ErrPolynomialPending || !reflect.DeepEqual(m.pscBuffer, before) || m.memory.State() != state {
+						t.Fatalf("borrowed callback mutated actual H: err=%v count=%d prior=%d", err, len(m.pscBuffer.values), len(before.values))
 					}
 				}
 				return true
@@ -139,6 +141,7 @@ func TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH(t *t
 		serviceMust(t, m.cleanupPSCNextInvocation(&receipt, true))
 	})
 	before := m.pscBuffer
+	before.values = append([]Polynomial(nil), before.values...)
 	state := m.memory.State()
 	rc, e := m.readWord(m.unit, 0)
 	serviceMust(t, e)
@@ -146,7 +149,7 @@ func TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH(t *t
 	serviceMust(t, m.cleanupPSCNextInvocation(&receipt, true))
 	rr, e := m.readWord(m.unit, 0)
 	serviceMust(t, e)
-	if m.pscBuffer != before || m.memory.State() != state || rr != rc || s.bodyCause != body || s.active {
+	if !reflect.DeepEqual(m.pscBuffer, before) || m.memory.State() != state || rr != rc || s.bodyCause != body || s.active {
 		t.Fatal("expired child tuple read or consumed later authority", s.active, rr, rc)
 	}
 	serviceMust(t, m.pscBuffer.finalize(m, true))

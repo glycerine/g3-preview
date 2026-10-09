@@ -31773,3 +31773,32 @@ The knot is not yet resolved. Remaining external consumers include polynomial
 SOM/core numeral vectors, the PSC reference buffer and SAT scalar/map/vector
 storage. Internal util numeric/text/parameter dependencies also still require
 seams before moving the remaining files into subpackages.
+
+## Native PSC reference buffer
+
+The retained PSC H local now stores []Polynomial. Removed source inline16 and
+doubling capacity, raw/pending/sourceRaw blocks, handle codecs, copied-growth
+state and the failed-push incoming reference. INC now publishes directly into
+the native slice. Source destruction still drops references in ascending order;
+the exact cursor and stopped DEC remain for explicit owning continuation. Actual
+parent invocation/borrow guards and younger-before-older lexical unwind remain.
+Physical audits name live references without counting native slice capacity.
+
+Native growth/reuse at sizes 4097/0/33/1/129 checks every row and reference count
+with Runtime reservations disabled and unchanged Runtime accounting. Invalid
+references cannot publish a row. An independent 129-object deletion fixture
+stops the real last-reference callback at row17, checks the cleared prefix and
+retained suffix, then verifies ascending owning continuation with no repeated
+callback. Three removed container-growth/failure tests are retired; existing
+PSC mathematical identities, cancellation, real numeric/factory failure sweeps,
+callback reentry, foreign invocation and stopped destructor tests remain.
+
+Validation: focused native PSC/GCD/resultant passed (1.682s), matching g3debug
+passed (2.421s), module-wide test compilation, polynomial vet, gofmt/diff checks
+and portcheck passed. Counts remain 2102 units / 677 APIs: 63 ported, 284 partial,
+1727 unported and two dead/deleted. The full native module checkpoint at
+21:43–21:45 UTC remains the last complete module run.
+
+The overall knot/split goal remains open. Polynomial SOM/core numeral vectors
+and SAT scalar/map/vector collections still require native conversion, followed
+by internal util numeric/text/parameter dependency seams and the package split.

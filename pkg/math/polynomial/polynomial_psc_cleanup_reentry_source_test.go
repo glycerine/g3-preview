@@ -105,16 +105,16 @@ func TestPolynomialPSCHActualCleanupDeletionReentry(t *testing.T) {
 				return nil
 			}
 			calls++
-			cursor, count, state := b.cursor, b.count, m.memory.State()
-			nested = b.finalizePhase(m, owning, owning)
-			if b.cursor != cursor || b.count != count || m.memory.State() != state {
+			cursor, count, state := b.cursor, len(b.values), m.memory.State()
+			nested = b.finalizePhase(m, owning)
+			if b.cursor != cursor || len(b.values) != count || m.memory.State() != state {
 				t.Error("recursive H destructor mutated actual buffer")
 			}
 			return arena.ErrBounds
 		})
 		serviceMust(t, e)
 		serviceMust(t, m.AddDeletionHandler(h))
-		returned := b.finalizePhase(m, owning, owning)
+		returned := b.finalizePhase(m, owning)
 		serviceMust(t, m.RemoveDeletionHandler(h))
 		serviceMust(t, h.CloseChecked())
 		if calls != 1 || !errors.Is(returned, arena.ErrBounds) || !errors.Is(nested, ErrPolynomialPending) {

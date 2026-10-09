@@ -1,10 +1,6 @@
 // Source: src/math/polynomial/polynomial.cpp:5654-5810; src/util/obj_ref.h.
 package polynomial
 
-import (
-	"github.com/glycerine/g3/pkg/util"
-)
-
 // Generation identifies a concrete invocation of these source local scopes.
 // The subordinate continuation itself records acquisition AFTER its own
 // foreign-pending guard. No allocator registry or refcount creates authority.
@@ -207,6 +203,6 @@ func (m *MultivariatePolynomialCore) pscPending() bool {
 	g := m.pscReceipts.generation
 	factory := m.pscReceipts.factory != 0 && m.monomials.creation.generation == m.pscReceipts.factory && m.monomials.creation.parent == m
 	return m.pscLocal.active || m.pscNext.active || m.lazardLocal.active ||
-		(m.pscBuffer.constructed && !m.pscBuffer.finalized) || m.pscBuffer.incoming != (Polynomial{}) || m.pscBuffer.pending != (util.Block{}) ||
+		(m.pscBuffer.constructed && !m.pscBuffer.finalized) ||
 		(g != 0 && (m.pending.pscOwner == g || m.powerLocal.pscOwner == g || m.pseudoDivision.pscOwner == g || m.exactDivision.pscOwner == g || m.generatedPSC == g)) || factory || (m.pscReceipts.singleton != (Monomial{}) && m.singletonReference && m.singletonMonomial == m.pscReceipts.singleton)
 }

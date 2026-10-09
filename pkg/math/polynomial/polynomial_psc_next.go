@@ -1,11 +1,7 @@
 // Source: src/math/polynomial/polynomial.cpp:5694-5749; src/util/obj_ref.h:31-112.
 package polynomial
 
-import (
-	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
-)
+import "errors"
 
 type polynomialPSCNextScope struct {
 	sourceGeneration                           uint64
@@ -70,7 +66,7 @@ func (m *MultivariatePolynomialCore) finishPSCNextPhase(owning, abort bool) (err
 			if m.pscBuffer.invocation != s.bufferInvocation {
 				return ErrPolynomialOwner
 			}
-			if e := m.pscBuffer.finalizePhase(m, owning, false); e != nil {
+			if e := m.pscBuffer.finalizePhase(m, owning); e != nil {
 				return e
 			}
 			s.bufferDestroyed = true
@@ -84,7 +80,7 @@ func (m *MultivariatePolynomialCore) finishPSCNextPhase(owning, abort bool) (err
 		if m.pscBuffer.invocation != s.bufferInvocation {
 			return ErrPolynomialOwner
 		}
-		if e := m.pscBuffer.finalizePhase(m, owning, false); e != nil {
+		if e := m.pscBuffer.finalizePhase(m, owning); e != nil {
 			return e
 		}
 		s.bufferDestroyed = true
@@ -112,9 +108,6 @@ func (m *MultivariatePolynomialCore) finishPSCNextPhase(owning, abort bool) (err
 		if s.refs[i].assigning || s.refs[i].incoming != (Polynomial{}) {
 			return nil
 		}
-	}
-	if s.bufferConstructed && m.matchesPSCNextBuffer(s) && (m.pscBuffer.incoming != (Polynomial{}) || m.pscBuffer.pending != (util.Block{})) {
-		return nil
 	}
 	if m.matchesFactoryInvocation(&s.factory) || m.matchesCoefficientInvocation(&s.coefficient) || m.matchesArithmeticInvocation(&s.arithmetic) || m.matchesExactDivInvocation(&s.division) || m.matchesVariableInvocation(&s.variable) && s.variable.frame.active {
 		return nil
@@ -202,7 +195,7 @@ func (m *MultivariatePolynomialCore) optimizedSe1WithReceipt(d, e uint32, a, sd1
 			return z
 		}
 	}
-	if polynomialSourceDebug && h.count != e {
+	if polynomialSourceDebug && uint32(len(h.values)) != e {
 		return ErrPolynomialAssertion
 	}
 	p, z = m.pscNextVariable(s, x, e)
@@ -226,7 +219,7 @@ func (m *MultivariatePolynomialCore) optimizedSe1WithReceipt(d, e uint32, a, sd1
 	if z = h.pushWithNextReceipt(m, p, &s.directReceipt); z != nil {
 		return z
 	}
-	if polynomialSourceDebug && h.count != e+1 {
+	if polynomialSourceDebug && uint32(len(h.values)) != e+1 {
 		return ErrPolynomialAssertion
 	}
 	s.constructed = 7
@@ -279,7 +272,7 @@ func (m *MultivariatePolynomialCore) optimizedSe1WithReceipt(d, e uint32, a, sd1
 			return z
 		}
 	}
-	if polynomialSourceDebug && h.count != d {
+	if polynomialSourceDebug && uint32(len(h.values)) != d {
 		return ErrPolynomialAssertion
 	}
 	s.constructed = 8

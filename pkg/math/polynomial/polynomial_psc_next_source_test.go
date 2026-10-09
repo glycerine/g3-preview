@@ -3,8 +3,6 @@ package polynomial
 
 import (
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialPSCNextIndependentQuadraticLinearIdentity(t *testing.T) {
@@ -39,7 +37,7 @@ func TestPolynomialPSCNextHeapBufferIndependentRemainder(t *testing.T) {
 	if !equal {
 		t.Fatal("x^18+3 modulo x^17+2 = 3-2*x")
 	}
-	if !m.pscBuffer.finalized || m.pscBuffer.raw != (util.Block{}) {
+	if !m.pscBuffer.finalized || m.pscBuffer.values != nil {
 		t.Fatal("actual completed source H destructor", m.pscBuffer)
 	}
 }

@@ -42,17 +42,9 @@ func TestPolynomialPSCOptimizedCapturedChildrenEveryReservationPrefix(t *testing
 			var raw []util.Block
 			h := &m.pscBuffer
 			if h.constructed {
-				raw = append(raw, h.raw, h.pending)
-				ps = append(ps, h.incoming)
 				if !h.finalized {
-					for i := h.cursor; i < h.count; i++ {
-						var v Polynomial
-						var e error
-						if h.pendingOwns {
-							v, e = pscReadHandle(m, h.pending, i)
-						} else {
-							v, e = h.physical(m, i)
-						}
+					for i := h.cursor; uint64(i) < uint64(len(h.values)); i++ {
+						v, e := h.physical(m, i)
 						serviceMust(t, e)
 						ps = append(ps, v)
 					}
