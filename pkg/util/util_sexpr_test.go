@@ -218,8 +218,7 @@ func TestSexprConcreteRefAndVectorActions(t *testing.T) {
 		t.Fatal(e)
 	}
 }
-func TestSexprPointerFreeAndBoundedDAG(t *testing.T) {
-	sxMust(t, arena.ValidateRecordType(reflect.TypeOf(sexprRecord{})))
+func TestSexprHandlesAndBoundedDAG(t *testing.T) {
 	sxMust(t, arena.ValidateRecordType(reflect.TypeOf(SexprHandle{})))
 	m, _, _ := sxOwner(t, arena.NewBudget(1<<24))
 	var handles []SexprHandle
@@ -618,8 +617,7 @@ func TestSexprConstructorAndWholePhysicalGraph(t *testing.T) {
 	sxMust(t, e)
 	sxRender(t, m, root, "(7/5 \"graph\")", nil)
 	stats := m.Stats()
-	ds := stats.Children.Descriptors
-	charged := stats.OwnerBytes + stats.RecordBytes + stats.DirectoryBytes + stats.ScratchBytes + stats.Children.OwnerBytes + stats.Children.PayloadBytes + stats.Children.BlockMetadataBytes + stats.Children.DirectoryBytes + ds.OwnerBytes + ds.RecordBytes + ds.MetadataBytes + ds.DirectoryBytes + stats.Text.OwnerBytes + stats.Text.PayloadBytes + stats.Text.MetadataBytes + stats.Text.DirectoryBytes
+	charged := stats.OwnerBytes + stats.RecordBytes + stats.DirectoryBytes + stats.ScratchBytes
 	// Inline numeral components do not grow borrowed numeric ownership here.
 	// FormatInto has its own owner-retained workspace, measured separately.
 	managerBytes := charged
@@ -847,4 +845,59 @@ func TestSexprVectorNativeGrowthUnderBudgetRefusal(t *testing.T) {
 	}
 	sxMust(t, m.DecRef(h))
 	budget.FailAfter(-1)
+}
+
+// Once a record page exists, child lists and text need no arena reservation.
+// The factory must own its child list even if the caller reuses the input slice.
+func TestSexprNativePayloadOwnership(t *testing.T) {
+	budget := arena.NewBudget(1 << 24)
+	_, symbols, rationals := sxOwner(t, budget)
+	m, e := NewSexprManager(SexprConfig{Budget: budget, PageSize: 16, Symbols: symbols, Rationals: rationals})
+	sxMust(t, e)
+	defer func() { sxMust(t, m.Close()) }()
+	left, e := m.MkString("left\x00tail", 0, 0)
+	sxMust(t, e)
+	before := budget.Used()
+	budget.FailAfter(0)
+	defer budget.FailAfter(-1)
+	right, e := m.MkString("right", 0, 0)
+	sxMust(t, e)
+	input := []SexprHandle{left, right, left}
+	root, e := m.MkComposite(input, 0, 0)
+	sxMust(t, e)
+	input[0] = right
+	got := make([]SexprHandle, 3)
+	n, e := m.ChildrenInto(root, got)
+	sxMust(t, e)
+	if n != 3 || got[0] != left || got[1] != right || got[2] != left {
+		t.Fatal("child order or independent ownership", got, n)
+	}
+	got[0] = right
+	if h, e := m.Child(root, 0); e != nil || h != left {
+		t.Fatal("caller output aliases children", h, e)
+	}
+	if refs, e := m.RefCount(left); e != nil || refs != 2 {
+		t.Fatal("duplicate child references", refs, e)
+	}
+	text, e := m.String(left)
+	sxMust(t, e)
+	if text != "left\x00tail" || budget.Used() != before {
+		t.Fatal("native payload or accounting", text, budget.Used(), before)
+	}
+	rootRecord, e := m.record(root)
+	sxMust(t, e)
+	leftRecord, e := m.record(left)
+	sxMust(t, e)
+	sxMust(t, m.IncRef(root))
+	sxMust(t, m.DecRef(root))
+	if m.Stats().Live != 0 || rootRecord.children != nil || leftRecord.text != "" {
+		t.Fatal("deletion retained payloads", m.Stats())
+	}
+	if _, e := m.Kind(left); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("deleted child remained valid", e)
+	}
+	sxMust(t, m.Close())
+	if text != "left\x00tail" {
+		t.Fatal("returned string lifetime", text)
+	}
 }

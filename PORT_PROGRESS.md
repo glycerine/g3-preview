@@ -30920,3 +30920,19 @@ SMT2 cleanup fixture that still expected text allocation refusal. Updated it
 to reach an actual numerical workspace refusal; the subsequent complete util
 run passed (138.8 seconds). Focused checked/debug formatting and SMT2 tests,
 vet for util/AST/polynomial/smtcore, and portcheck also passed.
+
+### Native S-expression payloads
+
+Replaced S-expression Words child payloads with concrete copied handle slices
+and SmallBytes text payloads with Go strings. Removed both arena owner services
+and string accessor staging; numerical display still uses its separate reusable
+staging buffer. Child ownership, duplicate references, source order, generation
+checks, and iterative destruction remain. Native payloads are outside arena
+accounting; physical-root tests count the retained manager/page resources.
+A focused ownership test checks independent input/output slices, duplicate
+reference counts, native construction under arena refusal, cleared recycled
+payloads, and returned-string lifetime after close.
+
+Validation: all focused S-expression tests pass in native and checked/debug
+builds. Module-wide compilation, util vet, and portcheck pass. The preceding
+full native checkpoint remains the latest broad run.

@@ -1,5 +1,5 @@
-// Concrete translation of util/sexpr.h/.cpp and the sexpr smart-reference
-// specializations. Physical storage replaces raw addresses, not source RC.
+// Source: src/util/sexpr.h; src/util/sexpr.cpp:28-55.
+// Concrete S-expression records retain source reference counting with Go storage.
 package util
 
 import (
@@ -51,8 +51,8 @@ type sexprRecord struct {
 	refs, line, pos, width uint32
 	Numeral                OwnedRational
 	symbol                 usymbol.Symbol
-	children               arena.VectorRef
-	text                   arena.SmallBytesRef
+	children               []SexprHandle
+	text                   string
 	length                 uint32
 	generation, next       uint32
 	Live, retired          bool
@@ -63,12 +63,10 @@ type sexprFrame struct {
 	index uint32
 }
 
-// SexprStats reports arena-owned storage; reusable Go scratch is excluded.
+// SexprStats reports budgeted record storage; Go payloads and scratch are excluded.
 type SexprStats struct {
 	Live, Slots, Retired, Pages                           uint32
 	OwnerBytes, RecordBytes, DirectoryBytes, ScratchBytes uint64
-	Children                                              arena.VectorStats
-	Text                                                  arena.SmallBytesStats
 }
 
 // Borrowed symbol and rational owners must outlive this manager. The shared
@@ -83,8 +81,6 @@ type SexprManager struct {
 	Pages                       []sexprPage
 	free, slots, live, retired  uint32
 	directoryBytes, recordBytes uint64
-	children                    *arena.Words
-	text                        *arena.SmallBytes
 	deletion                    []SexprHandle
 	frames                      []sexprFrame
 	output, stage               []byte
@@ -126,18 +122,7 @@ func NewSexprManager(c SexprConfig) (*SexprManager, error) {
 	if e = c.Budget.Reserve(header); e != nil {
 		return nil, e
 	}
-	words, e := arena.NewWords(arena.VectorConfig{Descriptors: arena.Config{PageSize: c.PageSize, Budget: c.Budget}})
-	if e != nil {
-		c.Budget.Release(header)
-		return nil, e
-	}
-	text, e := arena.NewSmallBytes(arena.SmallBytesConfig{Descriptors: arena.Config{PageSize: c.PageSize, Budget: c.Budget}})
-	if e != nil {
-		words.Close()
-		c.Budget.Release(header)
-		return nil, e
-	}
-	m := &SexprManager{Config: c, owner: id, children: words, text: text}
+	m := &SexprManager{Config: c, owner: id}
 	m.self = m
 	return m, nil
 }
@@ -291,15 +276,8 @@ func (m *SexprManager) dec(h SexprHandle) error {
 					m.deletion = append(m.deletion, child)
 				}
 			}
-			if e = m.children.Free(n.children); e != nil {
-				return e
-			}
 		case SexprNumeral, SexprBVNumeral:
 			if e = m.Config.Rationals.Del(&n.Numeral); e != nil {
-				return e
-			}
-		case SexprString:
-			if e = m.text.Deallocate(n.length, n.text); e != nil {
 				return e
 			}
 		}
@@ -326,7 +304,7 @@ func (m *SexprManager) MkComposite(children []SexprHandle, line, pos uint32) (Se
 		return SexprHandle{}, e
 	}
 	defer m.mu.Unlock()
-	if uint64(len(children)) > math.MaxUint32/2 {
+	if uint64(len(children)) > math.MaxUint32 {
 		return SexprHandle{}, arena.ErrBounds
 	}
 	for _, h := range children {
@@ -338,17 +316,10 @@ func (m *SexprManager) MkComposite(children []SexprHandle, line, pos uint32) (Se
 	if e != nil {
 		return SexprHandle{}, e
 	}
-	payload, e := m.children.Allocate(uint32(len(children))*2, uint32(len(children))*2)
-	if e != nil {
-		m.recycle(h)
-		return SexprHandle{}, e
-	}
 	r, _ := m.record(h)
-	r.children = payload
+	r.children = append([]SexprHandle(nil), children...)
 	r.length = uint32(len(children))
-	for i, c := range children {
-		m.children.Write(payload, uint32(i)*2, c.slot)
-		m.children.Write(payload, uint32(i)*2+1, c.generation)
+	for _, c := range children {
 		m.inc(c)
 	}
 	return h, nil
@@ -395,16 +366,8 @@ func (m *SexprManager) MkString(s string, line, pos uint32) (SexprHandle, error)
 	if e != nil {
 		return SexprHandle{}, e
 	}
-	payload, e := m.text.Allocate(uint32(len(s)))
-	if e != nil {
-		m.recycle(h)
-		return SexprHandle{}, e
-	}
-	for i := 0; i < len(s); i++ {
-		m.text.Write(payload, uint32(i), s[i])
-	}
 	r, _ := m.record(h)
-	r.text = payload
+	r.text = s
 	r.length = uint32(len(s))
 	return h, nil
 }
@@ -549,14 +512,7 @@ func (m *SexprManager) String(h SexprHandle) (string, error) {
 	if r.Kind != SexprString {
 		return "", ErrSexprKind
 	}
-	if uint64(len(m.stage)) < uint64(r.length) {
-		m.stage = make([]byte, r.length)
-	}
-	for i := uint32(0); i < r.length; i++ {
-		v, _ := m.text.Read(r.text, i)
-		m.stage[i] = v
-	}
-	return string(m.stage[:r.length]), nil
+	return r.text, nil
 }
 func (m *SexprManager) NumChildren(h SexprHandle) (uint32, error) {
 	if e := m.lock(); e != nil {
@@ -579,12 +535,7 @@ func (m *SexprManager) child(r *sexprRecord, i uint32) (SexprHandle, error) {
 	if i >= r.length {
 		return SexprHandle{}, arena.ErrBounds
 	}
-	slot, e := m.children.Read(r.children, i*2)
-	if e != nil {
-		return SexprHandle{}, e
-	}
-	generation, e := m.children.Read(r.children, i*2+1)
-	return SexprHandle{m.owner, slot, generation}, e
+	return r.children[i], nil
 }
 func (m *SexprManager) Child(h SexprHandle, i uint32) (SexprHandle, error) {
 	if e := m.lock(); e != nil {
@@ -864,10 +815,7 @@ func (m *SexprManager) displayAtom(h SexprHandle, n *uint32) error {
 			return e
 		}
 		for i := uint32(0); i < r.length; i++ {
-			c, e := m.text.Read(r.text, i)
-			if e != nil {
-				return e
-			}
+			c := r.text[i]
 			if c == 0 {
 				break
 			}
@@ -977,8 +925,6 @@ func (m *SexprManager) Stats() SexprStats {
 	if !m.closed {
 		s.OwnerBytes = uint64(reflect.TypeOf(SexprManager{}).Size())
 	}
-	s.Children = m.children.Stats()
-	s.Text = m.text.Stats()
 	return s
 }
 
@@ -1006,8 +952,6 @@ func (m *SexprManager) Close() error {
 			}
 		}
 	}
-	m.children.Close()
-	m.text.Close()
 	m.Config.Budget.Release(uint64(reflect.TypeOf(SexprManager{}).Size()) + m.directoryBytes + m.recordBytes)
 	m.Pages = nil
 	m.deletion = nil

@@ -979,3 +979,12 @@ their separate Runtime ownership and failure cleanup. Failure campaigns use
 operands exceeding inline numerical storage so they continue testing real
 allocation failures, alongside output, short-buffer, returned-string lifetime,
 and warm-allocation checks.
+
+S-expression child lists now use independently copied `[]SexprHandle`, and
+string records retain native Go `string` values. This removes their Words and
+SmallBytes owners, slot/generation word packing, and string copying through
+indexed payload access. Recycled records clear their slice/string fields;
+returned immutable strings remain valid after deletion and manager close.
+Record pages and the manager header remain budgeted, while child/text payloads
+are Go-managed. Source child order, duplicate reference counts, handle generation
+checks, iterative deletion, numerical ownership, and display quirks remain.
