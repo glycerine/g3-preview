@@ -1,5 +1,12 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
+SAT clause IDs now use the native `pkg/util/idgen` leaf. Typed `[]uint32`
+storage replaces the duplicate Runtime-backed unsigned vector, while the SAT
+Runtime remains the borrowed sticky-OOM provider and failure transport. LIFO
+reuse, recycle-before-clause-release ordering, allocation refusal, and provider
+lifetime checks remain covered. Raw ID-block corruption fixtures and solver
+root enumeration for that removed storage are gone.
+
 `src/util/prime_generator.h/.cpp` now live in `pkg/util/prime`. The leaf uses
 plain `[]uint64` slices with source-compatible capacity growth and budget
 failure points; it has no root `util` dependency. Polynomial factorization and
@@ -25952,9 +25959,9 @@ distinguish fresh source-null allocation failure from a dangling old pointer
 after destructive replacement. Full setter/source publication inventory and
 narrow actual primitive state proposal are required before further production
 changes; current malformed-token guard tests do not claim fresh-allocation
-failure coverage. Container real Runtime clause-ID backend private tests are
-GREEN with embedded utilid.Generator and no method-value closure; full SAT
-Check/search and user-scope remain pending. Numeric resumes source prerequisite
+failure coverage. Container clause-ID private tests are GREEN with the native
+typed idgen leaf and a borrowed Runtime OOM provider; full SAT Check/search and
+user-scope remain pending. Numeric resumes source prerequisite
 query/coefficient/Power/Equal bodies while full owner composition remains open.
 
 ### Complete bit utility bodies integrated (full gates GREEN)
@@ -26139,10 +26146,10 @@ nonnull extension callbacks, parallel search, recursive MUS/core minimization,
 clone, consequences/query APIs, printer/TRACE/verbose and global diagnostic tags.
 Preserved original minimize/dynamic-subsumption/core-min defaults; no production
 oracle or fake successful callback. Model lives in real Runtime signed32 enum
-fields, converter applies actual captured span. Clause IDs use actual embedded
-utilid.Generator borrowed Runtime; recycle observes real OOM before vector read.
-Failed pre-placement allocation retains declared actual extent before ID read;
-explicit owning abort does not invent a constructed source clause header.
+fields, converter applies actual captured span. Clause IDs use the native typed
+idgen free list with a borrowed Runtime OOM provider; recycle observes real OOM
+before free-list publication. Failed clause placement retains its declared
+extent for explicit owning abort without inventing a constructed source header.
 
 Full constructor73refusals then success; bounded Check5 then success; UserGC2
 then success; eager nested map14 then success. Immediate named physical/cold

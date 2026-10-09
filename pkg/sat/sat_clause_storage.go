@@ -41,7 +41,7 @@ type satClauseHotHeader struct{ ID, Size, Capacity, Approx, Flags uint32 }
 type satClauseAllocatorConfig struct {
 	Storage        arena.SmallBytesConfig
 	OutOfMemory    func() bool
-	IDRuntime      *util.Runtime
+	OOMRuntime     *util.Runtime
 	PooledOverride bool
 }
 type ClauseAllocator struct {
@@ -49,9 +49,7 @@ type ClauseAllocator struct {
 	origin                                 uint64
 	storage                                *arena.SmallBytes
 	ids                                    idgen.Generator
-	runtimeIDs                             util.Generator
-	idRuntime                              *util.Runtime
-	closing                                bool
+	oomRuntime                             *util.Runtime
 	budget                                 *arena.Budget
 	large                                  []satLargeClauseEntry
 	largeFree                              uint32
@@ -63,11 +61,11 @@ func NewSATClauseAllocator(c satClauseAllocatorConfig) (*ClauseAllocator, error)
 	return newSATClauseAllocator(c, false)
 }
 func newSATClauseAllocator(c satClauseAllocatorConfig, tmp bool) (*ClauseAllocator, error) {
-	if c.IDRuntime != nil {
-		if c.OutOfMemory != nil || c.IDRuntime.Budget() != c.Storage.Descriptors.Budget {
+	if c.OOMRuntime != nil {
+		if c.OutOfMemory != nil || c.OOMRuntime.Budget() != c.Storage.Descriptors.Budget {
 			return nil, arena.ErrConfig
 		}
-		if _, e := c.IDRuntime.AllocationSize(); e != nil {
+		if _, e := c.OOMRuntime.AllocationSize(); e != nil {
 			return nil, e
 		}
 	}
@@ -90,23 +88,15 @@ func newSATClauseAllocator(c satClauseAllocatorConfig, tmp bool) (*ClauseAllocat
 		b.Release(n)
 		return nil, e
 	}
-	a := &ClauseAllocator{origin: id, storage: store, budget: b, ids: idgen.NewBudgeted(0, b, c.OutOfMemory), ownerBytes: n, temporary: tmp}
+	a := &ClauseAllocator{origin: id, storage: store, budget: b, ids: idgen.NewBudgeted(0, b, c.OutOfMemory), oomRuntime: c.OOMRuntime, ownerBytes: n, temporary: tmp}
 	a.self = a
-	if c.IDRuntime != nil {
-		if e := a.runtimeIDs.Init(0, c.IDRuntime); e != nil {
-			a.storage.Close()
-			b.Release(n)
-			return nil, e
-		}
-		a.idRuntime = c.IDRuntime
-	}
 	return a, nil
 }
 func (a *ClauseAllocator) open() error {
 	if a == nil || a.self != a {
 		return ErrSATOwner
 	}
-	if a.closed || a.closing {
+	if a.closed {
 		return arena.ErrClosed
 	}
 	return nil
@@ -273,14 +263,7 @@ func (a *ClauseAllocator) mkClauseSpanPrefix(n uint32, span satSolverLiteralSpan
 	}
 	id := uint32(^uint32(0))
 	if !a.temporary {
-		if a.idRuntime != nil {
-			id, e = a.runtimeIDs.Next()
-			if e != nil {
-				return r, e
-			}
-		} else {
-			id = a.ids.Mk()
-		}
+		id = a.ids.Mk()
 	}
 	if prefix != nil {
 		prefix.unconstructed = false
@@ -698,13 +681,6 @@ func (a *ClauseAllocator) Close() error {
 	if a.closed {
 		return nil
 	}
-	if a.idRuntime != nil {
-		a.closing = true
-		if e := a.runtimeIDs.CloseChecked(); e != nil {
-			return e
-		}
-	}
-
 	for i := range a.large {
 		if a.large[i].live {
 			a.budget.Release(uint64(len(a.large[i].data)) * 4)
@@ -1017,26 +993,31 @@ func (a *ClauseAllocator) Stats() satClauseAllocatorStats {
 }
 func (w satWatched) NotEqual(v satWatched) bool { return !w.Equal(v) }
 
-// Actual source memory OOM check precedes any free-vector access. The legacy
-// adapter retains its existing caller provider; the Runtime profile has exactly
-// one actual process-state provider and no escaping callback context.
+// The source memory OOM check precedes free-list access. Standalone allocators
+// use their supplied callback; solver allocators borrow the one Runtime state
+// provider and apply its failure transport when typed slice growth is refused.
 func (a *ClauseAllocator) recycleID(id uint32) error {
-	if a.idRuntime == nil {
-		return a.ids.Recycle(id)
+	if a.oomRuntime != nil {
+		if _, e := a.oomRuntime.AllocationSize(); e != nil {
+			return e
+		}
+		if a.oomRuntime.State().OutOfMemory {
+			return nil
+		}
 	}
-	if _, e := a.idRuntime.AllocationSize(); e != nil {
+	if e := a.ids.Recycle(id); e != nil {
+		if a.oomRuntime != nil && (errors.Is(e, arena.ErrBudget) || errors.Is(e, arena.ErrInjectedFailure)) {
+			return a.oomRuntime.RecordAllocationFailure()
+		}
 		return e
 	}
-	if a.idRuntime.State().OutOfMemory {
-		return nil
-	}
-	return a.runtimeIDs.Recycle(id)
+	return nil
 }
 
-// An ID read can refuse after physical object allocation but before placement
-// construction. The caller's real ref plus the actual requested size remain
-// the owning root. This explicit abort does not invent readable source headers
-// or run source del_clause on an unconstructed clause.
+// A later construction action can refuse after physical object allocation but
+// before placement completes. The caller's ref and requested size remain the
+// owning root. This explicit abort does not invent readable source headers or
+// run source del_clause on an unconstructed clause.
 func (a *ClauseAllocator) cleanupAllocated(r StoredClauseRef, n uint32) error {
 	if e := a.validate(r); e != nil {
 		return e

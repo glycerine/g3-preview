@@ -67130,7 +67130,7 @@
         "pkg/sat/sat_clause_storage.go",
         "pkg/sat/sat_clause_large.go",
         "pkg/sat/sat_storage_vector.go",
-        "pkg/sat/sat_solver_clause_runtime_ids_test.go"
+        "pkg/sat/sat_clause_idgen_test.go"
       ],
       "tests": [
         "TestSATClauseSetSourceOrderAndGhostPrefixes",
@@ -67164,10 +67164,9 @@
         "TestSATSolverConflictFiniteImplicationOracle",
         "TestSATSolverConflictInitAndOptionalDispatchPrefixes",
         "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate",
-        "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
-        "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
-        "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
-        "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead"
+        "TestSATClauseNativeIDFreeListAndLIFO",
+        "TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips",
+        "TestSATClauseIDBorrowedOOMProviderLifetime"
       ],
       "conditionals": [
         {
@@ -67291,20 +67290,19 @@
           ]
         },
         {
-          "name": "Selected real SAT clause-ID embedded Runtime Generator consumer and pre-placement candidate extent retention before fallible Next; legacy profile unchanged",
+          "name": "SAT clause-ID native idgen consumer with typed free-list storage and borrowed Runtime OOM provider",
           "status": "ported",
           "go_target": "pkg/sat/sat_clause_storage.go",
           "tests": [
-            "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
-            "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
-            "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
-            "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead"
+            "TestSATClauseNativeIDFreeListAndLIFO",
+            "TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips",
+            "TestSATClauseIDBorrowedOOMProviderLifetime"
           ]
         }
       ],
       "ownership": [
         "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence.",
-        "Full facade uses existing embedded utilid.Generator on same actual Runtime; no OOM callback closure or second free-list owner. Source sticky OOM is read at actual recycle site before vector access, with Runtime provenance/lifetime guard. An actual allocation interrupted before placement retains declared extent for explicit owning abort; source Delete still exposes unread-header guard."
+        "SAT clause IDs use the native typed idgen free list on the allocator budget. The borrowed Runtime supplies sticky OOM state and failure transport; recycle checks its provenance and lifetime before publishing an ID, and allocation refusal leaves the clause live for retry."
       ],
       "deviations": [
         "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
@@ -71254,7 +71252,7 @@
         "pkg/sat/sat_scc.go",
         "pkg/sat/sat_solver.go",
         "pkg/sat/sat_solver_check_test.go",
-        "pkg/sat/sat_solver_clause_runtime_ids_test.go",
+        "pkg/sat/sat_clause_idgen_test.go",
         "pkg/sat/sat_solver_construction_test.go",
         "pkg/sat/sat_solver_constructor_fault_test.go",
         "pkg/sat/sat_solver_constructor_test.go",
@@ -71533,10 +71531,9 @@
         "TestSATSolverDefaultCheckSearchIndependentFiniteCNF",
         "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef",
         "TestSATSolverFullOwnerCopyClosedAndBorrowedRuntimeGuards",
-        "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
-        "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
-        "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
-        "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead",
+        "TestSATClauseNativeIDFreeListAndLIFO",
+        "TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips",
+        "TestSATClauseIDBorrowedOOMProviderLifetime",
         "TestSATSolverVariableColdPreparationHasNoPrematureQueue",
         "TestSATSolverDecisionColdDefaultSeedAndOwningUnwind",
         "TestSATSolverConverterColdBorrowBeforeSourceConstruction",
@@ -73012,7 +73009,7 @@
         "Cleaner interruption continuation is charged in the lifecycle header; owning Close drains only retained prefix and unread suffix with actual cursors. Source callbacks run while active; stopped lifecycle and direct pushClause reject later owning publication.",
         "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
         "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call.",
-        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model, eager outer map plus eight nested tables, and embedded Runtime ID generator have named scalar current/pending roots. Constructor sweep73 real refusals, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
+        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Constructor sweep73 real refusals, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
@@ -73119,7 +73116,7 @@
         "pkg/sat/sat_scc.go",
         "pkg/sat/sat_solver.go",
         "pkg/sat/sat_solver_check_test.go",
-        "pkg/sat/sat_solver_clause_runtime_ids_test.go",
+        "pkg/sat/sat_clause_idgen_test.go",
         "pkg/sat/sat_solver_construction_test.go",
         "pkg/sat/sat_solver_constructor_fault_test.go",
         "pkg/sat/sat_solver_constructor_test.go",
@@ -73348,10 +73345,9 @@
         "TestSATSolverDefaultCheckSearchIndependentFiniteCNF",
         "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef",
         "TestSATSolverFullOwnerCopyClosedAndBorrowedRuntimeGuards",
-        "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
-        "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
-        "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
-        "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead",
+        "TestSATClauseNativeIDFreeListAndLIFO",
+        "TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips",
+        "TestSATClauseIDBorrowedOOMProviderLifetime",
         "TestSATSolverVariableColdPreparationHasNoPrematureQueue",
         "TestSATSolverDecisionColdDefaultSeedAndOwningUnwind",
         "TestSATSolverConverterColdBorrowBeforeSourceConstruction",
@@ -74066,7 +74062,7 @@
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
         "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
         "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call.",
-        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model, eager outer map plus eight nested tables, and embedded Runtime ID generator have named scalar current/pending roots. Constructor sweep73 real refusals, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
+        "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Constructor sweep73 real refusals, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
@@ -116964,7 +116960,7 @@
         "pkg/util/idgen/generator.go",
         "pkg/util/generator.go",
         "pkg/sat/sat_clause_storage.go",
-        "pkg/sat/sat_solver_clause_runtime_ids_test.go"
+        "pkg/sat/sat_clause_idgen_test.go"
       ],
       "tests": [
         "TestIDGeneratorSourceOrder",
@@ -116985,10 +116981,9 @@
         "TestGeneratorNonNullZeroCapacitySourceBranch",
         "TestGeneratorSourceFinalizeRetainsUnpublishedMem",
         "TestGeneratorSourceFinalizePreservesHeaderGuard",
-        "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
-        "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
-        "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
-        "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead"
+        "TestSATClauseNativeIDFreeListAndLIFO",
+        "TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips",
+        "TestSATClauseIDBorrowedOOMProviderLifetime"
       ],
       "conditionals": [
         {
@@ -117158,14 +117153,13 @@
           "tests": []
         },
         {
-          "name": "Selected real SAT clause-ID embedded Runtime Generator consumer and pre-placement candidate extent retention before fallible Next; legacy profile unchanged",
+          "name": "SAT clause-ID native idgen consumer with typed free-list storage and borrowed Runtime OOM provider",
           "status": "ported",
           "go_target": "pkg/sat/sat_clause_storage.go",
           "tests": [
-            "TestSATClauseRuntimeIDFreeVectorIsActualSourceStorage",
-            "TestSATClauseRuntimeIDRecycleRefusalKeepsClauseThenOOMSkips",
-            "TestSATClauseRuntimeIDReadRefusalRetainsDeclaredCandidate",
-            "TestSATClauseRuntimeIDBorrowLifetimeCheckedAtRecycleRead"
+            "TestSATClauseNativeIDFreeListAndLIFO",
+            "TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips",
+            "TestSATClauseIDBorrowedOOMProviderLifetime"
           ]
         }
       ],
@@ -117174,7 +117168,7 @@
         "Raw specialization owns actual current vector and pending initial lexical mem tokens, with no mirrored free list. Cap/size/data live in Runtime bytes; real realloc and retained release cursors preserve physical prefixes. Cleanup only named tokens, close guards ordinary entry. Runtime must outlive embedded owner; charged in enclosing owner header.",
         "Malformed ILP32 accepted vector extent may wrap Runtime SIZE_T header extent to zero; changed actual realloc token is retained and only known short-extent owning cleanup uses Runtime.CleanupPartial without fabricated accounting subtraction. Nonnull cap0 source DEBUG assertion/release overflow precedes realloc; only null storage initializes cap2.",
         "SourceFinalize guards ordinary read and frees only actual published raw; pending lexical mem remains for explicit owning Close, short-header source guard retained rather than repaired. Actual consumed raw token is not deallocated twice on retry.",
-        "Full facade uses existing embedded utilid.Generator on same actual Runtime; no OOM callback closure or second free-list owner. Source sticky OOM is read at actual recycle site before vector access, with Runtime provenance/lifetime guard. An actual allocation interrupted before placement retains declared extent for explicit owning abort; source Delete still exposes unread-header guard."
+        "SAT clause IDs use the native typed idgen free list on the allocator budget. The borrowed Runtime supplies sticky OOM state and failure transport; recycle checks its provenance and lifetime before publishing an ID, and allocation refusal leaves the clause live for retry."
       ],
       "deviations": [
         "Budgeted recycle reports predictable allocation failure; reserveFreeIDs lets the future AST owner preflight reclamation before publication without changing logical IDs. The nil budget constructor remains unlimited. Host diagnostic free-ID rendering remains unbudgeted; actual AST printer is not credited.",

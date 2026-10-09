@@ -118,7 +118,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.decision, err = newSATColdDecision(c.Budget); err != nil {
 		return s, err
 	}
-	if s.Clauses, err = NewSATClauseAllocator(satClauseAllocatorConfig{Storage: arena.SmallBytesConfig{Descriptors: arena.Config{Budget: c.Budget}}, IDRuntime: c.Runtime.memory}); err != nil {
+	if s.Clauses, err = NewSATClauseAllocator(satClauseAllocatorConfig{Storage: arena.SmallBytesConfig{Descriptors: arena.Config{Budget: c.Budget}}, OOMRuntime: c.Runtime.memory}); err != nil {
 		return s, err
 	}
 	// The following actual charged contexts contain empty bound vector headers.

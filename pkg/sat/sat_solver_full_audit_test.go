@@ -107,9 +107,6 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 		roots = append(roots, satMutexFrameRoots(f)...)
 	}
 
-	for _, b := range s.Clauses.runtimeIDs.RawRoots() {
-		add(b)
-	}
 	for i := range s.binaryClauseGraph {
 		col(&s.binaryClauseGraph[i])
 	}
