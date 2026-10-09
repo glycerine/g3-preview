@@ -505,7 +505,7 @@ func (c *ParamsContext) Copy(dst, src *ParamsRef) error {
 }
 func (c *ParamsContext) Append(dst, src *ParamsRef) error { return c.Copy(dst, src) }
 func (c *ParamsContext) keyCheck(k Symbol) error          { _, e := c.SymbolsField.Hash(k); return e }
-func (c *ParamsContext) find(v *ParamsRef, k Symbol, name *string, byName bool, kind ParamKind, any bool) (*paramEntry, error) {
+func (c *ParamsContext) find(v *ParamsRef, k Symbol, name *string, byName bool, kind ParamKind, matchAnyKind bool) (*paramEntry, error) {
 	if e := c.check(v); e != nil {
 		return nil, e
 	}
@@ -528,7 +528,7 @@ func (c *ParamsContext) find(v *ParamsRef, k Symbol, name *string, byName bool, 
 				return nil, e
 			}
 		}
-		if match && (any || x.Kind == kind || (kind == ParamNumeral && x.Kind == ParamUInt)) {
+		if match && (matchAnyKind || x.Kind == kind || (kind == ParamNumeral && x.Kind == ParamUInt)) {
 			return x, nil
 		}
 	}

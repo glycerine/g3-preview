@@ -296,6 +296,12 @@ polynomial reference buffers are already concrete examples. Ordinary typed
 slices and maps should replace the remaining source templates; no dynamically
 typed root-util abstraction is needed.
 
+The unused `ref_util.h` stand-in has likewise been deleted. Its Go API erased
+map keys, map values, managers, and collections into `any`, while every source
+operation is just a short typed decrement loop followed by clearing the owning
+container. Those loops belong directly in each future concrete consumer, where
+the compiler can check both reference types and the relevant manager method.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before
