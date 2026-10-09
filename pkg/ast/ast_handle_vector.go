@@ -3,30 +3,12 @@ package ast
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
-	"reflect"
 )
-
-var astHandleStorageBytes = uint64(reflect.TypeOf(ASTHandle{}).Size())
 
 // ASTHandleVector stores borrowed handles; callers manage AST references.
 type ASTHandleVector struct{ values []ASTHandle }
 
-func (v *ASTHandleVector) Push(budget *arena.Budget, d ASTHandle) error {
-	if len(v.values) == cap(v.values) {
-		stride := astHandleStorageBytes
-		n, e := util.SourceVectorCapacity(cap(v.values), stride)
-		if e != nil {
-			return e
-		}
-		if e = budget.Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		next := make([]ASTHandle, len(v.values), n)
-		copy(next, v.values)
-		budget.Release(uint64(cap(v.values)) * stride)
-		v.values = next
-	}
+func (v *ASTHandleVector) Push(_ *arena.Budget, d ASTHandle) error {
 	v.values = append(v.values, d)
 	return nil
 }
@@ -40,8 +22,7 @@ func (v *ASTHandleVector) Erase(d ASTHandle) {
 		}
 	}
 }
-func (v *ASTHandleVector) Close(budget *arena.Budget) {
-	budget.Release(uint64(cap(v.values)) * astHandleStorageBytes)
+func (v *ASTHandleVector) Close(_ *arena.Budget) {
 	v.values = nil
 }
 

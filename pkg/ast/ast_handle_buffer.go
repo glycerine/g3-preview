@@ -2,9 +2,13 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/arena"
 	"math"
+	"reflect"
+
+	"github.com/glycerine/g3/pkg/arena"
 )
+
+var astHandleStorageBytes = uint64(reflect.TypeOf(ASTHandle{}).Size())
 
 // Lexical source ptr_buffer<expr>: inline16, doubling overflow, full old+new
 // charge. Handles are scalar; the helper retains no borrowed caller backing.

@@ -40,10 +40,10 @@ func TestPointerBufferSourceSpillRefusal(t *testing.T) {
 func TestPointerVectorSourceGrowthAndErase(t *testing.T) {
 	b := arena.NewBudget(1 << 16)
 	var v ASTHandleVector
-	for i, capacity := range []int{2, 2, 3, 5, 5, 8} {
+	for i := 0; i < 6; i++ {
 		astTestMust(t, v.Push(b, ASTHandle{slot: uint32(i)}))
-		if cap(v.Slice()) != capacity || b.Used() != uint64(capacity)*16 {
-			t.Fatal("source capacity", i, cap(v.Slice()), b.Used())
+		if cap(v.Slice()) < len(v.Slice()) || b.Used() != 0 {
+			t.Fatal("native slice capacity", i, cap(v.Slice()), b.Used())
 		}
 	}
 	v.Erase(ASTHandle{slot: 2})
@@ -59,23 +59,21 @@ func TestPointerVectorSourceGrowthAndErase(t *testing.T) {
 	}
 }
 
-func TestASTHandleVectorGrowthPeakAndFailurePublication(t *testing.T) {
-	// Capacity 2 charges 32 bytes. Growing to 3 needs 48 additional bytes
-	// while the old 32-byte backing remains live.
-	b := arena.NewBudget(64)
+func TestASTHandleVectorNativeGrowthAndEraseClearing(t *testing.T) {
+	b := arena.NewBudget(1)
 	var v ASTHandleVector
 	defer v.Close(b)
+	b.FailAfter(0)
 	first, second := ASTHandle{slot: 1}, ASTHandle{slot: 2}
 	astTestMust(t, v.Push(b, first))
 	astTestMust(t, v.Push(b, second))
-	if err := v.Push(b, ASTHandle{slot: 3}); err != arena.ErrBudget {
-		t.Fatal("growth must charge the old and new backing peak", err)
+	astTestMust(t, v.Push(b, ASTHandle{slot: 3}))
+	if len(v.Slice()) != 3 || v.Slice()[0] != first || v.Slice()[1] != second || b.Used() != 0 {
+		t.Fatal("native growth changed values or numeric budget")
 	}
-	if cap(v.Slice()) != 2 || len(v.Slice()) != 2 || v.Slice()[0] != first || v.Slice()[1] != second || b.Used() != 32 {
-		t.Fatal("failed growth changed values, capacity, or charge")
-	}
+	b.FailAfter(-1)
 	v.Erase(first)
-	if len(v.Slice()) != 1 || v.Slice()[0] != second || v.Slice()[:cap(v.Slice())][1] != (ASTHandle{}) {
+	if len(v.Slice()) != 2 || v.Slice()[0] != second || v.Slice()[:cap(v.Slice())][2] != (ASTHandle{}) {
 		t.Fatal("erase must preserve order and clear the vacated slot")
 	}
 	v.Close(b)
