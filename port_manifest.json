@@ -51317,7 +51317,7 @@
         "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
         "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
         "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
-        "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+        "TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal",
         "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
         "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
       ],
@@ -51339,7 +51339,7 @@
             "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
             "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
             "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
-            "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+            "TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal",
             "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
             "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
           ]
@@ -78800,7 +78800,7 @@
         "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
         "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
         "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
-        "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+        "TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal",
         "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
         "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
       ],
@@ -78822,7 +78822,7 @@
             "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
             "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
             "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
-            "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+            "TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal",
             "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
             "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
           ]
@@ -78859,7 +78859,7 @@
         "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
         "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
         "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
-        "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+        "TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal",
         "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
         "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund",
         "TestSMTParamsCopyConstructorPreservesAllBasesAndBorrowedPointerWithoutGetters",
@@ -78897,7 +78897,7 @@
             "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
             "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
             "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
-            "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+            "TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal",
             "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
             "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
           ]
@@ -79073,7 +79073,7 @@
         "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
         "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
         "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
-        "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+        "TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal",
         "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
         "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
       ],
@@ -79209,7 +79209,7 @@
             "TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead",
             "TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags",
             "TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases",
-            "TestSMTParamsActualStringSolverMemberConstructorFailureFrontier",
+            "TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal",
             "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
             "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
           ]
@@ -109468,6 +109468,7 @@
         "pkg/util/util_symbol.go"
       ],
       "tests": [
+        "TestSymbolNativeInternGrowthAndBorrowedViewLifetime",
         "TestSymbolSourceAssertions",
         "TestSymbolTagsNullBytesAndCachedHash",
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
@@ -109587,11 +109588,11 @@
         }
       ],
       "ownership": [
-        "Explicit owner-local SymbolManager (GO_PORT_PLAN.md B storage ownership) replaces mutable global cache. Manager owns region+table, strings live until Close, hot Symbol records contain only scalar origin/ref/generation/tag. Other managers are separate identity domains. Full nested cold/payload budget graph and mutex-protected canonical interning are audited. See PORT_PROGRESS.md#audit-symbol-port-status-md."
+        "Owner-local SymbolManager uses map[string]uint32 and a concrete entry slice containing immutable Go spellings and cached source hashes. Handles remain pointer-free owner/ID/generation/tag values; IDs are not recycled. Interning and teardown are serialized. Only the service/manager headers remain arena-budgeted; maps, entries and strings are Go-managed. Borrowed views check the manager lifetime when read."
       ],
       "deviations": [
-        "Native tagged pointers become explicit scalar tags/refs and owner-bound opaque tokens; callers cannot reinterpret a foreign symbol or raw address. Source full uint32 AMD64 numerical baseline remains valid on every Go target, independently of configurable4/8 byte page geometry.",
-        "Interner prepares source growth/probe, fills owned hash-prefix/spelling/NUL, then publishes; predictable failure never retains a caller query pointer. Earlier prepared storage may remain charged. Returned text is caller-owned, not temporarily budget-reserved.",
+        "Native tagged pointers become scalar tags/IDs and owner-bound opaque tokens; foreign owners and forged generations are rejected. Numerical symbols retain the source uint32 domain and signed rendering. Legacy arena geometry fields are ignored for Go-managed spellings.",
+        "Interning uses native map lookup and typed slice append, with strings.Clone to avoid retaining an input suffix. Cached source hash values remain observable, but raw size_t prefixes, physical NUL bytes, region descriptors and arena allocation failures for spellings are removed. Returned Go strings remain safe after manager close; explicitly borrowed views retain owner validation.",
         "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source."
       ]
     },
@@ -114745,7 +114746,7 @@
         "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
         "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
         "TestGlobalParamsNamespaceDisplayUsesGoBuffer",
-        "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
+        "TestGlobalParamsNamespaceNativeSymbolConstructionBeforeNull",
         "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
       ],
       "assertions": [
@@ -114899,7 +114900,7 @@
             "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
             "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
             "TestGlobalParamsNamespaceDisplayUsesGoBuffer",
-            "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
+            "TestGlobalParamsNamespaceNativeSymbolConstructionBeforeNull",
             "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
           ]
         },
@@ -115002,7 +115003,7 @@
         "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
         "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
         "TestGlobalParamsNamespaceDisplayUsesGoBuffer",
-        "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
+        "TestGlobalParamsNamespaceNativeSymbolConstructionBeforeNull",
         "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
       ],
       "conditionals": [
@@ -115088,7 +115089,7 @@
             "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
             "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
             "TestGlobalParamsNamespaceDisplayUsesGoBuffer",
-            "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
+            "TestGlobalParamsNamespaceNativeSymbolConstructionBeforeNull",
             "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
           ]
         }
@@ -139604,7 +139605,7 @@
         }
       ],
       "ownership": [
-        "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PORT_PROGRESS.md#audit-param-name-port-status-md.",
+        "Normalization reads canonical Go spelling under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PORT_PROGRESS.md#audit-param-name-port-status-md.",
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
@@ -140063,7 +140064,7 @@
         }
       ],
       "ownership": [
-        "Normalization reads borrowed symbol region under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PORT_PROGRESS.md#audit-param-name-port-status-md.",
+        "Normalization reads canonical Go spelling under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PORT_PROGRESS.md#audit-param-name-port-status-md.",
         "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
@@ -147316,6 +147317,7 @@
         "pkg/util/util_symbol_service_source_test.go"
       ],
       "tests": [
+        "TestSymbolNativeInternGrowthAndBorrowedViewLifetime",
         "TestSymbolSourceAssertions",
         "TestSymbolTagsNullBytesAndCachedHash",
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
@@ -147470,12 +147472,12 @@
         }
       ],
       "ownership": [
-        "Explicit owner-local SymbolManager (GO_PORT_PLAN.md B storage ownership) replaces mutable global cache. Manager owns region+table, strings live until Close, hot Symbol records contain only scalar origin/ref/generation/tag. Other managers are separate identity domains. Full nested cold/payload budget graph and mutex-protected canonical interning are audited. See PORT_PROGRESS.md#audit-symbol-port-status-md.",
-        "Explicit SymbolService cold owner holds nullable symbol-table pointer. Actual SymbolManager constructor region/table publishes only after completion; destructor table/region precedes pointer clear. Separate Close retires service header. Process singleton/global Runtime accounting remain open; no such completion credit."
+        "Owner-local SymbolManager uses map[string]uint32 and a concrete entry slice containing immutable Go spellings and cached source hashes. Handles remain pointer-free owner/ID/generation/tag values; IDs are not recycled. Interning and teardown are serialized. Only the service/manager headers remain arena-budgeted; maps, entries and strings are Go-managed. Borrowed views check the manager lifetime when read.",
+        "Explicit SymbolService holds a nullable manager pointer, publishes only a completed manager, preserves initialization identity, and clears the pointer after manager close. Reinitialization creates a fresh identity domain. Separate Close retires the service header. Process singleton/global Runtime accounting remain open."
       ],
       "deviations": [
-        "Native tagged pointers become explicit scalar tags/refs and owner-bound opaque tokens; callers cannot reinterpret a foreign symbol or raw address. Source full uint32 AMD64 numerical baseline remains valid on every Go target, independently of configurable4/8 byte page geometry.",
-        "Interner prepares source growth/probe, fills owned hash-prefix/spelling/NUL, then publishes; predictable failure never retains a caller query pointer. Earlier prepared storage may remain charged. Returned text is caller-owned, not temporarily budget-reserved.",
+        "Native tagged pointers become scalar tags/IDs and owner-bound opaque tokens; foreign owners and forged generations are rejected. Numerical symbols retain the source uint32 domain and signed rendering. Legacy arena geometry fields are ignored for Go-managed spellings.",
+        "Interning uses native map lookup and typed slice append, with strings.Clone to avoid retaining an input suffix. Cached source hash values remain observable, but raw size_t prefixes, physical NUL bytes, region descriptors and arena allocation failures for spellings are removed. Returned Go strings remain safe after manager close; explicitly borrowed views retain owner validation.",
         "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source."
       ]
     },
@@ -147494,6 +147496,7 @@
         "pkg/smtcore/util_smt_params_source_test.go"
       ],
       "tests": [
+        "TestSymbolNativeInternGrowthAndBorrowedViewLifetime",
         "TestSymbolSourceAssertions",
         "TestSymbolTagsNullBytesAndCachedHash",
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
@@ -147692,15 +147695,15 @@
         }
       ],
       "ownership": [
-        "Explicit owner-local SymbolManager (GO_PORT_PLAN.md B storage ownership) replaces mutable global cache. Manager owns region+table, strings live until Close, hot Symbol records contain only scalar origin/ref/generation/tag. Other managers are separate identity domains. Full nested cold/payload budget graph and mutex-protected canonical interning are audited. See PORT_PROGRESS.md#audit-symbol-port-status-md.",
+        "Owner-local SymbolManager uses map[string]uint32 and a concrete entry slice containing immutable Go spellings and cached source hashes. Handles remain pointer-free owner/ID/generation/tag values; IDs are not recycled. Interning and teardown are serialized. Only the service/manager headers remain arena-budgeted; maps, entries and strings are Go-managed. Borrowed views check the manager lifetime when read.",
         "Selected buffer insertion borrows SymbolManager only during the call, reads checked spelling bytes directly, and charges destination growth without intermediate Symbol.String text. See PORT_PROGRESS.md#audit-string-buffer-port-status-md.",
-        "Explicit SymbolService cold owner holds nullable symbol-table pointer. Actual SymbolManager constructor region/table publishes only after completion; destructor table/region precedes pointer clear. Separate Close retires service header. Process singleton/global Runtime accounting remain open; no such completion credit.",
+        "Explicit SymbolService holds a nullable manager pointer, publishes only a completed manager, preserves initialization identity, and clears the pointer after manager close. Reinitialization creates a fresh identity domain. Separate Close retires the service header. Process singleton/global Runtime accounting remain open.",
         "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal.",
         "Call-local actual symbol tag and provider identity drive separate insertion calls; string pointers use the existing borrowed CString engine and reached length/read guards, including badbit."
       ],
       "deviations": [
-        "Native tagged pointers become explicit scalar tags/refs and owner-bound opaque tokens; callers cannot reinterpret a foreign symbol or raw address. Source full uint32 AMD64 numerical baseline remains valid on every Go target, independently of configurable4/8 byte page geometry.",
-        "Interner prepares source growth/probe, fills owned hash-prefix/spelling/NUL, then publishes; predictable failure never retains a caller query pointer. Earlier prepared storage may remain charged. Returned text is caller-owned, not temporarily budget-reserved.",
+        "Native tagged pointers become scalar tags/IDs and owner-bound opaque tokens; foreign owners and forged generations are rejected. Numerical symbols retain the source uint32 domain and signed rendering. Legacy arena geometry fields are ignored for Go-managed spellings.",
+        "Interning uses native map lookup and typed slice append, with strings.Clone to avoid retaining an input suffix. Cached source hash values remain observable, but raw size_t prefixes, physical NUL bytes, region descriptors and arena allocation failures for spellings are removed. Returned Go strings remain safe after manager close; explicitly borrowed views retain owner validation.",
         "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source.",
         "Selected numerical buffer insertion preserves source k! publication before signed integer suffix; other INITIAL_SIZE template insertion specializations remain open.",
         "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",

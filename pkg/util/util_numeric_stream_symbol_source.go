@@ -1,10 +1,6 @@
 // Source: src/util/symbol.h:97-110; src/smt/params/smt_params.cpp:138.
 package util
 
-import (
-	"github.com/glycerine/g3/pkg/arena"
-)
-
 func (out *NumericTextStream) AppendSMTSymbol(g *GlobalParamsService, s Symbol) error {
 	enabled, e := g.NamespaceAssertionsEnabled()
 	if e != nil {
@@ -24,7 +20,7 @@ func (out *NumericTextStream) AppendSMTSymbol(g *GlobalParamsService, s Symbol) 
 		if s.owner != g.Symbols.owner {
 			return ErrSymbolOwner
 		}
-		return out.AppendCStringView(ParamsStringView{region: g.Symbols.region, regionRef: arena.BytesRegionRef{Slot: arena.Slot(s.Value), Generation: s.Generation}, offset: g.Symbols.pointerWidth, Mode: 3, PresentField: true})
+		return out.AppendCStringView(ParamsStringView{symbols: g.Symbols, symbol: s, Mode: 3, PresentField: true})
 	}
 	if e = out.AppendCString("k!"); e != nil {
 		return e

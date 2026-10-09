@@ -660,7 +660,7 @@ func smtParamsRefCount(t *testing.T, c *util.ParamsContext, v *util.ParamsRef) u
 	return c.Blocks[v.Slot-1].Refs
 }
 
-func TestSMTParamsActualStringSolverMemberConstructorFailureFrontier(t *testing.T) {
+func TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal(t *testing.T) {
 	_, _, q := paramsTestOwner(t)
 	bs := arena.NewBudget(^uint64(0))
 	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2, DirectOnly: true})
@@ -698,12 +698,12 @@ func TestSMTParamsActualStringSolverMemberConstructorFailureFrontier(t *testing.
 	paramsMust(t, c.SetBoolName(p, dynAckName("auto_config"), false))
 	bs.FailAfter(0)
 	s, e := NewSMTParams(c, p, g, b)
-	if !errors.Is(e, arena.ErrInjectedFailure) || s == nil || s.completedBases != 511 || !s.state.DefaultsInitialized || s.state.StringSolverInitialized || s.state.DumpInitialized || s.endedBases != 511 {
+	if e != nil || s == nil || s.completedBases != 511 || !s.state.DefaultsInitialized || !s.state.StringSolverInitialized || !s.state.DumpInitialized || s.endedBases != 0 || !s.constructorReady {
 		bs.FailAfter(-1)
 		if s != nil {
 			paramsMust(t, s.Close())
 		}
-		t.Fatal("symbol auto acquisition occurs after nine bases/all scalar initializers", e)
+		t.Fatal("native symbol acquisition must complete all bases and member initialization", e)
 	}
 	smtParamsNamedCold(t, s, g, b)
 	ss := g.Symbols.Stats()
@@ -765,9 +765,9 @@ func TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation(t *testing.
 			break
 		}
 	}
-	// Go string maps remove the two explicit C++ string-table allocations from
-	// this otherwise unchanged constructor horizon.
-	if success != 23 {
+	// Native symbol spellings add no arena reservations; the 13 remaining
+	// wrapper/module/helper acquisitions retain their failure cleanup checks.
+	if success != 13 {
 		t.Fatal("every actual shared acquisition through first success", success)
 	}
 }

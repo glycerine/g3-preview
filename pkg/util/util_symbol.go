@@ -1,4 +1,4 @@
-// Translation of src/util/symbol.h/.cpp, Leonardo de Moura, 2006-09-11.
+// Source: src/util/symbol.h; src/util/symbol.cpp.
 package util
 
 import (
@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -17,7 +18,8 @@ var ErrSymbolOwner = errors.New("g3: symbol belongs to another owner")
 
 // Symbol is a pointer-free source symbol identity. Tag0 is a string or null,
 // tag1 a uint32 numerical value, and tags2/3 the source marked forms. Physical
-// slots and generations replace addresses; owner is never recycled.
+// IDs replace addresses; owner and IDs are never recycled. Generation remains
+// in the encoded handle for compatibility and is validated on access.
 type Symbol struct {
 	owner      uint64
 	Value      uint32
@@ -59,7 +61,8 @@ type SymbolToken struct{ symbol Symbol }
 func (s Symbol) Token() SymbolToken { return SymbolToken{symbol: s} }
 
 type SymbolConfig struct {
-	Budget                                  *arena.Budget
+	Budget *arena.Budget
+	// Legacy arena geometry is ignored: spellings use Go-managed storage.
 	PageSize, Alignment, DescriptorPageSize uint32
 	DirectOnly                              bool
 }
@@ -77,42 +80,46 @@ type SymbolInternStats struct {
 	Size, Deleted, Capacity                               uint32
 }
 
-// SymbolManager explicitly owns the source global interning service. It has no
-// reset: all spelling identities survive until Close. The cold mutex preserves
-// source cr_symbol serialization; concurrent owner teardown is serialized too.
-// Returned Go strings are caller-owned outputs, not retained manager storage.
+// SymbolManager owns canonical immutable Go spellings. IDs are never recycled
+// within an owner; the mutex serializes interning and owner teardown.
 type SymbolManager struct {
-	mu           sync.Mutex
-	region       *arena.BytesRegion
-	byText       map[string]arena.BytesRegionRef
-	byRef        map[arena.BytesRegionRef]string
-	Budget       *arena.Budget
-	owner        uint64
-	pointerWidth uint32
-	closed       bool
+	mu      sync.Mutex
+	byText  map[string]uint32
+	entries []symbolEntry
+	Budget  *arena.Budget
+	owner   uint64
+	closed  bool
 }
+type symbolEntry struct {
+	text string
+	hash uint32
+}
+
+var symbolOwnerSequence atomic.Uint64
 
 func NewSymbolManager(c SymbolConfig) (*SymbolManager, error) {
 	header := uint64(reflect.TypeOf(SymbolManager{}).Size())
 	if e := c.Budget.Reserve(header); e != nil {
 		return nil, e
 	}
-	width := c.Alignment
-	if width == 0 {
-		width = 8
+	// Saturate instead of recycling identities on counter exhaustion.
+	var owner uint64
+	for {
+		previous := symbolOwnerSequence.Load()
+		if previous == math.MaxUint64 {
+			c.Budget.Release(header)
+			return nil, arena.ErrBounds
+		}
+		if symbolOwnerSequence.CompareAndSwap(previous, previous+1) {
+			owner = previous + 1
+			break
+		}
 	}
-	r, e := arena.NewBytesRegion(arena.BytesRegionConfig{PageSize: c.PageSize, Alignment: width, DirectOnly: c.DirectOnly, Descriptors: arena.Config{PageSize: c.DescriptorPageSize, Budget: c.Budget}})
-	if e != nil {
-		c.Budget.Release(header)
-		return nil, e
-	}
-	return &SymbolManager{region: r, byText: make(map[string]arena.BytesRegionRef), byRef: make(map[arena.BytesRegionRef]string), Budget: c.Budget, owner: r.OwnerID(), pointerWidth: width}, nil
+	return &SymbolManager{byText: make(map[string]uint32), Budget: c.Budget, owner: owner}, nil
 }
 func cSymbolLength(text string) int {
-	for i := 0; i < len(text); i++ {
-		if text[i] == 0 {
-			return i
-		}
+	if i := strings.IndexByte(text, 0); i >= 0 {
+		return i
 	}
 	return len(text)
 }
@@ -138,7 +145,7 @@ func (m *SymbolManager) check(s Symbol) error {
 	if s.owner != m.owner {
 		return ErrSymbolOwner
 	}
-	if !m.region.IsLive(arena.BytesRegionRef{Slot: arena.Slot(s.Value), Generation: s.Generation}) {
+	if s.Generation != 1 || uint64(s.Value) > uint64(len(m.entries)) {
 		return arena.ErrInvalidSlot
 	}
 	return nil
@@ -152,14 +159,12 @@ func (m *SymbolManager) checkPlain(s Symbol) error {
 	}
 	return nil
 }
-func (m *SymbolManager) symbol(r arena.BytesRegionRef) Symbol {
-	return Symbol{owner: m.owner, Value: uint32(r.Slot), Generation: r.Generation}
+func (m *SymbolManager) symbol(id uint32) Symbol {
+	return Symbol{owner: m.owner, Value: id, Generation: 1}
 }
 
-// Intern performs source threshold growth before duplicate lookup. On a miss,
-// it allocates hash-prefix+spelling+NUL, writes the source cached hash, then
-// publishes the borrowed region key. Unlike the source temporary query entry,
-// no caller string is published before owned spelling allocation succeeds.
+// Intern canonicalizes the C-string spelling using a Go map. The typed entry
+// retains the source hash without reproducing its raw size_t prefix or NUL.
 func (m *SymbolManager) Intern(text string) (Symbol, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -175,35 +180,15 @@ func (m *SymbolManager) intern(text string) (Symbol, error) {
 	if r, found := m.byText[text]; found {
 		return m.symbol(r), nil
 	}
-	wide := uint64(length) + 1 + uint64(m.pointerWidth)
-	if wide > math.MaxUint32 {
+	if uint64(length) > math.MaxUint32 || uint64(len(m.entries)) == math.MaxUint32 {
 		return Symbol{}, arena.ErrBounds
 	}
-	r, e := m.region.Allocate(uint32(wide))
-	if e != nil {
-		return Symbol{}, e
-	}
-	hash := String(text, 17)
-	for i := uint32(0); i < m.pointerWidth; i++ {
-		b := byte(0)
-		if i < 4 {
-			b = byte(hash >> (i * 8))
-		}
-		if e := m.region.Write(r, i, b); e != nil {
-			return Symbol{}, e
-		}
-	}
-	for i := 0; i < length; i++ {
-		if e := m.region.Write(r, m.pointerWidth+uint32(i), text[i]); e != nil {
-			return Symbol{}, e
-		}
-	}
-	if e := m.region.Write(r, m.pointerWidth+uint32(length), 0); e != nil {
-		return Symbol{}, e
-	}
-	m.byText[text] = r
-	m.byRef[r] = text
-	return m.symbol(r), nil
+	// Own only the spelling, rather than retaining a possibly large input suffix.
+	text = strings.Clone(text)
+	id := uint32(len(m.entries)) + 1
+	m.entries = append(m.entries, symbolEntry{text: text, hash: String(text, 17)})
+	m.byText[text] = id
+	return m.symbol(id), nil
 }
 
 // A null constructor needs no interned spelling, as in the source.
@@ -233,12 +218,10 @@ func (m *SymbolManager) FromToken(t SymbolToken) (Symbol, error) {
 	return t.symbol, nil
 }
 func (m *SymbolManager) spelling(s Symbol) (string, error) {
-	ref := arena.BytesRegionRef{Slot: arena.Slot(s.Value), Generation: s.Generation}
-	text, ok := m.byRef[ref]
-	if !ok {
+	if s.Value == 0 || uint64(s.Value) > uint64(len(m.entries)) || s.Generation != 1 {
 		return "", arena.ErrInvalidSlot
 	}
-	return text, nil
+	return m.entries[s.Value-1].text, nil
 }
 func (m *SymbolManager) text(s Symbol, display bool) (string, error) {
 	if e := m.checkPlain(s); e != nil {
@@ -266,8 +249,8 @@ func (m *SymbolManager) Display(s Symbol) (string, error) {
 	return m.text(s, true)
 }
 
-// BareString preserves the source nullable bare pointer through present=false
-// for null. Its text is a caller-owned copy, never a borrowed backing slice.
+// BareString preserves source nullability through present=false. Its immutable
+// Go string remains safe to use after the manager closes.
 func (m *SymbolManager) BareString(s Symbol) (text string, present bool, err error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -295,16 +278,7 @@ func (m *SymbolManager) Hash(s Symbol) (uint32, error) {
 	if s.Value == 0 {
 		return 0x9e3779d9, nil
 	}
-	r := arena.BytesRegionRef{Slot: arena.Slot(s.Value), Generation: s.Generation}
-	var hash uint32
-	for i := uint32(0); i < 4; i++ {
-		b, e := m.region.Read(r, i)
-		if e != nil {
-			return 0, e
-		}
-		hash |= uint32(b) << (8 * i)
-	}
-	return hash, nil
+	return m.entries[s.Value-1].hash, nil
 }
 func (m *SymbolManager) Contains(s Symbol, ch byte) (bool, error) {
 	m.mu.Lock()
@@ -427,7 +401,7 @@ func (m *SymbolManager) Less(a, b Symbol) (bool, error) {
 func (m *SymbolManager) Stats() SymbolStats {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	s := SymbolStats{Region: m.region.Stats()}
+	s := SymbolStats{}
 	if !m.closed {
 		s.OwnerBytes = uint64(reflect.TypeOf(SymbolManager{}).Size())
 		s.Symbols = uint32(len(m.byText))
@@ -441,12 +415,9 @@ func (m *SymbolManager) Close() error {
 	if m.closed {
 		return nil
 	}
-	if e := m.region.Close(); e != nil {
-		return e
-	}
 	m.Budget.Release(uint64(reflect.TypeOf(SymbolManager{}).Size()))
 	m.byText = nil
-	m.byRef = nil
+	m.entries = nil
 	m.closed = true
 	return nil
 }

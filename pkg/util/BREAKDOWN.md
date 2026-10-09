@@ -425,6 +425,17 @@ string-buffer owner.
 that slice no longer reserves arena budget or creates injectable failures, and
 its capacity is no longer reported as arena-owned memory.
 
+The symbol interner now owns immutable Go strings in a concrete entry slice,
+with `map[string]uint32` lookup and stable, pointer-free IDs. Cached Z3 hash
+values and signed-byte symbol comparison remain observable behavior; raw hash
+prefix bytes, physical NUL storage, region descriptors, and arena growth
+failures for spellings are gone. Borrowed parameter/stream views validate the
+symbol manager on access, while returned Go strings remain safe after close.
+Parameter name formatting and comparison now read native strings directly.
+This removes the spelling-storage dependency on `region.h` without changing
+symbol identity or source call ordering. Manager/service headers remain in
+explicit budget accounting for now.
+
 The live parameter-descriptor dictionary now uses
 `insdict.Dict[Symbol, paramDescrInfo]`. Copy traversal follows stable insertion
 order, while display continues to sort names explicitly for canonical output.

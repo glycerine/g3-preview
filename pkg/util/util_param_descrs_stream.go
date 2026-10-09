@@ -96,15 +96,12 @@ func (d *ParamDescrs) writeNameInto(dst *StringBuffer64, k Symbol, smt2 bool) er
 	if k.Value == 0 || k.IsNumerical() {
 		return ErrParamDescrsPrecondition
 	}
-	r := arena.BytesRegionRef{Slot: arena.Slot(k.Value), Generation: k.Generation}
-	for i := m.pointerWidth; ; i++ {
-		ch, e := m.region.Read(r, i)
-		if e != nil {
-			return e
-		}
-		if ch == 0 {
-			return nil
-		}
+	text, e := m.spelling(k)
+	if e != nil {
+		return e
+	}
+	for i := 0; i < len(text); i++ {
+		ch := text[i]
 		if smt2 && ch == '_' {
 			ch = '-'
 		} else if !smt2 && ch == '-' {
@@ -116,6 +113,7 @@ func (d *ParamDescrs) writeNameInto(dst *StringBuffer64, k Symbol, smt2 bool) er
 			return e
 		}
 	}
+	return nil
 }
 func (d *ParamDescrs) writeTextInto(dst *StringBuffer64, r paramDescrText) error {
 	for i := uint32(0); i < r.length; i++ {

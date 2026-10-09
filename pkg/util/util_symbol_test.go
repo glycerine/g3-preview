@@ -6,6 +6,7 @@ import (
 	"math"
 	"math/rand"
 	"reflect"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -221,7 +222,7 @@ func TestSymbolTagsNullBytesAndCachedHash(t *testing.T) {
 }
 
 func TestSymbolOwnerFailureLifetimeAndWarmIntern(t *testing.T) {
-	for prefix := int64(0); prefix < 20; prefix++ {
+	for prefix := int64(0); prefix < 2; prefix++ {
 		b := arena.NewBudget(1 << 20)
 		b.FailAfter(prefix)
 		m, e := NewSymbolManager(SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
@@ -232,29 +233,6 @@ func TestSymbolOwnerFailureLifetimeAndWarmIntern(t *testing.T) {
 		}
 		if b.Used() != 0 {
 			t.Fatal("constructor leak", prefix, b.Used())
-		}
-	}
-	for prefix := int64(0); prefix < 24; prefix++ {
-		b := arena.NewBudget(1 << 20)
-		m := symbolManagerTest(t, b, false)
-		old := internSymbol(t, m, "old")
-		destination := old
-		text := "a spelling substantially bigger than this small source page payload allocation"
-		b.FailAfter(prefix)
-		e := m.AssignString(&destination, &text)
-		b.FailAfter(-1)
-		if e != nil && (!errors.Is(e, arena.ErrInjectedFailure) || destination != old || symbolText(t, m, old) != "old") {
-			t.Fatal("publication failure", prefix, e)
-		}
-		want := internSymbol(t, m, text)
-		if e == nil && destination != want {
-			t.Fatal("successful publication")
-		}
-		if err := m.Close(); err != nil || b.Used() != 0 {
-			t.Fatal("close leak", prefix, err, b.Used())
-		}
-		if _, e := m.String(old); !errors.Is(e, arena.ErrClosed) {
-			t.Fatal("closed owner", e)
 		}
 	}
 	m, n := symbolManagerTest(t, nil, false), symbolManagerTest(t, nil, false)
@@ -353,27 +331,7 @@ func TestSymbolIndependentBytesAndPrefixOrder(t *testing.T) {
 					t.Fatal("independent identity")
 				}
 			}
-			// Source hash prefix is real region backing, not a second per-symbol
-			// scalar hash field, and source64's upper size_t bytes are zero.
-			ref := arena.BytesRegionRef{Slot: arena.Slot(symbols[i].Value), Generation: symbols[i].Generation}
-			n, e := m.region.Size(ref)
-			if e != nil || n != width+uint32(len(buf))+1 {
-				t.Fatal("source spelling allocation", n, e)
-			}
-			h, e := m.Hash(symbols[i])
-			if e != nil {
-				t.Fatal(e)
-			}
-			for offset := uint32(0); offset < width; offset++ {
-				got, e := m.region.Read(ref, offset)
-				want := byte(0)
-				if offset < 4 {
-					want = byte(h >> (offset * 8))
-				}
-				if e != nil || got != want {
-					t.Fatal("hash prefix", got, want, e)
-				}
-			}
+
 		}
 		for i := range texts {
 			for j := range texts {
@@ -453,5 +411,56 @@ func TestSymbolDuplicateLookupAndInvalidTokens(t *testing.T) {
 	}
 	if ok, e := m.EqualString(NumericalSymbol(math.MaxUint32), func() *string { s := "k!-1\x00tail"; return &s }()); e != nil || !ok {
 		t.Fatal("numerical C string equality", e)
+	}
+}
+
+// Native storage must not acquire the arena failure surface of C++ regions.
+func TestSymbolNativeInternGrowthAndBorrowedViewLifetime(t *testing.T) {
+	b := arena.NewBudget(1 << 20)
+	m := symbolManagerTest(t, b, false)
+	initial := b.Used()
+	b.FailAfter(0)
+	first := internSymbol(t, m, "kept\x00ignored")
+	text, present, e := m.BareString(first)
+	if e != nil || !present || text != "kept" {
+		t.Fatal(text, present, e)
+	}
+	view, e := m.CStringView(first)
+	if e != nil {
+		t.Fatal(e)
+	}
+	for i := 0; i < 1024; i++ {
+		internSymbol(t, m, strconv.Itoa(i))
+	}
+	if b.Used() != initial {
+		t.Fatal("Go interning charged arena", b.Used(), initial)
+	}
+	if got, e := m.Intern("kept"); e != nil || got != first {
+		t.Fatal("identity after growth", got, e)
+	}
+	for i := 0; i < len(text); i++ {
+		if ch, e := view.Byte(uint64(i)); e != nil || ch != text[i] {
+			t.Fatal("borrowed view after growth", ch, e)
+		}
+	}
+	if ch, e := view.Byte(uint64(len(text))); e != nil || ch != 0 {
+		t.Fatal("virtual terminator", ch, e)
+	}
+	if _, e := view.Byte(uint64(len(text) + 1)); !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("view bounds", e)
+	}
+	invalid := first
+	invalid.Generation++
+	if _, e := m.FromToken(invalid.Token()); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("forged generation", e)
+	}
+	if e := m.Close(); e != nil || b.Used() != 0 {
+		t.Fatal("close", e, b.Used())
+	}
+	if text != "kept" {
+		t.Fatal("returned Go string changed")
+	}
+	if _, e := view.Byte(0); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("borrowed view owner lifetime", e)
 	}
 }

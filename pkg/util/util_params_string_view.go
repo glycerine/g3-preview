@@ -14,9 +14,8 @@ type ParamsStringView struct {
 	words        *arena.Words
 	ref          arena.VectorRef
 	size         uint32
-	region       *arena.BytesRegion
-	regionRef    arena.BytesRegionRef
-	offset       uint32
+	symbols      *SymbolManager
+	symbol       Symbol
 	literal      string
 	Mode         uint8
 	PresentField bool
@@ -55,13 +54,25 @@ func (v ParamsStringView) Byte(i uint64) (byte, error) {
 		n, e := v.words.Read(v.ref, uint32(i/4))
 		return byte(n >> (8 * (i % 4))), e
 	case 3:
-		if v.region == nil {
+		if v.symbols == nil {
 			return 0, ErrParamsOwner
 		}
-		if i > math.MaxUint32-uint64(v.offset) {
+		v.symbols.mu.Lock()
+		defer v.symbols.mu.Unlock()
+		if e := v.symbols.checkPlain(v.symbol); e != nil {
+			return 0, e
+		}
+		text, e := v.symbols.spelling(v.symbol)
+		if e != nil {
+			return 0, e
+		}
+		if i > uint64(len(text)) {
 			return 0, arena.ErrBounds
 		}
-		return v.region.Read(v.regionRef, v.offset+uint32(i))
+		if i == uint64(len(text)) {
+			return 0, nil
+		}
+		return text[i], nil
 	}
 	return 0, ErrParamsOwner
 }
@@ -96,7 +107,7 @@ func (c *ParamsContext) GetStringViewFallbackName(v *ParamsRef, k *string, f *Pa
 		return ParamsStringView{}, nil
 	}
 	if x.text.borrowed {
-		return ParamsStringView{region: c.SymbolsField.region, regionRef: arena.BytesRegionRef{Slot: arena.Slot(x.symbol.Value), Generation: x.symbol.Generation}, offset: c.SymbolsField.pointerWidth, Mode: 3, PresentField: true}, nil
+		return ParamsStringView{symbols: c.SymbolsField, symbol: x.symbol, Mode: 3, PresentField: true}, nil
 	}
 	return ParamsStringView{words: c.Texts, ref: x.text.ref, size: x.text.size, Mode: 2, PresentField: true}, nil
 }

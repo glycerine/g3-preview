@@ -32,7 +32,7 @@ func (m *SymbolManager) CStringView(s Symbol) (ParamsStringView, error) {
 	if s.Value == 0 {
 		return ParamsStringView{}, ErrInvalidSymbol
 	}
-	return ParamsStringView{region: m.region, regionRef: arena.BytesRegionRef{Slot: arena.Slot(s.Value), Generation: s.Generation}, offset: m.pointerWidth, Mode: 3, PresentField: true}, nil
+	return ParamsStringView{symbols: m, symbol: s, Mode: 3, PresentField: true}, nil
 }
 func (c *ParamsContext) CheckServices(s *SymbolManager, q *RationalService) error {
 	if c == nil || c.Self != c || c.SymbolsField != s || q != nil && c.NumeralsField != q {

@@ -295,8 +295,8 @@ func TestSMTDynAckEveryActualUnwarmedSymbolAndHelperConstructorPrefix(t *testing
 			break
 		}
 	}
-	if first < 3 {
-		t.Fatal("unwarmed source symbol acquisition was not reached", first)
+	if first != 2 {
+		t.Fatal("wrapper and helper frame; native symbols add no reservations", first)
 	}
 	t.Log("first successful shared symbol/helper constructor", first)
 }

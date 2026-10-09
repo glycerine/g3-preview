@@ -1127,15 +1127,12 @@ func (c *ParamsContext) appendSymbol(k Symbol, strMode, normalize bool) error {
 		}
 		return c.appendString("null")
 	}
-	r := arena.BytesRegionRef{Slot: arena.Slot(k.Value), Generation: k.Generation}
-	for i := m.pointerWidth; ; i++ {
-		b, e := m.region.Read(r, i)
-		if e != nil {
-			return e
-		}
-		if b == 0 {
-			return nil
-		}
+	text, e := m.spelling(k)
+	if e != nil {
+		return e
+	}
+	for i := 0; i < len(text); i++ {
+		b := text[i]
 		if normalize {
 			if b == '-' {
 				b = '_'
@@ -1147,6 +1144,7 @@ func (c *ParamsContext) appendSymbol(k Symbol, strMode, normalize bool) error {
 			return e
 		}
 	}
+	return nil
 }
 func (c *ParamsContext) appendValue(x *paramEntry) error {
 	var a [128]byte

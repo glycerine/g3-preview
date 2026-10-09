@@ -531,7 +531,17 @@ func (d *ParamDescrs) symbolByte(k Symbol, index uint32) (byte, error) {
 	if k.Value == 0 || k.IsNumerical() {
 		return 0, ErrParamDescrsPrecondition
 	}
-	return m.region.Read(arena.BytesRegionRef{Slot: arena.Slot(k.Value), Generation: k.Generation}, m.pointerWidth+index)
+	text, e := m.spelling(k)
+	if e != nil {
+		return 0, e
+	}
+	if uint64(index) > uint64(len(text)) {
+		return 0, arena.ErrBounds
+	}
+	if uint64(index) == uint64(len(text)) {
+		return 0, nil
+	}
+	return text[index], nil
 }
 func (d *ParamDescrs) internBytes(b []byte) (Symbol, error) {
 	return d.manager.Intern(string(b))
@@ -666,27 +676,15 @@ func (d *ParamDescrs) symbolCompare(a, b Symbol) (int, error) {
 	if a.Value == 0 || b.Value == 0 || a.IsNumerical() || b.IsNumerical() {
 		return 0, ErrParamDescrsPrecondition
 	}
-	ar := arena.BytesRegionRef{Slot: arena.Slot(a.Value), Generation: a.Generation}
-	br := arena.BytesRegionRef{Slot: arena.Slot(b.Value), Generation: b.Generation}
-	for i := m.pointerWidth; ; i++ {
-		x, e := m.region.Read(ar, i)
-		if e != nil {
-			return 0, e
-		}
-		y, e := m.region.Read(br, i)
-		if e != nil {
-			return 0, e
-		}
-		if x < y {
-			return -1, nil
-		}
-		if x > y {
-			return 1, nil
-		}
-		if x == 0 {
-			return 0, nil
-		}
+	x, e := m.spelling(a)
+	if e != nil {
+		return 0, e
 	}
+	y, e := m.spelling(b)
+	if e != nil {
+		return 0, e
+	}
+	return strings.Compare(x, y), nil
 }
 
 // Concrete in-place sort realizes std::sort's comparator/output contract;
@@ -739,15 +737,12 @@ func (d *ParamDescrs) writeName(out *strings.Builder, k Symbol, smt2 bool) error
 	if k.Value == 0 || k.IsNumerical() {
 		return ErrParamDescrsPrecondition
 	}
-	r := arena.BytesRegionRef{Slot: arena.Slot(k.Value), Generation: k.Generation}
-	for i := m.pointerWidth; ; i++ {
-		ch, e := m.region.Read(r, i)
-		if e != nil {
-			return e
-		}
-		if ch == 0 {
-			return nil
-		}
+	text, e := m.spelling(k)
+	if e != nil {
+		return e
+	}
+	for i := 0; i < len(text); i++ {
+		ch := text[i]
 		if smt2 && ch == '_' {
 			ch = '-'
 		} else if !smt2 && ch == '-' {
@@ -757,6 +752,7 @@ func (d *ParamDescrs) writeName(out *strings.Builder, k Symbol, smt2 bool) error
 		}
 		out.WriteByte(ch)
 	}
+	return nil
 }
 func (d *ParamDescrs) writeText(out *strings.Builder, r paramDescrText) error {
 	for i := uint32(0); i < r.length; i++ {

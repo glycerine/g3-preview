@@ -230,8 +230,8 @@ func TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes(t *testing.T) {
 			break
 		}
 	}
-	if first < 5 {
-		t.Fatal("both module symbol paths not reached", first)
+	if first != 3 {
+		t.Fatal("wrapper and two helper frames; native symbols add no reservations", first)
 	}
 	t.Log("first successful unwarmed constructor", first)
 }

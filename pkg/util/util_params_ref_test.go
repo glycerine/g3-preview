@@ -755,7 +755,7 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 				break
 			}
 		}
-		goOnly := op == 5 || op == 6
+		goOnly := op == 5 || op == 6 || op == 7
 		if !completed || goOnly && failures != 0 || !goOnly && failures == 0 {
 			t.Fatal("incomplete failure sweep", op, completed, failures)
 		}

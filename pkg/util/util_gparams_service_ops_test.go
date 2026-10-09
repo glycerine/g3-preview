@@ -298,19 +298,20 @@ func TestGlobalParamsNamespaceDisplayUsesGoBuffer(t *testing.T) {
 	}
 }
 
-func TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull(t *testing.T) {
+func TestGlobalParamsNamespaceNativeSymbolConstructionBeforeNull(t *testing.T) {
 	s, b := gparamsNamespaceFixture(t)
 	sy := s.Symbols
 	before := sy.Stats()
 	cold := sy.Budget.Used()
 	sy.Budget.FailAfter(0)
 	_, e := s.SourceGetModuleName(strings.Repeat("actual-source-symbol-", 64))
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal("actual symbol constructor was replaced by namespace assertion", e)
+	if !namespaceNullError(e) {
+		t.Fatal("native symbol construction must reach namespace assertion", e)
 	}
-	if sy.Stats() != before || sy.Budget.Used() != cold {
-		t.Fatal("first-refusal named symbol storage prefix", before, sy.Stats())
+	if sy.Stats().Symbols != before.Symbols+1 || sy.Budget.Used() != cold {
+		t.Fatal("source argument must be interned before namespace assertion", before, sy.Stats())
 	}
+	before = sy.Stats()
 	if e = s.SourceDisplayModuleInto(nil, strings.Repeat("actual-source-symbol-", 64)); !namespaceNullError(e) {
 		t.Fatal("display namespace assertion did not precede symbol constructor", e)
 	}

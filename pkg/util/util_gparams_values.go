@@ -91,17 +91,14 @@ func (g *GlobalParams) normalizeSymbol(name Symbol) (Symbol, Symbol, error) {
 		return Symbol{}, Symbol{}, ErrGlobalParamsOwner
 	}
 	g.Workspace = g.Workspace[:0]
-	r := arena.BytesRegionRef{Slot: arena.Slot(name.Value), Generation: name.Generation}
+	text, e := m.spelling(name)
+	if e != nil {
+		m.mu.Unlock()
+		return Symbol{}, Symbol{}, e
+	}
 	first := true
-	for i := m.pointerWidth; ; i++ {
-		b, e := m.region.Read(r, i)
-		if e != nil {
-			m.mu.Unlock()
-			return Symbol{}, Symbol{}, e
-		}
-		if b == 0 {
-			break
-		}
+	for i := 0; i < len(text); i++ {
+		b := text[i]
 		if first && b == ':' {
 			first = false
 			continue
