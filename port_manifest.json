@@ -36505,7 +36505,6 @@
         "TestPolynomialDividesEveryActualReservationPrefix",
         "TestPolynomialDividesBigNumericPendingBlocksOwningClose",
         "TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix",
-        "TestPolynomialGCDMonomialBufferConsumedOldGrowth",
         "TestPolynomialGCDAndResultantEveryReachedCancellation",
         "TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation",
         "TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation",
@@ -36535,7 +36534,7 @@
         "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor",
         "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
         "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
-        "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop",
+        "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop",
         "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
         "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel",
         "TestPolynomialGCDICCPZPXSourceShortcutTable",
@@ -36913,7 +36912,10 @@
         "TestPolynomialGCDPowersNativeGrowthAndReuse",
         "TestPolynomialGCDVariableDegreesNativeCache",
         "TestPolynomialICCPNativeHighDegreeFilters",
-        "TestPolynomialGCDRecursiveTerminalEuclidIgnoresVariableValue"
+        "TestPolynomialGCDRecursiveTerminalEuclidIgnoresVariableValue",
+        "TestPolynomialGCDNativeMonomialSliceOwnsDuplicateReferences",
+        "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
+        "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel"
       ],
       "conditionals": [
         {
@@ -39718,7 +39720,7 @@
             "TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix",
             "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
             "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
-            "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop"
+            "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop"
           ]
         },
         {
@@ -39730,10 +39732,12 @@
             "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel",
             "TestPolynomialGCDICCPZPXSourceShortcutTable",
             "TestPolynomialGCDIntegerContentFieldChangeSourceInputAssertion",
-            "TestPolynomialGCDMonomialBufferConsumedOldGrowth",
             "TestPolynomialContentModeSwitchSourceSet",
             "TestPolynomialIntegerContentFieldEveryActualReservationPrefix",
-            "TestPolynomialICCPZPXModeSwitchSourceSet"
+            "TestPolynomialICCPZPXModeSwitchSourceSet",
+            "TestPolynomialGCDNativeMonomialSliceOwnsDuplicateReferences",
+            "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
+            "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel"
           ]
         },
         {
@@ -40957,7 +40961,8 @@
         "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
         "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
         "GCD variable/degree pairs and their persistent variable-to-position cache now use concrete Go slices. The power-pair sbuffer inline/spill capacity, raw/pending Runtime blocks, copied/initialized masks, source buffer free failures and hand-translated heapsort are removed. Go sort.Slice applies the original ascending unsigned variable-only or degree-only comparator; equal-key library comparison/swap order is not a fidelity requirement. Degree collection retains first occurrence, Max/Min selection and sentinel reset. Native source/owning cleanup releases slices in the existing enclosing scope order, and physical audits exclude them. Tests cover large cold growth with Runtime reservations disabled, unsigned pair sorting, equal-degree multiplicities, warmed append reuse and repeated degree cache reset; actual numeral/reference allocations and source lifetime guards remain live. No whole-unit completion credit is added.",
-        "ICCP coefficient counters and first-occurrence degree lists, and the modular-GCD recursion variable list, now use plain Go uint32 slices. The unsigned128 and variable32 sbuffer translations, Runtime expansion/pending blocks, initialized/copy masks and buffer destructor refusal paths are deleted. Existing ICCP/GCD invocation scope ordering clears the native slices at source/owning end; recursion borrows the variable slice without a container owner. Coefficient counting, first encounter order, degree-driven variable order, independent content/primitive results and terminal Euclid behavior remain. The stale ICCP receipt test now uses a real large-coefficient numeral allocation failure and requires an active replacement frame; snapshots include native slice contents. High-degree tests cover former capacity boundaries and repeated cleanup. Actual numeral/reference ownership and fault campaigns remain; tests dedicated to deleted C++ buffer topology are retired. No whole-unit completion credit is added."
+        "ICCP coefficient counters and first-occurrence degree lists, and the modular-GCD recursion variable list, now use plain Go uint32 slices. The unsigned128 and variable32 sbuffer translations, Runtime expansion/pending blocks, initialized/copy masks and buffer destructor refusal paths are deleted. Existing ICCP/GCD invocation scope ordering clears the native slices at source/owning end; recursion borrows the variable slice without a container owner. Coefficient counting, first encounter order, degree-driven variable order, independent content/primitive results and terminal Euclid behavior remain. The stale ICCP receipt test now uses a real large-coefficient numeral allocation failure and requires an active replacement frame; snapshots include native slice contents. High-degree tests cover former capacity boundaries and repeated cleanup. Actual numeral/reference ownership and fault campaigns remain; tests dedicated to deleted C++ buffer topology are retired. No whole-unit completion credit is added.",
+        "GCD monomial reference storage now uses a concrete []Monomial slice. Original IncRef-before-publication, generated ownership transfer, ordered DecRef/reset and resumable actual monomial destruction remain. Deleted inline/spill payloads, Runtime expansion blocks, copied/pending growth state and incoming ownership needed only by fallible backing writes. Native append has no custom Runtime refusal event. Duplicate references across growth/reuse, generated transfer, real last-reference destructor refusal/owning continuation and independent GF11[x] content factorization with 33 coefficient monomials are tested. The synthetic consumed-old-growth test is retired; younger reference release before an older source stop remains checked by actual reference counts. No whole-unit completion credit is added."
       ]
     },
     {
@@ -41612,7 +41617,6 @@
         "TestPolynomialDividesEveryActualReservationPrefix",
         "TestPolynomialDividesBigNumericPendingBlocksOwningClose",
         "TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix",
-        "TestPolynomialGCDMonomialBufferConsumedOldGrowth",
         "TestPolynomialGCDAndResultantEveryReachedCancellation",
         "TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation",
         "TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation",
@@ -41642,7 +41646,7 @@
         "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor",
         "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
         "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
-        "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop",
+        "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop",
         "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
         "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel",
         "TestPolynomialGCDICCPZPXSourceShortcutTable",
@@ -43210,7 +43214,6 @@
             "TestPolynomialDividesEveryActualReservationPrefix",
             "TestPolynomialDividesBigNumericPendingBlocksOwningClose",
             "TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix",
-            "TestPolynomialGCDMonomialBufferConsumedOldGrowth",
             "TestPolynomialGCDAndResultantEveryReachedCancellation",
             "TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation",
             "TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation",
@@ -43240,7 +43243,7 @@
             "TestPolynomialGCDDefaultMultivariateIndependentCommonFactor",
             "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
             "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
-            "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop",
+            "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop",
             "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
             "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel",
             "TestPolynomialGCDICCPZPXSourceShortcutTable",
@@ -111281,7 +111284,8 @@
         "pkg/ast/ast_handle_buffer_pop_test.go",
         "pkg/util/mpn_storage.go",
         "pkg/util/mpn_native_division_test.go",
-        "pkg/math/polynomial/polynomial_iccp.go"
+        "pkg/math/polynomial/polynomial_iccp.go",
+        "pkg/math/polynomial/polynomial_gcd_monomial_buffer.go"
       ],
       "tests": [
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
@@ -111353,7 +111357,10 @@
         "TestPolynomialGCDPowersNativeGrowthAndReuse",
         "TestPolynomialGCDVariableDegreesNativeCache",
         "TestPolynomialICCPNativeHighDegreeFilters",
-        "TestPolynomialGCDRecursiveTerminalEuclidIgnoresVariableValue"
+        "TestPolynomialGCDRecursiveTerminalEuclidIgnoresVariableValue",
+        "TestPolynomialGCDNativeMonomialSliceOwnsDuplicateReferences",
+        "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
+        "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel"
       ],
       "conditionals": [
         {
@@ -111600,7 +111607,8 @@
         "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
         "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
         "GCD variable/degree pairs and their persistent variable-to-position cache now use concrete Go slices. The power-pair sbuffer inline/spill capacity, raw/pending Runtime blocks, copied/initialized masks, source buffer free failures and hand-translated heapsort are removed. Go sort.Slice applies the original ascending unsigned variable-only or degree-only comparator; equal-key library comparison/swap order is not a fidelity requirement. Degree collection retains first occurrence, Max/Min selection and sentinel reset. Native source/owning cleanup releases slices in the existing enclosing scope order, and physical audits exclude them. Tests cover large cold growth with Runtime reservations disabled, unsigned pair sorting, equal-degree multiplicities, warmed append reuse and repeated degree cache reset; actual numeral/reference allocations and source lifetime guards remain live. No whole-unit completion credit is added.",
-        "ICCP coefficient counters and first-occurrence degree lists, and the modular-GCD recursion variable list, now use plain Go uint32 slices. The unsigned128 and variable32 sbuffer translations, Runtime expansion/pending blocks, initialized/copy masks and buffer destructor refusal paths are deleted. Existing ICCP/GCD invocation scope ordering clears the native slices at source/owning end; recursion borrows the variable slice without a container owner. Coefficient counting, first encounter order, degree-driven variable order, independent content/primitive results and terminal Euclid behavior remain. The stale ICCP receipt test now uses a real large-coefficient numeral allocation failure and requires an active replacement frame; snapshots include native slice contents. High-degree tests cover former capacity boundaries and repeated cleanup. Actual numeral/reference ownership and fault campaigns remain; tests dedicated to deleted C++ buffer topology are retired. No whole-unit completion credit is added."
+        "ICCP coefficient counters and first-occurrence degree lists, and the modular-GCD recursion variable list, now use plain Go uint32 slices. The unsigned128 and variable32 sbuffer translations, Runtime expansion/pending blocks, initialized/copy masks and buffer destructor refusal paths are deleted. Existing ICCP/GCD invocation scope ordering clears the native slices at source/owning end; recursion borrows the variable slice without a container owner. Coefficient counting, first encounter order, degree-driven variable order, independent content/primitive results and terminal Euclid behavior remain. The stale ICCP receipt test now uses a real large-coefficient numeral allocation failure and requires an active replacement frame; snapshots include native slice contents. High-degree tests cover former capacity boundaries and repeated cleanup. Actual numeral/reference ownership and fault campaigns remain; tests dedicated to deleted C++ buffer topology are retired. No whole-unit completion credit is added.",
+        "GCD monomial reference storage now uses a concrete []Monomial slice. Original IncRef-before-publication, generated ownership transfer, ordered DecRef/reset and resumable actual monomial destruction remain. Deleted inline/spill payloads, Runtime expansion blocks, copied/pending growth state and incoming ownership needed only by fallible backing writes. Native append has no custom Runtime refusal event. Duplicate references across growth/reuse, generated transfer, real last-reference destructor refusal/owning continuation and independent GF11[x] content factorization with 33 coefficient monomials are tested. The synthetic consumed-old-growth test is retired; younger reference release before an older source stop remains checked by actual reference counts. No whole-unit completion credit is added."
       ]
     },
     {
@@ -141887,12 +141895,14 @@
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
         "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
-        "TestPolynomialGCDMonomialBufferConsumedOldGrowth",
         "TestPolynomialPSCHActualCleanupDeletionReentry",
         "TestPolynomialPSCNextActualChildInvocationEveryReservationPrefix",
         "TestPolynomialPSCNextBorrowedHCallbackCannotMutateOwnedBuffer",
         "TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH",
-        "TestBVConcatRefBufferPushPopAndForwardDestruction"
+        "TestBVConcatRefBufferPushPopAndForwardDestruction",
+        "TestPolynomialGCDNativeMonomialSliceOwnsDuplicateReferences",
+        "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
+        "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel"
       ],
       "conditionals": [
         {
@@ -141996,11 +142006,14 @@
           ]
         },
         {
-          "name": "Concrete selected monomial ref_buffer lexical range, raw second-growth consumption and completed versus incoming ownership phases",
+          "name": "Concrete native GCD monomial reference slice with ordered owned-element cleanup and actual destructor continuation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_monomial_buffer.go",
           "tests": [
-            "TestPolynomialGCDMonomialBufferConsumedOldGrowth"
+            "TestPolynomialGCDNativeMonomialSliceOwnsDuplicateReferences",
+            "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
+            "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel",
+            "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop"
           ]
         },
         {
@@ -142015,7 +142028,8 @@
       ],
       "ownership": [],
       "deviations": [
-        "No generic RefBuffer exists in Go. Current AST and polynomial targets are concrete typed owners in their consumer packages; remaining specializations should follow that pattern."
+        "No generic RefBuffer exists in Go. Current AST and polynomial targets are concrete typed owners in their consumer packages; remaining specializations should follow that pattern.",
+        "GCD monomial reference storage now uses a concrete []Monomial slice. Original IncRef-before-publication, generated ownership transfer, ordered DecRef/reset and resumable actual monomial destruction remain. Deleted inline/spill payloads, Runtime expansion blocks, copied/pending growth state and incoming ownership needed only by fallible backing writes. Native append has no custom Runtime refusal event. Duplicate references across growth/reuse, generated transfer, real last-reference destructor refusal/owning continuation and independent GF11[x] content factorization with 33 coefficient monomials are tested. The synthetic consumed-old-growth test is retired; younger reference release before an older source stop remains checked by actual reference counts. No whole-unit completion credit is added."
       ]
     },
     {
@@ -143538,7 +143552,7 @@
         "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
         "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
         "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
-        "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop",
+        "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop",
         "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",
         "TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral",
         "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",
@@ -143730,7 +143744,7 @@
             "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
             "TestPolynomialPSCCompletedPhaseLeavesFailedConstructorForOuterUnwind",
             "TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop",
-            "TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop",
+            "TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop",
             "TestPolynomialSOMNormalizeCompletedNumeralSourceGuard",
             "TestPolynomialNormalizeYoungerSourceGuardRetainsOlderNumeral",
             "TestPolynomialSubstitutionYoungerSOMGuardRetainsOlderNumerals",

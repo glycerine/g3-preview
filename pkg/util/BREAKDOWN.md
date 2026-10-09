@@ -1330,3 +1330,29 @@ also passed in checked mode. The full native module checkpoint remains
 19:07–19:12 UTC; no additional whole-module or broad checked sweep was run.
 Manifest counts remain 2102 units / 677 APIs: 63 ported, 284 partial,
 1727 unported and two dead/deleted.
+
+## Native GCD monomial reference storage
+
+GCD's concrete monomial reference buffer now stores `[]Monomial`. Removed its
+inline/spill payloads, Runtime blocks, expansion copies, pending backing,
+fallible publication and unjoined-increment cleanup. The existing scope stack
+still owns its lifetime. Each append increments the real monomial reference
+before publication and transfers generated ownership; reset/destruction drops
+references in source order. A cleanup cursor and destructor-stop state remain
+for actual monomial destruction, including explicit owning continuation.
+
+New tests cover 4097 duplicate references, cold growth with Runtime reservations
+disabled, reset/reuse and final release. Generated monomial ownership and a real
+last-reference ID-recycling refusal exercise source-stop/retry/owning cleanup.
+An independent GF11[x] content/primitive model uses 33 coefficient monomials to
+exercise native growth through ICCP. Younger cleanup before an older stopped
+restore is now checked by reference counts rather than deleted backing blocks.
+The obsolete consumed-old-growth test is removed; its shared TLS owner teardown
+helper remains for other live tests. Physical audits exclude native storage.
+
+Validation: full native polynomial (35.99s), focused native GCD/ICCP/manager
+checks (3.24s), checked/debug feature checks (4.43s), module-wide test compilation,
+polynomial vet and portcheck passed. The full native module checkpoint remains
+19:07–19:12 UTC; another hourly checkpoint is not yet due. Manifest counts remain
+2102 units / 677 APIs: 63 ported, 284 partial, 1727 unported and two dead/deleted.
+No whole-unit completion claim or replacement container package is added.

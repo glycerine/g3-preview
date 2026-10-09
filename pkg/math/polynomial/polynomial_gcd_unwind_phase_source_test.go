@@ -120,9 +120,9 @@ func TestPolynomialGCDInnerModeBlockWaitsForActualYoungerSourceStop(t *testing.T
 }
 
 // Guarded helper domain: source restore sees an actual Copy-produced dangling
-// saved numeral. The younger completed ref_buffer still frees its published
-// backing before that older class body is reached by explicit owning unwind.
-func TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop(t *testing.T) {
+// saved numeral. The younger monomial slice releases its manager references
+// before that older class body is reached by explicit owning unwind.
+func TestPolynomialGCDCompletedMonomialReferencesPrecedeOlderStop(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	z := c.integer
@@ -138,11 +138,10 @@ func TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop(t *testing.T)
 	s.depth++
 	unit, e := c.monomials.Unit()
 	serviceMust(t, e)
+	before, e := c.monomialRefCount(unit)
+	serviceMust(t, e)
 	for i := 0; i < 17; i++ {
 		serviceMust(t, s.monomialBuffer.push(c, unit))
-	}
-	if s.monomialBuffer.raw == (util.Block{}) {
-		t.Fatal("actual overflow backing missing")
 	}
 	var large util.Int
 	limbs := make([]uint32, 8192)
@@ -163,8 +162,10 @@ func TestPolynomialGCDCompletedMonomialBufferFreePrecedesOlderStop(t *testing.T)
 	if !errors.Is(stop, arena.ErrInvalidSlot) {
 		t.Fatal("older literal restore guard", stop)
 	}
-	if s.depth != 1 || s.monomialBuffer.raw != (util.Block{}) {
-		t.Fatal("completed younger source buffer not fully destroyed before older stop", s.depth, s.monomialBuffer.raw)
+	after, e := c.monomialRefCount(unit)
+	serviceMust(t, e)
+	if s.depth != 1 || s.monomialBuffer.values != nil || after != before {
+		t.Fatal("younger monomial references retained across older stop", s.depth, after, before)
 	}
 	polynomialImpPhysicalAuditNamed(t, full, nil, []*util.Int{&large}, 0)
 }

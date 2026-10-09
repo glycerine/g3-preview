@@ -68,7 +68,7 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 				var e error
 				switch {
 				case id == gcdMonomialBufferID:
-					e = s.monomialBuffer.closePhase(c, true, false)
+					e = s.monomialBuffer.close(c, true)
 				case id >= gcdMonomialBase:
 					r := &s.monomials[id-gcdMonomialBase]
 					e = r.drop(c, &r.value, &r.decrementStarted, true)

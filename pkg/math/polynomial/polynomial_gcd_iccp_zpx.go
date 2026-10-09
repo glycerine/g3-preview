@@ -107,11 +107,11 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 			minimum = k
 		}
 	}
-	if polynomialSourceDebug && minimum != 0 && ms.size != 0 {
+	if polynomialSourceDebug && minimum != 0 && uint32(len(ms.values)) != 0 {
 		return ErrPolynomialAssertion
 	}
 	if minimum > 0 {
-		if polynomialSourceDebug && ms.size != 0 {
+		if polynomialSourceDebug && uint32(len(ms.values)) != 0 {
 			return ErrPolynomialAssertion
 		}
 		s.constructReference(c, 0)
@@ -139,7 +139,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		}
 		return content.assign(c, a)
 	}
-	marked, unmarked := ms.size, uint32(0)
+	marked, unmarked := uint32(len(ms.values)), uint32(0)
 	s.constructMonomial(0)
 	tmp := &s.monomials[0]
 	for i := uint32(0); i < size; i++ {
@@ -189,7 +189,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 	}
 	if unmarked < marked {
 		for i := uint32(0); i < marked; i++ {
-			a, e := ms.get(c, i)
+			a, e := ms.get(i)
 			if e != nil {
 				return e
 			}
@@ -235,7 +235,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 			return e
 		}
 		if pos == ^uint32(0) {
-			pos = ms.size
+			pos = uint32(len(ms.values))
 			if e = ms.push(c, term); e != nil {
 				return e
 			}
@@ -259,9 +259,9 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 			return e
 		}
 	}
-	count := ms.size
+	count := uint32(len(ms.values))
 	for i := uint32(0); i < count; i++ {
-		a, e := ms.get(c, i)
+		a, e := ms.get(i)
 		if e != nil {
 			return e
 		}
