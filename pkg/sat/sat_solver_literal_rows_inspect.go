@@ -49,7 +49,7 @@ func (o *satSolverLiteralRows) storageState() satLiteralRowsStorageState {
 	}
 	return s
 }
-func satLiteralColumnOwningRoots(c *util.RuntimeUintColumn, roots []util.Block) []util.Block {
+func satLiteralColumnOwningRoots(c *RuntimeUintColumn, roots []util.Block) []util.Block {
 	if c.Raw.Pending != (util.Block{}) {
 		roots = append(roots, c.Raw.Pending)
 	}

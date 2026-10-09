@@ -741,3 +741,8 @@ SAT consequence/mutex output, so the concrete owner now lives privately in
 `sat` as `satSolverLiteralRows`. SAT's existing fault campaigns retain the
 observable partial-copy, outer-growth, source-finalization, and ownership-root
 coverage; the util-only public facade and representation tests were removed.
+
+The concrete unsigned32 Runtime column and its copy specialization are likewise
+SAT-only and now live in `sat_solver_scalar_runtime.go`. Root
+`RuntimeVectorColumn` remains in `util` because both AST and SAT use its common
+checked byte-vector storage and growth protocol.

@@ -71290,8 +71290,7 @@
         "pkg/sat/sat_solver_stat_display_test.go",
         "pkg/sat/sat_var_queue_runtime.go",
         "pkg/sat/sat_var_queue_runtime_test.go",
-        "pkg/sat/sat_solver_literal_rows_inspect.go",
-        "pkg/util/runtime_vector_copy.go"
+        "pkg/sat/sat_solver_literal_rows_inspect.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -73144,8 +73143,7 @@
         "pkg/sat/sat_solver_views_test.go",
         "pkg/util/messages/messages.go",
         "pkg/util/messages/messages_test.go",
-        "pkg/sat/sat_solver_literal_rows_inspect.go",
-        "pkg/util/runtime_vector_copy.go"
+        "pkg/sat/sat_solver_literal_rows_inspect.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -149578,7 +149576,7 @@
         "pkg/ast/ast_handle_containers_test.go",
         "pkg/util/source_vector_capacity_test.go",
         "pkg/sat/sat_solver_literal_rows_inspect.go",
-        "pkg/util/runtime_vector_copy.go",
+        "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/ast/ast_ref_cache_resize.go",
         "pkg/util/runtime_uint32_view.go"
       ],

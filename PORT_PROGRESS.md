@@ -30802,3 +30802,9 @@ mutex extraction; its diagnostic views remain private to SAT tests. This
 removes the exported `RuntimeUnsignedRows` adapter and its duplicate util-only
 test surface while retaining SAT's allocation-refusal, partial-move, source
 finalization, and root-census campaigns.
+
+The adjacent `RuntimeUintColumn` and vector-copy specialization also moved into
+SAT after a module-wide consumer scan found no production use outside that
+package. SAT now owns its concrete unsigned32 column and copy constructor while
+continuing to build on root `util.RuntimeVectorColumn`, which remains shared by
+live AST and SAT consumers.

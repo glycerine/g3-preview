@@ -161,7 +161,7 @@ func (s *satMUSLiteralSet) assign(other *satMUSLiteralSet) error {
 // A failed copy constructor has no source destructor. Pending allocation stays
 // a named member root for separate owning cleanup, without repairing headers.
 func satMUSCopyColumn(dst, src *RuntimeVectorColumn, stride uint32) error {
-	return util.CopyRuntimeVectorColumn(dst, src, stride)
+	return copyRuntimeVectorColumn(dst, src, stride)
 }
 
 func satMUSCopyRequest(capacity, stride uint32) uint64 { return uint64(capacity)*uint64(stride) + 8 }

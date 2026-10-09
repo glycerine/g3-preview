@@ -244,7 +244,7 @@ func (o *satSolverLiteralRows) appendColumn(src *RuntimeUintColumn) error {
 	o.appendActive, o.appendIndex = true, n
 	dst := &o.rows[n]
 	dst.Bind(o.runtime)
-	if e = util.CopyRuntimeVectorColumn(&dst.Raw, &src.Raw, 4); e != nil {
+	if e = copyRuntimeVectorColumn(&dst.Raw, &src.Raw, 4); e != nil {
 		return e
 	}
 	if e = satLiteralRowWrite(o.runtime, o.raw, n, dst.Raw.Block); e != nil {
