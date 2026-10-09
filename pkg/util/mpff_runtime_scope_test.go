@@ -3,7 +3,6 @@ package util
 
 import (
 	"errors"
-	"math"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -209,23 +208,21 @@ func TestFastFloatSharedRuntimeProfileAndClose(t *testing.T) {
 			// Independent formatting scopes own Go scratch and Runtime storage.
 			// Closing one must preserve the other and the caller block.
 			serviceMust(t, first.beginFastFormatting())
-			first.formatting.completed = 1
-			first.formatting.large[0] = make([]uint32, 1025)
+			first.formatting.buffers[0] = make([]uint32, 1025)
 			serviceMust(t, second.beginFastFormatting())
-			second.formatting.completed = 4
-			serviceMust(t, second.formatting.small.resize(r, 32))
-			serviceMust(t, second.formatting.small.write(r, 0, 219))
-			secondRaw := second.formatting.small.Raw
+			second.formatting.buffers[2] = make([]uint32, 32)
+			second.formatting.buffers[2][0] = 219
+			secondData := &second.formatting.buffers[2][0]
 			fastSharedRuntimeAudit(t, r, []*FastFloatManager{first, second}, caller)
 			serviceMust(t, first.CloseChecked())
 			serviceMust(t, r.CheckOpen())
 			fastSharedRuntimeAudit(t, r, []*FastFloatManager{second}, caller)
-			if second.formatting.small.Raw != secondRaw {
-				t.Fatal("other owner's raw token moved")
+			if &second.formatting.buffers[2][0] != secondData {
+				t.Fatal("other owner's scratch moved")
 			}
-			word, e := second.formatting.small.read(r, 0)
-			if e != nil || word != 219 {
-				t.Fatal("other owner's live bytes", word, e)
+			word := second.formatting.buffers[2][0]
+			if word != 219 {
+				t.Fatal("other owner's live bytes", word)
 			}
 			serviceMust(t, second.endFastFormatting(nil))
 			n, e = second.FormatInto(&c, dst[:])
@@ -312,69 +309,6 @@ func TestFastFloatBorrowedTLSCharConstructorPostphysicalPrefix(t *testing.T) {
 	}
 }
 
-func TestFastFloatBorrowedTLSCompletedDefaultsAfterLateAllocationFailure(t *testing.T) {
-	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
-	serviceMust(t, e)
-	m, e := NewFastFloatManager(fastRuntimeConfig(b, r, 17000))
-	serviceMust(t, e)
-	caller, e := r.Allocate(17)
-	serviceMust(t, e)
-	var a FastFloat
-	serviceMust(t, m.SetFraction32(&a, 3, 2))
-	serviceMust(t, m.natural.reserveText(256))
-	serviceMust(t, r.SetMaxCount(1))
-	var dst [32]byte
-	for i := range dst {
-		dst[i] = '!'
-	}
-	_, e = m.FormatDecimalInto(&a, 8, 128, dst[:])
-	var refusal Failure
-	if !errors.As(e, &refusal) || refusal.Kind != FailureAllocExceeded {
-		t.Fatal(e)
-	}
-	// Real default b1,b2,b3 were completed before interleaved pushes. Their
-	// destructors release published buffers, but the failed expansion's new
-	// completed allocation remains an explicit unpublished owning root.
-	if m.formatting.completed != 0 || m.formatting.active || !m.formatting.pending || m.formatting.originalCause != refusal || m.formatting.cleanupCause != nil {
-		t.Fatal("completed destructor cursor", m.formatting.completed, m.formatting.pending, m.formatting.originalCause, m.formatting.cleanupCause)
-	}
-	var pending Block
-	for i, limbs := range m.formatting.large {
-		if len(limbs) != 0 {
-			t.Fatal("decimal scratch not reset after failure", i)
-		}
-	}
-	if m.formatting.small.Raw != (Block{}) || m.formatting.small.pos != 0 || m.formatting.small.capacity() != 16 {
-		t.Fatal("small completed destructor")
-	}
-	if m.formatting.small.Pending != (Block{}) {
-		if pending != (Block{}) {
-			t.Fatal("two failed allocations")
-		}
-		pending = m.formatting.small.Pending
-	}
-	if pending == (Block{}) || r.Stats().LiveBlocks != 2 {
-		t.Fatal("retained allocation and caller", r.Stats())
-	}
-	fastSharedRuntimeAudit(t, r, []*FastFloatManager{m}, caller)
-	for _, v := range dst {
-		if v != '!' {
-			t.Fatal("caller bytes")
-		}
-	}
-	// Owning close drains that real root and closes FF words/headers only. Runtime
-	// remains callable, allocation-limit count is not reset or used as a free guard.
-	serviceMust(t, m.CloseChecked())
-	serviceMust(t, r.CheckOpen())
-	fastSharedRuntimeAudit(t, r, nil, caller)
-	serviceMust(t, r.Deallocate(&caller))
-	serviceMust(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
-	}
-}
-
 func TestFastFloatBorrowedRuntimeInlineWarmScope(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 32, ThreadLocal: true})
@@ -405,106 +339,6 @@ func TestFastFloatBorrowedRuntimeInlineWarmScope(t *testing.T) {
 	}
 	fastSharedRuntimeAudit(t, r, []*FastFloatManager{m})
 	b.FailAfter(-1)
-	serviceMust(t, m.CloseChecked())
-	serviceMust(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
-	}
-}
-
-// Two actual oversized reallocations preserve source counter-before-physical
-// prefixes while the host-size guard retains the real old caller blocks. This
-// deliberately reaches guarded signed-overflow at a later TLS synchronization;
-// it is not valid allocation exhaustion or an allocation-limit free refusal.
-func TestFastFloatBorrowedTLSGuardedLateFreeCursor(t *testing.T) {
-	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
-	serviceMust(t, e)
-	m, e := NewFastFloatManager(fastRuntimeConfig(b, r, 2))
-	serviceMust(t, e)
-	first, e := r.Allocate(8)
-	serviceMust(t, e)
-	second, e := r.Allocate(8)
-	serviceMust(t, e)
-	serviceMust(t, r.Write(first, 0, 13))
-	serviceMust(t, r.Write(second, 0, 17))
-	serviceMust(t, m.beginFastFormatting())
-	m.formatting.completed = 4
-	serviceMust(t, m.formatting.small.resize(r, 32768))
-	sourceRaw := m.formatting.small.Raw
-	n, e := r.Size(sourceRaw)
-	serviceMust(t, e)
-	if n != 131072 {
-		t.Fatal(n)
-	}
-	fastSharedRuntimeAudit(t, r, []*FastFloatManager{m}, first, second)
-	before := r.State()
-	old := first
-	delta := int64(-1000000)
-	// old physical extent16, prospective n+8 =16+delta (source uint64 wrap).
-	request := uint64(16) + uint64(delta) - 8
-	if request <= uint64(^uint(0)>>1) {
-		t.Fatal("fixture not host guarded")
-	}
-	if e = r.Reallocate(&first, request); e != arena.ErrBounds || first != old {
-		t.Fatal("real old caller retained", e, first, old)
-	}
-	prefix := r.State()
-	if prefix.GlobalSize != before.GlobalSize || prefix.LocalSize != before.LocalSize+delta || prefix.LocalCount != before.LocalCount+1 || prefix.OutOfMemory {
-		t.Fatal("first source realloc counter prefix", before, prefix)
-	}
-	v, e := r.Read(first, 0)
-	if e != nil || v != 13 {
-		t.Fatal("old bytes", v, e)
-	}
-	fastSharedRuntimeAudit(t, r, []*FastFloatManager{m}, first, second)
-	serviceMust(t, r.Deallocate(&first))
-	negative := r.State()
-	if negative.GlobalSize != prefix.GlobalSize+prefix.LocalSize-16 || negative.LocalSize != 0 || negative.GlobalSize >= 0 || negative.GlobalCount != prefix.GlobalCount+prefix.LocalCount {
-		t.Fatal("first actual physical free/sync", prefix, negative)
-	}
-	// The first completed free made global negative. A second real failed realloc
-	// can place the lane near MinInt64 without overflowing the source lane write.
-	target := int64(math.MinInt64) + 1000 - negative.GlobalSize + 16
-	request = uint64(target) + 16 - 8
-	old = second
-	if request <= uint64(^uint(0)>>1) {
-		t.Fatal("second fixture not host guarded")
-	}
-	if e = r.Reallocate(&second, request); e != arena.ErrBounds || second != old {
-		t.Fatal("second real old caller retained", e)
-	}
-	prefix = r.State()
-	if prefix.LocalSize != target || prefix.LocalCount != negative.LocalCount+1 || prefix.GlobalSize != negative.GlobalSize {
-		t.Fatal("second source realloc counter prefix", prefix, target)
-	}
-	fastSharedRuntimeAudit(t, r, []*FastFloatManager{m}, second)
-	serviceMust(t, r.Deallocate(&second))
-	near := r.State()
-	if near.GlobalSize != math.MinInt64+1000 || near.LocalSize != 0 || near.GlobalCount != prefix.GlobalCount+prefix.LocalCount {
-		t.Fatal("bounded actual second free", near)
-	}
-	fastSharedRuntimeAudit(t, r, []*FastFloatManager{m})
-	if e = m.endFastFormatting(nil); e != arena.ErrBounds {
-		t.Fatal("signed overflow after physical source free", e)
-	}
-	stopped := r.State()
-	if stopped.GlobalSize != near.GlobalSize || stopped.LocalSize != -131080 || stopped.GlobalCount != near.GlobalCount || stopped.LocalCount != near.LocalCount {
-		t.Fatal("actual overflow stopped at sync addition", near, stopped)
-	}
-	if m.formatting.small.Raw != (Block{}) || m.formatting.completed != 4 || m.formatting.active || !m.formatting.pending || m.formatting.cleanupCause != arena.ErrBounds || m.formatting.originalCause != nil {
-		t.Fatal("real completed physical free cursor", m.formatting.completed, m.formatting.pending, m.formatting.cleanupCause)
-	}
-	if _, e = r.Size(sourceRaw); e != ErrRuntimeOwner {
-		t.Fatal("old freed physical token", e)
-	}
-	fastSharedRuntimeAudit(t, r, []*FastFloatManager{m})
-	// Cursor acknowledgement does not retry the failed TLS synchronization, replay
-	// physical free, or repair the guarded source counter. No root is lost.
-	serviceMust(t, m.CleanupFormatting())
-	if r.State() != stopped || m.formatting.completed != 0 || m.formatting.pending {
-		t.Fatal("cleanup acknowledgement replayed source actions", r.State(), stopped)
-	}
 	serviceMust(t, m.CloseChecked())
 	serviceMust(t, r.Close())
 	if b.Used() != 0 {

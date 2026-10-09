@@ -5,12 +5,10 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// Decimal scratch limbs use typed Go slices. The remaining small source buffer
-// and character formatting retain their explicit Runtime cleanup.
+// Decimal scratch limbs use reusable typed Go slices. Character formatting
+// and the shared MPN workspace retain their explicit Runtime cleanup.
 type fastFormattingScope struct {
-	large                       [3][]uint32
-	small                       SourceLimbBuffer
-	completed                   uint8
+	buffers                     [4][]uint32
 	active, pending             bool
 	originalCause, cleanupCause error
 }
@@ -20,23 +18,13 @@ func (m *FastFloatManager) beginFastFormatting() error {
 	if s.active || s.pending {
 		return arena.ErrInvalidSlot
 	}
-	*s = fastFormattingScope{large: s.large, active: true}
+	*s = fastFormattingScope{buffers: s.buffers, active: true}
 	return nil
 }
 func (m *FastFloatManager) formatView(i int, n uint32) ffLimbView {
-	if i == 2 {
-		return ffLimbView{runtime: m.natural.runtime, source16: &m.formatting.small, size: n}
-	}
-	j := i
-	if i == 3 {
-		j = 2
-	}
-	return ffLimbView{runtime: m.natural.runtime, external: m.formatting.large[j], size: n}
+	return ffLimbView{external: m.formatting.buffers[i], size: n}
 }
 func fastNaturalView(v ffLimbView) limbView {
-	if v.source16 != nil {
-		return limbView{runtime: v.runtime, source: v.source16, size: v.size}
-	}
 	if v.external != nil {
 		return limbView{external: v.external[v.offset:], size: v.size}
 	}
@@ -67,33 +55,13 @@ func (m *FastFloatManager) finishFastFormatting() error {
 	if e := m.natural.destroyIntegerCharacters(); e != nil {
 		return e
 	}
-	for i := 3; i >= 0; i-- {
-		bit := uint8(1) << uint(i)
-		if s.completed&bit == 0 {
-			continue
-		}
-		if i == 2 {
-			if s.small.Raw != (Block{}) {
-				if e := m.natural.runtime.Deallocate(&s.small.Raw); e != nil {
-					return e
-				}
-			}
-			s.small.pos = 0
-			s.small.cap = 0
-			s.small.initialized = 0
-		} else {
-			j := i
-			if i == 3 {
-				j = 2
-			}
-			s.large[j] = s.large[j][:0]
-		}
-		s.completed &^= bit
+	for i := range s.buffers {
+		s.buffers[i] = s.buffers[i][:0]
 	}
 	s.active = false
-	s.pending = m.natural.Formatting.PendingField || m.natural.CharFormatting.pending || s.small.Pending != (Block{})
+	s.pending = m.natural.Formatting.PendingField || m.natural.CharFormatting.pending
 	if !s.pending {
-		*s = fastFormattingScope{large: s.large}
+		*s = fastFormattingScope{buffers: s.buffers}
 	}
 	return nil
 }
@@ -126,12 +94,6 @@ func (m *FastFloatManager) CleanupFormatting() error {
 		return e
 	}
 	if e := m.natural.cleanupOutputFormatting(); e != nil {
-		return e
-	}
-	for i := range m.formatting.large {
-		m.formatting.large[i] = nil
-	}
-	if e := m.formatting.small.Finalize(m.natural.runtime); e != nil {
 		return e
 	}
 	m.formatting = fastFormattingScope{}

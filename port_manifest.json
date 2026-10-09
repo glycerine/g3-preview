@@ -111806,7 +111806,7 @@
         "TestFastFloatDecimalBuffersAreLexical",
         "TestFastFloatFormattingEveryConstructorPrefix",
         "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-        "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+        "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
         "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -111972,7 +111972,7 @@
           ]
         },
         {
-          "name": "MPFF full-precision character formatting and typed Go decimal scratch slices; remaining unsigned16 Runtime buffer retains explicit failure cleanup",
+          "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; shared MPN character buffers retain explicit failure cleanup",
           "status": "partial",
           "go_target": "pkg/util/mpff_format_scope.go",
           "tests": [
@@ -111980,7 +111980,7 @@
             "TestFastFloatDecimalBuffersAreLexical",
             "TestFastFloatFormattingEveryConstructorPrefix",
             "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-            "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+            "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
             "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -128185,7 +128185,7 @@
         "TestFastFloatDecimalBuffersAreLexical",
         "TestFastFloatFormattingEveryConstructorPrefix",
         "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-        "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+        "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
         "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -128194,9 +128194,7 @@
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
         "TestFastFloatSharedRuntimeProfileAndClose",
         "TestFastFloatBorrowedTLSCharConstructorPostphysicalPrefix",
-        "TestFastFloatBorrowedTLSCompletedDefaultsAfterLateAllocationFailure",
-        "TestFastFloatBorrowedRuntimeInlineWarmScope",
-        "TestFastFloatBorrowedTLSGuardedLateFreeCursor"
+        "TestFastFloatBorrowedRuntimeInlineWarmScope"
       ],
       "conditionals": [
         {
@@ -128761,7 +128759,7 @@
           "tests": []
         },
         {
-          "name": "MPFF full-precision character formatting and typed Go decimal scratch slices; remaining unsigned16 Runtime buffer retains explicit failure cleanup",
+          "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; shared MPN character buffers retain explicit failure cleanup",
           "status": "partial",
           "go_target": "pkg/util/mpff_format_scope.go",
           "tests": [
@@ -128769,7 +128767,7 @@
             "TestFastFloatDecimalBuffersAreLexical",
             "TestFastFloatFormattingEveryConstructorPrefix",
             "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-            "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+            "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
             "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -128777,7 +128775,7 @@
           ]
         },
         {
-          "name": "Selected shared/borrowed Runtime identity, TLS lexical display buffer failure and completed destruction cursors; permanent significand storage and global bindings remain open",
+          "name": "Shared/borrowed Runtime identity, TLS character formatting failure, and independent Go decimal scratch; permanent significand storage and global bindings remain open",
           "status": "partial",
           "go_target": "pkg/util/mpff.go",
           "tests": [
@@ -128785,9 +128783,7 @@
             "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
             "TestFastFloatSharedRuntimeProfileAndClose",
             "TestFastFloatBorrowedTLSCharConstructorPostphysicalPrefix",
-            "TestFastFloatBorrowedTLSCompletedDefaultsAfterLateAllocationFailure",
-            "TestFastFloatBorrowedRuntimeInlineWarmScope",
-            "TestFastFloatBorrowedTLSGuardedLateFreeCursor"
+            "TestFastFloatBorrowedRuntimeInlineWarmScope"
           ]
         }
       ],
@@ -128842,7 +128838,7 @@
         "TestFastFloatDecimalBuffersAreLexical",
         "TestFastFloatFormattingEveryConstructorPrefix",
         "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-        "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+        "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
         "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -128851,9 +128847,7 @@
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
         "TestFastFloatSharedRuntimeProfileAndClose",
         "TestFastFloatBorrowedTLSCharConstructorPostphysicalPrefix",
-        "TestFastFloatBorrowedTLSCompletedDefaultsAfterLateAllocationFailure",
-        "TestFastFloatBorrowedRuntimeInlineWarmScope",
-        "TestFastFloatBorrowedTLSGuardedLateFreeCursor"
+        "TestFastFloatBorrowedRuntimeInlineWarmScope"
       ],
       "conditionals": [
         {
@@ -129042,7 +129036,7 @@
           "tests": []
         },
         {
-          "name": "MPFF full-precision character formatting and typed Go decimal scratch slices; remaining unsigned16 Runtime buffer retains explicit failure cleanup",
+          "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; shared MPN character buffers retain explicit failure cleanup",
           "status": "partial",
           "go_target": "pkg/util/mpff_format_scope.go",
           "tests": [
@@ -129050,7 +129044,7 @@
             "TestFastFloatDecimalBuffersAreLexical",
             "TestFastFloatFormattingEveryConstructorPrefix",
             "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-            "TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal",
+            "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
             "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -129058,7 +129052,7 @@
           ]
         },
         {
-          "name": "Selected shared/borrowed Runtime identity, TLS lexical display buffer failure and completed destruction cursors; permanent significand storage and global bindings remain open",
+          "name": "Shared/borrowed Runtime identity, TLS character formatting failure, and independent Go decimal scratch; permanent significand storage and global bindings remain open",
           "status": "partial",
           "go_target": "pkg/util/mpff.go",
           "tests": [
@@ -129066,9 +129060,7 @@
             "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
             "TestFastFloatSharedRuntimeProfileAndClose",
             "TestFastFloatBorrowedTLSCharConstructorPostphysicalPrefix",
-            "TestFastFloatBorrowedTLSCompletedDefaultsAfterLateAllocationFailure",
-            "TestFastFloatBorrowedRuntimeInlineWarmScope",
-            "TestFastFloatBorrowedTLSGuardedLateFreeCursor"
+            "TestFastFloatBorrowedRuntimeInlineWarmScope"
           ]
         }
       ],

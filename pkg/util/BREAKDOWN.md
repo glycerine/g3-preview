@@ -440,14 +440,14 @@ cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before
 deleting functionality that has not yet reached Go.
 
-The fast-float decimal formatter now uses three typed Go limb slices in place
-of the copied `sbuffer<unsigned,1024>` storage. Its shifts, division, fractional
-digit generation, and full source precision are unchanged. The inline masks,
-spill blocks, custom growth, and Runtime binding for these three buffers are
-gone; capacity is reused across calls and released on explicit cleanup or close.
-Their Go allocations no longer appear in arena accounting. The smaller
-Runtime-backed quotient buffer and shared MPN character buffers remain for
-subsequent migration.
+The fast-float decimal formatter now uses four typed Go limb slices in place
+of all its copied `sbuffer<unsigned>` storage, including the quotient buffer.
+Its shifts, division, fractional digit generation, and full source precision
+are unchanged. Inline masks, spill blocks, custom growth, Runtime bindings,
+and the buffer-construction cursor are gone. Capacity is reused across calls
+and released on explicit cleanup or close; these Go allocations are outside
+arena accounting. Shared MPN character buffers and division workspaces remain
+for subsequent migration.
 
 ### Dissolution order
 

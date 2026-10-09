@@ -95,8 +95,6 @@ func fastFormattingNamedRoots(m *FastFloatManager, add func(Block)) {
 	}
 	add(m.natural.CharFormatting.Buffer.Raw)
 	add(m.natural.CharFormatting.Buffer.PendingField)
-	add(m.formatting.small.Raw)
-	add(m.formatting.small.Pending)
 }
 
 func TestFastFloatFormattingEveryConstructorPrefix(t *testing.T) {
@@ -195,34 +193,39 @@ func TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup(t *testing.
 	serviceMust(t, m.Del(&a))
 }
 
-func TestFastFloatCompletedDefaultBuffersUnwindOnGrowthRefusal(t *testing.T) {
+func TestFastFloatDecimalScratchResetsAfterCharacterFailure(t *testing.T) {
 	m := fastManager(t, 2)
-	b := m.config.Storage.Descriptors.Budget
+	budget := m.config.Storage.Descriptors.Budget
 	serviceMust(t, m.beginFastFormatting())
-	m.formatting.completed = 7
-	r := m.natural.runtime
-	// The three default constructors completed before their body pushes.
-	m.formatting.large[0] = make([]uint32, 1025)
-	m.formatting.large[1] = make([]uint32, 1025)
-	serviceMust(t, m.formatting.small.resize(r, 32))
-	small := m.formatting.small.Raw
-	b.FailAfter(0)
-	e := m.formatting.small.push(r, 7)
-	if !numericPhysicalReservationRefusal(e) || m.formatting.completed != 7 {
-		t.Fatal("body refusal must not unconstruct default objects", e)
+	for i := range m.formatting.buffers {
+		m.formatting.buffers[i] = make([]uint32, 1025)
 	}
-	if e2 := m.endFastFormatting(e); e2 != e {
-		t.Fatal("original action cause", e2, e)
+	budget.FailAfter(0)
+	_, cause := m.beginFastCharacters(m.formatView(0, 1025), 0)
+	if !numericPhysicalReservationRefusal(cause) {
+		t.Fatal("expected actual character allocation refusal", cause)
 	}
-	if _, e = r.Size(small); e == nil {
-		t.Fatal("completed source destructor omitted raw")
+	if e := m.endFastFormatting(cause); e != cause {
+		t.Fatal("original formatting cause", e, cause)
 	}
-	if len(m.formatting.large[0]) != 0 || len(m.formatting.large[1]) != 0 {
-		t.Fatal("decimal scratch not reset after formatting")
+	for _, limbs := range m.formatting.buffers {
+		if len(limbs) != 0 {
+			t.Fatal("decimal scratch not reset after failure")
+		}
 	}
 	fastAudit(t, m)
 	fastStandaloneBudgetAudit(t, m)
-	b.FailAfter(-1)
+	budget.FailAfter(-1)
+	serviceMust(t, m.CleanupFormatting())
+	var value FastFloat
+	serviceMust(t, m.SetFraction32(&value, 3, 2))
+	var dst [32]byte
+	n, e := m.FormatDecimalInto(&value, 8, 128, dst[:])
+	serviceMust(t, e)
+	if string(dst[:n]) != "1.5" {
+		t.Fatal("formatting after cleanup", n, dst)
+	}
+	serviceMust(t, m.Del(&value))
 }
 
 func TestFastFloatFormattingScopeGuardsAndInlineWarm(t *testing.T) {
@@ -266,7 +269,7 @@ func TestFastFloatDecimalLargePrecision(t *testing.T) {
 			if got := string(dst[:n]); got != tc.want {
 				t.Fatal(precision, tc.numerator, tc.denominator, got, tc.want)
 			}
-			for _, scratch := range m.formatting.large {
+			for _, scratch := range m.formatting.buffers {
 				if len(scratch) != 0 {
 					t.Fatal("decimal scratch not reset after output", precision)
 				}
@@ -274,7 +277,7 @@ func TestFastFloatDecimalLargePrecision(t *testing.T) {
 			serviceMust(t, m.Del(&value))
 		}
 		serviceMust(t, m.CleanupFormatting())
-		for _, scratch := range m.formatting.large {
+		for _, scratch := range m.formatting.buffers {
 			if scratch != nil {
 				t.Fatal("explicit cleanup retained scratch capacity", precision)
 			}
@@ -284,7 +287,7 @@ func TestFastFloatDecimalLargePrecision(t *testing.T) {
 
 func TestFastFloatDecimalEveryLargeLocalPrefix(t *testing.T) {
 	success := false
-	defaultRefusal, charRefusal, innerRefusal := false, false, false
+	charRefusal, innerRefusal := false, false
 	for fault := int64(0); fault < 192; fault++ {
 		b := arena.NewBudget(1 << 25)
 		c := DefaultFastFloatConfig(serviceConfig(b).Integers.Words)
@@ -312,7 +315,6 @@ func TestFastFloatDecimalEveryLargeLocalPrefix(t *testing.T) {
 			}
 			charRefusal = charRefusal || m.natural.CharFormatting.pending
 			innerRefusal = innerRefusal || m.natural.Formatting.PendingField
-			defaultRefusal = defaultRefusal || (!m.natural.CharFormatting.pending && !m.natural.Formatting.PendingField)
 		} else {
 			if string(dst[:n]) != "1.5" {
 				t.Fatal(n, dst)
@@ -330,8 +332,8 @@ func TestFastFloatDecimalEveryLargeLocalPrefix(t *testing.T) {
 			break
 		}
 	}
-	if !success || !defaultRefusal || !charRefusal || !innerRefusal {
-		t.Fatal("complete large local sweep", success, defaultRefusal, charRefusal, innerRefusal)
+	if !success || !charRefusal || !innerRefusal {
+		t.Fatal("complete large local sweep", success, charRefusal, innerRefusal)
 	}
 }
 

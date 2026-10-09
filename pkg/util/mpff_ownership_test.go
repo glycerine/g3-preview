@@ -502,11 +502,11 @@ func TestFastFloatActualWholeGraphCharges(t *testing.T) {
 	if budget.Used() != fastOwnedBytes(m) {
 		t.Fatal("formatter charge", budget.Used(), fastOwnedBytes(m))
 	}
-	if m.formatting.active || m.formatting.pending || m.formatting.completed != 0 || m.formatting.small.capacity() != 16 {
-		t.Fatal("completed source lexical locals", m.formatting.completed)
+	if m.formatting.active || m.formatting.pending {
+		t.Fatal("formatting scope still active or pending")
 	}
-	for i := range m.formatting.large {
-		if len(m.formatting.large[i]) != 0 {
+	for i := range m.formatting.buffers {
+		if len(m.formatting.buffers[i]) != 0 {
 			t.Fatal("source local destructor", i)
 		}
 	}

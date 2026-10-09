@@ -210,8 +210,7 @@ func (m *FastFloatManager) prepareDecimal(a *FastFloat, prec, maxPower uint32) (
 	// Source positive branch: scratch limbs followed by character formatting.
 	// The is_int fast path above makes it unreachable for canonical finite values.
 	if exp >= 0 {
-		m.formatting.completed = 1
-		buffer := &m.formatting.large[0]
+		buffer := &m.formatting.buffers[0]
 		extra := uint32(1 + exp/32)
 		shift := uint32(32 - exp%32)
 		for i := uint32(0); i < extra; i++ {
@@ -226,7 +225,6 @@ func (m *FastFloatManager) prepareDecimal(a *FastFloat, prec, maxPower uint32) (
 		return m.beginFastCharacters(v, n)
 	}
 	// Keep the source limb layout and interleaved initialization order.
-	m.formatting.completed = 7
 	exp = -exp
 	numWords := uint32(1 + exp/32)
 	extra := uint32(1)
@@ -235,24 +233,21 @@ func (m *FastFloatManager) prepareDecimal(a *FastFloat, prec, maxPower uint32) (
 	}
 	sig := m.sig(a)
 	for i := uint32(0); i < m.precision; i++ {
-		m.formatting.large[0] = append(m.formatting.large[0], sig.read(i))
-		m.formatting.large[1] = append(m.formatting.large[1], 0)
-		if e = m.formatting.small.push(m.natural.runtime, 0); e != nil {
-			return 0, e
-		}
+		m.formatting.buffers[0] = append(m.formatting.buffers[0], sig.read(i))
+		m.formatting.buffers[1] = append(m.formatting.buffers[1], 0)
+		m.formatting.buffers[2] = append(m.formatting.buffers[2], 0)
 	}
 	for i := uint32(0); i < extra; i++ {
-		m.formatting.large[0] = append(m.formatting.large[0], 0)
-		m.formatting.large[1] = append(m.formatting.large[1], 0)
+		m.formatting.buffers[0] = append(m.formatting.buffers[0], 0)
+		m.formatting.buffers[1] = append(m.formatting.buffers[1], 0)
 	}
-	m.formatting.completed |= 8
-	if uint64(cap(m.formatting.large[2])) < uint64(numWords) {
-		m.formatting.large[2] = make([]uint32, numWords)
+	if uint64(cap(m.formatting.buffers[3])) < uint64(numWords) {
+		m.formatting.buffers[3] = make([]uint32, numWords)
 	} else {
-		m.formatting.large[2] = m.formatting.large[2][:numWords]
-		clear(m.formatting.large[2])
+		m.formatting.buffers[3] = m.formatting.buffers[3][:numWords]
+		clear(m.formatting.buffers[3])
 	}
-	sz := uint32(len(m.formatting.large[0]))
+	sz := uint32(len(m.formatting.buffers[0]))
 	b1, b2, b3, pw := m.formatView(0, sz), m.formatView(1, sz), m.formatView(2, m.precision), m.formatView(3, numWords)
 	pw.write(0, 1)
 	ffShift(pw, pw, uint32(exp), true)
