@@ -18,7 +18,7 @@ func (v *PolynomialRefVector) setWithFactoryReceipt(i uint32, p Polynomial, r *p
 		return e
 	}
 	s := &v.state
-	if s.pushActive || s.setActive || s.draining || s.incoming != (Polynomial{}) || s.setInvocation == ^uint64(0) {
+	if s.setActive || s.draining || s.incoming != (Polynomial{}) || s.setInvocation == ^uint64(0) {
 		return ErrPolynomialPending
 	}
 	s.setInvocation++
@@ -62,9 +62,7 @@ func (v *PolynomialRefVector) setWithFactoryReceipt(i uint32, p Polynomial, r *p
 	}
 	s.setOldConsumed = true
 	s.incomingDec = false
-	if e = s.values.putMonomial(v.owner, i, Monomial{owner: p.owner, slot: p.slot, generation: p.generation}); e != nil {
-		return e
-	}
+	s.values[i] = p
 	s.incoming = Polynomial{}
 	s.setActive = false
 	return nil
@@ -104,9 +102,7 @@ func (v *polynomialReferenceVector) abortSet(m *MultivariatePolynomialCore) (err
 	}
 	// The failed source SET did not publish incoming. Retire only its actual
 	// old slot and incoming INC after the younger parent's declarations.
-	if e := v.values.putMonomial(m, v.setIndex, Monomial{}); e != nil {
-		return e
-	}
+	v.values[v.setIndex] = Polynomial{}
 	if e := polynomialReferenceDrop(m, &v.incoming, &v.incomingDec); e != nil {
 		return e
 	}
@@ -137,40 +133,17 @@ func (v *PolynomialRefVector) resizeZeroRange(n uint32) error {
 		return e
 	}
 	s := &v.state
-	if s.pushActive || s.setActive || s.draining || s.incoming != (Polynomial{}) {
+	if s.setActive || s.draining || s.incoming != (Polynomial{}) {
 		return ErrPolynomialPending
 	}
-	old, e := s.values.size(v.owner)
-	if e != nil {
-		return e
-	}
-	if old != 0 {
+	if len(s.values) != 0 {
 		return ErrPolynomialPending
 	}
-	cap, e := s.values.capacity(v.owner)
-	if e != nil {
-		return e
-	}
-	for n > cap {
-		if e = s.values.expand(v.owner); e != nil {
-			return e
-		}
-		cap, e = s.values.capacity(v.owner)
-		if e != nil {
-			return e
-		}
-	}
-	if n == 0 {
-		return nil
-	}
-	if e = s.values.publishSize(v.owner, n); e != nil {
-		return e
-	}
-	for i := uint32(0); i < n; i++ {
-		if e = s.values.putMonomial(v.owner, i, Monomial{}); e != nil {
-			return e
-		}
-		s.values.initialized = i + 1
+	if uint64(n) <= uint64(cap(s.values)) {
+		s.values = s.values[:n]
+		clear(s.values)
+	} else {
+		s.values = make([]Polynomial, int(n))
 	}
 	return nil
 }

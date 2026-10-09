@@ -103,10 +103,7 @@ func (m *MultivariatePolynomialManager) privatePolynomial(index uint32) (Polynom
 			}
 			index--
 		}
-		size, e := n.vs.values.size(c)
-		if e != nil {
-			return Polynomial{}, false, e
-		}
+		size := uint32(len(n.vs.values))
 		for j := n.vs.drain; j < size; j++ {
 			if index == 0 {
 				p, e := n.vs.get(c, j)

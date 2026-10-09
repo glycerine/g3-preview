@@ -21,7 +21,6 @@ type polynomialPSCChain2Scope struct {
 	division                             polynomialExactDivInvocationReceipt
 	arithmetic                           polynomialArithmeticInvocationReceipt
 	neg                                  polynomialNegInvocationReceipt
-	push                                 polynomialReferenceVectorPushReceipt
 	bodyCause, sourceCause, cleanupCause error
 }
 
@@ -148,7 +147,7 @@ func (m *MultivariatePolynomialManager) PSCChain2(p, q Polynomial, x uint32, out
 					return e
 				}
 				s.phase = 7
-				if e = out.pushWithReceipt(h1.root.value, &s.push); e != nil {
+				if e = out.Push(h1.root.value); e != nil {
 					return e
 				}
 				if zero {
@@ -229,12 +228,8 @@ func (v *PolynomialRefVector) reversePSCChain2() error {
 		if e != nil {
 			return e
 		}
-		if e = v.state.values.putMonomial(v.owner, i, Monomial{owner: b.owner, slot: b.slot, generation: b.generation}); e != nil {
-			return e
-		}
-		if e = v.state.values.putMonomial(v.owner, n-1-i, Monomial{owner: a.owner, slot: a.slot, generation: a.generation}); e != nil {
-			return e
-		}
+		v.state.values[i] = b
+		v.state.values[n-1-i] = a
 	}
 	return nil
 }
@@ -296,7 +291,7 @@ func (m *MultivariatePolynomialManager) pscChain2ChildrenPending() bool {
 			return true
 		}
 	}
-	return (s.push.matches() && s.push.frame.pushActive) || c.matchesNegInvocation(&s.neg) || c.matchesExactDivInvocation(&s.division) || c.matchesArithmeticInvocation(&s.arithmetic) || c.matchesPseudoInvocation(&s.pseudo) || c.matchesPowerInvocation(&s.power) || c.matchesCoefficientInvocation(&s.coefficient) || c.matchesFactoryInvocation(&s.factory)
+	return c.matchesNegInvocation(&s.neg) || c.matchesExactDivInvocation(&s.division) || c.matchesArithmeticInvocation(&s.arithmetic) || c.matchesPseudoInvocation(&s.pseudo) || c.matchesPowerInvocation(&s.power) || c.matchesCoefficientInvocation(&s.coefficient) || c.matchesFactoryInvocation(&s.factory)
 }
 func (m *MultivariatePolynomialManager) cleanupPSCChain2Children(abort bool) error {
 	s, c := &m.pscChain2, m.core
@@ -325,7 +320,7 @@ func (m *MultivariatePolynomialManager) cleanupPSCChain2Children(abort bool) err
 		if e := c.cheap.cleanupAppendInvocation(&s.append, true); e != nil {
 			return e
 		}
-		return s.push.cleanup()
+		return nil
 	}
 	return nil
 }
@@ -368,5 +363,5 @@ func (m *MultivariatePolynomialManager) CleanupPSCChain2() (err error) {
 	return nil
 }
 func (s *polynomialPSCChain2Scope) retire() {
-	*s = polynomialPSCChain2Scope{invocation: s.invocation, n1: s.n1, n2: s.n2, n3: s.n3, d0: s.d0, d1: s.d1, index: s.index, n3Initialized: s.n3Initialized, phase: s.phase, bodyCause: s.bodyCause, sourceCause: s.sourceCause, cleanupCause: s.cleanupCause, coefficient: s.coefficient, append: s.append, factory: s.factory, power: s.power, pseudo: s.pseudo, division: s.division, arithmetic: s.arithmetic, neg: s.neg, push: s.push}
+	*s = polynomialPSCChain2Scope{invocation: s.invocation, n1: s.n1, n2: s.n2, n3: s.n3, d0: s.d0, d1: s.d1, index: s.index, n3Initialized: s.n3Initialized, phase: s.phase, bodyCause: s.bodyCause, sourceCause: s.sourceCause, cleanupCause: s.cleanupCause, coefficient: s.coefficient, append: s.append, factory: s.factory, power: s.power, pseudo: s.pseudo, division: s.division, arithmetic: s.arithmetic, neg: s.neg}
 }

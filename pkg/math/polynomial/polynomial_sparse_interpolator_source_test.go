@@ -56,7 +56,7 @@ func TestPolynomialSparseNativeMonomialGrowthAcross129Groups(t *testing.T) {
 	coefficients := make([]int32, 129)
 	powers := make([][]MonomialPower, 129)
 	for i := range coefficients {
-		coefficients[i] = int32(i%96 + 1)
+		coefficients[i] = int32(i%47 + 1)
 		powers[i] = []MonomialPower{{1, uint32(i + 1)}}
 	}
 	p := polynomialQueryTerms(t, m, coefficients, powers)

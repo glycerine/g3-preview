@@ -65,7 +65,7 @@ func (m *MultivariatePolynomialCore) pscChildren(s *polynomialPSCScope, abort bo
 		if e := m.cheap.cleanupAppendInvocation(&s.append, true); e != nil {
 			return e
 		}
-		return s.push.cleanup()
+		return nil
 	}
 	return nil
 }

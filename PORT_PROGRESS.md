@@ -31547,3 +31547,32 @@ chunk (35.67s); the full native module checkpoint remains 20:08–20:11 UTC and 
 not due again yet. Counts remain 2102 units / 677 APIs: 63 ported, 284 partial,
 1727 unported and two dead/deleted. The complete util knot and package split
 remain open. Next: remaining concrete polynomial reference and numeral vectors.
+
+## Native polynomial reference collections (power-loss recovery)
+
+Recovered the uncommitted reference-vector conversion after the power outage.
+`PolynomialRefVector` and Newton's polynomial values now use `[]Polynomial`.
+Push performs the actual INC then native append; SET still acquires incoming
+before reading/destroying the old reference, and reset destroys entries in
+ascending order with retained stopped-destructor continuation. PSC outputs,
+reversal, display and physical censuses use the same typed storage.
+
+Removed reference-vector Runtime backing, growth/free states and push receipts
+whose only failure was eliminated container allocation. Retired those synthetic
+failure fixtures and updated inventory evidence and ownership claims. Actual
+polynomial/numeral construction, SET incoming ownership, callback reentry and
+stopped reference destruction remain covered. Cached-count display now stops at
+current native logical bounds following callback reset; it cannot read stale
+physical tail entries. Native slice storage is outside Runtime byte accounting.
+
+The independent 4097-entry growth regression checks handle association, nulls,
+exact reference counts, SET, reset, zero resize and storage reuse with Runtime
+reservations disabled. Validation: focused native checks passed (0.966s), focused
+g3debug checks passed (1.264s), full native polynomial passed (35.610s), and
+module-wide test compilation, polynomial vet, gofmt and portcheck passed. No full
+native module test run was repeated during recovery. Counts remain 2102 units /
+677 APIs: 63 ported, 284 partial, 1727 unported and two dead/deleted.
+
+Next: replace remaining concrete numeral vector backing (including Newton
+inputs/inverses) while preserving actual numeric ownership and source cleanup.
+The complete util knot and package split remain open.

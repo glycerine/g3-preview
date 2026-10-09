@@ -126,12 +126,12 @@ func TestPolynomialPSCChain1FactoryTransferBeforeCallbackPreservesForeignCoeffic
 	known := []Polynomial{p, q, other, foreign.value, foreign.incoming, out.state.incoming}
 	now, x := out.Size()
 	serviceMust(t, x)
-	for i := out.state.drain; i < now && i < out.state.values.initialized; i++ {
+	for i := out.state.drain; i < now; i++ {
 		v, x := out.Get(i)
 		serviceMust(t, x)
 		known = append(known, v)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, known, nil, out.header+h.header, []util.Block{out.state.values.raw, out.state.values.pending, out.state.values.old})
+	polynomialImpPhysicalAuditNamedRaw(t, m, known, nil, out.header+h.header, nil)
 	serviceMust(t, c.RemoveDeletionHandler(h))
 	m.originalBudget.FailAfter(-1)
 	serviceMust(t, h.CloseChecked())

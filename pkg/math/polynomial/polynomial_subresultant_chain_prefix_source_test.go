@@ -19,12 +19,12 @@ func subresultantNamedAudit(t *testing.T, m *MultivariatePolynomialManager, out 
 	polys = append(polys, out.state.incoming)
 	n, e := out.Size()
 	serviceMust(t, e)
-	for i := out.state.drain; i < n && i < out.state.values.initialized; i++ {
+	for i := out.state.drain; i < n; i++ {
 		p, e := out.Get(i)
 		serviceMust(t, e)
 		polys = append(polys, p)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, m, polys, numerals, out.header, []util.Block{out.state.values.raw, out.state.values.pending, out.state.values.old})
+	polynomialImpPhysicalAuditNamedRaw(t, m, polys, numerals, out.header, nil)
 }
 func TestPolynomialSubresultantChainDefectiveActualEveryReservationPrefix(t *testing.T) {
 	success, body, incomingSeen := false, false, false

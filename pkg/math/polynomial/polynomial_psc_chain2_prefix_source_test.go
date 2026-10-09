@@ -47,10 +47,8 @@ func TestPolynomialPSCChain2ActualEveryReservationPrefix(t *testing.T) {
 		}
 		if returned != nil {
 			message := returned.Error()
-			oldPush := m.pscChain2.push
 			inv := m.pscChain2.invocation
 			serviceMust(t, m.PSCChain2(p, q, 0, out))
-			serviceMust(t, oldPush.cleanup())
 			if returned.Error() != message || m.pscChain2.invocation == inv {
 				t.Fatal("later invocation changed original error", prefix)
 			}

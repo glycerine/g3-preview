@@ -22,7 +22,6 @@ type polynomialPSCScope struct {
 	pseudo                               polynomialPseudoDivisionInvocationReceipt
 	lazard                               polynomialLazardInvocationReceipt
 	next                                 polynomialPSCNextInvocationReceipt
-	push                                 polynomialReferenceVectorPushReceipt
 }
 
 func (m *MultivariatePolynomialCore) pscConstruct(i uint8) {
@@ -46,9 +45,6 @@ func (m *MultivariatePolynomialCore) finishPSCPhase(owning, abort bool) (err err
 		return s.sourceCause
 	}
 	if !s.active {
-		if abort {
-			return s.push.cleanup()
-		}
 		return nil
 	}
 	s.finishing = true
@@ -161,12 +157,12 @@ func (m *MultivariatePolynomialCore) PSCChain(p, q Polynomial, x uint32, S *Poly
 		return e
 	}
 	if n == 0 {
-		if e = S.pushWithReceipt(m.zero, &m.pscLocal.push); e != nil {
+		if e = S.Push(m.zero); e != nil {
 			return e
 		}
 		n = 1
 	}
-	// std::reverse adaptation: exchange actual scalar pointer handles in place.
+	// Reverse the published chain by exchanging scalar handles in place.
 	for i := uint32(0); i < n/2; i++ {
 		a, e := S.state.get(m, i)
 		if e != nil {
@@ -176,12 +172,8 @@ func (m *MultivariatePolynomialCore) PSCChain(p, q Polynomial, x uint32, S *Poly
 		if e != nil {
 			return e
 		}
-		if e = S.state.values.putMonomial(m, i, Monomial{owner: b.owner, slot: b.slot, generation: b.generation}); e != nil {
-			return e
-		}
-		if e = S.state.values.putMonomial(m, n-i-1, Monomial{owner: a.owner, slot: a.slot, generation: a.generation}); e != nil {
-			return e
-		}
+		S.state.values[i] = b
+		S.state.values[n-i-1] = a
 	}
 	return nil
 }
@@ -267,7 +259,7 @@ func (m *MultivariatePolynomialCore) pscOptimizedCoreWithReceipt(p, q Polynomial
 			return e
 		}
 		if !zero {
-			if e = S.pushWithReceipt(ps.value, &sc.push); e != nil {
+			if e = S.Push(ps.value); e != nil {
 				return e
 			}
 		}
@@ -288,7 +280,7 @@ func (m *MultivariatePolynomialCore) pscOptimizedCoreWithReceipt(p, q Polynomial
 				return e
 			}
 			if !zero {
-				if e = S.pushWithReceipt(ps.value, &sc.push); e != nil {
+				if e = S.Push(ps.value); e != nil {
 					return e
 				}
 			}

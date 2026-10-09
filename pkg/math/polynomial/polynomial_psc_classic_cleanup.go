@@ -46,7 +46,7 @@ func (m *MultivariatePolynomialCore) pscClassicChildren(abort bool) error {
 		if e := m.cheap.cleanupAppendInvocation(&s.append, true); e != nil {
 			return e
 		}
-		return s.push.cleanup()
+		return nil
 	}
 	return nil
 }
@@ -58,7 +58,7 @@ func (m *MultivariatePolynomialCore) pscClassicPending() bool {
 			return true
 		}
 	}
-	return s.push.matches() && s.push.frame.pushActive || m.matchesExactDivInvocation(&s.division) || m.matchesArithmeticInvocation(&s.arithmetic) || m.matchesPseudoInvocation(&s.pseudo) || m.matchesNegInvocation(&s.neg) || m.matchesPowerInvocation(&s.power) || m.matchesCoefficientInvocation(&s.coefficient) || m.matchesFactoryInvocation(&s.factory)
+	return m.matchesExactDivInvocation(&s.division) || m.matchesArithmeticInvocation(&s.arithmetic) || m.matchesPseudoInvocation(&s.pseudo) || m.matchesNegInvocation(&s.neg) || m.matchesPowerInvocation(&s.power) || m.matchesCoefficientInvocation(&s.coefficient) || m.matchesFactoryInvocation(&s.factory)
 }
 func (m *MultivariatePolynomialCore) finishPSCClassicPhase(owning, abort bool) (err error) {
 	if m == nil || m.self != m {

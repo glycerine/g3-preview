@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 type polynomialReference struct {
@@ -169,16 +168,13 @@ func (r *PolynomialRef) Close() error {
 }
 
 type polynomialReferenceVector struct {
-	pushInvocation                          uint64
-	pushActive, pushExecuting               bool
-	pushBodyCause, pushCleanupCause         error
 	setInvocation                           uint64
 	setIndex                                uint32
 	setActive, setExecuting, setOldConsumed bool
 	setOldRead                              bool
 	resetExecuting                          bool
 	setBodyCause, setCleanupCause           error
-	values                                  polynomialVector
+	values                                  []Polynomial
 	cleanupCause                            error
 	incoming                                Polynomial
 	incomingDec                             bool
@@ -188,78 +184,35 @@ type polynomialReferenceVector struct {
 }
 
 func (v *polynomialReferenceVector) get(m *MultivariatePolynomialCore, i uint32) (Polynomial, error) {
-	n, e := v.values.size(m)
-	if e != nil {
-		return Polynomial{}, e
-	}
-	if polynomialSourceDebug && i >= n {
-		return Polynomial{}, ErrPolynomialAssertion
-	}
-	if i >= v.values.initialized {
+	if uint64(i) >= uint64(len(v.values)) {
+		if polynomialSourceDebug {
+			return Polynomial{}, ErrPolynomialAssertion
+		}
 		return Polynomial{}, arena.ErrBounds
 	}
-	a, e := v.values.monomial(m, i)
-	return Polynomial{owner: a.owner, slot: a.slot, generation: a.generation}, e
+	return v.values[i], nil
 }
 func (v *polynomialReferenceVector) push(m *MultivariatePolynomialCore, p Polynomial) error {
-	return v.pushSource(m, p, nil, nil)
-}
-func (v *polynomialReferenceVector) pushSource(m *MultivariatePolynomialCore, p Polynomial, owner *PolynomialRefVector, r *polynomialReferenceVectorPushReceipt) (err error) {
-	if v.pushActive || v.setActive || v.draining || v.incoming != (Polynomial{}) {
+	if v.setActive || v.draining || v.incoming != (Polynomial{}) {
 		return ErrPolynomialPending
-	}
-	if r != nil {
-		if owner == nil || owner.self != owner || owner.owner != m || v != &owner.state {
-			return ErrPolynomialOwner
-		}
-		if v.pushInvocation == ^uint64(0) {
-			return ErrPolynomialPending
-		}
-		v.pushInvocation++
-		v.pushActive = true
-		v.pushExecuting = true
-		v.pushBodyCause = nil
-		v.pushCleanupCause = nil
-		*r = polynomialReferenceVectorPushReceipt{m, owner, v, v.pushInvocation}
-		defer func() {
-			v.pushExecuting = false
-			if err != nil && v.pushBodyCause == nil {
-				v.pushBodyCause = err
-			}
-		}()
 	}
 	if p != (Polynomial{}) {
 		if e := m.incRefCore(p); e != nil {
-			v.pushActive = false
 			return e
 		}
 	}
-	v.incoming = p
-	i, e := v.values.appendSlot(m)
-	if e != nil {
-		return e
-	}
-	if e = v.values.putMonomial(m, i, Monomial{owner: p.owner, slot: p.slot, generation: p.generation}); e != nil {
-		return e
-	}
-	if i >= v.values.initialized {
-		v.values.initialized = i + 1
-	}
-	if e = v.values.publishSize(m, i+1); e != nil {
-		return e
-	}
-	v.incoming = Polynomial{}
-	v.pushActive = false
+	v.values = append(v.values, p)
 	return nil
 }
+
 func (v *polynomialReferenceVector) reset(m *MultivariatePolynomialCore) error {
 	return v.resetMode(m, false)
 }
 func (v *polynomialReferenceVector) resetMode(m *MultivariatePolynomialCore, owning bool) (err error) {
-	if v.resetExecuting || v.pushExecuting {
+	if v.resetExecuting {
 		return ErrPolynomialPending
 	}
-	if v.setActive || (!owning && v.pushActive) {
+	if v.setActive {
 		return ErrPolynomialPending
 	}
 	if !owning && v.cleanupCause != nil {
@@ -275,10 +228,7 @@ func (v *polynomialReferenceVector) resetMode(m *MultivariatePolynomialCore, own
 		}
 	}()
 	v.draining = true
-	n, e := v.values.size(m)
-	if e != nil {
-		return e
-	}
+	n := uint32(len(v.values))
 	for v.drain < n {
 		p, e := v.get(m, v.drain)
 		if e != nil {
@@ -289,44 +239,23 @@ func (v *polynomialReferenceVector) resetMode(m *MultivariatePolynomialCore, own
 		}
 		v.drain++
 	}
-	if v.values.raw == (util.Block{}) {
-		v.drain = 0
-		v.draining = false
-		return nil
-	}
-	if e = v.values.reset(m); e != nil {
-		return e
-	}
+	v.values = v.values[:0]
 	v.drain = 0
 	v.draining = false
 	return nil
 }
 func (v *polynomialReferenceVector) close(m *MultivariatePolynomialCore) error {
-	if v.pushExecuting {
-		return ErrPolynomialPending
-	}
 	if e := v.abortSet(m); e != nil {
 		return e
 	}
 	if e := v.resetMode(m, true); e != nil {
 		return e
 	}
-	if e := v.values.close(m); e != nil {
-		return e
-	}
-	if e := v.abortIncoming(m); e != nil {
-		return e
-	}
-	v.pushActive = false
+	v.values = nil
 	return nil
 }
 
-func (v *polynomialReferenceVector) abortIncoming(m *MultivariatePolynomialCore) error {
-	return polynomialReferenceDrop(m, &v.incoming, &v.incomingDec)
-}
-
-// PolynomialRefVector owns exactly the logical source pointer range; retained
-// tail bits are borrowed and do not create a second reference.
+// PolynomialRefVector owns one reference per native slice entry.
 type PolynomialRefVector struct {
 	self            *PolynomialRefVector
 	owner           *MultivariatePolynomialCore
@@ -345,7 +274,6 @@ func NewPolynomialRefVector(m *MultivariatePolynomialCore) (*PolynomialRefVector
 	}
 	v := &PolynomialRefVector{owner: m, header: h}
 	v.self = v
-	v.state.values.width = 16
 	return v, nil
 }
 func (v *PolynomialRefVector) open() error {
@@ -373,7 +301,7 @@ func (v *PolynomialRefVector) Size() (uint32, error) {
 	if e := v.open(); e != nil {
 		return 0, e
 	}
-	return v.state.values.size(v.owner)
+	return uint32(len(v.state.values)), nil
 }
 func (v *PolynomialRefVector) Reset() error {
 	if e := v.open(); e != nil {
@@ -388,7 +316,7 @@ func (v *PolynomialRefVector) Close() error {
 	if v.closed {
 		return nil
 	}
-	if v.state.pushExecuting || v.state.setExecuting || v.state.resetExecuting {
+	if v.state.setExecuting || v.state.resetExecuting {
 		return ErrPolynomialPending
 	}
 	v.closing = true

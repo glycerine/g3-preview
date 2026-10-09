@@ -279,11 +279,11 @@ func TestPolynomialDisplayRefVectorCachedCount(t *testing.T) {
 		if !errors.Is(e, ErrPolynomialAssertion) {
 			t.Fatal("source seq.get DEBUG current logical size guard", e)
 		}
-	} else {
-		serviceMust(t, e)
-		if sink.text.String() != "7\n7\n" {
-			t.Fatal("cached count rereads physical retained pointer tail", sink.text.String())
-		}
+	} else if !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("native borrowed span bounds after callback reset", e)
+	}
+	if sink.text.String() != "7\n" {
+		t.Fatal("cached count stopped at current native range", sink.text.String())
 	}
 	serviceMust(t, m.CleanupDisplay())
 }

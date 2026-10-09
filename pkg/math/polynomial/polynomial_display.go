@@ -715,10 +715,7 @@ func (v *PolynomialRefVector) DisplayInto(sink PolynomialTextSink) error {
 	if e := v.open(); e != nil {
 		return e
 	}
-	n, e := v.state.values.size(v.owner)
-	if e != nil {
-		return e
-	}
+	n := uint32(len(v.state.values))
 	for i := uint32(0); i < n; i++ {
 		p, e := v.state.get(v.owner, i)
 		if e != nil {

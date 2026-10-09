@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialPSCClassicResetBeforeConstructorsAndOwnerReentry(t *testing.T) {
@@ -60,12 +59,12 @@ func TestPolynomialPSCClassicResetBeforeConstructorsAndOwnerReentry(t *testing.T
 	}
 	// Exact stop graph includes the real callback owner header and vector storage.
 	known := []Polynomial{p, q, out.state.incoming}
-	for i := uint32(0); i < out.state.values.initialized; i++ {
+	for i := uint32(0); uint64(i) < uint64(len(out.state.values)); i++ {
 		v, e := out.state.get(c, i)
 		serviceMust(t, e)
 		known = append(known, v)
 	}
-	polynomialImpPhysicalAuditNamedRaw(t, full, known, nil, out.header+h.header, []util.Block{out.state.values.raw, out.state.values.pending, out.state.values.old})
+	polynomialImpPhysicalAuditNamedRaw(t, full, known, nil, out.header+h.header, nil)
 	serviceMust(t, c.RemoveDeletionHandler(h))
 	serviceMust(t, h.CloseChecked())
 	serviceMust(t, c.CleanupPSCClassic())

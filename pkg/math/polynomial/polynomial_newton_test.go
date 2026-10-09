@@ -587,7 +587,7 @@ func TestPolynomialNewtonMkGrowthAndCancellationPrefixes(t *testing.T) {
 	}
 }
 
-func TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector(t *testing.T) {
+func TestPolynomialNewtonSignedSourceCountBoundsDomain(t *testing.T) {
 	m := polynomialCellFixture(t)
 	serviceMust(t, m.SetZPUint64(97))
 	n, e := NewPolynomialNewtonInterpolator(m)
@@ -598,20 +598,13 @@ func TestPolynomialNewtonSignedSourceCountGuardBeforeUnreadVector(t *testing.T) 
 	serviceMust(t, e)
 	oldCount, e := n.inputs.size(m)
 	serviceMust(t, e)
-	oldVS := n.vs.values.raw
-	dead, e := m.memory.Allocate(8)
-	serviceMust(t, e)
-	stale := dead
-	serviceMust(t, m.memory.Deallocate(&dead))
 	serviceMust(t, m.memory.WriteUint32(n.inputs.raw, 4, 0x80000000))
-	n.vs.values.raw = stale
 	e = n.Mk(0, r)
 	// int num=unsigned_count yields INT_MIN, then num-1 is source signed UB.
-	// The explicit reached Go domain guard precedes all m_vs reads and c ctor.
+	// The explicit Go guard rejects that signed arithmetic domain.
 	if !errors.Is(e, arena.ErrBounds) || errors.Is(e, util.ErrRuntimeOwner) {
 		t.Error("wrong reached source guard/read order", e)
 	}
-	n.vs.values.raw = oldVS
 	serviceMust(t, m.memory.WriteUint32(n.inputs.raw, 4, oldCount))
 	serviceMust(t, n.Close())
 	serviceMust(t, r.Close())
@@ -638,39 +631,6 @@ func TestPolynomialNewtonVectorSourceOwnerBinding(t *testing.T) {
 	serviceMust(t, v.SetOwner(m))
 	_, e = v.At(0)
 	serviceMust(t, e)
-	serviceMust(t, v.Close())
-}
-
-// A bounded malformed source size reaches a real field-access guard after
-// the incoming reference's DEC has consumed its count. Restore only that
-// deliberate header corruption; retry must acknowledge, not repeat the DEC.
-func TestPolynomialNewtonRefVectorPendingAbortRetry(t *testing.T) {
-	m := polynomialCellFixture(t)
-	p, e := m.MkVariable(0, 1)
-	serviceMust(t, e)
-	v, e := NewPolynomialRefVector(m)
-	serviceMust(t, e)
-	m.integer.Budget().FailAfter(0)
-	e = v.Push(p)
-	polynomialNewtonPhysicalAudit(t, m, nil, nil, []*PolynomialRefVector{v}, nil, nil, nil)
-	m.integer.Budget().FailAfter(-1)
-	if !numericPhysicalReservationRefusal(e) || v.state.incoming != p {
-		t.Fatal(e, v.state)
-	}
-	serviceMust(t, m.integer.CleanupPendingAllocation())
-	serviceMust(t, m.writeWord(p, 8, 2))
-	e = v.Close()
-	t.Log("reached malformed field guard", e)
-	if e != arena.ErrBounds || !v.state.incomingDec || v.state.incoming != p {
-		t.Fatal(e, v.state)
-	}
-	loc, x := m.polynomialLocation(p)
-	serviceMust(t, x)
-	if loc.deleteStage != 1 || loc.deleteIndex != 0 {
-		t.Fatal("consumed DEC prefix", loc)
-	}
-	polynomialNewtonPhysicalAudit(t, m, nil, nil, []*PolynomialRefVector{v}, nil, nil, nil)
-	serviceMust(t, m.writeWord(p, 8, 1))
 	serviceMust(t, v.Close())
 }
 
@@ -734,48 +694,6 @@ func TestPolynomialNewtonIndependentBoundedInterpolants(t *testing.T) {
 	}
 }
 
-func TestPolynomialNewtonWholeSourcePushBeforeOwningAbort(t *testing.T) {
-	m := polynomialCellFixture(t)
-	serviceMust(t, m.SetZPUint64(97))
-	r, e := NewPolynomialRef(m)
-	serviceMust(t, e)
-	input := util.NewInt(7)
-	ordinal := int64(3)
-	if polynomialSourceDebug {
-		ordinal = 4
-	} // Direct cold fixture grows the actual Runtime directory first.
-	m.integer.Budget().FailAfter(ordinal) // ctor owner/invs and inputs precede real vs backing.
-	e = m.NewtonInterpolation(0, 0, []util.Int{input}, []Polynomial{m.unit}, r)
-	polynomialNewtonPhysicalAudit(t, m, []*PolynomialNewtonInterpolator{m.newtonLocal}, []*PolynomialRef{r}, nil, nil, nil, nil)
-	m.integer.Budget().FailAfter(-1)
-	if !numericPhysicalReservationRefusal(e) {
-		t.Fatal(e)
-	}
-	n := m.newtonLocal
-	if n == nil || n.vs.incoming != m.unit {
-		t.Fatal("unjoined INC erased by ordinary outer destructor", n)
-	}
-	info, e := m.Info(m.unit)
-	serviceMust(t, e)
-	if info.RefCount != 2 || n.closeStage != 3 || n.header == 0 || n.closed {
-		t.Fatal("source versus owning prefix", info, n)
-	}
-	if n.inputs.raw != (util.Block{}) || n.invs.raw != (util.Block{}) || n.vs.values.raw != (util.Block{}) {
-		t.Fatal("completed source members not destroyed", n)
-	}
-	if e = m.CloseChecked(); e != ErrPolynomialPending {
-		t.Fatal("pending local owner not retained", e)
-	}
-	serviceMust(t, m.CleanupNewtonInterpolation())
-	serviceMust(t, m.integer.CleanupPendingAllocation())
-	info, e = m.Info(m.unit)
-	serviceMust(t, e)
-	if info.RefCount != 1 {
-		t.Fatal(info)
-	}
-	serviceMust(t, r.Close())
-}
-
 func TestPolynomialNewtonRefVectorSourceResetStop(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p, e := m.MkVariable(0, 1)
@@ -794,41 +712,6 @@ func TestPolynomialNewtonRefVectorSourceResetStop(t *testing.T) {
 		t.Fatal("source Reset owning-acknowledged stopped DEC", second, e)
 	}
 	serviceMust(t, v.Close())
-}
-
-func TestPolynomialNewtonLazySourceFlushBeforeOwningAbort(t *testing.T) {
-	m := polynomialCellFixture(t)
-	serviceMust(t, m.SetZPUint64(97))
-	v, e := NewPolynomialNewtonVector(m)
-	serviceMust(t, e)
-	serviceMust(t, v.SetOwner(m))
-	child, e := v.At(0)
-	serviceMust(t, e)
-	input := util.NewInt(7)
-	m.integer.Budget().FailAfter(1)
-	e = child.Add(&input, m.unit)
-	polynomialNewtonPhysicalAudit(t, m, nil, nil, nil, []*PolynomialNewtonVector{v}, nil, nil)
-	m.integer.Budget().FailAfter(-1)
-	if !numericPhysicalReservationRefusal(e) || child.vs.incoming != m.unit {
-		t.Fatal(e, child)
-	}
-	serviceMust(t, v.Flush())
-	info, e := m.Info(m.unit)
-	serviceMust(t, e)
-	if info.RefCount != 2 || child.closed || len(v.orphans) != 1 || v.orphans[0] != child || newtonVectorCount(t, v) != 0 {
-		t.Fatal("source Flush owning-aborted unjoined reference", info, child, v)
-	}
-	polynomialNewtonPhysicalAudit(t, m, nil, nil, nil, []*PolynomialNewtonVector{v}, nil, nil)
-	if _, e = v.At(0); e != ErrPolynomialPending {
-		t.Fatal("retained child overwritten", e)
-	}
-	serviceMust(t, v.Close())
-	serviceMust(t, m.integer.CleanupPendingAllocation())
-	info, e = m.Info(m.unit)
-	serviceMust(t, e)
-	if info.RefCount != 1 {
-		t.Fatal(info)
-	}
 }
 
 // TLS's returned block is a Go failed-constructor abort root, not a numeral.

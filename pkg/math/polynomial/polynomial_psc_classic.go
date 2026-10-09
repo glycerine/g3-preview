@@ -18,7 +18,6 @@ type polynomialPSCClassicScope struct {
 	pseudo                               polynomialPseudoDivisionInvocationReceipt
 	division                             polynomialExactDivInvocationReceipt
 	arithmetic                           polynomialArithmeticInvocationReceipt
-	push                                 polynomialReferenceVectorPushReceipt
 	bodyCause, sourceCause, cleanupCause error
 }
 type polynomialPSCClassicInvocationReceipt struct {
@@ -108,7 +107,7 @@ func (m *MultivariatePolynomialCore) pscClassicDivide(p, q Polynomial, r *polyno
 func (m *MultivariatePolynomialCore) pscClassicPush(out *PolynomialRefVector, p Polynomial) error {
 	s := &m.pscClassic
 	s.phase = 7
-	return out.pushWithReceipt(p, &s.push)
+	return out.Push(p)
 }
 func (m *MultivariatePolynomialCore) pscClassicConstruct(i uint8) {
 	s := &m.pscClassic

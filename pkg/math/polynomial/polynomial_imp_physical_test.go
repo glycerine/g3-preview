@@ -369,9 +369,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	for _, v := range refvectors {
 		extraBytes += v.header
-		vectors = append(vectors, &v.state.values)
-		count, e := v.state.values.size(m)
-		serviceMust(t, e)
+		count := uint32(len(v.state.values))
 		for i := v.state.drain; i < count; i++ {
 			p, e := v.state.get(m, i)
 			serviceMust(t, e)
@@ -405,7 +403,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		}
 		seenNewton[n] = true
 		extraBytes += n.header
-		vectors = append(vectors, &n.inputs, &n.invs, &n.vs.values)
+		vectors = append(vectors, &n.inputs, &n.invs)
 		for _, a := range []util.Int{n.scope.product, n.scope.aux, n.scope.c} {
 			add(a)
 		}
@@ -413,8 +411,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			addPolynomial(r.value)
 			addPolynomial(r.incoming)
 		}
-		count, e := n.vs.values.size(m)
-		serviceMust(t, e)
+		count := uint32(len(n.vs.values))
 		for i := n.vs.drain; i < count; i++ {
 			p, e := n.vs.get(m, i)
 			serviceMust(t, e)

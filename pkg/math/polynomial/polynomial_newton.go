@@ -44,7 +44,6 @@ func NewPolynomialNewtonInterpolator(m *MultivariatePolynomialCore) (*Polynomial
 	n.self = n
 	n.inputs.width = 12
 	n.invs.width = 12
-	n.vs.values.width = 16
 	zero := util.Int{}
 	if e := n.pushNumeral(&n.invs, &zero); e != nil {
 		return n, e
@@ -529,10 +528,10 @@ func (n *PolynomialNewtonInterpolator) Reset() (err error) {
 
 // These are named Go owning-abort fields, not constructed source members.
 func (n *PolynomialNewtonInterpolator) hasAbortRoots() bool {
-	if n.vs.incoming != (Polynomial{}) || n.scope.kind != 0 {
+	if n.scope.kind != 0 {
 		return true
 	}
-	for _, v := range [3]*polynomialVector{&n.vs.values, &n.invs, &n.inputs} {
+	for _, v := range [2]*polynomialVector{&n.invs, &n.inputs} {
 		if v.pending != (util.Block{}) || v.old != (util.Block{}) || v.retiredActive != 0 {
 			return true
 		}
@@ -572,9 +571,7 @@ func (n *PolynomialNewtonInterpolator) closeMode(owning, abort bool) error {
 		if e := n.vs.resetMode(n.owner, owning); e != nil {
 			return e
 		}
-		if e := n.sourceBacking(&n.vs.values); e != nil {
-			return e
-		}
+		n.vs.values = nil
 		n.closeStage++
 	}
 	if n.closeStage == 1 {
@@ -595,18 +592,15 @@ func (n *PolynomialNewtonInterpolator) closeMode(owning, abort bool) error {
 		}
 		n.closeStage++
 	}
-	// A failed push's extra INC is not a constructed source vector member.
-	// Its separate owning abort follows all completed class member destructors.
+	// Actual pending numeric/scope resources require separate owning abort
+	// after all completed class member destructors.
 	if !abort && n.hasAbortRoots() {
 		return nil
 	}
 	if e := n.scopeCleanup(owning, true); e != nil {
 		return e
 	}
-	if e := n.vs.abortIncoming(n.owner); e != nil {
-		return e
-	}
-	for _, v := range [3]*polynomialVector{&n.vs.values, &n.invs, &n.inputs} {
+	for _, v := range [2]*polynomialVector{&n.invs, &n.inputs} {
 		if e := v.close(n.owner); e != nil {
 			return e
 		}

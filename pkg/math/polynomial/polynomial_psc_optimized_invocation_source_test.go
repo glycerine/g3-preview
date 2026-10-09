@@ -2,7 +2,6 @@
 package polynomial
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
@@ -40,7 +39,7 @@ func TestPolynomialPSCOptimizedCapturedChildrenEveryReservationPrefix(t *testing
 			}
 			laz := &m.lazardLocal
 			ps = append(ps, laz.x.value, laz.x.incoming, laz.c.value, laz.c.incoming)
-			raw := []util.Block{out.state.values.raw, out.state.values.pending, out.state.values.old}
+			var raw []util.Block
 			h := &m.pscBuffer
 			if h.constructed {
 				raw = append(raw, h.raw, h.pending)
@@ -59,7 +58,7 @@ func TestPolynomialPSCOptimizedCapturedChildrenEveryReservationPrefix(t *testing
 					}
 				}
 			}
-			headers := out.header + uint64(cap(out.state.values.retired))*uint64(reflect.TypeOf(util.Int{}).Size())
+			headers := out.header
 			polynomialImpPhysicalAuditNamedRaw(t, full, ps, nil, headers, raw)
 		}
 		audit()
