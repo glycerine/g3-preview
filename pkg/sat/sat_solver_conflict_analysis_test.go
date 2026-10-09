@@ -35,7 +35,7 @@ func satLemmaAudit(t *testing.T, s *satSolverConflictAnalysis) {
 	satScalarAuditRoots(t, v, roots...)
 	want := s.ownerBytes + uint64(reflect.TypeOf(satSolverPropagationState{}).Size()) + uint64(cap(p.diffLevels.data)) + v.Stats().TotalBytes
 	todo := v.elimTodo
-	want += todo.ownerBytes + uint64(cap(todo.inSet)) + 4*uint64(cap(todo.values))
+	want += todo.ownerBytes
 	a := p.clauses
 	small := a.storage.Stats()
 	want += a.ownerBytes + 4*uint64(a.ids.FreeCapacity()) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes

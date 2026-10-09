@@ -234,7 +234,7 @@ func TestSATSolverAssignmentTLSAllocationFailureRetainsUnpublishedRoot(t *testin
 	if _, e = r.Read(v.assignment.Pending, 0); !errors.Is(e, util.ErrRuntimeUninitialized) {
 		t.Fatal("source header must not publish", e)
 	}
-	todoBytes := todo.Stats().OwnerBytes + todo.Stats().MembershipCapacity + 4*todo.Stats().ValuesCapacity
+	todoBytes := todo.Stats().OwnerBytes
 	if v.Stats().TotalBytes+todoBytes+r.Stats().TotalBytes != b.Used() {
 		t.Fatal("once-only physical cohort", b.Used(), v.Stats(), r.Stats())
 	}

@@ -72,7 +72,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 	if value != lbool.True {
 		t.Fatal("no copied assignment view", value)
 	}
-	todoBytes := todo.Stats().OwnerBytes + todo.Stats().MembershipCapacity + 4*todo.Stats().ValuesCapacity
+	todoBytes := todo.Stats().OwnerBytes
 	if s.Stats().TotalBytes+todoBytes+s.memory.Stats().TotalBytes != b.Used() {
 		t.Fatal(s.Stats(), todo.Stats(), b.Used())
 	}
@@ -107,7 +107,6 @@ func satVariableAssertFirstPrefix(t *testing.T, s *satSolverVariableState) {
 }
 func TestSATSolverMkVarAllActualReservationPrefixes(t *testing.T) {
 	failures, successes := 0, 0
-	seenHeapBeforeTodo, seenTodoBeforeValue := false, false
 	for fail := int64(0); fail < 160; fail++ {
 		t.Run(fmt.Sprint(fail), func(t *testing.T) {
 			s, _, b := satVariableStateFixture(t)
@@ -124,16 +123,13 @@ func TestSATSolverMkVarAllActualReservationPrefixes(t *testing.T) {
 			}
 			if e != nil {
 				failures++
-				if s.queue.Size() == 1 && !s.elimTodo.Contains(0) {
-					seenHeapBeforeTodo = true
-				}
-				if s.elimTodo.Contains(0) && s.elimTodo.Size() == 0 {
-					seenTodoBeforeValue = true
-				}
 				if !satAssignmentActualRefusal(s.memory, e) {
 					t.Fatal(fail, e)
 				}
 			} else {
+				if !s.elimTodo.Contains(0) || s.elimTodo.Size() != 1 {
+					t.Fatal("completed queue/todo publication")
+				}
 				successes++
 			}
 			b.FailAfter(-1)
@@ -144,9 +140,6 @@ func TestSATSolverMkVarAllActualReservationPrefixes(t *testing.T) {
 	}
 	if failures == 0 || successes != 1 {
 		t.Fatal(failures, successes)
-	}
-	if !seenHeapBeforeTodo || !seenTodoBeforeValue {
-		t.Fatal("missing actual final publication boundaries", seenHeapBeforeTodo, seenTodoBeforeValue)
 	}
 	t.Log("all actual first-variable reservations", failures, successes)
 }

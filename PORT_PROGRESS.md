@@ -30882,3 +30882,16 @@ request arithmetic helpers; remaining unsigned Runtime consumers call their
 existing concrete copy implementation directly. Complete SAT/tactic tests,
 focused checked/debug checks, module compilation, vet, and manifest validation
 cover the conversion.
+
+### Remove redundant SAT literal-set owner and native todo growth
+
+Deleted the unconsumed satSolverLiteralSet wrapper and its self-tests after a
+module-wide production scan. Its source class remains live; retained consumers
+use native literal storage, and incremental SAT remains unported. Converted
+the retained unsigned sets used by elimination todo, model conversion, and
+integrity checking to native slice growth. Removed unused operations, source
+capacity arithmetic, iterator epochs, simulated backing charges, and tests for
+the discarded allocation-failure states. Real constructor/Runtime publication
+campaigns and independent native set/order tests remain. Complete SAT/tactic
+tests, focused checked/debug tests, module compilation, vet, and manifest
+validation cover the change.

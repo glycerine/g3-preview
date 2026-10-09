@@ -945,3 +945,18 @@ borrows a Go slice. Runtime vector copy remains only at still-live unsigned
 column consumers; the MUS-named forwarding wrapper and unused request helpers
 have been removed. Physical allocation/destruction tests for the converted sets
 are replaced by order, independent-copy, native-growth, and scoped-cleanup tests.
+
+The separate `satSolverLiteralSet` owner/iterator facade had no production Go
+consumer anywhere in pkg/. It and its self-tests have been removed. This does
+not mark C++ `sat::literal_set` dead: current probing/MUS/consequence consumers
+use native storage, and `src/sat/sat_solver/inc_sat_solver.cpp` remains a future
+consumer. QE's similarly named class is its own `qe::util::literal_set`.
+
+The retained unsigned set now uses ordinary slice growth for elimination todo,
+model-converter variable collection, and integrity checks. Its cold owner
+header remains budgeted; Go backing capacity is outside arena accounting.
+Unused copy/union/intersection/removal facades, copied capacity arithmetic, and
+iterator relocation epochs are removed. Elimination ordering ranges over the
+captured values slice. Tests retain insertion order, deduplication, reset and
+regrowth, finalization/reuse, constructor/lifetime checks at real consumers,
+and independent membership/order comparison.

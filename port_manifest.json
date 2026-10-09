@@ -68724,13 +68724,6 @@
         "TestSATSolverNestedLiteralDeepCopyAndLedger",
         "TestSATSolverNestedLiteralFaultPrefixAndRoots",
         "TestSATSolverNestedLiteralOwnersPointerFreedomWarmAllocation",
-        "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-        "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-        "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-        "TestSATSolverUintSetSourceCharCapacityOverflowMath",
-        "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-        "TestSATSolverUintSetSourceOrderAndOperations",
-        "TestSATSolverUintSetValueIteratorRetainedLifetime",
         "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
         "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
         "TestSATSolverModelConverterImplicitAssignmentFaultPrefixes",
@@ -69097,7 +69090,7 @@
         }
       ],
       "ownership": [
-        "Concrete scalar entry/list records and fully charged cold owners, directories, Words payload/free-page graph. Nontrivial outer growth deep-copies ascending and destroys each old nested vector immediately, preserving actual source capacity/publication order. Exact-capacity nested copies and finite captured-end self-copy are tested. Real CollectVars inserts into charged sat::uint_set. See PORT_PROGRESS.md#audit-sat-solver-packet-md.",
+        "Concrete scalar entry/list records and fully charged cold owners, directories, Words payload/free-page graph. Nontrivial outer growth deep-copies ascending and destroys each old nested vector immediately, preserving actual source capacity/publication order. Exact-capacity nested copies and finite captured-end self-copy are tested. Real CollectVars inserts into the native typed sat::uint_set specialization, whose owner header remains charged while slice backing uses Go memory. See PORT_PROGRESS.md#audit-sat-solver-packet-md.",
         "Model class-copy owns exact-capacity outer and deep nested literal vectors. Assignment destroys destination ascending before copy, publishes source size/capacity before constructors and retains completed prefixes; safe Go cleanup/restart tracks actual constructed roots. See PORT_PROGRESS.md#audit-sat-model-copy-port-status-md."
       ],
       "deviations": [
@@ -69133,13 +69126,6 @@
         "TestSATSolverNestedLiteralDeepCopyAndLedger",
         "TestSATSolverNestedLiteralFaultPrefixAndRoots",
         "TestSATSolverNestedLiteralOwnersPointerFreedomWarmAllocation",
-        "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-        "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-        "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-        "TestSATSolverUintSetSourceCharCapacityOverflowMath",
-        "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-        "TestSATSolverUintSetSourceOrderAndOperations",
-        "TestSATSolverUintSetValueIteratorRetainedLifetime",
         "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
         "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
         "TestSATSolverModelConverterImplicitAssignmentFaultPrefixes",
@@ -69446,7 +69432,7 @@
         }
       ],
       "ownership": [
-        "Concrete scalar entry/list records and fully charged cold owners, directories, Words payload/free-page graph. Nontrivial outer growth deep-copies ascending and destroys each old nested vector immediately, preserving actual source capacity/publication order. Exact-capacity nested copies and finite captured-end self-copy are tested. Real CollectVars inserts into charged sat::uint_set. See PORT_PROGRESS.md#audit-sat-solver-packet-md.",
+        "Concrete scalar entry/list records and fully charged cold owners, directories, Words payload/free-page graph. Nontrivial outer growth deep-copies ascending and destroys each old nested vector immediately, preserving actual source capacity/publication order. Exact-capacity nested copies and finite captured-end self-copy are tested. Real CollectVars inserts into the native typed sat::uint_set specialization, whose owner header remains charged while slice backing uses Go memory. See PORT_PROGRESS.md#audit-sat-solver-packet-md.",
         "Model class-copy owns exact-capacity outer and deep nested literal vectors. Assignment destroys destination ascending before copy, publishes source size/capacity before constructors and retains completed prefixes; safe Go cleanup/restart tracks actual constructed roots. See PORT_PROGRESS.md#audit-sat-model-copy-port-status-md."
       ],
       "deviations": [
@@ -74092,7 +74078,6 @@
         "pkg/sat/sat_sets.go",
         "pkg/sat/sat_solver_uint_set.go",
         "pkg/sat/sat_types.go",
-        "pkg/sat/sat_solver_literal_set.go",
         "pkg/sat/sat_solver_literal_set_storage.go",
         "pkg/sat/sat_solver_mus_set.go",
         "pkg/sat/sat_solver_binary_pair.go",
@@ -74106,21 +74091,7 @@
         "TestSATSetFiniteModel",
         "TestSATSetOrderAndOwnership",
         "TestSATSolverModelConverterActualCollectVars",
-        "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-        "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-        "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-        "TestSATSolverUintSetSourceCharCapacityOverflowMath",
-        "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-        "TestSATSolverUintSetSourceOrderAndOperations",
-        "TestSATSolverUintSetValueIteratorRetainedLifetime",
         "TestSourceSATLiteralConstructors",
-        "TestSATSolverLiteralSetSourceVectorRoutesAndIndependence",
-        "TestSATSolverLiteralSetIndependentOrderedOracle",
-        "TestSATSolverLiteralSetCopyUnionIntersectionAndRetainedIterator",
-        "TestSATSolverLiteralSetSourceFlagBeforeListRefusalAndResetBeforeInputRead",
-        "TestSATSolverLiteralSetConstructorAndResultFailureOwnership",
-        "TestSATSolverLiteralSetWarmOperationsAndColdOwnerGuards",
-        "TestSATSolverLiteralSetActualIteratorOperators",
         "TestSATSolverDynamicSubsumptionBinaryAndFUIP",
         "TestSATSolverDynamicSubsumptionCachedImplicationAndFUIP",
         "TestSATSolverDynamicSubsumptionDuplicateMarkFailureAndRetainedEmpty",
@@ -74443,44 +74414,9 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_uint_set.go",
           "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
-          ]
-        },
-        {
-          "name": "sat::uint_set::remove",
-          "status": "partial",
-          "go_target": "pkg/sat/sat_solver_uint_set.go",
-          "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
-          ]
-        },
-        {
-          "name": "sat::uint_set::operator=",
-          "status": "partial",
-          "go_target": "pkg/sat/sat_solver_uint_set.go",
-          "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+            "TestSATSolverUintSetNativeGrowthAndReset",
+            "TestSATSolverUintSetIndependentNativeModel",
+            "TestSATSolverModelConverterActualCollectVars"
           ]
         },
         {
@@ -74488,44 +74424,9 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_uint_set.go",
           "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
-          ]
-        },
-        {
-          "name": "sat::uint_set::empty",
-          "status": "partial",
-          "go_target": "pkg/sat/sat_solver_uint_set.go",
-          "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
-          ]
-        },
-        {
-          "name": "sat::uint_set::erase",
-          "status": "partial",
-          "go_target": "pkg/sat/sat_solver_uint_set.go",
-          "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+            "TestSATSolverUintSetNativeGrowthAndReset",
+            "TestSATSolverUintSetIndependentNativeModel",
+            "TestSATSolverModelConverterActualCollectVars"
           ]
         },
         {
@@ -74533,29 +74434,17 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_uint_set.go",
           "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+            "TestSATSolverUintSetNativeGrowthAndReset",
+            "TestSATSolverUintSetIndependentNativeModel",
+            "TestSATSolverModelConverterActualCollectVars"
           ]
         },
         {
-          "name": "sat::uint_set::begin/end",
+          "name": "Selected elimination todo iteration over captured native slice",
           "status": "partial",
-          "go_target": "pkg/sat/sat_solver_uint_set.go",
+          "go_target": "pkg/sat/sat_simplifier_elimination.go",
           "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+            "TestSATSimplifierEliminationCostAndStableOrder"
           ]
         },
         {
@@ -74563,14 +74452,9 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_uint_set.go",
           "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+            "TestSATSolverUintSetNativeGrowthAndReset",
+            "TestSATSolverUintSetIndependentNativeModel",
+            "TestSATSolverModelConverterActualCollectVars"
           ]
         },
         {
@@ -74578,100 +74462,9 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_uint_set.go",
           "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
-          ]
-        },
-        {
-          "name": "sat::uint_set::operator&=",
-          "status": "partial",
-          "go_target": "pkg/sat/sat_solver_uint_set.go",
-          "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
-          ]
-        },
-        {
-          "name": "sat::uint_set::operator|=",
-          "status": "partial",
-          "go_target": "pkg/sat/sat_solver_uint_set.go",
-          "tests": [
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
-          ]
-        },
-        {
-          "name": "Charged sat::literal_set default/vector/implicit-copy constructors and copy/vector assignments",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_solver_literal_set.go",
-          "tests": [
-            "TestSATSolverLiteralSetSourceVectorRoutesAndIndependence",
-            "TestSATSolverLiteralSetIndependentOrderedOracle",
-            "TestSATSolverLiteralSetCopyUnionIntersectionAndRetainedIterator",
-            "TestSATSolverLiteralSetSourceFlagBeforeListRefusalAndResetBeforeInputRead",
-            "TestSATSolverLiteralSetConstructorAndResultFailureOwnership",
-            "TestSATSolverLiteralSetWarmOperationsAndColdOwnerGuards",
-            "TestSATSolverLiteralSetActualIteratorOperators"
-          ]
-        },
-        {
-          "name": "Charged sat::literal_set insert/remove/pop/contains/empty/size/reset/finalize/intersection/union/destruction",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_solver_literal_set.go",
-          "tests": [
-            "TestSATSolverLiteralSetSourceVectorRoutesAndIndependence",
-            "TestSATSolverLiteralSetIndependentOrderedOracle",
-            "TestSATSolverLiteralSetCopyUnionIntersectionAndRetainedIterator",
-            "TestSATSolverLiteralSetSourceFlagBeforeListRefusalAndResetBeforeInputRead",
-            "TestSATSolverLiteralSetConstructorAndResultFailureOwnership",
-            "TestSATSolverLiteralSetWarmOperationsAndColdOwnerGuards",
-            "TestSATSolverLiteralSetActualIteratorOperators"
-          ]
-        },
-        {
-          "name": "sat::literal_set::to_vector actual geometric list and lexical unpublished failure cleanup",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_solver_literal_set.go",
-          "tests": [
-            "TestSATSolverLiteralSetSourceVectorRoutesAndIndependence",
-            "TestSATSolverLiteralSetIndependentOrderedOracle",
-            "TestSATSolverLiteralSetCopyUnionIntersectionAndRetainedIterator",
-            "TestSATSolverLiteralSetSourceFlagBeforeListRefusalAndResetBeforeInputRead",
-            "TestSATSolverLiteralSetConstructorAndResultFailureOwnership",
-            "TestSATSolverLiteralSetWarmOperationsAndColdOwnerGuards",
-            "TestSATSolverLiteralSetActualIteratorOperators"
-          ]
-        },
-        {
-          "name": "sat::literal_set::iterator begin/end/dereference/preincrement/postincrement/equality with captured backing",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_solver_literal_set.go",
-          "tests": [
-            "TestSATSolverLiteralSetSourceVectorRoutesAndIndependence",
-            "TestSATSolverLiteralSetIndependentOrderedOracle",
-            "TestSATSolverLiteralSetCopyUnionIntersectionAndRetainedIterator",
-            "TestSATSolverLiteralSetSourceFlagBeforeListRefusalAndResetBeforeInputRead",
-            "TestSATSolverLiteralSetConstructorAndResultFailureOwnership",
-            "TestSATSolverLiteralSetWarmOperationsAndColdOwnerGuards",
-            "TestSATSolverLiteralSetActualIteratorOperators"
+            "TestSATSolverUintSetNativeGrowthAndReset",
+            "TestSATSolverUintSetIndependentNativeModel",
+            "TestSATSolverModelConverterActualCollectVars"
           ]
         },
         {
@@ -74758,7 +74551,7 @@
       ],
       "ownership": [
         "Owned scalar backing arrays. Reset retains capacity; finalize drops references. Explicit copies; source removal/iteration order preserved. Solver budgets/errors/diagnostics still pending; see PORT_PROGRESS.md#audit-sat-port-status-md.",
-        "Actual namespace sat::uint_set membership svector<char> and insertion svector<unsigned> retain exact source growth/copy/reset/finalize order, ghost flag publication before failed list push, and by-value captured-end iterators. Cold headers, backing and simultaneous old/new peaks charged; see PORT_PROGRESS.md#audit-sat-solver-packet-md.",
+        "The live sat::uint_set specialization uses native membership/value slices for elimination todo, model conversion and integrity checks. Insertion order, deduplication, reset and finalization remain; C++ capacity growth, copied iterator lifetime and simulated buffer failure states are removed. Its owner header remains charged. The unused separate literal-set wrapper and self-tests were removed; native probing/MUS/consequence sets cover current consumers, and incremental SAT remains future work.",
         "LiteralSet owns actual charged wrapper and uint-set cold headers, byte membership and unsigned ordered vector. Source flag-before-list and reset-before-input-read prefixes preserved. Returned literal vector is scalar owned list in caller-owned real LiteralStore; its unpublished root is destroyed on failure. See PORT_PROGRESS.md#audit-sat-literal-set-port-status-md.",
         "Selected probing/dynamic bodies borrow real propagation/lifecycle owners and separate literalMark. Probing assigned literals and conflict assumption membership use native bool/literal slices with unique first-insertion order. Reset retains capacity and regrowth zeroes membership; finalize drops backing and permits another round. Native storage is outside Runtime accounting and does not participate in the retained strict Runtime cache-memory cutoff. Simulated growth and destructor refusals for these members are removed. Failed ordinal roots and marks are inspected before faults are disabled. No independent solver counter or assignment mirror is created."
       ],
@@ -149383,13 +149176,6 @@
         "TestSATSolverNestedLiteralDeepCopyAndLedger",
         "TestSATSolverNestedLiteralFaultPrefixAndRoots",
         "TestSATSolverNestedLiteralOwnersPointerFreedomWarmAllocation",
-        "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-        "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-        "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-        "TestSATSolverUintSetSourceCharCapacityOverflowMath",
-        "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-        "TestSATSolverUintSetSourceOrderAndOperations",
-        "TestSATSolverUintSetValueIteratorRetainedLifetime",
         "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
         "TestSATSolverWatchStoreAssignmentConstructionGuardPrefix",
         "TestSATSolverWatchStoreBitmapWordBoundaryAndRawClauseBorrow",
@@ -149777,14 +149563,7 @@
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
             "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
             "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverUintSetSourceOrderAndOperations",
-            "TestSATSolverUintSetSourceGhostAndRefusalPrefixes",
-            "TestSATSolverUintSetDeepCopyAssignmentFailureAndWarmAlloc",
-            "TestSATSolverModelConverterActualCollectVars",
-            "TestSATSolverUintSetBoundsConstructorAndIndependentModel",
-            "TestSATSolverUintSetValueIteratorRetainedLifetime",
-            "TestSATSolverUintSetGhostDefinedSpareTailRelease",
-            "TestSATSolverUintSetSourceCharCapacityOverflowMath"
+            "TestSATSolverModelConverterActualCollectVars"
           ]
         },
         {

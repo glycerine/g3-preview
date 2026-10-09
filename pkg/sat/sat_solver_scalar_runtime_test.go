@@ -62,7 +62,7 @@ func satScalarAuditOwner(t *testing.T, v *satSolverVariableState, external ...ut
 	t.Helper()
 	satScalarAuditRoots(t, v, external...)
 	todo := v.elimTodo.Stats()
-	todoBytes := todo.OwnerBytes + todo.MembershipCapacity + 4*todo.ValuesCapacity
+	todoBytes := todo.OwnerBytes
 	if v.Stats().TotalBytes+todoBytes+v.memory.Stats().TotalBytes != v.budget.Used() {
 		t.Fatal("once-only scalar graph", v.Stats(), v.memory.Stats(), v.budget.Used())
 	}

@@ -114,18 +114,10 @@ func (s *satSimplifier) orderVariables() error {
 	defer s.closeEliminationCosts()
 	p := s.lifecycle.propagation
 	x := &s.elimination
-	it, e := p.variables.elimTodo.Iter()
-	if e != nil {
+	if e := p.variables.elimTodo.open(); e != nil {
 		return e
 	}
-	for {
-		v, ok, e := it.Next()
-		if e != nil {
-			return e
-		}
-		if !ok {
-			break
-		}
+	for _, v := range p.variables.elimTodo.values {
 		external, e := p.variables.external.Read(v)
 		if e != nil {
 			return e
@@ -155,14 +147,14 @@ func (s *satSimplifier) orderVariables() error {
 			return e
 		}
 	}
-	if e = p.variables.elimTodo.Reset(); e != nil {
+	if e := p.variables.elimTodo.Reset(); e != nil {
 		return e
 	}
-	if e = s.sortEliminationCosts(); e != nil {
+	if e := s.sortEliminationCosts(); e != nil {
 		return e
 	}
 	for _, a := range x.costs {
-		if e = x.vars.Push(a.variable); e != nil {
+		if e := x.vars.Push(a.variable); e != nil {
 			return e
 		}
 	}
