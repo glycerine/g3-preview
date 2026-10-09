@@ -180,8 +180,8 @@ func TestBVConcatRefBufferPushPopAndForwardDestruction(t *testing.T) {
 	m.Budget().FailAfter(-1)
 	rc, e := m.GetRefCount(x)
 	astTestMust(t, e)
-	if body == nil || len(b.values.Slice()) != 16 || b.pending != x || rc != before+17 {
-		t.Fatal("INC before refused spill", body, rc)
+	if body != nil || len(b.values.Slice()) != 17 || !b.pending.IsNull() || rc != before+17 {
+		t.Fatal("native buffer push", body, rc)
 	}
 	astTestMust(t, b.close(m))
 	rc, e = m.GetRefCount(x)

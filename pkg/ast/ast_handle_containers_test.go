@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestPointerBufferSourceSpillRefusal(t *testing.T) {
+func TestPointerBufferUsesNativeSliceStorage(t *testing.T) {
 	b := arena.NewBudget(1 << 16)
 	var v ASTHandleBuffer
 	for i := uint32(0); i < 16; i++ {
@@ -16,17 +16,11 @@ func TestPointerBufferSourceSpillRefusal(t *testing.T) {
 		t.Fatal("inline storage charged", b.Used())
 	}
 	b.FailAfter(0)
-	if e := v.Push(b, ASTHandle{slot: 16}); e != arena.ErrInjectedFailure {
-		t.Fatal("spill refusal", e)
-	}
-	if len(v.Slice()) != 16 || b.Used() != 0 {
-		t.Fatal("failed spill changed storage")
+	astTestMust(t, v.Push(b, ASTHandle{slot: 16}))
+	if cap(v.Slice()) < len(v.Slice()) || b.Used() != 0 {
+		t.Fatal("native slice storage", cap(v.Slice()), b.Used())
 	}
 	b.FailAfter(-1)
-	astTestMust(t, v.Push(b, ASTHandle{slot: 16}))
-	if cap(v.Slice()) != 32 || b.Used() != 512 {
-		t.Fatal("source doubled capacity", cap(v.Slice()), b.Used())
-	}
 	for i, n := range v.Slice() {
 		if n != (ASTHandle{slot: uint32(i)}) {
 			t.Fatal("lost value", i, n)

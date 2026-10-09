@@ -2,46 +2,33 @@ package ast
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestASTProofArgumentGrowthFailurePrefixes(t *testing.T) {
+func TestASTProofArgumentGrowthUsesGoSliceStorage(t *testing.T) {
 	m := astTestManager(t)
 	h := m.external(m.trueApp)
 	base := m.BudgetField.Used()
-	width := uint64(reflect.TypeOf(ASTHandle{}).Size())
-	for allowed := int64(0); allowed < 3; allowed++ {
-		var a astProofArguments
-		m.BudgetField.FailAfter(allowed)
-		var err error
-		for i := 0; i < 65; i++ {
-			if err = a.push(m, h); err != nil {
-				break
-			}
+	var a astProofArguments
+	m.BudgetField.FailAfter(0)
+	for i := 0; i < 65; i++ {
+		if e := a.push(m, h); e != nil {
+			t.Fatal(e)
 		}
-		wantCount := 16 << allowed
-		wantBytes := uint64(0)
-		if allowed > 0 {
-			wantBytes = uint64(wantCount) * width
-		}
-		if !errors.Is(err, arena.ErrInjectedFailure) || len(a.slice()) != wantCount || m.BudgetField.Used() != base+wantBytes {
-			t.Fatal("immediate retained source prefix", allowed, err, len(a.slice()), m.BudgetField.Used(), base+wantBytes)
-		}
-		for _, v := range a.slice() {
-			if v != h {
-				t.Fatal("prefix contents")
-			}
-		}
-		a.close(m)
-		if m.BudgetField.Used() != base {
-			t.Fatal("armed injector cleanup")
-		}
-		m.BudgetField.FailAfter(-1)
 	}
+	if len(a.slice()) != 65 || m.BudgetField.Used() != base {
+		t.Fatal("Go slice charged to AST budget", len(a.slice()), m.BudgetField.Used(), base)
+	}
+	for _, v := range a.slice() {
+		if v != h {
+			t.Fatal("contents")
+		}
+	}
+	a.close(m)
+	m.BudgetField.FailAfter(-1)
 }
 
 func TestASTProofUnitResolutionCountShortCircuit(t *testing.T) {

@@ -95,8 +95,7 @@ func (m *ASTManager) MkDistinctExpanded(args []ASTHandle) (ASTHandle, error) {
 		r, e := m.mkFamilyApp(0, ASTOpNot, nil, unary[:])
 		return m.external(r), e
 	}
-	// The literal ptr_buffer<expr> has sixteen inline non-owning slots. Reuse
-	// the existing concrete storage engine without adding reference increments.
+	// Use the concrete borrowed-handle buffer without adding reference increments.
 	var expanded astProofArguments
 	defer expanded.close(m)
 	for i := 0; i < len(args)-1; i++ {

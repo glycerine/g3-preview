@@ -144,7 +144,7 @@ func TestBVRewriterOriginalNegatedBitwiseAlgorithms(t *testing.T) {
 	}
 }
 
-func TestBVRewriterNANDWarmSpillRefusalPreservesOutput(t *testing.T) {
+func TestBVRewriterNANDWarmNativeBufferIgnoresBudgetFailure(t *testing.T) {
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	satOK(t, e)
@@ -169,8 +169,8 @@ func TestBVRewriterNANDWarmSpillRefusalPreservesOutput(t *testing.T) {
 	m.Budget().FailAfter(-1)
 	got, e := m.RefGet(out)
 	satOK(t, e)
-	if !errors.Is(body, arena.ErrInjectedFailure) || got != x || m.Budget().Used() != before {
-		t.Fatal("spill failure output/charge", body, got, before, m.Budget().Used())
+	if body != nil || got.IsNull() || m.Budget().Used() != before {
+		t.Fatal("native buffer output/charge", body, got, before, m.Budget().Used())
 	}
 }
 
@@ -238,7 +238,7 @@ func TestBVRewriterBitwiseEveryColdReservation(t *testing.T) {
 	}
 }
 
-func TestBVRewriterANDWarmSpillRefusalPreservesOutput(t *testing.T) {
+func TestBVRewriterANDWarmNativeBufferIgnoresBudgetFailure(t *testing.T) {
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	satOK(t, e)
@@ -263,7 +263,7 @@ func TestBVRewriterANDWarmSpillRefusalPreservesOutput(t *testing.T) {
 	m.Budget().FailAfter(-1)
 	got, e := m.RefGet(out)
 	satOK(t, e)
-	if !errors.Is(body, arena.ErrInjectedFailure) || got != x || m.Budget().Used() != before {
-		t.Fatal("spill failure output/charge", body, got, before, m.Budget().Used())
+	if body != nil || got.IsNull() || m.Budget().Used() != before {
+		t.Fatal("native buffer output/charge", body, got, before, m.Budget().Used())
 	}
 }

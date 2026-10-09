@@ -8,7 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestASTHandleBufferPopRetainsSpillAndBorrowedReferences(t *testing.T) {
+func TestASTHandleBufferPopRetainsCapacityAndBorrowedReferences(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -23,8 +23,8 @@ func TestASTHandleBufferPopRetainsSpillAndBorrowedReferences(t *testing.T) {
 		astTestMust(t, buffer.Push(m.Budget(), x))
 	}
 	used := m.Budget().Used()
-	if used <= before {
-		t.Fatal("spill not exercised")
+	if used != before {
+		t.Fatal("Go slice charged to AST budget", used, before)
 	}
 	m.Budget().FailAfter(0)
 	for i := 0; i < 40; i++ {
@@ -45,6 +45,6 @@ func TestASTHandleBufferPopRetainsSpillAndBorrowedReferences(t *testing.T) {
 	}
 	buffer.Close(m.Budget())
 	if m.Budget().Used() != before {
-		t.Fatal("spill retained after close")
+		t.Fatal("AST budget changed after close")
 	}
 }

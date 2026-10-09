@@ -762,3 +762,5 @@ The concrete scoped integer, rational, and binary-rational vectors now use typed
 The rational service's power-of-two cache now grows with native `append`. Cache entries remain concrete owned `Rational` values and are still destroyed in ascending order, but the copied `vector.h` growth routine, moved-from backing mutations, and `CacheBytes` arena accounting have been removed.
 
 `ast.ASTHandleVector` now uses native slice growth for its borrowed, pointer-free handles. Stable order, erase compaction, and clearing the vacated slot remain; the common `vector.h` capacity helper and numeric-arena charges for this Go slice are gone.
+
+`ast.ASTHandleBuffer` now uses the same native typed-slice representation for borrowed handles. Its inline-16/spill split, doubling logic, and AST-budget backing charge have been removed; reset and pop clear vacated handles while retaining ordinary Go slice capacity.

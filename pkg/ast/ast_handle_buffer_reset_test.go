@@ -3,7 +3,7 @@ package ast
 
 import "testing"
 
-func TestASTHandleBufferResetRetainsSpillCapacity(t *testing.T) {
+func TestASTHandleBufferResetRetainsSliceCapacity(t *testing.T) {
 	m := astTestManager(t)
 	var buffer ASTHandleBuffer
 	defer buffer.Close(m.Budget())

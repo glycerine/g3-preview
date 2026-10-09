@@ -2,56 +2,15 @@
 package ast
 
 import (
-	"math"
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-var astHandleStorageBytes = uint64(reflect.TypeOf(ASTHandle{}).Size())
+// ASTHandleBuffer stores borrowed handles in ordinary Go-managed storage.
+type ASTHandleBuffer struct{ values []ASTHandle }
 
-// Lexical source ptr_buffer<expr>: inline16, doubling overflow, full old+new
-// charge. Handles are scalar; the helper retains no borrowed caller backing.
-type ASTHandleBuffer struct {
-	inline  [16]ASTHandle
-	count   int
-	spill   []ASTHandle
-	charged uint64
-}
-
-func (a *ASTHandleBuffer) Slice() []ASTHandle {
-	if a.spill == nil {
-		return a.inline[:a.count]
-	}
-	return a.spill
-}
-func (a *ASTHandleBuffer) Push(budget *arena.Budget, h ASTHandle) error {
-	if a.spill == nil && a.count < len(a.inline) {
-		a.inline[a.count] = h
-		a.count++
-		return nil
-	}
-	if a.spill == nil || len(a.spill) == cap(a.spill) {
-		n := uint64(32)
-		if a.spill != nil {
-			n = uint64(cap(a.spill)) * 2
-		}
-		width := astHandleStorageBytes
-		if n > math.MaxUint32 || n > uint64(^uint(0)>>1)/width {
-			return arena.ErrBounds
-		}
-		bytes := n * width
-		if e := budget.Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]ASTHandle, a.count, int(n))
-		copy(next, a.Slice())
-		budget.Release(a.charged)
-		a.charged = bytes
-		a.spill = next
-	}
-	a.spill = append(a.spill, h)
-	a.count++
+func (a *ASTHandleBuffer) Slice() []ASTHandle { return a.values }
+func (a *ASTHandleBuffer) Push(_ *arena.Budget, h ASTHandle) error {
+	a.values = append(a.values, h)
 	return nil
 }
 func (a *ASTHandleBuffer) Append(budget *arena.Budget, hs []ASTHandle) error {
@@ -62,30 +21,22 @@ func (a *ASTHandleBuffer) Append(budget *arena.Budget, hs []ASTHandle) error {
 	}
 	return nil
 }
-func (a *ASTHandleBuffer) Close(budget *arena.Budget) {
-	budget.Release(a.charged)
-	a.spill = nil
-	a.count = 0
-	a.charged = 0
-}
+func (a *ASTHandleBuffer) Close(_ *arena.Budget) { a.values = nil }
 
-// Reset follows buffer::reset: clear the logical size and retain spill capacity.
+// Reset clears the logical contents and retains Go slice capacity.
 func (a *ASTHandleBuffer) Reset() {
-	a.count = 0
-	if a.spill != nil {
-		a.spill = a.spill[:0]
-	}
+	clear(a.values)
+	a.values = a.values[:0]
 }
 
 // PopBack decreases the logical size without releasing borrowed expressions
 // or backing storage. Source: src/util/buffer.h:160-175.
 func (a *ASTHandleBuffer) PopBack() error {
-	if a.count == 0 {
+	if len(a.values) == 0 {
 		return arena.ErrBounds
 	}
-	a.count--
-	if a.spill != nil {
-		a.spill = a.spill[:a.count]
-	}
+	last := len(a.values) - 1
+	a.values[last] = ASTHandle{}
+	a.values = a.values[:last]
 	return nil
 }

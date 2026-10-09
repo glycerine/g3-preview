@@ -7,9 +7,9 @@ import (
 	"reflect"
 )
 
-// A concrete expr_ref_buffer with the original inline16 pointer buffer. The
-// pending reference captures an INC before a refused push or a popped DEC
-// that has not consumed ownership. Consumption is recorded before returning.
+// A concrete expr_ref_buffer backed by a typed Go slice. The pending reference
+// captures a popped DEC that has not consumed ownership. Consumption is
+// recorded before returning.
 type bvConcatRefBuffer struct {
 	values  ast.ASTHandleBuffer
 	pending ast.ASTHandle

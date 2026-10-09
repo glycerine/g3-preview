@@ -155,8 +155,8 @@ func (rw *boolRewriter) mkOrCore(args []ast.ASTHandle, out ast.ASTRef) (brStatus
 	return rw.mkNFlatOrCore(args, out)
 }
 
-// Concrete expr_ref_buffer: the underlying inline16/doubling pointer storage
-// carries owning AST references here, including repeated entries.
+// Concrete expr_ref_buffer: the typed handle slice carries owning AST
+// references here, including repeated entries.
 type boolRewriterRefBuffer struct {
 	values ast.ASTHandleBuffer
 }

@@ -166,8 +166,8 @@ func TestArrayRewriterOriginalSortingConstantAndIteRules(t *testing.T) {
 	satOK(t, e)
 	astTestPin(t, m, wanted)
 	check(selected, wanted, Rewrite2)
-	// The ITE rule has real source ptr_vector reservations even when all ASTs
-	// are warm. A refused lexical vector must preserve the owning output.
+	// The lexical handle vectors use Go-managed slices and remain available when
+	// the AST allocation budget injector is armed.
 	d, e := m.GetDecl(selected)
 	satOK(t, e)
 	args, e := m.AppArgumentView(selected)
@@ -177,13 +177,13 @@ func TestArrayRewriterOriginalSortingConstantAndIteRules(t *testing.T) {
 	m.Budget().FailAfter(0)
 	status, e := rw.MkAppCore(d, args, out)
 	m.Budget().FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || status != RewriteFailed {
-		t.Fatal("vector refusal", status, e)
+	if e != nil || status != Rewrite2 {
+		t.Fatal("native vector rewrite", status, e)
 	}
 	got, e := m.RefGet(out)
 	satOK(t, e)
-	if got != yes || m.Budget().Used() != baseline {
-		t.Fatal("refused vector changed output or leaked")
+	if got != wanted || m.Budget().Used() != baseline {
+		t.Fatal("native vector changed result or AST charge")
 	}
 	check(selected, wanted, Rewrite2)
 	satOK(t, rw.UpdtParams(p))
