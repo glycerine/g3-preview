@@ -80,37 +80,35 @@ func (m *ASTManager) MkFreshConstNullable(prefix *string, sort ASTHandle) (ASTHa
 
 // This concrete source else scope destroys buffer before fresh_id publication.
 func (m *ASTManager) freshNamedDecl(prefix, suffix util.Symbol, domain []ASTHandle, sort ASTHandle, info ASTFuncDeclInfo) (astNodeRef, error) {
-	// Source stack string_buffer<64>: only a real overflow array is charged.
-	var inline [64]byte
-	buffer := util.StringBufferState{Budget: m.BudgetField, Capacity: 64, Initial: 64, LongBits: 64}
-	defer buffer.Close(true)
-	if e := buffer.Symbol(inline[:], m.Symbols, prefix); e != nil {
+	var buffer util.StringBuffer64
+	defer buffer.Close()
+	if e := buffer.AppendSymbol(m.Symbols, prefix); e != nil {
 		return astNodeRef{}, e
 	}
 	if prefix == (util.Symbol{}) {
-		if e := buffer.AppendCString(inline[:], "sk"); e != nil {
+		if e := buffer.AppendCString("sk"); e != nil {
 			return astNodeRef{}, e
 		}
 	}
-	if e := buffer.AppendCString(inline[:], "!"); e != nil {
+	if e := buffer.AppendCString("!"); e != nil {
 		return astNodeRef{}, e
 	}
 	if suffix != (util.Symbol{}) {
-		if e := buffer.Symbol(inline[:], m.Symbols, suffix); e != nil {
+		if e := buffer.AppendSymbol(m.Symbols, suffix); e != nil {
 			return astNodeRef{}, e
 		}
-		if e := buffer.AppendCString(inline[:], "!"); e != nil {
+		if e := buffer.AppendCString("!"); e != nil {
 			return astNodeRef{}, e
 		}
 	}
-	if e := buffer.Number(inline[:], int64(int32(m.freshID))); e != nil {
+	if e := buffer.AppendInt32(int32(m.freshID)); e != nil {
 		return astNodeRef{}, e
 	}
-	bytes, e := buffer.Cstr(inline[:])
+	text, e := buffer.CStr()
 	if e != nil {
 		return astNodeRef{}, e
 	}
-	name, e := m.Symbols.InternBytes(bytes)
+	name, e := m.Symbols.InternBytes([]byte(text))
 	if e != nil {
 		return astNodeRef{}, e
 	}

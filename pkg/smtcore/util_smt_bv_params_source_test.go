@@ -238,7 +238,7 @@ func TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes(t *testing.T) {
 
 const bvDefaultDisplay = "m_bv_mode=1\nm_hi_div0=1\nm_bv_reflect=1\nm_bv_lazy_le=0\nm_bv_cc=0\nm_bv_blast_max_size=2147483647\nm_bv_enable_int2bv2int=1\n"
 
-func TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit(t *testing.T) {
+func TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
 	v, e := NewSMTBVParams(c, p, g, b)
 	paramsMust(t, e)
@@ -271,8 +271,8 @@ func TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit(t *testing.T) 
 			break
 		}
 	}
-	if first < 1 {
-		t.Fatal("actual output horizon", first)
+	if first < 0 {
+		t.Fatal("Go buffer output did not complete", first)
 	}
 	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)

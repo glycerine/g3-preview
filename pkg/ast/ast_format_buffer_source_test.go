@@ -10,7 +10,7 @@ import (
 func TestASTFormatBorrowedBufferUsesActualStringEngine(t *testing.T) {
 	m := astTestManager(t)
 	defer func() { astTestMust(t, m.Close()) }()
-	b, e := util.NewStringBuffer64(util.StringBufferConfig{Budget: m.BudgetField})
+	b, e := util.NewStringBuffer64(util.StringBufferConfig{})
 	astTestMust(t, e)
 	defer func() { astTestMust(t, b.Close()) }()
 	astTestMust(t, b.AppendCString("((_ to_fp 8 24) RTZ "))

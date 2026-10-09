@@ -240,7 +240,7 @@ func TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards(t *testing.
 
 const arrayDisplayDefaults = "m_array_mode=3\nm_array_weak=0\nm_array_extensional=1\nm_array_laziness=1\nm_array_delay_exp_axiom=1\nm_array_cg=0\nm_array_always_prop_upward=1\nm_array_lazy_ieq=0\nm_array_lazy_ieq_delay=10\n"
 
-func TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit(t *testing.T) {
+func TestSMTArrayGoBufferOutputAndClosedFileBadbit(t *testing.T) {
 	_, g, _, b := dynAckSourceFixture(t)
 	a, e := NewSMTArrayParams(b)
 	paramsMust(t, e)
@@ -273,8 +273,8 @@ func TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit(t *testing.T) {
 			break
 		}
 	}
-	if first < 1 {
-		t.Fatal("no real output reservation horizon", first)
+	if first < 0 {
+		t.Fatal("Go buffer output did not complete", first)
 	}
 	file, e := os.CreateTemp(".", "smt-array-file-*")
 	paramsMust(t, e)

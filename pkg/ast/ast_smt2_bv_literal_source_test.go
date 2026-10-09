@@ -171,7 +171,7 @@ func TestASTSMT2BitVectorLiteralEveryReachedReservation(t *testing.T) {
 				astBVPrinterRawGraph(t, m, &input)
 				if want := before + m.Stats().AllocatedBytes + astTestSymbolGraph(c.SymbolsField) + runtime.Stats().TotalBytes; b.Used() != want {
 					for f := m.bitVectorPlugin.literalFrames; f != nil; f = f.next {
-						t.Log("literal diagnostic", f.header, len(f.buffer.State.Heap), f.text.storageBytes(), f.text.streamEnded, f.text.returned, f.sourceDone, f.ownDone)
+						t.Log("literal diagnostic", f.header, f.buffer.Position(), f.text.storageBytes(), f.text.streamEnded, f.text.returned, f.sourceDone, f.ownDone)
 					}
 					t.Log("components", before, m.Stats().AllocatedBytes, astTestSymbolGraph(c.SymbolsField), runtime.Stats().TotalBytes)
 					t.Fatal("before-lift actual literal cold graph", signed, radix, ordinal, body, b.Used(), want)

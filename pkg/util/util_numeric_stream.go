@@ -89,7 +89,7 @@ func NewNumericTextStream(c NumericTextStreamConfig) (*NumericTextStream, error)
 	var b *StringBuffer64
 	var e error
 	if c.BorrowedFile == nil {
-		b, e = NewStringBuffer64(StringBufferConfig{Budget: c.Budget})
+		b, e = NewStringBuffer64(StringBufferConfig{})
 	}
 	if e != nil {
 		c.Budget.Release(header)
@@ -125,7 +125,7 @@ func (s *NumericTextStream) Stats() NumericStreamStats {
 	if s.fileMode || s.File != nil {
 		return NumericStreamStats{OwnerBytes: s.OwnerBytes, ScratchBytes: uint64(len(s.scratch)), Position: s.FilePosition, State: s.state}
 	}
-	b := s.Buffer.State.Stats(true)
+	b := s.Buffer.Stats()
 	return NumericStreamStats{s.OwnerBytes, uint64(len(s.scratch)), b.Position, b.Capacity, b.OwnerBytes, b.OverflowBytes, s.state}
 }
 func (s *NumericTextStream) SetFloatMode(v NumericFloatMode) error {
@@ -245,7 +245,7 @@ func (s *NumericTextStream) emitByte(c byte) error {
 		}
 		return nil
 	}
-	return s.Buffer.State.AppendByte(s.Buffer.Inline[:], c)
+	return s.Buffer.AppendByte(c)
 }
 func (s *NumericTextStream) padding(n uint64) error {
 	for i := uint64(0); i < n; i++ {
@@ -540,7 +540,8 @@ func (s *NumericTextStream) String() (string, error) {
 	if s.fileMode || s.File != nil {
 		return "", ErrNumericStreamFile
 	}
-	return string(s.Buffer.State.Data(s.Buffer.Inline[:])[:s.Buffer.State.Pos]), nil
+	data, e := s.Buffer.BytesCopy()
+	return string(data), e
 }
 func (s *NumericTextStream) ResetText() error {
 	if e := s.lock(); e != nil {
@@ -550,8 +551,7 @@ func (s *NumericTextStream) ResetText() error {
 	if s.fileMode || s.File != nil {
 		return ErrNumericStreamFile
 	}
-	s.Buffer.State.Pos = 0
-	return nil
+	return s.Buffer.Reset()
 }
 func (s *NumericTextStream) Close() error {
 	if s == nil || s.self != s {
@@ -563,7 +563,9 @@ func (s *NumericTextStream) Close() error {
 		return nil
 	}
 	if s.Buffer != nil {
-		s.Buffer.State.Close(true)
+		if e := s.Buffer.Close(); e != nil {
+			return e
+		}
 	}
 	s.Budget.Release(uint64(len(s.scratch)) + s.OwnerBytes)
 	s.scratch = nil

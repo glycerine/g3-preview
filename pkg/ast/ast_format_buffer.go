@@ -11,12 +11,7 @@ func (m *ASTManager) FormatBuffer64(b *util.StringBuffer64) (ASTHandle, error) {
 	if b == nil {
 		return ASTHandle{}, util.ErrStringBufferOwner
 	}
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return ASTHandle{}, e
-	}
-	bytes, e := b.State.Cstr(b.Inline[:])
+	text, e := b.CStr()
 	if e != nil {
 		return ASTHandle{}, e
 	}
@@ -25,7 +20,7 @@ func (m *ASTManager) FormatBuffer64(b *util.StringBuffer64) (ASTHandle, error) {
 		return ASTHandle{}, e
 	}
 	defer f.unlockFormat()
-	name, e := f.Symbols.InternBytes(bytes)
+	name, e := f.Symbols.InternBytes([]byte(text))
 	if e != nil {
 		return ASTHandle{}, e
 	}

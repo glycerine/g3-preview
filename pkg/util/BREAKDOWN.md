@@ -751,4 +751,4 @@ SAT-only and now live in `sat_solver_scalar_runtime.go`. Root
 checked byte-vector storage and growth protocol.
 
 
-Only the currently consumed `StringBuffer64` specialization remains; the 32/128 variants and cross-width test matrix were removed. Replace the remaining explicit inline/overflow storage with `bytes.Buffer` as the next text-buffer step.
+Only the currently consumed `StringBuffer64` specialization remains; the 32/128 variants and cross-width test matrix were removed. `StringBuffer64` now uses `bytes.Buffer`, and its callers no longer reach through a C++-style state/inline/overflow representation or charge Go-managed text storage to an arena budget.

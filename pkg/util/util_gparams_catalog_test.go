@@ -96,7 +96,7 @@ func TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher(t *testing.T) {
 		if !ok {
 			t.Fatal(row)
 		}
-		out, e := NewStringBuffer64(StringBufferConfig{Budget: b})
+		out, e := NewStringBuffer64(StringBufferConfig{})
 		paramsMust(t, e)
 		paramsMust(t, g.descriptionInto(out, entry))
 		text, e := out.CStr()
@@ -159,7 +159,7 @@ func TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix(t *t
 	}()
 	paramsMust(t, g.ensureRegistered())
 	paramsMust(t, c.Region.Write(c.descriptions[15], 0, 'T'))
-	out, e := NewStringBuffer64(StringBufferConfig{Budget: b})
+	out, e := NewStringBuffer64(StringBufferConfig{})
 	paramsMust(t, e)
 	defer out.Close()
 	key, e := sy.Intern("ackermannization")

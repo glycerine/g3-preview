@@ -275,9 +275,8 @@ func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result err
 	return z3exception.NewDefaultException(text)
 }
 
-func (f *contextParamsFrame) initBuffer(b *arena.Budget) {
-	f.buffer = util.StringBuffer64{State: util.StringBufferState{Budget: b, Capacity: 64, Initial: 64, LongBits: 64}}
-	f.buffer.Self = &f.buffer
+func (f *contextParamsFrame) initBuffer(_ *arena.Budget) {
+	_ = f.buffer.Init(util.StringBufferConfig{})
 	f.bufferComplete = true
 }
 func contextStringEqual(v util.ParamsStringView, text string) (bool, error) {

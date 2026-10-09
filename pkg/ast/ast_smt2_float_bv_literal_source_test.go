@@ -149,7 +149,7 @@ func TestASTSMT2FloatDefaultWarmActualConstructorFrontier(t *testing.T) {
 	third, body := m.ppFloatBitVectorLiteral(m.external(node), true, nil)
 	astBVPrinterRawGraph(t, m, nil)
 	f := p.literalFrames
-	if !errors.Is(body, arena.ErrInjectedFailure) || !third.IsNull() || f == nil || f.header != 0 || f.sigConstructed || !f.sourceDone || !f.buffer.State.Closed || !f.valueConsumed || m.BudgetField.Used() != before {
+	if !errors.Is(body, arena.ErrInjectedFailure) || !third.IsNull() || f == nil || f.header != 0 || f.sigConstructed || !f.sourceDone || !f.buffer.Closed() || !f.valueConsumed || m.BudgetField.Used() != before {
 		t.Fatal("actual constructor frontier before significand declaration", body, third, f.header, f.bvPlaced, f.sourceDone, m.BudgetField.Used(), before)
 	}
 	tuple, cause := f.copy, f.bodyCause

@@ -1,10 +1,10 @@
-// Concrete INITIAL_SIZE32/64/128 translations of util/string_buffer.h.
+// Source: src/util/string_buffer.h:48-188.
 package util
 
 import (
+	"bytes"
 	"errors"
-	"reflect"
-	"sync"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -13,398 +13,238 @@ var (
 	ErrStringBufferOwner     = errors.New("g3: invalid string buffer owner")
 	ErrStringBufferConfig    = errors.New("g3: invalid string buffer long-width profile")
 	ErrStringBufferLongRange = errors.New("g3: string buffer value outside source long domain")
-	ErrStringBufferAlias     = errors.New("g3: source string buffer self-append would use freed heap storage")
 )
-var stringBufferAppendMutex sync.Mutex
 
 // LongBits selects the source ABI long width, default LP64. The unsigned
-// overload deliberately uses signed32-bit interpretation matching this fork's
-// %d baseline, a defined Go adaptation of the source high-bit type mismatch.
+// overload deliberately uses signed 32-bit interpretation matching this
+// fork's %d baseline.
 type StringBufferConfig struct {
-	Budget   *arena.Budget
 	LongBits uint32
 }
+
+// StringBufferStats retains the reporting shape used by existing callers.
+// bytes.Buffer owns ordinary Go memory, so the arena accounting fields are zero.
 type StringBufferStats struct {
 	Position, Capacity                     uint64
 	OwnerBytes, InlineBytes, OverflowBytes uint64
 	LongBits                               uint32
 }
 
-// InlineBytes is included in OwnerBytes, not a second budget charge. Each
-// concrete owner physically embeds its own exact initial byte array.
-type StringBufferState struct {
-	Mu                        sync.Mutex
-	Budget                    *arena.Budget
-	Heap                      []byte
-	Pos, Capacity, OwnerBytes uint64
-	Initial, LongBits         uint32
-	Closed                    bool
+// StringBuffer64 is the live specialization of the source string_buffer.
+// Its storage uses the standard library; the zero value is ready for use.
+type StringBuffer64 struct {
+	buffer   bytes.Buffer
+	longBits uint32
+	closed   bool
 }
 
-func sbConfig(c StringBufferConfig) (StringBufferConfig, error) {
-	if c.LongBits == 0 {
-		c.LongBits = 64
+func stringBufferLongBits(bits uint32) (uint32, error) {
+	if bits == 0 {
+		return 64, nil
 	}
-	if c.LongBits != 32 && c.LongBits != 64 {
-		return c, ErrStringBufferConfig
+	if bits != 32 && bits != 64 {
+		return 0, ErrStringBufferConfig
 	}
-	return c, nil
+	return bits, nil
 }
-func (s *StringBufferState) Open(valid bool) error {
-	if !valid {
+
+func NewStringBuffer64(c StringBufferConfig) (*StringBuffer64, error) {
+	b := new(StringBuffer64)
+	if err := b.Init(c); err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+// Init configures an embedded buffer. Calling it discards prior contents.
+func (b *StringBuffer64) Init(c StringBufferConfig) error {
+	if b == nil {
 		return ErrStringBufferOwner
 	}
-	if s.Closed {
+	bits, err := stringBufferLongBits(c.LongBits)
+	if err != nil {
+		return err
+	}
+	*b = StringBuffer64{longBits: bits}
+	return nil
+}
+
+func (b *StringBuffer64) open() error {
+	if b == nil {
+		return ErrStringBufferOwner
+	}
+	if b.closed {
 		return arena.ErrClosed
 	}
 	return nil
 }
-func (s *StringBufferState) Data(inline []byte) []byte {
-	if s.Heap != nil {
-		return s.Heap
+
+func (b *StringBuffer64) bits() uint32 {
+	if b.longBits == 0 {
+		return 64
 	}
-	return inline
-}
-func (s *StringBufferState) Expand(inline []byte) error {
-	if s.Capacity > uint64(^uint(0)>>1)/2 {
-		return arena.ErrBounds
-	}
-	n := s.Capacity * 2
-	if n == 0 {
-		return arena.ErrBounds
-	}
-	if e := s.Budget.Reserve(n); e != nil {
-		return e
-	}
-	next := make([]byte, int(n))
-	copy(next, s.Data(inline)[:s.Pos])
-	if s.Heap != nil {
-		s.Budget.Release(uint64(len(s.Heap)))
-	}
-	s.Heap = next
-	s.Capacity = n
-	return nil
-}
-func (s *StringBufferState) AppendBytes(inline, bytes []byte) error {
-	n := uint64(len(bytes))
-	if n > ^uint64(0)-s.Pos {
-		return arena.ErrBounds
-	}
-	next := s.Pos + n
-	for next > s.Capacity {
-		if e := s.Expand(inline); e != nil {
-			return e
-		}
-	}
-	copy(s.Data(inline)[s.Pos:next], bytes)
-	s.Pos = next
-	return nil
-}
-func (s *StringBufferState) AppendCString(inline []byte, text string) error {
-	n := uint64(cSymbolLength(text))
-	if n > ^uint64(0)-s.Pos {
-		return arena.ErrBounds
-	}
-	next := s.Pos + n
-	for next > s.Capacity {
-		if e := s.Expand(inline); e != nil {
-			return e
-		}
-	}
-	copy(s.Data(inline)[s.Pos:next], text[:n])
-	s.Pos = next
-	return nil
-}
-func (s *StringBufferState) AppendByte(inline []byte, b byte) error {
-	if s.Pos >= s.Capacity {
-		if e := s.Expand(inline); e != nil {
-			return e
-		}
-	}
-	s.Data(inline)[s.Pos] = b
-	s.Pos++
-	return nil
-}
-func (s *StringBufferState) Cstr(inline []byte) ([]byte, error) {
-	if s.Pos >= s.Capacity {
-		if e := s.Expand(inline); e != nil {
-			return nil, e
-		}
-	}
-	data := s.Data(inline)
-	data[s.Pos] = 0
-	n := s.Pos
-	for i := uint64(0); i < n; i++ {
-		if data[i] == 0 {
-			n = i
-			break
-		}
-	}
-	return data[:n], nil
-}
-func (s *StringBufferState) Number(inline []byte, value int64) error {
-	var stack [24]byte
-	at := len(stack) - 1
-	negative := value < 0
-	v := uint64(value)
-	if negative {
-		v = ^v + 1
-	}
-	for {
-		at--
-		stack[at] = '0' + byte(v%10)
-		v /= 10
-		if v == 0 {
-			break
-		}
-	}
-	if negative {
-		at--
-		stack[at] = '-'
-	}
-	return s.AppendBytes(inline, stack[at:len(stack)-1])
-}
-func (s *StringBufferState) Long(inline []byte, value int64) error {
-	if s.LongBits == 32 && (value < -2147483648 || value > 2147483647) {
-		return ErrStringBufferLongRange
-	}
-	return s.Number(inline, value)
-}
-func (s *StringBufferState) Boolean(inline []byte, b bool) error {
-	if b {
-		return s.AppendCString(inline, "true")
-	}
-	return s.AppendCString(inline, "false")
+	return b.longBits
 }
 
-// Source symbol insertion is a bulk CString action for names/null, and two
-// actions k! then signed UNBOXINT for numeric values. Borrowed manager lifetime
-// is confined to this synchronous call; no spelling copy/owner pointer escapes.
-func (s *StringBufferState) Symbol(inline []byte, m *SymbolManager, k Symbol) error {
+func (b *StringBuffer64) AppendByte(v byte) error {
+	if err := b.open(); err != nil {
+		return err
+	}
+	return b.buffer.WriteByte(v)
+}
+
+func (b *StringBuffer64) AppendBytes(v []byte) error {
+	if err := b.open(); err != nil {
+		return err
+	}
+	_, err := b.buffer.Write(v)
+	return err
+}
+
+func (b *StringBuffer64) AppendCString(v string) error {
+	if err := b.open(); err != nil {
+		return err
+	}
+	_, err := b.buffer.WriteString(v[:cSymbolLength(v)])
+	return err
+}
+
+func (b *StringBuffer64) appendNumber(v int64) error {
+	var text [24]byte
+	return b.AppendBytes(strconv.AppendInt(text[:0], v, 10))
+}
+
+func (b *StringBuffer64) AppendInt32(v int32) error   { return b.appendNumber(int64(v)) }
+func (b *StringBuffer64) AppendUInt32(v uint32) error { return b.appendNumber(int64(int32(v))) }
+
+func (b *StringBuffer64) AppendLong(v int64) error {
+	if err := b.open(); err != nil {
+		return err
+	}
+	if b.bits() == 32 && (v < -2147483648 || v > 2147483647) {
+		return ErrStringBufferLongRange
+	}
+	return b.appendNumber(v)
+}
+
+func (b *StringBuffer64) AppendBool(v bool) error {
+	if v {
+		return b.AppendCString("true")
+	}
+	return b.AppendCString("false")
+}
+
+func (b *StringBuffer64) AppendSymbol(m *SymbolManager, v Symbol) error {
+	if err := b.open(); err != nil {
+		return err
+	}
 	if m == nil {
 		return ErrInvalidSymbol
 	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	if e := m.checkPlain(k); e != nil {
-		return e
+	if err := m.checkPlain(v); err != nil {
+		return err
 	}
-	if k.IsNumerical() {
-		if e := s.AppendCString(inline, "k!"); e != nil {
-			return e
+	if v.IsNumerical() {
+		if err := b.AppendCString("k!"); err != nil {
+			return err
 		}
-		return s.Number(inline, int64(int32(k.Value)))
+		return b.appendNumber(int64(int32(v.Value)))
 	}
-	if k.Value == 0 {
-		return s.AppendCString(inline, "null")
+	if v.Value == 0 {
+		return b.AppendCString("null")
 	}
-	text, e := m.spelling(k)
-	if e != nil {
-		return e
+	text, err := m.spelling(v)
+	if err != nil {
+		return err
 	}
-	n := uint64(len(text))
-	if n > ^uint64(0)-s.Pos {
-		return arena.ErrBounds
-	}
-	next := s.Pos + n
-	for next > s.Capacity {
-		if e := s.Expand(inline); e != nil {
-			return e
-		}
-	}
-	copy(s.Data(inline)[s.Pos:next], text)
-	s.Pos = next
-	return nil
-}
-func sbAppendBuffer(dst, src *StringBufferState, dinline, sinline []byte, dvalid, svalid bool) error {
-	stringBufferAppendMutex.Lock()
-	defer stringBufferAppendMutex.Unlock()
-	dst.Mu.Lock()
-	defer dst.Mu.Unlock()
-	if src != dst {
-		src.Mu.Lock()
-		defer src.Mu.Unlock()
-	}
-	if e := dst.Open(dvalid); e != nil {
-		return e
-	}
-	if e := src.Open(svalid); e != nil {
-		return e
-	}
-	// Self append can invalidate the original heap CString when append expands.
-	// Full buffers first expand inside c_str; inline old storage remains embedded.
-	if src == dst && src.Heap != nil && src.Pos < src.Capacity {
-		n := src.Pos
-		data := src.Data(sinline)
-		for i := uint64(0); i < n; i++ {
-			if data[i] == 0 {
-				n = i
-				break
-			}
-		}
-		if n > src.Capacity-src.Pos {
-			return ErrStringBufferAlias
-		}
-	}
-	bytes, e := src.Cstr(sinline)
-	if e != nil {
-		return e
-	}
-	return dst.AppendBytes(dinline, bytes)
-}
-func (s *StringBufferState) Stats(valid bool) StringBufferStats {
-	if !valid || s.Closed {
-		return StringBufferStats{}
-	}
-	return StringBufferStats{s.Pos, s.Capacity, s.OwnerBytes, uint64(s.Initial), uint64(len(s.Heap)), s.LongBits}
-}
-func (s *StringBufferState) Close(valid bool) error {
-	if !valid {
-		return ErrStringBufferOwner
-	}
-	if s.Closed {
-		return nil
-	}
-	s.Budget.Release(uint64(len(s.Heap)) + s.OwnerBytes)
-	s.Heap = nil
-	s.Pos = 0
-	s.Capacity = 0
-	s.Closed = true
-	return nil
+	return b.AppendCString(text)
 }
 
-// StringBuffer64 owns a physical [64]byte inline payload plus optional overflow.
-// It must not be shallow-copied. No backing slice/pointer is publicly borrowed.
-type StringBuffer64 struct {
-	State  StringBufferState
-	Inline [64]byte
-	Self   *StringBuffer64
-}
-
-func NewStringBuffer64(c StringBufferConfig) (*StringBuffer64, error) {
-	c, e := sbConfig(c)
-	if e != nil {
-		return nil, e
-	}
-	owner := uint64(reflect.TypeOf(StringBuffer64{}).Size())
-	if e = c.Budget.Reserve(owner); e != nil {
-		return nil, e
-	}
-	b := &StringBuffer64{State: StringBufferState{Budget: c.Budget, Capacity: 64, OwnerBytes: owner, Initial: 64, LongBits: c.LongBits}}
-	b.Self = b
-	return b, nil
-}
-func (b *StringBuffer64) AppendByte(v byte) error {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return e
-	}
-	return b.State.AppendByte(b.Inline[:], v)
-}
-func (b *StringBuffer64) AppendCString(v string) error {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return e
-	}
-	return b.State.AppendCString(b.Inline[:], v)
-}
-func (b *StringBuffer64) AppendInt32(v int32) error {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return e
-	}
-	return b.State.Number(b.Inline[:], int64(v))
-}
-func (b *StringBuffer64) AppendUInt32(v uint32) error {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return e
-	}
-	return b.State.Number(b.Inline[:], int64(int32(v)))
-}
-func (b *StringBuffer64) AppendLong(v int64) error {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return e
-	}
-	return b.State.Long(b.Inline[:], v)
-}
-func (b *StringBuffer64) AppendBool(v bool) error {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return e
-	}
-	return b.State.Boolean(b.Inline[:], v)
-}
-func (b *StringBuffer64) AppendSymbol(m *SymbolManager, v Symbol) error {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return e
-	}
-	return b.State.Symbol(b.Inline[:], m, v)
-}
 func (b *StringBuffer64) Reset() error {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return e
+	if err := b.open(); err != nil {
+		return err
 	}
-	b.State.Pos = 0
+	b.buffer.Reset()
 	return nil
 }
+
 func (b *StringBuffer64) CStr() (string, error) {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return "", e
+	if err := b.open(); err != nil {
+		return "", err
 	}
-	bytes, e := b.State.Cstr(b.Inline[:])
-	if e != nil {
-		return "", e
+	data := b.buffer.Bytes()
+	if n := bytes.IndexByte(data, 0); n >= 0 {
+		data = data[:n]
 	}
-	return string(bytes), nil
+	return string(data), nil
 }
-func (b *StringBuffer64) Read(i uint64) (byte, error) {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if e := b.State.Open(b.Self == b); e != nil {
-		return 0, e
+
+// BytesCopy returns the counted contents, including bytes after embedded NULs.
+func (b *StringBuffer64) BytesCopy() ([]byte, error) {
+	if err := b.open(); err != nil {
+		return nil, err
 	}
-	if i >= b.State.Pos {
+	return bytes.Clone(b.buffer.Bytes()), nil
+}
+
+func (b *StringBuffer64) Read(i uint64) (byte, error) {
+	if err := b.open(); err != nil {
+		return 0, err
+	}
+	if i >= uint64(b.buffer.Len()) {
 		return 0, arena.ErrBounds
 	}
-	return b.State.Data(b.Inline[:])[i], nil
+	return b.buffer.Bytes()[i], nil
 }
+
 func (b *StringBuffer64) Size() uint32 { return uint32(b.Position()) }
+
 func (b *StringBuffer64) Position() uint64 {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	if b.State.Open(b.Self == b) != nil {
+	if b.open() != nil {
 		return 0
 	}
-	return b.State.Pos
+	return uint64(b.buffer.Len())
 }
+
 func (b *StringBuffer64) Empty() bool { return b.Position() == 0 }
+
 func (b *StringBuffer64) Stats() StringBufferStats {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	return b.State.Stats(b.Self == b)
+	if b.open() != nil {
+		return StringBufferStats{}
+	}
+	return StringBufferStats{
+		Position: uint64(b.buffer.Len()),
+		Capacity: uint64(b.buffer.Cap()),
+		LongBits: b.bits(),
+	}
 }
+
+func (b *StringBuffer64) Closed() bool { return b == nil || b.closed }
+
 func (b *StringBuffer64) Close() error {
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	return b.State.Close(b.Self == b)
-}
-func (b *StringBuffer64) AppendBuffer64(s *StringBuffer64) error {
-	if s == nil {
+	if b == nil {
 		return ErrStringBufferOwner
 	}
-	return sbAppendBuffer(&b.State, &s.State, b.Inline[:], s.Inline[:], b.Self == b, s.Self == s)
+	if b.closed {
+		return nil
+	}
+	b.buffer = bytes.Buffer{}
+	b.closed = true
+	return nil
+}
+
+func (b *StringBuffer64) AppendBuffer64(src *StringBuffer64) error {
+	if err := b.open(); err != nil {
+		return err
+	}
+	if err := src.open(); err != nil {
+		return err
+	}
+	text, err := src.CStr()
+	if err != nil {
+		return err
+	}
+	return b.AppendCString(text)
 }

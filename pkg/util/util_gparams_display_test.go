@@ -19,7 +19,7 @@ func gparamsDescriptionBytes(t *testing.T, r *arena.BytesRegion, s string) arena
 	return ref
 }
 func TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches(t *testing.T) {
-	g, _, _, b := gparamsRealRegistry(t)
+	g, _, _, _ := gparamsRealRegistry(t)
 	paramsMust(t, g.ensureRegistered())
 	rb := arena.NewBudget(^uint64(0))
 	r, e := arena.NewBytesRegion(arena.BytesRegionConfig{Descriptors: arena.Config{Budget: rb, PageSize: 2}, PageSize: 64})
@@ -32,7 +32,7 @@ func TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches(t *testing.T) {
 	}()
 	ref := gparamsDescriptionBytes(t, r, "prefixdescription\x00ignored")
 	paramsMust(t, g.RegisterModuleDescription("sat", r, ref, 6))
-	out, e := NewStringBuffer64(StringBufferConfig{Budget: b})
+	out, e := NewStringBuffer64(StringBufferConfig{})
 	paramsMust(t, e)
 	defer out.Close()
 	paramsMust(t, g.DisplayModulesInto(out))
@@ -66,9 +66,9 @@ func TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches(t *testing.T) {
 	}
 }
 func TestGlobalParamsDescriptionNullAndClosedReadPrefixes(t *testing.T) {
-	g, _, _, b := gparamsRealRegistry(t)
+	g, _, _, _ := gparamsRealRegistry(t)
 	paramsMust(t, g.ensureRegistered())
-	out, e := NewStringBuffer64(StringBufferConfig{Budget: b})
+	out, e := NewStringBuffer64(StringBufferConfig{})
 	paramsMust(t, e)
 	defer out.Close()
 	paramsMust(t, g.RegisterModuleDescription("sat", nil, arena.BytesRegionRef{}, 0))
@@ -106,11 +106,11 @@ func TestGlobalParamsDescriptionNullAndClosedReadPrefixes(t *testing.T) {
 }
 
 func TestGlobalParamsDisplayParameterDiagnosticBeforeLookup(t *testing.T) {
-	g, _, _, b := gparamsRealRegistry(t)
-	out, e := NewStringBuffer64(StringBufferConfig{Budget: b})
+	g, _, _, _ := gparamsRealRegistry(t)
+	out, e := NewStringBuffer64(StringBufferConfig{})
 	paramsMust(t, e)
 	defer out.Close()
-	debug, e := NewStringBuffer64(StringBufferConfig{Budget: b})
+	debug, e := NewStringBuffer64(StringBufferConfig{})
 	paramsMust(t, e)
 	defer debug.Close()
 	paramsMust(t, g.DisplayParameterInto(out, debug, ":SaT.SeEd"))

@@ -183,7 +183,7 @@ func TestNumericStreamFullByteOutputStringAndWidthConsumption(t *testing.T) {
 	}
 }
 
-func TestNumericStreamBudgetFailureStagesPrefixesAndPeak(t *testing.T) {
+func TestNumericStreamScratchBudgetFailureAndGoBufferGrowth(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	s, _ := NewNumericTextStream(NumericTextStreamConfig{Budget: b})
 	base := b.Used()
@@ -203,7 +203,7 @@ func TestNumericStreamBudgetFailureStagesPrefixesAndPeak(t *testing.T) {
 	s.SetWidth(0)
 	b.FailAfter(0)
 	e = s.AppendFloat64(1.25)
-	if !errors.Is(e, arena.ErrInjectedFailure) || s.Stats().Position != 64 || s.State().Width != 0 {
+	if e != nil || s.Stats().Position != 68 || s.State().Width != 0 {
 		t.Fatal(e, s.Stats())
 	}
 	s.Close()
@@ -357,10 +357,10 @@ func TestNumericStreamIndependentExactBinaryRounding(t *testing.T) {
 		}
 	}
 }
-func TestNumericStreamExactOwnerScratchOverlapAndHugeWidthPrefix(t *testing.T) {
+func TestNumericStreamExactOwnerScratchOverlapAndGoBufferGrowth(t *testing.T) {
 	unlimited := arena.NewBudget(^uint64(0))
 	s, _ := NewNumericTextStream(NumericTextStreamConfig{Budget: unlimited})
-	base := uint64(reflect.TypeOf(NumericTextStream{}).Size()) + uint64(reflect.TypeOf(StringBuffer64{}).Size())
+	base := uint64(reflect.TypeOf(NumericTextStream{}).Size())
 	if unlimited.Used() != base {
 		t.Fatal(unlimited.Used(), base)
 	}
@@ -391,9 +391,9 @@ func TestNumericStreamExactOwnerScratchOverlapAndHugeWidthPrefix(t *testing.T) {
 	b := arena.NewBudget(base)
 	s, _ = NewNumericTextStream(NumericTextStreamConfig{Budget: b})
 	s.AppendByte('p')
-	s.SetWidth(math.MaxInt64)
+	s.SetWidth(4096)
 	e := s.AppendUint32(1)
-	if !errors.Is(e, arena.ErrBudget) || s.Stats().Position != 64 || s.State().Width != 0 {
+	if e != nil || s.Stats().Position != 4097 || s.State().Width != 0 || b.Used() != base {
 		t.Fatal(e, s.Stats(), s.State())
 	}
 	s.Close()

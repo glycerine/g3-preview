@@ -2,7 +2,6 @@ package util
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -10,7 +9,7 @@ import (
 
 func pdStreamBuffer(t *testing.T, b *arena.Budget) *StringBuffer64 {
 	t.Helper()
-	s, e := NewStringBuffer64(StringBufferConfig{Budget: b})
+	s, e := NewStringBuffer64(StringBufferConfig{})
 	paramsMust(t, e)
 	t.Cleanup(func() { paramsMust(t, s.Close()) })
 	return s
@@ -67,7 +66,7 @@ func TestParamDescrsDisplayIntoNullDescriptionActualAction(t *testing.T) {
 		}
 	}
 }
-func TestParamDescrsDisplayIntoHugeIndentPrefix(t *testing.T) {
+func TestParamDescrsDisplayIntoGoBufferGrowth(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	db := arena.NewBudget(^uint64(0))
 	d := pdnew(t, m, db)
@@ -75,15 +74,14 @@ func TestParamDescrsDisplayIntoHugeIndentPrefix(t *testing.T) {
 	b := pdStreamBuffer(t, nil)
 	paramsMust(t, b.AppendCString("prefix"))
 	baseline := db.Used()
-	bb := arena.NewBudget(^uint64(0))
-	out := pdStreamBuffer(t, bb)
+	out := pdStreamBuffer(t, nil)
 	paramsMust(t, out.AppendByte('p'))
-	bb.FailAfter(0)
-	e := d.DisplayInto(out, ^uint32(0), false, true)
-	if !errors.Is(e, arena.ErrInjectedFailure) || out.Position() != 64 {
-		t.Fatal("full uint32 source indentation domain", e, out.Position())
+	const indent = uint32(4096)
+	e := d.DisplayInto(out, indent, false, true)
+	if e != nil || out.Position() <= uint64(indent) {
+		t.Fatal("standard buffer growth", e, out.Position())
 	}
-	for i := uint32(1); i < 64; i++ {
+	for i := uint32(1); i <= indent; i++ {
 		v, e := out.Read(uint64(i))
 		paramsMust(t, e)
 		if v != ' ' {
@@ -93,11 +91,6 @@ func TestParamDescrsDisplayIntoHugeIndentPrefix(t *testing.T) {
 	if db.Used() != baseline {
 		t.Fatal("descriptor arena usage changed")
 	}
-	st := out.Stats()
-	if bb.Used() != st.OwnerBytes+st.OverflowBytes || st.OwnerBytes != uint64(reflect.TypeOf(StringBuffer64{}).Size()) {
-		t.Fatal("actual dst prefix storage", bb.Used(), st)
-	}
-	bb.FailAfter(-1)
 }
 func TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)

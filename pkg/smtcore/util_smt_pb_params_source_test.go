@@ -166,7 +166,7 @@ func TestSMTPBEveryConstructorAndWarmHelperReservation(t *testing.T) {
 
 const pbDefaultDisplay = "m_pb_conflict_frequency=1000\nm_pb_learn_complements=1\nm_pb_enable_compilation=1\nm_pb_enable_simplex=0\n"
 
-func TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit(t *testing.T) {
+func TestSMTPBFourDisplayChainsGoBufferShowPosAndFileBadbit(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	v, e := NewSMTPBParams(b)
 	paramsMust(t, e)
@@ -203,8 +203,8 @@ func TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit(t *tes
 			break
 		}
 	}
-	if first < 1 {
-		t.Fatal("actual output leaves", first)
+	if first < 0 {
+		t.Fatal("Go buffer output did not complete", first)
 	}
 	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)

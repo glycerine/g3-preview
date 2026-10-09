@@ -15,7 +15,7 @@ func TestStringBufferMPFBorrowedCStringLiteralAppendAndLifetime(t *testing.T) {
 	paramsMust(t, text.AssignLiteral(strings.Repeat("1", 80)))
 	view, e := text.CString()
 	paramsMust(t, e)
-	out, e := NewStringBuffer64(StringBufferConfig{Budget: b})
+	out, e := NewStringBuffer64(StringBufferConfig{})
 	paramsMust(t, e)
 	paramsMust(t, out.AppendCString("RTZ "))
 	paramsMust(t, out.AppendFloatCString(view))
@@ -36,43 +36,31 @@ func TestStringBufferMPFBorrowedCStringLiteralAppendAndLifetime(t *testing.T) {
 	}
 }
 
-func TestStringBufferMPFBorrowedCStringEveryExpansionPrefix(t *testing.T) {
-	for ordinal := int64(0); ordinal <= 3; ordinal++ {
-		b := arena.NewBudget(1 << 20)
-		text, e := NewArbitraryFloatFormatText(b)
-		paramsMust(t, e)
-		paramsMust(t, text.AssignLiteral(strings.Repeat("7", 300)))
-		view, e := text.CString()
-		paramsMust(t, e)
-		out, e := NewStringBuffer64(StringBufferConfig{Budget: b})
-		paramsMust(t, e)
-		paramsMust(t, out.AppendCString("prefix "))
-		base := b.Used() - out.Stats().OwnerBytes - out.Stats().OverflowBytes
-		b.FailAfter(ordinal)
-		call := out.AppendFloatCString(view)
-		stats := out.Stats()
-		if b.Used() != base+stats.OwnerBytes+stats.OverflowBytes {
-			t.Fatal("before-lift exact buffer/text cold graph", ordinal, call)
-		}
-		if call != nil && stats.Position != 7 {
-			t.Fatal("source memcpy/position reached after refused expansion", ordinal, stats)
-		}
-		if call == nil && stats.Position != 307 {
-			t.Fatal("completed borrowed append size", stats)
-		}
-		b.FailAfter(-1)
-		if call != nil {
-			paramsMust(t, out.AppendFloatCString(view))
-		}
-		got, e := out.CStr()
-		paramsMust(t, e)
-		if got != "prefix "+strings.Repeat("7", 300) {
-			t.Fatal("source-valid literal retry", ordinal, got)
-		}
-		paramsMust(t, text.Close())
-		paramsMust(t, out.Close())
-		if b.Used() != 0 {
-			t.Fatal("actual owner end", ordinal, b.Used())
-		}
+func TestStringBufferMPFBorrowedCStringGoBufferGrowth(t *testing.T) {
+	b := arena.NewBudget(1 << 20)
+	text, e := NewArbitraryFloatFormatText(b)
+	paramsMust(t, e)
+	paramsMust(t, text.AssignLiteral(strings.Repeat("7", 300)))
+	view, e := text.CString()
+	paramsMust(t, e)
+	out, e := NewStringBuffer64(StringBufferConfig{})
+	paramsMust(t, e)
+	paramsMust(t, out.AppendCString("prefix "))
+	before := b.Used()
+	b.FailAfter(0)
+	paramsMust(t, out.AppendFloatCString(view))
+	if b.Used() != before || out.Position() != 307 {
+		t.Fatal("Go buffer touched numeric arena", b.Used(), before, out.Stats())
+	}
+	b.FailAfter(-1)
+	got, e := out.CStr()
+	paramsMust(t, e)
+	if got != "prefix "+strings.Repeat("7", 300) {
+		t.Fatal("source-valid literal", got)
+	}
+	paramsMust(t, text.Close())
+	paramsMust(t, out.Close())
+	if b.Used() != 0 {
+		t.Fatal("actual owner end", b.Used())
 	}
 }

@@ -4,7 +4,6 @@ package util
 
 import (
 	"errors"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -275,64 +274,27 @@ func TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays(t *testing.T)
 	gparamsServiceAudit(t, s, b)
 }
 
-func TestGlobalParamsNamespaceDisplayEveryActualOutputReservation(t *testing.T) {
-	success := false
-	for ordinal := int64(0); ordinal < 32; ordinal++ {
-		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
-			s, b := gparamsNamespaceFixture(t)
-			paramsMust(t, s.InitializeSource())
-			text := namespaceModule(t, s, b)
-			// Source catalog registration is a real prerequisite, completed before
-			// this independent output-only frontier. Namespace adds no fake event.
-			g, e := s.Manager()
-			paramsMust(t, e)
-			paramsMust(t, g.ensureRegistered())
-			outputBudget := arena.NewBudget(1 << 24)
-			out, e := NewStringBuffer64(StringBufferConfig{Budget: outputBudget})
-			paramsMust(t, e)
-			defer func() {
-				paramsMust(t, out.Close())
-				if outputBudget.Used() != 0 {
-					t.Error("actual output owner")
-				}
-			}()
-			outputBudget.FailAfter(ordinal)
-			e = s.SourceDisplayModuleInto(out, "namespace")
-			bodyErr := e
-			if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
-				t.Fatal("actual reached output refusal", e)
-			}
-			stats := out.Stats()
-			if outputBudget.Used() != stats.OwnerBytes+stats.OverflowBytes {
-				t.Fatal("exact output header/backing graph", stats, outputBudget.Used())
-			}
-			gparamsServiceAudit(t, s, b)
-			want := "[module] namespace\n    enabled (bool) " + text + " (default: false)\n"
-			bytes := make([]byte, out.Position())
-			for i := range bytes {
-				bytes[i], e = out.Read(uint64(i))
-				paramsMust(t, e)
-			}
-			if !strings.HasPrefix(want, string(bytes)) {
-				t.Fatal("source emitted prefix diverged", string(bytes), want)
-			}
-			if bodyErr == nil {
-				if string(bytes) != want {
-					t.Fatal("successful body emitted only prefix", string(bytes), want)
-				}
-				success = true
-			} else if len(bytes) == len(want) {
-				t.Fatal("failure did not preserve actual stopping prefix")
-			}
-			outputBudget.FailAfter(-1)
-		})
-		if success {
-			t.Logf("actual output first success %d", ordinal)
-			break
-		}
+func TestGlobalParamsNamespaceDisplayUsesGoBuffer(t *testing.T) {
+	s, b := gparamsNamespaceFixture(t)
+	paramsMust(t, s.InitializeSource())
+	text := namespaceModule(t, s, b)
+	g, e := s.Manager()
+	paramsMust(t, e)
+	paramsMust(t, g.ensureRegistered())
+	outputBudget := arena.NewBudget(0)
+	out, e := NewStringBuffer64(StringBufferConfig{})
+	paramsMust(t, e)
+	defer out.Close()
+	paramsMust(t, s.SourceDisplayModuleInto(out, "namespace"))
+	if outputBudget.Used() != 0 {
+		t.Fatal("Go buffer touched arena", outputBudget.Used())
 	}
-	if !success {
-		t.Fatal("every actual output reservation did not reach success")
+	gparamsServiceAudit(t, s, b)
+	want := "[module] namespace\n    enabled (bool) " + text + " (default: false)\n"
+	got, e := out.CStr()
+	paramsMust(t, e)
+	if got != want {
+		t.Fatal(got, want)
 	}
 }
 

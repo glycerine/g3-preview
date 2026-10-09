@@ -39,7 +39,7 @@ type astFloatLiteralFrame struct {
 func (p *astFloatingPointPluginOwner) literalBytes() uint64 {
 	var n uint64
 	for f := p.literalFrames; f != nil; f = f.next {
-		n += f.header + uint64(len(f.buffer.State.Heap))
+		n += f.header
 		if t := f.text; t != nil {
 			n += t.StorageBytes()
 		}
@@ -87,7 +87,7 @@ func (f *astFloatLiteralFrame) destroy(own bool) error {
 			return stop(e)
 		}
 	}
-	if f.bufferConstructed && !f.buffer.State.Closed {
+	if f.bufferConstructed && !f.buffer.Closed() {
 		if e := f.buffer.Close(); e != nil {
 			return stop(e)
 		}
@@ -184,8 +184,9 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 	f.self = f
 	p.literalFrames = f
 	// source scoped_mpf precedes get_manager and the default string_buffer.
-	f.buffer = util.StringBuffer64{State: util.StringBufferState{Budget: m.BudgetField, Capacity: 64, Initial: 64, LongBits: 64}}
-	f.buffer.Self = &f.buffer
+	if e = f.buffer.Init(util.StringBufferConfig{}); e != nil {
+		return out, e
+	}
 	f.bufferConstructed = true
 	defer func() {
 		f.bodyCause = result
@@ -288,9 +289,7 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 			return out, e
 		}
 	}
-	b.State.Mu.Lock()
-	defer b.State.Mu.Unlock()
-	bytes, e := b.State.Cstr(b.Inline[:])
+	text, e := b.CStr()
 	if e != nil {
 		return out, e
 	}
@@ -305,7 +304,7 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 		fm.formatExecuting = true
 		defer func() { fm.formatExecuting = false }()
 	}
-	symbol, e := fm.Symbols.InternBytes(bytes)
+	symbol, e := fm.Symbols.InternBytes([]byte(text))
 	if e != nil {
 		return out, e
 	}

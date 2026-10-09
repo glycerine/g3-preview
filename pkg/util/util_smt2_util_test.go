@@ -106,7 +106,7 @@ func TestSMT2SymbolSourcePreconditionAndLifetime(t *testing.T) {
 		t.Fatal(e)
 	}
 }
-func TestSMT2QuoteFaultBudgetAndIndependentBytes(t *testing.T) {
+func TestSMT2QuoteGoBufferAndIndependentBytes(t *testing.T) {
 	ownerBudget := arena.NewBudget(^uint64(0))
 	m, _ := NewSymbolManager(SymbolConfig{Budget: ownerBudget})
 	defer m.Close()
@@ -114,69 +114,27 @@ func TestSMT2QuoteFaultBudgetAndIndependentBytes(t *testing.T) {
 		raw := strings.Repeat("x", n) + "|\\\xff"
 		s, _ := m.Intern(raw)
 		want := "|" + strings.ReplaceAll(strings.ReplaceAll(raw, "\\", "\\\\"), "|", "\\|") + "|"
-		success := false
-		for fail := int64(0); fail < 8; fail++ {
-			b := arena.NewBudget(^uint64(0))
-			b.FailAfter(fail)
-			got, e := MkSMT2QuotedSymbol(m, s, b)
-			if b.Used() != 0 {
-				t.Fatal("leak", n, fail, b.Used())
-			}
-			if e == nil {
-				if got != want {
-					t.Fatalf("%q", got)
-				}
-				success = true
-				break
-			}
-			if !errors.Is(e, arena.ErrInjectedFailure) {
-				t.Fatal(e)
-			}
-		}
-		if !success {
-			t.Fatal("no success")
-		}
-	}
-	// 63 bytes of output require only owner storage, 64 additionally expands in CStr.
-	owner, _ := NewStringBuffer64(StringBufferConfig{})
-	header := owner.Stats().OwnerBytes
-	owner.Close()
-	for _, n := range []int{61, 62} {
-		raw := " " + strings.Repeat("x", n-1)
-		s, _ := m.Intern(raw)
-		b := arena.NewBudget(header)
-		_, e := MkSMT2QuotedSymbol(m, s, b)
-		if (n == 61) != (e == nil) {
-			t.Fatal(n, e)
-		}
-		if b.Used() != 0 {
-			t.Fatal(b.Used())
+		b := arena.NewBudget(0)
+		got, e := MkSMT2QuotedSymbol(m, s, b)
+		if e != nil || got != want || b.Used() != 0 {
+			t.Fatal(n, got, e, b.Used())
 		}
 	}
 }
 
-func TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges(t *testing.T) {
+func TestSMT2QuoteLongGoBufferAndNoBorrowCharges(t *testing.T) {
 	ownerBudget := arena.NewBudget(^uint64(0))
 	m, _ := NewSymbolManager(SymbolConfig{Budget: ownerBudget})
 	defer m.Close()
 	s, _ := m.Intern(" " + strings.Repeat("x", 125))
 	baseline := ownerBudget.Used()
-	b, _ := NewStringBuffer64(StringBufferConfig{})
-	header := b.Stats().OwnerBytes
-	b.Close()
-	for _, extra := range []uint64{383, 384} {
-		budget := arena.NewBudget(header + extra)
-		out, e := MkSMT2QuotedSymbol(m, s, budget)
-		if extra == 383 {
-			if !errors.Is(e, arena.ErrBudget) || out != "" {
-				t.Fatal(e, out)
-			}
-		} else if e != nil || len(out) != 128 {
-			t.Fatal(e, len(out))
-		}
-		if budget.Used() != 0 || ownerBudget.Used() != baseline {
-			t.Fatal("ownership", budget.Used(), ownerBudget.Used(), baseline)
-		}
+	budget := arena.NewBudget(0)
+	out, e := MkSMT2QuotedSymbol(m, s, budget)
+	if e != nil || len(out) != 128 {
+		t.Fatal(e, len(out))
+	}
+	if budget.Used() != 0 || ownerBudget.Used() != baseline {
+		t.Fatal("ownership", budget.Used(), ownerBudget.Used(), baseline)
 	}
 	if n := testing.AllocsPerRun(100, func() {
 		q, e := IsSMT2QuotedSymbol(m, s)

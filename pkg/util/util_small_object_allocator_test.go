@@ -105,22 +105,22 @@ func TestSmallObjectAllocatorNullStaleIDErrorPrefixes(t *testing.T) {
 		}
 	}
 }
-func TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree(t *testing.T) {
+func TestSmallObjectAllocatorDiagnosticGoBufferAfterFree(t *testing.T) {
 	rt, b, _, out := smallObjectDiagnosticFixture(t)
 	a, e := newUtilSmallObjectAllocator(utilSmallObjectConfig{Runtime: rt, Profile: utilSmallObjectProfile{PointerBits: 64, Debug: true, Windows: true}, ID: "a long borrowed static allocator identifier", Diagnostics: out})
 	sourceSmallObjectMust(t, e)
 	_ = sourceSmallObjectAlloc(t, a, 1)
 	b.FailAfter(0)
 	e = a.Close()
-	if e != arena.ErrInjectedFailure || rt.Stats().PhysicalBytes != 0 || out.Stats().Position != 64 {
-		t.Fatal("output refusal hid actual destructor prefix", e, rt.Stats(), out.Stats())
+	want := "Memory leak detected for small object allocator 'a long borrowed static allocator identifier'. 1 bytes leaked\n"
+	if e != nil || rt.Stats().PhysicalBytes != 0 || out.Stats().Position != uint64(len(want)) {
+		t.Fatal("Go buffer diagnostic after destructor", e, rt.Stats(), out.Stats())
 	}
 	b.FailAfter(-1)
 	text, e := out.String()
 	sourceSmallObjectMust(t, e)
-	want := "Memory leak detected for small object allocator 'a long borrowed static allocator identifier'. 1 bytes leaked\n"
-	if text != want[:64] {
-		t.Fatal("defined emitted byte prefix", text)
+	if text != want {
+		t.Fatal("diagnostic output", text)
 	}
 	sourceSmallObjectMust(t, a.Close())
 }

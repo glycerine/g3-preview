@@ -300,13 +300,8 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 			return e
 		}
 	}
-	// Lock order matches DisplayInto: output→descriptor→symbols. Direct text
-	// reads use the charged descriptor words and allocate no intermediate string.
-	out.State.Mu.Lock()
-	defer out.State.Mu.Unlock()
-	if e = out.State.Open(out.Self == out); e != nil {
-		return e
-	}
+	// Direct text reads use the charged descriptor words and allocate no
+	// intermediate string.
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if e = d.open(); e != nil {
@@ -319,13 +314,13 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 	if !found {
 		return ErrParamDescrsPrecondition
 	}
-	if e = out.State.AppendCString(out.Inline[:], "  type:           "); e != nil {
+	if e = out.AppendCString("  type:           "); e != nil {
 		return e
 	}
-	if e = out.State.AppendCString(out.Inline[:], info.kind.String()); e != nil {
+	if e = out.AppendCString(info.kind.String()); e != nil {
 		return e
 	}
-	if e = out.State.AppendCString(out.Inline[:], "\n  description:    "); e != nil {
+	if e = out.AppendCString("\n  description:    "); e != nil {
 		return e
 	}
 	if info.descr.ref == (arena.VectorRef{}) {
@@ -334,7 +329,7 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 	if e = d.writeTextInto(out, info.descr); e != nil {
 		return e
 	}
-	if e = out.State.AppendCString(out.Inline[:], "\n  default value:  "); e != nil {
+	if e = out.AppendCString("\n  default value:  "); e != nil {
 		return e
 	}
 	if info.def.ref == (arena.VectorRef{}) {
@@ -343,5 +338,5 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 	if e = d.writeTextInto(out, info.def); e != nil {
 		return e
 	}
-	return out.State.AppendByte(out.Inline[:], '\n')
+	return out.AppendByte('\n')
 }

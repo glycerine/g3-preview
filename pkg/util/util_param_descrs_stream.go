@@ -2,17 +2,11 @@ package util
 
 import "github.com/glycerine/g3/pkg/arena"
 
-// DisplayInto emits source param_descrs::display into a borrowed charged byte
-// destination. Lock order is destination→descriptors→symbols; private writes
-// never recursively enter destination public methods. Error keeps emitted bytes.
+// DisplayInto emits source param_descrs::display into a borrowed byte buffer.
+// Error keeps the prefix emitted before it.
 func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, includeDescr bool) error {
 	if dst == nil {
 		return ErrStringBufferOwner
-	}
-	dst.State.Mu.Lock()
-	defer dst.State.Mu.Unlock()
-	if e := dst.State.Open(dst.Self == dst); e != nil {
-		return e
 	}
 	if d == nil {
 		return ErrParamDescrsPrecondition
@@ -31,12 +25,12 @@ func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, incl
 	}
 	for _, key := range names {
 		for j := uint32(0); j < indent; j++ {
-			if e := dst.State.AppendByte(dst.Inline[:], ' '); e != nil {
+			if e := dst.AppendByte(' '); e != nil {
 				return e
 			}
 		}
 		if smt2 {
-			if e := dst.State.AppendByte(dst.Inline[:], ':'); e != nil {
+			if e := dst.AppendByte(':'); e != nil {
 				return e
 			}
 		}
@@ -53,17 +47,17 @@ func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, incl
 		if paramDescrsStreamSourceDebug && info.descr.ref == (arena.VectorRef{}) {
 			return ErrParamDescrsPrecondition
 		}
-		if e = dst.State.AppendCString(dst.Inline[:], " ("); e != nil {
+		if e = dst.AppendCString(" ("); e != nil {
 			return e
 		}
-		if e = dst.State.AppendCString(dst.Inline[:], info.kind.String()); e != nil {
+		if e = dst.AppendCString(info.kind.String()); e != nil {
 			return e
 		}
-		if e = dst.State.AppendByte(dst.Inline[:], ')'); e != nil {
+		if e = dst.AppendByte(')'); e != nil {
 			return e
 		}
 		if includeDescr {
-			if e = dst.State.AppendByte(dst.Inline[:], ' '); e != nil {
+			if e = dst.AppendByte(' '); e != nil {
 				return e
 			}
 			// Null CString sets source ostream failbit at this actual output action.
@@ -76,17 +70,17 @@ func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, incl
 			}
 		}
 		if info.def.ref != (arena.VectorRef{}) {
-			if e = dst.State.AppendCString(dst.Inline[:], " (default: "); e != nil {
+			if e = dst.AppendCString(" (default: "); e != nil {
 				return e
 			}
 			if e = d.writeTextInto(dst, info.def); e != nil {
 				return e
 			}
-			if e = dst.State.AppendByte(dst.Inline[:], ')'); e != nil {
+			if e = dst.AppendByte(')'); e != nil {
 				return e
 			}
 		}
-		if e = dst.State.AppendByte(dst.Inline[:], '\n'); e != nil {
+		if e = dst.AppendByte('\n'); e != nil {
 			return e
 		}
 	}
@@ -118,7 +112,7 @@ func (d *ParamDescrs) writeNameInto(dst *StringBuffer64, k Symbol, smt2 bool) er
 		} else if ch >= 'A' && ch <= 'Z' {
 			ch = ch - 'A' + 'a'
 		}
-		if e = dst.State.AppendByte(dst.Inline[:], ch); e != nil {
+		if e = dst.AppendByte(ch); e != nil {
 			return e
 		}
 	}
@@ -129,7 +123,7 @@ func (d *ParamDescrs) writeTextInto(dst *StringBuffer64, r paramDescrText) error
 		if e != nil {
 			return e
 		}
-		if e = dst.State.AppendByte(dst.Inline[:], byte(v>>(8*(i%4)))); e != nil {
+		if e = dst.AppendByte(byte(v >> (8 * (i % 4)))); e != nil {
 			return e
 		}
 	}

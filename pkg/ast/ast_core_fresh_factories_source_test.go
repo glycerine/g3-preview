@@ -98,7 +98,8 @@ func TestASTFreshFactoryEveryActualReservationAndLexicalOwner(t *testing.T) {
 		other := budget.Used() - astTestSymbolGraph(s) - m.Stats().AllocatedBytes
 		budget.FailAfter(after)
 		result, e := m.MkFreshFuncDecl(name, util.Symbol{}, nil, sort)
-		// Immediate source-completed and cold graph before lifting the fault.
+		// Immediate source-completed graph before lifting the fault. The local
+		// bytes.Buffer uses Go memory and is outside the injected arena budget.
 		if budget.Used() != other+astTestSymbolGraph(s)+m.Stats().AllocatedBytes {
 			t.Fatal("lost lexical overflow or source node", after, e, budget.Used())
 		}
@@ -126,7 +127,7 @@ func TestASTFreshFactoryEveryActualReservationAndLexicalOwner(t *testing.T) {
 			break
 		}
 	}
-	if !success || failures < 2 {
+	if !success || failures < 1 {
 		t.Fatal("actual fresh acquisition horizon", failures)
 	}
 }

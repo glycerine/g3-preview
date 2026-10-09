@@ -31,7 +31,7 @@ type astBVLiteralFrame struct {
 func (p *astBitVectorPluginOwner) literalBytes() uint64 {
 	var n uint64
 	for f := p.literalFrames; f != nil; f = f.next {
-		n += f.header + uint64(len(f.buffer.State.Heap)) + f.text.storageBytes()
+		n += f.header + f.text.storageBytes()
 	}
 	return n
 }
@@ -132,7 +132,7 @@ func (f *astBVLiteralFrame) destroyPhase(own, abort bool) (e error) {
 			return e
 		}
 	}
-	if f.stringBuffer && !f.buffer.State.Closed {
+	if f.stringBuffer && !f.buffer.Closed() {
 		if e = f.buffer.Close(); e != nil {
 			return e
 		}
@@ -365,8 +365,9 @@ func (m *ASTManager) ppBitVectorLiteralCore(h ASTHandle, signed, radix bool, g *
 	}
 	if !radix {
 		f.stringBuffer = true
-		f.buffer.State = util.StringBufferState{Budget: m.BudgetField, Capacity: 64, Initial: 64, LongBits: 64}
-		f.buffer.Self = &f.buffer
+		if e = f.buffer.Init(util.StringBufferConfig{}); e != nil {
+			return out, e
+		}
 		if e = f.buffer.AppendCString("(_ bv"); e != nil {
 			return out, e
 		}

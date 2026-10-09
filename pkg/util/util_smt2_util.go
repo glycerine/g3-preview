@@ -68,7 +68,7 @@ func IsSMT2QuotedSymbol(m *SymbolManager, s Symbol) (bool, error) {
 // buffer. Its private scalar buffer operations take no shared-buffer mutex, so
 // they cannot invert AppendSymbol's shared-buffer -> symbol-manager lock order.
 // Temporary owned storage is budgeted; the sole returned string is caller-owned.
-func MkSMT2QuotedSymbol(m *SymbolManager, s Symbol, budget *arena.Budget) (string, error) {
+func MkSMT2QuotedSymbol(m *SymbolManager, s Symbol, _ *arena.Budget) (string, error) {
 	if m == nil {
 		return "", ErrInvalidSymbol
 	}
@@ -81,12 +81,12 @@ func MkSMT2QuotedSymbol(m *SymbolManager, s Symbol, budget *arena.Budget) (strin
 	if !needed {
 		return "", ErrSMT2NeedsQuoting
 	}
-	b, e := NewStringBuffer64(StringBufferConfig{Budget: budget})
+	b, e := NewStringBuffer64(StringBufferConfig{})
 	if e != nil {
 		return "", e
 	}
 	defer b.Close()
-	if e = b.State.AppendByte(b.Inline[:], '|'); e != nil {
+	if e = b.AppendByte('|'); e != nil {
 		return "", e
 	}
 	text, e := m.spelling(s)
@@ -96,20 +96,16 @@ func MkSMT2QuotedSymbol(m *SymbolManager, s Symbol, budget *arena.Budget) (strin
 	for i := 0; i < len(text); i++ {
 		c := text[i]
 		if c == '|' || c == '\\' {
-			if e = b.State.AppendByte(b.Inline[:], '\\'); e != nil {
+			if e = b.AppendByte('\\'); e != nil {
 				return "", e
 			}
 		}
-		if e = b.State.AppendByte(b.Inline[:], c); e != nil {
+		if e = b.AppendByte(c); e != nil {
 			return "", e
 		}
 	}
-	if e = b.State.AppendByte(b.Inline[:], '|'); e != nil {
+	if e = b.AppendByte('|'); e != nil {
 		return "", e
 	}
-	data, e := b.State.Cstr(b.Inline[:])
-	if e != nil {
-		return "", e
-	}
-	return string(data), nil
+	return b.CStr()
 }

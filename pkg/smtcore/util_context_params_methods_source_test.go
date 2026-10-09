@@ -163,7 +163,7 @@ func contextMethodsCold(t *testing.T, s *ContextParams, g *util.GlobalParamsServ
 			if f.self != f || f.owner != s || f.invocation == 0 {
 				t.Fatal("actual lexical owner binding")
 			}
-			n += f.header + f.key.StorageBytes() + uint64(len(f.buffer.State.Heap))
+			n += f.header + f.key.StorageBytes()
 			d := &f.descriptor
 			if d.Self != nil {
 				if d.Self != d || d.OwnerBytes != 0 {
