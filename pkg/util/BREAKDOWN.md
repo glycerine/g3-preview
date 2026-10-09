@@ -155,7 +155,7 @@ The current Go versions of `list`, `scoped_vector`, and `backtrackable_set` use
 `any`. Each C++ template has a small set of concrete production instantiations.
 That use of `any` was an earlier porting mistake and should be eliminated.
 Replace these containers with concrete slices, Go maps, or
-`insdict.Dict` at v0.10.1 when insertion order is required. When a wrapper still
+`insdict.Dict` at v0.10.1 when stable iteration is required. When a wrapper still
 has meaningful behavior, specialize it for its real element type. Do not
 preserve unbounded template generality in the port.
 
@@ -211,7 +211,7 @@ old dependency cycle.
 | --- | --- | --- |
 | `buffer` | Concrete slices for typed scratch storage; `[]byte` or `bytes.Buffer` for mutable bytes; `strings.Builder` for text | Explicit cleanup only when elements own a real resource. The inline C++ storage optimization, placement construction, capacity header, and destructor template disappear. |
 | `vector` | Concrete slices with `append`, `copy`, and type-specific helpers | Preserve an algorithm's logical size and order. Do not preserve the universal vector class, growth formula, allocation header, or iterator classes. |
-| `hashtable` | Built-in maps for unordered lookup; `insdict.Dict` v0.10.1 only for insertion-ordered iteration | Custom equality becomes a comparable key, stable ID, or canonical key. Cached hash slots, tombstones, probing, and rehash code disappear. |
+| `hashtable` | Built-in maps for unordered lookup; `insdict.Dict` v0.10.1 when traversal must be stable | Insertion order is the accepted stable replacement for C++ bucket order. Custom equality becomes a comparable key, stable ID, or canonical key. Cached hash slots, tombstones, probing, and rehash code disappear. |
 | `str_hashtable` | `map[string]struct{}` | Nothing else. Go strings own their bytes and have value equality. |
 | `memory_manager` | Go allocation, slices/maps, `arena`, and an optional small `memlimit` policy package | Preserve configured limits, usage statistics, and error/fatal policy where consumers expose them. Remove raw blocks, allocation headers, byte-initialization maps, placement construction, and C++ realloc emulation. |
 | `debug` | Ordinary condition checks, `panic` or returned errors, and an optional tag set | Preserve user-facing assertion/debug toggles only if live consumers need them. Do not port debugger invocation, deliberate segmentation faults, macro expansion, or arena accounting for a tag map. |
@@ -230,13 +230,12 @@ the actual requirement.
 ### Map order and hash behavior
 
 Built-in Go map iteration is deliberately unspecified. Use it when an algorithm
-only needs membership or lookup. Use `insdict.Dict` when the required order is
-the insertion order. Do not use `insdict` automatically for every C++ hash
-table: Z3's open-addressed table iterates in bucket order, which is not insertion
-order. If that bucket order affects a solver choice or serialized result, either
-make the Go algorithm's order explicit and deterministic or retain a small
-specialized compatibility sequence for that one use. Sorting keys is often a
-better answer for canonical output.
+only needs membership or lookup. Use `insdict.Dict` when a C++ table traversal
+needs a stable order. Its insertion order does not reproduce the source table's
+physical bucket sequence, but exact bucket order is not a porting requirement;
+stability is. Do not retain a custom open-addressed table merely to reproduce
+that incidental sequence, and do not sort keys merely to imitate it. Sorting is
+still appropriate when a separate external format requires canonical order.
 
 Likewise, `hash/maphash` and the runtime's internal map hash do not replace an
 explicit Z3 hash value. They are intentionally seeded and their values are not
