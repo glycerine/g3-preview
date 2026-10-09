@@ -585,3 +585,6 @@ for the live upstream users that have not yet been ported.
 `util/backtrack` now owns trail stacks and both union-find variants. Their tests
 move with the implementation, and the leaf depends only on the standard
 library. Root aliases preserve the API for future upstream consumers.
+
+`util/version` owns the generated Z3 version tuple and its source-header
+consistency test. Root constants remain as compatibility names.

@@ -2,10 +2,13 @@
 // Values: src/util/version.h:2-7.
 package util
 
+import utilversion "github.com/glycerine/g3/pkg/util/version"
+
+// Compatibility constants for callers that have not moved to the leaf.
 const (
-	Z3MajorVersion   uint32 = 4
-	Z3MinorVersion   uint32 = 7
-	Z3BuildNumber    uint32 = 1
-	Z3RevisionNumber uint32 = 0
-	Z3FullVersion           = "Z3 4.7.1.0"
+	Z3MajorVersion   = utilversion.Major
+	Z3MinorVersion   = utilversion.Minor
+	Z3BuildNumber    = utilversion.Build
+	Z3RevisionNumber = utilversion.Revision
+	Z3FullVersion    = utilversion.Full
 )
