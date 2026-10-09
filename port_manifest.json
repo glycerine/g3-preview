@@ -102192,7 +102192,7 @@
       "role": "test",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_escaped.go"
+        "pkg/util/escaped/escaped.go"
       ],
       "tests": [
         "TestEscapedThirteenSourcePrintedFixtures"
@@ -102203,14 +102203,14 @@
         {
           "name": "tst_escaped all thirteen registered print-only fixtures (lines22-34), zero ENSURE assertions",
           "status": "ported",
-          "go_target": "pkg/util/util_escaped.go",
+          "go_target": "pkg/util/escaped/escaped.go",
           "tests": [
             "TestEscapedThirteenSourcePrintedFixtures"
           ]
         }
       ],
       "ownership": [
-        "Fixtures borrow nullable immutable strings and close each temporary charged owner; exact final bytes are caller-owned. No reference source or external C runtime is required at test runtime."
+        "Fixtures borrow nullable immutable strings; final strings belong to the caller. Tests require no reference source or external C runtime."
       ],
       "deviations": [
         "Thirteen source printed inputs are tested as fixed byte expectations, not counted as thirteen source assertions. Go output fixtures preserve quote/LF/null/trim routes; general indentation uses independent byte oracle coverage."
@@ -149643,7 +149643,7 @@
         "pkg/util/random/generator.go",
         "pkg/util/mpz_log.go",
         "pkg/util/util_sexpr.go",
-        "pkg/util/util_escaped.go",
+        "pkg/util/escaped/escaped.go",
         "pkg/util/util_verbose_context.go",
         "pkg/util/util_verbose_context_test.go",
         "pkg/util/small_allocator.go",
@@ -149665,7 +149665,7 @@
         "TestSexprRegisteredEscapedDefaultPrintInputs",
         "TestEscapedThirteenSourcePrintedFixtures",
         "TestEscapedIndependentByteIndentAndTrim",
-        "TestEscapedPublishedFailurePrefixesAndBudgets",
+        "TestEscapedWriterAndSizeBound",
         "TestVerboseContextMutableAllocatorSelection",
         "TestVerboseContextBorrowedPointerAndLifetime",
         "TestVerboseContextColdRefusalAndExactCharge",
@@ -149723,21 +149723,21 @@
         {
           "name": "escaped constructor and end nullable first-NUL/LF suffix selection (h379-389,cpp122-136)",
           "status": "ported",
-          "go_target": "pkg/util/util_escaped.go",
+          "go_target": "pkg/util/escaped/escaped.go",
           "tests": [
             "TestEscapedThirteenSourcePrintedFixtures",
             "TestEscapedIndependentByteIndentAndTrim",
-            "TestEscapedPublishedFailurePrefixesAndBudgets"
+            "TestEscapedWriterAndSizeBound"
           ]
         },
         {
-          "name": "escaped display and stream insertion complete owned-byte adapter (cpp138-152)",
+          "name": "escaped display and stream insertion through io.Writer (cpp138-152)",
           "status": "ported",
-          "go_target": "pkg/util/util_escaped.go",
+          "go_target": "pkg/util/escaped/escaped.go",
           "tests": [
             "TestEscapedThirteenSourcePrintedFixtures",
             "TestEscapedIndependentByteIndentAndTrim",
-            "TestEscapedPublishedFailurePrefixesAndBudgets"
+            "TestEscapedWriterAndSizeBound"
           ]
         },
         {
@@ -149761,11 +149761,11 @@
       ],
       "ownership": [
         "Random state owner-local, shuffle borrows caller sequence. Other util methods unported.",
-        "Complete escaped adapter borrows nullable input synchronously and appends into a physically charged concrete buffer. Byte/quote/indent successful prefixes remain live on budget failure. Convenience wrapper releases temporary storage on every exit and returns one caller-owned final text. Full uint32 indent domain is preserved; only actual host-int representability is guarded. See PORT_PROGRESS.md#audit-smt2-util-port-status-md.",
+        "The escaped leaf borrows nullable input synchronously and writes to a caller-owned io.Writer or returns a caller-owned string. Standard library builders replace C++ vector and stream storage.",
         "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
       ],
       "deviations": [
-        "Concrete buffer output replaces source ostream emission; all null/trim/indent byte branches are translated, but external custom stream state/badbit/exceptions remain open. Other util algorithms remain separate. No generics, boxed hot records or source assertions are invented."
+        "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound."
       ]
     },
     {
@@ -149777,7 +149777,7 @@
         "pkg/util/random/generator.go",
         "pkg/util/mpz_log.go",
         "pkg/util/util_sexpr.go",
-        "pkg/util/util_escaped.go",
+        "pkg/util/escaped/escaped.go",
         "pkg/util/util_verbose_context.go",
         "pkg/util/util_verbose_context_test.go",
         "pkg/util/small_allocator.go",
@@ -149799,7 +149799,7 @@
         "TestSexprRegisteredEscapedDefaultPrintInputs",
         "TestEscapedThirteenSourcePrintedFixtures",
         "TestEscapedIndependentByteIndentAndTrim",
-        "TestEscapedPublishedFailurePrefixesAndBudgets",
+        "TestEscapedWriterAndSizeBound",
         "TestVerboseContextMutableAllocatorSelection",
         "TestVerboseContextBorrowedPointerAndLifetime",
         "TestVerboseContextColdRefusalAndExactCharge",
@@ -150025,21 +150025,21 @@
         {
           "name": "escaped constructor and end nullable first-NUL/LF suffix selection (h379-389,cpp122-136)",
           "status": "ported",
-          "go_target": "pkg/util/util_escaped.go",
+          "go_target": "pkg/util/escaped/escaped.go",
           "tests": [
             "TestEscapedThirteenSourcePrintedFixtures",
             "TestEscapedIndependentByteIndentAndTrim",
-            "TestEscapedPublishedFailurePrefixesAndBudgets"
+            "TestEscapedWriterAndSizeBound"
           ]
         },
         {
-          "name": "escaped display and stream insertion complete owned-byte adapter (cpp138-152)",
+          "name": "escaped display and stream insertion through io.Writer (cpp138-152)",
           "status": "ported",
-          "go_target": "pkg/util/util_escaped.go",
+          "go_target": "pkg/util/escaped/escaped.go",
           "tests": [
             "TestEscapedThirteenSourcePrintedFixtures",
             "TestEscapedIndependentByteIndentAndTrim",
-            "TestEscapedPublishedFailurePrefixesAndBudgets"
+            "TestEscapedWriterAndSizeBound"
           ]
         },
         {
@@ -150063,11 +150063,11 @@
       ],
       "ownership": [
         "Random state owner-local, shuffle borrows caller sequence. Other util methods unported.",
-        "Complete escaped adapter borrows nullable input synchronously and appends into a physically charged concrete buffer. Byte/quote/indent successful prefixes remain live on budget failure. Convenience wrapper releases temporary storage on every exit and returns one caller-owned final text. Full uint32 indent domain is preserved; only actual host-int representability is guarded. See PORT_PROGRESS.md#audit-smt2-util-port-status-md.",
+        "The escaped leaf borrows nullable input synchronously and writes to a caller-owned io.Writer or returns a caller-owned string. Standard library builders replace C++ vector and stream storage.",
         "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
       ],
       "deviations": [
-        "Concrete buffer output replaces source ostream emission; all null/trim/indent byte branches are translated, but external custom stream state/badbit/exceptions remain open. Other util algorithms remain separate. No generics, boxed hot records or source assertions are invented."
+        "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound."
       ]
     },
     {
