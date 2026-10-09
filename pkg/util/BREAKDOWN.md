@@ -281,6 +281,21 @@ recover a weak runtime type check. Each future consumer should use its concrete
 pointer slice directly; the source operation is only indexed slice growth,
 lookup, clearing, and reset.
 
+Nine more unconsumed template stand-ins have been removed for the same reason:
+`ScopedVector`, `PtrScopedBuffer`, `ScopedPtrVector`, `RefBuffer`, `List`,
+`BacktrackableSet`, `TopSort`, `Pool`, and the related `RefVector` hierarchy.
+They exposed `any` throughout their APIs and had no production Go caller. This
+does not classify their upstream C++ facilities as dead. With the exception of
+`ptr_scoped_buffer`, which is used only by a C++ test, they have live consumers
+that must receive concrete Go implementations when those consumers are ported.
+The natural homes are the consumer packages: sequence theory for its three
+scoped-vector element types, AST for declaration topological sorting and AST
+reference buffers, SMT for its quantifier backtracking set and enode pool, and
+the relevant math packages for their owning pointer slices. Existing Go AST and
+polynomial reference buffers are already concrete examples. Ordinary typed
+slices and maps should replace the remaining source templates; no dynamically
+typed root-util abstraction is needed.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before
