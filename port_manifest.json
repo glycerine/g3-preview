@@ -114544,23 +114544,9 @@
       "path": "src/util/double_manager.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
-      "go_targets": [
-        "pkg/util/double_manager.go",
-        "pkg/util/double_manager_test.go",
-        "pkg/util/owned_string_stream.go",
-        "pkg/util/owned_string.go"
-      ],
-      "tests": [
-        "TestDoubleManagerSourceToleranceQuirk",
-        "TestDoubleManagerParameterBorrowAndFailedUpdate",
-        "TestDoubleManagerArithmeticIndependentOracleAndBoundaries",
-        "TestDoubleManagerSettersOrderingAndNumericHash",
-        "TestDoubleManagerAtOfPrefixAndIEEEBoundaries",
-        "TestDoubleManagerOwnedPrecision12FormattingEveryReservation",
-        "TestDoubleManagerSelectedIEEE64NaNPayload",
-        "TestDoubleManagerInPlaceInverseAndScalarAllocation"
-      ],
+      "status": "platform_replacement",
+      "go_targets": [],
+      "tests": [],
       "conditionals": [
         {
           "line": 19,
@@ -114579,28 +114565,10 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [
-        {
-          "name": "All defined double_manager scalar/parameter/precision12 string/hash bodies (double_manager.h:34-100)",
-          "status": "ported",
-          "go_target": "pkg/util/double_manager.go",
-          "tests": [
-            "TestDoubleManagerSourceToleranceQuirk",
-            "TestDoubleManagerParameterBorrowAndFailedUpdate",
-            "TestDoubleManagerArithmeticIndependentOracleAndBoundaries",
-            "TestDoubleManagerSettersOrderingAndNumericHash",
-            "TestDoubleManagerAtOfPrefixAndIEEEBoundaries",
-            "TestDoubleManagerOwnedPrecision12FormattingEveryReservation",
-            "TestDoubleManagerSelectedIEEE64NaNPayload",
-            "TestDoubleManagerInPlaceInverseAndScalarAllocation"
-          ]
-        }
-      ],
-      "ownership": [
-        "Manager is a copyable scalar tolerance, owning no dynamic storage. Parameter update copies only the reached double; failed reads preserve prior state. Static scalar helpers allocate no owner. Caller-provided local output stream and fresh return slot model the actual source ostringstream and independent str() result: success destroys stream and transfers result; failed transport retains actual string backing for explicit OwnAbort. All formatting reservation refusals audit actual string backing and exact refunds. Inputs are passed by value where source takes values; in-place neg/abs/inverse/reset/swap and no-read deletion preserve original scalar actions."
-      ],
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "Selected C-locale IEEE64/nearest-even profile, signed32 int and unsigned32 exponent. Go math/strconv provide the external scalar libm/decimal boundary; platform-specific libm bit rounding, changed locale/rounding modes, errno, native CRT/iostream ABI and exception transport are qualified. C atof prefix lexer supports decimal, optional-exponent hex, infinity, selected quiet NaN payload/sign, malformed exponent rollback, NUL and invalid-prefix positive zero. Parser syntax is checked against https://www.gnu.org/s/libc/manual/html_node/Parsing-of-Floats.html and payload conversion against https://raw.githubusercontent.com/bminor/glibc/master/stdlib/strtod_nan_main.c . Native unsigned floating casts outside the defined truncated range return ErrDoubleManagerHashDomain; within range hash_ull receives the original numeric uint64 cast. Source is_neg compares against positive tolerance intentionally. Debug p<=INT_MAX assertion is a returned guard; release narrows to signed32 before math.Pow. Static value-out arithmetic uses Go value returns, distinct typed setter names and caller-provided formatting scope replace overloaded/native return and stack unwinding interfaces. No native C/C++ source is built."
+        "The only Z3 consumer of double_manager is linear_equation::get_a(double_manager&, unsigned, double&), whose body only copies an existing double coefficient. Go represents that operation with an ordinary float64 return or assignment. Arithmetic uses Go operators and math; the otherwise unused C atof, ostream formatting, parameter-manager, and numeric-hash compatibility surfaces are deliberately not ported."
       ]
     },
     {

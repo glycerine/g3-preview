@@ -510,7 +510,7 @@ is grouped by likely disposition, not by a proposed one-package-per-row rule.
 ```text
 approx_nat             approx_set              backtrackable_set
 cancel_eh              checked_int64           cooperate
-dependency             double_manager          env_params
+dependency                                     env_params
 f2n                    fixed_bit_vector        heap
 hwf                    inf_eps_rational        inf_int_rational
 inf_s_integer          lbool                   list
@@ -532,6 +532,14 @@ Many of these are endpoints only within `src/util`; they have real consumers in
 AST, SAT, SMT, tactic, solver, shell, or `muz` code. For example, `lbool`,
 `statistics`, cancellation/cooperation, `heap`, and `union_find` all have broad
 upstream use. Package boundaries must preserve that outward API.
+
+`double_manager` was removed from the package candidates after a whole-source
+consumer audit. Its only Z3 consumer is the double overload of
+`linear_equation::get_a`, which merely copies an existing `double` coefficient.
+The Go port should represent that operation as an ordinary `float64` return or
+assignment. The manager's arithmetic maps directly to Go operators and `math`,
+and its unused `atof`, `ostringstream`, parameter, and hash surfaces should not
+be carried into Go.
 
 ### Small units requiring a Go-native shape before packaging
 
