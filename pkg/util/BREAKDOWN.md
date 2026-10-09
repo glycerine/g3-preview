@@ -595,3 +595,9 @@ trailing-dot extension with a separate boolean; the old borrowed `[]byte`
 C-string facade had no Go consumer and has been deleted rather than carried
 across the package boundary. Future API and shell ports should import this
 leaf directly.
+
+`util/approx` owns the concrete approximate natural and 64-bit unsigned-set
+implementations. Both depend only on the standard library. Formatting now uses
+`String`, and set traversal uses a typed callback; the translated numeric
+ostream edge and C++ iterator object were deleted. There were no current Go
+consumers requiring a root compatibility facade.
