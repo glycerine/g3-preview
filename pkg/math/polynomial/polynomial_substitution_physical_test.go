@@ -40,14 +40,7 @@ func polynomialSubstitutionPhysicalWithHandlers(t *testing.T, m *MultivariatePol
 
 func polynomialSubstitutionNamedRaw(m *MultivariatePolynomialCore) []util.Block {
 	d := &m.substitution
-	raw := []util.Block{m.tmp1.raw, m.tmp1.pending, d.found.raw, d.found.pending}
-	for _, v := range []*PolynomialVariableDegrees{&d.max.maxDegree, &d.max.variables, &d.positions.positions} {
-		if !v.rawDestroyed {
-			raw = append(raw, v.raw)
-		}
-		raw = append(raw, v.pending)
-	}
-	return raw
+	return []util.Block{m.tmp1.raw, m.tmp1.pending, d.found.raw, d.found.pending}
 }
 func polynomialSubstitutionNamedPolynomials(m *MultivariatePolynomialCore) []Polynomial {
 	s := &m.substitution.scope

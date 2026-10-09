@@ -14,12 +14,19 @@ type PolynomialVariablesView struct {
 	runtime *util.Runtime
 	raw     util.Block
 	offset  uint64
+	values  []uint32
 }
 
 func BorrowPolynomialVariables(r *util.Runtime, b util.Block, offset uint64) PolynomialVariablesView {
-	return PolynomialVariablesView{r, b, offset}
+	return PolynomialVariablesView{runtime: r, raw: b, offset: offset}
 }
 func (v PolynomialVariablesView) At(i uint32) (uint32, error) {
+	if v.values != nil {
+		if uint64(i) >= uint64(len(v.values)) {
+			return 0, arena.ErrBounds
+		}
+		return v.values[i], nil
+	}
 	if v.runtime == nil {
 		return 0, util.ErrRuntimeOwner
 	}
@@ -29,145 +36,65 @@ func (v PolynomialVariablesView) At(i uint32) (uint32, error) {
 	}
 	return v.runtime.ReadUint32(v.raw, o)
 }
-func (v PolynomialVariablesView) IsNull() bool { return v.raw == (util.Block{}) }
+func (v PolynomialVariablesView) IsNull() bool { return v.values == nil && v.raw == (util.Block{}) }
 func variableEmbedded(d *PolynomialVariableDegrees, r *util.Runtime, complete bool) {
 	*d = PolynomialVariableDegrees{runtime: r, constructed: complete}
 	d.self = d
 }
 func variableGet(d *PolynomialVariableDegrees, x, def uint32) (uint32, error) {
-	n, e := d.size()
-	if e != nil {
-		return 0, e
-	}
-	if x >= n {
+	if uint64(x) >= uint64(len(d.values)) {
 		return def, nil
 	}
-	return d.runtime.ReadUint32(d.raw, 8+uint64(x)*4)
+	return d.values[x], nil
 }
 func variableAt(d *PolynomialVariableDegrees, x uint32) (uint32, error) {
-	if polynomialSourceDebug {
-		n, e := d.size()
-		if e != nil {
-			return 0, e
-		}
-		if x >= n {
-			return 0, ErrPolynomialAssertion
-		}
+	if uint64(x) >= uint64(len(d.values)) {
+		return 0, ErrPolynomialAssertion
 	}
-	return d.runtime.ReadUint32(d.raw, 8+uint64(x)*4)
+	return d.values[x], nil
 }
 func variablePut(d *PolynomialVariableDegrees, x, v uint32) error {
-	if polynomialSourceDebug {
-		n, e := d.size()
-		if e != nil {
-			return e
-		}
-		if x >= n {
-			return ErrPolynomialAssertion
-		}
+	if uint64(x) >= uint64(len(d.values)) {
+		return ErrPolynomialAssertion
 	}
-	return d.runtime.WriteUint32(d.raw, 8+uint64(x)*4, v)
+	d.values[x] = v
+	return nil
 }
 
 // The filled resize overload grows through ALL allocations with old SIZE,
 // publishes requested SIZE once, then constructs its unsigned values ascending.
 func variableResizeFilled(d *PolynomialVariableDegrees, n, fill uint32) error {
-	old, e := d.size()
-	if e != nil {
+	old := len(d.values)
+	if e := d.resize(n); e != nil {
 		return e
 	}
-	if n <= old {
-		if d.raw == (util.Block{}) {
-			return nil
-		}
-		return d.runtime.WriteUint32(d.raw, 4, n)
-	}
-	for {
-		cap, e := d.capacity()
-		if e != nil {
-			return e
-		}
-		if n <= cap {
-			break
-		}
-		if e = d.expand(); e != nil {
-			return e
-		}
-	}
-	if e = d.runtime.WriteUint32(d.raw, 4, n); e != nil {
-		return e
-	}
-	for i := old; i < n; i++ {
-		if e = d.runtime.WriteUint32(d.raw, 8+uint64(i)*4, fill); e != nil {
-			d.interrupted = true
-			return e
-		}
+	for i := old; i < len(d.values); i++ {
+		d.values[i] = fill
 	}
 	return nil
 }
 func variableSetFilled(d *PolynomialVariableDegrees, x, value, fill uint32) error {
-	if d.interrupted || d.pending != (util.Block{}) {
-		return ErrPolynomialPending
+	if x == ^uint32(0) {
+		return arena.ErrBounds
 	}
-	n, e := d.size()
-	if e != nil {
-		return e
-	}
-	if x >= n {
-		if e = variableResizeFilled(d, x+1, fill); e != nil {
+	if uint64(x) >= uint64(len(d.values)) {
+		if e := variableResizeFilled(d, x+1, fill); e != nil {
 			return e
 		}
 	}
-	return d.runtime.WriteUint32(d.raw, 8+uint64(x)*4, value)
+	d.values[x] = value
+	return nil
 }
 func variablePush(d *PolynomialVariableDegrees, value uint32) error {
-	if d.interrupted || d.pending != (util.Block{}) {
-		return ErrPolynomialPending
-	}
-	if d.raw == (util.Block{}) {
-		if e := d.expand(); e != nil {
-			return e
-		}
-	} else {
-		n, e := d.size()
-		if e != nil {
-			return e
-		}
-		cap, e := d.capacity()
-		if e != nil {
-			return e
-		}
-		if n == cap {
-			if e = d.expand(); e != nil {
-				return e
-			}
-		}
-	}
-	n, e := d.size()
-	if e != nil {
-		return e
-	}
-	if e = d.runtime.WriteUint32(d.raw, 8+uint64(n)*4, value); e != nil {
-		return e
-	}
-	n, e = d.size()
-	if e != nil {
-		return e
-	}
-	return d.runtime.WriteUint32(d.raw, 4, n+1)
+	d.values = append(d.values, value)
+	return nil
 }
 func variableReset(d *PolynomialVariableDegrees) error {
-	if d.raw == (util.Block{}) {
-		return nil
-	}
-	return d.runtime.WriteUint32(d.raw, 4, 0)
+	d.values = d.values[:0]
+	return nil
 }
 func variableView(d *PolynomialVariableDegrees) PolynomialVariablesView {
-	offset := uint64(0)
-	if d.raw != (util.Block{}) {
-		offset = 8
-	}
-	return BorrowPolynomialVariables(d.runtime, d.raw, offset)
+	return PolynomialVariablesView{values: d.values}
 }
 
 // Each member is a real uint-vector state embedded in one charged stable cold

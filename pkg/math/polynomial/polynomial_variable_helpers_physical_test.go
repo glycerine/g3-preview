@@ -51,12 +51,6 @@ func polynomialVariablePhysicalCore(t *testing.T, m *MultivariatePolynomialCore,
 	extra := extraColdHeaders
 	for _, d := range degrees {
 		extra += d.header
-		if !d.rawDestroyed && d.raw != (util.Block{}) {
-			external = append(external, d.raw)
-		}
-		if d.pending != (util.Block{}) {
-			external = append(external, d.pending)
-		}
 	}
 	polynomialNewtonPhysicalWithExtra(t, m, owners, references, refvectors, lazy, polys, handlers, external, extra, public...)
 }

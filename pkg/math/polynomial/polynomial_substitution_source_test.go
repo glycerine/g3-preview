@@ -75,10 +75,13 @@ func TestPolynomialSubstitutionAbsentAndReachedRawFields(t *testing.T) {
 	if a != p || control.containsCalls != 2 || control.valueCalls != 0 || m.som.as.raw != oldAS || m.som.ms.raw != oldMS || m.substitution.found.raw != (util.Block{}) {
 		t.Fatal("source absent branch before numeric/SOM/found vars", a, control)
 	}
-	// The helper's variable arrays really allocate, but no scalar roots or SOM
-	// storage were created on the early-return path.
-	if m.memory.Stats().LiveBlocks <= stats.LiveBlocks || m.memory.State().GlobalCount <= count.GlobalCount {
-		t.Fatal("actual scoped maximum vectors")
+	// The helper retains ordinary Go slice capacity across Reset. The absent
+	// branch creates no Runtime blocks, scalar roots, or SOM storage.
+	if m.memory.Stats() != stats || m.memory.State() != count {
+		t.Fatal("absent branch changed Runtime storage", stats, m.memory.Stats(), count, m.memory.State())
+	}
+	if cap(m.substitution.max.maxDegree.values) == 0 || cap(m.substitution.max.variables.values) == 0 || len(m.substitution.max.variables.values) != 0 {
+		t.Fatal("native maximum-degree workspace was not retained and reset")
 	}
 	control = substitutionReadControl{match: true, value: util.RationalFromBorrowedNumerals(util.NewInt(1), util.NewInt(-2))}
 	a, e = m.SubstituteRationalMap(p, &control)

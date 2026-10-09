@@ -793,3 +793,11 @@ handles in `[]ASTParameter`. Parameter copies and ordered release remain
 explicit, while the raw byte vector, embedded capacity words, and arena-backed
 growth failures are gone. Lexical format metadata continues to borrow its
 call-local parameters through the existing lexical record.
+
+Polynomial variable-degree maps, maximum-degree variable lists, and variable
+position maps now use concrete `[]uint32` storage. Sparse default values,
+first-seen variable order, deep-copy assignment, move construction, scoped
+reset, and display behavior remain explicit. C++ vector capacity growth,
+`size_t` conversion, pending Runtime blocks, and arena failure states for these
+Go-managed slices have been removed, along with the tests that existed only to
+validate those representations.

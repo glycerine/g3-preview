@@ -76,14 +76,7 @@ func TestPolynomialVarsEveryActualReservationAndNamedGraph(t *testing.T) {
 			serviceMust(t, e)
 			c.integer.Budget().FailAfter(ordinal)
 			returned := m.Vars(p, xs)
-			roots := []util.Block{}
-			if xs.raw != (util.Block{}) {
-				roots = append(roots, xs.raw)
-			}
-			if xs.pending != (util.Block{}) {
-				roots = append(roots, xs.pending)
-			}
-			polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, nil, xs.header, roots)
+			polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, nil, xs.header, nil)
 			n, e := xs.size()
 			serviceMust(t, e)
 			for i := uint32(0); i < n; i++ {
@@ -116,11 +109,12 @@ func TestPolynomialVarsEveryActualReservationAndNamedGraph(t *testing.T) {
 	}
 }
 
-func TestPolynomialVarsFlagBeforePushAndNormalOnlyReset(t *testing.T) {
+func TestPolynomialVarsNativePushAndNormalReset(t *testing.T) {
 	m, p, _ := polynomialLexFixture(t)
 	c := m.core
 	xs, e := NewPolynomialVariableDegrees(c.memory)
 	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, xs.CloseChecked()) })
 	serviceMust(t, c.substitution.found.reserve(2))
 	first, e := c.monomialCore(p, 0)
 	serviceMust(t, e)
@@ -128,30 +122,36 @@ func TestPolynomialVarsFlagBeforePushAndNormalOnlyReset(t *testing.T) {
 	serviceMust(t, e)
 	c.integer.Budget().FailAfter(0)
 	returned := m.Vars(p, xs)
-	if !numericPhysicalReservationRefusal(returned) {
-		t.Fatal(returned)
-	}
+	c.integer.Budget().FailAfter(-1)
+	serviceMust(t, returned)
 	n, e := xs.size()
 	serviceMust(t, e)
 	seen, e := c.substitution.found.at(x)
 	serviceMust(t, e)
-	if n != 0 || !seen {
-		t.Fatal("flag write must precede refused push", n, seen)
+	if n != 2 || seen {
+		t.Fatal("native push and normal reset", n, seen)
+	}
+	for i := uint32(0); i < n; i++ {
+		collected, e := variableAt(xs, i)
+		serviceMust(t, e)
+		seen, e := c.substitution.found.at(collected)
+		serviceMust(t, e)
+		if seen {
+			t.Fatal("normal suffix did not reset collected variable", collected)
+		}
 	}
 	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, nil, xs.header, nil)
-	c.integer.Budget().FailAfter(-1)
 	serviceMust(t, m.Vars(p, xs))
 	n, e = xs.size()
 	serviceMust(t, e)
-	if n != 1 {
-		t.Fatal("literal retry must retain old true flag", n)
+	if n != 2 {
+		t.Fatal("repeat collection", n)
 	}
 	seen, e = c.substitution.found.at(x)
 	serviceMust(t, e)
-	if !seen {
-		t.Fatal("normal suffix must reset only actual xs entries")
+	if seen {
+		t.Fatal("normal suffix did not reset collected variable")
 	}
-	serviceMust(t, xs.CloseChecked())
 }
 
 // Returning ErrorTransport is a supported Go callback domain, distinct from
@@ -171,7 +171,7 @@ func TestPolynomialVarsReturningTransportOwnerReentry(t *testing.T) {
 					state := m.core.memory.State()
 					used := b.Used()
 					source, closed := m.sourceStarted, m.closed
-					raw, pending := xs.raw, xs.pending
+					values := append([]uint32(nil), xs.values...)
 					var returned error
 					switch which {
 					case "full-source":
@@ -189,7 +189,11 @@ func TestPolynomialVarsReturningTransportOwnerReentry(t *testing.T) {
 					case "same-call":
 						returned = m.Vars(p, xs)
 					}
-					if returned != ErrPolynomialPending || state != m.core.memory.State() || used != b.Used() || source != m.sourceStarted || closed != m.closed || raw != xs.raw || pending != xs.pending {
+					sameValues := len(values) == len(xs.values)
+					for i := range values {
+						sameValues = sameValues && values[i] == xs.values[i]
+					}
+					if returned != ErrPolynomialPending || state != m.core.memory.State() || used != b.Used() || source != m.sourceStarted || closed != m.closed || !sameValues {
 						t.Errorf("executing callback changed owner %v source=%v closed=%v", returned, m.sourceStarted, m.closed)
 					}
 				}

@@ -3,8 +3,6 @@ package polynomial
 
 import (
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialPseudoConstantDivisorActualModDChild(t *testing.T) {
@@ -24,7 +22,7 @@ func polynomialPseudoConstantModDChild(t *testing.T, degree uint32) {
 		serviceMust(t, bounds.SetDegree(1, degree))
 		Q, R := polynomialPseudoOutputs(t, c)
 		audit := func() {
-			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p, q, Q.root.value, Q.root.incoming, R.root.value, R.root.incoming}, nil, Q.header+R.header+bounds.header, []util.Block{bounds.raw, bounds.pending})
+			polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p, q, Q.root.value, Q.root.incoming, R.root.value, R.root.incoming}, nil, Q.header+R.header+bounds.header, nil)
 		}
 		c.integer.Budget().FailAfter(prefix)
 		body := c.ExactPseudoDivideModD(p, q, 0, bounds, Q, R)

@@ -47,12 +47,6 @@ func polynomialModDNewtonPhysicalWithRaw(t *testing.T, m *MultivariatePolynomial
 	var headers uint64
 	for _, d := range degrees {
 		headers += d.header
-		if !d.rawDestroyed && d.raw != (util.Block{}) {
-			external = append(external, d.raw)
-		}
-		if d.pending != (util.Block{}) {
-			external = append(external, d.pending)
-		}
 	}
 	polynomialNewtonPhysicalWithExtra(t, m, owners, references, refvectors, lazy, polys, handlers, external, headers, public...)
 }

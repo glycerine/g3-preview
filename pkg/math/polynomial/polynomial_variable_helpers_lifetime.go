@@ -1,12 +1,6 @@
 // Source: src/math/polynomial/polynomial.cpp:6179-6232,6307-6344; src/util/vector.h:101-214,530-546.
 package polynomial
 
-import (
-	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
-)
-
 func (d *PolynomialMaxDegrees) SourceFinalize() error {
 	if e := d.identity(); e != nil {
 		return e
@@ -88,39 +82,13 @@ func (d *PolynomialVariablePositions) CloseChecked() error {
 	d.closed = true
 	return nil
 }
-func variableCopyConstruct(to, from *PolynomialVariableDegrees) error {
-	if e := from.open(); e != nil {
-		return e
-	}
-	if from.raw != (util.Block{}) {
-		if e := to.copyCore(from); e != nil {
-			to.bodyCause = e
-			return e
-		}
-	}
-	if polynomialSourceDebug {
-		n, e := to.size()
-		if e != nil {
-			return e
-		}
-		other, e := from.size()
-		if e != nil {
-			return e
-		}
-		if n != other {
-			return ErrPolynomialAssertion
-		}
-	}
+func variableCopyConstruct(to, from *PolynomialVariableDegrees) {
+	to.values = append(to.values, from.values...)
 	to.constructed = true
-	return nil
 }
 func variableMoveConstruct(to, from *PolynomialVariableDegrees) {
-	to.raw, from.raw = from.raw, to.raw
-	to.rawDestroyed, from.rawDestroyed = from.rawDestroyed, false
+	to.values, from.values = from.values, nil
 	to.constructed = true
-}
-func variableOwns(d *PolynomialVariableDegrees) bool {
-	return d.pending != (util.Block{}) || (d.raw != (util.Block{}) && !d.rawDestroyed) || d.sourceCause != nil
 }
 func NewPolynomialMaxDegreesCopy(source *PolynomialMaxDegrees) (*PolynomialMaxDegrees, error) {
 	if e := source.open(); e != nil {
@@ -130,22 +98,8 @@ func NewPolynomialMaxDegreesCopy(source *PolynomialMaxDegrees) (*PolynomialMaxDe
 	if e != nil {
 		return nil, e
 	}
-	e = variableCopyConstruct(&d.maxDegree, &source.maxDegree)
-	if e == nil {
-		e = variableCopyConstruct(&d.variables, &source.variables)
-	}
-	if e != nil {
-		d.bodyCause = e
-		cleanup := d.SourceFinalize()
-		e = errors.Join(e, cleanup)
-		if !variableOwns(&d.maxDegree) && !variableOwns(&d.variables) && cleanup == nil {
-			d.runtime.Budget().Release(d.header)
-			d.header = 0
-			d.closed = true
-			return nil, e
-		}
-		return d, e
-	}
+	variableCopyConstruct(&d.maxDegree, &source.maxDegree)
+	variableCopyConstruct(&d.variables, &source.variables)
 	d.constructed = true
 	return d, nil
 }
@@ -192,17 +146,7 @@ func NewPolynomialVariablePositionsCopy(source *PolynomialVariablePositions) (*P
 	if e != nil {
 		return nil, e
 	}
-	e = variableCopyConstruct(&d.positions, &source.positions)
-	if e != nil {
-		d.bodyCause = e
-		if !variableOwns(&d.positions) {
-			d.runtime.Budget().Release(d.header)
-			d.header = 0
-			d.closed = true
-			return nil, e
-		}
-		return d, e
-	}
+	variableCopyConstruct(&d.positions, &source.positions)
 	d.constructed = true
 	return d, nil
 }

@@ -1,41 +1,30 @@
 // Source: src/math/polynomial/polynomial.cpp:6898-6922; src/util/vector.h:191-203.
 package polynomial
 
-import (
-	"testing"
+import "testing"
 
-	"github.com/glycerine/g3/pkg/util"
-)
-
-func TestPolynomialModDConstantWithStoppedMapAssignmentKeepsActualRoots(t *testing.T) {
+func TestPolynomialModDConstantWithNativeMapCopy(t *testing.T) {
 	m := polynomialCellFixture(t)
 	target, e := NewPolynomialVariableDegrees(m.memory)
 	serviceMust(t, e)
 	source, e := NewPolynomialVariableDegrees(m.memory)
 	serviceMust(t, e)
 	t.Cleanup(func() {
-		m.integer.Budget().FailAfter(-1)
 		serviceMust(t, target.CloseChecked())
 		serviceMust(t, source.CloseChecked())
 	})
 	serviceMust(t, target.SetDegree(1, 2))
 	serviceMust(t, source.SetDegree(1, 3))
-	old := target.raw
-	m.integer.Budget().FailAfter(0)
-	e = target.CopyFrom(source)
-	if !numericPhysicalReservationRefusal(e) || !target.rawDestroyed || target.raw != old || target.pending != (util.Block{}) {
-		t.Fatal("actual completed old free then replacement refusal", e, target)
+	serviceMust(t, target.CopyFrom(source))
+	serviceMust(t, source.SetDegree(1, 4))
+	v, e := target.Degree(1)
+	serviceMust(t, e)
+	if v != 3 {
+		t.Fatal("native map copy shares backing", v)
 	}
-	cause := target.bodyCause
 	got, e := m.ModD(m.unit, target)
 	serviceMust(t, e)
-	if got != m.unit || target.bodyCause != cause || !target.rawDestroyed || target.raw != old {
-		t.Fatal("constant source branch read or repaired stopped mapping", got, target)
+	if got != m.unit {
+		t.Fatal("constant source branch changed", got)
 	}
-	// The stale source pointer is history, not an owning physical block. Both
-	// real cold map objects and source's live raw block remain named here.
-	polynomialModDNewtonPhysicalWithRaw(t, m, nil, nil, nil, nil, nil, nil, nil, []*PolynomialVariableDegrees{target, source})
-	m.integer.Budget().FailAfter(-1)
-	serviceMust(t, target.CloseChecked())
-	polynomialModDNewtonPhysicalWithRaw(t, m, nil, nil, nil, nil, nil, nil, nil, []*PolynomialVariableDegrees{target, source})
 }

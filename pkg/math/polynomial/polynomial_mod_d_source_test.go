@@ -17,7 +17,7 @@ func polynomialDegreeMap(t *testing.T, m *MultivariatePolynomialCore) *Polynomia
 	t.Cleanup(func() { serviceMust(t, d.CloseChecked()) })
 	return d
 }
-func TestPolynomialVariableDegreesSparseDefaultsAndWrapPrefix(t *testing.T) {
+func TestPolynomialVariableDegreesSparseDefaultsAndRejectedMaxIndex(t *testing.T) {
 	m := polynomialCellFixture(t)
 	d := polynomialDegreeMap(t, m)
 	serviceMust(t, d.SetDegree(3, 2))
@@ -29,16 +29,16 @@ func TestPolynomialVariableDegreesSparseDefaultsAndWrapPrefix(t *testing.T) {
 			t.Fatal(x, actual, want)
 		}
 	}
-	// Source setx wraps idx+1 to zero, shrinks first, then the actual UINT_MAX
-	// store is outside physical capacity. This is guarded source-undefined input.
+	// The Go boundary rejects an index that cannot be represented by the
+	// source uint32 size without changing the existing map.
 	e := d.SetDegree(^uint32(0), 7)
 	if !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("actual endangered write", e)
 	}
 	actual, e := d.Degree(3)
 	serviceMust(t, e)
-	if actual != 0 {
-		t.Fatal("source shrink publication survived guard", actual)
+	if actual != 2 {
+		t.Fatal("rejected index changed existing degree", actual)
 	}
 }
 func TestPolynomialModDIndependentMultivariateFilter(t *testing.T) {
@@ -138,76 +138,34 @@ func TestPolynomialSOMModDSourceLogicalAssertionAndZeroReadMask(t *testing.T) {
 	serviceMust(t, e)
 }
 
-func TestPolynomialVariableDegreesActualGrowthRefusalPrefixes(t *testing.T) {
-	failures, success := 0, false
-	for ordinal := int64(0); ordinal < 64; ordinal++ {
-		reached := false
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			b := arena.NewBudget(1 << 22)
-			runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
-			serviceMust(t, e)
-			d, e := NewPolynomialVariableDegrees(runtime)
-			serviceMust(t, e)
-			b.FailAfter(ordinal)
-			e = d.SetDegree(9, 7)
-			// Actual published and unreturned blocks are separately named, before fault
-			// disable or source/owning cleanup. No allocation registry infers roots.
-			expected := uint32(0)
-			if d.raw != (util.Block{}) {
-				expected++
-			}
-			if d.pending != (util.Block{}) {
-				expected++
-			}
-			if runtime.Stats().LiveBlocks != expected || runtime.Stats().TotalBytes+d.header != b.Used() {
-				t.Fatal("actual map ownership", runtime.Stats(), d.header, b.Used(), expected)
-			}
-			n, x := d.size()
-			serviceMust(t, x)
-			if e != nil {
-				if !numericPhysicalReservationRefusal(e) {
-					t.Fatal("actual growth refusal", ordinal, e)
-				}
-				if n != 0 {
-					t.Fatal("all expansions precede requested size publication", ordinal, n)
-				}
-				failures++
-			} else {
-				if n != 10 {
-					t.Fatal(n)
-				}
-				for i := uint32(0); i < 10; i++ {
-					value, x := d.Degree(i)
-					serviceMust(t, x)
-					want := uint32(0)
-					if i == 9 {
-						want = 7
-					}
-					if value != want {
-						t.Fatal(i, value, want)
-					}
-				}
-				reached = true
-			}
-			b.FailAfter(-1)
-			serviceMust(t, d.SourceFinalize())
-			if d.pending != (util.Block{}) && runtime.Stats().LiveBlocks == 0 {
-				t.Fatal("source destructor cannot abort unreturned allocation")
-			}
-			serviceMust(t, d.CloseChecked())
-			serviceMust(t, runtime.Close())
-			if b.Used() != 0 {
-				t.Fatal("complete refund", b.Used())
-			}
-		})
-		if reached {
-			t.Log("first mathematical success", ordinal)
-			success = true
-			break
+func TestPolynomialVariableDegreesNativeGrowthIgnoresArenaFailure(t *testing.T) {
+	b := arena.NewBudget(1 << 22)
+	runtime, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
+	serviceMust(t, e)
+	d, e := NewPolynomialVariableDegrees(runtime)
+	serviceMust(t, e)
+	before := b.Used()
+	b.FailAfter(0)
+	serviceMust(t, d.SetDegree(9, 7))
+	b.FailAfter(-1)
+	if b.Used() != before || runtime.Stats().LiveBlocks != 0 {
+		t.Fatal("native degree storage charged to Runtime", before, b.Used(), runtime.Stats())
+	}
+	for i := uint32(0); i < 10; i++ {
+		value, e := d.Degree(i)
+		serviceMust(t, e)
+		want := uint32(0)
+		if i == 9 {
+			want = 7
+		}
+		if value != want {
+			t.Fatal(i, value, want)
 		}
 	}
-	if !success || failures == 0 {
-		t.Fatal(failures, success)
+	serviceMust(t, d.CloseChecked())
+	serviceMust(t, runtime.Close())
+	if b.Used() != 0 {
+		t.Fatal("complete refund", b.Used())
 	}
 }
 func TestPolynomialPseudoModDPhysicalFailurePrefixes(t *testing.T) {
@@ -301,13 +259,18 @@ func TestPolynomialModDWarmStorageAndColdOwnerGuards(t *testing.T) {
 	}
 	before := numericWarmProfileSnapshot(t, m.integer, m.integer.Budget())
 	monoBefore := m.monomials.allocator.Stats()
-	rawBefore := d.raw
+	valuesBefore := append([]uint32(nil), d.values...)
 	sizeBefore, e := d.size()
 	serviceMust(t, e)
 	allocations := testing.AllocsPerRun(20, operation)
 	numericWarmProfileAudit(t, m.integer, m.integer.Budget(), before, allocations, monoBefore.DirectObjects != 0)
-	if m.monomials.allocator.Stats() != monoBefore || d.raw != rawBefore || m.pseudoDivision.active {
+	if m.monomials.allocator.Stats() != monoBefore || len(d.values) != len(valuesBefore) || m.pseudoDivision.active {
 		t.Fatal("stable actual cohort")
+	}
+	for i := range valuesBefore {
+		if d.values[i] != valuesBefore[i] {
+			t.Fatal("degree map changed", i, d.values[i], valuesBefore[i])
+		}
 	}
 	sizeAfter, e := d.size()
 	serviceMust(t, e)
