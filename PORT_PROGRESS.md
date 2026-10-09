@@ -1,5 +1,13 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
+`src/util/heap.h` now has a native concrete `int32` implementation in
+`pkg/util/heap`. Typed slices hold the heap and inverse indices; the parallel
+Runtime/Block implementation, Runtime-only diagnostic fixtures, and root util
+facade are removed. The leaf retains mutable-priority updates, source order,
+checked iterators, copy/assignment behavior, deterministic ChaCha8 model tests,
+and allocation-failure prefix coverage. SAT keeps its separate specialized
+activity queue until that package is converted independently.
+
 The Runtime-backed unsigned specialization of `sorting_network` was deleted.
 The corresponding C++ `unsigned_ext` exists only in
 `src/test/sorting_network.cpp`; no production C++ or Go caller uses it. The live

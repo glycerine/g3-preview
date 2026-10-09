@@ -1,5 +1,5 @@
 // Regression fixtures follow the statement order in src/util/heap.h.
-package util
+package heap
 
 import (
 	"errors"
@@ -8,9 +8,9 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestIntHeapSourceInsertFailurePrefix(t *testing.T) {
+func TestHeapSourceInsertFailurePrefix(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	h := testIntHeap(t, 8, IntHeapConfig{Budget: b})
+	h := testInt(t, 8, Config{Budget: b})
 	heapMust(t, h.Insert(1)) // sentinel plus one value exhausts capacity two
 	before, epoch, it := b.Used(), h.epoch, h.Begin()
 	b.FailAfter(0)
@@ -41,9 +41,9 @@ func TestIntHeapSourceInsertFailurePrefix(t *testing.T) {
 	}
 }
 
-func TestIntHeapSourceEmptyResetAndGhostGuards(t *testing.T) {
+func TestHeapSourceEmptyResetAndGhostGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	h := testIntHeap(t, 8, IntHeapConfig{Budget: b})
+	h := testInt(t, 8, Config{Budget: b})
 	heapMust(t, h.Insert(1))
 	b.FailAfter(0)
 	if e := h.Insert(2); !errors.Is(e, arena.ErrInjectedFailure) {
@@ -61,7 +61,7 @@ func TestIntHeapSourceEmptyResetAndGhostGuards(t *testing.T) {
 		}
 	}
 	for _, action := range []func() error{func() error { return h.Erase(2) }, func() error { return h.Increased(2) }, func() error { return h.Decreased(2) }} {
-		if e := action(); !errors.Is(e, ErrHeapValue) {
+		if e := action(); !errors.Is(e, ErrValue) {
 			t.Fatal("out-of-bounds guard", e)
 		}
 		if !h.Contains(2) || !h.Empty() || h.epoch != epoch || b.Used() != before {
@@ -76,9 +76,9 @@ func TestIntHeapSourceEmptyResetAndGhostGuards(t *testing.T) {
 	}
 }
 
-func TestIntHeapSourceGhostInRangeContinuation(t *testing.T) {
+func TestHeapSourceGhostInRangeContinuation(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	h := testIntHeap(t, 8, IntHeapConfig{Budget: b})
+	h := testInt(t, 8, Config{Budget: b})
 	heapMust(t, h.Insert(1))
 	b.FailAfter(0)
 	if e := h.Insert(2); !errors.Is(e, arena.ErrInjectedFailure) {

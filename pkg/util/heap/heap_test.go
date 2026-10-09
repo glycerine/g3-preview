@@ -1,18 +1,26 @@
 // Source assertions: src/test/heap.cpp, including its original finite counts.
-package util
+package heap
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func testIntHeap(t *testing.T, bounds int32, c IntHeapConfig) *IntHeap {
+func testRNG(seed uint32) *rand.ChaCha8 {
+	var key [32]byte
+	binary.LittleEndian.PutUint32(key[:], seed)
+	return rand.NewChaCha8(key)
+}
+
+func testInt(t *testing.T, bounds int32, c Config) *Int {
 	t.Helper()
-	h, e := NewIntHeap(bounds, c)
+	h, e := New(bounds, c)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -26,14 +34,14 @@ func heapMust(t *testing.T, e error) {
 	}
 }
 
-func TestIntHeapSourceAssertions(t *testing.T) {
+func TestHeapSourceAssertions(t *testing.T) {
 	const n = 10000
 	for seed := uint32(0); seed < 3; seed++ {
-		rng := NewRandom(seed)
-		h := testIntHeap(t, n, IntHeapConfig{})
+		rng := testRNG(seed)
+		h := testInt(t, n, Config{})
 		var present [n]bool
 		for i := 0; i < n*3; i++ {
-			v := int32(rng.Next() % n)
+			v := int32(rng.Uint64() % n)
 			if !h.Contains(v) {
 				if present[v] {
 					t.Fatal("source set absence")
@@ -68,9 +76,9 @@ func TestIntHeapSourceAssertions(t *testing.T) {
 		}
 		var priorities [n]int32
 		for i := range priorities {
-			priorities[i] = int32(rng.Next())
+			priorities[i] = int32(rng.Uint64())
 		}
-		mutable := testIntHeap(t, n, IntHeapConfig{Less: func(a, b int32) bool {
+		mutable := testInt(t, n, Config{Less: func(a, b int32) bool {
 			if a < 0 || b < 0 || a >= n || b >= n {
 				t.Fatal("source comparator bounds")
 			}
@@ -83,9 +91,9 @@ func TestIntHeapSourceAssertions(t *testing.T) {
 			if i%1000 == 0 {
 				fmt.Fprintf(&log, "i: %d\n", i)
 			}
-			cmd := rng.Next() % 10
+			cmd := rng.Uint64() % 10
 			if cmd <= 3 {
-				v := int32(rng.Next() % n)
+				v := int32(rng.Uint64() % n)
 				if !mutable.Contains(v) {
 					heapMust(t, mutable.Insert(v))
 					if !mutable.Contains(v) {
@@ -93,7 +101,7 @@ func TestIntHeapSourceAssertions(t *testing.T) {
 					}
 				}
 			} else if cmd <= 6 {
-				v := int32(rng.Next() % n)
+				v := int32(rng.Uint64() % n)
 				if mutable.Contains(v) {
 					heapMust(t, mutable.Erase(v))
 					if mutable.Contains(v) {
@@ -101,8 +109,8 @@ func TestIntHeapSourceAssertions(t *testing.T) {
 					}
 				}
 			} else if cmd <= 8 {
-				v := int32(rng.Next() % n)
-				old, next := priorities[v], int32(rng.Next())
+				v := int32(rng.Uint64() % n)
+				old, next := priorities[v], int32(rng.Uint64())
 				if mutable.Contains(v) {
 					priorities[v] = next
 					if old < next {
@@ -125,14 +133,14 @@ func TestIntHeapSourceAssertions(t *testing.T) {
 	}
 }
 
-func TestIntHeapIndependentMutableOracle(t *testing.T) {
+func TestHeapIndependentMutableOracle(t *testing.T) {
 	const n = 97
 	var priority [n]int32
-	h := testIntHeap(t, n, IntHeapConfig{Less: func(a, b int32) bool { return priority[a] < priority[b] }})
+	h := testInt(t, n, Config{Less: func(a, b int32) bool { return priority[a] < priority[b] }})
 	var live [n]bool
-	rng := NewRandom(39)
+	rng := testRNG(39)
 	for step := 0; step < 5000; step++ {
-		v := int32(rng.Next() % n)
+		v := int32(rng.Uint64() % n)
 		switch step % 5 {
 		case 0:
 			if live[v] {
@@ -141,14 +149,14 @@ func TestIntHeapIndependentMutableOracle(t *testing.T) {
 			}
 		case 1:
 			if !live[v] {
-				priority[v] = int32(rng.Next())
+				priority[v] = int32(rng.Uint64())
 				heapMust(t, h.Insert(v))
 				live[v] = true
 			}
 		default:
 			if live[v] {
 				old := priority[v]
-				priority[v] = int32(rng.Next())
+				priority[v] = int32(rng.Uint64())
 				if priority[v] < old {
 					heapMust(t, h.Decreased(v))
 				} else {
@@ -182,8 +190,8 @@ func TestIntHeapIndependentMutableOracle(t *testing.T) {
 	}
 }
 
-func TestIntHeapSourceShapeFindLEAndLifetime(t *testing.T) {
-	h := testIntHeap(t, 20, IntHeapConfig{})
+func TestHeapSourceShapeFindLEAndLifetime(t *testing.T) {
+	h := testInt(t, 20, Config{})
 	for _, v := range []int32{4, 2, 6, 1, 3, 5, 7} {
 		heapMust(t, h.Insert(v))
 	}
@@ -229,10 +237,10 @@ func TestIntHeapSourceShapeFindLEAndLifetime(t *testing.T) {
 	if !h.Empty() || h.Contains(0) {
 		t.Fatal("empty bounded heap")
 	}
-	if _, e := h.Min(); !errors.Is(e, ErrHeapValue) {
+	if _, e := h.Min(); !errors.Is(e, ErrValue) {
 		t.Fatal("empty minimum", e)
 	}
-	if e := h.Insert(-1); !errors.Is(e, ErrHeapValue) {
+	if e := h.Insert(-1); !errors.Is(e, ErrValue) {
 		t.Fatal("negative key", e)
 	}
 	heapMust(t, h.Close())
@@ -241,11 +249,11 @@ func TestIntHeapSourceShapeFindLEAndLifetime(t *testing.T) {
 	}
 }
 
-func TestIntHeapBudgetsFailuresSwapAndWarm(t *testing.T) {
+func TestHeapBudgetsFailuresSwapAndWarm(t *testing.T) {
 	for prefix := int64(0); prefix < 5; prefix++ {
 		b := arena.NewBudget(1 << 20)
 		b.FailAfter(prefix)
-		h, e := NewIntHeap(32, IntHeapConfig{Budget: b})
+		h, e := New(32, Config{Budget: b})
 		if e == nil {
 			h.Close()
 		} else if !errors.Is(e, arena.ErrInjectedFailure) {
@@ -256,7 +264,7 @@ func TestIntHeapBudgetsFailuresSwapAndWarm(t *testing.T) {
 		}
 	}
 	b := arena.NewBudget(1 << 20)
-	h := testIntHeap(t, 32, IntHeapConfig{Budget: b})
+	h := testInt(t, 32, Config{Budget: b})
 	heapMust(t, h.Insert(1))
 	before := b.Used()
 	b.FailAfter(0)
@@ -275,12 +283,12 @@ func TestIntHeapBudgetsFailuresSwapAndWarm(t *testing.T) {
 		t.Fatal("warm allocations", allocations)
 	}
 	s := h.Stats()
-	if s.OwnerBytes+s.ValuesBytes+s.IndicesBytes+s.TodoBytes+s.FoundBytes != b.Used() {
+	if s.OwnerBytes+s.ValuesBytes+s.IndicesBytes != b.Used() {
 		t.Fatal("whole owned graph")
 	}
 	for fail := int64(0); fail < 2; fail++ {
 		otherBudget := arena.NewBudget(1 << 20)
-		other := testIntHeap(t, 4, IntHeapConfig{Budget: otherBudget})
+		other := testInt(t, 4, Config{Budget: otherBudget})
 		heapMust(t, other.Insert(3))
 		a, c := b.Used(), otherBudget.Used()
 		b.FailAfter(fail)
@@ -307,10 +315,10 @@ func TestIntHeapBudgetsFailuresSwapAndWarm(t *testing.T) {
 	}
 }
 
-func TestIntHeapFindLEFailureAndSourceCapacity(t *testing.T) {
+func TestHeapFindLEFailureAndSourceCapacity(t *testing.T) {
 	for fail := int64(0); fail < 16; fail++ {
 		b := arena.NewBudget(1 << 20)
-		h := testIntHeap(t, 16, IntHeapConfig{Budget: b})
+		h := testInt(t, 16, Config{Budget: b})
 		for i := int32(1); i <= 7; i++ {
 			heapMust(t, h.Insert(i))
 		}
@@ -343,10 +351,6 @@ func TestIntHeapFindLEFailureAndSourceCapacity(t *testing.T) {
 		if e == nil && len(got) != len(want) {
 			t.Fatal("source traversal", got)
 		}
-		if h.Stats().TodoBytes != 0 || h.Stats().FoundBytes != 0 {
-			t.Fatal("lexical todo retained", h.Stats())
-		}
-
 		if !h.CheckInvariant() || h.Size() != 7 {
 			t.Fatal("query altered heap")
 		}
@@ -356,7 +360,7 @@ func TestIntHeapFindLEFailureAndSourceCapacity(t *testing.T) {
 		}
 	}
 	b := arena.NewBudget(1 << 20)
-	h := testIntHeap(t, 16, IntHeapConfig{Budget: b})
+	h := testInt(t, 16, Config{Budget: b})
 	for i := int32(0); i < 10; i++ {
 		heapMust(t, h.Insert(i))
 	}
@@ -379,14 +383,14 @@ func TestIntHeapFindLEFailureAndSourceCapacity(t *testing.T) {
 	}); n == 0 {
 		t.Fatal("source fresh lexical todo allocation omitted")
 	}
-	if b.Used() != before || h.Stats().TodoBytes != 0 || h.Stats().FoundBytes != 0 {
+	if b.Used() != before {
 		t.Fatal("lexical query storage leak")
 	}
 
 }
 
-func TestIntHeapEpochBoundsIteratorAndComparatorSwap(t *testing.T) {
-	h := testIntHeap(t, 8, IntHeapConfig{})
+func TestHeapEpochBoundsIteratorAndComparatorSwap(t *testing.T) {
+	h := testInt(t, 8, Config{})
 	heapMust(t, h.Insert(2))
 	heapMust(t, h.Insert(4))
 	end := h.End()
@@ -427,8 +431,8 @@ func TestIntHeapEpochBoundsIteratorAndComparatorSwap(t *testing.T) {
 	heapMust(t, h.Swap(h))
 	heapMust(t, h.Close())
 	aCalls, bCalls := 0, 0
-	a := testIntHeap(t, 8, IntHeapConfig{Less: func(x, y int32) bool { aCalls++; return x < y }})
-	b := testIntHeap(t, 8, IntHeapConfig{Less: func(x, y int32) bool { bCalls++; return x < y }})
+	a := testInt(t, 8, Config{Less: func(x, y int32) bool { aCalls++; return x < y }})
+	b := testInt(t, 8, Config{Less: func(x, y int32) bool { bCalls++; return x < y }})
 	heapMust(t, a.Insert(1))
 	heapMust(t, a.Insert(3))
 	heapMust(t, b.Insert(2))
@@ -448,9 +452,9 @@ func TestIntHeapEpochBoundsIteratorAndComparatorSwap(t *testing.T) {
 	}
 }
 
-func TestIntHeapSourceBoundsGrowth(t *testing.T) {
+func TestHeapSourceBoundsGrowth(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	h := testIntHeap(t, 32, IntHeapConfig{Budget: b})
+	h := testInt(t, 32, Config{Budget: b})
 	if cap(h.indices) != 41 {
 		t.Fatal("source repeated resize expansion", cap(h.indices))
 	}
@@ -469,18 +473,18 @@ func TestIntHeapSourceBoundsGrowth(t *testing.T) {
 	}
 }
 
-func TestIntHeapCopyAndAllocationSizeBoundary(t *testing.T) {
-	if n, e := intHeapNextCapacity(0); n != 2 || e != nil {
+func TestHeapCopyAndAllocationSizeBoundary(t *testing.T) {
+	if n, e := nextCapacity(0); n != 2 || e != nil {
 		t.Fatal(n, e)
 	}
-	if n, e := intHeapNextCapacity(41); n != 62 || e != nil {
+	if n, e := nextCapacity(41); n != 62 || e != nil {
 		t.Fatal(n, e)
 	}
-	if _, e := intHeapNextCapacity(800000000); !errors.Is(e, arena.ErrSlotLimit) {
+	if _, e := nextCapacity(800000000); !errors.Is(e, arena.ErrSlotLimit) {
 		t.Fatal("source unsigned byte-size overflow", e)
 	}
 	b := arena.NewBudget(1 << 20)
-	h := testIntHeap(t, 32, IntHeapConfig{Budget: b})
+	h := testInt(t, 32, Config{Budget: b})
 	for _, v := range []int32{4, 2, 6, 1} {
 		heapMust(t, h.Insert(v))
 	}
@@ -492,7 +496,7 @@ func TestIntHeapCopyAndAllocationSizeBoundary(t *testing.T) {
 	c, e := h.Clone(copyBudget)
 	heapMust(t, e)
 	defer c.Close()
-	if cap(c.values) != cap(h.values) || cap(c.indices) != cap(h.indices) || c.Stats().TodoBytes != 0 || c.Stats().FoundBytes != 0 {
+	if cap(c.values) != cap(h.values) || cap(c.indices) != cap(h.indices) {
 		t.Fatal("source copied vector capacity or nonsource scratch", c.Stats())
 	}
 	heapMust(t, c.Erase(2))
@@ -513,7 +517,7 @@ func TestIntHeapCopyAndAllocationSizeBoundary(t *testing.T) {
 	copyBudget.FailAfter(-1)
 	it := c.Begin()
 	for prefix := int64(0); prefix < 2; prefix++ {
-		candidate := testIntHeap(t, 4, IntHeapConfig{Budget: copyBudget})
+		candidate := testInt(t, 4, Config{Budget: copyBudget})
 		heapMust(t, candidate.Insert(1))
 		before := copyBudget.Used()
 		oldValues, oldIndices := uint64(cap(candidate.values))*4, uint64(cap(candidate.indices))*4
@@ -543,10 +547,10 @@ func TestIntHeapCopyAndAllocationSizeBoundary(t *testing.T) {
 	}
 }
 
-func TestIntHeapSwapSecondReservationAndFinitePeak(t *testing.T) {
+func TestHeapSwapSecondReservationAndFinitePeak(t *testing.T) {
 	ab, bb := arena.NewBudget(1<<20), arena.NewBudget(1<<20)
-	a := testIntHeap(t, 32, IntHeapConfig{Budget: ab})
-	b := testIntHeap(t, 4, IntHeapConfig{Budget: bb})
+	a := testInt(t, 32, Config{Budget: ab})
+	b := testInt(t, 4, Config{Budget: bb})
 	heapMust(t, a.Insert(1))
 	heapMust(t, b.Insert(2))
 	ai, bi := a.Begin(), b.Begin()
@@ -564,8 +568,8 @@ func TestIntHeapSwapSecondReservationAndFinitePeak(t *testing.T) {
 	bb.FailAfter(-1)
 	// Constructor bounds2 uses indices capacity2. Exact retained graph fits;
 	// one further insert needs replacement values capacity3 while cap2 lives.
-	peak := arena.NewBudget(intHeapOwnerBytes + 2*4 + 2*4 + 3*4 - 1)
-	p := testIntHeap(t, 2, IntHeapConfig{Budget: peak})
+	peak := arena.NewBudget(ownerBytes + 2*4 + 2*4 + 3*4 - 1)
+	p := testInt(t, 2, Config{Budget: peak})
 	heapMust(t, p.Insert(0))
 	used := peak.Used()
 	if e := p.Insert(1); !errors.Is(e, arena.ErrBudget) || peak.Used() != used || !p.Contains(1) || !p.CheckInvariant() {

@@ -1,5 +1,5 @@
 // Source: src/util/heap.h:27-28,272-285; src/util/vector.h:102-129,191-202.
-package util
+package heap
 
 import (
 	"errors"
@@ -9,10 +9,10 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestIntHeapAssignmentSourceDestroyedFirstMember(t *testing.T) {
+func TestHeapAssignmentSourceDestroyedFirstMember(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	src := testIntHeap(t, 16, IntHeapConfig{Budget: b, Less: func(a, c int32) bool { return a > c }})
-	dst := testIntHeap(t, 4, IntHeapConfig{Budget: b})
+	src := testInt(t, 16, Config{Budget: b, Less: func(a, c int32) bool { return a > c }})
+	dst := testInt(t, 4, Config{Budget: b})
 	heapMust(t, src.Insert(3))
 	heapMust(t, dst.Insert(1))
 	before := b.Used()
@@ -34,9 +34,9 @@ func TestIntHeapAssignmentSourceDestroyedFirstMember(t *testing.T) {
 	heapMust(t, dst.CleanupStopped())
 }
 
-func TestIntHeapFindLESourceOutputBeforeChildGrowth(t *testing.T) {
+func TestHeapFindLESourceOutputBeforeChildGrowth(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	h := testIntHeap(t, 16, IntHeapConfig{Budget: b})
+	h := testInt(t, 16, Config{Budget: b})
 	for i := int32(1); i <= 7; i++ {
 		heapMust(t, h.Insert(i))
 	}
