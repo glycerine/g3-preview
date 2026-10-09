@@ -26,7 +26,8 @@ one package per C++ header. If a facility has no production C++ consumer,
 delete or defer the port instead of giving dead code a new home.
 
 The extraction work now includes `util/filepath`, `util/approx`,
-`util/messages`, `util/natset`, `util/stack`, `util/bitset`, and `util/luby`.
+`util/messages`, `util/natset`, `util/stack`, `util/bitset`, `util/luby`, and
+`util/statistics`.
 The bitset
 package owns the native variable-width, fast-reset, fixed-width, and unsigned
 set implementations. It imports `arena` directly for fixed-width pooled
@@ -199,9 +200,11 @@ These should follow after the first independent moves:
   handling. It must not reintroduce C++ string classes.
 * `util/params` can own `params` and environment parameter parsing and import
   `util/symbol` if necessary.
-* `util/stats` can own `statistics` and `stats`. Its use of symbols, maps, and
-  numeric values must be made explicit rather than reaching back into root
-  `util`.
+* `util/statistics` now owns `statistics.h/.cpp`. String keys, typed slices,
+  ordinary writers, and the approved insertion-ordered dictionary replace the
+  C-string, vector, arena, and hash-table simulations. The package has no root
+  `util` dependency. The separate source `stats` unit can join it when ported
+  if its consumers need the same boundary.
 * `util/control` can own cancellation, event handlers, resource limits,
   timeouts, timers, scoped control-C handling, and cooperation checks. These
   form a behavioral subsystem even though they are not one C++ include cycle.

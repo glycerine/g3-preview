@@ -71317,7 +71317,6 @@
         "pkg/sat/sat_solver_copy_test.go",
         "pkg/sat/sat_solver_statistics.go",
         "pkg/sat/sat_solver_statistics_test.go",
-        "pkg/sat/sat_solver_statistics_fault_test.go",
         "pkg/sat/sat_solver_inspection.go",
         "pkg/sat/sat_solver_display.go",
         "pkg/sat/sat_solver_inspection_test.go",
@@ -71650,11 +71649,10 @@
         "TestSATSolverCopyWarmUnitOnlyPhysicalPlateau",
         "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord",
         "TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC",
-        "TestSATSolverStatisticsZeroSkipAndWarmPhysicalPlateau",
+        "TestSATSolverStatisticsZeroSkipAndSliceReuse",
         "TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions",
         "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
         "TestSATSolverStatisticsIndependentSparseCounterMasks",
-        "TestSATSolverStatisticsEveryActualOutputReservationPrefix",
         "TestSATSolverInspectionExactSourceDisplays",
         "TestSATSolverInspectionExternalModelIndependentTruthTable",
         "TestSATSolverInspectionWCNFUnsignedWrapAndPartialSoftSpan",
@@ -72903,11 +72901,10 @@
           "go_target": "pkg/sat/sat_solver_statistics.go",
           "tests": [
             "TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC",
-            "TestSATSolverStatisticsZeroSkipAndWarmPhysicalPlateau",
+            "TestSATSolverStatisticsZeroSkipAndSliceReuse",
             "TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions",
             "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
-            "TestSATSolverStatisticsIndependentSparseCounterMasks",
-            "TestSATSolverStatisticsEveryActualOutputReservationPrefix"
+            "TestSATSolverStatisticsIndependentSparseCounterMasks"
           ]
         },
         {
@@ -73200,7 +73197,6 @@
         "pkg/sat/sat_solver_copy_test.go",
         "pkg/sat/sat_solver_statistics.go",
         "pkg/sat/sat_solver_statistics_test.go",
-        "pkg/sat/sat_solver_statistics_fault_test.go",
         "pkg/sat/sat_solver_inspection.go",
         "pkg/sat/sat_solver_display.go",
         "pkg/sat/sat_solver_inspection_test.go",
@@ -73479,11 +73475,10 @@
         "TestSATSolverCopyWarmUnitOnlyPhysicalPlateau",
         "TestSATSolverCopyReadsExactBinaryNonLearnedPackedWord",
         "TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC",
-        "TestSATSolverStatisticsZeroSkipAndWarmPhysicalPlateau",
+        "TestSATSolverStatisticsZeroSkipAndSliceReuse",
         "TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions",
         "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
         "TestSATSolverStatisticsIndependentSparseCounterMasks",
-        "TestSATSolverStatisticsEveryActualOutputReservationPrefix",
         "TestSATSolverInspectionExactSourceDisplays",
         "TestSATSolverInspectionExternalModelIndependentTruthTable",
         "TestSATSolverInspectionWCNFUnsignedWrapAndPartialSoftSpan",
@@ -74008,11 +74003,10 @@
           "go_target": "pkg/sat/sat_solver_statistics.go",
           "tests": [
             "TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC",
-            "TestSATSolverStatisticsZeroSkipAndWarmPhysicalPlateau",
+            "TestSATSolverStatisticsZeroSkipAndSliceReuse",
             "TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions",
             "TestSATSolverStatisticsCopiedClosedAndHeaderCharge",
-            "TestSATSolverStatisticsIndependentSparseCounterMasks",
-            "TestSATSolverStatisticsEveryActualOutputReservationPrefix"
+            "TestSATSolverStatisticsIndependentSparseCounterMasks"
           ]
         },
         {
@@ -148396,28 +148390,13 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_statistics.go",
-        "pkg/util/util_statistics_render.go"
+        "pkg/util/statistics/statistics.go"
       ],
       "tests": [
-        "TestStatisticsSourceFiveAssertionsAndRawDomains",
-        "TestStatisticsRenderingSourceQuirksAndIEEE",
-        "TestStatisticsBorrowedAliasesLifetimeAndNull",
-        "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-        "TestStatisticsFaultPrefixesAndImmediateAccounting",
-        "TestStatisticsInternalNonterminationAndEmptyPrefix",
-        "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-        "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-        "TestStatisticsWarmZeroAllocationAndClosedCopies",
-        "TestStatisticsCrossRegionCopyBindingAndFailures",
-        "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-        "TestStatisticsMergedExactIndependentOracleAndShadowState",
-        "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-        "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-        "TestStatisticsBindingBackingHostBounds",
-        "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-        "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity",
-        "TestStatisticsGoMemorySnapshotAndRuntime"
+        "TestContributionsCopyResetAndRawAccess",
+        "TestRenderingAggregationOrderingAndShadow",
+        "TestUint64Threshold",
+        "TestMemoryStatisticsUseGoRuntimeDomains"
       ],
       "assertions": [
         {
@@ -148445,139 +148424,54 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "update unsigned/double, append-copy/reset, raw indexed key/value/type/size queries and source implicit copy/move/member lifetime",
+          "name": "typed nonzero uint/double updates, append-copy/reset, and indexed contribution access",
           "status": "ported",
-          "go_target": "pkg/util/util_statistics.go",
+          "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
-            "TestStatisticsSourceFiveAssertionsAndRawDomains",
-            "TestStatisticsRenderingSourceQuirksAndIEEE",
-            "TestStatisticsBorrowedAliasesLifetimeAndNull",
-            "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-            "TestStatisticsFaultPrefixesAndImmediateAccounting",
-            "TestStatisticsInternalNonterminationAndEmptyPrefix",
-            "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-            "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-            "TestStatisticsWarmZeroAllocationAndClosedCopies",
-            "TestStatisticsCrossRegionCopyBindingAndFailures",
-            "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-            "TestStatisticsMergedExactIndependentOracleAndShadowState",
-            "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-            "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-            "TestStatisticsBindingBackingHostBounds",
-            "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-            "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
+            "TestContributionsCopyResetAndRawAccess",
+            "TestRenderingAggregationOrderingAndShadow",
+            "TestUint64Threshold"
           ]
         },
         {
-          "name": "Borrowed key aggregation: real uint/double concrete cached-hash maps, source ordered sums, uint wrap, USED bucket order and grow-before-overwrite",
+          "name": "stable aggregation with uint32 wrap and separate uint/double key domains",
           "status": "ported",
-          "go_target": "pkg/util/util_statistics_render.go",
+          "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
-            "TestStatisticsSourceFiveAssertionsAndRawDomains",
-            "TestStatisticsRenderingSourceQuirksAndIEEE",
-            "TestStatisticsBorrowedAliasesLifetimeAndNull",
-            "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-            "TestStatisticsFaultPrefixesAndImmediateAccounting",
-            "TestStatisticsInternalNonterminationAndEmptyPrefix",
-            "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-            "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-            "TestStatisticsWarmZeroAllocationAndClosedCopies",
-            "TestStatisticsCrossRegionCopyBindingAndFailures",
-            "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-            "TestStatisticsMergedExactIndependentOracleAndShadowState",
-            "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-            "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-            "TestStatisticsBindingBackingHostBounds",
-            "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-            "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
+            "TestRenderingAggregationOrderingAndShadow"
           ]
         },
         {
-          "name": "display/display_smt2 with original-key sorting, colon/padding quirks, duplicate cross-domain uint shadow and persistent stream flags",
+          "name": "sorted display and SMT2 display using Go strings and io.Writer",
           "status": "ported",
-          "go_target": "pkg/util/util_statistics_render.go",
+          "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
-            "TestStatisticsSourceFiveAssertionsAndRawDomains",
-            "TestStatisticsRenderingSourceQuirksAndIEEE",
-            "TestStatisticsBorrowedAliasesLifetimeAndNull",
-            "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-            "TestStatisticsFaultPrefixesAndImmediateAccounting",
-            "TestStatisticsInternalNonterminationAndEmptyPrefix",
-            "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-            "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-            "TestStatisticsWarmZeroAllocationAndClosedCopies",
-            "TestStatisticsCrossRegionCopyBindingAndFailures",
-            "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-            "TestStatisticsMergedExactIndependentOracleAndShadowState",
-            "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-            "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-            "TestStatisticsBindingBackingHostBounds",
-            "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-            "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
+            "TestRenderingAggregationOrderingAndShadow"
           ]
         },
         {
-          "name": "display_internal finite empty-key prefixes and explicit nonterminating-key entry adapter",
+          "name": "stable insertion-order internal display with ASCII key normalization",
           "status": "ported",
-          "go_target": "pkg/util/util_statistics_render.go",
+          "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
-            "TestStatisticsSourceFiveAssertionsAndRawDomains",
-            "TestStatisticsRenderingSourceQuirksAndIEEE",
-            "TestStatisticsBorrowedAliasesLifetimeAndNull",
-            "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-            "TestStatisticsFaultPrefixesAndImmediateAccounting",
-            "TestStatisticsInternalNonterminationAndEmptyPrefix",
-            "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-            "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-            "TestStatisticsWarmZeroAllocationAndClosedCopies",
-            "TestStatisticsCrossRegionCopyBindingAndFailures",
-            "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-            "TestStatisticsMergedExactIndependentOracleAndShadowState",
-            "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-            "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-            "TestStatisticsBindingBackingHostBounds",
-            "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-            "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
+            "TestRenderingAggregationOrderingAndShadow"
           ]
         },
         {
-          "name": "get_uint64_stats threshold and get_rlimit_statistics using real utilReslimit count and explicitly caller-owned key domain",
+          "name": "uint64 threshold helper and Go runtime memory counters",
           "status": "ported",
-          "go_target": "pkg/util/util_statistics.go",
+          "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
-            "TestStatisticsSourceFiveAssertionsAndRawDomains",
-            "TestStatisticsRenderingSourceQuirksAndIEEE",
-            "TestStatisticsBorrowedAliasesLifetimeAndNull",
-            "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-            "TestStatisticsFaultPrefixesAndImmediateAccounting",
-            "TestStatisticsInternalNonterminationAndEmptyPrefix",
-            "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-            "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-            "TestStatisticsWarmZeroAllocationAndClosedCopies",
-            "TestStatisticsCrossRegionCopyBindingAndFailures",
-            "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-            "TestStatisticsMergedExactIndependentOracleAndShadowState",
-            "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-            "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-            "TestStatisticsBindingBackingHostBounds",
-            "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-            "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
-          ]
-        },
-        {
-          "name": "get_memory_statistics using Go runtime current heap, estimated largest heap and cumulative allocation count (src/util/statistics.cpp:239-247)",
-          "status": "ported",
-          "go_target": "pkg/util/util_statistics.go",
-          "tests": [
-            "TestStatisticsGoMemorySnapshotAndRuntime"
+            "TestUint64Threshold",
+            "TestMemoryStatisticsUseGoRuntimeDomains"
           ]
         }
       ],
       "ownership": [
-        "Actual cold owner plus concrete uint/double contribution vectors and sorted cold borrowed-region bindings are charged with old/new overlap. Local real maps/key-buffer headers and backings, numeric output staging and prefixes are audited immediately before cleanup. Copy preserves borrowed key identity without dereferencing even closed regions; move-construction transfers actual backing charges, source move-assignment copies. Close destroys double then uint and never closes borrowed regions. See PORT_PROGRESS.md#audit-statistics-port-status-md."
+        "Go strings own key spellings and typed slices own contributions; copying appends values and reset retains reusable slice capacity. No borrowed C strings, arena regions, allocation budget, manual vector capacity, or mutex is part of this single-goroutine value container."
       ],
       "deviations": [
-        "No Go generics. Fixed-width region identities replace char pointers; raw zero/foreign/stale keys may be stored and copied, with typed errors at actual reads. External std::sort uses concrete allocation-free heap sort; existing selected NumericTextStream adapts C-locale runtime printing. Source nonadvancing internal loop has typed ErrStatisticsNonterminating at entry, preserving prior finite empty-key output rather than silently advancing key. IEEE arithmetic NaN sign/payload may vary by target; explicit signed NaN formatting remains exact. Go runtime.ReadMemStats supplies HeapAlloc for current memory, HeapSys as the standard library estimate of the largest heap size, and Mallocs for the cumulative allocation count."
+        "Go strings, typed slices, sort, strconv, and io.Writer replace C++ string pointers, vectors, iostreams, and allocation machinery. The approved github.com/glycerine/insdict dependency preserves stable insertion order for internal display; canonical displays sort key spellings. Go runtime.MemStats supplies the available process-memory counterparts."
       ]
     },
     {
@@ -148586,28 +148480,13 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_statistics.go",
-        "pkg/util/util_statistics_render.go"
+        "pkg/util/statistics/statistics.go"
       ],
       "tests": [
-        "TestStatisticsSourceFiveAssertionsAndRawDomains",
-        "TestStatisticsRenderingSourceQuirksAndIEEE",
-        "TestStatisticsBorrowedAliasesLifetimeAndNull",
-        "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-        "TestStatisticsFaultPrefixesAndImmediateAccounting",
-        "TestStatisticsInternalNonterminationAndEmptyPrefix",
-        "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-        "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-        "TestStatisticsWarmZeroAllocationAndClosedCopies",
-        "TestStatisticsCrossRegionCopyBindingAndFailures",
-        "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-        "TestStatisticsMergedExactIndependentOracleAndShadowState",
-        "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-        "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-        "TestStatisticsBindingBackingHostBounds",
-        "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-        "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity",
-        "TestStatisticsGoMemorySnapshotAndRuntime"
+        "TestContributionsCopyResetAndRawAccess",
+        "TestRenderingAggregationOrderingAndShadow",
+        "TestUint64Threshold",
+        "TestMemoryStatisticsUseGoRuntimeDomains"
       ],
       "conditionals": [
         {
@@ -148623,139 +148502,54 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "update unsigned/double, append-copy/reset, raw indexed key/value/type/size queries and source implicit copy/move/member lifetime",
+          "name": "typed nonzero uint/double updates, append-copy/reset, and indexed contribution access",
           "status": "ported",
-          "go_target": "pkg/util/util_statistics.go",
+          "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
-            "TestStatisticsSourceFiveAssertionsAndRawDomains",
-            "TestStatisticsRenderingSourceQuirksAndIEEE",
-            "TestStatisticsBorrowedAliasesLifetimeAndNull",
-            "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-            "TestStatisticsFaultPrefixesAndImmediateAccounting",
-            "TestStatisticsInternalNonterminationAndEmptyPrefix",
-            "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-            "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-            "TestStatisticsWarmZeroAllocationAndClosedCopies",
-            "TestStatisticsCrossRegionCopyBindingAndFailures",
-            "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-            "TestStatisticsMergedExactIndependentOracleAndShadowState",
-            "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-            "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-            "TestStatisticsBindingBackingHostBounds",
-            "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-            "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
+            "TestContributionsCopyResetAndRawAccess",
+            "TestRenderingAggregationOrderingAndShadow",
+            "TestUint64Threshold"
           ]
         },
         {
-          "name": "Borrowed key aggregation: real uint/double concrete cached-hash maps, source ordered sums, uint wrap, USED bucket order and grow-before-overwrite",
+          "name": "stable aggregation with uint32 wrap and separate uint/double key domains",
           "status": "ported",
-          "go_target": "pkg/util/util_statistics_render.go",
+          "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
-            "TestStatisticsSourceFiveAssertionsAndRawDomains",
-            "TestStatisticsRenderingSourceQuirksAndIEEE",
-            "TestStatisticsBorrowedAliasesLifetimeAndNull",
-            "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-            "TestStatisticsFaultPrefixesAndImmediateAccounting",
-            "TestStatisticsInternalNonterminationAndEmptyPrefix",
-            "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-            "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-            "TestStatisticsWarmZeroAllocationAndClosedCopies",
-            "TestStatisticsCrossRegionCopyBindingAndFailures",
-            "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-            "TestStatisticsMergedExactIndependentOracleAndShadowState",
-            "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-            "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-            "TestStatisticsBindingBackingHostBounds",
-            "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-            "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
+            "TestRenderingAggregationOrderingAndShadow"
           ]
         },
         {
-          "name": "display/display_smt2 with original-key sorting, colon/padding quirks, duplicate cross-domain uint shadow and persistent stream flags",
+          "name": "sorted display and SMT2 display using Go strings and io.Writer",
           "status": "ported",
-          "go_target": "pkg/util/util_statistics_render.go",
+          "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
-            "TestStatisticsSourceFiveAssertionsAndRawDomains",
-            "TestStatisticsRenderingSourceQuirksAndIEEE",
-            "TestStatisticsBorrowedAliasesLifetimeAndNull",
-            "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-            "TestStatisticsFaultPrefixesAndImmediateAccounting",
-            "TestStatisticsInternalNonterminationAndEmptyPrefix",
-            "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-            "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-            "TestStatisticsWarmZeroAllocationAndClosedCopies",
-            "TestStatisticsCrossRegionCopyBindingAndFailures",
-            "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-            "TestStatisticsMergedExactIndependentOracleAndShadowState",
-            "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-            "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-            "TestStatisticsBindingBackingHostBounds",
-            "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-            "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
+            "TestRenderingAggregationOrderingAndShadow"
           ]
         },
         {
-          "name": "display_internal finite empty-key prefixes and explicit nonterminating-key entry adapter",
+          "name": "stable insertion-order internal display with ASCII key normalization",
           "status": "ported",
-          "go_target": "pkg/util/util_statistics_render.go",
+          "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
-            "TestStatisticsSourceFiveAssertionsAndRawDomains",
-            "TestStatisticsRenderingSourceQuirksAndIEEE",
-            "TestStatisticsBorrowedAliasesLifetimeAndNull",
-            "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-            "TestStatisticsFaultPrefixesAndImmediateAccounting",
-            "TestStatisticsInternalNonterminationAndEmptyPrefix",
-            "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-            "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-            "TestStatisticsWarmZeroAllocationAndClosedCopies",
-            "TestStatisticsCrossRegionCopyBindingAndFailures",
-            "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-            "TestStatisticsMergedExactIndependentOracleAndShadowState",
-            "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-            "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-            "TestStatisticsBindingBackingHostBounds",
-            "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-            "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
+            "TestRenderingAggregationOrderingAndShadow"
           ]
         },
         {
-          "name": "get_uint64_stats threshold and get_rlimit_statistics using real utilReslimit count and explicitly caller-owned key domain",
+          "name": "uint64 threshold helper and Go runtime memory counters",
           "status": "ported",
-          "go_target": "pkg/util/util_statistics.go",
+          "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
-            "TestStatisticsSourceFiveAssertionsAndRawDomains",
-            "TestStatisticsRenderingSourceQuirksAndIEEE",
-            "TestStatisticsBorrowedAliasesLifetimeAndNull",
-            "TestStatisticsCopyAssignMoveCapacityAndPrefixes",
-            "TestStatisticsFaultPrefixesAndImmediateAccounting",
-            "TestStatisticsInternalNonterminationAndEmptyPrefix",
-            "TestStatisticsStreamPersistentFlagsAndBudgetPrefix",
-            "TestStatisticsRealRlimitThresholdAndLiteralOwnership",
-            "TestStatisticsWarmZeroAllocationAndClosedCopies",
-            "TestStatisticsCrossRegionCopyBindingAndFailures",
-            "TestStatisticsConstructorAssignmentMemberFailureAndPeak",
-            "TestStatisticsMergedExactIndependentOracleAndShadowState",
-            "TestStatisticsMoveTransferFailuresAndCallerLiteralPrefixes",
-            "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
-            "TestStatisticsBindingBackingHostBounds",
-            "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-            "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
-          ]
-        },
-        {
-          "name": "get_memory_statistics using Go runtime current heap, estimated largest heap and cumulative allocation count (src/util/statistics.cpp:239-247)",
-          "status": "ported",
-          "go_target": "pkg/util/util_statistics.go",
-          "tests": [
-            "TestStatisticsGoMemorySnapshotAndRuntime"
+            "TestUint64Threshold",
+            "TestMemoryStatisticsUseGoRuntimeDomains"
           ]
         }
       ],
       "ownership": [
-        "Actual cold owner plus concrete uint/double contribution vectors and sorted cold borrowed-region bindings are charged with old/new overlap. Local real maps/key-buffer headers and backings, numeric output staging and prefixes are audited immediately before cleanup. Copy preserves borrowed key identity without dereferencing even closed regions; move-construction transfers actual backing charges, source move-assignment copies. Close destroys double then uint and never closes borrowed regions. See PORT_PROGRESS.md#audit-statistics-port-status-md."
+        "Go strings own key spellings and typed slices own contributions; copying appends values and reset retains reusable slice capacity. No borrowed C strings, arena regions, allocation budget, manual vector capacity, or mutex is part of this single-goroutine value container."
       ],
       "deviations": [
-        "No Go generics. Fixed-width region identities replace char pointers; raw zero/foreign/stale keys may be stored and copied, with typed errors at actual reads. External std::sort uses concrete allocation-free heap sort; existing selected NumericTextStream adapts C-locale runtime printing. Source nonadvancing internal loop has typed ErrStatisticsNonterminating at entry, preserving prior finite empty-key output rather than silently advancing key. IEEE arithmetic NaN sign/payload may vary by target; explicit signed NaN formatting remains exact. Go runtime.ReadMemStats supplies HeapAlloc for current memory, HeapSys as the standard library estimate of the largest heap size, and Mallocs for the cumulative allocation count."
+        "Go strings, typed slices, sort, strconv, and io.Writer replace C++ string pointers, vectors, iostreams, and allocation machinery. The approved github.com/glycerine/insdict dependency preserves stable insertion order for internal display; canonical displays sort key spellings. Go runtime.MemStats supplies the available process-memory counterparts."
       ]
     },
     {

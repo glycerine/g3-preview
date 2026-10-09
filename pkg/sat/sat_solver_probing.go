@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 var ErrSATMissingIntegrityBinding = errors.New("g3: missing source SAT integrity-checker binding")
@@ -132,13 +133,12 @@ func (s *satSolverProbing) updateParams(c *util.ParamsContext, p *util.ParamsRef
 }
 func (s *satSolverProbing) resetStatistics() { s.numAssigned = 0 }
 
-// key borrows the caller-provided static spelling "probing assigned"; this
-// explicit byte-region binding replaces the source string-literal pointer.
-func (s *satSolverProbing) collectStatistics(st *util.Statistics, key util.StatisticsKey) error {
+func (s *satSolverProbing) collectStatistics(st *statistics.Statistics, key statistics.Key) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	return st.UpdateUint(key, s.numAssigned)
+	st.UpdateUint(key, s.numAssigned)
+	return nil
 }
 
 // Source collect_param_descrs has an empty TODO body.

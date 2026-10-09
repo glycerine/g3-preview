@@ -170,17 +170,15 @@ func TestSATCleanerConstructorAndStatistics(t *testing.T) {
 	}
 	c.elimClauses = 7
 	c.elimLiterals = 9
-	s, r := statFixture(t, nil)
-	ck := statKey(t, r, "elim clauses")
-	lk := statKey(t, r, "elim literals")
+	s := statFixture(t)
+	ck := statKey("elim clauses")
+	lk := statKey("elim literals")
 	satOK(t, c.collectStatistics(s, ck, lk))
 	if s.Size() != 2 {
 		t.Fatal(s.Size())
 	}
-	x, e := s.UintValue(0)
-	satOK(t, e)
-	y, e := s.UintValue(1)
-	satOK(t, e)
+	x := s.UintValue(0)
+	y := s.UintValue(1)
 	if x != 7 || y != 9 {
 		t.Fatal(x, y)
 	}

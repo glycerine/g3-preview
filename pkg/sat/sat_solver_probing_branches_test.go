@@ -278,16 +278,16 @@ func TestSATSolverProbingCacheSourceGrowthAndHostBounds(t *testing.T) {
 }
 func TestSATSolverProbingStatisticsAndDescriptorNoOp(t *testing.T) {
 	s, _ := satProbingFixture(t, 0)
-	st, region := statFixture(t, nil)
-	key := statKey(t, region, "probing assigned")
+	st := statFixture(t)
+	key := statKey("probing assigned")
 	s.numAssigned = 9
 	satOK(t, s.collectStatistics(st, key))
-	if len(st.U) != 1 || st.U[0].Key != key || st.U[0].Value != 9 {
+	if st.Size() != 1 || st.Key(0) != key || st.UintValue(0) != 9 {
 		t.Fatal("actual source stat contribution")
 	}
 	s.resetStatistics()
 	satOK(t, s.collectStatistics(st, key))
-	if len(st.U) != 1 {
+	if st.Size() != 1 {
 		t.Fatal("source zero stat is omitted")
 	}
 	d := pdnew(t, symbolManagerTest(t, nil, false), nil)

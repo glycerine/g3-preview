@@ -2,64 +2,29 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
-// Borrowed static-spelling counterparts. Their actual byte owners outlive the
-// Statistics output; no source counter or text payload is mirrored here.
+// Source-order keys for the solver's statistics counters.
 
 type satSolverStatisticsKeys struct {
-	main                [15]util.StatisticsKey
-	cleaner             [2]util.StatisticsKey
-	simplifier          [5]util.StatisticsKey
-	scc, asymm, probing util.StatisticsKey
+	main                [15]statistics.Key
+	cleaner             [2]statistics.Key
+	simplifier          [5]statistics.Key
+	scc, asymm, probing statistics.Key
 }
 
-func (s *Solver) collectMainStatistics(st *util.Statistics, keys [15]util.StatisticsKey) error {
-	if e := st.UpdateUint(keys[0], s.Variables.mkVarCount); e != nil {
-		return e
+func (s *Solver) collectMainStatistics(st *statistics.Statistics, keys [15]statistics.Key) error {
+	values := [15]uint32{
+		s.Variables.mkVarCount, s.Lifecycle.mkBinary, s.Lifecycle.mkTernary,
+		s.Lifecycle.mkNary, s.gc.gcClauseStat, s.Lifecycle.deleted,
+		s.conflict.conflictStat, s.propagation.clausePropagations,
+		s.decision.decisions, s.propagation.binaryPropagations,
+		s.propagation.ternaryPropagations, s.gc.restartStat,
+		s.analysis.minimizedLits, s.dynamic.eliminated, s.blockedCorrectionSets,
 	}
-	if e := st.UpdateUint(keys[1], s.Lifecycle.mkBinary); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[2], s.Lifecycle.mkTernary); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[3], s.Lifecycle.mkNary); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[4], s.gc.gcClauseStat); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[5], s.Lifecycle.deleted); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[6], s.conflict.conflictStat); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[7], s.propagation.clausePropagations); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[8], s.decision.decisions); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[9], s.propagation.binaryPropagations); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[10], s.propagation.ternaryPropagations); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[11], s.gc.restartStat); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[12], s.analysis.minimizedLits); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[13], s.dynamic.eliminated); e != nil {
-		return e
-	}
-	if e := st.UpdateUint(keys[14], s.blockedCorrectionSets); e != nil {
-		return e
+	for i, value := range values {
+		st.UpdateUint(keys[i], value)
 	}
 	return nil
 }
@@ -81,7 +46,7 @@ func (s *Solver) resetMainStatistics() {
 	s.Lifecycle.nonLearnedGeneration = 0
 	s.blockedCorrectionSets = 0
 }
-func (s *Solver) collectStatistics(st *util.Statistics, keys satSolverStatisticsKeys) error {
+func (s *Solver) collectStatistics(st *statistics.Statistics, keys satSolverStatisticsKeys) error {
 	if e := s.open(); e != nil {
 		return e
 	}

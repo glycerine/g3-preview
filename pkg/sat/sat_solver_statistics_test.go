@@ -7,25 +7,25 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
-func satSolverStatisticsFixture(t *testing.T, b *arena.Budget) (*util.Statistics, satSolverStatisticsKeys) {
-	st, r := statFixture(t, b)
+func satSolverStatisticsFixture(t *testing.T) (*statistics.Statistics, satSolverStatisticsKeys) {
+	st := statFixture(t)
 	var keys satSolverStatisticsKeys
 	names := [15]string{"mk bool var", "mk binary clause", "mk ternary clause", "mk clause", "gc clause", "del clause", "conflicts", "propagations", "decisions", "binary propagations", "ternary propagations", "restarts", "minimized lits", "dyn subsumption resolution", "blocked correction sets"}
 	for i, n := range names {
-		keys.main[i] = statKey(t, r, n)
+		keys.main[i] = statKey(n)
 	}
 	for i, n := range [2]string{"elim clauses", "elim literals"} {
-		keys.cleaner[i] = statKey(t, r, n)
+		keys.cleaner[i] = statKey(n)
 	}
 	for i, n := range [5]string{"subsumed", "subsumption resolution", "elim literals", "elim bool vars", "elim blocked clauses"} {
-		keys.simplifier[i] = statKey(t, r, n)
+		keys.simplifier[i] = statKey(n)
 	}
-	keys.scc = statKey(t, r, "elim bool vars")
-	keys.asymm = statKey(t, r, "elim literals")
-	keys.probing = statKey(t, r, "probing assigned")
+	keys.scc = statKey("elim bool vars")
+	keys.asymm = statKey("elim literals")
+	keys.probing = statKey("probing assigned")
 	return st, keys
 }
 func satSolverSeedStatistics(s *Solver) {
@@ -57,7 +57,7 @@ func satSolverSeedStatistics(s *Solver) {
 }
 func TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
-	st, keys := satSolverStatisticsFixture(t, nil)
+	st, keys := satSolverStatisticsFixture(t)
 	satSolverSeedStatistics(s)
 	s.Lifecycle.nonLearnedGeneration = 26
 	s.conflict.conflicts = 99
@@ -68,10 +68,9 @@ func TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC(t *testing.T) {
 	if st.Size() != 25 {
 		t.Fatal(st.Size())
 	}
-	for i := uint32(0); i < 25; i++ {
-		v, e := st.UintValue(i)
-		satOK(t, e)
-		if v != i+1 {
+	for i := 0; i < 25; i++ {
+		v := st.UintValue(i)
+		if v != uint32(i+1) {
 			t.Fatal(i, v)
 		}
 	}
@@ -79,46 +78,37 @@ func TestSATSolverStatisticsActualSourceOrderAndResetKeepsSCC(t *testing.T) {
 	if s.Lifecycle.nonLearnedGeneration != 0 || s.scc.numElim != 23 || s.conflict.conflicts != 99 || s.conflict.conflictsSinceRestart != 77 || s.gc.restarts != 44 || s.propagation.cleanerCounter != -17 {
 		t.Fatal("source reset boundaries")
 	}
-	satOK(t, st.Reset())
+	st.Reset()
 	satOK(t, s.collectStatistics(st, keys))
 	if st.Size() != 1 {
 		t.Fatal("SCC is intentionally retained", st.Size())
 	}
-	v, e := st.UintValue(0)
-	satOK(t, e)
+	v := st.UintValue(0)
 	if v != 23 {
 		t.Fatal(v)
 	}
 	satFullSolverRuntimeAudit(t, s)
 }
-func TestSATSolverStatisticsZeroSkipAndWarmPhysicalPlateau(t *testing.T) {
+func TestSATSolverStatisticsZeroSkipAndSliceReuse(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
-	b := arena.NewBudget(^uint64(0))
-	st, k := satSolverStatisticsFixture(t, b)
-	before := b.Used()
-	b.FailAfter(0)
-	satOK(t, s.collectStatistics(st, k))
-	if b.Used() != before || st.Size() != 0 {
-		t.Fatal("all real constructor counters initially zero", b.Used(), before, st.Size())
+	st, keys := satSolverStatisticsFixture(t)
+	satOK(t, s.collectStatistics(st, keys))
+	if st.Size() != 0 {
+		t.Fatal("all real constructor counters initially zero", st.Size())
 	}
-	b.FailAfter(-1)
 	satSolverSeedStatistics(s)
-	satOK(t, s.collectStatistics(st, k))
-	used := b.Used()
 	for pass := 0; pass < 6; pass++ {
-		satOK(t, st.Reset())
-		b.FailAfter(0)
-		satOK(t, s.collectStatistics(st, k))
-		if b.Used() != used || st.Size() != 25 {
-			t.Fatal("warm actual output backing", b.Used(), used, st.Size())
+		st.Reset()
+		satOK(t, s.collectStatistics(st, keys))
+		if st.Size() != 25 {
+			t.Fatal("reused output", st.Size())
 		}
-		b.FailAfter(-1)
 	}
 	satFullSolverRuntimeAudit(t, s)
 }
 func TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
-	st, k := satSolverStatisticsFixture(t, nil)
+	st, k := satSolverStatisticsFixture(t)
 	s.Variables.mkVarCount = ^uint32(0)
 	s.cleaner.elimLiterals = 3
 	s.simplifier.numElimLits = 5
@@ -126,12 +116,11 @@ func TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions(t *testi
 	// Source update appends contributions rather than coalescing key spellings.
 	satOK(t, s.collectStatistics(st, k))
 	want := []uint32{^uint32(0), 3, 5, 7}
-	if st.Size() != uint32(len(want)) {
+	if st.Size() != len(want) {
 		t.Fatal(st.Size())
 	}
 	for i, w := range want {
-		v, e := st.UintValue(uint32(i))
-		satOK(t, e)
+		v := st.UintValue(i)
 		if v != w {
 			t.Fatal(i, v, w)
 		}
@@ -141,8 +130,7 @@ func TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions(t *testi
 		t.Fatal(st.Size())
 	}
 	for i, w := range want {
-		v, e := st.UintValue(uint32(i + 4))
-		satOK(t, e)
+		v := st.UintValue(i + 4)
 		if v != w {
 			t.Fatal(i, v, w)
 		}
@@ -150,7 +138,7 @@ func TestSATSolverStatisticsPreservesUint32AndDuplicateKeyContributions(t *testi
 }
 func TestSATSolverStatisticsCopiedClosedAndHeaderCharge(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
-	st, k := satSolverStatisticsFixture(t, nil)
+	st, k := satSolverStatisticsFixture(t)
 	if s.ownerBytes != uint64(reflect.TypeOf(Solver{}).Size()) || s.blockedCorrectionSets != 0 {
 		t.Fatal("actual source field/header")
 	}
@@ -173,7 +161,7 @@ func TestSATSolverStatisticsIndependentSparseCounterMasks(t *testing.T) {
 	for mask := uint32(0); mask < 32; mask++ {
 		t.Run(fmt.Sprint(mask), func(t *testing.T) {
 			s, _, _ := satSolverCheckFixture(t)
-			st, k := satSolverStatisticsFixture(t, nil)
+			st, k := satSolverStatisticsFixture(t)
 			satSolverSeedStatistics(s)
 			positions := [5]int{0, 15, 17, 22, 24}
 			var expected [25]uint32
@@ -191,13 +179,12 @@ func TestSATSolverStatisticsIndependentSparseCounterMasks(t *testing.T) {
 			s.scc.numElim = expected[22]
 			s.probing.numAssigned = expected[24]
 			satOK(t, s.collectStatistics(st, k))
-			index := uint32(0)
+			index := 0
 			for _, want := range expected {
 				if want == 0 {
 					continue
 				}
-				v, e := st.UintValue(index)
-				satOK(t, e)
+				v := st.UintValue(index)
 				if v != want {
 					t.Fatal(index, v, want, mask)
 				}

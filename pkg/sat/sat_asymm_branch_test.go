@@ -312,12 +312,11 @@ func TestSATAsymmParametersStatsAndColdRefusal(t *testing.T) {
 	if a.enabled || a.rounds != 7 || a.limit != 1<<31-1 {
 		t.Fatal("source parameter keys/clamp")
 	}
-	st, r := statFixture(t, nil)
-	sk := statKey(t, r, "elim literals")
+	st := statFixture(t)
+	sk := statKey("elim literals")
 	a.elimLiterals = 9
 	satOK(t, a.collectStatistics(st, sk))
-	x, e := st.UintValue(0)
-	satOK(t, e)
+	x := st.UintValue(0)
 	if x != 9 {
 		t.Fatal(x)
 	}

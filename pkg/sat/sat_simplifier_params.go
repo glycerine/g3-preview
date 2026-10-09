@@ -3,20 +3,19 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
-// Keys borrow actual caller byte regions; they correspond, in source order, to
-// subsumed, subsumption resolution, elim literals, elim bool vars, elim blocked clauses.
+// Keys correspond, in source order, to subsumed, subsumption resolution,
+// elim literals, elim bool vars, and elim blocked clauses.
 
-func (s *satSimplifier) collectStatistics(st *util.Statistics, keys [5]util.StatisticsKey) error {
+func (s *satSimplifier) collectStatistics(st *statistics.Statistics, keys [5]statistics.Key) error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	values := [5]uint32{s.numSubsumed, s.numSubRes, s.numElimLits, s.numElimVars, s.numBlocked}
 	for i, v := range values {
-		if e := st.UpdateUint(keys[i], v); e != nil {
-			return e
-		}
+		st.UpdateUint(keys[i], v)
 	}
 	return nil
 }

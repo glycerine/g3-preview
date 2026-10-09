@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 type satAsymmBranch struct {
@@ -103,11 +104,12 @@ func (a *satAsymmBranch) Update(p *util.ParamsRef) (err error) {
 	return nil
 }
 func (a *satAsymmBranch) resetStatistics() { a.elimLiterals = 0 }
-func (a *satAsymmBranch) collectStatistics(s *util.Statistics, k util.StatisticsKey) error {
+func (a *satAsymmBranch) collectStatistics(s *statistics.Statistics, k statistics.Key) error {
 	if e := a.open(); e != nil {
 		return e
 	}
-	return s.UpdateUint(k, a.elimLiterals)
+	s.UpdateUint(k, a.elimLiterals)
+	return nil
 }
 func collectAsymmBranchParamDescrs(d *util.ParamDescrs) error {
 	for _, x := range [3]struct {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 func paramsMust(t *testing.T, e error) {
@@ -44,40 +45,11 @@ func paramsTestOwner(t *testing.T) (*util.ParamsContext, *util.SymbolManager, *u
 	})
 	return c, sy, q
 }
-func statFixture(t *testing.T, b *arena.Budget) (*util.Statistics, *arena.BytesRegion) {
+func statFixture(t *testing.T) *statistics.Statistics {
 	t.Helper()
-	r, e := arena.NewBytesRegion(arena.BytesRegionConfig{})
-	if e != nil {
-		t.Fatal(e)
-	}
-	s, e := util.NewStatistics(util.StatisticsConfig{Keys: r, Budget: b})
-	if e != nil {
-		r.Close()
-		t.Fatal(e)
-	}
-	t.Cleanup(func() { s.Close(); r.Close() })
-	return s, r
+	return statistics.New()
 }
-func statKey(t *testing.T, r *arena.BytesRegion, v string) util.StatisticsKey {
-	t.Helper()
-	ref, e := r.Allocate(uint32(len(v) + 1))
-	if e != nil {
-		t.Fatal(e)
-	}
-	for i := range v {
-		if e = r.Write(ref, uint32(i), v[i]); e != nil {
-			t.Fatal(e)
-		}
-	}
-	if e = r.Write(ref, uint32(len(v)), 0); e != nil {
-		t.Fatal(e)
-	}
-	k, e := util.NewStatisticsKey(r, ref, 0)
-	if e != nil {
-		t.Fatal(e)
-	}
-	return k
-}
+func statKey(v string) statistics.Key { return statistics.Key(v) }
 func pdnew(t *testing.T, m *util.SymbolManager, b *arena.Budget) *util.ParamDescrs {
 	t.Helper()
 	d, e := util.NewParamDescrs(m, util.ParamDescrsConfig{Budget: b, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2}}})

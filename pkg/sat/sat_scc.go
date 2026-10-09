@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 type satSCC struct {
@@ -90,11 +91,12 @@ func (c *satSCC) Update(local *util.ParamsRef) (err error) {
 	return e
 }
 func (c *satSCC) resetStatistics() { c.numElim = 0 }
-func (c *satSCC) collectStatistics(s *util.Statistics, key util.StatisticsKey) error {
+func (c *satSCC) collectStatistics(s *statistics.Statistics, key statistics.Key) error {
 	if e := c.open(); e != nil {
 		return e
 	}
-	return s.UpdateUint(key, c.numElim)
+	s.UpdateUint(key, c.numElim)
+	return nil
 }
 func (c *satSCC) closeVectors() error {
 	r := c.lifecycle.propagation.memory

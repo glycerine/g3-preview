@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 // Actual source cleaner member. Dependencies are borrowed and must outlive it.
@@ -67,15 +68,13 @@ func (c *satCleaner) open() error {
 }
 func (c *satCleaner) resetStatistics() { c.elimClauses = 0; c.elimLiterals = 0 }
 
-// Keys are explicit caller-borrowed static spelling counterparts.
-func (c *satCleaner) collectStatistics(s *util.Statistics, clauses, literals util.StatisticsKey) error {
+func (c *satCleaner) collectStatistics(s *statistics.Statistics, clauses, literals statistics.Key) error {
 	if e := c.open(); e != nil {
 		return e
 	}
-	if e := s.UpdateUint(clauses, c.elimClauses); e != nil {
-		return e
-	}
-	return s.UpdateUint(literals, c.elimLiterals)
+	s.UpdateUint(clauses, c.elimClauses)
+	s.UpdateUint(literals, c.elimLiterals)
+	return nil
 }
 func (c *satCleaner) invariant() error {
 	if satStorageSourceDebug && c.debugInvariant {

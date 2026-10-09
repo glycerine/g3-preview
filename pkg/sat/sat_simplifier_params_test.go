@@ -4,7 +4,7 @@ package sat
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 func TestSATSimplifierAllDescriptorsAndStatistics(t *testing.T) {
@@ -16,11 +16,11 @@ func TestSATSimplifierAllDescriptorsAndStatistics(t *testing.T) {
 	if n != 17 {
 		t.Fatal("all source descriptions", n)
 	}
-	st, r := statFixture(t, nil)
+	st := statFixture(t)
 	names := [5]string{"subsumed", "subsumption resolution", "elim literals", "elim bool vars", "elim blocked clauses"}
-	var keys [5]util.StatisticsKey
+	var keys [5]statistics.Key
 	for i, n := range names {
-		keys[i] = statKey(t, r, n)
+		keys[i] = statKey(n)
 	}
 	s.numSubsumed = 11
 	s.numSubRes = 12
@@ -28,10 +28,9 @@ func TestSATSimplifierAllDescriptorsAndStatistics(t *testing.T) {
 	s.numElimVars = 14
 	s.numBlocked = 15
 	satOK(t, s.collectStatistics(st, keys))
-	for i := uint32(0); i < 5; i++ {
-		v, e := st.UintValue(i)
-		satOK(t, e)
-		if v != 11+i {
+	for i := 0; i < 5; i++ {
+		v := st.UintValue(i)
+		if v != uint32(11+i) {
 			t.Fatal("actual source stats order", i, v)
 		}
 	}
