@@ -10,6 +10,12 @@ translation and are retained as historical notes, not current inventory.
 production source or Go code uses either specialization. Its compatibility
 implementation and self-only tests were removed as dead production code.
 
+`src/util/object_allocator.h` is instantiated only by
+`src/test/object_allocator.cpp`. Its `arena.Pool32` adaptation had no production
+Go consumer; that pool, its duplicated rational fixtures, and its self-only
+arena accounting cases were removed. Live arena slabs and regions are
+unchanged.
+
 Current source provenance policy: the C++ reference is fixed. Keep originating repository-relative source paths and line numbers in ported files; do not compute, store, or verify C++ content hashes, checksums, or fingerprints. Omit MIT-license, author, and Microsoft copyright notices from Go headers; retain repository license files. Solver algorithm hashing/fingerprints and Go working-tree SHA verification remain unchanged. Historical source digest records below have been removed; source paths, method mappings, assertions, conditional profiles, and test evidence remain.
 
 Current layout after reorganization: `pkg/` is the Go module. This progress record and `port_manifest.json` live at the repository root. Manifest Go targets are repository-relative `pkg/...` paths. Run verification from `pkg/` with `go run ./cmd/portcheck -source ..`; the default manifest is `../port_manifest.json`, and the syntax audit explicitly scans the `pkg/` module. Historical flat filenames, `mpnum/`, `golang/`, and verification-copy paths below describe their original checkpoints and are not current build instructions. Keep implementation changes visible in the main worktree; temporary verification artifacts may live outside it.

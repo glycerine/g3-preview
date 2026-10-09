@@ -106404,27 +106404,9 @@
       "path": "src/test/object_allocator.cpp",
       "component": "test",
       "role": "test",
-      "status": "partial",
-      "go_targets": [
-        "pkg/arena/pool32.go"
-      ],
-      "tests": [
-        "TestPool32SourceLifetimeProjection",
-        "TestPool32DoNothingReset",
-        "TestPool32WorkerDestinationAndModes",
-        "TestPool32DestructorOrderResetLedger",
-        "TestPool32RetirementAndDestructorPolicy",
-        "TestPool32PredictableFailuresPrecedeCallbacks",
-        "TestPool32IndependentStateMachine",
-        "TestPool32WarmReuse",
-        "TestPool32ResetAtGenerationLimit",
-        "TestPool32ConcurrentWorkerPartitions",
-        "TestPool32SourceDefaultsAndRecordAudit",
-        "TestPool32ResetPeakBudget",
-        "TestPool32SourceRationalTst1",
-        "TestPool32SourceRationalTst2",
-        "TestPool32RationalBigFractionLifetime"
-      ],
+      "status": "reference_only",
+      "go_targets": [],
+      "tests": [],
       "assertions": [
         {
           "line": 65,
@@ -106447,16 +106429,12 @@
           "text": "ENSURE(cell::g_num_allocated_cells == cell::g_num_deallocated_cells);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
-      "ownership": [
-        "Constructed=true scalar lifecycle specialization now executes all finite source coefficient assertions using actual MPQ numerals and budgeted caller-owned scalar fixture cells. The public rational wrapper, production source cell/links, construct=false and whole-template ownership remain pending. See PORT_PROGRESS.md#audit-arena-port-status-md."
-      ],
+      "ownership": [],
       "deviations": [
-        "Cold mutex serializes owner metadata; callbacks must not reenter owner or panic.",
-        "Predictable storage failure is checked before constructor/reset/destructor effects; storage peak charges and retained retry capacity are explicit.",
-        "Source100000-operation test uses a deterministic nonnegative generator in place of unspecified libc rand; selected pair index still controls the shadowed-index recycle branch. Actual RationalManager reset/destruction completes before numerical owner close."
+        "Whole-source include and symbol scans found object_allocator instantiated only by src/test/object_allocator.cpp. Its arena.Pool32 adaptation had no production Go consumer; the pool and its self-only tests were removed. Live arena slabs and regions are separate implementations and remain unchanged."
       ]
     },
     {
@@ -139628,27 +139606,9 @@
       "path": "src/util/object_allocator.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
-      "go_targets": [
-        "pkg/arena/pool32.go"
-      ],
-      "tests": [
-        "TestPool32SourceLifetimeProjection",
-        "TestPool32DoNothingReset",
-        "TestPool32WorkerDestinationAndModes",
-        "TestPool32DestructorOrderResetLedger",
-        "TestPool32RetirementAndDestructorPolicy",
-        "TestPool32PredictableFailuresPrecedeCallbacks",
-        "TestPool32IndependentStateMachine",
-        "TestPool32WarmReuse",
-        "TestPool32ResetAtGenerationLimit",
-        "TestPool32ConcurrentWorkerPartitions",
-        "TestPool32SourceDefaultsAndRecordAudit",
-        "TestPool32ResetPeakBudget",
-        "TestPool32SourceRationalTst1",
-        "TestPool32SourceRationalTst2",
-        "TestPool32RationalBigFractionLifetime"
-      ],
+      "status": "reference_only",
+      "go_targets": [],
+      "tests": [],
       "conditionals": [
         {
           "line": 20,
@@ -139705,93 +139665,12 @@
           "text": "SASSERT(worker_id < capacity());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [
-        {
-          "name": "constructed=true scalar constructor/reserve/capacity",
-          "status": "ported",
-          "go_target": "pkg/arena/pool32.go",
-          "tests": [
-            "TestPool32SourceLifetimeProjection",
-            "TestPool32DoNothingReset",
-            "TestPool32WorkerDestinationAndModes",
-            "TestPool32DestructorOrderResetLedger",
-            "TestPool32RetirementAndDestructorPolicy",
-            "TestPool32PredictableFailuresPrecedeCallbacks",
-            "TestPool32IndependentStateMachine",
-            "TestPool32WarmReuse",
-            "TestPool32ResetAtGenerationLimit",
-            "TestPool32ConcurrentWorkerPartitions",
-            "TestPool32SourceDefaultsAndRecordAudit",
-            "TestPool32ResetPeakBudget"
-          ]
-        },
-        {
-          "name": "constructed=true allocate_core/recycle_core",
-          "status": "ported",
-          "go_target": "pkg/arena/pool32.go",
-          "tests": [
-            "TestPool32SourceLifetimeProjection",
-            "TestPool32DoNothingReset",
-            "TestPool32WorkerDestinationAndModes",
-            "TestPool32DestructorOrderResetLedger",
-            "TestPool32RetirementAndDestructorPolicy",
-            "TestPool32PredictableFailuresPrecedeCallbacks",
-            "TestPool32IndependentStateMachine",
-            "TestPool32WarmReuse",
-            "TestPool32ResetAtGenerationLimit",
-            "TestPool32ConcurrentWorkerPartitions",
-            "TestPool32SourceDefaultsAndRecordAudit",
-            "TestPool32ResetPeakBudget"
-          ]
-        },
-        {
-          "name": "worker mode/indexed allocation/recycle/wrapper",
-          "status": "ported",
-          "go_target": "pkg/arena/pool32.go",
-          "tests": [
-            "TestPool32SourceLifetimeProjection",
-            "TestPool32DoNothingReset",
-            "TestPool32WorkerDestinationAndModes",
-            "TestPool32DestructorOrderResetLedger",
-            "TestPool32RetirementAndDestructorPolicy",
-            "TestPool32PredictableFailuresPrecedeCallbacks",
-            "TestPool32IndependentStateMachine",
-            "TestPool32WarmReuse",
-            "TestPool32ResetAtGenerationLimit",
-            "TestPool32ConcurrentWorkerPartitions",
-            "TestPool32SourceDefaultsAndRecordAudit",
-            "TestPool32ResetPeakBudget"
-          ]
-        },
-        {
-          "name": "constructed=true region reset/destructor/object count",
-          "status": "ported",
-          "go_target": "pkg/arena/pool32.go",
-          "tests": [
-            "TestPool32SourceLifetimeProjection",
-            "TestPool32DoNothingReset",
-            "TestPool32WorkerDestinationAndModes",
-            "TestPool32DestructorOrderResetLedger",
-            "TestPool32RetirementAndDestructorPolicy",
-            "TestPool32PredictableFailuresPrecedeCallbacks",
-            "TestPool32IndependentStateMachine",
-            "TestPool32WarmReuse",
-            "TestPool32ResetAtGenerationLimit",
-            "TestPool32ConcurrentWorkerPartitions",
-            "TestPool32SourceDefaultsAndRecordAudit",
-            "TestPool32ResetPeakBudget"
-          ]
-        }
-      ],
-      "ownership": [
-        "Constructed=true scalar lifecycle specialization now executes all finite source coefficient assertions using actual MPQ numerals and budgeted caller-owned scalar fixture cells. The public rational wrapper, production source cell/links, construct=false and whole-template ownership remain pending. See PORT_PROGRESS.md#audit-arena-port-status-md."
-      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "Cold mutex serializes owner metadata; callbacks must not reenter owner or panic.",
-        "Predictable storage failure is checked before constructor/reset/destructor effects; storage peak charges and retained retry capacity are explicit.",
-        "Source100000-operation test uses a deterministic nonnegative generator in place of unspecified libc rand; selected pair index still controls the shadowed-index recycle branch. Actual RationalManager reset/destruction completes before numerical owner close."
+        "Whole-source include and symbol scans found object_allocator instantiated only by src/test/object_allocator.cpp. Its arena.Pool32 adaptation had no production Go consumer; the pool and its self-only tests were removed. Live arena slabs and regions are separate implementations and remain unchanged."
       ]
     },
     {

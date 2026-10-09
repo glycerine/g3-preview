@@ -104,23 +104,6 @@ func ownerBudgetCases() []ownerBudgetCase {
 					return stats()
 				}, stats, nil
 		}},
-		{"Pool32", uint64(reflect.TypeOf(Pool32{}).Size()), func(b *Budget) (func(), func() uint64, func() uint64, error) {
-			s, e := NewPool32(Pool32Config{PageSize: 2, Workers: 1, Budget: b}, Pool32Policy{})
-			if e != nil {
-				return nil, nil, nil, e
-			}
-			stats := func() uint64 { return s.Stats().OwnerBytes }
-			return func() {
-					if e := s.Close(); e != nil {
-						panic(e)
-					}
-				}, func() uint64 {
-					if e := s.Reset(); e != nil {
-						panic(e)
-					}
-					return stats()
-				}, stats, nil
-		}},
 		{"SmallBytes", uint64(reflect.TypeOf(SmallBytes{}).Size()) + descriptor, func(b *Budget) (func(), func() uint64, func() uint64, error) {
 			s, e := NewSmallBytes(SmallBytesConfig{Descriptors: Config{PageSize: 2, Budget: b}})
 			if e != nil {
@@ -140,9 +123,6 @@ func TestOwnerBudgetConstructorAndClose(t *testing.T) {
 				t.Fatal(e)
 			}
 			backing := uint64(0)
-			if tc.name == "Pool32" {
-				backing = uint64(reflect.TypeOf(pool32Worker{}).Size()) + uint64(reflect.TypeOf(pool32Page{}).Size()) + 2*(4+uint64(reflect.TypeOf(pool32Meta{}).Size()))
-			}
 			if stats() != tc.expected || b.Used() != 7+tc.expected+backing {
 				t.Fatal("owner header uncharged", stats(), tc.expected, b.Used())
 			}
@@ -218,10 +198,6 @@ func TestOwnerBudgetInvalidConfigurationUnwind(t *testing.T) {
 		}},
 		{"Region32 child", func(b *Budget) error { _, e := NewRegion32(Config{PageSize: 3, Budget: b}); return e }},
 		{"Region64 child", func(b *Budget) error { _, e := NewRegion64(Config{PageSize: 3, Budget: b}); return e }},
-		{"Pool32", func(b *Budget) error {
-			_, e := NewPool32(Pool32Config{PageSize: 3, Budget: b}, Pool32Policy{})
-			return e
-		}},
 		{"SmallBytes descriptor", func(b *Budget) error {
 			_, e := NewSmallBytes(SmallBytesConfig{Descriptors: Config{PageSize: 3, Budget: b}})
 			return e
