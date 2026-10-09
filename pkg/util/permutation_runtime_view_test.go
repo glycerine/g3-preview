@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/permutation"
 )
 
 func runtimePermutationFixture(t *testing.T, n uint64) (*arena.Budget, *Runtime, Block, RuntimeUint32View) {
@@ -178,7 +179,7 @@ func TestRuntimePermutationPointerReachedAssertionBoundsAndRestorationPrefix(t *
 		runtimePermutationMust(t, p.Write(0, 2))
 		runtimePermutationMust(t, p.Write(1, 0))
 		e = ApplyPermutationCoreRuntimeUint32(2, RuntimeUint32View{}, p)
-		if !errors.Is(e, ErrPermutationAssertion) {
+		if !errors.Is(e, permutation.ErrAssertion) {
 			t.Fatal("p_j assertion before data/marker", e)
 		}
 		x, e = p.Read(0)

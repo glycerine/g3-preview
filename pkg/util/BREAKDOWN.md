@@ -157,7 +157,7 @@ self-contained in Go or depend only on `arena` or the standard library.
 | `util/bitset` | `bit_vector`, `fixed_bit_vector`, `uint_set` | Extracted. Native typed storage; fixed-width vectors import `arena` directly. `bit_util` is a Go platform replacement and `obj_mark` is represented by concrete AST specializations. |
 | `util/cliques` | `max_cliques`, its set helpers | Already has SAT consumers. A focused package would isolate the algorithm and its tests. |
 | `util/sortnet` | `sorting_network` | Standalone algorithm with production consumers outside `util`. |
-| `util/permutation` | live declarations from `permutation.h` | Only move the live free permutation operations. `permutation.cpp` itself has no production caller. |
+| `util/permutation` | live free operations from `permutation.h` | Extracted as concrete `uint32` slice operations. `permutation.cpp` itself has no production caller. |
 | `util/stack` | `stack` | Put the arena-backed implementation in a package that imports `pkg/arena` directly. |
 
 Very small leaf facilities such as `file_path`, `luby`, and `version` should

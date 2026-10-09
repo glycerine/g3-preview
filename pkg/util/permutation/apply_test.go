@@ -1,5 +1,5 @@
 // Source: src/util/permutation.h; src/test/permutation.cpp.
-package util
+package permutation
 
 import (
 	"errors"
@@ -32,7 +32,7 @@ func TestPermutationCyclesExhaustiveIndependentCopy(t *testing.T) {
 				want[i] = data[p[i]]
 			}
 			mapping := append([]uint32{}, p...)
-			if e := ApplyPermutationUint32(uint32(n), data, mapping); e != nil {
+			if e := ApplyUint32(uint32(n), data, mapping); e != nil {
 				t.Fatal(n, p, e)
 			}
 			if !reflect.DeepEqual(data, want) || !reflect.DeepEqual(mapping, p) {
@@ -41,7 +41,7 @@ func TestPermutationCyclesExhaustiveIndependentCopy(t *testing.T) {
 			for i := range data {
 				data[i] = uint32(i)*7919 + 31
 			}
-			if e := ApplyPermutationCoreUint32(uint32(n), data, mapping); e != nil {
+			if e := ApplyCoreUint32(uint32(n), data, mapping); e != nil {
 				t.Fatal(e)
 			}
 			if !reflect.DeepEqual(data, want) {
@@ -60,7 +60,7 @@ func TestPermutationCyclesExhaustiveIndependentCopy(t *testing.T) {
 func TestPermutationCyclesActualMarkBeforeReachedDataFailure(t *testing.T) {
 	p := []uint32{1, 0, 2}
 	data := []uint32{11}
-	if e := ApplyPermutationUint32(2, data, p); !errors.Is(e, ErrPermutationBounds) {
+	if e := ApplyUint32(2, data, p); !errors.Is(e, ErrBounds) {
 		t.Fatal(e)
 	}
 	if !reflect.DeepEqual(p, []uint32{^uint32(1), 0, 2}) || data[0] != 11 {
@@ -68,7 +68,7 @@ func TestPermutationCyclesActualMarkBeforeReachedDataFailure(t *testing.T) {
 	}
 	// The preserving wrapper cannot restore after its child stops.
 	p = []uint32{0}
-	if e := ApplyPermutationUint32(2, nil, p); !errors.Is(e, ErrPermutationBounds) {
+	if e := ApplyUint32(2, nil, p); !errors.Is(e, ErrBounds) {
 		t.Fatal(e)
 	}
 	if p[0] != ^uint32(0) {
@@ -77,22 +77,22 @@ func TestPermutationCyclesActualMarkBeforeReachedDataFailure(t *testing.T) {
 }
 
 func TestPermutationCyclesUnreadAndSignedCountBranches(t *testing.T) {
-	if e := ApplyPermutationCoreUint32(0, nil, nil); e != nil {
+	if e := ApplyCoreUint32(0, nil, nil); e != nil {
 		t.Fatal(e)
 	}
-	if e := ApplyPermutationUint32(0, nil, nil); e != nil {
+	if e := ApplyUint32(0, nil, nil); e != nil {
 		t.Fatal(e)
 	}
-	if e := ApplyPermutationCoreUint32(0x80000000, nil, nil); e != nil {
+	if e := ApplyCoreUint32(0x80000000, nil, nil); e != nil {
 		t.Fatal(e)
 	}
-	if e := ApplyPermutationUint32(0x80000000, nil, nil); !errors.Is(e, ErrPermutationBounds) {
+	if e := ApplyUint32(0x80000000, nil, nil); !errors.Is(e, ErrBounds) {
 		t.Fatal(e)
 	}
 	// Pre-marked entries skip without reading data. Restoration is literal,
 	// even when the caller supplied those markers before the invocation.
 	p := []uint32{0xffffffff, 0xfffffffe}
-	if e := ApplyPermutationUint32(2, nil, p); e != nil {
+	if e := ApplyUint32(2, nil, p); e != nil {
 		t.Fatal(e)
 	}
 	if !reflect.DeepEqual(p, []uint32{0, 1}) {
@@ -100,7 +100,7 @@ func TestPermutationCyclesUnreadAndSignedCountBranches(t *testing.T) {
 	}
 	// Identity cycles do not read data, and counts leave actual trailing words unread.
 	p = []uint32{0, 1, 99}
-	if e := ApplyPermutationUint32(2, nil, p); e != nil {
+	if e := ApplyUint32(2, nil, p); e != nil {
 		t.Fatal(e)
 	}
 	if !reflect.DeepEqual(p, []uint32{0, 1, 99}) {
@@ -110,14 +110,14 @@ func TestPermutationCyclesUnreadAndSignedCountBranches(t *testing.T) {
 
 func TestPermutationCyclesOverlappingActualBorrow(t *testing.T) {
 	p := []uint32{0, 1, 2, 99}
-	if e := ApplyPermutationUint32(3, p, p); e != nil {
+	if e := ApplyUint32(3, p, p); e != nil {
 		t.Fatal(e)
 	}
 	if !reflect.DeepEqual(p, []uint32{0, 1, 2, 99}) {
 		t.Fatal(p)
 	}
 	p = []uint32{0, 1, 2, 99}
-	if e := ApplyPermutationCoreUint32(3, p, p); e != nil {
+	if e := ApplyCoreUint32(3, p, p); e != nil {
 		t.Fatal(e)
 	}
 	if !reflect.DeepEqual(p, []uint32{^uint32(0), ^uint32(1), ^uint32(2), 99}) {
@@ -127,28 +127,28 @@ func TestPermutationCyclesOverlappingActualBorrow(t *testing.T) {
 
 func TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle(t *testing.T) {
 	p := []uint32{3, 0}
-	e := ApplyPermutationCoreUint32(2, nil, p)
+	e := ApplyCoreUint32(2, nil, p)
 	if sourceDebug {
-		if !errors.Is(e, ErrPermutationAssertion) || !reflect.DeepEqual(p, []uint32{3, 0}) {
+		if !errors.Is(e, ErrAssertion) || !reflect.DeepEqual(p, []uint32{3, 0}) {
 			t.Fatal(e, p)
 		}
 	} else {
-		if !errors.Is(e, ErrPermutationBounds) || !reflect.DeepEqual(p, []uint32{^uint32(3), 0}) {
+		if !errors.Is(e, ErrBounds) || !reflect.DeepEqual(p, []uint32{^uint32(3), 0}) {
 			t.Fatal(e, p)
 		}
 	}
 	p = []uint32{1, 1}
 	data := []uint32{11, 22}
-	e = ApplyPermutationUint32(2, data, p)
+	e = ApplyUint32(2, data, p)
 	if !reflect.DeepEqual(data, []uint32{22, 11}) {
 		t.Fatal(data)
 	}
 	if sourceDebug {
-		if !errors.Is(e, ErrPermutationAssertion) || !reflect.DeepEqual(p, []uint32{^uint32(1), ^uint32(1)}) {
+		if !errors.Is(e, ErrAssertion) || !reflect.DeepEqual(p, []uint32{^uint32(1), ^uint32(1)}) {
 			t.Fatal(e, p)
 		}
 	} else {
-		if !errors.Is(e, ErrPermutationBounds) || !reflect.DeepEqual(p, []uint32{^uint32(1), 1}) {
+		if !errors.Is(e, ErrBounds) || !reflect.DeepEqual(p, []uint32{^uint32(1), 1}) {
 			t.Fatal(e, p)
 		}
 	}

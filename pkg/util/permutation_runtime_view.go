@@ -3,6 +3,8 @@ package util
 
 import (
 	"math"
+
+	"github.com/glycerine/g3/pkg/util/permutation"
 )
 
 // RuntimeUint32View is a borrowed captured raw pointer in the checked Runtime
@@ -33,7 +35,7 @@ func (v RuntimeUint32View) wordOffset(i uint32) (uint64, error) {
 	}
 	delta := uint64(i) * 4
 	if v.overflow || v.offset > math.MaxUint64-delta {
-		return 0, ErrPermutationBounds
+		return 0, permutation.ErrBounds
 	}
 	return v.offset + delta, nil
 }
@@ -65,7 +67,7 @@ func ApplyPermutationCoreRuntimeUint32(size uint32, data, p RuntimeUint32View) e
 		j := i
 		for {
 			if sourceDebug && j < 0 {
-				return ErrPermutationAssertion
+				return permutation.ErrAssertion
 			}
 			v, e = p.Read(uint32(j))
 			if e != nil {
@@ -73,12 +75,12 @@ func ApplyPermutationCoreRuntimeUint32(size uint32, data, p RuntimeUint32View) e
 			}
 			pj := int32(v)
 			if sourceDebug && (pj < 0 || pj >= int32(size)) {
-				return ErrPermutationAssertion
+				return permutation.ErrAssertion
 			}
 			// Native signed negation of INT_MIN is undefined. Refuse only at
 			// that reached operation, before its nonexistent defined result.
 			if pj == math.MinInt32 {
-				return ErrPermutationBounds
+				return permutation.ErrBounds
 			}
 			if e = p.Write(uint32(j), uint32(-pj-1)); e != nil {
 				return e
@@ -118,7 +120,7 @@ func ApplyPermutationRuntimeUint32(size uint32, data, p RuntimeUint32View) error
 			return e
 		}
 		if int32(v) == math.MinInt32 {
-			return ErrPermutationBounds
+			return permutation.ErrBounds
 		}
 		if e = p.Write(i, uint32(-int32(v)-1)); e != nil {
 			return e

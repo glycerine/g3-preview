@@ -107188,9 +107188,13 @@
       "path": "src/test/permutation.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/permutation/apply_test.go"
+      ],
+      "tests": [
+        "TestPermutationCyclesExhaustiveIndependentCopy"
+      ],
       "conditionals": [
         {
           "line": 30,
@@ -141980,8 +141984,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/permutation.go",
-        "pkg/util/permutation_source_test.go",
+        "pkg/util/permutation/apply.go",
+        "pkg/util/permutation/apply_test.go",
         "pkg/util/util_unsigned_vector_runtime.go",
         "pkg/util/util_unsigned_vector_runtime_test.go",
         "pkg/util/util_permutation_runtime.go",
@@ -142002,7 +142006,9 @@
         "pkg/util/util_permutation_diagnostics_source_test.go",
         "pkg/util/util_debug_action_binding_source_test.go",
         "pkg/util/util_permutation_word_view.go",
-        "pkg/util/util_debug_notification.go"
+        "pkg/util/util_debug_notification.go",
+        "pkg/util/permutation/debug_off.go",
+        "pkg/util/permutation/debug_on.go"
       ],
       "tests": [
         "TestPermutationCyclesExhaustiveIndependentCopy",
@@ -142104,7 +142110,7 @@
         {
           "name": "apply_permutation_core concrete uint32 specialization",
           "status": "ported",
-          "go_target": "pkg/util/permutation.go",
+          "go_target": "pkg/util/permutation/apply.go",
           "tests": [
             "TestPermutationCyclesExhaustiveIndependentCopy",
             "TestPermutationCyclesActualMarkBeforeReachedDataFailure",
@@ -142116,7 +142122,7 @@
         {
           "name": "apply_permutation concrete uint32 specialization with literal restoration",
           "status": "ported",
-          "go_target": "pkg/util/permutation.go",
+          "go_target": "pkg/util/permutation/apply.go",
           "tests": [
             "TestPermutationCyclesExhaustiveIndependentCopy",
             "TestPermutationCyclesActualMarkBeforeReachedDataFailure",
