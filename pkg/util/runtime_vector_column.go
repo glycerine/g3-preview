@@ -311,12 +311,3 @@ func (c *RuntimeVectorColumn) Finalize() error {
 	c.Closed = true
 	return nil
 }
-
-// runtimeVectorCopyRequest preserves source size_t arithmetic before allocation.
-func runtimeVectorCopyRequest(capacity, stride uint32, bits uint8) uint64 {
-	n := uint64(capacity)*uint64(stride) + 8
-	if bits == 32 {
-		return uint64(uint32(n))
-	}
-	return n
-}
