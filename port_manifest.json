@@ -119093,59 +119093,57 @@
       "path": "src/util/inf_s_integer.cpp",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "platform_replacement",
       "go_targets": [
-        "pkg/util/inf_s_integer.go",
-        "pkg/util/inf_s_integer_test.go"
+        "pkg/util/smallint/infinitesimal.go",
+        "pkg/util/smallint/infinitesimal_test.go",
+        "pkg/util/smallint/debug_on.go",
+        "pkg/util/smallint/debug_off.go"
       ],
       "tests": [
-        "TestInfSIntegerConstructorsTraitsAndDebugGuards",
-        "TestInfSIntegerIndependentLexicographicAlgebra",
-        "TestInfSIntegerRationalConstructorAndAssignment",
-        "TestInfSIntegerDisplayOriginalNegativeCoefficientAndColdPrefixes",
-        "TestInfSIntegerWideOrderingAndRepresentableArithmetic",
-        "TestInfSIntegerFileFormattingFlagsAndBorrow"
+        "TestInfinitesimalConstructionPredicatesAndText",
+        "TestInfinitesimalLexicographicAlgebra",
+        "TestInfinitesimalFloorCeilFusedAndGuards",
+        "TestInfinitesimalWarmValueOperationsDoNotAllocate"
       ],
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
-          "name": "All defined inf_s_integer scalar/pair/rational constructors, constants, functors, projections/guards, assignments, scalar/pair arithmetic, increments, lexicographic pair and both-direction scalar comparisons, signs, floor/ceil, fused operations, abs and original coefficient stream insertion (inf_s_integer.h:25-347; inf_s_integer.cpp:22-24)",
+          "name": "live lexicographic signed32 pair algebra, predicates, projections and text",
           "status": "ported",
-          "go_target": "pkg/util/inf_s_integer.go",
+          "go_target": "pkg/util/smallint/infinitesimal.go",
           "tests": [
-            "TestInfSIntegerConstructorsTraitsAndDebugGuards",
-            "TestInfSIntegerIndependentLexicographicAlgebra",
-            "TestInfSIntegerRationalConstructorAndAssignment",
-            "TestInfSIntegerDisplayOriginalNegativeCoefficientAndColdPrefixes",
-            "TestInfSIntegerWideOrderingAndRepresentableArithmetic",
-            "TestInfSIntegerFileFormattingFlagsAndBorrow"
+            "TestInfinitesimalConstructionPredicatesAndText",
+            "TestInfinitesimalLexicographicAlgebra",
+            "TestInfinitesimalFloorCeilFusedAndGuards",
+            "TestInfinitesimalWarmValueOperationsDoNotAllocate"
           ]
         }
       ],
       "ownership": [
-        "Inline two-int32 class owns no payload; value copies preserve source copy construction. Borrowed rational scalar getter runs before assignment writes, preserving the old pair on errors. Native source static const references map to scalar value accessors. Display borrows output and preserves exact separate insertion actions, actual cold output prefixes, immediate complete budget accounting, unchanged input, file-stream allocation erasure and provider lifetime."
+        "Pointer-free pair of int32-backed Integer values; arithmetic and comparisons allocate no storage."
       ],
       "deviations": [
-        "Go debug tags preserve denominator/projection assertions and existing rational debug integrality checks; release erases those guards exactly, with no fabricated denominator division or epsilon check in scalar getters. C++ signed-overflow, INT_MIN negation, overflowing hash second+1 and zero-divisor undefined domains are not claimed; Go arithmetic wraps and division by zero panics. Undefined source to_string declaration maps to an explicit Go decimal convenience with no source-body credit. Commented-out nonlinear infinitesimal operations remain unimplemented and uncredited. No dedicated upstream inf_s_integer tests exist in src/test. Native reference/pointer identity and assertion/exception ABI remain representation adaptations."
+        "The Go leaf uses returned concrete values instead of C++ mutation operators, reference identity, hash/equality functors, stream insertion, or rational ownership. Future rational conversions belong at the consuming numeric boundary. Debug-tagged denominator and projection assertions are preserved. strconv replaces ostream for diagnostic text, including the source negative-epsilon coefficient spelling."
       ]
     },
     {
       "path": "src/util/inf_s_integer.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "platform_replacement",
       "go_targets": [
-        "pkg/util/inf_s_integer.go",
-        "pkg/util/inf_s_integer_test.go"
+        "pkg/util/smallint/infinitesimal.go",
+        "pkg/util/smallint/infinitesimal_test.go",
+        "pkg/util/smallint/debug_on.go",
+        "pkg/util/smallint/debug_off.go"
       ],
       "tests": [
-        "TestInfSIntegerConstructorsTraitsAndDebugGuards",
-        "TestInfSIntegerIndependentLexicographicAlgebra",
-        "TestInfSIntegerRationalConstructorAndAssignment",
-        "TestInfSIntegerDisplayOriginalNegativeCoefficientAndColdPrefixes",
-        "TestInfSIntegerWideOrderingAndRepresentableArithmetic",
-        "TestInfSIntegerFileFormattingFlagsAndBorrow"
+        "TestInfinitesimalConstructionPredicatesAndText",
+        "TestInfinitesimalLexicographicAlgebra",
+        "TestInfinitesimalFloorCeilFusedAndGuards",
+        "TestInfinitesimalWarmValueOperationsDoNotAllocate"
       ],
       "conditionals": [
         {
@@ -119175,24 +119173,22 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "All defined inf_s_integer scalar/pair/rational constructors, constants, functors, projections/guards, assignments, scalar/pair arithmetic, increments, lexicographic pair and both-direction scalar comparisons, signs, floor/ceil, fused operations, abs and original coefficient stream insertion (inf_s_integer.h:25-347; inf_s_integer.cpp:22-24)",
+          "name": "live lexicographic signed32 pair algebra, predicates, projections and text",
           "status": "ported",
-          "go_target": "pkg/util/inf_s_integer.go",
+          "go_target": "pkg/util/smallint/infinitesimal.go",
           "tests": [
-            "TestInfSIntegerConstructorsTraitsAndDebugGuards",
-            "TestInfSIntegerIndependentLexicographicAlgebra",
-            "TestInfSIntegerRationalConstructorAndAssignment",
-            "TestInfSIntegerDisplayOriginalNegativeCoefficientAndColdPrefixes",
-            "TestInfSIntegerWideOrderingAndRepresentableArithmetic",
-            "TestInfSIntegerFileFormattingFlagsAndBorrow"
+            "TestInfinitesimalConstructionPredicatesAndText",
+            "TestInfinitesimalLexicographicAlgebra",
+            "TestInfinitesimalFloorCeilFusedAndGuards",
+            "TestInfinitesimalWarmValueOperationsDoNotAllocate"
           ]
         }
       ],
       "ownership": [
-        "Inline two-int32 class owns no payload; value copies preserve source copy construction. Borrowed rational scalar getter runs before assignment writes, preserving the old pair on errors. Native source static const references map to scalar value accessors. Display borrows output and preserves exact separate insertion actions, actual cold output prefixes, immediate complete budget accounting, unchanged input, file-stream allocation erasure and provider lifetime."
+        "Pointer-free pair of int32-backed Integer values; arithmetic and comparisons allocate no storage."
       ],
       "deviations": [
-        "Go debug tags preserve denominator/projection assertions and existing rational debug integrality checks; release erases those guards exactly, with no fabricated denominator division or epsilon check in scalar getters. C++ signed-overflow, INT_MIN negation, overflowing hash second+1 and zero-divisor undefined domains are not claimed; Go arithmetic wraps and division by zero panics. Undefined source to_string declaration maps to an explicit Go decimal convenience with no source-body credit. Commented-out nonlinear infinitesimal operations remain unimplemented and uncredited. No dedicated upstream inf_s_integer tests exist in src/test. Native reference/pointer identity and assertion/exception ABI remain representation adaptations."
+        "The Go leaf uses returned concrete values instead of C++ mutation operators, reference identity, hash/equality functors, stream insertion, or rational ownership. Future rational conversions belong at the consuming numeric boundary. Debug-tagged denominator and projection assertions are preserved. strconv replaces ostream for diagnostic text, including the source negative-epsilon coefficient spelling."
       ]
     },
     {
@@ -145550,18 +145546,16 @@
       "path": "src/util/s_integer.cpp",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "platform_replacement",
       "go_targets": [
-        "pkg/util/s_integer.go",
-        "pkg/util/s_integer_test.go"
+        "pkg/util/smallint/integer.go",
+        "pkg/util/smallint/integer_test.go"
       ],
       "tests": [
-        "TestSIntegerConstructorsParsingAndTraits",
-        "TestSIntegerIndependentFiniteArithmeticAndNumberTheory",
-        "TestSIntegerRationalConversionsAndStream",
-        "TestSIntegerIndependentLP64Parsing",
-        "TestSIntegerRepresentableBoundaryArithmetic",
-        "TestSIntegerDisplayEveryColdReservation"
+        "TestIntegerConversionsPredicatesAndText",
+        "TestIntegerArithmeticAgainstWideOracle",
+        "TestIntegerPowerAndNumberTheory",
+        "TestIntegerWarmValueOperationsDoNotAllocate"
       ],
       "assertions": [
         {
@@ -145573,42 +145567,38 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "All defined s_integer constructors, casts/traits/projections, functors, comparisons, arithmetic, signed mod, increments, sign/parity, floor/ceil, expt/power, fused operations, abs, signed gcd/lcm, rational conversions and insertion (s_integer.h:25-145; s_integer.cpp:22-70)",
+          "name": "live signed32 value algebra, predicates, conversion, power, gcd/lcm and text",
           "status": "ported",
-          "go_target": "pkg/util/s_integer.go",
+          "go_target": "pkg/util/smallint/integer.go",
           "tests": [
-            "TestSIntegerConstructorsParsingAndTraits",
-            "TestSIntegerIndependentFiniteArithmeticAndNumberTheory",
-            "TestSIntegerRationalConversionsAndStream",
-            "TestSIntegerIndependentLP64Parsing",
-            "TestSIntegerRepresentableBoundaryArithmetic",
-            "TestSIntegerDisplayEveryColdReservation"
+            "TestIntegerConversionsPredicatesAndText",
+            "TestIntegerArithmeticAgainstWideOracle",
+            "TestIntegerPowerAndNumberTheory",
+            "TestIntegerWarmValueOperationsDoNotAllocate"
           ]
         }
       ],
       "ownership": [
-        "Inline int32 class owns no payload and uses value-copy semantics. LP64 decimal C-string scanner borrows input without retaining or allocating it. ToRational invokes the exact signed32 manager setter on a fresh owned rational; every int32 boundary stays inline with allocation refused, and callers destroy returned values. FromRational borrows the service/value and preserves its native debug guard versus release NUM-only scalar read. Display borrows the stream and retains actual output prefixes and accounting on reservation failures."
+        "Pointer-free int32 value; arithmetic and comparisons allocate no storage."
       ],
       "deviations": [
-        "Selected LP64 C-locale strtol profile saturates signed long before int32 narrowing. Native C++ signed-overflow/INT_MIN negation and zero-divisor undefined domains are not claimed; Go signed operations wrap and division by zero panics. The original gcd zero-input domain reaches a zero divisor and is not repaired. Unsigned power exponents with bit31 set make the source mask loop nonterminating; after reaching the wrap, the Go adapter returns its reached value and ErrSIntegerNonterminating instead of hanging or replacing the algorithm. The declared C++ to_string has no definition anywhere in src or cppsrc; exported ToString is an explicit Go decimal convenience, not a credited source body. Const scalar reference results map to Go value copies; static values are immutable through their accessors. No dedicated upstream s_integer test was found in src/test."
+        "The Go leaf exposes concrete value operations instead of C++ operators, reference-returning assignment methods, hash/equality functors, stream insertion, or rational ownership. Future rational conversions belong at the consuming numeric boundary. No Z3 production caller constructs s_integer from text, so the C strtol compatibility parser was removed; strconv formats diagnostic text. Go int32 preserves selected 32-bit wrapping outside portable C++ signed-overflow domains. Source zero-input gcd and high-bit unsigned-power domains remain qualified."
       ]
     },
     {
       "path": "src/util/s_integer.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "platform_replacement",
       "go_targets": [
-        "pkg/util/s_integer.go",
-        "pkg/util/s_integer_test.go"
+        "pkg/util/smallint/integer.go",
+        "pkg/util/smallint/integer_test.go"
       ],
       "tests": [
-        "TestSIntegerConstructorsParsingAndTraits",
-        "TestSIntegerIndependentFiniteArithmeticAndNumberTheory",
-        "TestSIntegerRationalConversionsAndStream",
-        "TestSIntegerIndependentLP64Parsing",
-        "TestSIntegerRepresentableBoundaryArithmetic",
-        "TestSIntegerDisplayEveryColdReservation"
+        "TestIntegerConversionsPredicatesAndText",
+        "TestIntegerArithmeticAgainstWideOracle",
+        "TestIntegerPowerAndNumberTheory",
+        "TestIntegerWarmValueOperationsDoNotAllocate"
       ],
       "conditionals": [
         {
@@ -145624,24 +145614,22 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "All defined s_integer constructors, casts/traits/projections, functors, comparisons, arithmetic, signed mod, increments, sign/parity, floor/ceil, expt/power, fused operations, abs, signed gcd/lcm, rational conversions and insertion (s_integer.h:25-145; s_integer.cpp:22-70)",
+          "name": "live signed32 value algebra, predicates, conversion, power, gcd/lcm and text",
           "status": "ported",
-          "go_target": "pkg/util/s_integer.go",
+          "go_target": "pkg/util/smallint/integer.go",
           "tests": [
-            "TestSIntegerConstructorsParsingAndTraits",
-            "TestSIntegerIndependentFiniteArithmeticAndNumberTheory",
-            "TestSIntegerRationalConversionsAndStream",
-            "TestSIntegerIndependentLP64Parsing",
-            "TestSIntegerRepresentableBoundaryArithmetic",
-            "TestSIntegerDisplayEveryColdReservation"
+            "TestIntegerConversionsPredicatesAndText",
+            "TestIntegerArithmeticAgainstWideOracle",
+            "TestIntegerPowerAndNumberTheory",
+            "TestIntegerWarmValueOperationsDoNotAllocate"
           ]
         }
       ],
       "ownership": [
-        "Inline int32 class owns no payload and uses value-copy semantics. LP64 decimal C-string scanner borrows input without retaining or allocating it. ToRational invokes the exact signed32 manager setter on a fresh owned rational; every int32 boundary stays inline with allocation refused, and callers destroy returned values. FromRational borrows the service/value and preserves its native debug guard versus release NUM-only scalar read. Display borrows the stream and retains actual output prefixes and accounting on reservation failures."
+        "Pointer-free int32 value; arithmetic and comparisons allocate no storage."
       ],
       "deviations": [
-        "Selected LP64 C-locale strtol profile saturates signed long before int32 narrowing. Native C++ signed-overflow/INT_MIN negation and zero-divisor undefined domains are not claimed; Go signed operations wrap and division by zero panics. The original gcd zero-input domain reaches a zero divisor and is not repaired. Unsigned power exponents with bit31 set make the source mask loop nonterminating; after reaching the wrap, the Go adapter returns its reached value and ErrSIntegerNonterminating instead of hanging or replacing the algorithm. The declared C++ to_string has no definition anywhere in src or cppsrc; exported ToString is an explicit Go decimal convenience, not a credited source body. Const scalar reference results map to Go value copies; static values are immutable through their accessors. No dedicated upstream s_integer test was found in src/test."
+        "The Go leaf exposes concrete value operations instead of C++ operators, reference-returning assignment methods, hash/equality functors, stream insertion, or rational ownership. Future rational conversions belong at the consuming numeric boundary. No Z3 production caller constructs s_integer from text, so the C strtol compatibility parser was removed; strconv formats diagnostic text. Go int32 preserves selected 32-bit wrapping outside portable C++ signed-overflow domains. Source zero-input gcd and high-bit unsigned-power domains remain qualified."
       ]
     },
     {

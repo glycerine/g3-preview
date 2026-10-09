@@ -513,7 +513,7 @@ cancel_eh              checked_int64           cooperate
 dependency                                     env_params
 f2n                    fixed_bit_vector        heap
 hwf                    inf_eps_rational        inf_int_rational
-inf_s_integer          lbool                   list
+                       lbool                   list
 luby                   max_cliques             min_cut
 mpbqi                  mpff                    mpfx
 mpq_inf                mpzzp                   nat_set
@@ -540,6 +540,12 @@ The Go port should represent that operation as an ordinary `float64` return or
 assignment. The manager's arithmetic maps directly to Go operators and `math`,
 and its unused `atof`, `ostringstream`, parameter, and hash surfaces should not
 be carried into Go.
+
+`s_integer` and `inf_s_integer` now form the pointer-free `util/smallint` leaf.
+It retains the signed32 value and lexicographic infinitesimal algebra used by SMT
+arithmetic and difference logic. Rational conversion stays at the future numeric
+consumer boundary; C++ operator, functor, stream, and unused text-parser
+compatibility surfaces are omitted.
 
 ### Small units requiring a Go-native shape before packaging
 
