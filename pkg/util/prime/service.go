@@ -1,72 +1,70 @@
 // Source: src/util/prime_generator.cpp:23-27,99-130; src/util/prime_generator.h:29-52.
-package util
+package prime
 
 import (
 	"errors"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
-var ErrDefaultPrimeServiceOwner = errors.New("g3: invalid default prime service owner")
+var ErrServiceOwner = errors.New("g3: invalid default prime service owner")
 
 // The actual generator is eagerly constructed with this binding, before any
 // memory initialization call. Finalize clears its vector and keeps its identity.
 // The enclosing header is charged cold Go binding metadata, not a source malloc
-// event. The existing generator's shared-Runtime cache storage and OpenMP/global
-// process wiring remain separate obligations.
-type DefaultPrimeService struct {
-	self      *DefaultPrimeService
-	generator *primegen.Generator
+// event. Process-global initialization remains a separate obligation.
+type DefaultService struct {
+	self      *DefaultService
+	generator *Generator
 	budget    *arena.Budget
 	header    uint64
 	closed    bool
 }
-type DefaultPrimeServiceStats struct {
+type ServiceStats struct {
 	OwnerBytes, TotalBytes uint64
-	Generator              primegen.Stats
+	Generator              Stats
 }
 
-func NewDefaultPrimeService(b *arena.Budget) (*DefaultPrimeService, error) {
-	n := uint64(reflect.TypeOf(DefaultPrimeService{}).Size())
+func NewDefaultService(b *arena.Budget) (*DefaultService, error) {
+	n := uint64(reflect.TypeOf(DefaultService{}).Size())
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	g, e := primegen.NewGenerator(b)
+	g, e := NewGenerator(b)
 	if e != nil {
 		b.Release(n)
 		return nil, e
 	}
-	s := &DefaultPrimeService{generator: g, budget: b, header: n}
+	s := &DefaultService{generator: g, budget: b, header: n}
 	s.self = s
 	return s, nil
 }
-func (s *DefaultPrimeService) open() error {
+func (s *DefaultService) open() error {
 	if s == nil || s.self != s {
-		return ErrDefaultPrimeServiceOwner
+		return ErrServiceOwner
 	}
 	if s.closed {
 		return arena.ErrClosed
 	}
 	return nil
 }
-func (s *DefaultPrimeService) Finalize() error {
+func (s *DefaultService) Finalize() error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	return s.generator.Finalize()
 }
-func (s *DefaultPrimeService) Stats() DefaultPrimeServiceStats {
+func (s *DefaultService) Stats() ServiceStats {
 	if s.open() != nil {
-		return DefaultPrimeServiceStats{}
+		return ServiceStats{}
 	}
 	g := s.generator.Stats()
-	return DefaultPrimeServiceStats{s.header, s.header + g.TotalBytes, g}
+	return ServiceStats{s.header, s.header + g.TotalBytes, g}
 }
-func (s *DefaultPrimeService) Close() error {
+func (s *DefaultService) Close() error {
 	if s == nil || s.self != s {
-		return ErrDefaultPrimeServiceOwner
+		return ErrServiceOwner
 	}
 	if s.closed {
 		return nil
@@ -81,23 +79,23 @@ func (s *DefaultPrimeService) Close() error {
 
 // This is a nonowning, freely copyable source iterator value. Local construction
 // does not read the unused default service or the supplied generator contents.
-type PrimeServiceIterator struct {
-	service   *DefaultPrimeService
-	generator *primegen.Generator
+type ServiceIterator struct {
+	service   *DefaultService
+	generator *Generator
 	index     uint32
 	global    bool
 }
 
-func NewPrimeServiceIterator(s *DefaultPrimeService, g *primegen.Generator) (PrimeServiceIterator, error) {
+func NewServiceIterator(s *DefaultService, g *Generator) (ServiceIterator, error) {
 	if g != nil {
-		return PrimeServiceIterator{generator: g}, nil
+		return ServiceIterator{generator: g}, nil
 	}
 	if e := s.open(); e != nil {
-		return PrimeServiceIterator{}, e
+		return ServiceIterator{}, e
 	}
-	return PrimeServiceIterator{service: s, generator: s.generator, global: true}, nil
+	return ServiceIterator{service: s, generator: s.generator, global: true}, nil
 }
-func (it *PrimeServiceIterator) Next() (uint64, error) {
+func (it *ServiceIterator) Next() (uint64, error) {
 	if it == nil {
 		return 0, arena.ErrConfig
 	}
@@ -115,7 +113,7 @@ func (it *PrimeServiceIterator) Next() (uint64, error) {
 // BorrowGenerator is an explicit Go binding for the default pointer selected
 // by prime_generator.cpp:99-107. It preserves the actual eager object, including
 // the empty-vector state after Finalize; the caller does not own the generator.
-func (s *DefaultPrimeService) BorrowGenerator() (*primegen.Generator, error) {
+func (s *DefaultService) BorrowGenerator() (*Generator, error) {
 	if e := s.open(); e != nil {
 		return nil, e
 	}

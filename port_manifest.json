@@ -141537,9 +141537,10 @@
         "pkg/util/prime/generator.go",
         "pkg/util/prime/generator_test.go",
         "pkg/util/prime_generator_source_test.go",
-        "pkg/util/util_default_prime_service.go",
-        "pkg/util/util_default_prime_service_test.go",
-        "pkg/util/util_default_prime_borrow_source_test.go",
+        "pkg/util/prime/service.go",
+        "pkg/util/prime/service_test.go",
+        "pkg/util/prime_service_integer_integration_test.go",
+        "pkg/util/prime/service_borrow_test.go",
         "pkg/math/polynomial/util_default_prime_factor_binding_source_test.go"
       ],
       "tests": [
@@ -141590,7 +141591,7 @@
         {
           "name": "Eager default prime service, captured local/default iterator increment-before-read and finalize same generator",
           "status": "partial",
-          "go_target": "pkg/util/util_default_prime_service.go",
+          "go_target": "pkg/util/prime/service.go",
           "tests": [
             "TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes",
             "TestDefaultPrimeRegisteredSequential10000IndependentSieve",
@@ -141598,12 +141599,15 @@
             "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
             "TestDefaultPrimeRegisteredIntegerRootAssertions",
             "TestDefaultPrimeIndexWrapAndActualGrowthRefusal"
+          ],
+          "go_targets": [
+            "pkg/util/prime_service_integer_integration_test.go"
           ]
         },
         {
           "name": "prime_generator.cpp:99-107 explicit Go borrowed generator binding and actual multivariate Factor backend config; accessor is not a C++ getter.",
           "status": "partial",
-          "go_target": "pkg/util/util_default_prime_service.go",
+          "go_target": "pkg/util/prime/service.go",
           "tests": [
             "TestDefaultPrimeBorrowExactBindingAndFinalizedIdentity",
             "TestDefaultPrimeBorrowFullPolynomialFactorEndToEnd"
@@ -141633,8 +141637,9 @@
         "pkg/util/prime/generator.go",
         "pkg/util/prime/generator_test.go",
         "pkg/util/prime_generator_source_test.go",
-        "pkg/util/util_default_prime_service.go",
-        "pkg/util/util_default_prime_service_test.go"
+        "pkg/util/prime/service.go",
+        "pkg/util/prime/service_test.go",
+        "pkg/util/prime_service_integer_integration_test.go"
       ],
       "tests": [
         "TestPrimeGeneratorRegisteredTenThousandWithIntegerRoot",
@@ -141686,7 +141691,7 @@
         {
           "name": "Eager default prime service, captured local/default iterator increment-before-read and finalize same generator",
           "status": "partial",
-          "go_target": "pkg/util/util_default_prime_service.go",
+          "go_target": "pkg/util/prime/service.go",
           "tests": [
             "TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes",
             "TestDefaultPrimeRegisteredSequential10000IndependentSieve",
@@ -141694,6 +141699,9 @@
             "TestDefaultPrimeLocalAndCachedWarmSourceRoutes",
             "TestDefaultPrimeRegisteredIntegerRootAssertions",
             "TestDefaultPrimeIndexWrapAndActualGrowthRefusal"
+          ],
+          "go_targets": [
+            "pkg/util/prime_service_integer_integration_test.go"
           ]
         }
       ],

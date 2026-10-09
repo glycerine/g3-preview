@@ -1,5 +1,5 @@
 // Source: src/util/prime_generator.cpp:23-27,99-130; src/util/prime_generator.h:29-52.
-package util
+package prime
 
 import (
 	"errors"
@@ -7,27 +7,26 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	s, e := NewDefaultPrimeService(b)
-	smallObjectMust(t, e)
+	s, e := NewDefaultService(b)
+	primeMust(t, e)
 	defer s.Close()
 	st := s.Stats()
-	if st.Generator.Count < 2 || st.OwnerBytes != uint64(reflect.TypeOf(DefaultPrimeService{}).Size()) || b.Used() != st.TotalBytes {
+	if st.Generator.Count < 2 || st.OwnerBytes != uint64(reflect.TypeOf(DefaultService{}).Size()) || b.Used() != st.TotalBytes {
 		t.Fatal("actual eager graph", st, b.Used())
 	}
 	g := s.generator
-	it, e := NewPrimeServiceIterator(s, nil)
-	smallObjectMust(t, e)
+	it, e := NewServiceIterator(s, nil)
+	primeMust(t, e)
 	p, e := it.Next()
-	smallObjectMust(t, e)
+	primeMust(t, e)
 	if p != 2 || it.index != 1 || !it.global || it.generator != g {
 		t.Fatal(p, it)
 	}
-	smallObjectMust(t, s.Finalize())
+	primeMust(t, s.Finalize())
 	if s.generator != g || s.Stats().Generator.Count != 0 || s.Stats().Generator.Capacity != 0 {
 		t.Fatal("no object recreation")
 	}
@@ -36,13 +35,13 @@ func TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes(t *testing.T) {
 	if !errors.Is(e, arena.ErrBounds) || it.index != 2 || b.Used() != before {
 		t.Fatal("increment before empty back read", e, it.index, b.Used(), before)
 	}
-	again, e := NewPrimeServiceIterator(s, nil)
-	smallObjectMust(t, e)
+	again, e := NewServiceIterator(s, nil)
+	primeMust(t, e)
 	_, e = again.Next()
 	if !errors.Is(e, arena.ErrBounds) || again.index != 1 || s.generator != g {
 		t.Fatal(e, again.index)
 	}
-	smallObjectMust(t, s.Close())
+	primeMust(t, s.Close())
 	_, e = again.Next()
 	if !errors.Is(e, arena.ErrClosed) || again.index != 2 {
 		t.Fatal(e, again.index)
@@ -53,11 +52,11 @@ func TestDefaultPrimeEagerLifetimeAndIteratorSourcePrefixes(t *testing.T) {
 }
 func TestDefaultPrimeRegisteredSequential10000IndependentSieve(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	s, e := NewDefaultPrimeService(b)
-	smallObjectMust(t, e)
+	s, e := NewDefaultService(b)
+	primeMust(t, e)
 	defer s.Close()
-	it, e := NewPrimeServiceIterator(s, nil)
-	smallObjectMust(t, e)
+	it, e := NewServiceIterator(s, nil)
+	primeMust(t, e)
 	var composite [104730]bool
 	for p := 2; p*p < len(composite); p++ {
 		if !composite[p] {
@@ -70,7 +69,7 @@ func TestDefaultPrimeRegisteredSequential10000IndependentSieve(t *testing.T) {
 	for n := 2; n < len(composite); n++ {
 		if !composite[n] {
 			p, e := it.Next()
-			smallObjectMust(t, e)
+			primeMust(t, e)
 			if p != uint64(n) {
 				t.Fatal(idx, p, n)
 			}
@@ -86,7 +85,7 @@ func TestDefaultPrimeEveryEagerConstructionRefusal(t *testing.T) {
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		b := arena.NewBudget(1 << 20)
 		b.FailAfter(ordinal)
-		s, e := NewDefaultPrimeService(b)
+		s, e := NewDefaultService(b)
 		if e != nil {
 			if !errors.Is(e, arena.ErrInjectedFailure) || s != nil || b.Used() != 0 {
 				t.Fatal(ordinal, s, e, b.Used())
@@ -100,7 +99,7 @@ func TestDefaultPrimeEveryEagerConstructionRefusal(t *testing.T) {
 		}
 		b.FailAfter(-1)
 		if s != nil {
-			smallObjectMust(t, s.Close())
+			primeMust(t, s.Close())
 		}
 		if b.Used() != 0 {
 			t.Fatal(b.Used())
@@ -116,14 +115,14 @@ func TestDefaultPrimeEveryEagerConstructionRefusal(t *testing.T) {
 }
 func TestDefaultPrimeLocalAndCachedWarmSourceRoutes(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	s, e := NewDefaultPrimeService(b)
-	smallObjectMust(t, e)
+	s, e := NewDefaultService(b)
+	primeMust(t, e)
 	defer s.Close()
-	local, e := primegen.NewGenerator(b)
-	smallObjectMust(t, e)
+	local, e := NewGenerator(b)
+	primeMust(t, e)
 	defer local.Close()
-	it, e := NewPrimeServiceIterator(nil, local)
-	smallObjectMust(t, e)
+	it, e := NewServiceIterator(nil, local)
+	primeMust(t, e)
 	if it.global {
 		t.Fatal("explicit local route")
 	}
@@ -131,7 +130,7 @@ func TestDefaultPrimeLocalAndCachedWarmSourceRoutes(t *testing.T) {
 	b.FailAfter(0)
 	for _, p := range []uint64{2, 3, 5, 7, 11} {
 		got, e := it.Next()
-		smallObjectMust(t, e)
+		primeMust(t, e)
 		if got != p {
 			t.Fatal(got, p)
 		}
@@ -141,66 +140,24 @@ func TestDefaultPrimeLocalAndCachedWarmSourceRoutes(t *testing.T) {
 	}
 	b.FailAfter(-1)
 	copy := *s
-	if e = copy.Finalize(); !errors.Is(e, ErrDefaultPrimeServiceOwner) {
+	if e = copy.Finalize(); !errors.Is(e, ErrServiceOwner) {
 		t.Fatal(e)
 	}
 }
-func TestDefaultPrimeRegisteredIntegerRootAssertions(t *testing.T) {
-	b := arena.NewBudget(1 << 24)
-	q, e := NewRationalManager(RationalConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 8, Budget: b}, Words: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 8, Budget: b}}}})
-	smallObjectMust(t, e)
-	s, e := NewDefaultPrimeService(b)
-	smallObjectMust(t, e)
-	it, e := NewPrimeServiceIterator(s, nil)
-	smallObjectMust(t, e)
-	z := q.Integers()
-	var sqrt Int
-	assertions := uint64(0)
-	var last uint64
-	for i := 0; i < 10000; i++ {
-		p, e := it.Next()
-		smallObjectMust(t, e)
-		last = p
-		if p == 2 {
-			continue
-		}
-		smallObjectMust(t, z.SetUint64(&sqrt, p))
-		_, e = z.RootInPlace(&sqrt, 2)
-		smallObjectMust(t, e)
-		k, e := z.Uint64(&sqrt)
-		smallObjectMust(t, e)
-		for d := uint64(2); d <= k; d++ {
-			assertions++
-			if p%d == 0 {
-				t.Fatal("actual source ENSURE", i, p, d)
-			}
-		}
-	}
-	if last != 104729 || assertions != 2073824 {
-		t.Fatal(last, assertions)
-	}
-	smallObjectMust(t, z.Del(&sqrt))
-	smallObjectMust(t, s.Close())
-	smallObjectMust(t, q.CloseChecked())
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
-	}
-	t.Log("actual source2073824ENSURE executions via default bound iterator; printing/flush remainsOPEN")
-}
 func TestDefaultPrimeIndexWrapAndActualGrowthRefusal(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	s, e := NewDefaultPrimeService(b)
-	smallObjectMust(t, e)
+	s, e := NewDefaultService(b)
+	primeMust(t, e)
 	defer s.Close()
-	it, e := NewPrimeServiceIterator(s, nil)
-	smallObjectMust(t, e)
+	it, e := NewServiceIterator(s, nil)
+	primeMust(t, e)
 	it.index = ^uint32(0)
 	_, e = it.Next()
-	if !errors.Is(e, primegen.ErrCapacity) || it.index != 0 {
+	if !errors.Is(e, ErrCapacity) || it.index != 0 {
 		t.Fatal(e, it.index)
 	}
 	p, e := it.Next()
-	smallObjectMust(t, e)
+	primeMust(t, e)
 	if p != 2 {
 		t.Fatal(p)
 	}
@@ -212,4 +169,11 @@ func TestDefaultPrimeIndexWrapAndActualGrowthRefusal(t *testing.T) {
 		t.Fatal(e, it.index, s.Stats(), before, b.Used())
 	}
 	b.FailAfter(-1)
+}
+
+func primeMust(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatal(err)
+	}
 }

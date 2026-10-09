@@ -8,13 +8,14 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func TestDefaultPrimeBorrowFullPolynomialFactorEndToEnd(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	polynomialBindingMust(t, e)
-	s, e := util.NewDefaultPrimeService(b)
+	s, e := primegen.NewDefaultService(b)
 	polynomialBindingMust(t, e)
 	g, e := s.BorrowGenerator()
 	polynomialBindingMust(t, e)

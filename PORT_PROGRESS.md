@@ -10,9 +10,9 @@ root enumeration for that removed storage are gone.
 `src/util/prime_generator.h/.cpp` now live in `pkg/util/prime`. The leaf uses
 plain `[]uint64` slices with source-compatible capacity growth and budget
 failure points; it has no root `util` dependency. Polynomial factorization and
-the default-prime binding import it directly. The 10,000-prime integration test
-stays in root `util` because it deliberately verifies the integer manager's
-root operation against the generated sequence.
+the eager default-prime binding and borrowed iterator live in the leaf. The
+10,000-prime integration test stays in root `util` because it deliberately
+verifies the integer manager's root operation against the generated sequence.
 
 The live resource-control subsystem now lives in `pkg/util/control`.
 `reslimit`, its scopes, cancel event handling, scoped timers, and scoped
