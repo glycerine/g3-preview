@@ -2,7 +2,6 @@
 package polynomial
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -103,7 +102,7 @@ func TestPolynomialFactorToPolynomialTransportCannotRetireExecutingOwner(t *test
 			if !seen || !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual SET returning transport", seen, cause)
 			}
-			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header+uint64(cap(fs.constantHistory))*uint64(reflect.TypeOf(polynomialFactorConstantHistory{}).Size()), []util.Block{held})
+			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []util.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
 			serviceMust(t, full.CleanupToPolynomial())
 			serviceMust(t, fs.CloseChecked())

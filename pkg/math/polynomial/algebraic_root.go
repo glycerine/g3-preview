@@ -903,7 +903,6 @@ func (m *AlgebraicRootCore) Close() error {
 		return e
 	}
 	b := m.config.Rationals.Budget()
-	b.Release(uint64(cap(m.negationHistory)) * uint64(reflect.TypeOf(algebraicNegHistory{}).Size()))
 	m.negationHistory = nil
 	b.Release(m.header)
 	m.locations = nil

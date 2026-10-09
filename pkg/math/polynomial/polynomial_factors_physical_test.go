@@ -3,7 +3,6 @@
 package polynomial
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
@@ -50,7 +49,7 @@ func polynomialFactorsAuditOwnersExtra(t *testing.T, f *PolynomialFactors, calle
 		add(f.current.value)
 		add(f.current.incoming)
 		add(f.freshResult)
-		h += f.header + uint64(cap(f.memberSetHistory))*uint64(reflect.TypeOf(polynomialFactorMemberSetHistory{}).Size()) + uint64(cap(f.constantHistory))*uint64(reflect.TypeOf(polynomialFactorConstantHistory{}).Size())
+		h += f.header
 		input = append(input, &f.constant, &f.local)
 	}
 	for _, r := range refs {

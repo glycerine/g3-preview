@@ -3,7 +3,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/util"
 )
@@ -282,18 +281,6 @@ func (m *MultivariatePolynomialManager) archiveFactorNumeralVector() error {
 	if !s.active || !s.executing || m.core.callbackDepth != 0 {
 		return ErrPolynomialPending
 	}
-	old := cap(m.factorNumeralVectorHistory)
-	if len(m.factorNumeralVectorHistory) == old {
-		n := old + old/2 + 1
-		stride := uint64(reflect.TypeOf(polynomialFactorNumeralVectorHistory{}).Size())
-		if e := m.originalBudget.Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		rows := make([]polynomialFactorNumeralVectorHistory, len(m.factorNumeralVectorHistory), n)
-		copy(rows, m.factorNumeralVectorHistory)
-		m.factorNumeralVectorHistory = rows
-		m.originalBudget.Release(uint64(old) * stride)
-	}
 	s.historyIndex, s.historyRecorded = len(m.factorNumeralVectorHistory), true
 	m.factorNumeralVectorHistory = append(m.factorNumeralVectorHistory, m.factorNumeralVectorSnapshot())
 	return nil
@@ -329,7 +316,6 @@ func (m *MultivariatePolynomialManager) factorNumeralVectorDiagnostic(r *polynom
 	return polynomialFactorNumeralVectorHistory{}, false
 }
 func (m *MultivariatePolynomialManager) closeFactorNumeralVectorHistory() {
-	m.originalBudget.Release(uint64(cap(m.factorNumeralVectorHistory)) * uint64(reflect.TypeOf(polynomialFactorNumeralVectorHistory{}).Size()))
 	m.factorNumeralVectorHistory = nil
 }
 

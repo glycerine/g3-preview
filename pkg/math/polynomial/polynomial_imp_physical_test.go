@@ -30,7 +30,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	lazy := []*PolynomialNewtonVector{&full.newton}
 	handlers := []*PolynomialDeletionHandler{}
 	external := append([]util.Block(nil), extraRaw...)
-	adapterBytes := uint64(cap(m.variableNumeralHistory))*uint64(reflect.TypeOf(polynomialVariableNumeralHistory{}).Size()) + uint64(cap(m.quasiHistory))*uint64(reflect.TypeOf(polynomialQuasiResultantHistory{}).Size()) + full.header
+	adapterBytes := full.header
 	public := []*util.Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
 	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
 		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient, &b.arithmeticScope.transport)
@@ -54,9 +54,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			public = append(public, &a)
 		}
 	}
-	adapterBytes += uint64(cap(full.factorUnivariateHistory)) * uint64(reflect.TypeOf(polynomialFactorUnivariateHistory{}).Size())
-	adapterBytes += uint64(cap(full.factorNumeralVectorHistory)) * uint64(reflect.TypeOf(polynomialFactorNumeralVectorHistory{}).Size())
-	adapterBytes += uint64(cap(full.toPolynomialHistory)) * uint64(reflect.TypeOf(polynomialToPolynomialHistory{}).Size())
+
 	if full.factorNumeralVector.constructed {
 		polys = append(polys, full.factorNumeralVector.np.value, full.factorNumeralVector.np.incoming)
 	}

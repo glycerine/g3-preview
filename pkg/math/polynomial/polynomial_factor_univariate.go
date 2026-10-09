@@ -3,7 +3,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/util"
 )
@@ -386,23 +385,10 @@ func (m *MultivariatePolynomialManager) archiveFactorUnivariate() error {
 	if s.invocation == 0 {
 		return nil
 	}
-	old := cap(m.factorUnivariateHistory)
-	if len(m.factorUnivariateHistory) == old {
-		n := old + old/2 + 1
-		stride := uint64(reflect.TypeOf(polynomialFactorUnivariateHistory{}).Size())
-		if e := m.originalBudget.Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		rows := make([]polynomialFactorUnivariateHistory, len(m.factorUnivariateHistory), n)
-		copy(rows, m.factorUnivariateHistory)
-		m.factorUnivariateHistory = rows
-		m.originalBudget.Release(uint64(old) * stride)
-	}
 	m.factorUnivariateHistory = append(m.factorUnivariateHistory, m.factorUnivariateHistoryRow())
 	return nil
 }
 func (m *MultivariatePolynomialManager) closeFactorUnivariateHistory() {
-	m.originalBudget.Release(uint64(cap(m.factorUnivariateHistory)) * uint64(reflect.TypeOf(polynomialFactorUnivariateHistory{}).Size()))
 	m.factorUnivariateHistory = nil
 }
 func numericIntegerManager_factorUnivariateCallerExecuting(m *util.IntegerManager) bool {

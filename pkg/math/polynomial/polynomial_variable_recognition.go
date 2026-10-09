@@ -4,7 +4,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/util"
 )
@@ -50,18 +49,6 @@ func (c *MultivariatePolynomialCore) archiveVariableNumeralDiagnostic() error {
 	s := &c.variableNumeral
 	if s.invocation == 0 {
 		return nil
-	}
-	if len(c.variableNumeralHistory) == cap(c.variableNumeralHistory) {
-		old := cap(c.variableNumeralHistory)
-		next := old + old/2 + 1
-		stride := uint64(reflect.TypeOf(polynomialVariableNumeralHistory{}).Size())
-		if e := c.integer.Budget().Reserve(uint64(next) * stride); e != nil {
-			return e
-		}
-		rows := make([]polynomialVariableNumeralHistory, len(c.variableNumeralHistory), next)
-		copy(rows, c.variableNumeralHistory)
-		c.variableNumeralHistory = rows
-		c.integer.Budget().Release(uint64(old) * stride)
 	}
 	c.variableNumeralHistory = append(c.variableNumeralHistory, polynomialVariableNumeralHistory{s.invocation, s.copy, s.normalize, s.bodyCause, s.sourceCause, s.cleanupCause})
 	return nil

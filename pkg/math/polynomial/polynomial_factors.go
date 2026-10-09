@@ -441,7 +441,7 @@ func (f *PolynomialFactors) CloseChecked() error {
 	}
 	f.degrees = nil
 	f.factors = nil
-	f.manager.core.integer.Budget().Release(f.header + uint64(cap(f.memberSetHistory))*uint64(reflect.TypeOf(polynomialFactorMemberSetHistory{}).Size()) + uint64(cap(f.constantHistory))*uint64(reflect.TypeOf(polynomialFactorConstantHistory{}).Size()))
+	f.manager.core.integer.Budget().Release(f.header)
 	f.constantHistory = nil
 	f.memberSetHistory = nil
 	f.header = 0

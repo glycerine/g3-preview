@@ -2,8 +2,6 @@
 package polynomial
 
 import (
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -21,23 +19,10 @@ func (m *MultivariatePolynomialManager) archiveToPolynomial() error {
 	if s.invocation == 0 {
 		return nil
 	}
-	old := cap(m.toPolynomialHistory)
-	if len(m.toPolynomialHistory) == old {
-		next := old + old/2 + 1
-		stride := uint64(reflect.TypeOf(polynomialToPolynomialHistory{}).Size())
-		if e := m.originalBudget.Reserve(uint64(next) * stride); e != nil {
-			return e
-		}
-		rows := make([]polynomialToPolynomialHistory, len(m.toPolynomialHistory), next)
-		copy(rows, m.toPolynomialHistory)
-		m.toPolynomialHistory = rows
-		m.originalBudget.Release(uint64(old) * stride)
-	}
 	m.toPolynomialHistory = append(m.toPolynomialHistory, polynomialToPolynomialHistory{s.invocation, s.bodyCause, s.sourceCause, s.cleanupCause, s.normalize, s.append, s.factory, s.monomialAllocator})
 	return nil
 }
 func (m *MultivariatePolynomialManager) closeToPolynomialHistory() {
-	m.originalBudget.Release(uint64(cap(m.toPolynomialHistory)) * uint64(reflect.TypeOf(polynomialToPolynomialHistory{}).Size()))
 	m.toPolynomialHistory = nil
 }
 func (m *MultivariatePolynomialManager) toPolynomialInvocationSourceCause(r *polynomialToPolynomialInvocationReceipt) error {

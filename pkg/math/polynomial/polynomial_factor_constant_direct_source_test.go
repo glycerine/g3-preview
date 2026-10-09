@@ -3,7 +3,6 @@
 package polynomial
 
 import (
-	"reflect"
 	"strconv"
 	"testing"
 
@@ -29,7 +28,7 @@ func TestPolynomialFactorConstantActualHelperReceipt(t *testing.T) {
 }
 
 // A repeated SET into the existing cell reaches no allocation. It must not
-// reserve an archive; the earlier reached allocation record remains charged.
+// reserve an archive; the earlier reached allocation record remains available.
 func TestPolynomialFactorConstantReusedCellPreservesPriorAllocationHistory(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	fs, e := NewPolynomialFactors(full)
@@ -149,7 +148,7 @@ func TestPolynomialFactorConstantTransportCannotRetireExecutingOwner(t *testing.
 			if !seen || !numericPhysicalReservationRefusal(cause) {
 				t.Fatal("actual SET returning transport", seen, cause)
 			}
-			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header+uint64(cap(fs.constantHistory))*uint64(reflect.TypeOf(polynomialFactorConstantHistory{}).Size()), []util.Block{held})
+			polynomialImpPhysicalAuditNamedRaw(t, full, nil, []*util.Int{&a, &callbackInput, &callbackOut, &fs.constant, &fs.local}, fs.header, []util.Block{held})
 			serviceMust(t, rt.SetMaxSize(0))
 			serviceMust(t, fs.CloseChecked())
 			serviceMust(t, q.Integers().Del(&a))

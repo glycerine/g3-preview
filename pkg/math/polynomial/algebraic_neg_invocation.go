@@ -5,7 +5,6 @@ package polynomial
 import (
 	"errors"
 	"math"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
@@ -324,18 +323,6 @@ func (q *algebraicNegScope) prepareHistory() error {
 		return nil
 	}
 	m := q.owner
-	if len(m.negationHistory) == cap(m.negationHistory) {
-		old := cap(m.negationHistory)
-		next := old + old/2 + 1
-		stride := uint64(reflect.TypeOf(algebraicNegHistory{}).Size())
-		if e := m.config.Rationals.Budget().Reserve(uint64(next) * stride); e != nil {
-			return e
-		}
-		rows := make([]algebraicNegHistory, len(m.negationHistory), next)
-		copy(rows, m.negationHistory)
-		m.negationHistory = rows
-		m.config.Rationals.Budget().Release(uint64(old) * stride)
-	}
 	q.historyIndex = len(m.negationHistory)
 	q.historyRecorded = true
 	m.negationHistory = append(m.negationHistory, q.diagnostic())

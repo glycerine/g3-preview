@@ -240,11 +240,19 @@ func TestPolynomialQuasiResultantActualDestructorReentry(t *testing.T) {
 		serviceMust(t, e)
 		c.integer.Budget().FailAfter(0)
 		refused := full.QuasiResultant(a, b, 0, output)
-		if !errors.Is(refused, arena.ErrInjectedFailure) || s.invocation != old.invocation || len(c.quasiHistory) != 0 || s.bodyCause != body || s.sourceCause != source || s.cleanupCause != own {
-			t.Fatal("diagnostic archive refusal changed old tuple", refused)
+		if refused != nil && !numericPhysicalReservationRefusal(refused) {
+			t.Fatal("actual algorithm refusal", refused)
+		}
+		if s.invocation != old.invocation+1 || len(c.quasiHistory) != 1 {
+			t.Fatal("native archive did not publish old tuple before next invocation", refused)
+		}
+		saved, ok := c.quasiResultantDiagnostic(&old)
+		if !ok || saved.bodyCause != body || saved.sourceCause != source || saved.cleanupCause != own {
+			t.Fatal("native archive changed old tuple")
 		}
 		quasiResultantNamedAudit(t, full, output, []Polynomial{a, b})
 		c.integer.Budget().FailAfter(-1)
+		serviceMust(t, full.CleanupQuasiResultant())
 		serviceMust(t, full.QuasiResultant(a, b, 0, output))
 		history, ok := c.quasiResultantDiagnostic(&old)
 		if !ok || history.sourceCause != source || history.bodyCause != body || history.cleanupCause != own || c.quasiResultantInvocationSourceCause(&old) != source {

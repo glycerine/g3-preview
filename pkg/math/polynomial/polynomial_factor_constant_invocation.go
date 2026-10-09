@@ -4,7 +4,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/util"
 )
@@ -54,18 +53,6 @@ func (f *PolynomialFactors) archiveFactorConstantHistory() error {
 	s := &f.constantInvocation
 	if s.historyRecorded {
 		return nil
-	}
-	if len(f.constantHistory) == cap(f.constantHistory) {
-		old := cap(f.constantHistory)
-		next := old + old/2 + 1
-		stride := uint64(reflect.TypeOf(polynomialFactorConstantHistory{}).Size())
-		if e := f.manager.core.integer.Budget().Reserve(uint64(next) * stride); e != nil {
-			return e
-		}
-		rows := make([]polynomialFactorConstantHistory, len(f.constantHistory), next)
-		copy(rows, f.constantHistory)
-		f.constantHistory = rows
-		f.manager.core.integer.Budget().Release(uint64(old) * stride)
 	}
 	s.historyIndex = len(f.constantHistory)
 	s.historyRecorded = true

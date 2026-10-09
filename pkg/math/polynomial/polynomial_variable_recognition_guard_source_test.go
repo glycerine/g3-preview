@@ -6,11 +6,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestPolynomialVariableRecognitionExactGuardAndArchiveRefusal(t *testing.T) {
+func TestPolynomialVariableRecognitionExactGuardAndNativeArchive(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	p := polynomialQueryTerms(t, c, []int32{1, 5}, [][]MonomialPower{{{0, 1}}, nil})
@@ -40,15 +39,18 @@ func TestPolynomialVariableRecognitionExactGuardAndArchiveRefusal(t *testing.T) 
 	if c.variableNumeral != before {
 		t.Fatal("invalid authority mutated actual source frame")
 	}
-	// The source variable publication precedes the real diagnostic archive reserve.
+	// Native diagnostics cannot refuse a scalar SET with no real allocations.
 	c.integer.Budget().FailAfter(0)
 	unchanged := old
 	n = util.NewInt(9)
 	v = 77
 	yes, e = c.isVariableNumeralWithReceipt(p, &v, &n, &unchanged)
-	if yes || !errors.Is(e, arena.ErrInjectedFailure) || unchanged != old || c.variableNumeral != before || n != util.NewInt(9) || v != 0 {
-		t.Fatal("archive refusal lost older exact tuple or source prefix", yes, e, v, n)
+	if !yes || e != nil || unchanged.invocation != old.invocation+1 || n != util.NewInt(5) || v != 0 {
+		t.Fatal("native archive interrupted scalar SET", yes, e, v, n)
 	}
+	first := before
+	before = c.variableNumeral
+	receiptBeforeFalse := unchanged
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, []*util.Int{&n}, 0)
 	c.integer.Budget().FailAfter(-1)
 	// False shape paths read no caller NUM and do not acquire a frame.
@@ -56,12 +58,12 @@ func TestPolynomialVariableRecognitionExactGuardAndArchiveRefusal(t *testing.T) 
 	v = 77
 	yes, e = c.isVariableNumeralWithReceipt(nonunit, &v, nil, &unchanged)
 	serviceMust(t, e)
-	if yes || v != 1 || unchanged != old || c.variableNumeral != before {
+	if yes || v != 1 || unchanged != receiptBeforeFalse || c.variableNumeral != before {
 		t.Fatal("unit-tail failure prefix/erased SET", v)
 	}
 	yes, e = c.isVariableNumeralWithReceipt(c.zero, nil, nil, &unchanged)
 	serviceMust(t, e)
-	if yes || unchanged != old || c.variableNumeral != before {
+	if yes || unchanged != receiptBeforeFalse || c.variableNumeral != before {
 		t.Fatal("zero branch constructed adapter")
 	}
 	var later polynomialVariableNumeralInvocationReceipt
@@ -71,7 +73,7 @@ func TestPolynomialVariableRecognitionExactGuardAndArchiveRefusal(t *testing.T) 
 		t.Fatal("new guarded invocation")
 	}
 	history, ok := c.variableNumeralDiagnostic(&old)
-	if !ok || history.invocation != old.invocation || history.bodyCause != before.bodyCause || history.copy != before.copy || history.normalize != before.normalize {
+	if !ok || history.invocation != old.invocation || history.bodyCause != first.bodyCause || history.copy != first.copy || history.normalize != first.normalize {
 		t.Fatal("actual archived child history")
 	}
 	current := c.variableNumeral

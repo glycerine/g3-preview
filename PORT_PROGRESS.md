@@ -32330,3 +32330,48 @@ The overall util knot/split remains active. Remaining polynomial native-containe
 work includes retained history/orphan collections and sexpr arguments. Then
 continue retained AST/SAT collections and text-stream consumers, and break the
 internal root-util numeric/text/parameter cycles before the actual package split.
+
+## Native slice-based diagnostic histories
+
+Eight retained diagnostic collections now use native Go append: polynomial
+quasi-resultant and variable-numeral histories, algebraic negation history,
+factor member SET and constant histories, factor numeral-vector conversion,
+factor univariate and to-polynomial histories. Removed their geometric growth,
+capacity reservations, overlap refunds and close-time capacity charges. Historical
+cause snapshots, exact invocation/child receipts, reached-allocation recording
+rules, index-based updates and stale-owner rejection remain. Diagnostics carry
+no additional numeral, polynomial or allocation-root ownership. Real numerical
+and object allocation accounting and cleanup remain independent.
+
+New TestPolynomialNativeVariableNumeralHistoryPreservesReceipts performs 4097
+actual variable-plus-numeral recognition calls with reservations disabled. It
+checks independent variable/constant results, every archived invocation, stale
+receipt cleanup and unchanged numeric/object storage and Budget usage. Updated
+exact-guard/archive and quasi-resultant tests to require native archival followed
+by the actual next source operation instead of simulated archive failure. Their
+copied-owner/frame guards, false-read prefixes, original destructor causes and
+stale cleanup checks remain. The fresh/null-versus-destroyed BIG setter test now
+refuses the actual next numeric allocation directly, without a synthetic history
+reservation offset. Physical audits exclude native history capacity.
+
+Validation: new native diagnostic growth passed (0.021s); full native polynomial
+passed (33.843s); focused g3debug algebraic negation, quasi-resultant, variable
+recognition, factor constant/conversion and cleanup groups passed (0.296s).
+Polynomial vet, portcheck, gofmt and diff checks passed. The manifest renames the
+former archive-refusal test, adds native diagnostic coverage and preserves all
+source/API statuses: 2102 units/677 APIs, 63 ported, 284 partial, 1727 unported and
+two dead/deleted.
+
+Hourly full native module checkpoint at 23:46–23:48 UTC passed with terminal
+exit zero (`go test ./... -count=1 -timeout=30m`): util 96.127s, polynomial 33.807s,
+AST 26.200s. Log: /mnt/oldrog/tmp/g3-util-knot-native-history-checkpoint.log.
+No Go source changed during the full-module run. No additional full-module run
+is needed until approximately 00:46–00:48 UTC unless new evidence warrants one.
+
+The complete util knot/split remains active. Remaining polynomial collections
+include owning orphan cohorts for derivative/composition/square-root/substitution
+and sexpr conversion frame slices. The separate linked diagnostic records also
+need review to distinguish actual cold records from container emulation. External
+AST activity/FPA tables and SAT Runtime columns still emulate source containers.
+Text-stream consumers and the internal root-util numeric/text/parameter cycles
+also remain before moving the remaining util files into actual subpackages.

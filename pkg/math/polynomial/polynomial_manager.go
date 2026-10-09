@@ -687,9 +687,7 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 	}
 	m.linearGenerated = nil
 	m.locations = nil
-	m.integer.Budget().Release(uint64(cap(m.quasiHistory)) * uint64(reflect.TypeOf(polynomialQuasiResultantHistory{}).Size()))
 	m.quasiHistory = nil
-	m.integer.Budget().Release(uint64(cap(m.variableNumeralHistory)) * uint64(reflect.TypeOf(polynomialVariableNumeralHistory{}).Size()))
 	m.variableNumeralHistory = nil
 	m.integer.Budget().Release(m.header)
 	m.header = 0

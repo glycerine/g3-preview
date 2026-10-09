@@ -4,7 +4,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 )
 
 type polynomialQuasiResultantScope struct {
@@ -29,18 +28,6 @@ func (c *MultivariatePolynomialCore) archiveQuasiResultantHistory() error {
 	s := &c.quasiResultant
 	if s.invocation == 0 {
 		return nil
-	}
-	if len(c.quasiHistory) == cap(c.quasiHistory) {
-		old := cap(c.quasiHistory)
-		next := old + old/2 + 1
-		stride := uint64(reflect.TypeOf(polynomialQuasiResultantHistory{}).Size())
-		if e := c.integer.Budget().Reserve(uint64(next) * stride); e != nil {
-			return e
-		}
-		rows := make([]polynomialQuasiResultantHistory, len(c.quasiHistory), next)
-		copy(rows, c.quasiHistory)
-		c.quasiHistory = rows
-		c.integer.Budget().Release(uint64(old) * stride)
 	}
 	c.quasiHistory = append(c.quasiHistory, polynomialQuasiResultantHistory{s.invocation, s.bodyCause, s.sourceCause, s.cleanupCause, s.pseudo})
 	return nil

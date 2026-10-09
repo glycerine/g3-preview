@@ -31,7 +31,7 @@ func TestAlgebraicNegActualHistoryLaterFailureAndErasedZero(t *testing.T) {
 			serviceMust(t, c.cleanupNegation(&old, true))
 			prior, ok := c.negationHistoryFor(&old)
 			if !ok || len(c.negationHistory) == 0 {
-				t.Fatal("actual allocating call lost charged history")
+				t.Fatal("actual allocating call lost diagnostic history")
 			}
 			z.Budget().FailAfter(prefix)
 			body := c.Neg(&later)

@@ -7,8 +7,6 @@
 package polynomial
 
 import (
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -53,18 +51,6 @@ func (c integerAllocationInvocationContext) prepareFactorHistory(z *util.Integer
 		f, s := r.owner, r.frame
 		if s.historyRecorded {
 			return nil
-		}
-		if len(f.memberSetHistory) == cap(f.memberSetHistory) {
-			old := cap(f.memberSetHistory)
-			next := old + old/2 + 1
-			stride := uint64(reflect.TypeOf(polynomialFactorMemberSetHistory{}).Size())
-			if e := z.Budget().Reserve(uint64(next) * stride); e != nil {
-				return e
-			}
-			rows := make([]polynomialFactorMemberSetHistory, len(f.memberSetHistory), next)
-			copy(rows, f.memberSetHistory)
-			f.memberSetHistory = rows
-			z.Budget().Release(uint64(old) * stride)
 		}
 		s.historyIndex, s.historyRecorded = len(f.memberSetHistory), true
 		f.memberSetHistory = append(f.memberSetHistory, polynomialFactorMemberSetHistory{s.invocation, s.normalize, s.bodyCause, s.sourceCause, s.cleanupCause})
