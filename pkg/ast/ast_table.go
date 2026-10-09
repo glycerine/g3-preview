@@ -195,7 +195,7 @@ func (m *ASTManager) tableEraseCaptured(key astNodeRef, hash uint32) error {
 }
 
 // Full three-register macro state is needed for successive source array
-// triples; utilhash.Mix exports only its final c register.
+// triples; util.Mix exports only its final c register.
 func astMix(a, b, c uint32) (uint32, uint32, uint32) {
 	a -= b
 	a -= c

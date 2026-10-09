@@ -68,7 +68,7 @@ func Mix(a, b, c uint32) uint32 { _, _, c = mix(a, b, c); return c }
 // Embedded NULs participate in the hash.
 func String(s string, init uint32) uint32 {
 	if uint64(len(s)) > uint64(^uint32(0)) {
-		panic("utilhash: string length exceeds source uint32 range")
+		panic("hash string length exceeds source uint32 range")
 	}
 	return hashBytes(uint32(len(s)), init,
 		func(i uint32) uint32 { return binary.LittleEndian.Uint32([]byte(s[i : i+4])) },
@@ -80,7 +80,7 @@ func String(s string, init uint32) uint32 {
 // n must not exceed four times the number of words.
 func WordBytes(words []uint32, n, init uint32) uint32 {
 	if uint64(n) > uint64(len(words))*4 {
-		panic("utilhash: word byte length out of range")
+		panic("hash word byte length out of range")
 	}
 	return hashBytes(n, init, func(i uint32) uint32 { return words[i/4] },
 		func(i uint32) uint32 { return uint32(int32(int8(byte(words[i/4] >> (8 * (i % 4)))))) })
@@ -113,7 +113,7 @@ func hashBytes(n, init uint32, word, character func(uint32) uint32) uint32 {
 // Composite preserves get_composite_hash's child callback visit order.
 func Composite(kind, n uint32, child func(uint32) uint32) uint32 {
 	if n == 0 {
-		panic("utilhash: composite requires at least one child")
+		panic("composite hash requires at least one child")
 	}
 	a, b, c := uint32(0x9e3779b9), uint32(0x9e3779b9), uint32(11)
 	switch n {

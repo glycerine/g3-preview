@@ -108,7 +108,7 @@ func (g *IDGen) SetNextID(id uint32) uint32 {
 	return v
 }
 func (g *IDGen) ShowHash() uint32 {
-	// Preserve the baseline byte order/sign policy of utilhash. Empty free IDs
+	// Preserve the baseline byte order/sign policy of the source hash. Empty free IDs
 	// need no invalid &vector[0] address. Source hash byte length is uint32.
 	if uint64(len(g.Free)) > uint64(^uint32(0))/4 {
 		panic("id generator: hash byte length overflow")

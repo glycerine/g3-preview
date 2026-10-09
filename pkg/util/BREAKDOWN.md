@@ -219,7 +219,7 @@ old dependency cycle.
 | `util` | Split functions among their consumers and standard packages such as `math/bits`, `io`, `strconv`, and `strings` | Preserve verbosity/fatal policy as small explicit services if live. There should be no Go package that corresponds to the miscellaneous C++ `util.h`. |
 | `warning` | `fmt.Fprintf` to an `io.Writer`; `bytes.Buffer` or `strings.Builder` only when a complete message must be assembled first | Preserve enable/disable, destination selection, prefixes, and write errors if observable. Delete the C `va_list` formatter and custom character vector. |
 | `z3_exception` | Go errors, sentinel errors, wrapping, and a small typed error-code value | Preserve public Z3 error codes and messages. Delete the C++ exception hierarchy and formatted exception constructor. |
-| `hash` | A standalone leaf of pure functions, or local functions beside their consumers | Retain only explicitly requested Z3 hash computations. Go map hashing replaces hashes used solely to implement a table, but it does not replace AST/numeral hashes used as data or to guide algorithms. |
+| `hash` | Keep explicit Z3 hash computations beside their consumers | Go `map` hashing replaces hashes used solely to implement a table. Retain hashes that are observable data or guide an algorithm, without creating a hash-table or `utilhash` package. |
 
 `bytes.Buffer` is not a general replacement for `vector<T>` or `buffer<T>`.
 Use it for byte streams. A concrete slice is the direct replacement for typed
@@ -239,10 +239,11 @@ still appropriate when a separate external format requires canonical order.
 
 Likewise, `hash/maphash` and the runtime's internal map hash do not replace an
 explicit Z3 hash value. They are intentionally seeded and their values are not
-available as a stable source-compatible result. The current pure operations
-such as `Combine`, `Mix`, string hashing, and composite hashing can live in a
-small `util/hash` leaf with no imports from the rest of `util`. Hash helpers
-used only by deleted custom tables should be deleted.
+available as a stable source-compatible result. Keep operations such as
+`Combine`, `Mix`, string hashing, and composite hashing in `util` while their
+consumers remain there, or move each operation beside its consumer when that
+consumer moves. Do not create a generic hash-table or `utilhash` package. Hash
+helpers used only by deleted custom tables should be deleted.
 
 ### Current Go obstacle
 
@@ -340,8 +341,8 @@ deleting functionality that has not yet reached Go.
    with `map` or `insdict.Dict` according to their required iteration order.
 3. Replace warning, formatting, and text-buffer paths with `io.Writer`, `fmt`,
    `bytes.Buffer`, `strings.Builder`, and `bufio` as appropriate.
-4. Move explicit stable hash functions into an import-independent `util/hash`
-   leaf and delete hashes that existed only for custom tables.
+4. Delete hashes that existed only for custom tables. Keep explicit Z3 hash
+   values beside the code that consumes them; do not form a `utilhash` package.
 5. Convert one owning feature package at a time from `Runtime`/`Block` storage
    to concrete fields and slices. Move its focused tests at the same time.
 6. Reduce memory management to `arena` plus a narrow limit/error policy. Remove
