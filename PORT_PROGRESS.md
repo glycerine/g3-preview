@@ -31482,3 +31482,38 @@ yet due. Counts remain 2102 units / 677 APIs: 63 ported, 284 partial,
 Next: concrete skeleton payload arrays and polynomial reference/numeral vectors
 still use byte-encoded Runtime backing. Replace their container mechanics while
 preserving project algorithms and actual reference/numeral ownership.
+
+## Native polynomial skeleton payload
+
+`PolynomialSkeleton` now stores typed entries, uint32 powers and original
+monomial handles in native slices. A borrowed local monomial slice and
+`sort.Slice` replace the inline128 buffer and sorting adapter. The original
+LexWithMinimum grouping, entry order, powers, unsigned indices, monomial INCs
+and entries-before-originals DECs remain. Comparator dispatch order is not
+part of the port contract.
+
+Deleted byte codecs for these payload arrays, Runtime growth/free state,
+retired-reference copies, custom slice charges and constructor transfer cursors.
+A failed constructor retains its actual acquired references in the same typed
+payload for explicit owning cleanup; it does not run the source class destructor.
+Real generated-monomial construction failure and stopped reference destruction
+remain covered. Native payload bounds replace reads of unused vector capacity;
+unsigned index addition still wraps before checking the resulting index.
+
+The 129-term pure-power regression permits only the owner-header reservation,
+verifies no Runtime allocations, checks canonical power order and audits actual
+references through source/owning destruction. Actual display callbacks test the
+reached owner lifetime. Removed malformed raw uninitialized-entry/header fixtures
+for storage that no longer exists. Physical censuses count real child resources.
+The shared byte-backed monomial buffer still serves sparse interpolation and
+cross-manager conversion; its existing code is isolated in
+`polynomial_monomial_buffer.go` until those consumers are converted.
+
+Validation: full native polynomial passed (35.67s), final focused debug skeleton/
+sparse/GCD/conversion/imp checks passed (1.18s), and module-wide test compilation,
+polynomial vet and portcheck passed. The full native module checkpoint remains
+20:08–20:11 UTC, not yet due again. Manifest counts remain 2102 units / 677 APIs:
+63 ported, 284 partial, 1727 unported and two dead/deleted. The complete util knot
+and package split remain open. Next: remove the remaining shared monomial buffer
+from its actual conversion/interpolation consumers, then remaining concrete
+reference/numeral vector storage.

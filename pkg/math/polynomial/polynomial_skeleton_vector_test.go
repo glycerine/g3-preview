@@ -3,11 +3,9 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialSkeletonVectorSourceOperations(t *testing.T) {
@@ -56,7 +54,6 @@ func TestPolynomialSkeletonVectorSourceOperations(t *testing.T) {
 
 func polynomialSkeletonVectorPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, v *PolynomialSkeletonVector, callerSkeletons []*PolynomialSkeleton, callers ...Polynomial) {
 	t.Helper()
-	var raw []util.Block
 	var roots []Monomial
 	extra := v.header
 	// Published child contexts are owned; callerSkeletons are
@@ -77,22 +74,10 @@ func polynomialSkeletonVectorPhysicalAudit(t *testing.T, m *MultivariatePolynomi
 		if s == nil {
 			continue
 		}
-		extra += s.header + uint64(cap(s.retiredEntries)+cap(s.retiredOriginals))*uint64(reflect.TypeOf(Monomial{}).Size())
-		for _, a := range []*polynomialVector{&s.entries, &s.originals, &s.powers} {
-			for _, b := range []util.Block{a.raw, a.pending, a.old} {
-				if b != (util.Block{}) {
-					raw = append(raw, b)
-				}
-			}
-		}
-		for _, b := range []util.Block{s.ms.raw, s.ms.pending} {
-			if b != (util.Block{}) {
-				raw = append(raw, b)
-			}
-		}
+		extra += s.header
 		roots = append(roots, polynomialSkeletonRoots(t, s)...)
 	}
-	polynomialNewtonPhysicalWithExtra(t, m, nil, nil, nil, nil, callers, nil, raw, extra)
+	polynomialNewtonPhysicalWithExtra(t, m, nil, nil, nil, nil, callers, nil, nil, extra)
 	polynomialOperationMonomialAudit(t, m, callers, roots)
 }
 
@@ -159,8 +144,8 @@ func TestPolynomialSkeletonVectorSetStoppedChildDestructor(t *testing.T) {
 	serviceMust(t, v.Push(a))
 	m.integer.Budget().FailAfter(0)
 	e = v.Set(0, b)
-	if !numericPhysicalReservationRefusal(e) || a.sourceFinalized || !a.sourceStarted || a.sourceStage != 0 || a.entryCursor != 2 || !a.entryDropping || b.sourceStarted || v.sourceCause != e {
-		t.Fatal("actual old child DEC/ref-recycle stop", e, a.sourceStage, a.entryCursor, a.entryDropping)
+	if !numericPhysicalReservationRefusal(e) || a.sourceFinalized || !a.sourceStarted || a.entryCursor != 2 || !a.entryDropping || b.sourceStarted || v.sourceCause != e {
+		t.Fatal("actual old child DEC/ref-recycle stop", e, a.originalCursor, a.entryCursor, a.entryDropping)
 	}
 	polynomialSkeletonVectorPhysicalAudit(t, m, v, []*PolynomialSkeleton{b}, p)
 	used := m.integer.Budget().Used()
@@ -170,7 +155,7 @@ func TestPolynomialSkeletonVectorSetStoppedChildDestructor(t *testing.T) {
 	}
 	m.integer.Budget().FailAfter(-1)
 	serviceMust(t, v.CloseChecked())
-	if a.sourceFinalized || a.sourceCause != cause || a.sourceStage != 0 {
+	if a.sourceFinalized || a.sourceCause != cause {
 		t.Fatal("owning abort changed literal source history")
 	}
 	serviceMust(t, b.CloseChecked())

@@ -66,11 +66,7 @@ func polynomialSparsePhysical(t *testing.T, s *PolynomialSparseInterpolator, out
 		}
 	}
 	if sk != nil {
-		extra += sk.header + uint64(cap(sk.retiredEntries)+cap(sk.retiredOriginals))*uint64(reflect.TypeOf(Monomial{}).Size())
-		for _, v := range []*polynomialVector{&sk.entries, &sk.powers, &sk.originals} {
-			raw = append(raw, v.raw, v.pending, v.old)
-		}
-		raw = append(raw, sk.ms.raw, sk.ms.pending)
+		extra += sk.header
 	}
 	handlers := []*PolynomialDeletionHandler{}
 	for h := m.deletionHead; h != nil; h = h.next {

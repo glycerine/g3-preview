@@ -297,9 +297,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			return
 		}
 		seenSkeleton[sk] = true
-		adapterBytes += sk.header + uint64(cap(sk.retiredEntries)+cap(sk.retiredOriginals))*uint64(reflect.TypeOf(Monomial{}).Size())
-		vectors = append(vectors, &sk.entries, &sk.powers, &sk.originals)
-		external = append(external, sk.ms.raw, sk.ms.pending)
+		adapterBytes += sk.header
 	}
 	for _, sk := range full.skeletons.children {
 		addSkeleton(sk)

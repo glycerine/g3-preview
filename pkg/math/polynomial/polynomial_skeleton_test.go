@@ -4,7 +4,6 @@ package polynomial
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -76,60 +75,18 @@ func TestPolynomialSkeletonSourceGroupsAndLifetime(t *testing.T) {
 	polynomialPhysicalAudit(t, m)
 }
 
-// A real fresh physical array has an initialized monomial pointer while its
-// unrelated first/count words remain uninitialized. This is bounded reached-
-// field evidence for the source get_entry_idx/destructor, not a successful
-// native entry-constructor claim or a fabricated allocation refusal.
-func TestPolynomialSkeletonSourcePointerOnlyRead(t *testing.T) {
-	m := polynomialCellFixture(t)
-	zero := m.zero
-	s, e := NewPolynomialSkeleton(m, zero, 0)
-	serviceMust(t, e)
-	raw, e := m.memory.Allocate(32)
-	serviceMust(t, e)
-	serviceMust(t, m.memory.WriteUint32(raw, 0, 1))
-	serviceMust(t, m.memory.WriteUint32(raw, 4, 1))
-	unit, e := m.monomials.Unit()
-	serviceMust(t, e)
-	serviceMust(t, m.monomials.IncRef(unit))
-	serviceMust(t, skeletonWriteMonomial(m.memory, raw, 8, unit))
-	s.entries.raw = raw
-	s.entries.initialized = 1
-	s.entryOwned = 1
-	index, e := s.EntryIndex(unit)
-	if e != nil || index != 0 {
-		t.Fatal("source identity lookup read unrelated uninitialized words", index, e)
-	}
-	serviceMust(t, s.SourceFinalize())
-	serviceMust(t, s.CloseChecked())
-	polynomialPhysicalAudit(t, m)
-}
-
 func polynomialSkeletonRoots(t *testing.T, s *PolynomialSkeleton) []Monomial {
 	t.Helper()
 	if s == nil {
 		return nil
 	}
 	var roots []Monomial
-	for i := s.entryCursor; i < s.entryOwned; i++ {
-		if i < s.entryTransferred {
-			continue
-		}
-		a, e := s.entryMonomialCore(i)
-		serviceMust(t, e)
-		roots = append(roots, a)
+	for i := s.entryCursor; uint64(i) < uint64(len(s.entries)); i++ {
+		roots = append(roots, s.entries[i].Monomial)
 	}
-	for i := s.originalCursor; i < s.originalOwned; i++ {
-		if i < s.originalTransferred {
-			continue
-		}
-		a, e := s.originals.monomial(s.owner, i)
-		serviceMust(t, e)
-		roots = append(roots, a)
+	for i := s.originalCursor; uint64(i) < uint64(len(s.originals)); i++ {
+		roots = append(roots, s.originals[i])
 	}
-	roots = append(roots, s.retiredEntries[s.retiredEntryCursor:s.retiredEntryCount]...)
-	roots = append(roots, s.retiredOriginals[s.retiredOriginalCursor:s.retiredOriginalCount]...)
-	roots = append(roots, s.incomingEntry, s.incomingOriginal)
 	if s.generatedActive {
 		roots = append(roots, s.generated)
 	}
@@ -137,24 +94,11 @@ func polynomialSkeletonRoots(t *testing.T, s *PolynomialSkeleton) []Monomial {
 }
 func polynomialSkeletonPhysicalAudit(t *testing.T, m *MultivariatePolynomialCore, s *PolynomialSkeleton, callers ...Polynomial) {
 	t.Helper()
-	var raw []util.Block
-	extra := uint64(0)
+	var extra uint64
 	if s != nil {
-		extra = s.header + uint64(cap(s.retiredEntries)+cap(s.retiredOriginals))*uint64(reflect.TypeOf(Monomial{}).Size())
-		for _, v := range []*polynomialVector{&s.entries, &s.originals, &s.powers} {
-			for _, r := range []util.Block{v.raw, v.pending, v.old} {
-				if r != (util.Block{}) {
-					raw = append(raw, r)
-				}
-			}
-		}
-		for _, r := range []util.Block{s.ms.raw, s.ms.pending} {
-			if r != (util.Block{}) {
-				raw = append(raw, r)
-			}
-		}
+		extra = s.header
 	}
-	polynomialNewtonPhysicalWithExtra(t, m, nil, nil, nil, nil, callers, nil, raw, extra)
+	polynomialNewtonPhysicalWithExtra(t, m, nil, nil, nil, nil, callers, nil, nil, extra)
 	polynomialOperationMonomialAudit(t, m, callers, polynomialSkeletonRoots(t, s))
 }
 func TestPolynomialSkeletonConstructorEveryReservation(t *testing.T) {
@@ -177,8 +121,8 @@ func TestPolynomialSkeletonConstructorEveryReservation(t *testing.T) {
 			} else {
 				var actual *PolynomialSkeleton
 				if s != nil {
-					if !errors.As(e, &actual) || actual != s || s.originalCause == nil || s.completed || s.sourceStarted || s.unwindStage != 4 || s.cleanupCause != nil {
-						t.Fatal("failed constructor member-only unwind", e, s)
+					if !errors.As(e, &actual) || actual != s || s.originalCause == nil || s.completed || s.sourceStarted || s.CleanupCause() != nil {
+						t.Fatal("failed constructor retained actual references", e, s)
 					}
 					failedRetained = true
 				}
@@ -187,7 +131,7 @@ func TestPolynomialSkeletonConstructorEveryReservation(t *testing.T) {
 					cause = actual.originalCause
 				}
 				if !numericPhysicalReservationRefusal(cause) {
-					t.Fatal("actual metadata/runtime refusal", cause)
+					t.Fatal("actual header/monomial refusal", cause)
 				}
 			}
 			polynomialSkeletonPhysicalAudit(t, m, s, p)
@@ -236,27 +180,26 @@ func TestPolynomialSkeletonSourceDisplay(t *testing.T) {
 	serviceMust(t, m.DecRef(p))
 }
 
-func TestPolynomialSkeletonSourceDisplayReachedPointer(t *testing.T) {
+func TestPolynomialSkeletonDisplayReachedOwnerLifetime(t *testing.T) {
 	m := polynomialCellFixture(t)
-	s, e := NewPolynomialSkeleton(m, m.zero, 0)
+	s, e := NewPolynomialSkeleton(m, m.unit, 0)
 	serviceMust(t, e)
-	raw, e := m.memory.Allocate(32)
-	serviceMust(t, e)
-	serviceMust(t, m.memory.WriteUint32(raw, 0, 1))
-	serviceMust(t, m.memory.WriteUint32(raw, 4, 1))
-	serviceMust(t, m.memory.WriteUint32(raw, 24, 0))
-	serviceMust(t, m.memory.WriteUint32(raw, 28, 0))
-	s.entries.raw = raw
-	var sink monomialTestSink
-	e = s.DisplayInto(&sink)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) || sink.text.String() != "()*" {
-		t.Fatal("source reference formation eagerly loaded pointer", e, sink.text.String())
+	sink := &polynomialDisplayTestSink{literalHook: func(v string) error {
+		if v == ")*" {
+			return s.SourceFinalize()
+		}
+		return nil
+	}}
+	e = s.DisplayInto(sink)
+	if !errors.Is(e, arena.ErrClosed) || sink.text.String() != "(x0^0)*" {
+		t.Fatal("reached child owner after output", e, sink.text.String())
 	}
 	polynomialSkeletonPhysicalAudit(t, m, s)
 	serviceMust(t, s.CloseChecked())
+	polynomialPhysicalAudit(t, m)
 }
 
-func TestPolynomialSkeletonSourceInline128Overflow(t *testing.T) {
+func TestPolynomialSkeletonNativePurePowerGrowth(t *testing.T) {
 	m := polynomialCellFixture(t)
 	as := make([]util.Int, 129)
 	ms := make([]Monomial, 129)
@@ -271,12 +214,15 @@ func TestPolynomialSkeletonSourceInline128Overflow(t *testing.T) {
 	serviceMust(t, m.IncRef(p))
 	before, e := m.memory.AllocationCount()
 	serviceMust(t, e)
+	used := m.integer.Budget().Used()
+	m.integer.Budget().FailAfter(1) // The actual skeleton owner header is the only reservation.
 	s, e := NewPolynomialSkeleton(m, p, 0)
+	m.integer.Budget().FailAfter(-1)
 	serviceMust(t, e)
 	after, e := m.memory.AllocationCount()
 	serviceMust(t, e)
-	if after <= before || s.ms.capacity != 256 || s.ms.size != 129 || s.ms.raw != (util.Block{}) || s.ms.pending != (util.Block{}) {
-		t.Fatal("actual local inline128 overflow and source destruction", s.ms.capacity, s.ms.size, before, after)
+	if after != before || len(s.powers) != 129 || len(s.originals) != 129 || m.integer.Budget().Used() != used+s.header {
+		t.Fatal("native pure-power storage", before, after, len(s.powers), len(s.originals))
 	}
 	n, e := s.NumEntries()
 	serviceMust(t, e)
@@ -302,42 +248,43 @@ func TestPolynomialSkeletonSourceInline128Overflow(t *testing.T) {
 	polynomialOperationMonomialAudit(t, m, nil, nil)
 }
 
-// Source vector operator[] checks its own logical size in DEBUG, after the
-// entry's NumPowers assertion. Release can read actual retained initialized
-// payload. These public Runtime header writes probe reached scalar domains.
-func TestPolynomialSkeletonSourceUnderlyingVectorGuards(t *testing.T) {
+// Native payload bounds retain the source DEBUG assertion; release returns
+// the Go bounds error rather than exposing unused vector capacity.
+func TestPolynomialSkeletonNativePayloadBounds(t *testing.T) {
 	m := polynomialCellFixture(t)
-	p, original := polynomialSkeletonInput(t, m)
+	p, originals := polynomialSkeletonInput(t, m)
 	s, e := NewPolynomialSkeleton(m, p, 0)
 	serviceMust(t, e)
 	a, e := s.Entry(0)
 	serviceMust(t, e)
-	n, e := s.powers.size(m)
-	serviceMust(t, e)
-	serviceMust(t, m.memory.WriteUint32(s.powers.raw, 4, 0))
-	k, e := s.Power(a, 0)
+	a.FirstPower = uint32(len(s.powers))
+	_, e = s.Power(a, 0)
+	want := arena.ErrBounds
 	if polynomialSourceDebug {
-		if !errors.Is(e, ErrPolynomialAssertion) {
-			t.Fatal("reached power vector DEBUG index", k, e)
-		}
-	} else if e != nil || k != 4 {
-		t.Fatal("release physical initialized power", k, e)
+		want = ErrPolynomialAssertion
 	}
-	polynomialSkeletonPhysicalAudit(t, m, s, p)
-	serviceMust(t, m.memory.WriteUint32(s.powers.raw, 4, n))
-	n, e = s.originals.size(m)
+	if !errors.Is(e, want) {
+		t.Fatal("native power bounds", e)
+	}
+	_, e = s.Original(a, 0)
+	if !errors.Is(e, want) {
+		t.Fatal("native original bounds", e)
+	}
+	_, e = s.Entry(uint32(len(s.entries)))
+	if !errors.Is(e, want) {
+		t.Fatal("native entry bounds", e)
+	}
+
+	// The source unsigned index addition wraps before the native bounds check.
+	a.FirstPower = ^uint32(0)
+	a.NumPowers = 2
+	k, e := s.Power(a, 1)
 	serviceMust(t, e)
-	serviceMust(t, m.memory.WriteUint32(s.originals.raw, 4, 0))
-	got, e := s.Original(a, 0)
-	if polynomialSourceDebug {
-		if !errors.Is(e, ErrPolynomialAssertion) {
-			t.Fatal("reached original vector DEBUG index", got, e)
-		}
-	} else if e != nil || got != original[4] {
-		t.Fatal("release actual initialized pointer", got, e)
+	orig, e := s.Original(a, 1)
+	serviceMust(t, e)
+	if k != 4 || orig != originals[4] {
+		t.Fatal("wrapped source index", k, orig)
 	}
-	polynomialSkeletonPhysicalAudit(t, m, s, p)
-	serviceMust(t, m.memory.WriteUint32(s.originals.raw, 4, n))
 	serviceMust(t, s.CloseChecked())
 	serviceMust(t, m.DecRef(p))
 	polynomialPhysicalAudit(t, m)
@@ -359,7 +306,7 @@ func polynomialSkeletonOverflowInput(t *testing.T, m *MultivariatePolynomialCore
 }
 func TestPolynomialSkeletonOverflowConstructorEveryReservation(t *testing.T) {
 	success := false
-	failedRetained := false
+
 	for ordinal := int64(0); ordinal < 100 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m := polynomialCellFixture(t)
@@ -377,17 +324,17 @@ func TestPolynomialSkeletonOverflowConstructorEveryReservation(t *testing.T) {
 			} else {
 				var actual *PolynomialSkeleton
 				if s != nil {
-					if !errors.As(e, &actual) || actual != s || s.originalCause == nil || s.completed || s.sourceStarted || s.unwindStage != 4 || s.cleanupCause != nil {
-						t.Fatal("failed constructor member-only unwind", e, s)
+					if !errors.As(e, &actual) || actual != s || s.originalCause == nil || s.completed || s.sourceStarted || s.CleanupCause() != nil {
+						t.Fatal("failed constructor retained actual references", e, s)
 					}
-					failedRetained = true
+
 				}
 				cause := e
 				if actual != nil {
 					cause = actual.originalCause
 				}
 				if !numericPhysicalReservationRefusal(cause) {
-					t.Fatal("actual metadata/runtime refusal", cause)
+					t.Fatal("actual header/monomial refusal", cause)
 				}
 			}
 			polynomialSkeletonPhysicalAudit(t, m, s, p)
@@ -417,7 +364,7 @@ func TestPolynomialSkeletonOverflowConstructorEveryReservation(t *testing.T) {
 			polynomialOperationMonomialAudit(t, m, nil, nil)
 		})
 	}
-	if !success || !failedRetained {
-		t.Fatal("bounded real sweep incomplete", success, failedRetained)
+	if !success {
+		t.Fatal("bounded real sweep incomplete", success)
 	}
 }
