@@ -770,3 +770,5 @@ Stored-model label snapshots in `tactic` now use `[]util.Symbol`. The inline-16/
 The goal flattener's polarity worklist in `tactic` now uses a concrete slice as a LIFO stack. Its inline-64/spill representation, doubling code, and arena backing charges have been removed; popped and closed entries are cleared.
 
 Bit-vector polynomial multiplication now stores its unsigned coordinates and borrowed sum views in concrete typed slices. Both inline-16/spill buffers and their arena accounting have been removed; close clears the slices.
+
+The multiplication-hoist validity mask now uses `[]bool`; its inline-16/spill buffer, doubling path, and arena charge have been removed.

@@ -5,57 +5,21 @@ package rewriter
 import (
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-// Concrete buffer<bool>, with sixteen raw inline slots and source doubling.
-type bvPolynomialValidity struct {
-	inline [16]bool
-	spill  []bool
-	count  uint32
-	bytes  uint64
-}
+type bvPolynomialValidity struct{ values []bool }
 
-func (v *bvPolynomialValidity) data() []bool {
-	if v.spill != nil {
-		return v.spill
-	}
-	return v.inline[:v.count]
-}
-func (v *bvPolynomialValidity) fill(m *ast.ASTManager, n uint32) error {
-	for v.count < n {
-		if v.spill == nil && v.count < 16 {
-			v.inline[v.count] = true
-			v.count++
-			continue
-		}
-		if v.spill == nil || len(v.spill) == cap(v.spill) {
-			capacity := uint64(32)
-			if v.spill != nil {
-				capacity = uint64(cap(v.spill)) * 2
-			}
-			if capacity > uint64(^uint32(0)) || capacity > uint64(^uint(0)>>1) {
-				return arena.ErrBounds
-			}
-			if e := m.Budget().Reserve(capacity); e != nil {
-				return e
-			}
-			data := make([]bool, v.count, int(capacity))
-			copy(data, v.data())
-			m.Budget().Release(v.bytes)
-			v.spill, v.bytes = data, capacity
-		}
-		v.spill = append(v.spill, true)
-		v.count++
+func (v *bvPolynomialValidity) data() []bool { return v.values }
+func (v *bvPolynomialValidity) fill(_ *ast.ASTManager, n uint32) error {
+	for uint64(len(v.values)) < uint64(n) {
+		v.values = append(v.values, true)
 	}
 	return nil
 }
-func (v *bvPolynomialValidity) close(m *ast.ASTManager) {
-	m.Budget().Release(v.bytes)
-	v.spill = nil
-	v.bytes = 0
-	v.count = 0
+func (v *bvPolynomialValidity) close(_ *ast.ASTManager) {
+	clear(v.values)
+	v.values = nil
 }
 
 // BVPolynomialMultiplicationHoist names one source invocation and borrows the
