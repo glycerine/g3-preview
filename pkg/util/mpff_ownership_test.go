@@ -399,7 +399,7 @@ func TestFastFloatIDRecyclingAndRetirement(t *testing.T) {
 	fastAudit(t, m)
 }
 func TestFastFloatScopedFailureLifetimes(t *testing.T) {
-	for op := 0; op < 5; op++ {
+	for op := 0; op < 3; op++ {
 		complete := false
 		for fail := int64(0); fail < 256; fail++ {
 			budget := arena.NewBudget(1 << 28)
@@ -413,8 +413,6 @@ func TestFastFloatScopedFailureLifetimes(t *testing.T) {
 			serviceMust(t, e)
 			serviceMust(t, a.SetInt32(7))
 			serviceMust(t, b.SetInt32(3))
-			v, e := NewScopedFastFloatVector(m)
-			serviceMust(t, e)
 			budget.FailAfter(fail)
 			var out *ScopedFastFloat
 			switch op {
@@ -424,17 +422,10 @@ func TestFastFloatScopedFailureLifetimes(t *testing.T) {
 				out, e = a.Add(b)
 			case 2:
 				out, e = a.Mul(b)
-			case 3:
-				e = v.Push(&a.num)
-			case 4:
-				e = v.Resize(17)
 			}
 			roots := []*FastFloat{&a.num, &b.num}
 			if out != nil {
 				roots = append(roots, &out.num)
-			}
-			for i := range v.values {
-				roots = append(roots, &v.values[i])
 			}
 			fastAudit(t, m, roots...)
 			if e != nil && !numericPhysicalReservationRefusal(e) {
@@ -444,7 +435,6 @@ func TestFastFloatScopedFailureLifetimes(t *testing.T) {
 				serviceMust(t, out.Close())
 				serviceMust(t, out.Close())
 			}
-			serviceMust(t, v.Close())
 			serviceMust(t, a.Close())
 			serviceMust(t, b.Close())
 			fastAudit(t, m)
@@ -462,7 +452,6 @@ func TestFastFloatScopedFailureLifetimes(t *testing.T) {
 		}
 	}
 }
-
 func TestFastFloatDivisionSourceDiagnosticPrefix(t *testing.T) {
 	m := fastManager(t, 33)
 	var a, b, c FastFloat

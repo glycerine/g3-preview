@@ -110,31 +110,6 @@ func (h *ffSource) set64(p uint32) {
 		h.ensure(h.q(m.IsInt64(&a)))
 	}
 }
-func (h *ffSource) capacity(p uint32) {
-	m := h.manager(p)
-	defer h.finish(m)
-	v, e := NewScopedFastFloatVector(m)
-	serviceMust(h.t, e)
-	defer v.Close()
-	var a FastFloat
-	defer m.Del(&a)
-	for i := uint32(0); i < 50000; i++ {
-		serviceMust(h.t, m.SetUint32(&a, i))
-		serviceMust(h.t, v.Push(&a))
-		x, e := v.Back()
-		serviceMust(h.t, e)
-		h.ensure(h.q(m.IsInteger(x)))
-		h.ensure(h.q(m.IsInt64(x)))
-		h.ensure(h.q(m.IsUint64(x)))
-	}
-	for i := uint32(0); i < 50000; i++ {
-		x, e := v.At(i)
-		serviceMust(h.t, e)
-		n, e := m.Int64(x)
-		serviceMust(h.t, e)
-		h.ensure(n == int64(i))
-	}
-}
 func (h *ffSource) power(p uint32) {
 	m := h.manager(p)
 	defer h.finish(m)
@@ -462,9 +437,6 @@ func TestFastFloatSourceActiveMatrix(t *testing.T) {
 	for _, p := range []uint32{2, 4, 18} {
 		h.power(p)
 	}
-	for _, p := range []uint32{2, 4, 8, 16} {
-		h.capacity(p)
-	}
 	for _, p := range []uint32{2, 4, 6} {
 		h.set64(p)
 	}
@@ -523,8 +495,8 @@ func TestFastFloatSourceActiveMatrix(t *testing.T) {
 		serviceMust(t, m.Del(&a))
 		h.finish(m)
 	}
-	if h.count != 908297 || h.verifies != 2 {
-		t.Fatal("source execution counts excluding5basic+14decimal", h.count, h.verifies)
+	if h.count != 108297 || h.verifies != 2 {
+		t.Fatal("production source execution counts excluding5basic+14decimal", h.count, h.verifies)
 	}
 }
 

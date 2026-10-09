@@ -184,6 +184,12 @@ values, wrapping, and caller-side formatting replace the source virtual
 exception hierarchy and varargs/iostream constructor; immutable strings own
 message storage.
 
+The concrete `ScopedFastFloatVector` port was deleted after a full source scan
+found that `scoped_mpff_vector` is instantiated only by `src/test/mpff.cpp`.
+No production Z3 or Go code consumes it. Production scalar `scoped_mpff`
+behavior and tests remain; vector capacity, allocator-layout, and retained-tail
+tests do not justify shipping a test-only C++ container specialization.
+
 Very small leaf facilities such as `file_path`, `luby`, and `version` should
 still become distinct Go package leaves. This makes their consumers visible in
 the import graph, gives them an enforceable boundary, and makes later deletion

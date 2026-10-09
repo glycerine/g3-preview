@@ -1,5 +1,10 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
+The test-only `ScopedFastFloatVector` translation was removed.
+`scoped_mpff_vector` is instantiated only by `src/test/mpff.cpp`; production
+Z3 and Go code use scalar `scoped_mpff` values. Scalar ownership and arithmetic
+coverage remains, while copied vector growth/allocation-layout tests are gone.
+
 `src/util/z3_exception.h/.cpp` and `error_codes.h` now live in the independent
 `pkg/util/z3exception` leaf. Current util, AST, SAT, and SMT consumers import it
 directly. Go errors and caller-side formatting replace the virtual exception

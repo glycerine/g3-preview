@@ -104990,8 +104990,7 @@
         "pkg/util/mpff_predicates.go",
         "pkg/util/mpff_ref.go",
         "pkg/util/mpff_ref_checked.go",
-        "pkg/util/scoped_fast_float.go",
-        "pkg/util/scoped_fast_float_vector.go"
+        "pkg/util/scoped_fast_float.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -105012,10 +105011,8 @@
         "TestFastFloatSourceActiveMatrix",
         "TestFastFloatSourceBasic",
         "TestFastFloatSourceDecimal",
-        "TestFastFloatVectorCheckedAllocationBounds",
-        "TestFastFloatOwnerProvenanceAndVectorLifetime",
-        "TestFastFloatNeighborAndThinRoutes",
-        "TestFastFloatVectorOldNewPeakBudget"
+        "TestFastFloatOwnerProvenance",
+        "TestFastFloatNeighborAndThinRoutes"
       ],
       "conditionals": [
         {
@@ -105535,10 +105532,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -105551,7 +105546,8 @@
         "Actual owner header, Words/Natural services, significand blocks, validity/generation metadata, recycle and eleven live vector roots plus retained text workspaces charged. Source statement and alias prefixes survive failure; lexical temporaries release with injector armed. Raw handles retain implicit manager provenance limits. See PORT_PROGRESS.md#audit-mpff-port-status-md."
       ],
       "deviations": [
-        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence."
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
+        "The scoped_mpff_vector specialization is omitted: its only upstream instantiation is src/test/mpff.cpp, and no production Z3 or Go code consumes it. Production scoped_mpff scalar behavior remains covered."
       ]
     },
     {
@@ -128847,7 +128843,6 @@
         "pkg/util/mpff_ref.go",
         "pkg/util/mpff_ref_checked.go",
         "pkg/util/scoped_fast_float.go",
-        "pkg/util/scoped_fast_float_vector.go",
         "pkg/util/mpff_format_scope.go",
         "pkg/util/mpff_format_scope_test.go",
         "pkg/util/mpff_source_buffer.go",
@@ -128872,10 +128867,8 @@
         "TestFastFloatSourceActiveMatrix",
         "TestFastFloatSourceBasic",
         "TestFastFloatSourceDecimal",
-        "TestFastFloatVectorCheckedAllocationBounds",
-        "TestFastFloatOwnerProvenanceAndVectorLifetime",
+        "TestFastFloatOwnerProvenance",
         "TestFastFloatNeighborAndThinRoutes",
-        "TestFastFloatVectorOldNewPeakBudget",
         "TestFastFloatFormattingRetainsSourcePrecision",
         "TestFastFloatDecimalBuffersAreLexical",
         "TestFastFloatFormattingEveryConstructorPrefix",
@@ -129311,10 +129304,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129340,10 +129331,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129369,10 +129358,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129398,10 +129385,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129427,10 +129412,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129456,10 +129439,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129520,7 +129501,6 @@
         "pkg/util/mpff_ref.go",
         "pkg/util/mpff_ref_checked.go",
         "pkg/util/scoped_fast_float.go",
-        "pkg/util/scoped_fast_float_vector.go",
         "pkg/util/mpff_format_scope.go",
         "pkg/util/mpff_format_scope_test.go",
         "pkg/util/mpff_source_buffer.go",
@@ -129545,10 +129525,8 @@
         "TestFastFloatSourceActiveMatrix",
         "TestFastFloatSourceBasic",
         "TestFastFloatSourceDecimal",
-        "TestFastFloatVectorCheckedAllocationBounds",
-        "TestFastFloatOwnerProvenanceAndVectorLifetime",
+        "TestFastFloatOwnerProvenance",
         "TestFastFloatNeighborAndThinRoutes",
-        "TestFastFloatVectorOldNewPeakBudget",
         "TestFastFloatFormattingRetainsSourcePrecision",
         "TestFastFloatDecimalBuffersAreLexical",
         "TestFastFloatFormattingEveryConstructorPrefix",
@@ -129608,10 +129586,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129637,10 +129613,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129666,10 +129640,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129695,10 +129667,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129724,10 +129694,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -129753,10 +129721,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -145551,10 +145517,8 @@
         "TestFastFloatSourceActiveMatrix",
         "TestFastFloatSourceBasic",
         "TestFastFloatSourceDecimal",
-        "TestFastFloatVectorCheckedAllocationBounds",
-        "TestFastFloatOwnerProvenanceAndVectorLifetime",
+        "TestFastFloatOwnerProvenance",
         "TestFastFloatNeighborAndThinRoutes",
-        "TestFastFloatVectorOldNewPeakBudget",
         "TestSMT2FreshDefaultCopyFailureNullDestructor",
         "TestSMT2CompletedTemporaryGuardedLateFree",
         "TestPolynomialEvaluationStoppedPhysicalLeafAndReuse",
@@ -145724,10 +145688,8 @@
             "TestFastFloatSourceActiveMatrix",
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
+            "TestFastFloatOwnerProvenance",
+            "TestFastFloatNeighborAndThinRoutes"
           ]
         },
         {
@@ -145853,7 +145815,6 @@
       "go_targets": [
         "pkg/util/scoped_numeral.go",
         "pkg/util/scoped_binary.go",
-        "pkg/util/scoped_fast_float_vector.go",
         "pkg/math/polynomial/upolynomial_vector.go",
         "pkg/math/polynomial/upolynomial_source_test.go"
       ],
@@ -145901,10 +145862,8 @@
         "TestFastFloatSourceActiveMatrix",
         "TestFastFloatSourceBasic",
         "TestFastFloatSourceDecimal",
-        "TestFastFloatVectorCheckedAllocationBounds",
-        "TestFastFloatOwnerProvenanceAndVectorLifetime",
+        "TestFastFloatOwnerProvenance",
         "TestFastFloatNeighborAndThinRoutes",
-        "TestFastFloatVectorOldNewPeakBudget",
         "TestUPolynomialScalarExtentAndLayout",
         "TestUPolynomialSourceUnsignedExtent",
         "TestUPolynomialColdDirectoryBounds",
@@ -146019,35 +145978,6 @@
           ]
         },
         {
-          "name": "concrete MPFF owning vector resize/push/pop/shrink/reset/indexed borrow, source growth and ascending destruction",
-          "status": "ported",
-          "go_target": "pkg/util/scoped_fast_float_vector.go",
-          "tests": [
-            "TestFastFloatIntegerConversionSource",
-            "TestFastFloatRationalRawShapeAndConversionFailures",
-            "TestFastFloatIntegerSourceDiscardedLimbDefects",
-            "TestFastFloatToIntegerSourceReleaseTruncation",
-            "TestFastFloatGetterSourceReleaseActions",
-            "TestFastFloatSourcePrintedPaths",
-            "TestFastFloatIndependentDirectedAliases",
-            "TestFastFloatConstructorReservationPrefixes",
-            "TestFastFloatArithmeticFailureRoots",
-            "TestFastFloatPowerWrapPrefixes",
-            "TestFastFloatFormattingFailureAndWarmStorage",
-            "TestFastFloatIDRecyclingAndRetirement",
-            "TestFastFloatScopedFailureLifetimes",
-            "TestFastFloatDivisionSourceDiagnosticPrefix",
-            "TestFastFloatActualWholeGraphCharges",
-            "TestFastFloatSourceActiveMatrix",
-            "TestFastFloatSourceBasic",
-            "TestFastFloatSourceDecimal",
-            "TestFastFloatVectorCheckedAllocationBounds",
-            "TestFastFloatOwnerProvenanceAndVectorLifetime",
-            "TestFastFloatNeighborAndThinRoutes",
-            "TestFastFloatVectorOldNewPeakBudget"
-          ]
-        },
-        {
           "name": "concrete mpzzp coefficient vector ownership, reset/shrink/resize/push/pop and destructor actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_vector.go",
@@ -146075,7 +146005,8 @@
       ],
       "deviations": [
         "Concrete Int, Rational, MPBQ, MPFF and mpzzp vectors retain manager-specific storage, ownership and failure behavior. Remaining source instantiations stay partial until a live caller is ported; the unused any-valued callback vector was removed.",
-        "Explicit Close substitutes RAII for retained concrete owners; no C++ vector implementation is ported."
+        "Explicit Close substitutes RAII for retained concrete owners; no C++ vector implementation is ported.",
+        "The scoped_mpff_vector specialization is omitted: its only upstream instantiation is src/test/mpff.cpp, and no production Z3 or Go code consumes it. Production scoped_mpff scalar behavior remains covered."
       ]
     },
     {
