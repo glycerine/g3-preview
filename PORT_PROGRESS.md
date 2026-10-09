@@ -1,5 +1,11 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
+The Runtime-backed unsigned specialization of `sorting_network` was deleted.
+The corresponding C++ `unsigned_ext` exists only in
+`src/test/sorting_network.cpp`; no production C++ or Go caller uses it. The live
+production `psort_nw` specialization and its behavioral tests remain in
+`pkg/ast`. Runtime unsigned-vector tests that cover other live owners remain.
+
 `src/util/max_cliques.h` is extracted into `pkg/util/cliques`. It uses
 `[][]uint32`, typed bit sets, and ordinary slices while preserving greedy source
 order and the source's retained transitive-cache behavior. The SAT caller now

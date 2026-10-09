@@ -109400,36 +109400,10 @@
       "role": "test",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_sorting_network_unsigned_source_test.go",
-        "pkg/util/util_sorting_network_unsigned_diagnostics_source_test.go",
-        "pkg/util/util_sorting_network_unsigned_storage.go",
-        "pkg/util/util_sorting_network_unsigned_ownership_source_test.go",
-        "pkg/util/util_sorting_network_unsigned.go",
-        "pkg/util/util_unsigned_vector_growth_source.go",
-        "pkg/util/util_unsigned_vector_growth_retry_source_test.go",
         "pkg/ast/util_psort_ast_context.go",
         "pkg/ast/util_psort_ast_context_source_test.go"
       ],
       "tests": [
-        "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
-        "TestUnsignedSortingNetworkIndependentFiniteUnsignedOracle",
-        "TestUnsignedSortingNetworkSourceRepeatedStorageAndSelfAlias",
-        "TestUnsignedSortingNetworkFullUnsignedBoundaryOracle",
-        "TestUnsignedSortingNetworkLiteralExchangeAndSortActions",
-        "TestUnsignedSortingNetworkClosedAssertionProviderAndUnusedBorrow",
-        "TestUnsignedSortingNetworkCapturedExchangeOperandsAndSetSourceOrder",
-        "TestUnsignedSortingNetworkEveryActualReservationAndCallerPrefix",
-        "TestUnsignedSortingNetworkConstructorIdentityAndColdRefusal",
-        "TestUnsignedSortingNetworkStoppedReverseDestructorActualReceipt",
-        "TestUnsignedSortingNetworkActualAllocationTransportCannotCloseExecutingOwner",
-        "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
-        "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
-        "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
-        "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
-        "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
-        "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
-        "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
-        "TestUnsignedVectorEveryAssignedCurrentGrowthReservation",
         "TestPsortASTContextActualFactoriesClausesAndTrail",
         "TestPsortASTContextUnpublishedClauseConsumedCleanupRetry",
         "TestPsortASTContextActualConstructorRefusalPrefixes",
@@ -109492,46 +109466,6 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
-        {
-          "name": "Concrete unsigned_ext sorting_network constructor, literal padded unsigned comparator network and recursive current/next pointer schedule (src/util/sorting_network.h:28-115)",
-          "status": "partial",
-          "go_target": "pkg/util/util_sorting_network_unsigned.go",
-          "tests": [
-            "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
-            "TestUnsignedSortingNetworkIndependentFiniteUnsignedOracle",
-            "TestUnsignedSortingNetworkSourceRepeatedStorageAndSelfAlias",
-            "TestUnsignedSortingNetworkFullUnsignedBoundaryOracle"
-          ]
-        },
-        {
-          "name": "Concrete actual Runtime svector index/payload prefix and SASSERT transport, reverse source DT with separate owning abort and reentrant lower allocation guard (src/util/sorting_network.h:31-34,39-50,98-108; src/util/vector.h:178-189,303-329,350-365,437-440)",
-          "status": "partial",
-          "go_target": "pkg/util/util_sorting_network_unsigned_storage.go",
-          "tests": [
-            "TestUnsignedSortingNetworkLiteralExchangeAndSortActions",
-            "TestUnsignedSortingNetworkClosedAssertionProviderAndUnusedBorrow",
-            "TestUnsignedSortingNetworkCapturedExchangeOperandsAndSetSourceOrder",
-            "TestUnsignedSortingNetworkEveryActualReservationAndCallerPrefix",
-            "TestUnsignedSortingNetworkConstructorIdentityAndColdRefusal",
-            "TestUnsignedSortingNetworkStoppedReverseDestructorActualReceipt",
-            "TestUnsignedSortingNetworkActualAllocationTransportCannotCloseExecutingOwner"
-          ]
-        },
-        {
-          "name": "Concrete unsigned vector source-valid NULL-growth retry with actual returned acquisition archives, scalar first cause, strict current-member DT and separate exact owning cleanup (src/util/vector.h:59-100,178-189,350-365; src/util/memory_manager.cpp:274-289)",
-          "status": "partial",
-          "go_target": "pkg/util/util_unsigned_vector_growth_source.go",
-          "tests": [
-            "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
-            "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
-            "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
-            "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
-            "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
-            "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
-            "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
-            "TestUnsignedVectorEveryAssignedCurrentGrowthReservation"
-          ]
-        },
         {
           "name": "Actual ast_ext2 Boolean factories and owning trail/clauses context; independent bounded clause semantics, no registered SMT driver completion (src/test/sorting_network.cpp:150-181)",
           "status": "partial",
@@ -147432,15 +147366,6 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_sorting_network_unsigned_source_test.go",
-        "pkg/util/util_sorting_network_unsigned_diagnostics_source_test.go",
-        "pkg/util/util_sorting_network_unsigned_storage.go",
-        "pkg/util/util_sorting_network_unsigned_ownership_source_test.go",
-        "pkg/util/util_sorting_network_unsigned.go",
-        "pkg/util/util_unsigned_vector_growth_source.go",
-        "pkg/util/util_unsigned_vector_growth_retry_source_test.go",
-        "pkg/util/util_sorting_network_unsigned_copy_source.go",
-        "pkg/util/util_sorting_network_unsigned_copy_source_test.go",
         "pkg/ast/util_psort_ast_network.go",
         "pkg/ast/util_psort_ast_context_source_test.go",
         "pkg/ast/util_psort_ast_costs_source_test.go",
@@ -147452,31 +147377,6 @@
         "pkg/ast/util_psort_ast_recursive_oracle_source_test.go"
       ],
       "tests": [
-        "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
-        "TestUnsignedSortingNetworkIndependentFiniteUnsignedOracle",
-        "TestUnsignedSortingNetworkSourceRepeatedStorageAndSelfAlias",
-        "TestUnsignedSortingNetworkFullUnsignedBoundaryOracle",
-        "TestUnsignedSortingNetworkLiteralExchangeAndSortActions",
-        "TestUnsignedSortingNetworkClosedAssertionProviderAndUnusedBorrow",
-        "TestUnsignedSortingNetworkCapturedExchangeOperandsAndSetSourceOrder",
-        "TestUnsignedSortingNetworkEveryActualReservationAndCallerPrefix",
-        "TestUnsignedSortingNetworkConstructorIdentityAndColdRefusal",
-        "TestUnsignedSortingNetworkStoppedReverseDestructorActualReceipt",
-        "TestUnsignedSortingNetworkActualAllocationTransportCannotCloseExecutingOwner",
-        "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
-        "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
-        "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
-        "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
-        "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
-        "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
-        "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
-        "TestUnsignedVectorEveryAssignedCurrentGrowthReservation",
-        "TestUnsignedSortingNetworkGeneratedCopyMemberStorageAndPointerAliases",
-        "TestUnsignedSortingNetworkEveryGeneratedCopyReservationAndMemberUnwind",
-        "TestUnsignedSortingNetworkCopiedPointersBorrowOriginalLifetimeOnlyAtDereference",
-        "TestUnsignedSortingNetworkGeneratedCopyClosedAssertionPrefixAndEmptyMembers",
-        "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
-        "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild",
         "TestPsortASTContextActualFactoriesClausesAndTrail",
         "TestPsortASTContextUnpublishedClauseConsumedCleanupRetry",
         "TestPsortASTContextActualConstructorRefusalPrefixes",
@@ -147665,59 +147565,6 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {
-          "name": "Concrete unsigned_ext sorting_network constructor, literal padded unsigned comparator network and recursive current/next pointer schedule (src/util/sorting_network.h:28-115)",
-          "status": "ported",
-          "go_target": "pkg/util/util_sorting_network_unsigned.go",
-          "tests": [
-            "TestUnsignedSortingNetworkSourceRegisteredUnsignedCampaigns",
-            "TestUnsignedSortingNetworkIndependentFiniteUnsignedOracle",
-            "TestUnsignedSortingNetworkSourceRepeatedStorageAndSelfAlias",
-            "TestUnsignedSortingNetworkFullUnsignedBoundaryOracle"
-          ]
-        },
-        {
-          "name": "Concrete actual Runtime svector index/payload prefix and SASSERT transport, reverse source DT with separate owning abort and reentrant lower allocation guard (src/util/sorting_network.h:31-34,39-50,98-108; src/util/vector.h:178-189,303-329,350-365,437-440)",
-          "status": "ported",
-          "go_target": "pkg/util/util_sorting_network_unsigned_storage.go",
-          "tests": [
-            "TestUnsignedSortingNetworkLiteralExchangeAndSortActions",
-            "TestUnsignedSortingNetworkClosedAssertionProviderAndUnusedBorrow",
-            "TestUnsignedSortingNetworkCapturedExchangeOperandsAndSetSourceOrder",
-            "TestUnsignedSortingNetworkEveryActualReservationAndCallerPrefix",
-            "TestUnsignedSortingNetworkConstructorIdentityAndColdRefusal",
-            "TestUnsignedSortingNetworkStoppedReverseDestructorActualReceipt",
-            "TestUnsignedSortingNetworkActualAllocationTransportCannotCloseExecutingOwner"
-          ]
-        },
-        {
-          "name": "Concrete unsigned vector source-valid NULL-growth retry with actual returned acquisition archives, scalar first cause, strict current-member DT and separate exact owning cleanup (src/util/vector.h:59-100,178-189,350-365; src/util/memory_manager.cpp:274-289)",
-          "status": "ported",
-          "go_target": "pkg/util/util_unsigned_vector_growth_source.go",
-          "tests": [
-            "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
-            "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
-            "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
-            "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
-            "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
-            "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
-            "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
-            "TestUnsignedVectorEveryAssignedCurrentGrowthReservation"
-          ]
-        },
-        {
-          "name": "Generated unsigned sorting_network copy constructor: vector members current\u2192next exact-cap copy then original scalar pointer aliases, completed-member reverse unwind and failed-constructor owning abort (src/util/sorting_network.h:28-34,87-94; src/util/vector.h:102-120,159-167,178-189)",
-          "status": "ported",
-          "go_target": "pkg/util/util_sorting_network_unsigned_copy_source.go",
-          "tests": [
-            "TestUnsignedSortingNetworkGeneratedCopyMemberStorageAndPointerAliases",
-            "TestUnsignedSortingNetworkEveryGeneratedCopyReservationAndMemberUnwind",
-            "TestUnsignedSortingNetworkCopiedPointersBorrowOriginalLifetimeOnlyAtDereference",
-            "TestUnsignedSortingNetworkGeneratedCopyClosedAssertionPrefixAndEmptyMembers",
-            "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
-            "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild"
-          ]
-        },
         {
           "name": "Concrete AST psort bound policies, cost arithmetic, recursive card/sort/merge/direct subset encodings, pairwise/bimander helpers and lexical placement/reverse destructor ownership (src/util/sorting_network.h:120-1046)",
           "status": "ported",
@@ -150548,8 +150395,6 @@
         "pkg/util/util_debug_macro_source_test.go",
         "pkg/util/util_unsigned_vector_growth_source.go",
         "pkg/util/util_unsigned_vector_growth_retry_source_test.go",
-        "pkg/util/util_sorting_network_unsigned_copy_source.go",
-        "pkg/util/util_sorting_network_unsigned_copy_source_test.go",
         "pkg/ast/util_ast_literal_vector.go",
         "pkg/ast/util_ast_literal_vector_copy_source_test.go",
         "pkg/ast/util_ast_literal_vector_source_test.go",
@@ -150915,7 +150760,6 @@
         "TestDebugMacroHeapMinContinueReachesConstIndexedSpare",
         "TestDebugMacroHeapRemainingFalseLeavesThrowBeforeBody",
         "TestDebugMacroHeapNestedVectorShrinkContinuePublishesAfterAssertion",
-        "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
         "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
         "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
         "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
@@ -150923,12 +150767,6 @@
         "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
         "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
         "TestUnsignedVectorEveryAssignedCurrentGrowthReservation",
-        "TestUnsignedSortingNetworkGeneratedCopyMemberStorageAndPointerAliases",
-        "TestUnsignedSortingNetworkEveryGeneratedCopyReservationAndMemberUnwind",
-        "TestUnsignedSortingNetworkCopiedPointersBorrowOriginalLifetimeOnlyAtDereference",
-        "TestUnsignedSortingNetworkGeneratedCopyClosedAssertionPrefixAndEmptyMembers",
-        "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
-        "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild",
         "TestASTLiteralVectorExactCopyCapacityAndRawTokens",
         "TestASTLiteralVectorEveryCopyReservationAndUnfinishedOwner",
         "TestASTLiteralVectorAllocationCallbacksCannotRetireExactCopyOwner",
@@ -151603,7 +151441,6 @@
           "status": "partial",
           "go_target": "pkg/util/util_unsigned_vector_growth_source.go",
           "tests": [
-            "TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions",
             "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
             "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
             "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
@@ -151611,19 +151448,6 @@
             "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
             "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
             "TestUnsignedVectorEveryAssignedCurrentGrowthReservation"
-          ]
-        },
-        {
-          "name": "Generated unsigned sorting_network copy constructor: vector members current\u2192next exact-cap copy then original scalar pointer aliases, completed-member reverse unwind and failed-constructor owning abort (src/util/sorting_network.h:28-34,87-94; src/util/vector.h:102-120,159-167,178-189)",
-          "status": "partial",
-          "go_target": "pkg/util/util_sorting_network_unsigned_copy_source.go",
-          "tests": [
-            "TestUnsignedSortingNetworkGeneratedCopyMemberStorageAndPointerAliases",
-            "TestUnsignedSortingNetworkEveryGeneratedCopyReservationAndMemberUnwind",
-            "TestUnsignedSortingNetworkCopiedPointersBorrowOriginalLifetimeOnlyAtDereference",
-            "TestUnsignedSortingNetworkGeneratedCopyClosedAssertionPrefixAndEmptyMembers",
-            "TestUnsignedSortingNetworkEmptyGeneratedCopyAndAccidentalOwnerCopy",
-            "TestUnsignedSortingNetworkGeneratedCopyPostphysicalFailuresRetainExactChild"
           ]
         },
         {

@@ -1,4 +1,4 @@
-// Source: src/util/sorting_network.h:97-115; src/util/vector.h:59-100,350-365; src/util/memory_manager.cpp:274-289.
+// Source: src/util/vector.h:59-100,350-365; src/util/memory_manager.cpp:274-289.
 package util
 
 import (
@@ -6,66 +6,6 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 )
-
-func TestUnsignedSortingNetworkSourceValidNullGrowthRetryRetainsAcquisitions(t *testing.T) {
-	b := arena.NewBudget(1 << 26)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, ThreadLocal: true})
-	paramsMust(t, e)
-	sn, e := NewRuntimeUnsignedSortingNetwork(r, b, nil)
-	paramsMust(t, e)
-	in, e := NewRuntimeUnsignedVector(r, b)
-	paramsMust(t, e)
-	out, e := NewRuntimeUnsignedVector(r, b)
-	paramsMust(t, e)
-	values := []uint32{9, 8, 7, 6, 5, 4, 3, 2, 1}
-	for _, v := range values {
-		paramsMust(t, in.Push(v))
-	}
-	paramsMust(t, out.Resize(16, 0))
-	// Real borrowed allocation puts the actual TLS lane just below its source
-	// synchronization threshold. The first internal malloc crosses it.
-	state := r.State()
-	request := int64(99990) - state.LocalSize - 8
-	if request <= 0 {
-		t.Fatal("bounded public priming recipe", state)
-	}
-	anchor, e := r.Allocate(uint64(request))
-	paramsMust(t, e)
-	paramsMust(t, r.SetMaxSize(1))
-	cause := sn.Sort(in, out)
-	if cause == nil || !r.State().OutOfMemory || sn.currentv.Column.Raw.Block != (Block{}) || sn.currentv.Column.Raw.Pending == (Block{}) {
-		t.Fatal("actual NULL source field and returned unjoined allocation", cause, r.State(), sn.currentv.Column.Raw)
-	}
-	old := sn.currentv.Column.Raw.Pending
-	unsignedGrowthGraph(t, b, r, []*RuntimeUnsignedVector{&sn.currentv, &sn.nextv, in, out}, sn.header, anchor)
-	_, e = r.Size(old)
-	paramsMust(t, e)
-	paramsMust(t, r.SetMaxSize(0))
-	if e = sn.Sort(in, out); e != nil {
-		t.Fatal("source allocate never reads sticky OOM flag; NULL retry must run literal body", e)
-	}
-	sortingUnsignedOracle(t, out, values)
-	if !r.State().OutOfMemory {
-		t.Fatal("retry must not clear actual source OOM flag")
-	}
-	_, e = r.Size(old)
-	paramsMust(t, e)
-	unsignedGrowthGraph(t, b, r, []*RuntimeUnsignedVector{&sn.currentv, &sn.nextv, in, out}, sn.header, anchor)
-	paramsMust(t, sn.SourceFinalize())
-	unsignedGrowthGraph(t, b, r, []*RuntimeUnsignedVector{&sn.currentv, &sn.nextv, in, out}, sn.header, anchor)
-	_, e = r.Size(old)
-	paramsMust(t, e)
-	paramsMust(t, sn.Close())
-	_, e = r.Size(anchor)
-	paramsMust(t, e)
-	paramsMust(t, out.Close())
-	paramsMust(t, in.Close())
-	paramsMust(t, r.Deallocate(&anchor))
-	paramsMust(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal("named acquisitions refund", b.Used())
-	}
-}
 
 // The graph names only concrete fields and caller-owned allocations; Runtime's
 // live directory checks the independently declared roots, never supplies them.
