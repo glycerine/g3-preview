@@ -50,6 +50,12 @@ class and its allocation-layout tests are removed. The borrowed uint32 Runtime
 view still used by AST and polynomial raw vectors now lives independently in
 `runtime_uint32_view.go`.
 
+The standalone root `RuntimeUnsignedVector` wrapper is also removed. Its sole
+production field was a permanently empty member of the datatype utility, so
+that field and its no-op destruction disappeared. Active AST vector owners use
+their concrete typed implementations; shared Runtime columns retain only the
+narrow growth-owner interface needed by those owners.
+
 `src/util/heap.h` now has a native concrete `int32` implementation in
 `pkg/util/heap`. Typed slices hold the heap and inverse indices; the parallel
 Runtime/Block implementation, Runtime-only diagnostic fixtures, and root util

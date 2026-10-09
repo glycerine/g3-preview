@@ -149560,12 +149560,6 @@
         "pkg/util/heap/source_frontier_test.go",
         "pkg/sat/sat_var_queue.go",
         "pkg/util/heap/owner_test.go",
-        "pkg/util/util_unsigned_vector_runtime.go",
-        "pkg/util/util_unsigned_vector_runtime_test.go",
-        "pkg/util/util_unsigned_vector_copy_source.go",
-        "pkg/util/util_unsigned_vector_copy_source_test.go",
-        "pkg/util/util_unsigned_vector_copy_retire_source_test.go",
-        "pkg/util/util_unsigned_vector_view_source_test.go",
         "pkg/math/polynomial/polynomial_cell.go",
         "pkg/math/polynomial/polynomial_store.go",
         "pkg/math/polynomial/polynomial_lex_sort.go",
@@ -149574,8 +149568,6 @@
         "pkg/util/util_debug_notification.go",
         "pkg/util/util_debug_macros.go",
         "pkg/util/util_debug_macro_source_test.go",
-        "pkg/util/util_unsigned_vector_growth_source.go",
-        "pkg/util/util_unsigned_vector_growth_retry_source_test.go",
         "pkg/ast/util_ast_literal_vector.go",
         "pkg/ast/util_ast_literal_vector_copy_source_test.go",
         "pkg/ast/util_ast_literal_vector_source_test.go",
@@ -149834,19 +149826,6 @@
         "TestHeapAssignmentSourceDestroyedFirstMember",
         "TestHeapFindLESourceOutputBeforeChildGrowth",
         "TestHeapLegacyCopiedCloseRejectsBeforeRefund",
-        "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
-        "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
-        "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
-        "TestRuntimeUnsignedVectorOwnerAndProviderGuards",
-        "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
-        "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
-        "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
-        "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
-        "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
-        "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
-        "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation",
-        "TestRuntimeUnsignedVectorCPtrCapturesPhysicalLifetimeAndSameCapacityMutation",
-        "TestRuntimeUnsignedVectorCPtrDoesNotReadUnreadHeader",
         "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
         "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
         "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
@@ -149866,13 +149845,6 @@
         "TestDebugMacroActualEnsureAndNotImplementedExits",
         "TestDebugMacroCassertLiteralTagShortCircuitAndUninitializedCondition",
         "TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch",
-        "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
-        "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
-        "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
-        "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
-        "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
-        "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
-        "TestUnsignedVectorEveryAssignedCurrentGrowthReservation",
         "TestASTLiteralVectorExactCopyCapacityAndRawTokens",
         "TestASTLiteralVectorEveryCopyReservationAndUnfinishedOwner",
         "TestASTLiteralVectorAllocationCallbacksCannotRetireExactCopyOwner",
@@ -150349,40 +150321,6 @@
           ]
         },
         {
-          "name": "concrete Runtime unsigned-vector/permutation class selected source reset alternating growth, swap, move_after, display, default-debug invariant and member destruction; exact ranges in cached source map",
-          "status": "partial",
-          "go_target": "pkg/util/util_unsigned_vector_runtime.go",
-          "tests": [
-            "TestRuntimeUnsignedVectorGeometryResetAndWarmReuse",
-            "TestRuntimeUnsignedVectorResetDoesNotReadOldSizeHeader",
-            "TestRuntimeUnsignedVectorResizeRetainsSizeUntilAllCapacityReady",
-            "TestRuntimeUnsignedVectorOwnerAndProviderGuards"
-          ]
-        },
-        {
-          "name": "concrete unsigned-vector exact-cap deep copy/destructive assignment and permutation forward-then-inverse implicit member copy; actual acquisition history and completed-member constructor unwind",
-          "status": "partial",
-          "go_target": "pkg/util/util_unsigned_vector_copy_source.go",
-          "tests": [
-            "TestRuntimeUnsignedVectorAssignmentDestroyBeforeExactCopyFailure",
-            "TestRuntimeUnsignedVectorCopyPreservesNonNullEmptyCapacity",
-            "TestRuntimeUnsignedVectorCopySizeT32ConversionBeforePhysicalAllocation",
-            "TestRuntimeUnsignedVectorAssignRetryRetainsActualAcquisitionHistory",
-            "TestRuntimeUnsignedVectorAcquisitionHistoryStoppedOwningCleanup",
-            "TestRuntimeUnsignedVectorSuccessfulAssignRetiresTransferredAcquisitionMetadata",
-            "TestRuntimeUnsignedVectorSuccessfulRetryRetiresPrephysicalEmptyInvocation"
-          ]
-        },
-        {
-          "name": "concrete Runtime unsigned_vector c_ptr captures actual current pointer without header/provider read; reached physical view generation and same-cap mutation",
-          "status": "partial",
-          "go_target": "pkg/util/util_unsigned_vector_runtime.go",
-          "tests": [
-            "TestRuntimeUnsignedVectorCPtrCapturesPhysicalLifetimeAndSameCapacityMutation",
-            "TestRuntimeUnsignedVectorCPtrDoesNotReadUnreadHeader"
-          ]
-        },
-        {
           "name": "actual polynomial lex recursive raw NUM/monomial cycle consumers and captured Runtime mapping; stable actual allocation layout and literal nested bucket size/append/capacity source reads",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_lex_sort.go",
@@ -150428,20 +150366,6 @@
           ],
           "go_targets": [
             "pkg/util/util_debug_macro_source_test.go"
-          ]
-        },
-        {
-          "name": "Concrete unsigned vector source-valid NULL-growth retry with actual returned acquisition archives, scalar first cause, strict current-member DT and separate exact owning cleanup (src/util/vector.h:59-100,178-189,350-365; src/util/memory_manager.cpp:274-289)",
-          "status": "partial",
-          "go_target": "pkg/util/util_unsigned_vector_growth_source.go",
-          "tests": [
-            "TestUnsignedVectorEveryNullRetryReservationPreservesOldAcquisition",
-            "TestUnsignedVectorTwoReturnedNullAcquisitionsAndPrephysicalCause",
-            "TestUnsignedVectorExecutingGrowthGuardsActualTransportCleanup",
-            "TestUnsignedVectorGrowthOwnerExactBindingBeforeMutation",
-            "TestUnsignedVectorGrowthClosedProviderBeforeArchiveMutation",
-            "TestUnsignedVectorAssignedCurrentGrowthRetainsOlderNullAcquisition",
-            "TestUnsignedVectorEveryAssignedCurrentGrowthReservation"
           ]
         },
         {

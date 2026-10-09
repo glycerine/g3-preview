@@ -75,7 +75,6 @@ type astDatatypeUtility struct {
 	plugin                *astDatatypePluginOwner
 	maps                  [9]astDatatypeObjectMap
 	references            astDatatypeReferenceVector
-	vectors               util.RuntimeUnsignedVector
 	start                 uint32
 	fullyInterpretedTrail RuntimeASTLiteralVector
 	completedMaps         uint8
@@ -112,8 +111,6 @@ func (u *astDatatypeUtility) construct(m *ASTManager) error {
 	}
 	u.references.manager = m
 	u.references.raw.Bind(m.numerals.RuntimeOwner())
-	u.vectors.Bind(m.numerals.RuntimeOwner(), m.BudgetField)
-	u.vectors.Constructed = true
 	u.start = 0
 	u.fullyInterpretedTrail = RuntimeASTLiteralVector{budget: m.BudgetField, constructed: true}
 	u.fullyInterpretedTrail.self = &u.fullyInterpretedTrail
@@ -135,16 +132,7 @@ func (u *astDatatypeUtility) destroy() error {
 	if u.closed {
 		return nil
 	}
-	// Default constructor scope has no vector elements in the destructor BODY.
-	if n, e := u.vectors.Column.Size(); e != nil {
-		return e
-	} else if n != 0 {
-		return ErrASTDomain
-	}
 	if e := u.fullyInterpretedTrail.SourceFinalize(); e != nil {
-		return e
-	}
-	if e := u.vectors.SourceFinalize(); e != nil {
 		return e
 	}
 	if n, e := u.references.raw.Size(); e != nil {

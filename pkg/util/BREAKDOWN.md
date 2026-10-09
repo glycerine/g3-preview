@@ -334,6 +334,11 @@ The probing array, tombstones, cached hash values, iterator implementation, and
 tests of the C++ table layout have been deleted. This removes one member of the
 infrastructure knot rather than moving it into a child package.
 
+The standalone `RuntimeUnsignedVector` wrapper has been deleted as well. Its
+only production field was a permanently empty datatype-utility member; active
+AST vectors already have concrete typed owners. The general Runtime column now
+keeps only the growth-owner interface used by those concrete implementations.
+
 The unused `UintPtrMap` template stand-in has also been deleted. Although the
 source `uint_map<T>` template has live C++ instantiations, the Go wrapper had no
 production consumer and stored every pointer as `any`, then used reflection to
