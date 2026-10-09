@@ -487,7 +487,7 @@ These 27 logical C++ units include no other direct `src/util` unit:
 approx_nat        array              basic_interval     common_msgs
 container_util    critical_flet      dec_ref_util        dlist
 error_codes       event_handler      ext_gcd             file_path
-luby              machine            obj_ref             optional
+luby                                 obj_ref             optional
 pop_scopes        ref                ref_util            resource_limit
 scoped_numeral    sstream            stats               stopwatch
 stream_buffer     version            z3_omp
@@ -551,6 +551,12 @@ compatibility surfaces are omitted.
 translation units include it, but neither inline `print_stat` overload is ever
 called. Its self-tested Go translation was removed instead of creating a
 package for dead source.
+
+`machine.h` is a C++ ABI macro used for allocator slot geometry and pointer
+tagging. Go arena implementations define their own concrete geometry, and Go
+pointers must remain visible to the garbage collector instead of being packed
+into `uintptr` tags. The unused root alignment mirror was removed; a concrete
+Go consumer can query `unsafe.Alignof` directly if alignment is relevant.
 
 ### Small units requiring a Go-native shape before packaging
 

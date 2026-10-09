@@ -30383,7 +30383,11 @@ Ledger validation passes with sstream.h classified as a platform replacement. In
 
 ### util file: machine.h
 
-Ported the source PTR_ALIGNMENT macro as exported Go target queries. PointerAlignmentBytes comes from unsafe.Alignof(uintptr(0)); PointerAlignmentShift derives its low-zero-bit count with math/bits. This follows the actual Go target rather than copying the C++ compiler's AMD64-versus-other conditional. Tests compare the reported values with independent standard-library queries and an allocated pointer.
+Classified as a platform replacement. `PTR_ALIGNMENT` configures C++ allocator
+slots and unsafe pointer-tagging macros. Go arena implementations own their
+concrete storage geometry, tagged C++ pointers must become typed Go fields, and
+any concrete alignment need can query `unsafe.Alignof` directly. The unused
+root alignment mirror and its self-only tests were deleted.
 
 Focused native and g3debug machine checks pass (0.004s each). Util vet, ledger and diff checks pass; inventory is now2102 units,677 APIs:56 ported,287 partial,1758 unported, plus the separately classified sstream platform replacement. No new full suite was needed after the21:37 UTC checkpoint.
 

@@ -124807,15 +124807,9 @@
       "path": "src/util/machine.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
-      "go_targets": [
-        "pkg/util/util_machine.go",
-        "pkg/util/util_machine_test.go"
-      ],
-      "tests": [
-        "TestMachinePointerAlignmentFromGoTarget",
-        "TestMachinePointerAlignmentCoversAllocatedPointer"
-      ],
+      "status": "platform_replacement",
+      "go_targets": [],
+      "tests": [],
       "conditionals": [
         {
           "line": 20,
@@ -124840,22 +124834,10 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [
-        {
-          "name": "PTR_ALIGNMENT host pointer alignment shift",
-          "status": "ported",
-          "go_target": "pkg/util/util_machine.go",
-          "tests": [
-            "TestMachinePointerAlignmentFromGoTarget",
-            "TestMachinePointerAlignmentCoversAllocatedPointer"
-          ]
-        }
-      ],
-      "ownership": [
-        "Compile-time Go target constants and pure queries own no storage."
-      ],
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "unsafe.Alignof(uintptr(0)) supplies the actual Go target alignment. This is more accurate for Go targets than the source's AMD64-versus-other preprocessor split. math/bits computes the shift; no C++ platform macro or ABI assumption is copied."
+        "PTR_ALIGNMENT configures C++ allocator slots and pointer-tagging macros. Go arena implementations own their concrete storage geometry, and tagged C++ pointers become typed Go fields visible to the garbage collector. Concrete code can query unsafe.Alignof directly if alignment matters; the unused standalone mirror was deleted."
       ]
     },
     {
@@ -150373,7 +150355,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "The complete header consists of unsafe C++ pointer-bit macros: alignment rounding, tag packing/unpacking, tag extraction and integer boxing. Go's garbage collector must retain real typed pointers and does not permit portable pointer tagging through uintptr. Each concrete consumer must represent its alternatives with ordinary typed pointer fields plus an enum or boolean, and boxed integers with Go integer fields. No shared TAG/UNTAG/BOXINT facade is created. PointerAlignmentShift remains the separate src/util/machine.h target query; no exported tag mask or pointer-reinterpretation API is retained."
+        "The complete header consists of unsafe C++ pointer-bit macros: alignment rounding, tag packing/unpacking, tag extraction and integer boxing. Go's garbage collector must retain real typed pointers and does not permit portable pointer tagging through uintptr. Each concrete consumer must represent its alternatives with ordinary typed pointer fields plus an enum or boolean, and boxed integers with Go integer fields. No shared TAG/UNTAG/BOXINT facade is created. Concrete code may query unsafe.Alignof directly if alignment matters; no shared alignment, tag-mask, or pointer-reinterpretation API is retained."
       ]
     },
     {
