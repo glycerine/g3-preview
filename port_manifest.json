@@ -108225,8 +108225,7 @@
         "pkg/util/mpq_number_theory.go",
         "pkg/util/mpq_inspect.go",
         "pkg/util/rational_service.go",
-        "pkg/util/rational_service_ops_test.go",
-        "pkg/util/ext_gcd_service_test.go"
+        "pkg/util/rational_service_ops_test.go"
       ],
       "tests": [
         "TestSourceStringAssertions",
@@ -108284,12 +108283,7 @@
         "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
         "TestRationalFacadeWarmZeroAllocations",
         "TestRationalFacadeInspectionForwardingAndSourceOutputAliases",
-        "TestRationalFacadeCompoundFailureAliases",
-        "TestExtendedGCDWrapperSource999Cases",
-        "TestExtendedGCDWrapperIndependentSignedBezout",
-        "TestExtendedGCDWrapperImmediateFailureOwnership",
-        "TestExtendedGCDWrapperSourceOutputAliases",
-        "TestExtendedGCDWrapperProvenanceGuards"
+        "TestRationalFacadeCompoundFailureAliases"
       ],
       "assertions": [
         {
@@ -109064,14 +109058,6 @@
           "tests": [
             "TestRationalFacadeSourceTST1",
             "TestRationalFacadeSourceTST2"
-          ]
-        },
-        {
-          "name": "tst7 all999 short-circuit inverse ENSUREs with500 inverse RHS through actual wrapper algorithm and facade power/mod/mul routes",
-          "status": "ported",
-          "go_target": "pkg/util/ext_gcd_service_test.go",
-          "tests": [
-            "TestExtendedGCDWrapperSource999Cases"
           ]
         }
       ],
@@ -114782,22 +114768,9 @@
       "path": "src/util/ext_gcd.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
-      "go_targets": [
-        "pkg/util/ext_gcd_service.go",
-        "pkg/util/rational_lexical_scope.go"
-      ],
-      "tests": [
-        "TestExtendedGCDWrapperSource999Cases",
-        "TestExtendedGCDWrapperIndependentSignedBezout",
-        "TestExtendedGCDWrapperImmediateFailureOwnership",
-        "TestExtendedGCDWrapperSourceOutputAliases",
-        "TestExtendedGCDWrapperProvenanceGuards",
-        "TestExtendedGCDWrapperCoefficientOuterBoundary",
-        "TestExtendedGCDWrapperCopyConstructorUnwindOrder",
-        "TestExtendedGCDWrapperWarmPhysicalBoundary",
-        "TestExtendedGCDWrapperNineRetainedDiagnosticRecords"
-      ],
+      "status": "reference_only",
+      "go_targets": [],
+      "tests": [],
       "conditionals": [
         {
           "line": 19,
@@ -114810,36 +114783,10 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [
-        {
-          "name": "extended_gcd complete concrete rational specialization used by source tst7",
-          "status": "ported",
-          "go_target": "pkg/util/ext_gcd_service.go",
-          "tests": [
-            "TestExtendedGCDWrapperSource999Cases",
-            "TestExtendedGCDWrapperIndependentSignedBezout",
-            "TestExtendedGCDWrapperImmediateFailureOwnership",
-            "TestExtendedGCDWrapperSourceOutputAliases",
-            "TestExtendedGCDWrapperProvenanceGuards"
-          ]
-        },
-        {
-          "name": "Selected external ExtendedGCD COPY/VALUE/DEFAULT lexical constructor frames and nested coefficient destruction boundaries",
-          "status": "ported",
-          "go_target": "pkg/util/ext_gcd_service.go",
-          "tests": [
-            "TestExtendedGCDWrapperCoefficientOuterBoundary",
-            "TestExtendedGCDWrapperCopyConstructorUnwindOrder",
-            "TestExtendedGCDWrapperWarmPhysicalBoundary",
-            "TestExtendedGCDWrapperNineRetainedDiagnosticRecords"
-          ]
-        }
-      ],
-      "ownership": [
-        "Inputs deep-copy before output initialization; six local owning numerals destroy in reverse source construction order, nested expressions destroy difference then product. Direct output prefixes and aliases retained. See PORT_PROGRESS.md#audit-ext-gcd-wrapper-port-status-md."
-      ],
+      "methods": [],
+      "ownership": [],
       "deviations": [
-        "The only instantiated source numeral type is rational; Go specialization is concrete with service provenance and typed allocation failures, no generics. Raw manager extended GCD is not substituted."
+        "Whole-source include and symbol scans found ext_gcd.h used only by src/test/rational.cpp. Production Z3 uses distinct IntegerManager, modular, and polynomial extended-GCD algorithms. The test-only RationalService compatibility wrapper and its self-only tests were removed."
       ]
     },
     {
@@ -143035,10 +142982,6 @@
         "TestConstructorCompletedUnwindPrecedesOwningAbort",
         "TestConstructorEightRootsAndWarmBoundary",
         "TestConstructorExpressionFailedCopyPhase",
-        "TestExtendedGCDWrapperCoefficientOuterBoundary",
-        "TestExtendedGCDWrapperCopyConstructorUnwindOrder",
-        "TestExtendedGCDWrapperWarmPhysicalBoundary",
-        "TestExtendedGCDWrapperNineRetainedDiagnosticRecords",
         "TestUPolynomialContextRawConstantCopy",
         "TestUPolynomialContextBorrowIdentity",
         "TestUPolynomialContextVectorStopAPI",
@@ -143551,12 +143494,7 @@
           "name": "ExtendedGCD external lexical frames and nine actual retained diagnostic records with charged owning storage; remaining raw temporary domains stay open",
           "status": "partial",
           "go_target": "pkg/util/rational_lexical_scope.go",
-          "tests": [
-            "TestExtendedGCDWrapperCoefficientOuterBoundary",
-            "TestExtendedGCDWrapperCopyConstructorUnwindOrder",
-            "TestExtendedGCDWrapperWarmPhysicalBoundary",
-            "TestExtendedGCDWrapperNineRetainedDiagnosticRecords"
-          ]
+          "tests": []
         },
         {
           "name": "Concrete same-Integer polynomial rational borrow context, owning constant COPY/exception/destruction timing and completed-before-partial cleanup; source global binding remains open",

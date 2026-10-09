@@ -486,7 +486,7 @@ These 27 logical C++ units include no other direct `src/util` unit:
 ```text
 approx_nat        array              basic_interval     common_msgs
 container_util    critical_flet      dec_ref_util        dlist
-error_codes       event_handler      ext_gcd             file_path
+error_codes       event_handler                          file_path
 luby                                 obj_ref             optional
 pop_scopes        ref                ref_util            resource_limit
 scoped_numeral    sstream            stats               stopwatch
@@ -497,7 +497,8 @@ This list does not mean every item should become a Go foundation package.
 `dlist` and `resource_limit` were confirmed dead and have already been removed
 from the port inventory. `critical_flet`, `pop_scopes`, and `sstream` have no
 known production source consumer and should be treated as deletion or deferral
-candidates. `ext_gcd` is test-only in the surveyed C++ tree. Several remaining
+candidates. `ext_gcd` is test-only in the surveyed C++ tree and its Go
+translation has been removed. Several remaining
 items are simple enough to replace with standard Go facilities.
 
 ## Complete extraction-leaf inventory
