@@ -170,6 +170,10 @@ The `lbool` boundary is now direct: SAT, tactic, API, AST, and model code import
 unused root `mincut` facade was deleted as well; its implementation remains only
 in `util/mincut`.
 
+The extracted `util/backtrack` package also stands on its own now. Its root
+`Trail` and `UnionFind` alias facades had no production consumer and were
+deleted; the concrete implementations and tests live only in the leaf.
+
 Very small leaf facilities such as `file_path`, `luby`, and `version` should
 still become distinct Go package leaves. This makes their consumers visible in
 the import graph, gives them an enforceable boundary, and makes later deletion
