@@ -2,10 +2,8 @@
 package ast
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -107,9 +105,9 @@ func TestASTSMT2FloatDefaultEveryActualReservation(t *testing.T) {
 }
 
 // Source format.cpp:66-99 constructs a real declaration/application even when
-// registration returns a duplicate. The pointer-free Go domain payload is an
-// actual constructor acquisition, distinct from the embedded lexical frame.
-func TestASTSMT2FloatDefaultWarmActualConstructorFrontier(t *testing.T) {
+// registration returns a duplicate. Native info-parameter slice growth does
+// not add an arena allocation to that warm path.
+func TestASTSMT2FloatDefaultWarmUsesNativeInfoStorage(t *testing.T) {
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	astTestMust(t, e)
@@ -132,8 +130,6 @@ func TestASTSMT2FloatDefaultWarmActualConstructorFrontier(t *testing.T) {
 	if second != first {
 		t.Fatal("same source format", first, second)
 	}
-	before := m.BudgetField.Used()
-	m.BudgetField.FailAfter(0)
 	bias, e := p.numeric.ExponentBias(8)
 	astTestMust(t, e)
 	if bias != 127 {
@@ -146,18 +142,13 @@ func TestASTSMT2FloatDefaultWarmActualConstructorFrontier(t *testing.T) {
 	if prefix.IsNull() || space.IsNull() {
 		t.Fatal("cached source strings")
 	}
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	defer m.BudgetField.FailAfter(-1)
 	third, body := m.ppFloatBitVectorLiteral(m.external(node), true, nil)
-	astBVPrinterRawGraph(t, m, nil)
-	f := p.literalFrames
-	if !errors.Is(body, arena.ErrInjectedFailure) || !third.IsNull() || f == nil || f.header != 0 || f.sigConstructed || !f.sourceDone || !f.buffer.Closed() || !f.valueConsumed || m.BudgetField.Used() != before {
-		t.Fatal("actual constructor frontier before significand declaration", body, third, f.header, f.bvPlaced, f.sourceDone, m.BudgetField.Used(), before)
-	}
-	tuple, cause := f.copy, f.bodyCause
 	m.BudgetField.FailAfter(-1)
-	later, e := m.ppFloatBitVectorLiteral(m.external(node), true, nil)
-	astTestMust(t, e)
-	if later != first || f.copy != tuple || f.bodyCause != cause || f.header != 0 {
-		t.Fatal("valid retry preserves stopped primary history", later, first)
+	if body != nil || third != first || m.BudgetField.Used() != before {
+		t.Fatal("warm native info storage", body, third, first, m.BudgetField.Used(), before)
 	}
 	astTestMust(t, m.Format.DelRef(&held))
 	astTestMust(t, p.numeric.Del(&v))

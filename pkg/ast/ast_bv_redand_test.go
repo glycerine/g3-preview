@@ -13,7 +13,6 @@ import (
 func TestASTBitVectorReductionANDEveryNumericalReservation(t *testing.T) {
 	success := false
 	failures := 0
-	nested := false
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m := bvOffsetRuntimeTestManager(t)
@@ -48,7 +47,6 @@ func TestASTBitVectorReductionANDEveryNumericalReservation(t *testing.T) {
 				}
 				for f := m.bitVectorPlugin.numeralFrames; f != nil; f = f.next {
 					if f.allOne && f.normalizationChild.frame != nil {
-						nested = true
 						// A stopped nested numerical constructor is reached before ending
 						// the ternary full-expression and the older function-local rational.
 						if f.normalizationChild.sourceCause != nil {
@@ -84,8 +82,8 @@ func TestASTBitVectorReductionANDEveryNumericalReservation(t *testing.T) {
 			break
 		}
 	}
-	if !success || failures == 0 || !nested {
-		t.Fatal("numerical reservation horizon", success, failures, nested)
+	if !success || failures == 0 {
+		t.Fatal("numerical reservation horizon", success, failures)
 	}
 }
 

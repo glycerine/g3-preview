@@ -12418,7 +12418,7 @@
         "TestASTSMT2FloatRealLiteralWarmSmallNaNErasesFrameAllocation",
         "TestASTSMT2FloatDefaultBitVectorFields",
         "TestASTSMT2FloatDefaultEveryActualReservation",
-        "TestASTSMT2FloatDefaultWarmActualConstructorFrontier"
+        "TestASTSMT2FloatDefaultWarmUsesNativeInfoStorage"
       ],
       "conditionals": [
         {
@@ -12596,7 +12596,7 @@
           "tests": [
             "TestASTSMT2FloatDefaultBitVectorFields",
             "TestASTSMT2FloatDefaultEveryActualReservation",
-            "TestASTSMT2FloatDefaultWarmActualConstructorFrontier"
+            "TestASTSMT2FloatDefaultWarmUsesNativeInfoStorage"
           ]
         }
       ],

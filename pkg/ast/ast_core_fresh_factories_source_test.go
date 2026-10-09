@@ -2,6 +2,7 @@
 package ast
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
@@ -77,7 +78,7 @@ func TestASTFreshFuncDeclNullAndSuffixSourceNames(t *testing.T) {
 	if text != "nullsk!tail!1" {
 		t.Fatal("literal null insertion precedes sk", text)
 	}
-	if m.freshInfoActive || m.freshInfo != (astInfoRecord{}) {
+	if m.freshInfoActive || !reflect.DeepEqual(m.freshInfo, astInfoRecord{}) {
 		t.Fatal("lexical info outlived source call")
 	}
 	if _, e = m.info(^uint32(0), m.freshInfoEpoch); e == nil {
@@ -103,7 +104,7 @@ func TestASTFreshFactoryEveryActualReservationAndLexicalOwner(t *testing.T) {
 		if budget.Used() != other+astTestSymbolGraph(s)+m.Stats().AllocatedBytes {
 			t.Fatal("lost lexical overflow or source node", after, e, budget.Used())
 		}
-		if m.freshInfoActive || m.freshInfo != (astInfoRecord{}) {
+		if m.freshInfoActive || !reflect.DeepEqual(m.freshInfo, astInfoRecord{}) {
 			t.Fatal("unfinished local info", after)
 		}
 		if e != nil {
@@ -154,7 +155,7 @@ func TestASTFreshConstDeclarationCopyPageAndApplicationPrefixes(t *testing.T) {
 		if budget.Used() != other+astTestSymbolGraph(s)+m.Stats().AllocatedBytes {
 			t.Fatal("actual declaration/copy/app graph", after, e, budget.Used())
 		}
-		if m.freshInfoActive || m.freshInfo != (astInfoRecord{}) {
+		if m.freshInfoActive || !reflect.DeepEqual(m.freshInfo, astInfoRecord{}) {
 			t.Fatal("lexical borrow retained", after)
 		}
 		if e != nil {

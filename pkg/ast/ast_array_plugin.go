@@ -243,7 +243,6 @@ func (m *ASTManager) arraySortCore(k int32, ps astArrayParameters) (_result astN
 		m.formatLexical.borrowed = ps.caller
 	}
 	m.formatLexical.info.count = uint32(ps.count())
-	m.formatLexical.info.capacity = ^uint32(0)
 	m.formatLexical.info.size = size
 	return m.mkSort(name, ASTSortInfo{m.origin, ^uint32(0) - 1, m.formatLexical.epoch})
 }

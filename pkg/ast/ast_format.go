@@ -38,12 +38,11 @@ func (m *ASTManager) beginFormatInfo(sort bool, id FamilyID, kind int32, paramet
 	}
 	f.epoch++
 	f.active = true
-	f.info = astInfoRecord{isSort: sort, live: true, family: id, kind: kind}
+	f.info = astInfoRecord{isSort: sort, live: true, lexical: true, family: id, kind: kind}
 	if parameter != nil {
 		f.parameter = *parameter
 		f.parameter.Live = true
 		f.info.count = 1
-		f.info.capacity = math.MaxUint32
 	}
 	return nil
 }

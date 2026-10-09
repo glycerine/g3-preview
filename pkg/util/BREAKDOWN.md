@@ -787,3 +787,9 @@ expressions. AST reference ownership remains explicit, while copied C++ vector
 growth and arena charges for Go-managed backing storage are gone. These were the
 last consumers of `SourceVectorCapacity`, so that shared helper and its
 implementation-only test have been deleted.
+
+AST sort and function-declaration metadata now stores its owning parameter
+handles in `[]ASTParameter`. Parameter copies and ordered release remain
+explicit, while the raw byte vector, embedded capacity words, and arena-backed
+growth failures are gone. Lexical format metadata continues to borrow its
+call-local parameters through the existing lexical record.

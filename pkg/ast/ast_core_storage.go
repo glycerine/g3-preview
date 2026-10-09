@@ -163,11 +163,12 @@ type astParameterRecord struct {
 type astInfoRecord struct {
 	generation, nextFree            uint32
 	live, isSort, private, attached bool
+	lexical                         bool
 	retainedByDebug                 bool
 	family                          FamilyID
 	kind                            int32
-	parameters                      arena.SmallBytesRef
-	count, capacity                 uint32
+	parameters                      []ASTParameter
+	count                           uint32
 	size                            SortSize
 	flags                           ASTFuncFlags
 }
