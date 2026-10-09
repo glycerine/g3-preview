@@ -768,3 +768,5 @@ The rational service's power-of-two cache now grows with native `append`. Cache 
 Stored-model label snapshots in `tactic` now use `[]util.Symbol`. The inline-16/spill buffer and its arena accounting are gone; construction still copies caller labels, application preserves insertion order, and close clears retained symbols.
 
 The goal flattener's polarity worklist in `tactic` now uses a concrete slice as a LIFO stack. Its inline-64/spill representation, doubling code, and arena backing charges have been removed; popped and closed entries are cleared.
+
+Bit-vector polynomial multiplication now stores its unsigned coordinates and borrowed sum views in concrete typed slices. Both inline-16/spill buffers and their arena accounting have been removed; close clears the slices.
