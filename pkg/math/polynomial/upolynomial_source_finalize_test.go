@@ -38,7 +38,6 @@ func upolynomialSourcePhysicalAudit(t *testing.T, q *util.RationalManager, u *UP
 	}
 	integerPhysicalAudit(t, q.Integers(), roots...)
 	n := q.HeaderBytes + integerActualOwnedBytes(q.Integers()) + u.header + u.modular.Header + u.store.header
-	n += uint64(cap(u.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(len(u.pages))*uint64(reflect.TypeOf(upolyDescriptorPage{}).Size()) + uint64(cap(u.bindings))*uint64(reflect.TypeOf(upolyStoreBinding{}).Size()) + uint64(cap(u.store.backings))*uint64(reflect.TypeOf(upolyBacking{}).Size())
 	for _, b := range u.store.backings {
 		if b.live {
 			n += uint64(cap(b.values)) * uint64(reflect.TypeOf(util.Int{}).Size())

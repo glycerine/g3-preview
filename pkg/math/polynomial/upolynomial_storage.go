@@ -76,20 +76,6 @@ func upolyNextCapacity(old, stride, hostMax uint64) (uint32, uint64, error) {
 	return n, uint64(n) * stride, nil
 }
 
-func upolyDirectoryNext(old, stride, host uint64) (uint64, uint64, error) {
-	if stride == 0 || old > host/2 {
-		return 0, 0, arena.ErrBounds
-	}
-	n := old * 2
-	if n == 0 {
-		n = 2
-	}
-	if n > host/stride {
-		return 0, 0, arena.ErrBounds
-	}
-	return n, n * stride, nil
-}
-
 func (m *UPolynomialManager) values(s *upolyVectorState) []util.Int {
 	if s.backing == 0 {
 		return nil
@@ -105,21 +91,6 @@ func (m *UPolynomialManager) backingSlot() (uint32, error) {
 	}
 	if uint64(len(m.store.backings)) >= math.MaxUint32 {
 		return 0, arena.ErrSlotLimit
-	}
-	if len(m.store.backings) == cap(m.store.backings) {
-		stride := uint64(reflect.TypeOf(upolyBacking{}).Size())
-		next, bytes, e := upolyDirectoryNext(uint64(cap(m.store.backings)), stride, uint64(int(^uint(0)>>1)))
-		if e != nil {
-			return 0, e
-		}
-		n := int(next)
-		if e := m.config.Integer.Budget().Reserve(bytes); e != nil {
-			return 0, e
-		}
-		a := make([]upolyBacking, len(m.store.backings), n)
-		copy(a, m.store.backings)
-		m.config.Integer.Budget().Release(uint64(cap(m.store.backings)) * stride)
-		m.store.backings = a
 	}
 	m.store.backings = append(m.store.backings, upolyBacking{generation: 1})
 	return uint32(len(m.store.backings)), nil

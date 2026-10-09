@@ -3,7 +3,6 @@ package polynomial
 
 import (
 	"math"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -35,9 +34,8 @@ func (m *UPolynomialManager) stateStore(s *upolyVectorState) *UPolynomialCoeffic
 }
 
 // BorrowCoefficientStore provides explicit cold provenance for source raw
-// pointers. It retains a distinct foreign store until core Close. Successful
-// directory growth/binding prefixes are physical Go storage adapters; no
-// coefficient copies or source arithmetic publication occur in this method.
+// pointers. It retains a distinct foreign store until core Close. Bindings use
+// a native slice; this method copies no coefficients or arithmetic state.
 func (m *UPolynomialManager) BorrowCoefficientStore(store *UPolynomialCoefficientStore) error {
 	if e := m.check(); e != nil {
 		return e
@@ -53,20 +51,6 @@ func (m *UPolynomialManager) BorrowCoefficientStore(store *UPolynomialCoefficien
 	}
 	if store.owners == math.MaxUint32 {
 		return arena.ErrSlotLimit
-	}
-	if len(m.bindings) == cap(m.bindings) {
-		stride := uint64(reflect.TypeOf(upolyStoreBinding{}).Size())
-		next, bytes, e := upolyDirectoryNext(uint64(cap(m.bindings)), stride, uint64(int(^uint(0)>>1)))
-		if e != nil {
-			return e
-		}
-		if e = m.config.Integer.Budget().Reserve(bytes); e != nil {
-			return e
-		}
-		a := make([]upolyStoreBinding, len(m.bindings), int(next))
-		copy(a, m.bindings)
-		m.config.Integer.Budget().Release(uint64(cap(m.bindings)) * stride)
-		m.bindings = a
 	}
 	store.owners++
 	m.bindings = append(m.bindings, upolyStoreBinding{store.origin, store})
@@ -84,8 +68,8 @@ func (m *UPolynomialManager) adoptState(source *UPolynomialManager, s *upolyVect
 }
 
 // SwapFrom is the concrete two-owner source vector swap. Binding preparations
-// finish before the infallible scalar swap; failed preparation retains only
-// successful cold binding prefixes and leaves both owning vectors unchanged.
+// finish before the infallible scalar swap. Native directory growth does not
+// allocate through the numeric Runtime or introduce a container fault prefix.
 func (m *UPolynomialManager) SwapFrom(dst UPolynomial, source *UPolynomialManager, src UPolynomial) error {
 	a, e := m.descriptor(dst)
 	if e != nil {

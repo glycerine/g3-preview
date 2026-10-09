@@ -37,7 +37,6 @@ func polynomialFactorBackendNamedRoots(t *testing.T, full *MultivariatePolynomia
 		if !store.closed {
 			bytes += store.header
 		}
-		bytes += uint64(cap(store.backings)) * uint64(reflect.TypeOf(upolyBacking{}).Size())
 		for _, backing := range store.backings {
 			if backing.live {
 				bytes += uint64(cap(backing.values)) * uint64(reflect.TypeOf(util.Int{}).Size())
@@ -59,7 +58,6 @@ func polynomialFactorBackendNamedRoots(t *testing.T, full *MultivariatePolynomia
 			bytes += m.modular.Header
 		}
 		roots = append(roots, &(*m.modular.BorrowModulus()), &m.modular.Lower, &m.modular.Upper, &m.modular.InvTmp1, &m.modular.InvTmp2, &m.modular.InvTmp3, &m.modular.DivTmp)
-		bytes += uint64(cap(m.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(len(m.pages))*uint64(reflect.TypeOf(upolyDescriptorPage{}).Size()) + uint64(cap(m.bindings))*uint64(reflect.TypeOf(upolyStoreBinding{}).Size())
 		addStore(m.store)
 		for _, b := range m.bindings {
 			addStore(b.store)

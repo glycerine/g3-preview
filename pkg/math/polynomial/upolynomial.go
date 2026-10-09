@@ -202,24 +202,6 @@ func (m *UPolynomialManager) NewPolynomial() (UPolynomial, error) {
 	if uint64(len(m.pages)+1)*32 > math.MaxUint32 {
 		return UPolynomial{}, arena.ErrSlotLimit
 	}
-	if len(m.pages) == cap(m.pages) {
-		next, bytes, e := upolyDirectoryNext(uint64(cap(m.pages)), uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()), uint64(int(^uint(0)>>1)))
-		if e != nil {
-			return UPolynomial{}, e
-		}
-		n := int(next)
-		if e := m.config.Integer.Budget().Reserve(bytes); e != nil {
-			return UPolynomial{}, e
-		}
-		a := make([]*upolyDescriptorPage, len(m.pages), n)
-		copy(a, m.pages)
-		m.config.Integer.Budget().Release(uint64(cap(m.pages)) * uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()))
-		m.pages = a
-	}
-	bytes := uint64(reflect.TypeOf(upolyDescriptorPage{}).Size())
-	if e := m.config.Integer.Budget().Reserve(bytes); e != nil {
-		return UPolynomial{}, e
-	}
 	page := &upolyDescriptorPage{}
 	m.pages = append(m.pages, page)
 	page.rows[0] = upolyDescriptor{generation: 1, live: true}
@@ -361,13 +343,10 @@ func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationR
 		return e
 	}
 	b := m.config.Integer.Budget()
-	b.Release(uint64(len(m.pages)) * uint64(reflect.TypeOf(upolyDescriptorPage{}).Size()))
-	b.Release(uint64(cap(m.pages)) * uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()))
 	m.store.release()
 	for _, binding := range m.bindings {
 		binding.store.release()
 	}
-	b.Release(uint64(cap(m.bindings)) * uint64(reflect.TypeOf(upolyStoreBinding{}).Size()))
 	m.bindings = nil
 	for q := m.displayFrames; q != nil; {
 		next := q.next

@@ -71,8 +71,9 @@ type UPolynomialStats struct {
 	LivePolynomials, LiveBackings                                                                  uint32
 }
 
-// Stats accounts the concrete physical storage graph; numeral cell payloads
-// remain in the borrowed IntegerManager and are not charged twice here.
+// Stats accounts charged owners and coefficient payloads. Native directories
+// and descriptor pages contribute no DirectoryBytes or PageBytes. Numeral cell
+// payloads remain in the borrowed IntegerManager and are not charged twice.
 func (m *UPolynomialManager) Stats() UPolynomialStats {
 	if m == nil || m.self != m || m.closed {
 		return UPolynomialStats{}
@@ -81,8 +82,6 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 	for f := m.displayFrames; f != nil; f = f.next {
 		s.OwnerBytes += f.header
 	}
-	s.DirectoryBytes = uint64(cap(m.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(cap(m.bindings))*uint64(reflect.TypeOf(upolyStoreBinding{}).Size())
-	s.PageBytes = uint64(len(m.pages)) * uint64(reflect.TypeOf(upolyDescriptorPage{}).Size())
 	m.addStoreStats(&s, m.store)
 	for _, binding := range m.bindings {
 		m.addStoreStats(&s, binding.store)
@@ -144,10 +143,8 @@ func (m *UPolynomialManager) Modulus(out *util.Int) error {
 }
 
 func (m *UPolynomialManager) addStoreStats(s *UPolynomialStats, store *UPolynomialCoefficientStore) {
-	dir := uint64(cap(store.backings)) * uint64(reflect.TypeOf(upolyBacking{}).Size())
 	s.StoreOwnerBytes += store.header
-	s.DirectoryBytes += dir
-	s.SharedStoreBytes += store.header + dir
+	s.SharedStoreBytes += store.header
 	for i := range store.backings {
 		b := &store.backings[i]
 		if !b.live {

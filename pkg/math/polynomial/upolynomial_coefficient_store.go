@@ -59,7 +59,6 @@ func (s *UPolynomialCoefficientStore) release() {
 	if s.owners != 0 {
 		return
 	}
-	s.integer.Budget().Release(uint64(cap(s.backings)) * uint64(reflect.TypeOf(upolyBacking{}).Size()))
 	s.integer.Budget().Release(s.header)
 	s.backings = nil
 	s.closed = true
@@ -94,7 +93,7 @@ func (s *UPolynomialCoefficientStore) Stats() (UPolynomialCoefficientStoreStats,
 	if e := s.check(); e != nil {
 		return UPolynomialCoefficientStoreStats{}, e
 	}
-	st := UPolynomialCoefficientStoreStats{Owners: s.owners, OwnerBytes: s.header, DirectoryBytes: uint64(cap(s.backings)) * uint64(reflect.TypeOf(upolyBacking{}).Size())}
+	st := UPolynomialCoefficientStoreStats{Owners: s.owners, OwnerBytes: s.header}
 	for i := range s.backings {
 		b := &s.backings[i]
 		if !b.live {

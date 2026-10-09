@@ -128,9 +128,10 @@ func TestUPolynomialRemoveOneHalfRootIndependentLiteralCases(t *testing.T) {
 	}
 }
 
-// Actual directory/backing capacities, independent of row SIZE and NUM census.
+// Actual coefficient backing capacities, excluding native directories and
+// independent of row SIZE and NUM census.
 func removeHalfVectorCold(p *UPolynomialManager) uint64 {
-	n := uint64(cap(p.bindings))*uint64(reflect.TypeOf(upolyStoreBinding{}).Size()) + uint64(cap(p.store.backings))*uint64(reflect.TypeOf(upolyBacking{}).Size())
+	n := uint64(0)
 	for _, b := range p.store.backings {
 		if b.live {
 			n += uint64(cap(b.values)) * uint64(reflect.TypeOf(util.Int{}).Size())

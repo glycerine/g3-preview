@@ -60,20 +60,3 @@ func TestUPolynomialSourceUnsignedExtent(t *testing.T) {
 		t.Fatal("source overflow action", e)
 	}
 }
-
-func TestUPolynomialColdDirectoryBounds(t *testing.T) {
-	for _, f := range []struct {
-		old, stride, host uint64
-		want              uint64
-		ok                bool
-	}{{0, 8, 16, 2, true}, {2, 8, 32, 4, true}, {2, 8, 31, 0, false}, {1 << 30, 8, (1 << 31) - 1, 0, false}, {0, 0, 100, 0, false}, {1 << 63, 1, ^uint64(0), 0, false}} {
-		n, _, e := upolyDirectoryNext(f.old, f.stride, f.host)
-		if f.ok {
-			if e != nil || n != f.want {
-				t.Fatal(f, n, e)
-			}
-		} else if !errors.Is(e, arena.ErrBounds) {
-			t.Fatal(f, n, e)
-		}
-	}
-}

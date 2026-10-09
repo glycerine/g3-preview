@@ -3,7 +3,6 @@ package polynomial
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -93,69 +92,34 @@ func upolyHenselImportedFixture(t *testing.T) (*UPolynomialManager, *UPolynomial
 	return m, prime, lift, donor, pf, lf, service, mustUPolyView(t, m, f), captured, b
 }
 
-func TestUPolynomialHenselImportedBindingFailurePrefixes(t *testing.T) {
-	// Source numerical actions start only after these three actual cold growth
-	// reservations. Successful bindings are retained on subsequent refusal.
-	expected := [][4]uint32{{1, 1, 1, 2}, {2, 2, 2, 2}, {3, 2, 2, 2}}
-	for ordinal, want := range expected {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m, prime, lift, donor, pf, lf, service, f, captured, b := upolyHenselImportedFixture(t)
-			cores := []*UPolynomialManager{m, prime, lift, donor}
-			stores := make([]*UPolynomialCoefficientStore, 4)
-			graph := func() uint64 {
-				var n uint64
-				for i, core := range cores {
-					n += core.Stats().ExclusiveBytes
-					ss, e := stores[i].Stats()
-					if e != nil {
-						t.Fatal(e)
-					}
-					n += ss.TotalBytes
-				}
-				return n
-			}
-			for i, core := range cores {
-				var e error
-				stores[i], e = core.CoefficientStore()
-				if e != nil {
-					t.Fatal(e)
-				}
-			}
-			external := b.Used() - graph()
-			beforePF, beforeLF := pf.Stats(), lf.Stats()
-			beforeNumeric := m.Stats()
-			b.FailAfter(int64(ordinal))
-			err := service.HenselLiftFactors(f, pf, 3, lf)
-			// Inspect actual owner graph before fault disable, formatting or cleanup.
-			if !errors.Is(err, arena.ErrInjectedFailure) {
-				t.Fatal(ordinal, err)
-			}
-			for i, store := range stores {
-				ss, e := store.Stats()
-				if e != nil || ss.Owners != want[i] {
-					t.Fatal("retained cold prefix", ordinal, i, ss, e, want)
-				}
-			}
-			if b.Used() != external+graph() {
-				t.Fatal("once-only physical store graph", ordinal, b.Used(), external+graph())
-			}
-			if pf.Stats() != beforePF || lf.Stats() != beforeLF {
-				t.Fatal("cold refusal changed factor ownership", pf.Stats(), lf.Stats())
-			}
-			immediate := m.Stats()
-			if immediate.IntegerLiveCells != beforeNumeric.IntegerLiveCells {
-				t.Fatal("cold prefix changed numeric roots", immediate, beforeNumeric)
-			}
-			v, e := pf.FactorView(0)
-			if e != nil {
-				t.Fatal(e)
-			}
-			if same, e := prime.EqualViews(captured, v); e != nil || !same {
-				t.Fatal("actual imported backing identity", same, e)
-			}
-			b.FailAfter(-1)
-		})
+func TestUPolynomialHenselNativeBindingsBeforeOwnerFailure(t *testing.T) {
+	m, prime, lift, donor, pf, lf, service, f, captured, b := upolyHenselImportedFixture(t)
+	cores := []*UPolynomialManager{m, prime, lift, donor}
+	wantOwners := []uint32{3, 2, 2, 4}
+	beforePF, beforeLF := pf.Stats(), lf.Stats()
+	b.FailAfter(0)
+	err := service.HenselLiftFactors(f, pf, 3, lf)
+	if !errors.Is(err, arena.ErrInjectedFailure) {
+		t.Fatal("actual Hensel invocation owner allocation", err)
 	}
+	upolyHenselAuditPhysical(t, cores, []*UPolynomialFactors{pf, lf})
+	for i, core := range cores {
+		ss, e := core.store.Stats()
+		if e != nil || ss.Owners != wantOwners[i] || ss.DirectoryBytes != 0 {
+			t.Fatal("native retained bindings", i, ss, e)
+		}
+	}
+	if pf.Stats() != beforePF || lf.Stats() != beforeLF {
+		t.Fatal("first real failure changed factor ownership")
+	}
+	v, e := pf.FactorView(0)
+	if e != nil {
+		t.Fatal(e)
+	}
+	if same, e := prime.EqualViews(captured, v); e != nil || !same {
+		t.Fatal("actual imported backing identity", same, e)
+	}
+	b.FailAfter(-1)
 }
 
 func TestUPolynomialHenselImportedOriginAndCapturedView(t *testing.T) {
@@ -191,8 +155,6 @@ func TestUPolynomialHenselImportedOriginAndCapturedView(t *testing.T) {
 func TestUPolynomialHenselImportedAlgorithmImmediateFailureRoots(t *testing.T) {
 	failures, successes, late := 0, 0, 0
 	firstPrimeRetain := int64(-1)
-	var previousPrimeOwners uint32
-	var previousLiftExclusive uint64
 	previousLiftHadPrime := false
 	for ordinal := int64(0); ordinal < 256; ordinal++ {
 		succeeded := false
@@ -227,28 +189,14 @@ func TestUPolynomialHenselImportedAlgorithmImmediateFailureRoots(t *testing.T) {
 			if e != nil {
 				t.Fatal(e)
 			}
-			liftHasPrime := false
-			liftBindings := testFieldBySourceName(reflect.ValueOf(lift).Elem(), "bindings")
-			primeIdentity := testFieldBySourceName(reflect.ValueOf(prime).Elem(), "store").Pointer()
-			for i := 0; i < liftBindings.Len(); i++ {
-				if testFieldBySourceName(liftBindings.Index(i), "store").Pointer() == primeIdentity {
-					liftHasPrime = true
-				}
-			}
+			liftHasPrime := lift.boundStore(prime.store.origin) == prime.store
 			if firstPrimeRetain < 0 && liftHasPrime {
 				firstPrimeRetain = ordinal
-				field, ok := testTypeFieldBySourceName(reflect.TypeOf(prime).Elem(), "bindings")
-				if !ok {
-					t.Fatal("actual cold directory")
-				}
-				bindingBytes := uint64(field.Type.Elem().Size())
-				if previousLiftHadPrime || ps.Owners < 3 || lift.Stats().ExclusiveBytes != previousLiftExclusive+2*bindingBytes {
-					t.Fatal("actual lifted PRIME binding growth transition", ordinal, previousPrimeOwners, ps, previousLiftExclusive, lift.Stats())
+				if previousLiftHadPrime || ps.Owners < 3 || lift.Stats().DirectoryBytes != 0 {
+					t.Fatal("native lifted PRIME binding transition", ordinal, ps, lift.Stats())
 				}
 			}
-			previousPrimeOwners = ps.Owners
 			previousLiftHadPrime = liftHasPrime
-			previousLiftExclusive = lift.Stats().ExclusiveBytes
 			b.FailAfter(-1)
 			if err == nil {
 				successes++
@@ -267,7 +215,7 @@ func TestUPolynomialHenselImportedAlgorithmImmediateFailureRoots(t *testing.T) {
 		}
 	}
 	if failures < 4 || late == 0 || successes != 1 || firstPrimeRetain < 1 {
-		t.Fatal("must cover cold prefixes, numerical refusals and success", failures, late, successes)
+		t.Fatal("must cover retained bindings, numerical refusals and success", failures, late, successes)
 	}
-	t.Log("actual imported Hensel refusal endpoints", failures, "after cold phase", late, "successes", successes, "actual-read binding refusal ordinal", firstPrimeRetain-1)
+	t.Log("actual imported Hensel refusal endpoints", failures, "with main store retained", late, "successes", successes, "native binding first retained at actual refusal", firstPrimeRetain)
 }

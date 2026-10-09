@@ -31965,3 +31965,45 @@ still current; no new full-module run was needed for this scalar conversion.
 The complete util knot/split goal remains open. Continue with univariate
 coefficient storage and the retained AST/SAT containers and text consumers,
 then break internal util numeric/text/parameter cycles before the package split.
+
+## Native univariate owner and backing directories
+
+Univariate descriptor-page, coefficient-backing and imported-store binding
+directories now grow with native Go slice append. Removed manual directory
+doubling, old/new overlap reservations/refunds, directory/page allocation faults
+and the now-unused directory-capacity arithmetic adapter. Native descriptor pages
+keep state addresses stable for actual borrowed invocation fields. Scalar slot
+and generation guards, explicit imported-store retains, cross-core adoption and
+borrowed coefficient-view provenance remain. Numeric coefficient payloads and
+real service/invocation owners still allocate through their existing backend.
+
+Stats and exact physical audits exclude native directory/page capacity; they
+still count actual numeral roots, coefficient backings and charged cold owners.
+A new test creates 4097 polynomial descriptors under disabled reservations,
+checks recycled generations reject stale owners, then grows 257 backing entries
+while permitting exactly each real coefficient-buffer allocation. It checks every
+independently calculated coefficient. Another test cold/warm binds 33 independent
+stores under disabled Runtime reservations and verifies exact retained owners.
+Native two-way adoption now completes both bindings and swaps actual views under
+disabled reservations, preserving the once-only physical cohort graph.
+
+The obsolete directory-capacity arithmetic test is retired. Two directory-fault
+expectations are replaced by native ownership checks. Hensel imported preflight
+now retains main/prime/lift/donor stores with counts 3/2/2/4 before the first real
+invocation-owner refusal: both the main and lift managers adopt the donor's
+actual factor backing. Later imported Hensel allocation campaigns still check
+actual immediate roots, numeric refusals, captured views and reconstruction;
+they no longer require a fabricated directory-byte growth transition. Existing
+related-manager constructor unwind and physical view invalidation tests remain.
+
+Validation: full native polynomial passed (36.897s); focused g3debug native
+owner/store, imported Hensel, Hensel pair and remove-one-half checks passed
+(0.516s). Module-wide compilation, polynomial vet, portcheck, gofmt and diff
+checks passed. Manifest counts/statuses are unchanged. The 22:43–22:45 UTC full
+native module checkpoint remains current; no new full-module run was needed.
+
+The complete knot/split goal remains open. Univariate coefficient payload
+capacity/growth and initialized-lifetime fields still need conversion; this
+checkpoint removes their surrounding locator-directory allocation machinery,
+not all remaining univariate containers. Then continue retained AST/SAT and
+text consumers and internal util numeric/text/parameter seams before splitting.

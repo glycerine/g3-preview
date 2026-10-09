@@ -105,7 +105,7 @@ func TestUPolynomialStoreIndependentAdoptionTransferAndOldPhysicalViews(t *testi
 		t.Fatal(e)
 	}
 }
-func TestUPolynomialStoreAdoptionFailurePrefixAndCohortGraph(t *testing.T) {
+func TestUPolynomialStoreNativeAdoptionAndCohortGraph(t *testing.T) {
 	m, q, b, limit, coop := upolySourceOwnerServices(t)
 	other := upolyAdoptionOther(t, q, limit, coop)
 	p := upolySourceNew(t, m, []int32{1, 2})
@@ -128,10 +128,9 @@ func TestUPolynomialStoreAdoptionFailurePrefixAndCohortGraph(t *testing.T) {
 		t.Fatal(e)
 	}
 	external := b.Used() - m.Stats().ExclusiveBytes - other.Stats().ExclusiveBytes - baseA.TotalBytes - baseB.TotalBytes
-	b.FailAfter(1)
-	err := m.SwapFrom(p, other, source)
-	if !errors.Is(err, arena.ErrInjectedFailure) {
-		t.Fatal(err)
+	b.FailAfter(0)
+	if e = m.SwapFrom(p, other, source); e != nil {
+		t.Fatal("native binding growth", e)
 	}
 	a, e := sa.Stats()
 	if e != nil {
@@ -141,19 +140,9 @@ func TestUPolynomialStoreAdoptionFailurePrefixAndCohortGraph(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	// First destination binding is retained; second fails before scalar swap.
-	if a.Owners != 1 || bb.Owners != 2 || b.Used() != external+m.Stats().ExclusiveBytes+other.Stats().ExclusiveBytes+a.TotalBytes+bb.TotalBytes {
-		t.Fatal("real cold retained prefix exact graph", a, bb, m.Stats(), other.Stats(), b.Used())
-	}
-	if ok, e := m.EqualViews(av, mustUPolyView(t, m, p)); e != nil || !ok {
-		t.Fatal(ok, e)
-	}
-	if ok, e := other.EqualViews(bv, mustUPolyView(t, other, source)); e != nil || !ok {
-		t.Fatal(ok, e)
-	}
-	b.FailAfter(-1)
-	if e = m.SwapFrom(p, other, source); e != nil {
-		t.Fatal(e)
+	// Both native bindings retain the real stores before the scalar swap.
+	if a.Owners != 2 || bb.Owners != 2 || b.Used() != external+m.Stats().ExclusiveBytes+other.Stats().ExclusiveBytes+a.TotalBytes+bb.TotalBytes {
+		t.Fatal("native adoption exact cohort graph", a, bb, m.Stats(), other.Stats(), b.Used())
 	}
 	if ok, e := m.EqualViews(bv, mustUPolyView(t, m, p)); e != nil || !ok {
 		t.Fatal(ok, e)
@@ -161,6 +150,7 @@ func TestUPolynomialStoreAdoptionFailurePrefixAndCohortGraph(t *testing.T) {
 	if ok, e := other.EqualViews(av, mustUPolyView(t, other, source)); e != nil || !ok {
 		t.Fatal(ok, e)
 	}
+	b.FailAfter(-1)
 }
 func TestUPolynomialStoreRelatedInheritsImportedBindingsAndUnwinds(t *testing.T) {
 	m, q, b, limit, coop := upolySourceOwnerServices(t)

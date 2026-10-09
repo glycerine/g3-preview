@@ -213,14 +213,14 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolyn
 			appendDisplay(f)
 		}
 		appendDisplay(&m.display)
-		n += m.header + m.modular.Header + uint64(cap(m.pages))*uint64(reflect.TypeOf((*upolyDescriptorPage)(nil)).Size()) + uint64(len(m.pages))*uint64(reflect.TypeOf(upolyDescriptorPage{}).Size()) + uint64(cap(m.bindings))*uint64(reflect.TypeOf(upolyStoreBinding{}).Size())
+		n += m.header + m.modular.Header
 		roots = append(roots, &(*m.modular.BorrowModulus()), &m.modular.Lower, &m.modular.Upper, &m.modular.InvTmp1, &m.modular.InvTmp2, &m.modular.InvTmp3, &m.modular.DivTmp)
 		for _, v := range []*upolyVectorState{&m.db, &m.dbab1, &m.dbab2, &m.tr, &m.push, &m.basic, &m.div1, &m.div2, &m.exactDiv, &m.gcd1, &m.gcd2, &m.cra, &m.mgcd[0], &m.mgcd[1], &m.mgcd[2], &m.mgcd[3], &m.mgcd[4], &m.mgcd[5], &m.sqf1, &m.sqf2, &m.pw} {
 			appendState(m, v)
 		}
 		if !stores[m.store] {
 			stores[m.store] = true
-			n += m.store.header + uint64(cap(m.store.backings))*uint64(reflect.TypeOf(upolyBacking{}).Size())
+			n += m.store.header
 			for _, b := range m.store.backings {
 				if b.live {
 					n += uint64(cap(b.values)) * uint64(reflect.TypeOf(util.Int{}).Size())
