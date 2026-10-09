@@ -19,8 +19,7 @@ func TestNumericCallerDivisionUsesCallerStorageAndRejectsExpiredOwner(t *testing
 	var raw IntegerScalarRawScope
 	var h *NumericInvocationHooks
 	var buffers [4]NaturalBufferReceipt
-	var verification *NaturalVerificationScope
-	bufferCalls, verificationCalls := 0, 0
+	bufferCalls := 0
 	h = &NumericInvocationHooks{
 		Roots: func(owner *IntegerManager, local *NumericAllocationRoots) *NumericAllocationRoots {
 			if owner != m || generation != expected || !active {
@@ -47,15 +46,7 @@ func TestNumericCallerDivisionUsesCallerStorageAndRejectsExpiredOwner(t *testing
 		bufferCalls++
 		return &buffers[index]
 	}
-	h.Verification = func(owner *NaturalManager) (*NaturalVerificationScope, error) {
-		if owner != m.Natural {
-			t.Fatal("foreign verification owner")
-		}
-		var e error
-		verification, e = owner.BeginCallerVerification(h)
-		verificationCalls++
-		return verification, e
-	}
+
 	serviceMust(t, m.SetCallerExecutionGuard(func() bool { return active }))
 	ops := m.WithAllocationContext((NumericAllocationContext{}).WithCaller(h))
 	serviceMust(t, ops.Div(&a, &b, &out))
@@ -77,11 +68,8 @@ func TestNumericCallerDivisionUsesCallerStorageAndRejectsExpiredOwner(t *testing
 	for i := range buffers {
 		serviceMust(t, buffers[i].Cleanup())
 	}
-	if verification != nil {
-		serviceMust(t, verification.Cleanup(m.Natural, true))
-	}
-	if bufferCalls == 0 || (modularSourceDebug && verificationCalls == 0) {
-		t.Fatal("caller buffers/verification bypassed", bufferCalls, verificationCalls)
+	if bufferCalls == 0 {
+		t.Fatal("caller buffers/verification bypassed", bufferCalls)
 	}
 	before := integerString(t, m, &out)
 	generation++

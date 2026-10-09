@@ -122,10 +122,7 @@ func (m *MultivariatePolynomialManager) finishToPolynomial(body error) error {
 	if s.bodyCause == nil {
 		s.bodyCause = body
 	}
-	e := m.core.modular.PNormalizeInvocationSourceCause(&s.normalize)
-	if e == nil {
-		e = s.buffer.SourceClose()
-	}
+	e := s.buffer.SourceClose()
 	if e != nil && s.sourceCause == nil {
 		s.sourceCause = e
 	}

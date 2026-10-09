@@ -112,9 +112,6 @@ func (q *upolyOneHalfRootScope) finish(body error) error {
 	}
 	z := q.owner.config.Integer
 	if q.sourceCause == nil {
-		q.sourceCause = q.owner.modular.PNormalizeInvocationSourceCause(&q.normalize)
-	}
-	if q.sourceCause == nil {
 		for q.sourceRemaining != 0 {
 			if _, e := upolynomialSourceNumeralDel(z, &q.values[q.sourceRemaining-1]); e != nil {
 				q.sourceCause = e

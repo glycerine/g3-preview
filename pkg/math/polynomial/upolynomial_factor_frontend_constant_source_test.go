@@ -277,8 +277,8 @@ func TestUPolynomialFactorFrontendErasedFieldSETActualPNPrefixes(t *testing.T) {
 			}
 		})
 	}
-	if !complete || !reached || (polynomialSourceDebug && !failedPN) {
-		t.Fatal("actual field SET PN prefix horizon", complete, reached, failedPN)
+	if !complete || !reached || failedPN {
+		t.Fatal("field SET reaches PN without native verification allocation failures", complete, reached, failedPN)
 	}
 }
 

@@ -28,11 +28,11 @@ type upolyRemoveOneHalfRootScope struct {
 	addMul                                                util.IntegerAddMulInvocationReceipt
 	divisionRaw, extendedRaw                              util.IntegerRawInvocationReceipt
 	buffers                                               [4]util.NaturalBufferReceipt
-	verification                                          util.NaturalVerificationReceipt
-	sourceRemaining, ownRemaining                         uint8
-	active, executing, finishing, ownStarted              bool
-	bodyCause, sourceCause, ownCause                      error
-	history                                               *upolyRemoveOneHalfRootHistory
+
+	sourceRemaining, ownRemaining            uint8
+	active, executing, finishing, ownStarted bool
+	bodyCause, sourceCause, ownCause         error
+	history                                  *upolyRemoveOneHalfRootHistory
 }
 
 // Diagnostics contain issued child tuples, never NUM payload/owning authority.
@@ -50,10 +50,10 @@ type upolyRemoveOneHalfRootHistory struct {
 	assertion                                             upolyOneHalfRootInvocationReceipt
 	addMul                                                util.IntegerAddMulInvocationReceipt
 	divisionRaw, extendedRaw                              util.IntegerRawInvocationReceipt
-	verification                                          util.NaturalVerificationReceipt
-	buffers                                               [4]upolyRemoveOneHalfBufferHistory
-	bodyCause, sourceCause, ownCause                      error
-	sourceRemaining                                       uint8
+
+	buffers                          [4]upolyRemoveOneHalfBufferHistory
+	bodyCause, sourceCause, ownCause error
+	sourceRemaining                  uint8
 }
 
 func (m *UPolynomialManager) removeOneHalfRootExecuting() bool {
@@ -104,7 +104,7 @@ func (q *upolyRemoveOneHalfRootScope) updateHistory() {
 		h.normalize = q.normalize
 		h.divisionRaw = q.divisionRaw
 		h.extendedRaw = q.extendedRaw
-		h.verification = q.verification
+
 		for i, r := range q.buffers {
 			h.buffers[i] = r.Identity()
 		}
@@ -117,7 +117,7 @@ func (q *upolyRemoveOneHalfRootScope) updateHistory() {
 func (q *upolyRemoveOneHalfRootScope) pending() bool {
 	z := q.owner.config.Integer
 	mm := q.owner.modular
-	return (q.failedRowStore != nil && !q.failedRowAcknowledged) || (q.assertion.frame != nil && q.assertion.frame.invocation == q.assertion.invocation && q.assertion.frame.active) || z.MatchesAddMulInvocation(&q.addMul) || q.sourceRemaining != 0 || polynomialNegNumericPending(&q.numeric) || mm.MatchesPNormalizeInvocation(&q.normalize) || z.MatchesRawInvocation(&q.divisionRaw) || z.MatchesRawInvocation(&q.extendedRaw) || z.Naturals().MatchesPNVerification(&q.verification) || q.pendingBuffers()
+	return (q.failedRowStore != nil && !q.failedRowAcknowledged) || (q.assertion.frame != nil && q.assertion.frame.invocation == q.assertion.invocation && q.assertion.frame.active) || z.MatchesAddMulInvocation(&q.addMul) || q.sourceRemaining != 0 || polynomialNegNumericPending(&q.numeric) || mm.MatchesPNormalizeInvocation(&q.normalize) || z.MatchesRawInvocation(&q.divisionRaw) || z.MatchesRawInvocation(&q.extendedRaw) || q.pendingBuffers()
 }
 func (q *upolyRemoveOneHalfRootScope) finish(body error) error {
 	if q.owner == nil || q.owner.self != q.owner || q != &q.owner.removeOneHalfRoot || q.executing || q.finishing {
@@ -129,9 +129,6 @@ func (q *upolyRemoveOneHalfRootScope) finish(body error) error {
 		q.bodyCause = body
 	}
 	z := q.owner.config.Integer
-	if q.sourceCause == nil {
-		q.sourceCause = q.owner.modular.PNormalizeInvocationSourceCause(&q.normalize)
-	}
 	if q.sourceCause == nil && q.assertion.frame != nil && q.assertion.frame.invocation == q.assertion.invocation {
 		q.sourceCause = q.assertion.frame.sourceCause
 	}
@@ -304,7 +301,7 @@ func (q *upolyRemoveOneHalfRootScope) numericChildCause() error {
 			return e
 		}
 	}
-	return z.Naturals().PnVerificationSourceCause(&q.verification)
+	return nil
 }
 func (q *upolyRemoveOneHalfRootScope) cleanupNumericChildren(abort bool) error {
 	z := q.owner.config.Integer
@@ -316,9 +313,7 @@ func (q *upolyRemoveOneHalfRootScope) cleanupNumericChildren(abort bool) error {
 			return e
 		}
 	}
-	if e := z.Naturals().CleanupPNVerification(&q.verification, abort); e != nil {
-		return e
-	}
+
 	if abort {
 		for i := len(q.buffers) - 1; i >= 0; i-- {
 			if e := q.buffers[i].Cleanup(); e != nil {
@@ -354,9 +349,6 @@ func (q *upolyRemoveOneHalfRootScope) finishAmSource(body error) error {
 	}
 	q.finishing = true
 	defer func() { q.finishing = false; q.updateHistory() }()
-	if q.sourceCause == nil {
-		q.sourceCause = q.owner.modular.PNormalizeInvocationSourceCause(&q.normalize)
-	}
 	if q.sourceCause == nil {
 		q.sourceCause = q.numericChildCause()
 	}

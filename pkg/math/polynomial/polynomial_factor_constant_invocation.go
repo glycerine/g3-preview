@@ -117,12 +117,6 @@ func (f *PolynomialFactors) finishFactorConstantSource() error {
 	}
 	s.finishing = true
 	defer func() { s.finishing = false; f.updateFactorConstantHistory() }()
-	for i := len(s.normalize) - 1; i >= 0; i-- {
-		if e := f.manager.core.modular.PNormalizeInvocationSourceCause(&s.normalize[i]); e != nil {
-			s.sourceCause = e
-			return e
-		}
-	}
 	if s.localConstructed {
 		if _, e := upolynomialSourceNumeralDel(f.manager.core.integer, &f.local); e != nil {
 			s.sourceCause = e

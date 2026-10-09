@@ -5,14 +5,14 @@ package util
 // Actual lexical NUM storage is reflected in the MPF owner header. Declaration
 // flags change only at literal reached constructors; sticky is branch-scoped.
 type ArbitraryFloatRoundScope struct {
-	parentFormattedSet                                  integerAllocationInvocationContext
-	receipt                                             *ArbitraryFloatRoundReceipt
-	Numeric                                             NumericAllocationRoots
-	history                                             *arbitraryFloatRoundHistory
-	Transferred                                         SmallAllocatorPendingAllocation
-	cellRetired                                         bool
-	buffers                                             [4]naturalPNBufferReceipt
-	verification                                        naturalPNVerificationReceipt
+	parentFormattedSet integerAllocationInvocationContext
+	receipt            *ArbitraryFloatRoundReceipt
+	Numeric            NumericAllocationRoots
+	history            *arbitraryFloatRoundHistory
+	Transferred        SmallAllocatorPendingAllocation
+	cellRetired        bool
+	buffers            [4]naturalPNBufferReceipt
+
 	Manager                                             *ArbitraryFloatManager
 	Invocation                                          uint64
 	sigma, cap, sticky                                  Int
@@ -42,10 +42,6 @@ func (m *ArbitraryFloatManager) finishRoundScopeSource(s *ArbitraryFloatRoundSco
 	}
 	s.finishing = true
 	defer func() { s.finishing = false; s.recordRoundHistory() }()
-	if e := m.integer.Natural.PnVerificationSourceCause(&s.verification); e != nil {
-		s.sourceCause = e
-		return e
-	}
 
 	for _, a := range []struct {
 		v           *Int
@@ -65,9 +61,7 @@ func (m *ArbitraryFloatManager) finishRoundScopeSource(s *ArbitraryFloatRoundSco
 			s.active = true
 		}
 	}
-	if m.integer.Natural.MatchesPNVerification(&s.verification) {
-		s.active = true
-	}
+
 	if !s.active && s.history != nil {
 		s.history.owned = true
 	}
@@ -128,12 +122,6 @@ func (m *ArbitraryFloatManager) cleanupRoundScope(s *ArbitraryFloatRoundScope, r
 	}
 	s.finishing = true
 	defer func() { s.finishing = false; s.recordRoundHistory() }()
-	if e := m.integer.Natural.CleanupPNVerification(&s.verification, false); e != nil {
-		if s.ownCause == nil {
-			s.ownCause = e
-		}
-		return e
-	}
 
 	for _, a := range []struct {
 		v           *Int
@@ -153,12 +141,7 @@ func (m *ArbitraryFloatManager) cleanupRoundScope(s *ArbitraryFloatRoundScope, r
 	if !abort {
 		return nil
 	}
-	if e := m.integer.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		if s.ownCause == nil {
-			s.ownCause = e
-		}
-		return e
-	}
+
 	for i := len(s.buffers) - 1; i >= 0; i-- {
 		if e := s.buffers[i].cleanup(); e != nil {
 			if s.ownCause == nil {

@@ -2,13 +2,13 @@
 package util
 
 type arbitraryFloatFMAScope struct {
-	manager                                                         *ArbitraryFloatManager
-	invocation                                                      uint64
-	hooks                                                           NumericInvocationHooks
-	integerBinding, naturalBinding                                  NumericCallerBinding
-	numeric                                                         NumericAllocationRoots
-	buffers                                                         [4]NaturalBufferReceipt
-	verification                                                    naturalPNVerificationReceipt
+	manager                        *ArbitraryFloatManager
+	invocation                     uint64
+	hooks                          NumericInvocationHooks
+	integerBinding, naturalBinding NumericCallerBinding
+	numeric                        NumericAllocationRoots
+	buffers                        [4]NaturalBufferReceipt
+
 	copyA, copyB, copyC, copyRes                                    ArbitraryFloatValueCopyReceipt
 	roundFrame                                                      *ArbitraryFloatRoundScope
 	roundInvocation                                                 uint64
@@ -47,17 +47,7 @@ func (s *arbitraryFloatFMAScope) NumericBuffer(n *NaturalManager, index int) *Na
 	}
 	return &s.buffers[index]
 }
-func (s *arbitraryFloatFMAScope) NumericVerification(n *NaturalManager) (*NaturalVerificationScope, error) {
-	if !s.NumericBound(true) || n != s.manager.integer.Natural {
-		return nil, ErrNumericOwner
-	}
-	f, e := n.BeginCallerVerification(&s.hooks)
-	if e != nil {
-		return nil, e
-	}
-	s.verification = naturalPNVerificationReceipt{n, f, f.invocation}
-	return f, nil
-}
+
 func (s *arbitraryFloatFMAScope) context() integerAllocationInvocationContext {
 	return integerAllocationInvocationContext{Caller: &s.hooks}
 }
@@ -106,10 +96,7 @@ func (m *ArbitraryFloatManager) finishFMASource() error {
 			return s.sourceCause
 		}
 	}
-	if e := m.integer.Natural.PnVerificationSourceCause(&s.verification); e != nil {
-		s.sourceCause = e
-		return e
-	}
+
 	for _, local := range [...]struct {
 		value *Int
 		live  *bool
@@ -125,7 +112,7 @@ func (m *ArbitraryFloatManager) finishFMASource() error {
 			}
 		}
 	}
-	s.active = s.bodyCause != nil || NumericAllocationPending(&s.numeric) || m.integer.Natural.MatchesPNVerification(&s.verification) || s.roundFrame != nil && s.roundFrame.active
+	s.active = s.bodyCause != nil || NumericAllocationPending(&s.numeric) || s.roundFrame != nil && s.roundFrame.active
 	for i := range s.buffers {
 		s.active = s.active || s.buffers[i].PendingField != (Block{})
 	}
@@ -160,9 +147,7 @@ func (m *ArbitraryFloatManager) CleanupFMA() (cause error) {
 			return e
 		}
 	}
-	if e := z.Natural.CleanupPNVerification(&s.verification, false); e != nil {
-		return e
-	}
+
 	if e := m.CleanupValueCopy(&s.copyRes, false); e != nil {
 		return e
 	}
@@ -198,9 +183,7 @@ func (m *ArbitraryFloatManager) CleanupFMA() (cause error) {
 	if e := m.CleanupValueCopy(&s.copyA, true); e != nil {
 		return e
 	}
-	if e := z.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	for i := len(s.buffers) - 1; i >= 0; i-- {
 		if e := s.buffers[i].Cleanup(); e != nil {
 			return e

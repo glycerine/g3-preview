@@ -8,14 +8,14 @@ type arbitraryFloatSBVScope struct {
 	integerBinding, naturalBinding NumericCallerBinding
 	numeric                        NumericAllocationRoots
 	buffers                        [4]NaturalBufferReceipt
-	verification                   naturalPNVerificationReceipt
-	copyA                          ArbitraryFloatValueCopyReceipt
-	a                              ArbitraryFloat
-	z                              Int
-	copyZ, outputCopy              integerCopyAllocationReceipt
-	aLive, zLive                   bool
-	active, executing, finishing   bool
-	bodyCause, sourceCause         error
+
+	copyA                        ArbitraryFloatValueCopyReceipt
+	a                            ArbitraryFloat
+	z                            Int
+	copyZ, outputCopy            integerCopyAllocationReceipt
+	aLive, zLive                 bool
+	active, executing, finishing bool
+	bodyCause, sourceCause       error
 }
 
 func (s *arbitraryFloatSBVScope) valid() bool {
@@ -45,17 +45,7 @@ func (s *arbitraryFloatSBVScope) NumericBuffer(n *NaturalManager, index int) *Na
 	}
 	return &s.buffers[index]
 }
-func (s *arbitraryFloatSBVScope) NumericVerification(n *NaturalManager) (*NaturalVerificationScope, error) {
-	if !s.NumericBound(true) || n != s.manager.integer.Natural {
-		return nil, ErrNumericOwner
-	}
-	f, e := n.BeginCallerVerification(&s.hooks)
-	if e != nil {
-		return nil, e
-	}
-	s.verification = naturalPNVerificationReceipt{n, f, f.invocation}
-	return f, nil
-}
+
 func (s *arbitraryFloatSBVScope) context() integerAllocationInvocationContext {
 	return integerAllocationInvocationContext{Caller: &s.hooks}
 }
@@ -88,10 +78,7 @@ func (m *ArbitraryFloatManager) finishSBVSource() error {
 	}
 	s.finishing = true
 	defer func() { s.finishing = false }()
-	if e := m.integer.Natural.PnVerificationSourceCause(&s.verification); e != nil {
-		s.sourceCause = e
-		return e
-	}
+
 	for _, local := range [...]struct {
 		value *Int
 		live  *bool
@@ -104,7 +91,7 @@ func (m *ArbitraryFloatManager) finishSBVSource() error {
 			*local.live = false
 		}
 	}
-	s.active = s.bodyCause != nil || NumericAllocationPending(&s.numeric) || m.integer.Natural.MatchesPNVerification(&s.verification)
+	s.active = s.bodyCause != nil || NumericAllocationPending(&s.numeric)
 	for i := range s.buffers {
 		s.active = s.active || s.buffers[i].PendingField != (Block{})
 	}
@@ -131,9 +118,7 @@ func (m *ArbitraryFloatManager) CleanupToSBVMPQ() (cause error) {
 	s.finishing = true
 	defer func() { s.finishing = false; cause = JoinNumericErrors(cause, s.unbind()) }()
 	z := m.integer
-	if e := z.Natural.CleanupPNVerification(&s.verification, false); e != nil {
-		return e
-	}
+
 	if e := m.CleanupValueCopy(&s.copyA, false); e != nil {
 		return e
 	}
@@ -157,9 +142,7 @@ func (m *ArbitraryFloatManager) CleanupToSBVMPQ() (cause error) {
 	if e := m.CleanupValueCopy(&s.copyA, true); e != nil {
 		return e
 	}
-	if e := z.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	for i := len(s.buffers) - 1; i >= 0; i-- {
 		if e := s.buffers[i].Cleanup(); e != nil {
 			return e

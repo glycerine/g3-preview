@@ -96,7 +96,7 @@ func TestUPolynomialFactorRetainedLexicalCleanup(t *testing.T) {
 				// These are already recorded real acquisition fields, not
 				// inferred ownership from Stats or graph cardinality.
 				actualRoots := !testFieldBySourceName(step, "numeric").IsZero()
-				for _, name := range []string{"divisionRaw", "extendedRaw", "gcdRaw", "boolNumeral", "addMul", "verification"} {
+				for _, name := range []string{"divisionRaw", "extendedRaw", "gcdRaw", "boolNumeral", "addMul"} {
 					frame := testFieldBySourceName(testFieldBySourceName(step, name), "frame")
 					if !frame.IsNil() && testFieldBySourceName(frame.Elem(), "active").Bool() {
 						actualRoots = true

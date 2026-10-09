@@ -19,16 +19,16 @@ type polynomialDividesScope struct {
 	normalize                util.IntegerNormalizeInvocationReceipt
 	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
 	buffers                  [4]util.NaturalBufferReceipt
-	verification             util.NaturalVerificationReceipt
-	directReceipt            polynomialDividesInvocationReceipt
-	monomial                 polynomialDivisionReference
-	numeral                  util.Int
-	numeric                  polynomialNumericRoots
-	active                   bool
-	stage, ownStage          uint8
-	ownStarted               bool
-	sourceCause              error
-	bodyCause, cleanupCause  error
+
+	directReceipt           polynomialDividesInvocationReceipt
+	monomial                polynomialDivisionReference
+	numeral                 util.Int
+	numeric                 polynomialNumericRoots
+	active                  bool
+	stage, ownStage         uint8
+	ownStarted              bool
+	sourceCause             error
+	bodyCause, cleanupCause error
 }
 
 func (m *MultivariatePolynomialCore) dividesChildSourceCause(s *polynomialDividesScope) error {

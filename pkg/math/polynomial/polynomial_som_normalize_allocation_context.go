@@ -19,8 +19,8 @@ type polynomialSOMNormalizeScope struct {
 	normalize                              util.IntegerNormalizeInvocationReceipt
 	gcdRaw, divisionRaw, extendedRaw       util.IntegerRawInvocationReceipt
 	buffers                                [4]util.NaturalBufferReceipt
-	verification                           util.NaturalVerificationReceipt
-	sourceCause, ownCause                  error
+
+	sourceCause, ownCause error
 }
 
 // Both persistent imp members and the actual separately charged source SOM
@@ -97,9 +97,7 @@ func numericIntegerManager_somNormalizeNumericSourceCause(m *util.IntegerManager
 		return nil
 	}
 	s := r.frame
-	if e := r.manager.modular.PNormalizeInvocationSourceCause(&s.normalize); e != nil {
-		return e
-	}
+
 	if e := m.RawInvocationSourceCause(&s.extendedRaw); e != nil {
 		return e
 	}
@@ -109,7 +107,7 @@ func numericIntegerManager_somNormalizeNumericSourceCause(m *util.IntegerManager
 	if e := m.RawInvocationSourceCause(&s.gcdRaw); e != nil {
 		return e
 	}
-	return m.Naturals().PnVerificationSourceCause(&s.verification)
+	return nil
 }
 func numericIntegerManager_cleanupSOMNormalizationNumeric(m *util.IntegerManager, r *polynomialSOMNormalizeInvocationReceipt, abort bool) error {
 	if r == nil || r.manager == nil || !r.manager.hasSOMNormalizeInvocationHistory(r) || r.manager.integer != m {
@@ -131,9 +129,7 @@ func numericIntegerManager_cleanupSOMNormalizationNumeric(m *util.IntegerManager
 	if e := m.CleanupRawInvocation(&s.gcdRaw, abort); e != nil {
 		return e
 	}
-	if e := m.Naturals().CleanupPNVerification(&s.verification, abort); e != nil {
-		return e
-	}
+
 	if abort {
 		for i := len(s.buffers) - 1; i >= 0; i-- {
 			if e := s.buffers[i].Cleanup(); e != nil {

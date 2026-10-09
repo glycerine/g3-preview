@@ -275,9 +275,6 @@ func (m *MultivariatePolynomialCore) constantCoefficientWithReceipt(p Polynomial
 		*frame = polynomialConstantCoefficientScope{active: true, executing: true, invocation: frame.invocation + 1}
 		*receipt = polynomialConstantCoefficientInvocationReceipt{m, frame, frame.invocation}
 		defer func() {
-			if frame.sourceCause == nil {
-				frame.sourceCause = m.modular.PNormalizeInvocationSourceCause(&frame.normalize)
-			}
 			frame.executing = false
 			if !m.integer.MatchesCopyAllocationInvocation(&frame.copy) && !m.modular.MatchesPNormalizeInvocation(&frame.normalize) {
 				frame.active = false

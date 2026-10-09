@@ -1210,8 +1210,8 @@ Formatting scratch no longer uses `SourceLimbBuffer`, inline16 growth policy,
 Runtime blocks, initialized-byte maps, or partial C++ constructor/destructor
 allocation states. Warm integer/rational and full-precision float formatting
 require zero Go allocations and zero Runtime allocation events. The remaining
-`SourceLimbBuffer` users are division and checked verification; those buffers
-still have real allocation/failure ownership and are a separate next boundary.
+`SourceLimbBuffer` users are now only division (checked verification was removed
+in the next chunk below); those buffers retain real allocation/failure ownership.
 Polynomial and AST physical-root test helpers count only those remaining blocks.
 
 Downstream fault tests tied exclusively to removed scratch allocations are
@@ -1222,3 +1222,21 @@ clean frame teardown; general visitor mark/history regression coverage remains.
 Validation: full native util/AST, focused native polynomial display,
 checked/debug affected features, module-wide compilation, affected-package vet,
 and portcheck passed.
+
+## Native checked division verification
+
+`mpn_source_verify.go` now performs the original checked multiply/add comparison
+using a reusable `[]uint32`. It clears the requested span on entry and truncates
+it on every return, including an arithmetic assertion. Owning close releases
+capacity. Cold scratch growth and warm verification do not enter Runtime;
+warmed calls allocate nothing.
+
+The verification holder/receipt types, primitive caller capability, private
+buffer branches and polynomial/MPF/MPQ cleanup plumbing are gone. Normalization's
+source-cause accessor was used only for that buffer destructor and is also gone.
+Tests requiring verification allocation/release refusal are retired; real
+integer/RAW and division allocation failure coverage remains. New tests cover
+sizes crossing the former inline boundary, assertion cleanup, reuse and close.
+
+`SourceLimbBuffer` now serves only the four division buffers. Removing their
+Runtime allocation/receipt machinery remains the next MPN storage boundary.

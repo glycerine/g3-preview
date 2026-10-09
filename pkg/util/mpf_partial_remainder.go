@@ -81,10 +81,7 @@ func (s *arbitraryFloatPartialRemainderScope) endNumeral(index int) error {
 	if !s.live[index] {
 		return nil
 	}
-	if e := s.manager.integer.Natural.PnVerificationSourceCause(&s.verification); e != nil {
-		s.sourceCause = e
-		return e
-	}
+
 	if _, e := SourceNumeralDel(s.manager.integer, &s.values[index]); e != nil {
 		s.sourceCause = e
 		return e

@@ -76,9 +76,6 @@ func (s *UPolynomialFactorizationService) finishPrimeTrialVectorSource(r *upolyP
 	if q.bodyCause == nil {
 		q.bodyCause = body
 	}
-	if q.sourceCause == nil {
-		q.sourceCause = q.zp.modular.PNormalizeInvocationSourceCause(&q.normalize)
-	}
 	if q.sourceCause != nil {
 		return errors.Join(q.bodyCause, q.sourceCause)
 	}
@@ -247,9 +244,7 @@ func (s *UPolynomialFactorizationService) finishPrimeTrialSource(r *upolyPrimeTr
 	if q.sourceEnded || q.sourceCause != nil {
 		return errors.Join(q.bodyCause, q.sourceCause)
 	}
-	if q.sourceCause = q.zp.modular.PNormalizeInvocationSourceCause(&q.normalize); q.sourceCause != nil {
-		return errors.Join(q.bodyCause, q.sourceCause)
-	}
+
 	if q.degreesStarted {
 		q.degrees.close(q.zp.config.Integer.Budget())
 		q.degreesStarted = false

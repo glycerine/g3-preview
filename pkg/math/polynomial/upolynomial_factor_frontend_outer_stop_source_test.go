@@ -116,13 +116,12 @@ func TestUPolynomialFactorFrontendActualOuterVectorSourceStop(t *testing.T) {
 		}
 	}
 	q := &s.frontend
-	t.Logf("body=%v source=%v constructed=%d image=%v/%v modGCD=%v/%d verification=%+v", body, q.sourceCause, q.constructed, q.image.classConstructed, q.image.savedConstructed, q.modularGCD.executing, q.modularGCD.constructed, q.verification)
+	t.Logf("body=%v source=%v constructed=%d image=%v/%v modGCD=%v/%d", body, q.sourceCause, q.constructed, q.image.classConstructed, q.image.savedConstructed, q.modularGCD.executing, q.modularGCD.constructed)
 	if body == nil || q.sourceCause == nil || !q.active {
 		t.Fatal("actual reached source stop missing", body, q.sourceCause, q.active)
 	}
-	childCause := z.Integers().Naturals().PnVerificationSourceCause(&q.verification)
-	if childCause != nil || m.modular.PNormalizeInvocationSourceCause(&q.normalize) != nil || q.image.sourceCause != nil || q.modularGCD.sourceCause != nil || q.sourceStoppedStage != 3 || q.constructed != 3 {
-		t.Fatal("real outer prime vector frontier after completed younger child DT", childCause, q.sourceStoppedStage, q.constructed)
+	if q.image.sourceCause != nil || q.modularGCD.sourceCause != nil || q.sourceStoppedStage != 3 || q.constructed != 3 {
+		t.Fatal("real outer prime vector frontier after completed younger child DT", q.sourceStoppedStage, q.constructed)
 	}
 	original, cause, receipt := body, q.sourceCause, q.receipt
 	count, stage, state := q.constructed, q.sourceStoppedStage, rt.State()

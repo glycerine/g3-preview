@@ -55,11 +55,6 @@ func (q *upolyRecombinationTrialScope) managers() [2]*UPolynomialManager {
 }
 func (q *upolyRecombinationTrialScope) childCause() error {
 	z := q.owner.manager.config.Integer
-	for i, m := range q.managers() {
-		if e := m.modular.PNormalizeInvocationSourceCause(&q.normalize[i]); e != nil {
-			return e
-		}
-	}
 	if e := z.DividesNumeralInvocationSourceCause(&q.boolNumeral); e != nil {
 		return e
 	}

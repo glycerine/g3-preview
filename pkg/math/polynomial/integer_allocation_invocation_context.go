@@ -328,7 +328,7 @@ func numericIntegerModularManager_normalizeWithArithmeticReceipt(m *util.Integer
 	}
 	e := m.PNormalizeWithReceipt(out, &r.frame.normalize)
 	if r.frame.sourceCause == nil {
-		r.frame.sourceCause = m.PNormalizeInvocationSourceCause(&r.frame.normalize)
+		r.frame.sourceCause = nil
 	}
 	return e
 }

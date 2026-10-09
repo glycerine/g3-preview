@@ -69,9 +69,7 @@ func numericIntegerManager_normalizationNumericSourceCause(m *util.IntegerManage
 		return nil
 	}
 	s := r.frame
-	if e := r.manager.core.modular.PNormalizeInvocationSourceCause(&s.normalize); e != nil {
-		return e
-	}
+
 	if e := m.RawInvocationSourceCause(&s.extendedRaw); e != nil {
 		return e
 	}
@@ -81,7 +79,7 @@ func numericIntegerManager_normalizationNumericSourceCause(m *util.IntegerManage
 	if e := m.RawInvocationSourceCause(&s.gcdRaw); e != nil {
 		return e
 	}
-	return m.Naturals().PnVerificationSourceCause(&s.verification)
+	return nil
 }
 func numericIntegerManager_cleanupNormalizationNumeric(m *util.IntegerManager, r *polynomialNormalizeInvocationReceipt, abort bool) error {
 	if r == nil || r.manager == nil || !r.manager.hasNormalizeInvocationHistory(r) || r.manager.core.integer != m {
@@ -103,9 +101,7 @@ func numericIntegerManager_cleanupNormalizationNumeric(m *util.IntegerManager, r
 	if e := m.CleanupRawInvocation(&s.gcdRaw, abort); e != nil {
 		return e
 	}
-	if e := m.Naturals().CleanupPNVerification(&s.verification, abort); e != nil {
-		return e
-	}
+
 	if abort {
 		for i := len(s.buffers) - 1; i >= 0; i-- {
 			if e := s.buffers[i].Cleanup(); e != nil {

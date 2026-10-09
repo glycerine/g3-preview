@@ -61,8 +61,8 @@ func (v limbView) write(i, n uint32) {
 // panic. len(a)>=len(b), the denominator is normalized/nonzero, q has
 // len(a)-len(b)+1 limbs, and r has len(b). Neither output overlaps an input
 // or the other output. The integer manager stages its own permitted aliases.
-// Source completed output prefixes remain visible when later scratch or debug
-// lexical verification allocations fail.
+// Division scratch preserves source allocation order. Checked verification
+// uses a reusable native slice after quotient and remainder publication.
 func (m *NaturalManager) Div(a, b, q, r []uint32) (bool, error) {
 	if len(b) == 0 || len(a) < len(b) || b[len(b)-1] == 0 || len(q) != len(a)-len(b)+1 || len(r) != len(b) {
 		panic("mpnum: invalid division operands or buffers")
@@ -114,14 +114,14 @@ func (m *NaturalManager) divideWithAllocationContext(a, b, q, r limbView, contex
 	if na == 1 && nb == 1 {
 		q.write(0, a.read(0)/b.read(0))
 		r.write(0, a.read(0)%b.read(0))
-		return false, m.sourceVerifyDivisionWithAllocationContext(a, b, q, r, context)
+		return false, m.sourceVerifyDivision(a, b, q, r)
 	}
 	if na == nb && a.read(na-1) < b.read(nb-1) {
 		q.write(0, 0)
 		for i := uint32(0); i < nb; i++ {
 			r.write(i, a.read(i))
 		}
-		return false, m.sourceVerifyDivisionWithAllocationContext(a, b, q, r, context)
+		return false, m.sourceVerifyDivision(a, b, q, r)
 	}
 	if na == math.MaxUint32 {
 		return false, arena.ErrBounds
@@ -174,7 +174,7 @@ func (m *NaturalManager) divideWithAllocationContext(a, b, q, r limbView, contex
 		}
 		r.write(nb-1, m.sourceDivRead(u, nb-1)>>d)
 	}
-	return true, m.sourceVerifyDivisionWithAllocationContext(a, b, q, r, context)
+	return true, m.sourceVerifyDivision(a, b, q, r)
 }
 func divideViewOne(a limbView, b uint32, q limbView) {
 	denom := uint64(b)

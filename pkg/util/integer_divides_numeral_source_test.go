@@ -160,7 +160,7 @@ func TestIntegerDividesScopedNUMSourceDTAndImmutableHistory(t *testing.T) {
 	s := &m.DividesNumeral
 	r := s.Receipt
 	if returned == nil || !errors.Is(returned, arena.ErrBounds) || result || s.sourceCause == nil || s.BodyCause != nil {
-		t.Fatal("literal completed Rem then scoped NUM DT stop", result, returned, s.BodyCause, s.sourceCause, "verification", m.Natural.VerificationInvocation.Constructed, m.Natural.VerificationInvocation.SourceCause, m.Natural.VerificationInvocation.active, "num", s.Ended, s.Numeral)
+		t.Fatal("literal completed Rem then scoped NUM DT stop", result, returned, s.BodyCause, s.sourceCause, "num", s.Ended, s.Numeral)
 	}
 	captured, source := returned.Error(), s.sourceCause
 	integerPhysicalAuditWithRaw(t, m, []Block{lane}, &a, &d, &s.Numeral)

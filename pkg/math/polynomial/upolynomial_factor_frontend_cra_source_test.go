@@ -30,9 +30,7 @@ func TestUPolynomialFactorFrontendActualCRAConstructorFrontiers(t *testing.T) {
 	_, e = s.Factor(m.stateView(&input), fs, DefaultUPolynomialFactorParams())
 	serviceMust(t, e)
 	q := &s.frontend.cra
-	if polynomialSourceDebug && s.frontend.verification.Invocation == 0 {
-		t.Fatal("actual positive CRA division private verification child was not captured")
-	}
+
 	if s.frontend.primitive.invocation == 0 {
 		t.Fatal("actual modular candidate primitive scoped cont not bound")
 	}

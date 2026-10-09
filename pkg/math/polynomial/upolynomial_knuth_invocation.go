@@ -110,9 +110,6 @@ func (q *upolyKnuthScope) finish(body error) error {
 	if q.bodyCause == nil {
 		q.bodyCause = body
 	}
-	if q.sourceCause == nil {
-		q.sourceCause = q.owner.modular.PNormalizeInvocationSourceCause(&q.normalize)
-	}
 	if !q.pending() {
 		q.active = false
 	}

@@ -193,9 +193,8 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 		s.BodyCause = err
 		if child := m.AddMulInvocationSourceCause(&s.AddMul); child != nil {
 			s.sourceCause = child
-		} else if child := m.Natural.PnVerificationSourceCause(&s.verification); child != nil {
-			s.sourceCause = child
 		}
+
 		if err == nil {
 			s.BodySucceeded = true
 			err = m.finishRawSource(s)

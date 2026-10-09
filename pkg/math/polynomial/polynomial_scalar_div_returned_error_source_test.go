@@ -5,7 +5,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -58,21 +57,7 @@ func TestScalarDivDirectStoppedReturnedCauseSurvivesOwnAndNewInvocation(t *testi
 	if !errors.Is(returned, arena.ErrBounds) {
 		t.Fatal("actual source error missing", returned)
 	}
-	if util.SourceExtendedGCDDebug {
-		v := &c.integer.Naturals().VerificationInvocation
-		if !c.integer.Naturals().MatchesPNVerification(&s.verification) || v.Constructed || v.Buffer.PendingField == (util.Block{}) || s.sourceCause != nil || !errors.Is(s.bodyCause, arena.ErrBounds) {
-			t.Fatal("actual failed younger verification ctor prefix", v, s.bodyCause, s.sourceCause)
-		}
-		original := v.Buffer
-		copied := original
-		if copied.Bound(false) {
-			t.Fatal("copied private buffer acquired actual cleanup authority")
-		}
-		serviceMust(t, copied.Cleanup())
-		if !reflect.DeepEqual(original, v.Buffer) || !reflect.DeepEqual(original, copied) {
-			t.Fatal("copied private buffer changed actual pending owner")
-		}
-	} else if s.sourceCause == nil {
+	if s.sourceCause == nil {
 		t.Fatal("actual reached older NUM source DT stop missing", returned, s.sourceCause)
 	}
 	t.Log("actual stop", "NUM", s.a, "tmp", c.integer.Tmp, "cheap", c.cheap.as, c.cheap.ms, "pending", c.pending, "factory", c.factoryInvocation)

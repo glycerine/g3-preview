@@ -6,134 +6,26 @@ import (
 )
 
 // sourceVerifyDivision is the source Z3DEBUG lexical temp, after both outputs.
-// The embedded charged holder retains a failed lexical construction/destruction
-// only for explicit Go owning cleanup. Successful calls destroy it immediately;
-// its allocation is never reused as source manager scratch.
+// A concrete Go slice holds q*b+r. It is cleared on entry and truncated on
+// every return, including an assertion failure; no allocator receipt is needed.
 
 func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
-	return m.sourceVerifyDivisionWithPNReceipt(a, b, q, r, nil)
-}
-func (m *NaturalManager) sourceVerifyDivisionWithPNReceipt(a, b, q, r limbView, pn *integerPNormalizeScope) (err error) {
-	return m.sourceVerifyDivisionWithAllocationContext(a, b, q, r, pnAllocationContext(pn))
-}
-func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r limbView, context integerAllocationInvocationContext) (err error) {
 
 	if !modularSourceDebug {
 		return nil
 	}
-	// Guard reuse of this retained lexical holder only when the source reaches
-	// its constructor, after the quotient and remainder have been published.
-	if m.VerificationActive {
-		return arena.ErrInvalidSlot
+	if a.size == ^uint32(0) {
+		return arena.ErrBounds
 	}
-	pn := context.pn
-	var frame *naturalPNVerificationScope
-	if !context.hasLocalInvocation() && context.Caller != nil && context.Caller.hasVerification() {
-		var e error
-		frame, e = context.Caller.callVerification(m)
-		if e != nil {
-			return e
-		}
-		if frame == nil || frame != &m.VerificationInvocation {
-			return ErrNumericOwner
-		}
-		defer func() { frame.executing = false }()
+	size := a.size + 1
+	if uint64(cap(m.verificationScratch)) < uint64(size) {
+		m.verificationScratch = make([]uint32, size)
+	} else {
+		m.verificationScratch = m.verificationScratch[:size]
+		clear(m.verificationScratch)
 	}
-
-	if r := context.BoolDivides; r != nil && r.Manager != nil && r.Manager.Natural == m && r.Manager.dividesNumeralContextRoots(context) != nil {
-		frame = &m.VerificationInvocation
-		if frame.active || frame.invocation == ^uint64(0) {
-			return ErrNumericPending
-		}
-		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, boolDivides: *r}
-		frame.Buffer = naturalPNBufferReceipt{Owner: m, BoolDivides: *r, Invocation: r.Invocation, Buffer: &m.Verification, private: true}
-		r.Frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
-		defer func() { frame.executing = false }()
-	}
-	if context.raw == nil && pn != nil && pn.owner != nil && pn.owner.manager.Natural == m && pn == &pn.owner.Normalization && pn.active && pn.executing {
-		frame = &m.VerificationInvocation
-		if frame.active || frame.invocation == ^uint64(0) {
-			return ErrNumericPending
-		}
-		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, parent: pn}
-		frame.Buffer = naturalPNBufferReceipt{Owner: m, context: pn, Invocation: pn.invocation, Buffer: &m.Verification, stage: pn.Stage, private: true}
-		pn.Verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
-		defer func() { frame.executing = false }()
-	}
-
-	if r := context.raw; r != nil && r.Manager != nil && r.Manager.Natural == m && context.rawReceipt(r.Manager) != nil {
-		frame = &m.VerificationInvocation
-		if frame.active || frame.invocation == ^uint64(0) {
-			return ErrNumericPending
-		}
-		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, raw: *r}
-		frame.Buffer = naturalPNBufferReceipt{Owner: m, raw: *r, Invocation: r.Invocation, Buffer: &m.Verification, private: true}
-		r.Frame.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
-		defer func() { frame.executing = false }()
-	}
-
-	if context.raw == nil && context.mpfFormat != nil {
-		q := context.formatFrame(context.mpfFormat.manager.integer, true)
-		if q == nil || q.manager.integer.Natural != m {
-			return ErrNumericOwner
-		}
-		frame = &m.VerificationInvocation
-		if frame.active || frame.invocation == ^uint64(0) {
-			return ErrNumericPending
-		}
-		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, formatContext: context}
-		frame.Buffer = naturalPNBufferReceipt{Owner: m, formatContext: context, Invocation: q.invocation, Buffer: &m.Verification, private: true}
-		receipt := naturalPNVerificationReceipt{m, frame, frame.invocation}
-		if context.formatDecimal != nil {
-			context.formatDecimal.verification = receipt
-		} else {
-			q.verification = receipt
-		}
-		defer func() { frame.executing = false }()
-	}
-
-	if context.raw == nil && context.mpfRationalSet != nil {
-		s := context.rationalSetFrame(context.mpfRationalSet.manager.integer, true)
-		if s == nil || s.manager.integer.Natural != m {
-			return ErrNumericOwner
-		}
-		frame = &m.VerificationInvocation
-		if frame.active || frame.invocation == ^uint64(0) {
-			return ErrNumericPending
-		}
-		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, rationalSetContext: context}
-		frame.Buffer = naturalPNBufferReceipt{Owner: m, rationalSetContext: context, Invocation: s.invocation, Buffer: &m.Verification, private: true}
-		s.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
-		defer func() { frame.executing = false }()
-	}
-	if context.mpfRound != nil {
-		s := context.roundFrame(context.mpfRound.Manager.integer, true)
-		if s == nil || s.Manager.integer.Natural != m {
-			return ErrNumericOwner
-		}
-		frame = &m.VerificationInvocation
-		if frame.active || frame.invocation == ^uint64(0) {
-			return ErrNumericPending
-		}
-		*frame = naturalPNVerificationScope{active: true, executing: true, invocation: frame.invocation + 1, roundContext: context}
-		frame.Buffer = naturalPNBufferReceipt{Owner: m, roundContext: context, Invocation: s.Invocation, Buffer: &m.Verification, private: true}
-		s.verification = naturalPNVerificationReceipt{m, frame, frame.invocation}
-		defer func() { frame.executing = false }()
-	}
-	m.VerificationActive = true
-	temp := &m.Verification
-	var buffer *naturalPNBufferReceipt
-	if frame != nil {
-		buffer = &frame.Buffer
-	}
-	if e := temp.resizeWithPNReceipt(m.runtime, a.size+1, buffer); e != nil {
-		return e
-	}
-	if frame != nil {
-		frame.Constructed = true
-		defer func() { err = JoinNumericErrors(err, m.FinishPNVerificationSource(frame)) }()
-	}
-	out := limbView{runtime: m.runtime, source: temp, size: a.size + 1}
+	defer func() { m.verificationScratch = m.verificationScratch[:0] }()
+	out := limbView{external: m.verificationScratch, size: size}
 	// mpn_manager::mul, Knuth M: initialize lnga cells, then every column.
 	for i := uint32(0); i < q.size; i++ {
 		out.write(i, 0)
@@ -189,12 +81,5 @@ func (m *NaturalManager) sourceVerifyDivisionWithAllocationContext(a, b, q, r li
 	if !ok {
 		return ErrIntegerAssertion
 	}
-	if frame != nil {
-		return nil
-	}
-	if e := temp.Finalize(m.runtime); e != nil {
-		return e
-	}
-	m.VerificationActive = false
 	return nil
 }

@@ -11,8 +11,6 @@ type integerPNormalizeScope struct {
 	active, executing    bool
 	Roots                NumericAllocationRoots
 	buffers              [4]naturalPNBufferReceipt
-	Verification         naturalPNVerificationReceipt
-	sourceCause          error
 }
 type integerPNormalizeInvocationReceipt struct {
 	Manager    *IntegerModularManager
@@ -31,9 +29,7 @@ func (m *IntegerModularManager) CleanupPNormalizeInvocation(r *integerPNormalize
 	if s.executing {
 		return ErrNumericPending
 	}
-	if e := m.manager.Natural.CleanupPNVerification(&s.Verification, abort); e != nil {
-		return e
-	}
+
 	if !abort {
 		return nil
 	}
@@ -45,7 +41,7 @@ func (m *IntegerModularManager) CleanupPNormalizeInvocation(r *integerPNormalize
 	if e := s.Roots.Cleanup(m.manager); e != nil {
 		return e
 	}
-	*s = integerPNormalizeScope{owner: m, invocation: s.invocation, Verification: s.Verification, sourceCause: s.sourceCause}
+	*s = integerPNormalizeScope{owner: m, invocation: s.invocation}
 	return nil
 }
 
@@ -70,8 +66,6 @@ type naturalPNBufferReceipt struct {
 	Buffer       *SourceLimbBuffer
 	PendingField Block
 	stage        uint8
-	private      bool
-	Published    Block
 }
 
 func (m *NaturalManager) pnBufferReceipt(pn *integerPNormalizeScope, i int) *naturalPNBufferReceipt {
@@ -90,30 +84,26 @@ func (r *naturalPNBufferReceipt) acquire(s *SourceLimbBuffer, block Block) {
 		if c := r.rationalSetContext; c.mpfRationalSet != nil {
 			q := c.rationalSetFrame(c.mpfRationalSet.manager.integer, true)
 			if q != nil && q.history != nil {
-				if r.private {
-					q.history.naturalOriginal[4] = block
-				} else {
-					for i := range q.buffers {
-						if r == &q.buffers[i] {
-							q.history.naturalOriginal[i] = block
-						}
+
+				for i := range q.buffers {
+					if r == &q.buffers[i] {
+						q.history.naturalOriginal[i] = block
 					}
 				}
+
 			}
 		}
 
 		if c := r.roundContext; c.mpfRound != nil {
 			q := c.roundFrame(c.mpfRound.Manager.integer, true)
 			if q != nil && q.history != nil {
-				if r.private {
-					q.history.naturalOriginal[4] = block
-				} else {
-					for i := range q.buffers {
-						if r == &q.buffers[i] {
-							q.history.naturalOriginal[i] = block
-						}
+
+				for i := range q.buffers {
+					if r == &q.buffers[i] {
+						q.history.naturalOriginal[i] = block
 					}
 				}
+
 			}
 		}
 
@@ -121,9 +111,7 @@ func (r *naturalPNBufferReceipt) acquire(s *SourceLimbBuffer, block Block) {
 }
 func (r *naturalPNBufferReceipt) publish(s *SourceLimbBuffer, block Block) {
 	if r.Buffer == s && r.PendingField == block {
-		if r.private {
-			r.Published = block
-		}
+
 		r.PendingField = Block{}
 	}
 }
@@ -141,9 +129,7 @@ func (r *naturalPNBufferReceipt) cleanup() error {
 	return e
 }
 func (s *integerPNormalizeScope) pending() bool {
-	if s.owner.manager.Natural.MatchesPNVerification(&s.Verification) {
-		return true
-	}
+
 	if NumericAllocationPending(&s.Roots) {
 		return true
 	}
@@ -165,10 +151,7 @@ func (r *naturalPNBufferReceipt) Bound(executing bool) bool {
 		if r.Owner == nil || s.manager == nil || r.Owner != s.manager.integer.Natural || c.rationalSetFrame(s.manager.integer, executing) == nil || r.Invocation != s.invocation {
 			return false
 		}
-		if r.private {
-			v := &r.Owner.VerificationInvocation
-			return r == &v.Buffer && r.Buffer == &r.Owner.Verification && v.rationalSetContext.mpfRationalSet == s && v.rationalSetContext.mpfRationalSetInvocation == s.invocation && r.Owner.MatchesPNVerification(&s.verification)
-		}
+
 		for i := range s.buffers {
 			if r == &s.buffers[i] {
 				return r.Buffer == &r.Owner.Division[i]
@@ -182,10 +165,7 @@ func (r *naturalPNBufferReceipt) Bound(executing bool) bool {
 		if r.Owner == nil || s.Manager == nil || r.Owner != s.Manager.integer.Natural || c.roundFrame(s.Manager.integer, executing) == nil || r.Invocation != s.Invocation {
 			return false
 		}
-		if r.private {
-			v := &r.Owner.VerificationInvocation
-			return r == &v.Buffer && r.Buffer == &r.Owner.Verification && v.roundContext.mpfRound == s && v.roundContext.mpfRoundInvocation == s.Invocation && r.Owner.MatchesPNVerification(&s.verification)
-		}
+
 		for i := range s.buffers {
 			if r == &s.buffers[i] {
 				return r.Buffer == &r.Owner.Division[i]
@@ -200,15 +180,10 @@ func (r *naturalPNBufferReceipt) Bound(executing bool) bool {
 			return false
 		}
 		buffers := &s.buffers
-		verification := &s.verification
 		if c.formatDecimal != nil {
 			buffers = &c.formatDecimal.buffers
-			verification = &c.formatDecimal.verification
 		}
-		if r.private {
-			v := &r.Owner.VerificationInvocation
-			return r == &v.Buffer && r.Buffer == &r.Owner.Verification && v.formatContext.mpfFormat == s && v.formatContext.mpfFormatInvocation == s.invocation && v.formatContext.formatDecimal == c.formatDecimal && r.Owner.MatchesPNVerification(verification)
-		}
+
 		for i := range buffers {
 			if r == &buffers[i] {
 				return r.Buffer == &r.Owner.Division[i]
@@ -221,10 +196,7 @@ func (r *naturalPNBufferReceipt) Bound(executing bool) bool {
 		if !s.Manager.MatchesDividesNumeralInvocation(&s) || r.Owner != s.Manager.Natural || r.Invocation != s.Invocation || (executing && s.Manager.dividesNumeralContextRoots(integerAllocationInvocationContext{BoolDivides: &s, BoolDividesInvocation: s.Invocation}) == nil) {
 			return false
 		}
-		if r.private {
-			v := &r.Owner.VerificationInvocation
-			return r == &v.Buffer && r.Buffer == &r.Owner.Verification && v.boolDivides == s && r.Owner.MatchesPNVerification(&s.Frame.verification)
-		}
+
 		for i := range s.Frame.Buffers {
 			if r == &s.Frame.Buffers[i] {
 				return r.Buffer == &r.Owner.Division[i]
@@ -238,10 +210,7 @@ func (r *naturalPNBufferReceipt) Bound(executing bool) bool {
 		if !s.Manager.MatchesRawInvocation(&s) || r.Owner != s.Manager.Natural || r.Invocation != s.Invocation || (executing && s.Manager.RawAllocationRoots(&s) == nil) {
 			return false
 		}
-		if r.private {
-			v := &r.Owner.VerificationInvocation
-			return r == &v.Buffer && r.Buffer == &r.Owner.Verification && v.raw == s && r.Owner.MatchesPNVerification(&s.Frame.verification)
-		}
+
 		for i := range s.Frame.buffers {
 			if r == &s.Frame.buffers[i] {
 				return r.Buffer == &r.Owner.Division[i]

@@ -1,100 +1,53 @@
-// Source: src/util/mpn.cpp:158-168 and 206-217.
+// Source: src/util/mpn.cpp:158-168,206-217.
 package util
 
 import (
+	"errors"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestNaturalRetainedVerificationGuardsOnlyReachedLocal(t *testing.T) {
-	budget := arena.NewBudget(1 << 24)
-	n, e := NewNaturalManager(arena.VectorConfig{Descriptors: arena.Config{Budget: budget}})
-	if e != nil {
-		t.Fatal(e)
-	}
-	defer n.Close()
-	if !modularSourceDebug {
-		// Release has no lexical verification constructor to retain.
-		q, r := []uint32{99}, []uint32{99}
-		if _, e = n.Div([]uint32{10}, []uint32{2}, q, r); e != nil || q[0] != 5 || r[0] != 0 || n.VerificationActive {
-			t.Fatal("release division", e, q, r)
+func TestNaturalNativeVerificationScratchReuse(t *testing.T) {
+	m := naturalManager(t)
+	state, stats, used := m.runtime.State(), m.runtime.Stats(), m.budget.Used()
+	m.budget.FailAfter(0)
+	for _, size := range []int{2, 17, 65, 129, 3} {
+		a, b, q, r := make([]uint32, size), make([]uint32, size), []uint32{99}, make([]uint32, size)
+		a[0], a[size-1], b[size-1] = 7, 1, 2
+		_, e := m.Div(a, b, q, r)
+		if e != nil || q[0] != 0 || oracle(r).Cmp(oracle(a)) != 0 {
+			t.Fatal(size, e, q, r)
 		}
-		return
+		if len(m.verificationScratch) != 0 {
+			t.Fatal("scratch retained active span")
+		}
 	}
-	var a, d [16]uint32
-	a[15], d[15] = 1, 2
-	q, r := [1]uint32{99}, [16]uint32{}
-	budget.FailAfter(0)
-	_, e = n.Div(a[:], d[:], q[:], r[:])
-	budget.FailAfter(-1)
-	if failure, ok := e.(Failure); !ok || failure.ErrorCode() != 101 || !n.VerificationActive || q[0] != 0 || r != a {
-		t.Fatal("actual failed verification constructor after outputs", e, q, r)
+	if m.runtime.State() != state || m.runtime.Stats() != stats || m.budget.Used() != used {
+		t.Fatal("native verification changed Runtime accounting")
 	}
-	retained := n.Verification
-	state, stats := n.runtime.State(), n.runtime.Stats()
-	// This source return precedes all denominator reads and the debug local.
-	short, zero, rem := [1]uint32{7}, [2]uint32{}, [2]uint32{99, 99}
-	result, e := n.divide(limbView{external: short[:], size: 1}, limbView{external: zero[:], size: 2}, limbView{}, limbView{external: rem[:], size: 2})
-	if e != nil || result || rem != [2]uint32{7, 0} {
-		t.Fatal("unreached retained local must not block early return", result, e, rem)
+	a, b, q, r := make([]uint32, 65), make([]uint32, 65), []uint32{99}, make([]uint32, 65)
+	a[64], b[64] = 1, 2
+	var err error
+	allocations := testing.AllocsPerRun(20, func() { _, err = m.Div(a, b, q, r) })
+	if err != nil || allocations != 0 {
+		t.Fatal("warm verification allocations", err, allocations)
 	}
-	if n.Verification != retained || !n.VerificationActive || n.runtime.State() != state || n.runtime.Stats() != stats {
-		t.Fatal("early return changed retained owner")
-	}
-	// A later ordinary division publishes its outputs before reaching the
-	// occupied Go holder for the source lexical constructor.
-	q1, r1 := [1]uint32{99}, [1]uint32{99}
-	_, e = n.Div([]uint32{10}, []uint32{2}, q1[:], r1[:])
-	if e != arena.ErrInvalidSlot || q1[0] != 5 || r1[0] != 0 || n.Verification != retained || !n.VerificationActive {
-		t.Fatal("reached-local guard must preserve output prefix and original root", e, q1, r1)
-	}
-	if e = n.CloseChecked(); e != nil || budget.Used() != 0 {
-		t.Fatal("owning cleanup", e, budget.Used())
-	}
+	m.budget.FailAfter(-1)
 }
 
-func TestNaturalEarlyReturnRetainsPhysicalVerificationRoot(t *testing.T) {
+func TestNaturalNativeVerificationAssertionCleanup(t *testing.T) {
 	if !modularSourceDebug {
-		return // The source local exists only under Z3DEBUG.
+		t.Skip("checked verification only")
 	}
-	for fault := int64(0); fault < 50; fault++ {
-		budget := arena.NewBudget(1 << 24)
-		n, e := NewNaturalManager(arena.VectorConfig{Descriptors: arena.Config{Budget: budget}})
-		if e != nil {
-			t.Fatal(e)
-		}
-		var a, d [65]uint32
-		a[64], d[64] = 1, 2
-		q, r := [1]uint32{99}, [65]uint32{}
-		budget.FailAfter(fault)
-		_, e = n.Div(a[:], d[:], q[:], r[:])
-		retained := e != nil && n.VerificationActive && n.Verification.Raw != (Block{})
-		if retained {
-			if q[0] != 0 || r != a {
-				t.Fatal("failed constructor lost published outputs")
-			}
-			root := n.Verification
-			state, stats, used := n.runtime.State(), n.runtime.Stats(), budget.Used()
-			if stats.LiveBlocks != 1 {
-				t.Fatal("actual failed-constructor backing", stats)
-			}
-			short, zero, rem := [1]uint32{7}, [2]uint32{}, [2]uint32{99, 99}
-			result, err := n.divide(limbView{external: short[:], size: 1}, limbView{external: zero[:], size: 2}, limbView{}, limbView{external: rem[:], size: 2})
-			if err != nil || result || rem != [2]uint32{7, 0} || n.Verification != root || !n.VerificationActive || n.runtime.State() != state || n.runtime.Stats() != stats || budget.Used() != used {
-				t.Fatal("early return under armed refusal must retain physical root", result, err, rem)
-			}
-			if _, err = n.runtime.ReadUint32(root.Raw, 0); err != nil {
-				t.Fatal("retained initialized backing", err)
-			}
-		}
-		budget.FailAfter(-1)
-		if e = n.CloseChecked(); e != nil || budget.Used() != 0 {
-			t.Fatal("failed-constructor owning cleanup", e, budget.Used())
-		}
-		if retained {
-			return
-		}
+	m := naturalManager(t)
+	view := func(n uint32) limbView { return limbView{external: []uint32{n}, size: 1} }
+	// The quotient is deliberately wrong: 4*2+0 != 10.
+	if e := m.sourceVerifyDivision(view(10), view(2), view(4), view(0)); !errors.Is(e, ErrIntegerAssertion) || len(m.verificationScratch) != 0 {
+		t.Fatal("assertion cleanup", e)
 	}
-	t.Fatal("no actual failed-constructor raw root observed")
+	if e := m.sourceVerifyDivision(view(10), view(2), view(5), view(0)); e != nil || len(m.verificationScratch) != 0 {
+		t.Fatal("reuse after assertion", e)
+	}
+	if e := m.CloseChecked(); e != nil || m.verificationScratch != nil {
+		t.Fatal("owner cleanup", e)
+	}
 }

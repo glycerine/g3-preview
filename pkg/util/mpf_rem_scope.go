@@ -8,19 +8,19 @@ type arbitraryFloatRemScope struct {
 	integerBinding, naturalBinding NumericCallerBinding
 	numeric                        NumericAllocationRoots
 	buffers                        [4]NaturalBufferReceipt
-	verification                   naturalPNVerificationReceipt
-	copyA, copyB                   ArbitraryFloatValueCopyReceipt
-	roundFrame                     *ArbitraryFloatRoundScope
-	roundInvocation                uint64
-	roundReceipt                   ArbitraryFloatRoundReceipt
-	partialInvocation              uint64
-	partialDone                    bool
-	formatReceipt                  ArbitraryFloatFormattedSetReceipt
-	formatSourceCause              error
-	a, b                           ArbitraryFloat
-	aLive, bLive                   bool
-	active, executing, finishing   bool
-	bodyCause, sourceCause         error
+
+	copyA, copyB                 ArbitraryFloatValueCopyReceipt
+	roundFrame                   *ArbitraryFloatRoundScope
+	roundInvocation              uint64
+	roundReceipt                 ArbitraryFloatRoundReceipt
+	partialInvocation            uint64
+	partialDone                  bool
+	formatReceipt                ArbitraryFloatFormattedSetReceipt
+	formatSourceCause            error
+	a, b                         ArbitraryFloat
+	aLive, bLive                 bool
+	active, executing, finishing bool
+	bodyCause, sourceCause       error
 }
 
 func (s *arbitraryFloatRemScope) valid() bool {
@@ -50,17 +50,7 @@ func (s *arbitraryFloatRemScope) NumericBuffer(n *NaturalManager, index int) *Na
 	}
 	return &s.buffers[index]
 }
-func (s *arbitraryFloatRemScope) NumericVerification(n *NaturalManager) (*NaturalVerificationScope, error) {
-	if !s.NumericBound(true) || n != s.manager.integer.Natural {
-		return nil, ErrNumericOwner
-	}
-	f, e := n.BeginCallerVerification(&s.hooks)
-	if e != nil {
-		return nil, e
-	}
-	s.verification = naturalPNVerificationReceipt{n, f, f.invocation}
-	return f, nil
-}
+
 func (s *arbitraryFloatRemScope) context() integerAllocationInvocationContext {
 	return integerAllocationInvocationContext{Caller: &s.hooks}
 }
@@ -123,10 +113,7 @@ func (m *ArbitraryFloatManager) finishRemSource() error {
 			return s.sourceCause
 		}
 	}
-	if e := m.integer.Natural.PnVerificationSourceCause(&s.verification); e != nil {
-		s.sourceCause = e
-		return e
-	}
+
 	for _, local := range [...]struct {
 		value *Int
 		live  *bool
@@ -139,7 +126,7 @@ func (m *ArbitraryFloatManager) finishRemSource() error {
 			*local.live = false
 		}
 	}
-	s.active = s.bodyCause != nil || NumericAllocationPending(&s.numeric) || m.integer.Natural.MatchesPNVerification(&s.verification) || s.roundFrame != nil && s.roundFrame.active
+	s.active = s.bodyCause != nil || NumericAllocationPending(&s.numeric) || s.roundFrame != nil && s.roundFrame.active
 	for i := range s.buffers {
 		s.active = s.active || s.buffers[i].PendingField != (Block{})
 	}
@@ -189,9 +176,7 @@ func (m *ArbitraryFloatManager) CleanupRem() (cause error) {
 		}
 		s.partialDone = true
 	}
-	if e := z.Natural.CleanupPNVerification(&s.verification, false); e != nil {
-		return e
-	}
+
 	if e := m.CleanupValueCopy(&s.copyB, false); e != nil {
 		return e
 	}
@@ -218,9 +203,7 @@ func (m *ArbitraryFloatManager) CleanupRem() (cause error) {
 	if e := m.CleanupValueCopy(&s.copyA, true); e != nil {
 		return e
 	}
-	if e := z.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	for i := len(s.buffers) - 1; i >= 0; i-- {
 		if e := s.buffers[i].Cleanup(); e != nil {
 			return e

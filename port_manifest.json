@@ -35268,7 +35268,8 @@
         "IsRational cpp292 passes algebraic_cell* through temporary anum (header366\u2013371) into save_intervals numeral const& (cpp897\u2013929); source reference dangles after construction. The Go lifetime adaptation binds the actual current caller and refreshes its handle after conversion; independent tests cover adapted behavior, not a source-defined dangling-reference result.",
         "Selected uint32 arithmetic/conversion profile is explicit; full manager construction, multivariate/resultant arithmetic, plugins, printers, and complete header/registered test surfaces remain OPEN.",
         "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz\u22121 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion.",
-        "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup."
+        "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -35893,7 +35894,6 @@
         "pkg/math/polynomial/polynomial_derivative_allocation_context.go",
         "pkg/math/polynomial/polynomial_derivative_allocation_context_test.go",
         "pkg/math/polynomial/polynomial_derivative_direct_source_test.go",
-        "pkg/math/polynomial/polynomial_derivative_normalize_stop_source_test.go",
         "pkg/math/polynomial/polynomial_derivative_uint32_leaf_source_test.go",
         "pkg/util/small_allocator.go",
         "pkg/util/small_allocator_allocation_outcome.go",
@@ -35912,20 +35912,17 @@
         "pkg/math/polynomial/polynomial_content_prelude_source_test.go",
         "pkg/util/integer_raw_invocation.go",
         "pkg/util/mpn_source_verify.go",
-        "pkg/util/mpn_verification_invocation.go",
         "pkg/util/mpq_inspect.go",
         "pkg/util/mpz_div.go",
         "pkg/util/mpz_gcd.go",
         "pkg/util/mpzzp_normalize_allocation_receipt.go",
         "pkg/math/polynomial/polynomial_arithmetic_acquisition_source_test.go",
-        "pkg/math/polynomial/polynomial_arithmetic_constant_normalize_stop_source_test.go",
         "pkg/math/polynomial/polynomial_arithmetic_constant_reentrant_source_test.go",
         "pkg/math/polynomial/polynomial_arithmetic_constant_source_test.go",
         "pkg/math/polynomial/polynomial_arithmetic_factory_buffer_source_test.go",
         "pkg/math/polynomial/polynomial_arithmetic_generated_source_test.go",
         "pkg/math/polynomial/polynomial_arithmetic_invocation.go",
         "pkg/math/polynomial/polynomial_arithmetic_modular_guard_source_test.go",
-        "pkg/math/polynomial/polynomial_arithmetic_normalize_stop_source_test.go",
         "pkg/math/polynomial/polynomial_arithmetic_numeric_slot_source_test.go",
         "pkg/math/polynomial/polynomial_arithmetic_regular_mixed_source_test.go",
         "pkg/math/polynomial/polynomial_arithmetic_regular_row_source_test.go",
@@ -35935,7 +35932,6 @@
         "pkg/math/polynomial/polynomial_exact_div_allocation_context.go",
         "pkg/math/polynomial/polynomial_exact_div_direct_numeric_source_test.go",
         "pkg/math/polynomial/polynomial_exact_div_numeric_context_source_test.go",
-        "pkg/math/polynomial/polynomial_exact_div_pn_stop_source_test.go",
         "pkg/math/polynomial/polynomial_exact_div_prelude_source_test.go",
         "pkg/math/polynomial/polynomial_neg_allocation_context.go",
         "pkg/math/polynomial/polynomial_neg_big_copy_source_test.go",
@@ -35963,7 +35959,6 @@
         "pkg/math/polynomial/polynomial_factor_quadratic.go",
         "pkg/math/polynomial/polynomial_factor_quadratic_source_test.go",
         "pkg/math/polynomial/polynomial_factors_physical_test.go",
-        "pkg/math/polynomial/polynomial_quadratic_arithmetic_stop_source_test.go",
         "pkg/math/polynomial/polynomial_scalar_exact_div_actual_source_test.go",
         "pkg/math/polynomial/polynomial_scalar_exact_div_allocation_context.go",
         "pkg/math/polynomial/polynomial_scalar_exact_div_bool_child_source_test.go",
@@ -35993,7 +35988,6 @@
         "pkg/math/polynomial/polynomial_resultant_concrete_children.go",
         "pkg/math/polynomial/polynomial_iccp_coefficient_child_source_test.go",
         "pkg/math/polynomial/polynomial_iccp_constant_child_source_test.go",
-        "pkg/math/polynomial/polynomial_iccp_constant_pn_stop_source_test.go",
         "pkg/math/polynomial/polynomial_iccp_constant_context_source_test.go",
         "pkg/math/polynomial/polynomial_resultant_children_source_test.go",
         "pkg/math/polynomial/polynomial_resultant_power_stop_source_test.go",
@@ -36025,7 +36019,6 @@
         "pkg/math/polynomial/polynomial_psc_chain2_child_stop_source_test.go",
         "pkg/math/polynomial/polynomial_ref_vector_push_receipt.go",
         "pkg/math/polynomial/polynomial_ref_vector_push_source_test.go",
-        "pkg/math/polynomial/polynomial_lazard_division_stop_source_test.go",
         "pkg/math/polynomial/polynomial_lazard_invocation_source_test.go",
         "pkg/math/polynomial/polynomial_psc_cleanup_reentry_source_test.go",
         "pkg/math/polynomial/polynomial_psc_invocation.go",
@@ -36054,7 +36047,6 @@
         "pkg/math/polynomial/polynomial_variable_recognition.go",
         "pkg/math/polynomial/polynomial_variable_recognition_guard_source_test.go",
         "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go",
-        "pkg/math/polynomial/polynomial_variable_recognition_pn_stop_source_test.go",
         "pkg/math/polynomial/polynomial_variable_recognition_source_test.go",
         "pkg/math/polynomial/polynomial_factor_member_set_invocation.go",
         "pkg/math/polynomial/polynomial_factor_up_factors_source_test.go",
@@ -36083,7 +36075,6 @@
         "pkg/math/polynomial/polynomial_factor_core_callback_source_test.go",
         "pkg/math/polynomial/polynomial_factor_univariate_source_test.go",
         "pkg/math/polynomial/polynomial_factor_core_guard_source_test.go",
-        "pkg/math/polynomial/polynomial_factor_constant_pn_stop_source_test.go",
         "pkg/math/polynomial/polynomial_factor_member_set_source_test.go",
         "pkg/math/polynomial/polynomial_factor_constant_wrapper_guard_source_test.go",
         "pkg/math/polynomial/polynomial_factor_min_variable_source_test.go",
@@ -36640,12 +36631,9 @@
         "TestPolynomialActualStoppedAppendGuardPreservesFailurePrefix",
         "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
         "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
         "TestPolynomialDerivativeDirectEveryBigCoefficientPrefix",
         "TestPolynomialDerivativeActualUnsignedSetLeafPrefixes",
-        "TestPolynomialDerivativePriorStoppedPNDoesNotPoisonUnreadNewInvocation",
         "TestPolynomialDerivativeCopiedOwnerCannotMatchReceipt",
         "TestPolynomialDerivativeNumericContextInactiveReceiptUnchanged",
         "TestPolynomialDerivativeNumericContextRejectsCopiedFrameAndOwner",
@@ -36697,7 +36685,6 @@
         "TestPolynomialContentPreludeNilParentBufferGuard",
         "TestPolynomialContentBeforeAIReachedGCDSourceStop",
         "TestPolynomialContentConstantActualSETAllocation",
-        "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
         "TestPolynomialContentFieldActualBIGInverseChildren",
         "TestExactDivNumericActualFrameAndImmutableContext",
         "TestExactDivNumericLowerActualPrefixes",
@@ -36707,12 +36694,10 @@
         "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
         "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
         "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
-        "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
         "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
         "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
         "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
         "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
-        "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference",
         "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
         "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
         "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
@@ -36725,7 +36710,6 @@
         "TestPolynomialRegularProductActualCalleeAcquisition",
         "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
         "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
-        "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
         "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
         "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame",
         "TestPolynomialNegDirectReceiptsValidateActualExecutingFrame",
@@ -36744,7 +36728,6 @@
         "TestPolynomialDividesPersistentMemberReturnDoesNotConsumeRows",
         "TestPolynomialDividesWholeOwnerCheckpointRefusalBeforeMutation",
         "TestPolynomialDividesYoungerScopedNUMStopsOlderSourceSuffix",
-        "TestPolynomialQuadraticDEBUGArithmeticSourceStopPreservesOlderLocals",
         "TestPolynomialQuadraticEveryActualCheckpoint",
         "TestPolynomialQuadraticEveryActualReservation",
         "TestPolynomialQuadraticFactorDormantInputAndParity",
@@ -36796,7 +36779,6 @@
         "TestPolynomialICCPConstantSETActualPendingAcquisition",
         "TestPolynomialICCPConstantModeSwitchSETAndNoLexicalLocals",
         "TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell",
-        "TestPolynomialICCPConstantYoungerPNSourceStopAndImmutableHistory",
         "TestPolynomialICCPConstantActualExecutingContextForeignAndReusedNonce",
         "TestPolynomialResultantActualConstantPowerChildPrefixes",
         "TestPolynomialResultantActualContentPowerChildPrefixes",
@@ -36839,7 +36821,6 @@
         "TestPolynomialPSCChain2YoungerPowerSourceStopPreservesNineLocals",
         "TestPolynomialReferenceVectorPushActualINCBeforeGrowthAndExactAbort",
         "TestPolynomialReferenceVectorPushGrowthTransportRefusesExecutingOwner",
-        "TestPolynomialLazardYoungerDivisionSourceStopPreservesTwoReferences",
         "TestPolynomialLazardActualInvocationZeroShortcutAndForeignRefusal",
         "TestPolynomialLazardActualBigChildrenEveryReservationPrefix",
         "TestPolynomialLazardUnsignedAssertionBeforeCConstruction",
@@ -36894,7 +36875,6 @@
         "TestPolynomialVariableRecognitionExactGuardAndArchiveRefusal",
         "TestPolynomialVariableRecognitionOldACKPreservesLaterForeignCopyAndPN",
         "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
-        "TestPolynomialVariableRecognitionYoungerPNStopAndCallerNUMHistory",
         "TestPolynomialVariableRecognitionLiteralWritePrefixes",
         "TestPolynomialVariableRecognitionBIGEveryActualPrefix",
         "TestIntegerPNormalizeNilReturningTransportOwnerRefusal",
@@ -36933,7 +36913,6 @@
         "TestPolynomialFactorUnivariateEveryActualReservationPrefix",
         "TestPolynomialFactorUnivariateLiteralSignParity",
         "TestPolynomialFactorCoreActualCanceledBodyCopiedAndStaleTuple",
-        "TestPolynomialFactorConstantYoungerPNProtectsActualHelperNUM",
         "TestPolynomialFactorResetSETOneActualInvocation",
         "TestPolynomialFactorResetSETOneEveryFieldReservationPrefix",
         "TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody",
@@ -39975,8 +39954,6 @@
           "tests": [
             "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
             "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
             "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
           ]
         },
@@ -39987,7 +39964,6 @@
           "tests": [
             "TestPolynomialDerivativeDirectEveryBigCoefficientPrefix",
             "TestPolynomialDerivativeActualUnsignedSetLeafPrefixes",
-            "TestPolynomialDerivativePriorStoppedPNDoesNotPoisonUnreadNewInvocation",
             "TestPolynomialDerivativeNumericPendingIdentity",
             "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
             "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
@@ -40178,7 +40154,6 @@
             "TestPolynomialContentPreludeNilParentBufferGuard",
             "TestPolynomialContentBeforeAIReachedGCDSourceStop",
             "TestPolynomialContentConstantActualSETAllocation",
-            "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
             "TestPolynomialContentFieldActualBIGInverseChildren"
           ]
         },
@@ -40193,7 +40168,6 @@
             "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
             "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
             "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
-            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
             "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
             "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
             "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
@@ -40206,7 +40180,6 @@
             "TestPolynomialRegularProductActualCalleeAcquisition",
             "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
             "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
-            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
             "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
             "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
           ]
@@ -40222,7 +40195,6 @@
             "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
             "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
             "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
-            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
             "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
             "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
             "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
@@ -40235,7 +40207,6 @@
             "TestPolynomialRegularProductActualCalleeAcquisition",
             "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
             "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
-            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
             "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
             "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
           ]
@@ -40251,7 +40222,6 @@
             "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
             "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
             "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
-            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
             "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
             "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
             "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
@@ -40264,7 +40234,6 @@
             "TestPolynomialRegularProductActualCalleeAcquisition",
             "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
             "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
-            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
             "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
             "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
           ]
@@ -40280,7 +40249,6 @@
             "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
             "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
             "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
-            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
             "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
             "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
             "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
@@ -40293,7 +40261,6 @@
             "TestPolynomialRegularProductActualCalleeAcquisition",
             "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
             "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
-            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
             "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
             "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
           ]
@@ -40308,8 +40275,7 @@
             "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
             "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
             "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
-            "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
-            "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference"
+            "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry"
           ]
         },
         {
@@ -40359,7 +40325,6 @@
           "go_target": "pkg/math/polynomial/polynomial_factor_quadratic.go",
           "status": "partial",
           "tests": [
-            "TestPolynomialQuadraticDEBUGArithmeticSourceStopPreservesOlderLocals",
             "TestPolynomialQuadraticEveryActualCheckpoint",
             "TestPolynomialQuadraticEveryActualReservation",
             "TestPolynomialQuadraticFactorDormantInputAndParity",
@@ -40455,7 +40420,6 @@
             "TestPolynomialICCPConstantSETActualPendingAcquisition",
             "TestPolynomialICCPConstantModeSwitchSETAndNoLexicalLocals",
             "TestPolynomialICCPConstantOldReceiptPreservesLaterForeignPendingCell",
-            "TestPolynomialICCPConstantYoungerPNSourceStopAndImmutableHistory",
             "TestPolynomialICCPConstantActualExecutingContextForeignAndReusedNonce"
           ]
         },
@@ -40547,7 +40511,6 @@
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_lazard.go",
           "tests": [
-            "TestPolynomialLazardYoungerDivisionSourceStopPreservesTwoReferences",
             "TestPolynomialLazardActualInvocationZeroShortcutAndForeignRefusal",
             "TestPolynomialLazardActualBigChildrenEveryReservationPrefix",
             "TestPolynomialLazardUnsignedAssertionBeforeCConstruction",
@@ -40693,7 +40656,6 @@
             "TestPolynomialVariableRecognitionExactGuardAndArchiveRefusal",
             "TestPolynomialVariableRecognitionOldACKPreservesLaterForeignCopyAndPN",
             "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
-            "TestPolynomialVariableRecognitionYoungerPNStopAndCallerNUMHistory",
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
@@ -40751,7 +40713,6 @@
             "TestPolynomialFactorUnivariateEveryActualReservationPrefix",
             "TestPolynomialFactorUnivariateLiteralSignParity",
             "TestPolynomialFactorCoreActualCanceledBodyCopiedAndStaleTuple",
-            "TestPolynomialFactorConstantYoungerPNProtectsActualHelperNUM",
             "TestPolynomialFactorResetSETOneActualInvocation",
             "TestPolynomialFactorResetSETOneEveryFieldReservationPrefix",
             "TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody",
@@ -41002,7 +40963,8 @@
         "Historical missing-API RED and actual Integer/Rational Copy/PN owner callback REDs retained. Requested-size-only pending metadata and the first sorted nonunit term fixture were oracle corrections, not algorithm failures; budget0 did not reach Runtime transport.",
         "Native foreign PN reservation prefixes retain no untransferred pending leaf: successful direct allocation publishes shared member storage atomically. The native proof preserves those actual members/caller NUM and independently checks remainder2^338+17; checked DEBUG verification yields the genuinely retained foreign PN child. Physical/cold audits remain unchanged for every prefix.",
         "FactorHigher literal TODO at polynomial.cpp:6727-6735 is preserved; this is the original degree dispatcher rather than a dense or degree-specific replacement. Default generator pointer selection prime_generator.cpp:99-107 is explicit borrowed Go config, with a guarded DefaultPrimeService accessor; no hidden global generator. tst_mfact is dormant after polynomial.cpp test driver return at1825: active original-driver credit remains0. Signed-host TLS DEBUG destructor fixtures qualify owner primitives; guard-copy and returning Go callbacks are separate domains. Broader polynomial/NLSAT units remain partial/unported.",
-        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -41237,7 +41199,6 @@
         "pkg/math/polynomial/polynomial_variable_recognition.go",
         "pkg/math/polynomial/polynomial_variable_recognition_guard_source_test.go",
         "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go",
-        "pkg/math/polynomial/polynomial_variable_recognition_pn_stop_source_test.go",
         "pkg/math/polynomial/polynomial_variable_recognition_source_test.go",
         "pkg/math/polynomial/polynomial_factor_member_set_invocation.go",
         "pkg/math/polynomial/polynomial_factor_up_factors_source_test.go",
@@ -41273,7 +41234,6 @@
         "pkg/math/polynomial/polynomial_factor_core_callback_source_test.go",
         "pkg/math/polynomial/polynomial_factor_univariate_source_test.go",
         "pkg/math/polynomial/polynomial_factor_core_guard_source_test.go",
-        "pkg/math/polynomial/polynomial_factor_constant_pn_stop_source_test.go",
         "pkg/math/polynomial/polynomial_factor_member_set_source_test.go",
         "pkg/math/polynomial/polynomial_factor_constant_wrapper_guard_source_test.go",
         "pkg/math/polynomial/polynomial_factor_min_variable_source_test.go",
@@ -41801,7 +41761,6 @@
         "TestPolynomialVariableRecognitionExactGuardAndArchiveRefusal",
         "TestPolynomialVariableRecognitionOldACKPreservesLaterForeignCopyAndPN",
         "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
-        "TestPolynomialVariableRecognitionYoungerPNStopAndCallerNUMHistory",
         "TestPolynomialVariableRecognitionLiteralWritePrefixes",
         "TestPolynomialVariableRecognitionBIGEveryActualPrefix",
         "TestIntegerPNormalizeNilReturningTransportOwnerRefusal",
@@ -41853,7 +41812,6 @@
         "TestPolynomialFactorUnivariateEveryActualReservationPrefix",
         "TestPolynomialFactorUnivariateLiteralSignParity",
         "TestPolynomialFactorCoreActualCanceledBodyCopiedAndStaleTuple",
-        "TestPolynomialFactorConstantYoungerPNProtectsActualHelperNUM",
         "TestPolynomialFactorResetSETOneActualInvocation",
         "TestPolynomialFactorResetSETOneEveryFieldReservationPrefix",
         "TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody",
@@ -43444,7 +43402,6 @@
             "TestPolynomialVariableRecognitionExactGuardAndArchiveRefusal",
             "TestPolynomialVariableRecognitionOldACKPreservesLaterForeignCopyAndPN",
             "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
-            "TestPolynomialVariableRecognitionYoungerPNStopAndCallerNUMHistory",
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
@@ -43502,7 +43459,6 @@
             "TestPolynomialFactorUnivariateEveryActualReservationPrefix",
             "TestPolynomialFactorUnivariateLiteralSignParity",
             "TestPolynomialFactorCoreActualCanceledBodyCopiedAndStaleTuple",
-            "TestPolynomialFactorConstantYoungerPNProtectsActualHelperNUM",
             "TestPolynomialFactorResetSETOneActualInvocation",
             "TestPolynomialFactorResetSETOneEveryFieldReservationPrefix",
             "TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody",
@@ -44230,7 +44186,6 @@
         "pkg/util/mpn_source_finalize.go",
         "pkg/util/mpn_source_verify.go",
         "pkg/util/mpn_storage.go",
-        "pkg/util/mpn_verification_invocation.go",
         "pkg/util/mpz_div.go",
         "pkg/util/mpz_number_theory.go",
         "pkg/util/mpzzp_normalize_allocation_receipt.go",
@@ -45664,7 +45619,8 @@
         "mpz.h:156-162 successful publication order is unchanged; released scratch descriptor remains exact disposal token and later capacity reuse refuses ErrInvalidSlot before freed reads.",
         "Count-zero/count-one erased SET issues no NUM/vector or per-call archival reserve. Stable call storage materializes only at actual Integer/Natural allocations. Field tests cover only literal count-one SET, not general field factorization. Native normalized SET completes PN without checked verification allocation; checked actual failed PN prefixes preserve exact child tuples.",
         "Display drivers src/test/upolynomial.cpp:23-65,468-490 reach printing but contain no ENSURE assertions; these exact output assertions are independent new checks. No whole UP-unit promotion. Invalid-Go copied/stale view and insertion receipt fixtures prove lifetime guards, not native allocation credit. Root genuine stale view RED95325 and receipt RED36363 are corrected by captured display epoch, including receipt checks after character ownership ends. Signed-host TLS character-DT stops are qualified returning-transport guard profiles; the separate four-limb fixture reaches older NUM DT, not character heap DT. Nested scopes charge persistent metadata only at reached allocating leaves; repeated erased inline calls preserve older unjoined RAW without archival reservation.",
-        "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup."
+        "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -46376,7 +46332,6 @@
         "pkg/math/polynomial/upolynomial_recombination_trial_invocation.go",
         "pkg/math/polynomial/upolynomial_recombination_trial_source_test.go",
         "pkg/util/mpn_source_verify.go",
-        "pkg/util/mpn_verification_invocation.go",
         "pkg/util/mpz_div.go",
         "pkg/util/mpz_gcd.go",
         "pkg/util/mpz_number_theory.go",
@@ -111405,8 +111360,6 @@
         "TestPolynomialICCPRetainsActualPendingGCDInvocation",
         "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
         "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
         "TestPointerBufferUsesNativeSliceStorage",
         "TestASTHandleBufferResetRetainsSliceCapacity",
@@ -111603,8 +111556,6 @@
           "tests": [
             "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
             "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
             "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
           ],
           "go_targets": [
@@ -111656,7 +111607,8 @@
         "RationalBuffer16 is the nongeneric concrete buffer<rational> dependency for polynomial coefficient collection, with sixteen raw inline slots and double-capacity relocation without numeric copies/destructors. Each appended value is copy-constructed into its physical slot through an exact invocation embedded in the charged header, and count advances only after construction returns. Expanded storage and the reflected Go owner are charged through Budget rather than claiming native allocation/layout/stack/pointer ABI. At borrows an address only until expansion/end; aliases retained across expansion are outside the source consumer contract. Successful source scopes explicitly run SourceEnd in ascending element order before backing release. Failed body calls retain their actual partial slot/child and stop; SourceEnd rejects simulated native unwinding, while explicit two-phase Go cleanup consumes the real fields without altering failure history. The stale-element DT test proves the checked boundary traversal prefix, not native fatal/exception resumability. General buffer APIs/reset/finalize and integration into the whole polynomial current-sort/mark/core owner remain required; no whole-unit completion is credited.",
         "ASTHandleBuffer.PopBack supplies the selected scalar non-destructing pop operation for the polynomial todo stack. It retains spilled capacity, acquires/releases no AST references and reports empty-pop as a checked Go bounds error. Native assertion/underflow/layout/allocator ABI and general template-buffer completion remain uncredited.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
-        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit."
+        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -126838,7 +126790,8 @@
         "Binary output preserves NaN forced sign0, infinity extra1, denormal biased minimum exponent1, unsigned extra-count wrapping and extended significant bits rather than imposing an IEEE bit representation. Independent binary-text, every cold reservation, warm inline, later-call isolation, actual COPY transport, older retained division and real checked TLS temporary-DT stop tests pass. Count constructors, reserve/concatenation and equal-budget move assignment follow the selected owned-string profile; compiler evaluation order, native STL ABI/NRVO and arbitrary allocator alternatives are not claimed. Negative stored significand in the finite branch retains the original debug assertion; undefined format domains and nonterminating invalid release inputs do not gain new semantics. Original upstream MPF driver contains no active binary-output assertion; whole MPF/util completion remains unclaimed.",
         "The component-based hexfloat overload deliberately returns ordinary to_string output as in source. Tests cover independent big.Int/decimal mantissas, raw/noncanonical components, Euclidean scale division, every selected cold reservation, complete immediate physical/byte graphs and refunds, warm inline specials, refused older text/division preservation, actual first COPY transport, a later callback formatting invocation and a real checked TLS younger-format DT stop in both owning-cleanup orders. Caller text construction/backing uses the existing explicit ToStringInto adapter; native std::string ABI/NRVO/locale alternatives are not claimed. The platform-dependent mpf-object hexfloat overload at mpf.cpp:1621-1633 remains unported. No active upstream driver assertion for this component overload, or whole MPF/util completion, is claimed.",
         "Signed32 undefined local negations use the preceding source setter checked domain. Debug zero denominators assert before conversion; release 0/0 fails during normalization while nonzero/0 reaches the existing rational-copy invalid-denominator guard after actual conversion begins. No defined native zero-denominator arithmetic or signed overflow is claimed. Independent exact rational rounding covers five modes and precisions2/4/24/53/120; every selected cold reservation has immediate complete physical/byte accounting, actual child joins and zero refunds. Warm inline, entry authority, real conversion allocation transport, retained older GCD/exponent refusals, unrelated retained history preservation and real checked TLS younger destruction stops with both cleanup orders are covered. The original src/test/mpf.cpp has no active signed-fraction overload assertion; no driver credit is fabricated. Whole MPF/util completion remains partial.",
-        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement."
+        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -127711,7 +127664,8 @@
         "Binary output preserves NaN forced sign0, infinity extra1, denormal biased minimum exponent1, unsigned extra-count wrapping and extended significant bits rather than imposing an IEEE bit representation. Independent binary-text, every cold reservation, warm inline, later-call isolation, actual COPY transport, older retained division and real checked TLS temporary-DT stop tests pass. Count constructors, reserve/concatenation and equal-budget move assignment follow the selected owned-string profile; compiler evaluation order, native STL ABI/NRVO and arbitrary allocator alternatives are not claimed. Negative stored significand in the finite branch retains the original debug assertion; undefined format domains and nonterminating invalid release inputs do not gain new semantics. Original upstream MPF driver contains no active binary-output assertion; whole MPF/util completion remains unclaimed.",
         "The component-based hexfloat overload deliberately returns ordinary to_string output as in source. Tests cover independent big.Int/decimal mantissas, raw/noncanonical components, Euclidean scale division, every selected cold reservation, complete immediate physical/byte graphs and refunds, warm inline specials, refused older text/division preservation, actual first COPY transport, a later callback formatting invocation and a real checked TLS younger-format DT stop in both owning-cleanup orders. Caller text construction/backing uses the existing explicit ToStringInto adapter; native std::string ABI/NRVO/locale alternatives are not claimed. The platform-dependent mpf-object hexfloat overload at mpf.cpp:1621-1633 remains unported. No active upstream driver assertion for this component overload, or whole MPF/util completion, is claimed.",
         "Signed32 undefined local negations use the preceding source setter checked domain. Debug zero denominators assert before conversion; release 0/0 fails during normalization while nonzero/0 reaches the existing rational-copy invalid-denominator guard after actual conversion begins. No defined native zero-denominator arithmetic or signed overflow is claimed. Independent exact rational rounding covers five modes and precisions2/4/24/53/120; every selected cold reservation has immediate complete physical/byte accounting, actual child joins and zero refunds. Warm inline, entry authority, real conversion allocation transport, retained older GCD/exponent refusals, unrelated retained history preservation and real checked TLS younger destruction stops with both cleanup orders are covered. The original src/test/mpf.cpp has no active signed-fraction overload assertion; no driver credit is fabricated. Whole MPF/util completion remains partial.",
-        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement."
+        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -128943,7 +128897,6 @@
         "pkg/math/polynomial/polynomial_imp_physical_test.go",
         "pkg/math/polynomial/polynomial_manager.go",
         "pkg/util/mpn_source_verify.go",
-        "pkg/util/mpn_verification_invocation.go",
         "pkg/util/mpzzp_normalize_allocation_receipt.go",
         "pkg/util/integer_divides_numeral_source_test.go",
         "pkg/util/util_numeric_rational_source.go",
@@ -128975,8 +128928,6 @@
         "TestNaturalFormattingEmptyGuardAfterLocalActions",
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
         "TestNaturalSourceFinalizeColdLifecycleGuards",
-        "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
-        "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot",
         "TestSourceCStringBoundedBytesAndLbuf",
         "TestIntegerCharacterNativeScratchAndCleanup",
         "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
@@ -128997,8 +128948,6 @@
         "TestPolynomialDisplaySinkCreatesForeignPending",
         "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
         "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
         "TestScalarDivDirectNumericNilContextSourceMath",
         "TestScalarDivDirectBigActualAllocationPrefixes",
@@ -129017,7 +128966,6 @@
         "TestPolynomialContentPreludeNilParentBufferGuard",
         "TestPolynomialContentBeforeAIReachedGCDSourceStop",
         "TestPolynomialContentConstantActualSETAllocation",
-        "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
         "TestPolynomialContentFieldActualBIGInverseChildren",
         "TestIntegerDividesScopedNUMBeforeZeroBranch",
         "TestIntegerDividesScopedNUMEveryActualRemPrefix",
@@ -129030,7 +128978,9 @@
         "TestDividesNumericActualBoolChildAndErasedFieldRoute",
         "TestNumericRationalSourceInsertionPreservesActualFieldChains",
         "TestNumeralInsertionReceiptUnusedSmallBranchAndForeignTupleGuard",
-        "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards"
+        "TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards",
+        "TestNaturalNativeVerificationScratchReuse",
+        "TestNaturalNativeVerificationAssertionCleanup"
       ],
       "conditionals": [
         {
@@ -129239,9 +129189,7 @@
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
             "TestOwnedTextNativeGrowthPreservesPrefix",
-            "TestNumericStringHostOwnershipBoundary",
-            "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
-            "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot"
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
@@ -129427,12 +129375,12 @@
           ]
         },
         {
-          "name": "Z3DEBUG verification retained-holder guard only at source lexical constructor after q/rem publication; earlier short-numerator return preserves retained actual backing",
+          "name": "Z3DEBUG arithmetic verification after q/rem publication using reusable native Go scratch with assertion cleanup",
           "status": "ported",
           "go_target": "pkg/util/mpn_source_verify.go",
           "tests": [
-            "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
-            "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot"
+            "TestNaturalNativeVerificationScratchReuse",
+            "TestNaturalNativeVerificationAssertionCleanup"
           ]
         },
         {
@@ -129471,12 +129419,10 @@
         {
           "name": "Algorithm D real source-buffer growth acquisition plus debug206-217 exact lexical constructor/DT receipt; unfinished ctor roots versus sticky completed DT source stop",
           "status": "partial",
-          "go_target": "pkg/util/mpn_verification_invocation.go",
+          "go_target": "pkg/util/mpn_source_verify.go",
           "tests": [
             "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
             "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
             "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
           ],
           "go_targets": [
@@ -129516,7 +129462,6 @@
           "status": "partial",
           "go_target": "pkg/util/mpn_source_verify.go",
           "tests": [
-            "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
             "TestPolynomialContentFieldActualBIGInverseChildren"
           ],
           "go_targets": [
@@ -129583,7 +129528,8 @@
         "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "NaturalManager no longer owns or borrows an arena.Words service: division uses actual Runtime buffers and formatting uses native slices. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
-        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit."
+        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -129603,7 +129549,6 @@
         "pkg/util/mp_integer_output_scope.go",
         "pkg/util/mp_integer_output_scope_test.go",
         "pkg/util/mpn_cstring.go",
-        "pkg/util/mpn_verification_invocation.go",
         "pkg/util/mpzzp_normalize_allocation_receipt.go",
         "pkg/math/polynomial/polynomial_constant_normalize_receipt_source_test.go"
       ],
@@ -129631,8 +129576,6 @@
         "TestNaturalFormattingEmptyGuardAfterLocalActions",
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
         "TestNaturalSourceFinalizeColdLifecycleGuards",
-        "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
-        "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot",
         "TestSourceCStringBoundedBytesAndLbuf",
         "TestIntegerCharacterNativeScratchAndCleanup",
         "TestIntegerCharacterNativeLargeFormattingWithReservationsDisabled",
@@ -129640,8 +129583,6 @@
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
         "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
         "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
         "TestIntegerPublicExtendedGCDRawBodyAndEndLifetimes",
         "TestIntegerPublicRawEveryActualPrefixAndExactReceipt",
@@ -129649,7 +129590,9 @@
         "TestIntegerPublicRawOwnAfterSourceFinalize",
         "TestIntegerPublicRawUnpublishedCellOwnAfterSourceFinalize",
         "TestIntegerPublicRawRuntimeCallbackHasNoAmbientAcquisition",
-        "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse"
+        "TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse",
+        "TestNaturalNativeVerificationScratchReuse",
+        "TestNaturalNativeVerificationAssertionCleanup"
       ],
       "conditionals": [
         {
@@ -129796,9 +129739,7 @@
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
             "TestOwnedTextNativeGrowthPreservesPrefix",
-            "TestNumericStringHostOwnershipBoundary",
-            "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
-            "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot"
+            "TestNumericStringHostOwnershipBoundary"
           ]
         },
         {
@@ -129984,12 +129925,12 @@
           ]
         },
         {
-          "name": "Z3DEBUG verification retained-holder guard only at source lexical constructor after q/rem publication; earlier short-numerator return preserves retained actual backing",
+          "name": "Z3DEBUG arithmetic verification after q/rem publication using reusable native Go scratch with assertion cleanup",
           "status": "ported",
           "go_target": "pkg/util/mpn_source_verify.go",
           "tests": [
-            "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
-            "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot"
+            "TestNaturalNativeVerificationScratchReuse",
+            "TestNaturalNativeVerificationAssertionCleanup"
           ]
         },
         {
@@ -130012,8 +129953,6 @@
           "tests": [
             "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
             "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
             "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
           ],
           "go_targets": [
@@ -130047,7 +129986,8 @@
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "NaturalManager no longer owns or borrows an arena.Words service: division uses actual Runtime buffers and formatting uses native slices. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
-        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit."
+        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -130948,7 +130888,8 @@
         "Literal and independent tests cover integer/fraction syntax, both decimal settings, zero and negative raw denominators, BIG values, and the allocating MinInt32 negation boundary. Every selected cold reservation includes immediate complete physical/byte graphs and zero refunds. All11 actual inline rational insertions are failed in turn with exact prefix assertions. Warm FailAfter(0) preserves exact Runtime/budget state and ended parent cleanup leaves later children intact. Real negative COPY transport checks nested scalar/lifecycle exclusion; a PageSize1 retained descriptor refusal proves older child preservation. A real signed-host TLS guard at negative temporary destruction stops rational continuation, retains source history and joins owning cleanup while preserving output. This is the existing explicit checked-runtime guard profile, not a claim of defined native signed overflow. Arbitrary native ostream ABI/locale and unrelated prior host-formatting adapters are not changed. Whole MPZ/MPQ/MPF/util completion is not claimed.",
         "Original Div/display/Rem and repeated Mul/Div/display/Rem retain unrounded, unpadded output and optional ? suffix. Precision0 still emits the literal decimal point before ? or truncation. Active C++ tst2 decimal calls are reproduced with independent expected bytes; source drivers are not compiled. Exhaustive small and independent BIG rational results cover both truncation settings and precision boundaries. Every selected cold reservation includes immediate complete physical/byte graphs and zero refunds; failed bodies preserve sourceCursor0. All8 selected negative decimal insertions, including the final ?, are failed in turn with exact prefix/declaration/end-label checks. Warm FailAfter(0) preserves exact Runtime/budget state and later-child isolation. Zero denominator fails only at reached Div after copies/sign/ten; copied scope and counter guards are tested. Real denominator COPY transport and real checked TLS d1 end-label release failure prove lexical/source/owning distinctions and output preservation. Native signed overflow is not claimed; the checked Runtime profile is explicit. Whole MPQ/MPF/util completion is not claimed. Literal raw negative-denominator tests preserve original field/sign/division behavior without normalization; they are not mathematical rational canonicalization.",
         "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
-        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -132984,8 +132925,6 @@
         "TestIntegerCopyAllocationReceiptUnchangedWithoutAllocation",
         "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
         "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
         "TestScalarDivDirectNumericNilContextSourceMath",
         "TestScalarDivDirectBigActualAllocationPrefixes",
@@ -133015,7 +132954,6 @@
         "TestPolynomialContentPreludeNilParentBufferGuard",
         "TestPolynomialContentBeforeAIReachedGCDSourceStop",
         "TestPolynomialContentConstantActualSETAllocation",
-        "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
         "TestPolynomialContentFieldActualBIGInverseChildren",
         "TestIntegerDividesScopedNUMBeforeZeroBranch",
         "TestIntegerDividesScopedNUMEveryActualRemPrefix",
@@ -134829,8 +134767,6 @@
           "tests": [
             "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
             "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
             "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
           ],
           "go_targets": [
@@ -134915,7 +134851,6 @@
             "TestPolynomialContentPreludeNilParentBufferGuard",
             "TestPolynomialContentBeforeAIReachedGCDSourceStop",
             "TestPolynomialContentConstantActualSETAllocation",
-            "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
             "TestPolynomialContentFieldActualBIGInverseChildren"
           ]
         },
@@ -135126,7 +135061,8 @@
         "Numeric text buffering and returned text use Go strings.Builder, strconv.FormatInt, strings.IndexByte and Go-managed counted bytes. Removed emulation of string-buffer capacity, put-pointer/high-water distinction, arena growth failures and returned C++ string storage. Project numeral allocation failures, checked source views, decimal output and returned text lifetime remain tested.",
         "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
-        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit."
+        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -135457,7 +135393,6 @@
         "TestPolynomialContentPreludeNilParentBufferGuard",
         "TestPolynomialContentBeforeAIReachedGCDSourceStop",
         "TestPolynomialContentConstantActualSETAllocation",
-        "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
         "TestPolynomialContentFieldActualBIGInverseChildren",
         "TestExactDivNumericActualFrameAndImmutableContext",
         "TestExactDivNumericLowerActualPrefixes",
@@ -135467,12 +135402,10 @@
         "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
         "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
         "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
-        "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
         "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
         "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
         "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
         "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
-        "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference",
         "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
         "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
         "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
@@ -135485,7 +135418,6 @@
         "TestPolynomialRegularProductActualCalleeAcquisition",
         "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
         "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
-        "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
         "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
         "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame",
         "TestIntegerDividesScopedNUMBeforeZeroBranch",
@@ -136907,7 +136839,6 @@
             "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
             "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
             "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
-            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
             "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
             "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
             "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
@@ -136920,7 +136851,6 @@
             "TestPolynomialRegularProductActualCalleeAcquisition",
             "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
             "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
-            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
             "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
             "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame",
             "TestExactDivNumericActualFrameAndImmutableContext",
@@ -136928,8 +136858,7 @@
             "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
             "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
             "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
-            "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
-            "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference"
+            "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry"
           ],
           "go_targets": [
             "pkg/math/polynomial/polynomial_arithmetic_modular_guard_source_test.go"
@@ -137110,7 +137039,8 @@
         "The former staged Integer parser contradicted mpz.cpp:283-303 and has been replaced in the primary SetString API. Allocation failure now retains actual caller digit prefixes rather than the old destination. The old transactional failure assertion was replaced with independent prefix and failed-publication checks. Six dedicated groups prove the first BIG reservation prefix, every selected cold reservation including an actually published BIG Mul temporary retained before Add failure, independent permissive/NUL byte semantics, warm inline and entry capture/owner/counter authority, real allocation transport and real checked TLS RESET release failure before either RAW declaration. Existing original tst1/bug1/int_min_bug assertions and literal inventories are rerun. Separate stopped RAW end-DEL refinement is not newly credited. Checked signed overflow is not defined native behavior; no native fatal resumability or whole MPZ/util completion is claimed.",
         "Numeric text buffering and returned text use Go strings.Builder, strconv.FormatInt, strings.IndexByte and Go-managed counted bytes. Removed emulation of string-buffer capacity, put-pointer/high-water distinction, arena growth failures and returned C++ string storage. Project numeral allocation failures, checked source views, decimal output and returned text lifetime remain tested.",
         "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
-        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {
@@ -137161,8 +137091,6 @@
         "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread",
         "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-        "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-        "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
         "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
         "TestScalarDivDirectNumericNilContextSourceMath",
         "TestScalarDivDirectBigActualAllocationPrefixes",
@@ -137174,7 +137102,6 @@
         "TestPolynomialContentPreludeNilParentBufferGuard",
         "TestPolynomialContentBeforeAIReachedGCDSourceStop",
         "TestPolynomialContentConstantActualSETAllocation",
-        "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
         "TestPolynomialContentFieldActualBIGInverseChildren",
         "TestExactDivNumericActualFrameAndImmutableContext",
         "TestExactDivNumericLowerActualPrefixes",
@@ -137184,12 +137111,10 @@
         "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
         "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
         "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
-        "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
         "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
         "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
         "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
         "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
-        "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference",
         "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
         "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
         "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
@@ -137202,7 +137127,6 @@
         "TestPolynomialRegularProductActualCalleeAcquisition",
         "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
         "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
-        "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
         "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
         "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame",
         "TestDividesNumericActualFrameAndImmutableContext",
@@ -137492,8 +137416,6 @@
           "tests": [
             "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
             "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
-            "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
-            "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
             "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix"
           ],
           "go_targets": [
@@ -137531,7 +137453,6 @@
             "TestPolynomialContentPreludeNilParentBufferGuard",
             "TestPolynomialContentBeforeAIReachedGCDSourceStop",
             "TestPolynomialContentConstantActualSETAllocation",
-            "TestPolynomialContentConstantPNSourceStopBeforeAbsentAI",
             "TestPolynomialContentFieldActualBIGInverseChildren"
           ]
         },
@@ -137546,7 +137467,6 @@
             "TestPolynomialArithmeticSourceWrappersEveryActualPrefix",
             "TestPolynomialArithmeticWrappersUseActualReturnedReceipt",
             "TestPolynomialConstantAllocationTransportCannotRetireExecutingFrame",
-            "TestPolynomialConstantYoungerPNStopPreservesOlderNUMSuffix",
             "TestPolynomialMulAddConstantShortcutActualAcquisitionsPreserveOlderRegular",
             "TestPolynomialRegularActualINCBindsRowBeforeCoefficientConstruction",
             "TestPolynomialRegularAddMulActualFactoryReturnEveryPrefix",
@@ -137559,7 +137479,6 @@
             "TestPolynomialRegularProductActualCalleeAcquisition",
             "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
             "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
-            "TestPolynomialRegularStoppedPNPreservesActualRowsAndHistory",
             "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
             "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
           ],
@@ -137577,8 +137496,7 @@
             "TestPolynomialExactDivActualNUMAcquisitionUsesDirectFrame",
             "TestPolynomialExactDivCompletedSourceResetPermitsLiteralRetry",
             "TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration",
-            "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry",
-            "TestPolynomialExactDivYoungerPNSourceStopPreservesOlderNUMReference"
+            "TestPolynomialExactDivPublicOwnAcknowledgmentPermitsSameOwnerRetry"
           ]
         },
         {
@@ -137633,7 +137551,8 @@
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
         "mpzzp.h:167-185,195-208 selected ScalarDiv transport prerequisite only: public/nil Integer negative Div and ExtendedGCD still eagerly delete RAW locals on failed bodies and remain incomplete. Shared mixed cohort ordered retirement and full Discriminant/Factor parents remain open. Native real signed-TLS guard reaches caller NUM DT; checked reaches failed younger verification ctor with no invented source DT. No new dormant original driver assertion credit or unit promotion.",
         "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit.",
-        "Selected concrete supported source profiles only; no source-unit/API promotion or registered-driver assertion credit. Signed-host TLS/source pointer guards are explicit helper domains, not ordinary mathematical OOM reachability. Unselected scalar ExactDiv, full Factor/Discriminant and high-level shared-buffer callback reentry remain distinct obligations."
+        "Selected concrete supported source profiles only; no source-unit/API promotion or registered-driver assertion credit. Signed-host TLS/source pointer guards are explicit helper domains, not ordinary mathematical OOM reachability. Unselected scalar ExactDiv, full Factor/Discriminant and high-level shared-buffer callback reentry remain distinct obligations.",
+        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added."
       ]
     },
     {

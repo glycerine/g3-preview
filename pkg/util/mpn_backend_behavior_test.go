@@ -56,15 +56,8 @@ func TestNaturalSourceDebugVerificationAfterOutputs(t *testing.T) {
 	budget.FailAfter(0)
 	_, e = n.Div(a[:], d[:], q[:], r[:])
 	budget.FailAfter(-1)
-	failure, ok := e.(Failure)
-	if !ok || failure.ErrorCode() != 101 {
-		t.Fatalf("debug lexical temp should refuse after output: %T %v", e, e)
-	}
-	if q[0] != 0 || r != a {
-		t.Fatal("completed source q/rem prefix lost", q, r)
-	}
-	if !n.VerificationActive || n.RuntimeOwner().Stats().LiveBlocks != 0 {
-		t.Fatal("lexical failure state", n.RuntimeOwner().Stats())
+	if e != nil || q[0] != 0 || r != a || n.RuntimeOwner().Stats().LiveBlocks != 0 {
+		t.Fatal("native verification after outputs", e, q, r)
 	}
 	if e = n.CloseChecked(); e != nil {
 		t.Fatal(e)
@@ -93,11 +86,11 @@ func TestNaturalSourceDebugLexicalTempDestroyedEachCall(t *testing.T) {
 		if _, e = n.Div(a[:], d[:], q[:], r[:]); e != nil {
 			t.Fatal(e)
 		}
-		if n.RuntimeOwner().Stats().LiveBlocks != 0 || n.VerificationActive {
+		if n.RuntimeOwner().Stats().LiveBlocks != 0 {
 			t.Fatal("source lexical temp retained")
 		}
 	}
-	if n.RuntimeOwner().State().GlobalCount != 2 {
+	if n.RuntimeOwner().State().GlobalCount != 0 {
 		t.Fatal("actual repeated lexical allocation count", n.RuntimeOwner().State())
 	}
 }
@@ -117,7 +110,7 @@ func TestNaturalSourceShortNumeratorEarlyReturn(t *testing.T) {
 	// unsigned quotient length is zero when the denominator is one limb longer.
 	result, e := n.divide(limbView{external: a[:], size: 1}, limbView{external: d[:], size: 2}, limbView{}, limbView{external: r[:], size: 2})
 	budget.FailAfter(-1)
-	if e != nil || result || r != [2]uint32{7, 0} || n.VerificationActive || n.RuntimeOwner().Stats().LiveBlocks != 0 {
+	if e != nil || result || r != [2]uint32{7, 0} || n.RuntimeOwner().Stats().LiveBlocks != 0 {
 		t.Fatal("early source return", result, e, r)
 	}
 }

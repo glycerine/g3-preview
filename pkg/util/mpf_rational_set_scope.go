@@ -4,12 +4,12 @@ package util
 // These are the actual reached lexical holders. Branch p2 and the nested
 // PrevPowerOfTwo NUM finish before the later p/t/sq declarations.
 type arbitraryFloatRationalSetScope struct {
-	plainParent                                              *arbitraryFloatPlainRationalSetScope
-	plainInvocation                                          uint64
-	receipt                                                  *ArbitraryFloatRationalSetReceipt
-	history                                                  *arbitraryFloatRationalSetHistory
-	buffers                                                  [4]naturalPNBufferReceipt
-	verification                                             naturalPNVerificationReceipt
+	plainParent     *arbitraryFloatPlainRationalSetScope
+	plainInvocation uint64
+	receipt         *ArbitraryFloatRationalSetReceipt
+	history         *arbitraryFloatRationalSetHistory
+	buffers         [4]naturalPNBufferReceipt
+
 	roundChild                                               ArbitraryFloatRoundReceipt
 	roundFrame                                               *ArbitraryFloatRoundScope
 	roundInvocation                                          uint64
@@ -78,9 +78,7 @@ func (m *ArbitraryFloatManager) finishRationalSetSource() error {
 	}
 
 	s.active = false
-	if m.integer.Natural.MatchesPNVerification(&s.verification) {
-		s.active = true
-	}
+
 	for i := range s.buffers {
 		if s.buffers[i].PendingField != (Block{}) {
 			s.active = true

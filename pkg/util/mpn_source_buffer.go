@@ -106,11 +106,7 @@ func (s *SourceLimbBuffer) expandWithPNReceipt(r *Runtime, receipt *naturalPNBuf
 		}
 	}
 	if s.Raw != (Block{}) {
-		old := s.Raw
 		e = r.Deallocate(&s.Raw)
-		if receipt != nil && receipt.private && s.Raw == (Block{}) && receipt.Published == old {
-			receipt.Published = Block{}
-		}
 		if e != nil {
 			return e
 		}
@@ -126,9 +122,6 @@ func (s *SourceLimbBuffer) expandWithPNReceipt(r *Runtime, receipt *naturalPNBuf
 	if n == 0 {
 		s.Pending = s.Raw
 		if receipt != nil {
-			if receipt.private && receipt.Published == s.Pending {
-				receipt.Published = Block{}
-			}
 			receipt.acquire(s, s.Pending)
 		}
 		s.Raw = Block{}

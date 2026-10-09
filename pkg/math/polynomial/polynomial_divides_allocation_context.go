@@ -65,16 +65,14 @@ func numericIntegerManager_dividesNumericSourceCause(m *util.IntegerManager, r *
 	if e := m.DividesNumeralInvocationSourceCause(&s.boolNumeral); e != nil {
 		return e
 	}
-	if e := r.core.modular.PNormalizeInvocationSourceCause(&s.normalize); e != nil {
-		return e
-	}
+
 	if e := m.RawInvocationSourceCause(&s.extendedRaw); e != nil {
 		return e
 	}
 	if e := m.RawInvocationSourceCause(&s.divisionRaw); e != nil {
 		return e
 	}
-	return m.Naturals().PnVerificationSourceCause(&s.verification)
+	return nil
 }
 
 // False completes reached younger source children. True drains unjoined
@@ -99,9 +97,7 @@ func numericIntegerManager_cleanupDividesNumeric(m *util.IntegerManager, r *poly
 	if e := m.CleanupRawInvocation(&s.divisionRaw, abort); e != nil {
 		return e
 	}
-	if e := m.Naturals().CleanupPNVerification(&s.verification, abort); e != nil {
-		return e
-	}
+
 	if abort {
 		for i := len(s.buffers) - 1; i >= 0; i-- {
 			if e := s.buffers[i].Cleanup(); e != nil {
@@ -126,7 +122,7 @@ func numericIntegerManager_dividesNumericPending(m *util.IntegerManager, r *poly
 		return false
 	}
 	s := r.frame
-	if polynomialNegNumericPending(&s.numeric) || m.Naturals().MatchesPNVerification(&s.verification) {
+	if polynomialNegNumericPending(&s.numeric) {
 		return true
 	}
 	if m.MatchesDividesNumeralInvocation(&s.boolNumeral) {

@@ -87,7 +87,7 @@ func (s *UPolynomialFactorizationService) setFrontendConstant(fs *UPolynomialFac
 		if q := b.record; q != nil {
 			q.normalize = b.normalize
 			q.bodyCause = cause
-			q.sourceCause = m.modular.PNormalizeInvocationSourceCause(&q.normalize)
+			q.sourceCause = nil
 			q.retired = !polynomialNegNumericPending(&q.numeric) && !m.modular.MatchesPNormalizeInvocation(&q.normalize)
 		}
 	}()

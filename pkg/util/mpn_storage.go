@@ -20,15 +20,13 @@ type NaturalManager struct {
 	runtime                           *Runtime
 	ownsRuntime                       bool
 	Division                          [4]SourceLimbBuffer
-	Verification                      SourceLimbBuffer
-	VerificationInvocation            naturalPNVerificationScope
+	verificationScratch               []uint32
 	Formatting                        naturalFormattingScope
 	CharFormatting                    integerCharacterScope
 	characterCalls                    *integerCharacterScope
 	SourceFinalizing, sourceFinalized bool
 	SourceStage                       uint8
 	sourceCause                       error
-	VerificationActive                bool
 	originalCause, cleanupCause       error
 	text                              []byte
 	budget                            *arena.Budget
@@ -135,12 +133,7 @@ func (m *NaturalManager) CloseChecked() error {
 		if e := m.cleanupOutputFormatting(); e != nil {
 			return fail(e)
 		}
-		if m.VerificationActive {
-			if e := m.Verification.Finalize(m.runtime); e != nil {
-				return fail(e)
-			}
-			m.VerificationActive = false
-		}
+
 		for i := 3; i >= 0; i-- {
 			if e := m.Division[i].Finalize(m.runtime); e != nil {
 				return fail(e)
@@ -148,6 +141,7 @@ func (m *NaturalManager) CloseChecked() error {
 		}
 	}
 	m.text = nil
+	m.verificationScratch = nil
 	if m.ownsRuntime && m.runtime != nil {
 		if e := m.runtime.Close(); e != nil {
 			return fail(e)
@@ -198,13 +192,6 @@ func (m *NaturalManager) overflowPayloads() uint32 {
 			count++
 		}
 	}
-	if m.VerificationActive {
-		if m.Verification.Raw != (Block{}) {
-			count++
-		}
-		if m.Verification.Pending != (Block{}) {
-			count++
-		}
-	}
+
 	return count
 }

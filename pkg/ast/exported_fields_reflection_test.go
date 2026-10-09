@@ -535,12 +535,6 @@ func testExportedFieldNames(name string) (string, string) {
 		return "Values", ""
 	case "variables":
 		return "Variables", ""
-	case "verification":
-		return "Verification", ""
-	case "verificationActive":
-		return "VerificationActive", ""
-	case "verificationInvocation":
-		return "VerificationInvocation", ""
 	case "words":
 		return "Words", ""
 	case "workspace":

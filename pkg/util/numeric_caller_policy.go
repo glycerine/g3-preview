@@ -21,9 +21,7 @@ type NumericCallerRecordPolicy interface {
 type NumericCallerBufferPolicy interface {
 	NumericBuffer(*NaturalManager, int) *NaturalBufferReceipt
 }
-type NumericCallerVerificationPolicy interface {
-	NumericVerification(*NaturalManager) (*NaturalVerificationScope, error)
-}
+
 type NumericCallerScalarPolicy interface {
 	NumericScalarRaw(*IntegerManager, string) (*IntegerScalarRawScope, error)
 }
@@ -75,16 +73,7 @@ func (h *NumericInvocationHooks) callBuffer(m *NaturalManager, i int) *NaturalBu
 	}
 	return h.Buffer(m, i)
 }
-func (h *NumericInvocationHooks) hasVerification() bool {
-	_, ok := h.Policy.(NumericCallerVerificationPolicy)
-	return ok && h.verificationEnabled() || h.Verification != nil
-}
-func (h *NumericInvocationHooks) callVerification(m *NaturalManager) (*NaturalVerificationScope, error) {
-	if p, ok := h.Policy.(NumericCallerVerificationPolicy); ok && h.verificationEnabled() {
-		return p.NumericVerification(m)
-	}
-	return h.Verification(m)
-}
+
 func (h *NumericInvocationHooks) hasScalarRaw() bool {
 	_, ok := h.Policy.(NumericCallerScalarPolicy)
 	return ok && h.scalarEnabled() || h.ScalarRaw != nil
@@ -130,7 +119,7 @@ func (h *NumericInvocationHooks) callSourceCause(m *IntegerManager) error {
 // Optional capability predicates select only reached caller specializations.
 // Other calls retain the primitive implementation's ordinary lexical scopes.
 type NumericCallerBufferEnabledPolicy interface{ NumericBufferEnabled() bool }
-type NumericCallerVerificationEnabledPolicy interface{ NumericVerificationEnabled() bool }
+
 type NumericCallerScalarEnabledPolicy interface{ NumericScalarRawEnabled() bool }
 
 func (h *NumericInvocationHooks) bufferEnabled() bool {
@@ -139,12 +128,7 @@ func (h *NumericInvocationHooks) bufferEnabled() bool {
 	}
 	return true
 }
-func (h *NumericInvocationHooks) verificationEnabled() bool {
-	if p, ok := h.Policy.(NumericCallerVerificationEnabledPolicy); ok {
-		return p.NumericVerificationEnabled()
-	}
-	return true
-}
+
 func (h *NumericInvocationHooks) scalarEnabled() bool {
 	if p, ok := h.Policy.(NumericCallerScalarEnabledPolicy); ok {
 		return p.NumericScalarRawEnabled()

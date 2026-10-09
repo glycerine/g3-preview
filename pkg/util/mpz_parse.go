@@ -39,9 +39,6 @@ func (m *IntegerManager) setStringWithBeginCapture(out *Int, text string, frame 
 	defer func() {
 		s.executing = false
 		s.bodyCause = cause
-		if s.sourceCause == nil {
-			s.sourceCause = m.Natural.PnVerificationSourceCause(&s.verification)
-		}
 		cause = JoinNumericErrors(cause, s.sourceCause)
 		cause = JoinNumericErrors(cause, s.unbind())
 		if cause == nil {

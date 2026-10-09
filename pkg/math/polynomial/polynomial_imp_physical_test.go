@@ -517,10 +517,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		put(s.Raw)
 		put(s.Pending)
 	}
-	if z.Naturals().VerificationActive {
-		put(z.Naturals().Verification.Raw)
-		put(z.Naturals().Verification.Pending)
-	}
+
 	za := z.SourceAllocator().Stats()
 	ma := util.AllocatorStats{}
 	mmBytes := uint64(0)

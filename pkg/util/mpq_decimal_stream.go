@@ -103,15 +103,15 @@ func (s *rationalDecimalStreamScope) run(out RationalSourceStream, a *Rational, 
 }
 
 type rationalDecimalStreamScope struct {
-	manager                                     *RationalManager
-	invocation                                  uint64
-	values                                      [4]Int // ten,n1,d1,v1: literal source end-label order
-	count, sourceCursor, ownCursor              uint8
-	hooks                                       NumericInvocationHooks
-	numeric                                     NumericAllocationRoots
-	division                                    integerRawInvocationReceipt
-	buffers                                     [4]NaturalBufferReceipt
-	verification                                naturalPNVerificationReceipt
+	manager                        *RationalManager
+	invocation                     uint64
+	values                         [4]Int // ten,n1,d1,v1: literal source end-label order
+	count, sourceCursor, ownCursor uint8
+	hooks                          NumericInvocationHooks
+	numeric                        NumericAllocationRoots
+	division                       integerRawInvocationReceipt
+	buffers                        [4]NaturalBufferReceipt
+
 	insertion                                   NumeralInsertionReceipt
 	integerBinding, naturalBinding              NumericCallerBinding
 	active, executing, finishing, bodySucceeded bool
@@ -150,17 +150,7 @@ func (s *rationalDecimalStreamScope) NumericBuffer(n *NaturalManager, index int)
 	}
 	return &s.buffers[index]
 }
-func (s *rationalDecimalStreamScope) NumericVerification(n *NaturalManager) (*NaturalVerificationScope, error) {
-	if !s.NumericBound(true) || n != s.manager.Z.Natural {
-		return nil, ErrNumericOwner
-	}
-	f, e := n.BeginCallerVerification(&s.hooks)
-	if e != nil {
-		return nil, e
-	}
-	s.verification = naturalPNVerificationReceipt{n, f, f.invocation}
-	return f, nil
-}
+
 func (s *rationalDecimalStreamScope) bind() error {
 	z := s.manager.Z
 	if e := z.BindCaller(&s.integerBinding, s, 33); e != nil {
@@ -187,7 +177,7 @@ func (m *RationalManager) finishDecimalStreamSource() error {
 	}
 	s.finishing = true
 	defer func() { s.finishing = false }()
-	for _, e := range []error{s.insertion.SourceCause(), m.Z.Natural.PnVerificationSourceCause(&s.verification), m.Z.RawInvocationSourceCause(&s.division)} {
+	for _, e := range []error{s.insertion.SourceCause(), m.Z.RawInvocationSourceCause(&s.division)} {
 		if e != nil {
 			s.sourceCause = e
 			return e
@@ -236,9 +226,7 @@ func (m *RationalManager) CleanupDecimalStream() (cause error) {
 			return e
 		}
 	}
-	if e := z.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	if e := z.CleanupRawInvocation(&s.division, true); e != nil {
 		return e
 	}

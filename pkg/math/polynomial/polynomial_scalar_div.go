@@ -11,16 +11,16 @@ type polynomialScalarDivScope struct {
 	active, ended, executing bool
 	normalize                util.IntegerNormalizeInvocationReceipt
 	buffers                  [4]util.NaturalBufferReceipt
-	verification             util.NaturalVerificationReceipt
-	transport                util.Int
-	transportBuffer          *polynomialSOM
-	transportSlot            uint32
-	transportBound           bool
-	division                 util.IntegerScalarRawScope
-	extended                 util.IntegerScalarRawScope
-	bodyCause, sourceCause   error
-	invocation               uint64
-	numeric                  polynomialNumericRoots
+
+	transport              util.Int
+	transportBuffer        *polynomialSOM
+	transportSlot          uint32
+	transportBound         bool
+	division               util.IntegerScalarRawScope
+	extended               util.IntegerScalarRawScope
+	bodyCause, sourceCause error
+	invocation             uint64
+	numeric                polynomialNumericRoots
 }
 type polynomialScalarDivInvocationReceipt struct {
 	manager    *MultivariatePolynomialCore
@@ -45,7 +45,7 @@ func (m *MultivariatePolynomialCore) finishScalarDivSource() error {
 	if !s.active || s.ended {
 		return nil
 	}
-	for _, e := range []error{s.division.SourceCause(), s.extended.SourceCause(), m.modular.PNormalizeInvocationSourceCause(&s.normalize), m.integer.Naturals().PnVerificationSourceCause(&s.verification)} {
+	for _, e := range []error{s.division.SourceCause(), s.extended.SourceCause()} {
 		if e != nil {
 			s.sourceCause = e
 			return e
@@ -80,9 +80,7 @@ func (m *MultivariatePolynomialCore) cleanupScalarDivPhase(abort bool) error {
 	if e := m.modular.CleanupPNormalizeInvocation(&s.normalize, false); e != nil {
 		return e
 	}
-	if e := m.integer.Naturals().CleanupPNVerification(&s.verification, false); e != nil {
-		return e
-	}
+
 	if e := s.division.Cleanup(false); e != nil {
 		return e
 	}
@@ -107,9 +105,7 @@ func (m *MultivariatePolynomialCore) cleanupScalarDivPhase(abort bool) error {
 		if e := m.modular.CleanupPNormalizeInvocation(&s.normalize, true); e != nil {
 			return e
 		}
-		if e := m.integer.Naturals().CleanupPNVerification(&s.verification, true); e != nil {
-			return e
-		}
+
 		if e := s.division.Cleanup(true); e != nil {
 			return e
 		}
@@ -132,7 +128,7 @@ func (m *MultivariatePolynomialCore) cleanupScalarDivPhase(abort bool) error {
 	}
 	if s.returned == (Polynomial{}) && !s.directPending(m) {
 		invocation := s.invocation
-		*s = polynomialScalarDivScope{invocation: invocation, bodyCause: s.bodyCause, sourceCause: s.sourceCause, division: s.division, extended: s.extended, normalize: s.normalize, verification: s.verification}
+		*s = polynomialScalarDivScope{invocation: invocation, bodyCause: s.bodyCause, sourceCause: s.sourceCause, division: s.division, extended: s.extended, normalize: s.normalize}
 	}
 	return nil
 }
@@ -203,7 +199,7 @@ func (m *MultivariatePolynomialCore) scalarDivWithParentReceipts(p Polynomial, d
 }
 
 func (s *polynomialScalarDivScope) directPending(m *MultivariatePolynomialCore) bool {
-	if s.transportBound || polynomialNegNumericPending(&s.numeric) || s.division.Active() || s.extended.Active() || m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.Naturals().MatchesPNVerification(&s.verification) {
+	if s.transportBound || polynomialNegNumericPending(&s.numeric) || s.division.Active() || s.extended.Active() || m.modular.MatchesPNormalizeInvocation(&s.normalize) {
 		return true
 	}
 	for i := range s.buffers {

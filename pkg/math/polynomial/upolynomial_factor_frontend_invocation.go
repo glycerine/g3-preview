@@ -36,33 +36,33 @@ type upolyFactorFrontendHistory struct {
 	divisibilityAddMul                                                                util.IntegerAddMulInvocationReceipt
 	boolNumeral                                                                       util.IntegerDividesNumeralInvocationReceipt
 	addMul                                                                            util.IntegerAddMulInvocationReceipt
-	verification                                                                      util.NaturalVerificationReceipt
-	remainderInvocation, monicInvocation, craInvocation                               uint64
-	remainderBodyCause, remainderSourceCause, remainderOwnCause                       error
-	monicBodyCause, monicSourceCause, monicOwnCause                                   error
-	craBodyCause, craSourceCause, craOwnCause                                         error
-	remainderAddMul                                                                   util.IntegerAddMulInvocationReceipt
-	monicEndEntered                                                                   bool
-	monicSourceIndex                                                                  uint8
-	imageFrame                                                                        *upolyFactorImageScope
-	imageInvocation                                                                   uint64
-	imageBodyCause, imageSourceCause, imageOwnCause                                   error
-	imageSourceStoppedStage                                                           uint8
-	modularGCDFrame                                                                   *upolyFactorModularGCDScope
-	modularGCDInvocation                                                              uint64
-	modularGCDBodyCause, modularGCDSourceCause, modularGCDOwnCause                    error
-	issued                                                                            upolyFactorFrontendInvocationReceipt
-	complete                                                                          bool
-	gcdRaw, divisionRaw, extendedRaw                                                  util.IntegerRawInvocationReceipt
-	normalize                                                                         util.IntegerNormalizeInvocationReceipt
-	squareFree                                                                        upolyFactorSquareFreeInvocationReceipt
-	self                                                                              *upolyFactorFrontendHistory
-	service                                                                           *UPolynomialFactorizationService
-	next                                                                              *upolyFactorFrontendHistory
-	header, invocation                                                                uint64
-	bodyCause, sourceCause, ownCause                                                  error
-	sourceStoppedStage                                                                uint8
-	sourceStoppedIndex                                                                uint32
+
+	remainderInvocation, monicInvocation, craInvocation            uint64
+	remainderBodyCause, remainderSourceCause, remainderOwnCause    error
+	monicBodyCause, monicSourceCause, monicOwnCause                error
+	craBodyCause, craSourceCause, craOwnCause                      error
+	remainderAddMul                                                util.IntegerAddMulInvocationReceipt
+	monicEndEntered                                                bool
+	monicSourceIndex                                               uint8
+	imageFrame                                                     *upolyFactorImageScope
+	imageInvocation                                                uint64
+	imageBodyCause, imageSourceCause, imageOwnCause                error
+	imageSourceStoppedStage                                        uint8
+	modularGCDFrame                                                *upolyFactorModularGCDScope
+	modularGCDInvocation                                           uint64
+	modularGCDBodyCause, modularGCDSourceCause, modularGCDOwnCause error
+	issued                                                         upolyFactorFrontendInvocationReceipt
+	complete                                                       bool
+	gcdRaw, divisionRaw, extendedRaw                               util.IntegerRawInvocationReceipt
+	normalize                                                      util.IntegerNormalizeInvocationReceipt
+	squareFree                                                     upolyFactorSquareFreeInvocationReceipt
+	self                                                           *upolyFactorFrontendHistory
+	service                                                        *UPolynomialFactorizationService
+	next                                                           *upolyFactorFrontendHistory
+	header, invocation                                             uint64
+	bodyCause, sourceCause, ownCause                               error
+	sourceStoppedStage                                             uint8
+	sourceStoppedIndex                                             uint32
 }
 type upolyFactorModularGCDScope struct {
 	executing, sourceExecuting, ownExecuting bool
@@ -182,14 +182,14 @@ type upolyFactorFlipScope struct {
 }
 
 type upolyFactorFrontendScope struct {
-	perfectSquare                                    util.IntegerPerfectSquareInvocationReceipt
-	vectorNormalize                                  upolyFactorVectorNormalizeScope
-	modularPower                                     upolyFactorModularPowerScope
-	quadratic                                        upolyFactorQuadraticScope
-	flip                                             upolyFactorFlipScope
-	result                                           *UPolynomialFactors
-	buffers                                          [4]util.NaturalBufferReceipt
-	verification                                     util.NaturalVerificationReceipt
+	perfectSquare   util.IntegerPerfectSquareInvocationReceipt
+	vectorNormalize upolyFactorVectorNormalizeScope
+	modularPower    upolyFactorModularPowerScope
+	quadratic       upolyFactorQuadraticScope
+	flip            upolyFactorFlipScope
+	result          *UPolynomialFactors
+	buffers         [4]util.NaturalBufferReceipt
+
 	primitive                                        upolyFactorPrimitiveScope
 	divisibility                                     upolyFactorDivisibilityScope
 	boolNumeral                                      util.IntegerDividesNumeralInvocationReceipt
@@ -283,9 +283,6 @@ func (q *upolyFactorFrontendScope) finish(body error) error {
 		q.sourceCause = q.flip.sourceCause
 	}
 	if q.sourceCause == nil {
-		q.sourceCause = q.service.manager.config.Integer.Naturals().PnVerificationSourceCause(&q.verification)
-	}
-	if q.sourceCause == nil {
 		q.sourceCause = q.service.manager.config.Integer.DividesNumeralInvocationSourceCause(&q.boolNumeral)
 	}
 	if q.sourceCause == nil {
@@ -353,9 +350,7 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 		q.recordHistory()
 	}()
 	z := q.service.manager.config.Integer
-	if e := z.Naturals().CleanupPNVerification(&q.verification, false); e != nil {
-		return e
-	}
+
 	if e := z.CleanupDividesNumeralInvocation(&q.boolNumeral, false); e != nil {
 		return e
 	}
@@ -432,9 +427,7 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 		if e := q.modularPower.own(true); e != nil {
 			return e
 		}
-		if e := z.Naturals().CleanupPNVerification(&q.verification, true); e != nil {
-			return e
-		}
+
 		for i := range q.buffers {
 			if e := q.buffers[i].Cleanup(); e != nil {
 				return e
@@ -487,9 +480,7 @@ func (q *upolyFactorFrontendScope) hasUnjoined() bool {
 	if q.modularPower.active {
 		return true
 	}
-	if z.Naturals().MatchesPNVerification(&q.verification) {
-		return true
-	}
+
 	for i := range q.buffers {
 		if q.buffers[i].Pending() != (util.Block{}) {
 			return true
@@ -582,7 +573,7 @@ func (q *upolyFactorFrontendScope) recordHistory() {
 	h.derivativePhase = q.derivative.phase
 	h.boolNumeral = q.boolNumeral
 	h.addMul = q.addMul
-	h.verification = q.verification
+
 	h.remainderInvocation = q.remainder.invocation
 	h.remainderBodyCause = q.remainder.bodyCause
 	h.remainderSourceCause = q.remainder.sourceCause
@@ -1294,9 +1285,7 @@ func (q *upolyFactorFrontendScope) numericSourceCause() error {
 		return q.sourceCause
 	}
 	z := q.service.manager.config.Integer
-	if e := z.Naturals().PnVerificationSourceCause(&q.verification); e != nil {
-		return e
-	}
+
 	if e := z.DividesNumeralInvocationSourceCause(&q.boolNumeral); e != nil {
 		return e
 	}
@@ -1510,10 +1499,7 @@ func (q *upolyFactorModularPowerScope) finishEnd() error {
 	}
 	q.sourceExecuting = true
 	defer func() { q.sourceExecuting = false }()
-	if e := q.owner.service.manager.config.Integer.Naturals().PnVerificationSourceCause(&q.owner.verification); e != nil {
-		q.sourceCause = e
-		return e
-	}
+
 	if _, e := upolynomialSourceNumeralDel(q.owner.service.manager.config.Integer, &q.power); e != nil {
 		q.sourceCause = e
 		return e

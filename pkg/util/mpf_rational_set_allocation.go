@@ -15,7 +15,7 @@ type arbitraryFloatRationalSetHistory struct {
 	plainInvocation                                 uint64
 	plainBodyCause, plainSourceCause, plainOwnCause error
 	plainExpFinished                                bool
-	naturalOriginal                                 [5]Block
+	naturalOriginal                                 [4]Block
 	issued                                          ArbitraryFloatRationalSetReceipt
 	gcd, division, extended                         integerRawInvocationReceipt
 	roundChild                                      ArbitraryFloatRoundReceipt
@@ -142,9 +142,7 @@ func (m *ArbitraryFloatManager) rationalSetChildrenSource(s *arbitraryFloatRatio
 	if s.prevSourceCause != nil {
 		return s.prevSourceCause
 	}
-	if e := m.integer.Natural.PnVerificationSourceCause(&s.verification); e != nil {
-		return e
-	}
+
 	if e := m.integer.RawInvocationSourceCause(&s.extended); e != nil {
 		return e
 	}
@@ -157,9 +155,7 @@ func (m *ArbitraryFloatManager) cleanupRationalSetChildren(s *arbitraryFloatRati
 	if e := m.rationalSetRoundCleanup(s, abort); e != nil {
 		return e
 	}
-	if e := m.integer.Natural.CleanupPNVerification(&s.verification, abort); e != nil {
-		return e
-	}
+
 	if abort {
 		for i := len(s.buffers) - 1; i >= 0; i-- {
 			if e := s.buffers[i].cleanup(); e != nil {

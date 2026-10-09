@@ -31,8 +31,8 @@ type upolyRecombinationStepScope struct {
 	addMul                                           util.IntegerAddMulInvocationReceipt
 	divisionRaw, extendedRaw, gcdRaw                 util.IntegerRawInvocationReceipt
 	buffers                                          [4]util.NaturalBufferReceipt
-	verification                                     util.NaturalVerificationReceipt
-	bodyCause, sourceCause, ownCause                 error
+
+	bodyCause, sourceCause, ownCause error
 }
 
 func (q *upolyRecombinationStepScope) matches() bool {
@@ -59,11 +59,6 @@ func (q *upolyRecombinationStepScope) managers() [2]*UPolynomialManager {
 }
 func (q *upolyRecombinationStepScope) childCause() error {
 	z := q.owner.manager.config.Integer
-	for i, m := range q.managers() {
-		if e := m.modular.PNormalizeInvocationSourceCause(&q.normalize[i]); e != nil {
-			return e
-		}
-	}
 	if e := z.DividesNumeralInvocationSourceCause(&q.boolNumeral); e != nil {
 		return e
 	}
@@ -75,7 +70,7 @@ func (q *upolyRecombinationStepScope) childCause() error {
 			return e
 		}
 	}
-	return z.Naturals().PnVerificationSourceCause(&q.verification)
+	return nil
 }
 func (q *upolyRecombinationStepScope) matchesReceipt(r *upolyRecombinationStepInvocationReceipt) bool {
 	return q.matches() && r != nil && r.owner == q.owner && r.frame == q && r.invocation != 0 && r.invocation == q.invocation
@@ -118,9 +113,7 @@ func (q *upolyRecombinationStepScope) pending() bool {
 	if polynomialNegNumericPending(&q.numeric) || z.MatchesDividesNumeralInvocation(&q.boolNumeral) || z.MatchesAddMulInvocation(&q.addMul) {
 		return true
 	}
-	if z.Naturals().MatchesPNVerification(&q.verification) {
-		return true
-	}
+
 	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 		if z.MatchesRawInvocation(r) {
 			return true
@@ -177,9 +170,7 @@ func (q *upolyRecombinationStepScope) own(r *upolyRecombinationStepInvocationRec
 			return e
 		}
 	}
-	if e := z.Naturals().CleanupPNVerification(&q.verification, false); e != nil {
-		return e
-	}
+
 	q.ownEnded = true
 	if abort {
 		for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
@@ -187,9 +178,7 @@ func (q *upolyRecombinationStepScope) own(r *upolyRecombinationStepInvocationRec
 				return e
 			}
 		}
-		if e := z.Naturals().CleanupPNVerification(&q.verification, true); e != nil {
-			return e
-		}
+
 		for i := range q.buffers {
 			if e := q.buffers[i].Cleanup(); e != nil {
 				return e

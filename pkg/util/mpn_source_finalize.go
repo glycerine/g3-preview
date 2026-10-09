@@ -6,8 +6,7 @@ import (
 )
 
 // SourceFinalize performs only the actual completed manager's source member
-// destructors. Leaked failed-constructor locals and unpublished member expansion
-// blocks remain in the charged owner for separate explicit owning CloseChecked.
+// destructors. Unpublished division member expansion blocks remain in the charged owner for separate explicit owning CloseChecked.
 
 func (m *NaturalManager) SourceFinalize() error {
 	if m.numericCallerExecuting() {

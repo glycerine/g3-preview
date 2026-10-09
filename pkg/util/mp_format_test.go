@@ -133,7 +133,7 @@ func TestNaturalBorrowedDivisionFailureAtomic(t *testing.T) {
 	wq, wr := new(big.Int), new(big.Int)
 	wq.QuoRem(oracle(a), oracle(b), wr)
 	completed := false
-	beforeOutputFailures, afterOutputFailures := 0, 0
+	beforeOutputFailures := 0
 	for fault := int64(0); fault < 128; fault++ {
 		budget := arena.NewBudget(1 << 22)
 		m, e := NewNaturalManager(arena.VectorConfig{PageSize: 32, Descriptors: arena.Config{PageSize: 2, Budget: budget}})
@@ -149,16 +149,14 @@ func TestNaturalBorrowedDivisionFailureAtomic(t *testing.T) {
 		}
 		budget.FailAfter(fault)
 		_, e = m.Div(a, b, q, r)
-		// Source mpn.cpp:208–223 constructs the debug verification buffer only
-		// after quotient and unnormalized remainder publication is complete.
+		// Source verification runs after quotient/remainder publication; its
+		// native scratch adds no Runtime allocation-refusal phase.
 		if m.Division[3].size() != 0 {
 			t.Fatal("fixture unexpectedly entered conditional add-back", fault)
 		}
 		roots := map[Block]bool{}
 		buffers := []*SourceLimbBuffer{&m.Division[0], &m.Division[1], &m.Division[2], &m.Division[3]}
-		if m.VerificationActive {
-			buffers = append(buffers, &m.Verification)
-		}
+
 		for _, buf := range buffers {
 			for _, ref := range []Block{buf.Raw, buf.Pending} {
 				if ref == (Block{}) {
@@ -182,12 +180,8 @@ func TestNaturalBorrowedDivisionFailureAtomic(t *testing.T) {
 			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal("unexpected division refusal", fault, e)
 			}
-			if m.VerificationActive {
-				afterOutputFailures++
-				if !modularSourceDebug || oracle(q).Cmp(wq) != 0 || oracle(r).Cmp(wr) != 0 {
-					t.Fatal("complete outputs before source verification refusal", fault, e)
-				}
-			} else {
+
+			{
 				beforeOutputFailures++
 				for _, v := range q {
 					if v != 123 {
@@ -230,8 +224,8 @@ func TestNaturalBorrowedDivisionFailureAtomic(t *testing.T) {
 			break
 		}
 	}
-	if !completed || beforeOutputFailures == 0 || (modularSourceDebug && afterOutputFailures == 0) || (!modularSourceDebug && afterOutputFailures != 0) {
-		t.Fatal("division source-phase sweep incomplete", completed, beforeOutputFailures, afterOutputFailures)
+	if !completed || beforeOutputFailures == 0 {
+		t.Fatal("division source-phase sweep incomplete", completed, beforeOutputFailures)
 	}
 }
 
@@ -463,27 +457,12 @@ func TestNaturalPreparedAddBackStorageAdaptation(t *testing.T) {
 	baseline := m.RuntimeOwner().Stats()
 	charge := m.budget.Used()
 	state := m.RuntimeOwner().State()
-	if modularSourceDebug {
-		// Each actual debug invocation constructs and destroys its lexical temp;
-		// no universal zero-Go-allocation claim applies to these source mallocs.
-		for iteration := 0; iteration < 10; iteration++ {
-			previous := m.RuntimeOwner().State().GlobalCount
-			if _, e := m.Div(a, b, q, r); e != nil {
-				t.Fatal(e)
-			}
-			now := m.RuntimeOwner().State()
-			if now.GlobalCount <= previous || now.GlobalSize != state.GlobalSize || now.LocalSize != state.LocalSize || m.RuntimeOwner().Stats() != baseline || m.budget.Used() != charge {
-				t.Fatal("lexical temp physical destruction", state, now, baseline, m.RuntimeOwner().Stats())
-			}
-		}
-	} else {
-		var failure error
-		if allocations := testing.AllocsPerRun(100, func() { _, failure = m.Div(a, b, q, r) }); allocations != 0 || failure != nil {
-			t.Fatal(allocations, failure)
-		}
-		if m.RuntimeOwner().State() != state || m.RuntimeOwner().Stats() != baseline || m.budget.Used() != charge {
-			t.Fatal("release warm division allocated actual storage")
-		}
+	var failure error
+	if allocations := testing.AllocsPerRun(100, func() { _, failure = m.Div(a, b, q, r) }); allocations != 0 || failure != nil {
+		t.Fatal(allocations, failure)
+	}
+	if m.RuntimeOwner().State() != state || m.RuntimeOwner().Stats() != baseline || m.budget.Used() != charge {
+		t.Fatal("native verification changed warmed physical graph")
 	}
 
 }

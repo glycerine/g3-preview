@@ -18,9 +18,9 @@ type polynomialNormalizeScope struct {
 	normalize                        util.IntegerNormalizeInvocationReceipt
 	gcdRaw, divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
 	buffers                          [4]util.NaturalBufferReceipt
-	verification                     util.NaturalVerificationReceipt
-	append                           polynomialCheapAppendInvocationReceipt
-	factory                          polynomialFactoryInvocationReceipt
+
+	append  polynomialCheapAppendInvocationReceipt
+	factory polynomialFactoryInvocationReceipt
 
 	invocation                                   uint64
 	g, a                                         util.Int
@@ -58,7 +58,7 @@ func (m *MultivariatePolynomialManager) beginNormalization() error {
 }
 func (s *polynomialNormalizeScope) directPending(m *MultivariatePolynomialManager) bool {
 	c := m.core
-	if polynomialNegNumericPending(&s.numeric) || c.integer.MatchesRawInvocation(&s.gcdRaw) || c.integer.MatchesRawInvocation(&s.divisionRaw) || c.integer.MatchesRawInvocation(&s.extendedRaw) || c.modular.MatchesPNormalizeInvocation(&s.normalize) || c.integer.Naturals().MatchesPNVerification(&s.verification) || c.cheap.matchesAppendInvocation(&s.append) || c.matchesFactoryInvocation(&s.factory) {
+	if polynomialNegNumericPending(&s.numeric) || c.integer.MatchesRawInvocation(&s.gcdRaw) || c.integer.MatchesRawInvocation(&s.divisionRaw) || c.integer.MatchesRawInvocation(&s.extendedRaw) || c.modular.MatchesPNormalizeInvocation(&s.normalize) || c.cheap.matchesAppendInvocation(&s.append) || c.matchesFactoryInvocation(&s.factory) {
 		return true
 	}
 	for i := range s.buffers {

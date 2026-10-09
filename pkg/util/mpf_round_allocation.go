@@ -14,7 +14,7 @@ type ArbitraryFloatRoundReceipt struct {
 	invocation uint64
 }
 type arbitraryFloatRoundHistory struct {
-	naturalOriginal                  [5]Block
+	naturalOriginal                  [4]Block
 	issued                           ArbitraryFloatRoundReceipt
 	owned                            bool
 	self                             *arbitraryFloatRoundHistory

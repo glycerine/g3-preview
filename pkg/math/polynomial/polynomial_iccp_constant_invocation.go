@@ -61,9 +61,6 @@ func (m *MultivariatePolynomialManager) iccpConstantSET(i, a *util.Int, parent *
 	defer func() {
 		s.executing = false
 		s.bodyCause = err
-		if s.sourceCause == nil {
-			s.sourceCause = c.modular.PNormalizeInvocationSourceCause(&s.normalize)
-		}
 		err = errors.Join(err, s.sourceCause)
 		pending := s.numeric.PendingObject() != (util.ObjectRef{}) || c.modular.MatchesPNormalizeInvocation(&s.normalize)
 		for _, raw := range s.numeric.PendingAllocatorBlocks() {

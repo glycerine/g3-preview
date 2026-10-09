@@ -130,7 +130,7 @@ func TestPolynomialVariableRecognitionOldACKPreservesLaterForeignCopyAndPN(t *te
 				body = c.integer.CopyFromOwnerWithReceipt(&out, c.integer, &big, &copyReceipt)
 			}
 			actual := c.integer.MatchesCopyAllocationInvocation(&copyReceipt) || c.modular.MatchesPNormalizeInvocation(&pnReceipt)
-			if (body != nil && actual) || (field && !polynomialSourceDebug && body == nil) {
+			if (body != nil && actual) || (field && body == nil) {
 				found = true
 
 				copyState, pnState := c.integer.CopyAllocation, c.modular.Normalization

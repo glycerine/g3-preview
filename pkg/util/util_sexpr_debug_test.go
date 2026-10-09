@@ -182,9 +182,6 @@ func sexprAuditNumericRoots(t *testing.T, q *RationalService, value *OwnedRation
 	for i := 0; i < buffers.Len(); i++ {
 		addRaw(buffers.Index(i))
 	}
-	if testFieldBySourceName(natural, "verificationActive").Bool() {
-		addRaw(testFieldBySourceName(natural, "verification"))
-	}
 	payloads += uint32(len(raw))
 	pending := testFieldBySourceName(testFieldBySourceName(integer, "pendingCell"), "object")
 	if testFieldBySourceName(pending, "owner").Uint() != 0 {

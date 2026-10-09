@@ -21,7 +21,7 @@ func (q *RationalManager) prevPowerOfTwoWithRationalSetContext(c integerAllocati
 	s.prev = Int{}
 	s.prevLive = true
 	defer func() {
-		// A younger Floor verification/RAW source stop leaves this NUM unread.
+		// A younger Floor RAW source stop leaves this NUM unread.
 		if source := s.manager.rationalSetChildrenSource(s); source != nil {
 			s.prevSourceCause = source
 			cause = errors.Join(cause, source)

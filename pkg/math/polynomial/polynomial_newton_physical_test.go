@@ -268,10 +268,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		put(s.Raw)
 		put(s.Pending)
 	}
-	if z.Naturals().VerificationActive {
-		put(z.Naturals().Verification.Raw)
-		put(z.Naturals().Verification.Pending)
-	}
+
 	za, ma := z.SourceAllocator().Stats(), mm.allocator.Stats()
 	if uint32(len(raw))+za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
 		t.Fatal("unnamed Runtime root", len(raw), za, ma, m.memory.Stats())

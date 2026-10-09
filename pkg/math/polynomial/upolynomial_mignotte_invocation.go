@@ -90,9 +90,6 @@ func (s *UPolynomialFactorizationService) finishMignotteSource(r *upolyMignotteI
 		q.sourceStarted = true
 	}
 	if q.sourceCause == nil {
-		q.sourceCause = s.manager.modular.PNormalizeInvocationSourceCause(&q.normalize)
-	}
-	if q.sourceCause == nil {
 		q.sourceCause = z.RootInvocationSourceCause(&q.root)
 	}
 	if q.sourceCause == nil {

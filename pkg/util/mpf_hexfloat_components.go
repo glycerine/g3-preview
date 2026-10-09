@@ -98,19 +98,19 @@ func (m *ArbitraryFloatManager) ToStringHexfloatComponentsInto(sign bool, expone
 }
 
 type arbitraryFloatHexfloatComponentsScope struct {
-	manager                        *ArbitraryFloatManager
-	invocation                     uint64
-	q                              ArbitraryFloat
-	sig                            Int
-	qLive, sigLive                 bool
-	format                         *ArbitraryFloatFormatInvocation
-	formatInvocation               uint64
-	formatOwned                    bool
-	hooks                          NumericInvocationHooks
-	numeric                        NumericAllocationRoots
-	division                       integerRawInvocationReceipt
-	buffers                        [4]NaturalBufferReceipt
-	verification                   naturalPNVerificationReceipt
+	manager          *ArbitraryFloatManager
+	invocation       uint64
+	q                ArbitraryFloat
+	sig              Int
+	qLive, sigLive   bool
+	format           *ArbitraryFloatFormatInvocation
+	formatInvocation uint64
+	formatOwned      bool
+	hooks            NumericInvocationHooks
+	numeric          NumericAllocationRoots
+	division         integerRawInvocationReceipt
+	buffers          [4]NaturalBufferReceipt
+
 	integerBinding, naturalBinding NumericCallerBinding
 	active, executing, finishing   bool
 	bodyCause, sourceCause         error
@@ -155,17 +155,7 @@ func (s *arbitraryFloatHexfloatComponentsScope) NumericBuffer(n *NaturalManager,
 	}
 	return &s.buffers[index]
 }
-func (s *arbitraryFloatHexfloatComponentsScope) NumericVerification(n *NaturalManager) (*NaturalVerificationScope, error) {
-	if !s.NumericBound(true) || n != s.manager.integer.Natural {
-		return nil, ErrNumericOwner
-	}
-	f, e := n.BeginCallerVerification(&s.hooks)
-	if e != nil {
-		return nil, e
-	}
-	s.verification = naturalPNVerificationReceipt{n, f, f.invocation}
-	return f, nil
-}
+
 func (s *arbitraryFloatHexfloatComponentsScope) bind() error {
 	z := s.manager.integer
 	if e := z.BindCaller(&s.integerBinding, s, 36); e != nil {
@@ -205,7 +195,7 @@ func (m *ArbitraryFloatManager) finishHexfloatComponentsSource() error {
 			return e
 		}
 	}
-	for _, e := range []error{m.integer.Natural.PnVerificationSourceCause(&s.verification), m.integer.RawInvocationSourceCause(&s.division)} {
+	for _, e := range []error{m.integer.RawInvocationSourceCause(&s.division)} {
 		if e != nil {
 			s.sourceCause = e
 			return e
@@ -261,9 +251,7 @@ func (m *ArbitraryFloatManager) CleanupHexfloatComponents() (cause error) {
 		s.formatOwned = true
 	}
 	z := m.integer
-	if e := z.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	if e := z.CleanupRawInvocation(&s.division, true); e != nil {
 		return e
 	}

@@ -609,9 +609,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 	}
 
 	buffers := []*util.SourceLimbBuffer{&m.Natural.Division[0], &m.Natural.Division[1], &m.Natural.Division[2], &m.Natural.Division[3]}
-	if m.Natural.VerificationActive {
-		buffers = append(buffers, &m.Natural.Verification)
-	}
+
 	for _, s := range buffers {
 		for _, r := range []util.Block{s.Raw, s.Pending} {
 			if r == (util.Block{}) {

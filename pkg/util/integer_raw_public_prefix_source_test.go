@@ -385,18 +385,7 @@ func TestIntegerPublicRawContextNonceDoesNotFollowEmbeddedReceiptReuse(t *testin
 	if b := m.Natural.DivisionBufferReceipt(current, 0); b == nil || !b.Bound(true) {
 		t.Fatal("actual new Natural member binding absent")
 	}
-	if SourceExtendedGCDDebug {
-		view := func(n uint32) limbView { return limbView{external: []uint32{n}, size: 1} }
-		before := m.Natural.VerificationInvocation
-		serviceMust(t, m.Natural.sourceVerifyDivisionWithAllocationContext(view(3), view(2), view(1), view(1), old))
-		if !reflect.DeepEqual(before, m.Natural.VerificationInvocation) || s.verification.Invocation != 0 {
-			t.Fatal("old context acquired verification authority")
-		}
-		serviceMust(t, m.Natural.sourceVerifyDivisionWithAllocationContext(view(3), view(2), view(1), view(1), current))
-		if s.verification.Invocation == 0 || m.Natural.VerificationInvocation.raw.Invocation != current.rawInvocation {
-			t.Fatal("actual new verification binding absent")
-		}
-	}
+
 	integerPhysicalAudit(t, m)
 	s.executing = false
 	serviceMust(t, m.CleanupRawInvocation(second, true))

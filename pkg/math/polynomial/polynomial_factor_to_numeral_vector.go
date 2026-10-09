@@ -193,10 +193,7 @@ func (m *MultivariatePolynomialManager) finishFactorNumeralVectorSource() error 
 	defer setFactorNumeralVectorCaller(m.core.integer, previousCaller)
 	s.finishing = true
 	defer func() { s.finishing = false }()
-	if e := m.upm.modular.PNormalizeInvocationSourceCause(&s.normalize); e != nil {
-		s.sourceCause = e
-		return e
-	}
+
 	if e := m.normalizeInvocationSourceCause(&s.normalization); e != nil {
 		s.sourceCause = e
 		return e

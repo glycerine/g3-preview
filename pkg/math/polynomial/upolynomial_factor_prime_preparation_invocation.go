@@ -34,8 +34,8 @@ type upolyFactorPrimePreparationScope struct {
 	normalize                                        [3]util.IntegerNormalizeInvocationReceipt
 	divisionRaw, extendedRaw, gcdRaw                 util.IntegerRawInvocationReceipt
 	buffers                                          [4]util.NaturalBufferReceipt
-	verification                                     util.NaturalVerificationReceipt
-	bodyCause, sourceCause, ownCause                 error
+
+	bodyCause, sourceCause, ownCause error
 }
 
 func (q *upolyFactorPrimePreparationScope) matches() bool {
@@ -68,20 +68,12 @@ func (q *upolyFactorPrimePreparationScope) childCause() error {
 	if q.matchesHensel() && q.hensel.sourceCause != nil {
 		return q.hensel.sourceCause
 	}
-	for i, m := range q.managers() {
-		if m == nil {
-			continue
-		}
-		if e := m.modular.PNormalizeInvocationSourceCause(&q.normalize[i]); e != nil {
-			return e
-		}
-	}
 	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 		if e := z.RawInvocationSourceCause(r); e != nil {
 			return e
 		}
 	}
-	return z.Naturals().PnVerificationSourceCause(&q.verification)
+	return nil
 }
 func (q *upolyFactorPrimePreparationScope) matchesReceipt(r *upolyFactorPrimePreparationInvocationReceipt) bool {
 	return q.matches() && r != nil && r.owner == q.owner && r.frame == q && r.invocation != 0 && r.invocation == q.invocation
@@ -127,9 +119,7 @@ func (q *upolyFactorPrimePreparationScope) pending() bool {
 	if polynomialNegNumericPending(&q.numeric) {
 		return true
 	}
-	if z.Naturals().MatchesPNVerification(&q.verification) {
-		return true
-	}
+
 	for _, r := range []*util.IntegerRawInvocationReceipt{&q.divisionRaw, &q.extendedRaw, &q.gcdRaw} {
 		if z.MatchesRawInvocation(r) {
 			return true
@@ -194,9 +184,7 @@ func (q *upolyFactorPrimePreparationScope) own(r *upolyFactorPrimePreparationInv
 			return e
 		}
 	}
-	if e := z.Naturals().CleanupPNVerification(&q.verification, false); e != nil {
-		return e
-	}
+
 	q.ownEnded = true
 	if abort {
 		if e := q.owner.service.cleanupMignotteInvocation(&q.mignotte, true); e != nil {
@@ -212,9 +200,7 @@ func (q *upolyFactorPrimePreparationScope) own(r *upolyFactorPrimePreparationInv
 				return e
 			}
 		}
-		if e := z.Naturals().CleanupPNVerification(&q.verification, true); e != nil {
-			return e
-		}
+
 		for i := range q.buffers {
 			if e := q.buffers[i].Cleanup(); e != nil {
 				return e

@@ -100,9 +100,6 @@ func (q *upolyRationalEvaluationScope) finish(body error) error {
 	}
 	z := q.owner.config.Integer
 	if q.sourceCause == nil {
-		q.sourceCause = q.owner.modular.PNormalizeInvocationSourceCause(&q.normalize)
-	}
-	if q.sourceCause == nil {
 		q.sourceCause = z.AddMulInvocationSourceCause(&q.addMul)
 	}
 	if q.sourceCause == nil {

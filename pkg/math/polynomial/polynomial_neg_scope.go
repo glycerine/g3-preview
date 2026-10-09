@@ -53,10 +53,7 @@ func (m *MultivariatePolynomialCore) finishNegSource() error {
 	if !s.negativeActive || s.negativeEnded {
 		return nil
 	}
-	if e := m.modular.PNormalizeInvocationSourceCause(&s.normalize); e != nil {
-		s.negativeCleanupCause = e
-		return e
-	}
+
 	_, e := upolynomialSourceNumeralDel(m.integer, &s.negativeCoefficient)
 	if e != nil {
 		s.negativeCleanupCause = e

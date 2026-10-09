@@ -297,9 +297,6 @@ func astFloatingPointRawGraphSourceOwners(t *testing.T, q *util.RationalService,
 				raw(testFieldBySourceName(division.Index(i), "raw"))
 				raw(testFieldBySourceName(division.Index(i), "pending"))
 			}
-			verification := testFieldBySourceName(n, "verification")
-			raw(testFieldBySourceName(verification, "raw"))
-			raw(testFieldBySourceName(verification, "pending"))
 		}
 		raw(testFieldBySourceName(testFieldBySourceName(z, "pendingCell"), "raw"))
 		a := testFieldBySourceName(z, "allocator")

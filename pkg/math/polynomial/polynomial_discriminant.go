@@ -123,9 +123,7 @@ func (m *MultivariatePolynomialManager) discriminantYoungerSourceCause() error {
 	if e := c.scalarDivInvocationSourceCause(&s.scalar); e != nil {
 		return e
 	}
-	if e := c.modular.PNormalizeInvocationSourceCause(&s.leadingNeg); e != nil {
-		return e
-	}
+
 	if e := c.negInvocationSourceCause(&s.neg); e != nil {
 		return e
 	}

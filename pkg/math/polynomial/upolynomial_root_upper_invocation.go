@@ -11,17 +11,17 @@ import (
 )
 
 type upolyRootUpperBoundScope struct {
-	constructed                              uint8
-	target                                   UPolynomialView
-	falseAcknowledged                        bool
-	owner                                    *UPolynomialManager
-	invocation                               uint64
-	values                                   [5]util.Int
-	numeric                                  polynomialNumericRoots
-	normalize                                util.IntegerNormalizeInvocationReceipt
-	divisionRaw, extendedRaw                 util.IntegerRawInvocationReceipt
-	buffers                                  [4]util.NaturalBufferReceipt
-	verification                             util.NaturalVerificationReceipt
+	constructed              uint8
+	target                   UPolynomialView
+	falseAcknowledged        bool
+	owner                    *UPolynomialManager
+	invocation               uint64
+	values                   [5]util.Int
+	numeric                  polynomialNumericRoots
+	normalize                util.IntegerNormalizeInvocationReceipt
+	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
+	buffers                  [4]util.NaturalBufferReceipt
+
 	sourceRemaining, ownRemaining            uint8
 	active, executing, finishing, ownStarted bool
 	bodyCause, sourceCause, ownCause         error
@@ -30,14 +30,14 @@ type upolyRootUpperBoundScope struct {
 
 // Diagnostics contain issued child tuples, never NUM payload/owning authority.
 type upolyRootUpperBoundHistory struct {
-	constructed                      uint8
-	owner                            *UPolynomialManager
-	frame                            *upolyRootUpperBoundScope
-	next                             *upolyRootUpperBoundHistory
-	invocation                       uint64
-	normalize                        util.IntegerNormalizeInvocationReceipt
-	divisionRaw, extendedRaw         util.IntegerRawInvocationReceipt
-	verification                     util.NaturalVerificationReceipt
+	constructed              uint8
+	owner                    *UPolynomialManager
+	frame                    *upolyRootUpperBoundScope
+	next                     *upolyRootUpperBoundHistory
+	invocation               uint64
+	normalize                util.IntegerNormalizeInvocationReceipt
+	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
+
 	buffers                          [4]upolyRootUpperBufferHistory
 	bodyCause, sourceCause, ownCause error
 	sourceRemaining                  uint8
@@ -83,7 +83,7 @@ func (q *upolyRootUpperBoundScope) updateHistory() {
 		h.normalize = q.normalize
 		h.divisionRaw = q.divisionRaw
 		h.extendedRaw = q.extendedRaw
-		h.verification = q.verification
+
 		for i, r := range q.buffers {
 			h.buffers[i] = r.Identity()
 		}
@@ -96,7 +96,7 @@ func (q *upolyRootUpperBoundScope) updateHistory() {
 func (q *upolyRootUpperBoundScope) pending() bool {
 	z := q.owner.config.Integer
 	mm := q.owner.modular
-	return q.sourceRemaining != 0 || polynomialNegNumericPending(&q.numeric) || mm.MatchesPNormalizeInvocation(&q.normalize) || z.MatchesRawInvocation(&q.divisionRaw) || z.MatchesRawInvocation(&q.extendedRaw) || z.Naturals().MatchesPNVerification(&q.verification) || q.pendingBuffers()
+	return q.sourceRemaining != 0 || polynomialNegNumericPending(&q.numeric) || mm.MatchesPNormalizeInvocation(&q.normalize) || z.MatchesRawInvocation(&q.divisionRaw) || z.MatchesRawInvocation(&q.extendedRaw) || q.pendingBuffers()
 }
 func (q *upolyRootUpperBoundScope) finish(body error) error {
 	if q.owner == nil || q.owner.self != q.owner || q != &q.owner.rootUpperBound || q.executing || q.finishing {
@@ -108,9 +108,6 @@ func (q *upolyRootUpperBoundScope) finish(body error) error {
 		q.bodyCause = body
 	}
 	z := q.owner.config.Integer
-	if q.sourceCause == nil {
-		q.sourceCause = q.owner.modular.PNormalizeInvocationSourceCause(&q.normalize)
-	}
 	if q.sourceCause == nil {
 		q.sourceCause = q.numericChildCause()
 	}
@@ -255,7 +252,7 @@ func (q *upolyRootUpperBoundScope) numericChildCause() error {
 			return e
 		}
 	}
-	return z.Naturals().PnVerificationSourceCause(&q.verification)
+	return nil
 }
 func (q *upolyRootUpperBoundScope) cleanupNumericChildren(abort bool) error {
 	z := q.owner.config.Integer
@@ -264,9 +261,7 @@ func (q *upolyRootUpperBoundScope) cleanupNumericChildren(abort bool) error {
 			return e
 		}
 	}
-	if e := z.Naturals().CleanupPNVerification(&q.verification, abort); e != nil {
-		return e
-	}
+
 	if abort {
 		for i := len(q.buffers) - 1; i >= 0; i-- {
 			if e := q.buffers[i].Cleanup(); e != nil {

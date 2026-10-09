@@ -382,7 +382,7 @@ func transitiveSourceAudit(t *testing.T, m *RationalManager, s *RationalService,
 	if z.Natural != nil {
 		n := z.Natural
 		owned += n.HeaderBytes
-		for _, buffer := range []*SourceLimbBuffer{&n.Division[0], &n.Division[1], &n.Division[2], &n.Division[3], &n.Verification} {
+		for _, buffer := range []*SourceLimbBuffer{&n.Division[0], &n.Division[1], &n.Division[2], &n.Division[3]} {
 			for _, raw := range []Block{buffer.Raw, buffer.Pending} {
 				if raw != (Block{}) {
 					if rawBuffers[raw] {

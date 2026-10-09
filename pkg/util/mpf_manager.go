@@ -552,11 +552,7 @@ func (m *ArbitraryFloatManager) formatFrameUnfinished(f *ArbitraryFloatFormatInv
 			}
 		}
 	}
-	for _, v := range []*naturalPNVerificationReceipt{&f.verification, &f.Decimal.verification} {
-		if m.integer.Natural != nil && m.integer.Natural.MatchesPNVerification(v) {
-			return true
-		}
-	}
+
 	if f.Decimal.insertion.active && (!f.Decimal.insertion.sourceDone || f.Decimal.insertion.characterOwned || f.Decimal.insertion.formattingOwned) {
 		return true
 	}

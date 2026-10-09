@@ -444,14 +444,7 @@ func (m *MultivariatePolynomialCore) pseudoCore(p, q Polynomial, x uint32, d *ui
 				return
 			}
 		}
-		if cause := m.modular.PNormalizeInvocationSourceCause(&s.normalize); cause != nil {
-			s.cleanupCause = cause
-			if s.sourceCause == nil {
-				s.sourceCause = cause
-			}
-			err = errors.Join(err, cause)
-			return
-		}
+
 		if e := m.modular.CleanupPNormalizeInvocation(&s.normalize, false); e != nil {
 			s.cleanupCause = e
 			err = errors.Join(err, e)

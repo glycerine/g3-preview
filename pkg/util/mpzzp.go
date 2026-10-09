@@ -290,9 +290,6 @@ func (m *IntegerModularManager) PNormalizeWithFactorHistory(a *Int, receipt *int
 		*scope = integerPNormalizeScope{factorHistoryContext: history, owner: m, invocation: scope.invocation + 1, active: true, executing: true, Stage: 1}
 		*receipt = integerPNormalizeInvocationReceipt{m, scope, scope.invocation}
 		defer func() {
-			if scope.sourceCause == nil {
-				scope.sourceCause = m.manager.Natural.PnVerificationSourceCause(&scope.Verification)
-			}
 			scope.executing = false
 			if !scope.pending() {
 				scope.active = false

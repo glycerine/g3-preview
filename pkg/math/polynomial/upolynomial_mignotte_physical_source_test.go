@@ -101,9 +101,7 @@ func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, ext
 	}
 
 	buffers := []*util.SourceLimbBuffer{&m.Naturals().Division[0], &m.Naturals().Division[1], &m.Naturals().Division[2], &m.Naturals().Division[3]}
-	if m.Naturals().VerificationActive {
-		buffers = append(buffers, &m.Naturals().Verification)
-	}
+
 	for _, s := range buffers {
 		for _, r := range []util.Block{s.Raw, s.Pending} {
 			if r == (util.Block{}) {

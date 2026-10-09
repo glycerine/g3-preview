@@ -55,16 +55,7 @@ func (m *MultivariatePolynomialCore) finishConstantScope(body error) error {
 	// stop the older NUM -> rational source suffix. A global normalization
 	// history from another caller supplies no authority or stopped frontier.
 	if s.arithmeticScope.active {
-		if child := m.modular.PNormalizeInvocationSourceCause(&s.arithmeticScope.normalize); child != nil {
-			s.stopped = true
-			if s.sourceCause == nil {
-				s.sourceCause = child
-			}
-			if s.arithmeticScope.sourceCause == nil {
-				s.arithmeticScope.sourceCause = child
-			}
-			return errors.Join(body, s.sourceCause)
-		}
+
 	}
 	if s.numeralCompleted {
 		if _, e := upolynomialSourceNumeralDel(m.integer, &s.numeral); e != nil {

@@ -55,16 +55,14 @@ func numericIntegerManager_scalarExactNumericSourceCause(m *util.IntegerManager,
 	if e := m.DividesNumeralInvocationSourceCause(&s.boolNumeral); e != nil {
 		return e
 	}
-	if e := r.core.modular.PNormalizeInvocationSourceCause(&s.normalize); e != nil {
-		return e
-	}
+
 	if e := m.RawInvocationSourceCause(&s.extendedRaw); e != nil {
 		return e
 	}
 	if e := m.RawInvocationSourceCause(&s.divisionRaw); e != nil {
 		return e
 	}
-	return m.Naturals().PnVerificationSourceCause(&s.verification)
+	return nil
 }
 
 // False completes reached younger source children. True drains unjoined
@@ -89,9 +87,7 @@ func numericIntegerManager_cleanupScalarExactDivNumeric(m *util.IntegerManager, 
 	if e := m.CleanupRawInvocation(&s.divisionRaw, abort); e != nil {
 		return e
 	}
-	if e := m.Naturals().CleanupPNVerification(&s.verification, abort); e != nil {
-		return e
-	}
+
 	if abort {
 		for i := len(s.buffers) - 1; i >= 0; i-- {
 			if e := s.buffers[i].Cleanup(); e != nil {

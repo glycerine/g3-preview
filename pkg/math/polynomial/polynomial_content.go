@@ -6,8 +6,8 @@ import (
 )
 
 type polynomialContentScope struct {
-	buffers                   [4]util.NaturalBufferReceipt
-	verification              util.NaturalVerificationReceipt
+	buffers [4]util.NaturalBufferReceipt
+
 	invocation                uint64
 	executing                 bool
 	receipt                   polynomialContentInvocationReceipt
@@ -44,7 +44,7 @@ func (m *MultivariatePolynomialCore) finishIntegerContentPhase(owning, abort boo
 	}
 
 	if !owning {
-		for _, e := range []error{m.integer.RawInvocationSourceCause(&s.gcd), m.integer.RawInvocationSourceCause(&s.division), m.integer.RawInvocationSourceCause(&s.extended), m.modular.PNormalizeInvocationSourceCause(&s.normalize), m.integer.Naturals().PnVerificationSourceCause(&s.verification)} {
+		for _, e := range []error{m.integer.RawInvocationSourceCause(&s.gcd), m.integer.RawInvocationSourceCause(&s.division), m.integer.RawInvocationSourceCause(&s.extended)} {
 			if e != nil {
 				if s.cleanupCause == nil {
 					s.cleanupCause = e
@@ -60,9 +60,7 @@ func (m *MultivariatePolynomialCore) finishIntegerContentPhase(owning, abort boo
 		if e := m.modular.CleanupPNormalizeInvocation(&s.normalize, false); e != nil {
 			return e
 		}
-		if e := m.integer.Naturals().CleanupPNVerification(&s.verification, false); e != nil {
-			return e
-		}
+
 		if e := m.integer.CleanupRawInvocation(&s.division, false); e != nil {
 			return e
 		}
@@ -97,9 +95,7 @@ func (m *MultivariatePolynomialCore) finishIntegerContentPhase(owning, abort boo
 		if e = m.modular.CleanupPNormalizeInvocation(&s.normalize, true); e != nil {
 			return e
 		}
-		if e = m.integer.Naturals().CleanupPNVerification(&s.verification, true); e != nil {
-			return e
-		}
+
 		if e = m.integer.CleanupRawInvocation(&s.division, true); e != nil {
 			return e
 		}
@@ -120,10 +116,10 @@ func (m *MultivariatePolynomialCore) finishIntegerContentPhase(owning, abort boo
 		if e = s.numeric.cleanup(m.integer); e != nil {
 			return e
 		}
-		*s = polynomialContentScope{invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, gcd: s.gcd, division: s.division, extended: s.extended, normalize: s.normalize, verification: s.verification}
+		*s = polynomialContentScope{invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, gcd: s.gcd, division: s.division, extended: s.extended, normalize: s.normalize}
 		return nil
 	}
-	pending := m.integer.MatchesRawInvocation(&s.gcd) || m.integer.MatchesRawInvocation(&s.division) || m.integer.MatchesRawInvocation(&s.extended) || m.integer.Naturals().MatchesPNVerification(&s.verification) || polynomialNegNumericPending(&s.numeric)
+	pending := m.integer.MatchesRawInvocation(&s.gcd) || m.integer.MatchesRawInvocation(&s.division) || m.integer.MatchesRawInvocation(&s.extended) || polynomialNegNumericPending(&s.numeric)
 	for j := range s.buffers {
 		pending = pending || s.buffers[j].Pending() != (util.Block{})
 	}
@@ -134,7 +130,7 @@ func (m *MultivariatePolynomialCore) finishIntegerContentPhase(owning, abort boo
 	}
 	pending = pending || (s.topOwner && m.pscPending())
 	if !pending {
-		*s = polynomialContentScope{invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, gcd: s.gcd, division: s.division, extended: s.extended, normalize: s.normalize, verification: s.verification}
+		*s = polynomialContentScope{invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, gcd: s.gcd, division: s.division, extended: s.extended, normalize: s.normalize}
 	}
 
 	return nil

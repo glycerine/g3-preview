@@ -61,21 +61,3 @@ type naturalPNBufferReceiptPolynomialBindings struct {
 	somNormalize            polynomialSOMNormalizeInvocationReceipt
 	normalization           polynomialNormalizeInvocationReceipt
 }
-type naturalPNVerificationScopePolynomialBindings struct {
-	rootUpperBound          *upolyRootUpperBoundScope
-	removeOneHalfRoot       *upolyRemoveOneHalfRootScope
-	rootUpperInvocation     uint64
-	removeOneHalfInvocation uint64
-	factorFrontendContext   integerAllocationInvocationContext
-	somNormalize            polynomialSOMNormalizeInvocationReceipt
-	normalization           polynomialNormalizeInvocationReceipt
-	henselCallerContext     integerAllocationInvocationContext
-	primePreparationContext integerAllocationInvocationContext
-	recombinationContext    integerAllocationInvocationContext
-	henselPair              upolyHenselPairInvocationReceipt
-	divides                 polynomialDividesInvocationReceipt
-	scalarExact             polynomialScalarExactDivInvocationReceipt
-	exactDiv                polynomialExactDivInvocationReceipt
-	scalar                  polynomialScalarDivInvocationReceipt
-	content                 polynomialContentInvocationReceipt
-}

@@ -48,7 +48,7 @@ func (m *ArbitraryFloatManager) formatChildSource(s *ArbitraryFloatFormatInvocat
 	if e := z.RawInvocationSourceCause(&s.gcd); e != nil {
 		return e
 	}
-	return z.Natural.PnVerificationSourceCause(&s.verification)
+	return nil
 }
 func (m *ArbitraryFloatManager) cleanupFormatChildren(s *ArbitraryFloatFormatInvocation, abort bool) error {
 	z := m.integer
@@ -60,9 +60,7 @@ func (m *ArbitraryFloatManager) cleanupFormatChildren(s *ArbitraryFloatFormatInv
 			return e
 		}
 	}
-	if e := z.Natural.CleanupPNVerification(&s.verification, abort); e != nil {
-		return e
-	}
+
 	if abort {
 		for i := len(s.buffers) - 1; i >= 0; i-- {
 			if e := s.buffers[i].cleanup(); e != nil {

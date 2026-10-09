@@ -79,9 +79,7 @@ func (m *UPolynomialManager) preparationCallPending() bool {
 }
 func (q *upolyFactorPreparationScope) childCause() error {
 	z := q.service.manager.config.Integer
-	if e := q.service.manager.modular.PNormalizeInvocationSourceCause(&q.normalize); e != nil {
-		return e
-	}
+
 	return z.RawInvocationSourceCause(&q.gcdRaw)
 }
 func (q *upolyFactorPreparationScope) pending() bool {

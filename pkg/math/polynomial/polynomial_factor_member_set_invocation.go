@@ -50,10 +50,7 @@ func (f *PolynomialFactors) finishFactorMemberSetSource() error {
 	}
 	s.finishing = true
 	defer func() { s.finishing = false; f.updateFactorMemberSetHistory() }()
-	if e := f.manager.core.modular.PNormalizeInvocationSourceCause(&s.normalize); e != nil {
-		s.sourceCause = e
-		return e
-	}
+
 	if !f.factorMemberSetPending() {
 		s.active = false
 	}

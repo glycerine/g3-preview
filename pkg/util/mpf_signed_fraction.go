@@ -68,10 +68,10 @@ type arbitraryFloatSignedFractionScope struct {
 	numeric                                          NumericAllocationRoots
 	gcd, division                                    integerRawInvocationReceipt
 	buffers                                          [4]NaturalBufferReceipt
-	verification                                     naturalPNVerificationReceipt
-	integerBinding, naturalBinding                   NumericCallerBinding
-	active, executing, finishing                     bool
-	bodyCause, sourceCause                           error
+
+	integerBinding, naturalBinding NumericCallerBinding
+	active, executing, finishing   bool
+	bodyCause, sourceCause         error
 }
 
 func (s *arbitraryFloatSignedFractionScope) valid() bool {
@@ -112,17 +112,7 @@ func (s *arbitraryFloatSignedFractionScope) NumericBuffer(n *NaturalManager, ind
 	}
 	return &s.buffers[index]
 }
-func (s *arbitraryFloatSignedFractionScope) NumericVerification(n *NaturalManager) (*NaturalVerificationScope, error) {
-	if !s.NumericBound(true) || n != s.manager.integer.Natural {
-		return nil, ErrNumericOwner
-	}
-	f, e := n.BeginCallerVerification(&s.hooks)
-	if e != nil {
-		return nil, e
-	}
-	s.verification = naturalPNVerificationReceipt{n, f, f.invocation}
-	return f, nil
-}
+
 func (s *arbitraryFloatSignedFractionScope) bind() error {
 	z := s.manager.integer
 	if e := z.BindCaller(&s.integerBinding, s, 37); e != nil {
@@ -138,9 +128,7 @@ func (s *arbitraryFloatSignedFractionScope) unbind() error {
 }
 func (s *arbitraryFloatSignedFractionScope) cleanupNormalization() error {
 	z := s.manager.integer
-	if e := z.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	if e := z.CleanupRawInvocation(&s.division, true); e != nil {
 		return e
 	}
@@ -220,7 +208,7 @@ func (m *ArbitraryFloatManager) finishSignedFractionSource() error {
 		}
 	}
 	if !s.normalizationOwned {
-		for _, e := range []error{m.integer.Natural.PnVerificationSourceCause(&s.verification), m.integer.RawInvocationSourceCause(&s.division), m.integer.RawInvocationSourceCause(&s.gcd)} {
+		for _, e := range []error{m.integer.RawInvocationSourceCause(&s.division), m.integer.RawInvocationSourceCause(&s.gcd)} {
 			if e != nil {
 				s.sourceCause = e
 				return e

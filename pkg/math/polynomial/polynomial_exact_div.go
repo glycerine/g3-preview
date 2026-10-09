@@ -66,15 +66,15 @@ func (r *polynomialDivisionReference) assign(m *MultivariatePolynomialCore, p Mo
 // Both records are actual method locals embedded in the charged core header.
 // Scalar exact_div's numeral is RAW: no source Del on pre-end exceptions.
 type polynomialExactDivisionScope struct {
-	invocation                           uint64
-	pscOwner                             uint64
-	monomial                             polynomialDivisionReference
-	numeral                              util.Int
-	numeric                              polynomialNumericRoots
-	normalize                            util.IntegerNormalizeInvocationReceipt
-	divisionRaw, extendedRaw             util.IntegerRawInvocationReceipt
-	buffers                              [4]util.NaturalBufferReceipt
-	verification                         util.NaturalVerificationReceipt
+	invocation               uint64
+	pscOwner                 uint64
+	monomial                 polynomialDivisionReference
+	numeral                  util.Int
+	numeric                  polynomialNumericRoots
+	normalize                util.IntegerNormalizeInvocationReceipt
+	divisionRaw, extendedRaw util.IntegerRawInvocationReceipt
+	buffers                  [4]util.NaturalBufferReceipt
+
 	boolNumeral                          util.IntegerDividesNumeralInvocationReceipt
 	scalarReceipt                        polynomialScalarExactDivInvocationReceipt
 	directReceipt                        polynomialExactDivInvocationReceipt
@@ -398,7 +398,7 @@ func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receip
 }
 
 func (m *MultivariatePolynomialCore) exactDivDirectPending(s *polynomialExactDivisionScope) bool {
-	if m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesRawInvocation(&s.divisionRaw) || m.integer.MatchesRawInvocation(&s.extendedRaw) || m.integer.Naturals().MatchesPNVerification(&s.verification) {
+	if m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesRawInvocation(&s.divisionRaw) || m.integer.MatchesRawInvocation(&s.extendedRaw) {
 		return true
 	}
 	for i := range s.buffers {

@@ -31236,3 +31236,28 @@ polynomial display (0.29s), checked/debug feature and display checks (util
 107.26s, AST 0.01s, polynomial 0.06s), module-wide test compilation, affected
 package vet, and portcheck passed. The latest full native module checkpoint
 remains 18:07–18:12 UTC; this change used affected-package checks.
+
+## Native checked MPN verification
+
+Retained the source division verification multiply/add/compare algorithm over
+one reusable Go uint32 slice. Clear on entry, truncate on all returns (including
+failed arithmetic assertions), release capacity on close. New tests check cold
+and warm Runtime-free operation across sizes, zero warm allocations, assertion
+cleanup and successful subsequent reuse.
+
+Removed verification holder/receipt types, primitive caller hooks/policies,
+private buffer publication roots and utility/polynomial cleanup/source-cause
+plumbing. PN source-cause transport was solely a path from the removed buffer
+destructor, so it is removed too. Retired tests that required those obsolete
+verification allocation/release stops; integer/RAW/division ownership tests stay.
+Remaining MPN Runtime scratch is confined to the four division buffers.
+
+Validation: the full native module checkpoint passed at 19:07–19:12 UTC
+(util 113.38s, polynomial 230.79s, AST 25.79s), before the final dead PN
+source-cause field/accessor pruning. After that pruning, focused native and
+checked/debug verification and affected-caller tests, module-wide test
+compilation, affected-package vet, and portcheck passed. The expanded checked
+caller run exposed one obsolete expectation of verification allocation failure;
+the test now checks successful PN ownership in both profiles, and its focused
+rerun passed. The broad checked polynomial sweep was canceled; no full checked
+polynomial pass is claimed.

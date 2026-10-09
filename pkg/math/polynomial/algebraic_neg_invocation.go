@@ -73,10 +73,6 @@ func (q *algebraicNegScope) pending() bool {
 	return polynomialNegNumericPending(&q.numeric) || polynomialNegNumericPending(&q.eval.numeric) || q.eval.sourceRemaining != 0 || mm.MatchesPNormalizeInvocation(&q.normalize) || mm.MatchesPNormalizeInvocation(&q.eval.normalize) || z.MatchesAddMulInvocation(&q.eval.addMul)
 }
 func (q *algebraicNegScope) childSourceCause() error {
-	mm := q.owner.config.Polynomials.modular
-	if q.sourceCause == nil {
-		q.sourceCause = mm.PNormalizeInvocationSourceCause(&q.normalize)
-	}
 	if q.sourceCause == nil {
 		q.sourceCause = q.eval.sourceCause
 	}
@@ -264,9 +260,6 @@ func (q *algebraicNegScope) finishBinarySource(body error) error {
 	}()
 	z := q.owner.config.Rationals.Integers()
 	mm := q.owner.config.Polynomials.modular
-	if e.sourceCause == nil {
-		e.sourceCause = mm.PNormalizeInvocationSourceCause(&e.normalize)
-	}
 	if e.sourceCause == nil {
 		e.sourceCause = z.AddMulInvocationSourceCause(&e.addMul)
 	}

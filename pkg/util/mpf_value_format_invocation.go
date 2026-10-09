@@ -29,9 +29,9 @@ type ArbitraryFloatFormatInvocation struct {
 	Transferred                                   SmallAllocatorPendingAllocation
 	gcd, division, extended                       integerRawInvocationReceipt
 	buffers                                       [4]naturalPNBufferReceipt
-	verification                                  naturalPNVerificationReceipt
-	Decimal                                       rationalDecimalScope
-	bodyCause, sourceCause, ownCause              error
+
+	Decimal                          rationalDecimalScope
+	bodyCause, sourceCause, ownCause error
 }
 
 func (m *ArbitraryFloatManager) knownFormatFrame(s *ArbitraryFloatFormatInvocation) bool {

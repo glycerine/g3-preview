@@ -480,7 +480,6 @@ func TestArbitraryFloatToStringOldScopePreservesLaterAllocatingCall(t *testing.T
 		serviceMust(t, first.scope.Cleanup(true))
 		if target {
 			oldBody, oldSource, oldOwn := m.FormatInvocationCauses(&first.scope)
-			child := first.scope.Decimal.verification
 			original := first.scope.Decimal.originalCell
 			later := &formatTestText{}
 			view, e := m.ToStringInto(&a, later)
@@ -493,7 +492,7 @@ func TestArbitraryFloatToStringOldScopePreservesLaterAllocatingCall(t *testing.T
 			if used != b.Used() || later.scope.invocation != fresh || formatTestString(t, view) != value {
 				t.Fatal("old ACK adopted later caller")
 			}
-			if bc, sc, oc := m.FormatInvocationCauses(&first.scope); bc != oldBody || sc != oldSource || oc != oldOwn || first.scope.Decimal.verification != child || first.scope.Decimal.originalCell != original {
+			if bc, sc, oc := m.FormatInvocationCauses(&first.scope); bc != oldBody || sc != oldSource || oc != oldOwn || first.scope.Decimal.originalCell != original {
 				t.Fatal("retained exact history changed")
 			}
 			integerPhysicalAuditWithRaw(t, m.integer, nil, &a.significand, &m.rational.NTmp)

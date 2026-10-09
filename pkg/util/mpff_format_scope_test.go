@@ -82,8 +82,6 @@ func fastFormattingNamedRoots(m *FastFloatManager, add func(Block)) {
 		add(m.natural.Division[i].Raw)
 		add(m.natural.Division[i].Pending)
 	}
-	add(m.natural.Verification.Raw)
-	add(m.natural.Verification.Pending)
 
 }
 

@@ -2,8 +2,8 @@
 package util
 
 // The actual Integer method owns its scoped tmp NUM, including the zero
-// branch. Its younger Natural verification child is distinct from shared
-// successful division buffers. There is no RAW end-only DEL in this method.
+// branch. Shared division buffers remain manager-owned; checked arithmetic
+// verification uses native scratch. There is no RAW end-only DEL in this method.
 type integerDividesNumeralScope struct {
 	owner                                        *IntegerManager
 	Receipt                                      integerDividesNumeralInvocationReceipt
@@ -13,8 +13,8 @@ type integerDividesNumeralScope struct {
 	Numeral                                      Int
 	Numeric                                      NumericAllocationRoots
 	Buffers                                      [4]naturalPNBufferReceipt
-	verification                                 naturalPNVerificationReceipt
-	BodyCause, sourceCause                       error
+
+	BodyCause, sourceCause error
 }
 type integerDividesNumeralInvocationReceipt struct {
 	Manager    *IntegerManager
@@ -78,10 +78,7 @@ func (m *IntegerManager) FinishDividesNumeralSource(s *integerDividesNumeralScop
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
-	if e := m.Natural.PnVerificationSourceCause(&s.verification); e != nil {
-		s.sourceCause = e
-		return e
-	}
+
 	if !s.Active || !s.Constructed || s.Ended || s.owned {
 		return nil
 	}
@@ -96,7 +93,7 @@ func (m *IntegerManager) FinishDividesNumeralSource(s *integerDividesNumeralScop
 	return nil
 }
 func (s *integerDividesNumeralScope) Pending(m *IntegerManager) bool {
-	if NumericAllocationPending(&s.Numeric) || m.Natural.MatchesPNVerification(&s.verification) {
+	if NumericAllocationPending(&s.Numeric) {
 		return true
 	}
 	for i := range s.Buffers {
@@ -114,9 +111,7 @@ func (m *IntegerManager) CleanupDividesNumeralInvocation(r *integerDividesNumera
 	if s.Executing {
 		return ErrNumericPending
 	}
-	if e := m.Natural.CleanupPNVerification(&s.verification, false); e != nil {
-		return e
-	}
+
 	if s.Constructed && !s.Ended && !s.owned {
 		if e := m.CleanupRawNumeral(&s.Numeral); e != nil {
 			return e
@@ -124,9 +119,7 @@ func (m *IntegerManager) CleanupDividesNumeralInvocation(r *integerDividesNumera
 		s.owned = true
 	}
 	if abort {
-		if e := m.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-			return e
-		}
+
 		for i := len(s.Buffers) - 1; i >= 0; i-- {
 			if e := s.Buffers[i].cleanup(); e != nil {
 				return e

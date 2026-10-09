@@ -14,10 +14,10 @@ type integerStringSetScope struct {
 	hooks                                                     NumericInvocationHooks
 	numeric                                                   NumericAllocationRoots
 	buffers                                                   [4]NaturalBufferReceipt
-	verification                                              naturalPNVerificationReceipt
-	integerBinding, naturalBinding                            NumericCallerBinding
-	active, executing, finishing                              bool
-	bodyCause, sourceCause, ownCause                          error
+
+	integerBinding, naturalBinding   NumericCallerBinding
+	active, executing, finishing     bool
+	bodyCause, sourceCause, ownCause error
 }
 
 func (s *integerStringSetScope) valid() bool {
@@ -47,17 +47,7 @@ func (s *integerStringSetScope) NumericBuffer(n *NaturalManager, index int) *Nat
 	}
 	return &s.buffers[index]
 }
-func (s *integerStringSetScope) NumericVerification(n *NaturalManager) (*NaturalVerificationScope, error) {
-	if !s.NumericBound(true) || n != s.manager.Natural {
-		return nil, ErrNumericOwner
-	}
-	f, e := n.BeginCallerVerification(&s.hooks)
-	if e != nil {
-		return nil, e
-	}
-	s.verification = naturalPNVerificationReceipt{n, f, f.invocation}
-	return f, nil
-}
+
 func (s *integerStringSetScope) bind() error {
 	z := s.manager
 	if e := z.BindCaller(&s.integerBinding, s, 38); e != nil {
@@ -73,9 +63,7 @@ func (s *integerStringSetScope) unbind() error {
 }
 func (s *integerStringSetScope) cleanupArithmetic() error {
 	z := s.manager
-	if e := z.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	for i := len(s.buffers) - 1; i >= 0; i-- {
 		if e := s.buffers[i].Cleanup(); e != nil {
 			return e
@@ -124,9 +112,7 @@ func (m *IntegerManager) CleanupStringSet() (cause error) {
 		}
 		cause = JoinNumericErrors(cause, s.unbind())
 	}()
-	if e := m.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	if s.declared && !s.tmpDelDone && !s.tmpOwned {
 		if e := m.CleanupRawNumeral(&s.tmp); e != nil {
 			return e

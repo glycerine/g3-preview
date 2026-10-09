@@ -53,7 +53,6 @@ type upolyHenselCallerScope struct {
 	divisionRaw, extendedRaw        util.IntegerRawInvocationReceipt
 	boolNumeral                     util.IntegerDividesNumeralInvocationReceipt
 	buffers                         [4]util.NaturalBufferReceipt
-	verification                    util.NaturalVerificationReceipt
 
 	owner                                                              *upolyFactorSquareFreeScope
 	active                                                             bool
@@ -349,9 +348,7 @@ func (h *upolyHenselCallerScope) cleanupNumeric(abort bool) error {
 	if e := z.CleanupRawInvocation(&h.extendedRaw, abort); e != nil {
 		return e
 	}
-	if e := z.Naturals().CleanupPNVerification(&h.verification, abort); e != nil {
-		return e
-	}
+
 	if abort {
 		for i := len(h.buffers) - 1; i >= 0; i-- {
 			if e := h.buffers[i].Cleanup(); e != nil {
@@ -380,16 +377,7 @@ func (h *upolyHenselCallerScope) numericSourceCause() error {
 	if e := z.RawInvocationSourceCause(&h.extendedRaw); e != nil {
 		return e
 	}
-	if e := z.Naturals().PnVerificationSourceCause(&h.verification); e != nil {
-		return e
-	}
-	for i, m := range h.numericManagers() {
-		if m != nil {
-			if e := m.PNormalizeInvocationSourceCause(&h.normalize[i]); e != nil {
-				return e
-			}
-		}
-	}
+
 	return nil
 }
 

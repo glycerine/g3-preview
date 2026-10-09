@@ -20,8 +20,8 @@ type IntegerRawScope struct {
 	Count, cursor                                  uint8
 	Numeric                                        NumericAllocationRoots
 	buffers                                        [4]naturalPNBufferReceipt
-	verification                                   naturalPNVerificationReceipt
-	BodyCause, sourceCause                         error
+
+	BodyCause, sourceCause error
 }
 type integerRawInvocationReceipt struct {
 	Manager    *IntegerManager
@@ -92,10 +92,7 @@ func (m *IntegerManager) finishRawSource(s *IntegerRawScope) error {
 		s.sourceCause = e
 		return e
 	}
-	if e := m.Natural.PnVerificationSourceCause(&s.verification); e != nil {
-		s.sourceCause = e
-		return e
-	}
+
 	if !s.Active || !s.BodySucceeded || s.ended || s.owned {
 		return nil
 	}
@@ -120,7 +117,7 @@ func (m *IntegerManager) RawInvocationSourceCause(r *integerRawInvocationReceipt
 	return nil
 }
 func (s *IntegerRawScope) pending(m *IntegerManager) bool {
-	if m.MatchesAddMulInvocation(&s.AddMul) || NumericAllocationPending(&s.Numeric) || m.Natural.MatchesPNVerification(&s.verification) {
+	if m.MatchesAddMulInvocation(&s.AddMul) || NumericAllocationPending(&s.Numeric) {
 		return true
 	}
 	for i := range s.buffers {
@@ -141,9 +138,7 @@ func (m *IntegerManager) CleanupRawInvocation(r *integerRawInvocationReceipt, ab
 	if e := m.CleanupAddMulInvocation(&s.AddMul, false); e != nil {
 		return e
 	}
-	if e := m.Natural.CleanupPNVerification(&s.verification, false); e != nil {
-		return e
-	}
+
 	if (s.BodySucceeded || abort) && !s.owned && !s.ended {
 		for s.cursor < s.Count {
 			if e := m.CleanupRawNumeral(&s.Values[s.cursor]); e != nil {
@@ -159,9 +154,7 @@ func (m *IntegerManager) CleanupRawInvocation(r *integerRawInvocationReceipt, ab
 	if e := m.CleanupAddMulInvocation(&s.AddMul, true); e != nil {
 		return e
 	}
-	if e := m.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	for i := len(s.buffers) - 1; i >= 0; i-- {
 		if e := s.buffers[i].cleanup(); e != nil {
 			return e
@@ -170,7 +163,7 @@ func (m *IntegerManager) CleanupRawInvocation(r *integerRawInvocationReceipt, ab
 	if e := s.Numeric.Cleanup(m); e != nil {
 		return e
 	}
-	*s = IntegerRawScope{owner: m, Invocation: s.Invocation, BodySucceeded: s.BodySucceeded, ended: s.ended, owned: s.owned, Count: s.Count, cursor: s.cursor, verification: s.verification, BodyCause: s.BodyCause, sourceCause: s.sourceCause}
+	*s = IntegerRawScope{owner: m, Invocation: s.Invocation, BodySucceeded: s.BodySucceeded, ended: s.ended, owned: s.owned, Count: s.Count, cursor: s.cursor, BodyCause: s.BodyCause, sourceCause: s.sourceCause}
 	return nil
 }
 

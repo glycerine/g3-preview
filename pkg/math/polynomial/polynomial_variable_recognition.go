@@ -177,7 +177,7 @@ func (c *MultivariatePolynomialCore) isVariableNumeralWithReceipt(p Polynomial, 
 	defer func() {
 		s.executing = false
 		s.bodyCause = err
-		s.sourceCause = c.modular.PNormalizeInvocationSourceCause(&s.normalize)
+		s.sourceCause = nil
 		err = errors.Join(err, s.sourceCause)
 		if err == nil && !c.variableNumeralChildrenPending() {
 			s.active = false
@@ -210,8 +210,8 @@ func (c *MultivariatePolynomialCore) cleanupVariableNumeralInvocation(r *polynom
 			s.cleanupCause = err
 		}
 	}()
-	// PN constructed source verification locals are younger than SET's pending
-	// untransferred prefix. The caller NUM is borrowed and is never destroyed here.
+	// Reclaim PN allocation prefixes before SET's pending copy. The caller
+	// numeral is borrowed and is never destroyed here.
 	if e := c.modular.CleanupPNormalizeInvocation(&s.normalize, abort); e != nil {
 		return e
 	}

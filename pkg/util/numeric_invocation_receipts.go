@@ -8,17 +8,11 @@ type IntegerAddMulInvocationReceipt = integerAddMulInvocationReceipt
 type IntegerCopyAllocationReceipt = integerCopyAllocationReceipt
 type IntegerPowerInvocationReceipt = integerPowerInvocationReceipt
 type IntegerRootInvocationReceipt = integerRootInvocationReceipt
-type NaturalVerificationReceipt = naturalPNVerificationReceipt
 
 func (r *integerPNormalizeInvocationReceipt) Matches(m *IntegerModularManager) bool {
 	return m != nil && m.MatchesPNormalizeInvocation(r)
 }
-func (r *integerPNormalizeInvocationReceipt) SourceCause() error {
-	if r == nil || r.Manager == nil {
-		return nil
-	}
-	return r.Manager.PNormalizeInvocationSourceCause(r)
-}
+
 func (r *integerPNormalizeInvocationReceipt) Cleanup(abort bool) error {
 	if r == nil || r.Manager == nil {
 		return ErrNumericOwner
@@ -42,15 +36,6 @@ func (r *integerAddMulInvocationReceipt) Cleanup(abort bool) error {
 }
 func (r *integerRawInvocationReceipt) Matches(m *IntegerManager) bool {
 	return m != nil && m.MatchesRawInvocation(r)
-}
-func (r *naturalPNVerificationReceipt) Matches(m *NaturalManager) bool {
-	return m != nil && m.MatchesPNVerification(r)
-}
-func (r *naturalPNVerificationReceipt) Cleanup(abort bool) error {
-	if r == nil || r.owner == nil {
-		return ErrNumericOwner
-	}
-	return r.owner.CleanupPNVerification(r, abort)
 }
 
 // IntegerRawKind names the concrete source RAW declaration, independently of
@@ -97,14 +82,13 @@ type NaturalBufferIdentity struct {
 	owner      *NaturalManager
 	buffer     *SourceLimbBuffer
 	invocation uint64
-	private    bool
 }
 
 func (r *naturalPNBufferReceipt) Identity() NaturalBufferIdentity {
 	if r == nil {
 		return NaturalBufferIdentity{}
 	}
-	return NaturalBufferIdentity{r.Owner, r.Buffer, r.Invocation, r.private}
+	return NaturalBufferIdentity{r.Owner, r.Buffer, r.Invocation}
 }
 func (r *naturalPNBufferReceipt) Pending() Block {
 	if r == nil {
@@ -113,13 +97,6 @@ func (r *naturalPNBufferReceipt) Pending() Block {
 	return r.PendingField
 }
 
-// Receipt borrows the identity of the real lexical verification holder.
-func (s *naturalPNVerificationScope) Receipt(m *NaturalManager) (NaturalVerificationReceipt, error) {
-	if m == nil || !m.ValidOwner() || s != &m.VerificationInvocation || !s.active || s.invocation == 0 {
-		return NaturalVerificationReceipt{}, ErrNumericOwner
-	}
-	return naturalPNVerificationReceipt{m, s, s.invocation}, nil
-}
 func (r *integerDividesNumeralInvocationReceipt) Pending() bool {
 	if r == nil || r.Manager == nil || !r.Manager.MatchesDividesNumeralInvocation(r) {
 		return false

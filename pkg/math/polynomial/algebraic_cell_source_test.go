@@ -288,9 +288,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 		addRaw(block)
 	}
 	buffers := []*util.SourceLimbBuffer{&z.Naturals().Division[0], &z.Naturals().Division[1], &z.Naturals().Division[2], &z.Naturals().Division[3]}
-	if z.Naturals().VerificationActive {
-		buffers = append(buffers, &z.Naturals().Verification)
-	}
+
 	for _, buffer := range buffers {
 		addRaw(buffer.Raw)
 		addRaw(buffer.Pending)

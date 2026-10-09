@@ -4,12 +4,12 @@ package util
 // These are the four literal RAW declarations. Failure omits the end label's
 // DEL statements; explicit owning cleanup has its own cursor after older NUMs.
 type rationalDecimalScope struct {
-	originalPending                        Block
-	originalCell                           SourceCellBacking
-	cellRetired                            bool
-	Transferred                            SmallAllocatorPendingAllocation
-	buffers                                [4]naturalPNBufferReceipt
-	verification                           naturalPNVerificationReceipt
+	originalPending Block
+	originalCell    SourceCellBacking
+	cellRetired     bool
+	Transferred     SmallAllocatorPendingAllocation
+	buffers         [4]naturalPNBufferReceipt
+
 	Parent                                 *ArbitraryFloatFormatInvocation
 	Values                                 [4]Int // ten,n1,d1,v1: source end-label DEL order
 	Count                                  uint8
@@ -112,10 +112,7 @@ func (m *ArbitraryFloatManager) finishFormatDecimal(d *rationalDecimalScope) err
 		d.sourceCause = e
 		return e
 	}
-	if e := m.integer.Natural.PnVerificationSourceCause(&d.verification); e != nil {
-		d.sourceCause = e
-		return e
-	}
+
 	if d.insertion.sourceCause != nil {
 		d.sourceCause = d.insertion.sourceCause
 		return d.sourceCause
@@ -153,9 +150,7 @@ func (m *ArbitraryFloatManager) cleanupFormatDecimal(d *rationalDecimalScope, ab
 		if e := m.cleanupFormatInsertion(&d.insertion, false); e != nil {
 			return e
 		}
-		if e := m.integer.Natural.CleanupPNVerification(&d.verification, false); e != nil {
-			return e
-		}
+
 		return m.integer.CleanupRawInvocation(&d.division, false)
 	}
 	for d.ownCursor < 4 {
@@ -175,9 +170,7 @@ func (m *ArbitraryFloatManager) cleanupFormatDecimal(d *rationalDecimalScope, ab
 	if e := m.integer.CleanupRawInvocation(&d.division, true); e != nil {
 		return e
 	}
-	if e := m.integer.Natural.CleanupPNVerification(&d.verification, true); e != nil {
-		return e
-	}
+
 	for i := len(d.buffers) - 1; i >= 0; i-- {
 		if e := d.buffers[i].cleanup(); e != nil {
 			return e

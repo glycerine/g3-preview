@@ -8,11 +8,11 @@ type arbitraryFloatIEEEBVScope struct {
 	integerBinding, naturalBinding NumericCallerBinding
 	numeric                        NumericAllocationRoots
 	buffers                        [4]NaturalBufferReceipt
-	verification                   naturalPNVerificationReceipt
-	biasedExp                      Int
-	biasedExpLive                  bool
-	active, executing, finishing   bool
-	bodyCause, sourceCause         error
+
+	biasedExp                    Int
+	biasedExpLive                bool
+	active, executing, finishing bool
+	bodyCause, sourceCause       error
 }
 
 func (s *arbitraryFloatIEEEBVScope) valid() bool {
@@ -42,17 +42,7 @@ func (s *arbitraryFloatIEEEBVScope) NumericBuffer(n *NaturalManager, index int) 
 	}
 	return &s.buffers[index]
 }
-func (s *arbitraryFloatIEEEBVScope) NumericVerification(n *NaturalManager) (*NaturalVerificationScope, error) {
-	if !s.NumericBound(true) || n != s.manager.integer.Natural {
-		return nil, ErrNumericOwner
-	}
-	f, e := n.BeginCallerVerification(&s.hooks)
-	if e != nil {
-		return nil, e
-	}
-	s.verification = naturalPNVerificationReceipt{n, f, f.invocation}
-	return f, nil
-}
+
 func (s *arbitraryFloatIEEEBVScope) context() integerAllocationInvocationContext {
 	return integerAllocationInvocationContext{Caller: &s.hooks}
 }
@@ -85,10 +75,7 @@ func (m *ArbitraryFloatManager) finishIEEEBVSource() error {
 	}
 	s.finishing = true
 	defer func() { s.finishing = false }()
-	if e := m.integer.Natural.PnVerificationSourceCause(&s.verification); e != nil {
-		s.sourceCause = e
-		return e
-	}
+
 	for _, local := range [...]struct {
 		value *Int
 		live  *bool
@@ -101,7 +88,7 @@ func (m *ArbitraryFloatManager) finishIEEEBVSource() error {
 			*local.live = false
 		}
 	}
-	s.active = s.bodyCause != nil || NumericAllocationPending(&s.numeric) || m.integer.Natural.MatchesPNVerification(&s.verification)
+	s.active = s.bodyCause != nil || NumericAllocationPending(&s.numeric)
 	for i := range s.buffers {
 		s.active = s.active || s.buffers[i].PendingField != (Block{})
 	}
@@ -128,9 +115,7 @@ func (m *ArbitraryFloatManager) CleanupToIEEEBVMPZ() (cause error) {
 	s.finishing = true
 	defer func() { s.finishing = false; cause = JoinNumericErrors(cause, s.unbind()) }()
 	z := m.integer
-	if e := z.Natural.CleanupPNVerification(&s.verification, false); e != nil {
-		return e
-	}
+
 	for _, local := range [...]struct {
 		value *Int
 		live  *bool
@@ -142,9 +127,7 @@ func (m *ArbitraryFloatManager) CleanupToIEEEBVMPZ() (cause error) {
 			*local.live = false
 		}
 	}
-	if e := z.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	for i := len(s.buffers) - 1; i >= 0; i-- {
 		if e := s.buffers[i].Cleanup(); e != nil {
 			return e

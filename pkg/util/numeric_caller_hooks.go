@@ -11,17 +11,17 @@ import (
 // and generation before returning ownership of allocation prefixes.
 
 type NumericInvocationHooks struct {
-	Policy       NumericCallerPolicy
-	Roots        func(*IntegerManager, *NumericAllocationRoots) *NumericAllocationRoots
-	Prepare      func(*IntegerManager, string) error
-	Record       func(*IntegerManager, string, NumericInvocationReceipt)
-	Buffer       func(*NaturalManager, int) *NaturalBufferReceipt
-	Verification func(*NaturalManager) (*NaturalVerificationScope, error)
-	ScalarRaw    func(*IntegerManager, string) (*IntegerScalarRawScope, error)
-	Normalize    func(*IntegerModularManager, Int) (Int, error)
-	Power        func(*IntegerModularManager) (*Int, func() error, func(error), error)
-	SourceCause  func(*IntegerManager) error
-	Bound        func(bool) bool
+	Policy  NumericCallerPolicy
+	Roots   func(*IntegerManager, *NumericAllocationRoots) *NumericAllocationRoots
+	Prepare func(*IntegerManager, string) error
+	Record  func(*IntegerManager, string, NumericInvocationReceipt)
+	Buffer  func(*NaturalManager, int) *NaturalBufferReceipt
+
+	ScalarRaw   func(*IntegerManager, string) (*IntegerScalarRawScope, error)
+	Normalize   func(*IntegerModularManager, Int) (Int, error)
+	Power       func(*IntegerModularManager) (*Int, func() error, func(error), error)
+	SourceCause func(*IntegerManager) error
+	Bound       func(bool) bool
 }
 
 type NumericInvocationReceipt struct {
@@ -34,7 +34,7 @@ type IntegerRawInvocationReceipt = integerRawInvocationReceipt
 type IntegerDividesNumeralInvocationReceipt = integerDividesNumeralInvocationReceipt
 type IntegerPerfectSquareInvocationReceipt = integerPerfectSquareInvocationReceipt
 type NaturalBufferReceipt = naturalPNBufferReceipt
-type NaturalVerificationScope = naturalPNVerificationScope
+
 type IntegerScalarRawScope = integerScalarRawScope
 
 func (c integerAllocationInvocationContext) WithCaller(h *NumericInvocationHooks) integerAllocationInvocationContext {
@@ -155,31 +155,6 @@ func (r *naturalPNBufferReceipt) Cleanup() error {
 		return nil
 	}
 	return r.cleanup()
-}
-
-// BeginCallerVerification constructs the real source lexical verification
-// holder; successful source destruction remains in the utility algorithm.
-func (m *NaturalManager) BeginCallerVerification(h *NumericInvocationHooks) (*NaturalVerificationScope, error) {
-	if m == nil || m.self != m || h == nil || !h.callBound(true) {
-		return nil, ErrNumericOwner
-	}
-	if m.ClosedField {
-		return nil, arena.ErrClosed
-	}
-	s := &m.VerificationInvocation
-	if s.active || s.invocation == ^uint64(0) {
-		return nil, ErrNumericPending
-	}
-	*s = naturalPNVerificationScope{caller: h, active: true, executing: true, invocation: s.invocation + 1}
-	s.Buffer = naturalPNBufferReceipt{CallerSelf: &s.Buffer, Owner: m, Buffer: &m.Verification, private: true, Invocation: s.invocation, Caller: h}
-	return s, nil
-}
-func (s *naturalPNVerificationScope) Cleanup(m *NaturalManager, abort bool) error {
-	if m == nil || m.self != m || s != &m.VerificationInvocation {
-		return ErrNumericOwner
-	}
-	r := naturalPNVerificationReceipt{m, s, s.invocation}
-	return m.CleanupPNVerification(&r, abort)
 }
 
 func (m *IntegerModularManager) SetCallerExecutionGuard(guard func() bool) error {

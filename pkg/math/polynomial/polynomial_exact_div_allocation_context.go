@@ -62,16 +62,14 @@ func numericIntegerManager_exactDivNumericSourceCause(m *util.IntegerManager, r 
 		return nil
 	}
 	s := r.frame
-	if e := r.core.modular.PNormalizeInvocationSourceCause(&s.normalize); e != nil {
-		return e
-	}
+
 	if e := m.RawInvocationSourceCause(&s.extendedRaw); e != nil {
 		return e
 	}
 	if e := m.RawInvocationSourceCause(&s.divisionRaw); e != nil {
 		return e
 	}
-	return m.Naturals().PnVerificationSourceCause(&s.verification)
+	return nil
 }
 
 // False completes reached younger source children. True drains unjoined
@@ -93,9 +91,7 @@ func numericIntegerManager_cleanupExactDivNumeric(m *util.IntegerManager, r *pol
 	if e := m.CleanupRawInvocation(&s.divisionRaw, abort); e != nil {
 		return e
 	}
-	if e := m.Naturals().CleanupPNVerification(&s.verification, abort); e != nil {
-		return e
-	}
+
 	if abort {
 		for i := len(s.buffers) - 1; i >= 0; i-- {
 			if e := s.buffers[i].Cleanup(); e != nil {

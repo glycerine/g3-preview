@@ -320,10 +320,10 @@ type arbitraryFloatBinaryStringScope struct {
 	numeric                              NumericAllocationRoots
 	division                             integerRawInvocationReceipt
 	buffers                              [4]NaturalBufferReceipt
-	verification                         naturalPNVerificationReceipt
-	integerBinding, naturalBinding       NumericCallerBinding
-	active, executing, finishing         bool
-	bodyCause, sourceCause               error
+
+	integerBinding, naturalBinding NumericCallerBinding
+	active, executing, finishing   bool
+	bodyCause, sourceCause         error
 }
 
 func (s *arbitraryFloatBinaryStringScope) valid() bool {
@@ -358,17 +358,7 @@ func (s *arbitraryFloatBinaryStringScope) NumericBuffer(n *NaturalManager, index
 	}
 	return &s.buffers[index]
 }
-func (s *arbitraryFloatBinaryStringScope) NumericVerification(n *NaturalManager) (*NaturalVerificationScope, error) {
-	if !s.NumericBound(true) || n != s.manager.integer.Natural {
-		return nil, ErrNumericOwner
-	}
-	f, e := n.BeginCallerVerification(&s.hooks)
-	if e != nil {
-		return nil, e
-	}
-	s.verification = naturalPNVerificationReceipt{n, f, f.invocation}
-	return f, nil
-}
+
 func (s *arbitraryFloatBinaryStringScope) bind() error {
 	z := s.manager.integer
 	if e := z.BindCaller(&s.integerBinding, s, 35); e != nil {
@@ -395,7 +385,7 @@ func (m *ArbitraryFloatManager) finishBinaryStringSource() error {
 	}
 	s.finishing = true
 	defer func() { s.finishing = false }()
-	for _, e := range []error{m.integer.Natural.PnVerificationSourceCause(&s.verification), m.integer.RawInvocationSourceCause(&s.division)} {
+	for _, e := range []error{m.integer.RawInvocationSourceCause(&s.division)} {
 		if e != nil {
 			s.sourceCause = e
 			return e
@@ -442,9 +432,7 @@ func (m *ArbitraryFloatManager) CleanupBinaryString() (cause error) {
 	s.finishing = true
 	defer func() { s.finishing = false; cause = JoinNumericErrors(cause, s.unbind()) }()
 	z := m.integer
-	if e := z.Natural.CleanupPNVerification(&s.verification, true); e != nil {
-		return e
-	}
+
 	if e := z.CleanupRawInvocation(&s.division, true); e != nil {
 		return e
 	}

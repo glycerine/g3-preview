@@ -51,13 +51,7 @@ func (m *MultivariatePolynomialManager) finishDerivativeNumerals() error {
 	if s.stopped {
 		return s.sourceCause
 	}
-	if e := m.core.modular.PNormalizeInvocationSourceCause(&s.normalize); e != nil {
-		s.stopped = true
-		if s.sourceCause == nil {
-			s.sourceCause = e
-		}
-		return s.sourceCause
-	}
+
 	for s.stage < 2 {
 		a := &s.a
 		mask := uint8(2)
