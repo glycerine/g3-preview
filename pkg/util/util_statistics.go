@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"reflect"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -607,6 +608,47 @@ func (s *Statistics) KeyText(k StatisticsKey) (string, error) {
 	return out.String(), nil
 }
 
+func (s *Statistics) literalKey(name string) (StatisticsKey, error) {
+	ref, e := s.keys.Allocate(uint32(len(name) + 1))
+	if e != nil {
+		return StatisticsKey{}, e
+	}
+	for i := range name {
+		if e = s.keys.Write(ref, uint32(i), name[i]); e != nil {
+			return StatisticsKey{}, e
+		}
+	}
+	if e = s.keys.Write(ref, uint32(len(name)), 0); e != nil {
+		return StatisticsKey{}, e
+	}
+	return StatisticsKey{s.keys.OwnerID(), ref, 0}, nil
+}
+
+func (s *Statistics) appendLiteralUint64(name string, value uint64) error {
+	if value == 0 {
+		return nil
+	}
+	k, e := s.literalKey(name)
+	if e != nil {
+		return e
+	}
+	if value <= uint64(^uint32(0)) {
+		return s.appendUint(k, uint32(value))
+	}
+	return s.appendDouble(k, float64(value))
+}
+
+func (s *Statistics) appendLiteralDouble(name string, value float64) error {
+	if value == 0 {
+		return nil
+	}
+	k, e := s.literalKey(name)
+	if e != nil {
+		return e
+	}
+	return s.appendDouble(k, value)
+}
+
 // GetRlimitStatistics reads the actual source reslimit count. The literal is
 // allocated explicitly in the receiver's borrowed key domain; no hidden cache.
 // That caller-owned region, not Statistics.Close, owns this spelling lifetime.
@@ -621,26 +663,45 @@ func GetRlimitStatistics(l *Reslimit, s *Statistics) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	n := l.Count()
-	if n == 0 {
-		return nil
-	}
-	const name = "rlimit count"
-	ref, e := s.keys.Allocate(uint32(len(name) + 1))
-	if e != nil {
+	return s.appendLiteralUint64("rlimit count", l.Count())
+}
+
+type goMemoryStatistics struct {
+	heapAlloc uint64
+	heapSys   uint64
+	mallocs   uint64
+}
+
+func memoryMegabytes(bytes uint64) float64 {
+	const mebibyte = uint64(1024 * 1024)
+	centi := (bytes/mebibyte)*100 + ((bytes%mebibyte)*100)/mebibyte
+	return float64(centi) / 100
+}
+
+func (s *Statistics) appendMemoryStatistics(memory goMemoryStatistics) error {
+	if e := s.appendLiteralDouble("max memory", memoryMegabytes(memory.heapSys)); e != nil {
 		return e
 	}
-	for i := range name {
-		if e = s.keys.Write(ref, uint32(i), name[i]); e != nil {
-			return e
-		}
-	}
-	if e = s.keys.Write(ref, uint32(len(name)), 0); e != nil {
+	if e := s.appendLiteralDouble("memory", memoryMegabytes(memory.heapAlloc)); e != nil {
 		return e
 	}
-	k := StatisticsKey{s.keys.OwnerID(), ref, 0}
-	if n <= uint64(^uint32(0)) {
-		return s.appendUint(k, uint32(n))
+	return s.appendLiteralUint64("num allocs", memory.mallocs)
+}
+
+// GetMemoryStatistics uses the Go runtime allocator counters corresponding to
+// statistics.cpp:239-246. HeapAlloc is current heap object memory. HeapSys is
+// the standard library's estimate of the largest heap size reached, and
+// Mallocs is the cumulative heap-object allocation count.
+func GetMemoryStatistics(s *Statistics) error {
+	if e := s.lock(); e != nil {
+		return e
 	}
-	return s.appendDouble(k, float64(n))
+	defer s.mu.Unlock()
+	var memory runtime.MemStats
+	runtime.ReadMemStats(&memory)
+	return s.appendMemoryStatistics(goMemoryStatistics{
+		heapAlloc: memory.HeapAlloc,
+		heapSys:   memory.HeapSys,
+		mallocs:   memory.Mallocs,
+	})
 }

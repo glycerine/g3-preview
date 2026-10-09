@@ -56,6 +56,90 @@ func statDouble(t *testing.T, s *Statistics, k StatisticsKey, v float64) {
 		t.Fatal(e)
 	}
 }
+
+func TestStatisticsGoMemorySnapshotAndRuntime(t *testing.T) {
+	const mebibyte = uint64(1024 * 1024)
+	s, _ := statFixture(t, nil)
+	if e := s.lock(); e != nil {
+		t.Fatal(e)
+	}
+	e := s.appendMemoryStatistics(goMemoryStatistics{
+		heapAlloc: mebibyte + mebibyte/2,
+		heapSys:   2*mebibyte + mebibyte/4,
+		mallocs:   uint64(^uint32(0)) + 3,
+	})
+	s.mu.Unlock()
+	if e != nil {
+		t.Fatal(e)
+	}
+	if s.Size() != 3 || s.IsUint(0) {
+		t.Fatal("large allocation count must use the double domain")
+	}
+	wantKeys := []string{"max memory", "memory", "num allocs"}
+	wantValues := []float64{2.25, 1.5, float64(uint64(^uint32(0)) + 3)}
+	for i := range wantKeys {
+		key, keyErr := s.Key(uint32(i))
+		if keyErr != nil {
+			t.Fatal(keyErr)
+		}
+		text, textErr := s.KeyText(key)
+		value, valueErr := s.DoubleValue(uint32(i))
+		if textErr != nil || valueErr != nil || text != wantKeys[i] || value != wantValues[i] {
+			t.Fatalf("entry %d = %q %v, want %q %v (errors %v, %v)", i, text, value, wantKeys[i], wantValues[i], textErr, valueErr)
+		}
+	}
+
+	if e = s.Reset(); e != nil {
+		t.Fatal(e)
+	}
+	if e = s.lock(); e != nil {
+		t.Fatal(e)
+	}
+	e = s.appendMemoryStatistics(goMemoryStatistics{heapAlloc: mebibyte, heapSys: 2 * mebibyte, mallocs: 7})
+	s.mu.Unlock()
+	if e != nil {
+		t.Fatal(e)
+	}
+	if s.Size() != 3 || !s.IsUint(0) {
+		t.Fatal("small allocation count must lead the uint domain")
+	}
+	key, e := s.Key(0)
+	if e != nil {
+		t.Fatal(e)
+	}
+	text, e := s.KeyText(key)
+	if value, valueErr := s.UintValue(0); e != nil || valueErr != nil || text != "num allocs" || value != 7 {
+		t.Fatal(text, value, e, valueErr)
+	}
+
+	if e = s.Reset(); e != nil {
+		t.Fatal(e)
+	}
+	if e = GetMemoryStatistics(s); e != nil {
+		t.Fatal(e)
+	}
+	if s.Size() != 3 {
+		t.Fatalf("runtime memory statistic count = %d", s.Size())
+	}
+	seen := make(map[string]bool, 3)
+	for i := uint32(0); i < s.Size(); i++ {
+		key, keyErr := s.Key(i)
+		if keyErr != nil {
+			t.Fatal(keyErr)
+		}
+		text, textErr := s.KeyText(key)
+		if textErr != nil {
+			t.Fatal(textErr)
+		}
+		seen[text] = true
+	}
+	for _, name := range wantKeys {
+		if !seen[name] {
+			t.Fatalf("missing runtime memory statistic %q", name)
+		}
+	}
+}
+
 func TestStatisticsSourceFiveAssertionsAndRawDomains(t *testing.T) {
 	s, r := statFixture(t, nil)
 	k := statKey(t, r, "x")

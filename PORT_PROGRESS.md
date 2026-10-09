@@ -30606,3 +30606,11 @@ Ported the low-level LIFO byte allocator as exported Stack and StackRef APIs. St
 Checked StackRef values replace raw void pointers and bind every allocation to its original owner and lifetime. Read, Write and Size provide bounded byte access. DeallocateRef implements top-checked placement deletion, while non-generic DeallocateValue invokes a borrowed destructor callback before reclaiming the top allocation. Explicit Close replaces the C++ destructor and copied owners are rejected.
 
 Four focused tests cover small, large and zero-size allocation; LIFO top restoration; stale, foreign and copied-owner rejection; bounds; page recycling and large-page release; typed destructor order; reset; close and empty operations. Focused native and g3debug checks pass (0.004s/0.006s). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 91 ported, 276 partial, 1726 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.
+
+### util files: statistics.cpp and statistics.h
+
+Completed the remaining `get_memory_statistics` implementation as exported GetMemoryStatistics. It reads Go's documented runtime.MemStats counters: HeapAlloc for current heap-object bytes, HeapSys for the standard library's estimate of the largest heap size, and Mallocs for the cumulative heap-object allocation count. Memory values retain the source's truncation to hundredths of a mebibyte, and allocation counts use the uint32 statistics domain when representable or the double domain otherwise.
+
+The existing concrete Statistics implementation continues to cover contribution storage, append-copy/reset, typed indexed access, aggregation, the three rendering modes, source formatting quirks and resource-limit statistics. A deterministic snapshot test covers exact conversion, both allocation-count domains and source storage ordering; the same test exercises the real Go runtime path and verifies all three exported keys.
+
+All 20 focused Statistics tests pass in native and g3debug builds (0.014s/0.010s). Util vet, ledger and diff validation pass; both source files are now marked ported. Inventory is now 2102 units, 677 APIs: 90 ported, 277 partial, 1726 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.

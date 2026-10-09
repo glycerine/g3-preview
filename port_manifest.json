@@ -152166,7 +152166,7 @@
       "path": "src/util/statistics.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/util_statistics.go",
         "pkg/util/util_statistics_render.go"
@@ -152190,7 +152190,8 @@
         "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
         "TestStatisticsBindingBackingHostBounds",
         "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-        "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
+        "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity",
+        "TestStatisticsGoMemorySnapshotAndRuntime"
       ],
       "assertions": [
         {
@@ -152348,22 +152349,26 @@
           ]
         },
         {
-          "name": "get_memory_statistics actual global process allocation/peak/allocation-count service and real solver/API/timer producers",
-          "status": "unported"
+          "name": "get_memory_statistics using Go runtime current heap, estimated largest heap and cumulative allocation count (src/util/statistics.cpp:239-247)",
+          "status": "ported",
+          "go_target": "pkg/util/util_statistics.go",
+          "tests": [
+            "TestStatisticsGoMemorySnapshotAndRuntime"
+          ]
         }
       ],
       "ownership": [
         "Actual cold owner plus concrete uint/double contribution vectors and sorted cold borrowed-region bindings are charged with old/new overlap. Local real maps/key-buffer headers and backings, numeric output staging and prefixes are audited immediately before cleanup. Copy preserves borrowed key identity without dereferencing even closed regions; move-construction transfers actual backing charges, source move-assignment copies. Close destroys double then uint and never closes borrowed regions. See PORT_PROGRESS.md#audit-statistics-port-status-md."
       ],
       "deviations": [
-        "No Go generics. Fixed-width region identities replace char pointers; raw zero/foreign/stale keys may be stored and copied, with typed errors at actual reads. External std::sort uses concrete allocation-free heap sort; existing selected NumericTextStream adapts C-locale runtime printing. Source nonadvancing internal loop has typed ErrStatisticsNonterminating at entry, preserving prior finite empty-key output rather than silently advancing key. IEEE arithmetic NaN sign/payload may vary by target; explicit signed NaN formatting remains exact. Global process memory getters and real downstream producers remain open."
+        "No Go generics. Fixed-width region identities replace char pointers; raw zero/foreign/stale keys may be stored and copied, with typed errors at actual reads. External std::sort uses concrete allocation-free heap sort; existing selected NumericTextStream adapts C-locale runtime printing. Source nonadvancing internal loop has typed ErrStatisticsNonterminating at entry, preserving prior finite empty-key output rather than silently advancing key. IEEE arithmetic NaN sign/payload may vary by target; explicit signed NaN formatting remains exact. Go runtime.ReadMemStats supplies HeapAlloc for current memory, HeapSys as the standard library estimate of the largest heap size, and Mallocs for the cumulative allocation count."
       ]
     },
     {
       "path": "src/util/statistics.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/util_statistics.go",
         "pkg/util/util_statistics_render.go"
@@ -152387,7 +152392,8 @@
         "TestStatisticsSignedSpecialValuesAndBorrowedOutputBounds",
         "TestStatisticsBindingBackingHostBounds",
         "TestStatisticsClosedSecondaryRawCopyDoesNotReadKeys",
-        "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity"
+        "TestStatisticsClosedPrimaryCloneMoveRetainsRawIdentity",
+        "TestStatisticsGoMemorySnapshotAndRuntime"
       ],
       "conditionals": [
         {
@@ -152533,15 +152539,19 @@
           ]
         },
         {
-          "name": "get_memory_statistics actual global process allocation/peak/allocation-count service and real solver/API/timer producers",
-          "status": "unported"
+          "name": "get_memory_statistics using Go runtime current heap, estimated largest heap and cumulative allocation count (src/util/statistics.cpp:239-247)",
+          "status": "ported",
+          "go_target": "pkg/util/util_statistics.go",
+          "tests": [
+            "TestStatisticsGoMemorySnapshotAndRuntime"
+          ]
         }
       ],
       "ownership": [
         "Actual cold owner plus concrete uint/double contribution vectors and sorted cold borrowed-region bindings are charged with old/new overlap. Local real maps/key-buffer headers and backings, numeric output staging and prefixes are audited immediately before cleanup. Copy preserves borrowed key identity without dereferencing even closed regions; move-construction transfers actual backing charges, source move-assignment copies. Close destroys double then uint and never closes borrowed regions. See PORT_PROGRESS.md#audit-statistics-port-status-md."
       ],
       "deviations": [
-        "No Go generics. Fixed-width region identities replace char pointers; raw zero/foreign/stale keys may be stored and copied, with typed errors at actual reads. External std::sort uses concrete allocation-free heap sort; existing selected NumericTextStream adapts C-locale runtime printing. Source nonadvancing internal loop has typed ErrStatisticsNonterminating at entry, preserving prior finite empty-key output rather than silently advancing key. IEEE arithmetic NaN sign/payload may vary by target; explicit signed NaN formatting remains exact. Global process memory getters and real downstream producers remain open."
+        "No Go generics. Fixed-width region identities replace char pointers; raw zero/foreign/stale keys may be stored and copied, with typed errors at actual reads. External std::sort uses concrete allocation-free heap sort; existing selected NumericTextStream adapts C-locale runtime printing. Source nonadvancing internal loop has typed ErrStatisticsNonterminating at entry, preserving prior finite empty-key output rather than silently advancing key. IEEE arithmetic NaN sign/payload may vary by target; explicit signed NaN formatting remains exact. Go runtime.ReadMemStats supplies HeapAlloc for current memory, HeapSys as the standard library estimate of the largest heap size, and Mallocs for the cumulative allocation count."
       ]
     },
     {
