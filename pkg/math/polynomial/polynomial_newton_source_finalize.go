@@ -6,7 +6,7 @@ import (
 )
 
 // SourceFinalize destroys published children before dropping native active
-// storage. Failed children and genuine unjoined roots await explicit Close.
+// storage. Genuine unjoined child resources await explicit Close.
 func (v *PolynomialNewtonVector) SourceFinalize() error {
 	if v == nil || v.self != v {
 		return ErrPolynomialOwner

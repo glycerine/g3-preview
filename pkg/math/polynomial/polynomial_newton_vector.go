@@ -13,7 +13,6 @@ type PolynomialNewtonVector struct {
 	self                              *PolynomialNewtonVector
 	owner, storage                    *MultivariatePolynomialCore
 	children                          []*PolynomialNewtonInterpolator
-	pending                           *PolynomialNewtonInterpolator
 	header                            uint64
 	cursor                            uint32
 	closing, closed                   bool
@@ -55,7 +54,7 @@ func (v *PolynomialNewtonVector) At(i uint32) (*PolynomialNewtonInterpolator, er
 	if e := v.storage.check(); e != nil {
 		return nil, e
 	}
-	if v.pending != nil || v.cursor != 0 || len(v.orphans) != 0 {
+	if v.cursor != 0 || len(v.orphans) != 0 {
 		return nil, ErrPolynomialPending
 	}
 	if v.owner == nil {
@@ -66,14 +65,10 @@ func (v *PolynomialNewtonVector) At(i uint32) (*PolynomialNewtonInterpolator, er
 	}
 	for uint64(i) >= uint64(len(v.children)) {
 		child, e := NewPolynomialNewtonInterpolator(v.owner)
-		if child != nil {
-			v.pending = child
-		}
 		if e != nil {
 			return nil, e
 		}
 		v.children = append(v.children, child)
-		v.pending = nil
 	}
 	return v.children[i], nil
 }
@@ -130,12 +125,6 @@ func (v *PolynomialNewtonVector) Close() error {
 		}
 	}
 	v.orphans = nil
-	if v.pending != nil {
-		if e := v.pending.Close(); e != nil {
-			return e
-		}
-		v.pending = nil
-	}
 	v.storage.integer.Budget().Release(v.header)
 	v.header = 0
 	v.closed = true

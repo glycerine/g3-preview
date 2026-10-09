@@ -20,16 +20,16 @@ type polynomialNewtonScope struct {
 // PolynomialNewtonInterpolator is the real modular incremental Newton algorithm.
 // Its heap owner is a charged Go adapter for the source stack or heap object.
 type PolynomialNewtonInterpolator struct {
-	self                          *PolynomialNewtonInterpolator
-	owner                         *MultivariatePolynomialCore
-	inputs, invs                  polynomialVector
-	vs                            polynomialReferenceVector
-	scope                         polynomialNewtonScope
-	resetCause                    error
-	header                        uint64
-	resetStage, closeStage        uint8
-	inputDrain, invDrain          uint32
-	constructing, closing, closed bool
+	self                   *PolynomialNewtonInterpolator
+	owner                  *MultivariatePolynomialCore
+	inputs, invs           []util.Int
+	vs                     polynomialReferenceVector
+	scope                  polynomialNewtonScope
+	resetCause             error
+	header                 uint64
+	resetStage, closeStage uint8
+	inputDrain, invDrain   uint32
+	closing, closed        bool
 }
 
 func NewPolynomialNewtonInterpolator(m *MultivariatePolynomialCore) (*PolynomialNewtonInterpolator, error) {
@@ -40,22 +40,15 @@ func NewPolynomialNewtonInterpolator(m *MultivariatePolynomialCore) (*Polynomial
 	if e := m.integer.Budget().Reserve(h); e != nil {
 		return nil, e
 	}
-	n := &PolynomialNewtonInterpolator{owner: m, header: h, constructing: true}
+	n := &PolynomialNewtonInterpolator{owner: m, header: h, invs: []util.Int{{}}}
 	n.self = n
-	n.inputs.width = 12
-	n.invs.width = 12
-	zero := util.Int{}
-	if e := n.pushNumeral(&n.invs, &zero); e != nil {
-		return n, e
-	}
-	n.constructing = false
 	return n, nil
 }
 func (n *PolynomialNewtonInterpolator) open() error {
 	if n == nil || n.self != n {
 		return ErrPolynomialOwner
 	}
-	if n.closed || n.closing || n.constructing {
+	if n.closed || n.closing {
 		return arena.ErrClosed
 	}
 	if n.scope.kind != 0 || n.resetStage != 0 {
@@ -70,7 +63,7 @@ func (n *PolynomialNewtonInterpolator) NumSamplePoints() (uint32, error) {
 	if n.closed {
 		return 0, arena.ErrClosed
 	}
-	return n.inputs.size(n.owner)
+	return uint32(len(n.inputs)), nil
 }
 
 type PolynomialNewtonInputs struct{ owner *PolynomialNewtonInterpolator }
@@ -85,71 +78,37 @@ func (n *PolynomialNewtonInterpolator) Input(i uint32) (util.Int, error) {
 	if n == nil || n.self != n {
 		return util.Int{}, ErrPolynomialOwner
 	}
-	if n.closed || n.closing || n.constructing {
+	if n.closed || n.closing {
 		return util.Int{}, arena.ErrClosed
 	}
 	if e := n.owner.check(); e != nil {
 		return util.Int{}, e
 	}
-	s, e := n.inputs.size(n.owner)
-	if e != nil {
-		return util.Int{}, e
-	}
-	if polynomialSourceDebug && i >= s {
-		return util.Int{}, ErrPolynomialAssertion
-	}
-	if i >= n.inputs.initialized {
+	if uint64(i) >= uint64(len(n.inputs)) {
+		if polynomialSourceDebug {
+			return util.Int{}, ErrPolynomialAssertion
+		}
 		return util.Int{}, arena.ErrBounds
 	}
-	return n.inputs.coefficient(n.owner, i)
+	return n.inputs[i], nil
 }
-func (n *PolynomialNewtonInterpolator) pushNumeral(v *polynomialVector, a *util.Int) error {
-	if e := v.appendCoefficient(n.owner, util.Int{}); e != nil {
-		return e
-	}
-	s, e := v.size(n.owner)
-	if e != nil {
-		return e
-	}
-	b, e := v.coefficient(n.owner, s-1)
-	if e != nil {
-		return e
-	}
-	e = n.owner.modular.Copy(&b, a)
-	if w := v.putCoefficient(n.owner, s-1, b); w != nil {
-		return polynomialNewtonJoin(e, w)
-	}
-	return e
+func (n *PolynomialNewtonInterpolator) pushNumeral(v *[]util.Int, a *util.Int) error {
+	// Publish a constructed zero numeral before SET; a failed numeric copy
+	// leaves its actual acquired resources in this owning entry.
+	*v = append(*v, util.Int{})
+	return n.owner.modular.Copy(&(*v)[len(*v)-1], a)
 }
-func (n *PolynomialNewtonInterpolator) destroyNumerals(v *polynomialVector, target uint32, cursor *uint32) error {
-	count, e := v.size(n.owner)
-	if e != nil {
-		return e
-	}
+func (n *PolynomialNewtonInterpolator) destroyNumerals(v *[]util.Int, target uint32, cursor *uint32) error {
 	if *cursor < target {
 		*cursor = target
 	}
-	for *cursor < count {
-		a, e := v.coefficient(n.owner, *cursor)
-		if e != nil {
-			return e
-		}
-		e = n.owner.modular.Del(&a)
-		if w := v.putCoefficient(n.owner, *cursor, a); w != nil {
-			return polynomialNewtonJoin(e, w)
-		}
-		if e != nil {
+	for uint64(*cursor) < uint64(len(*v)) {
+		if e := n.owner.modular.Del(&(*v)[*cursor]); e != nil {
 			return e
 		}
 		*cursor++
 	}
-	if v.raw == (util.Block{}) {
-		*cursor = 0
-		return nil
-	}
-	if e = v.publishSize(n.owner, target); e != nil {
-		return e
-	}
+	*v = (*v)[:target]
 	*cursor = 0
 	return nil
 }
@@ -243,10 +202,8 @@ func (n *PolynomialNewtonInterpolator) Add(input *util.Int, output Polynomial) (
 	if polynomialSourceDebug && m.modular.IntegerMode() {
 		return ErrPolynomialAssertion
 	}
-	sz, e := n.inputs.size(m)
-	if e != nil {
-		return e
-	}
+	sz := uint32(len(n.inputs))
+	var e error
 	if sz == 0 {
 		if e = n.pushNumeral(&n.inputs, input); e != nil {
 			return e
@@ -256,10 +213,7 @@ func (n *PolynomialNewtonInterpolator) Add(input *util.Int, output Polynomial) (
 	n.scope = polynomialNewtonScope{kind: 1}
 	defer func() { err = n.finish(err) }()
 	s := &n.scope
-	first, e := n.inputs.coefficient(m, 0)
-	if e != nil {
-		return e
-	}
+	first := n.inputs[0]
 	if polynomialSourceDebug {
 		same, e := m.modular.Equal(input, &first)
 		if e != nil {
@@ -273,10 +227,7 @@ func (n *PolynomialNewtonInterpolator) Add(input *util.Int, output Polynomial) (
 		return e
 	}
 	for i := uint32(1); i < sz; i++ {
-		a, e := n.inputs.coefficient(m, i)
-		if e != nil {
-			return e
-		}
+		a := n.inputs[i]
 		if polynomialSourceDebug {
 			same, e := m.modular.Equal(input, &a)
 			if e != nil {
@@ -303,10 +254,7 @@ func (n *PolynomialNewtonInterpolator) Add(input *util.Int, output Polynomial) (
 		return e
 	}
 	if polynomialSourceDebug {
-		a, e := n.inputs.coefficient(m, sz)
-		if e != nil {
-			return e
-		}
+		a := n.inputs[sz]
 		same, e := m.modular.Equal(&a, input)
 		if e != nil {
 			return e
@@ -324,10 +272,7 @@ func (n *PolynomialNewtonInterpolator) Add(input *util.Int, output Polynomial) (
 		return e
 	}
 	for j := int32(sz - 2); j >= 0; j-- {
-		a, e := n.inputs.coefficient(m, uint32(j))
-		if e != nil {
-			return e
-		}
+		a := n.inputs[uint32(j)]
 		if e = m.modular.Sub(input, &a, &s.aux); e != nil {
 			return e
 		}
@@ -366,10 +311,7 @@ func (n *PolynomialNewtonInterpolator) Add(input *util.Int, output Polynomial) (
 	if e = n.assertPolynomialNormalized(s.auxPoly.value); e != nil {
 		return e
 	}
-	a, e := n.invs.coefficient(m, sz)
-	if e != nil {
-		return e
-	}
+	a := n.invs[sz]
 	p, e = n.scale(&a, s.auxPoly.value)
 	if e != nil {
 		return e
@@ -406,10 +348,7 @@ func (n *PolynomialNewtonInterpolator) Mk(x uint32, r *PolynomialRef) (err error
 	n.scope = polynomialNewtonScope{kind: 2, refsConstructed: true}
 	defer func() { err = n.finish(err) }()
 	s := &n.scope
-	rawNum, e := n.inputs.size(m)
-	if e != nil {
-		return e
-	}
+	rawNum := uint32(len(n.inputs))
 	num := int32(rawNum)
 	if num == math.MinInt32 {
 		return arena.ErrBounds
@@ -431,10 +370,7 @@ func (n *PolynomialNewtonInterpolator) Mk(x uint32, r *PolynomialRef) (err error
 		return arena.ErrBounds
 	}
 	for k := d - 1; k >= 0; k-- {
-		a, e := n.inputs.coefficient(m, uint32(k))
-		if e != nil {
-			return e
-		}
+		a := n.inputs[uint32(k)]
 		if e = m.modular.Copy(&s.c, &a); e != nil {
 			return e
 		}
@@ -482,7 +418,7 @@ func (n *PolynomialNewtonInterpolator) Reset() (err error) {
 	if n == nil || n.self != n {
 		return ErrPolynomialOwner
 	}
-	if n.closed || n.closing || n.constructing {
+	if n.closed || n.closing {
 		return arena.ErrClosed
 	}
 	if n.scope.kind != 0 {
@@ -510,10 +446,7 @@ func (n *PolynomialNewtonInterpolator) Reset() (err error) {
 		n.resetStage = 4
 	}
 	if polynomialSourceDebug {
-		a, e := n.invs.coefficient(n.owner, 0)
-		if e != nil {
-			return e
-		}
+		a := n.invs[0]
 		zero, e := n.owner.modular.IsZero(&a)
 		if e != nil {
 			return e
@@ -523,25 +456,6 @@ func (n *PolynomialNewtonInterpolator) Reset() (err error) {
 		}
 	}
 	n.resetStage = 0
-	return nil
-}
-
-// These are named Go owning-abort fields, not constructed source members.
-func (n *PolynomialNewtonInterpolator) hasAbortRoots() bool {
-	if n.scope.kind != 0 {
-		return true
-	}
-	for _, v := range [2]*polynomialVector{&n.invs, &n.inputs} {
-		if v.pending != (util.Block{}) || v.old != (util.Block{}) || v.retiredActive != 0 {
-			return true
-		}
-	}
-	return false
-}
-func (n *PolynomialNewtonInterpolator) sourceBacking(v *polynomialVector) error {
-	if v.raw != (util.Block{}) {
-		return n.owner.memory.Deallocate(&v.raw)
-	}
 	return nil
 }
 
@@ -578,32 +492,23 @@ func (n *PolynomialNewtonInterpolator) closeMode(owning, abort bool) error {
 		if e := n.destroyNumerals(&n.invs, 0, &n.invDrain); e != nil {
 			return e
 		}
-		if e := n.sourceBacking(&n.invs); e != nil {
-			return e
-		}
+		n.invs = nil
 		n.closeStage++
 	}
 	if n.closeStage == 2 {
 		if e := n.destroyNumerals(&n.inputs, 0, &n.inputDrain); e != nil {
 			return e
 		}
-		if e := n.sourceBacking(&n.inputs); e != nil {
-			return e
-		}
+		n.inputs = nil
 		n.closeStage++
 	}
 	// Actual pending numeric/scope resources require separate owning abort
 	// after all completed class member destructors.
-	if !abort && n.hasAbortRoots() {
+	if !abort && n.scope.kind != 0 {
 		return nil
 	}
 	if e := n.scopeCleanup(owning, true); e != nil {
 		return e
-	}
-	for _, v := range [2]*polynomialVector{&n.invs, &n.inputs} {
-		if e := v.close(n.owner); e != nil {
-			return e
-		}
 	}
 	n.owner.integer.Budget().Release(n.header)
 	n.header = 0
@@ -657,21 +562,10 @@ func (m *MultivariatePolynomialCore) NewtonInterpolation(x, d uint32, inputs []u
 		return ErrPolynomialAssertion
 	}
 	n, e := NewPolynomialNewtonInterpolator(m)
-	if n != nil {
-		m.newtonLocal = n
-	}
 	if e != nil {
-		if n != nil {
-			// Failed construction destroys only completed source members. A
-			// TLS returned allocation stays named until explicit owning abort.
-			c := n.closeMode(false, false)
-			if n.closed {
-				m.newtonLocal = nil
-			}
-			return polynomialNewtonJoin(e, c)
-		}
 		return e
 	}
+	m.newtonLocal = n
 	defer func() {
 		c := n.sourceClose()
 		if n.closed {

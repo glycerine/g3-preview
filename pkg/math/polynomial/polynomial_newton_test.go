@@ -587,27 +587,28 @@ func TestPolynomialNewtonMkGrowthAndCancellationPrefixes(t *testing.T) {
 	}
 }
 
-func TestPolynomialNewtonSignedSourceCountBoundsDomain(t *testing.T) {
+func TestPolynomialNewtonNativeInputBounds(t *testing.T) {
 	m := polynomialCellFixture(t)
 	serviceMust(t, m.SetZPUint64(97))
 	n, e := NewPolynomialNewtonInterpolator(m)
 	serviceMust(t, e)
-	input := util.NewInt(0)
-	serviceMust(t, n.Add(&input, m.unit))
-	r, e := NewPolynomialRef(m)
-	serviceMust(t, e)
-	oldCount, e := n.inputs.size(m)
-	serviceMust(t, e)
-	serviceMust(t, m.memory.WriteUint32(n.inputs.raw, 4, 0x80000000))
-	e = n.Mk(0, r)
-	// int num=unsigned_count yields INT_MIN, then num-1 is source signed UB.
-	// The explicit Go guard rejects that signed arithmetic domain.
-	if !errors.Is(e, arena.ErrBounds) || errors.Is(e, util.ErrRuntimeOwner) {
-		t.Error("wrong reached source guard/read order", e)
+	t.Cleanup(func() { serviceMust(t, n.Close()) })
+	for _, i := range []uint32{0, 1, 0x80000000, ^uint32(0)} {
+		_, e := n.Input(i)
+		want := arena.ErrBounds
+		if polynomialSourceDebug {
+			want = ErrPolynomialAssertion
+		}
+		if e != want {
+			t.Fatal(i, e, want)
+		}
 	}
-	serviceMust(t, m.memory.WriteUint32(n.inputs.raw, 4, oldCount))
-	serviceMust(t, n.Close())
-	serviceMust(t, r.Close())
+	input := util.NewInt(7)
+	serviceMust(t, n.Add(&input, m.unit))
+	serviceMust(t, n.Reset())
+	if _, e := n.Input(0); e == nil {
+		t.Fatal("native input exposed reset tail")
+	}
 }
 
 func TestPolynomialNewtonVectorSourceOwnerBinding(t *testing.T) {
@@ -714,63 +715,94 @@ func TestPolynomialNewtonRefVectorSourceResetStop(t *testing.T) {
 	serviceMust(t, v.Close())
 }
 
-// TLS's returned block is a Go failed-constructor abort root, not a numeral.
-func TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock(t *testing.T) {
-	b := arena.NewBudget(1 << 28)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
-	serviceMust(t, e)
-	profile := util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: rt, Profile: profile, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
-	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: rt, Profile: profile})
-	serviceMust(t, e)
-	serviceMust(t, mm.IncManagerRef())
-	m, e := NewMultivariatePolynomialCore(MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { t.Fatal("constructor checkpoint"); return false }, Cooperation: func() error { t.Fatal("constructor cooperation"); return nil }})
-	serviceMust(t, e)
-	var prep util.Block
-	defer func() {
-		serviceMust(t, rt.SetMaxSize(0))
-		serviceMust(t, m.CleanupNewtonInterpolation())
-		serviceMust(t, rt.Deallocate(&prep))
-		serviceMust(t, m.CloseChecked())
-		serviceMust(t, mm.DecManagerRef())
-		serviceMust(t, q.CloseChecked())
-		serviceMust(t, rt.Close())
-	}()
+// Native collection growth cannot consume Runtime reservations; numeric SET
+// and source destruction still belong to the actual modular numeral owner.
+func TestPolynomialNewtonNativeNumeralGrowthResetAndReuse(t *testing.T) {
+	m := polynomialCellFixture(t)
 	serviceMust(t, m.SetZPUint64(97))
-	// Prime the lane using an actual independently owned block. No counter repair.
-	local := rt.State().LocalSize
-	if local < 0 || local >= 99972 {
-		t.Fatal("initial lane", rt.State())
-	}
-	prep, e = rt.Allocate(uint64(99980 - local - 8))
+	before := m.memory.Stats()
+	used := m.integer.Budget().Used()
+	m.integer.Budget().FailAfter(1) // Only the actual class header is charged.
+	n, e := NewPolynomialNewtonInterpolator(m)
 	serviceMust(t, e)
-	if rt.State().LocalSize != 99980 {
-		t.Fatal(rt.State())
+	t.Cleanup(func() { m.integer.Budget().FailAfter(-1); serviceMust(t, n.Close()) })
+	if m.memory.Stats() != before || m.integer.Budget().Used() != used+n.header {
+		t.Fatal("native zero inverse constructor charged backing")
 	}
-	before := rt.Stats()
-	serviceMust(t, rt.SetMaxSize(1))
-	e = m.NewtonInterpolation(0, 0, nil, nil, nil)
-	var failure util.Failure
-	if !errors.As(e, &failure) || failure.Kind != util.FailureMemout || !rt.State().OutOfMemory {
-		t.Fatal("TLS refusal", e, rt.State())
+	m.integer.Budget().FailAfter(0)
+	for pass := 0; pass < 2; pass++ {
+		for i := int32(0); i < 4097; i++ {
+			a := util.NewInt(i)
+			serviceMust(t, n.pushNumeral(&n.inputs, &a))
+			serviceMust(t, n.pushNumeral(&n.invs, &a))
+		}
+		if newtonCount(t, n) != 4097 || len(n.invs) != 4098 {
+			t.Fatal("native numeric association length")
+		}
+		for i := uint32(0); i < 4097; i++ {
+			a, e := n.Input(i)
+			serviceMust(t, e)
+			value, e := m.integer.Int64(&a)
+			serviceMust(t, e)
+			inverse, e := m.integer.Int64(&n.invs[i+1])
+			serviceMust(t, e)
+			want := int64(i % 97)
+			if want > 48 {
+				want -= 97
+			}
+			if value != want || inverse != want {
+				t.Fatal("native numeric association", i, value, inverse, want)
+			}
+		}
+		polynomialNewtonPhysicalAudit(t, m, []*PolynomialNewtonInterpolator{n}, nil, nil, nil, nil, nil)
+		serviceMust(t, n.Reset())
+		if len(n.inputs) != 0 || len(n.invs) != 1 {
+			t.Fatal("source reset must retain only inverse zero")
+		}
+		if m.memory.Stats() != before || m.integer.Budget().Used() != used+n.header {
+			t.Fatal("native numeral growth/reset charged Runtime")
+		}
 	}
-	n := m.newtonLocal
-	if n == nil {
-		t.Fatal("failed constructor automatically aborted actual returned block")
+	serviceMust(t, n.Close())
+	if n.inputs != nil || n.invs != nil || m.memory.Stats() != before || m.integer.Budget().Used() != used {
+		t.Fatal("native numeral owning close retained storage")
 	}
-	if n.invs.pending == (util.Block{}) || n.invs.raw != (util.Block{}) || n.closeStage != 3 || n.closed || n.header == 0 {
-		t.Fatal("source/abort phases", n)
+}
+
+func TestPolynomialNewtonNativeInputActualNumericCopyRefusals(t *testing.T) {
+	failures := 0
+	for ordinal := int64(0); ordinal < 64; ordinal++ {
+		m := polynomialCellFixture(t)
+		serviceMust(t, m.SetZPUint64(97))
+		n, e := NewPolynomialNewtonInterpolator(m)
+		serviceMust(t, e)
+		m.integer.Budget().FailAfter(ordinal)
+		e = n.Add(&m.integer.Two64, m.unit)
+		polynomialNewtonPhysicalAudit(t, m, []*PolynomialNewtonInterpolator{n}, nil, nil, nil, nil, nil)
+		m.integer.Budget().FailAfter(-1)
+		if e != nil {
+			if !numericPhysicalReservationRefusal(e) {
+				t.Fatal("actual input SET allocation", ordinal, e)
+			}
+			failures++
+		} else {
+			a, e := n.Input(0)
+			serviceMust(t, e)
+			value, e := m.integer.Int64(&a)
+			serviceMust(t, e)
+			if value != -36 { // Independently: 2^64 mod 97 = 61, centered to -36.
+				t.Fatal("native input retained wrong numeral", value)
+			}
+		}
+		serviceMust(t, n.Close())
+		serviceMust(t, m.integer.CleanupPendingAllocation())
+		polynomialNewtonPhysicalAudit(t, m, nil, nil, nil, nil, nil, nil)
+		if e == nil {
+			if failures == 0 {
+				t.Fatal("no actual numeric allocation refusals")
+			}
+			return
+		}
 	}
-	if rt.Stats().LiveBlocks != before.LiveBlocks+1 || rt.Stats().PhysicalBytes != before.PhysicalBytes+40 {
-		t.Fatal(before, rt.Stats())
-	}
-	polynomialNewtonPhysicalWithRaw(t, m, []*PolynomialNewtonInterpolator{n}, nil, nil, nil, nil, nil, []util.Block{prep})
-	// Lift only the explicit fixture limit AFTER immediate root/cause inspection.
-	serviceMust(t, rt.SetMaxSize(0))
-	serviceMust(t, m.CleanupNewtonInterpolation())
-	if m.newtonLocal != nil || rt.Stats().LiveBlocks != before.LiveBlocks {
-		t.Fatal("abort", rt.Stats())
-	}
-	polynomialNewtonPhysicalWithRaw(t, m, nil, nil, nil, nil, nil, nil, []util.Block{prep})
+	t.Fatal("no actual numeric copy completion")
 }

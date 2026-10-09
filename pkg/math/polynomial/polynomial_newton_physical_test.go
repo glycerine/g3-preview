@@ -140,17 +140,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 				owners = append(owners, n)
 			}
 		}
-		if v.pending != nil {
-			found := false
-			for _, n := range owners {
-				if n == v.pending {
-					found = true
-				}
-			}
-			if !found {
-				owners = append(owners, v.pending)
-			}
-		}
+
 	}
 	seenNewton := map[*PolynomialNewtonInterpolator]bool{}
 	for _, n := range owners {
@@ -159,7 +149,11 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		}
 		seenNewton[n] = true
 		extraBytes += n.header
-		vectors = append(vectors, &n.inputs, &n.invs)
+		for _, values := range [][]util.Int{n.inputs, n.invs} {
+			for _, a := range values {
+				add(a)
+			}
+		}
 		for _, a := range []util.Int{n.scope.product, n.scope.aux, n.scope.c} {
 			add(a)
 		}

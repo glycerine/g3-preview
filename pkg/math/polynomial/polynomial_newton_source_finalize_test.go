@@ -40,30 +40,3 @@ func TestPolynomialNewtonVectorSourceFinalizeNativeStorage(t *testing.T) {
 	serviceMust(t, v.SourceFinalize())
 	serviceMust(t, v.Close())
 }
-
-func TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild(t *testing.T) {
-	m := polynomialCellFixture(t)
-	v, e := NewPolynomialNewtonVector(m)
-	serviceMust(t, e)
-	serviceMust(t, v.SetOwner(m))
-	m.integer.Budget().FailAfter(1) // charged child owner, then actual inverse-vector allocation refusal.
-	_, e = v.At(0)
-	if !numericPhysicalReservationRefusal(e) || v.pending == nil || !v.pending.constructing {
-		t.Fatal("actual failed constructor root", e, v.pending)
-	}
-	child := v.pending
-	polynomialNewtonPhysicalAudit(t, m, nil, nil, nil, []*PolynomialNewtonVector{v}, nil, nil)
-	before := m.integer.Budget().Used()
-	serviceMust(t, v.SourceFinalize())
-	polynomialNewtonPhysicalAudit(t, m, nil, nil, nil, []*PolynomialNewtonVector{v}, nil, nil)
-	if v.pending != child || child.closed || child.header == 0 || m.integer.Budget().Used() != before {
-		t.Fatal("failed constructor incorrectly received source class destructor")
-	}
-	// No source class destructor or source counter rollback consumes this
-	// returned incomplete child. Only the explicit owning boundary does so.
-	m.integer.Budget().FailAfter(-1)
-	serviceMust(t, v.Close())
-	if !child.closed || v.pending != nil {
-		t.Fatal("actual owning child cleanup")
-	}
-}

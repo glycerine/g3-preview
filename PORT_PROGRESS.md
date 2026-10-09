@@ -31576,3 +31576,57 @@ native module test run was repeated during recovery. Counts remain 2102 units /
 Next: replace remaining concrete numeral vector backing (including Newton
 inputs/inverses) while preserving actual numeric ownership and source cleanup.
 The complete util knot and package split remain open.
+
+## Native Newton numeral collections and util split audit
+
+Newton inputs and inverses now use owning `[]util.Int` storage. Publish a zero
+entry before actual modular Copy so a failed numeric SET retains the actual
+initialized value. Ascending numeric destruction updates those same entries;
+reset preserves inverse zero, and class destruction releases polynomial
+references before inverses before inputs. Actual arithmetic, reference handling,
+and stopped destructor continuation remain. The constructor's initial zero
+inverse needs no Runtime block, so removed impossible partial-constructor
+storage, lazy-vector pending-child bookkeeping, and associated allocation/TLS
+and corrupt-byte-header fixtures. Class-header reservation failures remain.
+
+New independent checks grow/reuse both numeral slices through 4097 entries
+under disabled Runtime reservations, verify every balanced residue, retain only
+inverse zero on reset and release all storage on close. Another campaign refuses
+every actual numeric Copy allocation for a 2^64 input, audits immediately before
+lifting refusal, and checks the independently known centered residue -36 mod97.
+Native input bounds now reject reset tails and large unsigned indices.
+
+The user clarified the complete destination: replace external consumers'
+container emulation with idiomatic Go slices/maps/insdict.Dict/standard buffers,
+then divide the remaining root util files into dependency-safe subpackages.
+Newton completion alone does not resolve this goal. Other polynomial numeral /
+monomial vectors, SAT Runtime scalar columns and their live consumers remain.
+Actual numeral/object backing and ownership must be distinguished from obsolete
+container mechanics when auditing remaining Runtime/Block uses.
+
+A compiler-resolved file dependency audit (go/parser + go/types, current Linux
+release production GoFiles, no tests or source hashing) finds 287 root-util files
+and 104 strongly connected file components. The largest contains 164 files,
+including integer/rational/floating numerics, text and parameters. This is
+file-level dependency evidence, not an assertion that there are 104 intended
+packages or a reconstruction of the earlier eleven conceptual groups. One
+concrete cycle is mpz.go -> mp_smt2_stream.go -> util_params_ref.go ->
+mp_format.go -> mpz.go; mpz.go and mpf_manager.go also directly depend on each
+other. External consumer conversions alone will not erase those internal edges.
+The one-off audit and complete graph are in /mnt/oldrog/tmp/
+g3-util-dependencies.go and g3-util-file-dependencies.json. Do not mechanically
+move all files or claim split readiness until actual package boundaries and
+these crossing dependencies are addressed.
+
+Validation before the hourly checkpoint: focused native Newton/sparse/PSC/GCD/
+imp checks passed (1.374s), final focused g3debug checks passed (2.299s), full
+native polynomial passed (35.037s), module-wide test compilation, polynomial vet,
+gofmt/diff checks and portcheck passed. Manifest counts remain unchanged.
+
+Hourly full native module checkpoint at 21:43–21:45 UTC passed with terminal
+exit zero (`go test ./... -count=1 -timeout=30m`): util 94.741s, polynomial
+35.941s, AST 26.357s. Log: /mnt/oldrog/tmp/g3-util-knot-native-checkpoint.log.
+No Go source changed during that checkpoint. Continue focused verification
+until the next hourly checkpoint is due. The complete util knot/split goal
+remains active; next concrete storage consumers are sparse interpolation and
+remaining SOM/core numeral/monomial columns, followed by SAT scalar collections.

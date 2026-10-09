@@ -36186,11 +36186,12 @@
         "TestPolynomialNewtonLazyDirectoryPlateau",
         "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
         "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
-        "TestPolynomialNewtonSignedSourceCountBoundsDomain",
+        "TestPolynomialNewtonNativeInputBounds",
         "TestPolynomialNewtonVectorSourceOwnerBinding",
         "TestPolynomialNewtonIndependentBoundedInterpolants",
         "TestPolynomialNewtonRefVectorSourceResetStop",
-        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
+        "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
+        "TestPolynomialNewtonNativeInputActualNumericCopyRefusals",
         "TestPolynomialQueryCoefficientIndependentMaps",
         "TestPolynomialQueryPowerLinearIndependentOracle",
         "TestPolynomialQueryEqualSourceOrderAndPermutation",
@@ -36249,7 +36250,6 @@
         "TestPolynomialSkeletonVectorOwnerGuards",
         "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
         "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
-        "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
         "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
         "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
         "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
@@ -38907,11 +38907,12 @@
             "TestPolynomialNewtonLazyDirectoryPlateau",
             "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
             "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
-            "TestPolynomialNewtonSignedSourceCountBoundsDomain",
+            "TestPolynomialNewtonNativeInputBounds",
             "TestPolynomialNewtonVectorSourceOwnerBinding",
             "TestPolynomialNewtonIndependentBoundedInterpolants",
             "TestPolynomialNewtonRefVectorSourceResetStop",
-            "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+            "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
+            "TestPolynomialNewtonNativeInputActualNumericCopyRefusals"
           ]
         },
         {
@@ -39166,7 +39167,6 @@
             "TestPolynomialSkeletonVectorOwnerGuards",
             "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
             "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
-            "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
             "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory"
           ]
         },
@@ -40714,7 +40714,7 @@
         "Same actual factory engines report created/started outcome; source callee creation is retained on guard and only originating core owns explicit abort authority.",
         "Separate owning Close/CleanupConstruction/CleanupValue aborts versus literal SourceFinalizePrefix; no completed imp destructor on failed construction.",
         "Static charged borrowed deletion handlers preserve next-read after callback; process/global handler binding not provided.",
-        "Actual assignment incoming roots remain separate; source completed local/member destruction precedes explicit owning abort. Polynomial reference Push now publishes directly into a native typed slice after INC, with no Runtime backing failure. Real TLS constructor error returns allocated pending block: source-only implicit member unwind retains method-local cold owner until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed.",
+        "Actual assignment incoming roots remain separate; source completed local/member destruction precedes explicit owning abort. Polynomial reference Push now publishes directly into a native typed slice after INC, with no Runtime backing failure. Native zero-inverse construction has no Runtime allocation or partial-constructor root; only the actual class header reservation can fail. Method-local source destruction still retains actual stopped numeric/reference resources until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed.",
         "Query prerequisite uses one embedded actual m_m2pos scratch member and source Power local reference. Generated div_x monomial ownership records actual factory created/started outcome before coefficient copy/INC; no registry/RC0 inference. Stopped local destruction and unjoined INC remain for explicit owning cleanup.",
         "literal raw numeral; no pre-end source Del on exception; active scalar record retains actual NUM/failed adapter until explicit CleanupExactDivision; end entered recorded before source Del",
         "source monomial_ref then completed default scoped numeral at actual declaration; reverse NUM then reference; actual partial incoming INC retained separately; C.mk evaluated fresh output retained if local cleanup refuses",
@@ -40834,7 +40834,8 @@
         "polynomial.cpp:6978-6980: exact actual core/frame/nonwrapping invocation acquired at reached caller NUM SET. Passed Copy and PN receipts capture only actual existing allocator/cell/Natural/verification leaves; false owning continuation completes younger PN source suffix, true aborts exact unjoined children. Helper never destroys caller NUM. Diagnostic-only charged archive preserves body/source/first-own and child tuple until actual core context end; archive reservation failure precedes overwrite.",
         "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
         "polynomial.cpp:6558-6830: exact guarded named child receipts, actual source constructors/declaration counts, youngest child stop before reverse lexical DT, separate false acknowledgment and true unjoined cleanup, immutable body/source/first-own history. No before/after roots or return-value/RC inference. Inline SET0/SET1/Factor constants reserve no history; charged diagnostic records appear only at reached Integer/Natural allocation leaves. UP and caller Factors physical graphs name actual members; callbacks cannot retire matched active owners; unrelated Factors remain allowed.",
-        "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added."
+        "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added.",
+        "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -41335,11 +41336,12 @@
         "TestPolynomialNewtonLazyDirectoryPlateau",
         "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
         "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
-        "TestPolynomialNewtonSignedSourceCountBoundsDomain",
+        "TestPolynomialNewtonNativeInputBounds",
         "TestPolynomialNewtonVectorSourceOwnerBinding",
         "TestPolynomialNewtonIndependentBoundedInterpolants",
         "TestPolynomialNewtonRefVectorSourceResetStop",
-        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
+        "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
+        "TestPolynomialNewtonNativeInputActualNumericCopyRefusals",
         "TestPolynomialQueryCoefficientIndependentMaps",
         "TestPolynomialQueryPowerLinearIndependentOracle",
         "TestPolynomialQueryEqualSourceOrderAndPermutation",
@@ -41398,7 +41400,6 @@
         "TestPolynomialSkeletonVectorOwnerGuards",
         "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
         "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
-        "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
         "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
         "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
         "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
@@ -42560,11 +42561,12 @@
             "TestPolynomialNewtonLazyDirectoryPlateau",
             "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
             "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
-            "TestPolynomialNewtonSignedSourceCountBoundsDomain",
+            "TestPolynomialNewtonNativeInputBounds",
             "TestPolynomialNewtonVectorSourceOwnerBinding",
             "TestPolynomialNewtonIndependentBoundedInterpolants",
             "TestPolynomialNewtonRefVectorSourceResetStop",
-            "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+            "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
+            "TestPolynomialNewtonNativeInputActualNumericCopyRefusals"
           ]
         },
         {
@@ -42818,8 +42820,7 @@
             "TestPolynomialSkeletonVectorNativeReplacementPreservesChildOrder",
             "TestPolynomialSkeletonVectorOwnerGuards",
             "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
-            "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
-            "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild"
+            "TestPolynomialNewtonVectorSourceFinalizeNativeStorage"
           ]
         },
         {
@@ -43438,7 +43439,7 @@
         "Same actual factory engines report created/started outcome; source callee creation is retained on guard and only originating core owns explicit abort authority.",
         "Separate owning Close/CleanupConstruction/CleanupValue aborts versus literal SourceFinalizePrefix; no completed imp destructor on failed construction.",
         "Static charged borrowed deletion handlers preserve next-read after callback; process/global handler binding not provided.",
-        "Actual assignment incoming roots remain separate; source completed local/member destruction precedes explicit owning abort. Polynomial reference Push now publishes directly into a native typed slice after INC, with no Runtime backing failure. Real TLS constructor error returns allocated pending block: source-only implicit member unwind retains method-local cold owner until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed.",
+        "Actual assignment incoming roots remain separate; source completed local/member destruction precedes explicit owning abort. Polynomial reference Push now publishes directly into a native typed slice after INC, with no Runtime backing failure. Native zero-inverse construction has no Runtime allocation or partial-constructor root; only the actual class header reservation can fail. Method-local source destruction still retains actual stopped numeric/reference resources until CleanupNewtonInterpolation. Existing foreign callee pending roots remain borrowed.",
         "Query prerequisite uses one embedded actual m_m2pos scratch member and source Power local reference. Generated div_x monomial ownership records actual factory created/started outcome before coefficient copy/INC; no registry/RC0 inference. Stopped local destruction and unjoined INC remain for explicit owning cleanup.",
         "literal raw numeral; no pre-end source Del on exception; active scalar record retains actual NUM/failed adapter until explicit CleanupExactDivision; end entered recorded before source Del",
         "source monomial_ref then completed default scoped numeral at actual declaration; reverse NUM then reference; actual partial incoming INC retained separately; C.mk evaluated fresh output retained if local cleanup refuses",
@@ -43484,7 +43485,8 @@
         "polynomial.cpp:6978-6980: exact actual core/frame/nonwrapping invocation acquired at reached caller NUM SET. Passed Copy and PN receipts capture only actual existing allocator/cell/Natural/verification leaves; false owning continuation completes younger PN source suffix, true aborts exact unjoined children. Helper never destroys caller NUM. Diagnostic-only charged archive preserves body/source/first-own and child tuple until actual core context end; archive reservation failure precedes overwrite.",
         "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
         "polynomial.cpp:6558-6830: exact guarded named child receipts, actual source constructors/declaration counts, youngest child stop before reverse lexical DT, separate false acknowledgment and true unjoined cleanup, immutable body/source/first-own history. No before/after roots or return-value/RC inference. Inline SET0/SET1/Factor constants reserve no history; charged diagnostic records appear only at reached Integer/Natural allocation leaves. UP and caller Factors physical graphs name actual members; callbacks cannot retire matched active owners; unrelated Factors remain allowed.",
-        "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added."
+        "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added.",
+        "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness."
       ],
       "deviations": [
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
@@ -106558,11 +106560,12 @@
         "TestPolynomialNewtonLazyDirectoryPlateau",
         "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
         "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
-        "TestPolynomialNewtonSignedSourceCountBoundsDomain",
+        "TestPolynomialNewtonNativeInputBounds",
         "TestPolynomialNewtonVectorSourceOwnerBinding",
         "TestPolynomialNewtonIndependentBoundedInterpolants",
         "TestPolynomialNewtonRefVectorSourceResetStop",
-        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
+        "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
+        "TestPolynomialNewtonNativeInputActualNumericCopyRefusals",
         "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
         "TestPolynomialPSCRegisteredFirstFixture",
         "TestPolynomialEvaluationLiveAliasSource",
@@ -138021,11 +138024,12 @@
         "TestPolynomialNewtonLazyDirectoryPlateau",
         "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
         "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
-        "TestPolynomialNewtonSignedSourceCountBoundsDomain",
+        "TestPolynomialNewtonNativeInputBounds",
         "TestPolynomialNewtonVectorSourceOwnerBinding",
         "TestPolynomialNewtonIndependentBoundedInterpolants",
         "TestPolynomialNewtonRefVectorSourceResetStop",
-        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
+        "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
+        "TestPolynomialNewtonNativeInputActualNumericCopyRefusals",
         "TestPolynomialPSCBufferInlineAndUnjoinedPush",
         "TestPolynomialPSCBufferHeapAndCapturedInitializedRange",
         "TestPolynomialPSCBufferReturnedAllocationBeforeSourceDestruction",
@@ -138149,11 +138153,12 @@
             "TestPolynomialNewtonLazyDirectoryPlateau",
             "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
             "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
-            "TestPolynomialNewtonSignedSourceCountBoundsDomain",
+            "TestPolynomialNewtonNativeInputBounds",
             "TestPolynomialNewtonVectorSourceOwnerBinding",
             "TestPolynomialNewtonIndependentBoundedInterpolants",
             "TestPolynomialNewtonRefVectorSourceResetStop",
-            "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+            "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
+            "TestPolynomialNewtonNativeInputActualNumericCopyRefusals"
           ]
         },
         {
@@ -142221,11 +142226,12 @@
         "TestPolynomialNewtonLazyDirectoryPlateau",
         "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
         "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
-        "TestPolynomialNewtonSignedSourceCountBoundsDomain",
+        "TestPolynomialNewtonNativeInputBounds",
         "TestPolynomialNewtonVectorSourceOwnerBinding",
         "TestPolynomialNewtonIndependentBoundedInterpolants",
         "TestPolynomialNewtonRefVectorSourceResetStop",
-        "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock",
+        "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
+        "TestPolynomialNewtonNativeInputActualNumericCopyRefusals",
         "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
         "TestASTRefVectorPushForeignAndIndependentAcquisitions",
         "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure",
@@ -142408,11 +142414,12 @@
             "TestPolynomialNewtonLazyDirectoryPlateau",
             "TestPolynomialNewtonStoppedReferenceBeforeOwningAbort",
             "TestPolynomialNewtonMkGrowthAndCancellationPrefixes",
-            "TestPolynomialNewtonSignedSourceCountBoundsDomain",
+            "TestPolynomialNewtonNativeInputBounds",
             "TestPolynomialNewtonVectorSourceOwnerBinding",
             "TestPolynomialNewtonIndependentBoundedInterpolants",
             "TestPolynomialNewtonRefVectorSourceResetStop",
-            "TestPolynomialNewtonWholeFailedConstructorRetainedTLSBlock"
+            "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
+            "TestPolynomialNewtonNativeInputActualNumericCopyRefusals"
           ]
         },
         {
@@ -144023,7 +144030,6 @@
         "TestPolynomialSkeletonVectorOwnerGuards",
         "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
         "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
-        "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
         "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory",
         "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges"
       ],
@@ -148900,7 +148906,6 @@
         "TestPolynomialSkeletonVectorOwnerGuards",
         "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
         "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
-        "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
         "TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars",
         "TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles",
         "TestScopedPolynomialVariablePositionsCapturedBackingLifetime",
@@ -149331,7 +149336,6 @@
             "TestPolynomialSkeletonVectorOwnerGuards",
             "TestPolynomialSkeletonVectorSetStoppedChildDestructor",
             "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
-            "TestPolynomialNewtonVectorSourceFinalizeLeavesFailedChild",
             "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory"
           ]
         },
