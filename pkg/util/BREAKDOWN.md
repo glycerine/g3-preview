@@ -950,7 +950,7 @@ The separate `satSolverLiteralSet` owner/iterator facade had no production Go
 consumer anywhere in pkg/. It and its self-tests have been removed. This does
 not mark C++ `sat::literal_set` dead: current probing/MUS/consequence consumers
 use native storage, and `src/sat/sat_solver/inc_sat_solver.cpp` remains a future
-consumer. QE's similarly named class is its own `qe::util::literal_set`.
+consumer. The similarly named class in src/qe is its own `nlarith::util::literal_set`.
 
 The retained unsigned set now uses ordinary slice growth for elimination todo,
 model-converter variable collection, and integrity checks. Its cold owner
