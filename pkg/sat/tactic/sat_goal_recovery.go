@@ -13,7 +13,6 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/tactic"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Concrete expr_ref_vector used by the inverse map and SAT recovery. Each
@@ -21,22 +20,12 @@ import (
 type satGoalLiteralExpressions struct{ values []ast.ASTHandle }
 
 func (v *satGoalLiteralExpressions) resize(m *ast.ASTManager, n uint32) error {
-	stride := uint64(reflect.TypeOf(ast.ASTHandle{}).Size())
-	for uint64(n) > uint64(cap(v.values)) {
-		next, e := util.SourceVectorCapacity(cap(v.values), stride)
-		if e != nil {
-			return e
-		}
-		if e = m.Budget().Reserve(uint64(next) * stride); e != nil {
-			return e
-		}
-		data := make([]ast.ASTHandle, len(v.values), next)
-		copy(data, v.values)
-		m.Budget().Release(uint64(cap(v.values)) * stride)
-		v.values = data
+	if uint64(n) > uint64(^uint(0)>>1) {
+		return arena.ErrBounds
 	}
-	if uint64(n) < uint64(len(v.values)) {
-		for i := int(n); i < len(v.values); i++ {
+	newLen := int(n)
+	if newLen < len(v.values) {
+		for i := newLen; i < len(v.values); i++ {
 			if !v.values[i].IsNull() {
 				if e := m.DecRef(v.values[i]); e != nil {
 					return e
@@ -45,7 +34,17 @@ func (v *satGoalLiteralExpressions) resize(m *ast.ASTManager, n uint32) error {
 			}
 		}
 	}
-	v.values = v.values[:n]
+	oldLen := len(v.values)
+	if newLen > cap(v.values) {
+		data := make([]ast.ASTHandle, newLen)
+		copy(data, v.values)
+		v.values = data
+	} else {
+		v.values = v.values[:newLen]
+		for i := oldLen; i < newLen; i++ {
+			v.values[i] = ast.ASTHandle{}
+		}
+	}
 	return nil
 }
 func (v *satGoalLiteralExpressions) set(m *ast.ASTManager, i uint32, h ast.ASTHandle) error {
@@ -73,7 +72,6 @@ func (v *satGoalLiteralExpressions) close(m *ast.ASTManager) error {
 	if e := v.resize(m, 0); e != nil {
 		return e
 	}
-	m.Budget().Release(uint64(cap(v.values)) * uint64(reflect.TypeOf(ast.ASTHandle{}).Size()))
 	v.values = nil
 	return nil
 }

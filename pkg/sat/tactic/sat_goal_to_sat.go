@@ -10,7 +10,6 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
-	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 )
@@ -23,8 +22,6 @@ type satGoalFrame struct {
 	index      uint32
 	root, sign bool
 }
-
-func satGoalFrameBytes() uint64 { return uint64(reflect.TypeOf(satGoalFrame{}).Size()) }
 
 // This implements the source array-of-formulas overload, using the actual CDCL
 // solver. Goal dependencies, tactic/model converters and public API factories
@@ -146,11 +143,7 @@ func (tr *GoalTranslator) Close() error {
 	tr.Atoms.close(b)
 	tr.interfaces.close(b)
 	tr.dependencies.close(b)
-	b.Release(uint64(cap(tr.dependencyTrail)) * uint64(reflect.TypeOf(ast.ASTHandle{}).Size()))
 	tr.dependencyTrail = nil
-	b.Release(uint64(cap(tr.frames)) * uint64(reflect.TypeOf(satGoalFrame{}).Size()))
-	b.Release(uint64(cap(tr.results)) * 4)
-	b.Release(uint64(cap(tr.interpreted)) * uint64(reflect.TypeOf(ast.ASTHandle{}).Size()))
 	tr.interpreted = nil
 	tr.frames = nil
 	tr.results = nil
@@ -166,20 +159,6 @@ func (tr *GoalTranslator) HasInterpretedAtoms() (bool, error) {
 	return len(tr.interpreted) != 0, nil
 }
 func (tr *GoalTranslator) retainInterpreted(h ast.ASTHandle) error {
-	stride := uint64(reflect.TypeOf(h).Size())
-	if len(tr.interpreted) == cap(tr.interpreted) {
-		n, e := util.SourceVectorCapacity(cap(tr.interpreted), stride)
-		if e != nil {
-			return e
-		}
-		if e = tr.solver.Budget().Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		next := make([]ast.ASTHandle, len(tr.interpreted), n)
-		copy(next, tr.interpreted)
-		tr.solver.Budget().Release(uint64(cap(tr.interpreted)) * stride)
-		tr.interpreted = next
-	}
 	if e := tr.manager.IncRef(h); e != nil {
 		return e
 	}
@@ -187,37 +166,10 @@ func (tr *GoalTranslator) retainInterpreted(h ast.ASTHandle) error {
 	return nil
 }
 func (tr *GoalTranslator) pushFrame(fr satGoalFrame) error {
-	if len(tr.frames) == cap(tr.frames) {
-		stride := uint64(reflect.TypeOf(fr).Size())
-		n, e := util.SourceVectorCapacity(cap(tr.frames), stride)
-		if e != nil {
-			return e
-		}
-		if e = tr.solver.Budget().Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		next := make([]satGoalFrame, len(tr.frames), n)
-		copy(next, tr.frames)
-		tr.solver.Budget().Release(uint64(cap(tr.frames)) * stride)
-		tr.frames = next
-	}
 	tr.frames = append(tr.frames, fr)
 	return nil
 }
 func (tr *GoalTranslator) pushResult(l sat.Literal) error {
-	if len(tr.results) == cap(tr.results) {
-		n, e := util.SourceVectorCapacity(cap(tr.results), 4)
-		if e != nil {
-			return e
-		}
-		if e = tr.solver.Budget().Reserve(uint64(n) * 4); e != nil {
-			return e
-		}
-		next := make([]sat.Literal, len(tr.results), n)
-		copy(next, tr.results)
-		tr.solver.Budget().Release(uint64(cap(tr.results)) * 4)
-		tr.results = next
-	}
 	tr.results = append(tr.results, l)
 	return nil
 }

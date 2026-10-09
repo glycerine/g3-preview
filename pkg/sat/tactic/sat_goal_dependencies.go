@@ -4,29 +4,13 @@ package tactic
 
 import (
 	"errors"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/tactic"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func (tr *GoalTranslator) retainDependency(h ast.ASTHandle) error {
-	if len(tr.dependencyTrail) == cap(tr.dependencyTrail) {
-		stride := uint64(reflect.TypeOf(h).Size())
-		n, e := util.SourceVectorCapacity(cap(tr.dependencyTrail), stride)
-		if e != nil {
-			return e
-		}
-		if e = tr.solver.Budget().Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		next := make([]ast.ASTHandle, len(tr.dependencyTrail), n)
-		copy(next, tr.dependencyTrail)
-		tr.solver.Budget().Release(uint64(cap(tr.dependencyTrail)) * stride)
-		tr.dependencyTrail = next
-	}
 	if e := tr.manager.IncRef(h); e != nil {
 		return e
 	}

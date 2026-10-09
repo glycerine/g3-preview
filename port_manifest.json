@@ -3669,7 +3669,7 @@
         "TestAPIContextObjectReferenceAssignmentAndRecycledIDs",
         "TestAPIContextGoalRootSurvivesExplicitResultResetAndDrains",
         "TestAPIContextResultsCopiedAndForeignOwnerGuards",
-        "TestAPIContextObjectCloseRetainsRefusedFreeListPrefix"
+        "TestAPIContextObjectCloseUsesNativeFreeIDStorage"
       ],
       "assertions": [
         {
@@ -3705,7 +3705,7 @@
         "TestAPIContextObjectReferenceAssignmentAndRecycledIDs",
         "TestAPIContextGoalRootSurvivesExplicitResultResetAndDrains",
         "TestAPIContextResultsCopiedAndForeignOwnerGuards",
-        "TestAPIContextObjectCloseRetainsRefusedFreeListPrefix"
+        "TestAPIContextObjectCloseUsesNativeFreeIDStorage"
       ],
       "conditionals": [
         {
@@ -4423,7 +4423,7 @@
       ],
       "tests": [
         "TestAPIContextObjectReferenceAssignmentAndRecycledIDs",
-        "TestAPIContextObjectCloseRetainsRefusedFreeListPrefix"
+        "TestAPIContextObjectCloseUsesNativeFreeIDStorage"
       ],
       "conditionals": [
         {
@@ -9738,7 +9738,7 @@
         "TestASTNamedNodeFieldsAndSortNullInfoPredicates",
         "TestASTParameterDoubleHashSourceDomain",
         "TestASTPayloadArithmeticFiniteBoundaries",
-        "TestASTProofArgumentGrowthFailurePrefixes",
+        "TestASTProofArgumentGrowthUsesGoSliceStorage",
         "TestASTProofBooleanRulesAndUnitResolution",
         "TestASTProofCanonicalTrueFalseComplements",
         "TestASTProofFalseDiagnosticsUseCanonicalIdentity",
@@ -9754,7 +9754,7 @@
         "TestASTProofHyperReaderRetainsConclusionBeforeOuterGrowth",
         "TestASTProofHyperUnusedFactsVectorFailsBeforeConclusionDiagnostic",
         "TestASTProofHyperZeroPremisesAndDebugGuardOrder",
-        "TestASTProofInlineArgumentsDoNotAllocate",
+        "TestASTProofArgumentsDoNotChargeASTBudget",
         "TestASTProofModesReadersAndLegacyHelper",
         "TestASTProofModusPonensReflexivityBeforeReleaseFact",
         "TestASTProofQuantInstantiationAndTheoryParameters",
@@ -10618,7 +10618,7 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_proof_manager.go",
           "tests": [
-            "TestASTProofArgumentGrowthFailurePrefixes",
+            "TestASTProofArgumentGrowthUsesGoSliceStorage",
             "TestASTProofBooleanRulesAndUnitResolution",
             "TestASTProofCanonicalTrueFalseComplements",
             "TestASTProofFalseDiagnosticsUseCanonicalIdentity",
@@ -10634,7 +10634,7 @@
             "TestASTProofHyperReaderRetainsConclusionBeforeOuterGrowth",
             "TestASTProofHyperUnusedFactsVectorFailsBeforeConclusionDiagnostic",
             "TestASTProofHyperZeroPremisesAndDebugGuardOrder",
-            "TestASTProofInlineArgumentsDoNotAllocate",
+            "TestASTProofArgumentsDoNotChargeASTBudget",
             "TestASTProofModesReadersAndLegacyHelper",
             "TestASTProofModusPonensReflexivityBeforeReleaseFact",
             "TestASTProofQuantInstantiationAndTheoryParameters",
@@ -11122,7 +11122,7 @@
         "TestASTNamedNodeFieldsAndSortNullInfoPredicates",
         "TestASTParameterDoubleHashSourceDomain",
         "TestASTPayloadArithmeticFiniteBoundaries",
-        "TestASTProofArgumentGrowthFailurePrefixes",
+        "TestASTProofArgumentGrowthUsesGoSliceStorage",
         "TestASTProofBooleanRulesAndUnitResolution",
         "TestASTProofCanonicalTrueFalseComplements",
         "TestASTProofFalseDiagnosticsUseCanonicalIdentity",
@@ -11138,7 +11138,7 @@
         "TestASTProofHyperReaderRetainsConclusionBeforeOuterGrowth",
         "TestASTProofHyperUnusedFactsVectorFailsBeforeConclusionDiagnostic",
         "TestASTProofHyperZeroPremisesAndDebugGuardOrder",
-        "TestASTProofInlineArgumentsDoNotAllocate",
+        "TestASTProofArgumentsDoNotChargeASTBudget",
         "TestASTProofModesReadersAndLegacyHelper",
         "TestASTProofModusPonensReflexivityBeforeReleaseFact",
         "TestASTProofQuantInstantiationAndTheoryParameters",
@@ -11772,7 +11772,7 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_proof_manager.go",
           "tests": [
-            "TestASTProofArgumentGrowthFailurePrefixes",
+            "TestASTProofArgumentGrowthUsesGoSliceStorage",
             "TestASTProofBooleanRulesAndUnitResolution",
             "TestASTProofCanonicalTrueFalseComplements",
             "TestASTProofFalseDiagnosticsUseCanonicalIdentity",
@@ -11788,7 +11788,7 @@
             "TestASTProofHyperReaderRetainsConclusionBeforeOuterGrowth",
             "TestASTProofHyperUnusedFactsVectorFailsBeforeConclusionDiagnostic",
             "TestASTProofHyperZeroPremisesAndDebugGuardOrder",
-            "TestASTProofInlineArgumentsDoNotAllocate",
+            "TestASTProofArgumentsDoNotChargeASTBudget",
             "TestASTProofModesReadersAndLegacyHelper",
             "TestASTProofModusPonensReflexivityBeforeReleaseFact",
             "TestASTProofQuantInstantiationAndTheoryParameters",
@@ -18219,7 +18219,7 @@
         "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
         "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
         "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
-        "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+        "TestSMTPatternTenDisplayChainsGoBufferSignedEnumAndBool",
         "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
         "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
       ],
@@ -18234,7 +18234,7 @@
             "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
             "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
             "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
-            "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+            "TestSMTPatternTenDisplayChainsGoBufferSignedEnumAndBool",
             "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
             "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
           ]
@@ -18261,7 +18261,7 @@
         "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
         "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
         "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
-        "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+        "TestSMTPatternTenDisplayChainsGoBufferSignedEnumAndBool",
         "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
         "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
@@ -18289,7 +18289,7 @@
             "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
             "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
             "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
-            "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+            "TestSMTPatternTenDisplayChainsGoBufferSignedEnumAndBool",
             "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
             "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
           ]
@@ -18379,7 +18379,7 @@
         "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
         "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
         "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
-        "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+        "TestSMTPatternTenDisplayChainsGoBufferSignedEnumAndBool",
         "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
         "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
       ],
@@ -18394,7 +18394,7 @@
             "TestSMTPatternTenMembersLiteralConstructorAndPIModule",
             "TestSMTPatternEightGettersIndependentFallbackAndUntouchedInitializers",
             "TestSMTPatternEveryWarmConstructorReservationUninitializedPrefix",
-            "TestSMTPatternTenDisplayChainsOutputReservationsSignedEnumAndBool",
+            "TestSMTPatternTenDisplayChainsGoBufferSignedEnumAndBool",
             "TestSMTPatternFailedConstructorDisplayAndUpdateUnread",
             "TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation"
           ]
@@ -21339,7 +21339,7 @@
       ],
       "tests": [
         "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
-        "TestBVRewriterNANDWarmSpillRefusalPreservesOutput",
+        "TestBVRewriterNANDWarmNativeBufferIgnoresBudgetFailure",
         "TestBVRewriterBitwiseEveryColdReservation",
         "TestBVRewriterOriginalFixedRotations",
         "TestBVRewriterRotationIdentityErasesExtractionWork",
@@ -21357,7 +21357,7 @@
         "TestASTBitVectorSignExtensionPublicationAfterNumericalConstructor",
         "TestBVRewriterOriginalSignExtend",
         "TestBVRewriterSignExtendEverySymbolicReservation",
-        "TestBVRewriterANDWarmSpillRefusalPreservesOutput",
+        "TestBVRewriterANDWarmNativeBufferIgnoresBudgetFailure",
         "TestASTBitVectorOriginalZeroBitStoredNumerals",
         "TestASTBitVectorZeroBitConcatRoutingAndErasedReads",
         "TestASTBitVectorZeroBitEveryActualReservation",
@@ -22004,7 +22004,7 @@
           "go_target": "pkg/ast/rewriter/bv_rewriter_bitwise.go",
           "tests": [
             "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
-            "TestBVRewriterNANDWarmSpillRefusalPreservesOutput",
+            "TestBVRewriterNANDWarmNativeBufferIgnoresBudgetFailure",
             "TestBVRewriterBitwiseEveryColdReservation"
           ]
         },
@@ -22080,7 +22080,7 @@
           "tests": [
             "TestBVRewriterOriginalNegatedBitwiseAlgorithms",
             "TestBVRewriterBitwiseEveryColdReservation",
-            "TestBVRewriterANDWarmSpillRefusalPreservesOutput"
+            "TestBVRewriterANDWarmNativeBufferIgnoresBudgetFailure"
           ]
         },
         {
@@ -24361,7 +24361,7 @@
         "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
         "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
         "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
-        "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+        "TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit",
         "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
         "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
         "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
@@ -24380,7 +24380,7 @@
             "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
             "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
             "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
-            "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+            "TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit",
             "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
             "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
             "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
@@ -78613,7 +78613,7 @@
         "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
         "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
         "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
-        "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+        "TestSMTPreprocessorThirtyOneDisplayChainsGoBufferAndBadbit",
         "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
         "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
@@ -78630,7 +78630,7 @@
             "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
             "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
             "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
-            "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+            "TestSMTPreprocessorThirtyOneDisplayChainsGoBufferAndBadbit",
             "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
             "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
             "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
@@ -78658,7 +78658,7 @@
         "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
         "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
         "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
-        "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+        "TestSMTPreprocessorThirtyOneDisplayChainsGoBufferAndBadbit",
         "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
         "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
@@ -78685,7 +78685,7 @@
             "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
             "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
             "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
-            "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+            "TestSMTPreprocessorThirtyOneDisplayChainsGoBufferAndBadbit",
             "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
             "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
             "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
@@ -79087,13 +79087,13 @@
         "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
         "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
         "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
-        "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit",
+        "TestSMTArrayGoBufferOutputAndClosedFileBadbit",
         "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
         "TestSMTBVSevenDefaultsThenActualUpdate",
         "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
         "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
         "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
-        "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+        "TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit",
         "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
         "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
         "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
@@ -79117,7 +79117,7 @@
         "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
         "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
         "TestSMTPBEveryConstructorAndWarmHelperReservation",
-        "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+        "TestSMTPBFourDisplayChainsGoBufferShowPosAndFileBadbit",
         "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards",
         "TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate",
@@ -79129,7 +79129,7 @@
         "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
         "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
         "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
-        "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+        "TestSMTPreprocessorThirtyOneDisplayChainsGoBufferAndBadbit",
         "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
         "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation",
@@ -79174,7 +79174,7 @@
             "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
             "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
             "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
-            "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+            "TestSMTArrayGoBufferOutputAndClosedFileBadbit"
           ]
         },
         {
@@ -79187,7 +79187,7 @@
             "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
             "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
             "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
-            "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+            "TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit",
             "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
             "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
             "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
@@ -79232,7 +79232,7 @@
             "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
             "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
             "TestSMTPBEveryConstructorAndWarmHelperReservation",
-            "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+            "TestSMTPBFourDisplayChainsGoBufferShowPosAndFileBadbit",
             "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
             "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
           ]
@@ -79258,7 +79258,7 @@
             "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
             "TestSMTPreprocessorEveryWarmConstructorReservationAndBaseUnwind",
             "TestSMTPreprocessorUpdatePatternPublicationBeforeLocalDeclarationRefusal",
-            "TestSMTPreprocessorThirtyOneDisplayChainsEveryOutputPrefixAndBadbit",
+            "TestSMTPreprocessorThirtyOneDisplayChainsGoBufferAndBadbit",
             "TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation",
             "TestSMTPreprocessorFailedConstructorOrdinaryCallsAndOuterGuardUnread",
             "TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation"
@@ -79421,7 +79421,7 @@
         "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
         "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
         "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
-        "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit",
+        "TestSMTArrayGoBufferOutputAndClosedFileBadbit",
         "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
         "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
         "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
@@ -79440,7 +79440,7 @@
             "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
             "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
             "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
-            "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+            "TestSMTArrayGoBufferOutputAndClosedFileBadbit"
           ]
         },
         {
@@ -79482,7 +79482,7 @@
         "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
         "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
         "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
-        "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+        "TestSMTArrayGoBufferOutputAndClosedFileBadbit"
       ],
       "conditionals": [
         {
@@ -79515,7 +79515,7 @@
             "TestSMTArrayConstructorAndUpdateEveryRealReservationPrefix",
             "TestSMTArrayConstructorUninitializedGlobalsAndFunctionFailureRetry",
             "TestSMTModuleHelperBorrowedLocalExactFrameForeignAndStaleGuards",
-            "TestSMTArrayEveryActualOutputReservationAndClosedFileBadbit"
+            "TestSMTArrayGoBufferOutputAndClosedFileBadbit"
           ]
         }
       ],
@@ -79542,7 +79542,7 @@
         "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
         "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
         "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
-        "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+        "TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit",
         "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
         "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
         "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
@@ -79561,7 +79561,7 @@
             "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
             "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
             "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
-            "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+            "TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit",
             "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
             "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
             "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
@@ -79592,7 +79592,7 @@
         "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
         "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
         "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
-        "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+        "TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit",
         "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
         "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
         "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
@@ -79621,7 +79621,7 @@
             "TestSMTBVIndependentBooleanPrecedenceAndUntouchedMembers",
             "TestSMTBVEveryActualWarmConstructorReservationAndDeclarationPrefix",
             "TestSMTBVUnwarmedSharedSymbolAndHelperAcquisitionPrefixes",
-            "TestSMTBVSevenDisplayChainsShowPosAllOutputPrefixesAndBadbit",
+            "TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit",
             "TestSMTBVYoungerRealNumeralDestructorStopProtectsOlderHelper",
             "TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion",
             "TestSMTBVCompletedHelperHistoryAndNewInvocationDoNotReplay",
@@ -79708,7 +79708,7 @@
         "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
         "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
         "TestSMTPBEveryConstructorAndWarmHelperReservation",
-        "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+        "TestSMTPBFourDisplayChainsGoBufferShowPosAndFileBadbit",
         "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
       ],
@@ -79723,7 +79723,7 @@
             "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
             "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
             "TestSMTPBEveryConstructorAndWarmHelperReservation",
-            "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+            "TestSMTPBFourDisplayChainsGoBufferShowPosAndFileBadbit",
             "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
             "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
           ]
@@ -79749,7 +79749,7 @@
         "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
         "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
         "TestSMTPBEveryConstructorAndWarmHelperReservation",
-        "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+        "TestSMTPBFourDisplayChainsGoBufferShowPosAndFileBadbit",
         "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
         "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
       ],
@@ -79774,7 +79774,7 @@
             "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
             "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
             "TestSMTPBEveryConstructorAndWarmHelperReservation",
-            "TestSMTPBFourDisplayChainsEveryOutputReservationShowPosAndFileBadbit",
+            "TestSMTPBFourDisplayChainsGoBufferShowPosAndFileBadbit",
             "TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation",
             "TestSMTPBNullGlobalReachedHelperAndActualOwnerGuards"
           ]
@@ -97783,9 +97783,9 @@
         "TestModelConverterToModelOriginalAllocationAndApplication",
         "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
-        "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+        "TestTacticStoredModelLabelsSnapshotAndAppend",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
-        "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix",
+        "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
@@ -97821,9 +97821,9 @@
           "go_target": "pkg/tactic/tactic_stored_model.go",
           "tests": [
             "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
-            "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+            "TestTacticStoredModelLabelsSnapshotAndAppend",
             "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
-            "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix"
+            "TestTacticStoredModelLabelAppendUsesNativeSliceStorage"
           ]
         },
         {
@@ -97860,9 +97860,9 @@
         "TestModelConverterToModelOriginalAllocationAndApplication",
         "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
-        "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+        "TestTacticStoredModelLabelsSnapshotAndAppend",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
-        "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix",
+        "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
@@ -97908,9 +97908,9 @@
           "go_target": "pkg/tactic/tactic_stored_model.go",
           "tests": [
             "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
-            "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+            "TestTacticStoredModelLabelsSnapshotAndAppend",
             "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
-            "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix"
+            "TestTacticStoredModelLabelAppendUsesNativeSliceStorage"
           ]
         },
         {
@@ -105856,7 +105856,7 @@
         "TestRootWarmStorageAndClosedOutputs",
         "TestRationalRootWarmStorage",
         "TestScopedNumeralSourceTstScoped",
-        "TestScopedNumeralResizeFailurePrefixesAndBudget",
+        "TestScopedNumeralResizeUsesGoSliceStorage",
         "TestScopedNumeralMoveAndAscendingCleanup",
         "TestScopedNumeralScalarFailureAndAllThinOperations",
         "TestScopedNumeralWarmReuseAndLifetimeGuards",
@@ -105865,7 +105865,7 @@
         "TestScopedRationalVectorAndScalarLifetimes",
         "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
-        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak",
+        "TestScopedNumeralDeepCloneFailureCleanup",
         "TestIntegerFacadeSourceTst1ComparisonAssertions",
         "TestPowerPublicationInPlaceShiftOverloads",
         "TestPowerPublicationWrappedShiftHeaderAccessOrder",
@@ -106046,7 +106046,7 @@
           "go_target": "pkg/util/scoped_numeral.go",
           "tests": [
             "TestScopedNumeralSourceTstScoped",
-            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralResizeUsesGoSliceStorage",
             "TestScopedNumeralMoveAndAscendingCleanup",
             "TestScopedNumeralScalarFailureAndAllThinOperations",
             "TestScopedNumeralWarmReuseAndLifetimeGuards",
@@ -106055,7 +106055,7 @@
             "TestScopedRationalVectorAndScalarLifetimes",
             "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
-            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+            "TestScopedNumeralDeepCloneFailureCleanup"
           ]
         },
         {
@@ -108104,7 +108104,7 @@
         "TestRationalServiceConstructorBudgetUnwind",
         "TestRationalServiceCacheFailurePrefixes",
         "TestRationalServiceCopyFailureAndWarmReuse",
-        "TestRationalServiceCacheBackingPeakAndBounds",
+        "TestRationalServiceCacheNativeStorageAndBounds",
         "TestRationalServiceConcurrentCacheAndClose",
         "TestRationalServiceCrossOwnerFailureAndSameOwnerCopy",
         "TestRationalServiceForeignSmallValuesAndInvalidGuards",
@@ -108880,7 +108880,7 @@
             "TestRationalServiceConstructorBudgetUnwind",
             "TestRationalServiceCacheFailurePrefixes",
             "TestRationalServiceCopyFailureAndWarmReuse",
-            "TestRationalServiceCacheBackingPeakAndBounds",
+            "TestRationalServiceCacheNativeStorageAndBounds",
             "TestRationalServiceConcurrentCacheAndClose",
             "TestRationalServiceCrossOwnerFailureAndSameOwnerCopy",
             "TestRationalServiceForeignSmallValuesAndInvalidGuards",
@@ -109152,7 +109152,7 @@
         "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
         "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
         "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
-        "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+        "TestSmallObjectAllocatorConsolidateGoSliceScratch",
         "TestSmallObjectAllocatorDirectCallerLifetimeClose",
         "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
         "TestSmallObjectAllocatorIndependentModelWarmPlateau",
@@ -109161,12 +109161,11 @@
         "TestSmallObjectAllocatorPendingCompletedRawRoots",
         "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
         "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
-        "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+        "TestSmallObjectAllocatorDiagnosticGoBufferAfterFree",
         "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
         "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
         "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
         "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
-        "TestSmallObjectAllocatorLexicalFailedFreeRoots",
         "TestSmallObjectAllocatorGenerationExhaustionLedger",
         "TestMemorySharedRuntimeAllocatorIdentity",
         "TestMemorySharedSourceProfiles",
@@ -109175,7 +109174,6 @@
         "TestMemoryBorrowedStaticErrorAndAllocatorIO",
         "TestMemoryScalarLocationRecords",
         "TestMemoryNilTransportCannotSuppressFailure",
-        "TestMemoryVectorOverflowRetainsActualRootAndClass",
         "TestMemoryBridgeColdHeadersAndConstructorUnwind",
         "TestMemoryBridgeNominalOOMAndCountErrors",
         "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
@@ -109195,7 +109193,7 @@
             "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
             "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
             "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
-            "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+            "TestSmallObjectAllocatorConsolidateGoSliceScratch",
             "TestSmallObjectAllocatorDirectCallerLifetimeClose",
             "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
             "TestSmallObjectAllocatorIndependentModelWarmPlateau",
@@ -109205,7 +109203,6 @@
             "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
             "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
             "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
-            "TestSmallObjectAllocatorLexicalFailedFreeRoots",
             "TestSmallObjectAllocatorGenerationExhaustionLedger"
           ]
         },
@@ -109216,7 +109213,7 @@
           "tests": [
             "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
             "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
-            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+            "TestSmallObjectAllocatorDiagnosticGoBufferAfterFree",
             "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime"
           ]
         }
@@ -111843,9 +111840,9 @@
       ],
       "tests": [
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
-        "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+        "TestTacticStoredModelLabelsSnapshotAndAppend",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
-        "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix",
+        "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
         "TestSexprBVSourceInlineBufferAndTemporaryLifetime",
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
         "TestASTSharedOccurrencesAllTraversalPolicies",
@@ -111908,13 +111905,13 @@
         "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
         "TestPolynomialConstantCoefficientNormalizeVerificationDTBeforeCallerNUM",
         "TestPolynomialConstantCoefficientNormalizeEveryActualReservationPrefix",
-        "TestPointerBufferSourceSpillRefusal",
-        "TestASTHandleBufferResetRetainsSpillCapacity",
-        "TestRationalBuffer16InlineCopiesAndStorageRelocation",
+        "TestPointerBufferUsesNativeSliceStorage",
+        "TestASTHandleBufferResetRetainsSliceCapacity",
+        "TestRationalBuffer16CopiesAndSliceGrowth",
         "TestRationalBuffer16SourceDestructionStopsBeforeLaterElements",
         "TestRationalBuffer16ConstructionAndShallowCopyGuards",
-        "TestRationalBuffer16EveryGrowthAndActualCopyReservation",
-        "TestASTHandleBufferPopRetainsSpillAndBorrowedReferences"
+        "TestRationalBuffer16EveryActualCopyReservation",
+        "TestASTHandleBufferPopRetainsCapacityAndBorrowedReferences"
       ],
       "conditionals": [
         {
@@ -111989,9 +111986,9 @@
           "go_target": "pkg/tactic/tactic_stored_model.go",
           "tests": [
             "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
-            "TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend",
+            "TestTacticStoredModelLabelsSnapshotAndAppend",
             "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
-            "TestTacticStoredModelLabelAppendRefusalKeepsSourcePrefix"
+            "TestTacticStoredModelLabelAppendUsesNativeSliceStorage"
           ]
         },
         {
@@ -112120,7 +112117,7 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_handle_buffer.go",
           "tests": [
-            "TestASTHandleBufferResetRetainsSpillCapacity"
+            "TestASTHandleBufferResetRetainsSliceCapacity"
           ]
         },
         {
@@ -112128,10 +112125,10 @@
           "status": "partial",
           "go_target": "pkg/util/rational_buffer.go",
           "tests": [
-            "TestRationalBuffer16InlineCopiesAndStorageRelocation",
+            "TestRationalBuffer16CopiesAndSliceGrowth",
             "TestRationalBuffer16SourceDestructionStopsBeforeLaterElements",
             "TestRationalBuffer16ConstructionAndShallowCopyGuards",
-            "TestRationalBuffer16EveryGrowthAndActualCopyReservation"
+            "TestRationalBuffer16EveryActualCopyReservation"
           ]
         },
         {
@@ -112139,7 +112136,7 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_handle_buffer.go",
           "tests": [
-            "TestASTHandleBufferPopRetainsSpillAndBorrowedReferences"
+            "TestASTHandleBufferPopRetainsCapacityAndBorrowedReferences"
           ]
         }
       ],
@@ -114819,7 +114816,7 @@
         "TestGlobalParamsNamespaceEveryNullForwardLeavesUnusedArgumentsUnread",
         "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
         "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
-        "TestGlobalParamsNamespaceDisplayEveryActualOutputReservation",
+        "TestGlobalParamsNamespaceDisplayUsesGoBuffer",
         "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
         "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
       ],
@@ -114973,7 +114970,7 @@
             "TestGlobalParamsNamespaceEveryNullForwardLeavesUnusedArgumentsUnread",
             "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
             "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
-            "TestGlobalParamsNamespaceDisplayEveryActualOutputReservation",
+            "TestGlobalParamsNamespaceDisplayUsesGoBuffer",
             "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
             "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
           ]
@@ -115076,7 +115073,7 @@
         "TestGlobalParamsNamespaceEveryNullForwardLeavesUnusedArgumentsUnread",
         "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
         "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
-        "TestGlobalParamsNamespaceDisplayEveryActualOutputReservation",
+        "TestGlobalParamsNamespaceDisplayUsesGoBuffer",
         "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
         "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
       ],
@@ -115162,7 +115159,7 @@
             "TestGlobalParamsNamespaceEveryNullForwardLeavesUnusedArgumentsUnread",
             "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion",
             "TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays",
-            "TestGlobalParamsNamespaceDisplayEveryActualOutputReservation",
+            "TestGlobalParamsNamespaceDisplayUsesGoBuffer",
             "TestGlobalParamsNamespaceActualSymbolConstructionRefusalBeforeNull",
             "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
           ]
@@ -124443,7 +124440,6 @@
         "TestMemoryBorrowedStaticErrorAndAllocatorIO",
         "TestMemoryScalarLocationRecords",
         "TestMemoryNilTransportCannotSuppressFailure",
-        "TestMemoryVectorOverflowRetainsActualRootAndClass",
         "TestMemoryBridgeColdHeadersAndConstructorUnwind",
         "TestMemoryBridgeNominalOOMAndCountErrors",
         "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
@@ -124571,8 +124567,7 @@
             "TestMemorySharedRawRefusalRetainsSourcePrefix",
             "TestMemoryBorrowedStaticErrorAndAllocatorIO",
             "TestMemoryScalarLocationRecords",
-            "TestMemoryNilTransportCannotSuppressFailure",
-            "TestMemoryVectorOverflowRetainsActualRootAndClass"
+            "TestMemoryNilTransportCannotSuppressFailure"
           ]
         },
         {
@@ -124761,7 +124756,6 @@
         "TestMemoryBorrowedStaticErrorAndAllocatorIO",
         "TestMemoryScalarLocationRecords",
         "TestMemoryNilTransportCannotSuppressFailure",
-        "TestMemoryVectorOverflowRetainsActualRootAndClass",
         "TestMemoryBridgeColdHeadersAndConstructorUnwind",
         "TestMemoryBridgeNominalOOMAndCountErrors",
         "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
@@ -124881,8 +124875,7 @@
             "TestMemorySharedRawRefusalRetainsSourcePrefix",
             "TestMemoryBorrowedStaticErrorAndAllocatorIO",
             "TestMemoryScalarLocationRecords",
-            "TestMemoryNilTransportCannotSuppressFailure",
-            "TestMemoryVectorOverflowRetainsActualRootAndClass"
+            "TestMemoryNilTransportCannotSuppressFailure"
           ]
         },
         {
@@ -141196,7 +141189,7 @@
         "TestRationalServiceConstructorBudgetUnwind",
         "TestRationalServiceCacheFailurePrefixes",
         "TestRationalServiceCopyFailureAndWarmReuse",
-        "TestRationalServiceCacheBackingPeakAndBounds",
+        "TestRationalServiceCacheNativeStorageAndBounds",
         "TestRationalServiceConcurrentCacheAndClose",
         "TestRationalServiceCrossOwnerFailureAndSameOwnerCopy",
         "TestRationalServiceForeignSmallValuesAndInvalidGuards",
@@ -141291,7 +141284,7 @@
             "TestRationalServiceConstructorBudgetUnwind",
             "TestRationalServiceCacheFailurePrefixes",
             "TestRationalServiceCopyFailureAndWarmReuse",
-            "TestRationalServiceCacheBackingPeakAndBounds",
+            "TestRationalServiceCacheNativeStorageAndBounds",
             "TestRationalServiceConcurrentCacheAndClose",
             "TestRationalServiceCrossOwnerFailureAndSameOwnerCopy",
             "TestRationalServiceForeignSmallValuesAndInvalidGuards",
@@ -141313,7 +141306,7 @@
             "TestRationalServiceConstructorBudgetUnwind",
             "TestRationalServiceCacheFailurePrefixes",
             "TestRationalServiceCopyFailureAndWarmReuse",
-            "TestRationalServiceCacheBackingPeakAndBounds",
+            "TestRationalServiceCacheNativeStorageAndBounds",
             "TestRationalServiceConcurrentCacheAndClose",
             "TestRationalServiceCrossOwnerFailureAndSameOwnerCopy",
             "TestRationalServiceForeignSmallValuesAndInvalidGuards",
@@ -141536,7 +141529,7 @@
         "TestRationalServiceConstructorBudgetUnwind",
         "TestRationalServiceCacheFailurePrefixes",
         "TestRationalServiceCopyFailureAndWarmReuse",
-        "TestRationalServiceCacheBackingPeakAndBounds",
+        "TestRationalServiceCacheNativeStorageAndBounds",
         "TestRationalServiceConcurrentCacheAndClose",
         "TestRationalServiceCrossOwnerFailureAndSameOwnerCopy",
         "TestRationalServiceForeignSmallValuesAndInvalidGuards",
@@ -141784,7 +141777,7 @@
             "TestRationalServiceConstructorBudgetUnwind",
             "TestRationalServiceCacheFailurePrefixes",
             "TestRationalServiceCopyFailureAndWarmReuse",
-            "TestRationalServiceCacheBackingPeakAndBounds",
+            "TestRationalServiceCacheNativeStorageAndBounds",
             "TestRationalServiceConcurrentCacheAndClose",
             "TestRationalServiceCrossOwnerFailureAndSameOwnerCopy",
             "TestRationalServiceForeignSmallValuesAndInvalidGuards",
@@ -141806,7 +141799,7 @@
             "TestRationalServiceConstructorBudgetUnwind",
             "TestRationalServiceCacheFailurePrefixes",
             "TestRationalServiceCopyFailureAndWarmReuse",
-            "TestRationalServiceCacheBackingPeakAndBounds",
+            "TestRationalServiceCacheNativeStorageAndBounds",
             "TestRationalServiceConcurrentCacheAndClose",
             "TestRationalServiceCrossOwnerFailureAndSameOwnerCopy",
             "TestRationalServiceForeignSmallValuesAndInvalidGuards",
@@ -141828,7 +141821,7 @@
             "TestRationalServiceConstructorBudgetUnwind",
             "TestRationalServiceCacheFailurePrefixes",
             "TestRationalServiceCopyFailureAndWarmReuse",
-            "TestRationalServiceCacheBackingPeakAndBounds",
+            "TestRationalServiceCacheNativeStorageAndBounds",
             "TestRationalServiceConcurrentCacheAndClose",
             "TestRationalServiceCrossOwnerFailureAndSameOwnerCopy",
             "TestRationalServiceForeignSmallValuesAndInvalidGuards",
@@ -144169,7 +144162,7 @@
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
-        "TestScopedNumeralResizeFailurePrefixesAndBudget",
+        "TestScopedNumeralResizeUsesGoSliceStorage",
         "TestScopedNumeralMoveAndAscendingCleanup",
         "TestScopedNumeralScalarFailureAndAllThinOperations",
         "TestScopedNumeralWarmReuseAndLifetimeGuards",
@@ -144178,7 +144171,7 @@
         "TestScopedRationalVectorAndScalarLifetimes",
         "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
-        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak",
+        "TestScopedNumeralDeepCloneFailureCleanup",
         "TestBinarySourceTst1",
         "TestBinarySourceTst2",
         "TestBinaryMixedConversionsAndIntervals",
@@ -144251,7 +144244,7 @@
           "go_target": "pkg/util/scoped_numeral.go",
           "tests": [
             "TestScopedNumeralSourceTstScoped",
-            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralResizeUsesGoSliceStorage",
             "TestScopedNumeralMoveAndAscendingCleanup",
             "TestScopedNumeralScalarFailureAndAllThinOperations",
             "TestScopedNumeralWarmReuseAndLifetimeGuards",
@@ -144260,7 +144253,7 @@
             "TestScopedRationalVectorAndScalarLifetimes",
             "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
-            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+            "TestScopedNumeralDeepCloneFailureCleanup"
           ]
         },
         {
@@ -144269,7 +144262,7 @@
           "go_target": "pkg/util/scoped_numeral.go",
           "tests": [
             "TestScopedNumeralSourceTstScoped",
-            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralResizeUsesGoSliceStorage",
             "TestScopedNumeralMoveAndAscendingCleanup",
             "TestScopedNumeralScalarFailureAndAllThinOperations",
             "TestScopedNumeralWarmReuseAndLifetimeGuards",
@@ -144278,7 +144271,7 @@
             "TestScopedRationalVectorAndScalarLifetimes",
             "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
-            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+            "TestScopedNumeralDeepCloneFailureCleanup"
           ]
         },
         {
@@ -144287,7 +144280,7 @@
           "go_target": "pkg/util/scoped_numeral.go",
           "tests": [
             "TestScopedNumeralSourceTstScoped",
-            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralResizeUsesGoSliceStorage",
             "TestScopedNumeralMoveAndAscendingCleanup",
             "TestScopedNumeralScalarFailureAndAllThinOperations",
             "TestScopedNumeralWarmReuseAndLifetimeGuards",
@@ -144296,7 +144289,7 @@
             "TestScopedRationalVectorAndScalarLifetimes",
             "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
-            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+            "TestScopedNumeralDeepCloneFailureCleanup"
           ]
         },
         {
@@ -144305,7 +144298,7 @@
           "go_target": "pkg/util/scoped_numeral.go",
           "tests": [
             "TestScopedNumeralSourceTstScoped",
-            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralResizeUsesGoSliceStorage",
             "TestScopedNumeralMoveAndAscendingCleanup",
             "TestScopedNumeralScalarFailureAndAllThinOperations",
             "TestScopedNumeralWarmReuseAndLifetimeGuards",
@@ -144314,7 +144307,7 @@
             "TestScopedRationalVectorAndScalarLifetimes",
             "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
-            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+            "TestScopedNumeralDeepCloneFailureCleanup"
           ]
         },
         {
@@ -144514,7 +144507,7 @@
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
-        "TestScopedNumeralResizeFailurePrefixesAndBudget",
+        "TestScopedNumeralResizeUsesGoSliceStorage",
         "TestScopedNumeralMoveAndAscendingCleanup",
         "TestScopedNumeralScalarFailureAndAllThinOperations",
         "TestScopedNumeralWarmReuseAndLifetimeGuards",
@@ -144523,7 +144516,7 @@
         "TestScopedRationalVectorAndScalarLifetimes",
         "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
-        "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak",
+        "TestScopedNumeralDeepCloneFailureCleanup",
         "TestBinarySourceTst1",
         "TestBinarySourceTst2",
         "TestBinaryMixedConversionsAndIntervals",
@@ -144599,7 +144592,7 @@
           "go_target": "pkg/util/scoped_numeral.go",
           "tests": [
             "TestScopedNumeralSourceTstScoped",
-            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralResizeUsesGoSliceStorage",
             "TestScopedNumeralMoveAndAscendingCleanup",
             "TestScopedNumeralScalarFailureAndAllThinOperations",
             "TestScopedNumeralWarmReuseAndLifetimeGuards",
@@ -144608,7 +144601,7 @@
             "TestScopedRationalVectorAndScalarLifetimes",
             "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
-            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+            "TestScopedNumeralDeepCloneFailureCleanup"
           ]
         },
         {
@@ -144617,7 +144610,7 @@
           "go_target": "pkg/util/scoped_numeral.go",
           "tests": [
             "TestScopedNumeralSourceTstScoped",
-            "TestScopedNumeralResizeFailurePrefixesAndBudget",
+            "TestScopedNumeralResizeUsesGoSliceStorage",
             "TestScopedNumeralMoveAndAscendingCleanup",
             "TestScopedNumeralScalarFailureAndAllThinOperations",
             "TestScopedNumeralWarmReuseAndLifetimeGuards",
@@ -144626,7 +144619,7 @@
             "TestScopedRationalVectorAndScalarLifetimes",
             "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
-            "TestScopedNumeralDeepCloneFailureCleanupAndBackingPeak"
+            "TestScopedNumeralDeepCloneFailureCleanup"
           ]
         },
         {
@@ -145532,7 +145525,7 @@
         "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
         "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
         "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
-        "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+        "TestSmallObjectAllocatorConsolidateGoSliceScratch",
         "TestSmallObjectAllocatorDirectCallerLifetimeClose",
         "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
         "TestSmallObjectAllocatorIndependentModelWarmPlateau",
@@ -145541,12 +145534,11 @@
         "TestSmallObjectAllocatorPendingCompletedRawRoots",
         "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
         "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
-        "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+        "TestSmallObjectAllocatorDiagnosticGoBufferAfterFree",
         "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
         "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
         "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
         "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
-        "TestSmallObjectAllocatorLexicalFailedFreeRoots",
         "TestSmallObjectAllocatorGenerationExhaustionLedger",
         "TestMemorySharedRuntimeAllocatorIdentity",
         "TestMemorySharedSourceProfiles",
@@ -145555,7 +145547,6 @@
         "TestMemoryBorrowedStaticErrorAndAllocatorIO",
         "TestMemoryScalarLocationRecords",
         "TestMemoryNilTransportCannotSuppressFailure",
-        "TestMemoryVectorOverflowRetainsActualRootAndClass",
         "TestMemoryBridgeColdHeadersAndConstructorUnwind",
         "TestMemoryBridgeNominalOOMAndCountErrors",
         "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
@@ -145770,7 +145761,7 @@
             "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
             "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
             "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
-            "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+            "TestSmallObjectAllocatorConsolidateGoSliceScratch",
             "TestSmallObjectAllocatorDirectCallerLifetimeClose",
             "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
             "TestSmallObjectAllocatorIndependentModelWarmPlateau",
@@ -145780,7 +145771,6 @@
             "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
             "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
             "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
-            "TestSmallObjectAllocatorLexicalFailedFreeRoots",
             "TestSmallObjectAllocatorGenerationExhaustionLedger"
           ]
         },
@@ -145791,7 +145781,7 @@
           "tests": [
             "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
             "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
-            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+            "TestSmallObjectAllocatorDiagnosticGoBufferAfterFree",
             "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime"
           ]
         },
@@ -146006,7 +145996,7 @@
         "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
         "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
         "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
-        "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+        "TestSmallObjectAllocatorConsolidateGoSliceScratch",
         "TestSmallObjectAllocatorDirectCallerLifetimeClose",
         "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
         "TestSmallObjectAllocatorIndependentModelWarmPlateau",
@@ -146015,12 +146005,11 @@
         "TestSmallObjectAllocatorPendingCompletedRawRoots",
         "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
         "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
-        "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+        "TestSmallObjectAllocatorDiagnosticGoBufferAfterFree",
         "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime",
         "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
         "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
         "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
-        "TestSmallObjectAllocatorLexicalFailedFreeRoots",
         "TestSmallObjectAllocatorGenerationExhaustionLedger",
         "TestMemorySharedRuntimeAllocatorIdentity",
         "TestMemorySharedSourceProfiles",
@@ -146029,7 +146018,6 @@
         "TestMemoryBorrowedStaticErrorAndAllocatorIO",
         "TestMemoryScalarLocationRecords",
         "TestMemoryNilTransportCannotSuppressFailure",
-        "TestMemoryVectorOverflowRetainsActualRootAndClass",
         "TestMemoryBridgeColdHeadersAndConstructorUnwind",
         "TestMemoryBridgeNominalOOMAndCountErrors",
         "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
@@ -146188,7 +146176,7 @@
             "TestSmallObjectAllocatorStrictChunkEndpointConsolidateQuirk",
             "TestSmallObjectAllocatorConsolidateReclaimsRemainderClass",
             "TestSmallObjectAllocatorRequestedPrefixBeforeRealRawRefusal",
-            "TestSmallObjectAllocatorConsolidateLexicalScratchAndFailure",
+            "TestSmallObjectAllocatorConsolidateGoSliceScratch",
             "TestSmallObjectAllocatorDirectCallerLifetimeClose",
             "TestSmallObjectAllocatorResetRetainsDirectThreeSourceProfiles",
             "TestSmallObjectAllocatorIndependentModelWarmPlateau",
@@ -146198,7 +146186,6 @@
             "TestSmallObjectAllocatorConsolidateLateFreeRetainedRoots",
             "TestSmallObjectAllocatorPooledDuplicateFreePrefix",
             "TestSmallObjectAllocatorColdFailureSweepAndResetLedger",
-            "TestSmallObjectAllocatorLexicalFailedFreeRoots",
             "TestSmallObjectAllocatorGenerationExhaustionLedger"
           ]
         },
@@ -146209,7 +146196,7 @@
           "tests": [
             "TestSmallObjectAllocatorBorrowedIDMutationAndWholeCStringWidth",
             "TestSmallObjectAllocatorNullStaleIDErrorPrefixes",
-            "TestSmallObjectAllocatorDiagnosticOutputFailureAfterFree",
+            "TestSmallObjectAllocatorDiagnosticGoBufferAfterFree",
             "TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime"
           ]
         },
@@ -146336,8 +146323,8 @@
         "TestSMT2SimpleExhaustiveBytes",
         "TestSMT2QuotedCStringSourceBranches",
         "TestSMT2SymbolSourcePreconditionAndLifetime",
-        "TestSMT2QuoteFaultBudgetAndIndependentBytes",
-        "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+        "TestSMT2QuoteGoBufferAndIndependentBytes",
+        "TestSMT2QuoteLongGoBufferAndNoBorrowCharges"
       ],
       "assertions": [
         {
@@ -146371,7 +146358,7 @@
           "go_target": "pkg/util/util_smt2_util.go",
           "tests": [
             "TestSMT2SymbolSourcePreconditionAndLifetime",
-            "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+            "TestSMT2QuoteLongGoBufferAndNoBorrowCharges"
           ]
         },
         {
@@ -146380,8 +146367,8 @@
           "go_target": "pkg/util/util_smt2_util.go",
           "tests": [
             "TestSMT2SymbolSourcePreconditionAndLifetime",
-            "TestSMT2QuoteFaultBudgetAndIndependentBytes",
-            "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+            "TestSMT2QuoteGoBufferAndIndependentBytes",
+            "TestSMT2QuoteLongGoBufferAndNoBorrowCharges"
           ]
         }
       ],
@@ -146404,8 +146391,8 @@
         "TestSMT2SimpleExhaustiveBytes",
         "TestSMT2QuotedCStringSourceBranches",
         "TestSMT2SymbolSourcePreconditionAndLifetime",
-        "TestSMT2QuoteFaultBudgetAndIndependentBytes",
-        "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+        "TestSMT2QuoteGoBufferAndIndependentBytes",
+        "TestSMT2QuoteLongGoBufferAndNoBorrowCharges"
       ],
       "conditionals": [
         {
@@ -146443,7 +146430,7 @@
           "go_target": "pkg/util/util_smt2_util.go",
           "tests": [
             "TestSMT2SymbolSourcePreconditionAndLifetime",
-            "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+            "TestSMT2QuoteLongGoBufferAndNoBorrowCharges"
           ]
         },
         {
@@ -146452,8 +146439,8 @@
           "go_target": "pkg/util/util_smt2_util.go",
           "tests": [
             "TestSMT2SymbolSourcePreconditionAndLifetime",
-            "TestSMT2QuoteFaultBudgetAndIndependentBytes",
-            "TestSMT2QuoteExactGrowthPeakAndNoBorrowCharges"
+            "TestSMT2QuoteGoBufferAndIndependentBytes",
+            "TestSMT2QuoteLongGoBufferAndNoBorrowCharges"
           ]
         }
       ],
@@ -149462,9 +149449,7 @@
         "pkg/math/polynomial/polynomial_psc_chain1_prefix_source_test.go",
         "pkg/math/polynomial/polynomial_psc_chain1_source_test.go",
         "pkg/ast/ast_handle_vector.go",
-        "pkg/util/source_vector_capacity.go",
         "pkg/ast/ast_handle_containers_test.go",
-        "pkg/util/source_vector_capacity_test.go",
         "pkg/sat/sat_solver_literal_rows_inspect.go",
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/ast/ast_ref_cache_resize.go",
@@ -149746,8 +149731,7 @@
         "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
         "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse",
         "TestPointerVectorSourceGrowthAndErase",
-        "TestASTHandleVectorGrowthPeakAndFailurePublication",
-        "TestSourceVectorCapacityInvalidWidthsAndBounds"
+        "TestASTHandleVectorNativeGrowthAndEraseClearing"
       ],
       "conditionals": [
         {

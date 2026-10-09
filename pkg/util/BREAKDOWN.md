@@ -780,3 +780,10 @@ The API object directory and recycled-ID stack now use native typed slices. Stab
 Tactic model labels and concatenated-converter child/size arrays now use native typed slices. Converter reference ownership and label order remain explicit, while `SourceVectorCapacity` and arena charges for those Go slices are gone.
 
 AST as-array sort construction now stores its owning parameter descriptors in a typed slice. Parameter cleanup remains explicit; `SourceVectorCapacity`, capacity charges, and relocation bookkeeping are gone.
+
+SAT goal translation now uses native typed slices for dependency roots,
+interpreted atoms, traversal frames, result literals, and recovered literal
+expressions. AST reference ownership remains explicit, while copied C++ vector
+growth and arena charges for Go-managed backing storage are gone. These were the
+last consumers of `SourceVectorCapacity`, so that shared helper and its
+implementation-only test have been deleted.

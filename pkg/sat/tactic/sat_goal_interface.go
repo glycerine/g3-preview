@@ -27,11 +27,9 @@ func (tr *GoalTranslator) collectInterfaceWithDependencies(formulas, dependencie
 			return err
 		}
 	}
-	// The source todo and traversal stacks reuse the concrete frame backing at
-	// disjoint times. Keep the outer todo in its own charged vector because a
-	// general expression walk may start while other formulas are still pending.
+	// The outer todo remains separate because a general expression walk may
+	// start while other formulas are still pending.
 	todo := GoalTranslator{solver: tr.solver}
-	defer func() { tr.solver.Budget().Release(uint64(cap(todo.frames)) * satGoalFrameBytes()) }()
 	for _, formula := range formulas {
 		marked, e := fvisited.IsMarked(formula)
 		if e != nil {
