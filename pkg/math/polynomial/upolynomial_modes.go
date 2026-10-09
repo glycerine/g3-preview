@@ -3,8 +3,6 @@
 package polynomial
 
 import (
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -71,8 +69,8 @@ type UPolynomialStats struct {
 	LivePolynomials, LiveBackings                                                                  uint32
 }
 
-// Stats accounts charged owners and coefficient payloads. Native directories
-// and descriptor pages contribute no DirectoryBytes or PageBytes. Numeral cell
+// Stats accounts charged owners. Native coefficient slices, directories and
+// descriptor pages contribute no backing, directory or page bytes. Numeral cell
 // payloads remain in the borrowed IntegerManager and are not charged twice.
 func (m *UPolynomialManager) Stats() UPolynomialStats {
 	if m == nil || m.self != m || m.closed {
@@ -151,8 +149,5 @@ func (m *UPolynomialManager) addStoreStats(s *UPolynomialStats, store *UPolynomi
 			continue
 		}
 		s.LiveBackings++
-		bytes := uint64(cap(b.values)) * uint64(reflect.TypeOf(util.Int{}).Size())
-		s.BackingBytes += bytes
-		s.SharedStoreBytes += bytes
 	}
 }

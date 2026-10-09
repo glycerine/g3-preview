@@ -45,12 +45,12 @@ func TestUPolynomialNativeDescriptorAndBackingDirectories(t *testing.T) {
 	if _, e := m.Size(stale); !errors.Is(e, ErrUPolynomialOwner) {
 		t.Fatal("stale scalar owner", e)
 	}
-	// The payload still has one real allocation. Allow exactly that reservation;
-	// cold backing-directory growth must consume none of the allocation budget.
+	// Both backing directories and coefficient arrays grow natively without
+	// consuming numeric allocation reservations.
 	for i := 0; i < 257; i++ {
-		b.FailAfter(1)
+		b.FailAfter(0)
 		if e := m.Reserve(owned[i], 1); e != nil {
-			t.Fatal("backing directory consumed payload reservation", i, e)
+			t.Fatal("native backing growth reserved bytes", i, e)
 		}
 		b.FailAfter(-1)
 		value := util.NewInt(int32(17*i + 3))

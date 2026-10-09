@@ -187,10 +187,7 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*UPolynomialManager, factors
 				continue
 			}
 			values := testFieldBySourceName(b, "values")
-			n := testFieldBySourceName(b, "initialized").Uint()
-			if n > uint64(values.Len()) {
-				t.Fatal("coefficient physical extent", n, values.Len())
-			}
+			n := uint64(values.Len())
 			for j := uint64(0); j < n; j++ {
 				addInt(values.Index(int(j)))
 			}

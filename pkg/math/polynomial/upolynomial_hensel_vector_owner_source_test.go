@@ -78,8 +78,8 @@ func upolyHenselCheckVectorOwners(cores []*UPolynomialManager, factors []*UPolyn
 			return fmt.Errorf("one buffer has two scalar vector owners %v: %s and %s", key, previous, label)
 		}
 		owners[key] = label
-		if testFieldBySourceName(state, "capacity").Uint() != uint64(testFieldBySourceName(b, "values").Len()) || testFieldBySourceName(state, "size").Uint() > testFieldBySourceName(state, "capacity").Uint() {
-			return fmt.Errorf("%s vector physical capacity mismatch %v", label, key)
+		if testFieldBySourceName(state, "size").Uint() > uint64(testFieldBySourceName(b, "values").Len()) {
+			return fmt.Errorf("%s vector native constructed extent mismatch %v", label, key)
 		}
 		return nil
 	}

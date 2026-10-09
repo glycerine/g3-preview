@@ -3,7 +3,6 @@
 package polynomial
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -130,18 +129,13 @@ func mignotteScopePhysicalAuditExtra(t *testing.T, q *util.RationalManager, s *U
 	for _, v := range states {
 		if v.backing != 0 {
 			a := u.values(v)
-			for i := uint32(0); i < v.initialized; i++ {
+			for i := uint32(0); uint64(i) < uint64(len(a)); i++ {
 				roots = append(roots, &a[i])
 			}
 		}
 	}
 	mignotteNamedIntegerPhysicalAudit(t, q.Integers(), external, roots...)
 	n := q.HeaderBytes + integerActualOwnedBytes(q.Integers()) + u.header + u.modular.Header + u.store.header + s.header + s.config.Primes.Stats().TotalBytes
-	for _, b := range u.store.backings {
-		if b.live {
-			n += uint64(cap(b.values)) * uint64(reflect.TypeOf(util.Int{}).Size())
-		}
-	}
 	if c != nil {
 		n += c.header
 	}

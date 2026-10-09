@@ -78,7 +78,7 @@ func TestUPolynomialSequenceCopyMoveAndRetainedRows(t *testing.T) {
 }
 
 func TestUPolynomialSequenceExactMetadataFailurePrefixes(t *testing.T) {
-	for fault := int64(0); fault < 3; fault++ {
+	for fault := int64(0); fault <= 2; fault++ {
 		m, _, b := upolySourceOwner(t)
 		p := upolySourceNew(t, m, []int32{7})
 		seq := upolySturmSequence(t, m)
@@ -86,35 +86,32 @@ func TestUPolynomialSequenceExactMetadataFailurePrefixes(t *testing.T) {
 		e := seq.PushCopy(mustUPolyView(t, m, p))
 		stats := seq.Stats()
 		owned := m.Stats()
-		// Audit before disabling faults/reading numerals/Close. All coefficients are
-		// inline, so no sequence numeral cell justifies an unreferenced live root.
 		if owned.IntegerLiveCells != owned.IntegerCachedCells+owned.OwnedNumeralCells || stats.OwnedNumeralCells != 0 {
 			t.Fatal("immediate scalar graph", fault, owned, stats)
 		}
 		upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Sequences: []*UPolynomialSequence{seq}})
 		b.FailAfter(-1)
+		if fault == 2 {
+			if e != nil || stats.BeginCount != 1 || stats.SizeCount != 1 || stats.CoefficientCount != 1 {
+				t.Fatal("two metadata reservations suffice for native coefficient copy", e, stats)
+			}
+			row, e := seq.RowView(0)
+			serviceMust(t, e)
+			var n util.Int
+			serviceMust(t, m.ReadView(row, 0, &n))
+			value, e := m.IntegerManager().Int64(&n)
+			if e != nil || value != 7 {
+				t.Fatal(value, e)
+			}
+			serviceMust(t, m.IntegerManager().Del(&n))
+			continue
+		}
 		if !numericStorageReservationRefusal(e) {
 			t.Fatal(fault, e)
 		}
-		wantBegin, wantSize := uint32(0), uint32(0)
-		if fault >= 1 {
-			wantBegin = 1
-		}
-		if fault >= 2 {
-			wantSize = 1
-		}
-		if stats.BeginCount != wantBegin || stats.SizeCount != wantSize || stats.CoefficientCount != 0 {
+		wantBegin := uint32(fault)
+		if stats.BeginCount != wantBegin || stats.SizeCount != 0 || stats.CoefficientCount != 0 {
 			t.Fatal("source metadata publication", fault, stats)
-		}
-		if fault == 2 {
-			row, e := seq.RowView(0)
-			if e != nil {
-				t.Fatal(e)
-			}
-			var n util.Int
-			if e = m.ReadView(row, 0, &n); !errors.Is(e, ErrUPolynomialOwner) && !errors.Is(e, arena.ErrBounds) {
-				t.Fatal("unconstructed coefficient", e)
-			}
 		}
 	}
 }

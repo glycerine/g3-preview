@@ -230,17 +230,15 @@ func (s *UPolynomialSequence) Close() error {
 	return nil
 }
 
-// Coefficient backing is already charged in manager Stats. TotalBytes here
-// counts only the distinct cold owner and metadata; ManagerBackingBytes is
-// attribution, never a second reservation or a term in the combined sum.
+// Coefficients use native slices. TotalBytes counts the distinct cold owner
+// and the remaining sequence metadata; ManagerBackingBytes stays zero.
 func (s *UPolynomialSequence) Stats() UPolynomialSequenceStats {
 	if s == nil || s.self != s || s.closed || s.manager.check() != nil {
 		return UPolynomialSequenceStats{}
 	}
 	a := &s.state
-	r := UPolynomialSequenceStats{OwnerBytes: s.header, MetadataBytes: uint64(cap(a.begins.values)+cap(a.sizes.values)) * 4, BeginCount: a.begins.size, SizeCount: a.sizes.size, CoefficientCount: a.coefficients.size, BeginCapacity: uint32(cap(a.begins.values)), SizeCapacity: uint32(cap(a.sizes.values)), CoefficientCapacity: a.coefficients.capacity}
+	r := UPolynomialSequenceStats{OwnerBytes: s.header, MetadataBytes: uint64(cap(a.begins.values)+cap(a.sizes.values)) * 4, BeginCount: a.begins.size, SizeCount: a.sizes.size, CoefficientCount: a.coefficients.size, BeginCapacity: uint32(cap(a.begins.values)), SizeCapacity: uint32(cap(a.sizes.values)), CoefficientCapacity: uint32(cap(s.manager.values(&a.coefficients)))}
 	r.TotalBytes = r.OwnerBytes + r.MetadataBytes
-	r.ManagerBackingBytes = uint64(a.coefficients.capacity) * uint64(reflect.TypeOf(util.Int{}).Size())
 	for i := uint32(0); i < a.coefficients.size; i++ {
 		if s.manager.config.Integer.IsLiveCellToken(s.manager.values(&a.coefficients)[i].NativeCellToken()) {
 			r.OwnedNumeralCells++

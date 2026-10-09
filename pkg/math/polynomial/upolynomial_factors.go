@@ -483,7 +483,6 @@ func (fs *UPolynomialFactors) Stats() UPolynomialFactorsStats {
 	}
 	for i := uint32(0); i < fs.count; i++ {
 		s := &fs.factors[i]
-		st.ManagerBackingBytes += uint64(s.capacity) * uint64(reflect.TypeOf(util.Int{}).Size())
 		for j := uint32(0); j < s.size; j++ {
 			if z.IsLiveCellToken(fs.manager.values(s)[j].NativeCellToken()) {
 				st.OwnedNumeralCells++

@@ -25,7 +25,7 @@ func (m *UPolynomialManager) shrink(s *upolyVectorState, n uint32) error {
 	if s.backing == 0 {
 		return nil
 	}
-	if n > s.initialized {
+	if uint64(n) > uint64(len(m.values(s))) {
 		return arena.ErrBounds
 	}
 	s.size = n
@@ -61,21 +61,9 @@ func (m *UPolynomialManager) PushCoefficient(p UPolynomial, n *util.Int) error {
 	if s.size == math.MaxUint32 {
 		return arena.ErrBounds
 	}
-	if s.size == s.capacity {
-		if e = m.grow(s); e != nil {
-			return e
-		}
-	}
-	// Source constructs the default element, publishes push size, then copies.
 	i := s.size
-	m.values(s)[i] = util.Int{}
-	s.size++
-	if s.size > s.initialized {
-		s.initialized = s.size
-	}
-	b := &m.stateStore(s).backings[s.backing-1]
-	if s.size > b.initialized {
-		b.initialized = s.size
+	if e = m.reserve(s, i+1); e != nil {
+		return e
 	}
 	return m.modular.Copy(&m.values(s)[i], n)
 }

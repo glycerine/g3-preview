@@ -24,7 +24,7 @@ func TestUPolynomialHenselSourceBorrowedInputOutputAlias(t *testing.T) {
 				v := &inputs[i]
 				if v.backing != 0 {
 					a := m.values(v)
-					for j := uint32(0); j < v.initialized; j++ {
+					for j := uint32(0); uint64(j) < uint64(len(a)); j++ {
 						roots = append(roots, &a[j])
 					}
 				}

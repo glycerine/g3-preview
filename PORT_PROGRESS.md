@@ -32007,3 +32007,50 @@ capacity/growth and initialized-lifetime fields still need conversion; this
 checkpoint removes their surrounding locator-directory allocation machinery,
 not all remaining univariate containers. Then continue retained AST/SAT and
 text consumers and internal util numeric/text/parameter seams before splitting.
+
+## Native univariate coefficient slices
+
+Univariate coefficient backing now grows with native Go append. Removed source
+vector capacity/header arithmetic, manual growth reservations and refunds, and
+separate capacity/initialized fields. Slice length retains the actual numeral
+fields needed by owning cleanup; logical polynomial size remains separate.
+Native relocation transfers existing numeral tokens and invalidates old backing
+views through the existing generation binding. Extending within native capacity
+and swapping ownership preserve that binding. Coefficient buffers contribute no
+Runtime backing-byte charge. Real numeral allocation/copy/destruction and cold
+service/invocation owner allocation remain explicit.
+
+New checks exercise all 21 scratch states through 4097/0/129/1/33 field extents
+under disabled reservations, with independent coefficient values, default fields,
+read bounds, shrink/reset behavior and exact Runtime accounting. Actual BIG
+relocation preserves the same owning token, allocates no numeric storage, rejects
+old physical views and deletes the numeral on reset. Directory stress now also
+grows every coefficient backing under disabled reservations. Source destruction
+checks all 21 actual private numeral tokens end while preserving the caller owner.
+
+Updated storage, scoped push, sequence, isolation and prime-trial tests to reflect
+native coefficient growth. The scalar CRA campaign still sweeps every actual
+reservation and checks late failures and independent reconstruction; its obsolete
+failure-after-buffer-append requirement is removed. Existing BIG numeric CRA and
+prime-trial failure campaigns remain. The large-modulus prime helper now proves
+successful RAW transfer to a live BIG coefficient with cleared transport authority.
+Algebraic scalar Copy now checks independent completed native coefficient storage
+and actual cell-allocation refusals; the old null-buffer failure is unreachable.
+Existing BIG algebraic Copy campaigns retain partial numeric-copy source guards.
+Retired source-capacity arithmetic and artificially unconstructed native-tail tests.
+Physical owner audits now enumerate actual native field extents without charging
+native coefficient capacity. Failed remove-one-half row capture uses its actual
+imported store, preserving generation and exact-cell acknowledgment guards.
+
+Validation: full native polynomial passed (33.600s); focused g3debug native
+coefficient, source finalization, sequence/isolation, prime, modular GCD, extended
+GCD and algebraic publication checks passed (0.048s). Module-wide compilation,
+polynomial vet, portcheck, gofmt and diff checks passed. Manifest statuses/counts
+remain unchanged. The 22:43–22:45 UTC full native module checkpoint remains
+current; no additional full-module run was needed.
+
+The util knot/split goal remains open. Next retained polynomial containers include
+binary-rational vectors, sequence begin/size metadata and factor index vectors.
+AST activity/FPA/node-chain containers, SAT scalar collections and external text
+consumers also remain. Finish those native consumers, then break internal util
+numeric/text/parameter cycles before splitting root util into actual subpackages.

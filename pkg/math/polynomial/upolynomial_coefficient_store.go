@@ -100,8 +100,7 @@ func (s *UPolynomialCoefficientStore) Stats() (UPolynomialCoefficientStoreStats,
 			continue
 		}
 		st.LiveBackings++
-		st.BackingBytes += uint64(cap(b.values)) * uint64(reflect.TypeOf(util.Int{}).Size())
-		for j := uint32(0); j < b.initialized; j++ {
+		for j := uint32(0); uint64(j) < uint64(len(b.values)); j++ {
 			if s.integer.IsLiveCellToken(b.values[j].NativeCellToken()) {
 				st.OwnedNumeralCells++
 			}

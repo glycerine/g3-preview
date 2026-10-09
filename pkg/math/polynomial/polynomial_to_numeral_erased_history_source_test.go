@@ -11,7 +11,7 @@ func TestPolynomialToNumeralZeroReuseErasesHistoryReservation(t *testing.T) {
 	var output upolyVectorState
 	var prior polynomialFactorNumeralVectorReceipt
 	serviceMust(t, full.toNumeralVectorVariableWithReceipt(full.core.zero, 0, &output, &prior))
-	if output.backing == 0 || output.initialized == 0 {
+	if output.backing == 0 || len(full.upm.values(&output)) == 0 {
 		t.Fatal("actual retained initialized output", output)
 	}
 	serviceMust(t, full.cleanupFactorNumeralVector(&prior, false))
@@ -20,14 +20,14 @@ func TestPolynomialToNumeralZeroReuseErasesHistoryReservation(t *testing.T) {
 	if !ok {
 		t.Fatal("real prior diagnostic")
 	}
-	raw, size, initialized, used := output.backing, output.size, output.initialized, full.originalBudget.Used()
+	raw, size, initialized, used := output.backing, output.size, len(full.upm.values(&output)), full.originalBudget.Used()
 	full.originalBudget.FailAfter(0)
 	var later polynomialFactorNumeralVectorReceipt
 	cause := full.toNumeralVectorVariableWithReceipt(full.core.zero, 0, &output, &later)
 	if cause != nil {
 		t.Fatal("literal zero/reused output has no source allocation", cause)
 	}
-	if output.backing != raw || output.size != size || output.initialized != initialized || full.originalBudget.Used() != used {
+	if output.backing != raw || output.size != size || len(full.upm.values(&output)) != initialized || full.originalBudget.Used() != used {
 		t.Fatal("erased source path changed owned storage")
 	}
 	old, ok := full.factorNumeralVectorDiagnostic(&prior)

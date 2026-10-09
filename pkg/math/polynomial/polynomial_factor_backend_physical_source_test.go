@@ -22,10 +22,7 @@ func polynomialFactorBackendNamedRoots(t *testing.T, full *MultivariatePolynomia
 			return
 		}
 		values := m.values(v)
-		if v.initialized > uint32(len(values)) {
-			t.Fatal("actual vector initialized extent", v)
-		}
-		for i := uint32(0); i < v.initialized; i++ {
+		for i := uint32(0); uint64(i) < uint64(len(values)); i++ {
 			roots = append(roots, &values[i])
 		}
 	}
@@ -39,7 +36,6 @@ func polynomialFactorBackendNamedRoots(t *testing.T, full *MultivariatePolynomia
 		}
 		for _, backing := range store.backings {
 			if backing.live {
-				bytes += uint64(cap(backing.values)) * uint64(reflect.TypeOf(util.Int{}).Size())
 			}
 		}
 	}

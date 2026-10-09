@@ -3,7 +3,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -32,17 +31,12 @@ func upolynomialSourcePhysicalAudit(t *testing.T, q *util.RationalManager, u *UP
 			continue
 		}
 		a := u.values(st)
-		for i := uint32(0); i < st.initialized; i++ {
+		for i := uint32(0); uint64(i) < uint64(len(a)); i++ {
 			roots = append(roots, &a[i])
 		}
 	}
 	integerPhysicalAudit(t, q.Integers(), roots...)
 	n := q.HeaderBytes + integerActualOwnedBytes(q.Integers()) + u.header + u.modular.Header + u.store.header
-	for _, b := range u.store.backings {
-		if b.live {
-			n += uint64(cap(b.values)) * uint64(reflect.TypeOf(util.Int{}).Size())
-		}
-	}
 	if n != q.Budget().Used() {
 		t.Fatal("actual cold and physical graph", n, q.Budget().Used())
 	}
@@ -59,9 +53,11 @@ func TestUPolynomialSourceFinalizePrivateMembersAndCaller(t *testing.T) {
 	serviceMust(t, e)
 	serviceMust(t, u.SetInts(p, []util.Int{util.NewInt(5), util.NewInt(2)}))
 	members := [21]*upolyVectorState{&u.db, &u.dbab1, &u.dbab2, &u.tr, &u.push, &u.basic, &u.div1, &u.div2, &u.exactDiv, &u.gcd1, &u.gcd2, &u.cra, &u.mgcd[0], &u.mgcd[1], &u.mgcd[2], &u.mgcd[3], &u.mgcd[4], &u.mgcd[5], &u.sqf1, &u.sqf2, &u.pw}
+	var tokens [21]uint64
 	for i, s := range members {
 		serviceMust(t, u.reserve(s, 1))
 		serviceMust(t, q.Integers().SetUint64(&u.values(s)[0], uint64(1)<<40|uint64(i+1)))
+		tokens[i] = u.values(s)[0].NativeCellToken()
 	}
 	upolynomialSourcePhysicalAudit(t, q, u, p)
 	if e = u.Close(); !errors.Is(e, ErrUPolynomialLive) || u.closing {
@@ -75,8 +71,13 @@ func TestUPolynomialSourceFinalizePrivateMembersAndCaller(t *testing.T) {
 			t.Fatal("source private backing retained", *s)
 		}
 	}
-	if !u.sourceFinalized || u.closed || u.header == 0 || b.Used() >= before {
+	if !u.sourceFinalized || u.closed || u.header == 0 || b.Used() > before {
 		t.Fatal("source/owning lifetime conflated")
+	}
+	for _, token := range tokens {
+		if q.Integers().IsLiveCellToken(token) {
+			t.Fatal("source private numeral retained", token)
+		}
 	}
 	if _, e = u.Size(p); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal("ordinary access after source destruction", e)
@@ -198,26 +199,6 @@ func TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry(t *testing.T) {
 	}
 	if b.Used() != used || r.Stats() != blocks || (u.values(&u.db)[0]).Cell != old {
 		t.Error("source retry acknowledged owning release")
-	}
-}
-
-// A physically zero Go tail is not a constructed source mpz. The guard is
-// reached only after deleting the genuinely constructed earlier element.
-func TestUPolynomialSourceFinalizeUnconstructedTailPrefix(t *testing.T) {
-	q, _ := rationalManager(t, false)
-	u, e := NewUPolynomialManager(UPolynomialConfig{Integer: q.Integers(), Checkpoint: func() bool { panic("unreached") }, Cooperation: func() error { panic("unreached") }})
-	serviceMust(t, e)
-	serviceMust(t, u.reserve(&u.db, 2))
-	serviceMust(t, q.Integers().SetUint64(&u.values(&u.db)[0], 1<<40))
-	u.db.initialized = 1
-	e = u.SourceFinalize()
-	if !errors.Is(e, arena.ErrBounds) || u.sourceIndex != 1 || (u.values(&u.db)[0]).Cell != 0 || u.db.size != 2 || u.db.backing == 0 {
-		t.Fatal("actual constructed deletion before endangered tail", e, u.sourceIndex, u.db, u.values(&u.db)[0])
-	}
-	upolynomialSourcePhysicalAudit(t, q, u)
-	serviceMust(t, u.Close())
-	if u.sourceFinalized || !errors.Is(u.sourceCause, arena.ErrBounds) || u.sourceIndex != 1 {
-		t.Fatal("owning abort changed source prefix")
 	}
 }
 

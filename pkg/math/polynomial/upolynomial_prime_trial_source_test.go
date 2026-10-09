@@ -182,7 +182,7 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolyn
 	appendState := func(m *UPolynomialManager, v *upolyVectorState) {
 		if v.backing != 0 {
 			values := m.values(v)
-			for i := uint32(0); i < v.initialized; i++ {
+			for i := uint32(0); uint64(i) < uint64(len(values)); i++ {
 				roots = append(roots, &values[i])
 			}
 		}
@@ -221,11 +221,6 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolyn
 		if !stores[m.store] {
 			stores[m.store] = true
 			n += m.store.header
-			for _, b := range m.store.backings {
-				if b.live {
-					n += uint64(cap(b.values)) * uint64(reflect.TypeOf(util.Int{}).Size())
-				}
-			}
 		}
 	}
 	for h := s.henselPairs; h != nil; h = h.next {
@@ -493,7 +488,7 @@ func TestUPolynomialPrimeTrialCapturedContextRejectsReuseCopiesAndForeign(t *tes
 // The generic source helper accepts a true large positive modulus. The trial
 // loop's uint32 prime selection cannot itself produce this modulus, so this
 // proves reached helper RAW publication, not ordinary large-prime trial input.
-func TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure(t *testing.T) {
+func TestUPolynomialPrimeToZPNativePushAndPublishedRaw(t *testing.T) {
 	found := false
 	for ordinal := int64(0); ordinal < 1024; ordinal++ {
 		q, s := mignotteDirectFixture(t)
@@ -515,19 +510,21 @@ func TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure(t *testin
 		body := c.zp.toZPCopyWithPrimeReceipt(m.stateView(&c.fpp), &r.frame.fzp, &r)
 		r.frame.executing = false
 		primeTrialPhysicalAudit(t, q, s)
-		if body != nil && r.frame.fzp.size == 2 && r.frame.transportBound && util.ValidNumericRef(q.Integers().Cells, (r.frame.transport).Cell) {
-			same, x := q.Integers().Equal(&r.frame.transport, &q.Integers().Two64)
+		if body == nil {
+			if r.frame.fzp.size != 3 || r.frame.transportBound || r.frame.transport != (util.Int{}) {
+				t.Fatal("native push must move RAW into coefficient ownership", r.frame.fzp, r.frame.transport)
+			}
+			actual, x := c.zp.read(c.zp.stateView(&r.frame.fzp), 2)
+			serviceMust(t, x)
+			if !q.Integers().IsLiveCellToken(actual.NativeCellToken()) {
+				t.Fatal("BIG coefficient not owned", *actual)
+			}
+			same, x := q.Integers().Equal(actual, &q.Integers().Two64)
 			serviceMust(t, x)
 			if !same {
-				t.Fatal("actual published RAW value", r.frame.transport)
+				t.Fatal("actual moved RAW value", *actual)
 			}
 			found = true
-			raw := r.frame.transport
-			serviceMust(t, s.cleanupPrimeTrialInvocation(&r, false))
-			if r.frame.transport != raw || !r.frame.transportBound {
-				t.Fatal("source vector lifetime consumed RAW p_i")
-			}
-			primeTrialPhysicalAudit(t, q, s)
 		}
 		q.Budget().FailAfter(-1)
 		serviceMust(t, s.cleanupPrimeTrialInvocation(&r, false))
@@ -536,7 +533,7 @@ func TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure(t *testin
 		serviceMust(t, s.CleanupRetained())
 		if body == nil {
 			if !found {
-				t.Fatal("no actual BIG RAW push refusal before success", ordinal)
+				t.Fatal("no actual BIG RAW publication at native push completion", ordinal)
 			}
 			t.Log("completed helper success", ordinal)
 			return

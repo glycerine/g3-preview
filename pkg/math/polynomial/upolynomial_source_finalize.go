@@ -110,7 +110,7 @@ func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairIn
 				}
 				a := m.values(s)
 				for m.sourceIndex < s.size {
-					if m.sourceIndex >= s.initialized || uint64(m.sourceIndex) >= uint64(len(a)) {
+					if uint64(m.sourceIndex) >= uint64(len(a)) {
 						m.sourceGuard = true
 						m.sourceCause = arena.ErrBounds
 						return m.sourceCause
@@ -182,7 +182,7 @@ func (m *UPolynomialManager) CleanupPolynomial(p *UPolynomial) error {
 	}
 	if d.state.backing != 0 {
 		a := m.values(&d.state)
-		for j := uint32(0); j < d.state.initialized; j++ {
+		for j := uint32(0); uint64(j) < uint64(len(a)); j++ {
 			if e := m.config.Integer.Del(&a[j]); e != nil {
 				return e
 			}

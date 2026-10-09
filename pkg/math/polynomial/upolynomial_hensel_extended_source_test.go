@@ -74,7 +74,7 @@ func TestUPolynomialHenselActualExtendedGCDEveryBIGReservation(t *testing.T) {
 		}
 		roots := []*util.Int{&p, &n, &minus}
 		for i := range inputs {
-			for j := uint32(0); j < inputs[i].initialized; j++ {
+			for j := range s.manager.values(&inputs[i]) {
 				roots = append(roots, &s.manager.values(&inputs[i])[j])
 			}
 		}
@@ -144,7 +144,7 @@ func TestUPolynomialHenselActualQuadraticEveryReservation(t *testing.T) {
 		}
 		var roots []*util.Int
 		for i := range inputs {
-			for j := uint32(0); j < inputs[i].initialized; j++ {
+			for j := range m.values(&inputs[i]) {
 				roots = append(roots, &m.values(&inputs[i])[j])
 			}
 		}
@@ -241,7 +241,7 @@ func TestUPolynomialHenselActualTaggedQuadraticEveryReservation(t *testing.T) {
 		}
 		var roots []*util.Int
 		for i := range inputs {
-			for j := uint32(0); j < inputs[i].initialized; j++ {
+			for j := range m.values(&inputs[i]) {
 				roots = append(roots, &m.values(&inputs[i])[j])
 			}
 		}

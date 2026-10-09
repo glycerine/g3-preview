@@ -5,7 +5,6 @@ package polynomial
 
 import (
 	"math"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
@@ -25,11 +24,11 @@ type UPolynomialView struct {
 	backing, generation, start, count uint32
 }
 
-// Every hot coefficient is the actual named Int record. Variable backing
-// slices stay exclusively in the charged cold physical-storage directory.
+// Backings retain actual constructed numeral fields in native slices. Logical
+// polynomial size is distinct from the extent still owned for cleanup.
 type upolyVectorState struct {
-	origin                                           uint64
-	backing, generation, size, capacity, initialized uint32
+	origin                    uint64
+	backing, generation, size uint32
 }
 type upolyDescriptor struct {
 	state      upolyVectorState
@@ -38,42 +37,9 @@ type upolyDescriptor struct {
 }
 type upolyDescriptorPage struct{ rows [32]upolyDescriptor }
 type upolyBacking struct {
-	values                  []util.Int
-	generation, initialized uint32
-	live                    bool
-}
-
-// The source vector SZ is uint32 and selected LP64 sizeof(mpz)=16, header8.
-// Actual Go stride/host representability is checked independently; only the
-// real typed allocation bytes are reserved, source header metadata is in its
-// actual descriptor/cold ownership graph rather than a phantom allocation.
-// upolySourceCapacity performs the literal source SZ arithmetic/check first.
-func upolySourceCapacity(old uint32) (n, oldBytes, newBytes uint32, e error) {
-	if old == 0 {
-		return 2, 0, 40, nil
-	}
-	oldBytes = 16*old + 8
-	n = (3*old + 1) >> 1
-	newBytes = 16*n + 8
-	if n <= old || newBytes <= oldBytes {
-		e = arena.ErrBounds
-	}
-	return
-}
-func upolyNextCapacity(old, stride, hostMax uint64) (uint32, uint64, error) {
-	if old > math.MaxUint32 || stride == 0 {
-		return 0, 0, arena.ErrBounds
-	}
-	n, _, _, e := upolySourceCapacity(uint32(old))
-	if e != nil {
-		return 0, 0, e
-	}
-	// Separate undefined-source-allocation guard: wrapped byte allocations
-	// cannot hold the actual source coefficient extent. Do not model OOB writes.
-	if uint64(n)*16+8 > math.MaxUint32 || uint64(n) > hostMax/stride {
-		return 0, 0, arena.ErrBounds
-	}
-	return n, uint64(n) * stride, nil
+	values     []util.Int
+	generation uint32
+	live       bool
 }
 
 func (m *UPolynomialManager) values(s *upolyVectorState) []util.Int {
@@ -95,83 +61,42 @@ func (m *UPolynomialManager) backingSlot() (uint32, error) {
 	m.store.backings = append(m.store.backings, upolyBacking{generation: 1})
 	return uint32(len(m.store.backings)), nil
 }
-func (m *UPolynomialManager) grow(s *upolyVectorState) error {
-	return m.growWithFactorNumeralVectorReceipt(s, nil)
-}
-func (m *UPolynomialManager) growWithFactorNumeralVectorReceipt(s *upolyVectorState, r *polynomialFactorNumeralVectorReceipt) error {
-	n, bytes, e := upolyNextCapacity(uint64(s.capacity), uint64(reflect.TypeOf(util.Int{}).Size()), uint64(int(^uint(0)>>1)))
-	if e != nil {
-		return e
-	}
-	if r != nil {
-		if r.manager == nil || !r.manager.matchesFactorNumeralVector(r) || r.manager.upm != m || r.frame.output != s || !r.frame.active || !r.frame.executing || r.manager.core.callbackDepth != 0 {
-			return ErrUPolynomialOwner
-		}
-		if e := r.manager.archiveFactorNumeralVector(); e != nil {
-			return e
-		}
-	}
-	slot, e := m.backingSlot()
-	if e != nil {
-		return e
-	}
-	if e = m.config.Integer.Budget().Reserve(bytes); e != nil {
-		return e
-	}
-	a := make([]util.Int, n)
-	old := m.values(s)
-	// Source nontrivial growth publishes the new data binding before the
-	// ascending move loop; capacity publishes only after old storage deletion.
-	oldSlot, oldCap := s.backing, s.capacity
-	oldStore := m.stateStore(s)
-	b := &m.store.backings[slot-1]
-	b.values = a
-	b.live = true
-	s.origin = m.store.origin
-	s.backing = slot
-	s.generation = b.generation
-	for i := uint32(0); i < s.size; i++ {
-		a[i] = old[i]
-		old[i].Move()
-	}
-	s.initialized = s.size
-	b.initialized = s.size
-	if oldSlot != 0 {
-		oldB := &oldStore.backings[oldSlot-1]
-		oldB.values = nil
-		oldB.live = false
-		if oldB.generation != math.MaxUint32 {
-			oldB.generation++
-		}
-		m.config.Integer.Budget().Release(uint64(oldCap) * uint64(reflect.TypeOf(util.Int{}).Size()))
-	}
-	s.capacity = n
-	return nil
-}
+
+// Reserve extends the native constructed fields, then publishes logical size.
+// A real relocation invalidates the old backing binding; swapping ownership or
+// extending within native capacity preserves it. No numeric allocation occurs.
 func (m *UPolynomialManager) reserve(s *upolyVectorState, n uint32) error {
-	return m.reserveWithFactorNumeralVectorReceipt(s, n, nil)
-}
-func (m *UPolynomialManager) reserveWithFactorNumeralVectorReceipt(s *upolyVectorState, n uint32, r *polynomialFactorNumeralVectorReceipt) error {
 	if n <= s.size {
 		return nil
 	}
-	for n > s.capacity {
-		if e := m.growWithFactorNumeralVectorReceipt(s, r); e != nil {
+	if uint64(n) > uint64(^uint(0)>>1) {
+		return arena.ErrBounds
+	}
+	a := m.values(s)
+	if s.backing == 0 || uint64(n) > uint64(cap(a)) {
+		oldSlot, oldStore := s.backing, m.stateStore(s)
+		slot, e := m.backingSlot()
+		if e != nil {
 			return e
 		}
-	}
-	old := s.size
-	s.size = n // source resize publication precedes default construction
-	a := m.values(s)
-	for i := old; i < n; i++ {
-		a[i] = util.Int{}
-		if i+1 > m.stateStore(s).backings[s.backing-1].initialized {
-			m.stateStore(s).backings[s.backing-1].initialized = i + 1
+		a = append(a, make([]util.Int, int(n)-len(a))...)
+		if oldSlot != 0 {
+			old := &oldStore.backings[oldSlot-1]
+			old.values = nil
+			old.live = false
+			if old.generation != math.MaxUint32 {
+				old.generation++
+			}
 		}
+		b := &m.store.backings[slot-1]
+		b.values, b.live = a, true
+		s.origin, s.backing, s.generation = m.store.origin, slot, b.generation
+	} else if int(n) > len(a) {
+		a = append(a, make([]util.Int, int(n)-len(a))...)
+		m.stateStore(s).backings[s.backing-1].values = a
 	}
-	if n > s.initialized {
-		s.initialized = n
-	}
+	clear(a[s.size:n])
+	s.size = n
 	return nil
 }
 func (m *UPolynomialManager) freeBacking(s *upolyVectorState) {
@@ -182,7 +107,6 @@ func (m *UPolynomialManager) freeBacking(s *upolyVectorState) {
 		if b.generation != math.MaxUint32 {
 			b.generation++
 		}
-		m.config.Integer.Budget().Release(uint64(s.capacity) * uint64(reflect.TypeOf(util.Int{}).Size()))
 	}
 	*s = upolyVectorState{}
 }
@@ -212,7 +136,7 @@ func (m *UPolynomialManager) setSize(s *upolyVectorState, n uint32) error {
 	if s.backing == 0 {
 		return nil
 	}
-	if n > s.initialized {
+	if uint64(n) > uint64(len(m.values(s))) {
 		return arena.ErrBounds
 	}
 	a := m.values(s)
@@ -237,7 +161,7 @@ func (m *UPolynomialManager) Capacity(p UPolynomial) (uint32, error) {
 	if e != nil {
 		return 0, e
 	}
-	return d.state.capacity, nil
+	return uint32(cap(m.values(&d.state))), nil
 }
 func (m *UPolynomialManager) Degree(p UPolynomial) (uint32, error) {
 	n, e := m.Size(p)
@@ -397,7 +321,7 @@ func (m *UPolynomialManager) read(v UPolynomialView, index uint32) (*util.Int, e
 	if !b.live || b.generation != v.generation {
 		return nil, ErrUPolynomialOwner
 	}
-	if index >= v.count || uint64(v.start)+uint64(index) >= uint64(b.initialized) {
+	if index >= v.count || uint64(v.start)+uint64(index) >= uint64(len(b.values)) {
 		return nil, arena.ErrBounds
 	}
 	return &b.values[v.start+index], nil

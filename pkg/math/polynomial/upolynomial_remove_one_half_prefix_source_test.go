@@ -32,7 +32,7 @@ func TestUPolynomialRemoveOneHalfRootEveryActualPrefix(t *testing.T) {
 			serviceMust(t, z.Del(&neg))
 			v, e := p.wholeView(input)
 			serviceMust(t, e)
-			base := z.Budget().Used() - integerActualOwnedBytes(z) - p.oneHalfRootHistoryBytes - p.removeOneHalfRootHistoryBytes - removeHalfVectorCold(p)
+			base := z.Budget().Used() - integerActualOwnedBytes(z) - p.oneHalfRootHistoryBytes - p.removeOneHalfRootHistoryBytes
 			z.Budget().FailAfter(prefix)
 			body := p.RemoveOneHalfRoot(v, out)
 			q := &p.removeOneHalfRoot
@@ -53,7 +53,7 @@ func TestUPolynomialRemoveOneHalfRootEveryActualPrefix(t *testing.T) {
 				}
 			}
 			algebraicCellSourcePhysical(t, c, []UPolynomial{input, out}, extra, nil)
-			if got, want := z.Budget().Used(), base+integerActualOwnedBytes(z)+p.oneHalfRootHistoryBytes+p.removeOneHalfRootHistoryBytes+removeHalfVectorCold(p); got != want {
+			if got, want := z.Budget().Used(), base+integerActualOwnedBytes(z)+p.oneHalfRootHistoryBytes+p.removeOneHalfRootHistoryBytes; got != want {
 				t.Fatal("before-lift cold graph", got, want)
 			}
 			if polynomialNegNumericPending(&q.numeric) || z.MatchesAddMulInvocation(&q.addMul) {
@@ -126,16 +126,4 @@ func TestUPolynomialRemoveOneHalfRootIndependentLiteralCases(t *testing.T) {
 			}
 		})
 	}
-}
-
-// Actual coefficient backing capacities, excluding native directories and
-// independent of row SIZE and NUM census.
-func removeHalfVectorCold(p *UPolynomialManager) uint64 {
-	n := uint64(0)
-	for _, b := range p.store.backings {
-		if b.live {
-			n += uint64(cap(b.values)) * uint64(reflect.TypeOf(util.Int{}).Size())
-		}
-	}
-	return n
 }

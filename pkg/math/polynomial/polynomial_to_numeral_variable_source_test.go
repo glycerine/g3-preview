@@ -17,7 +17,7 @@ func TestPolynomialToNumeralSelectedVariableLiteralFilter(t *testing.T) {
 	var receipt polynomialFactorNumeralVectorReceipt
 	serviceMust(t, full.toNumeralVectorVariableWithReceipt(p, 0, &output, &receipt))
 	values := full.upm.values(&output)
-	if output.size != 2 || output.initialized < 4 || values[0] != util.NewInt(6) || values[1] != util.NewInt(9) || values[2] != util.NewInt(0) || values[3] != util.NewInt(0) {
+	if output.size != 2 || len(values) < 4 || values[0] != util.NewInt(6) || values[1] != util.NewInt(9) || values[2] != util.NewInt(0) || values[3] != util.NewInt(0) {
 		t.Fatal("source reserve degree then set_size trims rejected leading zeros", output.size, values)
 	}
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)

@@ -350,14 +350,14 @@ func removeOrHenselAddMulChild(context integerAllocationInvocationContext, r *up
 // constructed buffer NUM before SIZE. Owning acknowledgment clears only that
 // captured exact poison cell; it does not delete a foreign replacement NUM.
 func (q *upolyRemoveOneHalfRootScope) recordFailedRow(s *upolyVectorState, i uint32) {
-	if !q.matches() || !q.executing || s != &q.owner.div1 || s.backing == 0 || i >= s.initialized {
+	if !q.matches() || !q.executing || s != &q.owner.div1 || s.backing == 0 || uint64(i) >= uint64(len(q.owner.values(s))) {
 		return
 	}
 	row := &q.owner.values(s)[i]
 	if !q.owner.config.Integer.IsFailureNumeral(row) {
 		return
 	}
-	q.failedRowStore = q.owner.store
+	q.failedRowStore = q.owner.stateStore(s)
 	q.failedRowBacking = s.backing
 	q.failedRowGeneration = s.generation
 	q.failedRowIndex = i
@@ -372,7 +372,7 @@ func (q *upolyRemoveOneHalfRootScope) acknowledgeFailedRow() error {
 		return ErrUPolynomialOwner
 	}
 	b := &s.backings[q.failedRowBacking-1]
-	if b.live && b.generation == q.failedRowGeneration && q.failedRowIndex < b.initialized {
+	if b.live && b.generation == q.failedRowGeneration && uint64(q.failedRowIndex) < uint64(len(b.values)) {
 		row := &b.values[q.failedRowIndex]
 		if row.NativeCellToken() == q.failedRowCell && q.owner.config.Integer.IsFailureNumeral(row) {
 			q.owner.config.Integer.AcknowledgeFailedNumeral(row, q.failedRowCell)

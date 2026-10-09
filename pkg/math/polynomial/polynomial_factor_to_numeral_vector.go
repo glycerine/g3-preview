@@ -112,7 +112,7 @@ func (m *MultivariatePolynomialManager) toNumeralVectorSource(p Polynomial, vari
 	if e != nil {
 		return e
 	}
-	if e = m.upm.reserveWithFactorNumeralVectorReceipt(output, degree+1, &s.direct); e != nil {
+	if e = m.upm.reserve(output, degree+1); e != nil {
 		return e
 	}
 	for i := uint32(0); i <= degree; i++ {

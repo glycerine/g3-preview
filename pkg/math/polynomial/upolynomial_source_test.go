@@ -211,22 +211,15 @@ func TestUPolynomialStorageOwnershipAndPhysicalViews(t *testing.T) {
 	}
 	before := b.Used()
 	b.FailAfter(0)
-	if e = m.SetInts(q, []util.Int{util.NewInt(1), util.NewInt(2), util.NewInt(3)}); e == nil {
-		t.Fatal("growth must refuse")
+	if e = m.SetInts(q, []util.Int{util.NewInt(1), util.NewInt(2), util.NewInt(3)}); e != nil {
+		t.Fatal("native coefficient growth", e)
 	}
 	b.FailAfter(-1)
 	if b.Used() != before {
-		t.Fatal("failed growth leaked graph")
+		t.Fatal("native growth charged numeric budget")
 	}
-	if e = m.ReadView(v, 1, &n); e != nil {
-		t.Fatal(e)
-	}
-	if e := m.IntegerManager().Del(&n); e != nil {
-		t.Fatal(e)
-	}
-	if e = m.SetInts(q, []util.Int{util.NewInt(1), util.NewInt(2), util.NewInt(3)}); e != nil {
-		t.Fatal(e)
-	}
+	upolyGCDExpect(t, m, q, []int64{1, 2, 3})
+	upolyGCDExpect(t, m, p, []int64{9})
 	if e = m.ReadView(v, 0, &n); e == nil {
 		t.Fatal("replaced physical backing remained readable")
 	}
@@ -764,19 +757,17 @@ func TestUPolynomialConcreteScopedVectorActions(t *testing.T) {
 	if e = m.IntegerManager().Del(&n); e != nil {
 		t.Fatal(e)
 	}
+	value := util.NewInt(8)
 	b.FailAfter(0)
-	e = m.PushCoefficient(p, &util.Int{})
+	e = m.PushCoefficient(p, &value)
 	b.FailAfter(-1)
-	if e == nil {
-		t.Fatal("source growth-before-copy refusal", e)
+	if e != nil {
+		t.Fatal("native growth and inline copy", e)
 	}
-	if size, e := m.Size(p); e != nil || size != 2 {
+	if size, e := m.Size(p); e != nil || size != 3 {
 		t.Fatal(size, e)
 	}
-	value := util.NewInt(8)
-	if e = m.PushCoefficient(p, &value); e != nil {
-		t.Fatal(e)
-	}
+	upolyGCDExpect(t, m, p, []int64{3, 0, 8})
 	if e = m.PopCoefficient(p); e != nil {
 		t.Fatal(e)
 	}

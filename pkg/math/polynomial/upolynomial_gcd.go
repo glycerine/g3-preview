@@ -13,20 +13,9 @@ func (m *UPolynomialManager) pushDefault(s *upolyVectorState) (*util.Int, error)
 	if s.size == math.MaxUint32 {
 		return nil, arena.ErrBounds
 	}
-	if s.size == s.capacity {
-		if e := m.grow(s); e != nil {
-			return nil, e
-		}
-	}
 	i := s.size
-	m.values(s)[i] = util.Int{}
-	s.size++
-	if s.size > s.initialized {
-		s.initialized = s.size
-	}
-	b := &m.stateStore(s).backings[s.backing-1]
-	if s.size > b.initialized {
-		b.initialized = s.size
+	if e := m.reserve(s, i+1); e != nil {
+		return nil, e
 	}
 	return &m.values(s)[i], nil
 }

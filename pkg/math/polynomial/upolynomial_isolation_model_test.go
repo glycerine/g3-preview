@@ -353,7 +353,7 @@ func TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph(t *testing.T) {
 	}
 }
 
-func TestUPolynomialIsolationZeroResetPublicationBeforeRefusal(t *testing.T) {
+func TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication(t *testing.T) {
 	m, q, budget := upolySourceOwner(t)
 	b := upolyIsolationBinaryOwner(t, q, budget)
 	r, l, u := upolyIsolationVector(t, b), upolyIsolationVector(t, b), upolyIsolationVector(t, b)
@@ -368,8 +368,8 @@ func TestUPolynomialIsolationZeroResetPublicationBeforeRefusal(t *testing.T) {
 	e := m.SquareFreeIsolateRoots(mustUPolyView(t, m, p), b, r, l, u)
 	graph := m.Stats()
 	scratch, e2 := b.Stats()
-	if !numericStorageReservationRefusal(e) || e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators+r.Stats().OwnedNumeralCells+l.Stats().OwnedNumeralCells+u.Stats().OwnedNumeralCells || upolyIsolationSize(t, r) != 1 || upolyIsolationSize(t, l) != 0 || upolyIsolationSize(t, u) != 0 {
-		t.Fatal("reset roots/lower/upper and publish zero before nz backing refusal", e, e2, graph, r.Stats(), l.Stats(), u.Stats())
+	if e != nil || e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+scratch.LiveScratchNumerators+r.Stats().OwnedNumeralCells+l.Stats().OwnedNumeralCells+u.Stats().OwnedNumeralCells || upolyIsolationSize(t, r) != 1 || upolyIsolationSize(t, l) != 2 || upolyIsolationSize(t, u) != 2 {
+		t.Fatal("native coefficient scratch isolates zero and two intervals", e, e2, graph, r.Stats(), l.Stats(), u.Stats())
 	}
 	budget.FailAfter(-1)
 	value := upolyIsolationRead(t, b, r, 0)

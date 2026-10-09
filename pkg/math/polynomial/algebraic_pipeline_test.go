@@ -83,9 +83,9 @@ func TestAlgebraicIndependentRefinementAndRationalConversion(t *testing.T) {
 	serviceMust(t, c.Del(&r))
 	serviceMust(t, c.config.Rationals.Del(&want))
 }
-func TestAlgebraicPartialCopySourceDelGuard(t *testing.T) {
-	found := false
-	for fault := int64(0); fault < 16 && !found; fault++ {
+func TestAlgebraicNativeCoefficientCopyPublication(t *testing.T) {
+	completed, failures := false, 0
+	for fault := int64(0); fault < 16 && !completed; fault++ {
 		t.Run(big.NewInt(fault).String(), func(t *testing.T) {
 			c, p := algebraicCellSourceFixture(t)
 			poly, e := p.NewPolynomial()
@@ -100,41 +100,32 @@ func TestAlgebraicPartialCopySourceDelGuard(t *testing.T) {
 			budget := c.config.Rationals.Budget()
 			budget.FailAfter(fault)
 			e = c.Copy(&dst, &src)
-			if e != nil && !numericPhysicalReservationRefusal(e) {
-				t.Fatal(e)
-			}
-			if e != nil && dst.slot != 0 {
+			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, nil, nil, &src, &dst)
+			if e != nil {
+				if !numericPhysicalReservationRefusal(e) {
+					t.Fatal(e)
+				}
+				failures++
+			} else {
+				completed = true
 				l, e := c.location(&dst)
 				serviceMust(t, e)
 				r, e := c.load(l)
 				serviceMust(t, e)
-				if r.size > 0 && r.poly.slot != 0 {
-					pd, e := p.descriptor(r.poly)
-					serviceMust(t, e)
-					if pd.state.backing == 0 {
-						found = true
-						algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, nil, nil, &src, &dst)
-						before := budget.Used()
-						if e = c.Del(&dst); !errors.Is(e, arena.ErrBounds) {
-							t.Fatal("source null coefficient-array read must guard", e)
-						}
-						if budget.Used() != before {
-							t.Fatal("guard changed real roots")
-						}
-						algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, nil, nil, &src, &dst)
-					}
+				if l.coefficientInitialized != 3 || r.size != 3 || r.poly == poly {
+					t.Fatal("independent native coefficient ownership", l, r)
 				}
+				budget.FailAfter(-1)
+				upolyGCDExpect(t, p, r.poly, []int64{-2, 0, 1})
 			}
 			budget.FailAfter(-1)
-			if dst.slot != 0 {
-				serviceMust(t, c.CleanupValue(&dst))
-			}
+			serviceMust(t, c.CleanupValue(&dst))
 			serviceMust(t, c.Del(&src))
 			serviceMust(t, c.CleanupRetained())
 		})
 	}
-	if !found {
-		t.Fatal("did not reach actual published partial coefficient root")
+	if !completed || failures == 0 {
+		t.Fatal("actual cell refusal and completed native coefficient copy", failures, completed)
 	}
 }
 func TestAlgebraicSourceUnsignedMagnitude(t *testing.T) {

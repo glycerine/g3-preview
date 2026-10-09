@@ -38,7 +38,7 @@ func TestUPolynomialHenselPairEveryReachedReservationAndOwnChild(t *testing.T) {
 		for _, v := range []*upolyVectorState{&inputs[0], &inputs[1], &inputs[2], &inputs[3], &inputs[4], &outputs[0], &outputs[1]} {
 			if v.backing != 0 {
 				a := m.values(v)
-				for i := uint32(0); i < v.initialized; i++ {
+				for i := uint32(0); uint64(i) < uint64(len(a)); i++ {
 					roots = append(roots, &a[i])
 				}
 			}

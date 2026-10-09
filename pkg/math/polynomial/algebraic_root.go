@@ -427,7 +427,7 @@ func (m *AlgebraicRootCore) destroyPolynomial(l *algebraicLocation, r *algebraic
 		}
 		if owning {
 			values := p.values(&d.state)
-			for i := l.coefficientCursor; i < d.state.initialized; i++ {
+			for i := l.coefficientCursor; uint64(i) < uint64(len(values)); i++ {
 				if e = p.config.Integer.Del(&values[i]); e != nil {
 					return e
 				}

@@ -34769,7 +34769,7 @@
         "TestAlgebraicCellSourceLeadingPositiveAndCopyFlags",
         "TestAlgebraicCellSourceAllPublicationFailurePrefixes",
         "TestAlgebraicIndependentRefinementAndRationalConversion",
-        "TestAlgebraicPartialCopySourceDelGuard",
+        "TestAlgebraicNativeCoefficientCopyPublication",
         "TestAlgebraicSourceUnsignedMagnitude",
         "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
         "TestAlgebraicCompareSturmTarskiIndependentOrder",
@@ -35200,7 +35200,7 @@
             "TestAlgebraicCellSourceConstInputPreserved",
             "TestAlgebraicCellSourceLeadingPositiveAndCopyFlags",
             "TestAlgebraicCellSourceAllPublicationFailurePrefixes",
-            "TestAlgebraicPartialCopySourceDelGuard"
+            "TestAlgebraicNativeCoefficientCopyPublication"
           ]
         },
         {
@@ -35307,7 +35307,7 @@
         "TestAlgebraicCellSourceLeadingPositiveAndCopyFlags",
         "TestAlgebraicCellSourceAllPublicationFailurePrefixes",
         "TestAlgebraicIndependentRefinementAndRationalConversion",
-        "TestAlgebraicPartialCopySourceDelGuard",
+        "TestAlgebraicNativeCoefficientCopyPublication",
         "TestAlgebraicSourceUnsignedMagnitude",
         "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
         "TestAlgebraicCompareSturmTarskiIndependentOrder",
@@ -35358,7 +35358,7 @@
             "TestAlgebraicCellSourceConstInputPreserved",
             "TestAlgebraicCellSourceLeadingPositiveAndCopyFlags",
             "TestAlgebraicCellSourceAllPublicationFailurePrefixes",
-            "TestAlgebraicPartialCopySourceDelGuard"
+            "TestAlgebraicNativeCoefficientCopyPublication"
           ]
         },
         {
@@ -44181,11 +44181,12 @@
         "pkg/math/polynomial/upolynomial_remove_one_half_own_stop_source_test.go",
         "pkg/math/polynomial/upolynomial_remove_one_half_prefix_source_test.go",
         "pkg/math/polynomial/upolynomial_remove_one_half_source_test.go",
-        "pkg/math/polynomial/upolynomial_native_directories_test.go"
+        "pkg/math/polynomial/upolynomial_native_directories_test.go",
+        "pkg/math/polynomial/upolynomial_native_coefficients_test.go"
       ],
       "tests": [
-        "TestUPolynomialScalarExtentAndLayout",
-        "TestUPolynomialSourceUnsignedExtent",
+        "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
+        "TestUPolynomialNativeCoefficientGrowthMovesActualBIGAndView",
         "TestUPolynomialSourceNinePretranslationENSURE",
         "TestUPolynomialSourceBasicCoefficientRoutes",
         "TestUPolynomialStorageOwnershipAndPhysicalViews",
@@ -44256,7 +44257,7 @@
         "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
         "TestUPolynomialIsolationDefinedOutputAliases",
         "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
-        "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal",
+        "TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication",
         "TestUPolynomialIsolationPackedFrameAndScalarExtents",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
@@ -44277,7 +44278,6 @@
         "TestUPolynomialSourceFinalizeDerivedBackingBeforeCoreBody",
         "TestUPolynomialSourceFinalizeOwnerGuards",
         "TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry",
-        "TestUPolynomialSourceFinalizeUnconstructedTailPrefix",
         "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
         "TestUPolynomialSourceFinalizeFreshNullMember",
         "TestUPolynomialHenselActualExtendedGCDCallerIndependentIdentity",
@@ -44975,8 +44975,8 @@
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial.go",
           "tests": [
-            "TestUPolynomialScalarExtentAndLayout",
-            "TestUPolynomialSourceUnsignedExtent",
+            "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
+            "TestUPolynomialNativeCoefficientGrowthMovesActualBIGAndView",
             "TestUPolynomialNativeDescriptorAndBackingDirectories",
             "TestUPolynomialNativeBorrowedStoreDirectory"
           ]
@@ -45290,7 +45290,7 @@
             "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
             "TestUPolynomialIsolationDefinedOutputAliases",
             "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
-            "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal"
+            "TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication"
           ]
         },
         {
@@ -45346,7 +45346,6 @@
             "TestUPolynomialSourceFinalizeDerivedBackingBeforeCoreBody",
             "TestUPolynomialSourceFinalizeOwnerGuards",
             "TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry",
-            "TestUPolynomialSourceFinalizeUnconstructedTailPrefix",
             "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
             "TestUPolynomialSourceFinalizeFreshNullMember"
           ]
@@ -45594,7 +45593,8 @@
         "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup.",
         "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
         "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
-        "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added."
+        "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added.",
+        "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked."
       ]
     },
     {
@@ -45655,11 +45655,12 @@
         "pkg/math/polynomial/polynomial_to_numeral_variable.go",
         "pkg/math/polynomial/polynomial_to_numeral_variable_source_test.go",
         "pkg/math/polynomial/polynomial_numeral_slice_test.go",
-        "pkg/math/polynomial/upolynomial_native_directories_test.go"
+        "pkg/math/polynomial/upolynomial_native_directories_test.go",
+        "pkg/math/polynomial/upolynomial_native_coefficients_test.go"
       ],
       "tests": [
-        "TestUPolynomialScalarExtentAndLayout",
-        "TestUPolynomialSourceUnsignedExtent",
+        "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
+        "TestUPolynomialNativeCoefficientGrowthMovesActualBIGAndView",
         "TestUPolynomialSourceNinePretranslationENSURE",
         "TestUPolynomialSourceBasicCoefficientRoutes",
         "TestUPolynomialStorageOwnershipAndPhysicalViews",
@@ -45730,7 +45731,7 @@
         "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
         "TestUPolynomialIsolationDefinedOutputAliases",
         "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
-        "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal",
+        "TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication",
         "TestUPolynomialIsolationPackedFrameAndScalarExtents",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
@@ -45751,7 +45752,6 @@
         "TestUPolynomialSourceFinalizeDerivedBackingBeforeCoreBody",
         "TestUPolynomialSourceFinalizeOwnerGuards",
         "TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry",
-        "TestUPolynomialSourceFinalizeUnconstructedTailPrefix",
         "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
         "TestUPolynomialSourceFinalizeFreshNullMember",
         "TestUPolynomialRecombinationTrialRelatedOwnerTransport",
@@ -45801,8 +45801,8 @@
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial.go",
           "tests": [
-            "TestUPolynomialScalarExtentAndLayout",
-            "TestUPolynomialSourceUnsignedExtent",
+            "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
+            "TestUPolynomialNativeCoefficientGrowthMovesActualBIGAndView",
             "TestUPolynomialNativeDescriptorAndBackingDirectories",
             "TestUPolynomialNativeBorrowedStoreDirectory"
           ]
@@ -46116,7 +46116,7 @@
             "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
             "TestUPolynomialIsolationDefinedOutputAliases",
             "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
-            "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal"
+            "TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication"
           ]
         },
         {
@@ -46172,7 +46172,6 @@
             "TestUPolynomialSourceFinalizeDerivedBackingBeforeCoreBody",
             "TestUPolynomialSourceFinalizeOwnerGuards",
             "TestUPolynomialSourceFinalizeDoesNotOwnReleasedLeafRetry",
-            "TestUPolynomialSourceFinalizeUnconstructedTailPrefix",
             "TestUPolynomialSourceFinalizeFirstEntryConsumedLeafGuard",
             "TestUPolynomialSourceFinalizeFreshNullMember"
           ]
@@ -46234,7 +46233,8 @@
         "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added.",
         "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added.",
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
-        "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added."
+        "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added.",
+        "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked."
       ]
     },
     {
@@ -46347,7 +46347,8 @@
         "pkg/math/polynomial/upolynomial_factor_squarefree_invocation.go",
         "pkg/math/polynomial/upolynomial_factor_squarefree_invocation_source_test.go",
         "pkg/math/polynomial/upolynomial_factor_squarefree_splice_source_test.go",
-        "pkg/math/polynomial/upolynomial_native_directories_test.go"
+        "pkg/math/polynomial/upolynomial_native_directories_test.go",
+        "pkg/math/polynomial/upolynomial_native_coefficients_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -46366,7 +46367,7 @@
         "TestUPolynomialPrimeTrialCurrentDestructorStopsOlderVector",
         "TestUPolynomialPrimeTrialEveryActualReservation",
         "TestUPolynomialPrimeTrialCapturedContextRejectsReuseCopiesAndForeign",
-        "TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure",
+        "TestUPolynomialPrimeToZPNativePushAndPublishedRaw",
         "TestUPolynomialPrimeTrialEnclosingOwnContinuationEveryHelperPrefix",
         "TestUPolynomialHenselQuadraticTransportCannotRetireRelatedCaller",
         "TestUPolynomialHenselActualCallerChildStopProtectsOlderFields",
@@ -46598,7 +46599,7 @@
             "TestUPolynomialPrimeTrialCurrentDestructorStopsOlderVector",
             "TestUPolynomialPrimeTrialEveryActualReservation",
             "TestUPolynomialPrimeTrialCapturedContextRejectsReuseCopiesAndForeign",
-            "TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure",
+            "TestUPolynomialPrimeToZPNativePushAndPublishedRaw",
             "TestUPolynomialPrimeTrialEnclosingOwnContinuationEveryHelperPrefix"
           ]
         },
@@ -46877,7 +46878,7 @@
       ],
       "tests": [
         "TestUPolynomialPrimeTrialToZPRawEveryPrefix",
-        "TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure",
+        "TestUPolynomialPrimeToZPNativePushAndPublishedRaw",
         "TestUPolynomialRecombinationTrialEveryActualBranchPrefix",
         "TestUPolynomialRecombinationTrialFiniteBIGEveryActualPrefix"
       ],
@@ -46942,7 +46943,7 @@
           "go_target": "pkg/math/polynomial/upolynomial_factor_hensel.go",
           "tests": [
             "TestUPolynomialPrimeTrialToZPRawEveryPrefix",
-            "TestUPolynomialPrimeToZPCompletedPrefixAndPublishedRawPushFailure"
+            "TestUPolynomialPrimeToZPNativePushAndPublishedRaw"
           ]
         },
         {
@@ -109767,11 +109768,12 @@
         "pkg/math/polynomial/upolynomial_coefficient_store_lifetime_test.go",
         "pkg/math/polynomial/upolynomial_store_adoption.go",
         "pkg/math/polynomial/upolynomial_coefficient_store_adoption_test.go",
-        "pkg/math/polynomial/upolynomial_native_directories_test.go"
+        "pkg/math/polynomial/upolynomial_native_directories_test.go",
+        "pkg/math/polynomial/upolynomial_native_coefficients_test.go"
       ],
       "tests": [
-        "TestUPolynomialScalarExtentAndLayout",
-        "TestUPolynomialSourceUnsignedExtent",
+        "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
+        "TestUPolynomialNativeCoefficientGrowthMovesActualBIGAndView",
         "TestUPolynomialSourceNinePretranslationENSURE",
         "TestUPolynomialSourceBasicCoefficientRoutes",
         "TestUPolynomialStorageOwnershipAndPhysicalViews",
@@ -109842,7 +109844,7 @@
         "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
         "TestUPolynomialIsolationDefinedOutputAliases",
         "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
-        "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal",
+        "TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication",
         "TestUPolynomialIsolationPackedFrameAndScalarExtents",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
@@ -110183,7 +110185,7 @@
             "TestUPolynomialIsolationRemoveZeroExistingPublicRegression",
             "TestUPolynomialIsolationDefinedOutputAliases",
             "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph",
-            "TestUPolynomialIsolationZeroResetPublicationBeforeRefusal"
+            "TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication"
           ]
         },
         {
@@ -143888,8 +143890,8 @@
         "TestFastFloatSourceDecimal",
         "TestFastFloatOwnerProvenance",
         "TestFastFloatNeighborAndThinRoutes",
-        "TestUPolynomialScalarExtentAndLayout",
-        "TestUPolynomialSourceUnsignedExtent",
+        "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
+        "TestUPolynomialNativeCoefficientGrowthMovesActualBIGAndView",
         "TestUPolynomialSourceNinePretranslationENSURE",
         "TestUPolynomialSourceBasicCoefficientRoutes",
         "TestUPolynomialStorageOwnershipAndPhysicalViews",
@@ -144007,8 +144009,8 @@
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_vector.go",
           "tests": [
-            "TestUPolynomialScalarExtentAndLayout",
-            "TestUPolynomialSourceUnsignedExtent",
+            "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
+            "TestUPolynomialNativeCoefficientGrowthMovesActualBIGAndView",
             "TestUPolynomialNativeDescriptorAndBackingDirectories",
             "TestUPolynomialNativeBorrowedStoreDirectory"
           ]

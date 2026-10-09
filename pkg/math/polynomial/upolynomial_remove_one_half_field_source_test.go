@@ -38,7 +38,7 @@ func TestUPolynomialRemoveOneHalfRootFieldEveryActualPrefix(t *testing.T) {
 			serviceMust(t, z.Del(&neg))
 			v, e := p.wholeView(input)
 			serviceMust(t, e)
-			base := z.Budget().Used() - integerActualOwnedBytes(z) - p.oneHalfRootHistoryBytes - p.removeOneHalfRootHistoryBytes - removeHalfVectorCold(p)
+			base := z.Budget().Used() - integerActualOwnedBytes(z) - p.oneHalfRootHistoryBytes - p.removeOneHalfRootHistoryBytes
 			z.Budget().FailAfter(prefix)
 			body := p.RemoveOneHalfRoot(v, out)
 			q := &p.removeOneHalfRoot
@@ -58,7 +58,7 @@ func TestUPolynomialRemoveOneHalfRootFieldEveryActualPrefix(t *testing.T) {
 				}
 			}
 			algebraicCellSourcePhysical(t, c, []UPolynomial{input, out}, extra, nil)
-			if got, want := z.Budget().Used(), base+integerActualOwnedBytes(z)+p.oneHalfRootHistoryBytes+p.removeOneHalfRootHistoryBytes+removeHalfVectorCold(p); got != want {
+			if got, want := z.Budget().Used(), base+integerActualOwnedBytes(z)+p.oneHalfRootHistoryBytes+p.removeOneHalfRootHistoryBytes; got != want {
 				t.Fatal("field before-lift cold graph", got, want)
 			}
 			if q.normalize.Invocation != 0 || q.extendedRaw.Invocation != 0 || q.divisionRaw.Invocation != 0 {

@@ -168,7 +168,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 			t.Fatal("named coefficient owner stale")
 		}
 		backings[s.backing] = true
-		for i := uint32(0); i < s.initialized; i++ {
+		for i := uint32(0); uint64(i) < uint64(len(b.values)); i++ {
 			addRef((b.values[i]).Cell)
 		}
 	}
@@ -777,9 +777,8 @@ func TestAlgebraicCellSourceAllPublicationFailurePrefixes(t *testing.T) {
 			if failures == 0 || success != 1 {
 				t.Fatal("sweep did not reach refusal and actual success", failures, success)
 			}
-			if route == 1 && unpublished == 0 {
-				t.Fatal("newroot sweep did not cross owned unpublished cell prefix")
-			}
+			// Scalar root construction has no coefficient-container reservation.
+			// BIG Copy routes below still exercise actual partial numeric copies.
 			if route >= 2 && published == 0 {
 				t.Fatal("Copy sweep did not cross caller publication before coefficient copy")
 			}
