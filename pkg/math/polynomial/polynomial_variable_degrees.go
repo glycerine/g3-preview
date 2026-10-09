@@ -66,17 +66,10 @@ func (d *PolynomialVariableDegrees) resize(n uint32) error {
 	if uint64(n) > uint64(^uint(0)>>1) {
 		return arena.ErrBounds
 	}
-	old := len(d.values)
-	next := int(n)
-	if next > cap(d.values) {
-		values := make([]uint32, next)
-		copy(values, d.values)
-		d.values = values
-		return nil
-	}
-	d.values = d.values[:next]
-	for i := old; i < next; i++ {
-		d.values[i] = 0
+	if int(n) <= len(d.values) {
+		d.values = d.values[:n]
+	} else {
+		d.values = append(d.values, make([]uint32, int(n)-len(d.values))...)
 	}
 	return nil
 }

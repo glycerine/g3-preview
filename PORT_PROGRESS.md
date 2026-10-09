@@ -32203,3 +32203,45 @@ and position collections, evaluation-frame directories and retained history/orph
 collections. Review those actual consumers next, followed by remaining AST/SAT
 collections and text streams. Internal util numeric/text/parameter cycles also
 remain before the root util subpackage split.
+
+## Native algebraic locators and owning vectors
+
+Algebraic locator directories now grow through native append. Removed their
+geometric growth helper, allocation overlap charges and final capacity refund.
+Stable scalar slot/generation validation, reuse retirement, actual cell allocation
+and pending construction ownership remain. Algebraic owning vectors likewise use
+native append, native length, reslicing on reset and nil on close. Relocation
+transfers the owning scalar snapshots and clears old records once. Removed vector
+capacity arithmetic and buffer reservations/refunds. Root isolation's sorting,
+selection, physical census and owning-core close use actual vector lengths. Real
+cold vector/core owners, numerical copies, algebraic cells and stopped cleanup
+continuations remain explicit.
+
+Variable-degree and monomial-position arrays were already native uncharged Go
+storage. Their remaining explicit make/copy capacity branches are simplified to
+append, preserving zero/default-sentinel extension and retained logical prefixes.
+Existing sparse-default, self/move/copy, ID-only, bounds and disabled-reservation
+checks cover those changes.
+
+New native storage coverage constructs 4097 actual algebraic cells, including a
+BIG rational, and preserves every cell/slot across locator growth. Taking all
+cells into a cold growing vector succeeds under disabled reservations without
+changing numeral storage or Runtime accounting. Every rational is checked against
+independent numerator/denominator values, the BIG owning token stays identical,
+reset ends actual cell/numeral ownership, and recycled generations reject the
+stale scalar handle. Existing source publication, copy/cleanup refusal and stopped
+owning-selection tests remain.
+
+Validation: focused native algebraic tests passed (0.572s); full native polynomial
+passed (32.290s); native storage/variable-degree/position checks passed (0.056s);
+focused g3debug algebraic/variable-degree/position checks passed (0.879s).
+Module-wide compilation, polynomial vet, portcheck, gofmt and diff checks passed.
+Manifest counts/statuses remain unchanged. The 22:43–22:45 UTC full native module
+checkpoint remains current; no additional full-module run was needed.
+
+The util knot/split goal remains open. Remaining polynomial collections include
+monomial/polynomial locator directories, evaluation-frame directories, retained
+history/orphan collections and sexpr argument storage. Continue auditing/removing
+those container mechanics, then retained AST/SAT collections and text consumers.
+Internal util numeric/text/parameter cycles still need resolution before splitting
+root util files into actual subpackages.

@@ -197,7 +197,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 	cellHandles := map[Algebraic]bool{}
 	values = append(append([]*Algebraic(nil), values...), &c.pending)
 	if c.rootSelection != nil {
-		for i := uint32(0); i < c.rootSelection.size; i++ {
+		for i := uint32(0); i < uint32(len(c.rootSelection.values)); i++ {
 			values = append(values, &c.rootSelection.values[i])
 		}
 	}

@@ -170,26 +170,6 @@ func (m *AlgebraicRootCore) locationCleanup(a *Algebraic) (*algebraicLocation, e
 	}
 	return l, nil
 }
-func (m *AlgebraicRootCore) grow() error {
-	old := cap(m.locations)
-	n := 2
-	if old != 0 {
-		n = (3*old + 1) / 2
-	}
-	stride := uint64(reflect.TypeOf(algebraicLocation{}).Size())
-	if n <= old || uint64(n) > uint64(int(^uint(0)>>1))/stride || uint64(n) > math.MaxUint32 {
-		return arena.ErrBounds
-	}
-	b := m.config.Rationals.Budget()
-	if e := b.Reserve(uint64(n) * stride); e != nil {
-		return e
-	}
-	next := make([]algebraicLocation, len(m.locations), n)
-	copy(next, m.locations)
-	b.Release(uint64(old) * stride)
-	m.locations = next
-	return nil
-}
 func (m *AlgebraicRootCore) allocate(kind uint8) (Algebraic, error) {
 	if e := m.check(); e != nil {
 		return Algebraic{}, e
@@ -202,10 +182,8 @@ func (m *AlgebraicRootCore) allocate(kind uint8) (Algebraic, error) {
 		}
 	}
 	if i == len(m.locations) {
-		if len(m.locations) == cap(m.locations) {
-			if e := m.grow(); e != nil {
-				return Algebraic{}, e
-			}
+		if uint64(len(m.locations)) >= math.MaxUint32 || len(m.locations) == int(^uint(0)>>1) {
+			return Algebraic{}, arena.ErrSlotLimit
 		}
 		m.locations = append(m.locations, algebraicLocation{})
 	}
@@ -873,7 +851,7 @@ func (m *AlgebraicRootCore) Close() error {
 	var privateCallers, privateVectors uint32
 	if m.rootSelection != nil {
 		privateVectors = 1
-		for i := uint32(0); i < m.rootSelection.size; i++ {
+		for i := uint32(0); i < uint32(len(m.rootSelection.values)); i++ {
 			if m.rootSelection.values[i].slot != 0 {
 				privateCallers++
 			}
@@ -925,7 +903,6 @@ func (m *AlgebraicRootCore) Close() error {
 		return e
 	}
 	b := m.config.Rationals.Budget()
-	b.Release(uint64(cap(m.locations)) * uint64(reflect.TypeOf(algebraicLocation{}).Size()))
 	b.Release(uint64(cap(m.negationHistory)) * uint64(reflect.TypeOf(algebraicNegHistory{}).Size()))
 	m.negationHistory = nil
 	b.Release(m.header)

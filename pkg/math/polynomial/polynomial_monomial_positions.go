@@ -73,13 +73,7 @@ func (p *MonomialPositions) reserve(n uint32) error {
 	if next <= old {
 		return nil
 	}
-	if next > cap(p.values) {
-		values := make([]uint32, next)
-		copy(values, p.values)
-		p.values = values
-	} else {
-		p.values = p.values[:next]
-	}
+	p.values = append(p.values, make([]uint32, next-old)...)
 	for i := old; i < next; i++ {
 		p.values[i] = ^uint32(0)
 	}

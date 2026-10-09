@@ -165,8 +165,8 @@ func TestAlgebraicIsolationFailurePrefixes(t *testing.T) {
 			if c.config.Factors.scope != nil {
 				t.Fatal("factor lexical root needs explicit nested census")
 			}
-			values := make([]*Algebraic, 0, roots.size)
-			for i := uint32(0); i < roots.size; i++ {
+			values := make([]*Algebraic, 0, uint32(len(roots.values)))
+			for i := uint32(0); i < uint32(len(roots.values)); i++ {
 				values = append(values, &roots.values[i])
 			}
 			algebraicCellSourcePhysical(t, c, []UPolynomial{poly}, nil, nil, values...)
@@ -219,7 +219,7 @@ func TestAlgebraicSavedIntervalAndSquareFreePolicy(t *testing.T) {
 	if roots.Len() != 2 {
 		t.Fatal(roots.Len())
 	}
-	for i := uint32(0); i < roots.size; i++ {
+	for i := uint32(0); i < uint32(len(roots.values)); i++ {
 		l, e := c.location(&roots.values[i])
 		serviceMust(t, e)
 		r, e := c.load(l)

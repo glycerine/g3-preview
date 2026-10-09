@@ -230,12 +230,12 @@ func (m *AlgebraicRootCore) IsolateRoots(v UPolynomialView, out *AlgebraicVector
 	}
 	// Concrete heap sort is the documented external std::sort backend adapter;
 	// it sorts the entire append-only output without extra heap scratch.
-	for start := int(out.size)/2 - 1; start >= 0; start-- {
-		if err = m.rootSift(out, uint32(start), out.size); err != nil {
+	for start := len(out.values)/2 - 1; start >= 0; start-- {
+		if err = m.rootSift(out, uint32(start), uint32(len(out.values))); err != nil {
 			return err
 		}
 	}
-	for end := out.size; end > 1; end-- {
+	for end := uint32(len(out.values)); end > 1; end-- {
 		out.values[0], out.values[end-1] = out.values[end-1], out.values[0]
 		if err = m.rootSift(out, 0, end-1); err != nil {
 			return err
@@ -296,7 +296,7 @@ func (m *AlgebraicRootCore) MkRoot(v UPolynomialView, index uint32, out *Algebra
 	if err = m.IsolateRoots(v, r); err != nil {
 		return err
 	}
-	if index > r.size {
+	if uint64(index) > uint64(len(r.values)) {
 		return errors.New("invalid root object, polynomial does have sufficient roots")
 	}
 	return m.Copy(out, &r.values[index-1])

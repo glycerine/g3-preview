@@ -7,13 +7,12 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// Owning scoped svector<anum>. Get returns a borrowed scalar snapshot; it must
+// Native owning algebraic slice. Get returns a borrowed scalar snapshot; it must
 // never be deleted or retained beyond its owning element's lifetime.
 type AlgebraicVector struct {
 	self            *AlgebraicVector
 	core            *AlgebraicRootCore
 	values          []Algebraic
-	size            uint32
 	header          uint64
 	closed, closing bool
 }
@@ -47,13 +46,13 @@ func (v *AlgebraicVector) Len() uint32 {
 	if v == nil || v.self != v || v.closed {
 		return 0
 	}
-	return v.size
+	return uint32(len(v.values))
 }
 func (v *AlgebraicVector) Get(i uint32) (Algebraic, error) {
 	if e := v.check(); e != nil {
 		return Algebraic{}, e
 	}
-	if i >= v.size {
+	if i >= uint32(len(v.values)) {
 		return Algebraic{}, arena.ErrBounds
 	}
 	a := v.values[i]
@@ -64,30 +63,14 @@ func (v *AlgebraicVector) pushTake(a *Algebraic) error {
 	if e := v.check(); e != nil {
 		return e
 	}
-	if v.size == math.MaxUint32 {
+	if uint64(len(v.values)) >= math.MaxUint32 || len(v.values) == int(^uint(0)>>1) {
 		return arena.ErrBounds
 	}
-	if v.size == uint32(cap(v.values)) {
-		old := uint32(cap(v.values))
-		n := uint32(2)
-		if old != 0 {
-			n = (3*old + 1) >> 1
-		}
-		stride := uint64(reflect.TypeOf(Algebraic{}).Size())
-		if n <= old || uint64(n) > uint64(int(^uint(0)>>1))/stride {
-			return arena.ErrBounds
-		}
-		b := v.core.config.Rationals.Budget()
-		if e := b.Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		next := make([]Algebraic, n)
-		copy(next, v.values)
-		b.Release(uint64(old) * stride)
-		v.values = next
+	old := v.values
+	v.values = append(v.values, *a)
+	if len(old) != 0 && &old[0] != &v.values[0] {
+		clear(old)
 	}
-	v.values[v.size] = *a
-	v.size++
 	*a = Algebraic{}
 	return nil
 }
@@ -121,12 +104,12 @@ func (v *AlgebraicVector) Reset() error {
 	if e := v.check(); e != nil {
 		return e
 	}
-	for i := uint32(0); i < v.size; i++ {
+	for i := uint32(0); i < uint32(len(v.values)); i++ {
 		if e := v.core.Del(&v.values[i]); e != nil {
 			return e
 		}
 	}
-	v.size = 0
+	v.values = v.values[:0]
 	return nil
 }
 func (v *AlgebraicVector) Close() error {
@@ -137,7 +120,7 @@ func (v *AlgebraicVector) Close() error {
 		return nil
 	}
 	v.closing = true
-	for i := uint32(0); i < v.size; i++ {
+	for i := uint32(0); i < uint32(len(v.values)); i++ {
 		var e error
 		if v.core.closing {
 			e = v.core.delClosing(&v.values[i])
@@ -149,11 +132,9 @@ func (v *AlgebraicVector) Close() error {
 		}
 	}
 	b := v.core.config.Rationals.Budget()
-	b.Release(uint64(cap(v.values)) * uint64(reflect.TypeOf(Algebraic{}).Size()))
 	b.Release(v.header)
 	v.values = nil
 	v.header = 0
-	v.size = 0
 	v.core.vectors--
 	v.closed = true
 	return nil
@@ -165,7 +146,7 @@ func (v *AlgebraicVector) Compare(i, j uint32) (int, error) {
 	if e := v.check(); e != nil {
 		return 0, e
 	}
-	if i >= v.size || j >= v.size {
+	if i >= uint32(len(v.values)) || j >= uint32(len(v.values)) {
 		return 0, arena.ErrBounds
 	}
 	return v.core.Compare(&v.values[i], &v.values[j])
@@ -174,7 +155,7 @@ func (v *AlgebraicVector) IsInt(i uint32) (bool, error) {
 	if e := v.check(); e != nil {
 		return false, e
 	}
-	if i >= v.size {
+	if i >= uint32(len(v.values)) {
 		return false, arena.ErrBounds
 	}
 	return v.core.IsInt(&v.values[i])
@@ -183,7 +164,7 @@ func (v *AlgebraicVector) IsRational(i uint32) (bool, error) {
 	if e := v.check(); e != nil {
 		return false, e
 	}
-	if i >= v.size {
+	if i >= uint32(len(v.values)) {
 		return false, arena.ErrBounds
 	}
 	return v.core.IsRational(&v.values[i])
