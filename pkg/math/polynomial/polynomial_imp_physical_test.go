@@ -29,8 +29,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	refvectors := []*PolynomialRefVector{}
 	lazy := []*PolynomialNewtonVector{&full.newton}
 	handlers := []*PolynomialDeletionHandler{}
-	external := []util.Block{m.substitution.found.raw, m.substitution.found.pending}
-	external = append(external, extraRaw...)
+	external := append([]util.Block(nil), extraRaw...)
 	adapterBytes := uint64(cap(m.variableNumeralHistory))*uint64(reflect.TypeOf(polynomialVariableNumeralHistory{}).Size()) + uint64(cap(m.quasiHistory))*uint64(reflect.TypeOf(polynomialQuasiResultantHistory{}).Size()) + full.header
 	public := []*util.Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
 	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {

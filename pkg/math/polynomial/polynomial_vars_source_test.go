@@ -3,12 +3,11 @@
 package polynomial
 
 import (
-	"fmt"
+	"errors"
 	"sort"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialVarsOriginalDormantAssertions(t *testing.T) {
@@ -65,65 +64,24 @@ func polynomialVarsVariable(t *testing.T, c *MultivariatePolynomialCore, x uint3
 	return v
 }
 
-func TestPolynomialVarsEveryActualReservationAndNamedGraph(t *testing.T) {
-	success := false
-	for ordinal := int64(0); ordinal < 32; ordinal++ {
-		stop := false
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m, p, _ := polynomialLexFixture(t)
-			c := m.core
-			xs, e := NewPolynomialVariableDegrees(c.memory)
-			serviceMust(t, e)
-			c.integer.Budget().FailAfter(ordinal)
-			returned := m.Vars(p, xs)
-			polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, nil, xs.header, nil)
-			n, e := xs.size()
-			serviceMust(t, e)
-			for i := uint32(0); i < n; i++ {
-				x, e := variableAt(xs, i)
-				serviceMust(t, e)
-				seen, e := c.substitution.found.at(x)
-				serviceMust(t, e)
-				if seen != (returned != nil) {
-					t.Fatal("literal final reset prefix", returned, x, seen)
-				}
-			}
-			c.integer.Budget().FailAfter(-1)
-			if returned == nil {
-				if n != 2 {
-					t.Fatal(n)
-				}
-				stop = true
-				success = true
-			} else if !numericPhysicalReservationRefusal(returned) {
-				t.Fatal(returned)
-			}
-			serviceMust(t, xs.CloseChecked())
-		})
-		if stop {
-			break
-		}
-	}
-	if !success {
-		t.Fatal("no first-success horizon")
-	}
-}
-
-func TestPolynomialVarsNativePushAndNormalReset(t *testing.T) {
+func TestPolynomialVarsNativeColdPushAndNormalReset(t *testing.T) {
 	m, p, _ := polynomialLexFixture(t)
 	c := m.core
 	xs, e := NewPolynomialVariableDegrees(c.memory)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, xs.CloseChecked()) })
-	serviceMust(t, c.substitution.found.reserve(2))
 	first, e := c.monomialCore(p, 0)
 	serviceMust(t, e)
 	x, e := c.monomials.varCore(first, 0)
 	serviceMust(t, e)
+	before, used := c.memory.Stats(), c.integer.Budget().Used()
 	c.integer.Budget().FailAfter(0)
 	returned := m.Vars(p, xs)
 	c.integer.Budget().FailAfter(-1)
 	serviceMust(t, returned)
+	if c.memory.Stats() != before || c.integer.Budget().Used() != used {
+		t.Fatal("cold native variable storage changed Runtime accounting")
+	}
 	n, e := xs.size()
 	serviceMust(t, e)
 	seen, e := c.substitution.found.at(x)
@@ -151,86 +109,6 @@ func TestPolynomialVarsNativePushAndNormalReset(t *testing.T) {
 	serviceMust(t, e)
 	if seen {
 		t.Fatal("normal suffix did not reset collected variable")
-	}
-}
-
-// Returning ErrorTransport is a supported Go callback domain, distinct from
-// the C++ mathematical algorithm. Calls must refuse before owner mutation.
-func TestPolynomialVarsReturningTransportOwnerReentry(t *testing.T) {
-	for _, which := range []string{"full-source", "full-own", "core-source", "core-own", "output-source", "output-own", "same-call"} {
-		t.Run(which, func(t *testing.T) {
-			b := arena.NewBudget(1 << 28)
-			var m *MultivariatePolynomialManager
-			var xs *PolynomialVariableDegrees
-			var p Polynomial
-			armed, seen := false, false
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f util.Failure) error {
-				if armed {
-					armed = false
-					seen = true
-					state := m.core.memory.State()
-					used := b.Used()
-					source, closed := m.sourceStarted, m.closed
-					values := append([]uint32(nil), xs.values...)
-					var returned error
-					switch which {
-					case "full-source":
-						returned = m.SourceFinalize()
-					case "full-own":
-						returned = m.CloseChecked()
-					case "core-source":
-						returned = m.core.SourceFinalizePrefix()
-					case "core-own":
-						returned = m.core.CloseChecked()
-					case "output-source":
-						returned = xs.SourceFinalize()
-					case "output-own":
-						returned = xs.CloseChecked()
-					case "same-call":
-						returned = m.Vars(p, xs)
-					}
-					sameValues := len(values) == len(xs.values)
-					for i := range values {
-						sameValues = sameValues && values[i] == xs.values[i]
-					}
-					if returned != ErrPolynomialPending || state != m.core.memory.State() || used != b.Used() || source != m.sourceStarted || closed != m.closed || !sameValues {
-						t.Errorf("executing callback changed owner %v source=%v closed=%v", returned, m.sourceStarted, m.closed)
-					}
-				}
-				return f
-			}})
-			serviceMust(t, e)
-			cfg := serviceConfig(b).Integers
-			cfg.Memory = rt
-			q, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
-			serviceMust(t, e)
-			m, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
-			serviceMust(t, e)
-			x, e := m.core.monomials.MkVar()
-			serviceMust(t, e)
-			p = polynomialVarsVariable(t, m.core, x)
-			serviceMust(t, m.core.IncRef(p))
-			xs, e = NewPolynomialVariableDegrees(rt)
-			serviceMust(t, e)
-			b.FailAfter(0)
-			armed = true
-			returned := m.Vars(p, xs)
-			armed = false
-			if !seen || !numericPhysicalReservationRefusal(returned) {
-				t.Error("actual reserve callback absent", seen, returned)
-			}
-			b.FailAfter(-1)
-			serviceMust(t, xs.CloseChecked())
-			if !m.closed {
-				serviceMust(t, m.core.decRefCore(p))
-				serviceMust(t, m.CloseChecked())
-			}
-			serviceMust(t, q.CloseChecked())
-			serviceMust(t, rt.Close())
-			if b.Used() != 0 {
-				t.Error("named owner charge", b.Used())
-			}
-		})
 	}
 }
 
@@ -287,4 +165,43 @@ func TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards(t *testing.T) {
 		t.Fatal("older output reset prefix erased", n)
 	}
 	serviceMust(t, xs.CloseChecked())
+}
+
+func TestPolynomialVarsNativeFailureRetainsVisitedPrefix(t *testing.T) {
+	m, p, _ := polynomialLexFixture(t)
+	c := m.core
+	xs, e := NewPolynomialVariableDegrees(c.memory)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, xs.CloseChecked()) })
+	first, e := c.monomialCore(p, 0)
+	serviceMust(t, e)
+	visited, e := c.monomials.varCore(first, 0)
+	serviceMust(t, e)
+	second, e := c.monomialCore(p, 1)
+	serviceMust(t, e)
+	saved, e := c.monomials.varCore(second, 0)
+	serviceMust(t, e)
+	location, e := c.monomials.location(second)
+	serviceMust(t, e)
+	// The actual field is restored before ordinary destruction. This fixture
+	// exercises a reached bounds guard, not a completed source mathematical input.
+	serviceMust(t, c.monomials.allocator.WriteUint32(location.raw, 20, ^uint32(0)))
+	defer func() { serviceMust(t, c.monomials.allocator.WriteUint32(location.raw, 20, saved)) }()
+	e = m.Vars(p, xs)
+	wantError := error(arena.ErrBounds)
+	if polynomialSourceDebug {
+		wantError = ErrPolynomialAssertion
+	}
+	if !errors.Is(e, wantError) {
+		t.Fatal("reached native flag bounds", e)
+	}
+	if len(xs.values) != 1 || xs.values[0] != visited {
+		t.Fatal("published visited prefix", xs.values, visited)
+	}
+	for x, seen := range c.substitution.found.values {
+		if seen != (uint32(x) == visited) {
+			t.Fatal("source failure executed final reset", x, seen)
+		}
+	}
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, nil, xs.header, nil)
 }

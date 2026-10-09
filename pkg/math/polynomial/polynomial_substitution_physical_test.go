@@ -33,10 +33,6 @@ func polynomialSubstitutionPhysicalWithHandlers(t *testing.T, m *MultivariatePol
 	polynomialOperationMonomialAudit(t, m, polys, monos)
 }
 
-func polynomialSubstitutionNamedRaw(m *MultivariatePolynomialCore) []util.Block {
-	d := &m.substitution
-	return []util.Block{d.found.raw, d.found.pending}
-}
 func polynomialSubstitutionNamedPolynomials(m *MultivariatePolynomialCore) []Polynomial {
 	s := &m.substitution.scope
 	return []Polynomial{s.p1.value, s.p1.incoming, s.q1.value, s.q1.incoming, s.product.value, s.product.incoming, s.returned}

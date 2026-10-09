@@ -222,7 +222,6 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		}
 		raw[b] = true
 	}
-	external = append(external, polynomialSubstitutionNamedRaw(m)...)
 	for _, b := range external {
 		put(b)
 	}

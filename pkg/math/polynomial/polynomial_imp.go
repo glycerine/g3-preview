@@ -147,7 +147,6 @@ func NewMultivariatePolynomialManager(c MultivariatePolynomialManagerConfig) (*M
 	d.positions.runtime = m.core.memory
 	d.positions.constructed = true
 	variableEmbedded(&d.positions.positions, m.core.memory, true)
-	d.found.runtime = m.core.memory
 	m.constructed = 5
 	if m.core.monomials == nil {
 		m.core.monomials, e = NewMonomialManager(MonomialManagerConfig{Budget: c.Core.Integer.Budget(), Memory: c.Core.Integer.RuntimeOwner(), Allocator: c.Allocator})

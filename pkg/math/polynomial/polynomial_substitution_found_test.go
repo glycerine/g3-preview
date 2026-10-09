@@ -1,84 +1,69 @@
-// Source: src/math/polynomial/polynomial.cpp:3185,6253-6298; src/util/vector.h.
+// Source: src/math/polynomial/polynomial.cpp:3185,6253-6298.
 package polynomial
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestPolynomialFoundVariablesGrowthAndRetainedBits(t *testing.T) {
-	b := arena.NewBudget(1 << 20)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
-	serviceMust(t, e)
+func TestPolynomialFoundVariablesNativeGrowthRetainsBits(t *testing.T) {
+	m := polynomialCellFixture(t)
 	var v polynomialFoundVariables
-	v.runtime = r
-	serviceMust(t, v.reserve(3))
-	serviceMust(t, v.put(1, true))
-	serviceMust(t, v.reserve(9))
-	n, e := v.size()
-	serviceMust(t, e)
-	if n != 9 {
-		t.Fatal(n)
-	}
-	for i := uint32(0); i < 9; i++ {
-		a, e := v.at(i)
-		serviceMust(t, e)
-		if a != (i == 1) {
-			t.Fatal(i, a)
+	b := m.integer.Budget()
+	b.FailAfter(0)
+	t.Cleanup(func() { b.FailAfter(-1) })
+	before, used := m.memory.Stats(), b.Used()
+	old := uint32(0)
+	for _, n := range []uint32{1, 3, 9, 129, 4097} {
+		serviceMust(t, v.reserve(n))
+		for i := uint32(0); i < n; i++ {
+			got, e := v.at(i)
+			serviceMust(t, e)
+			if got != (i < old && i%7 == 0) {
+				t.Fatal("retained old / zero new flag", n, i, got)
+			}
+			serviceMust(t, v.put(i, i%7 == 0))
 		}
+		old = n
 	}
 	serviceMust(t, v.reserve(2))
-	n, e = v.size()
-	serviceMust(t, e)
-	if n != 9 {
-		t.Fatal("source reserve does not shrink", n)
+	n := uint32(len(v.values))
+	if n != 4097 {
+		t.Fatal("reserve shrank flags", n)
+	}
+	for i := uint32(0); i < n; i++ {
+		got, e := v.at(i)
+		serviceMust(t, e)
+		if got != (i%7 == 0) {
+			t.Fatal("independent flag", i, got)
+		}
+		serviceMust(t, v.put(i, false))
+	}
+	bounds := error(arena.ErrBounds)
+	if polynomialSourceDebug {
+		bounds = ErrPolynomialAssertion
+	}
+	if _, e := v.at(n); !errors.Is(e, bounds) {
+		t.Fatal("native read bounds", e)
+	}
+	if e := v.put(n, true); !errors.Is(e, bounds) {
+		t.Fatal("native write bounds", e)
 	}
 	serviceMust(t, v.sourceFinalize())
+	if v.values != nil || !v.closed {
+		t.Fatal("native scalar cleanup retained flags")
+	}
+	if e := v.reserve(3); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("closed growth", e)
+	}
+	if _, e := v.at(0); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("closed read", e)
+	}
 	serviceMust(t, v.close())
-	serviceMust(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
+	if m.memory.Stats() != before || b.Used() != used {
+		t.Fatal("native flags changed Runtime accounting")
 	}
-}
-func TestPolynomialFoundVariablesEveryGrowthOldSize(t *testing.T) {
-	success := false
-	for fault := int64(0); fault < 32 && !success; fault++ {
-		b := arena.NewBudget(1 << 20)
-		r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
-		serviceMust(t, e)
-		var v polynomialFoundVariables
-		v.runtime = r
-		b.FailAfter(fault)
-		e = v.reserve(19)
-		n, ne := v.size()
-		serviceMust(t, ne)
-		if e != nil {
-			if !numericPhysicalReservationRefusal(e) || n != 0 {
-				t.Fatal(fault, e, n)
-			}
-		} else {
-			if n != 19 {
-				t.Fatal(n)
-			}
-			success = true
-		}
-		st := r.Stats()
-		if st.TotalBytes != b.Used() {
-			t.Fatal("named sole raw/pending Runtime owner", st, b.Used())
-		}
-		if e != nil && v.raw == (util.Block{}) && v.pending == (util.Block{}) && st.LiveBlocks != 0 {
-			t.Fatal("unnamed actual root")
-		}
-		b.FailAfter(-1)
-		serviceMust(t, v.close())
-		serviceMust(t, r.Close())
-		if b.Used() != 0 {
-			t.Fatal(b.Used())
-		}
-	}
-	if !success {
-		t.Fatal("no complete mathematical success")
-	}
+	polynomialPhysicalAudit(t, m)
 }

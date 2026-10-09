@@ -31929,3 +31929,39 @@ passed (0.262s); final native scratch/table/power-sorting debug checks passed
 (0.104s). Module-wide compilation, polynomial vet, manifest/portcheck, gofmt and
 diff checks passed. Manifest statuses/counts are unchanged. Keep full native
 module runs sparse until the next hourly checkpoint or new evidence warrants one.
+
+## Native persistent substitution and Vars flags
+
+The shared persistent found-variable member now stores []bool. Removed its
+Runtime binding, cap/size byte codecs, manual 3/2 growth, pending/interrupted
+buffer state and container allocation/free failures. Both retained consumers,
+rational substitution and Vars, continue growing without shrinking or clearing
+existing flags. New flags start false. Their original reached reset loops remain;
+a source body failure still leaves its visited prefix set. Source/owning scalar
+cleanup releases the slice, and native bounds retain debug assertions plus typed
+release-mode bounds errors. Removed the now-empty raw-root census adapter and
+its callers from polynomial/Newton/imp physical audits.
+
+Native growth through 4097 flags verifies old bits, zero new bits, no shrink,
+checked bounds and scalar cleanup with Runtime reservations disabled and
+unchanged accounting. Cold Vars output publication and its normal reset now
+succeed without warming the bool member. A named actual monomial-field bounds
+fixture verifies the already published variable prefix and every retained flag;
+it restores that diagnostic field before normal object destruction. Existing
+first-encounter order, repeated/empty collection, borrow guards, rational/integer
+substitution identities and actual numeric/factory/lifetime tests remain.
+
+Three tests requiring removed bool-vector allocation failures or transport
+callbacks are retired; they no longer describe a reachable failure path. Native
+flag storage creates no numeric/ref ownership or synthetic callback opportunity.
+
+Validation: full native polynomial passed (37.232s), focused g3debug found/Vars,
+substitution and imp checks passed (0.064s), module-wide compilation, polynomial
+vet, portcheck, gofmt and diff checks passed. Final focused native checks also
+passed after removing the now-unused test-only size adapter. Manifest counts and
+statuses remain unchanged. The 22:43–22:45 UTC full native module checkpoint is
+still current; no new full-module run was needed for this scalar conversion.
+
+The complete util knot/split goal remains open. Continue with univariate
+coefficient storage and the retained AST/SAT containers and text consumers,
+then break internal util numeric/text/parameter cycles before the package split.

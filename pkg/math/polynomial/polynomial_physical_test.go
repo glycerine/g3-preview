@@ -131,24 +131,11 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 		_, e := z.SourceAllocator().ObjectExtent(z.PendingAllocationObject())
 		serviceMust(t, e)
 	}
-	raw := map[util.Block]bool{}
-	put := func(b util.Block) {
-		if b == (util.Block{}) {
-			return
-		}
-		if raw[b] {
-			t.Fatal("duplicate named physical root")
-		}
-		raw[b] = true
-	}
-	for _, b := range polynomialSubstitutionNamedRaw(m) {
-		put(b)
-	}
 	mm := m.monomials
 
 	za, ma := z.SourceAllocator().Stats(), mm.allocator.Stats()
-	if uint32(len(raw))+za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
-		t.Fatal("unnamed Runtime root", len(raw), za, ma, m.memory.Stats())
+	if za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
+		t.Fatal("unnamed Runtime root", za, ma, m.memory.Stats())
 	}
 	bytes := uint64(cap(m.substitution.orphans))*16 + uint64(m.ids.FreeCapacity()+mm.ids.FreeCapacity())*4 + integerActualOwnedBytes(z) + m.header + mm.header + uint64(cap(mm.locations))*uint64(reflect.TypeOf(monomialLocation{}).Size()) + ma.TotalBytes + uint64(cap(m.locations))*uint64(reflect.TypeOf(polynomialLocation{}).Size())
 	if !m.modular.Closed() {

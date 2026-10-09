@@ -36,7 +36,6 @@ func (m *MultivariatePolynomialCore) initSubstitutionMembers() {
 	d.positions.self = &d.positions
 	d.positions.constructed = true
 	variableEmbedded(&d.positions.positions, m.memory, true)
-	d.found.runtime = m.memory
 	d.array.positions = &d.positions
 }
 func (m *MultivariatePolynomialCore) beginSubstitution(kind uint8) error {

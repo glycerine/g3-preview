@@ -72,7 +72,7 @@ func TestPolynomialSubstitutionAbsentAndReachedRawFields(t *testing.T) {
 	oldAS, oldMS := append([]util.Int(nil), m.som.as.values...), append([]Monomial(nil), m.som.ms...)
 	a, e := m.SubstituteRationalMap(p, &control)
 	serviceMust(t, e)
-	if a != p || control.containsCalls != 2 || control.valueCalls != 0 || !polynomialEqualNumerals(m.som.as.values, oldAS) || !polynomialEqualMonomials(m.som.ms, oldMS) || m.substitution.found.raw != (util.Block{}) {
+	if a != p || control.containsCalls != 2 || control.valueCalls != 0 || !polynomialEqualNumerals(m.som.as.values, oldAS) || !polynomialEqualMonomials(m.som.ms, oldMS) || m.substitution.found.values != nil {
 		t.Fatal("source absent branch before numeric/SOM/found vars", a, control)
 	}
 	// The helper retains ordinary Go slice capacity across Reset. The absent
