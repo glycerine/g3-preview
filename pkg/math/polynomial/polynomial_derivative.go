@@ -3,8 +3,6 @@
 package polynomial
 
 import (
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -72,25 +70,6 @@ func (m *MultivariatePolynomialManager) finishDerivativeNumerals() error {
 	}
 	return nil
 }
-func (m *MultivariatePolynomialManager) prepareDerivativeRetirement() error {
-	s := &m.derivative
-	if len(s.orphans) == cap(s.orphans) {
-		c := cap(s.orphans)*2 + 1
-		stride := uint64(reflect.TypeOf(Monomial{}).Size()) + 8
-		if e := m.core.integer.Budget().Reserve(uint64(c) * stride); e != nil {
-			return e
-		}
-		next := make([]Monomial, len(s.orphans), c)
-		copy(next, s.orphans)
-		tags := make([]uint64, len(s.orphanInvocations), c)
-		copy(tags, s.orphanInvocations)
-
-		m.core.integer.Budget().Release(uint64(cap(s.orphans)) * stride)
-		s.orphans = next
-		s.orphanInvocations = tags
-	}
-	return nil
-}
 func (m *MultivariatePolynomialManager) retainDerivativeGenerated() {
 	s := &m.derivative
 	if s.generated != (Monomial{}) {
@@ -98,7 +77,11 @@ func (m *MultivariatePolynomialManager) retainDerivativeGenerated() {
 		l := &m.core.monomials.locations[s.generated.slot-1]
 		l.derivativeCohort = s
 		l.derivativeSlot = slot
+		old := s.orphans
 		s.orphans = append(s.orphans, s.generated)
+		if len(old) != 0 && &old[0] != &s.orphans[0] {
+			clear(old)
+		}
 		s.orphanInvocations = append(s.orphanInvocations, s.invocation)
 		s.generated = Monomial{}
 	}
@@ -222,9 +205,6 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 		if e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.prepareDerivativeRetirement(); e != nil {
-			return Polynomial{}, e
-		}
 		outcome := monomialFactoryOutcome{}
 		derivative, e := c.monomials.derivativeCreated(term, x, &outcome)
 		if outcome.allocatorInvocation.invocation != 0 {
@@ -286,7 +266,7 @@ func (m *MultivariatePolynomialManager) cleanupDerivativeModeOwned(abort bool, i
 		return e
 	}
 	s := &m.derivative
-	if !s.active && !m.derivativeHasOrphans() && cap(s.orphans) == 0 {
+	if !s.active && !m.derivativeHasOrphans() && len(s.orphans) == 0 {
 		return nil
 	}
 	if s.executing {
@@ -396,7 +376,6 @@ func (m *MultivariatePolynomialManager) releaseDerivativeRetirementIfEmpty() {
 	if s.active || m.derivativeHasOrphans() {
 		return
 	}
-	m.core.integer.Budget().Release(uint64(cap(s.orphans))*uint64(reflect.TypeOf(Monomial{}).Size()) + uint64(cap(s.orphanInvocations))*8)
 	s.orphans = nil
 	s.orphanInvocations = nil
 	s.drain = 0

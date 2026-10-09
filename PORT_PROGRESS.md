@@ -32375,3 +32375,45 @@ need review to distinguish actual cold records from container emulation. Externa
 AST activity/FPA tables and SAT Runtime columns still emulate source containers.
 Text-stream consumers and the internal root-util numeric/text/parameter cycles
 also remain before moving the remaining util files into actual subpackages.
+
+## Native owning orphan cohorts and sexpr conversion frames
+
+Derivative, composition, square-root and substitution orphan cohorts now grow
+with native Go append. Removed pre-factory container capacity reservations,
+geometric growth, overlap refunds and capacity charges at cleanup. Actual created
+monomial roots, invocation tags, cohort slot identities, transfer at successful
+INC and stopped-source owning cleanup remain. Relocation clears the old owning
+scalar records once; tags remain nonowning. Physical audits count actual roots,
+excluding native cohort capacity.
+
+SexprPolynomialConverter likewise uses a native frame slice and logical extent.
+Removed manual frame capacity/default-tail geometry and backing reservations or
+refunds. Relocation transfers actual scoped UPolynomial handles and clears old
+owning frames. Recursive index-based cleanup, child-before-parent stopped cleanup,
+complexity bounds, real cold converter header and numerical/vector owners remain.
+
+New derivative coverage grows 257 distinct GF2 created zero-term cohorts through
+actual public-source calls, checks all roots and invocation tags, and checks old
+owning records are cleared at each native relocation. Later GF3 calls verify exact
+independent coefficients and transfer only the mathematically nonzero terms at
+actual INC; matching original receipts drain the remaining zero-ref roots. New
+sexpr coverage twice parses 257 nested additions with a 2^80+1 constant, checks
+exact constant and linear coefficients and all completed frame owners, and audits
+the physical graph. The obsolete cohort-reservation fixture now verifies native
+repeat preserves borrowed older roots. Warm scalar repeat tests explicitly select
+supported pooled object allocation in both build profiles, isolating cohort
+storage from genuine direct-profile cold object allocation.
+
+Validation: new native ownership tests passed (0.052s); full native polynomial
+passed (33.036s); focused g3debug derivative/composition/square-root/substitution
+and sexpr groups passed (0.608s). Module-wide compilation, polynomial vet,
+portcheck, gofmt and diff checks passed. Manifest adds the new ownership tests,
+renames the obsolete reservation test and preserves all counts/statuses. The
+23:46–23:48 UTC full native module checkpoint remains current; no additional
+full-module run was needed.
+
+The overall util knot/split remains active. The follow-up scan finds remaining
+manual polynomial storage in SOM scalar cohort-tag arrays and display-frame
+pointer directories. Review those next, along with separate linked diagnostic
+records, then retained AST/SAT collections and text consumers. Internal root-util
+numeric/text/parameter cycles still precede the remaining subpackage split.

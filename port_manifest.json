@@ -36285,7 +36285,7 @@
         "TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation",
         "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind",
         "TestPolynomialSubstitutionZeroTermWarmPhysicalCohort",
-        "TestPolynomialSubstitutionCohortReservationPrecedesFactory",
+        "TestPolynomialSubstitutionNativeCohortPreservesBorrowedRoots",
         "TestPolynomialSubstitutionReceiptRejectsReplacementFactory",
         "TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement",
         "TestPolynomialSOMStoppedCalleeReplacementIdentity",
@@ -36557,6 +36557,7 @@
         "TestPolynomialDerivativeInvocationAcquisitionAndReplacement",
         "TestPolynomialExactDivInvocationQuickAndCompleted",
         "TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort",
+        "TestPolynomialNativeDerivativeOrphanGrowthAndTransfer",
         "TestPolynomialExactDivActualNUMStopPreservesOlderReference",
         "TestPolynomialPublicPrimitivePartLiteralContent",
         "TestPolynomialPrimitivePredicateLiteralCoefficientContent",
@@ -39295,7 +39296,7 @@
             "TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation",
             "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind",
             "TestPolynomialSubstitutionZeroTermWarmPhysicalCohort",
-            "TestPolynomialSubstitutionCohortReservationPrecedesFactory",
+            "TestPolynomialSubstitutionNativeCohortPreservesBorrowedRoots",
             "TestPolynomialSubstitutionReceiptRejectsReplacementFactory",
             "TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
@@ -39873,6 +39874,7 @@
             "TestPolynomialDerivativeInvocationAcquisitionAndReplacement",
             "TestPolynomialExactDivInvocationQuickAndCompleted",
             "TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort",
+            "TestPolynomialNativeDerivativeOrphanGrowthAndTransfer",
             "TestPolynomialExactDivActualNUMStopPreservesOlderReference"
           ]
         },
@@ -40662,6 +40664,7 @@
             "TestPolynomialDerivativeInvocationAcquisitionAndReplacement",
             "TestPolynomialExactDivInvocationQuickAndCompleted",
             "TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort",
+            "TestPolynomialNativeDerivativeOrphanGrowthAndTransfer",
             "TestPolynomialExactDivCompletedPreludeAllowsActualSourceReuse",
             "TestPolynomialFactorToPolynomialActualChildReceipt",
             "TestPolynomialFactorToPolynomialEveryBigReservationPrefix",
@@ -41427,7 +41430,7 @@
         "TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation",
         "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind",
         "TestPolynomialSubstitutionZeroTermWarmPhysicalCohort",
-        "TestPolynomialSubstitutionCohortReservationPrecedesFactory",
+        "TestPolynomialSubstitutionNativeCohortPreservesBorrowedRoots",
         "TestPolynomialSubstitutionReceiptRejectsReplacementFactory",
         "TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement",
         "TestPolynomialSOMStoppedCalleeReplacementIdentity",
@@ -41743,6 +41746,7 @@
         "TestPolynomialDerivativeInvocationAcquisitionAndReplacement",
         "TestPolynomialExactDivInvocationQuickAndCompleted",
         "TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort",
+        "TestPolynomialNativeDerivativeOrphanGrowthAndTransfer",
         "TestPolynomialExactDivCompletedPreludeAllowsActualSourceReuse",
         "TestPolynomialFactorToPolynomialActualChildReceipt",
         "TestPolynomialFactorToPolynomialEveryBigReservationPrefix",
@@ -42908,7 +42912,7 @@
             "TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation",
             "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind",
             "TestPolynomialSubstitutionZeroTermWarmPhysicalCohort",
-            "TestPolynomialSubstitutionCohortReservationPrecedesFactory",
+            "TestPolynomialSubstitutionNativeCohortPreservesBorrowedRoots",
             "TestPolynomialSubstitutionReceiptRejectsReplacementFactory",
             "TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
@@ -43423,6 +43427,7 @@
             "TestPolynomialDerivativeInvocationAcquisitionAndReplacement",
             "TestPolynomialExactDivInvocationQuickAndCompleted",
             "TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort",
+            "TestPolynomialNativeDerivativeOrphanGrowthAndTransfer",
             "TestPolynomialExactDivCompletedPreludeAllowsActualSourceReuse",
             "TestPolynomialFactorToPolynomialActualChildReceipt",
             "TestPolynomialFactorToPolynomialEveryBigReservationPrefix",
@@ -43984,6 +43989,7 @@
       ],
       "tests": [
         "TestSexprPolynomialSourceArithmetic",
+        "TestSexprPolynomialNativeFramesNestedBIGOwnership",
         "TestSexprPolynomialErrorsAndCompletedPrefix",
         "TestSexprPolynomialDepthBoundary",
         "TestSexprPolynomialActualFaultPrefixes",
@@ -44004,6 +44010,7 @@
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "tests": [
             "TestSexprPolynomialSourceArithmetic",
+            "TestSexprPolynomialNativeFramesNestedBIGOwnership",
             "TestSexprPolynomialErrorsAndCompletedPrefix",
             "TestSexprPolynomialDepthBoundary",
             "TestSexprPolynomialActualFaultPrefixes",
@@ -44040,6 +44047,7 @@
       ],
       "tests": [
         "TestSexprPolynomialSourceArithmetic",
+        "TestSexprPolynomialNativeFramesNestedBIGOwnership",
         "TestSexprPolynomialErrorsAndCompletedPrefix",
         "TestSexprPolynomialDepthBoundary",
         "TestSexprPolynomialActualFaultPrefixes",
@@ -44070,6 +44078,7 @@
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "tests": [
             "TestSexprPolynomialSourceArithmetic",
+            "TestSexprPolynomialNativeFramesNestedBIGOwnership",
             "TestSexprPolynomialErrorsAndCompletedPrefix",
             "TestSexprPolynomialDepthBoundary",
             "TestSexprPolynomialActualFaultPrefixes",

@@ -176,7 +176,7 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 	if m.core != nil && (m.core.translation.active || m.core.pscPending()) {
 		return ErrPolynomialPending
 	}
-	if cap(m.derivative.orphans) > 0 {
+	if len(m.derivative.orphans) > 0 {
 		if e := m.CleanupDerivative(); e != nil {
 			return e
 		}

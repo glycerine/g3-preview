@@ -24,8 +24,8 @@ type sexprPolynomialFrame struct {
 	live     bool
 }
 
-// Cold frame storage owns actual source scoped vectors, including stopped
-// cleanup. Its real Go bytes are charged separately from numeric payloads.
+// Native frames retain actual source scoped vectors, including stopped cleanup.
+// The converter header and actual numerical owners are charged separately.
 type SexprPolynomialConverter struct {
 	borrowed   *util.SexprBorrowedNodes
 	self       *SexprPolynomialConverter
@@ -71,22 +71,15 @@ func (c *SexprPolynomialConverter) parseError(h util.SexprHandle, msg string) er
 }
 func (c *SexprPolynomialConverter) frame() (uint32, error) {
 	i := c.depth
-	if uint64(i) >= uint64(len(c.frames)) {
-		n := uint64(len(c.frames)) * 2
-		if n == 0 {
-			n = 2
+	if i == ^uint32(0) {
+		return 0, arena.ErrBounds
+	}
+	if uint64(i) == uint64(len(c.frames)) {
+		old := c.frames
+		c.frames = append(c.frames, sexprPolynomialFrame{})
+		if len(old) != 0 && &old[0] != &c.frames[0] {
+			clear(old)
 		}
-		stride := uint64(reflect.TypeOf(sexprPolynomialFrame{}).Size())
-		if n > uint64(^uint(0)>>1)/stride {
-			return 0, arena.ErrBounds
-		}
-		if e := c.sexpr.Configuration().Budget.Reserve(n * stride); e != nil {
-			return 0, e
-		}
-		a := make([]sexprPolynomialFrame, int(n))
-		copy(a, c.frames)
-		c.sexpr.Configuration().Budget.Release(uint64(len(c.frames)) * stride)
-		c.frames = a
 	}
 	c.depth++
 	return i, nil
@@ -281,7 +274,7 @@ func (c *SexprPolynomialConverter) Close() error {
 	if e := c.Cleanup(); e != nil {
 		return e
 	}
-	c.sexpr.Configuration().Budget.Release(c.header + uint64(len(c.frames))*uint64(reflect.TypeOf(sexprPolynomialFrame{}).Size()))
+	c.sexpr.Configuration().Budget.Release(c.header)
 	c.frames = nil
 	c.header = 0
 	c.closed = true

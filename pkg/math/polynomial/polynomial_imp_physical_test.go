@@ -103,8 +103,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	public = append(public, &full.squareRoot.two)
 	public = append(public, input...)
-	adapterBytes += uint64(cap(full.squareRoot.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
-	adapterBytes += uint64(cap(full.squareRoot.orphanInvocations)) * 8
+
 	for _, f := range full.gcdFrames {
 		adapterBytes += f.header
 		if !f.active {
@@ -123,7 +122,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	for _, f := range full.iccpFrames {
 		adapterBytes += f.header
 	}
-	adapterBytes += uint64(cap(m.substitution.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
+
 	for _, frame := range full.factorFrames {
 		adapterBytes += frame.header
 		if frame.minimum != nil {
@@ -154,9 +153,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	for _, f := range es.intervalFrames {
 		public = append(public, &(*(*f.aux.BorrowLower()).BorrowNumerator()), &(*(*f.aux.BorrowUpper()).BorrowNumerator()))
 	}
-	adapterBytes += uint64(cap(full.composition.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
-	adapterBytes += uint64(cap(full.derivative.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
-	adapterBytes += uint64(cap(full.derivative.orphanInvocations)) * 8
+
 	backendNumerals, backendBytes := polynomialFactorBackendNamedRoots(t, full)
 	public = append(public, backendNumerals...)
 	adapterBytes += backendBytes

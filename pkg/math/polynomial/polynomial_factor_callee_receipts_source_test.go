@@ -9,7 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// A actual first cold-retention refusal leaves a reached derivative invocation.
+// An actual numerical/object refusal leaves a reached derivative invocation.
 // The cleanup authority belongs to that invocation, never a later replacement.
 func TestPolynomialDerivativeInvocationAcquisitionAndReplacement(t *testing.T) {
 	m, p, _ := polynomialLexFixture(t)
@@ -69,9 +69,20 @@ func TestPolynomialExactDivInvocationQuickAndCompleted(t *testing.T) {
 
 func polynomialPrimitiveFixture(t *testing.T) *MultivariatePolynomialManager {
 	t.Helper()
-	q, _ := rationalManager(t, false)
+	return polynomialPrimitiveFixtureWithProfile(t, util.SmallAllocatorProfile{})
+}
+
+func polynomialPrimitiveFixtureWithProfile(t *testing.T, profile util.SmallAllocatorProfile) *MultivariatePolynomialManager {
+	t.Helper()
+	q, b := rationalManager(t, false)
+	var mm *MonomialManager
+	if profile.PointerBits != 0 {
+		var e error
+		mm, e = NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().RuntimeOwner(), Profile: profile})
+		serviceMust(t, e)
+	}
 	control := &polynomialEvalControl{limit: 1 << 20}
-	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: control.checkpoint, Cooperation: control.cooperate}})
+	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: control.checkpoint, Cooperation: control.cooperate}})
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		serviceMust(t, m.CloseChecked())
@@ -87,7 +98,9 @@ func polynomialPrimitiveFixture(t *testing.T) *MultivariatePolynomialManager {
 }
 
 func TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort(t *testing.T) {
-	m := polynomialPrimitiveFixture(t)
+	// Select pooled object storage so a warm raw zero result needs no new
+	// object allocation in either build profile.
+	m := polynomialPrimitiveFixtureWithProfile(t, util.SmallAllocatorProfile{PointerBits: 64})
 	c := m.core
 	p := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 2}}, {{1, 2}}})
 	prime := util.NewInt(2)
@@ -104,17 +117,21 @@ func TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort(t *testing.
 	older := m.derivative.orphans[0]
 	var later polynomialDerivativeInvocationReceipt
 	c.integer.Budget().FailAfter(0)
-	_, e = m.derivativeWithReceipt(p, 0, &later)
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, first}, nil, 0)
+	repeated, e := m.derivativeWithReceipt(p, 0, &later)
+	if e == nil {
+		polynomialCaller(t, c, repeated)
+	}
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, first, repeated}, nil, 0)
 	c.integer.Budget().FailAfter(-1)
-	if !numericPhysicalReservationRefusal(e) || !m.matchesDerivativeInvocation(&later) {
-		t.Fatal("real later guarded cold-retention refusal", e)
+	zero, check := c.IsZero(repeated)
+	if e != nil || check != nil || !zero || later.invocation <= original.invocation {
+		t.Fatal("native repeated derivative did not preserve the earlier zero cohort", e)
 	}
 	serviceMust(t, m.cleanupDerivativeInvocation(&later, true))
 	if len(m.derivative.orphans) != 1 || m.derivative.orphans[0] != older {
 		t.Fatal("later invocation swept earlier successful created cohort", older, m.derivative.orphans)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, first}, nil, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, first, repeated}, nil, 0)
 	// A later ordinary nonzero INC through the same source derivative engine
 	// consumes the older actual zero-ref root and its provenance at the leaf.
 	prime = util.NewInt(3)
@@ -132,7 +149,7 @@ func TestPolynomialDerivativeReceiptPreservesEarlierGF2CreatedCohort(t *testing.
 	if c.integer.Budget().Used() != used {
 		t.Fatal("stale receipt refunded foreign current backing")
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, first, transferred}, nil, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, first, repeated, transferred}, nil, 0)
 	serviceMust(t, m.CleanupDerivative())
 }
 

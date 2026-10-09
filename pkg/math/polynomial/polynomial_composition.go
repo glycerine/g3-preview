@@ -4,7 +4,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
@@ -125,29 +124,11 @@ func (m *MultivariatePolynomialManager) compositionNumeral(op uint8, n *util.Int
 	}
 	return e
 }
-func (m *MultivariatePolynomialManager) prepareCompositionOrphan() error {
-	s := &m.composition
-	if len(s.orphans) == cap(s.orphans) {
-		n := cap(s.orphans)*2 + 1
-		bytes := uint64(n) * uint64(reflect.TypeOf(Monomial{}).Size())
-		if e := m.originalBudget.Reserve(bytes); e != nil {
-			return e
-		}
-		a := make([]Monomial, len(s.orphans), n)
-		copy(a, s.orphans)
-		m.originalBudget.Release(uint64(cap(s.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size()))
-		s.orphans = a
-	}
-	return nil
-}
 func (m *MultivariatePolynomialManager) compositionVariable(x, d uint32, powers []MonomialPower, product bool) (Monomial, error) {
 	s := &m.composition
 	c := m.core
 	if s.generated != (Monomial{}) {
 		return Monomial{}, ErrPolynomialPending
-	}
-	if e := m.prepareCompositionOrphan(); e != nil {
-		return Monomial{}, e
 	}
 	before, e := c.monomials.allocator.PendingRoots()
 	if e != nil {
@@ -189,7 +170,11 @@ func (m *MultivariatePolynomialManager) compositionAdd(a *util.Int, t Monomial) 
 			s.generated = Monomial{}
 		} else if e == nil {
 			i := uint32(len(s.orphans))
+			old := s.orphans
 			s.orphans = append(s.orphans, t)
+			if len(old) != 0 && &old[0] != &s.orphans[0] {
+				clear(old)
+			}
 			l, x := m.core.monomials.location(t)
 			if x != nil {
 				return x
@@ -1148,7 +1133,6 @@ func (m *MultivariatePolynomialManager) closeCompositionMetadata() error {
 	if m.composition.active || m.compositionHasOrphans() {
 		return ErrPolynomialPending
 	}
-	m.originalBudget.Release(uint64(cap(m.composition.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size()))
 	m.composition.orphans = nil
 	m.composition.drain = 0
 	return nil

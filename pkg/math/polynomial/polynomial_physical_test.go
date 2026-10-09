@@ -136,7 +136,7 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 	if za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
 		t.Fatal("unnamed Runtime root", za, ma, m.memory.Stats())
 	}
-	bytes := uint64(cap(m.substitution.orphans))*16 + uint64(m.ids.FreeCapacity()+mm.ids.FreeCapacity())*4 + integerActualOwnedBytes(z) + m.header + mm.header + ma.TotalBytes
+	bytes := uint64(m.ids.FreeCapacity()+mm.ids.FreeCapacity())*4 + integerActualOwnedBytes(z) + m.header + mm.header + ma.TotalBytes
 	if !m.modular.Closed() {
 		bytes += m.modular.Header
 	}

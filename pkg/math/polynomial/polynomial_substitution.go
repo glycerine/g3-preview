@@ -283,11 +283,6 @@ func (m *MultivariatePolynomialCore) generatedSubstitutionMonomial() (Monomial, 
 	if m.generatedActive {
 		return Monomial{}, ErrPolynomialPending
 	}
-	if m.substitution.scope.kind == 1 {
-		if e := m.reserveSubstitutionOrphan(); e != nil {
-			return Monomial{}, e
-		}
-	}
 	outcome := monomialFactoryOutcome{}
 	freshBinding := m.monomials.borrowedTemp == nil && m.monomials.creation.stage == 0
 	a, e := m.monomials.internBorrowedTempCreated(&m.tmp1, &outcome)
@@ -318,9 +313,13 @@ func (m *MultivariatePolynomialCore) addSubstitutionTerm(a *util.Int, term Monom
 		if guard != nil {
 			return guard
 		}
-		// Capacity was charged and reserved before the factory could publish.
+		// Native storage retains the actual unconsumed root after publication.
 		index := uint32(len(d.orphans))
+		old := d.orphans
 		d.orphans = append(d.orphans, term)
+		if len(old) != 0 && &old[0] != &d.orphans[0] {
+			clear(old)
+		}
 		l.unreferencedCohort, l.unreferencedSlot = d, index
 		m.transferGeneratedMonomial()
 		m.substitution.generatedReceipt = Monomial{}
@@ -503,7 +502,6 @@ func (m *MultivariatePolynomialCore) closeSubstitutionMembers() error {
 	if e := m.CleanupUnreferencedSubstitutionMonomials(); e != nil {
 		return e
 	}
-	m.integer.Budget().Release(uint64(cap(m.substitution.orphans)) * 16)
 	m.substitution.orphans = nil
 	if e := m.substitution.positions.CloseChecked(); e != nil {
 		return e
@@ -858,33 +856,6 @@ func (m *MultivariatePolynomialCore) SubstitutePolynomialFraction(r Polynomial, 
 	return nil
 }
 
-// This cold primitive cohort is Go owning continuation metadata, not source
-// vector storage. Charge simultaneous old and new backing before allocation.
-func (m *MultivariatePolynomialCore) reserveSubstitutionOrphan() error {
-	d := &m.substitution
-	if len(d.orphans) < cap(d.orphans) {
-		return nil
-	}
-	old := uint64(cap(d.orphans))
-	n := old * 2
-	if n == 0 {
-		n = 1
-	}
-	if n > uint64(^uint32(0)) || n > uint64(int(^uint(0)>>1))/16 {
-		return arena.ErrBounds
-	}
-	if e := m.integer.Budget().Reserve(n * 16); e != nil {
-		return e
-	}
-	next := make([]Monomial, len(d.orphans), int(n))
-	copy(next, d.orphans)
-	m.integer.Budget().Release(old * 16)
-	d.orphans = next
-	return nil
-}
-
-// Explicit owning abort only. Source ordinary destruction never erases the
-// monomial-manager empty-table assertion produced by zero-coefficient Add.
 func (m *MultivariatePolynomialCore) CleanupUnreferencedSubstitutionMonomials() error {
 	if m == nil || m.self != m || m.closed {
 		return ErrPolynomialOwner

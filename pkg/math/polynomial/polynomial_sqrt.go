@@ -4,7 +4,6 @@ package polynomial
 
 import (
 	"errors"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/util"
 )
@@ -118,29 +117,7 @@ func (m *MultivariatePolynomialCore) gradedLexMinPosition(p Polynomial) (uint32,
 	}
 	return min, nil
 }
-func (m *MultivariatePolynomialManager) reserveSquareRootCreated() error {
-	s := &m.squareRoot
-	if len(s.orphans) < cap(s.orphans) {
-		return nil
-	}
-	n := cap(s.orphans)*2 + 1
-	stride := uint64(reflect.TypeOf(Monomial{}).Size()) + 8
-	if e := m.core.integer.Budget().Reserve(uint64(n) * stride); e != nil {
-		return e
-	}
-	next := make([]Monomial, len(s.orphans), n)
-	copy(next, s.orphans)
-	tags := make([]uint64, len(s.orphanInvocations), n)
-	copy(tags, s.orphanInvocations)
-	m.core.integer.Budget().Release(uint64(cap(s.orphans)) * stride)
-	s.orphans = next
-	s.orphanInvocations = tags
-	return nil
-}
 func (m *MultivariatePolynomialManager) squareRootMonomial(op uint8, a, b Monomial) (Monomial, bool, error) {
-	if e := m.reserveSquareRootCreated(); e != nil {
-		return Monomial{}, false, e
-	}
 	s := &m.squareRoot
 	c := m.core
 	before, e := c.monomials.allocator.PendingRoots()
@@ -164,7 +141,11 @@ func (m *MultivariatePolynomialManager) squareRootMonomial(op uint8, a, b Monomi
 	}
 	if e == nil && outcome.created {
 		idx := uint32(len(s.orphans))
+		old := s.orphans
 		s.orphans = append(s.orphans, p)
+		if len(old) != 0 && &old[0] != &s.orphans[0] {
+			clear(old)
+		}
 		s.orphanInvocations = append(s.orphanInvocations, s.invocation)
 		l := &c.monomials.locations[p.slot-1]
 		l.squareRootCohort = s
@@ -676,7 +657,6 @@ func (m *MultivariatePolynomialManager) closeSquareRootMetadata() error {
 		return e
 	}
 	s := &m.squareRoot
-	m.originalBudget.Release(uint64(cap(s.orphans))*uint64(reflect.TypeOf(Monomial{}).Size()) + uint64(cap(s.orphanInvocations))*8)
 	s.orphans = nil
 	s.orphanInvocations = nil
 	s.drain = 0

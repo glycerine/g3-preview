@@ -428,8 +428,9 @@ func TestPolynomialSubstitutionZeroTermWarmPhysicalCohort(t *testing.T) {
 	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, nil)
 }
 
-func TestPolynomialSubstitutionCohortReservationPrecedesFactory(t *testing.T) {
-	m := polynomialCellFixture(t)
+func TestPolynomialSubstitutionNativeCohortPreservesBorrowedRoots(t *testing.T) {
+	// Isolate native cohort reuse from direct-profile cold object allocation.
+	m := polynomialCellFixtureWithProfile(t, util.SmallAllocatorProfile{PointerBits: 64})
 	p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{0, 1}, {1, 1}}, {{0, 2}, {2, 1}}})
 	zero := util.Int{}
 	a, e := m.SubstituteInteger(p, 0, &zero)
@@ -437,7 +438,7 @@ func TestPolynomialSubstitutionCohortReservationPrecedesFactory(t *testing.T) {
 	serviceMust(t, m.IncRef(a))
 	serviceMust(t, m.DecRef(a))
 	d := &m.substitution
-	if len(d.orphans) != 2 || cap(d.orphans) != 2 {
+	if len(d.orphans) != 2 {
 		t.Fatal("two actual zero-add roots", len(d.orphans), cap(d.orphans))
 	}
 	old := [2]Monomial{d.orphans[0], d.orphans[1]}
@@ -446,13 +447,20 @@ func TestPolynomialSubstitutionCohortReservationPrecedesFactory(t *testing.T) {
 	stats, bytes := m.memory.Stats(), m.integer.Budget().Used()
 	m.integer.Budget().FailAfter(0)
 	a, e = m.SubstituteInteger(p, 0, &zero)
-	if !numericPhysicalReservationRefusal(e) || a != (Polynomial{}) {
-		t.Fatal("cold cohort growth refusal", a, e)
+	if e != nil {
+		t.Fatal("native repeated zero substitution", a, e)
 	}
+	serviceMust(t, m.IncRef(a))
+	yes, guard := m.IsZero(a)
+	serviceMust(t, guard)
+	if !yes {
+		t.Fatal("independent p(0)=0")
+	}
+	serviceMust(t, m.DecRef(a))
 	after, err := m.memory.AllocationCount()
 	serviceMust(t, err)
-	if count != after || stats != m.memory.Stats() || bytes != m.integer.Budget().Used() || cap(d.orphans) != 2 || d.orphans[0] != old[0] || d.orphans[1] != old[1] || m.generatedActive || m.monomials.borrowedTemp != nil {
-		t.Fatal("factory started before owning metadata capacity existed")
+	if count != after || stats != m.memory.Stats() || bytes != m.integer.Budget().Used() || len(d.orphans) != 2 || d.orphans[0] != old[0] || d.orphans[1] != old[1] || m.generatedActive || m.monomials.borrowedTemp != nil {
+		t.Fatal("native repeat changed actual older roots or allocation")
 	}
 	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, nil)
 	m.integer.Budget().FailAfter(-1)
