@@ -8,13 +8,13 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// This is the actual source sparse-interpolator owner. Both numeral arrays
-// reside in Runtime bytes; the skeleton is borrowed for its source lifetime.
+// This owner retains actual numerals in typed Go slices. The skeleton is
+// borrowed for its source lifetime; native slice storage owns no Runtime blocks.
 type PolynomialSparseInterpolator struct {
 	self                                                         *PolynomialSparseInterpolator
 	owner                                                        *MultivariatePolynomialManager
 	skeleton                                                     *PolynomialSkeleton
-	inputs, outputs                                              polynomialVector
+	inputs, outputs                                              []util.Int
 	header                                                       uint64
 	constructed, closing, closed, sourceStarted, sourceFinalized bool
 	sourceStage                                                  uint8
@@ -60,7 +60,7 @@ func constructPolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk 
 }
 
 func initializePolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk *PolynomialSkeleton, s *PolynomialSparseInterpolator, header uint64) (err error) {
-	*s = PolynomialSparseInterpolator{owner: m, skeleton: sk, header: header, inputs: polynomialVector{width: 12}, outputs: polynomialVector{width: 12}}
+	*s = PolynomialSparseInterpolator{owner: m, skeleton: sk, header: header}
 	s.self = s
 	defer func() {
 		if err != nil {
@@ -82,9 +82,7 @@ func initializePolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk
 				return e
 			}
 			for j := uint32(0); j < entry.NumPowers; j++ {
-				if e = s.outputs.appendCoefficient(m.core, util.Int{}); e != nil {
-					return e
-				}
+				s.outputs = append(s.outputs, util.Int{})
 			}
 		}
 	}
@@ -110,29 +108,26 @@ func (s *PolynomialSparseInterpolator) Ready() (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}
-	n, e := s.inputs.size(s.owner.core)
-	if e != nil {
-		return false, e
-	}
+	n := uint32(len(s.inputs))
 	if s.skeleton == nil {
 		return false, ErrPolynomialOwner
 	}
 	max, e := s.skeleton.MaxNumPowers()
 	return n == max, e
 }
-func (s *PolynomialSparseInterpolator) copyField(v *polynomialVector, i uint32, a *util.Int) error {
-	m := s.owner.core
-	b, e := v.coefficient(m, i)
+func (s *PolynomialSparseInterpolator) copyField(v []util.Int, i uint32, a *util.Int) error {
+	if uint64(i) >= uint64(len(v)) {
+		if polynomialSourceDebug {
+			return ErrPolynomialAssertion
+		}
+		return arena.ErrBounds
+	}
+	before, e := s.numericBefore()
 	if e != nil {
 		return e
 	}
-	before, x := s.numericBefore()
-	if x != nil {
-		return x
-	}
-	e = m.modular.Copy(&b, a)
-	e = polynomialNewtonJoin(e, s.numericAfter(before))
-	return polynomialNewtonJoin(e, v.putCoefficient(m, i, b))
+	e = s.owner.core.modular.Copy(&v[i], a)
+	return polynomialNewtonJoin(e, s.numericAfter(before))
 }
 func (s *PolynomialSparseInterpolator) Add(in *util.Int, q Polynomial) (bool, error) {
 	if e := s.open(); e != nil {
@@ -145,10 +140,7 @@ func (s *PolynomialSparseInterpolator) Add(in *util.Int, q Polynomial) (bool, er
 		return false, ErrPolynomialOwner
 	}
 	m := s.owner.core
-	inputIndex, e := s.inputs.size(m)
-	if e != nil {
-		return false, e
-	}
+	inputIndex := uint32(len(s.inputs))
 	if polynomialSourceDebug {
 		n, e := s.skeleton.MaxNumPowers()
 		if e != nil {
@@ -158,10 +150,8 @@ func (s *PolynomialSparseInterpolator) Add(in *util.Int, q Polynomial) (bool, er
 			return false, ErrPolynomialAssertion
 		}
 	}
-	if e = s.inputs.appendCoefficient(m, util.Int{}); e != nil {
-		return false, e
-	}
-	if e = s.copyField(&s.inputs, inputIndex, in); e != nil {
+	s.inputs = append(s.inputs, util.Int{})
+	if e := s.copyField(s.inputs, inputIndex, in); e != nil {
 		return false, e
 	}
 	n, e := m.readWord(q, 8)
@@ -191,30 +181,20 @@ func (s *PolynomialSparseInterpolator) Add(in *util.Int, q Polynomial) (bool, er
 		if e != nil {
 			return false, e
 		}
-		if e = s.copyField(&s.outputs, entry.FirstPower+inputIndex, &a); e != nil {
+		if e = s.copyField(s.outputs, entry.FirstPower+inputIndex, &a); e != nil {
 			return false, e
 		}
 	}
 	return true, nil
 }
-func (s *PolynomialSparseInterpolator) deleteFields(v *polynomialVector, cursor *uint32, owning bool) error {
+func (s *PolynomialSparseInterpolator) deleteFields(v []util.Int, cursor *uint32, owning bool) error {
 	m := s.owner.core
-	n, e := v.size(m)
-	if e != nil {
-		return e
-	}
-	for *cursor < n {
-		a, e := v.coefficient(m, *cursor)
-		if e != nil {
-			return e
-		}
+	for uint64(*cursor) < uint64(len(v)) {
+		var e error
 		if owning {
-			e = m.deleteNumeral(&a)
+			e = m.deleteNumeral(&v[*cursor])
 		} else {
-			_, e = util.SourceNumeralDel(m.integer, &a)
-		}
-		if w := v.putCoefficient(m, *cursor, a); w != nil {
-			return polynomialNewtonJoin(e, w)
+			_, e = util.SourceNumeralDel(m.integer, &v[*cursor])
 		}
 		if e != nil {
 			return e
@@ -227,7 +207,6 @@ func (s *PolynomialSparseInterpolator) sourceFinish() (err error) {
 	if s.cleanupCause != nil {
 		return s.cleanupCause
 	}
-	m := s.owner.core
 	if e := s.finishInterpolationSource(); e != nil {
 		return e
 	}
@@ -239,7 +218,7 @@ func (s *PolynomialSparseInterpolator) sourceFinish() (err error) {
 	}()
 	if s.sourceStage == 0 {
 		if s.skeleton != nil {
-			if e := s.deleteFields(&s.inputs, &s.inputCursor, false); e != nil {
+			if e := s.deleteFields(s.inputs, &s.inputCursor, false); e != nil {
 				return e
 			}
 		}
@@ -247,34 +226,18 @@ func (s *PolynomialSparseInterpolator) sourceFinish() (err error) {
 	}
 	if s.sourceStage == 1 {
 		if s.skeleton != nil {
-			if e := s.deleteFields(&s.outputs, &s.outputCursor, false); e != nil {
+			if e := s.deleteFields(s.outputs, &s.outputCursor, false); e != nil {
 				return e
 			}
 		}
 		s.sourceStage = 2
 	}
 	if s.sourceStage == 2 {
-		if s.outputs.raw != (util.Block{}) {
-			e := m.memory.Deallocate(&s.outputs.raw)
-			if s.outputs.raw == (util.Block{}) {
-				s.outputs.initialized = 0
-			}
-			if e != nil {
-				return e
-			}
-		}
+		s.outputs = nil
 		s.sourceStage = 3
 	}
 	if s.sourceStage == 3 {
-		if s.inputs.raw != (util.Block{}) {
-			e := m.memory.Deallocate(&s.inputs.raw)
-			if s.inputs.raw == (util.Block{}) {
-				s.inputs.initialized = 0
-			}
-			if e != nil {
-				return e
-			}
-		}
+		s.inputs = nil
 		s.sourceStage = 4
 	}
 	s.sourceFinalized = true
@@ -309,22 +272,18 @@ func (s *PolynomialSparseInterpolator) CloseChecked() error {
 		}
 	}
 	if s.sourceStage < 2 {
-		if e := s.deleteFields(&s.inputs, &s.inputCursor, true); e != nil {
+		if e := s.deleteFields(s.inputs, &s.inputCursor, true); e != nil {
 			return e
 		}
-		if e := s.deleteFields(&s.outputs, &s.outputCursor, true); e != nil {
+		if e := s.deleteFields(s.outputs, &s.outputCursor, true); e != nil {
 			return e
 		}
 	}
 	if e := s.cleanupNumeric(); e != nil {
 		return e
 	}
-	if e := s.outputs.close(m); e != nil {
-		return e
-	}
-	if e := s.inputs.close(m); e != nil {
-		return e
-	}
+	s.outputs = nil
+	s.inputs = nil
 	m.integer.Budget().Release(s.header)
 	s.header = 0
 	s.closed = true
@@ -348,27 +307,13 @@ func (s *PolynomialSparseInterpolator) Reset() (err error) {
 		}
 	}()
 	m := s.owner.core
-	n, e := s.inputs.size(m)
-	if e != nil {
-		return e
-	}
-	for s.resetCursor < n {
-		a, e := s.inputs.coefficient(m, s.resetCursor)
-		if e != nil {
-			return e
-		}
-		_, e = util.SourceNumeralDel(m.integer, &a)
-		if w := s.inputs.putCoefficient(m, s.resetCursor, a); w != nil {
-			return polynomialNewtonJoin(e, w)
-		}
-		if e != nil {
+	for uint64(s.resetCursor) < uint64(len(s.inputs)) {
+		if _, e := util.SourceNumeralDel(m.integer, &s.inputs[s.resetCursor]); e != nil {
 			return e
 		}
 		s.resetCursor++
 	}
-	if e = s.inputs.reset(m); e != nil {
-		return e
-	}
+	s.inputs = s.inputs[:0]
 	s.resetActive = false
 	s.resetCursor = 0
 	return nil

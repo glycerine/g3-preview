@@ -269,18 +269,17 @@ func TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop(t *testing.
 		}
 		for _, f := range full.gcdFrames {
 			sp := &f.sparse
-			if !f.active || !sp.constructed || sp.skeleton == nil || sp.outputs.initialized == 0 {
+			if !f.active || !sp.constructed || sp.skeleton == nil || len(sp.outputs) == 0 {
 				continue
 			}
-			a, e := sp.outputs.coefficient(c, 0)
-			serviceMust(t, e)
+			a := sp.outputs[0]
 			serviceMust(t, c.integer.Copy(&a, &c.integer.Two64))
 			c.integer.Budget().FailAfter(0)
 			copyError := c.integer.Copy(&a, &large)
 			if !numericPhysicalReservationRefusal(copyError) || (a).Cell != c.integer.FailedRef {
 				t.Fatal("actual Copy replacement guard", copyError)
 			}
-			serviceMust(t, sp.outputs.putCoefficient(c, 0, a))
+			sp.outputs[0] = a
 			injected = true
 			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{factor, left, right, square, newU, newV, r.root.value}, []*util.Int{&large}, ur.header+vr.header+r.header+sr.header)
 			c.integer.Budget().FailAfter(-1)

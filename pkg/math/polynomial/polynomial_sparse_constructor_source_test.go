@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestPolynomialSparseConstructorEveryMemberReservationPrefix(t *testing.T) {
+func TestPolynomialSparseConstructorHeaderReservationPrefixes(t *testing.T) {
 	success := false
 	for ordinal := int64(0); ordinal < 48 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -20,7 +20,7 @@ func TestPolynomialSparseConstructorEveryMemberReservationPrefix(t *testing.T) {
 			m.integer.Budget().FailAfter(ordinal)
 			s, e := NewPolynomialSparseInterpolator(full, sk)
 			if e != nil && !numericPhysicalReservationRefusal(e) {
-				t.Fatal("real constructor reservation", e)
+				t.Fatal("actual class header reservation", e)
 			}
 			if s != nil {
 				polynomialSparsePhysical(t, s, nil, []Polynomial{p})
@@ -37,7 +37,7 @@ func TestPolynomialSparseConstructorEveryMemberReservationPrefix(t *testing.T) {
 			}
 			if e == nil {
 				success = true
-				t.Log("constructor every-prefix endpoint", ordinal)
+				t.Log("constructor header-prefix endpoint", ordinal)
 			}
 		})
 	}

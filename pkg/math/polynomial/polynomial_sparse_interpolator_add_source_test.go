@@ -23,23 +23,18 @@ func TestPolynomialSparseSourceMissingEntryKeepsInputThenReset(t *testing.T) {
 	if ok {
 		t.Fatal("actual missing skeleton entry")
 	}
-	n, e := s.inputs.size(m)
-	serviceMust(t, e)
+	n := len(s.inputs)
 	if n != 1 {
 		t.Fatal("published input before missing entry", n)
 	}
-	a, e := s.inputs.coefficient(m, 0)
-	serviceMust(t, e)
+	a := s.inputs[0]
 	if a != in {
 		t.Fatal("actual copied input", a)
 	}
-	capBefore, e := s.inputs.capacity(m)
-	serviceMust(t, e)
+	capBefore := cap(s.inputs)
 	serviceMust(t, s.Reset())
-	n, e = s.inputs.size(m)
-	serviceMust(t, e)
-	capAfter, e := s.inputs.capacity(m)
-	serviceMust(t, e)
+	n = len(s.inputs)
+	capAfter := cap(s.inputs)
 	if n != 0 || capAfter != capBefore {
 		t.Fatal("source reset retains capacity", n, capAfter, capBefore)
 	}

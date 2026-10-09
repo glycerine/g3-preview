@@ -7,7 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestPolynomialSparseWarmActualLexicalAllocationGraph(t *testing.T) {
+func TestPolynomialSparseWarmActualSolverAndFactoryGraph(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	m := full.core
 	z := m.integer
@@ -53,8 +53,8 @@ func TestPolynomialSparseWarmActualLexicalAllocationGraph(t *testing.T) {
 	afterCount, e := m.memory.AllocationCount()
 	serviceMust(t, e)
 	if afterCount <= beforeCount {
-		t.Fatal("fresh source lexical vector allocations were skipped")
+		t.Fatal("remaining solver/factory allocations were skipped")
 	}
 	polynomialSparsePhysical(t, s, out, []Polynomial{p, q})
-	t.Log("actual source lexical allocations; Go allocator events", allocs)
+	t.Log("actual solver/factory allocations; Go allocator events", allocs)
 }

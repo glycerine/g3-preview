@@ -22,27 +22,9 @@ func polynomialSparsePhysical(t *testing.T, s *PolynomialSparseInterpolator, out
 	if len(full.upm.pages) != 0 || len(full.upm.store.backings) != 0 {
 		t.Fatal("unexpected UP child work")
 	}
-	for _, v := range []*polynomialVector{&s.inputs, &s.outputs, &s.interpolation.vectors[0], &s.interpolation.vectors[1], &s.interpolation.vectors[2]} {
-		raw = append(raw, v.raw, v.pending, v.old)
-		extra += uint64(cap(v.retired)) * uint64(reflect.TypeOf(util.Int{}).Size())
-		for i := uint32(0); i < v.initialized; i++ {
-			if v.raw == (util.Block{}) {
-				break
-			}
-			a, e := v.coefficient(m, i)
-			serviceMust(t, e)
-			public = append(public, &a)
-		}
-		if v.old != (util.Block{}) {
-			old := polynomialVector{raw: v.old, width: 12}
-			for i := v.moved; i < v.oldInitialized; i++ {
-				a, e := old.coefficient(m, i)
-				serviceMust(t, e)
-				public = append(public, &a)
-			}
-		}
-		for i := uint32(0); i < v.retiredActive; i++ {
-			public = append(public, &v.retired[i])
+	for _, values := range [][]util.Int{s.inputs, s.outputs, s.interpolation.vectors[0], s.interpolation.vectors[1], s.interpolation.vectors[2]} {
+		for i := range values {
+			public = append(public, &values[i])
 		}
 	}
 	solver := &s.interpolation.solver

@@ -96,8 +96,7 @@ func TestPolynomialSparseBigInputEveryActualCopyReservationPrefix(t *testing.T) 
 				if !ok {
 					t.Fatal("matching constant skeleton entry")
 				}
-				got, x := s.inputs.coefficient(m, 0)
-				serviceMust(t, x)
+				got := s.inputs[0]
 				expected := util.NewInt(-36) // independent balanced residue: 2^64 mod 97 = 61 = -36
 				equal, x := m.integer.Equal(&got, &expected)
 				serviceMust(t, x)

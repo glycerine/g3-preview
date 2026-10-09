@@ -2,8 +2,9 @@
 package polynomial
 
 import (
-	"fmt"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialSparseEmbeddedNilConstructorHasNoReservation(t *testing.T) {
@@ -28,36 +29,33 @@ func TestPolynomialSparseEmbeddedNilConstructorHasNoReservation(t *testing.T) {
 	serviceMust(t, local.CloseChecked())
 	polynomialImpPhysicalAudit(t, full)
 }
-func TestPolynomialSparseEmbeddedEveryMemberPrefix(t *testing.T) {
-	success := false
-	for ordinal := int64(0); ordinal < 64 && !success; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			full := polynomialPSCFullFixture(t)
-			c := full.core
-			p := polynomialQueryTerms(t, c, []int32{1, 1, 1, 1}, [][]MonomialPower{{{0, 3}}, {{0, 2}}, {{0, 1}}, nil})
-			sk, e := NewPolynomialSkeleton(c, p, 0)
-			serviceMust(t, e)
-			t.Cleanup(func() { serviceMust(t, sk.CloseChecked()) })
-			var local PolynomialSparseInterpolator
-			c.integer.Budget().FailAfter(ordinal)
-			e = constructPolynomialSparseInterpolator(full, sk, &local)
-			if e != nil && !numericPhysicalReservationRefusal(e) {
-				t.Fatal("actual embedded ctor prefix", ordinal, e)
-			}
-			if local.header != 0 || e != nil && local.constructed {
-				t.Fatal("source failure completed class or added header", local.header, local.constructed)
-			}
-			polynomialSparsePhysical(t, &local, nil, []Polynomial{p})
-			c.integer.Budget().FailAfter(-1)
-			serviceMust(t, local.CloseChecked())
-			polynomialSparsePhysical(t, &local, nil, []Polynomial{p})
-			if e == nil {
-				success = true
-				t.Log("actual embedded source ctor endpoint", ordinal)
-			}
-		})
+func TestPolynomialSparseEmbeddedNativeOutputConstruction(t *testing.T) {
+	full := polynomialPSCFullFixture(t)
+	c := full.core
+	p := polynomialQueryTerms(t, c, []int32{1, 1, 1, 1}, [][]MonomialPower{{{0, 3}}, {{0, 2}}, {{0, 1}}, nil})
+	sk, e := NewPolynomialSkeleton(c, p, 0)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, sk.CloseChecked()) })
+	var local PolynomialSparseInterpolator
+	before, used := c.memory.Stats(), c.integer.Budget().Used()
+	c.integer.Budget().FailAfter(0)
+	t.Cleanup(func() { c.integer.Budget().FailAfter(-1); serviceMust(t, local.CloseChecked()) })
+	serviceMust(t, constructPolynomialSparseInterpolator(full, sk, &local))
+	if local.header != 0 || !local.constructed || len(local.outputs) != 4 {
+		t.Fatal("actual embedded output construction", local.header, local.constructed, len(local.outputs))
 	}
-	if !success {
-		t.Fatal("no completed embedded sparse construction")
+	for _, a := range local.outputs {
+		if a != (util.Int{}) {
+			t.Fatal("nonzero default output", a)
+		}
+	}
+	if c.memory.Stats() != before || c.integer.Budget().Used() != used {
+		t.Fatal("native embedded outputs charged Runtime")
+	}
+	polynomialSparsePhysical(t, &local, nil, []Polynomial{p})
+	serviceMust(t, local.SourceFinalize())
+	serviceMust(t, local.CloseChecked())
+	if local.outputs != nil || c.memory.Stats() != before || c.integer.Budget().Used() != used {
+		t.Fatal("native embedded source/owning cleanup")
 	}
 }

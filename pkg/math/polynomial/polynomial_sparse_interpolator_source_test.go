@@ -102,3 +102,136 @@ func TestPolynomialSparseNativeMonomialGrowthAcross129Groups(t *testing.T) {
 		polynomialSparsePhysical(t, s, out, []Polynomial{p})
 	}
 }
+
+func TestPolynomialSparseNativeNumeralGrowthAndReuse(t *testing.T) {
+	full := polynomialPSCFullFixtureWithLimit(t, 1<<28)
+	m := full.core
+	serviceMust(t, m.modular.SetZPUint64(97))
+	const size = 4097
+	coefficients := make([]int32, size)
+	powers := make([][]MonomialPower, size)
+	for i := range coefficients {
+		coefficients[i] = 1
+		if i != 0 {
+			powers[i] = []MonomialPower{{0, uint32(i)}}
+		}
+	}
+	p := polynomialQueryTerms(t, m, coefficients, powers)
+	sk, e := NewPolynomialSkeleton(m, p, 0)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, sk.CloseChecked()) })
+	before, used := m.memory.Stats(), m.integer.Budget().Used()
+	m.integer.Budget().FailAfter(1) // Only the actual class header may reserve.
+	s, e := NewPolynomialSparseInterpolator(full, sk)
+	serviceMust(t, e)
+	t.Cleanup(func() { m.integer.Budget().FailAfter(-1); serviceMust(t, s.CloseChecked()) })
+	if len(s.outputs) != size || m.memory.Stats() != before || m.integer.Budget().Used() != used+s.header {
+		t.Fatal("native output construction charged container storage")
+	}
+	m.integer.Budget().FailAfter(0)
+	first, last := util.NewInt(13), util.NewInt(29)
+	serviceMust(t, s.copyField(s.outputs, 0, &first))
+	serviceMust(t, s.copyField(s.outputs, size-1, &last))
+	for pass := 0; pass < 2; pass++ {
+		for i := int32(0); i < size; i++ {
+			input := util.NewInt(i)
+			ok, e := s.Add(&input, m.zero)
+			serviceMust(t, e)
+			if !ok {
+				t.Fatal("zero sample support", i)
+			}
+		}
+		ready, e := s.Ready()
+		serviceMust(t, e)
+		if !ready || len(s.inputs) != size {
+			t.Fatal("native sample count")
+		}
+		for i, input := range s.inputs {
+			value, e := m.integer.Int64(&input)
+			serviceMust(t, e)
+			want := int64(i % 97)
+			if want > 48 {
+				want -= 97
+			}
+			if value != want {
+				t.Fatal("native input association", i, value, want)
+			}
+		}
+		capacity := cap(s.inputs)
+		serviceMust(t, s.Reset())
+		if len(s.inputs) != 0 || cap(s.inputs) != capacity || s.outputs[0] != first || s.outputs[size-1] != last {
+			t.Fatal("source reset must retain outputs and reusable input capacity")
+		}
+		if m.memory.Stats() != before || m.integer.Budget().Used() != used+s.header {
+			t.Fatal("native sample growth/reset charged Runtime")
+		}
+	}
+	polynomialSparsePhysical(t, s, nil, []Polynomial{p})
+	serviceMust(t, s.SourceFinalize())
+	if s.inputs != nil || s.outputs != nil {
+		t.Fatal("source destruction retained native slices")
+	}
+	serviceMust(t, s.CloseChecked())
+	if m.memory.Stats() != before || m.integer.Budget().Used() != used {
+		t.Fatal("native sparse owning cleanup changed actual preexisting graph")
+	}
+}
+
+func TestPolynomialSparseNativeLocalsIndependentSeventeenSamples(t *testing.T) {
+	full := polynomialPSCFullFixture(t)
+	m := full.core
+	serviceMust(t, m.modular.SetZPUint64(97))
+	const size = 17
+	coefficients := make([]int32, size)
+	powers := make([][]MonomialPower, size)
+	for i := range coefficients {
+		coefficients[i] = int32(i + 1)
+		if i != 0 {
+			powers[i] = []MonomialPower{{0, uint32(i)}}
+		}
+	}
+	p := polynomialQueryTerms(t, m, coefficients, powers)
+	sk, e := NewPolynomialSkeleton(m, p, 0)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, sk.CloseChecked()) })
+	s, e := NewPolynomialSparseInterpolator(full, sk)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, s.CloseChecked()) })
+	out, e := NewPolynomialRef(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	for pass := int32(0); pass < 2; pass++ {
+		for x := int32(1); x <= size; x++ {
+			point := x + pass*size
+			value := int32(0)
+			for i := size - 1; i >= 0; i-- {
+				value = (value*point + coefficients[i]) % 97
+			}
+			if value > 48 {
+				value -= 97
+			}
+			q := polynomialQueryTerms(t, m, []int32{value}, [][]MonomialPower{nil})
+			input := util.NewInt(point)
+			ok, e := s.Add(&input, q)
+			serviceMust(t, e)
+			if !ok {
+				t.Fatal("independent sample support", point)
+			}
+		}
+		ok, e := s.Interpolate(out)
+		serviceMust(t, e)
+		if !ok {
+			t.Fatal("distinct prime-field Vandermonde samples")
+		}
+		equal, e := m.Equal(out.root.value, p)
+		serviceMust(t, e)
+		if !equal {
+			t.Fatal("independent seventeen coefficients", pass)
+		}
+		if s.interpolation.active {
+			t.Fatal("native local values survived completed destruction")
+		}
+		polynomialSparsePhysical(t, s, out, []Polynomial{p})
+		serviceMust(t, s.Reset())
+	}
+}

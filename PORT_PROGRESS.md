@@ -31630,3 +31630,40 @@ No Go source changed during that checkpoint. Continue focused verification
 until the next hourly checkpoint is due. The complete util knot/split goal
 remains active; next concrete storage consumers are sparse interpolation and
 remaining SOM/core numeral/monomial columns, followed by SAT scalar collections.
+
+## Native sparse interpolation numeral collections
+
+Sparse inputs, outputs and the cs/new_as/as lexical locals now own concrete
+`[]util.Int` storage. Actual modular SET still follows zero-slot publication;
+real numeric allocation capture and source/owning destruction order remain.
+Reset deletes/truncates inputs while preserving outputs. Source class destruction
+deletes inputs before outputs and releases their native slices. Lexical locals
+still follow solver, aux, mons, as, new_as, cs destruction order, with actual
+stopped numeral destruction retained for explicit owning continuation.
+
+The linear solver borrows native coefficient/output slices through its existing
+Add/Solve APIs; polynomial publication borrows the native numeral/monomial
+spans through the retained source factory algorithm. Removed only sparse
+container Runtime growth/free/pending/old/retired bookkeeping and its obsolete
+GCD pending-storage predicate. Physical audits count actual numeral resources,
+not Go slice capacity. Remaining linear-solver/factory/numeral Runtime allocations
+still have failure campaigns; native slice allocations are outside that budget.
+
+A 4097-term independent skeleton fixture allows only the real class-header
+reservation, then grows/resets/reuses all inputs twice with Runtime reservations
+disabled and checks every balanced residue plus unchanged outputs. Embedded
+output construction also succeeds under disabled Runtime reservations. A second
+regression reconstructs seventeen independent coefficients from independently
+calculated samples twice, exercising all three lexical numeral collections.
+Actual BIG-input Copy, interpolation numeric/solver/factory refusal prefixes,
+foreign callback allocations and stopped recursive-GCD destruction remain.
+
+Validation: focused native sparse/GCD/imp passed (0.991s), matching g3debug checks
+passed (1.401s), module-wide test compilation, polynomial vet, gofmt/diff checks
+and portcheck passed. Counts remain 2102 units / 677 APIs: 63 ported, 284 partial,
+1727 unported and two dead/deleted. The full native module checkpoint at
+21:43–21:45 UTC remains current; no repeated full sweep was needed.
+
+The complete external-container conversion and util split remain open. Next:
+linear solver matrix/RHS collections and remaining SOM/core numeral/monomial
+columns, then SAT scalar collections and the internal util dependency seams.

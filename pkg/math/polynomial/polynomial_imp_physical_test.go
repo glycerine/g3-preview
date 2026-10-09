@@ -306,7 +306,11 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		}
 		addSkeleton(f.newSkeleton)
 		if f.sparse.self != nil && !f.sparse.closed {
-			vectors = append(vectors, &f.sparse.inputs, &f.sparse.outputs)
+			for _, values := range [][]util.Int{f.sparse.inputs, f.sparse.outputs} {
+				for _, a := range values {
+					add(a)
+				}
+			}
 			adapterBytes += f.sparse.header
 		}
 	}
