@@ -140914,13 +140914,9 @@
           "tests": []
         }
       ],
-      "ownership": [
-        "Recycle transfers a nonnil pointer to the pool. A strong slice reference retains every cached object across garbage collections until Mk transfers it back to the caller or Close disposes it.",
-        "Mk transfers the returned object to the caller. Close processes cached objects in insertion order and does not touch checked-out objects, matching the source destructor's ownership boundary."
-      ],
+      "ownership": [],
       "deviations": [
-        "The source T template becomes a non-generic any-valued API that rejects nil and nonpointer values. Constructor and destructor behavior are supplied by factory and optional destroy callbacks; nil destroy delegates final memory reclamation to Go garbage collection.",
-        "A Go slice replaces ptr_vector storage while preserving strong retention, LIFO reuse and forward-order disposal. sync.Pool is intentionally not used because it may discard cached objects during garbage collection and therefore cannot preserve the source ownership contract."
+        "No generic Go adapter is retained. Live production specializations belong to their unported consumers and should use concrete typed slices with explicit reset/destruction behavior."
       ]
     },
     {
@@ -141139,7 +141135,7 @@
       "path": "src/util/ptr_scoped_buffer.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -141157,41 +141153,38 @@
       "methods": [
         {
           "name": "constructor, destructor, deallocate_all, reset and finalize",
-          "status": "partial",
+          "status": "reference_only",
           "go_target": "",
           "tests": []
         },
         {
           "name": "release ownership, size, empty and const iteration",
-          "status": "partial",
+          "status": "reference_only",
           "go_target": "",
           "tests": []
         },
         {
           "name": "push_back, back, pop_back and get",
-          "status": "partial",
+          "status": "reference_only",
           "go_target": "",
           "tests": []
         },
         {
           "name": "set identity no-op and destruction before replacement",
-          "status": "partial",
+          "status": "reference_only",
           "go_target": "",
           "tests": []
         },
         {
           "name": "append pointer range",
-          "status": "partial",
+          "status": "reference_only",
           "go_target": "",
           "tests": []
         }
       ],
-      "ownership": [
-        "PtrScopedBuffer owns every nonnil pointer until pop, replacement, reset, finalize, Close or Release. A caller-supplied concrete callback performs observable destruction; nil selects Go garbage collection. Release clears Go references without calling the callback, transferring lifetime back to pointers already retained by the caller."
-      ],
+      "ownership": [],
       "deviations": [
-        "The source T* and deallocator templates become a non-generic any-valued buffer that validates nil or Go pointer dynamic values and accepts a concrete destroy callback. Typed nil values are source null pointers; a stable self pointer rejects copied owners.",
-        "A Go slice replaces ptr_buffer and its inline16/heap allocation policy. Finalize releases the slice, Reset retains reusable capacity, and Append accepts a Go slice instead of an explicit count plus pointer. No C++ buffer or iterator implementation is ported."
+        "No Go adapter is retained. The only upstream instantiation is test-only, so production Go has no concrete specialization to implement."
       ]
     },
     {
@@ -142731,19 +142724,9 @@
           ]
         }
       ],
-      "ownership": [
-        "RefBuffer owns one reference for every stored slot. PushBack and Set increment incoming pointers before publication; PopBack removes before decrement; shrinking, reset, finalize and Close decrement removed slots from first to last. Clone and Assign acquire independent reference sets while retaining the same manager and callbacks.",
-        "CPtr and BackRef are live borrows into slice storage and become invalid after structural edits. Close invalidates the owner; checked pointer/copy-owner guards prevent continued use of an invalid or accidentally copied owning wrapper.",
-        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md.",
-        "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
-        "polynomial.cpp:5694-5749: H is bound at real ref_buffer constructor to the actual Next frame and invocation. Each push captures actual incoming INC and allocation leaves. Successful H destruction acknowledges the exact parent at the real finalization leaf; expired child cleanup neither reads later variable active state nor drains later H invocation.",
-        "polynomial.cpp:5659-5831: source/own finalization marks the exact actor as finishing before child cleanup or DEC. Actual delete-callback same-finalizer reentry refuses before cursor/root/history changes; H has an independent real-finalization guard. Source constructor order and DEC prefix are unchanged."
-      ],
+      "ownership": [],
       "deviations": [
-        "The source templates become one non-generic any-valued RefBuffer that accepts nil or Go pointer values and uses optional increment/decrement callbacks. Clone supplies the intended managed copy-constructor behavior despite the source's dependent-base append lookup, and nil callbacks supply sref_buffer behavior. Go slices replace ptr_buffer storage; Append captures its input before growth so self-append remains valid.",
-        "Owning construction cleanup refusal in concrete consumers publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "H uses concrete 16-byte polynomial handle storage rather than native pointer ABI. New helper tests do not increase historical active-driver assertion counts; original optimized source mathematics and alternative layouts remain unchanged."
+        "No generic RefBuffer exists in Go. Current AST and polynomial targets are concrete typed owners in their consumer packages; remaining specializations should follow that pattern."
       ]
     },
     {
@@ -142845,13 +142828,9 @@
           "tests": []
         }
       ],
-      "ownership": [
-        "Every helper borrows an ordered snapshot of entries or values. It decrements each selected reference in order and invokes the caller's reset only after the complete traversal; interrupted callbacks leave reset unpublished.",
-        "Real AST/dependency DEC callbacks run in ascending physical bucket order, key before value, with consumed/refused state recorded in actual table entries. Reset publication follows callbacks."
-      ],
+      "ownership": [],
       "deviations": [
-        "The source container and manager templates become ordered RefMapEntry/value slices, decrement callbacks and a reset callback. Callers adapt their native Go container rather than exposing C++ iterator or map machinery; this also prevents accidental nondeterministic iteration of a built-in Go map.",
-        "Interrupted Go callback cleanup resumes scalar progress rather than replaying consumed references; same-entry completion and destructor continuation are distinguished from C++ exception semantics."
+        "No generic Go adapter is retained. Each live decrement-and-clear operation belongs in its concrete consumer with compiler-checked element and manager types."
       ]
     },
     {
@@ -143245,30 +143224,9 @@
           ]
         }
       ],
-      "ownership": [
-        "RefVectorCore owns one acquired reference per stored slot. Push and fill growth increment before publication; Set increments incoming before decrementing old; Pop and Erase remove before decrement; shrink/reset/finalize/Close decrement removed ranges from first to last.",
-        "Clone and Assign acquire independent reference sequences. Move transfers the backing sequence without callbacks and leaves the source open and empty. Whole-vector Swap requires identical manager identity. Mutable element references and iterators borrow a particular structural generation and reject use after structural invalidation.",
-        "Scalar references/views and charged cold vector headers/backing; source reference action order and ownership transfer mapped for sexpr. See PORT_PROGRESS.md#audit-sexpr-port-status-md.",
-        "Actual AST callbacks, source INC-before-growth/set-index ordering, ASC teardown, backing-bound views and charged initialized high-water metadata are recorded in PORT_PROGRESS.md#audit-ast-core-packet-md. No fake rollback consumes orphan INC prefixes; source manager teardown remains responsible for actual unowned nodes.",
-        "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "Actual embedded full-manager frame and nonwrapping invocation; only real SET incoming INC and three constructed references are acquired. Child completed source suffix precedes older newS/prem/R destruction; unjoined assignment/child ownership abort follows older declarations. Caller output range remains independent.",
-        "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence.",
-        "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority.",
-        "Nine actual polynomial_ref declarations precede degree reads; youngest stopped child source DT blocks reverse reference destruction. Exact caller-vector Push tuple stamps at actual guarded push; completed incoming INC remains unjoined on growth failure and owning abort consumes only it after the nine older locals. Published range and vector backing remain caller-owned. Body/source/cleanup and child tuple history survive own acknowledgment; phase/index/degrees are diagnostics, never authority.",
-        "Persistent derived BV owner retains the reached bv2int invocation on failure. Its concrete numeric block owns default v and reached literal two/returned general power, with exact scalar and arithmetic-factory receipts. Numeric full-expression values survive tmp assignment, then end before vector replacement; loop tmp ends after size update. Owning cleanup joins exact newer numeric children and pending incoming INC before loop tmp, then forward vector elements and older v. Source vector SET stores replacement only after old DEC; consumed old references are recorded before a returned refusal so cleanup never repeats them. Source final vector destruction precedes default v."
-      ],
+      "ownership": [],
       "deviations": [
-        "The source templates become non-generic any-valued RefVectorCore, RefVector and SRefVector types that accept nil or Go pointer elements. Manager methods become callbacks, while SelfRefCounted supplies the unmanaged wrapper contract. Go slices replace ptr_vector storage without porting the C++ container.",
-        "Nonempty self-append, invalid indices, stale mutable elements/iterators and use after Close are explicit checked Go preconditions instead of source undefined behavior. Ref-vector null callbacks remain governed by the supplied concrete manager callbacks.",
-        "Go scalar tokens replace addresses and encode copied/stale-owner/lifetime guards. Source initialized retained pointer slots remain readable by live borrows; never-initialized/OOB access is guarded.",
-        "Owning construction cleanup refusal publishes a nonzero partial token with original error; scalar pending target/cursor tracks consumed callbacks without changing raw retained slots. Explicit Go retry/cleanup protects source-undefined interrupted destruction. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
-        "Concrete package integrations retain their own allocator, callback-failure and lifetime qualifications; the generic util contract is complete independently of those integration profiles.",
-        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
-        "Source remark equal-degree limitation and checked assertions retained. Default registered PSC dispatch uses optimized chain; dormant alternative gains zero active-driver credit. Pointer resize evidence covers only reached growth after completed reset, not ref_vector shrink. Signed-host TLS source release proof is an owner-primitive profile, not ordinary mathematical OOM. Actual mpz.h:156-163 old-TMP destruction before failing replacement leaves tmp[i]==0; only that literal dangling-pointer guard domain expects ErrInvalidSlot on retry. No scratch repair.",
-        "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
-        "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence.",
-        "Dormant psc_chain2 has zero active registered-driver assertion credit; default polynomial.cpp:5897-5902 remains optimized. uint32 d0-1, n1-n2 and index increment preserve source widths. Initial zero G2 reaches uninitialized n3 at polynomial.cpp:5647; Go guards that undefined source read with ErrRuntimeUninitialized, without inventing n3=0. Source child end-DT stop is qualified signed-host TLS owner-primitive domain, not ordinary mathematical OOM.",
-        "The selected bv2int uses the original leading-zero overflow predicates including their conservative multiplication and additive false-positive limitations, not corrected algorithms. Child conversion calls the original bv_util factory with borrowed sort parameter; singleton arithmetic app operands retain the original wrapper shortcut. Eight cold branch campaigns and actual Runtime numeric/power65/power130 campaigns establish source branches, publication, physical temporary lifetimes and owning cleanup, without independently proving stopped source destruction or native fatal resumability. C++ nested multiplication argument evaluation is unspecified; Go constructs coefficient before reading tmp. Native stack/layout/temporary-elision/allocator/assertion/exception ABI and whole-unit/full-dispatch completion remain qualified; pkg split is preserved."
+        "No generic RefVectorCore, RefVector, or SRefVector exists in Go. Current AST, polynomial, and s-expression targets use concrete typed owners; remaining specializations should stay beside their consumers."
       ]
     },
     {
@@ -144849,14 +144807,9 @@
           "tests": []
         }
       ],
-      "ownership": [
-        "ScopedPtrVector owns its Go slice and every nonnil pointer stored in it. A caller-supplied concrete destruction callback preserves project cleanup; nil selects ordinary Go garbage collection. Reset destroys first-to-last, resize shrink destroys last-to-first, set destroys the old value before publication, and Close performs the source destructor exactly once.",
-        "Skeleton entries/powers/originals use actual Runtime storage; failed constructor transfers actual unconsumed INC fields into charged cold owning-abort records before source backing free. Scoped pointer publications alone own concrete children; stopped source cause retained, separate owning cleanup. Variable helpers own two/one actual embedded uint vectors in one charged stable cold header, views/scopes borrow actual backing and references. Strong shared physical census names pseudo/Power/ExactDiv plus supplied headers/blocks without registry-derived ownership."
-      ],
+      "ownership": [],
       "deviations": [
-        "The source T* template becomes one non-generic any-valued vector that accepts only nil or Go pointer dynamic values. Pointer identity is checked with reflect at the API boundary; hot indexed reads use direct slice access. A stable self pointer rejects accidental owner copies.",
-        "Go slices replace ptr_vector storage. The explicit destroy callback is omitted when garbage collection is the complete source deletion action; concrete consumers with observable Close or reference-release behavior provide that action.",
-        "Selected concrete skeleton canonical order uses heap sort; platform std::sort comparator dispatch order is not claimed. Scalar child IDs encode actual cold object provenance under a fixed Runtime. Cold ownership metadata fully charged and distinct from source malloc events. Whole imp and registered-driver/global diagnostic integration remain open."
+        "No generic scoped pointer vector exists in Go. Current polynomial targets use concrete typed vectors and explicit cleanup; remaining live specializations should be implemented beside their consumers."
       ]
     },
     {
@@ -148283,13 +148236,9 @@
           "tests": []
         }
       ],
-      "ownership": [
-        "Insert copies each dependency set into Go-owned storage. Go garbage collection replaces destruction of the source-owned dependency sets and temporary maps/vectors. Returned TopSorted slices are copies so callers cannot mutate retained state."
-      ],
+      "ownership": [],
       "deviations": [
-        "The source template T* is represented by non-generic any values validated once at Insert as non-nil Go pointers. Internal maps therefore retain pointer identity without introducing Go generics.",
-        "The fork exposes only top_sorted, and its active revisit condition leaves the partition stack unchanged, making the observable result dependency-first DFS completion order. The Go implementation computes that same result iteratively to avoid Go call-stack exhaustion; it does not expose or emulate unobservable partition bookkeeping.",
-        "Independent roots and dependency sets use caller insertion order rather than C++ object-hash bucket order. A separate node slice supplies deterministic iteration without depending on Go map order."
+        "No generic Go adapter is retained. The sole production specialization is top_sort<sort> in the unported AST declaration collector; implement a concrete sort-pointer traversal in package ast when that consumer is ported."
       ]
     },
     {
@@ -148722,12 +148671,9 @@
           "tests": []
         }
       ],
-      "ownership": [
-        "UintPtrMap exclusively owns its dense slot slice and retains non-nil Go pointers as interface values. Erase and Reset clear slots so the pointed-to objects are no longer retained by the map; the map never owns or finalizes those objects."
-      ],
+      "ownership": [],
       "deviations": [
-        "The existing exported UintMap name belongs to the concrete u_map<unsigned> port from src/util/map.h, so this source uint_map<T*> becomes UintPtrMap. A []uintPtrMapSlot replaces ptr_vector<T>; an explicit present bit keeps Contains hot without reflection, while Insert performs one cold reflection check that the dynamic value is a non-nil pointer.",
-        "Find returns (any, bool), while Get is the source asserted find overload and panics for an absent key. Insert panics for nil or non-pointer values, adapting the source T* compile-time constraint and post-insert assertion."
+        "No generic Go adapter is retained. Future consumers should use concrete typed slices indexed by uint32; no interface-valued root utility is required."
       ]
     },
     {

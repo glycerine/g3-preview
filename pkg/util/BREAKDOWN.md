@@ -156,7 +156,7 @@ self-contained in Go or depend only on `arena` or the standard library.
 | --- | --- | --- |
 | `util/lbool` | `lbool` | High-value first move. The value type has no internal C++ dependency and already has many Go consumers. |
 | `util/mincut` | `min_cut` | Self-contained live algorithm. Make it a package leaf even though its `muz` consumer has not yet been ported. |
-| `util/toposort` | `top_sort` | Live in the AST code. Specialize the present `any`-based Go API for its real node type rather than preserving a generic C++ template shape. |
+| AST-local topological sort | `top_sort` | The generic Go adapter is gone. Implement the sole live `sort*` specialization beside the AST declaration collector when that consumer is ported. |
 | `util/natset` | `nat_set` | Self-contained live representation and a natural package leaf. |
 | `util/approx` | `approx_nat`, `approx_set` | Cohesive approximate-number/set functionality. Their display methods currently touch shared numeric formatting; replace that edge with ordinary `fmt`/`io` behavior or a narrow formatter. |
 | `util/backtrack` | `trail`, `union_find`, selected backtracking containers | `union_find` is widely used upstream. Keep trail ownership and undo behavior together. Specialize `backtrackable_set` for its actual consumer instead of keeping `any`. |
