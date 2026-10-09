@@ -5,8 +5,8 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// Decimal scratch limbs use reusable typed Go slices. Character formatting
-// and the shared MPN workspace retain their explicit Runtime cleanup.
+// Decimal scratch limbs and character bytes use reusable Go slices. Shared
+// MPN numerical workspaces retain their explicit Runtime cleanup.
 type fastFormattingScope struct {
 	buffers                     [4][]uint32
 	active, pending             bool
@@ -35,7 +35,7 @@ func (m *FastFloatManager) beginFastCharacters(v ffLimbView, offset uint32) (uin
 	if e := m.natural.beginIntegerCharacters(uint32(11 * n)); e != nil {
 		return 0, e
 	}
-	e := m.natural.sourceToCString(fastNaturalView(v), sourceDecimalDestination{character: &m.natural.CharFormatting.Buffer, assembly: m.natural}, uint64(m.natural.CharFormatting.Buffer.pos))
+	e := m.natural.sourceToCString(fastNaturalView(v), sourceDecimalDestination{character: m.natural.CharFormatting.Buffer}, uint64(len(m.natural.CharFormatting.Buffer)))
 	if e != nil {
 		return 0, e
 	}

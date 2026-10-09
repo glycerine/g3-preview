@@ -220,7 +220,7 @@ func (m *IntegerManager) prepareInteger(a *Int, offset uint32) (uint32, error) {
 		return 0, e
 	}
 	natural := m.Natural
-	e = natural.sourceToCString(limbView{allocator: m.Allocator, backing: c.Backing, size: size}, sourceDecimalDestination{character: &natural.CharFormatting.Buffer, assembly: natural}, uint64(natural.CharFormatting.Buffer.pos))
+	e = natural.sourceToCString(limbView{allocator: m.Allocator, backing: c.Backing, size: size}, sourceDecimalDestination{character: natural.CharFormatting.Buffer}, uint64(len(natural.CharFormatting.Buffer)))
 	var n uint32
 	if e == nil {
 		n, e = natural.appendIntegerCString(offset)

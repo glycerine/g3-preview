@@ -312,8 +312,6 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 		addRaw(buffer.Raw)
 		addRaw(buffer.Pending)
 	}
-	addRaw(z.Naturals().CharFormatting.Buffer.Raw)
-	addRaw(z.Naturals().CharFormatting.Buffer.PendingField)
 	numeric, cells := z.Allocator.Stats(), c.config.Allocator.Stats()
 	want := numeric.Chunks + numeric.DirectObjects + numeric.PendingBlocks + cells.Chunks + cells.DirectObjects + cells.PendingBlocks + uint32(len(rawRoots))
 	if want != z.RuntimeOwner().Stats().LiveBlocks {

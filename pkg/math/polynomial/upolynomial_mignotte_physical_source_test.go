@@ -136,18 +136,7 @@ func mignotteNamedIntegerPhysicalAudit(t *testing.T, m *util.IntegerManager, ext
 			}
 		}
 	}
-	for _, r := range []util.Block{m.Naturals().CharFormatting.Buffer.Raw, m.Naturals().CharFormatting.Buffer.PendingField} {
-		if r == (util.Block{}) {
-			continue
-		}
-		if raw[r] {
-			t.Fatal("duplicate character raw root")
-		}
-		raw[r] = true
-		if _, e := m.RuntimeOwner().Read(r, 0); e != nil && !errors.Is(e, util.ErrRuntimeUninitialized) {
-			t.Fatal("invalid character raw root", e)
-		}
-	}
+
 	for _, block := range external {
 		if block == (util.Block{}) || raw[block] {
 			t.Fatal("duplicate or empty named external block", block)

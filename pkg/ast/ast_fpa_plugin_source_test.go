@@ -246,9 +246,6 @@ func astFloatingPointRawGraphSourceOwners(t *testing.T, q *util.RationalService,
 					raw(allocations.Index(i))
 				}
 				raw(testFieldBySourceName(testFieldBySourceName(v, "transferred"), "block"))
-				characters := testFieldBySourceName(testFieldBySourceName(v, "characters"), "buffer")
-				raw(testFieldBySourceName(characters, "raw"))
-				raw(testFieldBySourceName(characters, "pending"))
 				locals := testFieldBySourceName(testFieldBySourceName(v, "characterFormatting"), "locals")
 				for i := 0; i < locals.Len(); i++ {
 					raw(testFieldBySourceName(locals.Index(i), "raw"))
@@ -310,9 +307,6 @@ func astFloatingPointRawGraphSourceOwners(t *testing.T, q *util.RationalService,
 			verification := testFieldBySourceName(n, "verification")
 			raw(testFieldBySourceName(verification, "raw"))
 			raw(testFieldBySourceName(verification, "pending"))
-			characters := testFieldBySourceName(testFieldBySourceName(n, "charFormatting"), "buffer")
-			raw(testFieldBySourceName(characters, "raw"))
-			raw(testFieldBySourceName(characters, "pending"))
 			locals := testFieldBySourceName(testFieldBySourceName(n, "formatting"), "locals")
 			for i := 0; i < locals.Len(); i++ {
 				raw(testFieldBySourceName(locals.Index(i), "raw"))

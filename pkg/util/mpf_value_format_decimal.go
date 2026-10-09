@@ -235,9 +235,7 @@ func (m *ArbitraryFloatManager) cleanupFormatInsertion(r *NumeralInsertionReceip
 		}
 	}
 	if r.characterOwned {
-		if e := r.Character.Buffer.finalize(n.runtime); e != nil {
-			return stop(e)
-		}
+		r.Character.Buffer = nil
 		n.CharFormatting = integerCharacterScope{invocation: r.invocation}
 	}
 	r.characterOwned = false

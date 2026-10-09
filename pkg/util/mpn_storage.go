@@ -297,11 +297,5 @@ func (m *NaturalManager) overflowPayloads() uint32 {
 			count++
 		}
 	}
-	if m.CharFormatting.Buffer.Raw != (Block{}) {
-		count++
-	}
-	if m.CharFormatting.Buffer.PendingField != (Block{}) {
-		count++
-	}
 	return count
 }

@@ -644,18 +644,7 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *util.IntegerManager, external 
 			}
 		}
 	}
-	for _, r := range []util.Block{m.Natural.CharFormatting.Buffer.Raw, m.Natural.CharFormatting.Buffer.PendingField} {
-		if r == (util.Block{}) {
-			continue
-		}
-		if raw[r] {
-			t.Fatal("duplicate character raw root")
-		}
-		raw[r] = true
-		if _, e := m.Memory.Read(r, 0); e != nil && !errors.Is(e, util.ErrRuntimeUninitialized) {
-			t.Fatal("invalid character raw root", e)
-		}
-	}
+
 	for _, block := range external {
 		if block == (util.Block{}) || raw[block] {
 			t.Fatal("duplicate or empty named external block", block)

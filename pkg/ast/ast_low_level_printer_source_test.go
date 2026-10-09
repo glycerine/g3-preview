@@ -180,7 +180,9 @@ func TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame(t *testing
 	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: ba})
 	paramsMust(t, e)
 	before := r.State()
-	paramsMust(t, r.SetMaxSize(uint64(before.GlobalSize+1000000)))
+	// Refuse a numerical workspace before decimal conversion; character
+	// scratch no longer contributes to Runtime size.
+	paramsMust(t, r.SetMaxSize(uint64(before.GlobalSize+200000)))
 	armed = true
 	e = m.DisplayLowLevel(out, app, true, true)
 	if !called {
@@ -220,29 +222,20 @@ func TestASTLowLevelPrinterYoungerNumeralStopProtectsActualOlderFrame(t *testing
 	if testFieldBySourceName(testFieldBySourceName(natural, "formatting"), "completed").Uint() != 0 || testFieldBySourceName(testFieldBySourceName(natural, "charFormatting"), "completed").Bool() {
 		t.Fatal("actual source child values not ended")
 	}
-	// A later source-valid new char constructor is foreign to the old receipt.
-	// Its real consumed-old-buffer signed-accounting guard retains exact
-	// unjoined allocation roots; this is Go guard-domain, not native OOM.
+	// A later numerical workspace failure belongs to its own insertion receipt.
 	var foreign util.NumeralInsertionReceipt
-	if e = q.InsertIntoTracked(out, &big, &foreign); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("actual foreign char constructor", e)
+	bn.FailAfter(0)
+	e = q.InsertIntoTracked(out, &big, &foreign)
+	bn.FailAfter(-1)
+	if e == nil {
+		t.Fatal("foreign numerical workspace unexpectedly succeeded")
 	}
 	foreignBefore := foreign
 	charBuffer := testFieldBySourceName(testFieldBySourceName(natural, "charFormatting"), "buffer")
-	foreignToken := func() [6]uint64 {
-		var tuple [6]uint64
-		for i, name := range []string{"raw", "pending"} {
-			block := testFieldBySourceName(charBuffer, name)
-			tuple[3*i] = testFieldBySourceName(block, "origin").Uint()
-			tuple[3*i+1] = testFieldBySourceName(block, "slot").Uint()
-			tuple[3*i+2] = testFieldBySourceName(block, "generation").Uint()
-		}
-		return tuple
+	foreignToken := func() string {
+		return string(charBuffer.Bytes())
 	}
 	foreignRaw := foreignToken()
-	if foreignRaw == ([6]uint64{}) {
-		t.Fatal("foreign constructor has no actual raw acquisition")
-	}
 	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{anchor}, nil, upolyPhysicalExtraOwners{ASTManagers: []*ASTManager{m}, RationalServices: []*util.RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}})
 	if ba.Used() != m.Stats().AllocatedBytes+out.Stats().OwnerBytes+out.Stats().ScratchBytes+out.Stats().OutputOwnerBytes+out.Stats().OutputOverflowBytes {
 		t.Fatal("foreign-before-old-ACK cold graph", ba.Used(), m.Stats(), out.Stats())

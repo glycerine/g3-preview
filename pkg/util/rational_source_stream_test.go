@@ -21,7 +21,7 @@ func TestNumeralCStringViewExactCompletedCharacterInvocation(t *testing.T) {
 	n := z.Natural
 	construct := func() NumeralCStringView {
 		serviceMust(t, n.beginIntegerCharacters(uint32(11*size)))
-		serviceMust(t, n.sourceToCString(limbView{allocator: z.Allocator, backing: c.Backing, size: size}, sourceDecimalDestination{character: &n.CharFormatting.Buffer, assembly: n}, uint64(n.CharFormatting.Buffer.pos)))
+		serviceMust(t, n.sourceToCString(limbView{allocator: z.Allocator, backing: c.Backing, size: size}, sourceDecimalDestination{character: n.CharFormatting.Buffer}, uint64(len(n.CharFormatting.Buffer))))
 		return NumeralCStringView{owner: n, invocation: n.CharFormatting.invocation}
 	}
 	old := construct()
@@ -32,7 +32,7 @@ func TestNumeralCStringViewExactCompletedCharacterInvocation(t *testing.T) {
 			t.Fatal("actual character bytes", i, got, want)
 		}
 	}
-	if _, e = old.Byte(uint64(n.CharFormatting.Buffer.capacity())); !errors.Is(e, arena.ErrBounds) {
+	if _, e = old.Byte(uint64(len(n.CharFormatting.Buffer))); !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("reached physical capacity", e)
 	}
 	serviceMust(t, n.destroyIntegerCharacters())

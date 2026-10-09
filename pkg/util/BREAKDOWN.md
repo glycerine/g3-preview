@@ -881,3 +881,13 @@ ascending source deletion, stopped-cleanup state, and borrowed views remain;
 inline/spill capacity, Runtime relocation blocks, and their allocation-failure
 tests are gone. Future specializations should likewise be typed at their actual
 consumer rather than restoring a universal buffer abstraction.
+
+Integer and polynomial decimal character scratch now uses native `[]byte`.
+The shared formatter reuses slice capacity and clears the active region before
+conversion. Borrowed output still checks the exact owner and invocation, while
+C++ inline/spill storage, Runtime character blocks, allocation-refusal states,
+and destructor-failure states are gone. MPN numerical workspaces still retain
+explicit resource ownership and failure cleanup; they are a separate remaining
+step. AST and polynomial physical-root audits now count only those real numeric
+allocations, and retained tests cover output, bounds, stale views, inner numeric
+failures, and cleanup.

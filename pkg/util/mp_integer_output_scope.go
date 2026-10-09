@@ -16,7 +16,7 @@ type integerCharacterScope struct {
 	formatting                  *naturalFormattingScope
 	previous                    *integerCharacterScope
 	callExecuting               bool
-	Buffer                      sourceCharBuffer
+	Buffer                      []byte
 	invocation                  uint64
 	active, Completed, pending  bool
 	originalCause, CleanupCause error
@@ -63,6 +63,9 @@ func (m *NaturalManager) beginIntegerCharacterScopeWithCaller(n uint32, service 
 		s = &caller.characters
 		formatting = &caller.characterFormatting
 	}
+	if uint64(n) > uint64(^uint(0)>>1) {
+		return arena.ErrBounds
+	}
 	if s.active || s.pending {
 		return arena.ErrInvalidSlot
 	}
@@ -74,7 +77,8 @@ func (m *NaturalManager) beginIntegerCharacterScopeWithCaller(n uint32, service 
 			return e
 		}
 	}
-	*s = integerCharacterScope{caller: caller, owner: m, display: display, formatting: formatting, active: true, invocation: s.invocation + 1}
+	buffer := s.Buffer
+	*s = integerCharacterScope{Buffer: buffer, caller: caller, owner: m, display: display, formatting: formatting, active: true, invocation: s.invocation + 1}
 	s.self = s
 	if display != nil {
 		s.displayInvocation = display.Generation
@@ -85,12 +89,13 @@ func (m *NaturalManager) beginIntegerCharacterScopeWithCaller(n uint32, service 
 	if executing {
 		m.beginIntegerCharacterCall(s)
 	}
-	if e := s.Buffer.resize(m.runtime, n); e != nil {
-		s.active = false
-		s.pending = true
-		s.originalCause = e
-		return e // failed constructor's destructor must not run
+	if int(n) > cap(s.Buffer) {
+		s.Buffer = make([]byte, n)
+	} else {
+		s.Buffer = s.Buffer[:n]
+		clear(s.Buffer)
 	}
+
 	s.Completed = true
 	if receipt != nil {
 		receipt.characterCompleted = true
@@ -104,29 +109,15 @@ func (m *NaturalManager) destroyIntegerCharacterScope(s *integerCharacterScope) 
 	if !s.Completed {
 		return nil
 	}
-	if s.Buffer.Raw != (Block{}) {
-		if e := m.runtime.Deallocate(&s.Buffer.Raw); e != nil {
-			s.active = false
-			s.pending = true
-			s.CleanupCause = e
-			if s.originalCause == nil {
-				s.originalCause = e
-			}
-			return e
-		}
-	}
 	s.Completed = false
 	s.active = false
-	if s.Buffer.PendingField != (Block{}) {
-		s.pending = true
-		return arena.ErrInvalidSlot
-	}
+
 	s.reset()
 	return nil
 }
 
 func (s *integerCharacterScope) reset() {
-	*s = integerCharacterScope{caller: s.caller, self: s.self, owner: s.owner, display: s.display, displayInvocation: s.displayInvocation, formatting: s.formatting, previous: s.previous, callExecuting: s.callExecuting, invocation: s.invocation}
+	*s = integerCharacterScope{Buffer: s.Buffer[:0], caller: s.caller, self: s.self, owner: s.owner, display: s.display, displayInvocation: s.displayInvocation, formatting: s.formatting, previous: s.previous, callExecuting: s.callExecuting, invocation: s.invocation}
 }
 
 func (m *NaturalManager) matchesIntegerCharacterScope(s *integerCharacterScope) bool {
@@ -156,9 +147,8 @@ func (m *NaturalManager) endIntegerCharacterCall(s *integerCharacterScope) {
 	}
 }
 
-// cleanupOutputFormatting first resumes completed source local destructors,
-// then the completed outer char destructor. Only afterwards does owning
-// cleanup reclaim actual failed-constructor/unpublished allocations.
+// cleanupOutputFormatting ends numerical locals before invalidating borrowed
+// character views, then reclaims retained numerical allocations and Go scratch.
 func (m *NaturalManager) cleanupOutputFormatting() error {
 	if m.Formatting.Active || m.Formatting.CompletedField != 0 {
 		if e := m.unwindFormattingLocals(); e != nil {
@@ -174,12 +164,9 @@ func (m *NaturalManager) cleanupOutputFormatting() error {
 		return e
 	}
 	if m.CharFormatting.pending {
-		if e := m.CharFormatting.Buffer.finalize(m.runtime); e != nil {
-			m.CharFormatting.CleanupCause = e
-			return e
-		}
 		m.CharFormatting = integerCharacterScope{invocation: m.CharFormatting.invocation}
 	}
+	m.CharFormatting.Buffer = nil
 	return nil
 }
 
@@ -187,7 +174,7 @@ func (m *NaturalManager) appendIntegerCString(offset uint32) (uint32, error) {
 	s := &m.CharFormatting
 	var n uint64
 	for {
-		v, e := s.Buffer.readPhysical(m.runtime, n)
+		v, e := characterByte(s.Buffer, n)
 		if e != nil {
 			return 0, e
 		}
@@ -206,7 +193,7 @@ func (m *NaturalManager) appendIntegerCString(offset uint32) (uint32, error) {
 		return 0, e
 	}
 	for i := uint64(0); i < n; i++ {
-		v, e := s.Buffer.readPhysical(m.runtime, i)
+		v, e := characterByte(s.Buffer, i)
 		if e != nil {
 			return 0, e
 		}

@@ -12,17 +12,14 @@ func TestNumericMagnitudeBorrowKeepsCharacterAndLimbLifetimesSeparate(t *testing
 	if e != nil {
 		t.Fatal(e)
 	}
-	var characters SourceCharacterBuffer
+	characters := make([]byte, 11*magnitude.Size())
 	var limbs NaturalFormattingScope
-	if e := characters.Resize(z.RuntimeOwner(), 11*magnitude.Size()); e != nil {
-		t.Fatal(e)
-	}
-	if e := magnitude.WriteCString(&characters, &limbs); e != nil {
+	if e := magnitude.WriteCString(characters, &limbs); e != nil {
 		t.Fatal(e)
 	}
 	var text []byte
 	for i := uint64(0); i < 100; i++ {
-		b, e := characters.ReadPhysical(z.RuntimeOwner(), i)
+		b, e := characterByte(characters, i)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -38,12 +35,6 @@ func TestNumericMagnitudeBorrowKeepsCharacterAndLimbLifetimesSeparate(t *testing
 		t.Fatal("completed limb destructors retained pending state")
 	}
 	if e := limbs.CleanupAfterSource(z.Naturals()); e != nil {
-		t.Fatal(e)
-	}
-	if e := characters.ReleasePublished(z.RuntimeOwner()); e != nil {
-		t.Fatal(e)
-	}
-	if e := characters.Finalize(z.RuntimeOwner()); e != nil {
 		t.Fatal(e)
 	}
 	if e := z.Del(&a); e != nil {

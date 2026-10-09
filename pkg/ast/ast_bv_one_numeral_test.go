@@ -4,6 +4,7 @@ package ast
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -52,7 +53,7 @@ func TestASTBitVectorBorrowedOneEveryActualReservation(t *testing.T) {
 			if m.numerals.OneField != oneBefore {
 				t.Fatal("borrowed constant changed")
 			}
-			if f := call.receipt.frame; f != nil && (f.placed[5] || f.children[9] != (util.RationalServiceInvocation{})) {
+			if f := call.receipt.frame; f != nil && (f.placed[5] || !reflect.DeepEqual(f.children[9], util.RationalServiceInvocation{})) {
 				t.Fatal("invented outer literal constructor")
 			}
 			copy := call

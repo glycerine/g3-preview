@@ -196,11 +196,11 @@ func TestFastFloatSharedRuntimeProfileAndClose(t *testing.T) {
 			state := r.State()
 			extent := int64(17 + bits/8)
 			if tls {
-				if state.GlobalSize != 0 || state.GlobalCount != 0 || state.LocalSize != extent || state.LocalCount != 8 {
+				if state.GlobalSize != 0 || state.GlobalCount != 0 || state.LocalSize != extent || state.LocalCount != 7 {
 					t.Fatal("TLS getters do not flush", bits, state)
 				}
 			} else {
-				if state.GlobalSize != extent || state.GlobalCount != 8 || state.LocalSize != 0 || state.LocalCount != 0 {
+				if state.GlobalSize != extent || state.GlobalCount != 7 || state.LocalSize != 0 || state.LocalCount != 0 {
 					t.Fatal("nonTLS accounting", bits, state)
 				}
 			}
@@ -243,69 +243,6 @@ func TestFastFloatSharedRuntimeProfileAndClose(t *testing.T) {
 				t.Fatal(bits, tls, b.Used())
 			}
 		}
-	}
-}
-
-func TestFastFloatBorrowedTLSCharConstructorPostphysicalPrefix(t *testing.T) {
-	b := arena.NewBudget(1 << 28)
-	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
-	serviceMust(t, e)
-	m, e := NewFastFloatManager(fastRuntimeConfig(b, r, 6364))
-	serviceMust(t, e)
-	caller, e := r.Allocate(17)
-	serviceMust(t, e)
-	var a FastFloat
-	serviceMust(t, m.SetInt32(&a, -1))
-	serviceMust(t, m.natural.reserveText(256))
-	serviceMust(t, r.SetMaxCount(1))
-	var dst [32]byte
-	for i := range dst {
-		dst[i] = '!'
-	}
-	_, e = m.FormatInto(&a, dst[:])
-	var refusal Failure
-	if !errors.As(e, &refusal) || refusal.Kind != FailureAllocExceeded {
-		t.Fatal("actual postphysical TLS count refusal", e)
-	}
-	char := &m.natural.CharFormatting
-	if char.Completed || !char.pending || char.Buffer.pos != 65536 || char.Buffer.Raw == (Block{}) || char.Buffer.PendingField == (Block{}) {
-		t.Fatal("failed constructor retains both physical roots", char.Buffer.pos, char.Completed, char.pending)
-	}
-	old, e := r.Size(char.Buffer.Raw)
-	serviceMust(t, e)
-	pending, e := r.Size(char.Buffer.PendingField)
-	serviceMust(t, e)
-	if old != 65536 || pending != 131072 || m.natural.textRead(0) != '-' || m.formatting.originalCause != refusal || m.formatting.cleanupCause != nil {
-		t.Fatal("real publication and cause", old, pending, m.formatting.originalCause, m.formatting.cleanupCause)
-	}
-	for _, v := range dst {
-		if v != '!' {
-			t.Fatal("caller bytes published")
-		}
-	}
-	fastSharedRuntimeAudit(t, r, []*FastFloatManager{m}, caller)
-	before := r.State()
-	// Threshold sync follows the successful new physical allocation; caller + old
-	// + pending are charged, local size reset, count stays cumulative (seven char
-	// expansions plus the caller). No failed-ctor destructor freed either root.
-	if before.GlobalSize != 25+65544+131080 || before.LocalSize != 0 || before.GlobalCount != 8 || before.LocalCount != 8 {
-		t.Fatal("source TLS postphysical prefix", before)
-	}
-	serviceMust(t, m.CleanupFormatting()) // free ignores allocation-only maxcount
-	after := r.State()
-	if after.GlobalSize != 25+65544 || after.LocalSize != -65544 || after.GlobalCount != 16 || after.LocalCount != 8 {
-		t.Fatal("negative threshold free sync and cumulative count", after)
-	}
-	if m.formatting.pending || char.pending || char.Buffer.Raw != (Block{}) || char.Buffer.PendingField != (Block{}) {
-		t.Fatal("owning cleanup not complete")
-	}
-	fastSharedRuntimeAudit(t, r, []*FastFloatManager{m}, caller)
-	serviceMust(t, m.CloseChecked())
-	serviceMust(t, r.CheckOpen())
-	serviceMust(t, r.Deallocate(&caller))
-	serviceMust(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
 	}
 }
 

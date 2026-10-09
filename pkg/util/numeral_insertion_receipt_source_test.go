@@ -2,6 +2,7 @@
 package util
 
 import (
+	"bytes"
 	"errors"
 	"reflect"
 	"testing"
@@ -88,7 +89,7 @@ func TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards
 				t.Fatal("actual constructor entry not stamped", receipt, body)
 			}
 			original := receipt
-			raw, pending := n.CharFormatting.Buffer.Raw, n.CharFormatting.Buffer.PendingField
+			buffer := append([]byte(nil), n.CharFormatting.Buffer...)
 			rtBefore := rt.Stats()
 			bad := receipt
 			bad.invocation++
@@ -103,7 +104,7 @@ func TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards
 			if e = q.CompleteNumeralInsertion(&bad, true); !errors.Is(e, arena.ErrInvalidSlot) {
 				t.Fatal("foreign frame", e)
 			}
-			if !reflect.DeepEqual(original, receipt) || raw != n.CharFormatting.Buffer.Raw || pending != n.CharFormatting.Buffer.PendingField || rt.Stats() != rtBefore {
+			if !reflect.DeepEqual(original, receipt) || !bytes.Equal(buffer, n.CharFormatting.Buffer) || rt.Stats() != rtBefore {
 				t.Fatal("rejected tuple changed actual acquisitions")
 			}
 			if body != nil {
@@ -117,9 +118,7 @@ func TestNumeralInsertionReceiptActualCharacterConstructorPrefixesAndTupleGuards
 				t.Fatal("immediate exact constructor cold graph", bits, ordinal, b.Used(), beforeUsed, rt.Stats())
 			}
 			// No injected fault is lifted until exact child and provider graph checks.
-			if body == nil && raw == (Block{}) {
-				t.Fatal("completed dynamic char constructor has no actual block")
-			}
+
 			b.FailAfter(-1)
 			serviceMust(t, q.CompleteNumeralInsertion(&receipt, false))
 			if receipt.characterCompleted && n.CharFormatting.Completed {

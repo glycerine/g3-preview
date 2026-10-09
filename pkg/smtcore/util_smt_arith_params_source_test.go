@@ -463,7 +463,8 @@ func TestSMTArithEveryUnwarmedSharedModuleAcquisitionReservation(t *testing.T) {
 			break
 		}
 	}
-	if first < 5 {
+	// Symbol spellings use Go storage; count only remaining arena acquisitions.
+	if first != 3 {
 		t.Fatal("actual shared symbol/module acquisition absent", first)
 	}
 	t.Log("first successful unwarmed arithmetic constructor", first)

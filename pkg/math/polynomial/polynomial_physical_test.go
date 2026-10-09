@@ -186,8 +186,6 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 			put(s.Pending)
 		}
 	}
-	put(z.Naturals().CharFormatting.Buffer.Raw)
-	put(z.Naturals().CharFormatting.Buffer.PendingField)
 	za, ma := z.SourceAllocator().Stats(), mm.allocator.Stats()
 	if uint32(len(raw))+za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
 		t.Fatal("unnamed Runtime root", len(raw), za, ma, m.memory.Stats())

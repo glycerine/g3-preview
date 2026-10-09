@@ -51,7 +51,7 @@ func (v NumeralCStringView) Byte(i uint64) (byte, error) {
 	if !s.active || !s.Completed || s.invocation != v.invocation {
 		return 0, arena.ErrInvalidSlot
 	}
-	return s.Buffer.readPhysical(v.owner.runtime, i)
+	return characterByte(s.Buffer, i)
 }
 
 func (s *RationalService) InsertInto(out RationalSourceStream, v *OwnedRational) error {
@@ -183,7 +183,7 @@ func (m *IntegerManager) insertSourceIntegerTrackedWithContexts(out RationalSour
 			}
 		}
 	}()
-	e = n.sourceToCStringScopedTracked(limbView{allocator: m.Allocator, backing: c.Backing, size: size}, sourceDecimalDestination{character: &characters.Buffer, assembly: n}, uint64(characters.Buffer.pos), characters.formatting, receipt)
+	e = n.sourceToCStringScopedTracked(limbView{allocator: m.Allocator, backing: c.Backing, size: size}, sourceDecimalDestination{character: characters.Buffer}, uint64(len(characters.Buffer)), characters.formatting, receipt)
 	if e == nil {
 		e = out.AppendNumeralCString(NumeralCStringView{owner: n, invocation: characters.invocation, Character: characters, displayInvocation: characters.displayInvocation, caller: caller})
 	}

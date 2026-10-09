@@ -36504,7 +36504,6 @@
         "TestPolynomialDisplayWarmInlineFrames",
         "TestPolynomialDisplayOwnerGuards",
         "TestPolynomialDisplayMonomialWrapperAndFiniteField",
-        "TestPolynomialDisplayYoungerStoppedDestructor",
         "TestPolynomialDisplayExactNumericReceiptAndReplacement",
         "TestPolynomialDisplaySinkCreatesForeignPending",
         "TestPolynomialFactorsAbortOwnsReachedCalleesOnly",
@@ -39633,7 +39632,6 @@
             "TestPolynomialDisplayWarmInlineFrames",
             "TestPolynomialDisplayOwnerGuards",
             "TestPolynomialDisplayMonomialWrapperAndFiniteField",
-            "TestPolynomialDisplayYoungerStoppedDestructor",
             "TestPolynomialDisplayExactNumericReceiptAndReplacement",
             "TestPolynomialDisplaySinkCreatesForeignPending"
           ]
@@ -41016,7 +41014,8 @@
         "Signed-host TLS DEBUG verification destructor stop is a qualified owner-primitive profile, not mathematical allocation failure. Returning Runtime transport and copied/foreign/stale metadata are supported Go owner boundary tests.",
         "Historical missing-API RED and actual Integer/Rational Copy/PN owner callback REDs retained. Requested-size-only pending metadata and the first sorted nonunit term fixture were oracle corrections, not algorithm failures; budget0 did not reach Runtime transport.",
         "Native foreign PN reservation prefixes retain no untransferred pending leaf: successful direct allocation publishes shared member storage atomically. The native proof preserves those actual members/caller NUM and independently checks remainder2^338+17; checked DEBUG verification yields the genuinely retained foreign PN child. Physical/cold audits remain unchanged for every prefix.",
-        "FactorHigher literal TODO at polynomial.cpp:6727-6735 is preserved; this is the original degree dispatcher rather than a dense or degree-specific replacement. Default generator pointer selection prime_generator.cpp:99-107 is explicit borrowed Go config, with a guarded DefaultPrimeService accessor; no hidden global generator. tst_mfact is dormant after polynomial.cpp test driver return at1825: active original-driver credit remains0. Signed-host TLS DEBUG destructor fixtures qualify owner primitives; guard-copy and returning Go callbacks are separate domains. Broader polynomial/NLSAT units remain partial/unported."
+        "FactorHigher literal TODO at polynomial.cpp:6727-6735 is preserved; this is the original degree dispatcher rather than a dense or degree-specific replacement. Default generator pointer selection prime_generator.cpp:99-107 is explicit borrowed Go config, with a guarded DefaultPrimeService accessor; no hidden global generator. tst_mfact is dormant after polynomial.cpp test driver return at1825: active original-driver credit remains0. Signed-host TLS DEBUG destructor fixtures qualify owner primitives; guard-copy and returning Go callbacks are separate domains. Broader polynomial/NLSAT units remain partial/unported.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
       ]
     },
     {
@@ -41651,7 +41650,6 @@
         "TestPolynomialDisplayWarmInlineFrames",
         "TestPolynomialDisplayOwnerGuards",
         "TestPolynomialDisplayMonomialWrapperAndFiniteField",
-        "TestPolynomialDisplayYoungerStoppedDestructor",
         "TestPolynomialDisplayExactNumericReceiptAndReplacement",
         "TestPolynomialDisplaySinkCreatesForeignPending",
         "TestPolynomialFactorsAbortOwnsReachedCalleesOnly",
@@ -43219,7 +43217,6 @@
             "TestPolynomialDisplayWarmInlineFrames",
             "TestPolynomialDisplayOwnerGuards",
             "TestPolynomialDisplayMonomialWrapperAndFiniteField",
-            "TestPolynomialDisplayYoungerStoppedDestructor",
             "TestPolynomialDisplayExactNumericReceiptAndReplacement",
             "TestPolynomialDisplaySinkCreatesForeignPending"
           ]
@@ -43648,7 +43645,8 @@
         "Signed-host TLS DEBUG verification destructor stop is a qualified owner-primitive profile, not mathematical allocation failure. Returning Runtime transport and copied/foreign/stale metadata are supported Go owner boundary tests.",
         "Historical missing-API RED and actual Integer/Rational Copy/PN owner callback REDs retained. Requested-size-only pending metadata and the first sorted nonunit term fixture were oracle corrections, not algorithm failures; budget0 did not reach Runtime transport.",
         "Native foreign PN reservation prefixes retain no untransferred pending leaf: successful direct allocation publishes shared member storage atomically. The native proof preserves those actual members/caller NUM and independently checks remainder2^338+17; checked DEBUG verification yields the genuinely retained foreign PN child. Physical/cold audits remain unchanged for every prefix.",
-        "FactorHigher literal TODO at polynomial.cpp:6727-6735 is preserved; this is the original degree dispatcher rather than a dense or degree-specific replacement. Default generator pointer selection prime_generator.cpp:99-107 is explicit borrowed Go config, with a guarded DefaultPrimeService accessor; no hidden global generator. tst_mfact is dormant after polynomial.cpp test driver return at1825: active original-driver credit remains0. Signed-host TLS DEBUG destructor fixtures qualify owner primitives; guard-copy and returning Go callbacks are separate domains. Broader polynomial/NLSAT units remain partial/unported."
+        "FactorHigher literal TODO at polynomial.cpp:6727-6735 is preserved; this is the original degree dispatcher rather than a dense or degree-specific replacement. Default generator pointer selection prime_generator.cpp:99-107 is explicit borrowed Go config, with a guarded DefaultPrimeService accessor; no hidden global generator. tst_mfact is dormant after polynomial.cpp test driver return at1825: active original-driver credit remains0. Signed-host TLS DEBUG destructor fixtures qualify owner primitives; guard-copy and returning Go callbacks are separate domains. Broader polynomial/NLSAT units remain partial/unported.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
       ]
     },
     {
@@ -44420,7 +44418,6 @@
         "TestUPolynomialDisplayNestedInlinePreservesActualOuterBorrow",
         "TestUPolynomialDisplayNestedAllocationFailureExactRetirement",
         "TestUPolynomialDisplayActualNaturalBorrowOwnerReentry",
-        "TestUPolynomialDisplayActualStoppedCharacterSuffix",
         "TestUPolynomialDisplayErasedRoutePreservesEarlierUnjoinedRAW",
         "TestUPolynomialDisplayBorrowRefusesLaterLiveEmbeddedCall",
         "TestUPolynomialDisplayInsertionReceiptRefusesLaterEmbeddedCall",
@@ -45515,7 +45512,6 @@
             "TestUPolynomialDisplayNestedInlinePreservesActualOuterBorrow",
             "TestUPolynomialDisplayNestedAllocationFailureExactRetirement",
             "TestUPolynomialDisplayActualNaturalBorrowOwnerReentry",
-            "TestUPolynomialDisplayActualStoppedCharacterSuffix",
             "TestUPolynomialDisplayErasedRoutePreservesEarlierUnjoinedRAW",
             "TestUPolynomialDisplayBorrowRefusesLaterLiveEmbeddedCall",
             "TestUPolynomialDisplayInsertionReceiptRefusesLaterEmbeddedCall"
@@ -111798,20 +111794,15 @@
         "TestASTSparseMarkPendingResetCanFinishAtFinalEpoch",
         "TestASTSparseMarkResetAndFinalizeFreeBeforeReserve",
         "TestASTSparseSharedExpressionDomainsAndASTWideVisited",
-        "TestIntegerCharacterConstructorBeforeLimbLocals",
-        "TestSourceCStringPhysicalBytesAndLbuf",
-        "TestIntegerCharacterScopeActualCapacityAndCleanup",
+        "TestSourceCStringBoundedBytesAndLbuf",
+        "TestIntegerCharacterNativeScratchAndCleanup",
         "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
-        "TestIntegerCharacterWrappedSizePhysicalCapacity",
-        "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots",
         "TestFastFloatFormattingRetainsSourcePrecision",
         "TestFastFloatDecimalBuffersAreLexical",
         "TestFastFloatFormattingEveryConstructorPrefix",
-        "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-        "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
+        "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
         "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -111961,31 +111952,27 @@
           ]
         },
         {
-          "name": "Selected ordinary digit32 BIG Integer/Rational display char1024 lexical constructor/source unwinding and actual physical C-string kernel/insertion/destruction; full stream, Windows/GMP/digit64 profiles remain open",
+          "name": "Ordinary digit32 BIG integer/rational decimal insertion using native byte scratch, bounded C-string conversion and exact borrow lifetime; broader stream and numeral profiles remain open",
           "status": "ported",
           "go_target": "pkg/util/mp_integer_output_scope.go",
           "tests": [
-            "TestIntegerCharacterConstructorBeforeLimbLocals",
-            "TestSourceCStringPhysicalBytesAndLbuf",
-            "TestIntegerCharacterScopeActualCapacityAndCleanup",
+            "TestSourceCStringBoundedBytesAndLbuf",
+            "TestIntegerCharacterNativeScratchAndCleanup",
             "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
-            "TestIntegerCharacterWrappedSizePhysicalCapacity",
-            "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-            "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+            "TestIntegerCharacterNativeScratchGrowthAndLifetime"
           ]
         },
         {
-          "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; shared MPN character buffers retain explicit failure cleanup",
+          "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; character scratch also uses native byte slices; shared MPN numerical workspaces retain explicit failure cleanup",
           "status": "partial",
           "go_target": "pkg/util/mpff_format_scope.go",
           "tests": [
             "TestFastFloatFormattingRetainsSourcePrecision",
             "TestFastFloatDecimalBuffersAreLexical",
             "TestFastFloatFormattingEveryConstructorPrefix",
-            "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-            "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
+            "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
             "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -112076,7 +112063,7 @@
       "ownership": [
         "Function-local inline16 bytes and budgeted overflow arrays, old/new overlap and per-atom destruction. Other buffer methods/types remain separately inventoried.",
         "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
-        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Actual completed lexical references and source INC-before-push incoming token, charged inline16/cold header and Runtime scalar-handle backing. Named failed allocation/consumed destructor state retained until owning abort. See PORT_PROGRESS.md.",
         "Actual inline prefix and Runtime block are authoritative; initialized/copy cursors follow source push/resize and returned-allocation lifetime, with enclosing owner charging cold fields.",
         "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
@@ -112088,7 +112075,8 @@
         "Concrete prerequisite does not implement all source buffer types or complete ICCP algorithm.",
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
         "RationalBuffer16 is the nongeneric concrete buffer<rational> dependency for polynomial coefficient collection, with sixteen raw inline slots and double-capacity relocation without numeric copies/destructors. Each appended value is copy-constructed into its physical slot through an exact invocation embedded in the charged header, and count advances only after construction returns. Expanded storage and the reflected Go owner are charged through Budget rather than claiming native allocation/layout/stack/pointer ABI. At borrows an address only until expansion/end; aliases retained across expansion are outside the source consumer contract. Successful source scopes explicitly run SourceEnd in ascending element order before backing release. Failed body calls retain their actual partial slot/child and stop; SourceEnd rejects simulated native unwinding, while explicit two-phase Go cleanup consumes the real fields without altering failure history. The stale-element DT test proves the checked boundary traversal prefix, not native fatal/exception resumability. General buffer APIs/reset/finalize and integration into the whole polynomial current-sort/mark/core owner remain required; no whole-unit completion is credited.",
-        "ASTHandleBuffer.PopBack supplies the selected scalar non-destructing pop operation for the polynomial todo stack. It retains spilled capacity, acquires/releases no AST references and reports empty-pop as a checked Go bounds error. Native assertion/underflow/layout/allocator ABI and general template-buffer completion remain uncredited."
+        "ASTHandleBuffer.PopBack supplies the selected scalar non-destructing pop operation for the polynomial todo stack. It retains spilled capacity, acquires/releases no AST references and reports empty-pop as a checked Go bounds error. Native assertion/underflow/layout/allocator ABI and general template-buffer completion remain uncredited.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
       ]
     },
     {
@@ -128189,8 +128177,7 @@
         "TestFastFloatFormattingRetainsSourcePrecision",
         "TestFastFloatDecimalBuffersAreLexical",
         "TestFastFloatFormattingEveryConstructorPrefix",
-        "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-        "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
+        "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
         "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -128198,7 +128185,6 @@
         "TestFastFloatBorrowedRuntimeIdentityAndGuards",
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
         "TestFastFloatSharedRuntimeProfileAndClose",
-        "TestFastFloatBorrowedTLSCharConstructorPostphysicalPrefix",
         "TestFastFloatBorrowedRuntimeInlineWarmScope"
       ],
       "conditionals": [
@@ -128764,15 +128750,14 @@
           "tests": []
         },
         {
-          "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; shared MPN character buffers retain explicit failure cleanup",
+          "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; character scratch also uses native byte slices; shared MPN numerical workspaces retain explicit failure cleanup",
           "status": "partial",
           "go_target": "pkg/util/mpff_format_scope.go",
           "tests": [
             "TestFastFloatFormattingRetainsSourcePrecision",
             "TestFastFloatDecimalBuffersAreLexical",
             "TestFastFloatFormattingEveryConstructorPrefix",
-            "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-            "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
+            "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
             "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -128787,7 +128772,6 @@
             "TestFastFloatBorrowedRuntimeIdentityAndGuards",
             "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
             "TestFastFloatSharedRuntimeProfileAndClose",
-            "TestFastFloatBorrowedTLSCharConstructorPostphysicalPrefix",
             "TestFastFloatBorrowedRuntimeInlineWarmScope"
           ]
         }
@@ -128842,8 +128826,7 @@
         "TestFastFloatFormattingRetainsSourcePrecision",
         "TestFastFloatDecimalBuffersAreLexical",
         "TestFastFloatFormattingEveryConstructorPrefix",
-        "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-        "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
+        "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
         "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -128851,7 +128834,6 @@
         "TestFastFloatBorrowedRuntimeIdentityAndGuards",
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
         "TestFastFloatSharedRuntimeProfileAndClose",
-        "TestFastFloatBorrowedTLSCharConstructorPostphysicalPrefix",
         "TestFastFloatBorrowedRuntimeInlineWarmScope"
       ],
       "conditionals": [
@@ -129041,15 +129023,14 @@
           "tests": []
         },
         {
-          "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; shared MPN character buffers retain explicit failure cleanup",
+          "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; character scratch also uses native byte slices; shared MPN numerical workspaces retain explicit failure cleanup",
           "status": "partial",
           "go_target": "pkg/util/mpff_format_scope.go",
           "tests": [
             "TestFastFloatFormattingRetainsSourcePrecision",
             "TestFastFloatDecimalBuffersAreLexical",
             "TestFastFloatFormattingEveryConstructorPrefix",
-            "TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup",
-            "TestFastFloatDecimalScratchResetsAfterCharacterFailure",
+            "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
             "TestFastFloatDecimalEveryLargeLocalPrefix",
@@ -129064,7 +129045,6 @@
             "TestFastFloatBorrowedRuntimeIdentityAndGuards",
             "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
             "TestFastFloatSharedRuntimeProfileAndClose",
-            "TestFastFloatBorrowedTLSCharConstructorPostphysicalPrefix",
             "TestFastFloatBorrowedRuntimeInlineWarmScope"
           ]
         }
@@ -129405,15 +129385,11 @@
         "TestNaturalSourceFinalizeColdLifecycleGuards",
         "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
         "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot",
-        "TestIntegerCharacterConstructorBeforeLimbLocals",
-        "TestSourceCStringPhysicalBytesAndLbuf",
-        "TestIntegerCharacterScopeActualCapacityAndCleanup",
+        "TestSourceCStringBoundedBytesAndLbuf",
+        "TestIntegerCharacterNativeScratchAndCleanup",
         "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
-        "TestIntegerCharacterWrappedSizePhysicalCapacity",
-        "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots",
         "TestPolynomialDisplayLiteralSourceQuirks",
         "TestPolynomialDisplayZeroAndRefVectorSuffix",
         "TestPolynomialDisplayScalarCStringAliveAndNested",
@@ -129425,7 +129401,6 @@
         "TestPolynomialDisplayWarmInlineFrames",
         "TestPolynomialDisplayOwnerGuards",
         "TestPolynomialDisplayMonomialWrapperAndFiniteField",
-        "TestPolynomialDisplayYoungerStoppedDestructor",
         "TestPolynomialDisplayExactNumericReceiptAndReplacement",
         "TestPolynomialDisplaySinkCreatesForeignPending",
         "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
@@ -129876,19 +129851,16 @@
           ]
         },
         {
-          "name": "Selected ordinary digit32 BIG Integer/Rational display char1024 lexical constructor/source unwinding and actual physical C-string kernel/insertion/destruction; full stream, Windows/GMP/digit64 profiles remain open",
+          "name": "Ordinary digit32 BIG integer/rational decimal insertion using native byte scratch, bounded C-string conversion and exact borrow lifetime; broader stream and numeral profiles remain open",
           "status": "ported",
           "go_target": "pkg/util/mp_integer_output_scope.go",
           "tests": [
-            "TestIntegerCharacterConstructorBeforeLimbLocals",
-            "TestSourceCStringPhysicalBytesAndLbuf",
-            "TestIntegerCharacterScopeActualCapacityAndCleanup",
+            "TestSourceCStringBoundedBytesAndLbuf",
+            "TestIntegerCharacterNativeScratchAndCleanup",
             "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
-            "TestIntegerCharacterWrappedSizePhysicalCapacity",
-            "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-            "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+            "TestIntegerCharacterNativeScratchGrowthAndLifetime"
           ]
         },
         {
@@ -129907,7 +129879,6 @@
             "TestPolynomialDisplayWarmInlineFrames",
             "TestPolynomialDisplayOwnerGuards",
             "TestPolynomialDisplayMonomialWrapperAndFiniteField",
-            "TestPolynomialDisplayYoungerStoppedDestructor",
             "TestPolynomialDisplayExactNumericReceiptAndReplacement",
             "TestPolynomialDisplaySinkCreatesForeignPending"
           ]
@@ -130010,7 +129981,7 @@
       ],
       "ownership": [
         "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Words/Budget/runtime without double ownership. Retained SmallBytes text is an explicit output assembly adapter. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
-        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact.",
         "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
         "Actual scalar core/embedded frame/nonwrapping invocation plus exact Integer/Modular receiver and executing callback-depth guard. Allocation capture/clear occurs only at actual existing integer, allocator and named Natural buffer leaves. Actual embedded RAW child and private buffer addresses reject copied owners. Successful persistent Inv/Natural publication stays member-owned; inactive same-invocation diagnostic history carries no numeric authority.",
@@ -130025,7 +129996,8 @@
         "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
         "Public/nil negative Div and ExtendedGCD now use the same literal engines with real IntegerManager RAW frames (mpz.h:468-485; mpz.cpp:915-985). Failed bodies retain reached declarations; successful bodies propagate strict end-DEL errors. Immutable source cause remains across exact owning acknowledgment until new guarded invocation. End-DEL Bounds proof is the real signed-host TLS guard domain, not ordinary mathematical OOM; checked diagnostic/verification failures remain literal failed-body prefixes. AddMul/SubMul public eager failure cleanup remains explicitly open. Shared polynomial cohorts, full Discriminant/Factor and whole source units remain partial; no original driver assertion credit added.",
         "Selected concrete Content invocation closure only; unrelated polynomial parent/regular SOM/ExactDiv/Neg/Discriminant and whole unit remain partial. Signed-host TLS tests are guarded owner-primitive profiles, not ordinary mathematical free-OOM. No new registered C++ driver assertion credit.",
-        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit."
+        "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
       ]
     },
     {
@@ -130078,15 +130050,11 @@
         "TestNaturalSourceFinalizeColdLifecycleGuards",
         "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
         "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot",
-        "TestIntegerCharacterConstructorBeforeLimbLocals",
-        "TestSourceCStringPhysicalBytesAndLbuf",
-        "TestIntegerCharacterScopeActualCapacityAndCleanup",
+        "TestSourceCStringBoundedBytesAndLbuf",
+        "TestIntegerCharacterNativeScratchAndCleanup",
         "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
-        "TestIntegerCharacterWrappedSizePhysicalCapacity",
-        "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots",
         "TestPolynomialConstantCoefficientNormalizeActualRemScratchLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualNaturalGrowthLeaf",
         "TestPolynomialConstantCoefficientNormalizeActualVerificationConstructorLeaf",
@@ -130448,19 +130416,16 @@
           ]
         },
         {
-          "name": "Selected ordinary digit32 BIG Integer/Rational display char1024 lexical constructor/source unwinding and actual physical C-string kernel/insertion/destruction; full stream, Windows/GMP/digit64 profiles remain open",
+          "name": "Ordinary digit32 BIG integer/rational decimal insertion using native byte scratch, bounded C-string conversion and exact borrow lifetime; broader stream and numeral profiles remain open",
           "status": "ported",
           "go_target": "pkg/util/mp_integer_output_scope.go",
           "tests": [
-            "TestIntegerCharacterConstructorBeforeLimbLocals",
-            "TestSourceCStringPhysicalBytesAndLbuf",
-            "TestIntegerCharacterScopeActualCapacityAndCleanup",
+            "TestSourceCStringBoundedBytesAndLbuf",
+            "TestIntegerCharacterNativeScratchAndCleanup",
             "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
-            "TestIntegerCharacterWrappedSizePhysicalCapacity",
-            "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-            "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+            "TestIntegerCharacterNativeScratchGrowthAndLifetime"
           ]
         },
         {
@@ -130495,14 +130460,15 @@
       ],
       "ownership": [
         "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Words/Budget/runtime without double ownership. Retained SmallBytes text is an explicit output assembly adapter. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
-        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
         "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161)."
       ],
       "deviations": [
         "Go guards actual endangered reads/writes and retained lexical-holder reuse without blocking source paths that never reach those holders. Algorithm D allocates add-back storage only at the source borrow branch. Runtime owns real source allocations and initialized-byte state; no Words shadows represent limb scratch. Final escaped Go strings are caller-owned. Exact character-buffer/output lifetime, broader public source span domains, diagnostic transport, architecture profiles and OMP/global integration remain separate obligations.",
         "Source char bytes use physical capacity/initialization independently of POS and unsigned11*size wrap. Selected non-Windows digit32 snprintf lbuf0/truncation and multi-limb ignored-lbuf behavior execute. Windows sprintf_s constraint handler, GMP/digit64, global/locale/ostream and literal std::string temporary allocation/evaluation remain open. No whole-unit or registered assertion completion is claimed.",
-        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open."
+        "Selected tests of signed-domain TLS guards use real public Reallocate/allocation/free prefixes and do not claim ordinary exhaustion. Source interactive-debugger continuation/exit remains qualified; Go ErrIntegerAssertion is its guard/throw-style adapter. Discriminant parent and Factor arithmetic integration remain open.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
       ]
     },
     {
@@ -131404,7 +131370,8 @@
         "ToOwnedString uses the same selected left-to-right concatenation profile as the existing infinitesimal formatter: numerator string, slash append, denominator string and append. It preserves raw zero/negative denominators and performs no normalization. Independent literal cases, every selected cold reservation with immediate physical/byte accounting and zero refunds, warm inline allocation refusal, caller-owned returned text after manager/runtime end, and real denominator-display returning transport are covered. Native C++ operand evaluation order, all library ABIs/NRVO schedules and alternate locale profiles are not claimed. This is the direct mpq to_string dependency for remaining MPF rational-string wrappers, which are still unfinished. Dedicated younger-source/first-own transport refinements remain outstanding.",
         "Literal and independent tests cover integer/fraction syntax, both decimal settings, zero and negative raw denominators, BIG values, and the allocating MinInt32 negation boundary. Every selected cold reservation includes immediate complete physical/byte graphs and zero refunds. All11 actual inline rational insertions are failed in turn with exact prefix assertions. Warm FailAfter(0) preserves exact Runtime/budget state and ended parent cleanup leaves later children intact. Real negative COPY transport checks nested scalar/lifecycle exclusion; a PageSize1 retained descriptor refusal proves older child preservation. A real signed-host TLS guard at negative temporary destruction stops rational continuation, retains source history and joins owning cleanup while preserving output. This is the existing explicit checked-runtime guard profile, not a claim of defined native signed overflow. Arbitrary native ostream ABI/locale and unrelated prior host-formatting adapters are not changed. Whole MPZ/MPQ/MPF/util completion is not claimed.",
         "Original Div/display/Rem and repeated Mul/Div/display/Rem retain unrounded, unpadded output and optional ? suffix. Precision0 still emits the literal decimal point before ? or truncation. Active C++ tst2 decimal calls are reproduced with independent expected bytes; source drivers are not compiled. Exhaustive small and independent BIG rational results cover both truncation settings and precision boundaries. Every selected cold reservation includes immediate complete physical/byte graphs and zero refunds; failed bodies preserve sourceCursor0. All8 selected negative decimal insertions, including the final ?, are failed in turn with exact prefix/declaration/end-label checks. Warm FailAfter(0) preserves exact Runtime/budget state and later-child isolation. Zero denominator fails only at reached Div after copies/sign/ten; copied scope and counter guards are tested. Real denominator COPY transport and real checked TLS d1 end-label release failure prove lexical/source/owning distinctions and output preservation. Native signed overflow is not claimed; the checked Runtime profile is explicit. Whole MPQ/MPF/util completion is not claimed. Literal raw negative-denominator tests preserve original field/sign/division behavior without normalization; they are not mathematical rational canonicalization.",
-        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement."
+        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
       ]
     },
     {
@@ -133406,15 +133373,11 @@
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
         "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
         "TestNaturalSourceFinalizeColdLifecycleGuards",
-        "TestIntegerCharacterConstructorBeforeLimbLocals",
-        "TestSourceCStringPhysicalBytesAndLbuf",
-        "TestIntegerCharacterScopeActualCapacityAndCleanup",
+        "TestSourceCStringBoundedBytesAndLbuf",
+        "TestIntegerCharacterNativeScratchAndCleanup",
         "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
-        "TestIntegerCharacterWrappedSizePhysicalCapacity",
-        "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots",
         "TestSMT2FreshDefaultCopyFailureNullDestructor",
         "TestSMT2CompletedTemporaryGuardedLateFree",
         "TestPolynomialIndexedArrayGCDEarlyOneLeavesTailUnread",
@@ -135161,19 +135124,16 @@
           ]
         },
         {
-          "name": "Selected ordinary digit32 BIG Integer/Rational display char1024 lexical constructor/source unwinding and actual physical C-string kernel/insertion/destruction; full stream, Windows/GMP/digit64 profiles remain open",
+          "name": "Ordinary digit32 BIG integer/rational decimal insertion using native byte scratch, bounded C-string conversion and exact borrow lifetime; broader stream and numeral profiles remain open",
           "status": "ported",
           "go_target": "pkg/util/mp_integer_output_scope.go",
           "tests": [
-            "TestIntegerCharacterConstructorBeforeLimbLocals",
-            "TestSourceCStringPhysicalBytesAndLbuf",
-            "TestIntegerCharacterScopeActualCapacityAndCleanup",
+            "TestSourceCStringBoundedBytesAndLbuf",
+            "TestIntegerCharacterNativeScratchAndCleanup",
             "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
-            "TestIntegerCharacterWrappedSizePhysicalCapacity",
-            "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-            "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+            "TestIntegerCharacterNativeScratchGrowthAndLifetime"
           ]
         },
         {
@@ -135538,7 +135498,7 @@
         "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See PORT_PROGRESS.md#audit-mpz-setter-port-status-md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See PORT_PROGRESS.md#audit-mpz-power-publication-packet-md; source allocator/backend integration remains required.",
         "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md.",
-        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata.",
         "Actual real foreign Runtime coefficient RED89453 led to reached-only owner check; empty borrowed view is unread. No owning numeral-array copy or generic storage introduced.",
         "Six actual RAW Int fields live in the charged IntegerManager header. Literal source end deletion stops at its first cause; explicit CleanupPerfectSquare resumes only owned fields and exact pending ObjectRef/physical roots. Direct final output SET remains caller-owned.",
@@ -135595,7 +135555,8 @@
         "Literal and independent tests cover integer/fraction syntax, both decimal settings, zero and negative raw denominators, BIG values, and the allocating MinInt32 negation boundary. Every selected cold reservation includes immediate complete physical/byte graphs and zero refunds. All11 actual inline rational insertions are failed in turn with exact prefix assertions. Warm FailAfter(0) preserves exact Runtime/budget state and ended parent cleanup leaves later children intact. Real negative COPY transport checks nested scalar/lifecycle exclusion; a PageSize1 retained descriptor refusal proves older child preservation. A real signed-host TLS guard at negative temporary destruction stops rational continuation, retains source history and joins owning cleanup while preserving output. This is the existing explicit checked-runtime guard profile, not a claim of defined native signed overflow. Arbitrary native ostream ABI/locale and unrelated prior host-formatting adapters are not changed. Whole MPZ/MPQ/MPF/util completion is not claimed.",
         "The former staged Integer parser contradicted mpz.cpp:283-303 and has been replaced in the primary SetString API. Allocation failure now retains actual caller digit prefixes rather than the old destination. The old transactional failure assertion was replaced with independent prefix and failed-publication checks. Six dedicated groups prove the first BIG reservation prefix, every selected cold reservation including an actually published BIG Mul temporary retained before Add failure, independent permissive/NUL byte semantics, warm inline and entry capture/owner/counter authority, real allocation transport and real checked TLS RESET release failure before either RAW declaration. Existing original tst1/bug1/int_min_bug assertions and literal inventories are rerun. Separate stopped RAW end-DEL refinement is not newly credited. Checked signed overflow is not defined native behavior; no native fatal resumability or whole MPZ/util completion is claimed.",
         "Numeric text buffering and returned text use Go strings.Builder, strconv.FormatInt, strings.IndexByte and Go-managed counted bytes. Removed emulation of string-buffer capacity, put-pointer/high-water distinction, arena growth failures and returned C++ string storage. Project numeral allocation failures, checked source views, decimal output and returned text lifetime remain tested.",
-        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement."
+        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
       ]
     },
     {
@@ -135876,15 +135837,11 @@
         "TestNaturalSourceFinalizeRetainsUnpublishedMemberAllocation",
         "TestIntegerSourceFinalizeRetainsFailedNaturalFormatting",
         "TestNaturalSourceFinalizeColdLifecycleGuards",
-        "TestIntegerCharacterConstructorBeforeLimbLocals",
-        "TestSourceCStringPhysicalBytesAndLbuf",
-        "TestIntegerCharacterScopeActualCapacityAndCleanup",
+        "TestSourceCStringBoundedBytesAndLbuf",
+        "TestIntegerCharacterNativeScratchAndCleanup",
         "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
-        "TestIntegerCharacterWrappedSizePhysicalCapacity",
-        "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
         "TestIntegerCharacterUsesActualInitializedSizeHeader",
         "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-        "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots",
         "TestIntegerSourceFailureTwoChargedSentinels",
         "TestIntegerSourceFreshNullAndDestructiveDangling",
         "TestIntegerSourceFailureSentinelPreparationPrefixes",
@@ -137213,19 +137170,16 @@
           ]
         },
         {
-          "name": "Selected ordinary digit32 BIG Integer/Rational display char1024 lexical constructor/source unwinding and actual physical C-string kernel/insertion/destruction; full stream, Windows/GMP/digit64 profiles remain open",
+          "name": "Ordinary digit32 BIG integer/rational decimal insertion using native byte scratch, bounded C-string conversion and exact borrow lifetime; broader stream and numeral profiles remain open",
           "status": "ported",
           "go_target": "pkg/util/mp_integer_output_scope.go",
           "tests": [
-            "TestIntegerCharacterConstructorBeforeLimbLocals",
-            "TestSourceCStringPhysicalBytesAndLbuf",
-            "TestIntegerCharacterScopeActualCapacityAndCleanup",
+            "TestSourceCStringBoundedBytesAndLbuf",
+            "TestIntegerCharacterNativeScratchAndCleanup",
             "TestIntegerCharacterCompletedBeforeFailedInnerConstructor",
-            "TestIntegerCharacterWrappedSizePhysicalCapacity",
-            "TestIntegerCharacterFailedConstructorSurvivesSourceFinalize",
             "TestIntegerCharacterUsesActualInitializedSizeHeader",
             "TestIntegerCharacterRationalNumeratorBeforeDenominator",
-            "TestIntegerCharacterLatePhysicalFailureKeepsBothCtorRoots"
+            "TestIntegerCharacterNativeScratchGrowthAndLifetime"
           ]
         },
         {
@@ -137538,7 +137492,7 @@
         "Base-two Power mutates caller storage through actual destructive allocate_if_needed; other Power and shift wrappers remain staged fidelity work. Scalar debug capacity assertion precedes sign/digits; existing normalize branch tests confirm actual behavior. See PORT_PROGRESS.md#audit-mpz-setter-port-status-md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See PORT_PROGRESS.md#audit-mpz-power-publication-packet-md; source allocator/backend integration remains required.",
         "Zero GCD copies directly into caller before Abs; minimum-promotion allocation refusal retains the completed inline copy, while failed BIG Copy retains the actual published sign/dead descriptor. Existing general GCD locals and final publication remain source ordered; twelve Lehmer and one intermediate ExtendedGCD diagnostics execute only in g3debug. Named roots audited before fault disabling. See PORT_PROGRESS.md#audit-mpz-gcd-publication-packet-md.",
-        "Actual character scope is embedded and charged in NaturalManager: completed char destruction follows inner limb destruction; failed char constructor and partial limb allocations retain distinct actual roots for owning cleanup. Ordinary NUM char lifetime ends before slash/DEN construction. SmallBytes output assembly and escaped Go string ownership are explicit adapters, never source allocation tickets.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Two actual permanently dead charged Go descriptors precede Words/Natural construction. Actual six source numeric cells unchanged. Source fresh NULL comes only from exact setter branch, never registry/scope inference; reserve failure retains charged constructor owner. No source allocator event invented for Go metadata.",
         "Current Root/Power RAW lifetime implementation supersedes earlier staged Root/output and implicit general Power cleanup descriptions. Actual four Root and one Power RAW fields are charged in the Integer header; body failures retain them, literal end-only DEL stops younger-to-older at the reached ascending source frontier. Exact manager/frame/unique nonwrapping nonce and physical object/block/extent identity match owning continuation; caller COPY/MUL output pending is excluded. Completed and abort phases distinguish reached end DEL from unfinished RAW body owners.",
         "Actual guarded manager/frame/unique invocation plus direct argument acquisition tokens; legacy foreign calls have nil receipt; same-cardinality replacement and stale frame owning cleanup preserve foreign graph before cleanup.",
@@ -137591,7 +137545,8 @@
         "Literal and independent tests cover integer/fraction syntax, both decimal settings, zero and negative raw denominators, BIG values, and the allocating MinInt32 negation boundary. Every selected cold reservation includes immediate complete physical/byte graphs and zero refunds. All11 actual inline rational insertions are failed in turn with exact prefix assertions. Warm FailAfter(0) preserves exact Runtime/budget state and ended parent cleanup leaves later children intact. Real negative COPY transport checks nested scalar/lifecycle exclusion; a PageSize1 retained descriptor refusal proves older child preservation. A real signed-host TLS guard at negative temporary destruction stops rational continuation, retains source history and joins owning cleanup while preserving output. This is the existing explicit checked-runtime guard profile, not a claim of defined native signed overflow. Arbitrary native ostream ABI/locale and unrelated prior host-formatting adapters are not changed. Whole MPZ/MPQ/MPF/util completion is not claimed.",
         "The former staged Integer parser contradicted mpz.cpp:283-303 and has been replaced in the primary SetString API. Allocation failure now retains actual caller digit prefixes rather than the old destination. The old transactional failure assertion was replaced with independent prefix and failed-publication checks. Six dedicated groups prove the first BIG reservation prefix, every selected cold reservation including an actually published BIG Mul temporary retained before Add failure, independent permissive/NUL byte semantics, warm inline and entry capture/owner/counter authority, real allocation transport and real checked TLS RESET release failure before either RAW declaration. Existing original tst1/bug1/int_min_bug assertions and literal inventories are rerun. Separate stopped RAW end-DEL refinement is not newly credited. Checked signed overflow is not defined native behavior; no native fatal resumability or whole MPZ/util completion is claimed.",
         "Numeric text buffering and returned text use Go strings.Builder, strconv.FormatInt, strings.IndexByte and Go-managed counted bytes. Removed emulation of string-buffer capacity, put-pointer/high-water distinction, arena growth failures and returned C++ string storage. Project numeral allocation failures, checked source views, decimal output and returned text lifetime remain tested.",
-        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement."
+        "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
       ]
     },
     {
@@ -147140,7 +147095,10 @@
         {
           "name": "Go string maps replace the char-pointer hash/equality specialization",
           "status": "platform_replacement",
-          "go_targets": ["pkg/util/symbol/symbol.go", "pkg/util/util_debug_context.go"],
+          "go_targets": [
+            "pkg/util/symbol/symbol.go",
+            "pkg/util/util_debug_context.go"
+          ],
           "tests": [
             "TestSymbolDuplicateLookupAndInvalidTokens",
             "TestDebugContextUsesOwnedGoStrings"

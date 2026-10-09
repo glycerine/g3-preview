@@ -2,8 +2,6 @@
 package ast
 
 import (
-	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -67,70 +65,4 @@ func TestASTBitVectorIntegerTextEveryReservation(t *testing.T) {
 		}
 	}
 	t.Fatal("source text reservation horizon")
-}
-
-func TestASTBitVectorIntegerTextLaterCallKeepsFailedCharacterConstructor(t *testing.T) {
-	for ordinal := int64(0); ordinal < 20; ordinal++ {
-		m := astTestManager(t)
-		q, b := m.numerals, m.BudgetField
-		firstValue, e := q.NewValue()
-		astTestMust(t, e)
-		astTestMust(t, q.SetString(&firstValue, strings.Repeat("9", 1200)))
-		laterValue, e := q.NewValue()
-		astTestMust(t, e)
-		astTestMust(t, q.SetString(&laterValue, "18446744073709551617"))
-		base := b.Used() - q.RuntimeOwner().Stats().TotalBytes
-		var first, later astBVIntegerText
-		b.FailAfter(ordinal)
-		body := first.construct(q, b, &firstValue)
-		receipt := testFieldBySourceName(reflect.ValueOf(&first.invocation).Elem(), "insertion")
-		character := testFieldBySourceName(receipt, "character")
-		reached := false
-		if !character.IsNil() {
-			scope := character.Elem()
-			reached = testFieldBySourceName(scope, "pending").Bool() && !testFieldBySourceName(scope, "completed").Bool()
-		}
-		if want := base + q.RuntimeOwner().Stats().TotalBytes + first.storageBytes(); b.Used() != want {
-			t.Fatal("before-lift retained text constructor graph", ordinal, body, b.Used(), want)
-		}
-		astFloatingPointRawGraphWithBlocks(t, q, nil, nil, &firstValue, &laterValue)
-		b.FailAfter(-1)
-		if reached {
-			t.Cleanup(func() {
-				astTestMust(t, later.cleanup(false))
-				astTestMust(t, later.cleanup(true))
-				astTestMust(t, first.cleanup(false))
-				astTestMust(t, first.cleanup(true))
-				astTestMust(t, q.CleanupValue(&laterValue))
-				astTestMust(t, q.CleanupValue(&firstValue))
-			})
-			if body == nil {
-				t.Fatal("actual failed ctor missing body cause")
-			}
-			issued := testFieldBySourceName(receipt, "invocation").Uint()
-			characterPointer := character.Pointer()
-			originalBody, originalSource, originalOwn := first.invocation.Causes()
-			if e = later.construct(q, b, &laterValue); e != nil {
-				t.Fatal("source-valid later call borrowed old incomplete char constructor", ordinal, e)
-			}
-			if testFieldBySourceName(receipt, "invocation").Uint() != issued || character.Pointer() != characterPointer || !testFieldBySourceName(character.Elem(), "pending").Bool() {
-				t.Fatal("later call changed older issued character tuple")
-			}
-			a, b, c := first.invocation.Causes()
-			if a != originalBody || b != originalSource || c != originalOwn {
-				t.Fatal("later call rewrote older body/source/own history")
-			}
-			astFloatingPointRawGraphWithBlocks(t, q, nil, nil, &firstValue, &laterValue)
-			if !testFieldBySourceName(receipt, "active").Bool() {
-				t.Fatal("later call erased actual older child")
-			}
-			return
-		}
-		astTestMust(t, first.cleanup(false))
-		astTestMust(t, first.cleanup(true))
-		astTestMust(t, q.CleanupValue(&laterValue))
-		astTestMust(t, q.CleanupValue(&firstValue))
-		astTestMust(t, m.Close())
-	}
-	t.Fatal("did not reach actual retained character constructor")
 }

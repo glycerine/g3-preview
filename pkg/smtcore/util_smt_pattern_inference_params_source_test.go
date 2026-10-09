@@ -305,7 +305,8 @@ func TestSMTPatternInferenceEveryUnwarmedSharedModuleAcquisitionReservation(t *t
 			break
 		}
 	}
-	if first != 4 {
+	// Symbol spellings use Go storage; count only remaining arena acquisitions.
+	if first != 2 {
 		t.Fatal("actual shared symbol/module acquisition absent", first)
 	}
 	t.Log("first successful unwarmed pattern constructor", first)

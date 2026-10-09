@@ -321,10 +321,6 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*polynomial.UPolynomialManag
 			}
 		}
 	}
-	characters := testFieldBySourceName(formatOwner, "charFormatting")
-	if testFieldBySourceName(characters, "active").Bool() || testFieldBySourceName(characters, "pending").Bool() || testFieldBySourceName(characters, "completed").Bool() {
-		addFormattingRaw(testFieldBySourceName(characters, "buffer"))
-	}
 	formatting := testFieldBySourceName(formatOwner, "formatting")
 	if testFieldBySourceName(formatting, "active").Bool() || testFieldBySourceName(formatting, "pending").Bool() || testFieldBySourceName(formatting, "completed").Uint() != 0 {
 		locals := testFieldBySourceName(formatting, "locals")

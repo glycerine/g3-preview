@@ -9,7 +9,7 @@ import (
 // persisted in a hot record, and no destination owner escapes per call.
 
 type sourceDecimalDestination struct {
-	character *sourceCharBuffer
+	character []byte
 	external  []byte
 	assembly  *NaturalManager
 	offset    uint32
@@ -17,7 +17,11 @@ type sourceDecimalDestination struct {
 
 func (d sourceDecimalDestination) write(i uint64, n byte) error {
 	if d.character != nil {
-		return d.character.writePhysical(d.assembly.runtime, i, n)
+		if i >= uint64(len(d.character)) {
+			return arena.ErrBounds
+		}
+		d.character[i] = n
+		return nil
 	}
 	if d.assembly != nil {
 		if i > uint64(^uint32(0))-uint64(d.offset) {
@@ -33,7 +37,7 @@ func (d sourceDecimalDestination) write(i uint64, n byte) error {
 }
 func (d sourceDecimalDestination) read(i uint64) (byte, error) {
 	if d.character != nil {
-		return d.character.readPhysical(d.assembly.runtime, i)
+		return characterByte(d.character, i)
 	}
 	if d.assembly != nil {
 		if i > uint64(^uint32(0))-uint64(d.offset) {

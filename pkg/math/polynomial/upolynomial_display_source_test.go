@@ -8,9 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
-	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 // The driver prints these values without ENSUREs. These exact stream checks
@@ -582,125 +580,6 @@ func TestUPolynomialDisplayActualNaturalBorrowOwnerReentry(t *testing.T) {
 
 // Signed-host TLS guard fixture: all boundary changes use public Runtime
 // Allocate/Reallocate/free actions. This is not an ordinary malloc-fault claim.
-func TestUPolynomialDisplayActualStoppedCharacterSuffix(t *testing.T) {
-	for _, bodyFails := range []bool{false, true} {
-		t.Run(strconv.FormatBool(bodyFails), func(t *testing.T) {
-			b := arena.NewBudget(1 << 27)
-			rt, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
-			serviceMust(t, e)
-			cfg := serviceConfig(b).Integers
-			cfg.Cells.PageSize = 1
-			cfg.Memory = rt
-			cfg.Profile = util.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-			r, e := util.NewRationalManager(util.RationalConfig{Integers: cfg})
-			serviceMust(t, e)
-			m, e := NewUPolynomialManager(UPolynomialConfig{Integer: r.Integers(), Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
-			serviceMust(t, e)
-			primes, e := primegen.NewGenerator(b)
-			serviceMust(t, e)
-			s, e := NewUPolynomialFactorizationService(m, UPolynomialFactorizationConfig{Primes: primes})
-			serviceMust(t, e)
-			var p upolyVectorState
-			var lane util.Block
-			defer func() {
-				b.FailAfter(-1)
-				contextTLSFinish(t, rt, m.CleanupDisplay)
-				if lane != (util.Block{}) {
-					contextTLSFinish(t, rt, func() error {
-						if lane == (util.Block{}) {
-							return nil
-						}
-						return rt.Deallocate(&lane)
-					})
-				}
-				contextTLSFinish(t, rt, func() error { return m.reset(&p) })
-				m.freeBacking(&p)
-				contextTLSFinish(t, rt, s.Close)
-				contextTLSFinish(t, rt, primes.Close)
-				contextTLSFinish(t, rt, m.Close)
-				contextTLSFinish(t, rt, r.CloseChecked)
-				contextTLSFinish(t, rt, rt.Close)
-				if b.Used() != 0 {
-					t.Fatal("actual display whole refund", b.Used())
-				}
-			}()
-			digits := make([]uint32, 94)
-			digits[len(digits)-1] = 1
-			var a util.Int
-			serviceMust(t, r.Integers().SetLimbs(&a, digits))
-			serviceMust(t, m.set(&p, []util.Int{a}))
-			serviceMust(t, r.Integers().Del(&a))
-			marker := errors.New("actual ostream failed before character DT")
-			var older util.NumericCellRef
-			var characterToken util.Block
-			out := &upolyDisplaySink{numeralHook: func(v util.NumeralCStringView) error {
-				older = (m.display.numeral).Cell
-				child := m.display.insertion.Character
-				if child == nil || !child.Completed || child.Buffer.Raw == (util.Block{}) {
-					t.Fatal("actual heap character constructor not reached")
-				}
-				characterToken = child.Buffer.Raw
-				if _, e := rt.Size(characterToken); e != nil {
-					t.Fatal("actual character raw allocation", e)
-				}
-				if _, e := v.Byte(0); e != nil {
-					t.Fatal(e)
-				}
-				primeTrialPhysicalAuditOwners(t, r, s, nil, &m.values(&p)[0])
-				contextTLSNearMinimum(t, rt)
-				// Arm the real local TLS lane just above its release synchronization
-				// threshold; this valid 94-limb heap character DT then reaches the guard.
-				lane, e = rt.Allocate(8)
-				serviceMust(t, e)
-				delta := int64(-100006)
-				if e = rt.Reallocate(&lane, uint64(16)+uint64(delta)-8); !errors.Is(e, arena.ErrBounds) {
-					t.Fatal("public signed-host prephysical realloc guard", e)
-				}
-				if rt.State().LocalSize != -99990 {
-					t.Fatal("actual bounded local lane", rt.State())
-				}
-				if bodyFails {
-					return marker
-				}
-				return nil
-			}}
-			returned := m.DisplayInto(m.stateView(&p), out, "x", false)
-			if !errors.Is(returned, arena.ErrBounds) || (bodyFails && !errors.Is(returned, marker)) || !m.display.constructed || (m.display.numeral).Cell != older || older == 0 {
-				t.Fatal("actual younger character DT must protect older NUM", returned, m.display.constructed)
-			}
-			if m.display.insertion.Character.Buffer.Raw != (util.Block{}) || m.display.insertion.Character.CleanupCause != arena.ErrBounds {
-				t.Fatal("character DT did not reach physical release cursor")
-			}
-			if _, e := rt.Size(characterToken); e == nil {
-				t.Fatal("character physical token survived actual reached DT")
-			}
-			if c := r.Integers().Cell(older); c.Released || c.CleanupPending {
-				t.Fatal("older NUM release cursor advanced after younger stop")
-			}
-			cause := m.display.sourceCause
-			state := rt.State()
-			used := b.Used()
-			cell := (m.display.numeral).Cell
-			if e = m.SourceFinalize(); !errors.Is(e, arena.ErrBounds) || m.sourceFinalizing || rt.State() != state || b.Used() != used || m.display.sourceCause != cause || (m.display.numeral).Cell != cell {
-				t.Fatal("source retry replayed older unread NUM/private members", e)
-			}
-			primeTrialPhysicalAuditExternal(t, r, s, []util.Block{lane}, &m.values(&p)[0])
-			contextTLSFinish(t, rt, m.CleanupDisplay)
-			if m.display.active || m.display.sourceCause != cause {
-				t.Fatal("own cleanup changed stopped source history")
-			}
-			var inline upolyVectorState
-			serviceMust(t, m.set(&inline, []util.Int{util.NewInt(1)}))
-			serviceMust(t, m.DisplayInto(m.stateView(&inline), &upolyDisplaySink{}, "x", false))
-			serviceMust(t, m.reset(&inline))
-			m.freeBacking(&inline)
-			if !errors.Is(returned, arena.ErrBounds) || (bodyFails && !errors.Is(returned, marker)) {
-				t.Fatal("later invocation changed original returned causes")
-			}
-		})
-	}
-}
-
 func TestUPolynomialDisplayErasedRoutePreservesEarlierUnjoinedRAW(t *testing.T) {
 	r, s := preparationPhysicalFixture(t)
 	m := s.manager

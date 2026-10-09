@@ -71,9 +71,7 @@ func CompleteNumeralInsertion(r *NumeralInsertionReceipt, natural *NaturalManage
 		}
 	}
 	if r.characterOwned && r.Character.pending {
-		if e := r.Character.Buffer.finalize(n.runtime); e != nil {
-			return stop(e)
-		}
+		r.Character.Buffer = nil
 		r.Character.reset()
 	}
 	r.characterOwned = false
@@ -131,9 +129,7 @@ func cleanupOwnedNumeralInsertion(r *NumeralInsertionReceipt, n *NaturalManager)
 		}
 	}
 	if r.characterOwned && r.Character.pending {
-		if e := r.Character.Buffer.finalize(n.runtime); e != nil {
-			return e
-		}
+		r.Character.Buffer = nil
 		r.Character.reset()
 	}
 	r.characterOwned, r.formattingOwned, r.active = false, false, false

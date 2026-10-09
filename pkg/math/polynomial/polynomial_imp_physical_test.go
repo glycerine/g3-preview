@@ -158,7 +158,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	adapterBytes += uint64(cap(m.display.frames))*uint64(reflect.TypeOf((*polynomialDisplayFrame)(nil)).Size()) + uint64(len(m.display.frames))*uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size())
 	for _, f := range m.display.frames {
 		public = append(public, &f.numeral)
-		external = append(external, f.characters.Raw, f.characters.PendingField)
 		for _, b := range f.limbs.Locals {
 			external = append(external, b.Raw, b.Pending)
 		}
@@ -531,8 +530,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			put(s.Pending)
 		}
 	}
-	put(z.Naturals().CharFormatting.Buffer.Raw)
-	put(z.Naturals().CharFormatting.Buffer.PendingField)
 	za := z.SourceAllocator().Stats()
 	ma := util.AllocatorStats{}
 	mmBytes := uint64(0)

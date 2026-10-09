@@ -346,7 +346,7 @@ func TestPolynomialDisplayWarmInlineFrames(t *testing.T) {
 		t.Fatal("inline warm cache changed real physical/header graph")
 	}
 	for _, f := range m.core.display.frames {
-		if f.active || (f.numeral).Cell != 0 || f.characters.Raw != (util.Block{}) || f.limbs.CompletedField != 0 {
+		if f.active || (f.numeral).Cell != 0 || len(f.characters) != 0 || f.limbs.CompletedField != 0 {
 			t.Fatal("successful cached frame retained a lexical owning root")
 		}
 	}

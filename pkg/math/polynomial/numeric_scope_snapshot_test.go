@@ -29,6 +29,16 @@ func testNumericScopeValueEqual(a, b reflect.Value) bool {
 			}
 		}
 		return true
+	case reflect.Slice:
+		if a.IsNil() != b.IsNil() || a.Len() != b.Len() || a.Cap() != b.Cap() || a.Pointer() != b.Pointer() {
+			return false
+		}
+		for i := 0; i < a.Len(); i++ {
+			if !testNumericScopeValueEqual(a.Index(i), b.Index(i)) {
+				return false
+			}
+		}
+		return true
 	case reflect.Array:
 		for i := 0; i < a.Len(); i++ {
 			if !testNumericScopeValueEqual(a.Index(i), b.Index(i)) {

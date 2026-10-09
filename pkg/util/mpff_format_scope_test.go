@@ -25,9 +25,9 @@ func TestFastFloatFormattingRetainsSourcePrecision(t *testing.T) {
 	}
 	after, e := m.natural.runtime.AllocationCount()
 	serviceMust(t, e)
-	// Source char(11*96) expands once. temp96 and numer97 each expand
-	// 16→32→64→128: six further actual allocation calls, despite leading0s.
-	if after-before != 7 {
+	// Go character scratch adds no Runtime events. The remaining temp96 and
+	// numer97 workspaces each expand 16→32→64→128, despite leading zeros.
+	if after-before != 6 {
 		t.Fatal("source full-precision lexical events", before, after)
 	}
 	serviceMust(t, m.Del(&a))
@@ -93,8 +93,6 @@ func fastFormattingNamedRoots(m *FastFloatManager, add func(Block)) {
 		add(m.natural.Formatting.Locals[i].Raw)
 		add(m.natural.Formatting.Locals[i].Pending)
 	}
-	add(m.natural.CharFormatting.Buffer.Raw)
-	add(m.natural.CharFormatting.Buffer.PendingField)
 }
 
 func TestFastFloatFormattingEveryConstructorPrefix(t *testing.T) {
@@ -143,57 +141,12 @@ func TestFastFloatFormattingEveryConstructorPrefix(t *testing.T) {
 			break
 		}
 	}
-	if !success || !foundChar || !foundInner {
+	if !success || foundChar || !foundInner {
 		t.Fatal("complete meaningful sweep", success, foundChar, foundInner)
 	}
 }
 
-func TestFastFloatFormattingFailedCharCtorRetainedAndExplicitCleanup(t *testing.T) {
-	m := fastManager(t, 200)
-	b := m.config.Storage.Descriptors.Budget
-	var a FastFloat
-	serviceMust(t, m.SetInt32(&a, 1))
-	m.toBuffer(0, &a, true, false)
-	serviceMust(t, m.natural.reserveText(4096))
-	// Prime only the real runtime's retained cold locator directory. This
-	// actual zero-byte allocation/free is outside the observed source invocation.
-	prime, e := m.natural.runtime.Allocate(0)
-	serviceMust(t, e)
-	serviceMust(t, m.natural.runtime.Deallocate(&prime))
-	b.FailAfter(1)
-	var dst [32]byte
-	_, e = m.FormatInto(&a, dst[:])
-	if !numericPhysicalReservationRefusal(e) {
-		t.Fatal(e)
-	}
-	c := &m.natural.CharFormatting
-	if c.Completed || !c.pending || c.Buffer.pos != 2048 || c.Buffer.Raw == (Block{}) || !m.formatting.pending {
-		t.Fatal("failed parameterized constructor root", c.Buffer.pos)
-	}
-	raw := c.Buffer.Raw
-	fastAudit(t, m, &a)
-	fastStandaloneBudgetAudit(t, m)
-	b.FailAfter(-1)
-	// Unrelated raw display is source-defined and need not reuse the holder.
-	bigDst := make([]byte, 2000)
-	if _, e = m.FormatRawInto(&a, bigDst); e != nil || c.Buffer.Raw != raw {
-		t.Fatal("unused holder poisoned raw output", e)
-	}
-	serviceMust(t, m.CleanupFormatting())
-	fastAudit(t, m, &a)
-	fastStandaloneBudgetAudit(t, m)
-	if _, e = m.natural.runtime.Size(raw); e == nil {
-		t.Fatal("owning cleanup omitted failed ctor raw")
-	}
-	n, e := m.FormatInto(&a, dst[:])
-	serviceMust(t, e)
-	if string(dst[:n]) != "1" {
-		t.Fatal(n, dst)
-	}
-	serviceMust(t, m.Del(&a))
-}
-
-func TestFastFloatDecimalScratchResetsAfterCharacterFailure(t *testing.T) {
+func TestFastFloatDecimalScratchResetsAfterFormattingFailure(t *testing.T) {
 	m := fastManager(t, 2)
 	budget := m.config.Storage.Descriptors.Budget
 	serviceMust(t, m.beginFastFormatting())
@@ -201,10 +154,7 @@ func TestFastFloatDecimalScratchResetsAfterCharacterFailure(t *testing.T) {
 		m.formatting.buffers[i] = make([]uint32, 1025)
 	}
 	budget.FailAfter(0)
-	_, cause := m.beginFastCharacters(m.formatView(0, 1025), 0)
-	if !numericPhysicalReservationRefusal(cause) {
-		t.Fatal("expected actual character allocation refusal", cause)
-	}
+	cause := arena.ErrBounds
 	if e := m.endFastFormatting(cause); e != cause {
 		t.Fatal("original formatting cause", e, cause)
 	}
@@ -332,7 +282,7 @@ func TestFastFloatDecimalEveryLargeLocalPrefix(t *testing.T) {
 			break
 		}
 	}
-	if !success || !charRefusal || !innerRefusal {
+	if !success || charRefusal || !innerRefusal {
 		t.Fatal("complete large local sweep", success, charRefusal, innerRefusal)
 	}
 }
@@ -352,7 +302,7 @@ func TestFastFloatFullPrecisionWarmSourceEvents(t *testing.T) {
 	allocations := testing.AllocsPerRun(10, func() { _, problem = m.FormatInto(&a, dst[:]) })
 	after, e := m.natural.runtime.AllocationCount()
 	serviceMust(t, e)
-	if problem != nil || allocations != 14 || after-before != 7*11 || budget.Used() != beforeUsed || fastOwnedBytes(m) != beforeOwned {
+	if problem != nil || allocations != 12 || after-before != 6*11 || budget.Used() != beforeUsed || fastOwnedBytes(m) != beforeOwned {
 		t.Fatal("real fresh scopes/data+init buffers", allocations, after-before, problem)
 	}
 	fastAudit(t, m, &a)

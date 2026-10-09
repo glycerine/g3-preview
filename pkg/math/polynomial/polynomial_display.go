@@ -27,7 +27,10 @@ func (v *PolynomialDecimalView) Byte(i uint32) (byte, error) {
 	}
 	f := v.frame
 	if f.big {
-		return f.characters.ReadPhysical(f.owner.memory, uint64(i))
+		if uint64(i) >= uint64(len(f.characters)) {
+			return 0, arena.ErrBounds
+		}
+		return f.characters[i], nil
 	}
 	if i >= f.smallSize {
 		return 0, arena.ErrBounds
@@ -70,7 +73,7 @@ type polynomialDisplayFrame struct {
 	active, stopped                      bool
 	numeral                              util.Int
 	constructed                          bool
-	characters                           util.SourceCharacterBuffer
+	characters                           []byte
 	characterCompleted, characterPending bool
 	limbs                                util.NaturalFormattingScope
 	numeric                              polynomialNumericRoots
@@ -268,13 +271,15 @@ func (f *polynomialDisplayFrame) displayInteger(a *util.Int) error {
 		if e != nil {
 			return e
 		}
-		f.characters = util.SourceCharacterBuffer{}
+		f.characters = nil
 		f.characterPending = true
-		if e = f.characters.Resize(f.owner.memory, uint32(11*magnitude.Size())); e != nil {
-			return e
+		n := uint32(11 * magnitude.Size())
+		if uint64(n) > uint64(^uint(0)>>1) {
+			return arena.ErrBounds
 		}
+		f.characters = make([]byte, n)
 		f.characterCompleted = true
-		e = magnitude.WriteCString(&f.characters, &f.limbs)
+		e = magnitude.WriteCString(f.characters, &f.limbs)
 		if e != nil && f.limbs.Completed() != 0 {
 			f.stopped = true
 			f.sourceCause = e
@@ -323,18 +328,9 @@ func (f *polynomialDisplayFrame) destroyCharacters(body error) error {
 	if f.stopped {
 		return polynomialNewtonJoin(body, f.sourceCause)
 	}
-	if f.characterCompleted {
-		if e := f.characters.ReleasePublished(f.owner.memory); e != nil {
-			f.stopped = true
-			f.sourceCause = e
-			return polynomialNewtonJoin(body, e)
-		}
-		f.characterCompleted = false
-	}
-	if f.characters.Pending() == (util.Block{}) {
-		f.characters = util.SourceCharacterBuffer{}
-		f.characterPending = false
-	}
+	f.characters = nil
+	f.characterCompleted = false
+	f.characterPending = false
 	return body
 }
 func (m *MultivariatePolynomialCore) CleanupDisplay() error {
@@ -366,10 +362,7 @@ func (m *MultivariatePolynomialCore) cleanupDisplayFrame(f *polynomialDisplayFra
 		f.cleanupCause = e
 		return e
 	}
-	if e := f.characters.Finalize(m.memory); e != nil {
-		f.cleanupCause = e
-		return e
-	}
+	f.characters = nil
 	f.characterCompleted = false
 	f.characterPending = false
 	if f.constructed {

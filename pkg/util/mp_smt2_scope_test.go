@@ -192,49 +192,25 @@ func TestSMT2CompletedTemporaryGuardedLateFree(t *testing.T) {
 				result = original
 			}
 			if hasInner {
-				original = m.Natural.destroyIntegerCharacters()
-				if original != arena.ErrBounds {
-					t.Fatal("actual completed inner free", original)
+				if e = m.Natural.destroyIntegerCharacters(); e != nil {
+					t.Fatal("native character lifetime end", e)
 				}
-				result = original
 			}
-			innerStopped := r.State()
 			m.finishSMT2Display(&length, &result)
 			stopped := r.State()
-			if !errors.Is(result, arena.ErrBounds) || (bodyFails && !errors.Is(result, original)) || length != 0 || stopped.GlobalSize != near.GlobalSize || stopped.LocalSize != -int64(n+8) && !hasInner || stopped.GlobalCount != near.GlobalCount || stopped.LocalCount != near.LocalCount {
+			if !errors.Is(result, arena.ErrBounds) || (bodyFails && !errors.Is(result, original)) || length != 0 || stopped.GlobalSize != near.GlobalSize || stopped.LocalSize != -int64(n+8) || stopped.GlobalCount != near.GlobalCount || stopped.LocalCount != near.LocalCount {
 				t.Fatal("completed source free/sync guard", result, length, near, stopped)
 			}
 			state := m.SMT2DisplayState()
 			if !state.Pending || state.Guard || state.OriginalCause != original || state.CleanupCause != arena.ErrBounds || m.Smt2Display.Value.Cell != ref {
 				t.Fatal("actual retained release cursor", state)
 			}
-			if hasInner {
-				if stopped != innerStopped || m.Cell(ref).Released {
-					t.Fatal("older temporary destroyed before completed child", stopped, innerStopped)
-				}
-				if _, e = r.Size(raw); e != nil {
-					t.Fatal("older actual physical root lost", e)
-				}
-			} else if _, e = r.Size(raw); e != ErrRuntimeOwner {
+			if _, e = r.Size(raw); e != ErrRuntimeOwner {
 				t.Fatal("physical free not completed", e)
 			}
 			integerPhysicalAudit(t, m, &a)
 			if e = m.SourceFinalize(); e != ErrSMT2DisplayPending || m.SourceFinalizeStage != 0 {
 				t.Fatal("parent before lexical unwind", e)
-			}
-			if hasInner {
-				if e = m.CleanupSMT2Display(); e != arena.ErrBounds {
-					t.Fatal("outer free after child acknowledgement", e)
-				}
-				afterOuter := r.State()
-				if afterOuter.GlobalSize != stopped.GlobalSize || afterOuter.LocalSize != stopped.LocalSize-int64(n+8) || afterOuter.LocalCount != stopped.LocalCount || afterOuter.GlobalCount != stopped.GlobalCount {
-					t.Fatal("actual next outer free", stopped, afterOuter)
-				}
-				if _, e = r.Size(raw); e != ErrRuntimeOwner {
-					t.Fatal("outer physical free", e)
-				}
-				stopped = afterOuter
-				integerPhysicalAudit(t, m, &a)
 			}
 			if e = m.CleanupSMT2Display(); e != nil || r.State() != stopped || m.SMT2DisplayState().Pending {
 				t.Fatal("release acknowledgement replayed source", e, r.State(), stopped)

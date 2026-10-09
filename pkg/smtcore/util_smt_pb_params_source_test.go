@@ -285,7 +285,8 @@ func TestSMTPBEveryUnwarmedSharedModuleAcquisitionReservation(t *testing.T) {
 			break
 		}
 	}
-	if first != 3 {
+	// Symbol spellings use Go storage; count only remaining arena acquisitions.
+	if first != 1 {
 		t.Fatal("actual shared symbol/module acquisition absent", first)
 	}
 	t.Log("first successful unwarmed PB update", first)

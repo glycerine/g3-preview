@@ -143,7 +143,8 @@ func TestBVRewriterMultiplicationCallerEveryColdReservation(t *testing.T) {
 			astTestMust(t, p.Close())
 		})
 	}
-	if !complete || !sawAfterCore || !sawExtract {
+	// Native coordinate/argument slices no longer create extraction refusal points.
+	if !complete || !sawAfterCore {
 		t.Fatal(complete, sawAfterCore, sawExtract)
 	}
 }

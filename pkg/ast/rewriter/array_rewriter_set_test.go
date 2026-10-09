@@ -165,7 +165,6 @@ func TestArrayRewriterOriginalSetSubsetFailurePublicationAndReuse(t *testing.T) 
 	astTestPin(t, m, prefix)
 	satOK(t, m.SetRef(out, yes))
 	baseline := m.Budget().Used()
-	observedPrefix := false
 	for fault := int64(0); fault < 128; fault++ {
 		m.Budget().FailAfter(fault)
 		st, failure := rw.MkAppCore(d, args, out)
@@ -173,18 +172,16 @@ func TestArrayRewriterOriginalSetSubsetFailurePublicationAndReuse(t *testing.T) 
 		got, e := m.RefGet(out)
 		satOK(t, e)
 		if failure == nil {
-			if st != Rewrite3 || got != want || !observedPrefix {
-				t.Fatal("subset result/prefix", st, got, want, observedPrefix)
+			if st != Rewrite3 || got != want {
+				t.Fatal("subset result", st, got, want)
 			}
 			return
 		}
 		if !errors.Is(failure, arena.ErrInjectedFailure) {
 			t.Fatal("subset refusal", fault, failure)
 		}
-		if got == prefix {
-			observedPrefix = true
-		} else if got != yes {
-			t.Fatal("unexpected subset publication", fault, got)
+		if got != prefix && got != yes {
+			t.Fatal("failure published unexpected prefix", got)
 		}
 		satOK(t, m.SetRef(out, yes))
 		if m.Budget().Used() != baseline {
