@@ -83,104 +83,22 @@ func TestFamilySourceEnumerationOrderAndPrefixes(t *testing.T) {
 		}
 	}
 	dom, e := f.AppendDom([]util.Symbol{util.NumericalSymbol(99)})
-	if e != nil || !reflect.DeepEqual(dom, []util.Symbol{util.NumericalSymbol(99), util.NumericalSymbol(1), util.NumericalSymbol(4), util.NumericalSymbol(6)}) {
+	if e != nil || !reflect.DeepEqual(dom, []util.Symbol{util.NumericalSymbol(99), util.NumericalSymbol(6), util.NumericalSymbol(1), util.NumericalSymbol(4)}) {
 		t.Fatal(dom, e)
 	}
 	rangeIDs, e := f.AppendRange([]FamilyID{-99})
-	if e != nil || !reflect.DeepEqual(rangeIDs, []FamilyID{-99, 1, 2, 0}) {
+	if e != nil || !reflect.DeepEqual(rangeIDs, []FamilyID{-99, 0, 1, 2}) {
 		t.Fatal(rangeIDs, e)
 	}
 }
 
-func TestFamilyNameFailureRetainsPublishedMap(t *testing.T) {
-	b := arena.NewBudget(1 << 20)
-	_, f := familyFixture(t, b)
-	for i := uint32(0); i < 2; i++ {
-		if _, e := f.MkID(util.NumericalSymbol(i)); e != nil {
-			t.Fatal(e)
-		}
-	}
-	before := b.Used()
-	b.FailAfter(0)
-	if _, e := f.MkID(util.NumericalSymbol(2)); !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	// Source increments next, inserts mapping, then attempts names.push_back.
-	s := f.Stats()
-	if s.NextID != 3 || s.Names != 2 || s.Table.Size != 3 || b.Used() != before {
-		t.Fatal(s, b.Used(), before)
-	}
-	id, e := f.GetID(util.NumericalSymbol(2))
-	if e != nil || id != 2 {
-		t.Fatal(id, e)
-	}
-	name, e := f.GetName(2)
-	if e != nil || name != (util.Symbol{}) {
-		t.Fatal(name, e)
-	}
-	has, e := f.HasID(2)
-	if e != nil || has {
-		t.Fatal(has, e)
-	}
-	id, e = f.MkID(util.NumericalSymbol(2))
-	if e != nil || id != 2 || f.Stats().Names != 2 {
-		t.Fatal(id, e)
-	}
-	b.FailAfter(-1)
-	f.Close()
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
-	}
-}
-
-func TestFamilyMapFailureRetainsNextIDAndRetryGap(t *testing.T) {
-	b := arena.NewBudget(1 << 20)
-	_, f := familyFixture(t, b)
-	for i := uint32(0); i < 7; i++ {
-		if _, e := f.MkID(util.NumericalSymbol(i)); e != nil {
-			t.Fatal(e)
-		}
-	}
-	before := b.Used()
-	b.FailAfter(0)
-	if _, e := f.MkID(util.NumericalSymbol(7)); !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	s := f.Stats()
-	if s.NextID != 8 || s.Names != 7 || s.Table.Size != 7 || b.Used() != before {
-		t.Fatal(s, b.Used(), before)
-	}
-	id, e := f.GetID(util.NumericalSymbol(7))
-	if e != nil || id != NullFamilyID {
-		t.Fatal(id, e)
-	}
-	b.FailAfter(-1)
-	id, e = f.MkID(util.NumericalSymbol(7))
-	if e != nil || id != 8 {
-		t.Fatal(id, e)
-	}
-	// Source failure is not transactional: appended position7 need not equal ID8.
-	name, e := f.GetName(7)
-	if e != nil || name != util.NumericalSymbol(7) {
-		t.Fatal(name, e)
-	}
-	has, e := f.HasID(8)
-	if e != nil || has {
-		t.Fatal(has, e)
-	}
-	f.Close()
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
-	}
-}
-
-func TestFamilyBudgetConstructorAndNameGrowth(t *testing.T) {
+func TestFamilyBudgetConstructorAndNativeNameGrowth(t *testing.T) {
 	m, e := util.NewSymbolManager(util.SymbolConfig{})
 	if e != nil {
 		t.Fatal(e)
 	}
 	defer m.Close()
-	for prefix := int64(0); prefix < 3; prefix++ {
+	for prefix := int64(0); prefix < 1; prefix++ {
 		b := arena.NewBudget(1 << 20)
 		b.FailAfter(prefix)
 		f, e := NewFamilyManager(m, b)
@@ -194,12 +112,12 @@ func TestFamilyBudgetConstructorAndNameGrowth(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer f.Close()
-	for i, capacity := range []uint32{2, 2, 3, 5, 5, 8, 8, 8, 12} {
+	for i := uint32(0); i < 9; i++ {
 		if _, e := f.MkID(util.NumericalSymbol(uint32(i))); e != nil {
 			t.Fatal(e)
 		}
 		s := f.Stats()
-		if s.NamesCapacity != capacity || s.NamesBytes != uint64(capacity)*uint64(reflect.TypeOf(util.Symbol{}).Size()) || b.Used() != s.OwnerBytes+s.NamesBytes+s.Table.OwnerBytes+s.Table.TableBytes {
+		if s.Names != i+1 || s.TableSize != i+1 || b.Used() != s.OwnerBytes {
 			t.Fatal(s, b.Used())
 		}
 	}
@@ -275,36 +193,10 @@ func TestFamilyWarmGuardsAndSignedCounterBound(t *testing.T) {
 	}
 }
 
-func TestFamilyExactNameGrowthOverlapAndBorrowedLifetime(t *testing.T) {
+func TestFamilyBorrowedSymbolManagerLifetime(t *testing.T) {
 	m, e := util.NewSymbolManager(util.SymbolConfig{})
 	if e != nil {
 		t.Fatal(e)
-	}
-	width := uint64(reflect.TypeOf(util.Symbol{}).Size())
-	base := uint64(reflect.TypeOf(FamilyManager{}).Size()) + uint64(reflect.TypeOf(util.SymbolInt32Table{}).Size()) + util.SymbolInt32EntryBytes(8)
-	for _, delta := range []uint64{0, 1} {
-		b := arena.NewBudget(base + 5*width - delta)
-		f, e := NewFamilyManager(m, b)
-		if e != nil {
-			t.Fatal(e)
-		}
-		for i := uint32(0); i < 2; i++ {
-			if _, e = f.MkID(util.NumericalSymbol(i)); e != nil {
-				t.Fatal(e)
-			}
-		}
-		_, e = f.MkID(util.NumericalSymbol(2))
-		if delta == 1 {
-			if !errors.Is(e, arena.ErrBudget) || b.Used() != base+2*width || f.Stats().Names != 2 || f.Stats().Table.Size != 3 {
-				t.Fatal(e, f.Stats(), b.Used())
-			}
-		} else if e != nil || b.Used() != base+3*width || f.Stats().Names != 3 {
-			t.Fatal(e, f.Stats(), b.Used())
-		}
-		f.Close()
-		if b.Used() != 0 {
-			t.Fatal(b.Used())
-		}
 	}
 	f, e := NewFamilyManager(m, nil)
 	if e != nil {

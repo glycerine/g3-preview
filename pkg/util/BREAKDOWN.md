@@ -321,6 +321,12 @@ comparable state-set representation when that consumer is ported. Neither
 source use needs bucket arrays, collision chains, tombstones, or custom table
 iterators in Go.
 
+The live family-name `SymbolInt32Table` has been replaced at its AST consumer
+with `insdict.Dict[Symbol, int32]`. Family lookup remains constant-time and
+domain/range enumeration now follows stable registration order. The dedicated
+probing table, scoped copy/rollback machinery unused by the family manager,
+physical bucket accounting, and layout tests have been deleted.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before

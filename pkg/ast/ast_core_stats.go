@@ -52,7 +52,7 @@ func (m *ASTManager) Stats() ASTManagerStats {
 	}
 	if m.families != nil {
 		f := m.families.Stats()
-		s.AllocatedBytes += f.OwnerBytes + f.NamesBytes + f.Table.OwnerBytes + f.Table.TableBytes + f.Table.TrailBytes + f.Table.ScopeBytes
+		s.AllocatedBytes += f.OwnerBytes
 	}
 	if m.Format != nil {
 		s.AllocatedBytes += m.Format.Stats().AllocatedBytes
