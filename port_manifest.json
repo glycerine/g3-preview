@@ -152707,7 +152707,7 @@
       "path": "src/util/str_hashtable.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/str_hashtable.go",
         "pkg/util/str_int32_map.go",
@@ -152817,11 +152817,31 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "str_hash_proc CString strlen/prefix seed17 hash",
+          "name": "str_hash_proc::operator() NUL length and project string_hash seed 17 (src/util/str_hashtable.h:28)",
+          "status": "ported",
+          "go_target": "pkg/util/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableCStringHashAndEqualRereadActualUnstoredPointer",
+            "TestStrHashtableCStringFiniteLengthAndEqualityOracle"
+          ]
+        },
+        {
+          "name": "str_eq_proc::operator() byte-string equality (src/util/str_hashtable.h:30)",
+          "status": "ported",
+          "go_target": "pkg/util/str_hashtable.go",
+          "tests": [
+            "TestStrHashtableSourceHashCStringAndEquality",
+            "TestStrHashtableIndependentOracleAndCStringLookup",
+            "TestStrHashtableCStringFiniteLengthAndEqualityOracle"
+          ]
+        },
+        {
+          "name": "concrete str_hashtable alias over the char-key ptr_hashtable specialization (src/util/str_hashtable.h:31)",
           "status": "ported",
           "go_target": "pkg/util/str_hashtable.go",
           "tests": [
@@ -152842,64 +152862,17 @@
             "TestStrHashtableCleanupResetAndFailurePeaks",
             "TestStrHashtableSourceInitialCapacity",
             "TestStrHashtablePartialRemovalAndStrictReset",
-            "TestStrHashtableEpochExhaustion"
-          ]
-        },
-        {
-          "name": "str_eq_proc strcmp equality",
-          "status": "ported",
-          "go_target": "pkg/util/str_hashtable.go",
-          "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableBorrowedLifetimeAndReplacement",
-            "TestStrHashtableSourceProbeThresholdAndTombstones",
-            "TestStrHashtableOperationsAndOutput",
-            "TestStrHashtableIndependentOracleAndCStringLookup",
-            "TestStrHashtableBudgetsSwapAndStaleViews",
-            "TestStrHashtableDumpCStringBytes",
-            "TestStrHashtableKeyOwnerAndStats",
-            "TestStrHashtableMultiOriginQueriesAndAdoption",
-            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
-            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
-            "TestStrHashtableMultiOriginSwapGraphFailures",
-            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
-            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
-            "TestStrHashtableCleanupResetAndFailurePeaks",
-            "TestStrHashtableSourceInitialCapacity",
-            "TestStrHashtablePartialRemovalAndStrictReset",
-            "TestStrHashtableEpochExhaustion"
-          ]
-        },
-        {
-          "name": "str_hashtable concrete char-pointer alias methods/ownership/copy/operators",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable.go",
-          "tests": [
-            "TestStrHashtableSourceHashCStringAndEquality",
-            "TestStrHashtableBorrowedLifetimeAndReplacement",
-            "TestStrHashtableSourceProbeThresholdAndTombstones",
-            "TestStrHashtableOperationsAndOutput",
-            "TestStrHashtableIndependentOracleAndCStringLookup",
-            "TestStrHashtableBudgetsSwapAndStaleViews",
-            "TestStrHashtableDumpCStringBytes",
-            "TestStrHashtableKeyOwnerAndStats",
-            "TestStrHashtableMultiOriginQueriesAndAdoption",
-            "TestStrHashtableMultiOriginOperatorsCloneAndLifetime",
-            "TestStrHashtableMultiOriginFailureOrderAndAccounting",
-            "TestStrHashtableMultiOriginSwapGraphFailures",
-            "TestStrHashtableMultiOriginQueryMethodsAndCollisionOrder",
-            "TestStrHashtableMultiOriginIndependentOracleAndDirectoryPeak",
-            "TestStrHashtableCleanupResetAndFailurePeaks",
-            "TestStrHashtableSourceInitialCapacity",
-            "TestStrHashtablePartialRemovalAndStrictReset",
-            "TestStrHashtableEpochExhaustion"
-          ]
-        },
-        {
-          "name": "Selected Runtime-backed char-pointer core class src/util/hashtable.h:94-645: actual pointer/hash entry fields, constructor/copy, probe/insert/remove, growth/reset/finalize, swap/union/assignment and lexical intersection; bound source assertions/statistics/native ostream remain open",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_runtime.go",
-          "tests": [
+            "TestStrHashtableEpochExhaustion",
+            "TestStrInt32MapSourceMap14Assertions",
+            "TestStrInt32MapForeignBorrowAndMutableValues",
+            "TestStrInt32MapIndependentOracleAndBuckets",
+            "TestStrInt32MapCopyOperatorsAndBudget",
+            "TestStrInt32MapHashCachedCopiesAndDefaultPayload",
+            "TestStrInt32MapWrappedTombstonesGrowthAndCleanup",
+            "TestStrInt32MapResetFinalizeThresholdsAndEpoch",
+            "TestStrInt32MapMultiOwnerBudgetsSwapLifetimeAndWarm",
+            "TestStrInt32MapConstructorGrowthAndUnionFailurePrefixes",
+            "TestStrInt32MapConcreteArchitectureLayoutAndBudget",
             "TestStrHashtableRuntimeActualWrapperTableAndLazyFieldInitialization",
             "TestStrHashtableRuntimeProbeGrowthAndIndependentContents",
             "TestStrHashtableRuntimeResetDestructiveRefusalPrefix",
@@ -152916,14 +152889,7 @@
             "TestStrHashtableRuntimeEveryLexicalAndDeletedReplacementReservation",
             "TestStrHashtableRuntimeOrdinaryAllocatorProfiles",
             "TestStrHashtableRuntimeAllocationReentrantOwningClose",
-            "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner"
-          ]
-        },
-        {
-          "name": "Selected concrete cold DebugContext bridge and real SASSERT/UNREACHABLE source-site transport for Runtime StrHashtable (src/util/hashtable.h:159-215,249,300-303,371,395,422,451,559,643-644); erased operands remain unread, C resumes literal source body",
-          "status": "partial",
-          "go_target": "pkg/util/util_str_hashtable_assertion_bridge.go",
-          "tests": [
+            "TestStrHashtableRuntimeLexicalCopyReentrantClosePreservesReturnedOwner",
             "TestStrHashtableBoundConstructorConditionBeforeEntryAllocation",
             "TestStrHashtableBoundInvariantContinuesLiteralSites",
             "TestStrHashtableBoundDisabledNonPowerCapacityLinearProbe",
@@ -152934,48 +152900,20 @@
             "TestStrHashtableBoundRemoveExhaustionFlagAndEarlyFreeErasure",
             "TestStrHashtableBoundDisabledInvariantAndUnusedTransport",
             "TestStrHashtableBoundBorrowBudgetValidationBeforeReservation",
-            "TestStrHashtableBoundEveryConstructorReservationImmediateGraph"
-          ]
-        },
-        {
-          "name": "Selected Runtime core source compile gates and default typed adapter, literal target-deleted static move predicate and finite source end/begin traversal (src/util/hashtable.h:159-215,249,497-514)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_assertions.go",
-          "tests": [
+            "TestStrHashtableBoundEveryConstructorReservationImmediateGraph",
             "TestStrHashtableSourceProbeIndexIndependentLinearLoops",
             "TestStrHashtableRuntimeDefaultAssertionConstructorActualWrapperPrefix",
-            "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate"
-          ]
-        },
-        {
-          "name": "Concrete Runtime HASHTABLE_STATISTICS actual unsigned64 field and source constructor/copy/reset/finalize/swap/probe increments (src/util/hashtable.h:33-36,138-140,254-256,267-269,281-283,359-373,409-424,481-491,533-543,649-653)",
-          "status": "partial",
-          "go_target": "pkg/util/str_hashtable_statistics.go",
-          "tests": [
+            "TestStrHashtableRuntimeMoveTableActualDeletedTargetPredicate",
             "TestStrHashtableRuntimeStatisticsActualFieldAndLiteralMissCounts",
             "TestStrHashtableRuntimeStatisticsEveryConstructorAndCopyReservation",
             "TestStrHashtableRuntimeStatisticsResetFinalizeInlineAndUnsignedWrap",
             "TestStrHashtableRuntimeStatisticsEveryReplacementAndGrowthPrefix",
-            "TestStrHashtableRuntimeStatisticsIndependentFiniteProbeCounts"
-          ]
-        },
-        {
-          "name": "Concrete borrowed NumericTextStream ostream dump chain and reached CString strlen with captured table/end (src/util/hashtable.h:581-600)",
-          "status": "partial",
-          "go_target": "pkg/util/util_str_hashtable_output.go",
-          "tests": [
+            "TestStrHashtableRuntimeStatisticsIndependentFiniteProbeCounts",
             "TestStrHashtableDumpIntoActualFieldFormattingAndCallerWidth",
             "TestStrHashtableDumpIntoClosedFileStillReachesActualBorrowedCString",
             "TestStrHashtableDumpIntoEveryOutputReservationAndExactPrefix",
             "TestStrHashtableDumpIntoActualFileAndEmptyBorrowErasure",
-            "TestStrHashtableDumpIntoBorrowedSpellingRereadAndFileBytes"
-          ]
-        },
-        {
-          "name": "Concrete borrowed char-pointer strlen/strcmp Hash/Eq and string/byte query prefixes with actual RegionBytes signed-tail reader (src/util/str_hashtable.h:28-30; src/util/hash.cpp:26-102)",
-          "status": "partial",
-          "go_target": "pkg/util/region_bytes.go",
-          "tests": [
+            "TestStrHashtableDumpIntoBorrowedSpellingRereadAndFileBytes",
             "TestStrHashtableCStringHashAndEqualRereadActualUnstoredPointer",
             "TestStrHashtableCStringBorrowChangedBeforeInsertionQueryEngine",
             "TestStrHashtableCStringFiniteLengthAndEqualityOracle",
@@ -152986,20 +152924,13 @@
         }
       ],
       "ownership": [
-        "CString spellings are borrowed across explicit byte-region origins. Hot keys are scalar; cold sorted owner bindings and table/header capacities are budgeted. All normal concrete char-pointer table methods are represented, including multi-origin bulk operations. See PORT_PROGRESS.md#audit-utilhash-port-status-md.",
-        "Runtime-backed mode uses its actual 24-byte wrapper and 32-byte pointer-free entry array, with NIL legacy hot slice. Exact acquisition nodes stamp returned Runtime leaves; ascending moves, destructive replacement, source strict destructor and separate owning cleanup retain each genuinely unjoined token. Lexical intersection copy has a concrete inline header, one actual table allocation, and source completed-copy destructor before owning abort.",
-        "One cold borrowed assertion-context interface is charged inside the actual reflected table owner/config, never in a hot entry and never a condition callback. Runtime debug tags bind their exact owning DebugContext. SASSERT checks only the assertion flag, without recursively looking up tag storage. Constructor condition follows real wrapper allocation and precedes the real entry array; strict returned allocation/copy/move owners remain named across actual transport refusal.",
-        "Enabled Runtime objects own32 physical bytes, default objects retain24; the unsigned64 statistics field is actual payload, while lexical copies use their actual inline scalar words. No mirrored statistics counter. Call-local output method set borrows actual NumericTextStream and actual stored CString region/token/offset; no cloned spelling or custom writer. Every constructor/copy/growth/replacement/output reservation prefix has immediate named physical/cold bijection before fault lift.",
-        "No allocation or copied spelling is introduced at strlen/strcmp/hash entry. Actual region origin/ref/offset is retained; reached bytes validate provider lifetime and bounds. Forty-one independent signed-byte length/equality cases and related StrInt32Map common consumers execute under active reservation refusal with immediate named Runtime/cold graph."
+        "StrHashtable owns its concrete table backing and cold region-binding directory. StrKey is a typed scalar borrow of one NUL-terminated spelling; table operations never own or free spelling bytes.",
+        "Reset, Finalize, Close, copy, assignment, union, intersection and swap preserve the concrete alias's key-borrow and table-ownership rules in both ordinary and checked Runtime storage profiles."
       ],
       "deviations": [
-        "Raw C-pointer/sentinel mechanics become scalar origin/ref/offset/length and checked epochs. Equality-preserving entry key replacement guards hash invariants; multi-origin binding directory is retained through Reset until Close. Other generic core specializations and optional enabled statistics remain open in hashtable.h.",
-        "This is a concrete Go representation, not native pointer/ABI byte geometry. Runtime no-error observers raise typed failures on reached raw errors rather than return zero. Existing checked CString/iterator/reference lifetime profiles and legacy staged Reset/growth remain separately qualified; bound core SASSERT dispatch, HASHTABLE_STATISTICS and native ostream/global allocator profiles remain open. Reentrant returning Go ErrorTransport cleanup is guarded until each real allocation outcome is recorded; this is not native C++ callback equivalence.",
-        "Existing alias-wide class completion includes legacy staged reset/exception frontiers and checked invalidation adaptations; Runtime-supported source storage is now proved but global source assertions and remaining compile/stream profiles are not whole-class complete.",
-        "Cold binding Budget/self validation is a Go configuration contract separate from erased source macro payload reads. A closed provider after valid preparation remains unread in release or at a source early return; DEBUG reaches its actual flag lifetime guard. The source check_invariant function exists only in Z3DEBUG; release CheckInvariantChecked retains the explicitly inventoried inspection adapter. GNU release UNREACHABLE is guarded with a class-local typed error before provider reads, not native undefined execution. Non-power-of-two constructor C/release continuation allocates actual entries and uses literal end/begin probe traversal; invalid/malformed source count fixtures are explicit guard domains, not ordinary source math failures. Other pointer-entry specializations, HASHTABLE_STATISTICS, native ostream/ABI/global provider profiles and legacy class assertion dispatch remain open.",
-        "Statistics mode is an explicit supported Runtime specialization; legacy hot-slice Statistics configuration is rejected before reservation and remains open. Physical wrapper24/32 and entry32 codecs are Go representation, not native C++ ABI. Collision arithmetic uses source unsigned64 wrap. Output is the existing selected narrow libstdc++/classic-format adapter with real borrowed os.File badbit; arbitrary native ostream locale/exception/ABI/global bindings remain open. Existing broader legacy and native pointer specializations retain partial status.",
-        "Borrow-time length remains advisory checked-borrow metadata; source Hash/Eq and char-pointer query comparisons no longer use it as source strlen/strcmp authority. Changing an inserted spelling can invalidate its cached table hash; source-valid regression changes the uninserted caller buffer, including before insertion, then leaves stored bytes unchanged. BytesRegion uses existing zeroed Go backing rather than Runtime initialized-byte tracking; raw oversized extent tests are checked/source-undefined guard-domain proof only. Source memcpy whole-word codec uses selected little-endian ascending byte loads and signed-char descending tails. Native libc optimized strcmp/strlen, sizeof(unsigned) assertion/global provider binding, other char/compiler/ABI profiles and legacy transactional Reset/Finalize/Intersect remain explicit open obligations. No registered char-pointer test driver exists; src/test/hashtable.cpp registered int_set/safe_int_set is not credited by these independent tests.",
-        "Reached uint64 region offset addition rejects overflow before token/payload access; zero-n erases the guard. Genuine checked Go helper-domain RED, not native CString algorithm credit."
+        "Checked StrKey origin/ref/offset values replace raw char pointers. Go byte reads and comparisons replace strlen and strcmp; no C standard-library implementation is ported.",
+        "The concrete char-key specialization is complete independently of other hashtable<T> instantiations. Remaining generic hashtable.h obligations stay on that separate manifest entry.",
+        "Go errors and checked epochs replace source undefined behavior for stale, foreign and malformed raw pointers. The project Jenkins-style hash algorithm is retained because it determines table behavior."
       ]
     },
     {

@@ -30622,3 +30622,11 @@ Completed the exported Stopwatch surface with GetSeconds, CurrentSeconds and Get
 The existing platform adapter retains the Linux process CPU clock behavior and uses Go's portable monotonic support elsewhere. Native Windows headers, Mach services and POSIX clock APIs are not reproduced. Clock failures remain explicit Go errors rather than allowing uninitialized native time values.
 
 Six focused tests cover source start/stop/reset/add and unsigned borrow behavior, actual platform reads, all named query forms, scoped reset/start/stop, repeated closure, nil owners and constructor/destructor clock failures. Focused native and g3debug checks pass (0.005s/0.004s). Util vet, ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 91 ported, 276 partial, 1726 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.
+
+### util file: str_hashtable.h
+
+Completed the file-level audit of the concrete string-table header. The source file declares only str_hash_proc, str_eq_proc and the char-key ptr_hashtable alias. StrHashtable and typed StrKey already implement that concrete specialization's construction, lookup, insertion, removal, traversal, reset/finalize, copy/assignment, set operations, swapping, output and lifetime behavior across its ordinary and checked Runtime storage profiles.
+
+The previous partial status incorrectly attached unfinished obligations from the separate generic hashtable.h source file. Those remain tracked there and no longer qualify str_hashtable.h. Go byte operations replace strlen and strcmp without porting the C standard library; the project hash remains because it determines table placement and collision behavior.
+
+All 103 focused StrHashtable, shared CString and RegionBytes tests pass in native and g3debug builds (0.193s/0.153s). The ledger and diff validation pass; inventory is now 2102 units, 677 APIs: 92 ported, 275 partial, 1726 unported, plus separately classified platform replacements. The 23:35 UTC full-suite checkpoint remains current.
