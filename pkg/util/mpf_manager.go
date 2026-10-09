@@ -527,10 +527,6 @@ func (m *ArbitraryFloatManager) OwnedStorageBytes() uint64 {
 		}
 		if z.Natural != nil {
 			n += z.Natural.HeaderBytes
-			if z.Natural.Text != nil {
-				s := z.Natural.Text.Stats()
-				n += s.OwnerBytes + s.PayloadBytes + s.MetadataBytes + s.DirectoryBytes
-			}
 		}
 	}
 	return n

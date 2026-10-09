@@ -30904,3 +30904,19 @@ and its self-tests; current production consumers use the native storage retained
 in solver code. Source SAT sets remain live and are not classified as dead C++.
 Preserved the independent approximation-mask test under sat_approx_set_test.go.
 Complete SAT/tactic tests and manifest validation pass for the removal.
+
+### Native numeric output assembly
+
+Converted NaturalManager's retained output assembly from arena.SmallBytes to
+reusable native byte storage. Publication uses Go copy/string operations;
+integer, rational, MPFF, and infinitesimal formatting retain output and prefix
+behavior. Removed text-only arena owners, capacity arithmetic, and physical-root
+entries. Native text backing is outside arena accounting; actual numeric limb
+allocations remain budgeted. Failure fixtures now exceed inline numerical
+storage to retain real allocation-failure and cleanup coverage.
+
+Validation: the native module checkpoint passed every package except one
+SMT2 cleanup fixture that still expected text allocation refusal. Updated it
+to reach an actual numerical workspace refusal; the subsequent complete util
+run passed (138.8 seconds). Focused checked/debug formatting and SMT2 tests,
+vet for util/AST/polynomial/smtcore, and portcheck also passed.

@@ -967,3 +967,15 @@ Current solver work uses the retained native literal/unsigned storage; unused
 copy/pop/vector-wrapper APIs will be implemented only for a concrete future
 consumer. The separate approximation mask is live in clauses and simplification;
 its existing test was moved beside that implementation and retained.
+
+Numeric output assembly now uses a reusable native `[]byte` owned by
+NaturalManager. Integer, rational, MPFF, and infinitesimal formatting copy the
+prepared bytes into caller buffers or independent Go strings. Growth preserves
+already-written prefixes, including the numerator while preparing a denominator;
+close drops the slice. The SmallBytes owner, indexed payload access, copied
+capacity schedule, and text-only allocation refusal states are gone. This
+Go-managed text is outside arena accounting. Numerical limb workspaces retain
+their separate Runtime ownership and failure cleanup. Failure campaigns use
+operands exceeding inline numerical storage so they continue testing real
+allocation failures, alongside output, short-buffer, returned-string lifetime,
+and warm-allocation checks.

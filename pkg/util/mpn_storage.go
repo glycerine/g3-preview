@@ -30,10 +30,7 @@ type NaturalManager struct {
 	sourceCause                       error
 	VerificationActive                bool
 	originalCause, cleanupCause       error
-	Text                              *arena.SmallBytes
-	textRef                           arena.SmallBytesRef
-	textCapacity                      uint32
-	config                            arena.VectorConfig
+	text                              []byte
 	budget                            *arena.Budget
 	HeaderBytes                       uint64
 	ClosedField, Closing              bool
@@ -50,7 +47,7 @@ func newNaturalManagerWithMemory(c arena.VectorConfig, runtime *Runtime) (*Natur
 	if e := c.Descriptors.Budget.Reserve(header); e != nil {
 		return nil, e
 	}
-	m := &NaturalManager{config: c, budget: c.Descriptors.Budget, HeaderBytes: header, runtime: runtime}
+	m := &NaturalManager{budget: c.Descriptors.Budget, HeaderBytes: header, runtime: runtime}
 	m.self = m
 	if runtime == nil {
 		m.ownsRuntime = true
@@ -150,10 +147,7 @@ func (m *NaturalManager) CloseChecked() error {
 			}
 		}
 	}
-	if m.Text != nil {
-		m.Text.Close()
-		m.Text = nil
-	}
+	m.text = nil
 	if m.ownsRuntime && m.runtime != nil {
 		if e := m.runtime.Close(); e != nil {
 			return fail(e)

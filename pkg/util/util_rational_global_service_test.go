@@ -215,9 +215,6 @@ func rationalGlobalColdGraph(t *testing.T, g *RationalGlobalService, r *Runtime)
 		if !nat.IsNil() {
 			nat = nat.Elem()
 			n += testFieldBySourceName(nat, "headerBytes").Uint()
-			if !testFieldBySourceName(nat, "text").IsNil() {
-				t.Fatal("undeclared Natural text owner")
-			}
 		}
 	}
 	addM := func(v reflect.Value) {

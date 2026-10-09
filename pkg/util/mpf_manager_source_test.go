@@ -70,10 +70,6 @@ func arbitraryFloatSourceCold(t *testing.T, m *ArbitraryFloatManager, r *Runtime
 		}
 		if z.Natural != nil {
 			n += z.Natural.HeaderBytes
-			if z.Natural.Text != nil {
-				v := z.Natural.Text.Stats()
-				n += v.OwnerBytes + v.PayloadBytes + v.MetadataBytes + v.DirectoryBytes
-			}
 			integerPhysicalAuditWithRaw(t, z, foreign)
 		} else {
 			sourcePreparedEarlyIntegerPhysical(t, z)

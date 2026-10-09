@@ -78,7 +78,7 @@ func TestSMT2FreshDefaultCopyFailureNullDestructor(t *testing.T) {
 func TestSMT2CompletedTemporaryGuardedLateFree(t *testing.T) {
 	for scenario := 0; scenario < 3; scenario++ {
 		bodyFails, hasInner := scenario == 1, scenario == 2
-		t.Run([]string{"completed-body", "refused-output-prefix", "completed-inner-before-outer"}[scenario], func(t *testing.T) {
+		t.Run([]string{"completed-body", "refused-numeric-workspace", "completed-inner-before-outer"}[scenario], func(t *testing.T) {
 			b := arena.NewBudget(1 << 26)
 			r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
 			if e != nil {
@@ -181,12 +181,12 @@ func TestSMT2CompletedTemporaryGuardedLateFree(t *testing.T) {
 			var result error
 			var original error
 			if bodyFails {
-				// Real Go output-workspace reservation at the actual source prefix
-				// insertion point; this is not a manufactured destructor error.
+				// Native output assembly cannot refuse arena reservations. Reach
+				// the real numerical workspace used to format the copied value.
 				b.FailAfter(0)
-				_, original = m.Natural.appendDisplay(0, "(- ")
+				_, original = m.prepareInteger(&m.Smt2Display.Value, 0)
 				if !numericPhysicalReservationRefusal(original) {
-					t.Fatal("actual body prefix refusal", original)
+					t.Fatal("actual numerical workspace refusal", original)
 				}
 				b.FailAfter(-1)
 				result = original

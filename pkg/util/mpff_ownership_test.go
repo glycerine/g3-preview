@@ -38,18 +38,6 @@ func fastAudit(t *testing.T, m *FastFloatManager, values ...*FastFloat) {
 	if active != m.live || active != uint32(len(roots)) {
 		t.Fatal("live mismatch", active, m.live, len(roots))
 	}
-	if m.natural.Text != nil {
-		live := uint32(0)
-		if m.natural.textRef != (arena.SmallBytesRef{}) {
-			live = 1
-			if !m.natural.Text.IsLive(m.natural.textRef) {
-				t.Fatal("invalid text root")
-			}
-		}
-		if m.natural.Text.Stats().Live != live {
-			t.Fatal("unrooted text workspace")
-		}
-	}
 	fastFormattingPhysicalAudit(t, m)
 
 }
@@ -450,10 +438,6 @@ func TestFastFloatDivisionSourceDiagnosticPrefix(t *testing.T) {
 
 func fastOwnedBytes(m *FastFloatManager) uint64 {
 	n := m.natural.RuntimeOwner().Stats().TotalBytes + m.headerBytes + m.natural.HeaderBytes
-	if m.natural.Text != nil {
-		b := m.natural.Text.Stats()
-		n += b.OwnerBytes + b.PayloadBytes + b.MetadataBytes + b.DirectoryBytes
-	}
 	return n
 }
 func TestFastFloatActualWholeGraphCharges(t *testing.T) {

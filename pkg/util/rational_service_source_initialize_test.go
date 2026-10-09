@@ -174,10 +174,6 @@ func sourcePreparedGraph(t *testing.T, s *RationalService, r *Runtime) {
 			q := z.Cells.Stats()
 			want += q.OwnerBytes + q.RecordBytes + q.MetadataBytes + q.DirectoryBytes
 		}
-		if z.Natural != nil && z.Natural.Text != nil {
-			q := z.Natural.Text.Stats()
-			want += q.OwnerBytes + q.PayloadBytes + q.MetadataBytes + q.DirectoryBytes
-		}
 		if z.Natural != nil {
 			integerPhysicalAudit(t, z)
 		} else {

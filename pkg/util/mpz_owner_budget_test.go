@@ -76,9 +76,8 @@ func TestIntegerOwnerConstructorFailureUnwind(t *testing.T) {
 	}
 }
 
-// A >256-byte retained formatting buffer takes SmallBytes' real direct branch.
-// PayloadBytes already includes that backing; DirectBytes is classification.
-func TestIntegerPhysicalBudgetGraphAfterDirectFormatting(t *testing.T) {
+// A long decimal result uses native text outside numeric arena accounting.
+func TestIntegerPhysicalBudgetGraphAfterNativeFormatting(t *testing.T) {
 	m, b := mpzPublicationOwner(t)
 	var a Int
 	want := "1" + strings.Repeat("0", 800)
@@ -88,8 +87,8 @@ func TestIntegerPhysicalBudgetGraphAfterDirectFormatting(t *testing.T) {
 	if got := integerString(t, m, &a); got != want {
 		t.Fatal("format value changed")
 	}
-	if m.Natural.Text == nil || m.Natural.Text.Stats().DirectBytes == 0 {
-		t.Fatal("fixture did not exercise direct text backing")
+	if len(m.Natural.text) < len(want) {
+		t.Fatal("fixture did not exercise native text backing")
 	}
 	integerPhysicalAudit(t, m, &a)
 	if got, want := integerActualOwnedBytes(m), b.Used(); got != want {

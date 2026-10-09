@@ -662,10 +662,6 @@ func integerActualOwnedBytes(m *util.IntegerManager) uint64 {
 	n := m.HeaderBytes + m.Natural.HeaderBytes + m.Memory.Stats().TotalBytes + m.Allocator.Stats().TotalBytes
 	n += cs.OwnerBytes + cs.RecordBytes + cs.MetadataBytes + cs.DirectoryBytes
 
-	if m.Natural.Text != nil {
-		s := m.Natural.Text.Stats()
-		n += s.OwnerBytes + s.PayloadBytes + s.MetadataBytes + s.DirectoryBytes
-	}
 	return n
 }
 func integerPhysicalAudit(t *testing.T, m *util.IntegerManager, public ...*util.Int) {

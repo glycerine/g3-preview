@@ -27,7 +27,12 @@ func (d sourceDecimalDestination) write(i uint64, n byte) error {
 		if i > uint64(^uint32(0))-uint64(d.offset) {
 			return arena.ErrBounds
 		}
-		return d.assembly.Text.Write(d.assembly.textRef, d.offset+uint32(i), n)
+		index := uint64(d.offset) + i
+		if index >= uint64(len(d.assembly.text)) {
+			return arena.ErrBounds
+		}
+		d.assembly.text[index] = n
+		return nil
 	}
 	if i >= uint64(len(d.external)) {
 		return arena.ErrBounds
@@ -43,7 +48,11 @@ func (d sourceDecimalDestination) read(i uint64) (byte, error) {
 		if i > uint64(^uint32(0))-uint64(d.offset) {
 			return 0, arena.ErrBounds
 		}
-		return d.assembly.Text.Read(d.assembly.textRef, d.offset+uint32(i))
+		index := uint64(d.offset) + i
+		if index >= uint64(len(d.assembly.text)) {
+			return 0, arena.ErrBounds
+		}
+		return d.assembly.text[index], nil
 	}
 	if i >= uint64(len(d.external)) {
 		return 0, arena.ErrBounds

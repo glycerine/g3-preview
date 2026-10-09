@@ -45,17 +45,5 @@ func astFormatterRationalColdBytes(t *testing.T, q *util.RationalService) uint64
 	n += slab(testFieldBySourceName(z, "cells"))
 	nat := testFieldBySourceName(z, "natural").Elem()
 	n += testFieldBySourceName(nat, "headerBytes").Uint()
-	if text := testFieldBySourceName(nat, "text"); !text.IsNil() {
-		text = text.Elem()
-		if !testFieldBySourceName(text, "closed").Bool() {
-			n += uint64(text.Type().Size())
-		}
-		n += testFieldBySourceName(text, "directoryBytes").Uint() + slab(testFieldBySourceName(text, "descriptors"))
-		pages := testFieldBySourceName(text, "pages")
-		for i := 0; i < pages.Len(); i++ {
-			p := pages.Index(i)
-			n += uint64(testFieldBySourceName(p, "data").Len()) + uint64(testFieldBySourceName(p, "next").Len())*4
-		}
-	}
 	return n
 }

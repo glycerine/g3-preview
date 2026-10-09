@@ -2,8 +2,10 @@
 package util
 
 import (
+	"bytes"
 	"errors"
 	"math"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -87,7 +89,9 @@ func TestInfFormatSignedZeroAndDomain(t *testing.T) {
 }
 
 // Every failure is inspected before further formatting or cleanup can mask a
-// leaked absolute-value temporary. Formatting buffers remain manager-owned.
+// leaked absolute-value temporary. Operands exceed the numerical inline
+// workspace, so the sweep reaches real numeric allocations after native text
+// growth stopped generating arena reservations.
 func TestInfFormatFailurePrefixesImmediateRoots(t *testing.T) {
 	for kind := 0; kind < 2; kind++ {
 		failures := 0
@@ -96,8 +100,8 @@ func TestInfFormatFailurePrefixesImmediateRoots(t *testing.T) {
 			budget := arena.NewBudget(1 << 25)
 			s, e := NewRationalService(serviceConfig(budget))
 			serviceMust(t, e)
-			first := serviceValue(t, s, "1684996666696914987166688442938726917102321526408785780068975640579/11")
-			eps := serviceValue(t, s, "-47890485652059026823698344598447161988085597568237573/13")
+			first := serviceValue(t, s, strings.Repeat("1234567890", 30)+"/11")
+			eps := serviceValue(t, s, "-"+strings.Repeat("9876543210", 25)+"/13")
 			v, e := s.NewInfValue()
 			serviceMust(t, e)
 			serviceMust(t, s.InfSetPair(&v, &first, &eps))
@@ -148,35 +152,24 @@ func TestInfFormatFailurePrefixesImmediateRoots(t *testing.T) {
 	}
 }
 
-func TestInfFormatWorkspaceGrowthPeak(t *testing.T) {
+func TestInfFormatNativeWorkspaceGrowth(t *testing.T) {
 	s, b := serviceNew(t)
 	v := infValue(t, s, 7, 5, "-2/3")
 	infText(t, s, &v, "(7/5 -e*2/3)")
 	n := s.Manager.Z.Natural
-	oldCapacity, oldRef := n.textCapacity, n.textRef
 	before := b.Used()
-	// Leave enough bytes for the retained size difference, but less than the
-	// incoming buffer itself. The old allocation must remain charged at growth.
-	incoming := uint64(oldCapacity) * 2
-	held := b.Limit() - before - (incoming - 1)
-	serviceMust(t, b.Reserve(held))
-	e := n.reserveText(oldCapacity + 1)
-	if !errors.Is(e, arena.ErrBudget) {
-		t.Fatal("old/new peak was not reserved", e)
+	old := append([]byte(nil), n.text...)
+	b.FailAfter(0)
+	serviceMust(t, n.reserveText(uint32(len(old)+8192)))
+	if !bytes.Equal(old, n.text[:len(old)]) || b.Used() != before {
+		t.Fatal("native growth changed assembled prefix/arena budget")
 	}
-	if n.textCapacity != oldCapacity || n.textRef != oldRef || b.Used() != before+held {
-		t.Fatal("failed growth changed live workspace")
-	}
+	b.FailAfter(-1)
 	infAuditRoots(t, s, []*OwnedInfRational{&v}, nil)
-	b.Release(held)
-	serviceMust(t, n.reserveText(oldCapacity+1))
-	if n.textCapacity != oldCapacity*2 || b.Used() < before+uint64(oldCapacity) {
-		t.Fatal("new workspace not charged")
-	}
 	infText(t, s, &v, "(7/5 -e*2/3)")
 	serviceMust(t, s.InfDel(&v))
 	serviceMust(t, s.Close())
-	if b.Used() != 0 {
+	if b.Used() != 0 || n.text != nil {
 		t.Fatal("workspace graph survived Close", b.Used())
 	}
 }

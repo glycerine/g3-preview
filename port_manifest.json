@@ -105108,7 +105108,7 @@
         "TestDecimalIndependentFiniteAndPrecision",
         "TestNumericDisplayShortBufferAndLifecycle",
         "TestNumericDisplayReservationFailureCleanup",
-        "TestNumericDisplayWorkspaceGrowthAndBudget",
+        "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
         "TestNumericDisplayWarmAllocationBoundaries",
         "TestSourceNoncanonicalRationalDisplayActions",
         "TestIntegerFacadeSourceTst1ComparisonAssertions",
@@ -105249,7 +105249,7 @@
             "TestDecimalIndependentFiniteAndPrecision",
             "TestNumericDisplayShortBufferAndLifecycle",
             "TestNumericDisplayReservationFailureCleanup",
-            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
@@ -105340,7 +105340,7 @@
         "Source prev-power assertions and log bounds translated; test powers are independent fixture generation until production Power is implemented. See PORT_PROGRESS.md#audit-mpnum-port-status-md.",
         "Power/shift outputs are staged in owned numerals and released on failure; peak and destructor timing differ from source direct mutation, successful arithmetic/aliases retained. See PORT_PROGRESS.md#audit-mpnum-port-status-md. Standalone MPN/String scratch ownership remains pending.",
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See PORT_PROGRESS.md#audit-mpnum-port-status-md.",
-        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See PORT_PROGRESS.md#audit-numeric-display-port-status-md.",
+        "Display punctuation and numeral text use reusable native Go byte slices outside arena accounting; numerical limb workspace remains separately budgeted and scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See PORT_PROGRESS.md#audit-numeric-display-port-status-md.",
         "tst1 retains original numerical setup, lexical manager scope and explicit Del; 18 comparison assertions across MPZ/MPQ. Additional printed fixtures and independent tests are not source assertions. See PORT_PROGRESS.md#audit-mpz-facade-extra-port-status-md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See PORT_PROGRESS.md#audit-mpz-power-publication-packet-md; source allocator/backend integration remains required.",
         "Division writes actual caller numerator/denominator in source order, preserving divisor/output aliases and explicit local-tmp Del before normalization. Finite denominator-zero results remain owned; cleanup-only validation permits destruction/reset while ordinary reads remain guarded. See PORT_PROGRESS.md#audit-mpq-division-publication-packet-md.",
@@ -116934,7 +116934,7 @@
         }
       ],
       "ownership": [
-        "Concrete pointer-free triple and scalar service provenance. Infinity publishes first, nested members first then second; destructor reverses members. Existing manager budget accounts numeric cells/Words/text scratch; one final caller string. Actual only repository Numeral=inf_rational specialization, no Go generics. See PORT_PROGRESS.md#audit-inf-eps-rational-port-status-md.",
+        "Concrete pointer-free triple and scalar service provenance. Infinity publishes first, nested members first then second; destructor reverses members. Existing manager budget accounts numeric cells and limb scratch; native text assembly is outside arena accounting, with one final caller string. Actual only repository Numeral=inf_rational specialization, no Go generics. See PORT_PROGRESS.md#audit-inf-eps-rational-port-status-md.",
         "Real remaining temporary Rational records are moved into charged embedded service9/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence.",
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open."
       ],
@@ -116971,7 +116971,7 @@
         "TestInfFormatOneFinalAllocation",
         "TestInfFormatSignedZeroAndDomain",
         "TestInfFormatFailurePrefixesImmediateRoots",
-        "TestInfFormatWorkspaceGrowthPeak"
+        "TestInfFormatNativeWorkspaceGrowth"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -117024,13 +117024,13 @@
             "TestInfFormatOneFinalAllocation",
             "TestInfFormatSignedZeroAndDomain",
             "TestInfFormatFailurePrefixesImmediateRoots",
-            "TestInfFormatWorkspaceGrowthPeak"
+            "TestInfFormatNativeWorkspaceGrowth"
           ]
         }
       ],
       "ownership": [
         "Concrete raw rational plus signed32 epsilon and scalar service provenance; existing service mutex/manager owns storage. Arithmetic publishes rational first then epsilon; scalar integer projection is reread after first multiplication. Explicit ownership and source temporary copies retained. See PORT_PROGRESS.md#audit-inf-int-rational-port-status-md.",
-        "Formatting has no intermediate host strings: existing budgeted manager text workspace preserves first/epsilon formatting and source abs temporary full-expression cleanup. Caller receives exactly one final string. See PORT_PROGRESS.md#audit-inf-format-port-status-md."
+        "Formatting has no intermediate host strings: reusable native Go byte assembly preserves first/epsilon formatting and source abs temporary full-expression cleanup. Caller receives exactly one final string. See PORT_PROGRESS.md#audit-inf-format-port-status-md."
       ],
       "deviations": [
         "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
@@ -117582,7 +117582,7 @@
         "TestInfFormatOneFinalAllocation",
         "TestInfFormatSignedZeroAndDomain",
         "TestInfFormatFailurePrefixesImmediateRoots",
-        "TestInfFormatWorkspaceGrowthPeak",
+        "TestInfFormatNativeWorkspaceGrowth",
         "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
         "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
         "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
@@ -117816,7 +117816,7 @@
             "TestInfFormatOneFinalAllocation",
             "TestInfFormatSignedZeroAndDomain",
             "TestInfFormatFailurePrefixesImmediateRoots",
-            "TestInfFormatWorkspaceGrowthPeak"
+            "TestInfFormatNativeWorkspaceGrowth"
           ]
         },
         {
@@ -117951,7 +117951,7 @@
       ],
       "ownership": [
         "Two concrete pointer-free rational components plus scalar provenance, owned by existing service and synchronized raw manager. Assignment/arithmetic first then second; implicit member destruction second then first. Full-expression copies and cleanup, partial output roots and exact budgets tested. See PORT_PROGRESS.md#audit-inf-rational-port-status-md.",
-        "Formatting has no intermediate host strings: existing budgeted manager text workspace preserves first/epsilon formatting and source abs temporary full-expression cleanup. Caller receives exactly one final string. See PORT_PROGRESS.md#audit-inf-format-port-status-md.",
+        "Formatting has no intermediate host strings: reusable native Go byte assembly preserves first/epsilon formatting and source abs temporary full-expression cleanup. Caller receives exactly one final string. See PORT_PROGRESS.md#audit-inf-format-port-status-md.",
         "Real remaining temporary Rational records are moved into charged embedded service9/manager1 storage before stack owners vanish; completed source destruction and partial-constructor owning abort are distinguished. Named-return finishers propagate refused cleanup and retain unpublished result roots. Public Inf Del retains caller suffix in actual source component order; pure queries and caller cleanup remain usable. Explicit CleanupLexical is Go owning recovery, not source destructor retry equivalence.",
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open."
       ],
@@ -129046,7 +129046,7 @@
         "TestNaturalDivisionWarmNoAllocations",
         "TestOwnedFormattingBudgetLimit",
         "TestNaturalPreparedAddBackStorageAdaptation",
-        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestOwnedTextNativeGrowthPreservesPrefix",
         "TestNumericStringHostOwnershipBoundary",
         "TestNaturalFormattingLexicalSourceLocals",
         "TestNaturalFormattingFailedConstructorRetainsRealRoot",
@@ -129230,7 +129230,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129253,7 +129253,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129276,7 +129276,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129299,7 +129299,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129322,7 +129322,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary",
             "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
             "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot"
@@ -129347,7 +129347,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129370,7 +129370,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129393,7 +129393,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129416,7 +129416,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129439,7 +129439,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129458,7 +129458,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129655,7 +129655,7 @@
         }
       ],
       "ownership": [
-        "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Budget/runtime without double ownership. Retained SmallBytes text is an explicit output assembly adapter. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
+        "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Budget/runtime without double ownership. Retained output assembly is a native Go byte slice outside arena accounting; publication copies into caller bytes or an independent Go string. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Stable charged recursive display frames own actual numeral, character and MPN locals; actual sink callbacks borrow decimal views only during insertion. Younger stopped destructor preserves older locals; CleanupDisplay uses exact physical tokens and leaves foreign/replacement roots intact.",
         "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
@@ -129712,7 +129712,7 @@
         "TestNaturalDivisionWarmNoAllocations",
         "TestOwnedFormattingBudgetLimit",
         "TestNaturalPreparedAddBackStorageAdaptation",
-        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestOwnedTextNativeGrowthPreservesPrefix",
         "TestNumericStringHostOwnershipBoundary",
         "TestNaturalFormattingLexicalSourceLocals",
         "TestNaturalFormattingFailedConstructorRetainsRealRoot",
@@ -129796,7 +129796,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129819,7 +129819,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129842,7 +129842,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129865,7 +129865,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129888,7 +129888,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary",
             "TestNaturalRetainedVerificationGuardsOnlyReachedLocal",
             "TestNaturalEarlyReturnRetainsPhysicalVerificationRoot"
@@ -129913,7 +129913,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129936,7 +129936,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129959,7 +129959,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -129982,7 +129982,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -130005,7 +130005,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -130024,7 +130024,7 @@
             "TestNaturalDivisionWarmNoAllocations",
             "TestOwnedFormattingBudgetLimit",
             "TestNaturalPreparedAddBackStorageAdaptation",
-            "TestOwnedTextGrowthPeakAndRefusal",
+            "TestOwnedTextNativeGrowthPreservesPrefix",
             "TestNumericStringHostOwnershipBoundary"
           ]
         },
@@ -130135,7 +130135,7 @@
         }
       ],
       "ownership": [
-        "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Budget/runtime without double ownership. Retained SmallBytes text is an explicit output assembly adapter. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
+        "NaturalManager owns a charged real cold header, four actual source inline16/doubling division buffers, a debug lexical verification holder, and embedded formatting lexical limb roots. Published member source destruction is distinct from failed-constructor/unpublished-block owning cleanup. Integer child borrows parent Budget/runtime without double ownership. Retained output assembly is a native Go byte slice outside arena accounting; publication copies into caller bytes or an independent Go string. Borrowed operands/outputs are operation-local; source OMP/global lifecycle remains open.",
         "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
         "Exact actual manager/frame/nonzero invocation generation and named allocation/buffer token only; no registry/refcount/high-level snapshot authority. Shared successful publication remains member owned. Source DT cause remains sticky across explicit owning acknowledgement until actual new invocation.",
         "Actual self/embedded frame/nonwrapping invocation validation before NUM/source reads; count marks actual one or four-to-six RAW declarations. Concrete receipt lives in charged Integer frame, not a heap temporary. Direct numeric acquisition and exact Natural member/private verification buffer binding; no snapshot or registry ownership. Published shared scratch remains member-owned. Runtime callbacks public empty-context acquisitions excluded, active same-frame public reentry refused. Source-finalize owning continuation uses exact named retained fields/captured pending cell only (mpz.h:124-149; mpz.cpp:142-161)."
@@ -130249,7 +130249,7 @@
         "TestNaturalDivisionWarmNoAllocations",
         "TestOwnedFormattingBudgetLimit",
         "TestNaturalPreparedAddBackStorageAdaptation",
-        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestOwnedTextNativeGrowthPreservesPrefix",
         "TestNumericStringHostOwnershipBoundary",
         "TestIntegerSourceRoots",
         "TestIntegerRootIndependentAndAliases",
@@ -130268,7 +130268,7 @@
         "TestDecimalIndependentFiniteAndPrecision",
         "TestNumericDisplayShortBufferAndLifecycle",
         "TestNumericDisplayReservationFailureCleanup",
-        "TestNumericDisplayWorkspaceGrowthAndBudget",
+        "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
         "TestNumericDisplayWarmAllocationBoundaries",
         "TestSourceNoncanonicalRationalDisplayActions",
         "TestNumberTheorySourceRationalGCDAndSignedSequence",
@@ -130699,7 +130699,7 @@
             "TestDecimalIndependentFiniteAndPrecision",
             "TestNumericDisplayShortBufferAndLifecycle",
             "TestNumericDisplayReservationFailureCleanup",
-            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
@@ -130715,7 +130715,7 @@
             "TestDecimalIndependentFiniteAndPrecision",
             "TestNumericDisplayShortBufferAndLifecycle",
             "TestNumericDisplayReservationFailureCleanup",
-            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
@@ -130731,7 +130731,7 @@
             "TestDecimalIndependentFiniteAndPrecision",
             "TestNumericDisplayShortBufferAndLifecycle",
             "TestNumericDisplayReservationFailureCleanup",
-            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
@@ -131009,7 +131009,7 @@
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See PORT_PROGRESS.md#audit-mpnum-port-status-md.",
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See PORT_PROGRESS.md#audit-mpnum-port-status-md.",
         "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See PORT_PROGRESS.md#audit-root-port-status-md.",
-        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See PORT_PROGRESS.md#audit-numeric-display-port-status-md.",
+        "Display punctuation and numeral text use reusable native Go byte slices outside arena accounting; numerical limb workspace remains separately budgeted and scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See PORT_PROGRESS.md#audit-numeric-display-port-status-md.",
         "Number theory locals use existing budgeted numerical cells and allocator-backed limbs and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See PORT_PROGRESS.md#audit-number-theory-port-status-md.",
         "Inspection uses existing integer roots; extraction acquires deep independent limbs and thin setters/swap retain source component identity. Failed-prefix tests audit cells, allocator-backed limbs and decoded values before rendering/teardown. See PORT_PROGRESS.md#audit-rational-inspection-port-status-md.",
         "Selected Power and shift paths preserve actual caller publication and source lexical temporaries; Rational Copy/Mul use the existing single integer/normalization algorithms. Tests audit named live roots before fault disabling and clean exact owned failed descriptors. See PORT_PROGRESS.md#audit-mpz-power-publication-packet-md; source allocator/backend integration remains required.",
@@ -131168,7 +131168,7 @@
         "TestNaturalDivisionWarmNoAllocations",
         "TestOwnedFormattingBudgetLimit",
         "TestNaturalPreparedAddBackStorageAdaptation",
-        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestOwnedTextNativeGrowthPreservesPrefix",
         "TestNumericStringHostOwnershipBoundary",
         "TestIntegerSourceRoots",
         "TestIntegerRootIndependentAndAliases",
@@ -131187,7 +131187,7 @@
         "TestDecimalIndependentFiniteAndPrecision",
         "TestNumericDisplayShortBufferAndLifecycle",
         "TestNumericDisplayReservationFailureCleanup",
-        "TestNumericDisplayWorkspaceGrowthAndBudget",
+        "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
         "TestNumericDisplayWarmAllocationBoundaries",
         "TestSourceNoncanonicalRationalDisplayActions",
         "TestRationalOpsSourceTst9All24Assertions",
@@ -131778,7 +131778,7 @@
             "TestDecimalIndependentFiniteAndPrecision",
             "TestNumericDisplayShortBufferAndLifecycle",
             "TestNumericDisplayReservationFailureCleanup",
-            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
@@ -131794,7 +131794,7 @@
             "TestDecimalIndependentFiniteAndPrecision",
             "TestNumericDisplayShortBufferAndLifecycle",
             "TestNumericDisplayReservationFailureCleanup",
-            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
@@ -131810,7 +131810,7 @@
             "TestDecimalIndependentFiniteAndPrecision",
             "TestNumericDisplayShortBufferAndLifecycle",
             "TestNumericDisplayReservationFailureCleanup",
-            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
@@ -132572,7 +132572,7 @@
         "Text setters borrow input for the call; staged owned numerals preserve old rational denominator history and publish after source sign/normalization. Source lexical temporary cleanup order retained; transient formatting/standalone MPN scratch ownership still pending. See PORT_PROGRESS.md#audit-mpnum-port-status-md.",
         "Numeric division and decimal formatting use child NaturalManager indexed scratch; all retained storage is budgeted, final host string is caller-owned. See PORT_PROGRESS.md#audit-mpnum-port-status-md.",
         "Root/square stage prior output and source alias rereads with existing owner-budgeted numerals, preserving finite false-result parts and synchronized/unsynchronized normalization policy. See PORT_PROGRESS.md#audit-root-port-status-md.",
-        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See PORT_PROGRESS.md#audit-numeric-display-port-status-md.",
+        "Display punctuation and numeral text use reusable native Go byte slices outside arena accounting; numerical limb workspace remains separately budgeted and scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See PORT_PROGRESS.md#audit-numeric-display-port-status-md.",
         "Mixed/fused locals use borrowed integer-manager storage; nonsynch reuses existing named caches, synch deletes all locals. Failed-prefix tests independently audit immediate live cells/Words before rendering or teardown. See PORT_PROGRESS.md#audit-mpnum-rational-ops-port-status-md.",
         "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells and allocator-backed limbs. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See PORT_PROGRESS.md#audit-numeral-copy-port-status-md.",
         "Number theory locals use existing budgeted numerical cells and allocator-backed limbs and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See PORT_PROGRESS.md#audit-number-theory-port-status-md.",
@@ -132916,7 +132916,7 @@
         "TestNaturalDivisionWarmNoAllocations",
         "TestOwnedFormattingBudgetLimit",
         "TestNaturalPreparedAddBackStorageAdaptation",
-        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestOwnedTextNativeGrowthPreservesPrefix",
         "TestNumericStringHostOwnershipBoundary",
         "TestIntegerSourceBitwiseBug4",
         "TestIntegerBitwiseIndependentOracleAndAliases",
@@ -132946,7 +132946,7 @@
         "TestDecimalIndependentFiniteAndPrecision",
         "TestNumericDisplayShortBufferAndLifecycle",
         "TestNumericDisplayReservationFailureCleanup",
-        "TestNumericDisplayWorkspaceGrowthAndBudget",
+        "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
         "TestNumericDisplayWarmAllocationBoundaries",
         "TestSourceNoncanonicalRationalDisplayActions",
         "TestIntegerCopyFromSourceStorageContract",
@@ -134593,7 +134593,7 @@
             "TestDecimalIndependentFiniteAndPrecision",
             "TestNumericDisplayShortBufferAndLifecycle",
             "TestNumericDisplayReservationFailureCleanup",
-            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
@@ -135166,7 +135166,7 @@
         "Bitwise source local numerals use budgeted manager cells and allocator-backed limbs; ordered64-bit arithmetic chunks and final actions are retained. Staged result preserves outputs on failure; see PORT_PROGRESS.md#audit-mpnum-bitwise-port-status-md.",
         "Root/square locals use existing budgeted numeric cells and allocator-backed limbs; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see PORT_PROGRESS.md#audit-root-port-status-md.",
         "Scalar inspection borrows manager cells and allocator-backed limbs and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See PORT_PROGRESS.md#audit-mpz-misc-port-status-md.",
-        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See PORT_PROGRESS.md#audit-numeric-display-port-status-md.",
+        "Display punctuation and numeral text use reusable native Go byte slices outside arena accounting; numerical limb workspace remains separately budgeted and scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See PORT_PROGRESS.md#audit-numeric-display-port-status-md.",
         "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests.",
         "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells and allocator-backed limbs. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See PORT_PROGRESS.md#audit-numeral-copy-port-status-md.",
         "Number theory locals use existing budgeted numerical cells and allocator-backed limbs and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See PORT_PROGRESS.md#audit-number-theory-port-status-md.",
@@ -135379,7 +135379,7 @@
         "TestNaturalDivisionWarmNoAllocations",
         "TestOwnedFormattingBudgetLimit",
         "TestNaturalPreparedAddBackStorageAdaptation",
-        "TestOwnedTextGrowthPeakAndRefusal",
+        "TestOwnedTextNativeGrowthPreservesPrefix",
         "TestNumericStringHostOwnershipBoundary",
         "TestIntegerSourceBitwiseBug4",
         "TestIntegerBitwiseIndependentOracleAndAliases",
@@ -135409,7 +135409,7 @@
         "TestDecimalIndependentFiniteAndPrecision",
         "TestNumericDisplayShortBufferAndLifecycle",
         "TestNumericDisplayReservationFailureCleanup",
-        "TestNumericDisplayWorkspaceGrowthAndBudget",
+        "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
         "TestNumericDisplayWarmAllocationBoundaries",
         "TestSourceNoncanonicalRationalDisplayActions",
         "TestIntegerCopyFromSourceStorageContract",
@@ -136575,7 +136575,7 @@
             "TestDecimalIndependentFiniteAndPrecision",
             "TestNumericDisplayShortBufferAndLifecycle",
             "TestNumericDisplayReservationFailureCleanup",
-            "TestNumericDisplayWorkspaceGrowthAndBudget",
+            "TestNumericDisplayNativeWorkspaceGrowthAndPrefix",
             "TestNumericDisplayWarmAllocationBoundaries",
             "TestSourceNoncanonicalRationalDisplayActions"
           ]
@@ -137160,7 +137160,7 @@
         "Bitwise source local numerals use budgeted manager cells and allocator-backed limbs; ordered64-bit arithmetic chunks and final actions are retained. Staged result preserves outputs on failure; see PORT_PROGRESS.md#audit-mpnum-bitwise-port-status-md.",
         "Root/square locals use existing budgeted numeric cells and allocator-backed limbs; source bound/Power/Swap/Copy actions preserved. Staged output includes real old+new peak; see PORT_PROGRESS.md#audit-root-port-status-md.",
         "Scalar inspection borrows manager cells and allocator-backed limbs and allocates no owner storage. Decompose publishes caller-owned digits; sufficient caller capacity allocates nothing. See PORT_PROGRESS.md#audit-mpz-misc-port-status-md.",
-        "Display punctuation and numeral text use existing budgeted indexed byte/limb workspace; source scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See PORT_PROGRESS.md#audit-numeric-display-port-status-md.",
+        "Display punctuation and numeral text use reusable native Go byte slices outside arena accounting; numerical limb workspace remains separately budgeted and scoped numeric temporaries are cleaned on all exits. Final buffer/string belongs to caller. See PORT_PROGRESS.md#audit-numeric-display-port-status-md.",
         "Earlier scratch IDX0-only inventory is superseded by publishTmpAt handling division IDX1 as well; see mpnum/mpz_div.go and source division tests.",
         "Explicit-owner CopyFrom uses source indexed limbs and destination-owned cells and allocator-backed limbs. Source set/copy shapes are preserved; rational pair staging preserves raw signed/unreduced representation. Raw records require genuine caller-supplied owners; public provenance is a separate service. See PORT_PROGRESS.md#audit-numeral-copy-port-status-md.",
         "Number theory locals use existing budgeted numerical cells and allocator-backed limbs and are always deleted in source order. ExtendedGCD preserves coefficient publication/failure prefixes and rational denominator reset timing; immediate failed-prefix caller/cache roots audited. See PORT_PROGRESS.md#audit-number-theory-port-status-md.",

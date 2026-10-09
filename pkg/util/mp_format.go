@@ -4,71 +4,25 @@ package util
 import (
 	"errors"
 	"math"
-	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
 
 var ErrShortBuffer = errors.New("mpnum: decimal output buffer too short")
 
-// reserveText retains budgeted scalar-indexed bytes. Growth preserves the
-// numerator prefix while preparing a rational denominator. DirectOnly is a
-// cold-storage adaptation, not the source allocation profile.
+// reserveText grows the reusable Go output assembly while preserving prefixes
+// already written, including the numerator before a rational denominator.
 func (m *NaturalManager) reserveText(needed uint32) error {
-	if needed <= m.textCapacity {
-		return nil
+	if uint64(needed) > uint64(^uint(0)>>1) {
+		return arena.ErrBounds
 	}
-	capacity := m.textCapacity
-	if capacity == 0 {
-		capacity = 1024
+	if int(needed) > len(m.text) {
+		m.text = append(m.text, make([]byte, int(needed)-len(m.text))...)
 	}
-	for capacity < needed {
-		if capacity > math.MaxUint32/2 {
-			return arena.ErrBounds
-		}
-		capacity *= 2
-	}
-	if m.Text == nil {
-		owner, e := arena.NewSmallBytes(arena.SmallBytesConfig{DirectOnly: true, Descriptors: m.config.Descriptors})
-		if e != nil {
-			return e
-		}
-		m.Text = owner
-	}
-	ref, e := m.Text.Allocate(capacity)
-	if e != nil {
-		return e
-	}
-	if m.textRef != (arena.SmallBytesRef{}) {
-		for i := uint32(0); i < m.textCapacity; i++ {
-			v, e := m.Text.Read(m.textRef, i)
-			if e != nil {
-				panic(e)
-			}
-			if e = m.Text.Write(ref, i, v); e != nil {
-				panic(e)
-			}
-		}
-		if e = m.Text.Deallocate(m.textCapacity, m.textRef); e != nil {
-			panic(e)
-		}
-	}
-	m.textRef = ref
-	m.textCapacity = capacity
 	return nil
 }
-func (m *NaturalManager) textRead(i uint32) byte {
-	v, e := m.Text.Read(m.textRef, i)
-	if e != nil {
-		panic(e)
-	}
-	return v
-}
-func (m *NaturalManager) textWrite(i uint32, v byte) {
-	if e := m.Text.Write(m.textRef, i, v); e != nil {
-		panic(e)
-	}
-}
+func (m *NaturalManager) textRead(i uint32) byte     { return m.text[i] }
+func (m *NaturalManager) textWrite(i uint32, v byte) { m.text[i] = v }
 func (m *NaturalManager) reverseText(start, end uint32) {
 	for start < end {
 		end--
@@ -125,25 +79,16 @@ func (m *NaturalManager) publishText(dst []byte, n uint32) (int, error) {
 	if uint64(n) > uint64(len(dst)) {
 		return int(n), ErrShortBuffer
 	}
-	for i := uint32(0); i < n; i++ {
-		dst[i] = m.textRead(i)
-	}
+	copy(dst, m.text[:n])
 	return int(n), nil
 }
 
-// finalString is the host-output ownership boundary: only the escaped Go string
-// backing is caller-owned. Numerical/digit scratch is budgeted; no transient
-// budget charge misrepresents the escaped string lifetime.
+// finalString copies the prepared bytes into the caller-owned Go string.
 func (m *NaturalManager) finalString(n uint32) (string, error) {
 	if uint64(n) > uint64(^uint(0)>>1) {
 		return "", arena.ErrBounds
 	}
-	var output strings.Builder
-	output.Grow(int(n))
-	for i := uint32(0); i < n; i++ {
-		output.WriteByte(m.textRead(i))
-	}
-	return output.String(), nil
+	return string(m.text[:n]), nil
 }
 
 // FormatInto excludes the C terminator. It writes exactly n bytes, leaving dst

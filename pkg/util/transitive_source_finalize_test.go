@@ -392,10 +392,6 @@ func transitiveSourceAudit(t *testing.T, m *RationalManager, s *RationalService,
 				}
 			}
 		}
-		if n.Text != nil {
-			ts := n.Text.Stats()
-			owned += ts.OwnerBytes + ts.PayloadBytes + ts.MetadataBytes + ts.DirectoryBytes
-		}
 	}
 	if s != nil {
 		owned += s.HeaderBytes

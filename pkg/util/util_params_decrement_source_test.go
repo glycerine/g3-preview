@@ -362,9 +362,6 @@ func paramsDecAuditColdGraph(t *testing.T, q *RationalService, m *IntegerManager
 	n += slabBytes(testFieldBySourceName(z, "cells").Elem())
 	nat := testFieldBySourceName(z, "natural").Elem()
 	n += testFieldBySourceName(nat, "headerBytes").Uint()
-	if !testFieldBySourceName(nat, "text").IsNil() {
-		t.Fatal("fixture reached undeclared Natural text owner")
-	}
 	if n != bn.Used() {
 		t.Fatal("once-only named numeric/provider graph", n, bn.Used())
 	}

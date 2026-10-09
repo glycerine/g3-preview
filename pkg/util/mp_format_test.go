@@ -395,8 +395,7 @@ func TestNaturalNestedOwnerAccounting(t *testing.T) {
 	dst := make([]byte, 1000)
 	_, e = m.FormatInto([]uint32{0xffffffff, 0xffffffff, 1}, dst)
 	serviceMust(t, e)
-	bs := m.Text.Stats()
-	measured := parent.Stats().TotalBytes + m.HeaderBytes + bs.OwnerBytes + bs.PayloadBytes + bs.MetadataBytes + bs.DirectoryBytes
+	measured := parent.Stats().TotalBytes + m.HeaderBytes
 	if measured != b.Used() {
 		t.Fatal("complete owner graph", measured, b.Used())
 	}
@@ -448,8 +447,8 @@ func TestOwnedFormattingBudgetLimit(t *testing.T) {
 		t.Fatal(e)
 	}
 	dst := []byte("unchanged")
-	if _, e = m.FormatInto([]uint32{123}, dst); !errors.Is(e, arena.ErrBudget) || string(dst) != "unchanged" {
-		t.Fatal(e)
+	if n, e := m.FormatInto([]uint32{123}, dst); e != nil || n != 3 || string(dst) != "123hanged" || b.Used() != baseline {
+		t.Fatal("native text must work with only owner budget", n, e, string(dst), b.Used())
 	}
 	m.Close()
 	if b.Used() != 0 {
@@ -509,32 +508,26 @@ func TestNaturalPreparedAddBackStorageAdaptation(t *testing.T) {
 
 }
 
-func TestOwnedTextGrowthPeakAndRefusal(t *testing.T) {
+func TestOwnedTextNativeGrowthPreservesPrefix(t *testing.T) {
 	m := naturalManager(t)
-	dst := bytes.Repeat([]byte{'?'}, 2000)
-	if _, e := m.FormatInto([]uint32{123}, dst[:3]); e != nil {
-		t.Fatal(e)
+	before := m.budget.Used()
+	runtimeBefore := m.RuntimeOwner().Stats()
+	m.budget.FailAfter(0)
+	defer m.budget.FailAfter(-1)
+	serviceMust(t, m.reserveText(8))
+	copy(m.text, "prefix")
+	serviceMust(t, m.reserveText(8192))
+	if string(m.text[:6]) != "prefix" || m.budget.Used() != before || m.RuntimeOwner().Stats() != runtimeBefore {
+		t.Fatal("native assembly growth changed prefix or charged storage")
 	}
-	oldRef, oldCapacity := m.textRef, m.textCapacity
-	// Leave less than the next complete2048-byte workspace reservation. The old
-	// live1024 bytes remain charged; publication cannot consume its storage.
-	otherOwner := m.budget.Limit() - m.budget.Used() - 2047
-	if e := m.budget.Reserve(otherOwner); e != nil {
-		t.Fatal(e)
-	}
-	a := make([]uint32, 130)
-	a[len(a)-1] = 1
-	before := append([]byte(nil), dst...)
-	if _, e := m.FormatInto(a, dst); !errors.Is(e, arena.ErrBudget) || !bytes.Equal(dst, before) || m.textRef != oldRef || m.textCapacity != oldCapacity || !m.Text.IsLive(oldRef) {
-		t.Fatal("old-plus-new refusal", e)
-	}
-	m.budget.Release(otherOwner)
-	if _, e := m.FormatInto(a, dst); e != nil || m.textCapacity != 2048 || m.Text.IsLive(oldRef) {
-		t.Fatal("growth replacement", e, m.textCapacity)
+	dst := bytes.Repeat([]byte{'?'}, 16)
+	n, e := m.FormatInto([]uint32{123}, dst)
+	if e != nil || n != 3 || string(dst[:n]) != "123" || dst[n] != '?' {
+		t.Fatal("native output", n, e)
 	}
 	m.Close()
-	if m.budget.Used() != 0 {
-		t.Fatal("growth close", m.budget.Used())
+	if m.text != nil || m.budget.Used() != 0 {
+		t.Fatal("assembly close retained memory")
 	}
 }
 

@@ -251,8 +251,8 @@ func TestNumericDisplayReservationFailureCleanup(t *testing.T) {
 		}
 	}
 }
-func TestNumericDisplayWorkspaceGrowthAndBudget(t *testing.T) {
-	m, b := rationalManager(t, false)
+func TestNumericDisplayNativeWorkspaceGrowthAndPrefix(t *testing.T) {
+	m, _ := rationalManager(t, false)
 	a := NewRational()
 	if e := m.SetFraction(&a, -1, 3); e != nil {
 		t.Fatal(e)
@@ -262,22 +262,10 @@ func TestNumericDisplayWorkspaceGrowthAndBudget(t *testing.T) {
 		t.Fatal(e)
 	}
 	nm := m.Z.Natural
-	oldRef, oldCapacity := nm.textRef, nm.textCapacity
-	other := b.Limit() - b.Used() - 2047
-	if e := b.Reserve(other); e != nil {
-		t.Fatal(e)
-	}
-	for i := range dst {
-		dst[i] = '!'
-	}
-	if _, e := m.FormatDecimalInto(&a, math.MaxUint32, false, dst); !errors.Is(e, arena.ErrBudget) || !bytes.Equal(dst, bytes.Repeat([]byte{'!'}, len(dst))) || nm.textRef != oldRef || nm.textCapacity != oldCapacity {
-		t.Fatal("growth refusal", e)
-	}
-	b.Release(other)
 	want := "-0." + strings.Repeat("3", 1100) + "?"
 	n, e := m.FormatDecimalInto(&a, 1100, false, dst)
-	if e != nil || string(dst[:n]) != want || dst[n] != '!' || nm.textCapacity != 2048 || nm.Text.IsLive(oldRef) {
-		t.Fatal("growth/prefix", n, e, nm.textCapacity)
+	if e != nil || string(dst[:n]) != want || dst[n] != '!' || len(nm.text) < n {
+		t.Fatal("growth/prefix", n, e, len(nm.text))
 	}
 	// A denominator preparation must preserve a large negative numerator prefix.
 	numerator := new(big.Int).Lsh(big.NewInt(1), 4096)
