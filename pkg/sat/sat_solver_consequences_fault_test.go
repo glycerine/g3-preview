@@ -56,30 +56,15 @@ func TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners(t *testing.
 					r, e := s.getConsequences([]Literal{0}, []BoolVar{1, 2, 3, 4}, out)
 					satFullSolverRuntimeAudit(t, s, out)
 					satFullSolverUserClauseAudit(t, s)
-					// Even an interrupted row construction cannot alter the caller's first row.
-					slot, er := s.runtime.memory.ReadUint32(out.storageState().Raw, 8)
+					// Solver allocation failure cannot alter the caller's first row.
+					row, er := out.captureRow(0)
 					satOK(t, er)
-					gen, er := s.runtime.memory.ReadUint32(out.storageState().Raw, 12)
+					v, er := row.read(0)
 					satOK(t, er)
-					if len(out.storageState().OldRows) != 0 {
-						// In a stopped move, the original row is owned by precisely one actual
-						// current-prefix or old-suffix field; compare its payload below.
-						row := out.storageState().Rows[0]
-						if row.Block.Slot() != slot || row.Block.Generation() != gen {
-							row = out.storageState().OldRows[0]
-						}
-						v, er := row.Read(0)
-						satOK(t, er)
-						if v != 0 {
-							t.Fatal(v)
-						}
-					} else {
-						v, er := out.storageState().Rows[0].Read(0)
-						satOK(t, er)
-						if v != 0 {
-							t.Fatal(v)
-						}
+					if v != 0 {
+						t.Fatal(v)
 					}
+
 					if e != nil {
 						satProbingExpectedRefusal(t, s.propagation, e)
 						failures++

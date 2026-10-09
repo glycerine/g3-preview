@@ -67,11 +67,11 @@ func TestSATConsequenceChunkEveryActualRefusalRetainsLocalAndOutputRoots(t *test
 					s.budget.FailAfter(ordinal)
 					r, e := s.coreChunking(m, satConsequenceInput{variables: []BoolVar{0, 1}, count: 2}, satConsequenceLiterals(nil), out, 2)
 					satChunkAudit(t, s, m, out)
-					row := out.storageState().Rows[0]
-					v, e2 := row.Read(0)
+					row, e2 := out.captureRow(0)
 					satOK(t, e2)
-					n, e2 := row.Size()
+					v, e2 := row.read(0)
 					satOK(t, e2)
+					n := row.count
 					if v != 8 || n != 1 {
 						t.Fatal(v, n)
 					}

@@ -31025,3 +31025,25 @@ native tests passed (33.5s). Focused floating-point/copy tests passed in native
 and g3checked,g3debug builds, including large owned numeral relocation with
 allocation refusal and two retained failed copy children. Module-wide test
 compilation, affected-package vet, and portcheck passed.
+
+## Store SAT consequence and mutex results in native literal rows
+
+Replaced the retained nested Runtime-vector output with independently copied
+`[][]Literal`. Removed the copied C++ pointer directory, inner scalar owners,
+temporary vectors, interrupted-move roots, backing accounting, and inspection
+facades. Runtime-column input adapters still check actual source reads before
+publishing a complete row. Native captures preserve row order and survive outer
+growth; source finalization/reuse invalidates earlier captures, and close
+invalidates all captures and releases the owner header.
+
+Replaced representation-corruption tests with input-copy independence, native
+growth under arena refusal, failed input publication, source-finalize/reuse,
+borrowed-view lifetime, bounds, and owner checks. Retained solver fault campaigns
+and their independent consequence/mutex model comparisons; native output memory
+is no longer part of the Runtime allocation census. Updated manifest targets.
+
+Validation: complete SAT suite passed (1.14s); focused consequence, mutex,
+chunking, output, and fault-campaign tests passed with g3checked,g3debug.
+Module-wide test compilation, SAT vet, and portcheck passed. The native row
+input test also covers a malformed maximal source size without allocating
+from that size. The costly full native suite was not repeated for this change.

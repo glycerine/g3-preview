@@ -1041,3 +1041,15 @@ in ascending order. Retained copy receipts protect actual numeral allocations,
 including multiple failed copies. The native copy-chain path replaces its unused
 Runtime-row facade, and the now-unconsumed vector allocator method is removed.
 Numerical cell/limb ownership remains separate from Go slice backing.
+
+## Native SAT consequence and mutex output rows
+
+SAT's `satSolverLiteralRows` now stores independent `[][]Literal` results.
+The copied outer pointer directory, Runtime-backed inner vectors, temporary
+unsigned row, metadata accounting, moved-prefix history, and failed vector
+constructor roots are gone. Runtime column inputs are still checked and copied
+through their actual reader. Captured rows survive native outer growth;
+finalization/reuse invalidates old views, and close releases the charged owner
+header. Go slice backing is outside arena accounting. Solver consequence and
+mutex refusal campaigns continue to audit real solver-owned allocations and
+verify that previously published output rows remain unchanged.

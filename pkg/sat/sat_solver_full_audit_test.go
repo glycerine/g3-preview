@@ -85,11 +85,6 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 			add(m.temps[i].pending)
 		}
 	}
-	for _, out := range outputs {
-		for _, h := range out.owningRoots() {
-			add(h)
-		}
-	}
 
 	for f := s.mutexFrames; f != nil; f = f.next {
 		roots = append(roots, satMutexFrameRoots(f)...)

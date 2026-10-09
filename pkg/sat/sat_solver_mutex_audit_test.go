@@ -5,12 +5,6 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func satMutexRowsRoots(o *satSolverLiteralRows) []util.Block {
-	if o == nil {
-		return nil
-	}
-	return o.owningRoots()
-}
 func satMutexColumnRoots(c *RuntimeUintColumn) []util.Block {
 	r := []util.Block{c.Raw.Pending}
 	if !c.Raw.PendingReplaces {

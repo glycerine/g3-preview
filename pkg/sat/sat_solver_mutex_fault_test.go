@@ -47,7 +47,9 @@ func TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners(t *testing.T
 			r, e := s.findMutexes([]Literal{0, 2, 4, 6}, out)
 			satFullSolverRuntimeAudit(t, s, out)
 			satFullSolverUserClauseAudit(t, s)
-			prefix, e2 := out.storageState().Rows[0].Read(0)
+			row, e2 := out.captureRow(0)
+			satOK(t, e2)
+			prefix, e2 := row.read(0)
 			satOK(t, e2)
 			if prefix != 8 {
 				t.Fatal(prefix)
