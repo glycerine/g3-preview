@@ -1,5 +1,5 @@
 // Source: src/util/trail.h:25-357.
-package util
+package backtrack
 
 import (
 	"errors"

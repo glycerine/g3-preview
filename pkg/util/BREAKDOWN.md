@@ -581,3 +581,7 @@ numeric boundary.
 `util/mincut` is also extracted with its focused tests. It depends only on the
 standard library and has no current Go production consumer; root keeps aliases
 for the live upstream users that have not yet been ported.
+
+`util/backtrack` now owns trail stacks and both union-find variants. Their tests
+move with the implementation, and the leaf depends only on the standard
+library. Root aliases preserve the API for future upstream consumers.
