@@ -81,9 +81,6 @@ func gparamsConstructorAudit(t *testing.T, g *GlobalParams, b *arena.Budget) {
 			t.Fatal("actual unfinished child identity")
 		}
 		n += d.OwnerBytes
-		if d.Texts != nil {
-			n += gparamsVectorGraph(d.Texts.Stats())
-		}
 	}
 	if n != b.Used() {
 		t.Fatal("named constructor physical/cold graph", n, b.Used())

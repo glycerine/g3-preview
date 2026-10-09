@@ -988,3 +988,13 @@ returned immutable strings remain valid after deletion and manager close.
 Record pages and the manager header remain budgeted, while child/text payloads
 are Go-managed. Source child order, duplicate reference counts, handle generation
 checks, iterative deletion, numerical ownership, and display quirks remain.
+
+Parameter descriptor descriptions, defaults, and module names now use immutable
+Go strings with explicit presence bits. Missing and present-empty metadata remain
+distinct, and C-string inputs still stop at NUL. Removed the Words service,
+word packing, text copy/free loops, and text allocation-failure states. Descriptor
+copy shares immutable strings safely across owner close while retaining insdict
+insertion order and independent dictionary ownership. Header allocation remains
+budgeted; native metadata, dictionary, and name storage are outside that budget.
+Parameter-value strings and their borrowed views still use their separate Words
+service and require a later conversion.

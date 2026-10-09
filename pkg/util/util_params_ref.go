@@ -94,6 +94,19 @@ type ParamsContext struct {
 	Closed            bool
 }
 
+func pdGrowth(n int) (int, error) {
+	if n == 0 {
+		return 2, nil
+	}
+	if uint64(n) > (uint64(^uint(0)>>1)-1)/3 {
+		return 0, arena.ErrBounds
+	}
+	v := (3*n + 1) / 2
+	if uint64(v) > uint64(^uint32(0)) || v <= n {
+		return 0, arena.ErrBounds
+	}
+	return v, nil
+}
 func paramsBytes(n int, t reflect.Type) uint64 { return uint64(n) * uint64(t.Size()) }
 func paramsBlockBytes(n int) uint64            { return paramsBytes(n, reflect.TypeOf(paramsBlock{})) }
 func paramsPageBytes(p paramsEntryPage) uint64 {
@@ -1354,7 +1367,7 @@ func (c *ParamsContext) appendDescrs(d *ParamDescrs) error {
 		if !found {
 			return ErrParamDescrsPrecondition
 		}
-		if info.descr.ref == (arena.VectorRef{}) {
+		if !info.descr.present {
 			return ErrParamDescrsPrecondition
 		}
 	}
@@ -1384,11 +1397,11 @@ func (c *ParamsContext) appendDescrs(d *ParamDescrs) error {
 		if e = c.appendByte(')'); e != nil {
 			return e
 		}
-		if info.def.ref != (arena.VectorRef{}) {
+		if info.def.present {
 			if e = c.appendString(" (default: "); e != nil {
 				return e
 			}
-			if e = c.appendText(d.Texts, info.def.ref, info.def.length); e != nil {
+			if e = c.appendString(info.def.value); e != nil {
 				return e
 			}
 			if e = c.appendByte(')'); e != nil {

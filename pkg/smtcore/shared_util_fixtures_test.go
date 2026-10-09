@@ -59,7 +59,7 @@ func catalogGraph(c *util.GlobalParamsCatalog) uint64 {
 	}
 	if c.Pending != nil {
 		s := c.Pending.Stats()
-		n += s.OwnerBytes + s.TableBytes + s.NamesBytes + gparamsVectorGraph(s.Text)
+		n += s.OwnerBytes + s.TableBytes + s.NamesBytes
 	}
 	return n
 }
@@ -70,7 +70,7 @@ func gparamsGraph(g *util.GlobalParams) uint64 {
 			return 0
 		}
 		s := d.Stats()
-		return s.OwnerBytes + s.TableBytes + s.NamesBytes + gparamsVectorGraph(s.Text)
+		return s.OwnerBytes + s.TableBytes + s.NamesBytes
 	}
 	n += count(g.GlobalDescriptors)
 	for _, d := range g.Descriptors {

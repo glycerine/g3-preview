@@ -30936,3 +30936,18 @@ payloads, and returned-string lifetime after close.
 Validation: all focused S-expression tests pass in native and checked/debug
 builds. Module-wide compilation, util vet, and portcheck pass. The preceding
 full native checkpoint remains the latest broad run.
+
+### Native parameter descriptor metadata
+
+Converted immutable descriptor metadata to Go strings with explicit nullable
+presence. Removed its Words owner, packing arithmetic, copy/free loops, and
+text-specific physical accounting. Preserved NUL truncation, missing/empty
+values, duplicate insertion behavior, insertion history, sorted display,
+independent descriptor copy, and metadata lifetime after source close. Updated
+merge/collector checks to verify native growth under arena refusal; owner-header
+and reachable registry failures retain their existing coverage. Parameter-value
+Words storage and lifetime-checked borrowed views remain separate work.
+
+Validation: focused parameter/descriptor/registry tests pass in native and
+checked/debug builds; complete AST, SAT, and smtcore tests pass. Module-wide
+compilation, vet for affected packages, and portcheck pass.

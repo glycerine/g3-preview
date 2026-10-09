@@ -114,37 +114,20 @@ func TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert(t *testing.T) {
 		t.Fatal(spelling)
 	}
 }
-func TestSATMainConfigGeneratedDescriptorFailurePrefixes(t *testing.T) {
+func TestSATMainConfigGeneratedDescriptorNativeStorage(t *testing.T) {
 	sy := symbolManagerTest(t, nil, false)
-	failures, successes, partial := 0, 0, 0
-	for fail := int64(0); fail < 180; fail++ {
-		b := arena.NewBudget(^uint64(0))
-		d := pdnew(t, sy, b)
-		b.FailAfter(fail)
-		e := collectSATConfigParamDescrs(d)
-		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal(fail, e)
-		}
-		st := d.Stats()
-		if b.Used() != pdtotal(st) || st.Live > 24 || st.Live < st.Names || st.Live > st.Names+1 || st.Text.Live != 3*st.Live {
-			t.Fatal("immediate source prefix graph", fail, e, st, b.Used())
-		}
-		if e == nil {
-			successes++
-		} else {
-			failures++
-			if st.Live > 0 {
-				partial++
-			}
-		}
-		b.FailAfter(-1)
-		paramsMust(t, d.Close())
-		if b.Used() != 0 {
-			t.Fatal("refund", fail, b.Used())
-		}
+	b := arena.NewBudget(^uint64(0))
+	d := pdnew(t, sy, b)
+	b.FailAfter(0)
+	paramsMust(t, collectSATConfigParamDescrs(d))
+	st := d.Stats()
+	if b.Used() != pdtotal(st) || st.Live != 24 || st.Names != 24 {
+		t.Fatal("native descriptor graph", st, b.Used())
 	}
-	if failures == 0 || successes == 0 || partial == 0 {
-		t.Fatal(failures, successes, partial)
+	b.FailAfter(-1)
+	paramsMust(t, d.Close())
+	if b.Used() != 0 {
+		t.Fatal("owner refund", b.Used())
 	}
 }
 func TestSATMainConfigGeneratedDescriptorLifetime(t *testing.T) {

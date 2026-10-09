@@ -90,8 +90,8 @@ type ParamDescrsConfig struct {
 	Text            arena.VectorConfig
 }
 type paramDescrText struct {
-	ref    arena.VectorRef
-	length uint32
+	value   string
+	present bool
 }
 type paramDescrInfo struct {
 	kind               ParamKind
@@ -100,12 +100,11 @@ type paramDescrInfo struct {
 type ParamDescrsStats struct {
 	Live, Deleted, Capacity, Names, NamesCapacity uint32
 	OwnerBytes, TableBytes, NamesBytes            uint64
-	Text                                          arena.VectorStats
 }
 
 // Symbols are borrowed from one manager, which must outlive this owner and may
-// not be torn down concurrently. Text is an immutable owned copy of each C
-// string; nil and present-empty are distinct. No entry stores a Go pointer.
+// not be torn down concurrently. Metadata retains immutable Go strings,
+// truncated at the first NUL; nil and present-empty are distinct.
 // The cold mutex protects this owner; a shared external Budget requires caller
 // serialization. Owning Go values must not be shallow-copied.
 type ParamDescrs struct {
@@ -113,7 +112,6 @@ type ParamDescrs struct {
 	Self                 *ParamDescrs
 	manager              *usymbol.Manager
 	Budget               *arena.Budget
-	Texts                *arena.Words
 	entries              *insdict.Dict[usymbol.Symbol, paramDescrInfo]
 	Names                []usymbol.Symbol
 	closed               bool
@@ -123,19 +121,6 @@ type ParamDescrs struct {
 	OwnerBytes           uint64
 }
 
-func pdGrowth(n int) (int, error) {
-	if n == 0 {
-		return 2, nil
-	}
-	if uint64(n) > (uint64(^uint(0)>>1)-1)/3 {
-		return 0, arena.ErrBounds
-	}
-	v := (3*n + 1) / 2
-	if uint64(v) > uint64(^uint32(0)) || v <= n {
-		return 0, arena.ErrBounds
-	}
-	return v, nil
-}
 func prepareSourceParamDescrs(m *usymbol.Manager, c ParamDescrsConfig) (ParamDescrsConfig, error) {
 	if m == nil {
 		return c, ErrParamDescrsPrecondition
@@ -154,13 +139,6 @@ func prepareSourceParamDescrs(m *usymbol.Manager, c ParamDescrsConfig) (ParamDes
 		return c, ErrParamDescrsPrecondition
 	}
 	c.InitialCapacity = n
-	c.Text.Descriptors.Budget = c.Budget
-	if c.Text.PageSize == 0 {
-		c.Text.PageSize = 256
-	}
-	if c.Text.Descriptors.PageSize == 0 {
-		c.Text.Descriptors.PageSize = 2
-	}
 	return c, nil
 }
 func newSourceParamDescrs(m *usymbol.Manager, c ParamDescrsConfig) (*ParamDescrs, error) {
@@ -182,14 +160,6 @@ func newSourceParamDescrs(m *usymbol.Manager, c ParamDescrsConfig) (*ParamDescrs
 
 // Same placement member engine; embedded callers charge the actual containing header.
 func (d *ParamDescrs) constructSourceMembers(c ParamDescrsConfig) error {
-	// Copied-text storage is actual additional Go cold context, prepared before
-	// source m_info construction; it is not a native table allocation ticket.
-	text, e := arena.NewWords(c.Text)
-	if e != nil {
-		d.constructorCause = e
-		return e
-	}
-	d.Texts = text
 	d.entries = insdict.NewDictFuncSize[usymbol.Symbol, paramDescrInfo](func(k usymbol.Symbol) uint64 {
 		words := k.SymbolWords()
 		h := ((uint64(words[0]) | uint64(words[1])<<32) ^ uint64(k.Value)<<32) | uint64(k.Tag)
@@ -222,57 +192,14 @@ func (d *ParamDescrs) find(k usymbol.Symbol) (paramDescrInfo, bool, error) {
 	v, ok := d.entries.Get2(k)
 	return v, ok, nil
 }
-func (d *ParamDescrs) store(s *string) (paramDescrText, error) {
+func paramDescrString(s *string) paramDescrText {
 	if s == nil {
-		return paramDescrText{}, nil
+		return paramDescrText{}
 	}
-	length := nulStringLength(*s)
-	if uint64(length) > uint64(^uint32(0))-4 {
-		return paramDescrText{}, arena.ErrBounds
-	}
-	words := (uint32(length) + 4) / 4
-	r, e := d.Texts.Allocate(words, words)
-	if e != nil {
-		return paramDescrText{}, e
-	}
-	for i := uint32(0); i < words; i++ {
-		var v uint32
-		for j := uint32(0); j < 4; j++ {
-			p := i*4 + j
-			if p < uint32(length) {
-				v |= uint32((*s)[p]) << (8 * j)
-			}
-		}
-		if e = d.Texts.Write(r, i, v); e != nil {
-			d.Texts.Free(r)
-			return paramDescrText{}, e
-		}
-	}
-	return paramDescrText{r, uint32(length)}, nil
+	return paramDescrText{value: (*s)[:nulStringLength(*s)], present: true}
 }
 func (d *ParamDescrs) load(r paramDescrText) (string, bool, error) {
-	if r.ref == (arena.VectorRef{}) {
-		return "", false, nil
-	}
-	var s strings.Builder
-	s.Grow(int(r.length))
-	for i := uint32(0); i < r.length; i++ {
-		v, e := d.Texts.Read(r.ref, i/4)
-		if e != nil {
-			return "", false, e
-		}
-		s.WriteByte(byte(v >> (8 * (i % 4))))
-	}
-	return s.String(), true, nil
-}
-func (d *ParamDescrs) drop(i paramDescrInfo) {
-	for _, r := range []paramDescrText{i.descr, i.def, i.module} {
-		if r.ref != (arena.VectorRef{}) {
-			if e := d.Texts.Free(r.ref); e != nil {
-				panic("g3: descriptor text lifetime violated")
-			}
-		}
-	}
+	return r.value, r.present, nil
 }
 func (d *ParamDescrs) prepareInsert(k usymbol.Symbol, kind ParamKind) (bool, error) {
 	_, e := d.manager.Hash(k)
@@ -296,7 +223,6 @@ func (d *ParamDescrs) publishInsert(k usymbol.Symbol, info paramDescrInfo) error
 	d.entries.Put(k, info)
 	if uint64(len(d.Names)) >= uint64(^uint32(0)) {
 		d.entries.Del(k)
-		d.drop(info)
 		return arena.ErrBounds
 	}
 	d.Names = append(d.Names, k)
@@ -307,60 +233,15 @@ func (d *ParamDescrs) insert(k usymbol.Symbol, kind ParamKind, descr, def, modul
 	if e != nil || existing {
 		return e
 	}
-	info := paramDescrInfo{kind: kind}
-	if info.descr, e = d.store(descr); e != nil {
-		return e
-	}
-	if info.def, e = d.store(def); e != nil {
-		d.drop(info)
-		return e
-	}
-	if info.module, e = d.store(module); e != nil {
-		d.drop(info)
-		return e
+	info := paramDescrInfo{
+		kind: kind, descr: paramDescrString(descr),
+		def: paramDescrString(def), module: paramDescrString(module),
 	}
 	return d.publishInsert(k, info)
 }
-func (d *ParamDescrs) copyText(source *ParamDescrs, old paramDescrText) (paramDescrText, error) {
-	if old.ref == (arena.VectorRef{}) {
-		return paramDescrText{}, nil
-	}
-	n, e := source.Texts.Len(old.ref)
-	if e != nil {
-		return paramDescrText{}, e
-	}
-	r, e := d.Texts.Allocate(n, n)
-	if e != nil {
-		return paramDescrText{}, e
-	}
-	for i := uint32(0); i < n; i++ {
-		v, e := source.Texts.Read(old.ref, i)
-		if e != nil {
-			d.Texts.Free(r)
-			return paramDescrText{}, e
-		}
-		if e = d.Texts.Write(r, i, v); e != nil {
-			d.Texts.Free(r)
-			return paramDescrText{}, e
-		}
-	}
-	return paramDescrText{r, old.length}, nil
-}
-func (d *ParamDescrs) insertCopy(source *ParamDescrs, key usymbol.Symbol, sourceInfo paramDescrInfo) error {
-	existing, e := d.prepareInsert(key, sourceInfo.kind)
+func (d *ParamDescrs) insertCopy(key usymbol.Symbol, info paramDescrInfo) error {
+	existing, e := d.prepareInsert(key, info.kind)
 	if e != nil || existing {
-		return e
-	}
-	info := paramDescrInfo{kind: sourceInfo.kind}
-	if info.descr, e = d.copyText(source, sourceInfo.descr); e != nil {
-		return e
-	}
-	if info.def, e = d.copyText(source, sourceInfo.def); e != nil {
-		d.drop(info)
-		return e
-	}
-	if info.module, e = d.copyText(source, sourceInfo.module); e != nil {
-		d.drop(info)
 		return e
 	}
 	return d.publishInsert(key, info)
@@ -410,11 +291,10 @@ func (d *ParamDescrs) ContainsName(name string) (bool, error) {
 	return d.contains(k)
 }
 func (d *ParamDescrs) erase(k usymbol.Symbol) error {
-	info, found, e := d.find(k)
+	_, found, e := d.find(k)
 	if e != nil || !found {
 		return e
 	}
-	d.drop(info)
 	d.entries.Del(k)
 	return nil
 }
@@ -567,24 +447,10 @@ func (d *ParamDescrs) internSymbolRange(k usymbol.Symbol, start, n uint32) (usym
 	return d.internBytes(b)
 }
 func (d *ParamDescrs) internText(r paramDescrText) (usymbol.Symbol, error) {
-	if r.ref == (arena.VectorRef{}) {
+	if !r.present {
 		return usymbol.Symbol{}, nil
 	}
-	if r.length == 0 {
-		return d.manager.Intern("")
-	}
-	if uint64(r.length) > uint64(^uint(0)>>1) {
-		return usymbol.Symbol{}, arena.ErrBounds
-	}
-	b := make([]byte, r.length)
-	for i := uint32(0); i < r.length; i++ {
-		v, e := d.Texts.Read(r.ref, i/4)
-		if e != nil {
-			return usymbol.Symbol{}, e
-		}
-		b[i] = byte(v >> (8 * (i % 4)))
-	}
-	return d.internBytes(b)
+	return d.manager.Intern(r.value)
 }
 func (d *ParamDescrs) splitName(name usymbol.Symbol) (usymbol.Symbol, usymbol.Symbol, bool, error) {
 	n, e := d.manager.Size(name)
@@ -754,13 +620,7 @@ func (d *ParamDescrs) writeName(out *strings.Builder, k usymbol.Symbol, smt2 boo
 	return nil
 }
 func (d *ParamDescrs) writeText(out *strings.Builder, r paramDescrText) error {
-	for i := uint32(0); i < r.length; i++ {
-		v, e := d.Texts.Read(r.ref, i/4)
-		if e != nil {
-			return e
-		}
-		out.WriteByte(byte(v >> (8 * (i % 4))))
-	}
+	out.WriteString(r.value)
 	return nil
 }
 func (d *ParamDescrs) Display(indent uint32, smt2, includeDescr bool) (string, error) {
@@ -784,7 +644,7 @@ func (d *ParamDescrs) Display(indent uint32, smt2, includeDescr bool) (string, e
 		if !found {
 			return "", ErrParamDescrsPrecondition
 		}
-		if info.descr.ref == (arena.VectorRef{}) {
+		if !info.descr.present {
 			return "", ErrParamDescrsPrecondition
 		}
 	}
@@ -818,7 +678,7 @@ func (d *ParamDescrs) Display(indent uint32, smt2, includeDescr bool) (string, e
 				return "", e
 			}
 		}
-		if info.def.ref != (arena.VectorRef{}) {
+		if info.def.present {
 			out.WriteString(" (default: ")
 			if e = d.writeText(&out, info.def); e != nil {
 				return "", e
@@ -852,7 +712,7 @@ func (d *ParamDescrs) Copy(other *ParamDescrs) error {
 		return ErrParamDescrsPrecondition
 	}
 	for key, info := range other.entries.All() {
-		if e := d.insertCopy(other, key, info); e != nil {
+		if e := d.insertCopy(key, info); e != nil {
 			return e
 		}
 	}
@@ -864,15 +724,11 @@ func (d *ParamDescrs) Stats() ParamDescrsStats {
 	if d.closed {
 		return ParamDescrsStats{}
 	}
-	var text arena.VectorStats
-	if d.Texts != nil {
-		text = d.Texts.Stats()
-	}
 	live := uint32(0)
 	if d.entries != nil {
 		live = uint32(d.entries.Len())
 	}
-	return ParamDescrsStats{Live: live, Names: uint32(len(d.Names)), NamesCapacity: uint32(cap(d.Names)), OwnerBytes: d.OwnerBytes, Text: text}
+	return ParamDescrsStats{Live: live, Names: uint32(len(d.Names)), NamesCapacity: uint32(cap(d.Names)), OwnerBytes: d.OwnerBytes}
 }
 func (d *ParamDescrs) Close() error {
 	d.mu.Lock()
@@ -886,7 +742,6 @@ func (d *ParamDescrs) Close() error {
 	if !d.constructorReady {
 		return ErrParamDescrsPrecondition
 	}
-	d.Texts.Close()
 	d.Budget.Release(d.OwnerBytes)
 	d.OwnerBytes = 0
 	d.entries = nil
@@ -912,7 +767,7 @@ func InsertTimeout(d *ParamDescrs) error {
 func pdLiteral(s string) *string { return &s }
 
 // sourceFinalizeMembers follows the actual reverse m_names/m_info declaration
-// order. Copied text is additional Go storage and drains after source members.
+// order. Immutable text shares the Go lifetime of its dictionary entries.
 func (d *ParamDescrs) sourceFinalizeMembers() error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -932,7 +787,6 @@ func (d *ParamDescrs) sourceFinalizeMembers() error {
 func (d *ParamDescrs) closeSourceMembers() error {
 	d.Names = nil
 	d.entries = nil
-	d.Texts.Close()
 	d.Budget.Release(d.OwnerBytes)
 	d.OwnerBytes = 0
 	d.closed = true

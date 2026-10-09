@@ -1,7 +1,6 @@
 package util
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -19,7 +18,7 @@ func gparamsGraph(g *GlobalParams) uint64 {
 			return 0
 		}
 		s := d.Stats()
-		return s.OwnerBytes + s.TableBytes + s.NamesBytes + gparamsVectorGraph(s.Text)
+		return s.OwnerBytes + s.TableBytes + s.NamesBytes
 	}
 	n += count(g.GlobalDescriptors)
 	for _, d := range g.Descriptors {
@@ -125,44 +124,37 @@ func TestGlobalParamsActualSATCollectorCurrentSharedRegistry(t *testing.T) {
 	}
 }
 
-func TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner(t *testing.T) {
-	failed, passed := 0, 0
-	for prefix := int64(0); prefix < 45; prefix++ {
-		g, _, sy, b := gparamsRealRegistry(t)
-		paramsMust(t, g.ensureRegistered())
-		incoming, e := NewParamDescrs(sy, ParamDescrsConfig{Budget: b, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
+func TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner(t *testing.T) {
+	g, _, sy, budget := gparamsRealRegistry(t)
+	paramsMust(t, g.ensureRegistered())
+	incoming, e := NewParamDescrs(sy, ParamDescrsConfig{Budget: budget})
+	paramsMust(t, e)
+	paramsMust(t, incoming.InsertName("new_parameter", ParamUInt, pdLiteral("native copied metadata"), pdLiteral("17"), nil))
+	budget.FailAfter(0)
+	paramsMust(t, g.RegisterModule("sat", incoming))
+	budget.FailAfter(-1)
+	if !incoming.closed || budget.Used() != gparamsGraph(g) {
+		t.Fatal("successful merge consumes incoming owner", incoming.closed, budget.Used())
+	}
+	key, e := sy.Intern("new_parameter")
+	paramsMust(t, e)
+	found := false
+	for _, d := range g.Descriptors {
+		text, present, e := d.Description(key)
 		paramsMust(t, e)
-		paramsMust(t, incoming.InsertName("new_parameter", ParamUInt, pdLiteral("a considerably longer description that requires real copied payload pages"), pdLiteral("17"), nil))
-		b.FailAfter(prefix)
-		e = g.RegisterModule("sat", incoming)
-		b.FailAfter(-1)
-		if e != nil {
-			if !errors.Is(e, arena.ErrInjectedFailure) {
-				t.Fatal(prefix, e)
+		if present {
+			found = true
+			if text != "native copied metadata" {
+				t.Fatal(text)
 			}
-			failed++
-			if incoming.closed {
-				t.Fatal("source deletes incoming only after complete Copy")
-			}
-		} else {
-			passed++
-			if !incoming.closed {
-				t.Fatal("successful merge did not destroy incoming")
-			}
-		}
-		s := incoming.Stats()
-		owned := gparamsGraph(g) + s.OwnerBytes + s.TableBytes + s.NamesBytes + gparamsVectorGraph(s.Text)
-		if b.Used() != owned {
-			t.Fatal(prefix, b.Used(), owned)
-		}
-		paramsMust(t, incoming.Close())
-		paramsMust(t, g.Close())
-		if b.Used() != 0 {
-			t.Fatal(prefix, b.Used())
 		}
 	}
-	if failed == 0 || passed == 0 {
-		t.Fatal(failed, passed)
+	if !found {
+		t.Fatal("merged metadata lost after incoming close")
+	}
+	paramsMust(t, g.Close())
+	if budget.Used() != 0 {
+		t.Fatal("owner refund", budget.Used())
 	}
 }
 func TestGlobalParamsDescriptionBindingAndMapPublication(t *testing.T) {

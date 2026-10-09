@@ -2,8 +2,6 @@ package util
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 
-import "github.com/glycerine/g3/pkg/arena"
-
 // DisplayInto emits source param_descrs::display into a borrowed byte buffer.
 // Error keeps the prefix emitted before it.
 func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, includeDescr bool) error {
@@ -46,7 +44,7 @@ func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, incl
 		if !found {
 			return ErrParamDescrsPrecondition
 		}
-		if paramDescrsStreamSourceDebug && info.descr.ref == (arena.VectorRef{}) {
+		if paramDescrsStreamSourceDebug && !info.descr.present {
 			return ErrParamDescrsPrecondition
 		}
 		if e = dst.AppendCString(" ("); e != nil {
@@ -64,14 +62,14 @@ func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, incl
 			}
 			// Null CString sets source ostream failbit at this actual output action.
 			// This byte-destination adapter returns a typed failure with that prefix.
-			if info.descr.ref == (arena.VectorRef{}) {
+			if !info.descr.present {
 				return ErrParamsStreamFailure
 			}
 			if e = d.writeTextInto(dst, info.descr); e != nil {
 				return e
 			}
 		}
-		if info.def.ref != (arena.VectorRef{}) {
+		if info.def.present {
 			if e = dst.AppendCString(" (default: "); e != nil {
 				return e
 			}
@@ -116,14 +114,5 @@ func (d *ParamDescrs) writeNameInto(dst *StringBuffer64, k usymbol.Symbol, smt2 
 	return nil
 }
 func (d *ParamDescrs) writeTextInto(dst *StringBuffer64, r paramDescrText) error {
-	for i := uint32(0); i < r.length; i++ {
-		v, e := d.Texts.Read(r.ref, i/4)
-		if e != nil {
-			return e
-		}
-		if e = dst.AppendByte(byte(v >> (8 * (i % 4)))); e != nil {
-			return e
-		}
-	}
-	return nil
+	return dst.AppendCString(r.value)
 }

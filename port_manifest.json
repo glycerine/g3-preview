@@ -67925,7 +67925,7 @@
       "tests": [
         "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
         "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
-        "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+        "TestSATMainConfigGeneratedDescriptorNativeStorage",
         "TestSATMainConfigGeneratedDescriptorLifetime",
         "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations",
         "TestSATMainConfigActualDefaultsAndIndeterminateGCFields",
@@ -67955,7 +67955,7 @@
           "tests": [
             "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
             "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
-            "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+            "TestSATMainConfigGeneratedDescriptorNativeStorage",
             "TestSATMainConfigGeneratedDescriptorLifetime",
             "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
           ]
@@ -68012,7 +68012,7 @@
       "tests": [
         "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
         "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
-        "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+        "TestSATMainConfigGeneratedDescriptorNativeStorage",
         "TestSATMainConfigGeneratedDescriptorLifetime",
         "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations",
         "TestSATMainConfigActualDefaultsAndIndeterminateGCFields",
@@ -68052,7 +68052,7 @@
           "tests": [
             "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
             "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
-            "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+            "TestSATMainConfigGeneratedDescriptorNativeStorage",
             "TestSATMainConfigGeneratedDescriptorLifetime",
             "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
           ]
@@ -69678,7 +69678,7 @@
       "tests": [
         "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
         "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
-        "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+        "TestSATMainConfigGeneratedDescriptorNativeStorage",
         "TestSATMainConfigGeneratedDescriptorLifetime",
         "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations",
         "TestSATMainConfigActualDefaultsAndIndeterminateGCFields",
@@ -69708,7 +69708,7 @@
           "tests": [
             "TestSATMainConfigGeneratedDescriptorBytesAndOrder",
             "TestSATMainConfigGeneratedDescriptorDuplicateSourceInsert",
-            "TestSATMainConfigGeneratedDescriptorFailurePrefixes",
+            "TestSATMainConfigGeneratedDescriptorNativeStorage",
             "TestSATMainConfigGeneratedDescriptorLifetime",
             "TestSATMainConfigGeneratedDescriptorWarmDuplicateAllocations"
           ]
@@ -112244,10 +112244,10 @@
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
         "TestParamDescrsSourceKindLabelsAndHelpers",
-        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsNativeStorageAndWarmDuplicate",
         "TestParamDescrsOwnershipNullableMetadataAndGuards",
-        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-        "TestParamDescrsCheckedCapacityBoundaries"
+        "TestParamDescrsNativeCopyDisplayAndPlateau",
+        "TestParamDescrsNativeInitialCapacity"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -112260,15 +112260,15 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         }
       ],
       "ownership": [
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md."
+        "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md."
       ],
       "deviations": []
     },
@@ -112285,10 +112285,10 @@
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
         "TestParamDescrsSourceKindLabelsAndHelpers",
-        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsNativeStorageAndWarmDuplicate",
         "TestParamDescrsOwnershipNullableMetadataAndGuards",
-        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestParamDescrsNativeCopyDisplayAndPlateau",
+        "TestParamDescrsNativeInitialCapacity",
         "TestCmdExceptionSourceConstructorRoutesAndLocationGuards",
         "TestCmdExceptionSourceSymbolCompositionAndBorrowedLifetime",
         "TestCmdExceptionIndependentByteDomainsAndOwnerAccounting"
@@ -112324,10 +112324,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -112352,7 +112352,7 @@
         }
       ],
       "ownership": [
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
+        "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See PORT_PROGRESS.md#audit-z3-exception-port-status-md."
       ],
       "deviations": [
@@ -113488,10 +113488,10 @@
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
         "TestParamDescrsSourceKindLabelsAndHelpers",
-        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsNativeStorageAndWarmDuplicate",
         "TestParamDescrsOwnershipNullableMetadataAndGuards",
-        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestParamDescrsNativeCopyDisplayAndPlateau",
+        "TestParamDescrsNativeInitialCapacity",
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
         "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
         "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
@@ -113501,7 +113501,7 @@
         "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
         "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
         "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
-        "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+        "TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner",
         "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
         "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
         "TestGlobalParamsNilStreamActualActionPrefixes",
@@ -113531,10 +113531,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -113551,7 +113551,7 @@
             "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
             "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
             "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
-            "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+            "TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner",
             "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
             "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
             "TestGlobalParamsNilStreamActualActionPrefixes",
@@ -113563,7 +113563,7 @@
         }
       ],
       "ownership": [
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
+        "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Three independent charged scalar record arrays and cold root directories preserve source physical bucket/action order. See PORT_PROGRESS.md#audit-gparams-registry-port-status-md; other source map operations remain required."
       ],
       "deviations": []
@@ -114369,7 +114369,7 @@
         "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
         "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
         "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
-        "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+        "TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner",
         "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
         "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
         "TestGlobalParamsNilStreamActualActionPrefixes",
@@ -114481,7 +114481,7 @@
             "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
             "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
             "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
-            "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+            "TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner",
             "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
             "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
             "TestGlobalParamsNilStreamActualActionPrefixes",
@@ -114628,7 +114628,7 @@
         "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
         "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
         "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
-        "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+        "TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner",
         "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
         "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
         "TestGlobalParamsNilStreamActualActionPrefixes",
@@ -114686,7 +114686,7 @@
             "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
             "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
             "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
-            "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+            "TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner",
             "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
             "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
             "TestGlobalParamsNilStreamActualActionPrefixes",
@@ -115034,10 +115034,10 @@
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
         "TestParamDescrsSourceKindLabelsAndHelpers",
-        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsNativeStorageAndWarmDuplicate",
         "TestParamDescrsOwnershipNullableMetadataAndGuards",
-        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestParamDescrsNativeCopyDisplayAndPlateau",
+        "TestParamDescrsNativeInitialCapacity",
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
         "TestASTSharedOccurrencesAllTraversalPolicies",
         "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
@@ -115296,10 +115296,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -115420,7 +115420,7 @@
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
         "StrHashtable borrows immutable region spellings through scalar origin/ref/offset/length records. Table lifecycle never copies/frees spellings; cold owner/table budgets and safe epochs are audited. Multi-origin Assign/Union/Intersect and foreign borrow/query/mutation paths are complete for this specialization; other entry types and optional enabled statistics remain open. See PORT_PROGRESS.md#audit-utilhash-port-status-md.",
         "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see PORT_PROGRESS.md#audit-utilhash-str-int32-map-port-status-md.",
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
+        "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Concrete AST expr identity-table and shared-occurrence owners preserve source bucket-order callbacks, borrowing, actual node shared flags and charged backing/header peaks. See PORT_PROGRESS.md#audit-ast-sparse-shared-port-status-md.",
         "Three selected expression substitution map backings retain distinct capacities and actual ownership bits; expansion temporaries are nonowning, sparse reset publishes half-capacity before allocation and finalize publishes64 after allocation. Generic maps remain partial.",
         "Runtime-backed mode uses its actual 24-byte wrapper and 32-byte pointer-free entry array, with NIL legacy hot slice. Exact acquisition nodes stamp returned Runtime leaves; ascending moves, destructive replacement, source strict destructor and separate owning cleanup retain each genuinely unjoined token. Lexical intersection copy has a concrete inline header, one actual table allocation, and source completed-copy destructor before owning abort.",
@@ -123730,10 +123730,10 @@
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
         "TestParamDescrsSourceKindLabelsAndHelpers",
-        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsNativeStorageAndWarmDuplicate",
         "TestParamDescrsOwnershipNullableMetadataAndGuards",
-        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestParamDescrsNativeCopyDisplayAndPlateau",
+        "TestParamDescrsNativeInitialCapacity",
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
         "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
         "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
@@ -123743,7 +123743,7 @@
         "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
         "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
         "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
-        "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+        "TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner",
         "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
         "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
         "TestGlobalParamsNilStreamActualActionPrefixes",
@@ -123857,10 +123857,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -123877,7 +123877,7 @@
             "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
             "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
             "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
-            "TestGlobalParamsDescriptorMergeFaultRetainsCallerOwner",
+            "TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner",
             "TestGlobalParamsDisplayParameterDiagnosticBeforeLookup",
             "TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches",
             "TestGlobalParamsNilStreamActualActionPrefixes",
@@ -123907,7 +123907,7 @@
         "Concrete scalar u_map<uint32> specialization with budgeted cold header and pointer-free entries. Other key/entry variants and source string map or Windows sentinel set remain unported. See PORT_PROGRESS.md#audit-utilhash-port-status-md.",
         "Scalar owned key refs preserve synthesized capacity-copy assignment and retained FREE/DELETED payloads. Rehash duplicates used keys before old table destruction; Swap moves owners without key-copy actions. See PORT_PROGRESS.md#audit-bitset-port-status-md.",
         "CString/int32 default entries retain complete borrowed key/value data on FREE/DELETED. Fixed40-byte scalar entries, budgeted header/table/directory, borrowed origins and source cached hash/bucket/action order; see PORT_PROGRESS.md#audit-utilhash-str-int32-map-port-status-md.",
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
+        "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Three independent charged scalar record arrays and cold root directories preserve source physical bucket/action order. See PORT_PROGRESS.md#audit-gparams-registry-port-status-md; other source map operations remain required.",
         "Default-entry Runtime mode has NIL Go hot slice and actual wrapper24/32-byte object plus40-byte record payload. Legacy mode has actual Go backing and cold scalar capacity/counter. Acquisitions stamp exact returned allocation; lexical copies are inline owners. Current field/pending nodes and failed copy owners remain named; source-completed DT separate from owning abort; immediate raw bijection/full cold sums precede each real reservation fault lift. Accidental Go owner copies reject exact self before mutation; actual source clones prepare valid owners."
       ],
@@ -138793,10 +138793,10 @@
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
         "TestParamDescrsSourceKindLabelsAndHelpers",
-        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsNativeStorageAndWarmDuplicate",
         "TestParamDescrsOwnershipNullableMetadataAndGuards",
-        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestParamDescrsNativeCopyDisplayAndPlateau",
+        "TestParamDescrsNativeInitialCapacity",
         "TestParamsReferenceSourceSharingAndReset",
         "TestParamsReferenceSourceCopyMergeAndSignedRat",
         "TestParamsReferenceNameReadsNeverIntern",
@@ -138924,10 +138924,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -138938,10 +138938,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -138952,10 +138952,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -138966,10 +138966,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -138980,10 +138980,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -139242,10 +139242,10 @@
       ],
       "ownership": [
         "Normalization reads canonical Go spelling under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PORT_PROGRESS.md#audit-param-name-port-status-md.",
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
+        "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
-        "DisplayInto borrows charged StringBuffer64; destination then descriptor then Symbol lock order. Temporary names use actual charged old/new peaks and are refunded; text bytes read directly without intermediate strings. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
+        "DisplayInto borrows the native bytes.Buffer-backed StringBuffer64; destination then descriptor then Symbol lock order. Temporary names and metadata text use native Go storage outside arena accounting. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
         "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement.",
         "Actual per-block cold invocation is prepared with the charged receipt directory. Null/shared/failed entry cannot stamp; wrong invocation, foreign value, empty receipt, double acknowledgment and stale reused generation cannot adopt a stopped block. Broader non-DEC reset and exceptional Assign/init remain open.",
         "Prepared charged per-block source-frame directory stamps held old reference only at actual init new-pointer publication, or extra SRC reference only at actual completed INC. Exact context/slot/generation/invocation and actual owning DEC phase govern abort. Named physical census enumerates these actual held tokens; source failure never rolls back caller output or reconstructs vectors.",
@@ -139254,9 +139254,9 @@
         "Defined absent-key lookup on a live parent after stopped numeral destruction returns without action or receipt stamp; source keys are scanned before the stopped mutation guard. Both symbol/name routes preserve original invocation, cursor, refs, size, Runtime and exact physical/cold graph. Source-ended zeroDEC lifetime is guarded before lookup separately. Historical premature whole-block guard candidate is superseded, not accepted.",
         "SET_RAT ADD stamps the actual NewValue result into precharged concrete setFrames.next.rat before Copy and retains it on actual Copy/append refusal. Source POD new_entry has no rational destructor; only true entry publication transfers ownership. Separate exact owning receipt or Context.Close releases this actual local, preserving first body and owning cleanup causes and actual consumed physical child frontier. SourceSetBytes is the independent reflected cold directory charge; audits name actual acquired tokens, not numeric live-count or RC inference.",
         "Concrete prepared per-block replacement frame binds actual matched index, old kind, slot/generation, nonwrapping invocation and borrowed current leaf identity at reached del_value. Actual owning NUM stays only in the entry, never copied into a second owning frame. Explicit CompleteSetReplacement acknowledges consumed physical child before kind then field publication; Context.Close instead discards prepared copied text and consumed old leaf before block teardown, with no setter body publication. Reflected ReplacementBytes cold directory and any actual acquired text are separately charged/named; no RC/count/registry authority.",
-        "Nested unfinished ParamDescrs is named ctorPendingDescriptor only, never published as completed globalDescriptors. Prepared Go copied-text context/header persists until explicit owning abort; reached completed info/names members alone unwind. Public ergonomic constructors use same source engine followed by separate all-refund abort on failure.",
+        "Descriptor owner-header refusal occurs before publication; native info, name, and immutable metadata storage introduce no arena refusal after that header. Existing registry cleanup retains actual acquired child owners, with embedded descriptors charged only in their containing frame.",
         "The concrete call-local pointer view captures actual Words/ref/length or Symbol BytesRegion/ref/offset from the returned source entry. No RC, copied payload or formatting-workspace allocation is acquired. Each reached byte retains actual provider/generation/lifetime checks; returned symbol spelling may outlive ParamsContext while its provider remains live.",
-        "prepareSourceParamDescrs and constructSourceMembers factor the existing source engine without changing standalone header/text/info/name order. The actual call-local descriptor is embedded in the charged context frame and never runs a heap-wrapper constructor. Completed descriptor destruction remains names then info, copied-text adapter cleanup then actual wrapper header; incomplete placement construction retains actual child text owner until explicit abort."
+        "The call-local descriptor is embedded in the charged context frame. Descriptor info uses insdict and names use native slices; metadata strings are Go-managed. Completed destruction clears names then info and releases any actual wrapper header; no separate text owner is constructed."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
@@ -139312,10 +139312,10 @@
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
         "TestParamDescrsSourceKindLabelsAndHelpers",
-        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+        "TestParamDescrsNativeStorageAndWarmDuplicate",
         "TestParamDescrsOwnershipNullableMetadataAndGuards",
-        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-        "TestParamDescrsCheckedCapacityBoundaries",
+        "TestParamDescrsNativeCopyDisplayAndPlateau",
+        "TestParamDescrsNativeInitialCapacity",
         "TestParamsReferenceSourceSharingAndReset",
         "TestParamsReferenceSourceCopyMergeAndSignedRat",
         "TestParamsReferenceNameReadsNeverIntern",
@@ -139404,10 +139404,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -139418,10 +139418,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -139432,10 +139432,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -139446,10 +139446,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -139460,10 +139460,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -139701,10 +139701,10 @@
       ],
       "ownership": [
         "Normalization reads canonical Go spelling under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PORT_PROGRESS.md#audit-param-name-port-status-md.",
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
+        "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
-        "DisplayInto borrows charged StringBuffer64; destination then descriptor then Symbol lock order. Temporary names use actual charged old/new peaks and are refunded; text bytes read directly without intermediate strings. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
+        "DisplayInto borrows the native bytes.Buffer-backed StringBuffer64; destination then descriptor then Symbol lock order. Temporary names and metadata text use native Go storage outside arena accounting. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
         "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement.",
         "Actual per-block cold invocation is prepared with the charged receipt directory. Null/shared/failed entry cannot stamp; wrong invocation, foreign value, empty receipt, double acknowledgment and stale reused generation cannot adopt a stopped block. Broader non-DEC reset and exceptional Assign/init remain open.",
         "Prepared charged per-block source-frame directory stamps held old reference only at actual init new-pointer publication, or extra SRC reference only at actual completed INC. Exact context/slot/generation/invocation and actual owning DEC phase govern abort. Named physical census enumerates these actual held tokens; source failure never rolls back caller output or reconstructs vectors.",
@@ -139713,7 +139713,7 @@
         "Defined absent-key lookup on a live parent after stopped numeral destruction returns without action or receipt stamp; source keys are scanned before the stopped mutation guard. Both symbol/name routes preserve original invocation, cursor, refs, size, Runtime and exact physical/cold graph. Source-ended zeroDEC lifetime is guarded before lookup separately. Historical premature whole-block guard candidate is superseded, not accepted.",
         "SET_RAT ADD stamps the actual NewValue result into precharged concrete setFrames.next.rat before Copy and retains it on actual Copy/append refusal. Source POD new_entry has no rational destructor; only true entry publication transfers ownership. Separate exact owning receipt or Context.Close releases this actual local, preserving first body and owning cleanup causes and actual consumed physical child frontier. SourceSetBytes is the independent reflected cold directory charge; audits name actual acquired tokens, not numeric live-count or RC inference.",
         "Concrete prepared per-block replacement frame binds actual matched index, old kind, slot/generation, nonwrapping invocation and borrowed current leaf identity at reached del_value. Actual owning NUM stays only in the entry, never copied into a second owning frame. Explicit CompleteSetReplacement acknowledges consumed physical child before kind then field publication; Context.Close instead discards prepared copied text and consumed old leaf before block teardown, with no setter body publication. Reflected ReplacementBytes cold directory and any actual acquired text are separately charged/named; no RC/count/registry authority.",
-        "Nested unfinished ParamDescrs is named ctorPendingDescriptor only, never published as completed globalDescriptors. Prepared Go copied-text context/header persists until explicit owning abort; reached completed info/names members alone unwind. Public ergonomic constructors use same source engine followed by separate all-refund abort on failure."
+        "Descriptor owner-header refusal occurs before publication; native info, name, and immutable metadata storage introduce no arena refusal after that header. Existing registry cleanup retains actual acquired child owners, with embedded descriptors charged only in their containing frame."
       ],
       "deviations": [
         "Owner-local null replaces process-global empty reference. C strings become owned nullable first-NUL payloads; replacement stages new text. Detach error retains published partial block but cleans old reference. Pooled pages persist physically until Close; inline concrete numeric tokens replace separate heap objects. Provenance/overflow guards and libstdc++ null-C-string prefix error are explicit Go adapters; Z3DEBUG pp is explicit text API rather than global stdout.",
@@ -149010,9 +149010,9 @@
         "pkg/util/runtime_uint32_view.go"
       ],
       "tests": [
-        "TestParamDescrsBudgetFailuresAndWarmDuplicate",
-        "TestParamDescrsCheckedCapacityBoundaries",
-        "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
+        "TestParamDescrsNativeStorageAndWarmDuplicate",
+        "TestParamDescrsNativeInitialCapacity",
+        "TestParamDescrsNativeCopyDisplayAndPlateau",
         "TestParamDescrsOwnershipNullableMetadataAndGuards",
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceKindLabelsAndHelpers",
@@ -149385,10 +149385,10 @@
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
             "TestParamDescrsSourceModuleAndNullKinds",
             "TestParamDescrsSourceKindLabelsAndHelpers",
-            "TestParamDescrsBudgetFailuresAndWarmDuplicate",
+            "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
-            "TestParamDescrsCopyDisplayFaultPrefixesAndPlateau",
-            "TestParamDescrsCheckedCapacityBoundaries"
+            "TestParamDescrsNativeCopyDisplayAndPlateau",
+            "TestParamDescrsNativeInitialCapacity"
           ]
         },
         {
@@ -149793,7 +149793,7 @@
         }
       ],
       "ownership": [
-        "Descriptor scalar dictionary entries and name history use charged concrete arrays; immutable nullable C-string metadata uses packed Words. Copy keeps bucket order and deep-copies metadata without intermediate strings; dictionary publishes before fallible names growth. Module scratch/Display keys and bridges charge actual overlaps. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
+        "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "SAT vector headers/backing/lifetime metadata use actual host widths, real 2-to-(3n+1)/2 growth and old/new peaks. Trivial reallocation copies retained capacity, watched erase/destroy lifetime is distinguished. Value iterators do not allocate cold wrappers. Source impossible constructors/equality overloads are not fabricated; aliases and raw pointer adapters are in PORT_PROGRESS.md#audit-sat-storage-port-status-md.",
         "Selected concrete nested literal payload and nontrivial model entry copy adaptations preserve source logical capacities, full retained trivial backing, exact-capacity logical copy, and ascending clone/destruct prefixes. Local SAT char membership storage preserves source uint32 growth arithmetic. Physical pooled storage and all cold metadata remain charged.",
         "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see PORT_PROGRESS.md#audit-sat-solver-watch-store-port-status-md.",

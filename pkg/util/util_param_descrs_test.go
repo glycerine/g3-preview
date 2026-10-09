@@ -233,38 +233,9 @@ func TestParamDescrsDictionaryBehaviorAndHistory(t *testing.T) {
 		}
 	}
 }
-func TestParamDescrsBudgetFailuresAndWarmDuplicate(t *testing.T) {
+func TestParamDescrsNativeStorageAndWarmDuplicate(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	key := internSymbol(t, m, "key")
-	fail, success := 0, 0
-	for prefix := int64(0); prefix < 22; prefix++ {
-		b := arena.NewBudget(^uint64(0))
-		d := pdnew(t, m, b)
-		base := b.Used()
-		b.FailAfter(prefix)
-		e := d.Insert(key, ParamUInt, pdstr(strings.Repeat("D", 70)), pdstr("99"), pdstr("mod"))
-		b.FailAfter(-1)
-		if e != nil {
-			fail++
-			n, _ := d.Size()
-			p, _ := d.Contains(key)
-			if n != 0 || (p && d.Texts.Stats().Live != 3) || (!p && d.Texts.Stats().Live != 0) {
-				t.Fatal(prefix, n, p, d.Texts.Stats())
-			}
-			if b.Used() < base {
-				t.Fatal("lost owner")
-			}
-		} else {
-			success++
-		}
-		d.Close()
-		if b.Used() != 0 {
-			t.Fatal(prefix, b.Used())
-		}
-	}
-	if fail == 0 || success == 0 {
-		t.Fatal(fail, success)
-	}
 	b := arena.NewBudget(^uint64(0))
 	d := pdnew(t, m, b)
 	pdinsert(t, d, "key", ParamUInt, pdstr("description"), nil, nil)
@@ -299,9 +270,7 @@ func TestParamDescrsBudgetFailuresAndWarmDuplicate(t *testing.T) {
 }
 
 func pdtotal(s ParamDescrsStats) uint64 {
-	v := s.Text
-	a := v.Descriptors
-	return s.OwnerBytes + s.TableBytes + s.NamesBytes + v.OwnerBytes + v.PayloadBytes + v.BlockMetadataBytes + v.DirectoryBytes + a.OwnerBytes + a.RecordBytes + a.MetadataBytes + a.DirectoryBytes
+	return s.OwnerBytes + s.TableBytes + s.NamesBytes
 }
 func TestParamDescrsOwnershipNullableMetadataAndGuards(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
@@ -360,48 +329,28 @@ func TestParamDescrsOwnershipNullableMetadataAndGuards(t *testing.T) {
 		t.Fatal(e)
 	}
 }
-func TestParamDescrsCopyDisplayFaultPrefixesAndPlateau(t *testing.T) {
+func TestParamDescrsNativeCopyDisplayAndPlateau(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	src := pdnew(t, m, nil)
 	for i := 0; i < 16; i++ {
 		pdinsert(t, src, fmt.Sprintf("merge%d", i), ParamString, pdstr(strings.Repeat("T", 25)), pdstr("0"), nil)
 	}
-	failures, successes, partial := 0, 0, 0
-	for prefix := int64(0); prefix < 90; prefix++ {
-		b := arena.NewBudget(^uint64(0))
-		dst := pdnew(t, m, b)
-		b.FailAfter(prefix)
-		e := dst.Copy(src)
-		b.FailAfter(-1)
-		s := dst.Stats()
-		if e != nil {
-			failures++
-			if s.Live > 0 {
-				partial++
-			}
-		} else {
-			successes++
-		}
-		if (s.Live != s.Names && s.Live != s.Names+1) || s.Text.Live != 2*s.Live || pdtotal(s) != b.Used() {
-			t.Fatal(prefix, e, s, b.Used())
-		}
-		order := []usymbol.Symbol{}
-		for key := range src.entries.All() {
-			order = append(order, key)
-		}
-		for i := uint32(0); i < s.Names; i++ {
-			got, _ := dst.ParamName(i)
-			if got != order[i] {
-				t.Fatal("merge failure source prefix", prefix, i)
-			}
-		}
-		dst.Close()
-		if b.Used() != 0 {
-			t.Fatal(prefix, b.Used())
+	copyBudget := arena.NewBudget(^uint64(0))
+	dst := pdnew(t, m, copyBudget)
+	copyBudget.FailAfter(0)
+	if e := dst.Copy(src); e != nil {
+		t.Fatal(e)
+	}
+	for i, key := range src.Names {
+		got, e := dst.ParamName(uint32(i))
+		if e != nil || got != key {
+			t.Fatal("copy insertion order", i, got, key, e)
 		}
 	}
-	if failures == 0 || successes == 0 || partial == 0 {
-		t.Fatal(failures, successes, partial)
+	copyBudget.FailAfter(-1)
+	dst.Close()
+	if copyBudget.Used() != 0 {
+		t.Fatal("copy owner leak", copyBudget.Used())
 	}
 	b := arena.NewBudget(^uint64(0))
 	d := pdnew(t, m, b)
@@ -417,8 +366,8 @@ func TestParamDescrsCopyDisplayFaultPrefixesAndPlateau(t *testing.T) {
 			t.Fatal("display scratch leak", prefix, e, b.Used(), base)
 		}
 	}
-	// History intentionally keeps growing after erase/reinsert. Metadata pages
-	// plateau independently, while all live descriptor records disappear on erase.
+	// History grows after erase/reinsert; native metadata does not consume
+	// arena budget and all erased dictionary entries disappear.
 	key := internSymbol(t, m, "plateau")
 	textBase := uint64(0)
 	for round := 0; round < 60; round++ {
@@ -427,8 +376,7 @@ func TestParamDescrsCopyDisplayFaultPrefixesAndPlateau(t *testing.T) {
 		}
 		d.Erase(key)
 		st := d.Stats()
-		v := st.Text
-		owned := v.OwnerBytes + v.PayloadBytes + v.BlockMetadataBytes + v.DirectoryBytes + v.Descriptors.OwnerBytes + v.Descriptors.RecordBytes + v.Descriptors.MetadataBytes + v.Descriptors.DirectoryBytes
+		owned := pdtotal(st)
 		if round == 2 {
 			textBase = owned
 		}
@@ -472,8 +420,7 @@ func TestParamDescrsModuleGoScratchAndMetadataPublication(t *testing.T) {
 	if failed != 0 || passed != 15 {
 		t.Fatal(failed, passed)
 	}
-	// Reusing freed arena text requires no reservation; ordinary Go name/map
-	// growth does not add an artificial Budget failure point.
+	// Native text and name/map growth require no artificial Budget reservation.
 	k0 := internSymbol(t, m, "warm0")
 	k1 := internSymbol(t, m, "warm1")
 	k2 := internSymbol(t, m, "warm2")
@@ -494,7 +441,7 @@ func TestParamDescrsModuleGoScratchAndMetadataPublication(t *testing.T) {
 	}
 	text, p, e := z.Description(k2)
 	n, _ := z.Size()
-	if e != nil || !p || text != "retained" || n != 3 || z.Stats().Live != 2 || b.Used() != before || z.Texts.Stats().Live != 2 {
+	if e != nil || !p || text != "retained" || n != 3 || z.Stats().Live != 2 || b.Used() != before {
 		t.Fatal(text, p, e, n, z.Stats(), b.Used(), before)
 	}
 }
@@ -511,19 +458,7 @@ func TestParamDescrsSourcePrefixUsesGoTemporaryStorage(t *testing.T) {
 		t.Fatal("Go temporary storage must not consume arena budget", split, e, b.Used(), base)
 	}
 }
-func TestParamDescrsCheckedCapacityBoundaries(t *testing.T) {
-	if n, e := pdGrowth(0); e != nil || n != 2 {
-		t.Fatal(n, e)
-	}
-	if n, e := pdGrowth(5); e != nil || n != 8 {
-		t.Fatal(n, e)
-	}
-	if uint64(^uint(0)>>1) > uint64(^uint32(0)) {
-		n := int(uint64(^uint32(0)))
-		if _, e := pdGrowth(n); e != arena.ErrBounds {
-			t.Fatal("uint32 capacity overflow", e)
-		}
-	}
+func TestParamDescrsNativeInitialCapacity(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	for _, cap := range []uint32{3, 6, 7} {
 		d, e := NewParamDescrs(m, ParamDescrsConfig{InitialCapacity: cap})
@@ -532,8 +467,5 @@ func TestParamDescrsCheckedCapacityBoundaries(t *testing.T) {
 		}
 		paramsMust(t, d.Close())
 	}
-	b := arena.NewBudget(^uint64(0))
-	if _, e := NewParamDescrs(m, ParamDescrsConfig{Budget: b, Text: arena.VectorConfig{PageSize: 3}}); e != arena.ErrConfig || b.Used() != 0 {
-		t.Fatal("nested invalid constructor unwind", e, b.Used())
-	}
+
 }

@@ -325,7 +325,7 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 	if e = out.AppendCString("\n  description:    "); e != nil {
 		return e
 	}
-	if info.descr.ref == (arena.VectorRef{}) {
+	if !info.descr.present {
 		return ErrParamsStreamFailure
 	}
 	if e = d.writeTextInto(out, info.descr); e != nil {
@@ -334,7 +334,7 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 	if e = out.AppendCString("\n  default value:  "); e != nil {
 		return e
 	}
-	if info.def.ref == (arena.VectorRef{}) {
+	if !info.def.present {
 		return ErrParamsStreamFailure
 	}
 	if e = d.writeTextInto(out, info.def); e != nil {

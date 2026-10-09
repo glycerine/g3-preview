@@ -82,9 +82,7 @@ func pdinsert(t *testing.T, d *util.ParamDescrs, n string, k util.ParamKind, des
 func pdstr(s string) *string { return &s }
 
 func pdtotal(s util.ParamDescrsStats) uint64 {
-	v := s.Text
-	a := v.Descriptors
-	return s.OwnerBytes + s.TableBytes + s.NamesBytes + v.OwnerBytes + v.PayloadBytes + v.BlockMetadataBytes + v.DirectoryBytes + a.OwnerBytes + a.RecordBytes + a.MetadataBytes + a.DirectoryBytes
+	return s.OwnerBytes + s.TableBytes + s.NamesBytes
 }
 func paramsBorrowedPhysicalBytes(s util.ParamsStats) uint64 {
 	d := s.Text.Descriptors

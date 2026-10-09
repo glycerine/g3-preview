@@ -1038,3 +1038,18 @@ func TestParamsReferenceCStringLengthBounds(t *testing.T) {
 	}
 	paramsMust(t, c.Del(&a))
 }
+
+func TestParamsEntryGrowthBounds(t *testing.T) {
+	if n, e := pdGrowth(0); e != nil || n != 2 {
+		t.Fatal(n, e)
+	}
+	if n, e := pdGrowth(5); e != nil || n != 8 {
+		t.Fatal(n, e)
+	}
+	if uint64(^uint(0)>>1) > uint64(^uint32(0)) {
+		n := int(uint64(^uint32(0)))
+		if _, e := pdGrowth(n); e != arena.ErrBounds {
+			t.Fatal("uint32 capacity overflow", e)
+		}
+	}
+}

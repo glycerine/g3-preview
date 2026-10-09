@@ -59,10 +59,6 @@ func (d *ParamDescrs) abortConstructor() error {
 	if d.constructorCompleted >= 1 {
 		d.entries = nil
 	}
-	if d.Texts != nil {
-		d.Texts.Close()
-		d.Texts = nil
-	}
 	d.Budget.Release(d.OwnerBytes)
 	d.OwnerBytes = 0
 	d.closed = true

@@ -170,9 +170,6 @@ func contextMethodsCold(t *testing.T, s *ContextParams, g *util.GlobalParamsServ
 				if d.Self != d || d.OwnerBytes != 0 {
 					t.Fatal("embedded actual descriptor, no second wrapper charge")
 				}
-				if d.Texts != nil {
-					n += gparamsVectorGraph(d.Texts.Stats())
-				}
 			}
 		}
 	}
