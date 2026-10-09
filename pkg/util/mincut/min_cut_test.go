@@ -1,5 +1,5 @@
 // Source: src/util/min_cut.h:25-59; src/util/min_cut.cpp:21-230.
-package util
+package mincut
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestMinCutNodeConstructionAndBounds(t *testing.T) {
-	m := NewMinCut()
+	m := New()
 	if got := m.NewNode(); got != 2 {
 		t.Fatal("first ordinary node", got)
 	}
@@ -22,21 +22,21 @@ func TestMinCutNodeConstructionAndBounds(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, edge := range [][2]uint32{{4, 0}, {0, 4}} {
-		if err := m.AddEdge(edge[0], edge[1]); !errors.Is(err, ErrMinCutNode) {
+		if err := m.AddEdge(edge[0], edge[1]); !errors.Is(err, ErrNode) {
 			t.Fatal("out-of-range edge", edge, err)
 		}
 	}
 	var absent *MinCut
-	if err := absent.AddEdge(0, 1); !errors.Is(err, ErrMinCutNode) {
+	if err := absent.AddEdge(0, 1); !errors.Is(err, ErrNode) {
 		t.Fatal("nil graph edge", err)
 	}
-	if _, err := absent.ComputeMinCut(nil); !errors.Is(err, ErrMinCutNode) {
+	if _, err := absent.ComputeMinCut(nil); !errors.Is(err, ErrNode) {
 		t.Fatal("nil graph compute", err)
 	}
 }
 
 func TestMinCutSourceSinkOnlyPreservesOutput(t *testing.T) {
-	m := NewMinCut()
+	m := New()
 	if err := m.AddEdgeCapacity(0, 1, 9); err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func TestMinCutSourceSinkOnlyPreservesOutput(t *testing.T) {
 }
 
 func TestMinCutWeightedBranchesAndAppendOrder(t *testing.T) {
-	m := NewMinCut()
+	m := New()
 	a := m.NewNode()
 	b := m.NewNode()
 	for _, edge := range []struct {
@@ -73,13 +73,13 @@ func TestMinCutWeightedBranchesAndAppendOrder(t *testing.T) {
 	if want := []uint32{77, b, 1}; !reflect.DeepEqual(got, want) {
 		t.Fatal("cut nodes", got, want)
 	}
-	if _, err := m.ComputeMinCut(nil); !errors.Is(err, ErrMinCutComputed) {
+	if _, err := m.ComputeMinCut(nil); !errors.Is(err, ErrComputed) {
 		t.Fatal("second compute", err)
 	}
 }
 
 func TestMinCutZeroCapacityStillAppearsInCutEnumeration(t *testing.T) {
-	m := NewMinCut()
+	m := New()
 	a := m.NewNode()
 	b := m.NewNode()
 	if err := m.AddEdge(0, a); err != nil {
@@ -104,16 +104,16 @@ func TestMinCutZeroCapacityStillAppearsInCutEnumeration(t *testing.T) {
 }
 
 func TestMinCutRejectsSourceGraphsThatWouldNotTerminate(t *testing.T) {
-	disconnected := NewMinCut()
+	disconnected := New()
 	a := disconnected.NewNode()
 	if err := disconnected.AddEdge(0, a); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := disconnected.ComputeMinCut(nil); !errors.Is(err, ErrMinCutGraph) {
+	if _, err := disconnected.ComputeMinCut(nil); !errors.Is(err, ErrGraph) {
 		t.Fatal("reached dead end", err)
 	}
 
-	cyclic := NewMinCut()
+	cyclic := New()
 	a = cyclic.NewNode()
 	if err := cyclic.AddEdge(0, a); err != nil {
 		t.Fatal(err)
@@ -124,7 +124,7 @@ func TestMinCutRejectsSourceGraphsThatWouldNotTerminate(t *testing.T) {
 	if err := cyclic.AddEdge(a, 1); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := cyclic.ComputeMinCut(nil); !errors.Is(err, ErrMinCutGraph) {
+	if _, err := cyclic.ComputeMinCut(nil); !errors.Is(err, ErrGraph) {
 		t.Fatal("cycle", err)
 	}
 }
@@ -144,7 +144,7 @@ func TestMinCutExhaustiveFourNodeDAGAgainstPartitionOracle(t *testing.T) {
 			continue
 		}
 
-		m := NewMinCut()
+		m := New()
 		m.NewNode()
 		m.NewNode()
 		for _, edge := range original {

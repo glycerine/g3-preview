@@ -577,3 +577,7 @@ consumer packages migrate to the leaf API. Once those aliases are no longer
 used, the compatibility file can be deleted. The same process can then be
 applied to cliques, union-find/backtracking, sorting networks, and the larger
 numeric boundary.
+
+`util/mincut` is also extracted with its focused tests. It depends only on the
+standard library and has no current Go production consumer; root keeps aliases
+for the live upstream users that have not yet been ported.
