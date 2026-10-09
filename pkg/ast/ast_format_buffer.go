@@ -4,13 +4,14 @@ package ast
 import (
 	"github.com/glycerine/g3/pkg/util"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // FormatBuffer64 evaluates the source c_str argument before reaching mk_string.
 // Its bytes remain borrowed from the actual buffer throughout symbol creation.
-func (m *ASTManager) FormatBuffer64(b *util.StringBuffer64) (ASTHandle, error) {
+func (m *ASTManager) FormatBuffer64(b *utext.Buffer) (ASTHandle, error) {
 	if b == nil {
-		return ASTHandle{}, util.ErrStringBufferOwner
+		return ASTHandle{}, utext.ErrOwner
 	}
 	text, e := b.CStr()
 	if e != nil {

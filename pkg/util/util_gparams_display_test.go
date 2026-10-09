@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func gparamsDescriptionBytes(t *testing.T, r *arena.BytesRegion, s string) arena.BytesRegionRef {
@@ -32,7 +33,7 @@ func TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches(t *testing.T) {
 	}()
 	ref := gparamsDescriptionBytes(t, r, "prefixdescription\x00ignored")
 	paramsMust(t, g.RegisterModuleDescription("sat", r, ref, 6))
-	out, e := NewStringBuffer64(StringBufferConfig{})
+	out, e := utext.NewBuffer(utext.Config{})
 	paramsMust(t, e)
 	defer out.Close()
 	paramsMust(t, g.DisplayModulesInto(out))
@@ -68,7 +69,7 @@ func TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches(t *testing.T) {
 func TestGlobalParamsDescriptionNullAndClosedReadPrefixes(t *testing.T) {
 	g, _, _, _ := gparamsRealRegistry(t)
 	paramsMust(t, g.ensureRegistered())
-	out, e := NewStringBuffer64(StringBufferConfig{})
+	out, e := utext.NewBuffer(utext.Config{})
 	paramsMust(t, e)
 	defer out.Close()
 	paramsMust(t, g.RegisterModuleDescription("sat", nil, arena.BytesRegionRef{}, 0))
@@ -107,10 +108,10 @@ func TestGlobalParamsDescriptionNullAndClosedReadPrefixes(t *testing.T) {
 
 func TestGlobalParamsDisplayParameterDiagnosticBeforeLookup(t *testing.T) {
 	g, _, _, _ := gparamsRealRegistry(t)
-	out, e := NewStringBuffer64(StringBufferConfig{})
+	out, e := utext.NewBuffer(utext.Config{})
 	paramsMust(t, e)
 	defer out.Close()
-	debug, e := NewStringBuffer64(StringBufferConfig{})
+	debug, e := utext.NewBuffer(utext.Config{})
 	paramsMust(t, e)
 	defer debug.Close()
 	paramsMust(t, g.DisplayParameterInto(out, debug, ":SaT.SeEd"))
@@ -153,14 +154,14 @@ func TestGlobalParamsDisplayParameterDiagnosticBeforeLookup(t *testing.T) {
 func TestGlobalParamsNilStreamActualActionPrefixes(t *testing.T) {
 	g, _, _, _ := gparamsRealRegistry(t)
 	// Header emission precedes lazy registration.
-	if e := g.DisplayInto(nil, 0, false, true); !errors.Is(e, ErrStringBufferOwner) {
+	if e := g.DisplayInto(nil, 0, false, true); !errors.Is(e, utext.ErrOwner) {
 		t.Fatal(e)
 	}
 	if g.modulesRegistered {
 		t.Fatal("registration ran before failed header action")
 	}
 	// Module lookup/registration precedes the first row output action.
-	if e := g.DisplayModulesInto(nil); !errors.Is(e, ErrStringBufferOwner) {
+	if e := g.DisplayModulesInto(nil); !errors.Is(e, utext.ErrOwner) {
 		t.Fatal(e)
 	}
 	if !g.modulesRegistered || len(g.Descriptors) != 1 {
@@ -169,7 +170,7 @@ func TestGlobalParamsNilStreamActualActionPrefixes(t *testing.T) {
 	if e := g.DisplayModuleInto(nil, "missing"); e == nil || e.Error() != "unknown module 'missing'" {
 		t.Fatal(e)
 	}
-	if e := g.DisplayModuleInto(nil, "sat"); !errors.Is(e, ErrStringBufferOwner) {
+	if e := g.DisplayModuleInto(nil, "sat"); !errors.Is(e, utext.ErrOwner) {
 		t.Fatal(e)
 	}
 	ctx, sy, _ := paramsTestOwner(t)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrGlobalParamsAssertion = errors.New("g3: global parameters source assertion")
@@ -165,21 +166,21 @@ func (s *GlobalParamsService) SourceGetRef() (*ParamsRef, error) {
 	}
 	return g.GetRef()
 }
-func (s *GlobalParamsService) SourceDisplayInto(out *StringBuffer64, indent uint32, smt2, includeDescr bool) error {
+func (s *GlobalParamsService) SourceDisplayInto(out *utext.Buffer, indent uint32, smt2, includeDescr bool) error {
 	g, e := s.namespaceImpAt(614)
 	if e != nil {
 		return e
 	}
 	return g.DisplayInto(out, indent, smt2, includeDescr)
 }
-func (s *GlobalParamsService) SourceDisplayModulesInto(out *StringBuffer64) error {
+func (s *GlobalParamsService) SourceDisplayModulesInto(out *utext.Buffer) error {
 	g, e := s.namespaceImpAt(619)
 	if e != nil {
 		return e
 	}
 	return g.DisplayModulesInto(out)
 }
-func (s *GlobalParamsService) SourceDisplayModuleInto(out *StringBuffer64, name string) error {
+func (s *GlobalParamsService) SourceDisplayModuleInto(out *utext.Buffer, name string) error {
 	g, e := s.namespaceImpAt(624)
 	if e != nil {
 		return e
@@ -195,7 +196,7 @@ func (s *GlobalParamsService) SourceDisplayModuleInto(out *StringBuffer64, name 
 	}
 	return g.displayModuleKey(out, key)
 }
-func (s *GlobalParamsService) SourceDisplayParameterInto(out, debugOut *StringBuffer64, name string) error {
+func (s *GlobalParamsService) SourceDisplayParameterInto(out, debugOut *utext.Buffer, name string) error {
 	g, e := s.namespaceImpAt(629)
 	if e != nil {
 		return e

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type astBVLiteralFrame struct {
@@ -19,7 +20,7 @@ type astBVLiteralFrame struct {
 	placed, complete, consumed                 [4]bool
 	children                                   [5]util.RationalServiceInvocation
 	normalization                              astBVNormalizationReceipt
-	buffer                                     util.StringBuffer64
+	buffer                                     utext.Buffer
 	characters                                 astBVCharBuffer16
 	text                                       astBVIntegerText
 	stringBuffer, characterBuffer, textReached bool
@@ -365,7 +366,7 @@ func (m *ASTManager) ppBitVectorLiteralCore(h ASTHandle, signed, radix bool, g *
 	}
 	if !radix {
 		f.stringBuffer = true
-		if e = f.buffer.Init(util.StringBufferConfig{}); e != nil {
+		if e = f.buffer.Init(utext.Config{}); e != nil {
 			return out, e
 		}
 		if e = f.buffer.AppendCString("(_ bv"); e != nil {
@@ -379,7 +380,7 @@ func (m *ASTManager) ppBitVectorLiteralCore(h ASTHandle, signed, radix bool, g *
 		if e != nil {
 			return out, e
 		}
-		if e = f.buffer.AppendFloatCString(view); e != nil {
+		if e = view.AppendTo(&f.buffer); e != nil {
 			return out, e
 		}
 		if e = f.buffer.AppendCString(" "); e != nil {

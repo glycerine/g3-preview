@@ -1,9 +1,11 @@
 // Source: src/util/gparams.cpp:150-160,446-550,623-627; src/util/gparams.h.
 package util
 
-import usymbol "github.com/glycerine/g3/pkg/util/symbol"
-
-import "github.com/glycerine/g3/pkg/arena"
+import (
+	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
 // Region bindings are cold borrowed owners. The source stores char* without
 // reading it at registration; closed/stale referents fail only at output.
@@ -58,7 +60,7 @@ func (g *GlobalParams) RegisterModuleDescription(name string, region *arena.Byte
 	defer g.mu.Unlock()
 	return g.registerModuleDescription(name, region, ref, offset)
 }
-func (g *GlobalParams) descriptionInto(out *StringBuffer64, text GlobalParamCString) error {
+func (g *GlobalParams) descriptionInto(out *utext.Buffer, text GlobalParamCString) error {
 	if !text.Present {
 		return ErrParamsStreamFailure
 	}
@@ -88,9 +90,9 @@ func (g *GlobalParams) descriptionInto(out *StringBuffer64, text GlobalParamCStr
 		}
 	}
 }
-func (g *GlobalParams) moduleHeaderInto(out *StringBuffer64, key usymbol.Symbol) error {
+func (g *GlobalParams) moduleHeaderInto(out *utext.Buffer, key usymbol.Symbol) error {
 	if out == nil {
-		return ErrStringBufferOwner
+		return utext.ErrOwner
 	}
 	if e := out.AppendCString("[module] "); e != nil {
 		return e
@@ -117,7 +119,7 @@ func (g *GlobalParams) descriptorEntry(n uint32) (*ParamDescrs, error) {
 	}
 	return g.Descriptors[n-1], nil
 }
-func (g *GlobalParams) DisplayInto(out *StringBuffer64, indent uint32, smt2, includeDescr bool) error {
+func (g *GlobalParams) DisplayInto(out *utext.Buffer, indent uint32, smt2, includeDescr bool) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -127,7 +129,7 @@ func (g *GlobalParams) DisplayInto(out *StringBuffer64, indent uint32, smt2, inc
 		return e
 	}
 	if out == nil {
-		return ErrStringBufferOwner
+		return utext.ErrOwner
 	}
 	if e := out.AppendCString("Global parameters\n"); e != nil {
 		return e
@@ -160,7 +162,7 @@ func (g *GlobalParams) DisplayInto(out *StringBuffer64, indent uint32, smt2, inc
 	}
 	return nil
 }
-func (g *GlobalParams) DisplayModulesInto(out *StringBuffer64) error {
+func (g *GlobalParams) DisplayModulesInto(out *utext.Buffer) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -176,7 +178,7 @@ func (g *GlobalParams) DisplayModulesInto(out *StringBuffer64) error {
 	}
 	return nil
 }
-func (g *GlobalParams) DisplayModuleInto(out *StringBuffer64, name string) error {
+func (g *GlobalParams) DisplayModuleInto(out *utext.Buffer, name string) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -193,7 +195,7 @@ func (g *GlobalParams) DisplayModuleInto(out *StringBuffer64, name string) error
 }
 
 // Caller owns the existing imp lock and has reached its ordinary open guard.
-func (g *GlobalParams) displayModuleKey(out *StringBuffer64, key usymbol.Symbol) error {
+func (g *GlobalParams) displayModuleKey(out *utext.Buffer, key usymbol.Symbol) error {
 	d, found, e := g.findModuleDescriptor(key)
 	if e != nil {
 		return e
@@ -210,7 +212,7 @@ func (g *GlobalParams) displayModuleKey(out *StringBuffer64, key usymbol.Symbol)
 // DisplayParameterInto preserves the source's unsolicited stdout line in the
 // explicit debugOut stream before descriptor lookup. Binding that stream to
 // process stdout remains the runtime caller's job; it is not a global CLI.
-func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name string) error {
+func (g *GlobalParams) DisplayParameterInto(out, debugOut *utext.Buffer, name string) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -224,7 +226,7 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 		return e
 	}
 	if debugOut == nil {
-		return ErrStringBufferOwner
+		return utext.ErrOwner
 	}
 	if e = debugOut.AppendCString(name); e != nil {
 		return e
@@ -268,7 +270,7 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 		return g.unknownParameter(param, d, module)
 	}
 	if out == nil {
-		return ErrStringBufferOwner
+		return utext.ErrOwner
 	}
 	if e = out.AppendCString("  name:           "); e != nil {
 		return e

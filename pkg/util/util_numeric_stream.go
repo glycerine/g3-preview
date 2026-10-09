@@ -13,6 +13,7 @@ import (
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrNumericStreamOwner = errors.New("g3: invalid numeric stream owner")
@@ -65,7 +66,7 @@ type NumericTextStream struct {
 	mu           sync.Mutex
 	self         *NumericTextStream
 	Budget       *arena.Budget
-	Buffer       *StringBuffer64
+	Buffer       *utext.Buffer
 	File         *os.File
 	fileByte     [1]byte
 	FilePosition uint64
@@ -86,10 +87,10 @@ func NewNumericTextStream(c NumericTextStreamConfig) (*NumericTextStream, error)
 	if e := c.Budget.Reserve(header); e != nil {
 		return nil, e
 	}
-	var b *StringBuffer64
+	var b *utext.Buffer
 	var e error
 	if c.BorrowedFile == nil {
-		b, e = NewStringBuffer64(StringBufferConfig{})
+		b, e = utext.NewBuffer(utext.Config{})
 	}
 	if e != nil {
 		c.Budget.Release(header)

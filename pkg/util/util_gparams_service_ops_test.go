@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func gparamsNamespaceFixture(t *testing.T) (*GlobalParamsService, *arena.Budget) {
@@ -283,7 +284,7 @@ func TestGlobalParamsNamespaceDisplayUsesGoBuffer(t *testing.T) {
 	paramsMust(t, e)
 	paramsMust(t, g.ensureRegistered())
 	outputBudget := arena.NewBudget(0)
-	out, e := NewStringBuffer64(StringBufferConfig{})
+	out, e := utext.NewBuffer(utext.Config{})
 	paramsMust(t, e)
 	defer out.Close()
 	paramsMust(t, s.SourceDisplayModuleInto(out, "namespace"))

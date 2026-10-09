@@ -1,5 +1,5 @@
 // Source: src/util/string_buffer.h:48-188.
-package util
+package text
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestStringBuffer64TextNumbersAndReset(t *testing.T) {
-	b, e := NewStringBuffer64(StringBufferConfig{})
+	b, e := NewBuffer(Config{})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -52,11 +52,11 @@ func TestStringBuffer64TextNumbersAndReset(t *testing.T) {
 }
 
 func TestStringBuffer64AppendAndEmbeddedNUL(t *testing.T) {
-	a, e := NewStringBuffer64(StringBufferConfig{})
+	a, e := NewBuffer(Config{})
 	if e != nil {
 		t.Fatal(e)
 	}
-	b, e := NewStringBuffer64(StringBufferConfig{})
+	b, e := NewBuffer(Config{})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -74,7 +74,7 @@ func TestStringBuffer64AppendAndEmbeddedNUL(t *testing.T) {
 	if e = b.AppendCString("right"); e != nil {
 		t.Fatal(e)
 	}
-	if e = a.AppendBuffer64(b); e != nil {
+	if e = a.AppendBuffer(b); e != nil {
 		t.Fatal(e)
 	}
 	if e = a.AppendByte(0); e != nil {
@@ -89,14 +89,14 @@ func TestStringBuffer64AppendAndEmbeddedNUL(t *testing.T) {
 }
 
 func TestStringBuffer64LifecycleAndLongProfile(t *testing.T) {
-	if b, e := NewStringBuffer64(StringBufferConfig{LongBits: 16}); b != nil || !errors.Is(e, ErrStringBufferConfig) {
+	if b, e := NewBuffer(Config{LongBits: 16}); b != nil || !errors.Is(e, ErrConfig) {
 		t.Fatal(b, e)
 	}
-	b, e := NewStringBuffer64(StringBufferConfig{LongBits: 32})
+	b, e := NewBuffer(Config{LongBits: 32})
 	if e != nil {
 		t.Fatal(e)
 	}
-	if e = b.AppendLong(math.MaxInt32 + 1); !errors.Is(e, ErrStringBufferLongRange) {
+	if e = b.AppendLong(math.MaxInt32 + 1); !errors.Is(e, ErrLongRange) {
 		t.Fatal(e)
 	}
 	if e = b.Close(); e != nil {

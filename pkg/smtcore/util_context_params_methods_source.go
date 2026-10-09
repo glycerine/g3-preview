@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -20,7 +21,7 @@ type contextParamsFrame struct {
 	invocation, header                                                       uint64
 	key                                                                      OwnedString
 	descriptor                                                               util.ParamDescrs
-	buffer                                                                   util.StringBuffer64
+	buffer                                                                   utext.Buffer
 	value                                                                    util.ParamsRef
 	sourceReceipt                                                            util.ParamsSourceReceipt
 	setReceipt                                                               util.ParamsSetReceipt
@@ -276,7 +277,7 @@ func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result err
 }
 
 func (f *contextParamsFrame) initBuffer(_ *arena.Budget) {
-	_ = f.buffer.Init(util.StringBufferConfig{})
+	_ = f.buffer.Init(utext.Config{})
 	f.bufferComplete = true
 }
 func contextStringEqual(v util.ParamsStringView, text string) (bool, error) {
@@ -353,7 +354,7 @@ func (s *ContextParams) setSourceUInt(f *contextParamsFrame, opt *uint32, param,
 	*opt = uint32(number)
 	return nil
 }
-func appendContextView(out *util.StringBuffer64, v util.ParamsStringView) error {
+func appendContextView(out *utext.Buffer, v util.ParamsStringView) error {
 	// The selected char-pointer insertion obtains strlen before stream emission.
 	n, e := v.Length()
 	if e != nil {

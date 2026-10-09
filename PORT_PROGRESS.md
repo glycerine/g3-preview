@@ -30987,3 +30987,19 @@ claim datatype algorithm completion.
 
 Validation: complete AST and smtcore tests pass, as do focused checked/debug
 constructor/finalization tests, module-wide compilation, AST vet, and portcheck.
+
+## Extract native text buffers into util/text
+
+Moved the live bytes.Buffer-backed text helper and its focused tests to
+`pkg/util/text`, using `Buffer`, `Config`, and direct consumer imports. No root
+util alias remains. Moved borrowed floating-point text copying to
+`ArbitraryFloatFormattedCString.AppendTo` so the text leaf does not import
+numerical ownership. Preserved C-string truncation, integer formatting, source
+long-width checks, independent published copies, and lifecycle checks. Updated
+manifest targets and the package breakdown.
+
+Validation: focused native and g3checked,g3debug tests passed for buffers,
+parameters, descriptors, formatting, trace files, and numeric streams; focused
+native SMT2 tests passed. Complete AST, SMT core, and util/text suites passed.
+Module-wide test compilation, affected-package vet, and portcheck passed.
+The expensive full native suite was not repeated for this extraction.

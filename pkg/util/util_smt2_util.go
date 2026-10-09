@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrSMT2NeedsQuoting = errors.New("g3: SMT2 symbol does not satisfy quoting precondition")
@@ -76,7 +77,7 @@ func MkSMT2QuotedSymbol(m *usymbol.Manager, s usymbol.Symbol, _ *arena.Budget) (
 	if !needed {
 		return "", ErrSMT2NeedsQuoting
 	}
-	b, e := NewStringBuffer64(StringBufferConfig{})
+	b, e := utext.NewBuffer(utext.Config{})
 	if e != nil {
 		return "", e
 	}

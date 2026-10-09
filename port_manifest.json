@@ -109046,7 +109046,7 @@
       "role": "test",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_string_buffer.go"
+        "pkg/util/text/buffer.go"
       ],
       "tests": [
         "TestStringBuffer64TextNumbersAndReset"
@@ -109071,7 +109071,7 @@
         {
           "name": "tst1 Testing10true ENSURE at line27",
           "status": "ported",
-          "go_target": "pkg/util/util_string_buffer.go",
+          "go_target": "pkg/util/text/buffer.go",
           "tests": [
             "TestStringBuffer64TextNumbersAndReset"
           ]
@@ -109079,7 +109079,7 @@
         {
           "name": "tst2 length10000 ENSURE at line37",
           "status": "ported",
-          "go_target": "pkg/util/util_string_buffer.go",
+          "go_target": "pkg/util/text/buffer.go",
           "tests": [
             "TestStringBuffer64TextNumbersAndReset"
           ]
@@ -109087,7 +109087,7 @@
         {
           "name": "tst3 32<-128 Hello World ENSURE at line45 and registered tst_string_buffer",
           "status": "ported",
-          "go_target": "pkg/util/util_string_buffer.go",
+          "go_target": "pkg/util/text/buffer.go",
           "tests": [
             "TestStringBuffer64TextNumbersAndReset"
           ]
@@ -146818,7 +146818,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_string_buffer.go"
+        "pkg/util/text/buffer.go"
       ],
       "tests": [
         "TestStringBuffer64TextNumbersAndReset",
@@ -146877,7 +146877,7 @@
         {
           "name": "live INITIAL_SIZE64 fields, constructor, destructor and expand (lines31-58)",
           "status": "partial",
-          "go_target": "pkg/util/util_string_buffer.go",
+          "go_target": "pkg/util/text/buffer.go",
           "tests": [
             "TestStringBuffer64AppendAndEmbeddedNUL",
             "TestStringBuffer64LifecycleAndLongProfile"
@@ -146886,7 +146886,7 @@
         {
           "name": "reset, char and CString append (lines60-80)",
           "status": "ported",
-          "go_target": "pkg/util/util_string_buffer.go",
+          "go_target": "pkg/util/text/buffer.go",
           "tests": [
             "TestStringBuffer64TextNumbersAndReset",
             "TestStringBuffer64AppendAndEmbeddedNUL"
@@ -146895,7 +146895,7 @@
         {
           "name": "int, unsigned, long and bool append (lines82-119)",
           "status": "ported",
-          "go_target": "pkg/util/util_string_buffer.go",
+          "go_target": "pkg/util/text/buffer.go",
           "tests": [
             "TestStringBuffer64TextNumbersAndReset"
           ]
@@ -146903,7 +146903,7 @@
         {
           "name": "size, empty and mutating c_str (lines121-135)",
           "status": "ported",
-          "go_target": "pkg/util/util_string_buffer.go",
+          "go_target": "pkg/util/text/buffer.go",
           "tests": [
             "TestStringBuffer64AppendAndEmbeddedNUL"
           ]
@@ -146911,7 +146911,7 @@
         {
           "name": "six scalar insertion operators (lines139-173)",
           "status": "ported",
-          "go_target": "pkg/util/util_string_buffer.go",
+          "go_target": "pkg/util/text/buffer.go",
           "tests": [
             "TestStringBuffer64TextNumbersAndReset"
           ]
@@ -146919,7 +146919,7 @@
         {
           "name": "live INITIAL_SIZE64 self-type buffer insertion (lines175-179)",
           "status": "partial",
-          "go_target": "pkg/util/util_string_buffer.go",
+          "go_target": "pkg/util/text/buffer.go",
           "tests": [
             "TestStringBuffer64TextNumbersAndReset",
             "TestStringBuffer64AppendAndEmbeddedNUL"
@@ -146937,7 +146937,7 @@
         }
       ],
       "ownership": [
-        "The retained Go implementation is only the live INITIAL_SIZE64 specialization. INITIAL_SIZE32 and INITIAL_SIZE128 had no production Go consumers and were removed with their representation-only tests. The remaining owner still uses the earlier explicit inline/overflow storage pending conversion to bytes.Buffer."
+        "The retained Go implementation is only the live INITIAL_SIZE64 specialization. INITIAL_SIZE32 and INITIAL_SIZE128 had no production Go consumers and were removed with their representation-only tests. The native util/text.Buffer uses bytes.Buffer storage. Consumers import the leaf directly; borrowed arbitrary-float text is appended through ArbitraryFloatFormattedCString.AppendTo, keeping numeric ownership outside the text leaf."
       ],
       "deviations": [
         "Current Go production consumers use only INITIAL_SIZE64. Other live upstream specializations remain deferred until their consumers are ported and should use native Go text buffers rather than restoring template-width variants."
@@ -147132,7 +147132,7 @@
         "pkg/util/symbol/bytes.go",
         "pkg/util/symbol/hash.go",
         "pkg/util/symbol/symbol.go",
-        "pkg/util/util_string_buffer.go",
+        "pkg/util/text/buffer.go",
         "pkg/util/symbol/service.go",
         "pkg/util/symbol/service_test.go",
         "pkg/util/util_gparams_service_ops.go",
@@ -147300,7 +147300,7 @@
         {
           "name": "string_buffer32/64/128 symbol insertion (lines113-129): plain/null bulk, numerical k! then signed UNBOXINT",
           "status": "ported",
-          "go_target": "pkg/util/util_string_buffer.go",
+          "go_target": "pkg/util/text/buffer.go",
           "tests": [
             "TestStringBuffer64TextNumbersAndReset",
             "TestStringBuffer64LifecycleAndLongProfile"

@@ -4,8 +4,8 @@ package ast
 import (
 	"math"
 
-	"github.com/glycerine/g3/pkg/util"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // The special token denotes only this manager's active lexical info object.
@@ -81,7 +81,7 @@ func (m *ASTManager) MkFreshConstNullable(prefix *string, sort ASTHandle) (ASTHa
 
 // This concrete source else scope destroys buffer before fresh_id publication.
 func (m *ASTManager) freshNamedDecl(prefix, suffix usymbol.Symbol, domain []ASTHandle, sort ASTHandle, info ASTFuncDeclInfo) (astNodeRef, error) {
-	var buffer util.StringBuffer64
+	var buffer utext.Buffer
 	defer buffer.Close()
 	if e := buffer.AppendSymbol(m.Symbols, prefix); e != nil {
 		return astNodeRef{}, e

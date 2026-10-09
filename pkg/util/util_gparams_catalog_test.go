@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func catalogTestConfig(b *arena.Budget) GlobalParamsCatalogConfig {
@@ -96,7 +97,7 @@ func TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher(t *testing.T) {
 		if !ok {
 			t.Fatal(row)
 		}
-		out, e := NewStringBuffer64(StringBufferConfig{})
+		out, e := utext.NewBuffer(utext.Config{})
 		paramsMust(t, e)
 		paramsMust(t, g.descriptionInto(out, entry))
 		text, e := out.CStr()
@@ -159,7 +160,7 @@ func TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix(t *t
 	}()
 	paramsMust(t, g.ensureRegistered())
 	paramsMust(t, c.Region.Write(c.descriptions[15], 0, 'T'))
-	out, e := NewStringBuffer64(StringBufferConfig{})
+	out, e := utext.NewBuffer(utext.Config{})
 	paramsMust(t, e)
 	defer out.Close()
 	key, e := sy.Intern("ackermannization")

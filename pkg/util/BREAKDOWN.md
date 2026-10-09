@@ -27,7 +27,7 @@ delete or defer the port instead of giving dead code a new home.
 
 The extraction work now includes `util/filepath`, `util/approx`,
 `util/messages`, `util/natset`, `util/stack`, `util/bitset`, `util/luby`,
-`util/statistics`, `util/control`, and `util/prime`.
+`util/statistics`, `util/control`, `util/prime`, and `util/text`.
 The bitset
 package owns the native variable-width, fast-reset, fixed-width, and unsigned
 set implementations. It imports `arena` directly for fixed-width pooled
@@ -1018,3 +1018,14 @@ ownership, and finalization. C++ datatype definitions and utility operations
 remain live and unported. Concrete native maps/slices should be introduced only
 when their functional Go consumers are ported; empty source templates do not
 justify another dependency on the container infrastructure.
+
+## Native text buffer extraction
+
+The live `string_buffer.h` behavior now resides in `util/text.Buffer`, backed
+by `bytes.Buffer`. Consumers import this package directly; root util has no
+forwarding alias. Its imports contain no numerical implementation. The one
+floating-point bridge is `ArbitraryFloatFormattedCString.AppendTo`, owned by
+the numerical value in root util, so numerical package extraction can proceed
+without introducing a text-to-numerics dependency. Existing C-string truncation,
+source integer formatting, long-width profiles, and borrowed-value lifetime
+checks remain covered by the buffer and numeric integration tests.

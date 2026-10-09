@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestStringBufferMPFBorrowedCStringLiteralAppendAndLifetime(t *testing.T) {
@@ -15,10 +16,10 @@ func TestStringBufferMPFBorrowedCStringLiteralAppendAndLifetime(t *testing.T) {
 	paramsMust(t, text.AssignLiteral(strings.Repeat("1", 80)))
 	view, e := text.CString()
 	paramsMust(t, e)
-	out, e := NewStringBuffer64(StringBufferConfig{})
+	out, e := utext.NewBuffer(utext.Config{})
 	paramsMust(t, e)
 	paramsMust(t, out.AppendCString("RTZ "))
-	paramsMust(t, out.AppendFloatCString(view))
+	paramsMust(t, view.AppendTo(out))
 	got, e := out.CStr()
 	paramsMust(t, e)
 	if got != "RTZ "+strings.Repeat("1", 80) {
@@ -26,7 +27,7 @@ func TestStringBufferMPFBorrowedCStringLiteralAppendAndLifetime(t *testing.T) {
 	}
 	paramsMust(t, text.SourceFinalize())
 	before := out.Stats()
-	if out.AppendFloatCString(view) == nil || out.Stats() != before {
+	if view.AppendTo(out) == nil || out.Stats() != before {
 		t.Fatal("ended source CString changed buffer")
 	}
 	paramsMust(t, text.Close())
@@ -43,12 +44,12 @@ func TestStringBufferMPFBorrowedCStringGoBufferGrowth(t *testing.T) {
 	paramsMust(t, text.AssignLiteral(strings.Repeat("7", 300)))
 	view, e := text.CString()
 	paramsMust(t, e)
-	out, e := NewStringBuffer64(StringBufferConfig{})
+	out, e := utext.NewBuffer(utext.Config{})
 	paramsMust(t, e)
 	paramsMust(t, out.AppendCString("prefix "))
 	before := b.Used()
 	b.FailAfter(0)
-	paramsMust(t, out.AppendFloatCString(view))
+	paramsMust(t, view.AppendTo(out))
 	if b.Used() != before || out.Position() != 307 {
 		t.Fatal("Go buffer touched numeric arena", b.Used(), before, out.Stats())
 	}

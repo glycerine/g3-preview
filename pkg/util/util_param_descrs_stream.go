@@ -1,12 +1,15 @@
 package util
 
-import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+import (
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
 // DisplayInto emits source param_descrs::display into a borrowed byte buffer.
 // Error keeps the prefix emitted before it.
-func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, includeDescr bool) error {
+func (d *ParamDescrs) DisplayInto(dst *utext.Buffer, indent uint32, smt2, includeDescr bool) error {
 	if dst == nil {
-		return ErrStringBufferOwner
+		return utext.ErrOwner
 	}
 	if d == nil {
 		return ErrParamDescrsPrecondition
@@ -86,7 +89,7 @@ func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, incl
 	}
 	return nil
 }
-func (d *ParamDescrs) writeNameInto(dst *StringBuffer64, k usymbol.Symbol, smt2 bool) error {
+func (d *ParamDescrs) writeNameInto(dst *utext.Buffer, k usymbol.Symbol, smt2 bool) error {
 	m := d.manager
 	if e := m.Validate(k); e != nil {
 		return e
@@ -113,6 +116,6 @@ func (d *ParamDescrs) writeNameInto(dst *StringBuffer64, k usymbol.Symbol, smt2 
 	}
 	return nil
 }
-func (d *ParamDescrs) writeTextInto(dst *StringBuffer64, r paramDescrText) error {
+func (d *ParamDescrs) writeTextInto(dst *utext.Buffer, r paramDescrText) error {
 	return dst.AppendCString(r.value)
 }

@@ -6,16 +6,17 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func pdStreamBuffer(t *testing.T, b *arena.Budget) *StringBuffer64 {
+func pdStreamBuffer(t *testing.T, b *arena.Budget) *utext.Buffer {
 	t.Helper()
-	s, e := NewStringBuffer64(StringBufferConfig{})
+	s, e := utext.NewBuffer(utext.Config{})
 	paramsMust(t, e)
 	t.Cleanup(func() { paramsMust(t, s.Close()) })
 	return s
 }
-func pdStreamText(t *testing.T, b *StringBuffer64) string {
+func pdStreamText(t *testing.T, b *utext.Buffer) string {
 	t.Helper()
 	s, e := b.CStr()
 	paramsMust(t, e)
@@ -105,7 +106,7 @@ func TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner(t *testing.T) {
 	if got := pdStreamText(t, b); got != "p  " {
 		t.Fatal("guard must occur at source name action", got)
 	}
-	if e := d.DisplayInto(nil, 0, false, false); !errors.Is(e, ErrStringBufferOwner) {
+	if e := d.DisplayInto(nil, 0, false, false); !errors.Is(e, utext.ErrOwner) {
 		t.Fatal(e)
 	}
 	copied := &ParamDescrs{Self: d, manager: m}

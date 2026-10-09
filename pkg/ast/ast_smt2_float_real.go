@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // Concrete source stack values live in this charged cold invocation header.
@@ -27,7 +28,7 @@ type astFloatLiteralFrame struct {
 	bvRefAcquired, bvRefConsumed                       [2]bool
 	bvChildren                                         [4]astFloatBVChild
 	copy                                               util.ArbitraryFloatValueCopyReceipt
-	buffer                                             util.StringBuffer64
+	buffer                                             utext.Buffer
 	text                                               *util.ArbitraryFloatFormatText
 	header, invocation                                 uint64
 	valueConstructed, valueConsumed, bufferConstructed bool
@@ -184,7 +185,7 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 	f.self = f
 	p.literalFrames = f
 	// source scoped_mpf precedes get_manager and the default string_buffer.
-	if e = f.buffer.Init(util.StringBufferConfig{}); e != nil {
+	if e = f.buffer.Init(utext.Config{}); e != nil {
 		return out, e
 	}
 	f.bufferConstructed = true
@@ -276,7 +277,7 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *util.Globa
 		if e != nil {
 			return out, e
 		}
-		if e = b.AppendFloatCString(view); e != nil {
+		if e = view.AppendTo(b); e != nil {
 			return out, e
 		}
 	}

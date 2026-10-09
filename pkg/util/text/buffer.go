@@ -1,39 +1,40 @@
 // Source: src/util/string_buffer.h:48-188.
-package util
+package text
 
 import (
 	"bytes"
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var (
-	ErrStringBufferOwner     = errors.New("g3: invalid string buffer owner")
-	ErrStringBufferConfig    = errors.New("g3: invalid string buffer long-width profile")
-	ErrStringBufferLongRange = errors.New("g3: string buffer value outside source long domain")
+	ErrOwner     = errors.New("g3: invalid string buffer owner")
+	ErrConfig    = errors.New("g3: invalid string buffer long-width profile")
+	ErrLongRange = errors.New("g3: string buffer value outside source long domain")
 )
 
 // LongBits selects the source ABI long width, default LP64. The unsigned
 // overload deliberately uses signed 32-bit interpretation matching this
 // fork's %d baseline.
-type StringBufferConfig struct {
+type Config struct {
 	LongBits uint32
 }
 
-// StringBufferStats retains the reporting shape used by existing callers.
+// Stats retains the reporting shape used by existing callers.
 // bytes.Buffer owns ordinary Go memory, so the arena accounting fields are zero.
-type StringBufferStats struct {
+type Stats struct {
 	Position, Capacity                     uint64
 	OwnerBytes, InlineBytes, OverflowBytes uint64
 	LongBits                               uint32
 }
 
-// StringBuffer64 is the live specialization of the source string_buffer.
+// Buffer is the live specialization of the source string_buffer.
 // Its storage uses the standard library; the zero value is ready for use.
-type StringBuffer64 struct {
+type Buffer struct {
 	buffer   bytes.Buffer
 	longBits uint32
 	closed   bool
@@ -44,13 +45,13 @@ func stringBufferLongBits(bits uint32) (uint32, error) {
 		return 64, nil
 	}
 	if bits != 32 && bits != 64 {
-		return 0, ErrStringBufferConfig
+		return 0, ErrConfig
 	}
 	return bits, nil
 }
 
-func NewStringBuffer64(c StringBufferConfig) (*StringBuffer64, error) {
-	b := new(StringBuffer64)
+func NewBuffer(c Config) (*Buffer, error) {
+	b := new(Buffer)
 	if err := b.Init(c); err != nil {
 		return nil, err
 	}
@@ -58,21 +59,21 @@ func NewStringBuffer64(c StringBufferConfig) (*StringBuffer64, error) {
 }
 
 // Init configures an embedded buffer. Calling it discards prior contents.
-func (b *StringBuffer64) Init(c StringBufferConfig) error {
+func (b *Buffer) Init(c Config) error {
 	if b == nil {
-		return ErrStringBufferOwner
+		return ErrOwner
 	}
 	bits, err := stringBufferLongBits(c.LongBits)
 	if err != nil {
 		return err
 	}
-	*b = StringBuffer64{longBits: bits}
+	*b = Buffer{longBits: bits}
 	return nil
 }
 
-func (b *StringBuffer64) open() error {
+func (b *Buffer) open() error {
 	if b == nil {
-		return ErrStringBufferOwner
+		return ErrOwner
 	}
 	if b.closed {
 		return arena.ErrClosed
@@ -80,21 +81,21 @@ func (b *StringBuffer64) open() error {
 	return nil
 }
 
-func (b *StringBuffer64) bits() uint32 {
+func (b *Buffer) bits() uint32 {
 	if b.longBits == 0 {
 		return 64
 	}
 	return b.longBits
 }
 
-func (b *StringBuffer64) AppendByte(v byte) error {
+func (b *Buffer) AppendByte(v byte) error {
 	if err := b.open(); err != nil {
 		return err
 	}
 	return b.buffer.WriteByte(v)
 }
 
-func (b *StringBuffer64) AppendBytes(v []byte) error {
+func (b *Buffer) AppendBytes(v []byte) error {
 	if err := b.open(); err != nil {
 		return err
 	}
@@ -102,40 +103,43 @@ func (b *StringBuffer64) AppendBytes(v []byte) error {
 	return err
 }
 
-func (b *StringBuffer64) AppendCString(v string) error {
+func (b *Buffer) AppendCString(v string) error {
 	if err := b.open(); err != nil {
 		return err
 	}
-	_, err := b.buffer.WriteString(v[:nulStringLength(v)])
+	if i := strings.IndexByte(v, 0); i >= 0 {
+		v = v[:i]
+	}
+	_, err := b.buffer.WriteString(v)
 	return err
 }
 
-func (b *StringBuffer64) appendNumber(v int64) error {
+func (b *Buffer) appendNumber(v int64) error {
 	var text [24]byte
 	return b.AppendBytes(strconv.AppendInt(text[:0], v, 10))
 }
 
-func (b *StringBuffer64) AppendInt32(v int32) error   { return b.appendNumber(int64(v)) }
-func (b *StringBuffer64) AppendUInt32(v uint32) error { return b.appendNumber(int64(int32(v))) }
+func (b *Buffer) AppendInt32(v int32) error   { return b.appendNumber(int64(v)) }
+func (b *Buffer) AppendUInt32(v uint32) error { return b.appendNumber(int64(int32(v))) }
 
-func (b *StringBuffer64) AppendLong(v int64) error {
+func (b *Buffer) AppendLong(v int64) error {
 	if err := b.open(); err != nil {
 		return err
 	}
 	if b.bits() == 32 && (v < -2147483648 || v > 2147483647) {
-		return ErrStringBufferLongRange
+		return ErrLongRange
 	}
 	return b.appendNumber(v)
 }
 
-func (b *StringBuffer64) AppendBool(v bool) error {
+func (b *Buffer) AppendBool(v bool) error {
 	if v {
 		return b.AppendCString("true")
 	}
 	return b.AppendCString("false")
 }
 
-func (b *StringBuffer64) AppendSymbol(m *usymbol.Manager, v usymbol.Symbol) error {
+func (b *Buffer) AppendSymbol(m *usymbol.Manager, v usymbol.Symbol) error {
 	if err := b.open(); err != nil {
 		return err
 	}
@@ -161,7 +165,7 @@ func (b *StringBuffer64) AppendSymbol(m *usymbol.Manager, v usymbol.Symbol) erro
 	return b.AppendCString(text)
 }
 
-func (b *StringBuffer64) Reset() error {
+func (b *Buffer) Reset() error {
 	if err := b.open(); err != nil {
 		return err
 	}
@@ -169,7 +173,7 @@ func (b *StringBuffer64) Reset() error {
 	return nil
 }
 
-func (b *StringBuffer64) CStr() (string, error) {
+func (b *Buffer) CStr() (string, error) {
 	if err := b.open(); err != nil {
 		return "", err
 	}
@@ -181,14 +185,14 @@ func (b *StringBuffer64) CStr() (string, error) {
 }
 
 // BytesCopy returns the counted contents, including bytes after embedded NULs.
-func (b *StringBuffer64) BytesCopy() ([]byte, error) {
+func (b *Buffer) BytesCopy() ([]byte, error) {
 	if err := b.open(); err != nil {
 		return nil, err
 	}
 	return bytes.Clone(b.buffer.Bytes()), nil
 }
 
-func (b *StringBuffer64) Read(i uint64) (byte, error) {
+func (b *Buffer) Read(i uint64) (byte, error) {
 	if err := b.open(); err != nil {
 		return 0, err
 	}
@@ -198,33 +202,33 @@ func (b *StringBuffer64) Read(i uint64) (byte, error) {
 	return b.buffer.Bytes()[i], nil
 }
 
-func (b *StringBuffer64) Size() uint32 { return uint32(b.Position()) }
+func (b *Buffer) Size() uint32 { return uint32(b.Position()) }
 
-func (b *StringBuffer64) Position() uint64 {
+func (b *Buffer) Position() uint64 {
 	if b.open() != nil {
 		return 0
 	}
 	return uint64(b.buffer.Len())
 }
 
-func (b *StringBuffer64) Empty() bool { return b.Position() == 0 }
+func (b *Buffer) Empty() bool { return b.Position() == 0 }
 
-func (b *StringBuffer64) Stats() StringBufferStats {
+func (b *Buffer) Stats() Stats {
 	if b.open() != nil {
-		return StringBufferStats{}
+		return Stats{}
 	}
-	return StringBufferStats{
+	return Stats{
 		Position: uint64(b.buffer.Len()),
 		Capacity: uint64(b.buffer.Cap()),
 		LongBits: b.bits(),
 	}
 }
 
-func (b *StringBuffer64) Closed() bool { return b == nil || b.closed }
+func (b *Buffer) Closed() bool { return b == nil || b.closed }
 
-func (b *StringBuffer64) Close() error {
+func (b *Buffer) Close() error {
 	if b == nil {
-		return ErrStringBufferOwner
+		return ErrOwner
 	}
 	if b.closed {
 		return nil
@@ -234,7 +238,7 @@ func (b *StringBuffer64) Close() error {
 	return nil
 }
 
-func (b *StringBuffer64) AppendBuffer64(src *StringBuffer64) error {
+func (b *Buffer) AppendBuffer(src *Buffer) error {
 	if err := b.open(); err != nil {
 		return err
 	}
