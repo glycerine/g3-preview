@@ -17,7 +17,6 @@ func polynomialTLSCloseFull(t *testing.T, m *MultivariatePolynomialManager, r *u
 		if attempts > 64 {
 			t.Fatal("bounded actual owning continuation")
 		}
-		oldDirectory := m.core.polynomials.raw
 		var oldCells [2]*polynomialLocation
 		var oldObjects [2]util.ObjectRef
 		for i, p := range [2]Polynomial{m.core.zero, m.core.unit} {
@@ -38,7 +37,7 @@ func polynomialTLSCloseFull(t *testing.T, m *MultivariatePolynomialManager, r *u
 		if !errors.Is(e, arena.ErrBounds) {
 			t.Fatal("actual reached owner refusal", e)
 		}
-		consumed := oldDirectory != (util.Block{}) && m.core.polynomials.raw == (util.Block{})
+		consumed := false
 		for i, l := range oldCells {
 			if l != nil && l.released {
 				if _, readErr := mm.allocator.ReadUint32(oldObjects[i], 0); readErr == nil {
@@ -48,18 +47,13 @@ func polynomialTLSCloseFull(t *testing.T, m *MultivariatePolynomialManager, r *u
 			}
 		}
 		if consumed {
-			if oldDirectory != (util.Block{}) && m.core.polynomials.raw == (util.Block{}) {
-				if _, readErr := r.ReadUint32(oldDirectory, 0); readErr == nil {
-					t.Fatal("old directory not physically consumed")
-				}
-			}
 			if m.core.ids.FreeCapacity() == 0 {
 				t.Fatal("actual new ID backing missing")
 			}
 			polynomialImpPhysicalAuditNamedRaw(t, m, nil, nil, 0, nil)
 		}
 		if !consumed && r.Stats().LiveBlocks >= live {
-			t.Fatal("no reached physical owning progress", e, m.cleanupStage, m.core.closeStage, m.core.zero, m.core.unit, m.core.ids.FreeCapacity(), oldDirectory, m.core.polynomials.raw, live, r.Stats().LiveBlocks)
+			t.Fatal("no reached physical owning progress", e, m.cleanupStage, m.core.closeStage, m.core.zero, m.core.unit, m.core.ids.FreeCapacity(), live, r.Stats().LiveBlocks)
 		}
 	}
 }

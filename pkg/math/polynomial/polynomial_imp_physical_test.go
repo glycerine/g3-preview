@@ -287,7 +287,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		cell(m.pending.value, l.initializedCoefficients)
 	}
 
-	vectors := []*polynomialVector{&m.rationalTerms, &m.linearTerms, &m.linearMonomials, &m.polynomials}
+	vectors := []*polynomialVector{&m.rationalTerms, &m.linearTerms}
 	adapterBytes += full.skeletons.header
 	seenSkeleton := map[*PolynomialSkeleton]bool{}
 	addSkeleton := func(sk *PolynomialSkeleton) {
@@ -514,7 +514,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	if uint32(len(raw))+za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
 		t.Fatal("unnamed Runtime root", len(raw), za, ma, m.memory.Stats())
 	}
-	bytes := uint64(cap(m.linearGenerated)) + uint64(m.ids.FreeCapacity())*4 + integerActualOwnedBytes(z) + m.header + mmBytes + uint64(cap(m.locations))*uint64(reflect.TypeOf(polynomialLocation{}).Size())
+	bytes := uint64(m.ids.FreeCapacity())*4 + integerActualOwnedBytes(z) + m.header + mmBytes + uint64(cap(m.locations))*uint64(reflect.TypeOf(polynomialLocation{}).Size())
 	if mm != nil {
 		bytes += uint64(mm.ids.FreeCapacity()) * 4
 	}

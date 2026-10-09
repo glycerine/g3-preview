@@ -221,19 +221,44 @@ func TestPolynomialDeletionPeerActionsAndDirectoryGrowth(t *testing.T) {
 				serviceMust(t, m.IncRef(peer))
 				polynomialCallbackObservation.peers[0] = peer
 			}
+			before, e := m.Info(p)
+			serviceMust(t, e)
+			oldDirectoryCapacity := cap(m.polynomials)
 			oldCapacity := cap(m.locations)
 			serviceMust(t, m.DecRef(p))
 			if _, e = m.polynomialLocation(p); e != ErrPolynomialOwner {
 				t.Fatal("outer deletion did not consume real current", e)
 			}
 			serviceMust(t, m.RemoveDeletionHandler(h))
+			if m.polynomials[before.ID] != (Polynomial{}) {
+				t.Fatal("deleted ID retained a live directory handle")
+			}
 			if tag == 7 {
 				if cap(m.locations) <= oldCapacity {
 					t.Fatal("actual callback did not grow cold directory")
 				}
+				if cap(m.polynomials) <= oldDirectoryCapacity {
+					t.Fatal("callback did not grow native polynomial directory")
+				}
+				// ID reuse must publish the replacement into the grown directory while
+				// retaining the two independently created callback peers.
+				replacement, e := m.MkVariable(0, 2)
+				serviceMust(t, e)
+				serviceMust(t, m.IncRef(replacement))
+				info, e := m.Info(replacement)
+				serviceMust(t, e)
+				if info.ID != before.ID || m.polynomials[info.ID] != replacement {
+					t.Fatal("recycled ID publication", info.ID, before.ID)
+				}
 				for _, peer := range polynomialCallbackObservation.peers {
+					info, e := m.Info(peer)
+					serviceMust(t, e)
+					if m.polynomials[info.ID] != peer {
+						t.Fatal("directory growth lost callback peer", info.ID)
+					}
 					serviceMust(t, m.DecRef(peer))
 				}
+				serviceMust(t, m.DecRef(replacement))
 			} else {
 				if polynomialCallbackObservation.count != 2 || polynomialCallbackObservation.values[0] != p || polynomialCallbackObservation.values[1] != polynomialCallbackObservation.peers[0] {
 					t.Fatal("nested actual arguments/order", polynomialCallbackObservation)

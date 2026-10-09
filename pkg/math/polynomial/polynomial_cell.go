@@ -373,16 +373,10 @@ func (m *MultivariatePolynomialCore) deleteCoreMode(p Polynomial, owning bool) e
 			return e
 		}
 		id := f & 0x7fffffff
-		n, e := m.polynomials.size(m)
-		if e != nil {
-			return e
-		}
-		if id >= n {
+		if uint64(id) >= uint64(len(m.polynomials)) {
 			return arena.ErrBounds
 		}
-		if e = m.polynomials.putMonomial(m, id, Monomial{}); e != nil {
-			return e
-		}
+		m.polynomials[id] = Polynomial{}
 		l.deleteStage = 4
 	}
 	if l.deleteStage == 4 {

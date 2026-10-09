@@ -291,25 +291,17 @@ func (m *MultivariatePolynomialCore) prepareLocation() (uint32, error) {
 	m.locations[n-1].generation = 1
 	return uint32(n), nil
 }
+
+// The source directory is an ID-indexed, nonowning collection of live handles.
 func (m *MultivariatePolynomialCore) publishDirectory(p Polynomial, id uint32) error {
-	n, e := m.polynomials.size(m)
-	if e != nil {
-		return e
+	for uint64(len(m.polynomials)) <= uint64(id) {
+		m.polynomials = append(m.polynomials, Polynomial{})
 	}
-	for n <= id {
-		if e = m.polynomials.appendMonomial(m, Monomial{}); e != nil {
-			return e
-		}
-		n++
-	}
-	old, e := m.polynomials.monomial(m, id)
-	if e != nil {
-		return e
-	}
-	if polynomialSourceDebug && old != (Monomial{}) {
+	if polynomialSourceDebug && m.polynomials[id] != (Polynomial{}) {
 		return ErrPolynomialAssertion
 	}
-	return m.polynomials.putMonomial(m, id, Monomial{owner: p.owner, slot: p.slot, generation: p.generation})
+	m.polynomials[id] = p
+	return nil
 }
 func (m *MultivariatePolynomialCore) mkCell(n uint32, as []util.Int, ms []Monomial, buffer *polynomialSOM, single *util.Int) (Polynomial, error) {
 	return m.mkCellWithReceipt(n, as, ms, buffer, single, nil)

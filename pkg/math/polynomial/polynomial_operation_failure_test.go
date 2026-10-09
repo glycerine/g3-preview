@@ -236,9 +236,7 @@ func polynomialOperationMonomialAudit(t *testing.T, m *MultivariatePolynomialCor
 	}
 	for i, owned := range m.linearGenerated {
 		if owned {
-			a, e := m.linearMonomials.monomial(m, uint32(i))
-			serviceMust(t, e)
-			add(a)
+			add(m.linearMonomials[i])
 		}
 	}
 	cells := append([]Polynomial{m.zero, m.unit, m.overloadResult, m.negativeResult, m.constantScope.result, m.exactDivision.returned, m.translation.freshResult}, callers...)

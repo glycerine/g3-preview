@@ -6,14 +6,10 @@ import "github.com/glycerine/g3/pkg/arena"
 // A borrowed span of actual monomial handles. This view owns no references.
 type monomialArrayView struct {
 	values []Monomial
-	vector *polynomialVector
 	count  uint32
 }
 
-func (v monomialArrayView) at(m *MultivariatePolynomialCore, i uint32) (Monomial, error) {
-	if v.vector != nil {
-		return v.vector.monomial(m, i)
-	}
+func (v monomialArrayView) at(i uint32) (Monomial, error) {
 	if i >= v.count || uint64(i) >= uint64(len(v.values)) {
 		return Monomial{}, arena.ErrBounds
 	}

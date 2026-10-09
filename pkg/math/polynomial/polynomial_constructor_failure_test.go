@@ -126,8 +126,8 @@ func TestPolynomialConstructorCompletedMembersUnwindBeforeReturn(t *testing.T) {
 			if m.sourceStarted || m.sourceStage != 0 {
 				t.Error("member unwind substituted completed imp destructor")
 			}
-			if m.polynomials.raw != (util.Block{}) {
-				t.Error("published directory backing survived completed member unwind")
+			if m.polynomials != nil {
+				t.Error("native directory survived completed member unwind")
 			}
 			if m.header == 0 || m.modular == nil || m.modular.Header == 0 || m.completed || !m.monomialRetained {
 				t.Error("charged retained owner/member/body distinction")

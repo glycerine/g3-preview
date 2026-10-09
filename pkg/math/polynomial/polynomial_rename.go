@@ -47,20 +47,11 @@ func (m *MultivariatePolynomialManager) Rename(xs []uint32) error {
 	if e := m.core.monomials.Rename(xs); e != nil {
 		return e
 	}
-	n, e := m.core.polynomials.size(m.core)
-	if e != nil {
-		return e
-	}
-	for i := uint32(0); i < n; i++ {
-		token, e := m.core.polynomials.monomial(m.core, i)
-		if e != nil {
-			return e
-		}
-		if token == (Monomial{}) {
+	for _, p := range m.core.polynomials {
+		if p == (Polynomial{}) {
 			continue
 		}
-		p := Polynomial{owner: token.owner, slot: token.slot, generation: token.generation}
-		if e = m.core.makeFirstMaximal(p); e != nil {
+		if e := m.core.makeFirstMaximal(p); e != nil {
 			return e
 		}
 		if polynomialSourceDebug {

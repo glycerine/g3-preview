@@ -116,7 +116,7 @@ type MultivariatePolynomialCore struct {
 	monomials                                                    *MonomialManager
 	memory                                                       *util.Runtime
 	ids                                                          idgen.Generator
-	polynomials                                                  polynomialVector
+	polynomials                                                  []Polynomial
 	locations                                                    []polynomialLocation
 	squareRootOwner                                              *polynomialSquareRootScope
 	derivativeOwner                                              *polynomialDerivativeScope
@@ -128,7 +128,7 @@ type MultivariatePolynomialCore struct {
 	zeroNumeral                                                  util.Int
 	minusOne, constantCopy                                       util.Int
 	rationalTerms, linearTerms                                   polynomialVector
-	linearMonomials                                              polynomialVector
+	linearMonomials                                              []Monomial
 	origin, header                                               uint64
 	live                                                         uint32
 	closeStage                                                   uint8
@@ -212,7 +212,6 @@ func preparePolynomialCore(c MultivariatePolynomialConfig, requireMonomials bool
 	return m, nil
 }
 func (m *MultivariatePolynomialCore) constructPolynomialCoreDefaults() error {
-	m.polynomials.width = 16
 	m.directoryInitialized = true
 	m.ids = idgen.NewBudgeted(0, m.integer.Budget(), func() bool { return m.memory.State().OutOfMemory })
 	m.idsInitialized = true
@@ -224,10 +223,8 @@ func (m *MultivariatePolynomialCore) initializePolynomialCoreBody() error {
 		return e
 	}
 	m.monomialRetained = true
-	m.polynomials.width = 16
 	m.rationalTerms.width = 12
 	m.linearTerms.width = 12
-	m.linearMonomials.width = 16
 	m.som.init(m, false)
 	m.som2.init(m, false)
 	m.cheap.init(m, true)
@@ -646,11 +643,12 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 		}
 		m.closeStage++
 	}
-	for _, v := range [4]*polynomialVector{&m.rationalTerms, &m.linearTerms, &m.linearMonomials, &m.polynomials} {
+	for _, v := range [2]*polynomialVector{&m.rationalTerms, &m.linearTerms} {
 		if e := v.close(m); e != nil {
 			return e
 		}
 	}
+	m.polynomials, m.linearMonomials = nil, nil
 	if m.idsInitialized || m.idsSourceDestroyed {
 		m.ids.Cleanup(0)
 		m.idsInitialized = false
@@ -692,7 +690,6 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 			return e
 		}
 	}
-	m.integer.Budget().Release(uint64(cap(m.linearGenerated)))
 	m.linearGenerated = nil
 	m.integer.Budget().Release(uint64(cap(m.locations)) * uint64(reflect.TypeOf(polynomialLocation{}).Size()))
 	m.locations = nil

@@ -129,7 +129,6 @@ func NewMultivariatePolynomialManager(c MultivariatePolynomialManagerConfig) (*M
 	// Source declaration order: directory, ID, m2pos, then actual imp tmp1.
 	m.core.rationalTerms.width = 12
 	m.core.linearTerms.width = 12
-	m.core.linearMonomials.width = 16
 	if e = monomialTempConstruct(m.core.memory, &m.core.tmp1); e != nil {
 		return fail(e)
 	}

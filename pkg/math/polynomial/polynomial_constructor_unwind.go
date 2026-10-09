@@ -29,13 +29,9 @@ func (m *MultivariatePolynomialCore) unwindConstructorMembers() error {
 	}
 	if m.constructorUnwindStage == 1 {
 		m.directorySourceDestroyed = m.directoryInitialized
-		// The published pointer-vector backing belongs to the completed
-		// member. A failed initial lexical allocation remains pending and
-		// belongs only to explicit owning cleanup, not this destructor.
-		if m.directoryInitialized && m.polynomials.raw != (util.Block{}) {
-			if e := m.memory.Deallocate(&m.polynomials.raw); e != nil {
-				return e
-			}
+		// Native directory storage has no destructor allocation or release failure.
+		if m.directoryInitialized {
+			m.polynomials = nil
 		}
 		m.constructorUnwindStage++
 	}

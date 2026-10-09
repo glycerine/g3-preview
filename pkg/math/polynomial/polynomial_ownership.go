@@ -251,41 +251,24 @@ func (m *MultivariatePolynomialCore) transferGeneratedMonomial() {
 	m.generatedBuffer = nil
 }
 
-// These are actual owning-abort tags for named source array slots, not source
-// allocations or mirrored numeral storage. Every real backing byte is charged.
-func (m *MultivariatePolynomialCore) prepareLinearGenerated(i uint32) error {
-	if uint64(i) >= uint64(cap(m.linearGenerated)) {
-		n := uint64(cap(m.linearGenerated))*2 + 1
-		if n <= uint64(i) {
-			n = uint64(i) + 1
-		}
-		if n > uint64(^uint(0)>>1) {
-			return arena.ErrBounds
-		}
-		if e := m.integer.Budget().Reserve(n); e != nil {
-			return e
-		}
-		a := make([]bool, int(i)+1, int(n))
-		copy(a, m.linearGenerated)
-		m.integer.Budget().Release(uint64(cap(m.linearGenerated)))
-		m.linearGenerated = a
-	} else if uint64(i) >= uint64(len(m.linearGenerated)) {
-		m.linearGenerated = m.linearGenerated[:int(i)+1]
+// Native tags retain cleanup authority for actual generated monomial slots.
+func (m *MultivariatePolynomialCore) prepareLinearGenerated(i uint32) {
+	for uint64(len(m.linearGenerated)) <= uint64(i) {
+		m.linearGenerated = append(m.linearGenerated, false)
 	}
 	m.linearGenerated[i] = false
 	m.linearGeneratedCleanup = 0
-	return nil
 }
 func (m *MultivariatePolynomialCore) cleanupLinearGenerated() error {
 	for m.linearGeneratedCleanup < uint32(len(m.linearGenerated)) {
 		i := m.linearGeneratedCleanup
 		if m.linearGenerated[i] {
-			a, e := m.linearMonomials.monomial(m, i)
-			if e != nil {
-				return e
+			if uint64(i) >= uint64(len(m.linearMonomials)) {
+				return arena.ErrBounds
 			}
-			e = m.monomials.CleanupValue(&a)
-			if a == (Monomial{}) {
+			a := &m.linearMonomials[i]
+			e := m.monomials.CleanupValue(a)
+			if *a == (Monomial{}) {
 				m.linearGenerated[i] = false
 			}
 			if e != nil {

@@ -70,7 +70,7 @@ func (m *MultivariatePolynomialManager) destroyMembers() error {
 			var e error
 			switch m.memberStage {
 			case 15:
-				e = polynomialImpRawSource(m.core, &m.core.linearMonomials)
+				// Retain actual orphan handles for explicit owning cleanup; native storage has no source free.
 			case 16:
 				e = m.sourceNumeralVector(&m.core.linearTerms)
 			case 17:
@@ -103,7 +103,7 @@ func (m *MultivariatePolynomialManager) destroyMembers() error {
 				m.core.idsInitialized = false
 			case 21:
 				m.core.directorySourceDestroyed = true
-				e = polynomialImpRawSource(m.core, &m.core.polynomials)
+				m.core.polynomials = nil
 			}
 			if e != nil {
 				return e
@@ -233,14 +233,8 @@ func (m *MultivariatePolynomialManager) SourceFinalize() error {
 			e = m.skeletons.resetSource()
 		case 9:
 			if polynomialSourceDebug {
-				e = m.core.polynomials.reset(m.core)
-			}
-			if e == nil && polynomialSourceDebug {
-				var n uint32
-				n, e = m.core.polynomials.size(m.core)
-				if e == nil && n != 0 {
-					e = ErrPolynomialAssertion
-				}
+				clear(m.core.polynomials)
+				m.core.polynomials = m.core.polynomials[:0]
 			}
 		case 10:
 			before := m.core.monomials.managerRefs

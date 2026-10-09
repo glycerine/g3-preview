@@ -31707,3 +31707,39 @@ The overall knot/split goal remains open: next external container consumers
 are SOM/core numeral and monomial columns, followed by SAT scalar collections;
 internal util numeric/text/parameter cycles still need concrete seams before
 moving files into subpackages.
+
+## Native polynomial directory and linear monomial workspace
+
+The core polynomial ID directory now stores []Polynomial directly. Removed
+monomial-shaped handle encoding, Runtime cap/size growth and directory release
+faultpoints. Publication grows the native ID-indexed slice, deletion clears the
+recycled slot, and global Rename visits actual nonzero polynomial handles.
+Constructor unwind and source/owning member teardown release this nonowning
+slice. Directory entries never become owning recovery roots; actual caller
+and private references remain independently named.
+
+The linear constructor now uses []Monomial workspace plus native []bool tags
+for actual newly generated monomials. Removed their manual vector/tag growth
+charges and source allocation failures. Real generation, source input swaps,
+coefficient copies, factory transfer and unconsumed generated-root cleanup
+remain. Successful construction clears/truncates the workspace. Source member
+destruction retains actual unconsumed generated handles for later explicit
+owning cleanup rather than inventing a reference destructor. Removed unused
+mkTermsVector and the last vector-backed monomialArrayView variant; all retained
+monomial spans now borrow concrete native slices. Numeral spans remain separate.
+
+The existing deletion callback regression now checks native directory growth,
+peer-handle preservation after relocation, cleared deleted slots and immediate
+ID reuse/publication. Constructor and linear actual-reservation sweeps, independent
+Rename first-maximum/paired-coefficient checks and actual TLS cell-release
+continuation remain. Physical audits exclude native slice capacity and continue
+to census real numerical/factory resources. The TLS close helper no longer
+expects a directory Runtime free; actual cell consumption remains its evidence.
+
+Validation: focused native constructor/member/deletion/rename/GCD/imp/Newton/
+sparse/linear/rational/terms/operation checks passed (1.002s), matching g3debug,
+module-wide test compilation, polynomial vet, gofmt/diff checks and portcheck
+passed. Manifest counts unchanged. The 21:43–21:45 UTC full native module
+checkpoint remains current. Overall knot/split goal remains active: shared SOM
+numeral/monomial columns and core numeral vectors still need native conversion,
+then remaining SAT containers and internal util package seams.
