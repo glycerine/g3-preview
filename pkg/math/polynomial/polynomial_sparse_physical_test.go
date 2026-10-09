@@ -22,7 +22,7 @@ func polynomialSparsePhysical(t *testing.T, s *PolynomialSparseInterpolator, out
 	if len(full.upm.pages) != 0 || len(full.upm.store.backings) != 0 {
 		t.Fatal("unexpected UP child work")
 	}
-	raw = append(raw, full.degree2pos.raw, full.degree2pos.pending, full.lexPermutation.raw, full.lexPermutation.pending)
+	raw = append(raw, full.lexPermutation.raw, full.lexPermutation.pending)
 	for _, v := range []*polynomialVector{&s.inputs, &s.outputs, &s.interpolation.vectors[0], &s.interpolation.vectors[1], &s.interpolation.vectors[2]} {
 		raw = append(raw, v.raw, v.pending, v.old)
 		extra += uint64(cap(v.retired)) * uint64(reflect.TypeOf(util.Int{}).Size())

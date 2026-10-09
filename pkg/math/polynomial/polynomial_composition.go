@@ -519,51 +519,24 @@ func (m *MultivariatePolynomialManager) ComposeMinusX(p Polynomial) (result Poly
 	return m.compositionCheapResult()
 }
 
-func (m *MultivariatePolynomialManager) reserveCompositionDegrees(n uint32) error {
-	v := &m.degree2pos
-	c := m.core
-	old, e := v.size(c)
-	if e != nil {
-		return e
+func (m *MultivariatePolynomialManager) reserveCompositionDegrees(n uint32) {
+	old := len(m.degree2pos)
+	if uint64(n) <= uint64(old) {
+		return
 	}
-	if n <= old {
-		return nil
+	m.degree2pos = append(m.degree2pos, make([]uint32, int(n)-old)...)
+	for i := old; i < len(m.degree2pos); i++ {
+		m.degree2pos[i] = ^uint32(0)
 	}
-	for {
-		cap, e := v.capacity(c)
-		if e != nil {
-			return e
-		}
-		if n <= cap {
-			break
-		}
-		if e = v.expand(c); e != nil {
-			return e
-		}
-	}
-	if e = v.publishSize(c, n); e != nil {
-		return e
-	}
-	for i := old; i < n; i++ {
-		if e = c.memory.WriteUint32(v.raw, 8+uint64(i)*4, ^uint32(0)); e != nil {
-			v.interrupted = true
-			return e
-		}
-		v.initialized = i + 1
-	}
-	return nil
 }
 func (m *MultivariatePolynomialManager) compositionDegreePosition(i uint32) (uint32, error) {
-	if polynomialSourceDebug {
-		n, e := m.degree2pos.size(m.core)
-		if e != nil {
-			return 0, e
-		}
-		if i >= n {
+	if uint64(i) >= uint64(len(m.degree2pos)) {
+		if polynomialSourceDebug {
 			return 0, ErrPolynomialAssertion
 		}
+		return 0, arena.ErrBounds
 	}
-	return m.core.memory.ReadUint32(m.degree2pos.raw, 8+uint64(i)*4)
+	return m.degree2pos[i], nil
 }
 func (m *MultivariatePolynomialManager) saveCompositionDegrees(p Polynomial) error {
 	if e := m.compositionUnivariate(p); e != nil {
@@ -577,9 +550,7 @@ func (m *MultivariatePolynomialManager) saveCompositionDegrees(p Polynomial) err
 	if e != nil {
 		return e
 	}
-	if e = m.reserveCompositionDegrees(n + 1); e != nil {
-		return e
-	}
+	m.reserveCompositionDegrees(n + 1)
 	size, e := m.core.readWord(p, 8)
 	if e != nil {
 		return e
@@ -613,9 +584,10 @@ func (m *MultivariatePolynomialManager) saveCompositionDegrees(p Polynomial) err
 		if e != nil {
 			return e
 		}
-		if e = m.core.memory.WriteUint32(m.degree2pos.raw, 8+uint64(d)*4, i); e != nil {
+		if _, e = m.compositionDegreePosition(d); e != nil {
 			return e
 		}
+		m.degree2pos[d] = i
 		m.composition.degreeStored = i + 1
 	}
 	return nil
@@ -657,9 +629,10 @@ func (m *MultivariatePolynomialManager) resetCompositionDegrees(p Polynomial) er
 		if e != nil {
 			return e
 		}
-		if e = m.core.memory.WriteUint32(m.degree2pos.raw, 8+uint64(d)*4, ^uint32(0)); e != nil {
+		if _, e = m.compositionDegreePosition(d); e != nil {
 			return e
 		}
+		m.degree2pos[d] = ^uint32(0)
 	}
 	m.composition.degreeStored = 0
 	return nil
@@ -1056,9 +1029,7 @@ func (m *MultivariatePolynomialManager) CleanupComposition() error {
 			if current != i {
 				return ErrPolynomialPending
 			}
-			if e = c.memory.WriteUint32(m.degree2pos.raw, 8+uint64(d)*4, ^uint32(0)); e != nil {
-				return e
-			}
+			m.degree2pos[d] = ^uint32(0)
 			s.degreeStored--
 		}
 	}

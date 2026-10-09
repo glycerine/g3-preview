@@ -99,13 +99,12 @@ func TestPolynomialImpSourceDestructorSeparateOwningClose(t *testing.T) {
 	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { panic("unreached") }, Cooperation: func() error { panic("unreached") }}})
 	serviceMust(t, e)
 	before := mm.managerRefs
-	for _, v := range [2]*polynomialVector{&m.degree2pos, &m.lexPermutation} {
-		serviceMust(t, v.expand(m.core))
-	}
+	m.reserveCompositionDegrees(17)
+	serviceMust(t, m.lexPermutation.expand(m.core))
 	m.varDegrees = []uint32{1, 2, 3}
 	serviceMust(t, m.core.substitution.found.reserve(5))
 	serviceMust(t, m.SourceFinalize())
-	if !m.sourceFinalized || m.closed || m.bodyStage != 11 || m.memberStage != 23 || m.header == 0 || !m.upm.sourceFinalized || m.core.tmp1.raw != (util.Block{}) || mm.managerRefs != before-1 || m.varDegrees != nil {
+	if !m.sourceFinalized || m.closed || m.bodyStage != 11 || m.memberStage != 23 || m.header == 0 || !m.upm.sourceFinalized || m.core.tmp1.raw != (util.Block{}) || mm.managerRefs != before-1 || m.varDegrees != nil || m.degree2pos != nil {
 		t.Fatal("literal complete body/member order or retained owner", m.bodyStage, m.memberStage)
 	}
 	count, e := q.Integers().Memory.AllocationCount()

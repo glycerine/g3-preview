@@ -385,8 +385,7 @@ func TestPolynomialCompositionCancellationRestoresActualDegreeMap(t *testing.T) 
 			if control.cooperation > control.checkpoints {
 				t.Fatal("cooperation without checkpoint")
 			}
-			n, e := m.degree2pos.size(m.core)
-			serviceMust(t, e)
+			n := uint32(len(m.degree2pos))
 			for i := uint32(0); i < n; i++ {
 				pos, e := m.compositionDegreePosition(i)
 				serviceMust(t, e)
@@ -803,19 +802,19 @@ func TestPolynomialCompositionUnsignedDegreeConstructorStop(t *testing.T) {
 	}()
 	before := m.core.memory.State()
 	cause := m.Compose(large, m.core.unit, r)
-	expected := error(util.ErrRuntimeOwner)
+	expected := error(arena.ErrBounds)
 	if polynomialSourceDebug {
 		expected = ErrPolynomialAssertion
 	}
 	if !errors.Is(cause, expected) || m.composition.degreeCompleted || m.composition.aCompleted || m.composition.degreeStored != 0 || r.root.value != m.core.unit {
 		t.Fatal("unsigned n+1 wrap at reached indexed access", cause, m.composition.degreeCompleted)
 	}
-	if m.core.memory.State() != before || m.degree2pos.raw != (util.Block{}) {
+	if m.core.memory.State() != before || m.degree2pos != nil {
 		t.Fatal("wrapped zero reserve manufactured an allocation")
 	}
 	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, large, r.root.value}, nil, r.header)
 	serviceMust(t, m.CleanupComposition())
-	if m.composition.degreeCompleted || m.composition.aCompleted || m.degree2pos.raw != (util.Block{}) {
+	if m.composition.degreeCompleted || m.composition.aCompleted || m.degree2pos != nil {
 		t.Fatal("owning abort fabricated failed constructor completion")
 	}
 }

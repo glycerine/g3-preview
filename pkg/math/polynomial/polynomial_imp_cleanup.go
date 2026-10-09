@@ -331,7 +331,7 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 		case 9:
 			e = m.lexBuckets.close()
 		case 10:
-			e = m.degree2pos.close(m.core)
+			m.degree2pos = nil
 		case 11:
 			if m.core.tmp1.raw != (util.Block{}) {
 				e = m.core.memory.Deallocate(&m.core.tmp1.raw)

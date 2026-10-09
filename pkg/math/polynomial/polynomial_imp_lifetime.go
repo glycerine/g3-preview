@@ -106,7 +106,7 @@ func (m *MultivariatePolynomialManager) destroyMembers() error {
 			case 13:
 				e = m.sourceBufferMembers(&m.core.som, true)
 			case 14:
-				e = polynomialImpRawSource(m.core, &m.degree2pos)
+				m.degree2pos = nil
 			}
 			if e != nil {
 				return e

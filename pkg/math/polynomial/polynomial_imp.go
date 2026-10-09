@@ -52,7 +52,8 @@ type MultivariatePolynomialManager struct {
 	self                                                       *MultivariatePolynomialManager
 	core                                                       *MultivariatePolynomialCore
 	upm                                                        *UPolynomialManager
-	degree2pos, lexPermutation                                 polynomialVector
+	degree2pos                                                 []uint32
+	lexPermutation                                             polynomialVector
 	varDegrees                                                 []uint32
 	lexBuckets                                                 polynomialImpBuckets
 	iccp                                                       PolynomialSOMVector
@@ -133,7 +134,6 @@ func NewMultivariatePolynomialManager(c MultivariatePolynomialManagerConfig) (*M
 		return fail(e)
 	}
 	m.constructed = 4
-	m.degree2pos.width = 4
 	m.lexPermutation.width = 4
 	m.lexBuckets.owner = m.core
 	m.lexBuckets.data.width = 8

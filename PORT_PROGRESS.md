@@ -31362,3 +31362,30 @@ polynomial vet and portcheck passed. The full native module checkpoint remains
 19:07–19:12 UTC; another hourly checkpoint is not yet due. Manifest counts remain
 2102 units / 677 APIs: 63 ported, 284 partial, 1727 unported and two dead/deleted.
 No whole-unit completion claim or replacement container package is added.
+
+## Native composition degree positions
+
+Composition's persistent degree-to-term-position member now uses `[]uint32`.
+Removed its raw vector header, custom Runtime growth/pending blocks and member
+free failures. New entries retain the maximum-unsigned missing-degree sentinel;
+save/reset and Horner arithmetic keep source term positions and evaluation order.
+Actual polynomial/monomial reads can still stop construction, so partial stored
+position cleanup remains. Source/owning member destruction clears the native
+slice at the existing lifecycle boundary; physical audits exclude its storage.
+
+New tests check degree 257 with Runtime reservations disabled, actual coefficient
+lookup for present degrees, missing-degree sentinels and reset/reuse. Independent
+sparse p(y^2) results cover increasing/decreasing degrees 17, 65, 257, 33 and 17.
+Existing cancellation, stopped child, ownership and actual allocation-failure
+campaigns pass. The unsigned n+1 wrap safety test now expects arena.ErrBounds
+in release mode; its source debug assertion and allocation-free failed-constructor
+behavior remain. No whole-unit completion credit is added.
+
+Validation: focused native composition/manager checks (0.12s), focused debug
+checks (0.13s), full native polynomial, module-wide test compilation, polynomial
+vet and portcheck passed. The hourly full native module checkpoint remains
+19:07–19:12 UTC; another checkpoint is not yet due. Manifest counts remain
+2102 units / 677 APIs: 63 ported, 284 partial, 1727 unported and two dead/deleted.
+The lexicographic sorter still has nested vector scratch and a borrowed raw
+permutation mapping; convert those together next, preserving its project sorting
+algorithm and coefficient/monomial pairing.
