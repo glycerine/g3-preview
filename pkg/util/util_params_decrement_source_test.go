@@ -366,7 +366,7 @@ func paramsDecAuditColdGraph(t *testing.T, q *RationalService, m *IntegerManager
 		t.Fatal("once-only named numeric/provider graph", n, bn.Used())
 	}
 	cs := c.Stats()
-	cn := cs.HeaderBytes + cs.BlockBytes + cs.ReceiptBytes + cs.SourceFrameBytes + cs.SourceSetBytes + cs.ReplacementBytes + cs.PageBytes + cs.DirectoryBytes + cs.FormatBytes + gparamsVectorGraph(cs.Text)
+	cn := cs.HeaderBytes + cs.BlockBytes + cs.ReceiptBytes + cs.SourceFrameBytes + cs.SourceSetBytes + cs.ReplacementBytes + cs.PageBytes + cs.DirectoryBytes + cs.FormatBytes
 	if cn != bc.Used() {
 		t.Fatal("actual ParamsContext owner graph", cn, bc.Used())
 	}

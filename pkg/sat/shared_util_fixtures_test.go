@@ -85,6 +85,5 @@ func pdtotal(s util.ParamDescrsStats) uint64 {
 	return s.OwnerBytes + s.TableBytes + s.NamesBytes
 }
 func paramsBorrowedPhysicalBytes(s util.ParamsStats) uint64 {
-	d := s.Text.Descriptors
-	return s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.ReplacementBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+	return s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.ReplacementBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes
 }

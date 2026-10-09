@@ -31,18 +31,13 @@ func (c *ParamsContext) continueResetKey(slot uint32) error {
 	// Explicit owned-string adapter release; source char strings are borrowed.
 	if b.resetStage == 1 {
 		if x.text.present && !x.text.borrowed {
-			if e := c.Texts.Free(x.text.ref); e != nil {
-				if r.cause == nil {
-					r.cause = e
-				}
-				return e
-			}
+			x.text.owned.release()
 			x.text.present = false
 		}
 		b.resetStage = 2
 	}
 	// Source ascending assignment shifts the suffix before pop_back. There is
-	// no fallible allocation in these scalar pointer-free entry assignments.
+	// no fallible allocation in these typed entry assignments.
 	for j := b.resetCursor + 1; j < b.Size; j++ {
 		*c.Entry(b, j-1) = *c.Entry(b, j)
 	}

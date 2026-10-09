@@ -389,7 +389,8 @@ func TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish(t *testing.
 	receipt, e := c.StoppedSetReplacement(&v)
 	paramsMust(t, e)
 	f := &c.replacementFrames[v.Slot-1]
-	if !f.next.text.present || f.next.text.borrowed || c.Texts.Stats().Live != 1 {
+	preparedText := f.next.text.owned
+	if !f.next.text.present || f.next.text.borrowed || preparedText == nil || !preparedText.live {
 		t.Fatal("actual prepared argument absent")
 	}
 	numericAuditPhysical(t, m, extras)
@@ -404,7 +405,7 @@ func TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish(t *testing.
 	if !b.Live || !b.resetActive || b.resetKind != paramsResetLive || b.Size != size+2 || f.active || f.phase != 2 || c.Entry(b, size+1).Kind == ParamString || *c.Entry(b, size+1) != (paramEntry{}) {
 		t.Fatal("own abort published replacement setter body")
 	}
-	if f.invocation != receipt.invocation || !errors.Is(f.cause, arena.ErrBounds) || c.Texts.Stats().Live != 0 {
+	if f.invocation != receipt.invocation || !errors.Is(f.cause, arena.ErrBounds) || preparedText.live {
 		t.Fatal("exact abort history/text refund")
 	}
 	afterRoots := numericAuditPhysical(t, m, extras)
@@ -426,122 +427,92 @@ func TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish(t *testing.
 	paramsDecFinish(t, func() error { return q.Del(&big) })
 }
 
-func TestParamsReferenceMatchedReplacementAllPreparedTextPrefixes(t *testing.T) {
-	success := false
-	for fault := 0; fault < 64; fault++ {
-		t.Run(strconv.Itoa(fault), func(t *testing.T) {
-			bn := arena.NewBudget(1 << 26)
-			bc := arena.NewBudget(1 << 24)
-			bs := arena.NewBudget(1 << 24)
-			r, e := NewRuntime(RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
-			paramsMust(t, e)
-			q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
-			paramsMust(t, e)
-			sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
-			paramsMust(t, e)
-			c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
-			paramsMust(t, e)
-			m := q.Manager.Z
-			t.Cleanup(func() {
-				bn.FailAfter(-1)
-				bc.FailAfter(-1)
-				paramsDecFinish(t, c.Close)
+func TestParamsReferenceMatchedReplacementNativeText(t *testing.T) {
+	bn := arena.NewBudget(1 << 26)
+	bc := arena.NewBudget(1 << 24)
+	bs := arena.NewBudget(1 << 24)
+	r, e := NewRuntime(RuntimeConfig{Budget: bn, SizeTBits: 64, ThreadLocal: true})
+	paramsMust(t, e)
+	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	paramsMust(t, e)
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	paramsMust(t, e)
+	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+	paramsMust(t, e)
+	m := q.Manager.Z
+	t.Cleanup(func() {
+		bn.FailAfter(-1)
+		bc.FailAfter(-1)
+		paramsDecFinish(t, c.Close)
 
-				paramsDecFinish(t, q.Close)
-				paramsDecFinish(t, r.Close)
-				paramsMust(t, sy.Close())
-				if bn.Used() != 0 || bc.Used() != 0 || bs.Used() != 0 {
-					t.Error("remaining named owners", bn.Used(), bc.Used(), bs.Used())
-				}
-			})
-			v, e := c.NewValue()
-			paramsMust(t, e)
-			k, e := sy.Intern("actual-large-numeral")
-			paramsMust(t, e)
-			// Separate efficient fixture: public source digit setter and scoped copy.
-			// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
-			scoped, e := NewScopedInt(m)
-			paramsMust(t, e)
-			num, e := scoped.Get()
-			paramsMust(t, e)
-			digits := make([]uint32, 32768)
-			digits[0], digits[len(digits)-1] = 17, 1
-			paramsMust(t, m.SetLimbs(num, digits))
-			big, e := q.NewFromScopedInt(scoped)
-			paramsMust(t, e)
-			paramsMust(t, scoped.Close())
-			prefix, e := sy.Intern("completed-prefix")
-			paramsMust(t, e)
-			paramsMust(t, c.SetUInt(&v, prefix, 42))
-			// Fill actual published vector capacity through ordinary source setters.
-			for c.Blocks[v.Slot-1].Size < c.Blocks[v.Slot-1].capacity {
-				key, e := sy.Intern("fill" + strconv.Itoa(int(c.Blocks[v.Slot-1].Size)))
-				paramsMust(t, e)
-				paramsMust(t, c.SetUInt(&v, key, 84))
-			}
-			before, e := q.Stats()
-			paramsMust(t, e)
-			token := v
-			size := c.Blocks[v.Slot-1].Size
-			extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
-			beforeRoots := numericAuditPhysical(t, m, extras)
-			paramsMust(t, c.SetRat(&v, k, &big))
-			beforeRoots = numericAuditPhysical(t, m, extras)
-			text := "prepared copied text before the real old numeral destructor"
-			bc.FailAfter(int64(fault))
-			e = c.SetString(&v, k, &text)
-			if e != nil {
-				if !errors.Is(e, arena.ErrInjectedFailure) {
-					t.Fatal("actual copied-string reservation", e)
-				}
-				if c.replacementFrames[v.Slot-1].active || c.Entry(&c.Blocks[v.Slot-1], size).Kind != ParamNumeral || c.Texts.Stats().Live != 0 {
-					t.Fatal("preparation failure reached old NUMDT or lost acquired text")
-				}
-				end := numericAuditPhysical(t, m, extras)
-				if end.Named != beforeRoots.Named || end.Objects != beforeRoots.Objects {
-					t.Fatal("prepare failure changed old root", beforeRoots, end)
-				}
-			} else {
-				success = true
-				if c.Entry(&c.Blocks[v.Slot-1], size).Kind != ParamString || c.replacementFrames[v.Slot-1].active {
-					t.Fatal("actual text publication")
-				}
-				end := numericAuditPhysical(t, m, extras)
-				if end.Named+1 != beforeRoots.Named || end.Objects+1 != beforeRoots.Objects {
-					t.Fatal("old numeral not retired", beforeRoots, end)
-				}
-			}
-			if v != token || c.Blocks[v.Slot-1].Size != size+1 {
-				t.Fatal("actual matched vector size")
-			}
-			paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
-			bc.FailAfter(-1)
-			if success {
-				value, present, e := c.GetString(&v, k, nil)
-				paramsMust(t, e)
-				if !present || value != text {
-					t.Fatal("source text value", value, present)
-				}
-			}
-			after, e := q.Stats()
-			paramsMust(t, e)
-			want := before.LiveCells + 1
-			if success {
-				want = before.LiveCells
-			}
-			if after.LiveCells != want {
-				t.Fatal("actual numeral roots", after.LiveCells, want)
-			}
-			paramsMust(t, q.Del(&big))
-		})
-		if success {
-			t.Logf("first actual text success %d", fault)
-			break
+		paramsDecFinish(t, q.Close)
+		paramsDecFinish(t, r.Close)
+		paramsMust(t, sy.Close())
+		if bn.Used() != 0 || bc.Used() != 0 || bs.Used() != 0 {
+			t.Error("remaining named owners", bn.Used(), bc.Used(), bs.Used())
 		}
+	})
+	v, e := c.NewValue()
+	paramsMust(t, e)
+	k, e := sy.Intern("actual-large-numeral")
+	paramsMust(t, e)
+	// Separate efficient fixture: public source digit setter and scoped copy.
+	// Historical BitwiseNot fixture and its 252-second RED remain unchanged.
+	scoped, e := NewScopedInt(m)
+	paramsMust(t, e)
+	num, e := scoped.Get()
+	paramsMust(t, e)
+	digits := make([]uint32, 32768)
+	digits[0], digits[len(digits)-1] = 17, 1
+	paramsMust(t, m.SetLimbs(num, digits))
+	big, e := q.NewFromScopedInt(scoped)
+	paramsMust(t, e)
+	paramsMust(t, scoped.Close())
+	prefix, e := sy.Intern("completed-prefix")
+	paramsMust(t, e)
+	paramsMust(t, c.SetUInt(&v, prefix, 42))
+	// Fill actual published vector capacity through ordinary source setters.
+	for c.Blocks[v.Slot-1].Size < c.Blocks[v.Slot-1].capacity {
+		key, e := sy.Intern("fill" + strconv.Itoa(int(c.Blocks[v.Slot-1].Size)))
+		paramsMust(t, e)
+		paramsMust(t, c.SetUInt(&v, key, 84))
 	}
-	if !success {
-		t.Fatal("actual text preparation sweep did not succeed")
+	before, e := q.Stats()
+	paramsMust(t, e)
+	token := v
+	size := c.Blocks[v.Slot-1].Size
+	extras := numericPhysicalExtraOwners{RationalServices: []*RationalService{q}, ParamsRationalValues: []paramsPhysicalRationalOwner{{q, &big}}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}}}
+	beforeRoots := numericAuditPhysical(t, m, extras)
+	paramsMust(t, c.SetRat(&v, k, &big))
+	beforeRoots = numericAuditPhysical(t, m, extras)
+	text := "prepared copied text before the real old numeral destructor"
+	bc.FailAfter(0)
+	e = c.SetString(&v, k, &text)
+	paramsMust(t, e)
+	if c.Entry(&c.Blocks[v.Slot-1], size).Kind != ParamString || c.replacementFrames[v.Slot-1].active {
+		t.Fatal("native text publication")
 	}
+	end := numericAuditPhysical(t, m, extras)
+	if end.Named+1 != beforeRoots.Named || end.Objects+1 != beforeRoots.Objects {
+		t.Fatal("old numeral not retired", beforeRoots, end)
+	}
+	if v != token || c.Blocks[v.Slot-1].Size != size+1 {
+		t.Fatal("actual matched vector size")
+	}
+	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
+	bc.FailAfter(-1)
+	value, present, e := c.GetString(&v, k, nil)
+	paramsMust(t, e)
+	if !present || value != text {
+		t.Fatal("source text value", value, present)
+	}
+	after, e := q.Stats()
+	paramsMust(t, e)
+	want := before.LiveCells
+	if after.LiveCells != want {
+		t.Fatal("actual numeral roots", after.LiveCells, want)
+	}
+	paramsMust(t, q.Del(&big))
 }
 
 func TestParamsReferenceMatchedReplacementIndependentFramesAndReuse(t *testing.T) {

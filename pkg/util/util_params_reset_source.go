@@ -41,12 +41,7 @@ func (c *ParamsContext) continueReset(slot uint32) error {
 	for b.resetCursor < b.Size {
 		x := c.Entry(b, b.resetCursor)
 		if x.text.present && !x.text.borrowed {
-			if e := c.Texts.Free(x.text.ref); e != nil {
-				if r.cause == nil {
-					r.cause = e
-				}
-				return e
-			}
+			x.text.owned.release()
 			x.text.present = false
 		}
 		b.resetCursor++

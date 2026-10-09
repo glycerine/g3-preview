@@ -30951,3 +30951,24 @@ Words storage and lifetime-checked borrowed views remain separate work.
 Validation: focused parameter/descriptor/registry tests pass in native and
 checked/debug builds; complete AST, SAT, and smtcore tests pass. Module-wide
 compilation, vet for affected packages, and portcheck pass.
+
+### Native parameter-value text and view lifetimes
+
+Replaced the parameter Words text service with concrete Go string lifetime
+records. Owned views remain checked after replacement/reset/close; independent
+deep copies have independent invalidation, while the source null-destination
+shortcut continues sharing the parameter block until copy-on-write. Borrowed
+symbol strings retain their provider identity. Removed packing, payload-copy
+loops, obsolete text-length bounds, simulated text allocation/refund checks,
+and text physical-accounting entries. Native text is outside arena accounting;
+real parameter entry/receipt arrays and numerical ownership remain budgeted.
+The new direct test covers native replacement under arena refusal, NUL prefixes,
+independent copied views, and reset/close invalidation.
+
+Validation: focused parameter/descriptor tests pass in native and checked/debug
+builds. An AST integration test exposed the distinction between closed-context
+and retired-value reads; returned views now retain their context provider to
+preserve ErrClosed versus ErrInvalidSlot. The complete AST rerun passes, as do
+complete SAT/smtcore tests, module compilation, affected-package vet, and
+portcheck. Native context construction no longer requires a phantom Words
+configuration, while conflicting budget configurations remain rejected.

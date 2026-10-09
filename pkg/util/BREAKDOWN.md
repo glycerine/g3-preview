@@ -998,3 +998,14 @@ insertion order and independent dictionary ownership. Header allocation remains
 budgeted; native metadata, dictionary, and name storage are outside that budget.
 Parameter-value strings and their borrowed views still use their separate Words
 service and require a later conversion.
+
+Parameter-value text now uses immutable Go strings in concrete owned lifetime
+records. Returned views borrow those records; replacement/reset/close invalidate
+the affected view and clear its bytes. Deep copies share immutable backing but
+receive distinct lifetime records; the original null-destination copy shortcut
+still shares the whole parameter block until copy-on-write. Borrowed symbols keep
+their independent symbol-provider lifetime. Removed the ParamsContext Words
+service, word packing, uint32 text-length codec, and text-only arena failures.
+Entry/receipt arrays remain separately budgeted; native text is outside arena
+accounting. Root util now has no Words owner; fixed-width bitset storage in its
+already-separated child package remains an independent arena consumer.

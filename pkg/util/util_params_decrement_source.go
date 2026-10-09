@@ -49,12 +49,7 @@ func (c *ParamsContext) continueDecrement(slot uint32) error {
 		}
 		if b.resetStage == 1 {
 			if entry.text.present && !entry.text.borrowed {
-				if e := c.Texts.Free(entry.text.ref); e != nil {
-					if receipt.cause == nil {
-						receipt.cause = e
-					}
-					return e
-				}
+				entry.text.owned.release()
 			}
 			b.resetStage = 2
 		}

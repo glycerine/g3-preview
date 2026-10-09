@@ -41,11 +41,31 @@ type paramsBlock struct {
 	resetKind                        uint8
 	resetActive                      bool
 }
+
+// paramsOwnedString gives returned views an explicit invalidation point without
+// indexing an arena payload. Copies share immutable bytes, with separate lives.
+type paramsOwnedString struct {
+	value string
+	live  bool
+}
+
+func (s *paramsOwnedString) read() (string, error) {
+	if s == nil || !s.live {
+		return "", arena.ErrInvalidSlot
+	}
+	return s.value, nil
+}
+func (s *paramsOwnedString) release() {
+	if s != nil {
+		s.live = false
+		s.value = ""
+	}
+}
+
 type paramsText struct {
-	ref     arena.VectorRef
-	size    uint32
+	owned   *paramsOwnedString
 	present bool
-	// Borrowed strings retain a canonical symbol instead of owning Words.
+	// Borrowed strings retain a canonical symbol instead of owning text.
 	borrowed bool
 }
 type paramEntry struct {
@@ -68,18 +88,16 @@ type paramsEntryPage struct {
 type ParamsStats struct {
 	LiveBlocks, References, Entries                                                                                                   uint32
 	HeaderBytes, BlockBytes, ReceiptBytes, SourceFrameBytes, SourceSetBytes, ReplacementBytes, PageBytes, DirectoryBytes, FormatBytes uint64
-	Text                                                                                                                              arena.VectorStats
 }
 
 // This cold owner borrows both services. They must outlive it; budgets shared
-// across owners require external confinement. All hot records are pointer-free.
+// across owners require external confinement. Entry storage is concrete and typed.
 type ParamsContext struct {
 	mu                sync.Mutex
 	Self              *ParamsContext
 	SymbolsField      *usymbol.Manager
 	NumeralsField     *RationalService
 	BudgetField       *arena.Budget
-	Texts             *arena.Words
 	Owner             uint64
 	Blocks            []paramsBlock
 	decrementReceipts []paramsDecrementReceipt
@@ -114,7 +132,7 @@ func paramsPageBytes(p paramsEntryPage) uint64 {
 }
 func paramsDirectoryBytes(n int) uint64 { return paramsBytes(n, reflect.TypeOf(paramsEntryPage{})) }
 func NewParamsContext(s *usymbol.Manager, q *RationalService, c ParamsConfig) (*ParamsContext, error) {
-	if s == nil || q == nil || c.Text.Descriptors.Budget != c.Budget {
+	if s == nil || q == nil || c.Text.Descriptors.Budget != nil && c.Text.Descriptors.Budget != c.Budget {
 		return nil, arena.ErrConfig
 	}
 	if _, e := s.Hash(usymbol.Symbol{}); e != nil {
@@ -149,12 +167,7 @@ func NewParamsContext(s *usymbol.Manager, q *RationalService, c ParamsConfig) (*
 	if e = c.Budget.Reserve(h); e != nil {
 		return nil, e
 	}
-	w, e := arena.NewWords(c.Text)
-	if e != nil {
-		c.Budget.Release(h)
-		return nil, e
-	}
-	p := &ParamsContext{SymbolsField: s, NumeralsField: q, BudgetField: c.Budget, Texts: w, Owner: id, pageEntries: n, headerBytes: h}
+	p := &ParamsContext{SymbolsField: s, NumeralsField: q, BudgetField: c.Budget, Owner: id, pageEntries: n, headerBytes: h}
 	p.Self = p
 	return p, nil
 }
@@ -312,9 +325,7 @@ func (c *ParamsContext) delEntry(x *paramEntry) error {
 		}
 	}
 	if x.text.present && !x.text.borrowed {
-		if e := c.Texts.Free(x.text.ref); e != nil {
-			return e
-		}
+		x.text.owned.release()
 	}
 	*x = paramEntry{}
 	return nil
@@ -635,59 +646,21 @@ func (c *ParamsContext) ResetKeyNameTracked(v *ParamsRef, k *string, receipt *Pa
 	return c.resetKey(v, usymbol.Symbol{}, k, true, receipt)
 }
 func (c *ParamsContext) storeText(s *string, source *paramsText) (paramsText, error) {
-	n := uint32(0)
-	present := s != nil
 	if source != nil {
-		n = source.size
-		present = source.present
-	} else if s != nil {
-		prefix := len(*s)
-		if i := strings.IndexByte(*s, 0); i >= 0 {
-			prefix = i
+		if !source.present {
+			return paramsText{}, nil
 		}
-		var e error
-		n, e = paramsCheckedTextLength(uint64(prefix))
+		value, e := source.owned.read()
 		if e != nil {
 			return paramsText{}, e
 		}
+		return paramsText{owned: &paramsOwnedString{value: value, live: true}, present: true}, nil
 	}
-	if !present {
+	if s == nil {
 		return paramsText{}, nil
 	}
-	length := (uint64(n) + 3) / 4
-	if length == 0 {
-		length = 1
-	}
-	if length > math.MaxUint32 {
-		return paramsText{}, arena.ErrBounds
-	}
-	r, e := c.Texts.Allocate(uint32(length), uint32(length))
-	if e != nil {
-		return paramsText{}, e
-	}
-	out := paramsText{ref: r, size: n, present: true}
-	for i := uint32(0); i < uint32(length); i++ {
-		var word uint32
-		for j := uint32(0); j < 4 && i*4+j < n; j++ {
-			var ch byte
-			if source != nil {
-				old, er := c.Texts.Read(source.ref, (i*4+j)/4)
-				if er != nil {
-					c.Texts.Free(r)
-					return paramsText{}, er
-				}
-				ch = byte(old >> (8 * ((i*4 + j) % 4)))
-			} else {
-				ch = (*s)[i*4+j]
-			}
-			word |= uint32(ch) << (8 * j)
-		}
-		if e = c.Texts.Write(r, i, word); e != nil {
-			c.Texts.Free(r)
-			return paramsText{}, e
-		}
-	}
-	return out, nil
+	value := (*s)[:nulStringLength(*s)]
+	return paramsText{owned: &paramsOwnedString{value: value, live: true}, present: true}, nil
 }
 func (c *ParamsContext) setCore(slot uint32, k usymbol.Symbol, kind ParamKind, bits uint64, sym usymbol.Symbol, str *string, rat *OwnedRational, text *paramsText) error {
 	b := &c.Blocks[slot-1]
@@ -725,8 +698,7 @@ func (c *ParamsContext) setCore(slot uint32, k usymbol.Symbol, kind ParamKind, b
 			return e
 		} // No copied-text acquisition has happened yet.
 	}
-	// Prepare owned text before deleting a replaced value: adapting borrowed C
-	// text to owned payload adds a failure point, without publishing a dangling tag.
+	// Prepare the native string lifetime before deleting a replaced value.
 	next := paramEntry{key: k, Kind: kind, bits: bits, symbol: sym}
 	if kind == ParamString {
 		if text != nil && text.borrowed {
@@ -1087,22 +1059,9 @@ func (c *ParamsContext) appendByte(b byte) error {
 	c.workspace = append(c.workspace, b)
 	return nil
 }
-func (c *ParamsContext) appendText(w *arena.Words, r arena.VectorRef, n uint32) error {
-	if e := c.reserveFormat(int(n)); e != nil {
-		return e
-	}
-	for i := uint32(0); i < n; i++ {
-		v, e := w.Read(r, i/4)
-		if e != nil {
-			return e
-		}
-		c.workspace = append(c.workspace, byte(v>>(8*(i%4))))
-	}
-	return nil
-}
 
 // appendEntryText copies actual bytes into the reusable Go format workspace,
-// directly from either owned Words or the borrowed symbol's real backing.
+// directly from either owned Go text or the borrowed symbol's real backing.
 func (c *ParamsContext) appendEntryText(x *paramEntry) error {
 	if x.text.borrowed {
 		if !x.text.present || x.symbol.Value == 0 || x.symbol.IsNumerical() {
@@ -1110,7 +1069,14 @@ func (c *ParamsContext) appendEntryText(x *paramEntry) error {
 		}
 		return c.appendSymbol(x.symbol, false, false)
 	}
-	return c.appendText(c.Texts, x.text.ref, x.text.size)
+	if !x.text.present {
+		return nil
+	}
+	value, e := x.text.owned.read()
+	if e != nil {
+		return e
+	}
+	return c.appendString(value)
 }
 
 func (c *ParamsContext) appendSymbol(k usymbol.Symbol, strMode, normalize bool) error {
@@ -1494,7 +1460,6 @@ func (c *ParamsContext) Stats() ParamsStats {
 	s.SourceSetBytes = paramsSetFrameBytes(cap(c.SetFrames))
 	s.ReplacementBytes = paramsReplacementFrameBytes(cap(c.replacementFrames))
 	s.DirectoryBytes = paramsDirectoryBytes(cap(c.pages))
-	s.Text = c.Texts.Stats()
 	for _, p := range c.pages {
 		s.PageBytes += paramsPageBytes(p)
 	}
@@ -1549,7 +1514,6 @@ func (c *ParamsContext) Close() error {
 			}
 		}
 	}
-	c.Texts.Close()
 	for _, p := range c.pages {
 		c.BudgetField.Release(paramsPageBytes(p))
 	}
@@ -1661,12 +1625,4 @@ func (c *ParamsContext) DebugString(v *ParamsRef) (string, error) {
 		return "", e
 	}
 	return string(c.workspace), nil
-}
-
-// Check the actual host C-prefix length before any uint32 narrowing.
-func paramsCheckedTextLength(n uint64) (uint32, error) {
-	if n > math.MaxUint32 {
-		return 0, arena.ErrBounds
-	}
-	return uint32(n), nil
 }

@@ -134,18 +134,14 @@ func TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule(t *testing.T)
 }
 func TestGlobalParamsBorrowedStringAndSharedSnapshotPublication(t *testing.T) {
 	g, ctx, sy, _ := gparamsRealRegistry(t)
-	before := ctx.Texts.Stats()
 	paramsMust(t, g.SetName("sat.text", "real\x00ignored"))
 	mod, e := sy.Intern("sat")
 	paramsMust(t, e)
 	raw, e := g.GetParams(mod)
 	paramsMust(t, e)
 	x := ctx.Entry(&ctx.Blocks[raw.Slot-1], 0)
-	if x.Kind != ParamString || !x.text.borrowed || x.text.ref != (arena.VectorRef{}) {
+	if x.Kind != ParamString || !x.text.borrowed || x.text.owned != nil {
 		t.Fatal("actual borrowed interned pointer", *x)
-	}
-	if ctx.Texts.Stats() != before {
-		t.Fatal("string spelling duplicated")
 	}
 	snapshot, e := g.GetModule(mod)
 	paramsMust(t, e)

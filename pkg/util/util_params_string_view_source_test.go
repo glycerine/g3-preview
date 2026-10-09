@@ -156,3 +156,60 @@ func TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit(t *testing.T) {
 		t.Fatal("strlen must reach stale pointer before badbit sentry", e)
 	}
 }
+
+func TestParamsNativeStringCopyLifetimeAndReplacement(t *testing.T) {
+	base, sy, q := paramsTestOwner(t)
+	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: base.BudgetField})
+	paramsMust(t, e)
+	t.Cleanup(func() { paramsMust(t, c.Close()) })
+	source, e := c.NewValue()
+	paramsMust(t, e)
+	copyValue, e := c.NewValue()
+	paramsMust(t, e)
+	name := "native-copy"
+	key, e := sy.Intern(name)
+	paramsMust(t, e)
+	text := "original"
+	paramsMust(t, c.SetString(&source, key, &text))
+	// Copy into existing backing exercises the deep merge, rather than the
+	// source null-destination shortcut that intentionally shares a block.
+	paramsMust(t, c.SetUInt(&copyValue, key, 1))
+	paramsMust(t, c.Copy(&copyValue, &source))
+	original, e := c.GetStringViewFallbackName(&source, &name, nil, nil)
+	paramsMust(t, e)
+	copied, e := c.GetStringViewFallbackName(&copyValue, &name, nil, nil)
+	paramsMust(t, e)
+	if original.owned == copied.owned {
+		t.Fatal("copy shared mutable lifetime")
+	}
+	before := c.BudgetField.Used()
+	c.BudgetField.FailAfter(0)
+	defer c.BudgetField.FailAfter(-1)
+	text = "replacement\x00ignored"
+	paramsMust(t, c.SetString(&source, key, &text))
+	if c.BudgetField.Used() != before {
+		t.Fatal("native replacement consumed arena budget")
+	}
+	if _, e := original.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("replaced view still valid", e)
+	}
+	if b, e := copied.Byte(0); e != nil || b != 'o' {
+		t.Fatal("replacement invalidated independent copy", b, e)
+	}
+	updated, e := c.GetStringViewFallbackName(&source, &name, nil, nil)
+	paramsMust(t, e)
+	if n, e := updated.Length(); e != nil || n != uint64(len("replacement")) {
+		t.Fatal("native C-string prefix", n, e)
+	}
+	paramsMust(t, c.Reset(&source))
+	if _, e := updated.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("reset did not invalidate view", e)
+	}
+	if b, e := copied.Byte(0); e != nil || b != 'o' {
+		t.Fatal("reset invalidated independent copy", b, e)
+	}
+	paramsMust(t, c.Close())
+	if _, e := copied.Byte(0); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("close did not invalidate view", e)
+	}
+}

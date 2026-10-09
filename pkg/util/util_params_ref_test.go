@@ -457,14 +457,16 @@ func TestParamsReferenceSourceGrowthAndFailurePrefixes(t *testing.T) {
 // numerator with an inline denominator, hence owns exactly one numeric cell.
 func paramsAuditRoots(t *testing.T, c *ParamsContext, q *RationalService, base, basePayloads uint32, roots []ParamsRef) {
 	t.Helper()
-	var strings, bigs uint32
+	var bigs uint32
 	for i, frame := range c.replacementFrames {
 		if frame.active {
 			if frame.invocation == 0 || frame.generation != c.Blocks[i].Generation || frame.index >= c.Blocks[i].Size {
 				t.Fatal("invalid declared replacement frame")
 			}
 			if frame.next.text.present && !frame.next.text.borrowed {
-				strings++
+				if _, e := frame.next.text.owned.read(); e != nil {
+					t.Fatal("invalid prepared native string", e)
+				}
 			}
 		}
 	}
@@ -521,16 +523,15 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *RationalService, base, 
 		}
 		for j := uint32(0); j < b.Size; j++ {
 			x := c.Entry(b, j)
-			if x.text.present {
-				strings++
+			if x.text.present && !x.text.borrowed {
+				if _, e := x.text.owned.read(); e != nil {
+					t.Fatal("invalid native string root", e)
+				}
 			}
 			if x.Kind == ParamNumeral {
 				auditNumeral(&x.Rat)
 			}
 		}
-	}
-	if c.Texts.Stats().Live != strings {
-		t.Fatal("lost text payload", c.Texts.Stats().Live, strings)
 	}
 	got, e := q.Stats()
 	paramsMust(t, e)
@@ -764,7 +765,7 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 }
 
 func TestParamsReferenceConstructorFaultAndRecordShape(t *testing.T) {
-	for _, typ := range []reflect.Type{reflect.TypeOf(ParamsRef{}), reflect.TypeOf(paramsBlock{}), reflect.TypeOf(paramEntry{}), reflect.TypeOf(paramsEntriesRef{})} {
+	for _, typ := range []reflect.Type{reflect.TypeOf(ParamsRef{}), reflect.TypeOf(paramsBlock{}), reflect.TypeOf(paramsEntriesRef{})} {
 		paramsMust(t, arena.ValidateRecordType(typ))
 	}
 	b := arena.NewBudget(^uint64(0))
@@ -873,12 +874,11 @@ func TestParamsReferenceExactContextAccountingAndGrowthPeak(t *testing.T) {
 	three := internSymbol(t, sy, "three")
 	baseline := c.BudgetField.Used()
 	s := c.Stats()
-	cold := s.HeaderBytes + s.Text.OwnerBytes + s.Text.Descriptors.OwnerBytes
+	cold := s.HeaderBytes
 	borrowed := baseline - cold
 	check := func() {
 		s := c.Stats()
-		d := s.Text.Descriptors
-		total := s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.ReplacementBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+		total := s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.ReplacementBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes
 		if c.BudgetField.Used() != borrowed+total {
 			t.Fatal("actual context charge", c.BudgetField.Used(), borrowed+total)
 		}
@@ -1014,17 +1014,7 @@ func TestParamsReferenceProvenanceBeforeMutation(t *testing.T) {
 	_ = q
 }
 
-func TestParamsReferenceCStringLengthBounds(t *testing.T) {
-	for _, n := range []uint64{0, 1, uint64(^uint32(0))} {
-		got, e := paramsCheckedTextLength(n)
-		paramsMust(t, e)
-		if uint64(got) != n {
-			t.Fatal("length wrapped", n, got)
-		}
-	}
-	if _, e := paramsCheckedTextLength(uint64(^uint32(0)) + 1); e != arena.ErrBounds {
-		t.Fatal("oversized prefix accepted", e)
-	}
+func TestParamsReferenceCStringPrefix(t *testing.T) {
 	// Stop at the first NUL before measuring the host prefix; later bytes are not
 	// part of a source C string and must not affect the stored length.
 	c, sy, _ := paramsTestOwner(t)
@@ -1033,8 +1023,8 @@ func TestParamsReferenceCStringLengthBounds(t *testing.T) {
 	text := "x\x00tail"
 	paramsMust(t, c.SetString(&a, internSymbol(t, sy, "s"), &text))
 	x := c.Entry(&c.Blocks[a.Slot-1], 0)
-	if x.text.size != 1 {
-		t.Fatal(x.text.size)
+	if len(x.text.owned.value) != 1 {
+		t.Fatal(x.text.owned.value)
 	}
 	paramsMust(t, c.Del(&a))
 }

@@ -138814,7 +138814,7 @@
         "TestParamsReferenceExactContextAccountingAndGrowthPeak",
         "TestParamsReferenceFiniteSignedRatAndNullDefaults",
         "TestParamsReferenceProvenanceBeforeMutation",
-        "TestParamsReferenceCStringLengthBounds",
+        "TestParamsReferenceCStringPrefix",
         "TestParamsBorrowedStringSymbolCopyAndOwnership",
         "TestParamsBorrowedStringSymbolReplacementAndWarmSet",
         "TestParamsBorrowedStringSymbolProvenanceAndLifetimeGuards",
@@ -138847,7 +138847,7 @@
         "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
         "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
         "TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish",
-        "TestParamsReferenceMatchedReplacementAllPreparedTextPrefixes",
+        "TestParamsReferenceMatchedReplacementNativeText",
         "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse",
         "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
         "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
@@ -139008,7 +139008,7 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringLengthBounds"
+            "TestParamsReferenceCStringPrefix"
           ]
         },
         {
@@ -139033,7 +139033,7 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringLengthBounds"
+            "TestParamsReferenceCStringPrefix"
           ]
         },
         {
@@ -139058,7 +139058,7 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringLengthBounds"
+            "TestParamsReferenceCStringPrefix"
           ]
         },
         {
@@ -139083,7 +139083,7 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringLengthBounds"
+            "TestParamsReferenceCStringPrefix"
           ]
         },
         {
@@ -139108,7 +139108,7 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringLengthBounds"
+            "TestParamsReferenceCStringPrefix"
           ]
         },
         {
@@ -139204,7 +139204,7 @@
             "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
             "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
             "TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish",
-            "TestParamsReferenceMatchedReplacementAllPreparedTextPrefixes",
+            "TestParamsReferenceMatchedReplacementNativeText",
             "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse"
           ]
         },
@@ -139243,7 +139243,7 @@
       "ownership": [
         "Normalization reads canonical Go spelling under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PORT_PROGRESS.md#audit-param-name-port-status-md.",
         "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
-        "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
+        "Scalar owner-local ParamsRef and backing blocks retain concrete numeral tokens and native string owners with explicit view invalidation. Context header and entry/receipt arrays and directories remain budgeted; string payloads and output scratch are Go-managed outside arena accounting. Immediate real allocation fault roots remain tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
         "DisplayInto borrows the native bytes.Buffer-backed StringBuffer64; destination then descriptor then Symbol lock order. Temporary names and metadata text use native Go storage outside arena accounting. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
         "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement.",
@@ -139253,7 +139253,7 @@
         "Matched ResetKey stamps only the actual reached index, slot/generation and unique invocation in precharged block metadata; source prefix/suffix/refcount retain their exact pre-shift state during numeral cleanup stop. Explicit CompleteResetKey completes only that current leaf then assigns suffix ascending before pop, with no allocations. Unmatched keys cannot adopt earlier stopped owners.",
         "Defined absent-key lookup on a live parent after stopped numeral destruction returns without action or receipt stamp; source keys are scanned before the stopped mutation guard. Both symbol/name routes preserve original invocation, cursor, refs, size, Runtime and exact physical/cold graph. Source-ended zeroDEC lifetime is guarded before lookup separately. Historical premature whole-block guard candidate is superseded, not accepted.",
         "SET_RAT ADD stamps the actual NewValue result into precharged concrete setFrames.next.rat before Copy and retains it on actual Copy/append refusal. Source POD new_entry has no rational destructor; only true entry publication transfers ownership. Separate exact owning receipt or Context.Close releases this actual local, preserving first body and owning cleanup causes and actual consumed physical child frontier. SourceSetBytes is the independent reflected cold directory charge; audits name actual acquired tokens, not numeric live-count or RC inference.",
-        "Concrete prepared per-block replacement frame binds actual matched index, old kind, slot/generation, nonwrapping invocation and borrowed current leaf identity at reached del_value. Actual owning NUM stays only in the entry, never copied into a second owning frame. Explicit CompleteSetReplacement acknowledges consumed physical child before kind then field publication; Context.Close instead discards prepared copied text and consumed old leaf before block teardown, with no setter body publication. Reflected ReplacementBytes cold directory and any actual acquired text are separately charged/named; no RC/count/registry authority.",
+        "Concrete prepared per-block replacement frame binds actual matched index, old kind, slot/generation, nonwrapping invocation and borrowed current leaf identity at reached del_value. Actual owning NUM stays only in the entry, never copied into a second owning frame. Explicit CompleteSetReplacement acknowledges consumed physical child before kind then field publication; Context.Close instead discards prepared copied text and consumed old leaf before block teardown, with no setter body publication. Reflected ReplacementBytes cold directory remains charged; prepared Go string lifetimes are named but outside arena accounting. No RC/count/registry authority.",
         "Descriptor owner-header refusal occurs before publication; native info, name, and immutable metadata storage introduce no arena refusal after that header. Existing registry cleanup retains actual acquired child owners, with embedded descriptors charged only in their containing frame.",
         "The concrete call-local pointer view captures actual Words/ref/length or Symbol BytesRegion/ref/offset from the returned source entry. No RC, copied payload or formatting-workspace allocation is acquired. Each reached byte retains actual provider/generation/lifetime checks; returned symbol spelling may outlive ParamsContext while its provider remains live.",
         "The call-local descriptor is embedded in the charged context frame. Descriptor info uses insdict and names use native slices; metadata strings are Go-managed. Completed destruction clears names then info and releases any actual wrapper header; no separate text owner is constructed."
@@ -139267,9 +139267,9 @@
         "ZeroDEC destruction ends object lifetime at destructor entry; its consumed-entry cleanup gives no ordinary source visibility credit. Live nonDEC reset retains defined UINT/BOOL/key/size prefixes on later numeral release stop. Last-reference DEC during a stopped live Reset has explicit Go stopped-owner guard to avoid replaying consumed source leaves, not literal final-destructor execution credit. Owned copied text is released in backing disposal after source numeral traversal. Global assertion profiles, reset(key) failure shifts, context destruction readiness and other source lifecycle scopes remain partial.",
         "The first actual ResetKey numeral stop already preserved the source prefix; its RED concerns Go ordinary retry implicitly consuming a callee owning receipt. New stopped-owner guard is an explicit safety-domain adapter, not a first-call source algorithm correction. Default valid-domain scalar shift is independently checked for 56 symbol/name removal cases with reservations refusing. Global assertion/raw ABI/readiness profiles remain partial; SET_RAT untransferred local allocation ownership remains open.",
         "Only ADD/untransferred local path selected; existing-key exceptional destruction, native pointer ABI/global assertions and wider profiles stay partial. TLS signed-overflow guarded cleanup-stop proof is distinct from ordinary actual reservation/refusal campaigns. No source whole-class/ownership-audited promotion.",
-        "Actual repeated ordinary setter consumed a callee owning receipt after postphysical TLS guard; this RED is Go stopped-owner safety-domain protocol, not first-call source math RED. Eleven source kind/name cases, pure absent RESET/Contains/scalar read and real Context.Close nonpublish stop are proved. Source borrowed C-string versus Go copied-text preparation is explicit; all preparation ordinals are independently audited. Whole params.cpp/h remain partial; source-global/native ABI/wider profiles and broader stopped-mutation domains stay open.",
+        "Actual repeated ordinary setter consumed a callee owning receipt after postphysical TLS guard; this RED is Go stopped-owner safety-domain protocol, not first-call source math RED. Eleven source kind/name cases, pure absent RESET/Contains/scalar read and real Context.Close nonpublish stop are proved. Source borrowed C-string versus Go-owned immutable text is explicit; native string preparation introduces no arena reservation. Whole params.cpp/h remain partial; source-global/native ABI/wider profiles and broader stopped-mutation domains stay open.",
         "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM.",
-        "Existing string getter APIs remain unchanged. The existing Words text codec virtual terminator is a precise representation adaptation; native pointer ABI and standalone whole Params exceptional lifetime families remain open. Getter and view tests are independent, no registered driver credit.",
+        "Existing string getter APIs retain nullable and borrowed-view behavior. Native strings expose a virtual NUL terminator; distinct owned string lifetimes invalidate views on replacement/reset/close, while borrowed symbols keep their provider lifetime. Native pointer ABI and standalone whole Params exceptional lifetime families remain open. Getter and view tests are independent, no registered driver credit.",
         "This same-engine factoring adds no whole param_descrs lifecycle or source native ABI/registered-driver credit."
       ]
     },
@@ -139333,7 +139333,7 @@
         "TestParamsReferenceExactContextAccountingAndGrowthPeak",
         "TestParamsReferenceFiniteSignedRatAndNullDefaults",
         "TestParamsReferenceProvenanceBeforeMutation",
-        "TestParamsReferenceCStringLengthBounds",
+        "TestParamsReferenceCStringPrefix",
         "TestParamsBorrowedStringSymbolCopyAndOwnership",
         "TestParamsBorrowedStringSymbolReplacementAndWarmSet",
         "TestParamsBorrowedStringSymbolProvenanceAndLifetimeGuards",
@@ -139366,7 +139366,7 @@
         "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
         "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
         "TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish",
-        "TestParamsReferenceMatchedReplacementAllPreparedTextPrefixes",
+        "TestParamsReferenceMatchedReplacementNativeText",
         "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse",
         "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
         "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
@@ -139488,7 +139488,7 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringLengthBounds"
+            "TestParamsReferenceCStringPrefix"
           ]
         },
         {
@@ -139513,7 +139513,7 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringLengthBounds"
+            "TestParamsReferenceCStringPrefix"
           ]
         },
         {
@@ -139538,7 +139538,7 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringLengthBounds"
+            "TestParamsReferenceCStringPrefix"
           ]
         },
         {
@@ -139563,7 +139563,7 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringLengthBounds"
+            "TestParamsReferenceCStringPrefix"
           ]
         },
         {
@@ -139588,7 +139588,7 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringLengthBounds"
+            "TestParamsReferenceCStringPrefix"
           ]
         },
         {
@@ -139684,7 +139684,7 @@
             "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
             "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
             "TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish",
-            "TestParamsReferenceMatchedReplacementAllPreparedTextPrefixes",
+            "TestParamsReferenceMatchedReplacementNativeText",
             "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse"
           ]
         },
@@ -139702,7 +139702,7 @@
       "ownership": [
         "Normalization reads canonical Go spelling under owner lock and produces one caller-owned output string without interning, retained workspace or intermediate symbol spelling. See PORT_PROGRESS.md#audit-param-name-port-status-md.",
         "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
-        "Scalar owner-local ParamsRef and backing blocks; typed pooled pointer-free entries retain concrete numeral tokens and owned packed C text. Context header, all arrays/directories/text/workspaces and old/new peaks charged; immediate fault roots tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
+        "Scalar owner-local ParamsRef and backing blocks retain concrete numeral tokens and native string owners with explicit view invalidation. Context header and entry/receipt arrays and directories remain budgeted; string payloads and output scratch are Go-managed outside arena accounting. Immediate real allocation fault roots remain tested. Source action publication and shared resets preserved. See PORT_PROGRESS.md#audit-params-ref-port-status-md.",
         "Borrowed canonical spelling occupies existing scalar symbol field with a paramsText tag; copy retains identity and deletion frees only owned text. SymbolManager outlives borrowers; physical record stride remains reflect-accounted. See PORT_PROGRESS.md#audit-gparams-port-status-md.",
         "DisplayInto borrows the native bytes.Buffer-backed StringBuffer64; destination then descriptor then Symbol lock order. Temporary names and metadata text use native Go storage outside arena accounting. See PORT_PROGRESS.md#audit-param-descrs-stream-port-status-md.",
         "Actual zero-ref leaf destruction stop retains pointer-free per-block cursor/stage and precharged cold cause/generation receipts; exact current entry numeral is retained, mutation cannot replace it, independent blocks can stop/continue separately. Explicit CleanupDecrement and owning context Close acknowledge actual child release receipts without a second decrement. Whole ownership remains unproven for Reset/resetBlock outside zero-ref DEC and exceptional copy/init/value replacement.",
@@ -139712,7 +139712,7 @@
         "Matched ResetKey stamps only the actual reached index, slot/generation and unique invocation in precharged block metadata; source prefix/suffix/refcount retain their exact pre-shift state during numeral cleanup stop. Explicit CompleteResetKey completes only that current leaf then assigns suffix ascending before pop, with no allocations. Unmatched keys cannot adopt earlier stopped owners.",
         "Defined absent-key lookup on a live parent after stopped numeral destruction returns without action or receipt stamp; source keys are scanned before the stopped mutation guard. Both symbol/name routes preserve original invocation, cursor, refs, size, Runtime and exact physical/cold graph. Source-ended zeroDEC lifetime is guarded before lookup separately. Historical premature whole-block guard candidate is superseded, not accepted.",
         "SET_RAT ADD stamps the actual NewValue result into precharged concrete setFrames.next.rat before Copy and retains it on actual Copy/append refusal. Source POD new_entry has no rational destructor; only true entry publication transfers ownership. Separate exact owning receipt or Context.Close releases this actual local, preserving first body and owning cleanup causes and actual consumed physical child frontier. SourceSetBytes is the independent reflected cold directory charge; audits name actual acquired tokens, not numeric live-count or RC inference.",
-        "Concrete prepared per-block replacement frame binds actual matched index, old kind, slot/generation, nonwrapping invocation and borrowed current leaf identity at reached del_value. Actual owning NUM stays only in the entry, never copied into a second owning frame. Explicit CompleteSetReplacement acknowledges consumed physical child before kind then field publication; Context.Close instead discards prepared copied text and consumed old leaf before block teardown, with no setter body publication. Reflected ReplacementBytes cold directory and any actual acquired text are separately charged/named; no RC/count/registry authority.",
+        "Concrete prepared per-block replacement frame binds actual matched index, old kind, slot/generation, nonwrapping invocation and borrowed current leaf identity at reached del_value. Actual owning NUM stays only in the entry, never copied into a second owning frame. Explicit CompleteSetReplacement acknowledges consumed physical child before kind then field publication; Context.Close instead discards prepared copied text and consumed old leaf before block teardown, with no setter body publication. Reflected ReplacementBytes cold directory remains charged; prepared Go string lifetimes are named but outside arena accounting. No RC/count/registry authority.",
         "Descriptor owner-header refusal occurs before publication; native info, name, and immutable metadata storage introduce no arena refusal after that header. Existing registry cleanup retains actual acquired child owners, with embedded descriptors charged only in their containing frame."
       ],
       "deviations": [
@@ -139724,7 +139724,7 @@
         "ZeroDEC destruction ends object lifetime at destructor entry; its consumed-entry cleanup gives no ordinary source visibility credit. Live nonDEC reset retains defined UINT/BOOL/key/size prefixes on later numeral release stop. Last-reference DEC during a stopped live Reset has explicit Go stopped-owner guard to avoid replaying consumed source leaves, not literal final-destructor execution credit. Owned copied text is released in backing disposal after source numeral traversal. Global assertion profiles, reset(key) failure shifts, context destruction readiness and other source lifecycle scopes remain partial.",
         "The first actual ResetKey numeral stop already preserved the source prefix; its RED concerns Go ordinary retry implicitly consuming a callee owning receipt. New stopped-owner guard is an explicit safety-domain adapter, not a first-call source algorithm correction. Default valid-domain scalar shift is independently checked for 56 symbol/name removal cases with reservations refusing. Global assertion/raw ABI/readiness profiles remain partial; SET_RAT untransferred local allocation ownership remains open.",
         "Only ADD/untransferred local path selected; existing-key exceptional destruction, native pointer ABI/global assertions and wider profiles stay partial. TLS signed-overflow guarded cleanup-stop proof is distinct from ordinary actual reservation/refusal campaigns. No source whole-class/ownership-audited promotion.",
-        "Actual repeated ordinary setter consumed a callee owning receipt after postphysical TLS guard; this RED is Go stopped-owner safety-domain protocol, not first-call source math RED. Eleven source kind/name cases, pure absent RESET/Contains/scalar read and real Context.Close nonpublish stop are proved. Source borrowed C-string versus Go copied-text preparation is explicit; all preparation ordinals are independently audited. Whole params.cpp/h remain partial; source-global/native ABI/wider profiles and broader stopped-mutation domains stay open.",
+        "Actual repeated ordinary setter consumed a callee owning receipt after postphysical TLS guard; this RED is Go stopped-owner safety-domain protocol, not first-call source math RED. Eleven source kind/name cases, pure absent RESET/Contains/scalar read and real Context.Close nonpublish stop are proved. Source borrowed C-string versus Go-owned immutable text is explicit; native string preparation introduces no arena reservation. Whole params.cpp/h remain partial; source-global/native ABI/wider profiles and broader stopped-mutation domains stay open.",
         "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM."
       ]
     },

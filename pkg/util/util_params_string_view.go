@@ -12,9 +12,8 @@ import (
 // Cold borrowed source pointer. Captured storage/provider/ref comes from the
 // actual returned entry; no context workspace, copied string or RC is acquired.
 type ParamsStringView struct {
-	words        *arena.Words
-	ref          arena.VectorRef
-	size         uint32
+	owned        *paramsOwnedString
+	context      *ParamsContext
 	symbols      *usymbol.Manager
 	symbol       usymbol.Symbol
 	literal      string
@@ -40,20 +39,23 @@ func (v ParamsStringView) Byte(i uint64) (byte, error) {
 		}
 		return v.literal[i], nil
 	case 2:
-		if v.words == nil {
+		if v.context == nil {
 			return 0, ErrParamsOwner
 		}
-		if i > uint64(v.size) {
-			return 0, arena.ErrBounds
+		if v.context.Closed {
+			return 0, arena.ErrClosed
 		}
-		// Existing params text codec omits a separate NUL word for multiples of
-		// four. Its virtual terminator retains the actual descriptor lifetime check.
-		if i == uint64(v.size) {
-			_, e := v.words.Len(v.ref)
+		value, e := v.owned.read()
+		if e != nil {
 			return 0, e
 		}
-		n, e := v.words.Read(v.ref, uint32(i/4))
-		return byte(n >> (8 * (i % 4))), e
+		if i > uint64(len(value)) {
+			return 0, arena.ErrBounds
+		}
+		if i == uint64(len(value)) {
+			return 0, nil
+		}
+		return value[i], nil
 	case 3:
 		if v.symbols == nil {
 			return 0, ErrParamsOwner
@@ -108,5 +110,5 @@ func (c *ParamsContext) GetStringViewFallbackName(v *ParamsRef, k *string, f *Pa
 	if x.text.borrowed {
 		return ParamsStringView{symbols: c.SymbolsField, symbol: x.symbol, Mode: 3, PresentField: true}, nil
 	}
-	return ParamsStringView{words: c.Texts, ref: x.text.ref, size: x.text.size, Mode: 2, PresentField: true}, nil
+	return ParamsStringView{owned: x.text.owned, context: c, Mode: 2, PresentField: true}, nil
 }

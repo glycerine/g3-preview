@@ -280,7 +280,7 @@ func TestContextParamsMergeEveryContextCOWReservationPreservesInputAndExactRetur
 		out, e := s.MergeDefaultParams(p)
 		contextMethodsCold(t, s, g, b)
 		cs := c.Stats()
-		cold := cs.HeaderBytes + cs.BlockBytes + cs.ReceiptBytes + cs.SourceFrameBytes + cs.SourceSetBytes + cs.ReplacementBytes + cs.PageBytes + cs.DirectoryBytes + cs.FormatBytes + gparamsVectorGraph(cs.Text)
+		cold := cs.HeaderBytes + cs.BlockBytes + cs.ReceiptBytes + cs.SourceFrameBytes + cs.SourceSetBytes + cs.ReplacementBytes + cs.PageBytes + cs.DirectoryBytes + cs.FormatBytes
 		if cold != bc.Used() || astTestSymbolGraph(sy) != bs.Used() {
 			t.Fatal("immediate named COW and separate borrowed-symbol cold owners", cold, bc.Used())
 		}

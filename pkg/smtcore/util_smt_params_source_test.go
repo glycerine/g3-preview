@@ -741,9 +741,8 @@ func TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation(t *testing.
 		s, e := NewSMTParams(c, &p, g, b)
 		smtParamsNamedCold(t, s, g, b)
 		st := c.Stats()
-		ts := c.Texts.Stats()
-		if bc.Used() != st.HeaderBytes+st.BlockBytes+st.ReceiptBytes+st.SourceFrameBytes+st.SourceSetBytes+st.ReplacementBytes+st.PageBytes+st.DirectoryBytes+st.FormatBytes+gparamsVectorGraph(ts) {
-			t.Fatal("named actual context storage", ordinal, st, ts, bc.Used())
+		if bc.Used() != st.HeaderBytes+st.BlockBytes+st.ReceiptBytes+st.SourceFrameBytes+st.SourceSetBytes+st.ReplacementBytes+st.PageBytes+st.DirectoryBytes+st.FormatBytes {
+			t.Fatal("named actual context storage", ordinal, st, bc.Used())
 		}
 		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
 			t.Fatal(e)

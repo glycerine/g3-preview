@@ -78,12 +78,7 @@ func (c *ParamsContext) continueReplacement(slot uint32, publish bool) error {
 		// Context owning abort is distinct from resuming the failed setter body.
 		// It discards only the actual prepared argument and consumed old leaf.
 		if f.next.text.present && !f.next.text.borrowed {
-			if e := c.Texts.Free(f.next.text.ref); e != nil {
-				if f.cleanupCause == nil {
-					f.cleanupCause = e
-				}
-				return e
-			}
+			f.next.text.owned.release()
 		}
 		*entry = paramEntry{}
 	}

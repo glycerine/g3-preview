@@ -20,10 +20,9 @@ func TestParamsBorrowedStringSymbolCopyAndOwnership(t *testing.T) {
 	paramsMust(t, e)
 	paramsMust(t, c.SetStringSymbol(&v, k, spelling))
 	x := c.Entry(&c.Blocks[v.Slot-1], 0)
-	if x.Kind != ParamString || x.symbol != spelling || !x.text.borrowed || !x.text.present || x.text.ref != (arena.VectorRef{}) {
+	if x.Kind != ParamString || x.symbol != spelling || !x.text.borrowed || !x.text.present || x.text.owned != nil {
 		t.Fatal("scalar borrowed record", *x)
 	}
-	before := c.Texts.Stats()
 	text, present, e := c.GetString(&v, k, nil)
 	paramsMust(t, e)
 	if !present || text != "real borrowed" {
@@ -37,11 +36,8 @@ func TestParamsBorrowedStringSymbolCopyAndOwnership(t *testing.T) {
 	paramsMust(t, c.SetUInt(&dst, k, 9))
 	paramsMust(t, c.Copy(&dst, &v))
 	y := c.Entry(&c.Blocks[dst.Slot-1], 0)
-	if !y.text.borrowed || y.symbol != spelling || y.text.ref != (arena.VectorRef{}) {
+	if !y.text.borrowed || y.symbol != spelling || y.text.owned != nil {
 		t.Fatal("copy lost borrowed identity", *y)
-	}
-	if c.Texts.Stats() != before {
-		t.Fatal("borrowed copy allocated owned text")
 	}
 	paramsMust(t, c.Del(&v))
 	text, present, e = c.GetString(&dst, k, nil)
@@ -67,12 +63,12 @@ func TestParamsBorrowedStringSymbolReplacementAndWarmSet(t *testing.T) {
 	paramsMust(t, e)
 	owned := "owned payload"
 	paramsMust(t, c.SetString(&v, k, &owned))
-	old := c.Entry(&c.Blocks[v.Slot-1], 0).text.ref
-	if !c.Texts.IsLive(old) {
+	old := c.Entry(&c.Blocks[v.Slot-1], 0).text.owned
+	if !old.live {
 		t.Fatal("owned precondition")
 	}
 	paramsMust(t, c.SetStringSymbol(&v, k, empty))
-	if c.Texts.IsLive(old) {
+	if old.live {
 		t.Fatal("replacement retained owned root")
 	}
 	text, present, e := c.GetString(&v, k, nil)
@@ -128,8 +124,7 @@ func TestParamsBorrowedStringSymbolProvenanceAndLifetimeGuards(t *testing.T) {
 }
 
 func paramsBorrowedPhysicalBytes(s ParamsStats) uint64 {
-	d := s.Text.Descriptors
-	return s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.ReplacementBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes + s.Text.OwnerBytes + s.Text.PayloadBytes + s.Text.BlockMetadataBytes + s.Text.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+	return s.HeaderBytes + s.BlockBytes + s.ReceiptBytes + s.SourceFrameBytes + s.SourceSetBytes + s.ReplacementBytes + s.PageBytes + s.DirectoryBytes + s.FormatBytes
 }
 func TestParamsBorrowedStringSymbolSharedCopyFaultPrefixes(t *testing.T) {
 	for fail := int64(0); fail < 12; fail++ {
@@ -148,7 +143,6 @@ func TestParamsBorrowedStringSymbolSharedCopyFaultPrefixes(t *testing.T) {
 		paramsMust(t, c.Assign(&alias, &v))
 		baseline := c.BudgetField.Used() - paramsBorrowedPhysicalBytes(c.Stats())
 		original := *c.Entry(&c.Blocks[v.Slot-1], 0)
-		wordsBefore := c.Texts.Stats()
 		c.BudgetField.FailAfter(fail)
 		e = c.SetStringSymbol(&alias, k, next)
 		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
@@ -158,9 +152,6 @@ func TestParamsBorrowedStringSymbolSharedCopyFaultPrefixes(t *testing.T) {
 		// before any getter can grow format scratch or teardown hides a root.
 		if got := *c.Entry(&c.Blocks[v.Slot-1], 0); got != original {
 			t.Fatal("shared source changed", fail)
-		}
-		if c.Texts.Stats() != wordsBefore {
-			t.Fatal("copy-on-write allocated spelling", fail)
 		}
 		if got, want := c.BudgetField.Used(), baseline+paramsBorrowedPhysicalBytes(c.Stats()); got != want {
 			t.Fatal("actual prefix graph", fail, got, want)
