@@ -49,7 +49,6 @@ func NewPolynomialSOMBuffer(m *MultivariatePolynomialCore) (*PolynomialSOMBuffer
 	b := &PolynomialSOMBuffer{storage: m, header: h}
 	b.self = b
 	b.buffer.as.width = 12
-	b.buffer.ms.width = 16
 	b.buffer.positions.self = &b.buffer.positions
 	// Borrowed transport is not source m_owner. The latter stays null until
 	// the actual set_owner call, and empty Reset never dereferences it.
@@ -251,24 +250,6 @@ func (b *PolynomialSOMBuffer) prepareRetirement(need uint32) error {
 		b.retiredNumerals = a
 		b.storage.integer.Budget().Release(uint64(old) * stride)
 	}
-	if need > uint32(len(b.retiredMonomials)) {
-		old := len(b.retiredMonomials)
-		n := old + old/2 + 1
-		if uint64(n) < uint64(need) {
-			n = int(need)
-		}
-		stride := uint64(reflect.TypeOf(somRetainedMonomial{}).Size())
-		if uint64(n) > uint64(^uint(0)>>1)/stride {
-			return arena.ErrBounds
-		}
-		if e := b.storage.integer.Budget().Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		a := make([]somRetainedMonomial, n)
-		copy(a, b.retiredMonomials)
-		b.retiredMonomials = a
-		b.storage.integer.Budget().Release(uint64(old) * stride)
-	}
 	return nil
 }
 func (b *PolynomialSOMBuffer) ownsMonomial(i uint32) bool {
@@ -290,9 +271,6 @@ func (b *PolynomialSOMBuffer) retireMonomials() error {
 	for b.monomialTransferred < n {
 		i := b.monomialTransferred
 		if b.ownsMonomial(i) {
-			if b.retiredMonomialCount >= uint32(len(b.retiredMonomials)) {
-				return ErrPolynomialPending
-			}
 			t, e := a.ms.monomial(b.storage, i)
 			if e != nil {
 				return e
@@ -305,7 +283,7 @@ func (b *PolynomialSOMBuffer) retireMonomials() error {
 				}
 				dropping = l.stage != 0
 			}
-			b.retiredMonomials[b.retiredMonomialCount] = somRetainedMonomial{t, dropping}
+			b.retiredMonomials = append(b.retiredMonomials, somRetainedMonomial{t, dropping})
 			b.retiredMonomialCount++
 		}
 		b.monomialTransferred++
@@ -353,11 +331,7 @@ func (b *PolynomialSOMBuffer) SourceFinalize() error {
 		if e := b.retireMonomials(); e != nil {
 			return fail(e)
 		}
-		if b.buffer.ms.raw != (util.Block{}) {
-			if e := b.storage.memory.Deallocate(&b.buffer.ms.raw); e != nil {
-				return fail(e)
-			}
-		}
+		b.buffer.ms = nil
 		b.sourceStage++
 	}
 	if b.sourceStage == 1 {
@@ -469,7 +443,7 @@ func (b *PolynomialSOMBuffer) CloseChecked() error {
 			return e
 		}
 	}
-	b.storage.integer.Budget().Release(b.header + uint64(cap(b.retiredNumerals))*uint64(reflect.TypeOf(util.Int{}).Size()) + uint64(cap(b.retiredMonomials))*uint64(reflect.TypeOf(somRetainedMonomial{}).Size()))
+	b.storage.integer.Budget().Release(b.header + uint64(cap(b.retiredNumerals))*uint64(reflect.TypeOf(util.Int{}).Size()))
 	b.header = 0
 	b.retiredNumerals = nil
 	b.retiredMonomials = nil

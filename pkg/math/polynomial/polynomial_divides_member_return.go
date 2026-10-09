@@ -22,7 +22,7 @@ func (b *polynomialSOM) transferArithmeticRowsToMember(r *polynomialArithmeticIn
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
-	if s.transportBound || s.positionPublished || s.singleton != (Monomial{}) || s.generated != (Monomial{}) || s.calleeGeneration != 0 || (m.monomials.matchesMonomialAllocatorInvocation(&s.monomialAllocator) && s.monomialAllocator.outcome.Pending != (util.Block{})) || s.numeric.PendingObject().OwnerID() != 0 || s.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) || m.matchesFactoryInvocation(&s.factory) || m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesAddMulInvocation(&s.addMul) {
+	if s.transportBound || s.singleton != (Monomial{}) || s.generated != (Monomial{}) || s.calleeGeneration != 0 || (m.monomials.matchesMonomialAllocatorInvocation(&s.monomialAllocator) && s.monomialAllocator.outcome.Pending != (util.Block{})) || s.numeric.PendingObject().OwnerID() != 0 || s.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) || m.matchesFactoryInvocation(&s.factory) || m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesAddMulInvocation(&s.addMul) {
 		return ErrPolynomialPending
 	}
 	a := &b.appendScope

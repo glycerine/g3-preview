@@ -78,9 +78,9 @@ func polynomialSOMNamedRoots(t *testing.T, m *MultivariatePolynomialCore, vector
 	}
 	for _, b := range buffers {
 		a := &b.buffer
-		extra += b.header + uint64(cap(b.retiredNumerals))*uint64(reflect.TypeOf(util.Int{}).Size()) + uint64(cap(b.retiredMonomials))*uint64(reflect.TypeOf(somRetainedMonomial{}).Size())
+		extra += b.header + uint64(cap(b.retiredNumerals))*uint64(reflect.TypeOf(util.Int{}).Size())
 		extra += a.positions.header + uint64(cap(a.as.retired))*uint64(reflect.TypeOf(util.Int{}).Size()) + uint64(cap(b.sortNumerals.retired))*uint64(reflect.TypeOf(util.Int{}).Size())
-		for _, s := range []*polynomialVector{&a.as, &a.ms, &b.sortNumerals} {
+		for _, s := range []*polynomialVector{&a.as, &b.sortNumerals} {
 			addRaw(s.raw)
 			addRaw(s.pending)
 			addRaw(s.old)

@@ -31743,3 +31743,33 @@ passed. Manifest counts unchanged. The 21:43–21:45 UTC full native module
 checkpoint remains current. Overall knot/split goal remains active: shared SOM
 numeral/monomial columns and core numeral vectors still need native conversion,
 then remaining SAT containers and internal util package seams.
+
+## Native SOM monomial columns
+
+SOM monomial handles now use a concrete Go slice and sort.Slice with the
+source descending graded-lex comparison. Removed their byte codec, Runtime
+growth/release failures, charged retired-container capacity and handwritten
+heapsort. Native retirement retains actual monomial references for explicit
+owning cleanup. Numeral columns and their real numerical ownership remain.
+
+Removed the arithmetic position marker and eight obsolete tests whose failure
+paths depended on container allocation between position publication and native
+append. Factory receipt fixtures now trigger genuine object or location
+allocation failures; the sqrt postphysical fixture explicitly primes actual
+Runtime storage. The debug BIG-copy fixture accepts completed NULL cleanup
+after a real failed acquisition rather than demanding leftover storage.
+
+A 129-term independent powers fixture checks native sorting with Runtime
+reservations disabled, unchanged Runtime accounting, coefficient pairing after
+the complete sort, source retirement and owning reference cleanup. Physical
+audits enumerate actual references rather than native backing capacity.
+
+Validation: full native polynomial package passed (33.889s), focused g3debug
+passed (2.848s), module-wide test compilation, polynomial vet, gofmt/diff checks
+and portcheck passed. Manifest counts unchanged. The full native module
+checkpoint at 21:43–21:45 UTC remains the last complete module run.
+
+The knot is not yet resolved. Remaining external consumers include polynomial
+SOM/core numeral vectors, the PSC reference buffer and SAT scalar/map/vector
+storage. Internal util numeric/text/parameter dependencies also still require
+seams before moving the remaining files into subpackages.

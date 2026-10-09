@@ -35966,8 +35966,6 @@
         "pkg/math/polynomial/polynomial_power_invocation.go",
         "pkg/math/polynomial/polynomial_power_child_source_test.go",
         "pkg/math/polynomial/polynomial_power_raw_stop_source_test.go",
-        "pkg/math/polynomial/polynomial_arithmetic_position_marker_source_test.go",
-        "pkg/math/polynomial/polynomial_position_marker.go",
         "pkg/math/polynomial/polynomial_pseudo_invocation.go",
         "pkg/math/polynomial/polynomial_pseudo_allocation_context.go",
         "pkg/math/polynomial/polynomial_pseudo_created.go",
@@ -36072,7 +36070,8 @@
         "pkg/math/polynomial/polynomial_factor_min_variable_source_test.go",
         "pkg/math/polynomial/polynomial_to_polynomial_invocation.go",
         "pkg/math/polynomial/polynomial_to_polynomial_created.go",
-        "pkg/math/polynomial/polynomial_imp_binding.go"
+        "pkg/math/polynomial/polynomial_imp_binding.go",
+        "pkg/math/polynomial/polynomial_som_monomials.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -36166,7 +36165,6 @@
         "TestPolynomialConstructorCompletedMembersUnwindBeforeReturn",
         "TestPolynomialVariableConstructionFailurePrefixes",
         "TestPolynomialMultiplicationFailurePrefixes",
-        "TestPolynomialExistingZeroReferenceProductRemainsBorrowed",
         "TestPolynomialLinearMixedGeneratedFailurePrefixes",
         "TestPolynomialUnivariateGeneratedFailurePrefixes",
         "TestPolynomialSoleRetainCalleeConstructionCleanup",
@@ -36636,13 +36634,11 @@
         "TestPolynomialCheapMatchedInvocationStartsAfterForeignSourceRow",
         "TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow",
         "TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease",
-        "TestPolynomialCheapKnownPendingINCPreservesEarlierForeignRows",
         "TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend",
         "TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend",
         "TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard",
         "TestPolynomialCheapCopiedBufferFrameCannotConsumeActualRows",
         "TestPolynomialCheapOwnerClosePreservesAlreadyConsumedEarlierOwnedRow",
-        "TestPolynomialDerivativeMatchedCleanupRetiresActualPendingINC",
         "TestPolynomialDerivativeActualAppendFactoryEveryPrefix",
         "TestPolynomialDerivativeAbortPreservesLaterForeignSourceRow",
         "TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement",
@@ -36727,11 +36723,6 @@
         "TestPolynomialPowerSourceContinuationCopiedOwnerRefuses",
         "TestPolynomialPowerBodyHistorySurvivesExactOwnACK",
         "TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory",
-        "TestPolynomialRegularBorrowedPositionSurvivesOlderMonomialDestruction",
-        "TestPolynomialRegularPositionMarkerPreservesRecycledForeignWrite",
-        "TestPolynomialRegularPositionMarkerCallbackWritePreserved",
-        "TestPolynomialRegularPositionMarkerRejectsCopiedAndStaleAcquisition",
-        "TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken",
         "TestPolynomialPseudoActualCoefficientChildPrefixes",
         "TestPolynomialPseudoReceiptActualFrameAndReuse",
         "TestPolynomialPseudoActualMinusANumericAcquisition",
@@ -36905,7 +36896,8 @@
         "TestPolynomialGlobalConvertReturnedResultNativeMonomials",
         "TestPolynomialSparseNativeMonomialGrowthAcross129Groups",
         "TestPolynomialSparseNativeNumeralGrowthAndReuse",
-        "TestPolynomialSparseNativeLocalsIndependentSeventeenSamples"
+        "TestPolynomialSparseNativeLocalsIndependentSeventeenSamples",
+        "TestPolynomialSOMNativeMonomialSortIndependentPowers"
       ],
       "conditionals": [
         {
@@ -38882,7 +38874,6 @@
             "TestPolynomialConstructorCompletedMembersUnwindBeforeReturn",
             "TestPolynomialVariableConstructionFailurePrefixes",
             "TestPolynomialMultiplicationFailurePrefixes",
-            "TestPolynomialExistingZeroReferenceProductRemainsBorrowed",
             "TestPolynomialLinearMixedGeneratedFailurePrefixes",
             "TestPolynomialUnivariateGeneratedFailurePrefixes",
             "TestPolynomialSoleRetainCalleeConstructionCleanup",
@@ -40022,7 +40013,6 @@
             "TestPolynomialCheapMatchedInvocationStartsAfterForeignSourceRow",
             "TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow",
             "TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease",
-            "TestPolynomialCheapKnownPendingINCPreservesEarlierForeignRows",
             "TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend",
             "TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend",
             "TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard",
@@ -40046,7 +40036,6 @@
             "TestPolynomialCheapMatchedInvocationStartsAfterForeignSourceRow",
             "TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow",
             "TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease",
-            "TestPolynomialCheapKnownPendingINCPreservesEarlierForeignRows",
             "TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend",
             "TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend",
             "TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard",
@@ -40070,7 +40059,6 @@
             "TestPolynomialCheapMatchedInvocationStartsAfterForeignSourceRow",
             "TestPolynomialCheapKnownPartialCopyPreservesEarlierForeignRow",
             "TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease",
-            "TestPolynomialCheapKnownPendingINCPreservesEarlierForeignRows",
             "TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend",
             "TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend",
             "TestPolynomialCheapFactoryCoefficientMoveBeforeZeroRefSourceGuard",
@@ -40086,7 +40074,6 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_derivative.go",
           "tests": [
-            "TestPolynomialDerivativeMatchedCleanupRetiresActualPendingINC",
             "TestPolynomialDerivativeActualAppendFactoryEveryPrefix",
             "TestPolynomialDerivativeAbortPreservesLaterForeignSourceRow",
             "TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement",
@@ -40098,7 +40085,6 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_derivative.go",
           "tests": [
-            "TestPolynomialDerivativeMatchedCleanupRetiresActualPendingINC",
             "TestPolynomialDerivativeActualAppendFactoryEveryPrefix",
             "TestPolynomialDerivativeAbortPreservesLaterForeignSourceRow",
             "TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement",
@@ -40350,18 +40336,6 @@
             "TestPolynomialPowerSourceContinuationCopiedOwnerRefuses",
             "TestPolynomialPowerBodyHistorySurvivesExactOwnACK",
             "TestPolynomialPowerYoungerAddMulSourceStopPreservesOlderResultAndHistory"
-          ]
-        },
-        {
-          "name": "polynomial.cpp:454-481 monomial2pos Set/Reset row write token and regular borrowed-before-INC owning continuation",
-          "status": "partial",
-          "go_target": "pkg/math/polynomial/polynomial_position_marker.go",
-          "tests": [
-            "TestPolynomialRegularBorrowedPositionSurvivesOlderMonomialDestruction",
-            "TestPolynomialRegularPositionMarkerPreservesRecycledForeignWrite",
-            "TestPolynomialRegularPositionMarkerCallbackWritePreserved",
-            "TestPolynomialRegularPositionMarkerRejectsCopiedAndStaleAcquisition",
-            "TestPolynomialRegularPositionMarkerActualMapDestructionConsumesToken"
           ]
         },
         {
@@ -40801,7 +40775,7 @@
         "No additional lexical NUM or polynomial reference; actual factors Push publishes borrowed pointer before INC and records exact acquired ownership. Actual assertion predicate frames remain owned by the full manager; all prefix graphs precede fault lift, predicate/factors owning cleanup preserves caller RC.",
         "Power polynomial.cpp:4600-4614 acquires only its actual charged embedded result frame for k>=2 after existing entry/active/nonwrapping generation guards; exact manager/frame/nonce identifies the actual Mul arithmetic child. Completed younger source children precede older result destruction; only explicit abort drains matched unjoined child roots afterward. Source/body causes and concrete child identity survive owning acknowledgment without retaining result or numeric payload authority; new guarded invocation retires that history.",
         "Power polynomial.cpp:4600-4614 preserves the identical nonnil cleanupCause together with bodyCause/sourceCause and concrete arithmetic child identity through false/true owning acknowledgment; inactive metadata carries no result/numeric authority. Actual next guarded invocation retires all prior history.",
-        "Exact actual Set write stamps actual embedded positions owner/self, arithmetic frame/nonwrapping captured invocation and vector block/id/value. Owning reset reads the exact position slot without dereferencing borrowed monomial. Successful foreign Set/Reset acknowledges prior token at its actual write; actual reallocation carries the existing token at publication. Actual row push transfers marker ownership to the source row; no extra monomial INC.",
+        "Monomial position Set updates its native unsigned span before nonallocating native monomial append; no vector-failure marker token is retained. Actual reference and numeral ownership remains with its concrete enclosing source scope.",
         "Actual map SourceFinalize/Close acknowledges only the token bound to that physically consumed map block, before propagating any postphysical release error. Refused releases retain exact marker authority. Immutable body/source error values are not overwritten by token retirement.",
         "Pseudo polynomial.cpp:4905-5065 retains actual completed declaration stack; conditional coefficient and Power children precede minus_a construction. Direct NUM allocation captures exact owner/frame/captured nonce at real Copy/Neg/PN leaves, generated created-token authority at actual factory outcome, and R/Q row/factory transport at actual guarded actions. Younger source stops precede older NUM/ref destruction; false acknowledges completed source suffix and true only drains matched unjoined roots afterward. Inactive retirement preserves immutable body/source/cleanup and child identities without NUM/ref payload ownership.",
         "polynomial.cpp:3461-3465 constant SET acquires only the actual guarded cold continuation and direct Copy/PN leaves; no ai/ci/GCD/filter/powers construction. polynomial.cpp:3512-3530 ci is constructed after Content and before first coefficient; matched younger child source stop precedes ci DT. polynomial.cpp:5356-5480 actual child tuples are captured at invoked guards and retired false-before-older/true-after-older source suffix, with body/source/cleanup history retained separately from active authority.",
@@ -40954,7 +40928,9 @@
         "PolynomialSkeleton now uses []PolynomialSkeletonEntry, []uint32 powers and []Monomial originals, with local borrowed []Monomial sorting scratch and Go sort.Slice. Deleted Runtime payload vector codecs, inline128 class emulation, growth/free fault states, charged retired-reference arrays and transfer cursors. Failed constructors retain exactly their actual INC references in the native payload until owning Close; they do not invoke the source class destructor. Source destruction still releases entries before originals, and stopped real monomial destruction remains resumable by explicit owning cleanup. Pure-power growth through 129 terms succeeds with only the actual owner-header reservation and no Runtime allocation. Native bounds retain unsigned index wrap and debug assertions, with release bounds errors instead of exposing vector spare capacity. Retired raw uninitialized-entry/header mutation fixtures; added actual display callback owner-lifetime and native bounds coverage. The remaining shared byte-backed monomial buffer has since been removed from both sparse interpolation and cross-manager conversion; their borrowed handles use native slices. Platform sort comparator dispatch order is not claimed. No whole-unit completion credit is added.",
         "Sparse interpolation and cross-manager conversion now use borrowed []Monomial locals; their actual scoped numeral cleanup, linear solver, degree filtering, target-manager monomial conversion and polynomial publication remain. Conversion retains only newly created zero-reference monomials in its native orphan slice, without custom capacity charges or allocation failures. Removed the shared inline128/spill monomial buffer, Runtime pending/free branches and codecs. The indexed factory monomial span now accepts only borrowed native handles; unused inline/raw Runtime and polynomialVector variants are deleted. Real monomial/numeric/factory failure campaigns and foreign-owner protections remain. A 4097-entry lexical conversion fixture verifies no Runtime reservations and preserves the real returned factory root through source/owning cleanup; a 129-group single-sample interpolation independently reconstructs all coefficients and monomials twice. The old TLS pointer-buffer-free stop is retired with its removed storage. No whole-unit completion credit is added.",
         "Sparse interpolation now owns inputs, outputs and cs/new_as/as locals in native []util.Int slices. Actual zero-before-SET publication, numeric acquisition capture, source ascending Del, reverse lexical local destruction and explicit owning continuation remain. Reset retains outputs and truncates cleared inputs; source member destruction clears native slices only after their real numerals are destroyed. Solver Add/Solve borrow concrete slices and the polynomial factory borrows native coefficient/monomial spans. Removed container Runtime growth/free/old/retired roots and corresponding GCD pending-storage predicate. Native storage is outside Runtime accounting. A 4097-term constructor/input growth/reset/reuse regression permits only the actual class header reservation; embedded output construction succeeds with all Runtime reservations disabled. Independent seventeen-sample reconstruction twice exercises all native local vectors. Actual BIG-copy/numeric/solver/factory refusal campaigns and foreign callback roots remain; no whole-unit completion or util split readiness is claimed.",
-        "The core ID-indexed polynomial directory now uses []Polynomial, and linear-constructor monomial workspace/actual generated-root tags use []Monomial/[]bool. Removed their byte-vector codecs, custom container growth/fault/free paths and tag capacity charges. Actual ID recycle, factory/numeral/monomial allocation, reference lifetime and orphan cleanup remain. Rename visits native directory handles, deletion clears each recycled ID slot, constructor unwind/source member destruction release the nonowning directory. Linear source destruction retains actual unconsumed generated handles until owning cleanup; successful construction clears/truncates its workspace. Removed the now-unused vector-backed monomial span and mkTermsVector adapter. Existing callback regression now proves native directory growth, preserved peers, deletion clearing and ID reuse after relocation; source constructor/linear/rename/refusal campaigns remain. No whole-unit completion credit is added."
+        "The core ID-indexed polynomial directory now uses []Polynomial, and linear-constructor monomial workspace/actual generated-root tags use []Monomial/[]bool. Removed their byte-vector codecs, custom container growth/fault/free paths and tag capacity charges. Actual ID recycle, factory/numeral/monomial allocation, reference lifetime and orphan cleanup remain. Rename visits native directory handles, deletion clears each recycled ID slot, constructor unwind/source member destruction release the nonowning directory. Linear source destruction retains actual unconsumed generated handles until owning cleanup; successful construction clears/truncates its workspace. Removed the now-unused vector-backed monomial span and mkTermsVector adapter. Existing callback regression now proves native directory growth, preserved peers, deletion clearing and ID reuse after relocation; source constructor/linear/rename/refusal campaigns remain. No whole-unit completion credit is added.",
+        "SOM monomial columns now use concrete native []Monomial storage, with native retired-reference lists for standalone implicit source destruction. Removed pointer-vector byte codecs, Runtime growth/pending/free failures and charged retired-monomial capacity. Actual INC/DEC, position writes, append-cohort ownership and stopped reference destruction remain. Source class finalization captures actual remaining reference roots before releasing the slice; owning cleanup consumes those roots. Go sort.Slice applies the original descending graded-lex comparator in place of a handwritten STL sorting backend. With native push, no live allocation remains between position Set and marker release: removed that vector-failure marker transport and its obsolete tests, plus pending-INC tests requiring a failed pointer push. Actual numeral/field/factory refusal tests remain; cold factory fixtures now retain real caller-owned cells to force an actual location reserve, or request a genuinely allocating direct factory extent. Failed BIG assertion-copy tests retain captured-parent/NULL-release history even when source destruction already consumed the failed acquisition. Native span snapshots and complete physical audits exclude monomial slice capacity. No whole-unit completion credit is added.",
+        "A 129-term independently permuted pure-power fixture sorts native monomial handles with Runtime reservations disabled, checks every descending degree, then completes source coefficient/map movement and validates every paired coefficient. Implicit source finalization retains all actual reference roots until owning cleanup. The naked zero-reference borrowed-product test requiring refusal before native pointer push is retired: native append now completes INC ownership before the still-live numeral allocation can fail, so its eventual DEC legitimately destroys that zero-reference original. Actual square-root final-factory TLS proof now primes the real lane with a named caller allocation and includes it in physical audits, rather than relying on eliminated vector allocation traffic."
       ]
     },
     {
@@ -41226,7 +41202,8 @@
         "pkg/math/polynomial/polynomial_factor_min_variable_source_test.go",
         "pkg/math/polynomial/polynomial_to_polynomial_invocation.go",
         "pkg/math/polynomial/polynomial_to_polynomial_created.go",
-        "pkg/math/polynomial/polynomial_imp_binding.go"
+        "pkg/math/polynomial/polynomial_imp_binding.go",
+        "pkg/math/polynomial/polynomial_som_monomials.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -41320,7 +41297,6 @@
         "TestPolynomialConstructorCompletedMembersUnwindBeforeReturn",
         "TestPolynomialVariableConstructionFailurePrefixes",
         "TestPolynomialMultiplicationFailurePrefixes",
-        "TestPolynomialExistingZeroReferenceProductRemainsBorrowed",
         "TestPolynomialLinearMixedGeneratedFailurePrefixes",
         "TestPolynomialUnivariateGeneratedFailurePrefixes",
         "TestPolynomialSoleRetainCalleeConstructionCleanup",
@@ -41791,7 +41767,8 @@
         "TestPolynomialGlobalConvertReturnedResultNativeMonomials",
         "TestPolynomialSparseNativeMonomialGrowthAcross129Groups",
         "TestPolynomialSparseNativeNumeralGrowthAndReuse",
-        "TestPolynomialSparseNativeLocalsIndependentSeventeenSamples"
+        "TestPolynomialSparseNativeLocalsIndependentSeventeenSamples",
+        "TestPolynomialSOMNativeMonomialSortIndependentPowers"
       ],
       "conditionals": [
         {
@@ -42540,7 +42517,6 @@
             "TestPolynomialConstructorCompletedMembersUnwindBeforeReturn",
             "TestPolynomialVariableConstructionFailurePrefixes",
             "TestPolynomialMultiplicationFailurePrefixes",
-            "TestPolynomialExistingZeroReferenceProductRemainsBorrowed",
             "TestPolynomialLinearMixedGeneratedFailurePrefixes",
             "TestPolynomialUnivariateGeneratedFailurePrefixes",
             "TestPolynomialSoleRetainCalleeConstructionCleanup",
@@ -43554,7 +43530,9 @@
         "PolynomialFactors stores polynomial handles, unsigned multiplicities and actual reference-destruction progress in concrete native Go slices. Removed byte-encoded pointer/degree vectors, Runtime expansion/pending blocks and custom charged phase-slice growth. Push retains pointer then degree publication, unsigned total update then actual polynomial INC; SetDegree keeps the source index-zero assertion quirk and unsigned wrap. Reset/source destruction/owning cleanup retain real polynomial and constant lifetime order and stopped destructor continuation. Native storage is excluded from Runtime root/byte audits. Cold/warm growth through 4097 references verifies exact counts and multiplicity association under disabled Runtime reservations. Tests requiring a pointer-before-degree allocation failure and its resulting borrowed dangling row are retired; actual numeral/reference allocation and failure campaigns remain. The last shared polynomialUnsigned byte-vector helper is removed. No whole-unit completion credit is added.",
         "Sparse interpolation and cross-manager conversion now use borrowed []Monomial locals; their actual scoped numeral cleanup, linear solver, degree filtering, target-manager monomial conversion and polynomial publication remain. Conversion retains only newly created zero-reference monomials in its native orphan slice, without custom capacity charges or allocation failures. Removed the shared inline128/spill monomial buffer, Runtime pending/free branches and codecs. The indexed factory monomial span now accepts only borrowed native handles; unused inline/raw Runtime and polynomialVector variants are deleted. Real monomial/numeric/factory failure campaigns and foreign-owner protections remain. A 4097-entry lexical conversion fixture verifies no Runtime reservations and preserves the real returned factory root through source/owning cleanup; a 129-group single-sample interpolation independently reconstructs all coefficients and monomials twice. The old TLS pointer-buffer-free stop is retired with its removed storage. No whole-unit completion credit is added.",
         "Sparse interpolation now owns inputs, outputs and cs/new_as/as locals in native []util.Int slices. Actual zero-before-SET publication, numeric acquisition capture, source ascending Del, reverse lexical local destruction and explicit owning continuation remain. Reset retains outputs and truncates cleared inputs; source member destruction clears native slices only after their real numerals are destroyed. Solver Add/Solve borrow concrete slices and the polynomial factory borrows native coefficient/monomial spans. Removed container Runtime growth/free/old/retired roots and corresponding GCD pending-storage predicate. Native storage is outside Runtime accounting. A 4097-term constructor/input growth/reset/reuse regression permits only the actual class header reservation; embedded output construction succeeds with all Runtime reservations disabled. Independent seventeen-sample reconstruction twice exercises all native local vectors. Actual BIG-copy/numeric/solver/factory refusal campaigns and foreign callback roots remain; no whole-unit completion or util split readiness is claimed.",
-        "The core ID-indexed polynomial directory now uses []Polynomial, and linear-constructor monomial workspace/actual generated-root tags use []Monomial/[]bool. Removed their byte-vector codecs, custom container growth/fault/free paths and tag capacity charges. Actual ID recycle, factory/numeral/monomial allocation, reference lifetime and orphan cleanup remain. Rename visits native directory handles, deletion clears each recycled ID slot, constructor unwind/source member destruction release the nonowning directory. Linear source destruction retains actual unconsumed generated handles until owning cleanup; successful construction clears/truncates its workspace. Removed the now-unused vector-backed monomial span and mkTermsVector adapter. Existing callback regression now proves native directory growth, preserved peers, deletion clearing and ID reuse after relocation; source constructor/linear/rename/refusal campaigns remain. No whole-unit completion credit is added."
+        "The core ID-indexed polynomial directory now uses []Polynomial, and linear-constructor monomial workspace/actual generated-root tags use []Monomial/[]bool. Removed their byte-vector codecs, custom container growth/fault/free paths and tag capacity charges. Actual ID recycle, factory/numeral/monomial allocation, reference lifetime and orphan cleanup remain. Rename visits native directory handles, deletion clears each recycled ID slot, constructor unwind/source member destruction release the nonowning directory. Linear source destruction retains actual unconsumed generated handles until owning cleanup; successful construction clears/truncates its workspace. Removed the now-unused vector-backed monomial span and mkTermsVector adapter. Existing callback regression now proves native directory growth, preserved peers, deletion clearing and ID reuse after relocation; source constructor/linear/rename/refusal campaigns remain. No whole-unit completion credit is added.",
+        "SOM monomial columns now use concrete native []Monomial storage, with native retired-reference lists for standalone implicit source destruction. Removed pointer-vector byte codecs, Runtime growth/pending/free failures and charged retired-monomial capacity. Actual INC/DEC, position writes, append-cohort ownership and stopped reference destruction remain. Source class finalization captures actual remaining reference roots before releasing the slice; owning cleanup consumes those roots. Go sort.Slice applies the original descending graded-lex comparator in place of a handwritten STL sorting backend. With native push, no live allocation remains between position Set and marker release: removed that vector-failure marker transport and its obsolete tests, plus pending-INC tests requiring a failed pointer push. Actual numeral/field/factory refusal tests remain; cold factory fixtures now retain real caller-owned cells to force an actual location reserve, or request a genuinely allocating direct factory extent. Failed BIG assertion-copy tests retain captured-parent/NULL-release history even when source destruction already consumed the failed acquisition. Native span snapshots and complete physical audits exclude monomial slice capacity. No whole-unit completion credit is added.",
+        "A 129-term independently permuted pure-power fixture sorts native monomial handles with Runtime reservations disabled, checks every descending degree, then completes source coefficient/map movement and validates every paired coefficient. Implicit source finalization retains all actual reference roots until owning cleanup. The naked zero-reference borrowed-product test requiring refusal before native pointer push is retired: native append now completes INC ownership before the still-live numeral allocation can fail, so its eventual DEC legitimately destroys that zero-reference original. Actual square-root final-factory TLS proof now primes the real lane with a named caller allocation and includes it in physical audits, rather than relying on eliminated vector allocation traffic."
       ]
     },
     {
@@ -148764,7 +148742,8 @@
         "pkg/util/runtime_uint32_view.go",
         "pkg/math/polynomial/polynomial_gcd_power_buffer.go",
         "pkg/math/polynomial/polynomial_gcd_power_buffer_source_test.go",
-        "pkg/math/polynomial/polynomial_composition.go"
+        "pkg/math/polynomial/polynomial_composition.go",
+        "pkg/math/polynomial/polynomial_som_monomials.go"
       ],
       "tests": [
         "TestParamDescrsNativeStorageAndWarmDuplicate",
@@ -149011,7 +148990,8 @@
         "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse",
         "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership",
         "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory",
-        "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges"
+        "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges",
+        "TestPolynomialSOMNativeMonomialSortIndependentPowers"
       ],
       "conditionals": [
         {
@@ -149622,7 +149602,9 @@
         "PolynomialFactors stores polynomial handles, unsigned multiplicities and actual reference-destruction progress in concrete native Go slices. Removed byte-encoded pointer/degree vectors, Runtime expansion/pending blocks and custom charged phase-slice growth. Push retains pointer then degree publication, unsigned total update then actual polynomial INC; SetDegree keeps the source index-zero assertion quirk and unsigned wrap. Reset/source destruction/owning cleanup retain real polynomial and constant lifetime order and stopped destructor continuation. Native storage is excluded from Runtime root/byte audits. Cold/warm growth through 4097 references verifies exact counts and multiplicity association under disabled Runtime reservations. Tests requiring a pointer-before-degree allocation failure and its resulting borrowed dangling row are retired; actual numeral/reference allocation and failure campaigns remain. The last shared polynomialUnsigned byte-vector helper is removed. No whole-unit completion credit is added.",
         "SOM, Newton and skeleton child collections now use concrete native Go pointer slices instead of Runtime child-ID vectors and charged duplicate directories. Actual child construction failures, source destructor order, stopped reference/numeral cleanup and owning completion remain. Newton separately retains only actual unjoined child roots after source Flush; skeletons retain actual published contexts for later owning completion after replacement/source destruction. Native slice allocation and release are not Runtime faultpoints or charged blocks; obsolete push/directory/TLS-vector-free failure fixtures are retired. Source and owning physical censuses still enumerate actual child resources. Independent 4098-slot skeleton growth/replacement and 129-child SOM owner-charge checks supplement retained real child failure tests. No whole-unit completion credit is added.",
         "PolynomialSkeleton now uses []PolynomialSkeletonEntry, []uint32 powers and []Monomial originals, with local borrowed []Monomial sorting scratch and Go sort.Slice. Deleted Runtime payload vector codecs, inline128 class emulation, growth/free fault states, charged retired-reference arrays and transfer cursors. Failed constructors retain exactly their actual INC references in the native payload until owning Close; they do not invoke the source class destructor. Source destruction still releases entries before originals, and stopped real monomial destruction remains resumable by explicit owning cleanup. Pure-power growth through 129 terms succeeds with only the actual owner-header reservation and no Runtime allocation. Native bounds retain unsigned index wrap and debug assertions, with release bounds errors instead of exposing vector spare capacity. Retired raw uninitialized-entry/header mutation fixtures; added actual display callback owner-lifetime and native bounds coverage. The remaining shared byte-backed monomial buffer has since been removed from both sparse interpolation and cross-manager conversion; their borrowed handles use native slices. Platform sort comparator dispatch order is not claimed. No whole-unit completion credit is added.",
-        "The core ID-indexed polynomial directory now uses []Polynomial, and linear-constructor monomial workspace/actual generated-root tags use []Monomial/[]bool. Removed their byte-vector codecs, custom container growth/fault/free paths and tag capacity charges. Actual ID recycle, factory/numeral/monomial allocation, reference lifetime and orphan cleanup remain. Rename visits native directory handles, deletion clears each recycled ID slot, constructor unwind/source member destruction release the nonowning directory. Linear source destruction retains actual unconsumed generated handles until owning cleanup; successful construction clears/truncates its workspace. Removed the now-unused vector-backed monomial span and mkTermsVector adapter. Existing callback regression now proves native directory growth, preserved peers, deletion clearing and ID reuse after relocation; source constructor/linear/rename/refusal campaigns remain. No whole-unit completion credit is added."
+        "The core ID-indexed polynomial directory now uses []Polynomial, and linear-constructor monomial workspace/actual generated-root tags use []Monomial/[]bool. Removed their byte-vector codecs, custom container growth/fault/free paths and tag capacity charges. Actual ID recycle, factory/numeral/monomial allocation, reference lifetime and orphan cleanup remain. Rename visits native directory handles, deletion clears each recycled ID slot, constructor unwind/source member destruction release the nonowning directory. Linear source destruction retains actual unconsumed generated handles until owning cleanup; successful construction clears/truncates its workspace. Removed the now-unused vector-backed monomial span and mkTermsVector adapter. Existing callback regression now proves native directory growth, preserved peers, deletion clearing and ID reuse after relocation; source constructor/linear/rename/refusal campaigns remain. No whole-unit completion credit is added.",
+        "SOM monomial columns now use concrete native []Monomial storage, with native retired-reference lists for standalone implicit source destruction. Removed pointer-vector byte codecs, Runtime growth/pending/free failures and charged retired-monomial capacity. Actual INC/DEC, position writes, append-cohort ownership and stopped reference destruction remain. Source class finalization captures actual remaining reference roots before releasing the slice; owning cleanup consumes those roots. Go sort.Slice applies the original descending graded-lex comparator in place of a handwritten STL sorting backend. With native push, no live allocation remains between position Set and marker release: removed that vector-failure marker transport and its obsolete tests, plus pending-INC tests requiring a failed pointer push. Actual numeral/field/factory refusal tests remain; cold factory fixtures now retain real caller-owned cells to force an actual location reserve, or request a genuinely allocating direct factory extent. Failed BIG assertion-copy tests retain captured-parent/NULL-release history even when source destruction already consumed the failed acquisition. Native span snapshots and complete physical audits exclude monomial slice capacity. No whole-unit completion credit is added.",
+        "A 129-term independently permuted pure-power fixture sorts native monomial handles with Runtime reservations disabled, checks every descending degree, then completes source coefficient/map movement and validates every paired coefficient. Implicit source finalization retains all actual reference roots until owning cleanup. The naked zero-reference borrowed-product test requiring refusal before native pointer push is retired: native append now completes INC ownership before the still-live numeral allocation can fail, so its eventual DEC legitimately destroys that zero-reference original. Actual square-root final-factory TLS proof now primes the real lane with a named caller allocation and includes it in physical audits, rather than relying on eliminated vector allocation traffic."
       ]
     },
     {

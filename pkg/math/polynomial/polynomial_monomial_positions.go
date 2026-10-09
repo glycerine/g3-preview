@@ -12,14 +12,12 @@ import (
 // positions with ordinary Go storage; neither monomials nor the manager are
 // retained. The borrower must be closed before its manager.
 type MonomialPositions struct {
-	markerFrame      *polynomialArithmeticScope
-	markerInvocation uint64
-	self             *MonomialPositions
-	manager          *MonomialManager
-	values           []uint32
-	header           uint64
-	finalizing       bool
-	closed           bool
+	self       *MonomialPositions
+	manager    *MonomialManager
+	values     []uint32
+	header     uint64
+	finalizing bool
+	closed     bool
 }
 
 func NewMonomialPositions(m *MonomialManager) (*MonomialPositions, error) {
@@ -124,16 +122,9 @@ func (p *MonomialPositions) Reset(a Monomial) error {
 		return arena.ErrBounds
 	}
 	p.values[id] = ^uint32(0)
-	p.acknowledgeMarkerWrite(id)
 	return nil
 }
 func (p *MonomialPositions) Set(a Monomial, pos uint32) error {
-	return p.setWithArithmeticReceipt(a, pos, nil)
-}
-func (p *MonomialPositions) setWithArithmeticReceipt(a Monomial, pos uint32, r *polynomialArithmeticInvocationReceipt) error {
-	if r != nil && !p.acceptsArithmeticMarker(r) {
-		return ErrPolynomialOwner
-	}
 	if e := p.check(); e != nil {
 		return e
 	}
@@ -154,16 +145,6 @@ func (p *MonomialPositions) setWithArithmeticReceipt(a Monomial, pos uint32, r *
 		return ErrMonomialAssertion
 	}
 	p.values[id] = pos
-	p.acknowledgeMarkerWrite(id)
-	if r != nil {
-		s := r.frame
-		s.positionTerm = a
-		s.positionPublished = true
-		s.positionID = id
-		s.positionValue = pos
-		p.markerFrame = s
-		p.markerInvocation = r.invocation
-	}
 	return nil
 }
 
@@ -200,7 +181,6 @@ func (p *MonomialPositions) ResetMonomials(xs []Monomial) error {
 
 func (p *MonomialPositions) releaseValues() {
 	p.values = nil
-	p.acknowledgeReleasedMarker()
 }
 func (p *MonomialPositions) SourceFinalize() error {
 	if e := p.identity(); e != nil {

@@ -107,7 +107,7 @@ func (c *MultivariatePolynomialCore) prepareNormalizationConverterHistoryAtAlloc
 	}
 	s := r.frame
 	reached := false
-	if v != nil && (v == &c.cheap.as || v == &c.cheap.ms) && c.cheap.matchesAppendInvocation(&s.append) {
+	if v != nil && v == &c.cheap.as && c.cheap.matchesAppendInvocation(&s.append) {
 		reached = true
 	}
 	if f != nil && c.matchesFactoryInvocation(f) && *f == s.factory {

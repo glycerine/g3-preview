@@ -10,16 +10,15 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// Concrete scalar vector codec: coefficients use 12 bytes and monomial or
-// polynomial locators use 16. Headers and payload inhabit one real Runtime
-// allocation, with no shadow typed backing or fabricated allocation events.
+// Remaining concrete numeral vector codec. Monomial and polynomial handles
+// use native slices; only the retained numeral fields still inhabit Runtime bytes.
 type polynomialVector struct {
 	raw, pending, old                                            util.Block
 	initialized, oldInitialized, oldSize, moved, oldCleanupIndex uint32
 	retired                                                      []util.Int
 	retirementStart, retiredActive                               uint32
 	width                                                        uint32
-	interrupted, partial                                         bool
+	interrupted                                                  bool
 }
 
 func (v *polynomialVector) size(m *MultivariatePolynomialCore) (uint32, error) {
@@ -69,18 +68,7 @@ func (v *polynomialVector) expand(m *MultivariatePolynomialCore) error {
 		v.pending = util.Block{}
 		return nil
 	}
-	if v.width == 12 {
-		return v.expandNumerals(m, n, bytes)
-	}
-	before := v.raw
-	if e = m.memory.Reallocate(&v.raw, uint64(bytes)); e != nil {
-		if v.raw != before {
-			v.interrupted = true
-			v.partial = m.memory.SizeTBits() == 32 && uint32(bytes+4) < 4
-		}
-		return e
-	}
-	return m.memory.WriteUint32(v.raw, 0, n)
+	return v.expandNumerals(m, n, bytes)
 }
 func (v *polynomialVector) appendSlot(m *MultivariatePolynomialCore) (uint32, error) {
 	n, e := v.size(m)
@@ -137,29 +125,6 @@ func (v *polynomialVector) putCoefficient(m *MultivariatePolynomialCore, i uint3
 	}
 	return v.write64(m, o+4, uint64(a.NativeCellToken()))
 }
-func (v *polynomialVector) monomial(m *MultivariatePolynomialCore, i uint32) (Monomial, error) {
-	o := uint64(8) + uint64(i)*16
-	a, e := v.read64(m, o)
-	if e != nil {
-		return Monomial{}, e
-	}
-	s, e := m.memory.ReadUint32(v.raw, o+8)
-	if e != nil {
-		return Monomial{}, e
-	}
-	g, e := m.memory.ReadUint32(v.raw, o+12)
-	return Monomial{owner: a, slot: s, generation: g}, e
-}
-func (v *polynomialVector) putMonomial(m *MultivariatePolynomialCore, i uint32, a Monomial) error {
-	o := uint64(8) + uint64(i)*16
-	if e := v.write64(m, o, a.owner); e != nil {
-		return e
-	}
-	if e := m.memory.WriteUint32(v.raw, o+8, a.slot); e != nil {
-		return e
-	}
-	return m.memory.WriteUint32(v.raw, o+12, a.generation)
-}
 func (v *polynomialVector) appendCoefficient(m *MultivariatePolynomialCore, a util.Int) error {
 	return v.appendCoefficientWithAppendScope(m, a, nil, false)
 }
@@ -204,39 +169,9 @@ func (v *polynomialVector) appendCoefficientWithAppendScope(m *MultivariatePolyn
 	}
 	return v.publishSize(m, i+1)
 }
-func (v *polynomialVector) appendMonomial(m *MultivariatePolynomialCore, a Monomial) error {
-	return v.appendMonomialWithAppendScope(m, a, nil, false)
-}
-func (v *polynomialVector) appendMonomialWithAppendScope(m *MultivariatePolynomialCore, a Monomial, scope *polynomialCheapAppendScope, owned bool) error {
-	i, e := v.appendSlot(m)
-	if e != nil {
-		return e
-	}
-	if e = v.putMonomial(m, i, a); e != nil {
-		return e
-	}
-	if scope != nil {
-		scope.buffer.monomialTransferred[i] = 0
-		if owned {
-			scope.buffer.monomialOwners[i] = scope.invocation
-			scope.monomialClaims++
-			scope.monomials = i + 1
-			scope.pending = Monomial{}
-		} else {
-			scope.buffer.monomialOwners[i] = 0
-			if scope.retirePhase == 1 || scope.retirePhase == 2 {
-				scope.retireMs = i + 1
-			}
-			scope.foreignMixed = true
-		}
-	}
-	return v.publishSize(m, i+1)
-}
 func (v *polynomialVector) close(m *MultivariatePolynomialCore) error {
-	if v.width == 12 {
-		if e := v.cleanupNumerals(m); e != nil {
-			return e
-		}
+	if e := v.cleanupNumerals(m); e != nil {
+		return e
 	}
 	if v.pending != (util.Block{}) {
 		if e := m.memory.Deallocate(&v.pending); e != nil {
@@ -244,18 +179,12 @@ func (v *polynomialVector) close(m *MultivariatePolynomialCore) error {
 		}
 	}
 	if v.raw != (util.Block{}) {
-		var e error
-		if v.partial {
-			e = m.memory.CleanupPartial(&v.raw)
-		} else {
-			e = m.memory.Deallocate(&v.raw)
-		}
+		e := m.memory.Deallocate(&v.raw)
 		if e != nil {
 			return e
 		}
 	}
 	v.interrupted = false
-	v.partial = false
 	return nil
 }
 func (m *MultivariatePolynomialCore) prepareLocation() (uint32, error) {

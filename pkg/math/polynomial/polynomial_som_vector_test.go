@@ -711,12 +711,12 @@ func TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation(t *testing.T) {
 		t.Fatal("actual returned default-local allocation", e, rt.State())
 	}
 	polynomialSOMPhysicalWithExternal(t, m, v, nil, []util.Block{prep}) // BEFORE lifting actual limit.
-	oldMS, oldAS := b.buffer.ms.raw, b.buffer.as.raw
+	oldMS, oldAS := append([]Monomial(nil), b.buffer.ms...), b.buffer.as.raw
 	one := util.NewInt(1)
 	if e = b.Add(&one, x); e != ErrPolynomialPending {
 		t.Fatal("stopped lexical context allowed ordinary mutation", e)
 	}
-	if b.buffer.ms.raw != oldMS || b.buffer.as.raw != oldAS {
+	if !polynomialEqualMonomials(b.buffer.ms, oldMS) || b.buffer.as.raw != oldAS {
 		t.Fatal("owning guard modified original raw fields")
 	}
 	// Identity-only physical reads verify the actual old coefficient, without
@@ -742,4 +742,50 @@ func TestPolynomialSOMBufferStoppedSortRejectsOrdinaryMutation(t *testing.T) {
 	zero := util.NewInt(0)
 	serviceMust(t, peer.Add(&zero, x)) // another actual owner is not poisoned.
 	polynomialSOMPhysicalWithExternal(t, m, v, nil, []util.Block{prep})
+}
+
+func TestPolynomialSOMNativeMonomialSortIndependentPowers(t *testing.T) {
+	m := polynomialCellFixture(t)
+	b, e := NewPolynomialSOMBuffer(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { m.integer.Budget().FailAfter(-1); serviceMust(t, b.CloseChecked()) })
+	serviceMust(t, b.SetOwner(m))
+	const n = 129
+	for i := uint32(0); i < n; i++ {
+		degree := i * 37 % n
+		term, e := m.monomials.MkVariable(0, degree)
+		serviceMust(t, e)
+		coefficient := util.NewInt(int32(3*degree + 5))
+		serviceMust(t, b.Add(&coefficient, term))
+	}
+	beforeBytes, beforeStats := m.integer.Budget().Used(), m.memory.Stats()
+	m.integer.Budget().FailAfter(0)
+	serviceMust(t, b.sortMonomials())
+	if m.integer.Budget().Used() != beforeBytes || m.memory.Stats() != beforeStats {
+		t.Fatal("native monomial sort allocated Runtime storage")
+	}
+	for i, term := range b.buffer.ms {
+		degree, e := m.monomials.DegreeOf(term, 0)
+		serviceMust(t, e)
+		if degree != n-1-uint32(i) {
+			t.Fatal("independent descending power order", i, degree)
+		}
+	}
+	m.integer.Budget().FailAfter(-1)
+	// The lexical numeral vector remains separate. Its actual source swaps use
+	// the pre-sort position map to move each coefficient with its monomial.
+	serviceMust(t, b.SortGradedLex())
+	for i := uint32(0); i < n; i++ {
+		a, e := b.Coefficient(i)
+		serviceMust(t, e)
+		if a != util.NewInt(int32(3*(n-1-i)+5)) {
+			t.Fatal("paired coefficient after native monomial permutation", i, a)
+		}
+	}
+	serviceMust(t, b.SourceFinalize())
+	if b.buffer.ms != nil || b.retiredMonomialCount != n {
+		t.Fatal("implicit source destruction lost actual references")
+	}
+	serviceMust(t, b.CloseChecked())
+	polynomialPhysicalAudit(t, m)
 }

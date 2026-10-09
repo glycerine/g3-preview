@@ -109,37 +109,6 @@ func TestPolynomialMultiplicationFailurePrefixes(t *testing.T) {
 	}
 }
 
-// An existing unreferenced intern result is still a borrowed return value. The
-// original explicit caller owns its abort authority; a failed later operation
-// must not discover ownership from the zero reference count.
-func TestPolynomialExistingZeroReferenceProductRemainsBorrowed(t *testing.T) {
-	m := polynomialCellFixture(t)
-	p, e := m.MkVariable(0, 1)
-	serviceMust(t, e)
-	serviceMust(t, m.IncRef(p))
-	term, e := m.TermMonomial(p, 0)
-	serviceMust(t, e)
-	caller, e := m.monomials.Mul(term, term)
-	serviceMust(t, e)
-	if n, e := m.monomialRefCount(caller); e != nil || n != 0 {
-		t.Fatal("real original zero-ref local", n, e)
-	}
-	m.integer.Budget().FailAfter(0)
-	_, e = m.Mul(p, p)
-	if !numericPhysicalReservationRefusal(e) {
-		t.Fatal("actual before-publication refusal", e)
-	}
-	polynomialPhysicalAudit(t, m)
-	polynomialOperationMonomialAudit(t, m, []Polynomial{p}, []Monomial{caller})
-	m.integer.Budget().FailAfter(-1)
-	serviceMust(t, m.DecRef(p))
-	serviceMust(t, m.CloseChecked())
-	if n, e := m.monomialRefCount(caller); e != nil || n != 0 {
-		t.Fatal("borrowed original local destroyed", n, e)
-	}
-	serviceMust(t, m.monomials.CleanupValue(&caller))
-}
-
 func TestPolynomialLinearMixedGeneratedFailurePrefixes(t *testing.T) {
 	success := false
 	for fault := int64(0); fault < 100 && !success; fault++ {

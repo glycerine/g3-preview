@@ -151,3 +151,28 @@ func TestPolynomialConstructorCompletedMembersUnwindBeforeReturn(t *testing.T) {
 		t.Fatal("campaign did not reach real post-zero body refusal")
 	}
 }
+
+func polynomialRetainLocationCapacity(t *testing.T, c *MultivariatePolynomialCore) []Polynomial {
+	t.Helper()
+	var held []Polynomial
+	for {
+		full := len(c.locations) == cap(c.locations)
+		for i := range c.locations {
+			full = full && c.locations[i].live
+		}
+		if full {
+			break
+		}
+		p, e := c.mkCell(0, nil, nil, nil, nil)
+		serviceMust(t, e)
+		serviceMust(t, c.IncRef(p))
+		held = append(held, p)
+	}
+	t.Cleanup(func() {
+		c.integer.Budget().FailAfter(-1)
+		for _, p := range held {
+			serviceMust(t, c.DecRef(p))
+		}
+	})
+	return held
+}

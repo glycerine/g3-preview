@@ -69,10 +69,10 @@ func TestPolynomialSubstitutionAbsentAndReachedRawFields(t *testing.T) {
 	p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, {{1, 1}}})
 	control := substitutionReadControl{}
 	stats, count := m.memory.Stats(), m.memory.State()
-	oldAS, oldMS := m.som.as.raw, m.som.ms.raw
+	oldAS, oldMS := m.som.as.raw, append([]Monomial(nil), m.som.ms...)
 	a, e := m.SubstituteRationalMap(p, &control)
 	serviceMust(t, e)
-	if a != p || control.containsCalls != 2 || control.valueCalls != 0 || m.som.as.raw != oldAS || m.som.ms.raw != oldMS || m.substitution.found.raw != (util.Block{}) {
+	if a != p || control.containsCalls != 2 || control.valueCalls != 0 || m.som.as.raw != oldAS || !polynomialEqualMonomials(m.som.ms, oldMS) || m.substitution.found.raw != (util.Block{}) {
 		t.Fatal("source absent branch before numeric/SOM/found vars", a, control)
 	}
 	// The helper retains ordinary Go slice capacity across Reset. The absent

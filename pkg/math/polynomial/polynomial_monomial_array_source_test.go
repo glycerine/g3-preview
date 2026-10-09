@@ -67,3 +67,16 @@ func TestPolynomialTermsIndexedNativeSliceAndUnreachedTail(t *testing.T) {
 	}
 	serviceMust(t, as.close(m))
 }
+
+// Compare actual native handle spans after a guarded call.
+func polynomialEqualMonomials(a, b []Monomial) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}

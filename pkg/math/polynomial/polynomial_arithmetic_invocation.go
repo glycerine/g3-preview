@@ -27,9 +27,6 @@ type polynomialArithmeticScope struct {
 	transport                                         util.Int
 	transportSlot                                     uint32
 	transportBound                                    bool
-	positionID, positionValue                         uint32
-	positionTerm                                      Monomial
-	positionPublished                                 bool
 	calleeGeneration                                  uint64
 	generated                                         Monomial
 	monomialAllocator                                 monomialAllocatorInvocationReceipt
@@ -84,7 +81,7 @@ func (b *polynomialSOM) acquireArithmeticInvocationWithCoefficient(r *polynomial
 	if e := m.check(); e != nil {
 		return e
 	}
-	if b.arithmeticScope.active || b.appendScope.active || b.resetActive || b.removeActive || b.hasPendingReference || b.borrowedAppend || b.as.interrupted || b.ms.interrupted || b.as.pending != (util.Block{}) || b.ms.pending != (util.Block{}) || m.arithmeticInvocation == ^uint64(0) {
+	if b.arithmeticScope.active || b.appendScope.active || b.resetActive || b.removeActive || b.hasPendingReference || b.borrowedAppend || b.as.interrupted || b.as.pending != (util.Block{}) || m.arithmeticInvocation == ^uint64(0) {
 		return ErrPolynomialPending
 	}
 	n, e := b.ms.size(m)
@@ -218,13 +215,6 @@ func (m *MultivariatePolynomialCore) cleanupArithmeticInvocation(r *polynomialAr
 	if e := m.cleanupFactoryInvocation(&s.factory, true); e != nil {
 		return e
 	}
-	if s.positionPublished {
-		if e := s.buffer.positions.cleanupArithmeticMarker(r); e != nil {
-			return e
-		}
-		s.positionPublished = false
-		s.positionTerm = Monomial{}
-	}
 	if e := s.buffer.cleanupAppendInvocation(&s.append, true); e != nil {
 		return e
 	}
@@ -317,7 +307,7 @@ func (b *polynomialSOM) acknowledgeArithmeticSourceReset(r *polynomialArithmetic
 		return
 	}
 	s := r.frame
-	if s.sourceCause != nil || s.transportBound || s.positionPublished || s.singleton != (Monomial{}) || s.generated != (Monomial{}) || s.calleeGeneration != 0 || (m.monomials.matchesMonomialAllocatorInvocation(&s.monomialAllocator) && s.monomialAllocator.outcome.Pending != (util.Block{})) || s.numeric.PendingObject().OwnerID() != 0 || s.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) || m.matchesFactoryInvocation(&s.factory) || m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesAddMulInvocation(&s.addMul) {
+	if s.sourceCause != nil || s.transportBound || s.singleton != (Monomial{}) || s.generated != (Monomial{}) || s.calleeGeneration != 0 || (m.monomials.matchesMonomialAllocatorInvocation(&s.monomialAllocator) && s.monomialAllocator.outcome.Pending != (util.Block{})) || s.numeric.PendingObject().OwnerID() != 0 || s.numeric.PendingAllocatorBlocks() != ([3]util.Block{}) || m.matchesFactoryInvocation(&s.factory) || m.modular.MatchesPNormalizeInvocation(&s.normalize) || m.integer.MatchesAddMulInvocation(&s.addMul) {
 		return
 	}
 	a := &b.appendScope

@@ -27,7 +27,8 @@ type polynomialSOM struct {
 	removePrefix, removeSuffix                  uint32
 	owner                                       *MultivariatePolynomialCore
 	positions                                   MonomialPositions
-	as, ms                                      polynomialVector
+	as                                          polynomialVector
+	ms                                          polynomialMonomials
 	gcd                                         util.Int
 	gcdActive                                   bool
 	gcdEnded                                    bool
@@ -50,7 +51,6 @@ func (b *polynomialSOM) init(m *MultivariatePolynomialCore, cheap bool) {
 	b.owner = m
 	b.cheap = cheap
 	b.as.width = 12
-	b.ms.width = 16
 	b.positions.manager = m.monomials
 	b.positions.self = &b.positions
 }
@@ -173,7 +173,7 @@ func (b *polynomialSOM) addConsumedScalarNegEngine(a *util.Int, term Monomial, t
 	}
 
 	if !b.cheap {
-		if e = b.positions.setWithArithmeticReceipt(term, n, arithmeticReceipt); e != nil {
+		if e = b.positions.Set(term, n); e != nil {
 			return e
 		}
 	}
@@ -269,9 +269,6 @@ func (b *polynomialSOM) addConsumedScalarNegEngine(a *util.Int, term Monomial, t
 	}
 	b.hasPendingReference = false
 	b.pendingMonomial = Monomial{}
-	if arithmeticReceipt != nil {
-		b.positions.releaseArithmeticMarker(arithmeticReceipt)
-	}
 	if !b.cheap {
 		if e = b.as.appendCoefficientWithAppendScope(m, util.Int{}, observer, appendScope != nil); e != nil {
 			return e
@@ -464,7 +461,7 @@ func (b *polynomialSOM) addSourceInputWithArithmeticReceipt(a *util.Int, term Mo
 				}
 			}
 			if !b.cheap {
-				if e = b.positions.setWithArithmeticReceipt(prod, n, receipt); e != nil {
+				if e = b.positions.Set(prod, n); e != nil {
 					return e
 				}
 				// Source regular push precedes INC. This publication is a
@@ -473,9 +470,6 @@ func (b *polynomialSOM) addSourceInputWithArithmeticReceipt(a *util.Int, term Mo
 				// after the actual successful INC.
 				if e = b.ms.appendMonomial(m, prod); e != nil {
 					return e
-				}
-				if receipt != nil {
-					b.positions.releaseArithmeticMarker(receipt)
 				}
 				if b.appendScope.active {
 					b.monomialOwners[n], b.monomialTransferred[n] = 0, 0

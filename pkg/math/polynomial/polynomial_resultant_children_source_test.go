@@ -246,7 +246,7 @@ func TestPolynomialResultantLaterFailurePreservesSuccessfulDividesMemberRows(t *
 			t.Fatal("actual successful member transfer retained slot authority")
 		}
 	}
-	rawAs, rawMs := c.som.as.raw, c.som.ms.raw
+	rawAs, rawMs := c.som.as.raw, append([]Monomial(nil), c.som.ms...)
 	c.integer.Budget().FailAfter(0)
 	body := full.Resultant(p, q, 0, out)
 	if !numericPhysicalReservationRefusal(body) {
@@ -256,7 +256,7 @@ func TestPolynomialResultantLaterFailurePreservesSuccessfulDividesMemberRows(t *
 	c.integer.Budget().FailAfter(-1)
 	serviceMust(t, full.CleanupGCD())
 	serviceMust(t, c.cleanupDividesInvocation(&earlier, true))
-	if c.som.as.raw != rawAs || c.som.ms.raw != rawMs {
+	if c.som.as.raw != rawAs || !polynomialEqualMonomials(c.som.ms, rawMs) {
 		t.Fatal("later caller swept persistent raw members")
 	}
 	for j := uint32(0); j < 2; j++ {

@@ -339,58 +339,6 @@ func TestPolynomialCheapCompactedRowsRetryAfterPendingPhysicalRelease(t *testing
 	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&large}, 0)
 }
 
-func TestPolynomialCheapKnownPendingINCPreservesEarlierForeignRows(t *testing.T) {
-	found := false
-	for ordinal := int64(0); ordinal < 16 && !found; ordinal++ {
-		m := polynomialPSCFullFixture(t)
-		c := m.core
-		_, e := c.monomials.MkVar()
-		serviceMust(t, e)
-		_, e = c.monomials.MkVar()
-		serviceMust(t, e)
-		x, e := c.monomials.MkVariable(0, 1)
-		serviceMust(t, e)
-		owned, e := c.monomials.MkVariable(1, 1)
-		serviceMust(t, e)
-		serviceMust(t, c.monomials.IncRef(owned))
-		a, b, d := util.NewInt(11), util.NewInt(13), util.NewInt(7)
-		serviceMust(t, c.cheap.add(&a, c.monomials.unit, false))
-		serviceMust(t, c.cheap.add(&b, x, false))
-		serviceMust(t, c.cheap.prepareAppendTags(3))
-		beforeUnit, e := c.monomialRefCount(c.monomials.unit)
-		serviceMust(t, e)
-		beforeX, e := c.monomialRefCount(x)
-		serviceMust(t, e)
-		var r polynomialCheapAppendInvocationReceipt
-		c.integer.Budget().FailAfter(ordinal)
-		cause := c.cheap.addWithAppendReceipt(&d, owned, false, &r)
-		partial := cause != nil && c.cheap.hasPendingReference && c.cheap.appendScope.pending == owned
-		polynomialImpPhysicalAuditNamed(t, m, nil, nil, 0)
-		c.integer.Budget().FailAfter(-1)
-		if partial {
-			found = true
-		}
-		if e = c.cheap.cleanupAppendInvocation(&r, true); e != nil {
-			t.Fatalf("ordinal%d pendingINC%v: %v", ordinal, partial, e)
-		}
-		unit, e := c.monomialRefCount(c.monomials.unit)
-		serviceMust(t, e)
-		xr, e := c.monomialRefCount(x)
-		serviceMust(t, e)
-		own, e := c.monomialRefCount(owned)
-		serviceMust(t, e)
-		if unit != beforeUnit || xr != beforeX || own != 1 {
-			t.Fatal("pending INC retirement altered foreign/reference ownership", ordinal, unit, beforeUnit, xr, beforeX, own)
-		}
-		polynomialImpPhysicalAuditNamed(t, m, nil, nil, 0)
-		serviceMust(t, c.cheap.reset())
-		serviceMust(t, c.monomials.DecRef(owned))
-	}
-	if !found {
-		t.Fatal("no actual INC before pointer-vector growth refusal")
-	}
-}
-
 func TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core

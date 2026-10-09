@@ -7,13 +7,6 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func polynomialImpRawSource(m *MultivariatePolynomialCore, v *polynomialVector) error {
-	if v.raw != (util.Block{}) {
-		return m.memory.Deallocate(&v.raw)
-	}
-	return nil
-}
-
 // This records only actual completed member construction. Failed constructors
 // never execute the imp destructor body or release the body MM retain.
 func (m *MultivariatePolynomialManager) unwindMembers() error {
@@ -133,9 +126,7 @@ func (m *MultivariatePolynomialManager) sourceNumeralVector(v *polynomialVector)
 	return m.retireSourceNumeralVector(v)
 }
 func (m *MultivariatePolynomialManager) sourceBufferMembers(b *polynomialSOM, positions bool) error {
-	if e := polynomialImpRawSource(m.core, &b.ms); e != nil {
-		return e
-	}
+	b.ms = nil
 	if e := m.sourceNumeralVector(&b.as); e != nil {
 		return e
 	}

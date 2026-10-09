@@ -8,62 +8,6 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestPolynomialDerivativeMatchedCleanupRetiresActualPendingINC(t *testing.T) {
-	found := false
-	for ordinal := int64(0); ordinal < 64 && !found; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m := polynomialPSCFullFixture(t)
-			c := m.core
-			p := polynomialICCPUnownedTerms(t, c, []int32{7}, [][]MonomialPower{{{0, 1}}})
-			serviceMust(t, c.IncRef(p))
-			defer func() { serviceMust(t, c.DecRef(p)) }()
-			var receipt polynomialDerivativeInvocationReceipt
-			c.integer.Budget().FailAfter(ordinal)
-			result, cause := m.derivativeWithReceipt(p, 0, &receipt)
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result}, nil, 0)
-			pending := c.cheap.hasPendingReference
-			if pending {
-				if !numericPhysicalReservationRefusal(cause) {
-					t.Fatal("actual INC before failed pointer push", cause)
-				}
-				as, e := c.cheap.as.size(c)
-				serviceMust(t, e)
-				ms, e := c.cheap.ms.size(c)
-				serviceMust(t, e)
-				if as != 1 || ms != 0 {
-					t.Fatal("literal default NUM/Swap then INC/push prefix", as, ms)
-				}
-				serviceMust(t, m.cleanupDerivativeInvocation(&receipt, false))
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result}, nil, 0)
-				if !c.cheap.hasPendingReference {
-					t.Fatal("false phase consumed unjoined source INC")
-				}
-				serviceMust(t, m.cleanupDerivativeInvocation(&receipt, true))
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result}, nil, 0)
-				as, e = c.cheap.as.size(c)
-				serviceMust(t, e)
-				ms, e = c.cheap.ms.size(c)
-				serviceMust(t, e)
-				if c.cheap.hasPendingReference || as != 0 || ms != 0 {
-					t.Fatal("matched derivative abort omitted actual default row/INC", as, ms, c.cheap.hasPendingReference)
-				}
-				found = true
-			}
-			c.integer.Budget().FailAfter(-1)
-			if !pending {
-				serviceMust(t, m.cleanupDerivativeInvocation(&receipt, false))
-				serviceMust(t, m.cleanupDerivativeInvocation(&receipt, true))
-			}
-			if result != (Polynomial{}) {
-				serviceMust(t, c.CleanupValue(&result))
-			}
-		})
-	}
-	if !found {
-		t.Fatal("no reached derivative INC/push refusal")
-	}
-}
-
 func TestPolynomialDerivativeActualAppendFactoryEveryPrefix(t *testing.T) {
 	success := false
 	for ordinal := int64(0); ordinal < 96 && !success; ordinal++ {
@@ -205,10 +149,11 @@ func TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement(t *testin
 			p := polynomialICCPUnownedTerms(t, c, []int32{7, 11}, [][]MonomialPower{{{0, 2}}, {{0, 1}}})
 			serviceMust(t, c.IncRef(p))
 			defer func() { serviceMust(t, c.DecRef(p)) }()
+			held := polynomialRetainLocationCapacity(t, c)
 			var receipt polynomialDerivativeInvocationReceipt
 			c.integer.Budget().FailAfter(ordinal)
 			result, cause := m.derivativeWithReceipt(p, 0, &receipt)
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, result}, nil, 0)
+			polynomialImpPhysicalAuditNamed(t, m, append(held, p, result), nil, 0)
 			old := m.derivative.factory
 			eligible := cause != nil && c.matchesFactoryInvocation(&old)
 			c.integer.Budget().FailAfter(-1)
@@ -223,7 +168,7 @@ func TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement(t *testin
 				if !c.matchesFactoryInvocation(&foreign) || foreign.invocation == old.invocation || foreign.frame != old.frame {
 					t.Fatal("actual foreign constructor did not replace guarded nonce", old, foreign)
 				}
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, later, c.factoryInvocation.result}, nil, 0)
+				polynomialImpPhysicalAuditNamed(t, m, append(held, p, later, c.factoryInvocation.result), nil, 0)
 				c.integer.Budget().FailAfter(-1)
 				factory, pending := c.factoryInvocation, c.pending
 				serviceMust(t, m.cleanupDerivativeInvocation(&receipt, false))
@@ -231,10 +176,10 @@ func TestPolynomialDerivativeFactoryReceiptPreservesForeignReplacement(t *testin
 				if c.factoryInvocation != factory || c.pending != pending || m.derivative.bodyCause != cause {
 					t.Fatal("old derivative consumed foreign factory or source history")
 				}
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, later, c.factoryInvocation.result}, nil, 0)
+				polynomialImpPhysicalAuditNamed(t, m, append(held, p, later, c.factoryInvocation.result), nil, 0)
 				serviceMust(t, c.cleanupFactoryInvocation(&foreign, false))
 				serviceMust(t, c.cleanupFactoryInvocation(&foreign, true))
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, nil, 0)
+				polynomialImpPhysicalAuditNamed(t, m, append(held, p), nil, 0)
 				found = true
 			} else {
 				serviceMust(t, m.cleanupDerivativeInvocation(&receipt, false))

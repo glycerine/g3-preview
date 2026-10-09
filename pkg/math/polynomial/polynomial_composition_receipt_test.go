@@ -15,6 +15,7 @@ func TestPolynomialCompositionOwnsActualSingletonAcquisition(t *testing.T) {
 	for ordinal := int64(0); ordinal < 8 && !found; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{2, 0, 0}}, {7, [3]uint32{}}})
+			held := polynomialRetainLocationCapacity(t, m.core)
 			as := make([]util.Int, 70)
 			ms := make([]Monomial, 70)
 			unit, e := m.core.monomials.Unit()
@@ -31,7 +32,7 @@ func TestPolynomialCompositionOwnsActualSingletonAcquisition(t *testing.T) {
 				serviceMust(t, e)
 				transferred = l.initializedMonomials
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, nil, 0)
+			polynomialImpPhysicalAuditNamed(t, m, append(held, p), nil, 0)
 			m.core.integer.Budget().FailAfter(-1)
 			defer func() {
 				m.core.integer.Budget().FailAfter(-1)
@@ -58,7 +59,7 @@ func TestPolynomialCompositionOwnsActualSingletonAcquisition(t *testing.T) {
 			if e != ErrPolynomialPending || !m.core.singletonReference {
 				t.Fatal("source singleton before foreign cell guard", e)
 			}
-			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&a}, 0)
+			polynomialImpPhysicalAuditNamed(t, m, append(held, p), []*util.Int{&a}, 0)
 			if m.composition.singleton != unit {
 				t.Fatal("actual source INC lacks operation receipt")
 			}
@@ -216,7 +217,7 @@ func TestPolynomialCompositionSingletonForeignReplacement(t *testing.T) {
 	unit, e := m.core.monomials.Unit()
 	serviceMust(t, e)
 
-	held := []Polynomial{}
+	held := polynomialRetainLocationCapacity(t, m.core)
 	stopped := func() {
 		for ordinal := int64(0); ordinal < 120; ordinal++ {
 			as := make([]util.Int, 70)

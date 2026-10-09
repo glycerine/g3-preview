@@ -406,19 +406,20 @@ func TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller(t *testing.T) {
 	for ordinal := int64(0); ordinal < 50 && !found; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m, p, ms := polynomialLexFixture(t)
+			held := polynomialRetainLocationCapacity(t, m.core)
 			b := m.core.integer.Budget()
 			b.FailAfter(ordinal)
 			d, e := m.Derivative(p, 0)
 			if e == nil {
 				serviceMust(t, m.core.IncRef(d))
 			}
-			values := []Polynomial{p}
+			values := append(held, p)
 			if e == nil {
 				values = append(values, d)
 			}
 			polynomialDerivativePhysicalAudit(t, m, values)
 			b.FailAfter(-1)
-			if m.core.pending.value == (Polynomial{}) {
+			if m.core.pending.value == (Polynomial{}) && m.core.pending.raw == (util.ObjectRef{}) {
 				serviceMust(t, m.CleanupDerivative())
 				if e == nil {
 					serviceMust(t, m.core.DecRef(d))
@@ -435,7 +436,7 @@ func TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller(t *testing.T) {
 				if e == nil {
 					serviceMust(t, m.core.IncRef(later))
 				}
-				polynomialDerivativePhysicalAudit(t, m, []Polynomial{p, later})
+				polynomialDerivativePhysicalAudit(t, m, append(held, p, later))
 				pending = m.core.pending
 				b.FailAfter(-1)
 				if pending.value != (Polynomial{}) || pending.raw != (util.ObjectRef{}) {
@@ -456,7 +457,7 @@ func TestPolynomialDerivativeFactoryReceiptPreservesLaterCaller(t *testing.T) {
 			if pending.generation == old || pending.derivativeParent != nil || m.core.pending != pending {
 				t.Fatal("old derivative swept unrelated pending creation", old, pending, m.core.pending)
 			}
-			polynomialDerivativePhysicalAudit(t, m, []Polynomial{p})
+			polynomialDerivativePhysicalAudit(t, m, append(held, p))
 			serviceMust(t, m.core.CleanupConstruction())
 		})
 	}

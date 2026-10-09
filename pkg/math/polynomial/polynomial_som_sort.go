@@ -3,83 +3,21 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	"sort"
 )
 
-// This external sorting backend implements std::sort's final-order contract
-// using a concrete heap sort. It does not claim native comparator dispatch.
-func (b *PolynomialSOMBuffer) sortBefore(i, j uint32) (bool, error) {
-	m := b.storage
-	x, e := b.buffer.ms.monomial(m, i)
-	if e != nil {
-		return false, e
-	}
-	y, e := b.buffer.ms.monomial(m, j)
-	if e != nil {
-		return false, e
-	}
-	c, e := m.monomials.GradedLex(x, y)
-	return c < 0, e
-}
-func (b *PolynomialSOMBuffer) sortSwap(i, j uint32) error {
-	m := b.storage
-	x, e := b.buffer.ms.monomial(m, i)
-	if e != nil {
-		return e
-	}
-	y, e := b.buffer.ms.monomial(m, j)
-	if e != nil {
-		return e
-	}
-	if e = b.buffer.ms.putMonomial(m, i, y); e != nil {
-		return e
-	}
-	return b.buffer.ms.putMonomial(m, j, x)
-}
-func (b *PolynomialSOMBuffer) sortDown(root, end uint32) error {
-	for uint64(root)*2+1 < uint64(end) {
-		child := root*2 + 1
-		if child+1 < end {
-			yes, e := b.sortBefore(child+1, child)
-			if e != nil {
-				return e
-			}
-			if yes {
-				child++
-			}
-		}
-		yes, e := b.sortBefore(child, root)
-		if e != nil {
-			return e
-		}
-		if !yes {
-			return nil
-		}
-		if e = b.sortSwap(root, child); e != nil {
-			return e
-		}
-		root = child
-	}
-	return nil
-}
+// std::sort contributes its descending graded-lex order, not library internals.
 func (b *PolynomialSOMBuffer) sortMonomials() error {
-	n, e := b.buffer.ms.size(b.storage)
-	if e != nil {
-		return e
-	}
-	for i := n / 2; i > 0; i-- {
-		if e = b.sortDown(i-1, n); e != nil {
-			return e
+	var cause error
+	sort.Slice(b.buffer.ms, func(i, j int) bool {
+		if cause != nil {
+			return false
 		}
-	}
-	for end := n; end > 1; end-- {
-		if e = b.sortSwap(0, end-1); e != nil {
-			return e
-		}
-		if e = b.sortDown(0, end-1); e != nil {
-			return e
-		}
-	}
-	return nil
+		var order int
+		order, cause = b.storage.monomials.GradedLex(b.buffer.ms[i], b.buffer.ms[j])
+		return cause == nil && order > 0
+	})
+	return cause
 }
 
 // Owning abort resumes only actual untransferred local fields, separately from

@@ -45,10 +45,10 @@ func TestPolynomialScalarExactDivCompiledAssertionBIGRefusalPrefixes(t *testing.
 		full := polynomialExactDivDirectPageOneFixture(t)
 		c, z := full.core, full.core.integer
 		var a, d util.Int
-		words := make([]uint32, 80)
-		words[0], words[79] = 1, 1
+		words := make([]uint32, 2048)
+		words[0], words[len(words)-1] = 1, 1
 		serviceMust(t, z.SetLimbs(&a, words))
-		words[79] = 2
+		words[len(words)-1] = 2
 		serviceMust(t, z.SetLimbs(&d, words))
 		p, e := c.MkConstantTakeCopy(&a)
 		serviceMust(t, e)
@@ -77,6 +77,14 @@ func TestPolynomialScalarExactDivCompiledAssertionBIGRefusalPrefixes(t *testing.
 
 		if !errors.Is(body, ErrPolynomialAssertion) && !numericPhysicalReservationRefusal(body) {
 			t.Fatal("actual refusal or source assertion required", prefix, body)
+		}
+		// A failed fresh-NULL BIG copy may already be consumed by the literal
+		// source destructor; its captured body cause and published scalar remain.
+		if numericPhysicalReservationRefusal(child.BodyCause) && child.Numeral.NativeScalar() != 0 {
+			saw = true
+			if !child.Ended && !child.Pending(z) {
+				t.Fatal("failed bool NUM lost its source cleanup frontier", prefix)
+			}
 		}
 		savedBody, savedChild := s.bodyCause, child.BodyCause
 		z.Budget().FailAfter(-1)

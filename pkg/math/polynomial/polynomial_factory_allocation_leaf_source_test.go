@@ -126,7 +126,7 @@ func TestPolynomialFactoryAllocationRealCallbackForeignStart(t *testing.T) {
 			t.Error("actual external callback acquired older factory outcome")
 		}
 		c.integer.Budget().FailAfter(0)
-		_, cause := c.mkCell(0, nil, nil, nil, nil)
+		_, cause := c.mkCell(15000, nil, nil, nil, nil)
 		if !numericPhysicalReservationRefusal(cause) {
 			t.Error("real foreign callback refusal absent", cause)
 		}

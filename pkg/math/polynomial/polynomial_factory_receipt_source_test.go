@@ -50,7 +50,7 @@ func TestPolynomialFactoryReceiptReplacementAndRejectedEntry(t *testing.T) {
 	serviceMust(t, c.transferFactoryResult(&old, p))
 	var current polynomialFactoryInvocationReceipt
 	c.integer.Budget().FailAfter(0)
-	_, e = c.mkCellWithReceipt(0, nil, nil, nil, nil, &current)
+	_, e = c.mkCellWithReceipt(15000, nil, nil, nil, nil, &current)
 	if e == nil {
 		t.Fatal("actual allocation refusal not reached")
 	}
@@ -110,7 +110,7 @@ func TestPolynomialFactoryReceiptPreservesUnreceiptedReplacement(t *testing.T) {
 	c := m.core
 	var old polynomialFactoryInvocationReceipt
 	c.integer.Budget().FailAfter(0)
-	_, e := c.mkCellWithReceipt(0, nil, nil, nil, nil, &old)
+	_, e := c.mkCellWithReceipt(15000, nil, nil, nil, nil, &old)
 	if e == nil {
 		t.Fatal("actual old factory refusal missing")
 	}
@@ -119,8 +119,8 @@ func TestPolynomialFactoryReceiptPreservesUnreceiptedReplacement(t *testing.T) {
 	// actual nil-receipt factory invocation must not inherit its authority.
 	serviceMust(t, c.cleanupPendingCreation())
 	serviceMust(t, c.monomials.allocator.CleanupPending())
-	c.integer.Budget().FailAfter(1)
-	_, e = c.mkCell(0, nil, nil, nil, nil)
+	c.integer.Budget().FailAfter(0)
+	_, e = c.mkCell(15000, nil, nil, nil, nil)
 	if e == nil {
 		t.Fatal("actual replacement prefix refusal missing")
 	}

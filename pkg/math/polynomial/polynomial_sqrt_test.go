@@ -462,12 +462,14 @@ func TestPolynomialSqrtFinalFactoryPostphysicalRaw(t *testing.T) {
 	c := m.core
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
+	var held util.Block
 	defer func() {
 		serviceMust(t, rt.SetMaxSize(0))
 		serviceMust(t, m.CleanupSqrt())
 		serviceMust(t, c.monomials.allocator.CleanupPending())
 		serviceMust(t, m.CloseChecked())
 		serviceMust(t, q.CloseChecked())
+		serviceMust(t, rt.Deallocate(&held))
 		serviceMust(t, rt.Close())
 		if b.Used() != 0 {
 			t.Fatal("whole actual factory graph refund", b.Used())
@@ -479,6 +481,17 @@ func TestPolynomialSqrtFinalFactoryPostphysicalRaw(t *testing.T) {
 		serviceMust(t, e)
 		serviceMust(t, c.som.add(&a, term, false))
 	}
+	// Prime the real TLS lane with a named caller allocation; native monomial
+	// storage no longer contributes the old pointer-vector allocation traffic.
+	pad := int64(99996) - rt.State().LocalSize - 8
+	if pad <= 0 {
+		t.Fatal("actual TLS priming extent", rt.State())
+	}
+	held, e = rt.Allocate(uint64(pad))
+	serviceMust(t, e)
+	if rt.State().LocalSize != 99996 {
+		t.Fatal("real TLS lane not primed", rt.State())
+	}
 	serviceMust(t, m.beginSquareRoot())
 	serviceMust(t, rt.SetMaxSize(1))
 	_, cause := c.som.mk(false)
@@ -488,7 +501,8 @@ func TestPolynomialSqrtFinalFactoryPostphysicalRaw(t *testing.T) {
 		t.Fatal("actual final cell source allocator postphysical stop", cause, roots, c.pending)
 	}
 	_ = m.finishSquareRoot(cause)
-	polynomialSqrtPhysicalAudit(t, m, nil, nil, 0)
+	polynomialImpPhysicalAuditNamedExtra(t, m, nil, nil, 0, []util.Block{held})
+	polynomialOperationMonomialAudit(t, c, nil, nil)
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, m.CleanupSqrt())
 	after, e := c.monomials.allocator.PendingRoots()

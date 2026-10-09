@@ -421,7 +421,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	buffers := [4]*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2}
 	for _, b := range buffers {
 		add(b.gcd)
-		vectors = append(vectors, &b.as, &b.ms)
+		vectors = append(vectors, &b.as)
 	}
 	for _, v := range vectors {
 		if v.width != 12 {

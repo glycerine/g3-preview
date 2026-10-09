@@ -118,7 +118,7 @@ func (b *polynomialSOM) addPolynomialWithArithmeticReceipt(p Polynomial, receipt
 					return e
 				}
 			}
-			if e = b.positions.setWithArithmeticReceipt(term, sz, receipt); e != nil {
+			if e = b.positions.Set(term, sz); e != nil {
 				return e
 			}
 			if e = b.ms.appendMonomial(m, term); e != nil {
@@ -126,9 +126,6 @@ func (b *polynomialSOM) addPolynomialWithArithmeticReceipt(p Polynomial, receipt
 			}
 			if b.appendScope.active {
 				b.monomialOwners[sz], b.monomialTransferred[sz] = 0, 0
-			}
-			if receipt != nil {
-				b.positions.releaseArithmeticMarker(receipt)
 			}
 			b.borrowedAppend = true
 			b.borrowedAppendIndex = sz
