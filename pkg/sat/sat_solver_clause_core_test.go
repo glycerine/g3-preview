@@ -3,21 +3,21 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverClauseCoreFiniteSimplification(t *testing.T) {
 	// Three variable assignments, all root/nonroot level subsets, and every
 	// ordered clause of up to three literals over these variables.
 	for assignments := 0; assignments < 27; assignments++ {
-		var values [6]util.LBool
+		var values [6]lbool.LBool
 		code := assignments
 		for v := 0; v < 3; v++ {
-			value := []util.LBool{util.LFalse, util.LUndef, util.LTrue}[code%3]
+			value := []lbool.LBool{lbool.False, lbool.Undef, lbool.True}[code%3]
 			code /= 3
 			values[2*v] = value
 			values[2*v+1] = value.Negated()
@@ -45,12 +45,12 @@ func TestSATSolverClauseCoreFiniteSimplification(t *testing.T) {
 							clause[i] = Literal(literal)
 							val := values[literal]
 							if scope != 0 && lvls[literal/2] != 0 {
-								val = util.LUndef
+								val = lbool.Undef
 							}
-							if val == util.LTrue {
+							if val == lbool.True {
 								satisfied = true
 							}
-							if val == util.LUndef {
+							if val == lbool.Undef {
 								mask |= 1 << literal
 							}
 						}
@@ -96,10 +96,10 @@ func TestSATSolverClauseCoreWatchSelection(t *testing.T) {
 	literals := satLs(0, 2, 4, 6)
 	clause := satMk(t, a, literals, true)
 	for assignments := 0; assignments < 81; assignments++ {
-		var values [8]util.LBool
+		var values [8]lbool.LBool
 		code := assignments
 		for v := 0; v < 4; v++ {
-			value := []util.LBool{util.LFalse, util.LUndef, util.LTrue}[code%3]
+			value := []lbool.LBool{lbool.False, lbool.Undef, lbool.True}[code%3]
 			code /= 3
 			values[2*v] = value
 			values[2*v+1] = value.Negated()
@@ -117,13 +117,13 @@ func TestSATSolverClauseCoreWatchSelection(t *testing.T) {
 				// Independent category priority: true then unknown then false. True/false
 				// retain the first extreme-level tie; unknown retains the final candidate.
 				for i := start; i < 4; i++ {
-					if values[2*i] == util.LTrue && (want == ^uint32(0) || lvls[i] < lvls[want]) {
+					if values[2*i] == lbool.True && (want == ^uint32(0) || lvls[i] < lvls[want]) {
 						want = i
 					}
 				}
 				if want == ^uint32(0) {
 					for i := start; i < 4; i++ {
-						if values[2*i] == util.LUndef {
+						if values[2*i] == lbool.Undef {
 							want = i
 						}
 					}
@@ -140,7 +140,7 @@ func TestSATSolverClauseCoreWatchSelection(t *testing.T) {
 					t.Fatal(assignments, levels, start, got, want, e)
 				}
 			}
-			if values[2] == util.LFalse && values[4] == util.LFalse && values[6] == util.LFalse {
+			if values[2] == lbool.False && values[4] == lbool.False && values[6] == lbool.False {
 				want := uint32(1)
 				for i := uint32(2); i < 4; i++ {
 					if lvls[i] > lvls[want] {
@@ -157,7 +157,7 @@ func TestSATSolverClauseCoreWatchSelection(t *testing.T) {
 }
 
 func TestSATSolverClauseCoreSourcePrefixesAndGuards(t *testing.T) {
-	state := satSolverClauseState{assignment: satClauseAssignmentBytes([]util.LBool{util.LFalse, util.LTrue, util.LUndef, util.LUndef, util.LTrue, util.LFalse}), levels: []uint32{0, 0, 0}}
+	state := satSolverClauseState{assignment: satClauseAssignmentBytes([]lbool.LBool{lbool.False, lbool.True, lbool.Undef, lbool.Undef, lbool.True, lbool.False}), levels: []uint32{0, 0, 0}}
 	clause := satLs(4, 2, 0)
 	n := uint32(3)
 	keep, e := state.simplifyClause(0, &n, clause)
@@ -173,7 +173,7 @@ func TestSATSolverClauseCoreSourcePrefixesAndGuards(t *testing.T) {
 		t.Fatal("guard after actual earlier source writes", clause, n, e)
 	}
 	// Above-root values become unknown; the level access happens after value read.
-	state.assignment = satClauseAssignmentBytes([]util.LBool{util.LTrue, util.LFalse})
+	state.assignment = satClauseAssignmentBytes([]lbool.LBool{lbool.True, lbool.False})
 	state.levels = nil
 	clause = satLs(0)
 	n = 1
@@ -183,7 +183,7 @@ func TestSATSolverClauseCoreSourcePrefixesAndGuards(t *testing.T) {
 }
 
 func TestSATSolverClauseCoreWarmNoAllocation(t *testing.T) {
-	values := []util.LBool{util.LUndef, util.LUndef, util.LUndef, util.LUndef, util.LUndef, util.LUndef}
+	values := []lbool.LBool{lbool.Undef, lbool.Undef, lbool.Undef, lbool.Undef, lbool.Undef, lbool.Undef}
 	state := satSolverClauseState{assignment: satClauseAssignmentBytes(values), levels: []uint32{0, 0, 0}}
 	var literals [6]Literal
 	var err error
@@ -210,7 +210,7 @@ func TestSATSolverClauseCoreWatchSourceAssertions(t *testing.T) {
 	} else if e != nil || got != 1 {
 		t.Fatal("release level selection", got, e)
 	}
-	state.assignment = satClauseAssignmentBytes([]util.LBool{util.LFalse, util.LTrue, util.LUndef, util.LUndef, util.LFalse, util.LTrue, util.LFalse, util.LTrue})
+	state.assignment = satClauseAssignmentBytes([]lbool.LBool{lbool.False, lbool.True, lbool.Undef, lbool.Undef, lbool.False, lbool.True, lbool.False, lbool.True})
 	got, e = state.selectLearnedWatchLiteral(a, clause)
 	if satStorageSourceDebug {
 		if !errors.Is(e, ErrSATAssertion) {
@@ -246,7 +246,7 @@ func TestSATSolverClauseCoreWatchSourceAssertions(t *testing.T) {
 
 func TestSATSolverClauseStateSourceAssignmentWidth(t *testing.T) {
 	// solver.h stores literal assignments in char_vector, independently of the
-	// int32 util.LBool enum used for returned values. Keep the hot storage byte-wide.
+	// int32 lbool.LBool enum used for returned values. Keep the hot storage byte-wide.
 	var state satSolverClauseState
 	if n := reflect.TypeOf(state.assignment).Elem().Size(); n != 1 {
 		t.Fatal("source assignment byte width", n)
@@ -255,7 +255,7 @@ func TestSATSolverClauseStateSourceAssignmentWidth(t *testing.T) {
 
 // Fixture conversion preserves the independent enum-valued truth oracles while
 // supplying the source char-vector representation to the borrowed view.
-func satClauseAssignmentBytes(values []util.LBool) []int8 {
+func satClauseAssignmentBytes(values []lbool.LBool) []int8 {
 	out := make([]int8, len(values))
 	for i, v := range values {
 		out[i] = int8(v)

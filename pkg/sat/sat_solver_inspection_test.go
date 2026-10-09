@@ -2,6 +2,7 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"math"
 	"testing"
 
@@ -66,9 +67,9 @@ func TestSATSolverInspectionExternalModelIndependentTruthTable(t *testing.T) {
 	for bits := uint32(0); bits < 16; bits++ {
 		m := make(Model, 4)
 		for v := range m {
-			m[v] = util.LFalse
+			m[v] = lbool.False
 			if bits&(1<<uint(v)) != 0 {
-				m[v] = util.LTrue
+				m[v] = lbool.True
 			}
 		}
 		want := (bits&1 != 0 || bits&2 != 0) && (bits&1 == 0 || bits&4 != 0 || bits&8 != 0)

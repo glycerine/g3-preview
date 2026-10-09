@@ -2,6 +2,7 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -127,10 +128,10 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 	if e := s.watches.PushEmpty(); e != nil {
 		return v, e
 	}
-	if e := s.assignment.Push(int8(util.LUndef)); e != nil {
+	if e := s.assignment.Push(int8(lbool.Undef)); e != nil {
 		return v, e
 	}
-	if e := s.assignment.Push(int8(util.LUndef)); e != nil {
+	if e := s.assignment.Push(int8(lbool.Undef)); e != nil {
 		return v, e
 	}
 	if e := s.justification.push(satJustification{}); e != nil {
@@ -200,14 +201,14 @@ func (s *satSolverVariableState) mkVar(ext, dvar bool) (BoolVar, error) {
 func (s *satSolverVariableState) clauseState() satSolverClauseState {
 	return satSolverClauseState{variables: s}
 }
-func (s *satSolverVariableState) valueLiteral(l Literal) (util.LBool, error) {
+func (s *satSolverVariableState) valueLiteral(l Literal) (lbool.LBool, error) {
 	if e := s.open(); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	v, e := s.assignment.Read(l.index())
-	return util.LBool(v), e
+	return lbool.LBool(v), e
 }
-func (s *satSolverVariableState) valueVar(v BoolVar) (util.LBool, error) {
+func (s *satSolverVariableState) valueVar(v BoolVar) (lbool.LBool, error) {
 	return s.valueLiteral(Literal(uint32(v) << 1))
 }
 func (s *satSolverVariableState) levelVar(v BoolVar) (uint32, error) {

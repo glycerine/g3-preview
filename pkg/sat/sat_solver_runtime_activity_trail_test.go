@@ -4,6 +4,7 @@ package sat
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -168,7 +169,7 @@ func TestSATSolverRuntimeTrailAllActualRefusalPrefixes(t *testing.T) {
 			e := s.assignCore(0, satJustification{})
 			satScalarAuditRoots(t, v)
 			satPropagationAssertGraph(t, s)
-			if satAssignmentTestValue(t, &v.assignment, 0) != int8(util.LTrue) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 0 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 1 {
+			if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 0 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 1 {
 				t.Fatal("source scalar prefix before trail")
 			}
 			n, x := v.trail.Size(v.trailRef)

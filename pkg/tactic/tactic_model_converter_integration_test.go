@@ -8,6 +8,7 @@ tactic_test
 import (
 	"errors"
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
+	"github.com/glycerine/g3/pkg/util/lbool"
 
 	"reflect"
 	"testing"
@@ -27,7 +28,7 @@ func TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime(t *testing.T)
 	satOK(t, tr.Compile([]ast.ASTHandle{p}))
 	result, e := s.Check(nil)
 	satOK(t, e)
-	if result != util.LTrue {
+	if result != lbool.True {
 		t.Fatal("real solver failed", result)
 	}
 	values, e := s.AppendModel(nil)

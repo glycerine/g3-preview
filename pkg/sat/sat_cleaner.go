@@ -2,6 +2,7 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -169,7 +170,7 @@ func (c *satCleaner) cleanupWatches() error {
 		if e != nil {
 			return e
 		}
-		if value != util.LUndef {
+		if value != lbool.Undef {
 			if e = list.Finalize(); e != nil {
 				return e
 			}
@@ -210,12 +211,12 @@ func (c *satCleaner) cleanupWatches() error {
 					if e != nil {
 						return e
 					}
-					if a != util.LTrue {
+					if a != lbool.True {
 						a, e = v.valueLiteral(l)
 						if e != nil {
 							return e
 						}
-						if a != util.LUndef {
+						if a != lbool.Undef {
 							return ErrSATAssertion
 						}
 					}
@@ -224,7 +225,7 @@ func (c *satCleaner) cleanupWatches() error {
 				if e != nil {
 					return e
 				}
-				keep = a == util.LUndef
+				keep = a == lbool.Undef
 			case 1, 2:
 			case 3:
 				keep = true

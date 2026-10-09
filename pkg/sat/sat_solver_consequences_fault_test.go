@@ -3,10 +3,9 @@ package sat
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satConsequenceFaultFixture(t *testing.T, route int) (*Solver, *satSolverLiteralRows) {
@@ -41,7 +40,7 @@ func TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners(t *testing.
 				s.budget.FailAfter(start)
 				r, e := s.getConsequences([]Literal{0}, []BoolVar{1, 2, 3, 4}, out)
 				satOK(t, e)
-				if r != util.LTrue {
+				if r != lbool.True {
 					t.Fatal(r)
 				}
 				horizon = start - testFieldBySourceName(reflect.ValueOf(s.budget).Elem(), "remaining").Int()
@@ -86,7 +85,7 @@ func TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners(t *testing.
 						failures++
 					} else {
 						success++
-						if r != util.LTrue {
+						if r != lbool.True {
 							t.Fatal(r)
 						}
 					}

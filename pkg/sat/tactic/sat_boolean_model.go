@@ -3,11 +3,11 @@ package tactic
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/sat"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 var ErrSATBooleanModelInterpreted = errors.New("sat: interpreted atoms require source sat2goal recovery")
@@ -50,9 +50,9 @@ func BuildBooleanModel(tr *GoalTranslator, values sat.Model) (md *model.ModelCor
 		}
 		var interpretation ast.ASTHandle
 		switch value {
-		case util.LTrue:
+		case lbool.True:
 			interpretation, e = tr.manager.MkTrue()
-		case util.LFalse:
+		case lbool.False:
 			interpretation, e = tr.manager.MkFalse()
 		default:
 			continue

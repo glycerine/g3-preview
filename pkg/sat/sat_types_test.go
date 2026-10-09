@@ -1,9 +1,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Port the literal constructors' actual SASSERT(var/sign) obligations from
@@ -44,11 +43,11 @@ func TestSATLiteralAndModelRendering(t *testing.T) {
 			t.Fatalf("render %v", l)
 		}
 	}
-	m := Model{util.LTrue, util.LUndef, util.LFalse, util.LTrue}
+	m := Model{lbool.True, lbool.Undef, lbool.False, lbool.True}
 	if m.String() != "0 -2 3" {
 		t.Fatal(m.String())
 	}
-	if m.valueAt(MakeLiteral(0, false)) != util.LTrue || m.valueAt(MakeLiteral(0, true)) != util.LFalse || m.valueAt(MakeLiteral(1, true)) != util.LUndef {
+	if m.valueAt(MakeLiteral(0, false)) != lbool.True || m.valueAt(MakeLiteral(0, true)) != lbool.False || m.valueAt(MakeLiteral(1, true)) != lbool.Undef {
 		t.Fatal("partial model values")
 	}
 	if satLiteralsString([]Literal{MakeLiteral(0, true), MakeLiteral(3, false)}) != "-0 3" || satLiteralsString(nil) != "" {
@@ -57,18 +56,18 @@ func TestSATLiteralAndModelRendering(t *testing.T) {
 }
 func TestLiftedBooleanSourceSemantics(t *testing.T) {
 	for _, c := range []struct {
-		v               util.LBool
-		neg             util.LBool
+		v               lbool.LBool
+		neg             lbool.LBool
 		printed, status string
-	}{{util.LFalse, util.LTrue, "l_false", "unsatisfiable"}, {util.LUndef, util.LUndef, "l_undef", "unknown"}, {util.LTrue, util.LFalse, "l_true", "satisfiable"}} {
+	}{{lbool.False, lbool.True, "l_false", "unsatisfiable"}, {lbool.Undef, lbool.Undef, "l_undef", "unknown"}, {lbool.True, lbool.False, "l_true", "satisfiable"}} {
 		if c.v.Negated() != c.neg || c.v.String() != c.printed || c.v.SATString() != c.status {
 			t.Fatalf("value %d", c.v)
 		}
 	}
-	if util.ToLBool(false) != util.LFalse || util.ToLBool(true) != util.LTrue {
+	if lbool.FromBool(false) != lbool.False || lbool.FromBool(true) != lbool.True {
 		t.Fatal("Boolean conversion")
 	}
-	if util.LBool(5).String() != "l_undef" || util.LBool(5).SATString() != "unknown" {
+	if lbool.LBool(5).String() != "l_undef" || lbool.LBool(5).SATString() != "unknown" {
 		t.Fatal("source default rendering branch")
 	}
 }

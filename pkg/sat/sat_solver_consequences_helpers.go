@@ -2,7 +2,7 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func (s *Solver) addConsequenceAssumption(l Literal) error {
@@ -24,7 +24,7 @@ func (s *Solver) consequenceDomain(l, antecedent Literal) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if value != util.LTrue {
+		if value != lbool.True {
 			return false, ErrSATAssertion
 		}
 		n, e := s.todoAntecedents.Size()
@@ -312,7 +312,7 @@ func (s *Solver) extractFixedSet(lits, assumptions, unfixed *satMUSLiteralSet, o
 			if e != nil {
 				return e
 			}
-			if value == util.LTrue {
+			if value == lbool.True {
 				if e = s.extractFixedConsequence(l, assumptions, unfixed, out); e != nil {
 					return e
 				}
@@ -376,7 +376,7 @@ func (s *Solver) deleteUnfixed(lits, vars *satMUSLiteralSet) (err error) {
 		if e != nil {
 			return e
 		}
-		if value == util.LTrue {
+		if value == lbool.True {
 			if err = f.sets[0].insert(l); err != nil {
 				return err
 			}

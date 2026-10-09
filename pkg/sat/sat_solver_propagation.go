@@ -2,7 +2,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 // These raw positions capture the actual source payload/end. A moved/freed
@@ -88,14 +88,14 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 			if e != nil {
 				return false, e
 			}
-			if a != util.LTrue {
+			if a != lbool.True {
 				return false, ErrSATAssertion
 			}
 			a, e = v.valueLiteral(not)
 			if e != nil {
 				return false, e
 			}
-			if a != util.LFalse {
+			if a != lbool.False {
 				return false, ErrSATAssertion
 			}
 		}
@@ -135,13 +135,13 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 					return false, e
 				}
 				switch value {
-				case util.LFalse:
+				case lbool.False:
 					if e = s.propagationConflictCleanup(&iter, pos, &out, list); e != nil {
 						return false, e
 					}
 					s.setConflict(newSATBinaryJustification(not), l1.Negated())
 					return false, nil
-				case util.LUndef:
+				case lbool.Undef:
 					s.binaryPropagations++
 					if e = s.assignCore(l1, newSATBinaryJustification(not)); e != nil {
 						return false, e
@@ -164,17 +164,17 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if a == util.LFalse && b == util.LUndef {
+				if a == lbool.False && b == lbool.Undef {
 					s.ternaryPropagations++
 					if e = s.assignCore(l2, newSATTernaryJustification(l1, not)); e != nil {
 						return false, e
 					}
-				} else if a == util.LUndef && b == util.LFalse {
+				} else if a == lbool.Undef && b == lbool.False {
 					s.ternaryPropagations++
 					if e = s.assignCore(l1, newSATTernaryJustification(l2, not)); e != nil {
 						return false, e
 					}
-				} else if a == util.LFalse && b == util.LFalse {
+				} else if a == lbool.False && b == lbool.False {
 					if e = s.propagationConflictCleanup(&iter, pos, &out, list); e != nil {
 						return false, e
 					}
@@ -190,7 +190,7 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if value == util.LTrue {
+				if value == lbool.True {
 					break
 				}
 				off, e := w.ClauseOffset()
@@ -239,7 +239,7 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if value == util.LTrue {
+				if value == lbool.True {
 					w.SetClause(c0, off)
 					break
 				}
@@ -257,7 +257,7 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 					if e != nil {
 						return false, e
 					}
-					if value == util.LFalse {
+					if value == lbool.False {
 						continue
 					}
 					if e = s.clauses.SetLiteral(c, 1, replacement); e != nil {
@@ -288,10 +288,10 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if satStorageSourceDebug && value != util.LFalse && value != util.LUndef {
+				if satStorageSourceDebug && value != lbool.False && value != lbool.Undef {
 					return false, ErrSATAssertion
 				}
-				if value == util.LFalse {
+				if value == lbool.False {
 					if e = s.clauses.MarkUsed(c); e != nil {
 						return false, e
 					}

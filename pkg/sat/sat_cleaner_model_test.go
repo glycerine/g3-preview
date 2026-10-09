@@ -4,6 +4,7 @@ package sat
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
@@ -300,7 +301,7 @@ func TestSATCleanerFiniteFormulaOracle(t *testing.T) {
 				for i := uint32(0); i < 3; i++ {
 					a, e := p.variables.valueVar(BoolVar(i))
 					satOK(t, e)
-					if a != util.LUndef && ((mask&(1<<i) != 0) != (a == util.LTrue)) {
+					if a != lbool.Undef && ((mask&(1<<i) != 0) != (a == lbool.True)) {
 						actual = false
 					}
 				}

@@ -2,10 +2,10 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverCopyActualFlagsTrailClausesAndUserScope(t *testing.T) {
@@ -52,7 +52,7 @@ func TestSATSolverCopyActualFlagsTrailClausesAndUserScope(t *testing.T) {
 	}
 	value, e := dst.Variables.valueLiteral(8)
 	satOK(t, e)
-	if value != util.LTrue {
+	if value != lbool.True {
 		t.Fatal(value)
 	}
 	if dst.Lifecycle.mkBinary != 1 || dst.Lifecycle.mkNary != 1 || len(dst.Lifecycle.learned) != 0 {
@@ -134,7 +134,7 @@ func TestSATSolverCopyUsesOnlySourceBaseTrailAndPopsDestination(t *testing.T) {
 	if dst.Variables.scopeLevel != 0 || src.Variables.scopeLevel != 1 {
 		t.Fatal(dst.Variables.scopeLevel, src.Variables.scopeLevel)
 	}
-	for l, w := range map[Literal]util.LBool{0: util.LTrue, 2: util.LUndef, 4: util.LUndef} {
+	for l, w := range map[Literal]lbool.LBool{0: lbool.True, 2: lbool.Undef, 4: lbool.Undef} {
 		v, e := dst.Variables.valueLiteral(l)
 		satOK(t, e)
 		if v != w {
@@ -194,7 +194,7 @@ func TestSATSolverCopyDebugConverterAssertionAfterDestinationPop(t *testing.T) {
 	}
 	value, e2 := dst.Variables.valueLiteral(0)
 	satOK(t, e2)
-	if value != util.LUndef {
+	if value != lbool.Undef {
 		t.Fatal(value)
 	}
 	if satStorageSourceDebug {

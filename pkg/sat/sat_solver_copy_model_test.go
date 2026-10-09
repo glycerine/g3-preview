@@ -3,9 +3,8 @@ package sat
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverCopyIndependentBinaryCNFsAndDestinationUnion(t *testing.T) {
@@ -39,9 +38,9 @@ func TestSATSolverCopyIndependentBinaryCNFsAndDestinationUnion(t *testing.T) {
 				satFullSolverRuntimeAudit(t, dst)
 				r, e := dst.Check(nil)
 				satOK(t, e)
-				want := util.LFalse
+				want := lbool.False
 				if len(satConsequenceModels(clauses, nil, 2)) > 0 {
-					want = util.LTrue
+					want = lbool.True
 				}
 				if r != want {
 					t.Fatal(r, want, clauses)
@@ -71,9 +70,9 @@ func TestSATSolverCopyIndependentNaryAssignmentModels(t *testing.T) {
 			}
 			r, e := dst.Check(asms)
 			satOK(t, e)
-			want := util.LFalse
+			want := lbool.False
 			if len(satConsequenceModels(clauses, asms, 4)) > 0 {
-				want = util.LTrue
+				want = lbool.True
 			}
 			if r != want {
 				t.Fatal(r, want, asms)

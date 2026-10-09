@@ -2,6 +2,7 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -21,8 +22,8 @@ func TestSATSolverActualRuntimeModelConverterMatchesSlice(t *testing.T) {
 	var col RuntimeUintColumn
 	col.Bind(r)
 	satOK(t, satSolverResizeModel(&col, 3))
-	native := Model{util.LUndef, util.LUndef, util.LFalse}
-	negative := util.LFalse
+	native := Model{lbool.Undef, lbool.Undef, lbool.False}
+	negative := lbool.False
 	satOK(t, col.Write(2, uint32(int32(negative))))
 	satOK(t, mc.Apply(native))
 	satOK(t, mc.applyModelSpan(satSolverModelSpan{column: &col}))

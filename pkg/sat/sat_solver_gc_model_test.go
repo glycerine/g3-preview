@@ -4,11 +4,11 @@ package sat
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/luby"
 )
 
@@ -55,7 +55,7 @@ func TestSATSolverGCFrozenAllReactivationArities(t *testing.T) {
 			if n == 1 {
 				v, e := p.variables.valueLiteral(2)
 				satOK(t, e)
-				if v != util.LTrue {
+				if v != lbool.True {
 					t.Fatal(v)
 				}
 			}
@@ -134,7 +134,7 @@ func TestSATSolverGCRefusalRootsAndReactivationPrefix(t *testing.T) {
 				}
 				v, err := p.variables.valueLiteral(4)
 				satOK(t, err)
-				if v != util.LTrue {
+				if v != lbool.True {
 					t.Fatal("reactivated unit assignment", v)
 				}
 			}

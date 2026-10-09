@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -224,7 +225,7 @@ func (s *satSolverPropagationState) numDiffLevelsSpanCore(n uint32, span satSolv
 			if e != nil {
 				return count, e
 			}
-			if v == util.LUndef {
+			if v == lbool.Undef {
 				return count, ErrSATAssertion
 			}
 		}

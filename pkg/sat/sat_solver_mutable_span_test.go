@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -21,7 +22,7 @@ func TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice(t *testing.T) {
 			state := satSolverClauseState{assignment: make([]int8, 6), levels: []uint32{0, 1, 0}}
 			x := mask
 			for v := 0; v < 3; v++ {
-				value := util.LBool(x%3 - 1)
+				value := lbool.LBool(x%3 - 1)
 				x /= 3
 				state.assignment[2*v] = int8(value)
 				state.assignment[2*v+1] = int8(-value)

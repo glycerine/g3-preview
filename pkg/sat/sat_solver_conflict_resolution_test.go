@@ -3,11 +3,11 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satConflictFixture(t *testing.T, n uint32) *satSolverConflictResolution {
@@ -70,7 +70,7 @@ func TestSATSolverConflictFirstUIPDefaultPipeline(t *testing.T) {
 	}
 	value, e := v.valueLiteral(3)
 	satOK(t, e)
-	if value != util.LTrue {
+	if value != lbool.True {
 		t.Fatal(value)
 	}
 	for i := uint32(0); i < 4; i++ {

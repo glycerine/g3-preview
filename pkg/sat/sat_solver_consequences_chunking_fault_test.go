@@ -4,10 +4,9 @@ package sat
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satChunkFixture(t *testing.T, multi bool) (*Solver, *RuntimeUintColumn, *satSolverLiteralRows) {
@@ -23,13 +22,13 @@ func satChunkFixture(t *testing.T, multi bool) (*Solver, *RuntimeUintColumn, *sa
 	}
 	r, e := s.Check(nil)
 	satOK(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal(r)
 	}
 	model := &RuntimeUintColumn{}
 	model.Bind(s.runtime.memory)
 	for i := 0; i < 2; i++ {
-		satOK(t, model.Push(uint32(util.LTrue)))
+		satOK(t, model.Push(uint32(lbool.True)))
 	}
 	t.Cleanup(func() { satOK(t, model.Finalize()) })
 	out, e := newSATSolverLiteralRows(s.runtime.memory, s.budget)
@@ -54,7 +53,7 @@ func TestSATConsequenceChunkEveryActualRefusalRetainsLocalAndOutputRoots(t *test
 				s.budget.FailAfter(n)
 				r, e := s.coreChunking(m, satConsequenceInput{variables: []BoolVar{0, 1}, count: 2}, satConsequenceLiterals(nil), out, 2)
 				satOK(t, e)
-				if r != util.LTrue {
+				if r != lbool.True {
 					t.Fatal(r)
 				}
 				horizon = n - testFieldBySourceName(reflect.ValueOf(s.budget).Elem(), "remaining").Int()
@@ -80,7 +79,7 @@ func TestSATConsequenceChunkEveryActualRefusalRetainsLocalAndOutputRoots(t *test
 						satProbingExpectedRefusal(t, s.propagation, e)
 						failures++
 					} else {
-						if r != util.LTrue {
+						if r != lbool.True {
 							t.Fatal(r)
 						}
 						success++

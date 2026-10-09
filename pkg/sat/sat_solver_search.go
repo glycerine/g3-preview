@@ -3,8 +3,7 @@ package sat
 
 import (
 	"errors"
-
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 var ErrSATMissingDimacsBinding = errors.New("sat: missing source DIMACS printer binding")
@@ -218,219 +217,219 @@ func (s *Solver) simplifyProblem() error {
 	}
 	return nil
 }
-func (s *Solver) backjumpStep() (util.LBool, bool, error) {
+func (s *Solver) backjumpStep() (lbool.LBool, bool, error) {
 	done := true
 	if _, e := s.Lifecycle.propagate(true, false, false); e != nil {
-		return util.LUndef, done, e
+		return lbool.Undef, done, e
 	}
 	if !s.propagation.inconsistent {
-		return util.LTrue, done, nil
+		return lbool.True, done, nil
 	}
 	yes, e := s.conflict.resolveConflict()
 	if e != nil {
-		return util.LUndef, done, e
+		return lbool.Undef, done, e
 	}
 	if !yes {
-		return util.LFalse, done, nil
+		return lbool.False, done, nil
 	}
 	cfg, e := s.config.State()
 	if e != nil {
-		return util.LUndef, done, e
+		return lbool.Undef, done, e
 	}
 	if s.conflict.conflicts > cfg.MaxConflicts || s.conflict.conflictsSinceRestart > s.gc.restartThreshold {
-		return util.LUndef, done, nil
+		return lbool.Undef, done, nil
 	}
 	if s.Variables.scopeLevel == 0 {
 		if e = s.cleaner.cleanup(); e != nil {
-			return util.LUndef, done, e
+			return lbool.Undef, done, e
 		}
 		if s.propagation.inconsistent {
-			return util.LFalse, done, nil
+			return lbool.False, done, nil
 		}
 		if e = s.gc.gc(); e != nil {
-			return util.LUndef, done, e
+			return lbool.Undef, done, e
 		}
 	}
-	return util.LTrue, false, nil
+	return lbool.True, false, nil
 }
-func (s *Solver) boundedSearch() (util.LBool, error) {
+func (s *Solver) boundedSearch() (lbool.LBool, error) {
 	for {
 		if e := s.propagation.checkpoint(); e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		done := false
 		for !done {
 			r, d, e := s.backjumpStep()
 			if e != nil {
-				return util.LUndef, e
+				return lbool.Undef, e
 			}
-			if r != util.LTrue {
+			if r != lbool.True {
 				return r, nil
 			}
 			done = d
 		}
 		if e := s.gc.gc(); e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		yes, e := s.decision.decide()
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		if !yes {
 			if s.propagation.extensionPresent {
-				return util.LUndef, ErrSATMissingSourceExtBinding
+				return lbool.Undef, ErrSATMissingSourceExtBinding
 			}
 			if e = s.mkModel(); e != nil {
-				return util.LUndef, e
+				return lbool.Undef, e
 			}
-			return util.LTrue, nil
+			return lbool.True, nil
 		}
 	}
 }
-func (s *Solver) Check(lits []Literal) (util.LBool, error) {
+func (s *Solver) Check(lits []Literal) (lbool.LBool, error) {
 	return s.checkSpan(uint32(len(lits)), satSolverLiteralSpan{literals: lits})
 }
-func (s *Solver) checkSpan(count uint32, span satSolverLiteralSpan) (util.LBool, error) {
+func (s *Solver) checkSpan(count uint32, span satSolverLiteralSpan) (lbool.LBool, error) {
 	if e := s.open(); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	if e := s.popToBase(); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	if satStorageSourceDebug && s.Variables.scopeLevel != 0 {
-		return util.LUndef, ErrSATAssertion
+		return lbool.Undef, ErrSATAssertion
 	}
 	cfg, e := s.config.State()
 	if e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	if cfg.DimacsDisplay {
 		if s.dimacsOutput == nil {
-			return util.LUndef, ErrSATMissingDimacsBinding
+			return lbool.Undef, ErrSATMissingDimacsBinding
 		}
 		if e = s.displayDIMACS(s.dimacsOutput); e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		for i := uint32(0); i < count; i++ {
 			l, err := span.literal(i)
 			if err != nil {
-				return util.LUndef, err
+				return lbool.Undef, err
 			}
 			if err = satDIMACSLiteralInto(s.dimacsOutput, l); err != nil {
-				return util.LUndef, err
+				return lbool.Undef, err
 			}
 			if err = s.dimacsOutput.AppendCString(" 0\n"); err != nil {
-				return util.LUndef, err
+				return lbool.Undef, err
 			}
 		}
-		return util.LUndef, nil
+		return lbool.Undef, nil
 	}
 	if cfg.NumParallel > 1 && !s.conflict.parallelPresent {
-		return util.LUndef, ErrSATMissingParallelBinding
+		return lbool.Undef, ErrSATMissingParallelBinding
 	}
 	r, e := s.checkCoreSpan(count, span)
 	var abort satSolverAbort
 	if errors.As(e, &abort) {
-		return util.LUndef, nil
+		return lbool.Undef, nil
 	}
 	return r, e
 }
-func (s *Solver) checkCore(lits []Literal) (util.LBool, error) {
+func (s *Solver) checkCore(lits []Literal) (lbool.LBool, error) {
 	return s.checkCoreSpan(uint32(len(lits)), satSolverLiteralSpan{literals: lits})
 }
-func (s *Solver) checkCoreSpan(count uint32, span satSolverLiteralSpan) (util.LBool, error) {
+func (s *Solver) checkCoreSpan(count uint32, span satSolverLiteralSpan) (lbool.LBool, error) {
 	if s.propagation.inconsistent {
-		return util.LFalse, nil
+		return lbool.False, nil
 	}
 	if e := s.gc.initSearch(); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	if _, e := s.Lifecycle.propagate(false, false, false); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	if s.propagation.inconsistent {
-		return util.LFalse, nil
+		return lbool.False, nil
 	}
 	if e := s.initAssumptionsSpan(count, span); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	if _, e := s.Lifecycle.propagate(false, false, false); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	yes, e := s.checkInconsistent()
 	if e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	if yes {
-		return util.LFalse, nil
+		return lbool.False, nil
 	}
 	if e = s.cleaner.cleanup(); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	cfg, e := s.config.State()
 	if e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	if cfg.MaxConflicts > 0 && cfg.BurstSearch > 0 {
 		s.gc.restartThreshold = cfg.BurstSearch
 		r, e := s.boundedSearch()
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
-		if r != util.LUndef {
+		if r != lbool.Undef {
 			return r, nil
 		}
 		if e = s.conflict.popReinit(s.Variables.scopeLevel); e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		s.conflict.conflictsSinceRestart = 0
 		s.gc.restartThreshold = cfg.RestartInitial
 	}
 	if e = s.simplifyProblem(); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	yes, e = s.checkInconsistent()
 	if e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	if yes {
-		return util.LFalse, nil
+		return lbool.False, nil
 	}
 	if cfg.MaxConflicts == 0 {
-		return util.LUndef, nil
+		return lbool.Undef, nil
 	}
 	for {
 		if satStorageSourceDebug && s.propagation.inconsistent {
-			return util.LUndef, ErrSATAssertion
+			return lbool.Undef, ErrSATAssertion
 		}
 		r, e := s.boundedSearch()
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
-		if r != util.LUndef {
+		if r != lbool.Undef {
 			return r, nil
 		}
 		if s.conflict.conflicts > cfg.MaxConflicts {
-			return util.LUndef, nil
+			return lbool.Undef, nil
 		}
 		if e = s.gc.restart(); e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		if e = s.simplifyProblem(); e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		yes, e = s.checkInconsistent()
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		if yes {
-			return util.LFalse, nil
+			return lbool.False, nil
 		}
 		if e = s.gc.gc(); e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		if cfg.RestartMax <= s.gc.restarts {
-			return util.LUndef, nil
+			return lbool.Undef, nil
 		}
 	}
 }

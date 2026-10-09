@@ -5,8 +5,8 @@ package rewriter
 import (
 	"fmt"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
 
-	"github.com/glycerine/g3/pkg/util"
 	"reflect"
 	"testing"
 )
@@ -228,7 +228,7 @@ func TestBoolRewriterACIndependentAssignmentsThroughCDCL(t *testing.T) {
 					satOK(t, tr.Compile(forms))
 					r, e := s.Check(nil)
 					satOK(t, e)
-					if (r == util.LTrue) != want || r == util.LUndef {
+					if (r == lbool.True) != want || r == lbool.Undef {
 						t.Fatal("independent truth table", or, row, bits, r, want)
 					}
 					satOK(t, tr.Close())

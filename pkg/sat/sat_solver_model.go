@@ -3,6 +3,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func (s *Solver) mkModel() error {
@@ -76,7 +77,7 @@ func (s *Solver) checkModelSpan(model satSolverModelSpan) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if value != util.LTrue {
+		if value != lbool.True {
 			list, e := s.Variables.watches.Get(idx)
 			if e != nil {
 				return false, e
@@ -101,7 +102,7 @@ func (s *Solver) checkModelSpan(model satSolverModelSpan) (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if value != util.LTrue {
+				if value != lbool.True {
 					ok = false
 				}
 			}
@@ -120,7 +121,7 @@ func (s *Solver) checkModelSpan(model satSolverModelSpan) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if v != util.LTrue {
+		if v != lbool.True {
 			ok = false
 		}
 	}

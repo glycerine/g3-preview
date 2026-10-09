@@ -4,6 +4,7 @@
 package rewriter
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -76,7 +77,7 @@ func TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables(t *testing.T
 				satOK(t, tr.Compile(forms))
 				answer, e := solver.Check(nil)
 				satOK(t, e)
-				if answer == util.LUndef || (answer == util.LTrue) != want {
+				if answer == lbool.Undef || (answer == lbool.True) != want {
 					t.Fatal("independent recursive rewrite meaning", bits, answer, want)
 				}
 				satOK(t, tr.Close())

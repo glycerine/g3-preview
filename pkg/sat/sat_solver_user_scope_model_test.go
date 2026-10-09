@@ -2,9 +2,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula(t *testing.T) {
@@ -19,13 +18,13 @@ func TestSATSolverUserScopeSourcePushPopPreservesOriginalFormula(t *testing.T) {
 	satOK(t, s.MkClause([]Literal{3}))
 	got, e := s.Check(nil)
 	satOK(t, e)
-	if got != util.LFalse {
+	if got != lbool.False {
 		t.Fatal(got)
 	}
 	satOK(t, s.UserPop(1))
 	got, e = s.Check(nil)
 	satOK(t, e)
-	if got != util.LTrue {
+	if got != lbool.True {
 		t.Fatal(got)
 	}
 }

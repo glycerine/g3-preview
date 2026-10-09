@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -14,19 +15,19 @@ func TestSATSolverReportModelConsumerCopySelfAndGuardedReadPrefix(t *testing.T) 
 	var source RuntimeUintColumn
 	source.Bind(s.runtime.memory)
 	t.Cleanup(func() { satOK(t, source.Finalize()) })
-	for _, v := range [2]util.LBool{util.LTrue, util.LFalse} {
+	for _, v := range [2]lbool.LBool{lbool.True, lbool.False} {
 		satOK(t, source.Push(uint32(v)))
 	}
 	satOK(t, s.setModel(&source))
 	m, e := s.AppendModel(nil)
 	satOK(t, e)
-	if len(m) != 2 || m[0] != util.LTrue || m[1] != util.LFalse || !s.Variables.modelIsCurrent {
+	if len(m) != 2 || m[0] != lbool.True || m[1] != lbool.False || !s.Variables.modelIsCurrent {
 		t.Fatal(m, s.Variables.modelIsCurrent)
 	}
-	satOK(t, source.Write(0, uint32(util.LUndef)))
+	satOK(t, source.Write(0, uint32(lbool.Undef)))
 	m, e = s.AppendModel(nil)
 	satOK(t, e)
-	if m[0] != util.LTrue {
+	if m[0] != lbool.True {
 		t.Fatal("source requires copying, not backing stealing", m)
 	}
 	satOK(t, s.setModel(&s.model))
@@ -42,7 +43,7 @@ func TestSATSolverReportModelConsumerCopySelfAndGuardedReadPrefix(t *testing.T) 
 	var bad RuntimeUintColumn
 	bad.Bind(s.runtime.memory)
 	t.Cleanup(func() { satOK(t, bad.Finalize()) })
-	satOK(t, bad.Push(uint32(util.LTrue)))
+	satOK(t, bad.Push(uint32(lbool.True)))
 	satOK(t, WriteRuntimeWord(s.runtime.memory, bad.Raw.Block, 4, 2))
 	satOK(t, s.mkModel())
 	e = s.setModel(&bad)

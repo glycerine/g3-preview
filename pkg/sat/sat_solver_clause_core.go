@@ -3,7 +3,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 // Borrowed views of the solver's literal-indexed assignment and variable-indexed
@@ -15,17 +15,17 @@ type satSolverClauseState struct {
 	levels     []uint32
 }
 
-func (s *satSolverClauseState) value(l Literal) (util.LBool, error) {
+func (s *satSolverClauseState) value(l Literal) (lbool.LBool, error) {
 	if s == nil {
-		return util.LUndef, ErrSATOwner
+		return lbool.Undef, ErrSATOwner
 	}
 	if s.variables != nil {
 		return s.variables.valueLiteral(l)
 	}
 	if uint64(l.index()) >= uint64(len(s.assignment)) {
-		return util.LUndef, arena.ErrBounds
+		return lbool.Undef, arena.ErrBounds
 	}
-	return util.LBool(s.assignment[l.index()]), nil
+	return lbool.LBool(s.assignment[l.index()]), nil
 }
 func (s *satSolverClauseState) level(l Literal) (uint32, error) {
 	if s == nil {
@@ -106,12 +106,12 @@ func (s *satSolverClauseState) simplifyClauseSpan(scope uint32, n *uint32, span 
 				return false, e
 			}
 			if lvl > 0 {
-				val = util.LUndef
+				val = lbool.Undef
 			}
 		}
 		switch val {
-		case util.LFalse:
-		case util.LUndef:
+		case lbool.False:
+		case lbool.Undef:
 			if curr == prev.Negated() {
 				return false, nil
 			}
@@ -128,7 +128,7 @@ func (s *satSolverClauseState) simplifyClauseSpan(scope uint32, n *uint32, span 
 				}
 				j++
 			}
-		case util.LTrue:
+		case lbool.True:
 			return false, nil
 		}
 	}
@@ -159,7 +159,7 @@ func (s *satSolverClauseState) selectWatchLiteral(a *ClauseAllocator, clause Sto
 			return 0, e
 		}
 		switch val {
-		case util.LFalse:
+		case lbool.False:
 			if maxFalse == none {
 				maxFalse = i
 			} else {
@@ -179,9 +179,9 @@ func (s *satSolverClauseState) selectWatchLiteral(a *ClauseAllocator, clause Sto
 					maxFalse = i
 				}
 			}
-		case util.LUndef:
+		case lbool.Undef:
 			unknown = i
-		case util.LTrue:
+		case lbool.True:
 			if minTrue == none {
 				minTrue = i
 			} else {
@@ -237,7 +237,7 @@ func (s *satSolverClauseState) selectLearnedWatchLiteral(a *ClauseAllocator, cla
 			if e != nil {
 				return 0, e
 			}
-			if val != util.LFalse {
+			if val != lbool.False {
 				return 0, ErrSATAssertion
 			}
 		}

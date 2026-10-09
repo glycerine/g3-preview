@@ -3,11 +3,11 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satCleanerFixture(t *testing.T, n uint32) (*satCleaner, *satSolverClauseLifecycle) {
@@ -112,7 +112,7 @@ func TestSATCleanerFrozenAndActiveClauseRoutes(t *testing.T) {
 			if n == 1 {
 				v, e := p.variables.valueLiteral(2)
 				satOK(t, e)
-				if v != util.LTrue {
+				if v != lbool.True {
 					t.Fatal(v)
 				}
 			}

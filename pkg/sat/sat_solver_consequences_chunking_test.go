@@ -2,9 +2,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATConsequenceChunkPruneAndLastDuplicateRemoval(t *testing.T) {
@@ -13,7 +12,7 @@ func TestSATConsequenceChunkPruneAndLastDuplicateRemoval(t *testing.T) {
 	model.Bind(s.runtime.memory)
 	lambda.Bind(s.runtime.memory)
 	defer func() { satOK(t, lambda.Finalize()); satOK(t, model.Finalize()) }()
-	for _, v := range []util.LBool{util.LTrue, util.LFalse, util.LUndef} {
+	for _, v := range []lbool.LBool{lbool.True, lbool.False, lbool.Undef} {
 		satOK(t, model.Push(uint32(int32(v))))
 	}
 	for _, v := range []uint32{0, 1, 2, 3, 4, 5} {
@@ -56,7 +55,7 @@ func TestSATConsequenceChunkUsesActualCheckAndAppendsCore(t *testing.T) {
 	satOK(t, s.MkClause([]Literal{0}))
 	r, e := s.Check(nil)
 	satOK(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal(r)
 	}
 	out, e := newSATSolverLiteralRows(s.runtime.memory, s.budget)
@@ -65,7 +64,7 @@ func TestSATConsequenceChunkUsesActualCheckAndAppendsCore(t *testing.T) {
 	satOK(t, out.appendLiterals([]Literal{8}))
 	r, e = s.coreChunking(&s.model, satConsequenceInput{variables: []BoolVar{0, 1}, count: 2}, satConsequenceLiterals(nil), out, 2)
 	satOK(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal(r)
 	}
 	n, e := out.rowCount()
@@ -94,7 +93,7 @@ func TestSATConsequenceChunkPruneReachedGuardPreservesSwapPrefix(t *testing.T) {
 	model.Bind(s.runtime.memory)
 	lambda.Bind(s.runtime.memory)
 	defer func() { satOK(t, lambda.Finalize()); satOK(t, model.Finalize()) }()
-	lf := util.LFalse
+	lf := lbool.False
 	satOK(t, model.Push(uint32(int32(lf))))
 	for _, l := range []uint32{0, 4, 1} {
 		satOK(t, lambda.Push(l))
@@ -121,7 +120,7 @@ func TestSATConsequenceChunkWarmedPhysicalPlateau(t *testing.T) {
 	for pass := 0; pass < 6; pass++ {
 		r, e := s.coreChunking(model, satConsequenceInput{variables: []BoolVar{0, 1}, count: 2}, satConsequenceLiterals(nil), out, 2)
 		satOK(t, e)
-		if r != util.LTrue {
+		if r != lbool.True {
 			t.Fatal(r)
 		}
 		satChunkAudit(t, s, model, out)

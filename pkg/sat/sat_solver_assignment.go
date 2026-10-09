@@ -1,7 +1,7 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func (s *satSolverPropagationState) setConflict(c satJustification, l Literal) {
@@ -21,9 +21,9 @@ func (s *satSolverPropagationState) assign(l Literal, j satJustification) error 
 		return e
 	}
 	switch v {
-	case util.LFalse:
+	case lbool.False:
 		s.setConflict(j, l.Negated())
-	case util.LUndef:
+	case lbool.Undef:
 		return s.assignCore(l, j)
 	}
 	return nil
@@ -38,17 +38,17 @@ func (s *satSolverPropagationState) assignCore(l Literal, j satJustification) er
 		if e != nil {
 			return e
 		}
-		if value != util.LUndef {
+		if value != lbool.Undef {
 			return ErrSATAssertion
 		}
 	}
 	if v.scopeLevel == 0 {
 		j = satJustification{}
 	}
-	if e := v.assignment.Write(l.index(), int8(util.LTrue)); e != nil {
+	if e := v.assignment.Write(l.index(), int8(lbool.True)); e != nil {
 		return e
 	}
-	if e := v.assignment.Write(l.Negated().index(), int8(util.LFalse)); e != nil {
+	if e := v.assignment.Write(l.Negated().index(), int8(lbool.False)); e != nil {
 		return e
 	}
 	id := uint32(l.variable())
@@ -92,53 +92,53 @@ func (s *satSolverPropagationState) assignCore(l Literal, j satJustification) er
 		if e != nil {
 			return e
 		}
-		if (l.sign() && a != util.LFalse) || (!l.sign() && a != util.LTrue) {
+		if (l.sign() && a != lbool.False) || (!l.sign() && a != lbool.True) {
 			return ErrSATAssertion
 		}
 		a, e = v.valueLiteral(l)
 		if e != nil {
 			return e
 		}
-		if a != util.LTrue {
+		if a != lbool.True {
 			return ErrSATAssertion
 		}
 		a, e = v.valueLiteral(l.Negated())
 		if e != nil {
 			return e
 		}
-		if a != util.LFalse {
+		if a != lbool.False {
 			return ErrSATAssertion
 		}
 	}
 	return nil
 }
-func (s *satSolverPropagationState) status(c StoredClauseRef) (util.LBool, error) {
+func (s *satSolverPropagationState) status(c StoredClauseRef) (lbool.LBool, error) {
 	if e := s.open(); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	n, e := s.clauses.Size(c)
 	if e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	found := false
 	for i := uint32(0); i < n; i++ {
 		l, e := s.clauses.Literal(c, i)
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		v, e := s.variables.valueLiteral(l)
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		switch v {
-		case util.LTrue:
-			return util.LTrue, nil
-		case util.LUndef:
+		case lbool.True:
+			return lbool.True, nil
+		case lbool.Undef:
 			found = true
 		}
 	}
 	if found {
-		return util.LUndef, nil
+		return lbool.Undef, nil
 	}
-	return util.LFalse, nil
+	return lbool.False, nil
 }

@@ -1,7 +1,7 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func (s *satSolverClauseLifecycle) propagateBinClause(a, b Literal) (bool, error) {
@@ -10,7 +10,7 @@ func (s *satSolverClauseLifecycle) propagateBinClause(a, b Literal) (bool, error
 	if e != nil {
 		return false, e
 	}
-	if v == util.LFalse {
+	if v == lbool.False {
 		p.binaryPropagations++
 		return true, p.assign(a, newSATBinaryJustification(b))
 	}
@@ -18,7 +18,7 @@ func (s *satSolverClauseLifecycle) propagateBinClause(a, b Literal) (bool, error
 	if e != nil {
 		return false, e
 	}
-	if v == util.LFalse {
+	if v == lbool.False {
 		p.binaryPropagations++
 		return true, p.assign(b, newSATBinaryJustification(a))
 	}
@@ -112,7 +112,7 @@ func (s *satSolverClauseLifecycle) attachTerClause(c StoredClauseRef) (bool, err
 			if e != nil {
 				return false, e
 			}
-			if v != util.LFalse {
+			if v != lbool.False {
 				continue
 			}
 			y, e := a.Literal(c, k)
@@ -123,7 +123,7 @@ func (s *satSolverClauseLifecycle) attachTerClause(c StoredClauseRef) (bool, err
 			if e != nil {
 				return false, e
 			}
-			if v != util.LFalse {
+			if v != lbool.False {
 				continue
 			}
 			l, e := a.Literal(c, i)
@@ -197,7 +197,7 @@ func (s *satSolverClauseLifecycle) attachNaryClause(c StoredClauseRef) (bool, er
 		if e != nil {
 			return false, e
 		}
-		if v == util.LFalse {
+		if v == lbool.False {
 			p.clausePropagations++
 			l, e = a.Literal(c, 1)
 			if e != nil {
@@ -216,7 +216,7 @@ func (s *satSolverClauseLifecycle) attachNaryClause(c StoredClauseRef) (bool, er
 			if e != nil {
 				return false, e
 			}
-			if v == util.LFalse {
+			if v == lbool.False {
 				p.clausePropagations++
 				l, e = a.Literal(c, 0)
 				if e != nil {

@@ -2,9 +2,8 @@ package sat
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverClauseAttachDetachActualKinds(t *testing.T) {
@@ -78,7 +77,7 @@ func TestSATSolverClauseLearnedWatchActualSelection(t *testing.T) {
 }
 
 func TestSATSolverAttachBinaryAndTernaryFiniteMatrices(t *testing.T) {
-	vals := []util.LBool{util.LFalse, util.LUndef, util.LTrue}
+	vals := []lbool.LBool{lbool.False, lbool.Undef, lbool.True}
 	for _, scope := range []uint32{0, 2} {
 		for a := 0; a < 3; a++ {
 			for b := 0; b < 3; b++ {
@@ -86,8 +85,8 @@ func TestSATSolverAttachBinaryAndTernaryFiniteMatrices(t *testing.T) {
 					s, p, v, _ := satLifecycleFixture(t, 2)
 					v.scopeLevel = scope
 					for i, x := range []int{a, b} {
-						if vals[x] != util.LUndef {
-							satOK(t, p.assign(MakeLiteral(BoolVar(i), vals[x] == util.LFalse), satJustification{}))
+						if vals[x] != lbool.Undef {
+							satOK(t, p.assign(MakeLiteral(BoolVar(i), vals[x] == lbool.False), satJustification{}))
 						}
 					}
 					satOK(t, s.mkBinClause(0, 2, false))
@@ -103,8 +102,8 @@ func TestSATSolverAttachBinaryAndTernaryFiniteMatrices(t *testing.T) {
 						actual, e := v.valueVar(BoolVar(target))
 						satOK(t, e)
 						want := vals[[]int{a, b}[target]]
-						if want == util.LUndef {
-							want = util.LTrue
+						if want == lbool.Undef {
+							want = lbool.True
 						}
 						if actual != want {
 							t.Fatal("source first-false precedence", actual, want)
@@ -136,8 +135,8 @@ func TestSATSolverAttachBinaryAndTernaryFiniteMatrices(t *testing.T) {
 						input := []int{a, b, c}
 						oldTrail := uint32(0)
 						for i, x := range input {
-							if vals[x] != util.LUndef {
-								satOK(t, p.assign(MakeLiteral(BoolVar(i), vals[x] == util.LFalse), satJustification{}))
+							if vals[x] != lbool.Undef {
+								satOK(t, p.assign(MakeLiteral(BoolVar(i), vals[x] == lbool.False), satJustification{}))
 								oldTrail++
 							}
 						}
@@ -259,7 +258,7 @@ func TestSATSolverAttachNaryReorderAndWatchFaultPrefixes(t *testing.T) {
 				satOK(t, x)
 				z, x := p.clauses.Literal(c, 1)
 				satOK(t, x)
-				if a != 6 || z != 4 || p.clausePropagations != 1 || satAssignmentTestValue(t, &v.assignment, 6) != int8(util.LTrue) {
+				if a != 6 || z != 4 || p.clausePropagations != 1 || satAssignmentTestValue(t, &v.assignment, 6) != int8(lbool.True) {
 					t.Fatal("source swaps+assignment precede watches", a, z)
 				}
 				w, x := v.watches.Get(7)

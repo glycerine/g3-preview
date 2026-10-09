@@ -8,7 +8,7 @@ tactic_test
 import (
 	"github.com/glycerine/g3/pkg/sat"
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -45,20 +45,20 @@ func TestTacticGoalAssertionsToSATAndValidatedModel(t *testing.T) {
 			if rv {
 				selected = pv
 			}
-			want := util.LFalse
+			want := lbool.False
 			if (pv || qv) && !(pv && qv) && selected {
-				want = util.LTrue
+				want = lbool.True
 			}
 			if got != want {
 				t.Fatal("original goal assertions", got, want)
 			}
-			if got == util.LTrue {
+			if got == lbool.True {
 				model, e := s.AppendModel(nil)
 				satOK(t, e)
 				for i, h := range []ast.ASTHandle{p, q, r} {
 					v, e := tr.Variable(h)
 					satOK(t, e)
-					if v == sat.NullBoolVar || int(v) >= len(model) || model[v] == util.LUndef || (model[v] == util.LTrue) != (bits&(1<<i) != 0) {
+					if v == sat.NullBoolVar || int(v) >= len(model) || model[v] == lbool.Undef || (model[v] == lbool.True) != (bits&(1<<i) != 0) {
 						t.Fatal("model violates goal assertion", i, v)
 					}
 				}

@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"math"
 	"reflect"
 
@@ -268,7 +269,7 @@ func (g *satSolverGC) canDelete(r StoredClauseRef) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	if v != util.LTrue {
+	if v != lbool.True {
 		return true, nil
 	}
 	j, e := p.variables.justification.read(uint32(l.variable()))

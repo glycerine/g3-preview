@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -365,9 +366,9 @@ func (m *satModelConverter) Copy(src *satModelConverter) error {
 	}
 	return nil
 }
-func satConverterModelValue(model Model, l Literal) (util.LBool, error) {
+func satConverterModelValue(model Model, l Literal) (lbool.LBool, error) {
 	if uint64(l.variable()) >= uint64(len(model)) {
-		return util.LUndef, arena.ErrBounds
+		return lbool.Undef, arena.ErrBounds
 	}
 	v := model[l.variable()]
 	if l.sign() {
@@ -398,7 +399,7 @@ func (m *satModelConverter) applyModelSpan(model satSolverModelSpan) error {
 			if e != nil {
 				return e
 			}
-			if value != util.LUndef {
+			if value != lbool.Undef {
 				return ErrSATAssertion
 			}
 		}
@@ -414,9 +415,9 @@ func (m *satModelConverter) applyModelSpan(model satSolverModelSpan) error {
 			}
 			if l == DefaultLiteral() {
 				if !sat {
-					selected := util.LTrue
+					selected := lbool.True
 					if sign {
-						selected = util.LFalse
+						selected = lbool.False
 					}
 					if e := model.write(v, selected); e != nil {
 						return e
@@ -437,17 +438,17 @@ func (m *satModelConverter) applyModelSpan(model satSolverModelSpan) error {
 			if e != nil {
 				return e
 			}
-			if value == util.LTrue {
+			if value == lbool.True {
 				sat = true
 			} else if lv != v {
 				current, e := model.read(lv)
 				if e != nil {
 					return e
 				}
-				if current == util.LUndef {
-					selected := util.LTrue
+				if current == lbool.Undef {
+					selected := lbool.True
 					if l.sign() {
-						selected = util.LFalse
+						selected = lbool.False
 					}
 					if e := model.write(lv, selected); e != nil {
 						return e
@@ -495,7 +496,7 @@ func (m *satModelConverter) assertEntryModelSpan(x *satModelConversionEntry, mod
 		if e != nil {
 			return e
 		}
-		sat = v == util.LTrue
+		sat = v == lbool.True
 	}
 	return nil
 }
@@ -527,7 +528,7 @@ func (m *satModelConverter) checkEntryModelSpan(x *satModelConversionEntry, mode
 		if e != nil {
 			return false, e
 		}
-		sat = v == util.LTrue
+		sat = v == lbool.True
 	}
 	return ok, nil
 }

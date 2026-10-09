@@ -2,9 +2,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // The clause excludes precisely the assignment satisfying all three positive
@@ -21,7 +20,7 @@ func TestSATSolverMUSActualThreeNecessaryAssumptions(t *testing.T) {
 	satOK(t, s.UpdateParams(&params))
 	got, e := s.Check([]Literal{0, 2, 4})
 	satOK(t, e)
-	if got != util.LFalse {
+	if got != lbool.False {
 		t.Fatal(got)
 	}
 	n, e := s.conflict.core.Size()

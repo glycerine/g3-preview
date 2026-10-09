@@ -3,10 +3,10 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverConsequenceReasonShortCircuitAndClauseDomainTodoPrefix(t *testing.T) {
@@ -115,7 +115,7 @@ func TestSATSolverConsequenceCopiedOutputAndCurrentModelQueryLifetime(t *testing
 	satOK(t, s.MkClause([]Literal{0}))
 	r, e := s.Check(nil)
 	satOK(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal(r)
 	}
 	old, e := s.AppendModel(nil)
@@ -132,7 +132,7 @@ func TestSATSolverConsequenceCopiedOutputAndCurrentModelQueryLifetime(t *testing
 	}
 	r, e = s.getConsequences(nil, []BoolVar{0, 1}, out)
 	satOK(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal(r)
 	}
 	now, e := s.AppendModel(nil)
@@ -189,7 +189,7 @@ func TestSATSolverConsequencesWarmedActualGraphPlateau(t *testing.T) {
 	for pass := 0; pass < 6; pass++ {
 		r, e := s.getConsequences([]Literal{0}, []BoolVar{1, 2}, out)
 		satOK(t, e)
-		if r != util.LTrue {
+		if r != lbool.True {
 			t.Fatal(r)
 		}
 		n, e := out.rowCount()

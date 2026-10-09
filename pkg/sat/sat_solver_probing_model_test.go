@@ -4,6 +4,7 @@ package sat
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
@@ -131,11 +132,11 @@ func TestSATSolverProbingIndependentFiniteImplications(t *testing.T) {
 			for id := uint32(0); id < 4; id++ {
 				value, e := p.variables.valueVar(BoolVar(id))
 				satOK(t, e)
-				if value == util.LUndef {
+				if value == lbool.Undef {
 					continue
 				}
 				for _, mask := range models {
-					if (mask>>id&1 != 0) != (value == util.LTrue) {
+					if (mask>>id&1 != 0) != (value == lbool.True) {
 						t.Fatal("unsound deduction", id, value, models)
 					}
 				}
@@ -167,7 +168,7 @@ func TestSATSolverProbingAllPhysicalRefusalPrefixes(t *testing.T) {
 				}
 				value, e := life.propagation.variables.valueVar(1)
 				satOK(t, e)
-				if value != util.LTrue {
+				if value != lbool.True {
 					t.Fatal(value)
 				}
 			}

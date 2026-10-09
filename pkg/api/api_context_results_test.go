@@ -5,7 +5,7 @@ package api
 import (
 	"errors"
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
@@ -152,7 +152,7 @@ func TestAPIContextGoalRootSurvivesExplicitResultResetAndDrains(t *testing.T) {
 	astTestMust(t, tr.Compile(forms))
 	r, e := s.Check(nil)
 	astTestMust(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal("retained assertion did not reach the real SAT solver", r)
 	}
 	values, e := s.AppendModel(nil)

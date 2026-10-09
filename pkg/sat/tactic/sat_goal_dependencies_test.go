@@ -4,11 +4,11 @@ package tactic
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATGoalDependenciesSignedAssumptionsAndCore(t *testing.T) {
@@ -38,7 +38,7 @@ func TestSATGoalDependenciesSignedAssumptionsAndCore(t *testing.T) {
 			}
 			r, e := s.Check(assumptions)
 			satOK(t, e)
-			if r != util.LFalse {
+			if r != lbool.False {
 				t.Fatal("guarded false must be unsat under label", r)
 			}
 			core, e := s.BorrowCore()
@@ -55,7 +55,7 @@ func TestSATGoalDependenciesSignedAssumptionsAndCore(t *testing.T) {
 			}
 			r, e = s.Check(nil)
 			satOK(t, e)
-			if r != util.LTrue {
+			if r != lbool.True {
 				t.Fatal("guarded false should permit disabled label", r)
 			}
 		})
@@ -77,7 +77,7 @@ func TestSATGoalDependenciesFormulaLabelShortcutAndInterface(t *testing.T) {
 	satOK(t, e)
 	value, e := s.SourceValueVar(v)
 	satOK(t, e)
-	if value != util.LUndef {
+	if value != lbool.Undef {
 		t.Fatal("source skip_dep emitted a root unit", value)
 	}
 	external, e := s.SourceIsExternal(v)
@@ -89,12 +89,12 @@ func TestSATGoalDependenciesFormulaLabelShortcutAndInterface(t *testing.T) {
 	satOK(t, e)
 	r, e := s.Check(a)
 	satOK(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal(r)
 	}
 	model, e := s.AppendModel(nil)
 	satOK(t, e)
-	if model[v] != util.LTrue {
+	if model[v] != lbool.True {
 		t.Fatal("assumption not enforced")
 	}
 }
@@ -133,9 +133,9 @@ func TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable(t *testi
 			}
 			r, e := s.Check(a)
 			satOK(t, e)
-			want := util.LFalse
+			want := lbool.False
 			if bits == 3 {
-				want = util.LTrue
+				want = lbool.True
 			}
 			if r != want {
 				t.Fatal("independent label/guard truth table", bits, r, want)

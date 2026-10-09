@@ -2,9 +2,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks(t *testing.T) {
@@ -17,7 +16,7 @@ func TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks(t *testing.T) {
 		satOK(t, s.MkClause([]Literal{1, 3, 5}))
 		result, e := s.Check([]Literal{0, 2, 4, 6})
 		satOK(t, e)
-		if result != util.LFalse {
+		if result != lbool.False {
 			t.Fatal(result)
 		}
 		// A valid but redundant source core input: original a,b,c plus d remains
@@ -33,7 +32,7 @@ func TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks(t *testing.T) {
 		oldRestarts := s.gc.restarts
 		result, e = s.mus.run()
 		satOK(t, e)
-		if result != util.LTrue {
+		if result != lbool.True {
 			t.Fatal(result)
 		}
 		count, e := s.conflict.core.Size()

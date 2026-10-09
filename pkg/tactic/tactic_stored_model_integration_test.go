@@ -8,12 +8,12 @@ tactic_test
 import (
 	"github.com/glycerine/g3/pkg/model"
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
+	"github.com/glycerine/g3/pkg/util/lbool"
 
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestTacticStoredModelRealSATBindingOwnershipAndReplacement(t *testing.T) {
@@ -29,7 +29,7 @@ func TestTacticStoredModelRealSATBindingOwnershipAndReplacement(t *testing.T) {
 	satOK(t, tr.Compile([]ast.ASTHandle{p}))
 	result, e := s.Check(nil)
 	satOK(t, e)
-	if result != util.LTrue {
+	if result != lbool.True {
 		t.Fatal(result)
 	}
 	values, e := s.AppendModel(nil)

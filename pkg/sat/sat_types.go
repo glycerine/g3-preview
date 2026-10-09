@@ -2,10 +2,9 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"strconv"
 	"strings"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 type BoolVar uint32
@@ -53,9 +52,9 @@ func (l Literal) dimacsString() string {
 
 // Model owns a pointer-free slice; consumers retain their own result storage.
 // This is the source partial model representation, not a model producer.
-type Model []util.LBool
+type Model []lbool.LBool
 
-func (m Model) valueAt(l Literal) util.LBool {
+func (m Model) valueAt(l Literal) lbool.LBool {
 	r := m[l.variable()]
 	if l.sign() {
 		return r.Negated()
@@ -66,14 +65,14 @@ func (m Model) String() string {
 	var out strings.Builder
 	first := true
 	for v, value := range m {
-		if value == util.LUndef {
+		if value == lbool.Undef {
 			continue
 		}
 		if !first {
 			out.WriteByte(' ')
 		}
 		first = false
-		if value != util.LTrue {
+		if value != lbool.True {
 			out.WriteByte('-')
 		}
 		out.WriteString(strconv.FormatUint(uint64(v), 10))

@@ -3,15 +3,15 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // These are finite branch/oracle fixtures, separate from the registered
 // sat_user_scope.cpp campaign. No truth-table algorithm is production code.
-func satSolverFiniteCNFOracle(clauses [][]Literal, n uint32) util.LBool {
+func satSolverFiniteCNFOracle(clauses [][]Literal, n uint32) lbool.LBool {
 	for bits := uint32(0); bits < 1<<n; bits++ {
 		all := true
 		for _, c := range clauses {
@@ -22,10 +22,10 @@ func satSolverFiniteCNFOracle(clauses [][]Literal, n uint32) util.LBool {
 			all = all && yes
 		}
 		if all {
-			return util.LTrue
+			return lbool.True
 		}
 	}
-	return util.LFalse
+	return lbool.False
 }
 func TestSATSolverDefaultCheckSearchIndependentFiniteCNF(t *testing.T) {
 	// All 16 subsets of four binary clauses over two variables; some entail a
@@ -55,13 +55,13 @@ func TestSATSolverDefaultCheckSearchIndependentFiniteCNF(t *testing.T) {
 			if want := satSolverFiniteCNFOracle(clauses, 2); got != want {
 				t.Fatalf("default source search got %v want %v", got, want)
 			}
-			if got == util.LTrue {
+			if got == lbool.True {
 				model, e := s.AppendModel(nil)
 				satOK(t, e)
 				for _, c := range clauses {
 					yes := false
 					for _, l := range c {
-						yes = yes || model[l.variable()] == util.LTrue && !l.sign() || model[l.variable()] == util.LFalse && l.sign()
+						yes = yes || model[l.variable()] == lbool.True && !l.sign() || model[l.variable()] == lbool.False && l.sign()
 					}
 					if !yes {
 						t.Fatalf("actual converter/model does not satisfy original %v: %v", c, model)
@@ -80,7 +80,7 @@ func TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef(t *testing.T) {
 	// zero-limit return; it does not produce a guessed satisfying model.
 	got, e := s.Check(nil)
 	satOK(t, e)
-	if got != util.LUndef {
+	if got != lbool.Undef {
 		t.Fatal(got)
 	}
 }

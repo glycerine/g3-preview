@@ -2,7 +2,7 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func (s *satSimplifier) removeClauseCore(c StoredClauseRef) error {
@@ -59,12 +59,12 @@ func (s *satSimplifier) cleanupClause(c StoredClauseRef, inUse bool) (bool, erro
 			return false, e
 		}
 		switch v {
-		case util.LUndef:
+		case lbool.Undef:
 			if e = a.SetLiteral(c, j, l); e != nil {
 				return false, e
 			}
 			j++
-		case util.LFalse:
+		case lbool.False:
 			s.needCleanup = true
 			if inUse {
 				f, e := a.Frozen(c)
@@ -81,7 +81,7 @@ func (s *satSimplifier) cleanupClause(c StoredClauseRef, inUse bool) (bool, erro
 					}
 				}
 			}
-		case util.LTrue:
+		case lbool.True:
 			result = true
 			if e = a.SetLiteral(c, j, l); e != nil {
 				return false, e
@@ -110,13 +110,13 @@ func (s *satSimplifier) cleanupLiterals(list satSolverLiteralListRef) (bool, err
 			return false, e
 		}
 		switch v {
-		case util.LUndef:
+		case lbool.Undef:
 			if e = s.literalStore.Write(list, j, l); e != nil {
 				return false, e
 			}
 			j++
-		case util.LFalse:
-		case util.LTrue:
+		case lbool.False:
+		case lbool.True:
 			return true, nil
 		}
 	}

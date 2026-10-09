@@ -4,12 +4,12 @@ package tactic
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATGoalInverseLiteralOwnership(t *testing.T) {
@@ -99,14 +99,14 @@ func TestSATGoalRecoveryIndependentBinaryTruthTables(t *testing.T) {
 				satOK(t, back.Compile(input))
 				got, e := check.Check(nil)
 				satOK(t, e)
-				want := util.LTrue
+				want := lbool.True
 				for _, cl := range cnf {
 					yes := false
 					for _, l := range cl {
 						yes = yes || ((bits&(1<<uint32(l.Variable())) != 0) != l.Sign())
 					}
 					if !yes {
-						want = util.LFalse
+						want = lbool.False
 					}
 				}
 				if got != want {

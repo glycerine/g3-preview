@@ -3,10 +3,10 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satProbingFixture(t *testing.T, n uint32) (*satSolverProbing, *satSolverClauseLifecycle) {
@@ -70,7 +70,7 @@ func TestSATSolverProbingCommonConsequenceAndNormalFinalize(t *testing.T) {
 	}
 	v, e := life.propagation.variables.valueVar(1)
 	satOK(t, e)
-	if v != util.LTrue || s.numAssigned != 1 || life.propagation.variables.scopeLevel != 0 {
+	if v != lbool.True || s.numAssigned != 1 || life.propagation.variables.scopeLevel != 0 {
 		t.Fatal(v, s.numAssigned)
 	}
 	size, e := s.assigned.size()
@@ -87,7 +87,7 @@ func TestSATSolverProbingFailedLiteralAndTryLiteralCounterDifference(t *testing.
 	satOK(t, s.process(0))
 	v, e := life.propagation.variables.valueVar(0)
 	satOK(t, e)
-	if v != util.LFalse || s.numAssigned != 1 || s.propagation().probingCounter != 0 {
+	if v != lbool.False || s.numAssigned != 1 || s.propagation().probingCounter != 0 {
 		t.Fatal(v, s.numAssigned, s.propagation().probingCounter)
 	}
 }

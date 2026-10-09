@@ -2,9 +2,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverFindMutexesActualBinaryWatchesAppendOutput(t *testing.T) {
@@ -22,7 +21,7 @@ func TestSATSolverFindMutexesActualBinaryWatchesAppendOutput(t *testing.T) {
 	satOK(t, out.appendLiterals([]Literal{6}))
 	r, e := s.findMutexes([]Literal{0, 2, 4}, out)
 	satOK(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal(r)
 	}
 	n, e := out.rowCount()
@@ -43,7 +42,7 @@ func TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight(t *testing.T)
 	s.propagation.inconsistent = true
 	r, e := s.findMutexes([]Literal{0, 2, 4, 6}, out)
 	satOK(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal(r)
 	}
 	satFullSolverRuntimeAudit(t, s, out)

@@ -2,9 +2,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions(t *testing.T) {
@@ -22,7 +21,7 @@ func TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions(t *testing.T) {
 	satOK(t, s.UpdateParams(&params))
 	result, e := s.Check(assumptions)
 	satOK(t, e)
-	if result != util.LFalse {
+	if result != lbool.False {
 		t.Fatal(result)
 	}
 	n, e := s.conflict.core.Size()
@@ -54,12 +53,12 @@ func TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions(t *testing.T) {
 		subset = append(subset, assumptions[missing+1:]...)
 		result, e = s.Check(subset)
 		satOK(t, e)
-		if result != util.LTrue {
+		if result != lbool.True {
 			t.Fatal(missing, result)
 		}
 		v, e := s.model.Read(uint32(missing))
 		satOK(t, e)
-		if util.LBool(int32(v)) != util.LFalse {
+		if lbool.LBool(int32(v)) != lbool.False {
 			t.Fatal("required negative witness", missing, v)
 		}
 	}
@@ -74,7 +73,7 @@ func TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets(t 
 	satOK(t, s.MkClause([]Literal{1, 3, 5}))
 	r, e := s.Check([]Literal{0, 2, 4})
 	satOK(t, e)
-	if r != util.LFalse {
+	if r != lbool.False {
 		t.Fatal(r)
 	}
 	oldRestart := s.config.state.RestartMax
@@ -82,7 +81,7 @@ func TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets(t 
 	s.Limit.Cancel()
 	r, e = s.mus.run()
 	satOK(t, e)
-	if r != util.LUndef {
+	if r != lbool.Undef {
 		t.Fatal(r)
 	}
 	n, e := s.conflict.core.Size()

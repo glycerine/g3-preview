@@ -3,7 +3,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func (c *satCleaner) clauseVector() *[]StoredClauseRef {
@@ -53,11 +53,11 @@ func (c *satCleaner) cleanupClauses(learned bool) error {
 			if e != nil {
 				return e
 			}
-			if value == util.LTrue {
+			if value == lbool.True {
 				satisfied = true
 				break
 			}
-			if value == util.LFalse {
+			if value == lbool.False {
 				c.elimLiterals++
 			} else {
 				if e = a.SetLiteral(r, j, lit); e != nil {
@@ -119,7 +119,7 @@ func (c *satCleaner) cleanupClauses(learned bool) error {
 					if e != nil {
 						return e
 					}
-					if x != util.LUndef {
+					if x != lbool.Undef {
 						return ErrSATAssertion
 					}
 				}

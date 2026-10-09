@@ -3,7 +3,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 // These copyable nonowning values borrow the actual named solver member, not
@@ -30,12 +30,12 @@ func (v satSolverModelView) Size() (uint32, error) {
 	}
 	return v.owner.model.Size()
 }
-func (v satSolverModelView) Read(i BoolVar) (util.LBool, error) {
+func (v satSolverModelView) Read(i BoolVar) (lbool.LBool, error) {
 	if e := v.owner.open(); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	x, e := v.owner.model.Read(uint32(i))
-	return util.LBool(int32(x)), e
+	return lbool.LBool(int32(x)), e
 }
 func (v satSolverCoreView) Size() (uint32, error) {
 	if e := v.owner.open(); e != nil {
@@ -92,15 +92,15 @@ func (s *Solver) sourceScopeLevel() (uint32, error) {
 	}
 	return s.Variables.scopeLevel, nil
 }
-func (s *Solver) sourceValueLiteral(l Literal) (util.LBool, error) {
+func (s *Solver) sourceValueLiteral(l Literal) (lbool.LBool, error) {
 	if e := s.open(); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	return s.Variables.valueLiteral(l)
 }
-func (s *Solver) sourceValueVar(v BoolVar) (util.LBool, error) {
+func (s *Solver) sourceValueVar(v BoolVar) (lbool.LBool, error) {
 	if e := s.open(); e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	return s.Variables.valueVar(v)
 }

@@ -7,12 +7,12 @@ tactic_test
 
 import (
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestTacticFilterModelRealSATBindingsUniverseAndReplacement(t *testing.T) {
@@ -36,7 +36,7 @@ func TestTacticFilterModelRealSATBindingsUniverseAndReplacement(t *testing.T) {
 	satOK(t, tr.Compile([]ast.ASTHandle{atoms[0], nq, atoms[2]}))
 	r, e := s.Check(nil)
 	satOK(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal(r)
 	}
 	values, e := s.AppendModel(nil)

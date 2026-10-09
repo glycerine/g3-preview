@@ -2,7 +2,7 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 // Actual source cpp3022-3074 conditional check producers, backed by real clause
@@ -25,14 +25,14 @@ func (s *satSolverClauseLifecycle) clauseUnit(c StoredClauseRef) (bool, error) {
 			return false, e
 		}
 		switch v {
-		case util.LUndef:
+		case lbool.Undef:
 			if found {
 				return false, nil
 			}
 			found = true
-		case util.LTrue:
+		case lbool.True:
 			return false, nil
-		case util.LFalse:
+		case lbool.False:
 		}
 	}
 	return found, nil
@@ -52,7 +52,7 @@ func (s *satSolverClauseLifecycle) clauseEmpty(c StoredClauseRef) (bool, error) 
 		if e != nil {
 			return false, e
 		}
-		if v != util.LFalse {
+		if v != lbool.False {
 			return false, nil
 		}
 	}

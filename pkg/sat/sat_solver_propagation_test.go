@@ -2,10 +2,10 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satPropagationPush(t *testing.T, s *satSolverPropagationState, l Literal, w satWatched) {
@@ -112,12 +112,12 @@ func TestSATSolverPropagationIndependentTruthTables(t *testing.T) {
 			t.Run(string(rune('0'+a))+string(rune('0'+b)), func(t *testing.T) {
 				s, v, _ := satPropagationFixture(t, 3)
 				v.scopeLevel = 1
-				vals := []util.LBool{util.LFalse, util.LUndef, util.LTrue}
-				for i, x := range []util.LBool{vals[a], vals[b]} {
-					if x == util.LUndef {
+				vals := []lbool.LBool{lbool.False, lbool.Undef, lbool.True}
+				for i, x := range []lbool.LBool{vals[a], vals[b]} {
+					if x == lbool.Undef {
 						continue
 					}
-					l := MakeLiteral(BoolVar(i+1), x == util.LFalse)
+					l := MakeLiteral(BoolVar(i+1), x == lbool.False)
 					satOK(t, s.assign(l, satJustification{}))
 				}
 				w, e := newSATTernaryWatch(2, 4)
@@ -163,17 +163,17 @@ func TestSATSolverPropagationIndependentTruthTables(t *testing.T) {
 	s, v, _ := satPropagationFixture(t, 3)
 	c, e := s.clauses.MkClause([]Literal{0, 2, 4}, false)
 	satOK(t, e)
-	vals := []util.LBool{util.LFalse, util.LUndef, util.LTrue}
+	vals := []lbool.LBool{lbool.False, lbool.Undef, lbool.True}
 	for a := 0; a < 3; a++ {
 		for b := 0; b < 3; b++ {
 			for d := 0; d < 3; d++ {
-				want := util.LFalse
+				want := lbool.False
 				for i, x := range []int{a, b, d} {
 					satOK(t, v.assignment.Write(uint32(2*i), int8(vals[x])))
 					if x == 2 {
-						want = util.LTrue
-					} else if x == 1 && want != util.LTrue {
-						want = util.LUndef
+						want = lbool.True
+					} else if x == 1 && want != lbool.True {
+						want = lbool.Undef
 					}
 				}
 				got, e := s.status(c)
@@ -323,7 +323,7 @@ func TestSATSolverPropagationWarmActualBackingPlateau(t *testing.T) {
 	satPropagationPush(t, s, 0, w)
 	cycle := func() {
 		for i := uint32(0); i < satAssignmentTestSize(t, &v.assignment); i++ {
-			satOK(t, v.assignment.Write(i, int8(util.LUndef)))
+			satOK(t, v.assignment.Write(i, int8(lbool.Undef)))
 		}
 		satOK(t, v.trail.Shrink(v.trailRef, 0))
 		v.qhead = 0
@@ -360,7 +360,7 @@ func TestSATSolverPropagationLastSelfMoveRawLifetime(t *testing.T) {
 	satOK(t, e)
 	satPropagationPush(t, s, 0, w)
 	satOK(t, s.assign(0, satJustification{}))
-	satOK(t, v.assignment.Write(1, int8(util.LUndef)))
+	satOK(t, v.assignment.Write(1, int8(lbool.Undef)))
 	_, e = s.propagateCore(false)
 	if satStorageSourceDebug {
 		if !errors.Is(e, ErrSATAssertion) || v.qhead != 1 || s.cleanerCounter != -1 || s.asymmCounter != 0 || s.probingCounter != 0 || s.numCheckpoints != 1 {

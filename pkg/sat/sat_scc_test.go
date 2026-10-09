@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
@@ -177,17 +178,17 @@ func TestSATSCCIndependentBoundedImplicationGraphs(t *testing.T) {
 			t.Fatal(bits, n, components)
 		}
 		for mask := uint32(0); mask < 8; mask++ {
-			model := Model{util.LFalse, util.LFalse, util.LFalse}
+			model := Model{lbool.False, lbool.False, lbool.False}
 			for i := uint32(0); i < 3; i++ {
 				if mask&(1<<i) != 0 {
-					model[i] = util.LTrue
+					model[i] = lbool.True
 				}
 			}
 			for i := uint32(0); i < 3; i++ {
 				el, er := l.propagation.variables.wasEliminated(BoolVar(i))
 				satOK(t, er)
 				if el {
-					model[i] = util.LUndef
+					model[i] = lbool.Undef
 				}
 			}
 			satOK(t, l.propagation.converter.Apply(model))
@@ -226,7 +227,7 @@ func TestSATElimEqsEmptyUnitUnaffectedAndExternal(t *testing.T) {
 		} else {
 			v, err := p.variables.valueLiteral(0)
 			satOK(t, err)
-			if v != util.LTrue || len(l.learned) != 0 || p.clauses.IsLive(r) {
+			if v != lbool.True || len(l.learned) != 0 || p.clauses.IsLive(r) {
 				t.Fatal("unit assign then delete", v, len(l.learned))
 			}
 		}

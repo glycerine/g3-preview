@@ -3,9 +3,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satSimplifierFixture(t *testing.T, n uint32) (*satSimplifier, *satSolverClauseLifecycle) {
@@ -103,7 +102,7 @@ func satSimplifierFormulaValue(clauses [][]Literal, model Model) bool {
 	for _, c := range clauses {
 		yes := false
 		for _, x := range c {
-			v := model[uint32(x)>>1] == util.LTrue
+			v := model[uint32(x)>>1] == lbool.True
 			if x&1 != 0 {
 				v = !v
 			}
@@ -145,16 +144,16 @@ func TestSATSimplifierIndependentFiniteFullDefaultModelOracle(t *testing.T) {
 			for mask := uint32(0); mask < 16; mask++ {
 				model := make(Model, 4)
 				for v := uint32(0); v < 4; v++ {
-					model[v] = util.LFalse
+					model[v] = lbool.False
 					if mask&(1<<v) != 0 {
-						model[v] = util.LTrue
+						model[v] = lbool.True
 					}
 				}
 				reduced := !p.inconsistent
 				for v := uint32(0); v < 4; v++ {
 					assigned, e := p.variables.valueVar(BoolVar(v))
 					satOK(t, e)
-					if assigned != util.LUndef && assigned != model[v] {
+					if assigned != lbool.Undef && assigned != model[v] {
 						reduced = false
 					}
 				}
@@ -165,7 +164,7 @@ func TestSATSimplifierIndependentFiniteFullDefaultModelOracle(t *testing.T) {
 					for j := uint32(0); j < n; j++ {
 						x, e := p.clauses.Literal(r, j)
 						satOK(t, e)
-						v := model[uint32(x)>>1] == util.LTrue
+						v := model[uint32(x)>>1] == lbool.True
 						if x&1 != 0 {
 							v = !v
 						}
@@ -186,11 +185,11 @@ func TestSATSimplifierIndependentFiniteFullDefaultModelOracle(t *testing.T) {
 							b, e := w.Literal()
 							satOK(t, e)
 							a := Literal(idx).Negated()
-							va := model[uint32(a)>>1] == util.LTrue
+							va := model[uint32(a)>>1] == lbool.True
 							if a&1 != 0 {
 								va = !va
 							}
-							vb := model[uint32(b)>>1] == util.LTrue
+							vb := model[uint32(b)>>1] == lbool.True
 							if b&1 != 0 {
 								vb = !vb
 							}
@@ -206,7 +205,7 @@ func TestSATSimplifierIndependentFiniteFullDefaultModelOracle(t *testing.T) {
 						eliminated, e := p.variables.eliminated.Read(v)
 						satOK(t, e)
 						if eliminated != 0 {
-							model[v] = util.LUndef
+							model[v] = lbool.Undef
 						}
 					}
 					satOK(t, p.converter.Apply(model))

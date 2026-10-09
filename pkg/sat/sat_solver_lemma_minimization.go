@@ -1,7 +1,7 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 // Source sat_solver.cpp:2238-2253. In particular mark precedes BOTH vector
@@ -189,7 +189,7 @@ func (s *satSolverConflictAnalysis) impliedByMarked(l Literal) (bool, error) {
 			if e != nil {
 				return false, e
 			}
-			consequent := MakeLiteral(BoolVar(v), value == util.LFalse)
+			consequent := MakeLiteral(BoolVar(v), value == lbool.False)
 			if e = s.fillExtAntecedents(consequent, j); e != nil {
 				return false, e
 			}

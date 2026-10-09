@@ -3,10 +3,10 @@ package rewriter
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning(t *testing.T) {
@@ -92,7 +92,7 @@ func TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning(t *testing.
 						satOK(t, tr.Compile(forms))
 						answer, e := s.Check(nil)
 						satOK(t, e)
-						if answer == util.LUndef || (answer == util.LTrue) != want {
+						if answer == lbool.Undef || (answer == lbool.True) != want {
 							t.Fatal("independent local-context meaning", bits, answer, want)
 						}
 						satOK(t, tr.Close())

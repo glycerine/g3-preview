@@ -2,6 +2,7 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/util"
@@ -126,87 +127,87 @@ func (s *Solver) collectMutexBins(learned bool) error {
 	}
 	return nil
 }
-func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result util.LBool, err error) {
+func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result lbool.LBool, err error) {
 	if err = s.consequenceEntry(out); err != nil {
-		return util.LUndef, err
+		return lbool.Undef, err
 	}
 	s.mutexRunning = true
 	defer func() { s.mutexRunning = false }()
 	f, e := s.mutexFrame()
 	if e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	defer func() { err = s.mutexDrop(f, err) }()
 	f.graph, err = util.NewNegatedLiteralCliques(s.runtime.memory, s.budget)
 	if err != nil {
-		return util.LUndef, err
+		return lbool.Undef, err
 	}
 	if err = s.userBinClauses.Reset(); err != nil {
-		return util.LUndef, err
+		return lbool.Undef, err
 	}
 	// Existing concrete empty/member graph reset. Actual owning rows destroy in
 	// ascending order; retained outer cold backing is not a source malloc ticket.
 	for i := range s.binaryClauseGraph {
 		if err = s.binaryClauseGraph[i].Finalize(); err != nil {
-			return util.LUndef, err
+			return lbool.Undef, err
 		}
 	}
 	s.binaryClauseGraph = s.binaryClauseGraph[:0]
 	if err = s.collectMutexBins(true); err != nil {
-		return util.LUndef, err
+		return lbool.Undef, err
 	}
 	if err = s.collectMutexBins(false); err != nil {
-		return util.LUndef, err
+		return lbool.Undef, err
 	}
 	f.seenUsed = true
 	if err = f.seen.init(s.runtime.memory); err != nil {
-		return util.LUndef, err
+		return lbool.Undef, err
 	}
 	f.seenComplete = true
 	for i := uint32(0); ; i++ {
 		n, e := s.userBinClauses.Size()
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		if i >= n {
 			break
 		}
 		bc, e := s.userBinClauses.Get(i)
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		a, b := bc.Literal1().index(), bc.Literal2().index()
 		yes, e := f.seen.contains(a, b)
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		if !yes {
 			if err = f.seen.insert(a, b); err != nil {
-				return util.LUndef, err
+				return lbool.Undef, err
 			}
 			if err = f.graph.AddEdge(a, b); err != nil {
-				return util.LUndef, err
+				return lbool.Undef, err
 			}
 		}
 	}
 	f.results, err = util.NewRuntimeUnsignedRows(s.runtime.memory, s.budget)
 	if err != nil {
-		return util.LUndef, err
+		return lbool.Undef, err
 	}
 	f.psUsed = true
 	f.ps.Bind(s.runtime.memory)
 	for _, l := range lits {
 		if err = f.ps.Push(l.index()); err != nil {
-			return util.LUndef, err
+			return lbool.Undef, err
 		}
 	}
 	if err = f.graph.Cliques(&f.ps, f.results); err != nil {
-		return util.LUndef, err
+		return lbool.Undef, err
 	}
 	for i := uint32(0); ; i++ {
 		n, e := f.results.RowCount()
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		if i >= n {
 			break
@@ -216,31 +217,31 @@ func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result 
 		f.rowUsed = true
 		src, e := f.results.Row(i)
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		for j := uint32(0); ; j++ {
 			n, e := src.Size()
 			if e != nil {
-				return util.LUndef, e
+				return lbool.Undef, e
 			}
 			if j >= n {
 				break
 			}
 			v, e := src.Read(j)
 			if e != nil {
-				return util.LUndef, e
+				return lbool.Undef, e
 			}
 			if err = f.row.Push(v); err != nil {
-				return util.LUndef, err
+				return lbool.Undef, err
 			}
 		}
 		if err = out.appendColumn(&f.row); err != nil {
-			return util.LUndef, err
+			return lbool.Undef, err
 		}
 		if err = f.row.Finalize(); err != nil {
-			return util.LUndef, err
+			return lbool.Undef, err
 		}
 		f.rowUsed = false
 	}
-	return util.LTrue, nil
+	return lbool.True, nil
 }

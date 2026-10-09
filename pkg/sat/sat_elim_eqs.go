@@ -2,10 +2,10 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 type satElimEqs struct {
@@ -314,10 +314,10 @@ func (e *satElimEqs) cleanupClauses(learned bool) error {
 			if err != nil {
 				return err
 			}
-			if val == util.LTrue {
+			if val == lbool.True {
 				break
 			}
-			if val == util.LFalse {
+			if val == lbool.False {
 				continue
 			}
 			if err = a.SetLiteral(c, j, lit); err != nil {

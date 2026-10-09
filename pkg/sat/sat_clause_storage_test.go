@@ -2,12 +2,12 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"math"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satStore(t *testing.T, b *arena.Budget) *ClauseAllocator {
@@ -173,14 +173,14 @@ func TestSATClauseReleaseDebugBodiesAndModels(t *testing.T) {
 		m := make(Model, 3)
 		x := state
 		for i := range m {
-			m[i] = util.LBool(x%3 - 1)
+			m[i] = lbool.LBool(x%3 - 1)
 			x /= 3
 		}
 		want := false
 		for i := uint32(0); i < n; i++ {
 			l, _ := a.Literal(r, i)
 			v := m[l.variable()]
-			want = want || (!l.sign() && v == util.LTrue) || (l.sign() && v == util.LFalse)
+			want = want || (!l.sign() && v == lbool.True) || (l.sign() && v == lbool.False)
 		}
 		got, e := a.SatisfiedBy(r, m)
 		if got != want || e != nil {

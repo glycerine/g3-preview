@@ -2,6 +2,7 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -65,7 +66,7 @@ func TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer(t *testing.T) {
 	satOK(t, assumptions.Push(2))
 	r, e := s.checkSpan(2, satConflictRuntimeSpan(&assumptions))
 	satOK(t, e)
-	if r != util.LFalse {
+	if r != lbool.False {
 		t.Fatal(r)
 	}
 }

@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
@@ -43,7 +44,7 @@ func TestSATSolverActualAssumptionCoreAndLaterPlainCheck(t *testing.T) {
 	satOK(t, s.MkClause([]Literal{0, 2}))
 	got, e := s.Check([]Literal{1, 3})
 	satOK(t, e)
-	if got != util.LFalse {
+	if got != lbool.False {
 		t.Fatal(got)
 	}
 	n, e := s.conflict.core.Size()
@@ -62,7 +63,7 @@ func TestSATSolverActualAssumptionCoreAndLaterPlainCheck(t *testing.T) {
 	}
 	got, e = s.Check(nil)
 	satOK(t, e)
-	if got != util.LTrue {
+	if got != lbool.True {
 		t.Fatal(got)
 	}
 	satFullSolverRuntimeAudit(t, s)

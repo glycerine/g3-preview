@@ -4,6 +4,7 @@ package sat
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"math"
 	"reflect"
 	"testing"
@@ -69,7 +70,7 @@ func TestSATAsymmProcessActualBinaryReduction(t *testing.T) {
 	for i := uint32(0); i < 3; i++ {
 		x, e := p.variables.valueVar(BoolVar(i))
 		satOK(t, e)
-		if x != util.LUndef {
+		if x != lbool.Undef {
 			t.Fatal("actual backtrack")
 		}
 	}
@@ -246,7 +247,7 @@ func TestSATAsymmActualNewUnitAndCounterLimit(t *testing.T) {
 	satOK(t, a.run(true))
 	value, e := p.variables.valueLiteral(0)
 	satOK(t, e)
-	if value != util.LTrue || p.clauses.IsLive(r) || a.elimLiterals != 2 || len(l.Original) != 0 || p.variables.scopeLevel != 0 {
+	if value != lbool.True || p.clauses.IsLive(r) || a.elimLiterals != 2 || len(l.Original) != 0 || p.variables.scopeLevel != 0 {
 		t.Fatal("actual first-assumption conflict creates new root unit")
 	}
 	if p.variables.phase.Block == before {

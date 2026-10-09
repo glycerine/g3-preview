@@ -4,6 +4,7 @@ package sat
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
@@ -24,7 +25,7 @@ func TestSATSolverProbingCachedTryLitAndFailedBranchStatistic(t *testing.T) {
 		satOK(t, e)
 		value, e := p.variables.valueVar(1)
 		satOK(t, e)
-		if !keep || value != util.LTrue || s.numAssigned != 1 || p.probingCounter != 17 {
+		if !keep || value != lbool.True || s.numAssigned != 1 || p.probingCounter != 17 {
 			t.Fatal(keep, value, s.numAssigned, p.probingCounter)
 		}
 		satProbingAudit(t, s, nil, nil)
@@ -40,7 +41,7 @@ func TestSATSolverProbingCachedTryLitAndFailedBranchStatistic(t *testing.T) {
 		}
 		value, e := life.propagation.variables.valueVar(0)
 		satOK(t, e)
-		if value != util.LFalse {
+		if value != lbool.False {
 			t.Fatal(value)
 		}
 		satProbingAudit(t, s, nil, nil)
@@ -157,12 +158,12 @@ func TestSATSolverProbingMissedPropagationTruthTable(t *testing.T) {
 			for i := uint32(0); i < 3; i++ {
 				state := code % 3
 				code /= 3
-				value := []util.LBool{util.LFalse, util.LUndef, util.LTrue}[state]
+				value := []lbool.LBool{lbool.False, lbool.Undef, lbool.True}[state]
 				satOK(t, life.propagation.variables.assignment.Write(2*i, int8(value)))
-				if value == util.LUndef {
+				if value == lbool.Undef {
 					undef++
 				}
-				if value == util.LTrue {
+				if value == lbool.True {
 					trues++
 				}
 			}

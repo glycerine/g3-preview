@@ -2,9 +2,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // This ports the Boolean implication input from source test1 into the actual
@@ -26,7 +25,7 @@ func TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput(t *te
 	satOK(t, out.appendLiterals([]Literal{6}))
 	got, e := s.getConsequences([]Literal{0}, []BoolVar{1, 2, 3}, out)
 	satOK(t, e)
-	if got != util.LTrue {
+	if got != lbool.True {
 		t.Fatal(got)
 	}
 	n, e := out.rowCount()

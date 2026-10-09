@@ -5,11 +5,11 @@ package tactic
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // The truth table is an independent bounded correctness check. Production
@@ -51,18 +51,18 @@ func TestSATGoalTranslatorNestedBooleanTruthTableAndModel(t *testing.T) {
 			got, e := s.Check(nil)
 			satOK(t, e)
 			p, q, r := bits&1 != 0, bits&2 != 0, bits&4 != 0
-			want := util.LFalse
+			want := lbool.False
 			selected := q
 			if r {
 				selected = p
 			}
 			if (p || q) && !(p && q) && selected {
-				want = util.LTrue
+				want = lbool.True
 			}
 			if got != want {
 				t.Fatalf("original Boolean goal: got %v want %v", got, want)
 			}
-			if got == util.LTrue {
+			if got == lbool.True {
 				model, e := s.AppendModel(nil)
 				satOK(t, e)
 				for i, h := range vars {
@@ -71,7 +71,7 @@ func TestSATGoalTranslatorNestedBooleanTruthTableAndModel(t *testing.T) {
 					if v == sat.NullBoolVar || int(v) >= len(model) {
 						t.Fatal("missing source atom binding", i, v)
 					}
-					truth := model[v] == util.LTrue
+					truth := model[v] == lbool.True
 					if truth != (bits&(1<<i) != 0) {
 						t.Fatal("model violates original Boolean assertion", i, model[v])
 					}
@@ -97,9 +97,9 @@ func TestSATGoalTranslatorConstants(t *testing.T) {
 			satOK(t, tr.Compile([]ast.ASTHandle{h, h}))
 			got, e := s.Check(nil)
 			satOK(t, e)
-			want := util.LFalse
+			want := lbool.False
 			if truth {
-				want = util.LTrue
+				want = lbool.True
 			}
 			if got != want {
 				t.Fatal(got, want)
@@ -176,9 +176,9 @@ func TestSATGoalTranslatorConnectivesTruthTable(t *testing.T) {
 						if negate {
 							truth = !truth
 						}
-						want := util.LFalse
+						want := lbool.False
 						if truth {
-							want = util.LTrue
+							want = lbool.True
 						}
 						got, e := s.Check(nil)
 						satOK(t, e)
@@ -357,7 +357,7 @@ func TestSATGoalTranslatorAtomMapGrowthAndModel(t *testing.T) {
 	}
 	got, e := s.Check(nil)
 	satOK(t, e)
-	if got != util.LTrue {
+	if got != lbool.True {
 		t.Fatal(got)
 	}
 	model, e := s.AppendModel(nil)
@@ -365,9 +365,9 @@ func TestSATGoalTranslatorAtomMapGrowthAndModel(t *testing.T) {
 	for i, h := range vars {
 		v, e := tr.Variable(h)
 		satOK(t, e)
-		want := util.LFalse
+		want := lbool.False
 		if i == 0 {
-			want = util.LTrue
+			want = lbool.True
 		}
 		if v == sat.NullBoolVar || int(v) >= len(model) || model[v] != want {
 			t.Fatal("model binding lost across source table growth", i, v)

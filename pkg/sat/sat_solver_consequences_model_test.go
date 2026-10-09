@@ -3,9 +3,8 @@ package sat
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Enumeration is a test oracle only. Production consequence discovery must
@@ -64,12 +63,12 @@ func TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs(t *testing.T) 
 				n, e := out.rowCount()
 				satOK(t, e)
 				if len(models) == 0 {
-					if got != util.LFalse || n != 0 {
+					if got != lbool.False || n != 0 {
 						t.Fatal("unsatisfiable source query", got, n)
 					}
 					return
 				}
-				if got != util.LTrue {
+				if got != lbool.True {
 					t.Fatal("satisfiable source query", got)
 				}
 				seen := map[Literal]bool{}

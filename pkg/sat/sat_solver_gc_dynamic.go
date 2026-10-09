@@ -2,7 +2,7 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func (g *satSolverGC) gcDynPSM() error {
@@ -214,10 +214,10 @@ func (g *satSolverGC) activateFrozenClause(r StoredClauseRef) (bool, error) {
 			return false, e
 		}
 		switch value {
-		case util.LTrue:
+		case lbool.True:
 			return false, nil
-		case util.LFalse:
-		case util.LUndef:
+		case lbool.False:
+		case lbool.Undef:
 			x, e := a.Literal(r, i)
 			if e != nil {
 				return false, e

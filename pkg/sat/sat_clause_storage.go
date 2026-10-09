@@ -4,6 +4,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"sync/atomic"
 
@@ -584,7 +585,7 @@ func (a *ClauseAllocator) satisfiedByModelSpan(r StoredClauseRef, m satSolverMod
 		if e != nil {
 			return false, e
 		}
-		if l.sign() && v == util.LFalse || !l.sign() && v == util.LTrue {
+		if l.sign() && v == lbool.False || !l.sign() && v == lbool.True {
 			return true, nil
 		}
 	}

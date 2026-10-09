@@ -6,6 +6,7 @@ package rewriter
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -136,7 +137,7 @@ func TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables(t *testing
 					satOK(t, tr.Compile(forms))
 					r, e := s.Check(nil)
 					satOK(t, e)
-					if (r == util.LTrue) != (bits == 7) || r == util.LUndef {
+					if (r == lbool.True) != (bits == 7) || r == lbool.Undef {
 						t.Fatal("independent elimination", bits, r)
 					}
 					satOK(t, tr.Close())

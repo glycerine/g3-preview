@@ -1,10 +1,10 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func (s *satSolverClauseLifecycle) push() error {
@@ -98,10 +98,10 @@ func (s *satSolverClauseLifecycle) unassignVars(old uint32) error {
 		if e != nil {
 			return e
 		}
-		if e = v.assignment.Write(l.index(), int8(util.LUndef)); e != nil {
+		if e = v.assignment.Write(l.index(), int8(lbool.Undef)); e != nil {
 			return e
 		}
-		if e = v.assignment.Write(l.Negated().index(), int8(util.LUndef)); e != nil {
+		if e = v.assignment.Write(l.Negated().index(), int8(lbool.Undef)); e != nil {
 			return e
 		}
 		if satStorageSourceDebug {
@@ -109,7 +109,7 @@ func (s *satSolverClauseLifecycle) unassignVars(old uint32) error {
 			if e != nil {
 				return e
 			}
-			if value != util.LUndef {
+			if value != lbool.Undef {
 				return ErrSATAssertion
 			}
 		}

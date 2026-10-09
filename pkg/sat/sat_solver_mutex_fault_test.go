@@ -3,10 +3,9 @@ package sat
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satMutexFixture(t *testing.T) (*Solver, *satSolverLiteralRows) {
@@ -32,7 +31,7 @@ func TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners(t *testing.T
 		s.budget.FailAfter(start)
 		r, e := s.findMutexes([]Literal{0, 2, 4, 6}, out)
 		satOK(t, e)
-		if r != util.LTrue {
+		if r != lbool.True {
 			t.Fatal(r)
 		}
 		horizon = start - testFieldBySourceName(reflect.ValueOf(s.budget).Elem(), "remaining").Int()
@@ -57,7 +56,7 @@ func TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners(t *testing.T
 				satProbingExpectedRefusal(t, s.propagation, e)
 				failures++
 			} else {
-				if r != util.LTrue {
+				if r != lbool.True {
 					t.Fatal(r)
 				}
 				success++

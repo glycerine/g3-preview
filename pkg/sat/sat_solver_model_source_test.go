@@ -3,10 +3,10 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverSourceModelUsesRealAssignmentAndConverter(t *testing.T) {
@@ -22,7 +22,7 @@ func TestSATSolverSourceModelUsesRealAssignmentAndConverter(t *testing.T) {
 	satOK(t, s.mkModel())
 	m, e := s.AppendModel(nil)
 	satOK(t, e)
-	if len(m) != 2 || m[0] != util.LTrue || m[1] != util.LFalse {
+	if len(m) != 2 || m[0] != lbool.True || m[1] != lbool.False {
 		t.Fatal(m)
 	}
 	good, e := s.checkModel()
@@ -30,7 +30,7 @@ func TestSATSolverSourceModelUsesRealAssignmentAndConverter(t *testing.T) {
 	if !good {
 		t.Fatal("valid model rejected")
 	}
-	satOK(t, (satSolverModelSpan{column: &s.model}).write(0, util.LFalse))
+	satOK(t, (satSolverModelSpan{column: &s.model}).write(0, lbool.False))
 	good, e = s.checkModel()
 	satOK(t, e)
 	if good {

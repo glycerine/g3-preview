@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
@@ -31,9 +32,9 @@ func TestSATSolverModelConverterReversePatchAndBlockedFlip(t *testing.T) {
 	b, e := c.Mk(satModelElimVar, 1)
 	paramsMust(t, e)
 	paramsMust(t, c.InsertLiterals(b, []Literal{MakeLiteral(1, false)}))
-	m := Model{util.LUndef, util.LUndef}
+	m := Model{lbool.Undef, lbool.Undef}
 	paramsMust(t, c.Apply(m))
-	if m[0] != util.LUndef || m[1] != util.LTrue {
+	if m[0] != lbool.Undef || m[1] != lbool.True {
 		t.Fatalf("source reverse order and partial model %v", m)
 	}
 	ok, e := c.CheckModel(m)
@@ -45,12 +46,12 @@ func TestSATSolverModelConverterReversePatchAndBlockedFlip(t *testing.T) {
 	a, e = c.Mk(satModelBlockLit, 0)
 	paramsMust(t, e)
 	paramsMust(t, c.InsertBinary(a, MakeLiteral(0, true), MakeLiteral(1, false)))
-	m = Model{util.LTrue, util.LFalse}
+	m = Model{lbool.True, lbool.False}
 	paramsMust(t, c.Apply(m))
-	if m[0] != util.LFalse || m[1] != util.LFalse {
+	if m[0] != lbool.False || m[1] != lbool.False {
 		t.Fatalf("source blocked flip %v", m)
 	}
-	ok, e = c.CheckModel(Model{util.LTrue, util.LFalse})
+	ok, e = c.CheckModel(Model{lbool.True, lbool.False})
 	paramsMust(t, e)
 	if ok {
 		t.Fatal("check_model must detect original saved clause")
@@ -61,9 +62,9 @@ func TestSATSolverModelConverterSourceOtherUndefinedAndDisplay(t *testing.T) {
 	a, e := c.Mk(satModelElimVar, 0)
 	paramsMust(t, e)
 	paramsMust(t, c.InsertBinary(a, MakeLiteral(0, true), MakeLiteral(2, true)))
-	m := Model{util.LUndef, util.LFalse, util.LUndef}
+	m := Model{lbool.Undef, lbool.False, lbool.Undef}
 	paramsMust(t, c.Apply(m))
-	if m[0] != util.LUndef || m[2] != util.LFalse {
+	if m[0] != lbool.Undef || m[2] != lbool.False {
 		t.Fatalf("source assigns other undefined variable %v", m)
 	}
 	v, e := c.MaxVar(1)
@@ -196,7 +197,7 @@ func TestSATSolverModelConverterCopyAppendAndSourceBitFields(t *testing.T) {
 		t.Fatal("source Copy appends instead of assigning")
 	}
 	paramsMust(t, s.Reset())
-	ok, e := d.CheckModel(Model{util.LTrue, util.LFalse, util.LUndef})
+	ok, e := d.CheckModel(Model{lbool.True, lbool.False, lbool.Undef})
 	paramsMust(t, e)
 	if !ok {
 		t.Fatal("copied nested payload borrowed source")
@@ -242,10 +243,10 @@ func TestSATSolverModelConverterIndependentChainModels(t *testing.T) {
 		model := make(Model, 5)
 		for i := 0; i < 4; i++ {
 			kind := satModelElimVar
-			model[i] = util.LUndef
+			model[i] = lbool.Undef
 			if mask&(1<<uint(i)) != 0 {
 				kind = satModelBlockLit
-				model[i] = util.LTrue
+				model[i] = lbool.True
 			}
 			r, e := c.Mk(kind, BoolVar(i))
 			paramsMust(t, e)
@@ -254,22 +255,22 @@ func TestSATSolverModelConverterIndependentChainModels(t *testing.T) {
 			paramsMust(t, c.InsertBinary(r, originals[2*i][0], originals[2*i][1]))
 			paramsMust(t, c.InsertBinary(r, originals[2*i+1][0], originals[2*i+1][1]))
 		}
-		model[4] = util.LFalse
+		model[4] = lbool.False
 		if mask&16 != 0 {
-			model[4] = util.LTrue
+			model[4] = lbool.True
 		}
 		paramsMust(t, c.Apply(model))
 		for _, clause := range originals {
 			good := false
 			for _, l := range clause {
-				good = good || model[l.variable()] == util.LTrue && !l.sign() || model[l.variable()] == util.LFalse && l.sign()
+				good = good || model[l.variable()] == lbool.True && !l.sign() || model[l.variable()] == lbool.False && l.sign()
 			}
 			if !good {
 				t.Fatalf("independent original clause mask%d %v model%v", mask, clause, model)
 			}
 		}
 		for i := 0; i < 4; i++ {
-			if model[i] == model[i+1] || model[i] == util.LUndef {
+			if model[i] == model[i+1] || model[i] == lbool.Undef {
 				t.Fatalf("independent parity oracle %v", model)
 			}
 		}
@@ -298,7 +299,7 @@ func TestSATSolverModelConverterActualClauseAndWrapperRoutes(t *testing.T) {
 		}
 	}
 	paramsMust(t, a.Delete(clause))
-	ok, e := c.CheckModel(Model{util.LTrue, util.LFalse, util.LFalse, util.LFalse})
+	ok, e := c.CheckModel(Model{lbool.True, lbool.False, lbool.False, lbool.False})
 	paramsMust(t, e)
 	if !ok {
 		t.Fatal("owned saved data died with clause")
@@ -466,7 +467,7 @@ func TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral(t *testi
 	paramsMust(t, m.InsertBinary(r, MakeLiteral(0, false), MakeLiteral(1, false)))
 	paramsMust(t, m.InsertBinary(r, MakeLiteral(0, true), MakeLiteral(0, true)))
 	paramsMust(t, m.InsertBinary(r, MakeLiteral(5, false), MakeLiteral(0, false)))
-	model := Model{util.LTrue, util.LFalse}
+	model := Model{lbool.True, lbool.False}
 	e = m.Apply(model)
 	if satStorageSourceDebug {
 		if !errors.Is(e, ErrSATAssertion) {
@@ -475,7 +476,7 @@ func TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral(t *testi
 	} else {
 		paramsMust(t, e)
 	}
-	if model[0] != util.LFalse || model[1] != util.LFalse {
+	if model[0] != lbool.False || model[1] != lbool.False {
 		t.Fatalf("completed source assignment prefix %v", model)
 	}
 	if _, e = m.CheckModel(model); !errors.Is(e, arena.ErrBounds) {

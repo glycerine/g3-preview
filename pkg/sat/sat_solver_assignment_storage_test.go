@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
@@ -269,15 +270,15 @@ func TestSATSolverAssignmentReallocateRefusalKeepsActualOldBinding(t *testing.T)
 }
 func TestSATSolverAssignmentCurrentMemberBorrowAndOwnerGuards(t *testing.T) {
 	v, _, _ := satVariableStateFixture(t)
-	satOK(t, v.assignment.Push(int8(util.LTrue)))
+	satOK(t, v.assignment.Push(int8(lbool.True)))
 	view := v.clauseState()
 	old := v.assignment.Block
-	satOK(t, v.assignment.Push(int8(util.LUndef)))
-	satOK(t, v.assignment.Push(int8(util.LFalse)))
-	satOK(t, v.assignment.Write(0, int8(util.LFalse)))
+	satOK(t, v.assignment.Push(int8(lbool.Undef)))
+	satOK(t, v.assignment.Push(int8(lbool.False)))
+	satOK(t, v.assignment.Write(0, int8(lbool.False)))
 	x, e := view.value(0)
 	satOK(t, e)
-	if x != util.LFalse {
+	if x != lbool.False {
 		t.Fatal("stale member shadow", x)
 	}
 	if _, e = v.memory.Read(old, 8); e == nil {

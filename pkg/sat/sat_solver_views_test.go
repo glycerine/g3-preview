@@ -4,6 +4,7 @@ package sat
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -17,7 +18,7 @@ func TestSATSolverBorrowedModelCoreCurrentMembers(t *testing.T) {
 	cv, e := s.BorrowCore()
 	satOK(t, e)
 	for i := uint32(0); i < 30; i++ {
-		satOK(t, s.model.Push(uint32(util.LTrue)))
+		satOK(t, s.model.Push(uint32(lbool.True)))
 		satOK(t, s.conflict.core.Push(i))
 		n, e := mv.Size()
 		satOK(t, e)
@@ -26,7 +27,7 @@ func TestSATSolverBorrowedModelCoreCurrentMembers(t *testing.T) {
 		}
 		v, e := mv.Read(BoolVar(i))
 		satOK(t, e)
-		if v != util.LTrue {
+		if v != lbool.True {
 			t.Fatal(v)
 		}
 		l, e := cv.Read(i)
@@ -78,12 +79,12 @@ func TestSATSolverBorrowedScalarSourceAuthorities(t *testing.T) {
 	}
 	l, e := s.sourceValueLiteral(3)
 	satOK(t, e)
-	if l != util.LTrue {
+	if l != lbool.True {
 		t.Fatal(l)
 	}
 	l, e = s.sourceValueVar(1)
 	satOK(t, e)
-	if l != util.LFalse {
+	if l != lbool.False {
 		t.Fatal(l)
 	}
 	n, e = s.sourceInitTrailSize()
@@ -185,11 +186,11 @@ func TestSATSolverBorrowedIndependentAssignmentAndScopeViews(t *testing.T) {
 					satOK(t, s.propagation.assign(Literal(uint32(variable)*2+uint32(sign)), satJustification{}))
 				}
 				for v := 0; v < 4; v++ {
-					want := util.LUndef
+					want := lbool.Undef
 					if v == variable && sign >= 0 {
-						want = util.LTrue
+						want = lbool.True
 						if sign == 1 {
-							want = util.LFalse
+							want = lbool.False
 						}
 					}
 					got, e := s.sourceValueVar(BoolVar(v))

@@ -165,6 +165,11 @@ self-contained in Go or depend only on `arena` or the standard library.
 | `util/permutation` | live free operations from `permutation.h` | Extracted as concrete `uint32` slice operations. `permutation.cpp` itself has no production caller. |
 | `util/stack` | `stack` | Put the arena-backed implementation in a package that imports `pkg/arena` directly. |
 
+The `lbool` boundary is now direct: SAT, tactic, API, AST, and model code import
+`util/lbool` themselves, and the root `util` alias facade has been deleted. The
+unused root `mincut` facade was deleted as well; its implementation remains only
+in `util/mincut`.
+
 Very small leaf facilities such as `file_path`, `luby`, and `version` should
 still become distinct Go package leaves. This makes their consumers visible in
 the import graph, gives them an enforceable boundary, and makes later deletion

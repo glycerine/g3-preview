@@ -2,9 +2,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph(t *testing.T) {
@@ -13,7 +12,7 @@ func TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph(t *testing
 		// Caller-owned input is prepared before measuring the warmed solver.
 		// A fresh slice literal in satMUSFaultCall escapes through Check.
 		assumptions := []Literal{0, 2, 4}
-		operation := func() (util.LBool, error) {
+		operation := func() (lbool.LBool, error) {
 			if recursive {
 				return satMUSFaultCall(s, true)
 			}
@@ -29,9 +28,9 @@ func TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph(t *testing
 			if e != nil {
 				t.Fatal(e)
 			}
-			want := util.LFalse
+			want := lbool.False
 			if recursive {
-				want = util.LTrue
+				want = lbool.True
 			}
 			if r != want {
 				t.Fatal(r)

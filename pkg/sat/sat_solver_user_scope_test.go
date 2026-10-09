@@ -3,6 +3,7 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
@@ -69,7 +70,7 @@ func TestSATSolverSourceUserScopeFiniteCycle(t *testing.T) {
 		if incrementalResult != want {
 			t.Fatalf("independent original-CNF oracle check %d: got=%v want=%v", checks, incrementalResult, want)
 		}
-		if incrementalResult == util.LTrue {
+		if incrementalResult == lbool.True {
 			model, err := solver.AppendModel(nil)
 			paramsMust(t, err)
 			if !satSolverScopeModelSatisfies(frames, model) {
@@ -113,7 +114,7 @@ func TestSATSolverSourceUserScopeFiniteCycle(t *testing.T) {
 	}
 }
 
-func satSolverScopeOracle(frames [][][3]Literal) util.LBool {
+func satSolverScopeOracle(frames [][][3]Literal) lbool.LBool {
 	for bits := uint32(0); bits < 64; bits++ {
 		good := true
 		for _, frame := range frames {
@@ -127,13 +128,13 @@ func satSolverScopeOracle(frames [][][3]Literal) util.LBool {
 			}
 		}
 		if good {
-			return util.LTrue
+			return lbool.True
 		}
 	}
-	return util.LFalse
+	return lbool.False
 }
 
-func satSolverScopeModelSatisfies(frames [][][3]Literal, model []util.LBool) bool {
+func satSolverScopeModelSatisfies(frames [][][3]Literal, model []lbool.LBool) bool {
 	for _, frame := range frames {
 		for _, clause := range frame {
 			good := false
@@ -141,7 +142,7 @@ func satSolverScopeModelSatisfies(frames [][][3]Literal, model []util.LBool) boo
 				if uint64(l.variable()) >= uint64(len(model)) {
 					return false
 				}
-				good = good || model[l.variable()] == util.LTrue && !l.sign() || model[l.variable()] == util.LFalse && l.sign()
+				good = good || model[l.variable()] == lbool.True && !l.sign() || model[l.variable()] == lbool.False && l.sign()
 			}
 			if !good {
 				return false

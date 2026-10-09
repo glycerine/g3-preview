@@ -3,13 +3,13 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"math"
 	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverInspectionDIMACSActualCheckBindingAndAssumptions(t *testing.T) {
@@ -24,14 +24,14 @@ func TestSATSolverInspectionDIMACSActualCheckBindingAndAssumptions(t *testing.T)
 	satOK(t, s.UpdateParams(&p))
 	knownBefore, decisionsBefore := s.Variables.modelKnown, s.decision.decisions
 	got, e := s.Check([]Literal{3})
-	if got != util.LUndef || !errors.Is(e, ErrSATMissingDimacsBinding) {
+	if got != lbool.Undef || !errors.Is(e, ErrSATMissingDimacsBinding) {
 		t.Fatal(got, e)
 	}
 	o := satInspectionStream(t, arena.NewBudget(math.MaxUint64))
 	satOK(t, s.bindDIMACS(o))
 	got, e = s.Check([]Literal{3})
 	satOK(t, e)
-	if got != util.LUndef {
+	if got != lbool.Undef {
 		t.Fatal(got)
 	}
 	satInspectionText(t, o, "p cnf 2 1\n1 2 0\n-2 0\n")

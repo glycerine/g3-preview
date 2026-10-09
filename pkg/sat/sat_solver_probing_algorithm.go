@@ -3,6 +3,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func (s *satSolverProbing) tryLit(l Literal, updateCache bool) (bool, error) {
@@ -231,7 +232,7 @@ func (s *satSolverProbing) processCore(id BoolVar) error {
 			if e != nil {
 				return e
 			}
-			if value != util.LUndef {
+			if value != lbool.Undef {
 				continue
 			}
 			keep, e := s.tryLit(other, false)
@@ -340,7 +341,7 @@ func (s *satSolverProbing) run(force bool) (answer bool, err error) {
 		if e != nil {
 			return false, e
 		}
-		skip := value != util.LUndef
+		skip := value != lbool.Undef
 		if !skip {
 			x, e := v.eliminated.Read(id)
 			if e != nil {

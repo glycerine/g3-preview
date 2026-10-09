@@ -2,6 +2,7 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"math"
 	"reflect"
 
@@ -111,7 +112,7 @@ func (d *satSolverDecision) nextVar() (BoolVar, error) {
 		if e != nil {
 			return NullBoolVar, e
 		}
-		if value == util.LUndef {
+		if value == lbool.Undef {
 			removed, e := v.wasEliminated(next)
 			if e != nil {
 				return NullBoolVar, e
@@ -137,7 +138,7 @@ func (d *satSolverDecision) nextVar() (BoolVar, error) {
 		if e != nil {
 			return NullBoolVar, e
 		}
-		if value == util.LUndef {
+		if value == lbool.Undef {
 			removed, e := v.wasEliminated(next)
 			if e != nil {
 				return NullBoolVar, e
@@ -167,18 +168,18 @@ func (d *satSolverDecision) decide() (bool, error) {
 	if p.extensionPresent {
 		return false, ErrSATMissingSourceExtBinding
 	}
-	phase := util.LUndef
+	phase := lbool.Undef
 	cfg, e := p.config.State()
 	if e != nil {
 		return false, e
 	}
 	switch cfg.Phase {
 	case satPhaseAlwaysTrue:
-		phase = util.LTrue
+		phase = lbool.True
 	case satPhaseAlwaysFalse:
-		phase = util.LFalse
+		phase = lbool.False
 	case satPhaseCaching:
-		phase = util.LFalse
+		phase = lbool.False
 		if d.conflict.phaseCacheOn {
 			cached, e := p.variables.phase.Read(uint32(next))
 			if e != nil {
@@ -190,23 +191,23 @@ func (d *satSolverDecision) decide() (bool, error) {
 					return false, e
 				}
 				if cached == 0 {
-					phase = util.LTrue
+					phase = lbool.True
 				}
 			}
 		}
 	case satPhaseRandom:
 		if d.rng.Next()%2 == 0 {
-			phase = util.LTrue
+			phase = lbool.True
 		} else {
-			phase = util.LFalse
+			phase = lbool.False
 		}
 	default:
 		return false, ErrSATAssertion
 	}
-	if satStorageSourceDebug && phase == util.LUndef {
+	if satStorageSourceDebug && phase == lbool.Undef {
 		return false, ErrSATAssertion
 	}
-	if e = p.assign(MakeLiteral(next, phase == util.LFalse), satJustification{}); e != nil {
+	if e = p.assign(MakeLiteral(next, phase == lbool.False), satJustification{}); e != nil {
 		return false, e
 	}
 	return true, nil

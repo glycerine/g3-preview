@@ -3,9 +3,9 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 type satSimplifierVarCost struct{ variable, cost uint32 }
@@ -144,7 +144,7 @@ func (s *satSimplifier) orderVariables() error {
 		if e != nil {
 			return e
 		}
-		if value != util.LUndef {
+		if value != lbool.Undef {
 			continue
 		}
 		c, e := s.eliminationCost(BoolVar(v))
@@ -500,7 +500,7 @@ func (s *satSimplifier) tryEliminate(v BoolVar) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	if val != util.LUndef {
+	if val != lbool.Undef {
 		return false, nil
 	}
 	bp, e := s.nonLearnedBinaries(pos)

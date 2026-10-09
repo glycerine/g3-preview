@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -304,7 +305,7 @@ func (s *satSolverProbing) assertReady(l Literal) error {
 	if e != nil {
 		return e
 	}
-	if a != util.LUndef {
+	if a != lbool.Undef {
 		return ErrSATAssertion
 	}
 	return nil

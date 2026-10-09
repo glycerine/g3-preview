@@ -3,6 +3,7 @@ package sat
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
 
@@ -50,7 +51,7 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 		for _, l := range []Literal{MakeLiteral(v, false), MakeLiteral(v, true)} {
 			value, e := s.valueLiteral(l)
 			satOK(t, e)
-			if value != util.LUndef {
+			if value != lbool.Undef {
 				t.Fatal(l, value)
 			}
 		}
@@ -65,10 +66,10 @@ func TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView(t *testing.T) 
 	if view.variables != s {
 		t.Fatal("source char assignment")
 	}
-	satOK(t, s.assignment.Write(0, int8(util.LTrue)))
+	satOK(t, s.assignment.Write(0, int8(lbool.True)))
 	value, e := view.value(0)
 	satOK(t, e)
-	if value != util.LTrue {
+	if value != lbool.True {
 		t.Fatal("no copied assignment view", value)
 	}
 	todoBytes := todo.Stats().OwnerBytes + todo.Stats().MembershipCapacity + 4*todo.Stats().ValuesCapacity

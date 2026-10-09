@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -43,7 +44,7 @@ func TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy(t *testing.
 	if _, e = v.justification.read(0); !errors.Is(e, ErrSATOwner) {
 		t.Fatal("missing provenance may not infer live registry token", e)
 	}
-	if satAssignmentTestValue(t, &v.assignment, 0) != int8(util.LTrue) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 2 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 0 {
+	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 2 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 0 {
 		t.Fatal("actual assignment statement prefix")
 	}
 	satScalarAuditRoots(t, v)

@@ -6,6 +6,7 @@ package tactic
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -191,9 +192,9 @@ func recoverSATGoalFormulas(tr *GoalTranslator, g *tactic.Goal, learned bool, ma
 			return e
 		}
 		switch value {
-		case util.LTrue:
+		case lbool.True:
 			e = g.Assert(expressions.values[2*v])
-		case util.LFalse:
+		case lbool.False:
 			e = g.Assert(expressions.values[2*v+1])
 		}
 		if e != nil {

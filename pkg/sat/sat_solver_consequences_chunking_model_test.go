@@ -3,9 +3,8 @@ package sat
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATConsequenceChunkIndependentBinaryCNFs(t *testing.T) {
@@ -29,12 +28,12 @@ func TestSATConsequenceChunkIndependentBinaryCNFs(t *testing.T) {
 				r, e := s.Check(nil)
 				satOK(t, e)
 				if len(models) == 0 {
-					if r != util.LFalse {
+					if r != lbool.False {
 						t.Fatal(r)
 					}
 					return
 				}
-				if r != util.LTrue {
+				if r != lbool.True {
 					t.Fatal(r)
 				}
 				var mdl RuntimeUintColumn
@@ -46,7 +45,7 @@ func TestSATConsequenceChunkIndependentBinaryCNFs(t *testing.T) {
 				defer func() { satOK(t, out.CloseChecked()) }()
 				r, e = s.coreChunking(&mdl, satConsequenceInput{variables: []BoolVar{0, 1}, count: 2}, satConsequenceLiterals(nil), out, K)
 				satOK(t, e)
-				if r != util.LTrue {
+				if r != lbool.True {
 					t.Fatal(r)
 				}
 				seen := map[uint32]bool{}
@@ -98,7 +97,7 @@ func TestSATConsequenceChunkMultipleCoreUsesBruteForce(t *testing.T) {
 	var model RuntimeUintColumn
 	model.Bind(s.runtime.memory)
 	for i := 0; i < 2; i++ {
-		satOK(t, model.Push(uint32(util.LTrue)))
+		satOK(t, model.Push(uint32(lbool.True)))
 	}
 	defer func() { satOK(t, model.Finalize()) }()
 	out, e := newSATSolverLiteralRows(s.runtime.memory, s.budget)
@@ -106,7 +105,7 @@ func TestSATConsequenceChunkMultipleCoreUsesBruteForce(t *testing.T) {
 	defer func() { satOK(t, out.CloseChecked()) }()
 	r, e := s.coreChunking(&model, satConsequenceInput{variables: []BoolVar{0, 1}, count: 2}, satConsequenceLiterals(nil), out, 2)
 	satOK(t, e)
-	if r != util.LTrue {
+	if r != lbool.True {
 		t.Fatal(r)
 	}
 	n, e := out.rowCount()

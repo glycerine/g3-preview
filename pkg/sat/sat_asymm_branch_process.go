@@ -3,9 +3,9 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func (a *satAsymmBranch) process(c StoredClauseRef) (keep bool, err error) {
@@ -53,7 +53,7 @@ func (a *satAsymmBranch) process(c StoredClauseRef) (keep bool, err error) {
 		if e != nil {
 			return false, e
 		}
-		if val == util.LTrue {
+		if val == lbool.True {
 			if e = l.detachClause(c); e != nil {
 				return false, e
 			}
@@ -140,13 +140,13 @@ func (a *satAsymmBranch) process(c StoredClauseRef) (keep bool, err error) {
 			return false, e
 		}
 		switch val {
-		case util.LUndef:
+		case lbool.Undef:
 			if e = cl.SetLiteral(c, j, x); e != nil {
 				return false, e
 			}
 			j++
-		case util.LFalse:
-		case util.LTrue:
+		case lbool.False:
+		case lbool.True:
 			return false, ErrSATAssertion
 		}
 	}
@@ -189,7 +189,7 @@ func (a *satAsymmBranch) process(c StoredClauseRef) (keep bool, err error) {
 				if e != nil {
 					return false, e
 				}
-				if val != util.LUndef {
+				if val != lbool.Undef {
 					return false, ErrSATAssertion
 				}
 			}

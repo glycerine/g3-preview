@@ -2,10 +2,10 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverBacktrackRealTrailQueueAndReinit(t *testing.T) {
@@ -39,7 +39,7 @@ func TestSATSolverBacktrackRealTrailQueueAndReinit(t *testing.T) {
 	for i := uint32(0); i < 3; i++ {
 		got, e := v.valueVar(BoolVar(i))
 		satOK(t, e)
-		if got != util.LUndef || !v.queue.Contains(BoolVar(i)) {
+		if got != lbool.Undef || !v.queue.Contains(BoolVar(i)) {
 			t.Fatal("actual unassign callback", i, got)
 		}
 	}
@@ -76,11 +76,11 @@ func TestSATSolverUnassignInvalidOldActualReadPrefix(t *testing.T) {
 	}
 	e = s.unassignVars(3)
 	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATAssertion) || satAssignmentTestValue(t, &v.assignment, 0) != int8(util.LTrue) || satAssignmentTestValue(t, &v.assignment, 2) != int8(util.LTrue) {
+		if !errors.Is(e, ErrSATAssertion) || satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satAssignmentTestValue(t, &v.assignment, 2) != int8(lbool.True) {
 			t.Fatal("actual source SASSERT before any mutation", e)
 		}
 	} else {
-		if e == nil || satAssignmentTestValue(t, &v.assignment, 0) != int8(util.LUndef) || satAssignmentTestValue(t, &v.assignment, 2) != int8(util.LUndef) || v.qhead != 2 {
+		if e == nil || satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.Undef) || satAssignmentTestValue(t, &v.assignment, 2) != int8(lbool.Undef) || v.qhead != 2 {
 			t.Fatal("reverse prefix before unsigned invalid read", e, satAssignmentTestSize(t, &v.assignment))
 		}
 	}

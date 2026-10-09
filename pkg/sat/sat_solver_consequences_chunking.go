@@ -3,7 +3,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func satConsequencePruneUnfixed(lambda, model *RuntimeUintColumn) error {
@@ -23,7 +23,7 @@ func satConsequencePruneUnfixed(lambda, model *RuntimeUintColumn) error {
 		if e != nil {
 			return e
 		}
-		if (util.LBool(int32(v)) == util.LFalse) != Literal(l).sign() {
+		if (lbool.LBool(int32(v)) == lbool.False) != Literal(l).sign() {
 			n, e = lambda.Size()
 			if e != nil {
 				return e
@@ -155,56 +155,56 @@ func (s *Solver) bruteForceConsequenceOne(asms satConsequenceInput, nlit uint32,
 	if e != nil {
 		return e
 	}
-	if r == util.LFalse {
+	if r == lbool.False {
 		return out.appendColumn(&s.conflict.core)
 	}
 	return nil
 }
-func (s *Solver) coreChunking(model *RuntimeUintColumn, vars, asms satConsequenceInput, out *satSolverLiteralRows, K uint32) (result util.LBool, err error) {
+func (s *Solver) coreChunking(model *RuntimeUintColumn, vars, asms satConsequenceInput, out *satSolverLiteralRows, K uint32) (result lbool.LBool, err error) {
 	if err = s.consequenceEntry(out); err != nil {
-		return util.LUndef, err
+		return lbool.Undef, err
 	}
 	s.consequenceRunning = true
 	defer func() { s.consequenceRunning = false }()
 	f, e := s.consequenceFrame()
 	if e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	defer func() { err = s.consequenceDrop(f, err) }()
 	if err = f.vector(s, 0, nil); err != nil {
-		return util.LUndef, err
+		return lbool.Undef, err
 	}
 	lambda := &f.vectors[0]
 	for i := uint32(0); ; i++ {
 		n, e := vars.size()
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		if i >= n {
 			break
 		}
 		v, e := vars.read(i)
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		m, e := model.Read(v)
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
-		if err = lambda.Push(MakeLiteral(BoolVar(v), util.LBool(int32(m)) == util.LFalse).index()); err != nil {
-			return util.LUndef, err
+		if err = lambda.Push(MakeLiteral(BoolVar(v), lbool.LBool(int32(m)) == lbool.False).index()); err != nil {
+			return lbool.Undef, err
 		}
 	}
 	for {
 		n, e := lambda.Size()
 		if e != nil {
-			return util.LUndef, e
+			return lbool.Undef, e
 		}
 		if n == 0 {
-			return util.LTrue, nil
+			return lbool.True, nil
 		}
 		if err = s.coreChunk(lambda, asms, out, K); err != nil {
-			return util.LUndef, err
+			return lbool.Undef, err
 		}
 	}
 }
@@ -275,7 +275,7 @@ func (s *Solver) coreChunkCheck(lambda, gamma, omega *RuntimeUintColumn, asms sa
 	if e != nil {
 		return false, e
 	}
-	if r == util.LTrue {
+	if r == lbool.True {
 		return true, satConsequencePruneUnfixed(lambda, &s.model)
 	}
 	// Source reads the existing core after l_undef too; no status repair.

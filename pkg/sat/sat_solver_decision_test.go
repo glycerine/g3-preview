@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"math"
 	"testing"
 
@@ -71,7 +72,7 @@ func TestSATSolverDecisionEveryActualAllocationPrefix(t *testing.T) {
 			}
 			value, e := p.variables.valueVar(0)
 			satOK(t, e)
-			if value != util.LTrue {
+			if value != lbool.True {
 				t.Fatal("assignment publication precedes trail growth")
 			}
 		}

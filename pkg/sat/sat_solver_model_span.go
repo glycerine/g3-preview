@@ -3,7 +3,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 // Concrete model& borrow. Runtime reads resolve the current member backing at
@@ -14,17 +14,17 @@ type satSolverModelSpan struct {
 	column *RuntimeUintColumn
 }
 
-func (m satSolverModelSpan) read(v BoolVar) (util.LBool, error) {
+func (m satSolverModelSpan) read(v BoolVar) (lbool.LBool, error) {
 	if m.column != nil {
 		x, e := m.column.Read(uint32(v))
-		return util.LBool(int32(x)), e
+		return lbool.LBool(int32(x)), e
 	}
 	if uint64(v) >= uint64(len(m.slice)) {
-		return util.LUndef, arena.ErrBounds
+		return lbool.Undef, arena.ErrBounds
 	}
 	return m.slice[v], nil
 }
-func (m satSolverModelSpan) write(v BoolVar, x util.LBool) error {
+func (m satSolverModelSpan) write(v BoolVar, x lbool.LBool) error {
 	if m.column != nil {
 		return m.column.Write(uint32(v), uint32(int32(x)))
 	}
@@ -34,10 +34,10 @@ func (m satSolverModelSpan) write(v BoolVar, x util.LBool) error {
 	m.slice[v] = x
 	return nil
 }
-func (m satSolverModelSpan) value(l Literal) (util.LBool, error) {
+func (m satSolverModelSpan) value(l Literal) (lbool.LBool, error) {
 	v, e := m.read(l.variable())
 	if e != nil {
-		return util.LUndef, e
+		return lbool.Undef, e
 	}
 	if l.sign() {
 		v = v.Negated()
@@ -70,7 +70,7 @@ func satSolverResizeModel(c *RuntimeUintColumn, n uint32) error {
 		return e
 	}
 	for i := old; i < n; i++ {
-		if e = c.Write(i, uint32(util.LUndef)); e != nil {
+		if e = c.Write(i, uint32(lbool.Undef)); e != nil {
 			return e
 		}
 	}

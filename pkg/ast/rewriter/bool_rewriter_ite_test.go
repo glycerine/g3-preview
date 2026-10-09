@@ -3,10 +3,10 @@
 package rewriter
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestBoolRewriterITEExactBranchesAndIndependentTruthTables(t *testing.T) {
@@ -101,7 +101,7 @@ func TestBoolRewriterITEExactBranchesAndIndependentTruthTables(t *testing.T) {
 						satOK(t, tr.Compile(forms))
 						r, e := s.Check(nil)
 						satOK(t, e)
-						if (r == util.LTrue) != want || r == util.LUndef {
+						if (r == lbool.True) != want || r == lbool.Undef {
 							t.Fatal("independent ITE meaning", bits, r, want)
 						}
 						satOK(t, tr.Close())

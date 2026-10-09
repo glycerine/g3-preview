@@ -119088,7 +119088,7 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_lbool.go",
+        "pkg/util/lbool/lbool.go",
         "pkg/sat/sat_types_test.go"
       ],
       "tests": [
@@ -119100,7 +119100,7 @@
         {
           "name": "operator~",
           "status": "ported",
-          "go_target": "pkg/util/util_lbool.go",
+          "go_target": "pkg/util/lbool/lbool.go",
           "tests": [
             "TestLiftedBooleanSourceSemantics"
           ],
@@ -119111,7 +119111,7 @@
         {
           "name": "to_lbool",
           "status": "ported",
-          "go_target": "pkg/util/util_lbool.go",
+          "go_target": "pkg/util/lbool/lbool.go",
           "tests": [
             "TestLiftedBooleanSourceSemantics"
           ],
@@ -119122,7 +119122,7 @@
         {
           "name": "operator<<",
           "status": "ported",
-          "go_target": "pkg/util/util_lbool.go",
+          "go_target": "pkg/util/lbool/lbool.go",
           "tests": [
             "TestLiftedBooleanSourceSemantics"
           ],
@@ -119133,7 +119133,7 @@
         {
           "name": "to_sat_str",
           "status": "ported",
-          "go_target": "pkg/util/util_lbool.go",
+          "go_target": "pkg/util/lbool/lbool.go",
           "tests": [
             "TestLiftedBooleanSourceSemantics"
           ],
@@ -119153,7 +119153,7 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_lbool.go",
+        "pkg/util/lbool/lbool.go",
         "pkg/sat/sat_types_test.go"
       ],
       "tests": [
@@ -119175,7 +119175,7 @@
         {
           "name": "operator~",
           "status": "ported",
-          "go_target": "pkg/util/util_lbool.go",
+          "go_target": "pkg/util/lbool/lbool.go",
           "tests": [
             "TestLiftedBooleanSourceSemantics"
           ],
@@ -119186,7 +119186,7 @@
         {
           "name": "to_lbool",
           "status": "ported",
-          "go_target": "pkg/util/util_lbool.go",
+          "go_target": "pkg/util/lbool/lbool.go",
           "tests": [
             "TestLiftedBooleanSourceSemantics"
           ],
@@ -119197,7 +119197,7 @@
         {
           "name": "operator<<",
           "status": "ported",
-          "go_target": "pkg/util/util_lbool.go",
+          "go_target": "pkg/util/lbool/lbool.go",
           "tests": [
             "TestLiftedBooleanSourceSemantics"
           ],
@@ -119208,7 +119208,7 @@
         {
           "name": "to_sat_str",
           "status": "ported",
-          "go_target": "pkg/util/util_lbool.go",
+          "go_target": "pkg/util/lbool/lbool.go",
           "tests": [
             "TestLiftedBooleanSourceSemantics"
           ],

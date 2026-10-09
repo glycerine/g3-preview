@@ -3,10 +3,9 @@ package sat
 
 import (
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func satMUSFaultFixture(t *testing.T, recursive bool) *Solver {
@@ -28,7 +27,7 @@ func satMUSFaultFixture(t *testing.T, recursive bool) *Solver {
 		// core. Dispatch threshold >64 is independently covered by the65 fixture.
 		r, e := s.Check(assumptions)
 		satOK(t, e)
-		if r != util.LFalse {
+		if r != lbool.False {
 			t.Fatal(r)
 		}
 	} else {
@@ -38,7 +37,7 @@ func satMUSFaultFixture(t *testing.T, recursive bool) *Solver {
 	}
 	return s
 }
-func satMUSFaultCall(s *Solver, recursive bool) (util.LBool, error) {
+func satMUSFaultCall(s *Solver, recursive bool) (lbool.LBool, error) {
 	if recursive {
 		// Reproduce the operator's completed is_active flet before invoking
 		// this private callee on a smaller independently valid source core.
@@ -59,9 +58,9 @@ func TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots(t *testing.T)
 				s.budget.FailAfter(start)
 				r, e := satMUSFaultCall(s, recursive)
 				satOK(t, e)
-				want := util.LFalse
+				want := lbool.False
 				if recursive {
-					want = util.LTrue
+					want = lbool.True
 				}
 				if r != want {
 					t.Fatal(r, want)
@@ -88,9 +87,9 @@ func TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots(t *testing.T)
 						failures++
 					} else {
 						success++
-						want := util.LFalse
+						want := lbool.False
 						if recursive {
-							want = util.LTrue
+							want = lbool.True
 						}
 						if result != want {
 							t.Fatal(result, want)

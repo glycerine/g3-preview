@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"github.com/glycerine/g3/pkg/sat"
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
+	"github.com/glycerine/g3/pkg/util/lbool"
 
-	"github.com/glycerine/g3/pkg/util"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -261,7 +261,7 @@ func TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose(t *testing.T) {
 	satOK(t, tr.Compile(formulas))
 	result, e := s.Check(nil)
 	satOK(t, e)
-	if result != util.LTrue {
+	if result != lbool.True {
 		t.Fatal(result)
 	}
 	values, e := s.AppendModel(nil)
@@ -304,10 +304,10 @@ func TestSATBooleanModelSkipsUndefinedSourceRows(t *testing.T) {
 	// This is a direct source model-row reader fixture, not a solver result.
 	rows := make(sat.Model, s.Variables.NumVars())
 	for i := range rows {
-		rows[i] = util.LUndef
+		rows[i] = lbool.Undef
 	}
-	rows[pv] = util.LTrue
-	rows[qv] = util.LUndef
+	rows[pv] = lbool.True
+	rows[qv] = lbool.Undef
 	md, e := sattactic.BuildBooleanModel(tr, rows)
 	astTestMust(t, e)
 	t.Cleanup(func() { astTestMust(t, md.Close()) })
@@ -360,14 +360,14 @@ func TestSATBooleanModelMatchesOriginalGoalTruthTable(t *testing.T) {
 			if rv {
 				selected = pv
 			}
-			want := util.LFalse
+			want := lbool.False
 			if (pv || qv) && !(pv && qv) && selected {
-				want = util.LTrue
+				want = lbool.True
 			}
 			if result != want {
 				t.Fatal(result, want)
 			}
-			if result != util.LTrue {
+			if result != lbool.True {
 				return
 			}
 			rows, e := s.AppendModel(nil)

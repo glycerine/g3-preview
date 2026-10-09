@@ -2,9 +2,8 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph(t *testing.T) {
@@ -18,7 +17,7 @@ func TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph(t *testing.T) {
 	for i := 0; i < 8; i++ {
 		v, e := s.Check(nil)
 		satOK(t, e)
-		if v != util.LTrue {
+		if v != lbool.True {
 			t.Fatal(v)
 		}
 	}
@@ -27,7 +26,7 @@ func TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph(t *testing.T) {
 	for i := 0; i < 64; i++ {
 		v, e := s.Check(nil)
 		satOK(t, e)
-		if v != util.LTrue {
+		if v != lbool.True {
 			t.Fatal(v)
 		}
 		satFullSolverRuntimeAudit(t, s)
@@ -37,7 +36,7 @@ func TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph(t *testing.T) {
 	}
 	allocs := testing.AllocsPerRun(10, func() {
 		v, e := s.Check(nil)
-		if e != nil || v != util.LTrue {
+		if e != nil || v != lbool.True {
 			panic("real warm source Check")
 		}
 	})

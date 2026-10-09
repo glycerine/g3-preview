@@ -3,9 +3,9 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // A source stack checker borrows the actual solver member owners. It owns no
@@ -204,7 +204,7 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		watchedFalse := value == util.LFalse
+		watchedFalse := value == lbool.False
 		if !watchedFalse {
 			second, e := a.Literal(cl, 1)
 			if e != nil {
@@ -214,7 +214,7 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 			if e != nil {
 				return false, e
 			}
-			watchedFalse = value == util.LFalse
+			watchedFalse = value == lbool.False
 		}
 		if watchedFalse {
 			onStack := false
@@ -252,7 +252,7 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if status != util.LTrue {
+				if status != lbool.True {
 					for i := uint32(2); ; i++ {
 						size, e := a.Size(cl)
 						if e != nil {
@@ -270,7 +270,7 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 							if e != nil {
 								return false, e
 							}
-							if val != util.LFalse {
+							if val != lbool.False {
 								return false, ErrSATAssertion
 							}
 						}

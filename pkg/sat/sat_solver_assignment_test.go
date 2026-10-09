@@ -2,16 +2,15 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATSolverAssignConflictStatusSourceOrder(t *testing.T) {
 	s, v, _ := satPropagationFixture(t, 3)
 	j := newSATBinaryJustification(MakeLiteral(2, true))
 	satOK(t, s.assign(MakeLiteral(0, true), j))
-	if satAssignmentTestValue(t, &v.assignment, 0) != int8(util.LFalse) || satAssignmentTestValue(t, &v.assignment, 1) != int8(util.LTrue) || !satJustificationTestValue(t, &v.justification, 0).None() || satScalarTestUint(t, &v.level, 0) != 0 || satAssignmentTestValue(t, &v.phase, 0) != 1 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 1 {
+	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.False) || satAssignmentTestValue(t, &v.assignment, 1) != int8(lbool.True) || !satJustificationTestValue(t, &v.justification, 0).None() || satScalarTestUint(t, &v.level, 0) != 0 || satAssignmentTestValue(t, &v.phase, 0) != 1 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 1 {
 		t.Fatal("base assignment")
 	}
 	v.scopeLevel = 3
@@ -23,13 +22,13 @@ func TestSATSolverAssignConflictStatusSourceOrder(t *testing.T) {
 	satOK(t, e)
 	z, e := s.status(c)
 	satOK(t, e)
-	if z != util.LUndef {
+	if z != lbool.Undef {
 		t.Fatal(z)
 	}
 	satOK(t, s.assign(MakeLiteral(2, true), j))
 	z, e = s.status(c)
 	satOK(t, e)
-	if z != util.LFalse {
+	if z != lbool.False {
 		t.Fatal(z)
 	}
 	satOK(t, s.assign(MakeLiteral(0, false), j))
@@ -49,7 +48,7 @@ func TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix(t *testing.T) {
 	if !satAssignmentActualRefusal(v.memory, e) {
 		t.Fatal("actual initial trail refusal", e)
 	}
-	if satAssignmentTestValue(t, &v.assignment, 0) != int8(util.LTrue) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 0 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 1 {
+	if satAssignmentTestValue(t, &v.assignment, 0) != int8(lbool.True) || satScalarTestUint(t, &v.level, 0) != 1 || satAssignmentTestValue(t, &v.phase, 0) != 0 || satAssignmentTestValue(t, &v.assignedSinceGC, 0) != 1 {
 		t.Fatal("scalar prefix")
 	}
 	n, x := v.trail.Size(v.trailRef)
