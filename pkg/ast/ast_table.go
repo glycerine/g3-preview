@@ -6,8 +6,10 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
+
+const astChainFree = math.MaxUint32
+const astChainEnd = math.MaxUint32 - 1
 
 type astChainCell struct {
 	node astNodeRef
@@ -21,7 +23,7 @@ type astChainTable struct {
 func astChainBytes(n uint32) uint64 { return uint64(n) * uint64(reflect.TypeOf(astChainCell{}).Size()) }
 func (m *ASTManager) allocateChain(slots, cellar uint32) ([]astChainCell, error) {
 	n := uint64(slots) + uint64(cellar)
-	if slots == 0 || slots&(slots-1) != 0 || cellar == 0 || n >= uint64(util.ChainEnd) || n > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(astChainCell{}).Size()) {
+	if slots == 0 || slots&(slots-1) != 0 || cellar == 0 || n >= uint64(astChainEnd) || n > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(astChainCell{}).Size()) {
 		return nil, arena.ErrBounds
 	}
 	if e := m.BudgetField.Reserve(astChainBytes(uint32(n))); e != nil {
@@ -29,7 +31,7 @@ func (m *ASTManager) allocateChain(slots, cellar uint32) ([]astChainCell, error)
 	}
 	a := make([]astChainCell, int(n))
 	for i := range a {
-		a[i].next = util.ChainFree
+		a[i].next = astChainFree
 	}
 	return a, nil
 }
@@ -38,7 +40,7 @@ func (m *ASTManager) initTable() error {
 	if e != nil {
 		return e
 	}
-	m.table = astChainTable{cells: a, slots: 8, next: 8, free: util.ChainEnd}
+	m.table = astChainTable{cells: a, slots: 8, next: 8, free: astChainEnd}
 	return nil
 }
 func (m *ASTManager) astCopyTable(a []astChainCell, slots uint32) (uint32, bool, error) {
@@ -46,17 +48,17 @@ func (m *ASTManager) astCopyTable(a []astChainCell, slots uint32) (uint32, bool,
 	t.used = 0
 	next := slots
 	for bucket := uint32(0); bucket < t.slots; bucket++ {
-		if t.cells[bucket].next == util.ChainFree {
+		if t.cells[bucket].next == astChainFree {
 			continue
 		}
-		for i := bucket; i != util.ChainEnd; i = t.cells[i].next {
+		for i := bucket; i != astChainEnd; i = t.cells[i].next {
 			if e := m.validNode(t.cells[i].node); e != nil {
 				return next, false, e
 			}
 			index := m.nodeAt(t.cells[i].node.slot).hash & (slots - 1)
-			if a[index].next == util.ChainFree {
+			if a[index].next == astChainFree {
 				a[index] = t.cells[i]
-				a[index].next = util.ChainEnd
+				a[index].next = astChainEnd
 				t.used++
 			} else {
 				if next == uint32(len(a)) {
@@ -75,7 +77,7 @@ func (m *ASTManager) expandTable() error {
 	slots := uint64(m.table.slots) * 2
 	cellar := uint64(len(m.table.cells)-int(m.table.slots)) * 2
 	for {
-		if slots >= uint64(util.ChainEnd) || cellar >= uint64(util.ChainEnd) {
+		if slots >= uint64(astChainEnd) || cellar >= uint64(astChainEnd) {
 			return arena.ErrBounds
 		}
 		a, e := m.allocateChain(uint32(slots), uint32(cellar))
@@ -92,7 +94,7 @@ func (m *ASTManager) expandTable() error {
 			m.table.cells = a
 			m.table.slots = uint32(slots)
 			m.table.next = next
-			m.table.free = util.ChainEnd
+			m.table.free = astChainEnd
 			return nil
 		}
 		m.BudgetField.Release(astChainBytes(uint32(len(a))))
@@ -103,10 +105,10 @@ func (m *ASTManager) tableFind(key astNodeRef) (astNodeRef, bool, error) {
 	t := &m.table
 	hash := m.nodeAt(key.slot).hash
 	i := hash & (t.slots - 1)
-	if t.cells[i].next == util.ChainFree {
+	if t.cells[i].next == astChainFree {
 		return astNodeRef{}, false, nil
 	}
-	for ; i != util.ChainEnd; i = t.cells[i].next {
+	for ; i != astChainEnd; i = t.cells[i].next {
 		other := t.cells[i].node
 		if e := m.validNode(other); e != nil {
 			return astNodeRef{}, false, e
@@ -126,7 +128,7 @@ func (m *ASTManager) tableFind(key astNodeRef) (astNodeRef, bool, error) {
 }
 func (m *ASTManager) tableInsert(key astNodeRef) (astNodeRef, bool, error) {
 	t := &m.table
-	if t.free == util.ChainEnd && t.next == uint32(len(t.cells)) {
+	if t.free == astChainEnd && t.next == uint32(len(t.cells)) {
 		if e := m.expandTable(); e != nil {
 			return astNodeRef{}, false, e
 		}
@@ -135,12 +137,12 @@ func (m *ASTManager) tableInsert(key astNodeRef) (astNodeRef, bool, error) {
 		return old, false, e
 	}
 	idx := m.nodeAt(key.slot).hash & (t.slots - 1)
-	if t.cells[idx].next == util.ChainFree {
-		t.cells[idx] = astChainCell{key, util.ChainEnd}
+	if t.cells[idx].next == astChainFree {
+		t.cells[idx] = astChainCell{key, astChainEnd}
 		t.used++
 	} else {
 		j := t.next
-		if t.free != util.ChainEnd {
+		if t.free != astChainEnd {
 			j = t.free
 			t.free = t.cells[j].next
 		} else {
@@ -162,17 +164,17 @@ func (m *ASTManager) tableEraseCaptured(key astNodeRef, hash uint32) error {
 	t := &m.table
 	i := hash & (t.slots - 1)
 	prev := uint32(math.MaxUint32)
-	if t.cells[i].next == util.ChainFree {
+	if t.cells[i].next == astChainFree {
 		return ErrASTHandle
 	}
-	for i != util.ChainEnd {
+	for i != astChainEnd {
 		if t.cells[i].node == key {
 			t.size--
 			if prev == math.MaxUint32 {
 				j := t.cells[i].next
-				if j == util.ChainEnd {
+				if j == astChainEnd {
 					t.used--
-					t.cells[i].next = util.ChainFree
+					t.cells[i].next = astChainFree
 				} else {
 					t.cells[i] = t.cells[j]
 					t.cells[j].next = t.free

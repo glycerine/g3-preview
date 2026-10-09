@@ -319,10 +319,10 @@ func (m *ASTManager) closeCore(source bool) error {
 			}
 		}
 		for bucket := uint32(0); bucket < m.table.slots; bucket++ {
-			if m.table.cells[bucket].next == util.ChainFree {
+			if m.table.cells[bucket].next == astChainFree {
 				continue
 			}
-			for j := bucket; j != util.ChainEnd; j = m.table.cells[j].next {
+			for j := bucket; j != astChainEnd; j = m.table.cells[j].next {
 				r := m.table.cells[j].node
 				if e := m.validNode(r); e != nil {
 					return e
@@ -378,10 +378,10 @@ func (m *ASTManager) closeCore(source bool) error {
 		var head, tail astNodeRef
 		emergency := false
 		for bucket := uint32(0); bucket < m.table.slots; bucket++ {
-			if m.table.cells[bucket].next == util.ChainFree {
+			if m.table.cells[bucket].next == astChainFree {
 				continue
 			}
-			for j := bucket; j != util.ChainEnd; j = m.table.cells[j].next {
+			for j := bucket; j != astChainEnd; j = m.table.cells[j].next {
 				r := m.table.cells[j].node
 				if m.nodeAt(r.slot).closeMark {
 					continue

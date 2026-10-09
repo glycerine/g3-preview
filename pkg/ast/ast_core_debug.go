@@ -2,10 +2,6 @@
 
 package ast
 
-import (
-	"github.com/glycerine/g3/pkg/util"
-)
-
 const ASTSourceDebug = true
 
 func (m *ASTManager) registrationBefore(r astNodeRef) (bool, error) {
@@ -16,10 +12,10 @@ func (m *ASTManager) registrationBefore(r astNodeRef) (bool, error) {
 	if !contains && m.debugNondeterminism {
 		count := uint32(0)
 		for bucket := uint32(0); bucket < m.table.slots; bucket++ {
-			if m.table.cells[bucket].next == util.ChainFree {
+			if m.table.cells[bucket].next == astChainFree {
 				continue
 			}
-			for i := bucket; i != util.ChainEnd; i = m.table.cells[i].next {
+			for i := bucket; i != astChainEnd; i = m.table.cells[i].next {
 				curr := m.table.cells[i].node
 				equal, e := m.compareNodes(curr, r)
 				if e != nil {

@@ -312,6 +312,15 @@ real consumer and should use `fmt`, `io.Writer`, and ordinary string sets. The
 deleted formatter was a manual C `printf`/`va_list` simulation and must not be
 reintroduced.
 
+Two more actual table implementations have been removed. The concrete
+`Int32ChainTable`/`Int32ChainMap` port represented `chashtable`/`cmap`
+instantiations that exist only in the upstream C++ table tests, and it had no
+Go production consumer. `UintSetMap` also had no current Go consumer; its live
+upstream symbolic-automata use should become a Go map keyed by a canonical,
+comparable state-set representation when that consumer is ported. Neither
+source use needs bucket arrays, collision chains, tombstones, or custom table
+iterators in Go.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before

@@ -7,7 +7,6 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Concrete cmap<expr*, tagged expr*> specialization. Encoded link indices and
@@ -28,7 +27,7 @@ func activityTableBytes(n uint32) uint64 {
 }
 func activityCells(m *ASTManager, slots, cellar uint32) ([]astActivityCell, error) {
 	n := uint64(slots) + uint64(cellar)
-	if slots == 0 || slots&(slots-1) != 0 || cellar == 0 || n >= uint64(util.ChainEnd) || n > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(astActivityCell{}).Size()) {
+	if slots == 0 || slots&(slots-1) != 0 || cellar == 0 || n >= uint64(astChainEnd) || n > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(astActivityCell{}).Size()) {
 		return nil, arena.ErrBounds
 	}
 	if e := m.BudgetField.Reserve(activityTableBytes(uint32(n))); e != nil {
@@ -36,7 +35,7 @@ func activityCells(m *ASTManager, slots, cellar uint32) ([]astActivityCell, erro
 	}
 	cells := make([]astActivityCell, int(n))
 	for i := range cells {
-		cells[i].next = util.ChainFree
+		cells[i].next = astChainFree
 	}
 	return cells, nil
 }
@@ -45,29 +44,29 @@ func (t *astActivityTable) init(m *ASTManager) error {
 	if e != nil {
 		return e
 	}
-	*t = astActivityTable{cells: cells, slots: 8, next: 8, free: util.ChainEnd, collisions: t.collisions}
+	*t = astActivityTable{cells: cells, slots: 8, next: 8, free: astChainEnd, collisions: t.collisions}
 	return nil
 }
 func (t *astActivityTable) find(k ASTHandle, hash uint32) (uint32, bool) {
 	if t.slots == 0 {
-		return util.ChainEnd, false
+		return astChainEnd, false
 	}
 	i := hash & (t.slots - 1)
-	if t.cells[i].next == util.ChainFree {
-		return util.ChainEnd, false
+	if t.cells[i].next == astChainFree {
+		return astChainEnd, false
 	}
-	for ; i != util.ChainEnd; i = t.cells[i].next {
+	for ; i != astChainEnd; i = t.cells[i].next {
 		if t.cells[i].key == k {
 			return i, true
 		}
 		t.collisions++
 	}
-	return util.ChainEnd, false
+	return astChainEnd, false
 }
 func (t *astActivityTable) expand(m *ASTManager) error {
 	slots, cellar := uint64(t.slots)*2, uint64(len(t.cells)-int(t.slots))*2
 	for {
-		if slots >= uint64(util.ChainEnd) || cellar >= uint64(util.ChainEnd) {
+		if slots >= uint64(astChainEnd) || cellar >= uint64(astChainEnd) {
 			return arena.ErrBounds
 		}
 		cells, e := activityCells(m, uint32(slots), uint32(cellar))
@@ -78,14 +77,14 @@ func (t *astActivityTable) expand(m *ASTManager) error {
 		t.used = 0
 		fits := true
 		for b := uint32(0); b < t.slots && fits; b++ {
-			if t.cells[b].next == util.ChainFree {
+			if t.cells[b].next == astChainFree {
 				continue
 			}
-			for i := b; i != util.ChainEnd; i = t.cells[i].next {
+			for i := b; i != astChainEnd; i = t.cells[i].next {
 				idx := t.cells[i].hash & (uint32(slots) - 1)
-				if cells[idx].next == util.ChainFree {
+				if cells[idx].next == astChainFree {
 					cells[idx] = t.cells[i]
-					cells[idx].next = util.ChainEnd
+					cells[idx].next = astChainEnd
 					t.used++
 				} else {
 					if next == uint32(len(cells)) {
@@ -104,7 +103,7 @@ func (t *astActivityTable) expand(m *ASTManager) error {
 			t.cells = cells
 			t.slots = uint32(slots)
 			t.next = next
-			t.free = util.ChainEnd
+			t.free = astChainEnd
 			return nil
 		}
 		m.BudgetField.Release(activityTableBytes(uint32(len(cells))))
@@ -113,21 +112,21 @@ func (t *astActivityTable) expand(m *ASTManager) error {
 }
 func (t *astActivityTable) insertDummy(m *ASTManager, k ASTHandle, hash uint32) (uint32, error) {
 	// Source grows before checking whether this key is already present.
-	if t.free == util.ChainEnd && t.next == uint32(len(t.cells)) {
+	if t.free == astChainEnd && t.next == uint32(len(t.cells)) {
 		if e := t.expand(m); e != nil {
-			return util.ChainEnd, e
+			return astChainEnd, e
 		}
 	}
 	if i, found := t.find(k, hash); found {
 		return i, nil
 	}
 	idx := hash & (t.slots - 1)
-	entry := astActivityCell{key: k, hash: hash, next: util.ChainEnd, dummy: true}
-	if t.cells[idx].next == util.ChainFree {
+	entry := astActivityCell{key: k, hash: hash, next: astChainEnd, dummy: true}
+	if t.cells[idx].next == astChainFree {
 		t.used++
 	} else {
 		j := t.free
-		if j != util.ChainEnd {
+		if j != astChainEnd {
 			t.free = t.cells[j].next
 		} else {
 			j = t.next
@@ -142,18 +141,18 @@ func (t *astActivityTable) insertDummy(m *ASTManager, k ASTHandle, hash uint32) 
 }
 func (t *astActivityTable) erase(k ASTHandle, hash uint32) {
 	i := hash & (t.slots - 1)
-	if t.cells[i].next == util.ChainFree {
+	if t.cells[i].next == astChainFree {
 		return
 	}
-	prev := uint32(util.ChainEnd)
-	for i != util.ChainEnd {
+	prev := uint32(astChainEnd)
+	for i != astChainEnd {
 		c := t.cells[i]
 		if c.key == k {
 			t.size--
-			if prev == util.ChainEnd {
-				if c.next == util.ChainEnd {
+			if prev == astChainEnd {
+				if c.next == astChainEnd {
 					t.used--
-					t.cells[i].next = util.ChainFree
+					t.cells[i].next = astChainFree
 				} else {
 					t.cells[i] = t.cells[c.next]
 					t.cells[c.next].next = t.free
@@ -173,7 +172,7 @@ func (t *astActivityTable) erase(k ASTHandle, hash uint32) {
 }
 func (t *astActivityTable) release(m *ASTManager) {
 	m.BudgetField.Release(activityTableBytes(uint32(len(t.cells))))
-	*t = astActivityTable{free: util.ChainEnd, collisions: t.collisions}
+	*t = astActivityTable{free: astChainEnd, collisions: t.collisions}
 }
 
 // The cache is an owning cold object borrowing its AST manager. The queue is
@@ -448,10 +447,10 @@ func (c *ActivityCache) decRefs() error {
 		return e
 	}
 	for b := uint32(0); b < c.table.slots; b++ {
-		if c.table.cells[b].next == util.ChainFree {
+		if c.table.cells[b].next == astChainFree {
 			continue
 		}
-		for i := b; i != util.ChainEnd; i = c.table.cells[i].next {
+		for i := b; i != astChainEnd; i = c.table.cells[i].next {
 			if e := c.retire(&c.table.cells[i]); e != nil {
 				return e
 			}
