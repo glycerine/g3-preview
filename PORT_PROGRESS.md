@@ -30648,3 +30648,9 @@ Deleted StrHashtable, StrKey, CStringByteSource, RegionBytes, the Runtime/legacy
 Focused symbol, debug, trace, AST, SAT, polynomial, and SMT checks pass. Every package compiles, util/ast vet passes, the manifest validates, and the test-only CString-to-int specialization remains separately excluded based on the complete C++ liveness audit.
 
 The 00:44 UTC full native checkpoint found one stale AST allocation-count assertion: copying a byte slice into its owned Go string performs one Go allocation while preserving symbol identity and charged-budget state. After correcting that expectation, the complete AST package passes (30.034s); every other package in the full checkpoint passed, including util (143.798s) and polynomial (241.581s). No known failing check remains.
+
+### util dead header deletion: dlist.h and resource_limit.h
+
+A recursive liveness audit of the complete `src/` tree, including `src/test` and source generators, found no include or caller of `src/util/dlist.h` and no include or consumer of the classes declared by `src/util/resource_limit.h`. Subpaving's uses of the word “dlist” are comments, and the `resource_limit` class local to `src/smt/theory_lra.cpp` is unrelated and derives from `lp::lp_resource_limit`.
+
+The user deleted both headers from `pkg/util/cppsrc/util`. Their manifest status is now `dead_deleted`, distinct from a platform replacement or a completed port, and records the whole-tree evidence for the deletion. The existing Go resource-limit implementation remains historical work pending a separate Go-consumer audit; it does not make the deleted C++ header live.

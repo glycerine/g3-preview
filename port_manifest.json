@@ -115983,7 +115983,7 @@
       "path": "src/util/dlist.h",
       "component": "util",
       "role": "production",
-      "status": "platform_replacement",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -116039,7 +116039,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "All six operations are unused C++ templates over caller-supplied next/previous field accessors; no retained source file includes dlist.h. Per the no-generics rule, no Go list abstraction is created. A future concrete owner must update its typed next/previous pointers directly for add, delete, pop and insert-after, and use an ordinary Go loop for contains, length and invariant checks. The concrete owner remains responsible for the source null/detached/link-consistency preconditions."
+        "Dead and intentionally deleted from pkg/util/cppsrc/util. A recursive scan of the complete src tree, including src/test and source generators, found no include of dlist.h and no call to any dlist operation. The only other occurrences of the word dlist are prose comments in subpaving. No Go implementation is retained or required."
       ]
     },
     {
@@ -147548,7 +147548,7 @@
       "path": "src/util/resource_limit.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "dead_deleted",
       "go_targets": [
         "pkg/util/resource_limit.go",
         "pkg/util/resource_limit_test.go"
@@ -147647,7 +147647,8 @@
       ],
       "deviations": [
         "Source signed int is represented by int32. Reached signed counter/addition overflow and nonfinite/out-of-range double-to-int conversion are explicit guarded undefined domains, without publishing wrapped state.",
-        "Raw CString process addresses differ; null and present-empty descriptions remain distinct and NUL truncation preserves source spelling. Rejected increments return false directly; the source's optional TRACE-only diagnostic has no state or control-flow effect and is omitted instead of recreating a C++ global stream."
+        "Raw CString process addresses differ; null and present-empty descriptions remain distinct and NUL truncation preserves source spelling. Rejected increments return false directly; the source's optional TRACE-only diagnostic has no state or control-flow effect and is omitted instead of recreating a C++ global stream.",
+        "Dead and intentionally deleted from pkg/util/cppsrc/util. A recursive scan of the complete src tree, including src/test and source generators, found no include of resource_limit.h and no use of its base_resource_limit, li_resource_limit, or ei_resource_limit classes. The similarly named class local to src/smt/theory_lra.cpp is unrelated and derives from lp::lp_resource_limit. The existing Go files record the earlier port and are not evidence that this C++ source is live."
       ]
     },
     {
@@ -161420,5 +161421,5 @@
     }
   ],
   "baseline": "patched Z3 4.7.1.0",
-  "schema": 1
+  "schema": 2
 }

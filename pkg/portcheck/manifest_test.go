@@ -115,6 +115,17 @@ func TestMalformedLedger(t *testing.T) {
 	}
 }
 
+func TestDeadDeletedRequiresExplanation(t *testing.T) {
+	m := Manifest{Schema: SchemaVersion, Units: []Unit{{Path: "src/util/dead.h", Status: "dead_deleted"}}}
+	if Validate(m) == nil {
+		t.Fatal("dead/deleted unit without liveness evidence accepted")
+	}
+	m.Units[0].Deviations = []string{"No source file includes this header; it was intentionally deleted from the retained reference copy."}
+	if err := Validate(m); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestExecutableEvidence(t *testing.T) {
 	root := t.TempDir()
 	source(t, root, "api.go", "package example\nfunc One() {}\n")

@@ -74,6 +74,6 @@ func run(root, p string, generate bool) error {
 	for _, u := range m.Units {
 		statuses[u.Status]++
 	}
-	fmt.Printf("%d units, %d APIs: %d ported, %d partial, %d unported\n", len(m.Units), len(m.APIs), statuses["ported"], statuses["partial"], statuses["unported"])
+	fmt.Printf("%d units, %d APIs: %d ported, %d partial, %d unported, %d dead/deleted\n", len(m.Units), len(m.APIs), statuses["ported"], statuses["partial"], statuses["unported"], statuses["dead_deleted"])
 	return nil
 }

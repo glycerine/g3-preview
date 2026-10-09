@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-const SchemaVersion = 1
+const SchemaVersion = 2
 
 type Manifest struct {
 	Schema   int    `json:"schema"`
@@ -232,7 +232,7 @@ func validPath(p string) bool {
 	return p != "" && !strings.HasPrefix(p, "/") && path.Clean(p) == p && p != ".." && !strings.HasPrefix(p, "../") && !strings.Contains(p, "\\")
 }
 func validStatus(s string) bool {
-	return s == "unported" || s == "partial" || s == "ported" || s == "platform_replacement" || s == "reference_only"
+	return s == "unported" || s == "partial" || s == "ported" || s == "platform_replacement" || s == "reference_only" || s == "dead_deleted"
 }
 func Validate(m Manifest) error {
 	if m.Schema != SchemaVersion {
@@ -257,7 +257,7 @@ func Validate(m Manifest) error {
 				}
 			}
 		}
-		if (u.Status == "platform_replacement" || u.Status == "reference_only") && len(u.Deviations) == 0 {
+		if (u.Status == "platform_replacement" || u.Status == "reference_only" || u.Status == "dead_deleted") && len(u.Deviations) == 0 {
 			return fmt.Errorf("unexplained classification for %s", u.Path)
 		}
 		for _, p := range u.GoTargets {
