@@ -463,6 +463,13 @@ append/make, and no scratch growth consumes the numeric arena budget. Paged
 records, child handles, text payloads, and owned numerals retain their actual
 arena/resource lifetimes.
 
+The live parser `sexpr_ref_vector` specialization now owns a concrete Go slice
+of scalar handles. Logical size is the slice length; append, erase compaction,
+resize, reset, clone, and move use native storage. Reference increments/decrements
+and structural-borrow invalidation remain explicit. The copied vector growth
+helper, separate size field, and header/backing arena charges have been removed.
+Its remaining upstream consumer is `src/parsers/smt2/smt2parser.cpp`.
+
 ### Dissolution order
 
 1. Stop creating new `Runtime`, `Block`, custom vector, custom buffer, and

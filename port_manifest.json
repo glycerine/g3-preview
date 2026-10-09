@@ -138575,6 +138575,7 @@
         "TestSexprAccessorsAndScalarIterator",
         "TestSexprBVGoScratchAndNumeralLifetime",
         "TestSexprGoTraversalScratchUnderBudgetRefusal",
+        "TestSexprVectorNativeGrowthUnderBudgetRefusal",
         "TestSexprBVSourceWidthQuirks",
         "TestSexprConcreteRefAndVectorActions",
         "TestSexprConstructorAndWholePhysicalGraph",
@@ -142776,6 +142777,7 @@
         "TestSexprAccessorsAndScalarIterator",
         "TestSexprBVGoScratchAndNumeralLifetime",
         "TestSexprGoTraversalScratchUnderBudgetRefusal",
+        "TestSexprVectorNativeGrowthUnderBudgetRefusal",
         "TestSexprBVSourceWidthQuirks",
         "TestSexprConcreteRefAndVectorActions",
         "TestSexprConstructorAndWholePhysicalGraph",
@@ -145025,6 +145027,7 @@
         "TestSexprAccessorsAndScalarIterator",
         "TestSexprBVGoScratchAndNumeralLifetime",
         "TestSexprGoTraversalScratchUnderBudgetRefusal",
+        "TestSexprVectorNativeGrowthUnderBudgetRefusal",
         "TestSexprDebugBVInvariantAndShortCircuit",
         "TestSexprDebugBVComparisonFailureRoots"
       ],
@@ -145199,7 +145202,7 @@
         }
       ],
       "ownership": [
-        "Pointer-free paged records and scalar owned references/vector views; children Words and byte payloads pooled. Actual manager/vector headers and record directories/pages are charged. Output, staging, and traversal/deletion scratch use Go slices outside arena accounting. BV digit scratch uses reusable Go bytes outside arena accounting; temporary numeric values still receive explicit destruction. Immediate failed-prefix roots tested. See PORT_PROGRESS.md#audit-sexpr-port-status-md.",
+        "Pointer-free paged records and scalar owned references/vector views; children Words and byte payloads pooled. The manager header and record directories/pages are charged. Reference-vector headers and typed-slice backing use Go storage outside arena accounting. Output, staging, and traversal/deletion scratch use Go slices outside arena accounting. BV digit scratch uses reusable Go bytes outside arena accounting; temporary numeric values still receive explicit destruction. Immediate failed-prefix roots tested. See PORT_PROGRESS.md#audit-sexpr-port-status-md.",
         "Fractional BV display follows raw numerator Rem/IDiv in release and integrality assertion in debug; exact output prefixes remain #x1 versus #x before the existing boundaries. TestSexprBVSourceWidthQuirks retains all original finite width checks."
       ],
       "deviations": [
@@ -145232,6 +145235,7 @@
         "TestSexprAccessorsAndScalarIterator",
         "TestSexprBVGoScratchAndNumeralLifetime",
         "TestSexprGoTraversalScratchUnderBudgetRefusal",
+        "TestSexprVectorNativeGrowthUnderBudgetRefusal",
         "TestSexprDebugBVInvariantAndShortCircuit",
         "TestSexprDebugBVComparisonFailureRoots"
       ],
@@ -145370,7 +145374,7 @@
         }
       ],
       "ownership": [
-        "Pointer-free paged records and scalar owned references/vector views; children Words and byte payloads pooled. Actual manager/vector headers and record directories/pages are charged. Output, staging, and traversal/deletion scratch use Go slices outside arena accounting. BV digit scratch uses reusable Go bytes outside arena accounting; temporary numeric values still receive explicit destruction. Immediate failed-prefix roots tested. See PORT_PROGRESS.md#audit-sexpr-port-status-md."
+        "Pointer-free paged records and scalar owned references/vector views; children Words and byte payloads pooled. The manager header and record directories/pages are charged. Reference-vector headers and typed-slice backing use Go storage outside arena accounting. Output, staging, and traversal/deletion scratch use Go slices outside arena accounting. BV digit scratch uses reusable Go bytes outside arena accounting; temporary numeric values still receive explicit destruction. Immediate failed-prefix roots tested. See PORT_PROGRESS.md#audit-sexpr-port-status-md."
       ],
       "deviations": [
         "Source noncomposite display falls into an invalid composite cast; Go returns its defined printed prefix plus a typed continuation error. Empty composites still print only closing parenthesis. Checked scalar handles replace raw pointers and owner teardown cleans outstanding owned numerals. Ref-vector null callbacks are explicit no-op adapter; raw manager null calls reject. Nonempty self-append rejects source unbounded growth; allocation preflight avoids leaked reference increments. RC uint32 wrap preserved; generation/capacity limits checked. Compiler pragmas do not change Go semantic core."

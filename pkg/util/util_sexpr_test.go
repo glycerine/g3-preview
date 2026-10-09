@@ -288,8 +288,8 @@ func TestSexprStringBytesAndWrapperRemainingBranches(t *testing.T) {
 	v, e := m.NewRefVector()
 	sxMust(t, e)
 	sxMust(t, v.ResizeFill(4, c))
-	if v.Capacity() != 5 {
-		t.Fatal("source vector capacity", v.Capacity())
+	if v.Size() != 4 || v.Capacity() < v.Size() {
+		t.Fatal("native vector size/capacity", v.Size(), v.Capacity())
 	}
 	element, e := v.Element(0)
 	sxMust(t, e)
@@ -458,7 +458,7 @@ func TestSexprFailurePrefixesImmediateOwnership(t *testing.T) {
 				break
 			}
 		}
-		if !success || op != 3 && failures == 0 {
+		if !success || op < 3 && failures == 0 {
 			t.Fatal(op, success, failures)
 		}
 	}
@@ -795,5 +795,55 @@ func TestSexprGoTraversalScratchUnderBudgetRefusal(t *testing.T) {
 	if m.Stats().Live != 0 || len(m.deletion) != 0 {
 		t.Fatal("wide/deep deletion left live records or pending work", m.Stats())
 	}
+	budget.FailAfter(-1)
+}
+
+func TestSexprVectorNativeGrowthUnderBudgetRefusal(t *testing.T) {
+	budget := arena.NewBudget(1 << 24)
+	m, _, _ := sxOwner(t, budget)
+	h, e := m.MkString("retained", 0, 0)
+	sxMust(t, e)
+	sxMust(t, m.IncRef(h))
+	before := budget.Used()
+	budget.FailAfter(0)
+	v, e := m.NewRefVector()
+	sxMust(t, e)
+	sxMust(t, v.ResizeFill(64, h))
+	borrow, e := v.Element(0)
+	sxMust(t, e)
+	sxMust(t, v.PushBack(h))
+	if _, e = v.GetElement(borrow); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("structural growth retained an element borrow", e)
+	}
+	clone, e := v.Clone()
+	sxMust(t, e)
+	moved, e := clone.Move()
+	sxMust(t, e)
+	if !clone.Empty() || moved.Size() != 65 {
+		t.Fatal("move did not transfer owned handles", clone.Size(), moved.Size())
+	}
+	if refs, e := m.RefCount(h); e != nil || refs != 131 {
+		t.Fatal("copy/move reference counts", refs, e)
+	}
+	sxMust(t, v.Reset())
+	sxMust(t, v.Resize(3))
+	for i := uint32(0); i < v.Size(); i++ {
+		node, e := v.Get(i)
+		sxMust(t, e)
+		if !node.IsNull() {
+			t.Fatal("resizing after reset exposed a released handle", i)
+		}
+	}
+	sxMust(t, clone.Close())
+	sxMust(t, moved.Finalize())
+	sxMust(t, moved.Close())
+	sxMust(t, v.Close())
+	if refs, e := m.RefCount(h); e != nil || refs != 1 {
+		t.Fatal("vector cleanup did not return the caller reference", refs, e)
+	}
+	if budget.Used() != before {
+		t.Fatal("Go vector headers or backing charged the arena", budget.Used(), before)
+	}
+	sxMust(t, m.DecRef(h))
 	budget.FailAfter(-1)
 }

@@ -622,21 +622,6 @@ func (m *SexprManager) ChildrenInto(h SexprHandle, dst []SexprHandle) (uint32, e
 	return r.length, nil
 }
 
-// Cold scalar arrays use the source vector capacity progression (2,3,5,...).
-func sxCapacity(old, needed uint32) (uint32, error) {
-	c := old
-	if c == 0 {
-		c = 2
-	}
-	for c < needed {
-		next := (uint64(c)*3 + 1) >> 1
-		if next > math.MaxUint32 || next <= uint64(c) {
-			return 0, arena.ErrBounds
-		}
-		c = uint32(next)
-	}
-	return c, nil
-}
 func (m *SexprManager) put(n *uint32, v byte) error {
 	if *n == math.MaxUint32 {
 		return arena.ErrBounds
@@ -1182,13 +1167,13 @@ func (m *SexprManager) EqualRef(a, b *SexprRef) (bool, error) {
 
 // SexprRefVector adapts undefined source null callback dereferences to no-ops,
 // allowing reserve/resize null placeholders followed by Set. Manager raw null
-// callbacks remain typed errors. The backing store is concrete pointer-free.
+// callbacks remain typed errors. Owned handles use a native typed slice; its
+// Go storage is outside arena accounting.
 type SexprRefVector struct {
 	id      uint64
 	manager *SexprManager
 	self    *SexprRefVector
 	nodes   []SexprHandle
-	size    uint32
 	epoch   uint64
 	closed  bool
 }
@@ -1206,9 +1191,6 @@ func (m *SexprManager) NewRefVector() (*SexprRefVector, error) {
 	defer m.mu.Unlock()
 	if m.nextVector == math.MaxUint64 {
 		return nil, arena.ErrBounds
-	}
-	if e := m.Config.Budget.Reserve(uint64(reflect.TypeOf(SexprRefVector{}).Size())); e != nil {
-		return nil, e
 	}
 	m.nextVector++
 	id := m.nextVector
@@ -1235,37 +1217,16 @@ func (v *SexprRefVector) canBump() error {
 	}
 	return nil
 }
-func (v *SexprRefVector) capacity(needed uint32) error {
-	if uint64(needed) <= uint64(len(v.nodes)) {
-		return nil
-	}
-	c, e := sxCapacity(uint32(len(v.nodes)), needed)
-	if e != nil {
-		return e
-	}
-	charge, e := sxSize(uint64(c), reflect.TypeOf(SexprHandle{}).Size())
-	if e != nil {
-		return e
-	}
-	if e = v.manager.Config.Budget.Reserve(charge); e != nil {
-		return e
-	}
-	next := make([]SexprHandle, c)
-	copy(next, v.nodes)
-	v.manager.Config.Budget.Release(uint64(len(v.nodes)) * uint64(reflect.TypeOf(SexprHandle{}).Size()))
-	v.nodes = next
-	return nil
-}
-func (v *SexprRefVector) Size() uint32              { return v.size }
-func (v *SexprRefVector) Capacity() uint32          { return uint32(len(v.nodes)) }
-func (v *SexprRefVector) Empty() bool               { return v.size == 0 }
+func (v *SexprRefVector) Size() uint32              { return uint32(len(v.nodes)) }
+func (v *SexprRefVector) Capacity() uint32          { return uint32(cap(v.nodes)) }
+func (v *SexprRefVector) Empty() bool               { return v.Size() == 0 }
 func (v *SexprRefVector) GetManager() *SexprManager { return v.manager }
 func (v *SexprRefVector) Get(i uint32) (SexprHandle, error) {
 	if e := v.lock(); e != nil {
 		return SexprHandle{}, e
 	}
 	defer v.manager.mu.Unlock()
-	if i >= v.size {
+	if i >= v.Size() {
 		return SexprHandle{}, arena.ErrBounds
 	}
 	return v.nodes[i], nil
@@ -1275,16 +1236,16 @@ func (v *SexprRefVector) GetDefault(i uint32, d SexprHandle) (SexprHandle, error
 		return SexprHandle{}, e
 	}
 	defer v.manager.mu.Unlock()
-	if i >= v.size {
+	if i >= v.Size() {
 		return d, nil
 	}
 	return v.nodes[i], nil
 }
 func (v *SexprRefVector) Back() (SexprHandle, error) {
-	if v.size == 0 {
+	if v.Size() == 0 {
 		return SexprHandle{}, arena.ErrBounds
 	}
-	return v.Get(v.size - 1)
+	return v.Get(v.Size() - 1)
 }
 func (v *SexprRefVector) inc(h SexprHandle) error {
 	if h.IsNull() {
@@ -1299,7 +1260,7 @@ func (v *SexprRefVector) dec(h SexprHandle) error {
 	return v.manager.dec(h)
 }
 func (v *SexprRefVector) push(h SexprHandle) error {
-	if v.size == math.MaxUint32 {
+	if v.Size() == math.MaxUint32 {
 		return arena.ErrBounds
 	}
 	if e := v.canBump(); e != nil {
@@ -1310,14 +1271,10 @@ func (v *SexprRefVector) push(h SexprHandle) error {
 			return e
 		}
 	}
-	if e := v.capacity(v.size + 1); e != nil {
-		return e
-	}
 	if e := v.inc(h); e != nil {
 		return e
 	}
-	v.nodes[v.size] = h
-	v.size++
+	v.nodes = append(v.nodes, h)
 	v.epoch++
 	return nil
 }
@@ -1329,22 +1286,22 @@ func (v *SexprRefVector) PushBack(h SexprHandle) error {
 	return v.push(h)
 }
 func (v *SexprRefVector) shrink(size uint32) error {
-	if size > v.size {
+	if size > v.Size() {
 		return arena.ErrBounds
 	}
-	if size == v.size {
+	if size == v.Size() {
 		return nil
 	}
 	if e := v.canBump(); e != nil {
 		return e
 	}
-	for i := size; i < v.size; i++ {
+	for i := size; i < v.Size(); i++ {
 		if e := v.dec(v.nodes[i]); e != nil {
 			return e
 		}
 		v.nodes[i] = SexprHandle{}
 	}
-	v.size = size
+	v.nodes = v.nodes[:size]
 	v.epoch++
 	return nil
 }
@@ -1360,19 +1317,13 @@ func (v *SexprRefVector) Resize(size uint32) error {
 		return e
 	}
 	defer v.manager.mu.Unlock()
-	if size <= v.size {
+	if size <= v.Size() {
 		return v.shrink(size)
 	}
 	if e := v.canBump(); e != nil {
 		return e
 	}
-	if e := v.capacity(size); e != nil {
-		return e
-	}
-	for i := v.size; i < size; i++ {
-		v.nodes[i] = SexprHandle{}
-	}
-	v.size = size
+	v.nodes = append(v.nodes, make([]SexprHandle, int(size)-len(v.nodes))...)
 	v.epoch++
 	return nil
 }
@@ -1381,10 +1332,10 @@ func (v *SexprRefVector) ResizeFill(size uint32, h SexprHandle) error {
 		return e
 	}
 	defer v.manager.mu.Unlock()
-	if size <= v.size {
+	if size <= v.Size() {
 		return v.shrink(size)
 	}
-	for v.size < size {
+	for v.Size() < size {
 		if e := v.push(h); e != nil {
 			return e
 		}
@@ -1394,7 +1345,7 @@ func (v *SexprRefVector) ResizeFill(size uint32, h SexprHandle) error {
 
 // Source reserve changes size, rather than reserving capacity only.
 func (v *SexprRefVector) Reserve(size uint32) error {
-	if size <= v.size {
+	if size <= v.Size() {
 		return nil
 	}
 	return v.Resize(size)
@@ -1411,19 +1362,17 @@ func (v *SexprRefVector) Finalize() error {
 		return e
 	}
 	defer v.manager.mu.Unlock()
-	if len(v.nodes) == 0 {
+	if cap(v.nodes) == 0 {
 		return nil
 	}
 	if e := v.canBump(); e != nil {
 		return e
 	}
-	for i := uint32(0); i < v.size; i++ {
+	for i := uint32(0); i < v.Size(); i++ {
 		if e := v.dec(v.nodes[i]); e != nil {
 			return e
 		}
 	}
-	v.size = 0
-	v.manager.Config.Budget.Release(uint64(len(v.nodes)) * uint64(reflect.TypeOf(SexprHandle{}).Size()))
 	v.nodes = nil
 	v.epoch++
 	return nil
@@ -1434,20 +1383,21 @@ func (v *SexprRefVector) PopBack() error {
 		return e
 	}
 	defer v.manager.mu.Unlock()
-	if v.size == 0 {
+	if v.Size() == 0 {
 		return arena.ErrBounds
 	}
 	if e := v.canBump(); e != nil {
 		return e
 	}
-	v.size--
-	h := v.nodes[v.size]
-	v.nodes[v.size] = SexprHandle{}
+	last := len(v.nodes) - 1
+	h := v.nodes[last]
+	v.nodes[last] = SexprHandle{}
+	v.nodes = v.nodes[:last]
 	v.epoch++
 	return v.dec(h)
 }
 func (v *SexprRefVector) set(i uint32, h SexprHandle) error {
-	if i >= v.size {
+	if i >= v.Size() {
 		return arena.ErrBounds
 	}
 	if e := v.inc(h); e != nil {
@@ -1468,16 +1418,17 @@ func (v *SexprRefVector) Set(i uint32, h SexprHandle) error {
 	return v.set(i, h)
 }
 func (v *SexprRefVector) erase(i uint32) error {
-	if i >= v.size {
+	if i >= v.Size() {
 		return arena.ErrBounds
 	}
 	if e := v.canBump(); e != nil {
 		return e
 	}
 	h := v.nodes[i]
-	copy(v.nodes[i:v.size-1], v.nodes[i+1:v.size])
-	v.size--
-	v.nodes[v.size] = SexprHandle{}
+	copy(v.nodes[i:], v.nodes[i+1:])
+	last := len(v.nodes) - 1
+	v.nodes[last] = SexprHandle{}
+	v.nodes = v.nodes[:last]
 	v.epoch++
 	return v.dec(h)
 }
@@ -1493,7 +1444,7 @@ func (v *SexprRefVector) EraseHandle(h SexprHandle) error {
 		return e
 	}
 	defer v.manager.mu.Unlock()
-	for i := uint32(0); i < v.size; i++ {
+	for i := uint32(0); i < v.Size(); i++ {
 		if v.nodes[i] == h {
 			return v.erase(i)
 		}
@@ -1505,7 +1456,7 @@ func (v *SexprRefVector) Contains(h SexprHandle) (bool, error) {
 		return false, e
 	}
 	defer v.manager.mu.Unlock()
-	for i := uint32(0); i < v.size; i++ {
+	for i := uint32(0); i < v.Size(); i++ {
 		if v.nodes[i] == h {
 			return true, nil
 		}
@@ -1535,10 +1486,10 @@ func (v *SexprRefVector) AppendVector(other *SexprRefVector) error {
 	if other.closed {
 		return arena.ErrClosed
 	}
-	if other == v && v.size > 0 {
+	if other == v && v.Size() > 0 {
 		return arena.ErrBounds
 	}
-	for i := uint32(0); i < other.size; i++ {
+	for i := uint32(0); i < other.Size(); i++ {
 		if e := v.push(other.nodes[i]); e != nil {
 			return e
 		}
@@ -1550,7 +1501,7 @@ func (v *SexprRefVector) SwapIndices(a, b uint32) error {
 		return e
 	}
 	defer v.manager.mu.Unlock()
-	if a >= v.size || b >= v.size {
+	if a >= v.Size() || b >= v.Size() {
 		return arena.ErrBounds
 	}
 	v.nodes[a], v.nodes[b] = v.nodes[b], v.nodes[a]
@@ -1561,8 +1512,8 @@ func (v *SexprRefVector) Reverse() error {
 		return e
 	}
 	defer v.manager.mu.Unlock()
-	for i := uint32(0); i < v.size/2; i++ {
-		j := v.size - i - 1
+	for i := uint32(0); i < v.Size()/2; i++ {
+		j := v.Size() - i - 1
 		v.nodes[i], v.nodes[j] = v.nodes[j], v.nodes[i]
 	}
 	return nil
@@ -1622,7 +1573,6 @@ func (v *SexprRefVector) Swap(other *SexprRefVector) error {
 		return e
 	}
 	v.nodes, other.nodes = other.nodes, v.nodes
-	v.size, other.size = other.size, v.size
 	v.epoch++
 	other.epoch++
 	return nil
@@ -1632,18 +1582,18 @@ func (v *SexprRefVector) CopyInto(dst []SexprHandle) (uint32, error) {
 		return 0, e
 	}
 	defer v.manager.mu.Unlock()
-	if uint64(len(dst)) < uint64(v.size) {
-		return v.size, arena.ErrBounds
+	if uint64(len(dst)) < uint64(v.Size()) {
+		return v.Size(), arena.ErrBounds
 	}
-	copy(dst, v.nodes[:v.size])
-	return v.size, nil
+	copy(dst, v.nodes[:v.Size()])
+	return v.Size(), nil
 }
 func (v *SexprRefVector) Element(i uint32) (SexprVectorElement, error) {
 	if e := v.lock(); e != nil {
 		return SexprVectorElement{}, e
 	}
 	defer v.manager.mu.Unlock()
-	if i >= v.size {
+	if i >= v.Size() {
 		return SexprVectorElement{}, arena.ErrBounds
 	}
 	return SexprVectorElement{vectorID: v.id, owner: v.manager.owner, epoch: v.epoch, index: i}, nil
@@ -1653,7 +1603,7 @@ func (v *SexprRefVector) GetElement(e SexprVectorElement) (SexprHandle, error) {
 		return SexprHandle{}, err
 	}
 	defer v.manager.mu.Unlock()
-	if e.owner != v.manager.owner || e.vectorID != v.id || e.epoch != v.epoch || e.index >= v.size {
+	if e.owner != v.manager.owner || e.vectorID != v.id || e.epoch != v.epoch || e.index >= v.Size() {
 		return SexprHandle{}, arena.ErrInvalidSlot
 	}
 	return v.nodes[e.index], nil
@@ -1663,7 +1613,7 @@ func (v *SexprRefVector) SetElement(e SexprVectorElement, h SexprHandle) error {
 		return err
 	}
 	defer v.manager.mu.Unlock()
-	if e.owner != v.manager.owner || e.vectorID != v.id || e.epoch != v.epoch || e.index >= v.size {
+	if e.owner != v.manager.owner || e.vectorID != v.id || e.epoch != v.epoch || e.index >= v.Size() {
 		return arena.ErrInvalidSlot
 	}
 	return v.set(e.index, h)
@@ -1693,15 +1643,13 @@ func (v *SexprRefVector) Close() error {
 		return nil
 	}
 	if !m.closed {
-		for i := uint32(0); i < v.size; i++ {
+		for i := uint32(0); i < v.Size(); i++ {
 			if e := v.dec(v.nodes[i]); e != nil {
 				return e
 			}
 		}
 	}
-	m.Config.Budget.Release(uint64(reflect.TypeOf(SexprRefVector{}).Size()) + uint64(len(v.nodes))*uint64(reflect.TypeOf(SexprHandle{}).Size()))
 	v.nodes = nil
-	v.size = 0
 	v.closed = true
 	return nil
 }
@@ -1744,14 +1692,14 @@ func (v *SexprRefVector) Begin() (SexprVectorIterator, error) {
 }
 func (v *SexprRefVector) End() (SexprVectorIterator, error) {
 	i, e := v.Begin()
-	i.index = v.size
+	i.index = v.Size()
 	return i, e
 }
 func (v *SexprRefVector) iterator(i SexprVectorIterator) error {
 	if i.owner != v.manager.owner || i.vectorID != v.id || i.epoch != v.epoch {
 		return arena.ErrInvalidSlot
 	}
-	if i.index > v.size {
+	if i.index > v.Size() {
 		return arena.ErrBounds
 	}
 	return nil
@@ -1764,7 +1712,7 @@ func (v *SexprRefVector) IteratorGet(i SexprVectorIterator) (SexprHandle, error)
 	if e := v.iterator(i); e != nil {
 		return SexprHandle{}, e
 	}
-	if i.index == v.size {
+	if i.index == v.Size() {
 		return SexprHandle{}, arena.ErrBounds
 	}
 	return v.nodes[i.index], nil
@@ -1777,7 +1725,7 @@ func (v *SexprRefVector) IteratorNext(i SexprVectorIterator) (SexprVectorIterato
 	if e := v.iterator(i); e != nil {
 		return SexprVectorIterator{}, e
 	}
-	if i.index == v.size {
+	if i.index == v.Size() {
 		return SexprVectorIterator{}, arena.ErrBounds
 	}
 	i.index++
