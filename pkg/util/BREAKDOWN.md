@@ -357,6 +357,10 @@ in explicit memory accounting. Global-parameter diagnostics now compose text
 with `strings.Builder` and checked symbol display instead of the translated C++
 string-buffer owner.
 
+`ParamsContext` formatting retains an ordinary Go byte slice for reuse. Growing
+that slice no longer reserves arena budget or creates injectable failures, and
+its capacity is no longer reported as arena-owned memory.
+
 The live parameter-descriptor dictionary now uses
 `insdict.Dict[Symbol, paramDescrInfo]`. Copy traversal follows stable insertion
 order, while display continues to sort names explicitly for canonical output.

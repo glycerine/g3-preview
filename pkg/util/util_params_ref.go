@@ -1053,12 +1053,8 @@ func (c *ParamsContext) reserveFormat(extra int) error {
 		}
 		n *= 2
 	}
-	if e := c.BudgetField.Reserve(uint64(n)); e != nil {
-		return e
-	}
 	next := make([]byte, len(c.workspace), n)
 	copy(next, c.workspace)
-	c.BudgetField.Release(uint64(cap(c.workspace)))
 	c.workspace = next
 	return nil
 }
@@ -1090,7 +1086,7 @@ func (c *ParamsContext) appendText(w *arena.Words, r arena.VectorRef, n uint32) 
 	return nil
 }
 
-// appendEntryText copies actual bytes into the charged format workspace,
+// appendEntryText copies actual bytes into the reusable Go format workspace,
 // directly from either owned Words or the borrowed symbol's real backing.
 func (c *ParamsContext) appendEntryText(x *paramEntry) error {
 	if x.text.borrowed {
@@ -1487,7 +1483,6 @@ func (c *ParamsContext) Stats() ParamsStats {
 	s.SourceSetBytes = paramsSetFrameBytes(cap(c.SetFrames))
 	s.ReplacementBytes = paramsReplacementFrameBytes(cap(c.replacementFrames))
 	s.DirectoryBytes = paramsDirectoryBytes(cap(c.pages))
-	s.FormatBytes = uint64(cap(c.workspace))
 	s.Text = c.Texts.Stats()
 	for _, p := range c.pages {
 		s.PageBytes += paramsPageBytes(p)
@@ -1547,7 +1542,7 @@ func (c *ParamsContext) Close() error {
 	for _, p := range c.pages {
 		c.BudgetField.Release(paramsPageBytes(p))
 	}
-	c.BudgetField.Release(paramsDirectoryBytes(cap(c.pages)) + paramsBlockBytes(cap(c.Blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)) + paramsSourceFrameBytes(cap(c.SourceFrames)) + paramsSetFrameBytes(cap(c.SetFrames)) + paramsReplacementFrameBytes(cap(c.replacementFrames)) + uint64(cap(c.workspace)) + c.headerBytes)
+	c.BudgetField.Release(paramsDirectoryBytes(cap(c.pages)) + paramsBlockBytes(cap(c.Blocks)) + paramsReceiptBytes(cap(c.decrementReceipts)) + paramsSourceFrameBytes(cap(c.SourceFrames)) + paramsSetFrameBytes(cap(c.SetFrames)) + paramsReplacementFrameBytes(cap(c.replacementFrames)) + c.headerBytes)
 	c.Blocks = nil
 	c.decrementReceipts = nil
 	c.SourceFrames = nil

@@ -682,7 +682,6 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 				paramsMust(t, c.SetBool(&a, unknown, true))
 			}
 			dst := []byte(strings.Repeat("z", 8192))
-			before := string(dst)
 			c.BudgetField.FailAfter(prefix)
 			switch op {
 			case 0:
@@ -726,9 +725,6 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 			injected := numericStorageReservationRefusal(e)
 			if injected {
 				failures++
-				if op == 5 && string(dst) != before {
-					t.Fatal("failed formatting published")
-				}
 			} else {
 				if op == 6 {
 					if e == nil {
@@ -759,7 +755,8 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 				break
 			}
 		}
-		if !completed || failures == 0 {
+		goOnly := op == 5 || op == 6
+		if !completed || goOnly && failures != 0 || !goOnly && failures == 0 {
 			t.Fatal("incomplete failure sweep", op, completed, failures)
 		}
 	}

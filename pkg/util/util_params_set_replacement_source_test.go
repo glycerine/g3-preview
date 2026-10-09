@@ -288,7 +288,7 @@ func TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops(t *testing.T) 
 				case "owned-string", "borrowed-string":
 					numericAuditPhysical(t, m, extras)
 					paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
-					bc.FailAfter(-1) // Caller-owned Go string extraction has its own charged workspace.
+					bc.FailAfter(-1)
 					value, present, e := c.GetString(&v, k, nil)
 					paramsMust(t, e)
 					want := text
