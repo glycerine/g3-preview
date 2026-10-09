@@ -73,7 +73,7 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 					r := &s.monomials[id-gcdMonomialBase]
 					e = r.drop(c, &r.value, &r.decrementStarted, true)
 				case id == gcdVariablesId:
-					e = s.vars.closePhase(true, false)
+					s.vars = nil
 				case id == gcdSparseId:
 					e = s.sparse.CloseChecked()
 				case id == gcdZPId:
@@ -168,9 +168,7 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 		if e := s.zp.cleanup(); e != nil {
 			return e
 		}
-		if e := s.vars.close(true); e != nil {
-			return e
-		}
+		s.vars = nil
 		for j := range s.powers {
 			s.powers[j] = nil
 		}

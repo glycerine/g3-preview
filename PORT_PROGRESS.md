@@ -31312,3 +31312,27 @@ The hourly full native module checkpoint remains 19:07–19:12 UTC; no additiona
 whole-module run or broad checked sweep was needed for this feature conversion.
 Manifest counts remain 2102 units / 677 APIs, with 63 ported, 284 partial,
 1727 unported and two dead/deleted.
+
+## Native ICCP unsigned scratch and GCD variables
+
+Deleted both C++ unsigned-buffer emulations. ICCP counters/first-occurrence
+powers and modular-GCD variable order now use `[]uint32`; recursion borrows the
+variable slice directly. Removed their Runtime roots, allocation/initialized
+metadata, pending cleanup and buffer destructor failure branches. Existing scope
+order and actual numeral/reference cleanup remain.
+
+High-degree independent content/primitive regressions cover former buffer
+boundaries and repeated cleanup. Existing dense/sparse recursive GCD and field
+checks use native borrowed variables. The stale ICCP receipt test now reaches a
+real large-coefficient numeral allocation refusal and checks an active replacement
+invocation; slice contents are included in its unchanged-state assertion. Old
+standalone buffer topology/refusal tests are retired. No whole-unit completion
+claim is added.
+
+Validation: full native polynomial (36.93s), focused native GCD/ICCP/manager
+checks (3.16s), final checked/debug feature checks, module-wide test compilation,
+polynomial vet and portcheck passed. The active replacement-receipt assertion
+also passed in checked mode. The full native module checkpoint remains
+19:07–19:12 UTC; no additional whole-module or broad checked sweep was run.
+Manifest counts remain 2102 units / 677 APIs: 63 ported, 284 partial,
+1727 unported and two dead/deleted.

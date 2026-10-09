@@ -10,8 +10,8 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// One concrete lexical invocation, including the two actual sbuffer<unsigned,
-// 128> objects and the ci reference constructed only after the integer content.
+// One concrete lexical invocation, with native unsigned scratch and the ci
+// reference constructed only after the integer content.
 // The cold Go directory is an owning adapter, not a source allocation ticket.
 type polynomialICCPScope struct {
 	coefficient        polynomialCoefficientInvocationReceipt
@@ -25,7 +25,7 @@ type polynomialICCPScope struct {
 	gcdInvocation                   polynomialGCDInvocationReceipt
 	contentInvocation               polynomialContentInvocationReceipt
 	parent, child                   *polynomialICCPScope
-	filter, powers                  polynomialContentUnsignedBuffer
+	filter, powers                  []uint32
 	ci                              polynomialReference
 	active, ciConstructed, topOwner bool
 	generation                      uint64
@@ -97,20 +97,14 @@ func (m *MultivariatePolynomialManager) iccpSourceEnd(s *polynomialICCPScope) er
 		s.cursor = 1
 	}
 	if s.cursor == 1 {
-		if e := s.powers.close(false); e != nil {
-			s.cleanupCause = e
-			return e
-		}
+		s.powers = nil
 		s.cursor = 2
 	}
 	if s.cursor == 2 {
-		if e := s.filter.close(false); e != nil {
-			s.cleanupCause = e
-			return e
-		}
+		s.filter = nil
 		s.cursor = 3
 	}
-	if s.filter.pending == (util.Block{}) && s.powers.pending == (util.Block{}) && !s.ci.assigning && !(s.topOwner && c.pscPending()) && !c.matchesContentInvocation(&s.contentInvocation) && !m.iccpConcreteChildrenPending(s) {
+	if !s.ci.assigning && !(s.topOwner && c.pscPending()) && !c.matchesContentInvocation(&s.contentInvocation) && !m.iccpConcreteChildrenPending(s) {
 		s.retireICCPInvocation()
 	}
 	return nil
@@ -228,18 +222,9 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		*receipt = polynomialICCPInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
 	}
 	m.iccpDepth++
-	s.filter.construct(core.memory)
-	s.powers.construct(core.memory)
 	defer func() { m.iccpDepth--; core.pscLeave(); s.bodyCause = err; err = errors.Join(err, m.iccpSourceEnd(s)) }()
-	if e = s.filter.resize(d+1, 0); e != nil {
-		return e
-	}
-	s.powers.reset()
-	for j := uint32(0); j <= d; j++ {
-		if e = s.filter.set(j, 0); e != nil {
-			return e
-		}
-	}
+	s.filter = make([]uint32, d+1)
+	s.powers = s.powers[:0]
 	size, e := core.readWord(p, 8)
 	if e != nil {
 		return e
@@ -253,14 +238,9 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		if e != nil {
 			return e
 		}
-		count, e := s.filter.get(k)
-		if e != nil {
-			return e
-		}
+		count := s.filter[k]
 		if count == 0 {
-			if e = s.powers.push(k); e != nil {
-				return e
-			}
+			s.powers = append(s.powers, k)
 		}
 		sz, e := core.monomials.sizeCore(term)
 		if e != nil {
@@ -271,45 +251,28 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 			expected = 1
 		}
 		// Source rereads the counter in ++ / += after the reached size read.
-		count, e = s.filter.get(k)
-		if e != nil {
-			return e
-		}
+		count = s.filter[k]
 		if sz == expected {
 			count++
 		} else {
 			count += 2
 		}
-		if e = s.filter.set(k, count); e != nil {
-			return e
-		}
+		s.filter[k] = count
 	}
-	if polynomialSourceDebug && s.powers.count == 0 {
+	if polynomialSourceDebug && uint32(len(s.powers)) == 0 {
 		return ErrPolynomialAssertion
 	}
-	number := s.powers.count
+	number := uint32(len(s.powers))
 	for j := uint32(0); j < number; j++ {
-		k, e := s.powers.get(j)
-		if e != nil {
-			return e
-		}
+		k := s.powers[j]
 		if polynomialSourceDebug {
-			count, e := s.filter.get(k)
-			if e != nil {
-				return e
-			}
+			count := s.filter[k]
 			if count == 0 {
 				return ErrPolynomialAssertion
 			}
 		}
-		k, e = s.powers.get(j)
-		if e != nil {
-			return e
-		}
-		count, e := s.filter.get(k)
-		if e != nil {
-			return e
-		}
+		k = s.powers[j]
+		count := s.filter[k]
 		if count == 1 {
 			if e = core.integerContentWithReceipt(p, i, pp, &s.contentInvocation); e != nil {
 				return e
@@ -321,10 +284,7 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		return e
 	}
 	s.ciConstructed = true
-	k, e := s.powers.get(0)
-	if e != nil {
-		return e
-	}
+	k := s.powers[0]
 	q, e := core.coeffCoreWithReceipts(pp.value, x, k, nil, &s.coefficient, &s.coefficientAppend, &s.coefficientFactory)
 	if e != nil {
 		return e
@@ -333,10 +293,7 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		return e
 	}
 	for j := uint32(1); j < number; j++ {
-		k, e := s.powers.get(j)
-		if e != nil {
-			return e
-		}
+		k := s.powers[j]
 		q, e := core.coeffCoreWithReceipts(pp.value, x, k, nil, &s.coefficient, &s.coefficientAppend, &s.coefficientFactory)
 		if e != nil {
 			return e
@@ -424,12 +381,8 @@ func (m *MultivariatePolynomialManager) cleanupICCPScopes(scopes []*polynomialIC
 					return e
 				}
 			}
-			if e := s.powers.closePhase(true, false); e != nil {
-				return e
-			}
-			if e := s.filter.closePhase(true, false); e != nil {
-				return e
-			}
+			s.powers = nil
+			s.filter = nil
 		}
 		return nil
 	}
@@ -452,12 +405,8 @@ func (m *MultivariatePolynomialManager) cleanupICCPScopes(scopes []*polynomialIC
 		if e := s.ci.abort(c); e != nil {
 			return e
 		}
-		if e := s.powers.close(true); e != nil {
-			return e
-		}
-		if e := s.filter.close(true); e != nil {
-			return e
-		}
+		s.powers = nil
+		s.filter = nil
 	}
 	for _, s := range scopes {
 		if s.active && s.topOwner && s.generation != 0 && s.generation == c.pscReceipts.generation {

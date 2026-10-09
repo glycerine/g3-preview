@@ -47,20 +47,20 @@ func TestPolynomialGCDRecursiveBigFieldEveryReservationPrefix(t *testing.T) {
 			serviceMust(t, full.newton.SetOwner(c))
 			serviceMust(t, full.skeletons.Push(nil))
 			serviceMust(t, full.skeletons.Push(nil))
-			vars := polynomialGCDVariableBuffer{}
-			vars.construct(c.memory)
-			serviceMust(t, vars.push(0))
-			serviceMust(t, vars.push(1))
+			var vars []uint32
+
+			vars = append(vars, 0)
+			vars = append(vars, 1)
 			r, e := NewPolynomialRef(c)
 			serviceMust(t, e)
 			t.Cleanup(func() {
 				z.Budget().FailAfter(-1)
 				serviceMust(t, full.CleanupGCD())
-				serviceMust(t, vars.close(true))
+				vars = nil
 				serviceMust(t, r.Close())
 			})
 			z.Budget().FailAfter(ordinal)
-			cause := full.modGCDRec(p, q, 11, 0, &vars, &r.root)
+			cause := full.modGCDRec(p, q, 11, 0, vars, &r.root)
 			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{common, a, b, p, q, r.root.value}, []*util.Int{&prime, &as[0]}, r.header)
 			z.Budget().FailAfter(-1)
 			if cause != nil {

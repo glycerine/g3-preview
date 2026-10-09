@@ -3,11 +3,13 @@ package polynomial
 
 import (
 	"errors"
+
+	"github.com/glycerine/g3/pkg/arena"
 )
 
-func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32, vars *polynomialGCDVariableBuffer, r *polynomialReference) (err error) {
+func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32, vars []uint32, r *polynomialReference) (err error) {
 	c := m.core
-	numVars := vars.count
+	numVars := uint32(len(vars))
 	if polynomialSourceDebug && numVars == 0 {
 		return ErrPolynomialAssertion
 	}
@@ -30,10 +32,13 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 		}
 		return m.gcdEuclid(u, v, r)
 	}
-	x, e := vars.get(idx)
-	if e != nil {
-		return e
+	if uint64(idx) >= uint64(len(vars)) {
+		if polynomialSourceDebug {
+			return ErrPolynomialAssertion
+		}
+		return arena.ErrBounds
 	}
+	x := vars[idx]
 	s, e := m.beginGCDFunction()
 	if e != nil {
 		return e

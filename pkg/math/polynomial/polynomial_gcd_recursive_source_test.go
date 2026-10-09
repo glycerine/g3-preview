@@ -10,18 +10,18 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestPolynomialGCDRecursiveLastVariableUsesEuclidWithoutReadingVariable(t *testing.T) {
+func TestPolynomialGCDRecursiveTerminalEuclidIgnoresVariableValue(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	serviceMust(t, c.modular.SetZPUint64(11))
-	// The last-variable branch reads size and idx, not vars[idx]. Preserve the
-	// actual unavailable variable payload rather than substituting a host slice.
-	vars := polynomialGCDVariableBuffer{count: 1, constructed: true, runtime: c.memory}
+	// The terminal branch depends only on the variable count. A deliberately
+	// invalid variable value must not affect its Euclidean result.
+	vars := []uint32{^uint32(0)}
 	p := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, nil})
 	r, e := NewPolynomialRef(c)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, r.Close()) })
-	serviceMust(t, full.modGCDRec(c.zero, p, 11, 0, &vars, &r.root))
+	serviceMust(t, full.modGCDRec(c.zero, p, 11, 0, vars, &r.root))
 	same, e := c.Equal(r.root.value, p)
 	serviceMust(t, e)
 	if !same {
@@ -57,11 +57,11 @@ func TestPolynomialGCDRecursiveDenseIndependentCommonFactor(t *testing.T) {
 	serviceMust(t, full.newton.SetOwner(c))
 	serviceMust(t, full.skeletons.Push(nil))
 	serviceMust(t, full.skeletons.Push(nil))
-	var vars polynomialGCDVariableBuffer
-	vars.construct(c.memory)
-	serviceMust(t, vars.push(0))
-	serviceMust(t, vars.push(1))
-	serviceMust(t, full.modGCDRec(u, v, 11, 0, &vars, &r.root))
+	var vars []uint32
+
+	vars = append(vars, 0)
+	vars = append(vars, 1)
+	serviceMust(t, full.modGCDRec(u, v, 11, 0, vars, &r.root))
 	same, e := c.Equal(r.root.value, factor)
 	serviceMust(t, e)
 	if !same {
@@ -100,17 +100,17 @@ func TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor(t *testing.T
 	serviceMust(t, full.newton.SetOwner(c))
 	serviceMust(t, full.skeletons.Push(nil))
 	serviceMust(t, full.skeletons.Push(nil))
-	var vars polynomialGCDVariableBuffer
-	vars.construct(c.memory)
-	serviceMust(t, vars.push(0))
-	serviceMust(t, vars.push(1))
-	serviceMust(t, full.modGCDRec(u, v, 11, 0, &vars, &r.root))
+	var vars []uint32
+
+	vars = append(vars, 0)
+	vars = append(vars, 1)
+	serviceMust(t, full.modGCDRec(u, v, 11, 0, vars, &r.root))
 	saved, e := full.skeletons.Get(0)
 	serviceMust(t, e)
 	if saved == nil {
 		t.Fatal("source did not publish learned skeleton")
 	}
-	serviceMust(t, full.modGCDRec(u, v, 11, 0, &vars, &r.root))
+	serviceMust(t, full.modGCDRec(u, v, 11, 0, vars, &r.root))
 	same, e := c.Equal(r.root.value, factor)
 	serviceMust(t, e)
 	if !same {
@@ -146,11 +146,11 @@ func TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind(t *
 	serviceMust(t, full.newton.SetOwner(c))
 	serviceMust(t, full.skeletons.Push(nil))
 	serviceMust(t, full.skeletons.Push(nil))
-	var vars polynomialGCDVariableBuffer
-	vars.construct(c.memory)
-	serviceMust(t, vars.push(0))
-	serviceMust(t, vars.push(1))
-	serviceMust(t, full.modGCDRec(u, v, 11, 0, &vars, &r.root))
+	var vars []uint32
+
+	vars = append(vars, 0)
+	vars = append(vars, 1)
+	serviceMust(t, full.modGCDRec(u, v, 11, 0, vars, &r.root))
 	saved, e := full.skeletons.Get(0)
 	serviceMust(t, e)
 	if saved == nil {
@@ -168,7 +168,7 @@ func TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind(t *
 	newV, e := c.Mul(square, right)
 	serviceMust(t, e)
 	serviceMust(t, vr.root.assign(c, newV))
-	body := full.modGCDRec(newU, newV, 11, 0, &vars, &r.root)
+	body := full.modGCDRec(newU, newV, 11, 0, vars, &r.root)
 	var failed *polynomialSparseMGCDException
 	if !errors.As(body, &failed) {
 		t.Fatal("actual saved sparse skeleton mismatch did not throw source exception", body)
@@ -213,11 +213,11 @@ func TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop(t *testing.
 	serviceMust(t, full.newton.SetOwner(c))
 	serviceMust(t, full.skeletons.Push(nil))
 	serviceMust(t, full.skeletons.Push(nil))
-	var vars polynomialGCDVariableBuffer
-	vars.construct(c.memory)
-	serviceMust(t, vars.push(0))
-	serviceMust(t, vars.push(1))
-	serviceMust(t, full.modGCDRec(u, v, 11, 0, &vars, &r.root))
+	var vars []uint32
+
+	vars = append(vars, 0)
+	vars = append(vars, 1)
+	serviceMust(t, full.modGCDRec(u, v, 11, 0, vars, &r.root))
 	saved, e := full.skeletons.Get(0)
 	serviceMust(t, e)
 	if saved == nil {
@@ -288,7 +288,7 @@ func TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop(t *testing.
 		}
 		return true
 	}
-	body := full.modGCDRec(newU, newV, 11, 0, &vars, &r.root)
+	body := full.modGCDRec(newU, newV, 11, 0, vars, &r.root)
 	full.gcdDepth--
 	c.pscLeave()
 	outerLeft = true
@@ -350,11 +350,11 @@ func TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind(t *tes
 	serviceMust(t, full.newton.SetOwner(c))
 	serviceMust(t, full.skeletons.Push(nil))
 	serviceMust(t, full.skeletons.Push(nil))
-	var vars polynomialGCDVariableBuffer
-	vars.construct(c.memory)
-	serviceMust(t, vars.push(0))
-	serviceMust(t, vars.push(1))
-	serviceMust(t, full.modGCDRec(u, v, 11, 0, &vars, &r.root))
+	var vars []uint32
+
+	vars = append(vars, 0)
+	vars = append(vars, 1)
+	serviceMust(t, full.modGCDRec(u, v, 11, 0, vars, &r.root))
 	saved, e := full.skeletons.Get(0)
 	serviceMust(t, e)
 	if saved == nil {
@@ -378,7 +378,7 @@ func TestPolynomialGCDRecursiveRepeatedSparsePointThrowsAfterActualUnwind(t *tes
 		}
 	}
 	clibrand.Srand(2)
-	body := full.modGCDRec(u, v, 11, 0, &vars, &r.root)
+	body := full.modGCDRec(u, v, 11, 0, vars, &r.root)
 	var failed *polynomialSparseMGCDException
 	if !errors.As(body, &failed) {
 		t.Fatal("literal repeated-point sparse exception absent", body)

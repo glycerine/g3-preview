@@ -4,6 +4,7 @@ package polynomial
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
@@ -24,20 +25,36 @@ func TestPolynomialICCPInvocationReceiptRejectsReusedFrame(t *testing.T) {
 	if old.frame == nil || old.invocation == 0 {
 		t.Fatal("actual guarded invocation missing")
 	}
+	// A large coefficient reaches a real numeral allocation. Native filter
+	// growth no longer supplies a synthetic failure for the stale receipt test.
+	var big util.Int
+	words := make([]uint32, 500)
+	words[0], words[499] = 1, 1
+	serviceMust(t, c.integer.SetLimbs(&big, words))
+	t.Cleanup(func() { c.integer.Budget().FailAfter(-1); serviceMust(t, c.integer.Del(&big)) })
+	first, e := c.TermMonomial(p, 0)
+	serviceMust(t, e)
+	second, e := c.TermMonomial(p, 1)
+	serviceMust(t, e)
+	large, e := c.MkTerms([]util.Int{big, util.NewInt(4)}, []Monomial{first, second})
+	serviceMust(t, e)
+	polynomialCaller(t, c, large)
 	c.integer.Budget().FailAfter(0)
-	e := m.iccpPartsWithReceipt(p, 0, &i, &content, &pp, &current)
-	if !numericPhysicalReservationRefusal(e) || current.frame != old.frame || current.invocation == old.invocation {
+	e = m.iccpPartsWithReceipt(large, 0, &i, &content, &pp, &current)
+	if !numericPhysicalReservationRefusal(e) || current.frame != old.frame || current.invocation == old.invocation || !m.matchesICCPInvocation(&current) {
 		t.Fatal("actual second guarded invocation", e, old, current)
 	}
-	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p}, []*util.Int{&i}, 0)
+	polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, large}, []*util.Int{&i, &big}, 0)
 	state := *current.frame
+	state.filter = append([]uint32(nil), state.filter...)
+	state.powers = append([]uint32(nil), state.powers...)
 	used := c.integer.Budget().Used()
 	serviceMust(t, m.cleanupICCPInvocation(&old, false))
 	serviceMust(t, m.cleanupICCPInvocation(&old, true))
 	foreign := current
 	foreign.manager = &MultivariatePolynomialManager{}
 	serviceMust(t, m.cleanupICCPInvocation(&foreign, true))
-	if *current.frame != state || c.integer.Budget().Used() != used {
+	if !reflect.DeepEqual(*current.frame, state) || c.integer.Budget().Used() != used {
 		t.Fatal("stale or foreign receipt consumed replacement")
 	}
 	c.integer.Budget().FailAfter(-1)

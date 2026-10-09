@@ -77,3 +77,46 @@ func TestPolynomialGeneralGCDIndependentCommonContent(t *testing.T) {
 	}
 	serviceMust(t, r.Close())
 }
+
+// Exercise a coefficient filter beyond both former inline capacities. Expected
+// content and primitive parts are independently constructed polynomials.
+func TestPolynomialICCPNativeHighDegreeFilters(t *testing.T) {
+	for _, degree := range []uint32{33, 129, 257} {
+		full := polynomialPSCFullFixture(t)
+		c := full.core
+		for i := 0; i < 2; i++ {
+			_, e := c.monomials.MkVar()
+			serviceMust(t, e)
+		}
+		p := polynomialQueryTerms(t, c, []int32{2, 4}, [][]MonomialPower{{{0, degree}, {1, 1}}, {{0, 3}, {1, 1}}})
+		wantContent := polynomialQueryTerms(t, c, []int32{1}, [][]MonomialPower{{{1, 1}}})
+		wantPrimitive := polynomialQueryTerms(t, c, []int32{1, 2}, [][]MonomialPower{{{0, degree}}, {{0, 3}}})
+		var integer util.Int
+		var content, primitive polynomialReference
+		for repeat := 0; repeat < 2; repeat++ {
+			serviceMust(t, full.iccpParts(p, 0, &integer, &content, &primitive))
+			if integer != util.NewInt(2) {
+				t.Fatal("integer content", degree, integer)
+			}
+			same, e := c.Equal(content.value, wantContent)
+			serviceMust(t, e)
+			if !same {
+				t.Fatal("coefficient content", degree)
+			}
+			same, e = c.Equal(primitive.value, wantPrimitive)
+			serviceMust(t, e)
+			if !same {
+				t.Fatal("primitive part", degree)
+			}
+			for _, s := range full.iccpFrames {
+				if s.active || s.filter != nil || s.powers != nil {
+					t.Fatal("completed ICCP scratch retained", degree, s.active, len(s.filter), len(s.powers))
+				}
+			}
+			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, wantContent, wantPrimitive, content.value, primitive.value}, []*util.Int{&integer}, 0)
+			serviceMust(t, content.close(c))
+			serviceMust(t, primitive.close(c))
+			serviceMust(t, c.integer.Del(&integer))
+		}
+	}
+}

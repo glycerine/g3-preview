@@ -51,7 +51,7 @@ type polynomialGCDFunctionScope struct {
 	numeric                 polynomialNumericRoots
 	bodyCause, cleanupCause error
 	zp                      polynomialScopedSetZP
-	vars                    polynomialGCDVariableBuffer
+	vars                    []uint32
 	sparse                  PolynomialSparseInterpolator
 	monomialBuffer          polynomialGCDMonomialBuffer
 	newSkeleton             *PolynomialSkeleton
@@ -239,7 +239,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 			r := &s.monomials[id-gcdMonomialBase]
 			e = r.drop(m.core, &r.value, &r.decrementStarted, false)
 		case id == gcdVariablesId:
-			e = s.vars.close(false)
+			s.vars = nil
 		case id == gcdSparseId:
 			e = s.sparse.SourceFinalize()
 		case id == gcdZPId:
@@ -260,7 +260,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	if frontier != 0 {
 		return nil
 	}
-	pending := (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.vars.pending.OwnerID() != 0 || (s.sparse.self != nil && !s.sparse.closed && (s.sparse.inputs.pending.OwnerID() != 0 || s.sparse.outputs.pending.OwnerID() != 0)) || s.topOwner && m.core.pscPending()
+	pending := (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || (s.sparse.self != nil && !s.sparse.closed && (s.sparse.inputs.pending.OwnerID() != 0 || s.sparse.outputs.pending.OwnerID() != 0)) || s.topOwner && m.core.pscPending()
 	pending = pending || m.matchesNormalizeInvocation(&s.normalizeInvocation)
 	pending = pending || (m.matchesDerivativeInvocation(&s.derivativeInvocation) || m.derivativeInvocationHasOrphans(&s.derivativeInvocation)) || m.core.matchesExactDivInvocation(&s.divisionInvocation) || m.core.dividesInvocationPending(&s.dividesInvocation)
 	pending = pending || m.quadraticPending(s) || m.core.matchesPowerInvocation(&s.resultantPower) || m.core.matchesPseudoInvocation(&s.resultantPseudo) || m.core.matchesArithmeticInvocation(&s.resultantArithmetic) || m.resultantConcreteChildrenPending(s)

@@ -1300,3 +1300,33 @@ The hourly full native module checkpoint remains 19:07–19:12 UTC; no additiona
 whole-module run or broad checked sweep was needed for this feature conversion.
 Manifest counts remain 2102 units / 677 APIs, with 63 ported, 284 partial,
 1727 unported and two dead/deleted.
+
+## Native ICCP unsigned scratch and modular-GCD variables
+
+ICCP's coefficient counters and first-occurrence degree list now use plain
+`[]uint32`, as does the degree-sorted variable list borrowed by modular-GCD
+recursion. `polynomial_content_buffer.go` and
+`polynomial_gcd_variable_buffer.go` are deleted. Their inline/spill storage,
+expansion copies, initialized masks, pending Runtime blocks and destructor
+failure states no longer exist. Source/owning scope cleanup clears native
+slices at the existing boundaries; actual numeral/reference children still
+control whether older cleanup may proceed.
+
+New independent content/primitive tests exercise degrees 33, 129 and 257 and
+repeat the operation to check release of the native scratch. Recursive dense,
+sparse, field and source-stop tests use borrowed Go slices. A deliberately
+invalid terminal variable value leaves the Euclidean base-case result unchanged.
+The stale ICCP receipt test now triggers a real large-coefficient numeral
+allocation failure and requires an active replacement invocation, rather than
+relying on eliminated filter growth. Its state comparison includes slice data.
+
+The monomial reference buffer and remaining polynomial vectors still require
+native storage conversions. This chunk adds no replacement container package.
+
+Validation: full native polynomial (36.93s), focused native GCD/ICCP/manager
+checks (3.16s), final checked/debug feature checks, module-wide test compilation,
+polynomial vet and portcheck passed. The active replacement-receipt assertion
+also passed in checked mode. The full native module checkpoint remains
+19:07–19:12 UTC; no additional whole-module or broad checked sweep was run.
+Manifest counts remain 2102 units / 677 APIs: 63 ported, 284 partial,
+1727 unported and two dead/deleted.

@@ -131,7 +131,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		for i := range f.refs {
 			references = append(references, &f.refs[i])
 		}
-		external = append(external, f.vars.raw, f.vars.pending, f.monomialBuffer.raw, f.monomialBuffer.pending)
+		external = append(external, f.monomialBuffer.raw, f.monomialBuffer.pending)
 	}
 	adapterBytes += uint64(cap(full.iccpFrames)) * uint64(reflect.TypeOf((*polynomialICCPScope)(nil)).Size())
 	for _, f := range full.iccpFrames {
@@ -348,7 +348,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		if !f.active {
 			continue
 		}
-		external = append(external, f.filter.raw, f.filter.pending, f.powers.raw, f.powers.pending)
 		addPolynomial(f.ci.value)
 		addPolynomial(f.ci.incoming)
 	}

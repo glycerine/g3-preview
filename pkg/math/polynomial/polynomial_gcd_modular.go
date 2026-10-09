@@ -50,7 +50,7 @@ func (m *MultivariatePolynomialManager) modularGCDImage(s *polynomialGCDFunction
 	if size != old {
 		return true, nil
 	}
-	if e = m.modGCDRec(s.refs[2].root.value, s.refs[3].root.value, prime, 0, &s.vars, &s.refs[5].root); e != nil {
+	if e = m.modGCDRec(s.refs[2].root.value, s.refs[3].root.value, prime, 0, s.vars, &s.refs[5].root); e != nil {
 		return false, e
 	}
 	q, e := m.GlexMonic(s.refs[5].root.value)
@@ -99,7 +99,7 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 	if e != nil {
 		return e
 	}
-	s.vars.construct(c.memory)
+	s.vars = nil
 	s.stack[s.depth] = gcdVariablesId
 	s.depth++
 	s.constructPowers(0)
@@ -151,9 +151,7 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 		if e != nil {
 			return e
 		}
-		if e = s.vars.push(x); e != nil {
-			return e
-		}
+		s.vars = append(s.vars, x)
 		if e = m.skeletons.Push(nil); e != nil {
 			return e
 		}
