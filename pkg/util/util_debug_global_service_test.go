@@ -321,10 +321,6 @@ func debugGlobalProcessAudit(t *testing.T, p *MemoryProcess, service *DebugGloba
 	n += c.Debug.ownerBytes
 	n += debugTagColdBytes(c.Debug)
 	n += c.Trace.ownerBytes
-	if c.Trace.tags != nil {
-		s := c.Trace.tags.Stats()
-		n += s.OwnerBytes + s.TableBytes + s.DirectoryBytes
-	}
 	regions := map[uintptr]bool{}
 	for _, region := range []*arena.BytesRegion{c.Debug.region, c.Trace.region} {
 		id := reflect.ValueOf(region).Pointer()
