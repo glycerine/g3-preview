@@ -11,14 +11,7 @@ import (
 // for explicit owning abort. The missing m_upm is not synthesized here.
 func (m *MultivariatePolynomialCore) unwindConstructorMembers() error {
 	m.constructorUnwinding = true
-	if m.tmp1.completed && !m.tmp1SourceConsumed {
-		if m.tmp1.raw != (util.Block{}) {
-			if e := m.memory.Deallocate(&m.tmp1.raw); e != nil {
-				return e
-			}
-		}
-		m.tmp1SourceConsumed = true
-	}
+	m.tmp1 = monomialTemp{}
 	if m.constructorUnwindStage == 0 {
 		if m.idsInitialized {
 			m.idsSourceDestroyed = true

@@ -31847,3 +31847,36 @@ and portcheck passed. Counts unchanged. The full native module checkpoint at
 The full knot/split goal remains open. Continue auditing retained container
 consumers, including remaining monomial scratch/table storage and SAT collections,
 then resolve internal util numeric/text/parameter seams before the package split.
+
+## Native monomial scratch and variable counting
+
+The four monomial-manager temporaries, borrowed temporary records and imp tmp1
+now use concrete []MonomialPower storage. MkFromVariables counts into another
+native power slice and sorts caller variables with Go sort.Slice. Removed the
+inline128 buffers, byte/header codecs, capacity/growth bookkeeping, pending and
+copied buffers, container-only allocation/free failures and handwritten sorting.
+The project's cached interning hash remains; actual monomial object allocation,
+refcounts, table publication and stopped owning destruction remain unchanged.
+
+Native scratch writes grow the active slice. A partial product fixture still
+checks the source-reached missing object degree and the completed power prefix;
+reading beyond that prefix now reports native bounds. Nine obsolete tests of
+removed container allocation/growth/release behavior are retired. Physical audits
+exclude native scratch capacity and continue enumerating actual object/table
+resources. Constructor and reverse-member cleanup simply release scalar slices.
+
+New independent tests cover every manager scratch and a borrowed record through
+sizes 0/1/128/129/4097/33, shrink/regrowth zeroing, input independence, bounds and
+cleanup with Runtime reservations disabled. Variable counting sorts and interns
+129 distinct variables with independently calculated multiplicities, checks every
+power and canonical object identity, and succeeds cold and warm with unchanged
+Runtime accounting. Existing project hash/operation identities remain covered.
+
+Validation: full native polynomial passed (37.033s), focused g3debug monomial,
+constructor, borrowed temporary and substitution checks passed (0.084s), module
+compilation and polynomial vet passed. Manifest retains partial status; the full
+native module checkpoint at 21:43–21:45 UTC remains current.
+
+The util knot/split goal remains open. Remaining work includes polynomial's
+monomial interning/rename tables and rename-found vector, SAT collections, and
+internal util numeric/text/parameter dependency seams before the package split.

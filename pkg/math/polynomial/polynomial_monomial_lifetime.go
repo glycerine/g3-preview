@@ -11,15 +11,8 @@ import (
 // Constructor unwind invokes only destructors of completed members. A failed
 // raw allocation or body-created pointer remains an explicitly retained owner.
 func (m *MonomialManager) constructorUnwind() error {
-	for m.completedTemps > 0 {
-		i := m.completedTemps - 1
-		t := &m.temps[i]
-		if t.raw != (util.Block{}) {
-			if e := m.memory.Deallocate(&t.raw); e != nil {
-				return e
-			}
-		}
-		m.completedTemps--
+	for i := range m.temps {
+		m.temps[i] = monomialTemp{}
 	}
 	if m.idsInitialized {
 		m.ids.Cleanup(0)
@@ -96,22 +89,10 @@ func (m *MonomialManager) SourceFinalize() error {
 		m.sourceStage++
 	}
 	for m.sourceStage >= 4 && m.sourceStage < 8 {
-		idx := 7 - m.sourceStage
-		t := &m.temps[idx]
-		if !t.destroyConsumed {
-			if t.raw == (util.Block{}) {
-				return ErrMonomialPending
-			}
-			e := m.memory.Deallocate(&t.raw)
-			if t.raw == (util.Block{}) {
-				t.destroyConsumed = true
-			}
-			if e != nil {
-				return e
-			}
-		}
+		m.temps[7-m.sourceStage] = monomialTemp{}
 		m.sourceStage++
 	}
+
 	if m.sourceStage == 8 {
 		if m.idsInitialized {
 			m.ids.Cleanup(0)

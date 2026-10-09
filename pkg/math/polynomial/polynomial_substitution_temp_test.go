@@ -3,8 +3,6 @@ package polynomial
 
 import (
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialBorrowedTemporaryActualFactoryIdentity(t *testing.T) {
@@ -14,7 +12,6 @@ func TestPolynomialBorrowedTemporaryActualFactoryIdentity(t *testing.T) {
 		serviceMust(t, e)
 	}
 	var tmp monomialTemp
-	serviceMust(t, m.tempConstruct(&tmp))
 	t.Cleanup(func() { serviceMust(t, m.tempCleanup(&tmp)) })
 	serviceMust(t, m.tempSetSize(&tmp, 2))
 	serviceMust(t, m.tempSetPower(&tmp, 0, MonomialPower{0, 3}))
@@ -44,7 +41,7 @@ func TestPolynomialBorrowedTemporaryActualFactoryIdentity(t *testing.T) {
 	if other != a || outcome.created {
 		t.Fatal("source intern existing branch", other, outcome)
 	}
-	monomialPhysicalAudit(t, m, tmp.raw)
+	monomialPhysicalAudit(t, m)
 }
 func TestPolynomialBorrowedTemporaryStoppedInsertionLifetime(t *testing.T) {
 	success := false
@@ -53,13 +50,12 @@ func TestPolynomialBorrowedTemporaryStoppedInsertionLifetime(t *testing.T) {
 		_, e := m.MkVar()
 		serviceMust(t, e)
 		var tmp monomialTemp
-		serviceMust(t, m.tempConstruct(&tmp))
 		serviceMust(t, m.tempSetSize(&tmp, 1))
 		serviceMust(t, m.tempSetPower(&tmp, 0, MonomialPower{0, 27}))
 		m.config.Budget.FailAfter(fault)
 		outcome := monomialFactoryOutcome{}
 		a, e := m.internBorrowedTempCreated(&tmp, &outcome)
-		monomialPhysicalAudit(t, m, tmp.raw)
+		monomialPhysicalAudit(t, m)
 		if e != nil {
 			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal(fault, e)
@@ -87,7 +83,7 @@ func TestPolynomialBorrowedTemporaryStoppedInsertionLifetime(t *testing.T) {
 			t.Fatal("explicit callee abort releases borrowed identity")
 		}
 		serviceMust(t, m.tempCleanup(&tmp))
-		if tmp.raw != (util.Block{}) {
+		if tmp.powers != nil {
 			t.Fatal("temporary source owner cleanup")
 		}
 	}

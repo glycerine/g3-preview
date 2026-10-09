@@ -36070,7 +36070,8 @@
         "pkg/math/polynomial/polynomial_to_polynomial_created.go",
         "pkg/math/polynomial/polynomial_imp_binding.go",
         "pkg/math/polynomial/polynomial_som_monomials.go",
-        "pkg/math/polynomial/polynomial_numeral_slice_test.go"
+        "pkg/math/polynomial/polynomial_numeral_slice_test.go",
+        "pkg/math/polynomial/polynomial_monomial_slice_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -36089,8 +36090,6 @@
         "TestMonomialSourceVariableSortPowerAndDerivative",
         "TestMonomialDormantSourceManagerIdentityAndConversion",
         "TestMonomialActualConstructorFailureUnwind",
-        "TestMonomialTmpSourceFreeBeforeGrowFailure",
-        "TestMonomialTmpExactCapacitySourceAssertion",
         "TestMonomialSourceRefcountAndExponentWidth",
         "TestMonomialSourceDisplayParenthesisQuirks",
         "TestMonomialSourceRenameAndSearch",
@@ -36101,14 +36100,12 @@
         "TestMonomialSourceInternFailurePrefixesAndRetry",
         "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
         "TestMonomialSourceRetainedPhysicalPowerAccess",
-        "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
         "TestMonomialSourceRawPowerArrayProduct",
         "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
         "TestMonomialSourceRepeatedRenameFreshLexicalTable",
         "TestMonomialScalarQueriesStopAtOwnerLifetime",
         "TestMonomialOwningCloseAfterUnitIDRefusal",
         "TestMonomialSourceMaxSmallerNullAssertion",
-        "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
         "TestMonomialSourceSingletonValidityDoesNotReadPower",
         "TestMonomialSourceDegreeSumDoesNotReadVariable",
         "TestMonomialSourceValidityFieldShortCircuit",
@@ -36225,8 +36222,6 @@
         "TestPolynomialModDBigCoefficientEveryActualRefusal",
         "TestPolynomialModDConstantWithNativeMapCopy",
         "TestPolynomialMemberPreparationBeforeBody",
-        "TestPolynomialRuntimeTempDefaultAndFailure",
-        "TestPolynomialRuntimeTempReachedPlacementGuard",
         "TestPolynomialSkeletonSourceGroupsAndLifetime",
         "TestPolynomialSkeletonConstructorEveryReservation",
         "TestPolynomialSkeletonSourceDisplay",
@@ -36293,11 +36288,8 @@
         "TestPolynomialImpBorrowedAllocatorConstructorHierarchy",
         "TestPolynomialImpSourceDestructorSeparateOwningClose",
         "TestPolynomialImpConstructorEveryReservationUnwindsMembersOnly",
-        "TestPolynomialImpActualTmpReplacementHoleStopsSourceDestruction",
         "TestPolynomialImpAllocatorAndDefaultConstructorEveryReservation",
-        "TestPolynomialImpSourceTmpPostPhysicalStopRemainsSticky",
         "TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction",
-        "TestPolynomialImpChildMonomialStopPrecedesReverseMembers",
         "TestPolynomialImpUPStoppedLeafPreservesParentSuffix",
         "TestPolynomialTranslateIndependentMultivariableIdentity",
         "TestPolynomialTranslateArraySourceAssignment",
@@ -36892,7 +36884,9 @@
         "TestPolynomialPSCBufferNativeGrowthAndReuse",
         "TestPolynomialPSCBufferNativeStoppedReferenceCleanup",
         "TestPolynomialNativeNumeralGrowthResetAndBounds",
-        "TestPolynomialNativeNumeralResetRetainsActualBIG"
+        "TestPolynomialNativeNumeralResetRetainsActualBIG",
+        "TestMonomialNativeScratchGrowthResetAndBounds",
+        "TestMonomialNativeVariableCountingAndInterning"
       ],
       "conditionals": [
         {
@@ -38180,7 +38174,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
@@ -38189,8 +38183,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38201,21 +38193,21 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -38224,8 +38216,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38236,21 +38226,21 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -38259,8 +38249,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38271,17 +38259,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38294,8 +38282,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38306,17 +38292,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38329,8 +38315,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38341,17 +38325,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38364,8 +38348,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38376,17 +38358,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38399,8 +38381,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38411,17 +38391,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38434,8 +38414,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38446,18 +38424,18 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
-            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38470,8 +38448,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38482,18 +38458,18 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
-            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38506,8 +38482,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38518,17 +38492,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38541,8 +38515,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38553,17 +38525,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38576,8 +38548,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38588,17 +38558,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38611,8 +38581,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38623,17 +38591,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38646,8 +38614,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38658,17 +38624,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38681,8 +38647,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38693,18 +38657,18 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
-            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -38717,8 +38681,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -38729,17 +38691,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -39125,9 +39087,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
-            "TestPolynomialMemberPreparationBeforeBody",
-            "TestPolynomialRuntimeTempDefaultAndFailure",
-            "TestPolynomialRuntimeTempReachedPlacementGuard"
+            "TestPolynomialMemberPreparationBeforeBody"
           ]
         },
         {
@@ -39281,11 +39241,8 @@
             "TestPolynomialImpBorrowedAllocatorConstructorHierarchy",
             "TestPolynomialImpSourceDestructorSeparateOwningClose",
             "TestPolynomialImpConstructorEveryReservationUnwindsMembersOnly",
-            "TestPolynomialImpActualTmpReplacementHoleStopsSourceDestruction",
             "TestPolynomialImpAllocatorAndDefaultConstructorEveryReservation",
-            "TestPolynomialImpSourceTmpPostPhysicalStopRemainsSticky",
             "TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction",
-            "TestPolynomialImpChildMonomialStopPrecedesReverseMembers",
             "TestPolynomialImpUPStoppedLeafPreservesParentSuffix"
           ]
         },
@@ -39298,11 +39255,8 @@
             "TestPolynomialImpBorrowedAllocatorConstructorHierarchy",
             "TestPolynomialImpSourceDestructorSeparateOwningClose",
             "TestPolynomialImpConstructorEveryReservationUnwindsMembersOnly",
-            "TestPolynomialImpActualTmpReplacementHoleStopsSourceDestruction",
             "TestPolynomialImpAllocatorAndDefaultConstructorEveryReservation",
-            "TestPolynomialImpSourceTmpPostPhysicalStopRemainsSticky",
             "TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction",
-            "TestPolynomialImpChildMonomialStopPrecedesReverseMembers",
             "TestPolynomialImpUPStoppedLeafPreservesParentSuffix"
           ]
         },
@@ -40919,7 +40873,8 @@
         "SOM monomial columns now use concrete native []Monomial storage, with native retired-reference lists for standalone implicit source destruction. Removed pointer-vector byte codecs, Runtime growth/pending/free failures and charged retired-monomial capacity. Actual INC/DEC, position writes, append-cohort ownership and stopped reference destruction remain. Source class finalization captures actual remaining reference roots before releasing the slice; owning cleanup consumes those roots. Go sort.Slice applies the original descending graded-lex comparator in place of a handwritten STL sorting backend. With native push, no live allocation remains between position Set and marker release: removed that vector-failure marker transport and its obsolete tests, plus pending-INC tests requiring a failed pointer push. Actual numeral/field/factory refusal tests remain; cold factory fixtures now retain real caller-owned cells to force an actual location reserve, or request a genuinely allocating direct factory extent. Failed BIG assertion-copy tests retain captured-parent/NULL-release history even when source destruction already consumed the failed acquisition. Native span snapshots and complete physical audits exclude monomial slice capacity. No whole-unit completion credit is added.",
         "A 129-term independently permuted pure-power fixture sorts native monomial handles with Runtime reservations disabled, checks every descending degree, then completes source coefficient/map movement and validates every paired coefficient. Implicit source finalization retains all actual reference roots until owning cleanup. The naked zero-reference borrowed-product test requiring refusal before native pointer push is retired: native append now completes INC ownership before the still-live numeral allocation can fail, so its eventual DEC legitimately destroys that zero-reference original. Actual square-root final-factory TLS proof now primes the real lane with a named caller allocation and includes it in physical audits, rather than relying on eliminated vector allocation traffic.",
         "Polynomial PSC H reference storage now uses a concrete []Polynomial slice. Removed inline16 capacity emulation, Runtime payload growth/free, scalar-handle codecs, copied/pending/sourceRaw state and the unjoined INC whose only failure point was container publication. Actual INC-before-append and ascending DEC remain; a stopped real destructor retains its exact row and drain state until explicit owning cleanup. Native growth/reuse through 4097 rows succeeds with Runtime reservations disabled; an independent 129-row last-reference deletion fixture stops at row17 and verifies source retry refusal, exact owning continuation and no duplicate callback. Existing PSC mathematical identities, cancellation, actual numeric/factory refusal campaigns, lexical unwind and foreign-invocation guards remain. Three container-topology/failure tests are retired. No whole-unit completion credit is added.",
-        "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added."
+        "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added.",
+        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added."
       ]
     },
     {
@@ -41191,7 +41146,8 @@
         "pkg/math/polynomial/polynomial_to_polynomial_created.go",
         "pkg/math/polynomial/polynomial_imp_binding.go",
         "pkg/math/polynomial/polynomial_som_monomials.go",
-        "pkg/math/polynomial/polynomial_numeral_slice_test.go"
+        "pkg/math/polynomial/polynomial_numeral_slice_test.go",
+        "pkg/math/polynomial/polynomial_monomial_slice_test.go"
       ],
       "tests": [
         "TestMonomialOrderSourceLexAssertions",
@@ -41210,8 +41166,6 @@
         "TestMonomialSourceVariableSortPowerAndDerivative",
         "TestMonomialDormantSourceManagerIdentityAndConversion",
         "TestMonomialActualConstructorFailureUnwind",
-        "TestMonomialTmpSourceFreeBeforeGrowFailure",
-        "TestMonomialTmpExactCapacitySourceAssertion",
         "TestMonomialSourceRefcountAndExponentWidth",
         "TestMonomialSourceDisplayParenthesisQuirks",
         "TestMonomialSourceRenameAndSearch",
@@ -41222,14 +41176,12 @@
         "TestMonomialSourceInternFailurePrefixesAndRetry",
         "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
         "TestMonomialSourceRetainedPhysicalPowerAccess",
-        "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
         "TestMonomialSourceRawPowerArrayProduct",
         "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
         "TestMonomialSourceRepeatedRenameFreshLexicalTable",
         "TestMonomialScalarQueriesStopAtOwnerLifetime",
         "TestMonomialOwningCloseAfterUnitIDRefusal",
         "TestMonomialSourceMaxSmallerNullAssertion",
-        "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
         "TestMonomialSourceSingletonValidityDoesNotReadPower",
         "TestMonomialSourceDegreeSumDoesNotReadVariable",
         "TestMonomialSourceValidityFieldShortCircuit",
@@ -41346,8 +41298,6 @@
         "TestPolynomialModDBigCoefficientEveryActualRefusal",
         "TestPolynomialModDConstantWithNativeMapCopy",
         "TestPolynomialMemberPreparationBeforeBody",
-        "TestPolynomialRuntimeTempDefaultAndFailure",
-        "TestPolynomialRuntimeTempReachedPlacementGuard",
         "TestPolynomialSkeletonSourceGroupsAndLifetime",
         "TestPolynomialSkeletonConstructorEveryReservation",
         "TestPolynomialSkeletonSourceDisplay",
@@ -41398,11 +41348,8 @@
         "TestPolynomialImpBorrowedAllocatorConstructorHierarchy",
         "TestPolynomialImpSourceDestructorSeparateOwningClose",
         "TestPolynomialImpConstructorEveryReservationUnwindsMembersOnly",
-        "TestPolynomialImpActualTmpReplacementHoleStopsSourceDestruction",
         "TestPolynomialImpAllocatorAndDefaultConstructorEveryReservation",
-        "TestPolynomialImpSourceTmpPostPhysicalStopRemainsSticky",
         "TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction",
-        "TestPolynomialImpChildMonomialStopPrecedesReverseMembers",
         "TestPolynomialImpUPStoppedLeafPreservesParentSuffix",
         "TestPolynomialTranslateIndependentMultivariableIdentity",
         "TestPolynomialTranslateArraySourceAssignment",
@@ -41753,7 +41700,9 @@
         "TestPolynomialPSCBufferNativeGrowthAndReuse",
         "TestPolynomialPSCBufferNativeStoppedReferenceCleanup",
         "TestPolynomialNativeNumeralGrowthResetAndBounds",
-        "TestPolynomialNativeNumeralResetRetainsActualBIG"
+        "TestPolynomialNativeNumeralResetRetainsActualBIG",
+        "TestMonomialNativeScratchGrowthResetAndBounds",
+        "TestMonomialNativeVariableCountingAndInterning"
       ],
       "conditionals": [
         {
@@ -41813,7 +41762,7 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
@@ -41822,8 +41771,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -41834,21 +41781,21 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -41857,8 +41804,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -41869,21 +41814,21 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: Reached raw validity/degree reads follow source; private power record translated to actual two uint32 words.",
+          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -41892,8 +41837,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -41904,17 +41847,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -41927,8 +41870,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -41939,17 +41880,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -41962,8 +41903,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -41974,17 +41913,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -41997,8 +41936,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42009,17 +41946,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42032,8 +41969,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42044,17 +41979,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42067,8 +42002,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42079,18 +42012,18 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
-            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42103,8 +42036,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42115,18 +42046,18 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
-            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42139,8 +42070,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42151,17 +42080,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42174,8 +42103,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42186,17 +42113,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42209,8 +42136,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42221,17 +42146,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42244,8 +42169,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42256,17 +42179,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42279,8 +42202,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42291,17 +42212,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42314,8 +42235,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42326,18 +42245,18 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
-            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42350,8 +42269,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -42362,17 +42279,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -42758,9 +42675,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
-            "TestPolynomialMemberPreparationBeforeBody",
-            "TestPolynomialRuntimeTempDefaultAndFailure",
-            "TestPolynomialRuntimeTempReachedPlacementGuard"
+            "TestPolynomialMemberPreparationBeforeBody"
           ]
         },
         {
@@ -42857,11 +42772,8 @@
             "TestPolynomialImpBorrowedAllocatorConstructorHierarchy",
             "TestPolynomialImpSourceDestructorSeparateOwningClose",
             "TestPolynomialImpConstructorEveryReservationUnwindsMembersOnly",
-            "TestPolynomialImpActualTmpReplacementHoleStopsSourceDestruction",
             "TestPolynomialImpAllocatorAndDefaultConstructorEveryReservation",
-            "TestPolynomialImpSourceTmpPostPhysicalStopRemainsSticky",
             "TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction",
-            "TestPolynomialImpChildMonomialStopPrecedesReverseMembers",
             "TestPolynomialImpUPStoppedLeafPreservesParentSuffix"
           ]
         },
@@ -42874,11 +42786,8 @@
             "TestPolynomialImpBorrowedAllocatorConstructorHierarchy",
             "TestPolynomialImpSourceDestructorSeparateOwningClose",
             "TestPolynomialImpConstructorEveryReservationUnwindsMembersOnly",
-            "TestPolynomialImpActualTmpReplacementHoleStopsSourceDestruction",
             "TestPolynomialImpAllocatorAndDefaultConstructorEveryReservation",
-            "TestPolynomialImpSourceTmpPostPhysicalStopRemainsSticky",
             "TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction",
-            "TestPolynomialImpChildMonomialStopPrecedesReverseMembers",
             "TestPolynomialImpUPStoppedLeafPreservesParentSuffix"
           ]
         },
@@ -43514,7 +43423,8 @@
         "SOM monomial columns now use concrete native []Monomial storage, with native retired-reference lists for standalone implicit source destruction. Removed pointer-vector byte codecs, Runtime growth/pending/free failures and charged retired-monomial capacity. Actual INC/DEC, position writes, append-cohort ownership and stopped reference destruction remain. Source class finalization captures actual remaining reference roots before releasing the slice; owning cleanup consumes those roots. Go sort.Slice applies the original descending graded-lex comparator in place of a handwritten STL sorting backend. With native push, no live allocation remains between position Set and marker release: removed that vector-failure marker transport and its obsolete tests, plus pending-INC tests requiring a failed pointer push. Actual numeral/field/factory refusal tests remain; cold factory fixtures now retain real caller-owned cells to force an actual location reserve, or request a genuinely allocating direct factory extent. Failed BIG assertion-copy tests retain captured-parent/NULL-release history even when source destruction already consumed the failed acquisition. Native span snapshots and complete physical audits exclude monomial slice capacity. No whole-unit completion credit is added.",
         "A 129-term independently permuted pure-power fixture sorts native monomial handles with Runtime reservations disabled, checks every descending degree, then completes source coefficient/map movement and validates every paired coefficient. Implicit source finalization retains all actual reference roots until owning cleanup. The naked zero-reference borrowed-product test requiring refusal before native pointer push is retired: native append now completes INC ownership before the still-live numeral allocation can fail, so its eventual DEC legitimately destroys that zero-reference original. Actual square-root final-factory TLS proof now primes the real lane with a named caller allocation and includes it in physical audits, rather than relying on eliminated vector allocation traffic.",
         "Polynomial PSC H reference storage now uses a concrete []Polynomial slice. Removed inline16 capacity emulation, Runtime payload growth/free, scalar-handle codecs, copied/pending/sourceRaw state and the unjoined INC whose only failure point was container publication. Actual INC-before-append and ascending DEC remain; a stopped real destructor retains its exact row and drain state until explicit owning cleanup. Native growth/reuse through 4097 rows succeeds with Runtime reservations disabled; an independent 129-row last-reference deletion fixture stops at row17 and verifies source retry refusal, exact owning continuation and no duplicate callback. Existing PSC mathematical identities, cancellation, actual numeric/factory refusal campaigns, lexical unwind and foreign-invocation guards remain. Three container-topology/failure tests are retired. No whole-unit completion credit is added.",
-        "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added."
+        "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added.",
+        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added."
       ]
     },
     {
@@ -46179,7 +46089,8 @@
         "No registered source driver calls this selected-variable overload; the new assertions are independent semantic and actual ownership checks. Public output belongs to the borrowed actual full-manager UPolynomial manager. Normal/error source suffix completes only reached np/Normalize children; CleanupNumeralVectorConversion separately acknowledges exact unjoined child roots and never deletes caller output. Existing charged converter history is reused; this overload adds no new source NUM or pre-entry archival reserve. set_size trims leading zeros after selected-degree reserve. No whole UP unit promotion.",
         "Genuine erased-zero RED47337 corrected: no history reservation before Normalize/inline reused zero conversion. Current immutable diagnostic records are materialized only at reached Integer/Natural/vector/factory allocation branches; exact returned inline receipt holds readonly final diagnostic values. Callback-captured old receipts retain final body/source/first-own and actual child tuple history across later reuse. Histories never supply acquisition or cleanup authority. Obsolete pre-entry archive-refusal fixture expectations were migrated to the reached new source invocation while preserving old history and named before-lift graph assertions.",
         "The exported Full-manager selected-variable wrapper is bound to actual full.core/full.upm. UnivariateManager is a Go borrowing accessor, not a C++ getter. Source upolynomial.h:426-450 independently takes pm from p.m() and the UP target m(); arbitrary foreign-manager profiles and whole generic header completion remain unclaimed.",
-        "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added."
+        "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added.",
+        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added."
       ]
     },
     {
@@ -106494,8 +106405,6 @@
         "TestMonomialSourceVariableSortPowerAndDerivative",
         "TestMonomialDormantSourceManagerIdentityAndConversion",
         "TestMonomialActualConstructorFailureUnwind",
-        "TestMonomialTmpSourceFreeBeforeGrowFailure",
-        "TestMonomialTmpExactCapacitySourceAssertion",
         "TestMonomialSourceRefcountAndExponentWidth",
         "TestMonomialSourceDisplayParenthesisQuirks",
         "TestMonomialSourceRenameAndSearch",
@@ -106506,14 +106415,12 @@
         "TestMonomialSourceInternFailurePrefixesAndRetry",
         "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
         "TestMonomialSourceRetainedPhysicalPowerAccess",
-        "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
         "TestMonomialSourceRawPowerArrayProduct",
         "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
         "TestMonomialSourceRepeatedRenameFreshLexicalTable",
         "TestMonomialScalarQueriesStopAtOwnerLifetime",
         "TestMonomialOwningCloseAfterUnitIDRefusal",
         "TestMonomialSourceMaxSmallerNullAssertion",
-        "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
         "TestMonomialSourceSingletonValidityDoesNotReadPower",
         "TestMonomialSourceDegreeSumDoesNotReadVariable",
         "TestMonomialSourceValidityFieldShortCircuit",
@@ -106610,7 +106517,9 @@
         "TestPolynomialQuasiResultantConcreteFrameAndUnreadGuards",
         "TestPolynomialQuasiResultantActualDestructorReentry",
         "TestPolynomialQuasiResultantBIGEveryReservationAndOwnedRetry",
-        "TestPolynomialQuasiResultantActualCallerPublicationCallback"
+        "TestPolynomialQuasiResultantActualCallerPublicationCallback",
+        "TestMonomialNativeScratchGrowthResetAndBounds",
+        "TestMonomialNativeVariableCountingAndInterning"
       ],
       "conditionals": [
         {
@@ -106970,8 +106879,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -106982,17 +106889,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -111642,8 +111549,6 @@
         "TestMonomialSourceVariableSortPowerAndDerivative",
         "TestMonomialDormantSourceManagerIdentityAndConversion",
         "TestMonomialActualConstructorFailureUnwind",
-        "TestMonomialTmpSourceFreeBeforeGrowFailure",
-        "TestMonomialTmpExactCapacitySourceAssertion",
         "TestMonomialSourceRefcountAndExponentWidth",
         "TestMonomialSourceDisplayParenthesisQuirks",
         "TestMonomialSourceRenameAndSearch",
@@ -111654,21 +111559,21 @@
         "TestMonomialSourceInternFailurePrefixesAndRetry",
         "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
         "TestMonomialSourceRetainedPhysicalPowerAccess",
-        "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
         "TestMonomialSourceRawPowerArrayProduct",
         "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
         "TestMonomialSourceRepeatedRenameFreshLexicalTable",
         "TestMonomialScalarQueriesStopAtOwnerLifetime",
         "TestMonomialOwningCloseAfterUnitIDRefusal",
         "TestMonomialSourceMaxSmallerNullAssertion",
-        "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
         "TestMonomialSourceSingletonValidityDoesNotReadPower",
         "TestMonomialSourceDegreeSumDoesNotReadVariable",
         "TestMonomialSourceValidityFieldShortCircuit",
         "TestASTActivityCacheSourceOwnershipReplacementAndReset",
         "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
         "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
-        "TestASTActivityCacheOriginalChainDisplacementRehashAndErase"
+        "TestASTActivityCacheOriginalChainDisplacementRehashAndErase",
+        "TestMonomialNativeScratchGrowthResetAndBounds",
+        "TestMonomialNativeVariableCountingAndInterning"
       ],
       "conditionals": [
         {
@@ -111955,8 +111860,6 @@
             "TestMonomialSourceVariableSortPowerAndDerivative",
             "TestMonomialDormantSourceManagerIdentityAndConversion",
             "TestMonomialActualConstructorFailureUnwind",
-            "TestMonomialTmpSourceFreeBeforeGrowFailure",
-            "TestMonomialTmpExactCapacitySourceAssertion",
             "TestMonomialSourceRefcountAndExponentWidth",
             "TestMonomialSourceDisplayParenthesisQuirks",
             "TestMonomialSourceRenameAndSearch",
@@ -111967,17 +111870,17 @@
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
-            "TestMonomialSourceTempPostphysicalReleaseAcknowledgment",
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseAfterUnitIDRefusal",
             "TestMonomialSourceMaxSmallerNullAssertion",
-            "TestMonomialSourceMissingTempHoleKeepsStoppedHistory",
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
-            "TestMonomialSourceValidityFieldShortCircuit"
+            "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialNativeVariableCountingAndInterning"
           ]
         },
         {
@@ -149589,7 +149492,8 @@
         "The core ID-indexed polynomial directory now uses []Polynomial, and linear-constructor monomial workspace/actual generated-root tags use []Monomial/[]bool. Removed their byte-vector codecs, custom container growth/fault/free paths and tag capacity charges. Actual ID recycle, factory/numeral/monomial allocation, reference lifetime and orphan cleanup remain. Rename visits native directory handles, deletion clears each recycled ID slot, constructor unwind/source member destruction release the nonowning directory. Linear source destruction retains actual unconsumed generated handles until owning cleanup; successful construction clears/truncates its workspace. Removed the now-unused vector-backed monomial span and mkTermsVector adapter. Existing callback regression now proves native directory growth, preserved peers, deletion clearing and ID reuse after relocation; source constructor/linear/rename/refusal campaigns remain. No whole-unit completion credit is added.",
         "SOM monomial columns now use concrete native []Monomial storage, with native retired-reference lists for standalone implicit source destruction. Removed pointer-vector byte codecs, Runtime growth/pending/free failures and charged retired-monomial capacity. Actual INC/DEC, position writes, append-cohort ownership and stopped reference destruction remain. Source class finalization captures actual remaining reference roots before releasing the slice; owning cleanup consumes those roots. Go sort.Slice applies the original descending graded-lex comparator in place of a handwritten STL sorting backend. With native push, no live allocation remains between position Set and marker release: removed that vector-failure marker transport and its obsolete tests, plus pending-INC tests requiring a failed pointer push. Actual numeral/field/factory refusal tests remain; cold factory fixtures now retain real caller-owned cells to force an actual location reserve, or request a genuinely allocating direct factory extent. Failed BIG assertion-copy tests retain captured-parent/NULL-release history even when source destruction already consumed the failed acquisition. Native span snapshots and complete physical audits exclude monomial slice capacity. No whole-unit completion credit is added.",
         "A 129-term independently permuted pure-power fixture sorts native monomial handles with Runtime reservations disabled, checks every descending degree, then completes source coefficient/map movement and validates every paired coefficient. Implicit source finalization retains all actual reference roots until owning cleanup. The naked zero-reference borrowed-product test requiring refusal before native pointer push is retired: native append now completes INC ownership before the still-live numeral allocation can fail, so its eventual DEC legitimately destroys that zero-reference original. Actual square-root final-factory TLS proof now primes the real lane with a named caller allocation and includes it in physical audits, rather than relying on eliminated vector allocation traffic.",
-        "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added."
+        "Shared polynomial SOM/core numeral collections and lexical sorting scratch now use concrete native []util.Int values plus native retired BIG-resource slices. Removed Runtime cap/size byte codecs, manual 3/2 growth, old/pending relocation, initialized high-water fields, charged retirement arrays and source container allocation/free failures. Source mpz has no destructor: native shrink/reset retain only actual discarded BIG tokens for later explicit owning Del; inline scalars and zero fields require no retirement. Full-manager source destruction uses these same actual retained fields rather than six copied retirement directories. Native borrowed inputs use actual slice element pointers; removed the vector variant from univariate inputs and the two-route linear input adapter. Normalize GCD borrows native numeral views; division reads the source-reached remainder field after divisor/product guards. Native cold growth/reset/shrink/bounds across all six collections and 4097 rows needs no Runtime reservation; retained BIG identity and cleanup are independently checked. Sorting preserves independent monomial/coefficient pairing and moves BIG fields under disabled reservations. Real regular row INC-before-numeric Copy refusal, large SOM numeric refusal and scalar transport reentry fixtures use genuine large allocations; obsolete byte-header/spare-capacity and container-only failure tests are retired. Real numeric/source destruction and invocation guards remain. No whole-unit completion credit is added.",
+        "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added."
       ]
     },
     {

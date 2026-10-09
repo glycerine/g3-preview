@@ -4,7 +4,6 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // This records only actual completed member construction. Failed constructors
@@ -69,14 +68,7 @@ func (m *MultivariatePolynomialManager) destroyMembers() error {
 			case 17:
 				e = m.sourceNumeralVector(&m.core.rationalTerms)
 			case 18:
-				if m.core.tmp1.raw == (util.Block{}) && !m.core.tmp1.destroyConsumed {
-					e = ErrMonomialPending
-				} else if m.core.tmp1.raw != (util.Block{}) {
-					e = m.core.memory.Deallocate(&m.core.tmp1.raw)
-					if m.core.tmp1.raw == (util.Block{}) {
-						m.core.tmp1.destroyConsumed = true
-					}
-				}
+				m.core.tmp1 = monomialTemp{}
 			}
 			if e != nil {
 				return e

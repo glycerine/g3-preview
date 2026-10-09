@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -296,10 +297,12 @@ func TestMonomialReadOrderProductChosenCopyPrefix(t *testing.T) {
 		t.Fatal(p)
 	}
 	_, e = m.tempPower(&m.temps[1], 1)
-	monomialReadMissing(t, e)
+	if !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("native scratch bounds", e)
+	}
 	n, e := m.tempSize(&m.temps[1])
 	serviceMust(t, e)
-	if n != 0 {
+	if n != 1 {
 		t.Fatal(n)
 	}
 	monomialPhysicalAudit(t, m)

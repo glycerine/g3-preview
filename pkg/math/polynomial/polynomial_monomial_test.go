@@ -68,8 +68,8 @@ func TestMonomialSourceConstructorAndInterning(t *testing.T) {
 	if i.ID != 0 || i.Size != 0 || i.TotalDegree != 0 || i.RefCount != 1 {
 		t.Fatal(i)
 	}
-	if m.RuntimeOwner().Stats().LiveBlocks != 6 {
-		t.Fatal("table, four actual temp blocks, unit pool", m.RuntimeOwner().Stats())
+	if m.RuntimeOwner().Stats().LiveBlocks != 2 {
+		t.Fatal("table and unit pool; native scratch owns no Runtime blocks", m.RuntimeOwner().Stats())
 	}
 	for v := uint32(0); v < 10; v++ {
 		x, e := m.MkVar()
@@ -295,54 +295,7 @@ func TestMonomialActualConstructorFailureUnwind(t *testing.T) {
 		t.Fatal("every real construction prefix through success", success, refusals)
 	}
 }
-func TestMonomialTmpSourceFreeBeforeGrowFailure(t *testing.T) {
-	m := monomialFixture(t)
-	old := m.temps[0].raw
-	oldCount, _ := m.RuntimeOwner().AllocationCount()
-	m.config.Budget.FailAfter(0)
-	powers := make([]MonomialPower, 129)
-	for i := range powers {
-		powers[i] = MonomialPower{uint32(i), 1}
-	}
-	_, e := m.MkMonomial(powers)
-	if !numericPhysicalReservationRefusal(e) {
-		t.Fatal("actual raw allocation refusal", e)
-	}
-	if _, e = m.RuntimeOwner().Size(old); e == nil {
-		t.Fatal("source old temporary was not physically freed")
-	}
-	if m.temps[0].raw != (util.Block{}) {
-		t.Fatal("source missing temp root must remain a hole")
-	}
-	count, _ := m.RuntimeOwner().AllocationCount()
-	if count != oldCount+1 || !m.RuntimeOwner().State().OutOfMemory {
-		t.Fatal("actual source count/OOM publishes before refused physical preparation", count, oldCount, m.RuntimeOwner().State())
-	}
-	monomialPhysicalAudit(t, m)
-	m.config.Budget.FailAfter(-1)
-}
-func TestMonomialTmpExactCapacitySourceAssertion(t *testing.T) {
-	m := monomialFixture(t)
-	powers := make([]MonomialPower, 128)
-	for i := range powers {
-		powers[i] = MonomialPower{uint32(i), 1}
-	}
-	old := m.temps[0].raw
-	a, e := m.MkMonomial(powers)
-	if polynomialSourceDebug {
-		if !errors.Is(e, ErrMonomialAssertion) {
-			t.Fatal("source sz<capacity at128", e)
-		}
-	} else {
-		serviceMust(t, e)
-		serviceMust(t, m.IncRef(a))
-		serviceMust(t, m.DecRef(a))
-	}
-	if m.temps[0].raw != old {
-		t.Fatal("strict assertion does not cause source growth")
-	}
-	monomialPhysicalAudit(t, m)
-}
+
 func TestMonomialSourceRefcountAndExponentWidth(t *testing.T) {
 	m := monomialFixture(t)
 	_, e := m.MkVar()
@@ -495,20 +448,17 @@ func TestMonomialCompletedSourceDestructorReverseMembers(t *testing.T) {
 	serviceMust(t, e)
 	m, e := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
 	serviceMust(t, e)
-	var temps [4]util.Block
-	for i := range temps {
-		temps[i] = m.temps[i].raw
-	}
 	table := m.table.raw
 	serviceMust(t, m.SourceFinalize())
 	if m.sourceStage != 10 || r.Stats().LiveBlocks != 0 {
 		t.Fatal("literal member destruction", m.sourceStage, r.Stats())
 	}
-	for _, b := range temps {
-		if _, e = r.Read(b, 0); e == nil {
-			t.Fatal("destroyed temp remains live")
+	for i := range m.temps {
+		if m.temps[i].powers != nil {
+			t.Fatal("native scratch not released", i)
 		}
 	}
+
 	if _, e = r.Read(table, 0); e == nil {
 		t.Fatal("destroyed table remains live")
 	}
@@ -701,47 +651,6 @@ func TestMonomialSourceRetainedPhysicalPowerAccess(t *testing.T) {
 
 // This bounded public Runtime recipe reaches guarded source signed overflow;
 // it is not valid allocation exhaustion or an allocation-limit free refusal.
-func TestMonomialSourceTempPostphysicalReleaseAcknowledgment(t *testing.T) {
-	b := arena.NewBudget(1 << 24)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true})
-	serviceMust(t, e)
-	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
-	serviceMust(t, e)
-	p := make([]MonomialPower, 20000)
-	for i := range p {
-		p[i] = MonomialPower{uint32(i), 1}
-	}
-	a, e := m.MkMonomial(p)
-	serviceMust(t, e)
-	serviceMust(t, m.IncRef(a))
-	serviceMust(t, m.DecRef(a))
-	old := m.temps[0].raw
-	contextTLSNearMinimum(t, r)
-	before := r.Stats()
-	e = m.SourceFinalize()
-	if !errors.Is(e, arena.ErrBounds) || m.sourceStage != 7 || m.temps[0].raw != (util.Block{}) {
-		t.Fatal("actual source free then TLS guard", e, m.sourceStage, m.temps[0].raw)
-	}
-	if _, e = r.Read(old, 0); e == nil {
-		t.Fatal("old temp remains physical")
-	}
-	if r.Stats().LiveBlocks >= before.LiveBlocks {
-		t.Fatal("no actual completed physical frees")
-	}
-	e = m.SourceFinalize()
-	if !errors.Is(e, arena.ErrBounds) || m.sourceStage != 9 || m.table.raw != (util.Block{}) {
-		t.Fatal("next actual table free retains separate TLS error", e, m.sourceStage)
-	}
-	serviceMust(t, m.SourceFinalize())
-	if m.sourceStage != 10 {
-		t.Fatal(m.sourceStage)
-	}
-	serviceMust(t, m.CloseChecked())
-	serviceMust(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
-	}
-}
 
 func TestMonomialSourceRawPowerArrayProduct(t *testing.T) {
 	m := monomialFixture(t)
@@ -866,38 +775,6 @@ func TestMonomialSourceMaxSmallerNullAssertion(t *testing.T) {
 		}
 	} else if e != nil || v != 1 {
 		t.Fatal(v, e)
-	}
-}
-
-func TestMonomialSourceMissingTempHoleKeepsStoppedHistory(t *testing.T) {
-	b := arena.NewBudget(1 << 22)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
-	serviceMust(t, e)
-	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}})
-	serviceMust(t, e)
-	var p [129]MonomialPower
-	for i := range p {
-		p[i] = MonomialPower{uint32(i), 1}
-	}
-	b.FailAfter(0)
-	_, e = m.MkMonomial(p[:])
-	if !numericPhysicalReservationRefusal(e) || m.temps[0].raw != (util.Block{}) {
-		t.Fatal("actual free-before-allocation hole", e)
-	}
-	monomialPhysicalAudit(t, m)
-	b.FailAfter(-1)
-	e = m.SourceFinalize()
-	if !errors.Is(e, ErrMonomialPending) || m.sourceStage != 7 || m.temps[0].destroyConsumed {
-		t.Fatal("missing source pointer is not completed destructor", e, m.sourceStage, m.temps[0])
-	}
-	monomialPhysicalAudit(t, m)
-	serviceMust(t, m.CloseChecked())
-	if m.sourceStage != 7 {
-		t.Fatal("owning cleanup invented source completion", m.sourceStage)
-	}
-	serviceMust(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
 	}
 }
 

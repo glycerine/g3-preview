@@ -145,12 +145,8 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 		put(b)
 	}
 	mm := m.monomials
-	for _, r := range []util.Block{mm.table.raw, mm.table.pending, mm.renameTable.raw, mm.renameTable.pending, mm.renameFound, mm.powers.raw, mm.powers.pending} {
+	for _, r := range []util.Block{mm.table.raw, mm.table.pending, mm.renameTable.raw, mm.renameTable.pending, mm.renameFound} {
 		put(r)
-	}
-	for _, tmp := range mm.temps {
-		put(tmp.raw)
-		put(tmp.pending)
 	}
 
 	za, ma := z.SourceAllocator().Stats(), mm.allocator.Stats()

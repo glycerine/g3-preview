@@ -69,7 +69,6 @@ type monomialCreation struct {
 	stage                    uint8
 	idConsumed, tableRemoved bool
 }
-type monomialPowerVector struct{ raw, pending util.Block }
 type MonomialManager struct {
 	allocatorInvocation                                                       monomialAllocatorScope
 	unitDropConsumed                                                          bool
@@ -85,7 +84,7 @@ type MonomialManager struct {
 	ids                                                                       idgen.Generator
 	table                                                                     monomialTable
 	temps                                                                     [4]monomialTemp
-	powers                                                                    monomialPowerVector
+	powers                                                                    []MonomialPower
 	renameTable                                                               monomialTable
 	renameFound                                                               util.Block
 	locations                                                                 []monomialLocation
@@ -93,7 +92,6 @@ type MonomialManager struct {
 	unit                                                                      Monomial
 	origin, header                                                            uint64
 	nextVar, managerRefs, publishedObjects                                    uint32
-	completedTemps                                                            uint8
 	idsInitialized                                                            bool
 	allocatorOwned, memoryOwned, completed, closing, closed, sourceFinalizing bool
 	sourceStage                                                               uint8
@@ -176,12 +174,6 @@ func NewMonomialManager(c MonomialManagerConfig) (*MonomialManager, error) {
 	}
 	m.ids = idgen.NewBudgeted(0, c.Budget, func() bool { return r.State().OutOfMemory })
 	m.idsInitialized = true
-	for i := range m.temps {
-		if e := m.tempConstruct(&m.temps[i]); e != nil {
-			return fail(e)
-		}
-		m.completedTemps++
-	}
 	m.allocator = c.Allocator
 	if m.allocator == nil {
 		a, e := util.NewSmallAllocator(util.SmallAllocatorConfig{Runtime: r, Profile: c.Profile})

@@ -127,9 +127,6 @@ func NewMultivariatePolynomialManager(c MultivariatePolynomialManagerConfig) (*M
 	m.constructed = 3
 	// Source declaration order: directory, ID, m2pos, then actual imp tmp1.
 
-	if e = monomialTempConstruct(m.core.memory, &m.core.tmp1); e != nil {
-		return fail(e)
-	}
 	m.constructed = 4
 	for _, v := range [2]*PolynomialSOMVector{&m.iccp, &m.core.translateBuffers} {
 		v.self = v

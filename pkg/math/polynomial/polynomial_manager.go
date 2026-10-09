@@ -72,7 +72,6 @@ type MultivariatePolynomialCore struct {
 	translation                                                                                polynomialTranslationScope
 	substitution                                                                               polynomialSubstitutionState
 	tmp1                                                                                       monomialTemp
-	tmp1SourceConsumed                                                                         bool
 	pseudoDivision                                                                             polynomialPseudoDivisionScope
 	exactDivision                                                                              polynomialExactDivisionScope
 	queryPositions                                                                             MonomialPositions
@@ -147,9 +146,6 @@ func NewMultivariatePolynomialCore(c MultivariatePolynomialConfig) (*Multivariat
 		return m, m
 	}
 	if e = m.constructPolynomialCoreDefaults(); e != nil {
-		return fail(e)
-	}
-	if e = m.monomials.tempConstruct(&m.tmp1); e != nil {
 		return fail(e)
 	}
 	if e = m.initializePolynomialCoreBody(); e != nil {

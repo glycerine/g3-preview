@@ -403,9 +403,6 @@ func (m *MultivariatePolynomialCore) substituteIntegers(p Polynomial, n uint32, 
 		if e = m.modular.Copy(&s.newA, &a); e != nil {
 			return Polynomial{}, e
 		}
-		if e = m.monomials.tempReserve(&m.tmp1, info.Size); e != nil {
-			return Polynomial{}, e
-		}
 		newSize := uint32(0)
 		for j := uint32(0); j < info.Size; j++ {
 			x, e := m.monomials.varCore(term, j)
@@ -618,9 +615,6 @@ func (m *MultivariatePolynomialCore) substituteRationalMap(p Polynomial, x2v Pol
 			return Polynomial{}, e
 		}
 		if e = m.modular.Copy(&s.newA, &a); e != nil {
-			return Polynomial{}, e
-		}
-		if e = m.monomials.tempReserve(&m.tmp1, info.Size); e != nil {
 			return Polynomial{}, e
 		}
 		newSize := uint32(0)

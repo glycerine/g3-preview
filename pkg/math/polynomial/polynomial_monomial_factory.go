@@ -11,13 +11,13 @@ func (m *MonomialManager) keyWord(k monomialKey, word uint32) (uint32, error) {
 		if m.borrowedTemp == nil || k.slot != 0 {
 			return 0, ErrMonomialPending
 		}
-		return m.memory.ReadUint32(m.borrowedTemp.raw, uint64(word)*4)
+		return m.tempKeyWord(m.borrowedTemp, word)
 	}
 	if k.kind == monomialTemporaryKey {
 		if k.slot >= uint32(len(m.temps)) {
 			return 0, arena.ErrBounds
 		}
-		return m.memory.ReadUint32(m.temps[k.slot].raw, uint64(word)*4)
+		return m.tempKeyWord(&m.temps[k.slot], word)
 	}
 	if k.kind != monomialObjectKey || k.slot == 0 || uint64(k.slot) > uint64(len(m.locations)) {
 		return 0, ErrMonomialOwner
@@ -203,10 +203,7 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 	m.creation.idConsumed = true
 	l.id = id
 	m.creation.stage = 4
-	h, e := m.memory.ReadUint32(t.raw, 16)
-	if e != nil {
-		return Monomial{}, e
-	}
+	h := t.hash
 	for i, v := range [5]uint32{0, id, 0, n, h} {
 		if e = m.allocator.WriteUint32(object, uint64(i)*4, v); e != nil {
 			return Monomial{}, e
@@ -327,14 +324,6 @@ func (m *MonomialManager) convertCreated(source *MonomialManager, a Monomial, ou
 	}
 	// Source init copies all powers before interning. No hidden spelling slice.
 	t := &m.temps[0]
-	if info.Size > t.capacity {
-		if e = m.tempIncrease(t, info.Size*2); e != nil {
-			return Monomial{}, e
-		}
-	}
-	if polynomialSourceDebug && info.Size >= t.capacity {
-		return Monomial{}, ErrMonomialAssertion
-	}
 	if e = m.tempSetSize(t, info.Size); e != nil {
 		return Monomial{}, e
 	}
@@ -429,4 +418,15 @@ func (m *MonomialManager) completeBorrowedContinuation() {
 	}
 	m.borrowedParent = nil
 	m.borrowedTemp = nil
+}
+
+// Only size and cached hash are read from a temporary by retained table users.
+func (m *MonomialManager) tempKeyWord(t *monomialTemp, word uint32) (uint32, error) {
+	switch word {
+	case 3:
+		return uint32(len(t.powers)), nil
+	case 4:
+		return t.hash, nil
+	}
+	return 0, arena.ErrBounds
 }

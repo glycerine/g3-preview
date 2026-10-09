@@ -329,7 +329,6 @@ func TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation(t *testin
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{1}, [][]MonomialPower{{{0, 1}, {1, 1}}})
 	var foreign monomialTemp
-	serviceMust(t, m.monomials.tempConstruct(&foreign))
 	serviceMust(t, m.monomials.tempSetSize(&foreign, 3))
 	for i := uint32(0); i < 3; i++ {
 		serviceMust(t, m.monomials.tempSetPower(&foreign, i, MonomialPower{i, 19 + i}))
@@ -340,7 +339,7 @@ func TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation(t *testin
 	if !numericPhysicalReservationRefusal(e) {
 		t.Fatal("real foreign factory refusal", e)
 	}
-	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []util.Block{foreign.raw})
+	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, nil)
 	m.integer.Budget().FailAfter(-1)
 	oldCreation := m.monomials.creation
 	one := util.NewInt(1)
@@ -352,7 +351,7 @@ func TestPolynomialSubstitutionCleanupLeavesForeignFactoryContinuation(t *testin
 	if m.monomials.borrowedTemp != &foreign || m.monomials.creation != oldCreation || m.generatedCalleePending {
 		t.Fatal("foreign continuation acquired by substitution")
 	}
-	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []util.Block{foreign.raw})
+	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, nil)
 	serviceMust(t, m.monomials.CleanupCreation())
 	serviceMust(t, m.monomials.tempCleanup(&foreign))
 }

@@ -28,19 +28,10 @@ func TestPolynomialImpBorrowedMonomialConstructorHierarchy(t *testing.T) {
 	if m.core == nil || m.upm == nil || m.upm.modular == m.core.modular || m.upm.config.Integer != q.Integers() || m.core.monomials != mm || mm.managerRefs != before+1 {
 		t.Fatal("actual separate UP/coefficient managers or MM body retain missing")
 	}
-	if !m.core.tmp1.completed || m.core.tmp1.capacity != 128 || m.core.tmp1.raw == (util.Block{}) || m.core.tmp1.pending != (util.Block{}) {
-		t.Fatal("imp tmp1 default member was replaced by MM workspace")
+	if m.core.tmp1.powers != nil || &m.core.tmp1 == &mm.temps[1] {
+		t.Fatal("native imp scratch is a distinct empty member")
 	}
-	if m.core.tmp1.raw == mm.temps[1].raw {
-		t.Fatal("distinct source tmp1 aliases MM member")
-	}
-	for i, want := range [5]uint32{0, ^uint32(0), 0, 0, 0} {
-		got, e := q.Integers().Memory.ReadUint32(m.core.tmp1.raw, uint64(i)*4)
-		serviceMust(t, e)
-		if got != want {
-			t.Fatal("source temporary placement", i, got, want)
-		}
-	}
+
 	if !m.useSparseGCD || m.usePRSGCD || !m.core.completed {
 		t.Fatal("post-init source flag/body publication missing")
 	}
@@ -105,7 +96,7 @@ func TestPolynomialImpSourceDestructorSeparateOwningClose(t *testing.T) {
 	m.varDegrees = []uint32{1, 2, 3}
 	serviceMust(t, m.core.substitution.found.reserve(5))
 	serviceMust(t, m.SourceFinalize())
-	if !m.sourceFinalized || m.closed || m.bodyStage != 11 || m.memberStage != 23 || m.header == 0 || !m.upm.sourceFinalized || m.core.tmp1.raw != (util.Block{}) || mm.managerRefs != before-1 || m.varDegrees != nil || m.degree2pos != nil || m.lexPermutation != nil || m.lexBuckets != nil {
+	if !m.sourceFinalized || m.closed || m.bodyStage != 11 || m.memberStage != 23 || m.header == 0 || !m.upm.sourceFinalized || m.core.tmp1.powers != nil || mm.managerRefs != before-1 || m.varDegrees != nil || m.degree2pos != nil || m.lexPermutation != nil || m.lexBuckets != nil {
 		t.Fatal("literal complete body/member order or retained owner", m.bodyStage, m.memberStage)
 	}
 	count, e := q.Integers().Memory.AllocationCount()
@@ -180,42 +171,6 @@ func TestPolynomialImpConstructorEveryReservationUnwindsMembersOnly(t *testing.T
 	}
 }
 
-func TestPolynomialImpActualTmpReplacementHoleStopsSourceDestruction(t *testing.T) {
-	q, b := rationalManager(t, false)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().Memory})
-	serviceMust(t, e)
-	serviceMust(t, mm.IncManagerRef())
-	defer func() { serviceMust(t, mm.DecManagerRef()) }()
-	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { panic("unreached") }, Cooperation: func() error { panic("unreached") }}})
-	serviceMust(t, e)
-	b.FailAfter(0)
-	e = mm.tempIncrease(&m.core.tmp1, 256)
-	if !numericPhysicalReservationRefusal(e) || m.core.tmp1.raw != (util.Block{}) || !m.core.tmp1.completed || m.core.tmp1.capacity != 128 {
-		t.Fatal("genuine source free-before-replacement prefix", e, m.core.tmp1)
-	}
-	polynomialImpPhysicalAudit(t, m) // the actual endangered root before fault lifting.
-	b.FailAfter(-1)
-	e = m.SourceFinalize()
-	if e != ErrMonomialPending || m.sourceFinalized || m.memberStage != 18 || m.upm.sourceFinalizing {
-		t.Fatal("source dangling private temp guard was silently completed", e, m.memberStage)
-	}
-	polynomialImpPhysicalAudit(t, m)
-	count, e2 := q.Integers().Memory.AllocationCount()
-	serviceMust(t, e2)
-	if e2 = m.SourceFinalize(); e2 != e {
-		t.Fatal("source stopped cause not sticky", e, e2)
-	}
-	after, e2 := q.Integers().Memory.AllocationCount()
-	serviceMust(t, e2)
-	if after != count {
-		t.Fatal("stopped source reentry ran actions")
-	}
-	serviceMust(t, m.CloseChecked())
-	if m.sourceFinalized || m.sourceCause != ErrMonomialPending || m.memberStage != 18 {
-		t.Fatal("owning abort repaired source history")
-	}
-}
-
 func TestPolynomialImpAllocatorAndDefaultConstructorEveryReservation(t *testing.T) {
 	for _, borrowed := range []bool{true, false} {
 		t.Run(fmt.Sprint("borrowedAllocator=", borrowed), func(t *testing.T) {
@@ -272,50 +227,6 @@ func TestPolynomialImpAllocatorAndDefaultConstructorEveryReservation(t *testing.
 	}
 }
 
-// Public oversized reallocations select the guarded signed-overflow host domain;
-// this is a real postphysical TLS stop, not allocation exhaustion/free injection.
-func TestPolynomialImpSourceTmpPostPhysicalStopRemainsSticky(t *testing.T) {
-	b := arena.NewBudget(1 << 25)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64, ThreadLocal: true})
-	serviceMust(t, e)
-	q, e := util.NewRationalManager(util.RationalConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64}, Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
-	serviceMust(t, e)
-	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r})
-	serviceMust(t, e)
-	serviceMust(t, mm.IncManagerRef())
-	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { panic("unreached") }, Cooperation: func() error { panic("unreached") }}})
-	serviceMust(t, e)
-	serviceMust(t, mm.tempIncrease(&m.core.tmp1, 40000))
-	polynomialImpPhysicalAudit(t, m)
-	contextTLSNearMinimum(t, r)
-	oldTmp := m.core.tmp1.raw
-	e = m.SourceFinalize()
-	if !errors.Is(e, arena.ErrBounds) || m.memberStage != 18 || m.core.tmp1.raw != (util.Block{}) || !m.core.tmp1.destroyConsumed || m.sourceFinalized {
-		t.Fatal("actual postphysical source stop", e, m.memberStage, m.core.tmp1)
-	}
-	if _, readErr := r.ReadUint32(oldTmp, 0); readErr == nil {
-		t.Fatal("actual old source temporary remains live after physical release")
-	}
-	polynomialImpPhysicalAudit(t, m)
-	state := r.State()
-	if retry := m.SourceFinalize(); retry != e || r.State() != state {
-		t.Fatal("literal source retry acknowledged physical release", retry, r.State(), state)
-	}
-	contextTLSFinish(t, r, m.CloseChecked)
-	if m.sourceFinalized || m.memberStage != 18 || m.sourceCause != e {
-		t.Fatal("owning cleanup repaired source cursor")
-	}
-	if dropErr := mm.DecManagerRef(); dropErr != nil && !errors.Is(dropErr, arena.ErrBounds) {
-		t.Fatal("final borrowed source retain", dropErr)
-	}
-	contextTLSFinish(t, r, mm.CloseChecked)
-	contextTLSFinish(t, r, q.CloseChecked)
-	contextTLSFinish(t, r, r.Close)
-	if b.Used() != 0 {
-		t.Fatal("owning graph remains", b.Used())
-	}
-}
-
 func TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction(t *testing.T) {
 	q, b := rationalManager(t, false)
 	mm, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: q.Integers().Memory})
@@ -347,33 +258,6 @@ func TestPolynomialImpOwningCloseRejectsActualCallerBeforeDestruction(t *testing
 	copied := *m
 	if e = copied.ready(); e != ErrPolynomialOwner {
 		t.Fatal("copied owner readiness", e)
-	}
-}
-
-func TestPolynomialImpChildMonomialStopPrecedesReverseMembers(t *testing.T) {
-	q, b := rationalManager(t, false)
-	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { panic("unreached") }, Cooperation: func() error { panic("unreached") }}})
-	serviceMust(t, e)
-	mm := m.core.monomials
-	b.FailAfter(0)
-	e = mm.tempIncrease(&mm.temps[3], 256)
-	if !numericPhysicalReservationRefusal(e) || mm.temps[3].raw != (util.Block{}) || !mm.temps[3].completed {
-		t.Fatal("actual child replacement hole", e)
-	}
-	polynomialImpPhysicalAudit(t, m)
-	b.FailAfter(-1)
-	e = m.SourceFinalize()
-	if e != ErrMonomialPending || m.bodyStage != 10 || m.memberStage != 0 || !m.mmDropDone || m.core.monomialRetained || mm.managerRefs != 0 || m.core.tmp1.raw == (util.Block{}) || m.upm.sourceFinalizing {
-		t.Fatal("MM DEC did not stop before reverse members", e, m.bodyStage, m.memberStage, mm.managerRefs)
-	}
-	polynomialImpPhysicalAudit(t, m)
-	state := q.Integers().Memory.State()
-	if again := m.SourceFinalize(); again != e || q.Integers().Memory.State() != state {
-		t.Fatal("stopped child source replay", again)
-	}
-	serviceMust(t, m.CloseChecked())
-	if m.sourceFinalized || m.bodyStage != 10 || m.memberStage != 0 || m.sourceCause != e {
-		t.Fatal("owning child cleanup claimed source completion")
 	}
 }
 

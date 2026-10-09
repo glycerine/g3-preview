@@ -29,7 +29,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	refvectors := []*PolynomialRefVector{}
 	lazy := []*PolynomialNewtonVector{&full.newton}
 	handlers := []*PolynomialDeletionHandler{}
-	external := []util.Block{m.tmp1.raw, m.tmp1.pending, m.substitution.found.raw, m.substitution.found.pending}
+	external := []util.Block{m.substitution.found.raw, m.substitution.found.pending}
 	external = append(external, extraRaw...)
 	adapterBytes := uint64(cap(m.variableNumeralHistory))*uint64(reflect.TypeOf(polynomialVariableNumeralHistory{}).Size()) + uint64(cap(m.quasiHistory))*uint64(reflect.TypeOf(polynomialQuasiResultantHistory{}).Size()) + full.header
 	public := []*util.Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
@@ -447,12 +447,8 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	mm := m.monomials
 	if mm != nil {
-		for _, r := range []util.Block{mm.table.raw, mm.table.pending, mm.renameTable.raw, mm.renameTable.pending, mm.renameFound, mm.powers.raw, mm.powers.pending} {
+		for _, r := range []util.Block{mm.table.raw, mm.table.pending, mm.renameTable.raw, mm.renameTable.pending, mm.renameFound} {
 			put(r)
-		}
-		for _, tmp := range mm.temps {
-			put(tmp.raw)
-			put(tmp.pending)
 		}
 	}
 

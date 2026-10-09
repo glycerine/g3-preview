@@ -28,12 +28,6 @@ func monomialPhysicalAudit(t *testing.T, m *MonomialManager, externalRaw ...util
 	add(m.renameTable.raw)
 	add(m.renameTable.pending)
 	add(m.renameFound)
-	for i := range m.temps {
-		add(m.temps[i].raw)
-		add(m.temps[i].pending)
-	}
-	add(m.powers.raw)
-	add(m.powers.pending)
 	bytes := m.header + uint64(cap(m.locations))*uint64(reflect.TypeOf(monomialLocation{}).Size()) + uint64(m.ids.FreeCapacity())*4 + r.TotalBytes
 	if m.allocator != nil {
 		a := m.allocator.Stats()

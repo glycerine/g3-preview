@@ -2,9 +2,7 @@
 // src/util/vector.h.
 package polynomial
 
-import (
-	"github.com/glycerine/g3/pkg/util"
-)
+import ()
 
 // Returns actual named owning fields; a directory is never swept to recover
 // caller values. Repeat traversal is cold and allocation-free.
@@ -258,12 +256,7 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 		case 10:
 			m.degree2pos = nil
 		case 11:
-			if m.core.tmp1.raw != (util.Block{}) {
-				e = m.core.memory.Deallocate(&m.core.tmp1.raw)
-			}
-			if e == nil && m.core.tmp1.pending != (util.Block{}) {
-				e = m.core.memory.Deallocate(&m.core.tmp1.pending)
-			}
+			m.core.tmp1 = monomialTemp{}
 		}
 		if e != nil {
 			m.cleanupCause = e

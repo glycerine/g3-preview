@@ -35,7 +35,7 @@ func polynomialSubstitutionPhysicalWithHandlers(t *testing.T, m *MultivariatePol
 
 func polynomialSubstitutionNamedRaw(m *MultivariatePolynomialCore) []util.Block {
 	d := &m.substitution
-	return []util.Block{m.tmp1.raw, m.tmp1.pending, d.found.raw, d.found.pending}
+	return []util.Block{d.found.raw, d.found.pending}
 }
 func polynomialSubstitutionNamedPolynomials(m *MultivariatePolynomialCore) []Polynomial {
 	s := &m.substitution.scope
