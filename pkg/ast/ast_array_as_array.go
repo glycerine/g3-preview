@@ -2,39 +2,16 @@
 // src/ast/array_decl_plugin.h:192-195; src/util/vector.h.
 package ast
 
-import (
-	"errors"
-	"github.com/glycerine/g3/pkg/util"
-	"reflect"
-)
+import "errors"
 
 // Concrete lexical source vector<parameter>. Each slot holds the actual Go
 // parameter descriptor; AST payloads are borrowed until declaration publication.
-type astArrayParameterVector struct {
-	values  []ASTParameter
-	charged uint64
-}
+type astArrayParameterVector struct{ values []ASTParameter }
 
 func (v *astArrayParameterVector) push(m *ASTManager, h ASTHandle) error {
 	p, e := m.newParameterAST(h)
 	if e != nil {
 		return e
-	}
-	if len(v.values) == cap(v.values) {
-		width := uint64(reflect.TypeOf(ASTParameter{}).Size())
-		n, e := util.SourceVectorCapacity(cap(v.values), width)
-		if e != nil {
-			return errors.Join(e, m.dropParameter(p))
-		}
-		bytes := uint64(n) * width
-		if e = m.BudgetField.Reserve(bytes); e != nil {
-			return errors.Join(e, m.dropParameter(p))
-		}
-		next := make([]ASTParameter, len(v.values), n)
-		copy(next, v.values)
-		m.BudgetField.Release(v.charged)
-		v.charged = bytes
-		v.values = next
 	}
 	v.values = append(v.values, p)
 	return nil
@@ -44,9 +21,8 @@ func (v *astArrayParameterVector) close(m *ASTManager) error {
 	for _, p := range v.values {
 		err = errors.Join(err, m.dropParameter(p))
 	}
-	m.BudgetField.Release(v.charged)
+	clear(v.values)
 	v.values = nil
-	v.charged = 0
 	return err
 }
 func (m *ASTManager) arrayAsArrayDecl(ps []ASTParameter) (result astNodeRef, err error) {

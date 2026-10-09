@@ -778,3 +778,5 @@ The model package's function-entry directory, function-interpretation entries, u
 The API object directory and recycled-ID stack now use native typed slices. Stable destruction order remains in the approved insertion-ordered dictionary; the auxiliary slices no longer use `SourceVectorCapacity` or AST-budget backing charges.
 
 Tactic model labels and concatenated-converter child/size arrays now use native typed slices. Converter reference ownership and label order remain explicit, while `SourceVectorCapacity` and arena charges for those Go slices are gone.
+
+AST as-array sort construction now stores its owning parameter descriptors in a typed slice. Parameter cleanup remains explicit; `SourceVectorCapacity`, capacity charges, and relocation bookkeeping are gone.
