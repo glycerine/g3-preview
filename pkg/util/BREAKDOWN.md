@@ -201,13 +201,12 @@ the import graph, gives them an enforceable boundary, and makes later deletion
 straightforward. Package size alone is not a reason to leave unrelated code in
 root `util`. These three leaves have now been extracted.
 
-The current Go versions of `list`, `scoped_vector`, and `backtrackable_set` use
-`any`. Each C++ template has a small set of concrete production instantiations.
-That use of `any` was an earlier porting mistake and should be eliminated.
-Replace these containers with concrete slices, Go maps, or
-`insdict.Dict` at v0.10.1 when stable iteration is required. When a wrapper still
-has meaningful behavior, specialize it for its real element type. Do not
-preserve unbounded template generality in the port.
+The former `any`-based Go versions of `list`, `scoped_vector`, and
+`backtrackable_set` have been removed. Their live C++ instantiations belong to
+SMT consumers that have not yet been ported. Implement those concrete element
+types beside their consumers with typed nodes, slices, maps, or `insdict.Dict`
+at v0.10.1 when stable iteration is required. Do not restore a generic root
+adapter.
 
 ### 2. Symbols, parameters, statistics, and control
 

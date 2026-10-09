@@ -111227,12 +111227,9 @@
           "tests": []
         }
       ],
-      "ownership": [
-        "BacktrackableSet owns its Go map, trail values and scope indices. It retains comparable key interface values and an optional event closure until removal, undo or reset; returned Values slices are caller-owned snapshots."
-      ],
+      "ownership": [],
       "deviations": [
-        "The retained source specialization stores quantifier pointers. A map[any]struct{} supports comparable Go pointer identity without Go generics; non-comparable dynamic values retain a caller precondition and panic at the built-in map operation. Values replaces begin/end and deliberately promises no order, matching hash-set iteration semantics.",
-        "src/util/backtrackable_set.h:62-65 implements level-zero erase by calling m_set.insert(e), contradicting the method name and the scoped branch. The Go port deletes the value; TestBacktrackableSetLevelZeroEraseAndReset covers the correction. ErrBacktrackableSetScope replaces popping an empty source scope vector."
+        "No Go adapter is retained. The live quantifier-pointer specialization belongs to the unported SMT model finder and should use a concrete typed map plus typed undo slices when ported."
       ]
     },
     {
@@ -118701,12 +118698,9 @@
           "tests": []
         }
       ],
-      "ownership": [
-        "List nodes are ordinary Go allocations. Reachability and garbage collection replace the source region that owns list nodes; AppendList retains the source structural-sharing contract."
-      ],
+      "ownership": [],
       "deviations": [
-        "The source template is represented by one non-generic List whose head has dynamic Go type any. Retained consumers recover their concrete scalar or pointer type with an assertion. The region parameter is omitted because Go owns node lifetime.",
-        "The project persistent-list contract cannot be implemented by container/list, whose mutable doubly linked nodes cannot share an immutable suffix. No C++ standard-library container is ported."
+        "No Go adapter is retained. The production instantiations belong to unported SMT consumers; port each concrete value type there with a typed Go node or slice when that consumer arrives."
       ]
     },
     {
@@ -145166,12 +145160,9 @@
           "tests": []
         }
       ],
-      "ownership": [
-        "ScopedVector owns all logical values, historical scope copies, index mappings and rollback trails in Go slices. PopScope clears discarded any values before reslicing so garbage collection can reclaim their referenced objects."
-      ],
+      "ownership": [],
       "deviations": [
-        "The source template T is represented by one non-generic any-valued vector. Each concrete consumer owns one source specialization and is responsible for consistent dynamic value types.",
-        "Ref returns *any to the current slice slot. Like the source mutable reference, it bypasses copy-on-write and is invalid to retain across structural edits. Source assertion preconditions become Go panics."
+        "No Go adapter is retained. The live theory-sequence specialization belongs to unported SMT code and should be implemented there with concrete typed slices and scope indices."
       ]
     },
     {
