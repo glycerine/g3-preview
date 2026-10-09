@@ -174,6 +174,9 @@ The extracted `util/backtrack` package also stands on its own now. Its root
 `Trail` and `UnionFind` alias facades had no production consumer and were
 deleted; the concrete implementations and tests live only in the leaf.
 
+The root version-constant facade was likewise unused and has been deleted;
+generated version values live only in `util/version`.
+
 Very small leaf facilities such as `file_path`, `luby`, and `version` should
 still become distinct Go package leaves. This makes their consumers visible in
 the import graph, gives them an enforceable boundary, and makes later deletion
