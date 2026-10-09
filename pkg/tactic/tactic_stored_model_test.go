@@ -13,7 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestTacticStoredModelLabelsSnapshotInlineSpillAndAppend(t *testing.T) {
+func TestTacticStoredModelLabelsSnapshotAndAppend(t *testing.T) {
 	for _, n := range []int{0, 16, 17, 40} {
 		t.Run(fmt.Sprint(n), func(t *testing.T) {
 			m := astTestManager(t)
