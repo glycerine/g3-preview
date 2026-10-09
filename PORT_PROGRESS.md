@@ -1,5 +1,10 @@
 # Port progress — authoritative TODO and FINISHED ledger
 
+The unused Go translation of `src/util/resource_limit.h` and its self-only tests
+were removed. The prior whole-tree audit already classified the upstream header
+as dead and deleted: no production or test source includes it or uses its three
+classes. This is distinct from the live `Reslimit` implementation.
+
 `src/util/cooperate.h/.cpp` now live in the independent
 `pkg/util/cooperate` leaf with their debug and release build profiles. Model
 evaluation, SAT goal translation, and current polynomial/tactic fixtures import
@@ -30626,6 +30631,10 @@ Five focused tests cover callback order, nil growth, fill growth, reserve, erase
 
 ### util file: resource_limit.h
 
+Superseded: the implementation described below was removed after confirming it
+had no Go consumer and its upstream header is dead across the complete source
+tree. The text remains historical evidence of the earlier port.
+
 Completed the existing resource-limit port as exported ResourceLimit, BaseResourceLimit, LinearResourceLimit and ExponentialResourceLimit APIs in resource_limit.go, with exported constructors and methods matching the source class surface. The implementation preserves counter increment versus exhaustion boundaries, initial/current/maximum setters, independent counter and full resets, signed linear increments, truncating double-to-int exponential increments, nullable and present-empty descriptions, and refusal without state publication.
 
 The source's TRACE statement only reports a rejected increment and has no state or control-flow effect. The Go port returns the same false result with the limit unchanged and omits recreation of the C++ process-global diagnostic stream. Reached signed overflow and invalid floating conversion remain explicit errors because those operations are undefined in the C++ source domain.
@@ -30718,4 +30727,8 @@ The 00:44 UTC full native checkpoint found one stale AST allocation-count assert
 
 A recursive liveness audit of the complete `src/` tree, including `src/test` and source generators, found no include or caller of `src/util/dlist.h` and no include or consumer of the classes declared by `src/util/resource_limit.h`. Subpaving's uses of the word “dlist” are comments, and the `resource_limit` class local to `src/smt/theory_lra.cpp` is unrelated and derives from `lp::lp_resource_limit`.
 
-The user deleted both headers from `pkg/util/cppsrc/util`. Their manifest status is now `dead_deleted`, distinct from a platform replacement or a completed port, and records the whole-tree evidence for the deletion. The existing Go resource-limit implementation remains historical work pending a separate Go-consumer audit; it does not make the deleted C++ header live.
+The user deleted both headers from `pkg/util/cppsrc/util`. Their manifest status
+is now `dead_deleted`, distinct from a platform replacement or a completed port,
+and records the whole-tree evidence for the deletion. The former Go
+resource-limit implementation was also deleted after the consumer audit found
+no callers. The live `Reslimit` service is unrelated.
