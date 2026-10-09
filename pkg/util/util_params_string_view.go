@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Cold borrowed source pointer. Captured storage/provider/ref comes from the
@@ -14,8 +15,8 @@ type ParamsStringView struct {
 	words        *arena.Words
 	ref          arena.VectorRef
 	size         uint32
-	symbols      *SymbolManager
-	symbol       Symbol
+	symbols      *usymbol.Manager
+	symbol       usymbol.Symbol
 	literal      string
 	Mode         uint8
 	PresentField bool
@@ -57,14 +58,12 @@ func (v ParamsStringView) Byte(i uint64) (byte, error) {
 		if v.symbols == nil {
 			return 0, ErrParamsOwner
 		}
-		v.symbols.mu.Lock()
-		defer v.symbols.mu.Unlock()
-		if e := v.symbols.checkPlain(v.symbol); e != nil {
-			return 0, e
-		}
-		text, e := v.symbols.spelling(v.symbol)
+		text, present, e := v.symbols.BareString(v.symbol)
 		if e != nil {
 			return 0, e
+		}
+		if !present {
+			return 0, arena.ErrInvalidSlot
 		}
 		if i > uint64(len(text)) {
 			return 0, arena.ErrBounds
@@ -93,7 +92,7 @@ func (v ParamsStringView) Length() (uint64, error) {
 func (c *ParamsContext) GetStringViewFallbackName(v *ParamsRef, k *string, f *ParamsRef, d *string) (ParamsStringView, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	x, ok, e := c.get(v, Symbol{}, k, true, ParamString, f)
+	x, ok, e := c.get(v, usymbol.Symbol{}, k, true, ParamString, f)
 	if e != nil {
 		return ParamsStringView{}, e
 	}

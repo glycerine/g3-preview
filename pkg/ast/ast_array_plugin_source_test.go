@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTArraySourceConstructorAndInfiniteSortParameters(t *testing.T) {
@@ -59,7 +60,7 @@ func TestASTArrayEverySymbolConstructorAndPublicationReservation(t *testing.T) {
 	completed, failed := false, false
 	for ordinal := int64(0); ordinal < 256; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+		sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
 		m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
 		astTestMust(t, e)
@@ -248,7 +249,7 @@ func TestASTArrayFiniteEveryReturnExpressionReservation(t *testing.T) {
 	failed, completed := false, false
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+		sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
 		m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
 		astTestMust(t, e)

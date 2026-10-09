@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -27,14 +28,14 @@ func NewCmdExceptionCString(message string) CmdException {
 func NewCmdExceptionAt(message string, line, pos int32) CmdException {
 	return CmdException{z3exception.NewDefaultException(message), line, pos}
 }
-func NewCmdExceptionSymbol(m *util.SymbolManager, message string, s util.Symbol) (CmdException, error) {
+func NewCmdExceptionSymbol(m *usymbol.Manager, message string, s usymbol.Symbol) (CmdException, error) {
 	return NewCmdExceptionSymbolAt(m, message, s, -1, -1)
 }
 
 // The manager is borrowed during construction only. Checked spelling bytes go
 // directly into one final caller-owned message; no Symbol.String allocation or
 // owner mutation/charge occurs. Returned exceptions survive manager Close.
-func NewCmdExceptionSymbolAt(m *util.SymbolManager, message string, s util.Symbol, line, pos int32) (CmdException, error) {
+func NewCmdExceptionSymbolAt(m *usymbol.Manager, message string, s usymbol.Symbol, line, pos int32) (CmdException, error) {
 	if m == nil {
 		return CmdException{}, z3exception.ErrExceptionPrecondition
 	}
@@ -42,7 +43,7 @@ func NewCmdExceptionSymbolAt(m *util.SymbolManager, message string, s util.Symbo
 		return CmdException{}, e
 	}
 	if s.IsMarked() {
-		return CmdException{}, util.ErrInvalidSymbol
+		return CmdException{}, usymbol.ErrInvalid
 	}
 	prefix := message
 	if i := strings.IndexByte(message, 0); i >= 0 {
@@ -61,7 +62,7 @@ func NewCmdExceptionSymbolAt(m *util.SymbolManager, message string, s util.Symbo
 		length = uint64(2 + len(numeric))
 	} else if !s.IsNull() {
 		var e error
-		view, e = m.CStringView(s)
+		view, e = util.SymbolCStringView(m, s)
 		if e != nil {
 			return CmdException{}, e
 		}

@@ -5,14 +5,14 @@ package ast
 import (
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type astArrayPluginOwner struct {
 	next      *astArrayPluginOwner
 	self      *astArrayPluginOwner
 	owner     *ASTManager
-	names     [12]util.Symbol
+	names     [12]usymbol.Symbol
 	family    FamilyID
 	header    uint64
 	published bool

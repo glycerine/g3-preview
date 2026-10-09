@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly(t *testing.T) {
@@ -518,12 +519,12 @@ func TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags(t
 	defer func() { paramsMust(t, out.Close()) }()
 	plain, e := g.Symbols.Intern("QF_LIA")
 	paramsMust(t, e)
-	paramsMust(t, out.AppendSMTSymbol(g, util.Symbol{}))
+	paramsMust(t, out.AppendSMTSymbol(g, usymbol.Symbol{}))
 	paramsMust(t, out.AppendByte('|'))
 	paramsMust(t, out.AppendSMTSymbol(g, plain))
 	paramsMust(t, out.AppendByte('|'))
 	paramsMust(t, out.SetShowPos(true))
-	paramsMust(t, out.AppendSMTSymbol(g, util.NumericalSymbol(13)))
+	paramsMust(t, out.AppendSMTSymbol(g, usymbol.Numerical(13)))
 	text, e := out.String()
 	paramsMust(t, e)
 	if text != "null|QF_LIA|k!13" {
@@ -540,7 +541,7 @@ func TestSMTParamsRealYoungerModelDestructorStopProtectsOlderHelperAndAllBases(t
 	paramsMust(t, e)
 	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -663,7 +664,7 @@ func smtParamsRefCount(t *testing.T, c *util.ParamsContext, v *util.ParamsRef) u
 func TestSMTParamsNativeStringSolverMemberIgnoresSymbolArenaRefusal(t *testing.T) {
 	_, _, q := paramsTestOwner(t)
 	bs := arena.NewBudget(^uint64(0))
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2, DirectOnly: true})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2, DirectOnly: true})
 	paramsMust(t, e)
 	bc := arena.NewBudget(^uint64(0))
 	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
@@ -719,7 +720,7 @@ func TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation(t *testing.
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		_, _, q := paramsTestOwner(t)
 		b := arena.NewBudget(^uint64(0))
-		sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+		sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		bc := arena.NewBudget(^uint64(0))
 		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})

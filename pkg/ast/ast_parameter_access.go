@@ -2,6 +2,7 @@ package ast
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func (m *ASTManager) parameterOfKind(p ASTParameter, kind ASTParameterKind) (*astParameterRecord, error) {
@@ -36,14 +37,14 @@ func (m *ASTManager) ParameterAST(p ASTParameter) (ASTHandle, error) {
 	}
 	return m.external(r.ast), nil
 }
-func (m *ASTManager) ParameterSymbol(p ASTParameter) (util.Symbol, error) {
+func (m *ASTManager) ParameterSymbol(p ASTParameter) (usymbol.Symbol, error) {
 	if e := m.lock(); e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	defer m.mu.Unlock()
 	r, e := m.parameterOfKind(p, ASTParameterSymbol)
 	if e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	return r.symbol, nil
 }

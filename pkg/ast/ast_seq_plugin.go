@@ -8,7 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // IDs encode only the source pointer slots. The separately charged concrete
@@ -16,7 +16,7 @@ import (
 type astSequenceSignature struct {
 	next                                                       *astSequenceSignature
 	owner                                                      *astSequencePluginOwner
-	name                                                       util.Symbol
+	name                                                       usymbol.Symbol
 	parameters, id, cursor                                     uint32
 	domain                                                     ASTRefVector
 	rangeSort                                                  astNodeRef
@@ -29,7 +29,7 @@ type astSequencePluginOwner struct {
 	next                    *astSequencePluginOwner
 	self                    *astSequencePluginOwner
 	owner                   *ASTManager
-	names                   [2]util.Symbol
+	names                   [2]usymbol.Symbol
 	family                  FamilyID
 	signatures              astPluginVector
 	owned                   *astSequenceSignature
@@ -461,7 +461,7 @@ func (m *ASTManager) initializeSequence(p *astSequencePluginOwner) error {
 		return nil
 	}
 	p.initialized = true // source publication precedes every recursive declaration
-	k, e := m.registerUserName(util.NumericalSymbol(0))
+	k, e := m.registerUserName(usymbol.Numerical(0))
 	if e != nil {
 		return e
 	}

@@ -9,9 +9,10 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *util.SexprManager, *util.SymbolManager, *util.RationalService, *UPolynomialManager, UPolynomial) {
+func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *util.SexprManager, *usymbol.Manager, *util.RationalService, *UPolynomialManager, UPolynomial) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	sx, sy, q := sxOwner(t, b)
@@ -34,7 +35,7 @@ func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *util.SexprManager, *
 	})
 	return c, sx, sy, q, p, out
 }
-func sxPolySym(t *testing.T, sx *util.SexprManager, sy *util.SymbolManager, name string) util.SexprHandle {
+func sxPolySym(t *testing.T, sx *util.SexprManager, sy *usymbol.Manager, name string) util.SexprHandle {
 	t.Helper()
 	h, e := sx.MkSymbol(internSymbol(t, sy, name), 13, 17)
 	sxMust(t, e)
@@ -48,7 +49,7 @@ func sxPolyNum(t *testing.T, sx *util.SexprManager, q *util.RationalService, tex
 	sxMust(t, q.Del(&v))
 	return h
 }
-func sxPolyApp(t *testing.T, sx *util.SexprManager, sy *util.SymbolManager, op string, args ...util.SexprHandle) util.SexprHandle {
+func sxPolyApp(t *testing.T, sx *util.SexprManager, sy *usymbol.Manager, op string, args ...util.SexprHandle) util.SexprHandle {
 	t.Helper()
 	children := append([]util.SexprHandle{sxPolySym(t, sx, sy, op)}, args...)
 	h, e := sx.MkComposite(children, 31, 37)

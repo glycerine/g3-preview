@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func pdStreamBuffer(t *testing.T, b *arena.Budget) *StringBuffer64 {
@@ -97,7 +98,7 @@ func TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner(t *testing.T) {
 	d := pdnew(t, m, nil)
 	b := pdStreamBuffer(t, nil)
 	paramsMust(t, b.AppendCString("p"))
-	paramsMust(t, d.Insert(Symbol{}, ParamUInt, pdstr("desc"), nil, nil))
+	paramsMust(t, d.Insert(usymbol.Symbol{}, ParamUInt, pdstr("desc"), nil, nil))
 	if e := d.DisplayInto(b, 2, false, false); !errors.Is(e, ErrParamDescrsPrecondition) {
 		t.Fatal(e)
 	}

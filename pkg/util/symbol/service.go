@@ -1,5 +1,5 @@
 // Source: src/util/symbol.cpp:70-83; internal_symbol_table members:33-35.
-package util
+package symbol
 
 import (
 	"errors"
@@ -8,55 +8,54 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-var ErrSymbolServiceOwner = errors.New("g3: invalid symbol service owner")
-var ErrSymbolServiceUninitialized = errors.New("g3: source symbol table is null")
+var ErrServiceOwner = errors.New("g3: invalid symbol service owner")
+var ErrServiceUninitialized = errors.New("g3: source symbol table is null")
 
-// SymbolService holds the source symbol-table pointer in an explicit single-
-// lane owner. The actual manager constructs region then table, and destroys
-// table then region. The cold service header is charged once; no synthetic
-// reservation represents initialize_symbols or finalize_symbols.
+// Service holds the source symbol-table pointer in an explicit single-lane
+// owner. Initialization publishes a completed native Go manager; finalization
+// closes it before clearing the pointer. The service header is charged once.
 // Process singleton and global Runtime accounting remain separate bindings.
-type SymbolService struct {
-	self       *SymbolService
-	config     SymbolConfig
-	manager    *SymbolManager
+type Service struct {
+	self       *Service
+	config     Config
+	manager    *Manager
 	ownerBytes uint64
 	closed     bool
 }
 
-func NewSymbolService(c SymbolConfig) (*SymbolService, error) {
-	n := uint64(reflect.TypeOf(SymbolService{}).Size())
+func NewService(c Config) (*Service, error) {
+	n := uint64(reflect.TypeOf(Service{}).Size())
 	if e := c.Budget.Reserve(n); e != nil {
 		return nil, e
 	}
-	s := &SymbolService{config: c, ownerBytes: n}
+	s := &Service{config: c, ownerBytes: n}
 	s.self = s
 	return s, nil
 }
-func (s *SymbolService) open() error {
+func (s *Service) open() error {
 	if s == nil || s.self != s {
-		return ErrSymbolServiceOwner
+		return ErrServiceOwner
 	}
 	if s.closed {
 		return arena.ErrClosed
 	}
 	return nil
 }
-func (s *SymbolService) InitializeSource() error {
+func (s *Service) InitializeSource() error {
 	if e := s.open(); e != nil {
 		return e
 	}
 	if s.manager != nil {
 		return nil
 	}
-	m, e := NewSymbolManager(s.config)
+	m, e := NewManager(s.config)
 	if e != nil {
 		return e
 	}
 	s.manager = m
 	return nil
 }
-func (s *SymbolService) FinalizeSource() error {
+func (s *Service) FinalizeSource() error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -71,18 +70,18 @@ func (s *SymbolService) FinalizeSource() error {
 
 // Manager borrows the currently published table. Finalization invalidates all
 // symbols of that owner; a later initialization acquires a fresh owner identity.
-func (s *SymbolService) Manager() (*SymbolManager, error) {
+func (s *Service) Manager() (*Manager, error) {
 	if e := s.open(); e != nil {
 		return nil, e
 	}
 	if s.manager == nil {
-		return nil, ErrSymbolServiceUninitialized
+		return nil, ErrServiceUninitialized
 	}
 	return s.manager, nil
 }
-func (s *SymbolService) Close() error {
+func (s *Service) Close() error {
 	if s == nil || s.self != s {
-		return ErrSymbolServiceOwner
+		return ErrServiceOwner
 	}
 	if s.closed {
 		return nil

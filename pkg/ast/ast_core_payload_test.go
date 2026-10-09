@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTSymbolPayloadCodecAndPhysicalCharges(t *testing.T) {
@@ -15,10 +15,10 @@ func TestASTSymbolPayloadCodecAndPhysicalCharges(t *testing.T) {
 	text := astTestSymbol(t, m, "codec-spelling")
 	marked, e := text.Mark()
 	astTestMust(t, e)
-	numerical := util.NumericalSymbol(math.MaxUint32)
+	numerical := usymbol.Numerical(math.MaxUint32)
 	markedNumber, e := numerical.Mark()
 	astTestMust(t, e)
-	values := []util.Symbol{{}, util.NumericalSymbol(0), numerical, text, marked, markedNumber, util.DummySymbol()}
+	values := []usymbol.Symbol{{}, usymbol.Numerical(0), numerical, text, marked, markedNumber, usymbol.Dummy()}
 	before := m.allocator.Stats()
 	p, e := m.allocator.Allocate(uint32(len(values)) * 24)
 	astTestMust(t, e)
@@ -47,17 +47,17 @@ func TestASTSymbolPayloadCodecAndPhysicalCharges(t *testing.T) {
 	}
 	got, e := m.readSymbol(p, 0)
 	astTestMust(t, e)
-	if got != (util.Symbol{}) {
+	if got != (usymbol.Symbol{}) {
 		t.Fatal("overflow mutated element zero")
 	}
 	if _, e = m.readSymbol(p, 1<<29); !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("overflowed reader offset", e)
 	}
-	other, e := util.NewSymbolManager(util.SymbolConfig{})
+	other, e := usymbol.NewManager(usymbol.Config{})
 	astTestMust(t, e)
 	foreign, e := other.Intern("foreign")
 	astTestMust(t, e)
-	if e = m.writeSymbol(p, 0, foreign); !errors.Is(e, util.ErrSymbolOwner) {
+	if e = m.writeSymbol(p, 0, foreign); !errors.Is(e, usymbol.ErrOwner) {
 		t.Fatal("foreign spelling accepted", e)
 	}
 	astTestMust(t, other.Close())

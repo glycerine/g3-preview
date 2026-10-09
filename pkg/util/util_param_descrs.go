@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/insdict"
 )
 
@@ -110,11 +111,11 @@ type ParamDescrsStats struct {
 type ParamDescrs struct {
 	mu                   sync.Mutex
 	Self                 *ParamDescrs
-	manager              *SymbolManager
+	manager              *usymbol.Manager
 	Budget               *arena.Budget
 	Texts                *arena.Words
-	entries              *insdict.Dict[Symbol, paramDescrInfo]
-	Names                []Symbol
+	entries              *insdict.Dict[usymbol.Symbol, paramDescrInfo]
+	Names                []usymbol.Symbol
 	closed               bool
 	constructorReady     bool
 	constructorCompleted uint8
@@ -135,11 +136,11 @@ func pdGrowth(n int) (int, error) {
 	}
 	return v, nil
 }
-func prepareSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (ParamDescrsConfig, error) {
+func prepareSourceParamDescrs(m *usymbol.Manager, c ParamDescrsConfig) (ParamDescrsConfig, error) {
 	if m == nil {
 		return c, ErrParamDescrsPrecondition
 	}
-	if _, e := m.Hash(Symbol{}); e != nil {
+	if _, e := m.Hash(usymbol.Symbol{}); e != nil {
 		return c, e
 	}
 	n := c.InitialCapacity
@@ -162,7 +163,7 @@ func prepareSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (ParamDescr
 	}
 	return c, nil
 }
-func newSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, error) {
+func newSourceParamDescrs(m *usymbol.Manager, c ParamDescrsConfig) (*ParamDescrs, error) {
 	c, e := prepareSourceParamDescrs(m, c)
 	if e != nil {
 		return nil, e
@@ -189,8 +190,9 @@ func (d *ParamDescrs) constructSourceMembers(c ParamDescrsConfig) error {
 		return e
 	}
 	d.Texts = text
-	d.entries = insdict.NewDictFuncSize[Symbol, paramDescrInfo](func(k Symbol) uint64 {
-		h := (k.owner ^ uint64(k.Value)<<32) | uint64(k.Tag)
+	d.entries = insdict.NewDictFuncSize[usymbol.Symbol, paramDescrInfo](func(k usymbol.Symbol) uint64 {
+		words := k.SymbolWords()
+		h := ((uint64(words[0]) | uint64(words[1])<<32) ^ uint64(k.Value)<<32) | uint64(k.Tag)
 		return h ^ uint64(k.Generation)*0x9e3779b97f4a7c15
 	}, int(c.InitialCapacity))
 	d.constructorCompleted = 1 // actual info dictionary completed
@@ -209,10 +211,10 @@ func (d *ParamDescrs) open() error {
 	if !d.constructorReady {
 		return ErrParamDescrsPrecondition
 	}
-	_, e := d.manager.Hash(Symbol{})
+	_, e := d.manager.Hash(usymbol.Symbol{})
 	return e
 }
-func (d *ParamDescrs) find(k Symbol) (paramDescrInfo, bool, error) {
+func (d *ParamDescrs) find(k usymbol.Symbol) (paramDescrInfo, bool, error) {
 	_, e := d.manager.Hash(k)
 	if e != nil {
 		return paramDescrInfo{}, false, e
@@ -224,7 +226,7 @@ func (d *ParamDescrs) store(s *string) (paramDescrText, error) {
 	if s == nil {
 		return paramDescrText{}, nil
 	}
-	length := cSymbolLength(*s)
+	length := nulStringLength(*s)
 	if uint64(length) > uint64(^uint32(0))-4 {
 		return paramDescrText{}, arena.ErrBounds
 	}
@@ -272,7 +274,7 @@ func (d *ParamDescrs) drop(i paramDescrInfo) {
 		}
 	}
 }
-func (d *ParamDescrs) prepareInsert(k Symbol, kind ParamKind) (bool, error) {
+func (d *ParamDescrs) prepareInsert(k usymbol.Symbol, kind ParamKind) (bool, error) {
 	_, e := d.manager.Hash(k)
 	if e != nil {
 		return false, e
@@ -288,7 +290,7 @@ func (d *ParamDescrs) prepareInsert(k Symbol, kind ParamKind) (bool, error) {
 	}
 	return false, nil
 }
-func (d *ParamDescrs) publishInsert(k Symbol, info paramDescrInfo) error {
+func (d *ParamDescrs) publishInsert(k usymbol.Symbol, info paramDescrInfo) error {
 	// Preserve source insertion publication before names.push_back. A names
 	// history records the first successful insertion.
 	d.entries.Put(k, info)
@@ -300,7 +302,7 @@ func (d *ParamDescrs) publishInsert(k Symbol, info paramDescrInfo) error {
 	d.Names = append(d.Names, k)
 	return nil
 }
-func (d *ParamDescrs) insert(k Symbol, kind ParamKind, descr, def, module *string) error {
+func (d *ParamDescrs) insert(k usymbol.Symbol, kind ParamKind, descr, def, module *string) error {
 	existing, e := d.prepareInsert(k, kind)
 	if e != nil || existing {
 		return e
@@ -344,7 +346,7 @@ func (d *ParamDescrs) copyText(source *ParamDescrs, old paramDescrText) (paramDe
 	}
 	return paramDescrText{r, old.length}, nil
 }
-func (d *ParamDescrs) insertCopy(source *ParamDescrs, key Symbol, sourceInfo paramDescrInfo) error {
+func (d *ParamDescrs) insertCopy(source *ParamDescrs, key usymbol.Symbol, sourceInfo paramDescrInfo) error {
 	existing, e := d.prepareInsert(key, sourceInfo.kind)
 	if e != nil || existing {
 		return e
@@ -363,7 +365,7 @@ func (d *ParamDescrs) insertCopy(source *ParamDescrs, key Symbol, sourceInfo par
 	}
 	return d.publishInsert(key, info)
 }
-func (d *ParamDescrs) Insert(k Symbol, kind ParamKind, descr, def, module *string) error {
+func (d *ParamDescrs) Insert(k usymbol.Symbol, kind ParamKind, descr, def, module *string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if e := d.open(); e != nil {
@@ -383,8 +385,11 @@ func (d *ParamDescrs) InsertName(name string, kind ParamKind, descr, def, module
 	}
 	return d.insert(k, kind, descr, def, module)
 }
-func (d *ParamDescrs) contains(k Symbol) (bool, error) { _, found, e := d.find(k); return found, e }
-func (d *ParamDescrs) Contains(k Symbol) (bool, error) {
+func (d *ParamDescrs) contains(k usymbol.Symbol) (bool, error) {
+	_, found, e := d.find(k)
+	return found, e
+}
+func (d *ParamDescrs) Contains(k usymbol.Symbol) (bool, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if e := d.open(); e != nil {
@@ -404,7 +409,7 @@ func (d *ParamDescrs) ContainsName(name string) (bool, error) {
 	}
 	return d.contains(k)
 }
-func (d *ParamDescrs) erase(k Symbol) error {
+func (d *ParamDescrs) erase(k usymbol.Symbol) error {
 	info, found, e := d.find(k)
 	if e != nil || !found {
 		return e
@@ -413,7 +418,7 @@ func (d *ParamDescrs) erase(k Symbol) error {
 	d.entries.Del(k)
 	return nil
 }
-func (d *ParamDescrs) Erase(k Symbol) error {
+func (d *ParamDescrs) Erase(k usymbol.Symbol) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if e := d.open(); e != nil {
@@ -433,14 +438,14 @@ func (d *ParamDescrs) EraseName(name string) error {
 	}
 	return d.erase(k)
 }
-func (d *ParamDescrs) kind(k Symbol) (ParamKind, error) {
+func (d *ParamDescrs) kind(k usymbol.Symbol) (ParamKind, error) {
 	info, found, e := d.find(k)
 	if e != nil || !found {
 		return ParamInvalid, e
 	}
 	return info.kind, nil
 }
-func (d *ParamDescrs) Kind(k Symbol) (ParamKind, error) {
+func (d *ParamDescrs) Kind(k usymbol.Symbol) (ParamKind, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if e := d.open(); e != nil {
@@ -460,7 +465,7 @@ func (d *ParamDescrs) KindName(name string) (ParamKind, error) {
 	}
 	return d.kind(k)
 }
-func (d *ParamDescrs) text(k Symbol, which uint32) (string, bool, error) {
+func (d *ParamDescrs) text(k usymbol.Symbol, which uint32) (string, bool, error) {
 	info, found, e := d.find(k)
 	if e != nil || !found {
 		return "", false, e
@@ -474,7 +479,7 @@ func (d *ParamDescrs) text(k Symbol, which uint32) (string, bool, error) {
 	}
 	return d.load(r)
 }
-func (d *ParamDescrs) getText(k Symbol, which uint32) (string, bool, error) {
+func (d *ParamDescrs) getText(k usymbol.Symbol, which uint32) (string, bool, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if e := d.open(); e != nil {
@@ -494,12 +499,12 @@ func (d *ParamDescrs) getTextName(name string, which uint32) (string, bool, erro
 	}
 	return d.text(k, which)
 }
-func (d *ParamDescrs) Description(k Symbol) (string, bool, error)     { return d.getText(k, 0) }
-func (d *ParamDescrs) Default(k Symbol) (string, bool, error)         { return d.getText(k, 1) }
-func (d *ParamDescrs) Module(k Symbol) (string, bool, error)          { return d.getText(k, 2) }
-func (d *ParamDescrs) DescriptionName(n string) (string, bool, error) { return d.getTextName(n, 0) }
-func (d *ParamDescrs) DefaultName(n string) (string, bool, error)     { return d.getTextName(n, 1) }
-func (d *ParamDescrs) ModuleName(n string) (string, bool, error)      { return d.getTextName(n, 2) }
+func (d *ParamDescrs) Description(k usymbol.Symbol) (string, bool, error) { return d.getText(k, 0) }
+func (d *ParamDescrs) Default(k usymbol.Symbol) (string, bool, error)     { return d.getText(k, 1) }
+func (d *ParamDescrs) Module(k usymbol.Symbol) (string, bool, error)      { return d.getText(k, 2) }
+func (d *ParamDescrs) DescriptionName(n string) (string, bool, error)     { return d.getTextName(n, 0) }
+func (d *ParamDescrs) DefaultName(n string) (string, bool, error)         { return d.getTextName(n, 1) }
+func (d *ParamDescrs) ModuleName(n string) (string, bool, error)          { return d.getTextName(n, 2) }
 func (d *ParamDescrs) Size() (uint32, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -508,30 +513,28 @@ func (d *ParamDescrs) Size() (uint32, error) {
 	}
 	return uint32(len(d.Names)), nil
 }
-func (d *ParamDescrs) ParamName(i uint32) (Symbol, error) {
+func (d *ParamDescrs) ParamName(i uint32) (usymbol.Symbol, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if e := d.open(); e != nil {
-		return Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	if uint64(i) >= uint64(len(d.Names)) {
-		return Symbol{}, arena.ErrBounds
+		return usymbol.Symbol{}, arena.ErrBounds
 	}
 	return d.Names[i], nil
 }
 
 // Checked spelling byte access does not allocate a borrowed spelling copy.
-func (d *ParamDescrs) symbolByte(k Symbol, index uint32) (byte, error) {
+func (d *ParamDescrs) symbolByte(k usymbol.Symbol, index uint32) (byte, error) {
 	m := d.manager
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if e := m.checkPlain(k); e != nil {
+	if e := m.Validate(k); e != nil {
 		return 0, e
 	}
 	if k.Value == 0 || k.IsNumerical() {
 		return 0, ErrParamDescrsPrecondition
 	}
-	text, e := m.spelling(k)
+	text, _, e := m.BareString(k)
 	if e != nil {
 		return 0, e
 	}
@@ -543,12 +546,12 @@ func (d *ParamDescrs) symbolByte(k Symbol, index uint32) (byte, error) {
 	}
 	return text[index], nil
 }
-func (d *ParamDescrs) internBytes(b []byte) (Symbol, error) {
+func (d *ParamDescrs) internBytes(b []byte) (usymbol.Symbol, error) {
 	return d.manager.Intern(string(b))
 }
-func (d *ParamDescrs) internSymbolRange(k Symbol, start, n uint32) (Symbol, error) {
+func (d *ParamDescrs) internSymbolRange(k usymbol.Symbol, start, n uint32) (usymbol.Symbol, error) {
 	if uint64(n) > uint64(^uint(0)>>1) {
-		return Symbol{}, arena.ErrBounds
+		return usymbol.Symbol{}, arena.ErrBounds
 	}
 	if n == 0 {
 		return d.manager.Intern("")
@@ -557,42 +560,42 @@ func (d *ParamDescrs) internSymbolRange(k Symbol, start, n uint32) (Symbol, erro
 	for i := uint32(0); i < n; i++ {
 		v, e := d.symbolByte(k, start+i)
 		if e != nil {
-			return Symbol{}, e
+			return usymbol.Symbol{}, e
 		}
 		b[i] = v
 	}
 	return d.internBytes(b)
 }
-func (d *ParamDescrs) internText(r paramDescrText) (Symbol, error) {
+func (d *ParamDescrs) internText(r paramDescrText) (usymbol.Symbol, error) {
 	if r.ref == (arena.VectorRef{}) {
-		return Symbol{}, nil
+		return usymbol.Symbol{}, nil
 	}
 	if r.length == 0 {
 		return d.manager.Intern("")
 	}
 	if uint64(r.length) > uint64(^uint(0)>>1) {
-		return Symbol{}, arena.ErrBounds
+		return usymbol.Symbol{}, arena.ErrBounds
 	}
 	b := make([]byte, r.length)
 	for i := uint32(0); i < r.length; i++ {
 		v, e := d.Texts.Read(r.ref, i/4)
 		if e != nil {
-			return Symbol{}, e
+			return usymbol.Symbol{}, e
 		}
 		b[i] = byte(v >> (8 * (i % 4)))
 	}
 	return d.internBytes(b)
 }
-func (d *ParamDescrs) splitName(name Symbol) (Symbol, Symbol, bool, error) {
+func (d *ParamDescrs) splitName(name usymbol.Symbol) (usymbol.Symbol, usymbol.Symbol, bool, error) {
 	n, e := d.manager.Size(name)
 	if e != nil {
-		return Symbol{}, Symbol{}, false, e
+		return usymbol.Symbol{}, usymbol.Symbol{}, false, e
 	}
 	dot := uint32(0)
 	for dot < n {
 		ch, e := d.symbolByte(name, dot)
 		if e != nil {
-			return Symbol{}, Symbol{}, false, e
+			return usymbol.Symbol{}, usymbol.Symbol{}, false, e
 		}
 		if ch == '.' {
 			break
@@ -600,26 +603,26 @@ func (d *ParamDescrs) splitName(name Symbol) (Symbol, Symbol, bool, error) {
 		dot++
 	}
 	if dot == n {
-		return Symbol{}, Symbol{}, false, nil
+		return usymbol.Symbol{}, usymbol.Symbol{}, false, nil
 	}
 	prefixBytes := make([]byte, dot)
 	for i := uint32(0); i < dot; i++ {
 		prefixBytes[i], e = d.symbolByte(name, i)
 		if e != nil {
-			return Symbol{}, Symbol{}, false, e
+			return usymbol.Symbol{}, usymbol.Symbol{}, false, e
 		}
 	}
 	prefix, e := d.internBytes(prefixBytes)
 	if e != nil {
-		return Symbol{}, Symbol{}, false, e
+		return usymbol.Symbol{}, usymbol.Symbol{}, false, e
 	}
 	suffix, e := d.internSymbolRange(name, dot+1, n-dot-1)
 	if e != nil {
-		return Symbol{}, Symbol{}, false, e
+		return usymbol.Symbol{}, usymbol.Symbol{}, false, e
 	}
 	return prefix, suffix, true, nil
 }
-func (d *ParamDescrs) KindInModule(name *Symbol) (ParamKind, error) {
+func (d *ParamDescrs) KindInModule(name *usymbol.Symbol) (ParamKind, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if e := d.open(); e != nil {
@@ -632,7 +635,7 @@ func (d *ParamDescrs) KindInModule(name *Symbol) (ParamKind, error) {
 	if e != nil || k != ParamInvalid || name.IsNumerical() {
 		return k, e
 	}
-	if *name == (Symbol{}) {
+	if *name == (usymbol.Symbol{}) {
 		return ParamInvalid, ErrParamDescrsPrecondition
 	}
 	prefix, suffix, split, e := d.splitName(*name)
@@ -663,24 +666,22 @@ func (d *ParamDescrs) KindInModule(name *Symbol) (ParamKind, error) {
 
 // symbolCompare is strcmp over the borrowed manager's checked spelling,
 // without materializing uncharged intermediate Go strings.
-func (d *ParamDescrs) symbolCompare(a, b Symbol) (int, error) {
+func (d *ParamDescrs) symbolCompare(a, b usymbol.Symbol) (int, error) {
 	m := d.manager
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if e := m.checkPlain(a); e != nil {
+	if e := m.Validate(a); e != nil {
 		return 0, e
 	}
-	if e := m.checkPlain(b); e != nil {
+	if e := m.Validate(b); e != nil {
 		return 0, e
 	}
 	if a.Value == 0 || b.Value == 0 || a.IsNumerical() || b.IsNumerical() {
 		return 0, ErrParamDescrsPrecondition
 	}
-	x, e := m.spelling(a)
+	x, _, e := m.BareString(a)
 	if e != nil {
 		return 0, e
 	}
-	y, e := m.spelling(b)
+	y, _, e := m.BareString(b)
 	if e != nil {
 		return 0, e
 	}
@@ -689,7 +690,7 @@ func (d *ParamDescrs) symbolCompare(a, b Symbol) (int, error) {
 
 // Concrete in-place sort realizes std::sort's comparator/output contract;
 // it has no reflection swapper or additional heap-backed work arrays.
-func (d *ParamDescrs) siftSymbols(a []Symbol, root, end int) error {
+func (d *ParamDescrs) siftSymbols(a []usymbol.Symbol, root, end int) error {
 	for root < end/2 {
 		child := root*2 + 1
 		if child+1 < end {
@@ -713,7 +714,7 @@ func (d *ParamDescrs) siftSymbols(a []Symbol, root, end int) error {
 	}
 	return nil
 }
-func (d *ParamDescrs) sortSymbols(a []Symbol) error {
+func (d *ParamDescrs) sortSymbols(a []usymbol.Symbol) error {
 	for i := len(a) / 2; i > 0; i-- {
 		if e := d.siftSymbols(a, i-1, len(a)); e != nil {
 			return e
@@ -727,17 +728,15 @@ func (d *ParamDescrs) sortSymbols(a []Symbol) error {
 	}
 	return nil
 }
-func (d *ParamDescrs) writeName(out *strings.Builder, k Symbol, smt2 bool) error {
+func (d *ParamDescrs) writeName(out *strings.Builder, k usymbol.Symbol, smt2 bool) error {
 	m := d.manager
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if e := m.checkPlain(k); e != nil {
+	if e := m.Validate(k); e != nil {
 		return e
 	}
 	if k.Value == 0 || k.IsNumerical() {
 		return ErrParamDescrsPrecondition
 	}
-	text, e := m.spelling(k)
+	text, _, e := m.BareString(k)
 	if e != nil {
 		return e
 	}
@@ -770,7 +769,7 @@ func (d *ParamDescrs) Display(indent uint32, smt2, includeDescr bool) (string, e
 	if e := d.open(); e != nil {
 		return "", e
 	}
-	var names []Symbol
+	var names []usymbol.Symbol
 	for key := range d.entries.All() {
 		names = append(names, key)
 	}
@@ -941,7 +940,7 @@ func (d *ParamDescrs) closeSourceMembers() error {
 }
 
 // InitEmbeddedSource preserves placement-new storage and failed member prefixes.
-func (d *ParamDescrs) InitEmbeddedSource(m *SymbolManager, c ParamDescrsConfig) error {
+func (d *ParamDescrs) InitEmbeddedSource(m *usymbol.Manager, c ParamDescrsConfig) error {
 	cfg, e := prepareSourceParamDescrs(m, c)
 	if e != nil {
 		return e

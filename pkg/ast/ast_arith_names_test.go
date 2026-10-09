@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTArithmeticOriginalSortNamesAndPersistentConversion(t *testing.T) {
@@ -14,7 +14,7 @@ func TestASTArithmeticOriginalSortNamesAndPersistentConversion(t *testing.T) {
 		m := astTestManager(t)
 		_, e := m.RegisterArithmeticPlugin()
 		astTestMust(t, e)
-		logic := util.Symbol{}
+		logic := usymbol.Symbol{}
 		if text != "" {
 			logic = astTestSymbol(t, m, text)
 		}
@@ -72,7 +72,7 @@ func TestASTArithmeticOriginalOperatorNamesOrderAndLogic(t *testing.T) {
 	astTestMust(t, e)
 	want := []string{"<=", ">=", "<", ">", "+", "-", "~", "*", "/", "div", "rem", "mod", "to_real", "to_int", "is_int", "abs", "^", "sin", "cos", "tan", "asin", "acos", "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "pi", "euler"}
 	for _, text := range []string{"", "ALL", "QF_NRA", "QF_LIA", "NRA"} {
-		logic := util.Symbol{}
+		logic := usymbol.Symbol{}
 		if text != "" {
 			logic = astTestSymbol(t, m, text)
 		}
@@ -103,7 +103,7 @@ func TestASTArithmeticNameCallbacksAppendToExistingVector(t *testing.T) {
 	astTestMust(t, e)
 	var names ASTBuiltinNames
 	defer names.Close()
-	astTestMust(t, m.GetArithmeticSortNames(&names, util.Symbol{}))
+	astTestMust(t, m.GetArithmeticSortNames(&names, usymbol.Symbol{}))
 	first, second := names.Items()[0], names.Items()[1]
 	astTestMust(t, m.GetArithmeticSortNames(&names, astTestSymbol(t, m, "NRA")))
 	if len(names.Items()) != 3 || names.Items()[0] != first || names.Items()[1] != second || names.Items()[2] != second {
@@ -128,11 +128,11 @@ func TestASTArithmeticNameVectorRefusalPreservesFlagAndPrefix(t *testing.T) {
 		t.Fatal("source conversion flag precedes name vector growth", e)
 	}
 	defer names.Close()
-	astTestMust(t, m.GetArithmeticOpNames(&names, util.Symbol{}))
+	astTestMust(t, m.GetArithmeticOpNames(&names, usymbol.Symbol{}))
 	names.Close()
 	for fault := int64(0); fault < 32; fault++ {
 		m.Budget().FailAfter(fault)
-		e = m.GetArithmeticOpNames(&names, util.Symbol{})
+		e = m.GetArithmeticOpNames(&names, usymbol.Symbol{})
 		m.Budget().FailAfter(-1)
 		if e == nil {
 			if len(names.Items()) != 31 {

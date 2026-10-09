@@ -8,11 +8,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type astDatatypeDefinitionEntry struct {
 	hash, state uint32
-	name        util.Symbol
+	name        usymbol.Symbol
 	definition  uint32
 }
 type astDatatypeDefinitionMap struct {
@@ -156,7 +157,7 @@ type astDatatypePluginOwner struct {
 	next                 *astDatatypePluginOwner
 	utility              *astDatatypeUtility
 	definitions          astDatatypeDefinitionMap
-	definitionBlock      []util.Symbol
+	definitionBlock      []usymbol.Symbol
 	classID              uint32
 	family               FamilyID
 	header               uint64
@@ -217,7 +218,7 @@ func (m *ASTManager) RegisterDatatypePlugin() (FamilyID, error) {
 }
 func (m *ASTManager) datatypePluginBytes() uint64 {
 	size := func(p *astDatatypePluginOwner) uint64 {
-		return p.header + uint64(len(p.definitions.cells))*uint64(reflect.TypeOf(astDatatypeDefinitionEntry{}).Size()) + uint64(cap(p.definitionBlock))*uint64(reflect.TypeOf(util.Symbol{}).Size())
+		return p.header + uint64(len(p.definitions.cells))*uint64(reflect.TypeOf(astDatatypeDefinitionEntry{}).Size()) + uint64(cap(p.definitionBlock))*uint64(reflect.TypeOf(usymbol.Symbol{}).Size())
 	}
 	var n uint64
 	if m.datatypePlugin != nil {
@@ -231,7 +232,7 @@ func (m *ASTManager) datatypePluginBytes() uint64 {
 func (m *ASTManager) releaseDatatypePluginHistory() {
 	release := func(p *astDatatypePluginOwner) {
 		p.definitions.destroy(m.BudgetField)
-		m.BudgetField.Release(uint64(cap(p.definitionBlock)) * uint64(reflect.TypeOf(util.Symbol{}).Size()))
+		m.BudgetField.Release(uint64(cap(p.definitionBlock)) * uint64(reflect.TypeOf(usymbol.Symbol{}).Size()))
 		p.definitionBlock = nil
 		m.BudgetField.Release(p.header)
 		p.header = 0
@@ -270,7 +271,7 @@ func (m *ASTManager) finalizeDatatypePlugin() error {
 		p.utility = nil
 	}
 	// The destructor repeats the empty BODY, then reverse automatic members.
-	m.BudgetField.Release(uint64(cap(p.definitionBlock)) * uint64(reflect.TypeOf(util.Symbol{}).Size()))
+	m.BudgetField.Release(uint64(cap(p.definitionBlock)) * uint64(reflect.TypeOf(usymbol.Symbol{}).Size()))
 	p.definitionBlock = nil
 	p.definitions.destroy(m.BudgetField)
 	p.membersEnded = true

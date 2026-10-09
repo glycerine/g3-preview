@@ -1,6 +1,8 @@
 // Source: src/util/gparams.cpp:150-160,446-550,623-627; src/util/gparams.h.
 package util
 
+import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+
 import "github.com/glycerine/g3/pkg/arena"
 
 // Region bindings are cold borrowed owners. The source stores char* without
@@ -86,7 +88,7 @@ func (g *GlobalParams) descriptionInto(out *StringBuffer64, text GlobalParamCStr
 		}
 	}
 }
-func (g *GlobalParams) moduleHeaderInto(out *StringBuffer64, key Symbol) error {
+func (g *GlobalParams) moduleHeaderInto(out *StringBuffer64, key usymbol.Symbol) error {
 	if out == nil {
 		return ErrStringBufferOwner
 	}
@@ -191,7 +193,7 @@ func (g *GlobalParams) DisplayModuleInto(out *StringBuffer64, name string) error
 }
 
 // Caller owns the existing imp lock and has reached its ordinary open guard.
-func (g *GlobalParams) displayModuleKey(out *StringBuffer64, key Symbol) error {
+func (g *GlobalParams) displayModuleKey(out *StringBuffer64, key usymbol.Symbol) error {
 	d, found, e := g.findModuleDescriptor(key)
 	if e != nil {
 		return e
@@ -243,7 +245,7 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 		return e
 	}
 	var d *ParamDescrs
-	if module == (Symbol{}) {
+	if module == (usymbol.Symbol{}) {
 		if e = g.ensureRegistered(); e != nil {
 			return e
 		}
@@ -277,7 +279,7 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 	if e = out.AppendByte('\n'); e != nil {
 		return e
 	}
-	if module != (Symbol{}) {
+	if module != (usymbol.Symbol{}) {
 		if e = out.AppendCString("  module:         "); e != nil {
 			return e
 		}

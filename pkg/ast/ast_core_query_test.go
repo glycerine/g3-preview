@@ -3,7 +3,7 @@ package ast
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTNamedNodeFieldsAndSortNullInfoPredicates(t *testing.T) {
@@ -48,7 +48,7 @@ func TestASTNamedNodeFieldsAndSortNullInfoPredicates(t *testing.T) {
 	if d != decl || count != 1 || ground {
 		t.Fatal("actual app fields/flags")
 	}
-	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{plain}, Names: []util.Symbol{name}, Body: app, Weight: 13, QID: name})
+	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{plain}, Names: []usymbol.Symbol{name}, Body: app, Weight: 13, QID: name})
 	astTestMust(t, e)
 	astTestPin(t, m, q)
 	body, e := m.GetQuantifierBody(q)

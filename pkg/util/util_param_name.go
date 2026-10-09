@@ -3,6 +3,8 @@ package util
 
 import (
 	"strings"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func paramNameByte(value byte) byte {
@@ -42,22 +44,20 @@ func NormParamName(text *string) string {
 
 // NormParamSymbolName reads the live owner's bare C-string directly. It does
 // not allocate an intermediate spelling string or intern the normalized result.
-func NormParamSymbolName(manager *SymbolManager, name Symbol) (string, error) {
+func NormParamSymbolName(manager *usymbol.Manager, name usymbol.Symbol) (string, error) {
 	if manager == nil {
-		return "", ErrInvalidSymbol
+		return "", usymbol.ErrInvalid
 	}
-	manager.mu.Lock()
-	defer manager.mu.Unlock()
-	if err := manager.checkPlain(name); err != nil {
+	if err := manager.Validate(name); err != nil {
 		return "", err
 	}
 	if name.IsNumerical() {
-		return "", ErrInvalidSymbol
+		return "", usymbol.ErrInvalid
 	}
 	if name.Value == 0 {
 		return "_", nil
 	}
-	text, err := manager.spelling(name)
+	text, _, err := manager.BareString(name)
 	if err != nil {
 		return "", err
 	}

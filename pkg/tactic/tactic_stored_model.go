@@ -7,14 +7,14 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/model"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Model2mc copies labels rather than retaining the caller's slice; applying
 // labels appends without clearing the destination.
-type tacticStoredLabelBuffer struct{ values []util.Symbol }
+type tacticStoredLabelBuffer struct{ values []usymbol.Symbol }
 
-func (b *tacticStoredLabelBuffer) push(value util.Symbol) error {
+func (b *tacticStoredLabelBuffer) push(value usymbol.Symbol) error {
 	b.values = append(b.values, value)
 	return nil
 }
@@ -36,7 +36,7 @@ type tacticStoredModelConverter struct {
 func NewStoredModel(md *model.ModelCore) (ModelConverter, error) {
 	return newTacticStoredModelWithLabels(md, nil)
 }
-func newTacticStoredModelWithLabels(md *model.ModelCore, labels []util.Symbol) (result ModelConverter, err error) {
+func newTacticStoredModelWithLabels(md *model.ModelCore, labels []usymbol.Symbol) (result ModelConverter, err error) {
 	if md == nil {
 		return nil, nil
 	}

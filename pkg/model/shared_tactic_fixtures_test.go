@@ -6,7 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func goalTestAtom(t *testing.T, m *ast.ASTManager, name string) ast.ASTHandle {
@@ -36,7 +36,7 @@ type modelConverterTestLeaf struct {
 	calls  *[]string
 	refs   uint32
 	closed bool
-	label  util.Symbol
+	label  usymbol.Symbol
 	run    func(*tactic.ModelRef, uint32) error
 	fail   error
 }

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTFreshConstActualSourceCounterAndSkolemMetadata(t *testing.T) {
@@ -60,15 +60,15 @@ func TestASTFreshFuncDeclNullAndSuffixSourceNames(t *testing.T) {
 	b, e := m.MkBoolSort()
 	astTestMust(t, e)
 	suffix := astTestSymbol(t, m, "tail")
-	plain, e := m.MkFreshFuncDecl(util.Symbol{}, util.Symbol{}, nil, b)
+	plain, e := m.MkFreshFuncDecl(usymbol.Symbol{}, usymbol.Symbol{}, nil, b)
 	astTestMust(t, e)
 	astTestPin(t, m, plain)
 	name, e := m.GetASTName(plain)
 	astTestMust(t, e)
-	if name != util.NumericalSymbol(0) {
+	if name != usymbol.Numerical(0) {
 		t.Fatal("null/null numerical source name", name)
 	}
-	withSuffix, e := m.MkFreshFuncDecl(util.Symbol{}, suffix, nil, b)
+	withSuffix, e := m.MkFreshFuncDecl(usymbol.Symbol{}, suffix, nil, b)
 	astTestMust(t, e)
 	astTestPin(t, m, withSuffix)
 	name, e = m.GetASTName(withSuffix)
@@ -98,7 +98,7 @@ func TestASTFreshFactoryEveryActualReservationAndLexicalOwner(t *testing.T) {
 		name := astTestSymbol(t, m, "fresh-prefix-that-exceeds-the-sixty-four-byte-local-buffer-after-appending-an-ID")
 		other := budget.Used() - astTestSymbolGraph(s) - m.Stats().AllocatedBytes
 		budget.FailAfter(after)
-		result, e := m.MkFreshFuncDecl(name, util.Symbol{}, nil, sort)
+		result, e := m.MkFreshFuncDecl(name, usymbol.Symbol{}, nil, sort)
 		// Immediate source-completed graph before lifting the fault. The local
 		// bytes.Buffer uses Go memory and is outside the injected arena budget.
 		if budget.Used() != other+astTestSymbolGraph(s)+m.Stats().AllocatedBytes {
@@ -242,7 +242,7 @@ func TestASTFreshConstNullPointerPrefixSourceOverload(t *testing.T) {
 	astTestMust(t, e)
 	name, e := m.GetASTName(decl)
 	astTestMust(t, e)
-	if name != util.NumericalSymbol(0) {
+	if name != usymbol.Numerical(0) {
 		t.Fatal("null source char prefix", name)
 	}
 }

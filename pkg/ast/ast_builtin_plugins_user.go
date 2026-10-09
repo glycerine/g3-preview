@@ -5,10 +5,10 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func astRegisterUserName(dictionary *util.SymbolDictionaryInt32, names *[]util.Symbol, budget *arena.Budget, name util.Symbol) (int32, error) {
+func astRegisterUserName(dictionary *usymbol.DictionaryInt32, names *[]usymbol.Symbol, budget *arena.Budget, name usymbol.Symbol) (int32, error) {
 	if k, ok, e := dictionary.Find(name); e != nil || ok {
 		return k, e
 	}
@@ -17,7 +17,7 @@ func astRegisterUserName(dictionary *util.SymbolDictionaryInt32, names *[]util.S
 	}
 	k := int32(len((*names)))
 	if len((*names)) == cap((*names)) {
-		width := uint64(reflect.TypeOf(util.Symbol{}).Size())
+		width := uint64(reflect.TypeOf(usymbol.Symbol{}).Size())
 		n, e := astDirectoryGrowth(uint32(cap((*names))), uint32(len((*names))+1), width)
 		if e != nil {
 			return 0, e
@@ -25,7 +25,7 @@ func astRegisterUserName(dictionary *util.SymbolDictionaryInt32, names *[]util.S
 		if e = budget.Reserve(uint64(n) * width); e != nil {
 			return 0, e
 		}
-		next := make([]util.Symbol, len((*names)), int(n))
+		next := make([]usymbol.Symbol, len((*names)), int(n))
 		copy(next, (*names))
 		budget.Release(uint64(cap((*names))) * width)
 		(*names) = next
@@ -43,8 +43,8 @@ func astRegisterUserName(dictionary *util.SymbolDictionaryInt32, names *[]util.S
 // its name vector and dictionary, borrows spelling identities, and has no AST
 // callback or fabricated manager. Future plugin inheritance binds it normally.
 type astFreshUserPlugin struct {
-	dictionary util.SymbolDictionaryInt32
-	names      []util.Symbol
+	dictionary usymbol.DictionaryInt32
+	names      []usymbol.Symbol
 	budget     *arena.Budget
 	ownerBytes uint64
 }
@@ -72,7 +72,7 @@ func (p *astFreshUserPlugin) close() {
 		return
 	}
 	p.dictionary.Close()
-	p.budget.Release(uint64(cap(p.names))*uint64(reflect.TypeOf(util.Symbol{}).Size()) + p.ownerBytes)
+	p.budget.Release(uint64(cap(p.names))*uint64(reflect.TypeOf(usymbol.Symbol{}).Size()) + p.ownerBytes)
 	p.ownerBytes = 0
 	p.names = nil
 }

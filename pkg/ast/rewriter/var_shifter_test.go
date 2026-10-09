@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func shiftTestVar(t *testing.T, m *ast.ASTManager, i uint32) ast.ASTHandle {
@@ -89,7 +89,7 @@ func TestVariableShifterNestedBindersPatternsAndAnnotations(t *testing.T) {
 	satOK(t, e)
 	v := []ast.ASTHandle{shiftTestVar(t, m, 0), shiftTestVar(t, m, 1), shiftTestVar(t, m, 2), shiftTestVar(t, m, 3), shiftTestVar(t, m, 4)}
 	body := goalTestApp(t, m, ast.ASTOpOr, v...)
-	inner, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b, b}, Names: []util.Symbol{util.NumericalSymbol(1), util.NumericalSymbol(2)}, Body: body})
+	inner, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b, b}, Names: []usymbol.Symbol{usymbol.Numerical(1), usymbol.Numerical(2)}, Body: body})
 	satOK(t, e)
 	astTestPin(t, m, inner)
 	annotation := goalTestApp(t, m, ast.ASTOpOr, v[:3]...)
@@ -99,7 +99,7 @@ func TestVariableShifterNestedBindersPatternsAndAnnotations(t *testing.T) {
 	qid, skid := astTestSymbol(t, m, "shift-qid"), astTestSymbol(t, m, "shift-skid")
 	for _, patterns := range []bool{false, true} {
 		t.Run(fmt.Sprint(patterns), func(t *testing.T) {
-			spec := ast.ASTQuantifierSpec{Forall: false, Sorts: []ast.ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: inner, Weight: 17, QID: qid, SkolemID: skid}
+			spec := ast.ASTQuantifierSpec{Forall: false, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: inner, Weight: 17, QID: qid, SkolemID: skid}
 			if patterns {
 				spec.Patterns = []ast.ASTHandle{pattern}
 			} else {
@@ -136,7 +136,7 @@ func TestVariableShifterNestedBindersPatternsAndAnnotations(t *testing.T) {
 			satOK(t, e)
 			name, e := m.GetDeclarationName(got, 0)
 			satOK(t, e)
-			if weight != 17 || forall || a != qid || z != skid || name != util.NumericalSymbol(0) {
+			if weight != 17 || forall || a != qid || z != skid || name != usymbol.Numerical(0) {
 				t.Fatal("original quantifier annotations changed")
 			}
 			if len(s.core.scopes) != 0 || s.core.numQVars != 0 || s.core.cache != s.core.cacheStack.values[0] {
@@ -259,7 +259,7 @@ func TestVariableShifterSharedTermDifferentBinderDepthAndOutputLifetime(t *testi
 	shared := goalTestApp(t, m, ast.ASTOpOr, v0, v1)
 	b, e := m.MkBoolSort()
 	satOK(t, e)
-	quant, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: shared})
+	quant, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: shared})
 	satOK(t, e)
 	astTestPin(t, m, quant)
 	original := goalTestApp(t, m, ast.ASTOpOr, shared, quant, quant)

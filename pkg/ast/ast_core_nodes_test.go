@@ -3,7 +3,7 @@ package ast
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTEagerNormalAndFormatConstructors(t *testing.T) {
@@ -84,7 +84,7 @@ func TestASTAllFiveKindsAndQuantifierIdentity(t *testing.T) {
 	a, e := m.MkApp(d, []ASTHandle{v})
 	astTestMust(t, e)
 	astTestPin(t, m, a)
-	spec := ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []util.Symbol{astTestSymbol(t, m, "x")}, Body: a, Weight: 1, QID: astTestSymbol(t, m, "q1")}
+	spec := ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []usymbol.Symbol{astTestSymbol(t, m, "x")}, Body: a, Weight: 1, QID: astTestSymbol(t, m, "q1")}
 	q, e := m.MkQuantifier(spec)
 	astTestMust(t, e)
 	astTestPin(t, m, q)

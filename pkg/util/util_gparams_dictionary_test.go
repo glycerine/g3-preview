@@ -1,20 +1,22 @@
 package util
 
+import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+
 import "testing"
 
 func TestGparamsDictionariesUseRequiredGoOrdering(t *testing.T) {
 	var descriptors gparamsDescriptorDictionary
 	descriptors.init()
 	for i := uint32(0); i < 8; i++ {
-		descriptors.set(NumericalSymbol(i), i+1)
+		descriptors.set(usymbol.Numerical(i), i+1)
 	}
-	descriptors.set(NumericalSymbol(2), 99)
-	if got, ok := descriptors.get(NumericalSymbol(2)); !ok || got != 99 || descriptors.size() != 8 {
+	descriptors.set(usymbol.Numerical(2), 99)
+	if got, ok := descriptors.get(usymbol.Numerical(2)); !ok || got != 99 || descriptors.size() != 8 {
 		t.Fatal(got, ok, descriptors.size())
 	}
 	want := uint32(0)
 	for key := range descriptors.values.All() {
-		if key != NumericalSymbol(want) {
+		if key != usymbol.Numerical(want) {
 			t.Fatal("descriptor registration order", key, want)
 		}
 		want++
@@ -22,9 +24,9 @@ func TestGparamsDictionariesUseRequiredGoOrdering(t *testing.T) {
 
 	var refs gparamsRefDictionary
 	refs.init()
-	refs.set(NumericalSymbol(1), 4)
-	refs.set(NumericalSymbol(1), 9)
-	if got, ok := refs.get(NumericalSymbol(1)); !ok || got != 9 || refs.size() != 1 {
+	refs.set(usymbol.Numerical(1), 4)
+	refs.set(usymbol.Numerical(1), 9)
+	if got, ok := refs.get(usymbol.Numerical(1)); !ok || got != 9 || refs.size() != 1 {
 		t.Fatal(got, ok, refs.size())
 	}
 	refs.reset()
@@ -35,8 +37,8 @@ func TestGparamsDictionariesUseRequiredGoOrdering(t *testing.T) {
 	var descriptions gparamsDescriptionDictionary
 	descriptions.init()
 	text := GlobalParamCString{Offset: 7, Present: true}
-	descriptions.set(NumericalSymbol(3), text)
-	if got, ok := descriptions.get(NumericalSymbol(3)); !ok || got != text {
+	descriptions.set(usymbol.Numerical(3), text)
+	if got, ok := descriptions.get(usymbol.Numerical(3)); !ok || got != text {
 		t.Fatal(got, ok)
 	}
 }

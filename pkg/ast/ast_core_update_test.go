@@ -3,7 +3,7 @@ package ast
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTQuantifierUpdateSourceOverloads(t *testing.T) {
@@ -20,7 +20,7 @@ func TestASTQuantifierUpdateSourceOverloads(t *testing.T) {
 	astTestMust(t, e)
 	astTestPin(t, m, pat)
 	qid, skid := astTestSymbol(t, m, "update-qid"), astTestSymbol(t, m, "update-skid")
-	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []util.Symbol{astTestSymbol(t, m, "bound")}, Body: a, Weight: 7, QID: qid, SkolemID: skid, NoPatterns: []ASTHandle{a}})
+	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []usymbol.Symbol{astTestSymbol(t, m, "bound")}, Body: a, Weight: 7, QID: qid, SkolemID: skid, NoPatterns: []ASTHandle{a}})
 	astTestMust(t, e)
 	astTestPin(t, m, q)
 	// Each source overload returns the identical pointer before any allocation.
@@ -99,7 +99,7 @@ func TestASTQuantifierUpdateFailureAndEarlyIdentity(t *testing.T) {
 	a, e := m.MkConst(astTestSymbol(t, m, "failure-body"), b)
 	astTestMust(t, e)
 	astTestPin(t, m, a)
-	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []util.Symbol{{}}, Body: a, Weight: 0})
+	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []usymbol.Symbol{{}}, Body: a, Weight: 0})
 	astTestMust(t, e)
 	astTestPin(t, m, q)
 	baseline := m.liveNodes

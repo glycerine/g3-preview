@@ -10,12 +10,13 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *util.SymbolManager, *util.RationalService) {
+func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -113,7 +114,7 @@ type paramsPhysicalValueOwner struct {
 
 // Cold graph uses the actual named owners and their typed backing capacities.
 // Source allocation counters remain separate from this physical Go charge.
-func paramsDecAuditColdGraph(t *testing.T, q *util.RationalService, m *polynomial.UPolynomialManager, r *util.Runtime, bn *arena.Budget, c *util.ParamsContext, bc *arena.Budget, sy *util.SymbolManager, bs *arena.Budget) {
+func paramsDecAuditColdGraph(t *testing.T, q *util.RationalService, m *polynomial.UPolynomialManager, r *util.Runtime, bn *arena.Budget, c *util.ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
 	t.Helper()
 	qv := reflect.ValueOf(q).Elem()
 	qm := testFieldBySourceName(qv, "manager").Elem()
@@ -213,9 +214,9 @@ func numericFileFixture(t *testing.T) (*os.File, *util.NumericTextStream, *arena
 	})
 	return f, s, b
 }
-func symbolManagerTest(t *testing.T, b *arena.Budget, direct bool) *util.SymbolManager {
+func symbolManagerTest(t *testing.T, b *arena.Budget, direct bool) *usymbol.Manager {
 	t.Helper()
-	m, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2, DirectOnly: direct})
+	m, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2, DirectOnly: direct})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -226,7 +227,7 @@ func symbolManagerTest(t *testing.T, b *arena.Budget, direct bool) *util.SymbolM
 	})
 	return m
 }
-func internSymbol(t *testing.T, m *util.SymbolManager, text string) util.Symbol {
+func internSymbol(t *testing.T, m *usymbol.Manager, text string) usymbol.Symbol {
 	t.Helper()
 	s, e := m.Intern(text)
 	if e != nil {
@@ -234,7 +235,7 @@ func internSymbol(t *testing.T, m *util.SymbolManager, text string) util.Symbol 
 	}
 	return s
 }
-func symbolText(t *testing.T, m *util.SymbolManager, s util.Symbol) string {
+func symbolText(t *testing.T, m *usymbol.Manager, s usymbol.Symbol) string {
 	t.Helper()
 	v, e := m.String(s)
 	if e != nil {

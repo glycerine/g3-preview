@@ -4,6 +4,8 @@ package util
 
 import (
 	"errors"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var ErrGlobalParamsUnconstructed = errors.New("g3: source global parameters constructor incomplete")
@@ -11,7 +13,7 @@ var ErrGlobalParamsUnconstructed = errors.New("g3: source global parameters cons
 // Public constructors preserve the existing ergonomic all-refund adapter.
 // Source member unwind and owning abortion of unfinished placement storage
 // are separate actions; neither invokes the uncompleted outer destructor.
-func NewParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, error) {
+func NewParamDescrs(m *usymbol.Manager, c ParamDescrsConfig) (*ParamDescrs, error) {
 	d, e := newSourceParamDescrs(m, c)
 	if e != nil && d != nil {
 		if cleanup := d.abortConstructor(); cleanup != nil {
@@ -23,7 +25,7 @@ func NewParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, error)
 	}
 	return d, nil
 }
-func NewGlobalParams(s *SymbolManager, p *ParamsContext, c GlobalParamsConfig) (*GlobalParams, error) {
+func NewGlobalParams(s *usymbol.Manager, p *ParamsContext, c GlobalParamsConfig) (*GlobalParams, error) {
 	g, e := newSourceGlobalParams(s, p, c)
 	if e != nil && g != nil {
 		if cleanup := g.abortConstructor(); cleanup != nil {

@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func gparamsRealRegistry(t *testing.T) (*GlobalParams, *ParamsContext, *SymbolManager, *arena.Budget) {
+func gparamsRealRegistry(t *testing.T) (*GlobalParams, *ParamsContext, *usymbol.Manager, *arena.Budget) {
 	t.Helper()
 	ctx, sy, _ := paramsTestOwner(t)
 	b := arena.NewBudget(^uint64(0))
@@ -200,7 +201,7 @@ func TestGlobalParamsDefaultLookupAndSourceHistoricalMessages(t *testing.T) {
 	if got != "-0" {
 		t.Fatal("negativezero", got)
 	}
-	_, e = g.GetValueSymbol(NumericalSymbol(4))
+	_, e = g.GetValueSymbol(usymbol.Numerical(4))
 	if GlobalParamsSourceDebug {
 		if e != ErrGlobalParamsOwner {
 			t.Fatal("source bare-str assertion", e)
@@ -208,7 +209,7 @@ func TestGlobalParamsDefaultLookupAndSourceHistoricalMessages(t *testing.T) {
 	} else if e == nil || !gparamsTestContains(e.Error(), "unknown parameter ''") {
 		t.Fatal("source release bare-str empty", e)
 	}
-	if _, e = g.GetValueSymbol(Symbol{}); e == nil {
+	if _, e = g.GetValueSymbol(usymbol.Symbol{}); e == nil {
 		t.Fatal("null bare pointer")
 	}
 }

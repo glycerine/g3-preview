@@ -4,7 +4,7 @@ package ast
 import (
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Actual cold new-expression owner. The pointer-free field array follows
@@ -21,7 +21,7 @@ type astArithmeticPluginOwner struct {
 	next                       *astArithmeticPluginOwner
 	self                       *astArithmeticPluginOwner
 	owner                      *ASTManager
-	names                      [3]util.Symbol
+	names                      [3]usymbol.Symbol
 	fields                     [46]astNodeRef
 	family                     FamilyID
 	header                     uint64

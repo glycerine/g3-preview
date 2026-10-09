@@ -9,13 +9,13 @@ import (
 	"errors"
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime(t *testing.T) {
@@ -81,7 +81,7 @@ func TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime(t *testing.T)
 	satOK(t, labels.Append(prefix))
 	satOK(t, c.ApplyLabels(&labels, 9))
 	satOK(t, c.Cancel())
-	if !reflect.DeepEqual(labels.Values, []util.Symbol{prefix, second.label, first.label}) {
+	if !reflect.DeepEqual(labels.Values, []usymbol.Symbol{prefix, second.label, first.label}) {
 		t.Fatal("label append order", labels.Values)
 	}
 	satOK(t, c.DecRef())

@@ -2,6 +2,7 @@ package tactic_test
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -23,7 +24,7 @@ func astTestMust(t *testing.T, e error) {
 	}
 }
 
-func astTestSymbol(t *testing.T, m *ast.ASTManager, text string) util.Symbol {
+func astTestSymbol(t *testing.T, m *ast.ASTManager, text string) usymbol.Symbol {
 	t.Helper()
 	s, e := m.Symbols.Intern(text)
 	astTestMust(t, e)
@@ -36,10 +37,10 @@ func astTestPin(t *testing.T, m *ast.ASTManager, h ast.ASTHandle) ast.ASTRef {
 	t.Cleanup(func() { astTestMust(t, m.DelRef(&r)) })
 	return r
 }
-func astTestOwners(t *testing.T) (*util.SymbolManager, *util.RationalService, *arena.Budget) {
+func astTestOwners(t *testing.T) (*usymbol.Manager, *util.RationalService, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)
-	s, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+	s, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
 	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)

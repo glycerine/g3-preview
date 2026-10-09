@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func gparamsVectorGraph(s arena.VectorStats) uint64 {
@@ -105,9 +106,9 @@ func TestGlobalParamsActualSATCollectorCurrentSharedRegistry(t *testing.T) {
 	defer func() { paramsMust(t, ctx.Del(&second)) }()
 	key, e := sy.Intern("restart")
 	paramsMust(t, e)
-	a, e := ctx.GetSymbol(&first, key, Symbol{})
+	a, e := ctx.GetSymbol(&first, key, usymbol.Symbol{})
 	paramsMust(t, e)
-	z, e := ctx.GetSymbol(&second, key, Symbol{})
+	z, e := ctx.GetSymbol(&second, key, usymbol.Symbol{})
 	paramsMust(t, e)
 	if a == z {
 		t.Fatal("current per-call registry snapshot must observe replacement")

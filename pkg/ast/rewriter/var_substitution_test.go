@@ -5,8 +5,8 @@ package rewriter
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/messages"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"testing"
 )
 
@@ -40,7 +40,7 @@ func TestVarSubstitutionOriginalRegisteredIdentities(t *testing.T) {
 		return h
 	}
 	quant := func(n int, body ast.ASTHandle) ast.ASTHandle {
-		h, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort, sort}[:n], Names: []util.Symbol{astTestSymbol(t, m, "y"), astTestSymbol(t, m, "x")}[:n], Body: body})
+		h, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort, sort}[:n], Names: []usymbol.Symbol{astTestSymbol(t, m, "y"), astTestSymbol(t, m, "x")}[:n], Body: body})
 		satOK(t, e)
 		astTestPin(t, m, h)
 		return h
@@ -183,7 +183,7 @@ func TestVarSubstitutionFreeReplacementShiftAndDeepTraversal(t *testing.T) {
 	b, e := m.MkBoolSort()
 	satOK(t, e)
 	body := goalTestApp(t, m, ast.ASTOpOr, shiftTestVar(t, m, 0), shiftTestVar(t, m, 1), shiftTestVar(t, m, 2))
-	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: body})
+	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: body})
 	satOK(t, e)
 	astTestPin(t, m, q)
 	out := astTestPin(t, m, ast.ASTHandle{})

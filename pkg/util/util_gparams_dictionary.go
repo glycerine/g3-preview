@@ -1,35 +1,38 @@
 // Source: src/util/gparams.cpp; src/util/dictionary.h; src/util/map.h.
 package util
 
+import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+
 import "github.com/glycerine/insdict"
 
 // Module descriptors are rendered by traversal, so their dictionary preserves
 // registration order. The other two dictionaries are lookup-only.
 type gparamsDescriptorDictionary struct {
-	values *insdict.Dict[Symbol, uint32]
+	values *insdict.Dict[usymbol.Symbol, uint32]
 }
 
 type gparamsRefDictionary struct {
-	values map[Symbol]uint32
+	values map[usymbol.Symbol]uint32
 }
 
 type gparamsDescriptionDictionary struct {
-	values map[Symbol]GlobalParamCString
+	values map[usymbol.Symbol]GlobalParamCString
 }
 
 func (d *gparamsDescriptorDictionary) init() {
-	d.values = insdict.NewDictFunc[Symbol, uint32](func(k Symbol) uint64 {
-		h := k.owner ^ uint64(k.Value)<<32 | uint64(k.Tag)
+	d.values = insdict.NewDictFunc[usymbol.Symbol, uint32](func(k usymbol.Symbol) uint64 {
+		words := k.SymbolWords()
+		h := (uint64(words[0]) | uint64(words[1])<<32) ^ uint64(k.Value)<<32 | uint64(k.Tag)
 		return h ^ uint64(k.Generation)*0x9e3779b97f4a7c15
 	})
 }
-func (d *gparamsDescriptorDictionary) get(k Symbol) (uint32, bool) {
+func (d *gparamsDescriptorDictionary) get(k usymbol.Symbol) (uint32, bool) {
 	if d.values == nil {
 		return 0, false
 	}
 	return d.values.Get2(k)
 }
-func (d *gparamsDescriptorDictionary) set(k Symbol, descriptor uint32) {
+func (d *gparamsDescriptorDictionary) set(k usymbol.Symbol, descriptor uint32) {
 	if d.values == nil {
 		d.init()
 	}
@@ -48,12 +51,12 @@ func (d *gparamsDescriptorDictionary) size() uint32 {
 	return uint32(d.values.Len())
 }
 
-func (d *gparamsRefDictionary) init() { d.values = make(map[Symbol]uint32) }
-func (d *gparamsRefDictionary) get(k Symbol) (uint32, bool) {
+func (d *gparamsRefDictionary) init() { d.values = make(map[usymbol.Symbol]uint32) }
+func (d *gparamsRefDictionary) get(k usymbol.Symbol) (uint32, bool) {
 	v, ok := d.values[k]
 	return v, ok
 }
-func (d *gparamsRefDictionary) set(k Symbol, cell uint32) {
+func (d *gparamsRefDictionary) set(k usymbol.Symbol, cell uint32) {
 	if d.values == nil {
 		d.init()
 	}
@@ -66,13 +69,13 @@ func (d *gparamsRefDictionary) size() uint32 {
 }
 
 func (d *gparamsDescriptionDictionary) init() {
-	d.values = make(map[Symbol]GlobalParamCString)
+	d.values = make(map[usymbol.Symbol]GlobalParamCString)
 }
-func (d *gparamsDescriptionDictionary) get(k Symbol) (GlobalParamCString, bool) {
+func (d *gparamsDescriptionDictionary) get(k usymbol.Symbol) (GlobalParamCString, bool) {
 	v, ok := d.values[k]
 	return v, ok
 }
-func (d *gparamsDescriptionDictionary) set(k Symbol, text GlobalParamCString) {
+func (d *gparamsDescriptionDictionary) set(k usymbol.Symbol, text GlobalParamCString) {
 	if d.values == nil {
 		d.init()
 	}

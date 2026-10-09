@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/insdict"
 )
 
@@ -24,10 +24,10 @@ var ErrFamilyOwner = errors.New("g3: invalid or copied family manager")
 type FamilyManager struct {
 	mu      sync.Mutex
 	self    *FamilyManager
-	symbols *util.SymbolManager
+	symbols *usymbol.Manager
 	budget  *arena.Budget
-	table   insdict.Dict[util.Symbol, int32]
-	names   []util.Symbol
+	table   insdict.Dict[usymbol.Symbol, int32]
+	names   []usymbol.Symbol
 	next    FamilyID
 	closed  bool
 }
@@ -39,7 +39,7 @@ type FamilyStats struct {
 	OwnerBytes, NamesBytes uint64
 }
 
-func NewFamilyManager(symbols *util.SymbolManager, budget *arena.Budget) (*FamilyManager, error) {
+func NewFamilyManager(symbols *usymbol.Manager, budget *arena.Budget) (*FamilyManager, error) {
 	if symbols == nil {
 		return nil, ErrFamilyOwner
 	}
@@ -47,7 +47,7 @@ func NewFamilyManager(symbols *util.SymbolManager, budget *arena.Budget) (*Famil
 	if e := budget.Reserve(owner); e != nil {
 		return nil, e
 	}
-	table := insdict.NewDictFunc[util.Symbol, int32](func(symbol util.Symbol) uint64 {
+	table := insdict.NewDictFunc[usymbol.Symbol, int32](func(symbol usymbol.Symbol) uint64 {
 		hash, _ := symbols.Hash(symbol)
 		return uint64(hash)
 	})
@@ -65,7 +65,7 @@ func (f *FamilyManager) open() error {
 	if f.closed {
 		return arena.ErrClosed
 	}
-	_, e := f.symbols.Hash(util.Symbol{})
+	_, e := f.symbols.Hash(usymbol.Symbol{})
 	return e
 }
 
@@ -81,17 +81,17 @@ func (f *FamilyManager) lock() error {
 	return nil
 }
 
-func (f *FamilyManager) pushName(s util.Symbol) {
+func (f *FamilyManager) pushName(s usymbol.Symbol) {
 	f.names = append(f.names, s)
 }
 
-func (f *FamilyManager) MkID(s util.Symbol) (FamilyID, error) {
+func (f *FamilyManager) MkID(s usymbol.Symbol) (FamilyID, error) {
 	if e := f.lock(); e != nil {
 		return NullFamilyID, e
 	}
 	defer f.mu.Unlock()
-	if s == (util.Symbol{}) {
-		return NullFamilyID, util.ErrInvalidSymbol
+	if s == (usymbol.Symbol{}) {
+		return NullFamilyID, usymbol.ErrInvalid
 	}
 	if _, e := f.symbols.Hash(s); e != nil {
 		return NullFamilyID, e
@@ -112,13 +112,13 @@ func (f *FamilyManager) MkID(s util.Symbol) (FamilyID, error) {
 	return id, nil
 }
 
-func (f *FamilyManager) GetID(s util.Symbol) (FamilyID, error) {
+func (f *FamilyManager) GetID(s usymbol.Symbol) (FamilyID, error) {
 	if e := f.lock(); e != nil {
 		return NullFamilyID, e
 	}
 	defer f.mu.Unlock()
-	if s == (util.Symbol{}) {
-		return NullFamilyID, util.ErrInvalidSymbol
+	if s == (usymbol.Symbol{}) {
+		return NullFamilyID, usymbol.ErrInvalid
 	}
 	if _, e := f.symbols.Hash(s); e != nil {
 		return NullFamilyID, e
@@ -130,13 +130,13 @@ func (f *FamilyManager) GetID(s util.Symbol) (FamilyID, error) {
 	return id, nil
 }
 
-func (f *FamilyManager) HasSymbol(s util.Symbol) (bool, error) {
+func (f *FamilyManager) HasSymbol(s usymbol.Symbol) (bool, error) {
 	if e := f.lock(); e != nil {
 		return false, e
 	}
 	defer f.mu.Unlock()
-	if s == (util.Symbol{}) {
-		return false, util.ErrInvalidSymbol
+	if s == (usymbol.Symbol{}) {
+		return false, usymbol.ErrInvalid
 	}
 	if _, e := f.symbols.Hash(s); e != nil {
 		return false, e
@@ -145,13 +145,13 @@ func (f *FamilyManager) HasSymbol(s util.Symbol) (bool, error) {
 	return found, nil
 }
 
-func (f *FamilyManager) GetName(id FamilyID) (util.Symbol, error) {
+func (f *FamilyManager) GetName(id FamilyID) (usymbol.Symbol, error) {
 	if e := f.lock(); e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	defer f.mu.Unlock()
 	if id < 0 || uint64(id) >= uint64(len(f.names)) {
-		return util.Symbol{}, nil
+		return usymbol.Symbol{}, nil
 	}
 	return f.names[id], nil
 }
@@ -166,7 +166,7 @@ func (f *FamilyManager) HasID(id FamilyID) (bool, error) {
 
 // Enumeration uses stable insertion order. Returned slices append to
 // caller-owned output buffers, which are outside this owner's budget.
-func (f *FamilyManager) AppendDom(dst []util.Symbol) ([]util.Symbol, error) {
+func (f *FamilyManager) AppendDom(dst []usymbol.Symbol) ([]usymbol.Symbol, error) {
 	if e := f.lock(); e != nil {
 		return dst, e
 	}
@@ -196,7 +196,7 @@ func (f *FamilyManager) Stats() FamilyStats {
 	if f.self != f || f.closed {
 		return FamilyStats{}
 	}
-	return FamilyStats{NextID: f.next, Names: uint32(len(f.names)), NamesCapacity: uint32(cap(f.names)), TableSize: uint32(f.table.Len()), OwnerBytes: uint64(reflect.TypeOf(FamilyManager{}).Size()), NamesBytes: uint64(cap(f.names)) * uint64(reflect.TypeOf(util.Symbol{}).Size())}
+	return FamilyStats{NextID: f.next, Names: uint32(len(f.names)), NamesCapacity: uint32(cap(f.names)), TableSize: uint32(f.table.Len()), OwnerBytes: uint64(reflect.TypeOf(FamilyManager{}).Size()), NamesBytes: uint64(cap(f.names)) * uint64(reflect.TypeOf(usymbol.Symbol{}).Size())}
 }
 
 func (f *FamilyManager) Close() error {

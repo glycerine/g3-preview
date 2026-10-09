@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type SexprPolynomialError struct {
@@ -288,7 +289,7 @@ func (c *SexprPolynomialConverter) Close() error {
 }
 
 func stringPointer(s string) *string { return &s }
-func (c *SexprPolynomialConverter) operator(sym util.Symbol) (string, error) {
+func (c *SexprPolynomialConverter) operator(sym usymbol.Symbol) (string, error) {
 	if sym.IsNumerical() {
 		return "", nil
 	}

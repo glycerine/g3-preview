@@ -5,10 +5,10 @@ package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/messages"
 )
 
@@ -193,7 +193,7 @@ func TestBetaReducerOriginalBindingOrderAndBinderShift(t *testing.T) {
 	shiftTestIndices(t, m, got, []uint32{1, 0, 2, 3})
 	b, e := m.MkBoolSort()
 	satOK(t, e)
-	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: expr})
+	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: expr})
 	satOK(t, e)
 	astTestPin(t, m, q)
 	satOK(t, rw.engine.Reset())
@@ -373,7 +373,7 @@ func TestRewriterEngineOriginalMacroExpansionUnderBinder(t *testing.T) {
 	arg := rewriterTestApp(t, m, f, v0)
 	b, e := m.MkBoolSort()
 	satOK(t, e)
-	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: arg})
+	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: arg})
 	satOK(t, e)
 	astTestPin(t, m, q)
 	cfg := rewriterTestConfig{defaultRewriterConfig: defaultRewriterConfig{m}, macroDecl: f, macroBody: body, calls: map[ast.ASTHandle]uint32{}}
@@ -426,7 +426,7 @@ func TestBetaReducerOriginalPatternAndNoPatternReplacement(t *testing.T) {
 	for _, pattern := range []bool{true, false} {
 		satOK(t, rw.engine.Reset())
 		satOK(t, rw.engine.SetInvBindings([]ast.ASTHandle{a}))
-		spec := ast.ASTQuantifierSpec{Forall: false, Weight: 7, Sorts: []ast.ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: body}
+		spec := ast.ASTQuantifierSpec{Forall: false, Weight: 7, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: body}
 		if pattern {
 			spec.Patterns = []ast.ASTHandle{pat}
 		} else {
@@ -488,7 +488,7 @@ func TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel(t *testing.T) {
 	cfg.rejectScopes = true
 	b, e := m.MkBoolSort()
 	satOK(t, e)
-	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: term})
+	q, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: term})
 	satOK(t, e)
 	astTestPin(t, m, q)
 	e = rw.Rewrite(q, out)

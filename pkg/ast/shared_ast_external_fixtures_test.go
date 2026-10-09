@@ -6,6 +6,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func astTestManager(t *testing.T) *ast.ASTManager {
@@ -30,10 +31,10 @@ func astTestPin(t *testing.T, m *ast.ASTManager, h ast.ASTHandle) ast.ASTRef {
 	t.Cleanup(func() { astTestMust(t, m.DelRef(&r)) })
 	return r
 }
-func astTestOwners(t *testing.T) (*util.SymbolManager, *util.RationalService, *arena.Budget) {
+func astTestOwners(t *testing.T) (*usymbol.Manager, *util.RationalService, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)
-	s, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+	s, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
 	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 	astTestMust(t, e)

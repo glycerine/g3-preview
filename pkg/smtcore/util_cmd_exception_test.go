@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -55,11 +55,11 @@ func TestCmdExceptionSourceConstructorRoutesAndLocationGuards(t *testing.T) {
 func TestCmdExceptionSourceSymbolCompositionAndBorrowedLifetime(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	other := symbolManagerTest(t, nil, false)
-	for _, s := range []util.Symbol{util.Symbol{}, util.NumericalSymbol(0), util.NumericalSymbol(17), util.NumericalSymbol(0x7fffffff), util.NumericalSymbol(0x80000000), util.NumericalSymbol(^uint32(0)), internSymbol(t, m, "name\x00suffix"), internSymbol(t, m, "\xff-name")} {
+	for _, s := range []usymbol.Symbol{usymbol.Symbol{}, usymbol.Numerical(0), usymbol.Numerical(17), usymbol.Numerical(0x7fffffff), usymbol.Numerical(0x80000000), usymbol.Numerical(^uint32(0)), internSymbol(t, m, "name\x00suffix"), internSymbol(t, m, "\xff-name")} {
 		expected := "null"
 		if s.IsNumerical() {
 			expected = fmt.Sprintf("k!%d", int32(s.Value))
-		} else if s != (util.Symbol{}) {
+		} else if s != (usymbol.Symbol{}) {
 			expected = symbolText(t, m, s)
 		}
 		x, e := NewCmdExceptionSymbol(m, "prefix\x00ignored", s)
@@ -75,13 +75,13 @@ func TestCmdExceptionSourceSymbolCompositionAndBorrowedLifetime(t *testing.T) {
 		}
 	}
 	foreign := internSymbol(t, other, "foreign")
-	if _, e := NewCmdExceptionSymbol(m, "x", foreign); e != util.ErrSymbolOwner {
+	if _, e := NewCmdExceptionSymbol(m, "x", foreign); e != usymbol.ErrOwner {
 		t.Fatal(e)
 	}
-	if _, e := NewCmdExceptionSymbol(m, "x", util.DummySymbol()); e != util.ErrInvalidSymbol {
+	if _, e := NewCmdExceptionSymbol(m, "x", usymbol.Dummy()); e != usymbol.ErrInvalid {
 		t.Fatal(e)
 	}
-	if _, e := NewCmdExceptionSymbol(nil, "x", util.Symbol{}); e != z3exception.ErrExceptionPrecondition {
+	if _, e := NewCmdExceptionSymbol(nil, "x", usymbol.Symbol{}); e != z3exception.ErrExceptionPrecondition {
 		t.Fatal(e)
 	}
 	x, e := NewCmdExceptionSymbol(m, "owner:", internSymbol(t, m, "alive"))
@@ -92,14 +92,14 @@ func TestCmdExceptionSourceSymbolCompositionAndBorrowedLifetime(t *testing.T) {
 	if x.Message() != "owner:alive" {
 		t.Fatal(x)
 	}
-	if _, e = NewCmdExceptionSymbol(m, "", util.Symbol{}); e != arena.ErrClosed {
+	if _, e = NewCmdExceptionSymbol(m, "", usymbol.Symbol{}); e != arena.ErrClosed {
 		t.Fatal(e)
 	}
 }
 func TestCmdExceptionIndependentByteDomainsAndOwnerAccounting(t *testing.T) {
 	for _, width := range []uint32{4, 8} {
 		b := arena.NewBudget(^uint64(0))
-		m, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, Alignment: width, PageSize: 64, DescriptorPageSize: 2})
+		m, e := usymbol.NewManager(usymbol.Config{Budget: b, Alignment: width, PageSize: 64, DescriptorPageSize: 2})
 		if e != nil {
 			t.Fatal(e)
 		}

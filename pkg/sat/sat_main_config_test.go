@@ -5,9 +5,10 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func satMainConfigTestRuntime(t *testing.T) (*util.ParamsContext, *util.SymbolManager, *util.GlobalParams, *arena.Budget) {
+func satMainConfigTestRuntime(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.GlobalParams, *arena.Budget) {
 	t.Helper()
 	c, s, _ := paramsTestOwner(t)
 	b := arena.NewBudget(^uint64(0))

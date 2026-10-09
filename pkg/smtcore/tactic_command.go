@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var errTacticRegistryOwner = errors.New("tactic: invalid, copied or retired registration owner")
@@ -32,7 +33,7 @@ type tacticFactory interface {
 type tacticCmd struct {
 	self               *tacticCmd
 	params             *util.ParamsContext
-	name               util.Symbol
+	name               usymbol.Symbol
 	description        string
 	descriptionPresent bool
 	factory            tacticFactory
@@ -41,7 +42,7 @@ type tacticCmd struct {
 	closed             bool
 }
 
-func newTacticCmd(c *util.ParamsContext, name util.Symbol, description *string, factory tacticFactory) (*tacticCmd, error) {
+func newTacticCmd(c *util.ParamsContext, name usymbol.Symbol, description *string, factory tacticFactory) (*tacticCmd, error) {
 	if c == nil || factory == nil {
 		return nil, errTacticRegistryOwner
 	}
@@ -104,9 +105,9 @@ func (cmd *tacticCmd) Close() error {
 
 type tacticProbeInfo struct {
 	self               *tacticProbeInfo
-	symbols            *util.SymbolManager
+	symbols            *usymbol.Manager
 	budget             *arena.Budget
-	name               util.Symbol
+	name               usymbol.Symbol
 	description        string
 	descriptionPresent bool
 	probe              tacticReference
@@ -115,9 +116,9 @@ type tacticProbeInfo struct {
 	closed             bool
 }
 
-func newTacticProbeInfo(s *util.SymbolManager, b *arena.Budget, name util.Symbol, description *string, probe tacticReference) (*tacticProbeInfo, error) {
+func newTacticProbeInfo(s *usymbol.Manager, b *arena.Budget, name usymbol.Symbol, description *string, probe tacticReference) (*tacticProbeInfo, error) {
 	if s == nil {
-		return nil, util.ErrSymbolOwner
+		return nil, usymbol.ErrOwner
 	}
 	if _, e := s.Hash(name); e != nil {
 		return nil, e

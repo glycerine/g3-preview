@@ -6,7 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Concrete pointer-free source ptr_vector specialization. The actual backing
@@ -74,7 +74,7 @@ type astFormatPluginOwner struct {
 	next                       *astFormatPluginOwner
 	self                       *astFormatPluginOwner
 	owner                      *ASTManager
-	names                      [7]util.Symbol
+	names                      [7]usymbol.Symbol
 	family                     FamilyID
 	sort                       astNodeRef
 	header                     uint64

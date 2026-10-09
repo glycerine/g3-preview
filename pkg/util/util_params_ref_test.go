@@ -9,12 +9,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func paramsTestOwner(t *testing.T) (*ParamsContext, *SymbolManager, *RationalService) {
+func paramsTestOwner(t *testing.T) (*ParamsContext, *usymbol.Manager, *RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
-	sy, e := NewSymbolManager(SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -235,7 +236,7 @@ func TestParamsReferenceNumericalSymbolValueGuard(t *testing.T) {
 	a, e := c.NewValue()
 	paramsMust(t, e)
 	before := c.Stats()
-	e = c.SetSymbol(&a, internSymbol(t, sy, "s"), NumericalSymbol(5))
+	e = c.SetSymbol(&a, internSymbol(t, sy, "s"), usymbol.Numerical(5))
 	if e != ErrParamsPrecondition {
 		t.Fatal(e)
 	}
@@ -272,7 +273,7 @@ func TestParamsReferenceNullableStreamAndDisplayName(t *testing.T) {
 	if text != "(params s " {
 		t.Fatal("null C string stream prefix", text)
 	}
-	paramsMust(t, c.SetSymbol(&a, k, Symbol{}))
+	paramsMust(t, c.SetSymbol(&a, k, usymbol.Symbol{}))
 	text, e = c.Display(&a)
 	paramsMust(t, e)
 	if text != "(params s null)" {
@@ -370,14 +371,14 @@ func TestParamsReferenceFallbackAllKinds(t *testing.T) {
 		t.Fatal(out, present)
 	}
 	paramsMust(t, c.SetSymbolName(&b, &name, s))
-	direct, e := c.GetSymbol(&b, k, Symbol{})
+	direct, e := c.GetSymbol(&b, k, usymbol.Symbol{})
 	paramsMust(t, e)
-	named, e := c.GetSymbolName(&b, &name, Symbol{})
+	named, e := c.GetSymbolName(&b, &name, usymbol.Symbol{})
 	paramsMust(t, e)
 	if direct != s || named != s {
 		t.Fatal("symbol overloads")
 	}
-	sym, e := c.GetSymbolFallbackName(&a, &name, &b, Symbol{})
+	sym, e := c.GetSymbolFallbackName(&a, &name, &b, usymbol.Symbol{})
 	paramsMust(t, e)
 	if sym != s {
 		t.Fatal(sym)
@@ -409,9 +410,9 @@ func TestParamsReferenceSourceGrowthAndFailurePrefixes(t *testing.T) {
 	c, sy, q := paramsTestOwner(t)
 	a, e := c.NewValue()
 	paramsMust(t, e)
-	var keys [12]Symbol
+	var keys [12]usymbol.Symbol
 	for i := range keys {
-		keys[i] = NumericalSymbol(uint32(i))
+		keys[i] = usymbol.Numerical(uint32(i))
 	}
 	for i := 0; i < 12; i++ {
 		paramsMust(t, c.SetUInt(&a, keys[i], uint32(i)))
@@ -767,7 +768,7 @@ func TestParamsReferenceConstructorFaultAndRecordShape(t *testing.T) {
 		paramsMust(t, arena.ValidateRecordType(typ))
 	}
 	b := arena.NewBudget(^uint64(0))
-	sy, e := NewSymbolManager(SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Cells: arena.Config{PageSize: 2, Budget: b}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}}})
 	paramsMust(t, e)

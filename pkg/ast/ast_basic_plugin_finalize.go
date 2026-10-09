@@ -4,7 +4,7 @@ package ast
 import (
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func (m *ASTManager) finalizeBasic() error {
@@ -108,7 +108,7 @@ func (m *ASTManager) destroyPluginBacking() {
 		m.BudgetField.Release(uint64(cap(m.basic.proofCaches[i])) * width)
 		m.basic.proofCaches[i] = nil
 	}
-	m.BudgetField.Release(uint64(cap(m.builtin.userNames)) * uint64(reflect.TypeOf(util.Symbol{}).Size()))
+	m.BudgetField.Release(uint64(cap(m.builtin.userNames)) * uint64(reflect.TypeOf(usymbol.Symbol{}).Size()))
 	m.builtin.userNames = nil
 	m.builtin.userTable.Close()
 	m.plugins.close(m.BudgetField)

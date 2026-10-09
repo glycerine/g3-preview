@@ -1,7 +1,9 @@
 // Source: src/util/symbol.h:97-110; src/smt/params/smt_params.cpp:138.
 package util
 
-func (out *NumericTextStream) AppendSMTSymbol(g *GlobalParamsService, s Symbol) error {
+import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+
+func (out *NumericTextStream) AppendSMTSymbol(g *GlobalParamsService, s usymbol.Symbol) error {
 	enabled, e := g.NamespaceAssertionsEnabled()
 	if e != nil {
 		return e
@@ -17,8 +19,8 @@ func (out *NumericTextStream) AppendSMTSymbol(g *GlobalParamsService, s Symbol) 
 		}
 		// This call acquires scalar pointer identity only. Actual strlen/bytes are
 		// reached by the existing C-string engine, including after stream badbit.
-		if s.owner != g.Symbols.owner {
-			return ErrSymbolOwner
+		if !g.Symbols.Owns(s) {
+			return usymbol.ErrOwner
 		}
 		return out.AppendCStringView(ParamsStringView{symbols: g.Symbols, symbol: s, Mode: 3, PresentField: true})
 	}

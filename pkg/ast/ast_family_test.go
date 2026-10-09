@@ -7,12 +7,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func familyFixture(t *testing.T, b *arena.Budget) (*util.SymbolManager, *FamilyManager) {
+func familyFixture(t *testing.T, b *arena.Budget) (*usymbol.Manager, *FamilyManager) {
 	t.Helper()
-	m, e := util.NewSymbolManager(util.SymbolConfig{})
+	m, e := usymbol.NewManager(usymbol.Config{})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -65,7 +65,7 @@ func TestFamilySourceRegistrationAndQueries(t *testing.T) {
 	}
 	for _, id := range []FamilyID{-1, -2, 6, math.MaxInt32} {
 		s, e := f.GetName(id)
-		if e != nil || s != (util.Symbol{}) {
+		if e != nil || s != (usymbol.Symbol{}) {
 			t.Fatal(s, e)
 		}
 		has, e := f.HasID(id)
@@ -78,12 +78,12 @@ func TestFamilySourceRegistrationAndQueries(t *testing.T) {
 func TestFamilySourceEnumerationOrderAndPrefixes(t *testing.T) {
 	_, f := familyFixture(t, nil)
 	for _, k := range []uint32{6, 1, 4} {
-		if _, e := f.MkID(util.NumericalSymbol(k)); e != nil {
+		if _, e := f.MkID(usymbol.Numerical(k)); e != nil {
 			t.Fatal(e)
 		}
 	}
-	dom, e := f.AppendDom([]util.Symbol{util.NumericalSymbol(99)})
-	if e != nil || !reflect.DeepEqual(dom, []util.Symbol{util.NumericalSymbol(99), util.NumericalSymbol(6), util.NumericalSymbol(1), util.NumericalSymbol(4)}) {
+	dom, e := f.AppendDom([]usymbol.Symbol{usymbol.Numerical(99)})
+	if e != nil || !reflect.DeepEqual(dom, []usymbol.Symbol{usymbol.Numerical(99), usymbol.Numerical(6), usymbol.Numerical(1), usymbol.Numerical(4)}) {
 		t.Fatal(dom, e)
 	}
 	rangeIDs, e := f.AppendRange([]FamilyID{-99})
@@ -93,7 +93,7 @@ func TestFamilySourceEnumerationOrderAndPrefixes(t *testing.T) {
 }
 
 func TestFamilyBudgetConstructorAndNativeNameGrowth(t *testing.T) {
-	m, e := util.NewSymbolManager(util.SymbolConfig{})
+	m, e := usymbol.NewManager(usymbol.Config{})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -113,7 +113,7 @@ func TestFamilyBudgetConstructorAndNativeNameGrowth(t *testing.T) {
 	}
 	defer f.Close()
 	for i := uint32(0); i < 9; i++ {
-		if _, e := f.MkID(util.NumericalSymbol(uint32(i))); e != nil {
+		if _, e := f.MkID(usymbol.Numerical(uint32(i))); e != nil {
 			t.Fatal(e)
 		}
 		s := f.Stats()
@@ -158,13 +158,13 @@ func TestFamilyWarmGuardsAndSignedCounterBound(t *testing.T) {
 	if _, e := copyOwner.MkID(s); !errors.Is(e, ErrFamilyOwner) {
 		t.Fatal(e)
 	}
-	if _, e := f.MkID(util.Symbol{}); !errors.Is(e, util.ErrInvalidSymbol) {
+	if _, e := f.MkID(usymbol.Symbol{}); !errors.Is(e, usymbol.ErrInvalid) {
 		t.Fatal(e)
 	}
-	if _, e := f.MkID(util.DummySymbol()); !errors.Is(e, util.ErrInvalidSymbol) {
+	if _, e := f.MkID(usymbol.Dummy()); !errors.Is(e, usymbol.ErrInvalid) {
 		t.Fatal(e)
 	}
-	other, e := util.NewSymbolManager(util.SymbolConfig{})
+	other, e := usymbol.NewManager(usymbol.Config{})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -172,12 +172,12 @@ func TestFamilyWarmGuardsAndSignedCounterBound(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if _, e := f.GetID(foreign); !errors.Is(e, util.ErrSymbolOwner) {
+	if _, e := f.GetID(foreign); !errors.Is(e, usymbol.ErrOwner) {
 		t.Fatal(e)
 	}
 	other.Close()
 	f.next = math.MaxInt32
-	if _, e := f.MkID(util.NumericalSymbol(88)); !errors.Is(e, arena.ErrBounds) || f.next != math.MaxInt32 {
+	if _, e := f.MkID(usymbol.Numerical(88)); !errors.Is(e, arena.ErrBounds) || f.next != math.MaxInt32 {
 		t.Fatal(e, f.next)
 	}
 	f.Close()
@@ -194,7 +194,7 @@ func TestFamilyWarmGuardsAndSignedCounterBound(t *testing.T) {
 }
 
 func TestFamilyBorrowedSymbolManagerLifetime(t *testing.T) {
-	m, e := util.NewSymbolManager(util.SymbolConfig{})
+	m, e := usymbol.NewManager(usymbol.Config{})
 	if e != nil {
 		t.Fatal(e)
 	}

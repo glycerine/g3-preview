@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -33,10 +34,10 @@ func (g *GlobalParams) reserveWorkspace(n int) error {
 	return nil
 }
 
-func (g *GlobalParams) internWorkspace(b []byte) (Symbol, error) {
+func (g *GlobalParams) internWorkspace(b []byte) (usymbol.Symbol, error) {
 	return g.SymbolsField.Intern(string(b))
 }
-func (g *GlobalParams) normalizeWorkspace() (Symbol, Symbol, error) {
+func (g *GlobalParams) normalizeWorkspace() (usymbol.Symbol, usymbol.Symbol, error) {
 	n := uint32(len(g.Workspace)) // source unsigned narrowing, before both loops
 	for i := uint32(0); i < n; i++ {
 		ch := g.Workspace[i]
@@ -51,50 +52,45 @@ func (g *GlobalParams) normalizeWorkspace() (Symbol, Symbol, error) {
 			// The source publishes suffix PARAM before prefix MODULE.
 			param, e := g.internWorkspace(g.Workspace[i+1:])
 			if e != nil {
-				return Symbol{}, Symbol{}, e
+				return usymbol.Symbol{}, usymbol.Symbol{}, e
 			}
 			module, e := g.internWorkspace(g.Workspace[:i])
 			return module, param, e
 		}
 	}
 	param, e := g.internWorkspace(g.Workspace)
-	return Symbol{}, param, e
+	return usymbol.Symbol{}, param, e
 }
-func (g *GlobalParams) normalizeName(name string) (Symbol, Symbol, error) {
-	name = name[:cSymbolLength(name)]
+func (g *GlobalParams) normalizeName(name string) (usymbol.Symbol, usymbol.Symbol, error) {
+	name = name[:nulStringLength(name)]
 	if len(name) > 0 && name[0] == ':' {
 		name = name[1:]
 	}
 	if e := g.reserveWorkspace(len(name)); e != nil {
-		return Symbol{}, Symbol{}, e
+		return usymbol.Symbol{}, usymbol.Symbol{}, e
 	}
 	g.Workspace = g.Workspace[:len(name)]
 	copy(g.Workspace, name)
 	return g.normalizeWorkspace()
 }
-func (g *GlobalParams) normalizeSymbol(name Symbol) (Symbol, Symbol, error) {
+func (g *GlobalParams) normalizeSymbol(name usymbol.Symbol) (usymbol.Symbol, usymbol.Symbol, error) {
 	m := g.SymbolsField
-	m.mu.Lock()
-	if e := m.checkPlain(name); e != nil {
-		m.mu.Unlock()
-		return Symbol{}, Symbol{}, e
+	if e := m.Validate(name); e != nil {
+		return usymbol.Symbol{}, usymbol.Symbol{}, e
 	}
 	if name.IsNumerical() {
-		m.mu.Unlock()
 		if GlobalParamsSourceDebug {
-			return Symbol{}, Symbol{}, ErrGlobalParamsOwner
+			return usymbol.Symbol{}, usymbol.Symbol{}, ErrGlobalParamsOwner
 		}
 		return g.normalizeName("")
 	}
 	if name.Value == 0 {
-		m.mu.Unlock()
-		return Symbol{}, Symbol{}, ErrGlobalParamsOwner
+		return usymbol.Symbol{}, usymbol.Symbol{}, ErrGlobalParamsOwner
 	}
 	g.Workspace = g.Workspace[:0]
-	text, e := m.spelling(name)
+	text, _, e := m.BareString(name)
 	if e != nil {
-		m.mu.Unlock()
-		return Symbol{}, Symbol{}, e
+		return usymbol.Symbol{}, usymbol.Symbol{}, e
 	}
 	first := true
 	for i := 0; i < len(text); i++ {
@@ -105,23 +101,21 @@ func (g *GlobalParams) normalizeSymbol(name Symbol) (Symbol, Symbol, error) {
 		}
 		first = false
 		if e = g.reserveWorkspace(len(g.Workspace) + 1); e != nil {
-			m.mu.Unlock()
-			return Symbol{}, Symbol{}, e
+			return usymbol.Symbol{}, usymbol.Symbol{}, e
 		}
 		g.Workspace = append(g.Workspace, b)
 	}
-	m.mu.Unlock()
 	return g.normalizeWorkspace()
 }
 
 type gparamsErrorPart struct {
 	text     string
-	symbol   Symbol
+	symbol   usymbol.Symbol
 	symbolic bool
 }
 
-func gpText(s string) gparamsErrorPart   { return gparamsErrorPart{text: s} }
-func gpSymbol(s Symbol) gparamsErrorPart { return gparamsErrorPart{symbol: s, symbolic: true} }
+func gpText(s string) gparamsErrorPart           { return gparamsErrorPart{text: s} }
+func gpSymbol(s usymbol.Symbol) gparamsErrorPart { return gparamsErrorPart{symbol: s, symbolic: true} }
 
 func (g *GlobalParams) exception(parts ...gparamsErrorPart) error {
 	var out strings.Builder
@@ -138,7 +132,7 @@ func (g *GlobalParams) exception(parts ...gparamsErrorPart) error {
 	}
 	return z3exception.NewDefaultException(out.String())
 }
-func (g *GlobalParams) oldName(k Symbol) (bool, error) {
+func (g *GlobalParams) oldName(k usymbol.Symbol) (bool, error) {
 	for _, name := range gparamsOldNames {
 		same, e := g.SymbolsField.EqualString(k, &name)
 		if e != nil {
@@ -150,7 +144,7 @@ func (g *GlobalParams) oldName(k Symbol) (bool, error) {
 	}
 	return false, nil
 }
-func (g *GlobalParams) renamedName(k Symbol) (string, bool, error) {
+func (g *GlobalParams) renamedName(k usymbol.Symbol) (string, bool, error) {
 	for _, pair := range gparamsRenames {
 		same, e := g.SymbolsField.EqualString(k, &pair.old)
 		if e != nil {
@@ -162,8 +156,8 @@ func (g *GlobalParams) renamedName(k Symbol) (string, bool, error) {
 	}
 	return "", false, nil
 }
-func (g *GlobalParams) unknownParameter(k Symbol, d *ParamDescrs, module Symbol) error {
-	if module == (Symbol{}) {
+func (g *GlobalParams) unknownParameter(k usymbol.Symbol, d *ParamDescrs, module usymbol.Symbol) error {
+	if module == (usymbol.Symbol{}) {
 		newName, found, e := g.renamedName(k)
 		if e != nil {
 			return e
@@ -186,7 +180,7 @@ func (g *GlobalParams) unknownParameter(k Symbol, d *ParamDescrs, module Symbol)
 	var out strings.Builder
 	out.WriteString("unknown parameter '")
 	out.WriteString(keyText)
-	if module == (Symbol{}) {
+	if module == (usymbol.Symbol{}) {
 		out.WriteString("'\n")
 	} else {
 		moduleText, e := g.SymbolsField.Display(module)
@@ -205,7 +199,7 @@ func (g *GlobalParams) unknownParameter(k Symbol, d *ParamDescrs, module Symbol)
 	out.WriteString(legal)
 	return z3exception.NewDefaultException(out.String())
 }
-func (g *GlobalParams) findModuleDescriptor(k Symbol) (*ParamDescrs, bool, error) {
+func (g *GlobalParams) findModuleDescriptor(k usymbol.Symbol) (*ParamDescrs, bool, error) {
 	if e := g.ensureRegistered(); e != nil {
 		return nil, false, e
 	}
@@ -221,7 +215,7 @@ func (g *GlobalParams) findModuleDescriptor(k Symbol) (*ParamDescrs, bool, error
 	}
 	return g.Descriptors[n-1], true, nil
 }
-func (g *GlobalParams) validateType(k Symbol, value string, d *ParamDescrs) error {
+func (g *GlobalParams) validateType(k usymbol.Symbol, value string, d *ParamDescrs) error {
 	kind, e := d.Kind(k)
 	if e != nil {
 		return e
@@ -247,7 +241,7 @@ func (g *GlobalParams) validateType(k Symbol, value string, d *ParamDescrs) erro
 	}
 	return nil
 }
-func (g *GlobalParams) setValue(k Symbol, value string, d *ParamDescrs, module Symbol) error {
+func (g *GlobalParams) setValue(k usymbol.Symbol, value string, d *ParamDescrs, module usymbol.Symbol) error {
 	kind, e := d.Kind(k)
 	if e != nil {
 		return e
@@ -271,7 +265,7 @@ func (g *GlobalParams) setValue(k Symbol, value string, d *ParamDescrs, module S
 		if value == "false" {
 			return g.ContextField.SetBool(ps, k, false)
 		}
-		if module == (Symbol{}) {
+		if module == (usymbol.Symbol{}) {
 			return g.exception(gpText("invalid value '"), gpText(value), gpText("' for Boolean parameter '"), gpSymbol(k), gpText("' at module '"), gpSymbol(module), gpText("'"))
 		}
 		return g.exception(gpText("invalid value '"), gpText(value), gpText("' for Boolean parameter '"), gpSymbol(k), gpText("'"))
@@ -288,15 +282,15 @@ func (g *GlobalParams) setValue(k Symbol, value string, d *ParamDescrs, module S
 		}
 		return g.ContextField.SetStringSymbol(ps, k, s)
 	default:
-		if module == (Symbol{}) {
+		if module == (usymbol.Symbol{}) {
 			return g.exception(gpText("unsupported parameter type '"), gpSymbol(k), gpText("' at module '"), gpSymbol(module), gpText("'"))
 		}
 		return g.exception(gpText("unsupported parameter type '"), gpSymbol(k), gpText("'"))
 	}
 }
-func (g *GlobalParams) setNormalized(module, k Symbol, value string) error {
+func (g *GlobalParams) setNormalized(module, k usymbol.Symbol, value string) error {
 	var d *ParamDescrs
-	if module == (Symbol{}) {
+	if module == (usymbol.Symbol{}) {
 		if e := g.ensureRegistered(); e != nil {
 			return e
 		}
@@ -311,7 +305,7 @@ func (g *GlobalParams) setNormalized(module, k Symbol, value string) error {
 		}
 		d = found
 	}
-	value = value[:cSymbolLength(value)]
+	value = value[:nulStringLength(value)]
 	if e := g.validateType(k, value, d); e != nil {
 		return e
 	}
@@ -332,7 +326,7 @@ func (g *GlobalParams) SetName(name, value string) error {
 	}
 	return g.setNormalized(module, k, value)
 }
-func (g *GlobalParams) SetSymbol(name Symbol, value string) error {
+func (g *GlobalParams) SetSymbol(name usymbol.Symbol, value string) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -347,7 +341,7 @@ func (g *GlobalParams) SetSymbol(name Symbol, value string) error {
 	}
 	return g.setNormalized(module, k, value)
 }
-func (g *GlobalParams) getDefault(d *ParamDescrs, k, module Symbol) (string, error) {
+func (g *GlobalParams) getDefault(d *ParamDescrs, k, module usymbol.Symbol) (string, error) {
 	yes, e := d.Contains(k)
 	if e != nil {
 		return "", e
@@ -364,8 +358,8 @@ func (g *GlobalParams) getDefault(d *ParamDescrs, k, module Symbol) (string, err
 	}
 	return s, nil
 }
-func (g *GlobalParams) getValue(module, k Symbol) (string, error) {
-	if module == (Symbol{}) {
+func (g *GlobalParams) getValue(module, k usymbol.Symbol) (string, error) {
+	if module == (usymbol.Symbol{}) {
 		yes, e := g.ContextField.Contains(&g.globalParams, k)
 		if e != nil {
 			return "", e
@@ -418,7 +412,7 @@ func (g *GlobalParams) GetValueName(name string) (string, error) {
 	}
 	return g.getValue(module, k)
 }
-func (g *GlobalParams) GetValueSymbol(name Symbol) (string, error) {
+func (g *GlobalParams) GetValueSymbol(name usymbol.Symbol) (string, error) {
 	if g == nil {
 		return "", ErrGlobalParamsOwner
 	}

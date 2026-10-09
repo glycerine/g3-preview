@@ -2,10 +2,10 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func (m *ASTManager) pluginDecl(name util.Symbol, fid FamilyID, k int32, ps []ASTParameter, domain []ASTHandle, result astNodeRef, flags ASTFuncFlags, private bool) (astNodeRef, error) {
+func (m *ASTManager) pluginDecl(name usymbol.Symbol, fid FamilyID, k int32, ps []ASTParameter, domain []ASTHandle, result astNodeRef, flags ASTFuncFlags, private bool) (astNodeRef, error) {
 	s, g, e := m.newInfo(false, fid, k, ps, SortSize{}, flags, private)
 	if e != nil {
 		return astNodeRef{}, e
@@ -113,7 +113,7 @@ func (m *ASTManager) builtinDecl(fid FamilyID, k int32, ps []ASTParameter, domai
 		return astNodeRef{}, ErrASTDomain
 	}
 }
-func (m *ASTManager) registerUserName(name util.Symbol) (int32, error) {
+func (m *ASTManager) registerUserName(name usymbol.Symbol) (int32, error) {
 	return astRegisterUserName(&m.builtin.userTable, &m.builtin.userNames, m.BudgetField, name)
 }
 func (m *ASTManager) userSort(k int32, ps []ASTParameter) (astNodeRef, error) {
@@ -127,7 +127,7 @@ func (m *ASTManager) userSort(k int32, ps []ASTParameter) (astNodeRef, error) {
 	defer m.dropInfoStorage(s, g)
 	return m.mkSort(m.builtin.userNames[k], ASTSortInfo{m.origin, s, g})
 }
-func (m *ASTManager) MkUninterpretedSort(name util.Symbol, ps []ASTParameter) (ASTHandle, error) {
+func (m *ASTManager) MkUninterpretedSort(name usymbol.Symbol, ps []ASTParameter) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}

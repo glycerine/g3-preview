@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestParamNameNormalizationSourceBranches(t *testing.T) {
@@ -65,19 +66,19 @@ func TestParamNameSymbolOwnershipAndSourceRoutes(t *testing.T) {
 			t.Fatal(pair, got, err, "normalization changed the symbol owner")
 		}
 	}
-	if got, err := NormParamSymbolName(m, Symbol{}); err != nil || got != "_" {
+	if got, err := NormParamSymbolName(m, usymbol.Symbol{}); err != nil || got != "_" {
 		t.Fatal(got, err)
 	}
-	for _, invalid := range []Symbol{NumericalSymbol(1), DummySymbol()} {
-		if _, err := NormParamSymbolName(m, invalid); !errors.Is(err, ErrInvalidSymbol) {
+	for _, invalid := range []usymbol.Symbol{usymbol.Numerical(1), usymbol.Dummy()} {
+		if _, err := NormParamSymbolName(m, invalid); !errors.Is(err, usymbol.ErrInvalid) {
 			t.Fatal(invalid, err)
 		}
 	}
 	foreign := internSymbol(t, other, "FOREIGN")
-	if _, err := NormParamSymbolName(m, foreign); !errors.Is(err, ErrSymbolOwner) {
+	if _, err := NormParamSymbolName(m, foreign); !errors.Is(err, usymbol.ErrOwner) {
 		t.Fatal(err)
 	}
-	if _, err := NormParamSymbolName(nil, Symbol{}); !errors.Is(err, ErrInvalidSymbol) {
+	if _, err := NormParamSymbolName(nil, usymbol.Symbol{}); !errors.Is(err, usymbol.ErrInvalid) {
 		t.Fatal(err)
 	}
 	serviceSymbol := internSymbol(t, m, ":LIFETIME-NAME")

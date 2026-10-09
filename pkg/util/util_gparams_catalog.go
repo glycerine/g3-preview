@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var ErrGlobalParamsCatalogPending = errors.New("g3: parameter catalog retains unpublished descriptor owner")
@@ -22,7 +23,7 @@ type GlobalParamsCatalogConfig struct {
 type GlobalParamsCatalog struct {
 	mu           sync.Mutex
 	self         *GlobalParamsCatalog
-	symbols      *SymbolManager
+	symbols      *usymbol.Manager
 	budget       *arena.Budget
 	Region       *arena.BytesRegion
 	descriptions [16]arena.BytesRegionRef
@@ -32,11 +33,11 @@ type GlobalParamsCatalog struct {
 	closed       bool
 }
 
-func NewGlobalParamsCatalog(s *SymbolManager, c GlobalParamsCatalogConfig) (*GlobalParamsCatalog, error) {
+func NewGlobalParamsCatalog(s *usymbol.Manager, c GlobalParamsCatalogConfig) (*GlobalParamsCatalog, error) {
 	if s == nil {
 		return nil, ErrGlobalParamsOwner
 	}
-	if _, e := s.Hash(Symbol{}); e != nil {
+	if _, e := s.Hash(usymbol.Symbol{}); e != nil {
 		return nil, e
 	}
 	if c.Descriptions.Descriptors.Budget != nil && c.Descriptions.Descriptors.Budget != c.Budget || c.Text.Descriptors.Budget != nil && c.Text.Descriptors.Budget != c.Budget {

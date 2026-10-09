@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type SMTParamsState struct {
@@ -59,7 +60,7 @@ type SMTParamsState struct {
 	OldClauseRelevancy         uint32
 	InvClauseDecay             float64
 	SmtlibDumpLemmas           bool
-	Logic                      util.Symbol
+	Logic                      usymbol.Symbol
 	ProfileResSub              bool
 	DisplayBoolVar2expr        bool
 	DisplayLlBoolVar2expr      bool
@@ -83,7 +84,7 @@ type SMTParamsState struct {
 	DumpBenchmarks             bool
 	DumpMinTime                float64
 	DumpRecheck                bool
-	StringSolver               util.Symbol
+	StringSolver               usymbol.Symbol
 	// DefaultsInitialized records the 70 initializers preceding StringSolver.
 	// These diagnostic flags do not imply completed constructor/body lifetime.
 	DefaultsInitialized, StringSolverInitialized, DumpInitialized bool
@@ -222,7 +223,7 @@ func (s *SMTParams) construct(p *util.ParamsRef) error {
 	s.state.OldClauseRelevancy = 6
 	s.state.InvClauseDecay = 1
 	s.state.SmtlibDumpLemmas = false
-	s.state.Logic = util.Symbol{}
+	s.state.Logic = usymbol.Symbol{}
 	s.state.ProfileResSub = false
 	s.state.DisplayBoolVar2expr = false
 	s.state.DisplayLlBoolVar2expr = false

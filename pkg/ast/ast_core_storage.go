@@ -14,6 +14,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/idgen"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var ErrASTHandle = errors.New("g3: invalid AST owner, kind or lifetime")
@@ -50,7 +51,7 @@ const (
 )
 
 type ASTManagerConfig struct {
-	Symbols     *util.SymbolManager
+	Symbols     *usymbol.Manager
 	Numerals    *util.RationalService
 	Budget      *arena.Budget
 	ProofMode   ASTProofMode
@@ -97,10 +98,10 @@ type ASTFuncFlags struct{ LeftAssociative, RightAssociative, FlatAssociative, Co
 type ASTQuantifierSpec struct {
 	Forall               bool
 	Sorts                []ASTHandle
-	Names                []util.Symbol
+	Names                []usymbol.Symbol
 	Body                 ASTHandle
 	Weight               int32
-	QID, SkolemID        util.Symbol
+	QID, SkolemID        usymbol.Symbol
 	Patterns, NoPatterns []ASTHandle
 }
 
@@ -118,12 +119,12 @@ type astNodeRecord struct {
 }
 type astSortRecord struct {
 	nextFree uint32
-	name     util.Symbol
+	name     usymbol.Symbol
 	info     ASTSortInfo
 }
 type astFuncDeclRecord struct {
 	nextFree  uint32
-	name      util.Symbol
+	name      usymbol.Symbol
 	info      ASTFuncDeclInfo
 	domain    arena.SmallBytesRef
 	arity     uint32
@@ -146,7 +147,7 @@ type astQuantifierRecord struct {
 	sorts, names, patterns, noPatterns         arena.SmallBytesRef
 	count, patternCount, noPatternCount, depth uint32
 	weight                                     int32
-	qid, skolemID                              util.Symbol
+	qid, skolemID                              usymbol.Symbol
 	forall, unusedVars, labels                 bool
 }
 type astParameterRecord struct {
@@ -155,7 +156,7 @@ type astParameterRecord struct {
 	Live                 bool
 	integer              int32
 	ast                  astNodeRef
-	symbol               util.Symbol
+	symbol               usymbol.Symbol
 	Rational             util.OwnedRational
 	double               float64
 	external             uint32
@@ -222,9 +223,9 @@ type astBasicPluginState struct {
 	proofCaches         [ASTLastBasicPR][]astNodeRef
 }
 type astBuiltinPluginState struct {
-	labelPos, labelNeg, labelLit util.Symbol
-	userNames                    []util.Symbol
-	userTable                    util.SymbolDictionaryInt32
+	labelPos, labelNeg, labelLit usymbol.Symbol
+	userNames                    []usymbol.Symbol
+	userTable                    usymbol.DictionaryInt32
 }
 
 type ASTManager struct {
@@ -241,8 +242,8 @@ type ASTManager struct {
 	Self                                                                                               *ASTManager
 	origin                                                                                             uint64
 	BudgetField                                                                                        *arena.Budget
-	Symbols                                                                                            *util.SymbolManager
-	recFun                                                                                             util.Symbol
+	Symbols                                                                                            *usymbol.Manager
+	recFun                                                                                             usymbol.Symbol
 	numerals                                                                                           *util.RationalService
 	families                                                                                           *FamilyManager
 	Limit                                                                                              control.Reslimit // source inline member, charged in the ASTManager header

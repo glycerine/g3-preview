@@ -3,44 +3,33 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
-
-// SymbolWords encodes the pointer-free identity in source aggregate storage.
-// DecodeSymbolWords validates the reconstructed identity against this manager.
-func (s Symbol) SymbolWords() [5]uint32 {
-	return [5]uint32{uint32(s.owner), uint32(s.owner >> 32), s.Value, uint32(s.Generation), s.Tag}
-}
-func (m *SymbolManager) DecodeSymbolWords(v [5]uint32) (Symbol, error) {
-	return m.FromToken(Symbol{owner: uint64(v[0]) | uint64(v[1])<<32, Value: v[2], Generation: arena.Generation(v[3]), Tag: v[4]}.Token())
-}
-func (s Symbol) IsNull() bool { return s.Tag == 0 && s.Value == 0 }
 
 // CStringView borrows the source bare_str storage; numerical symbols follow
 // the source debug guard and release empty spelling. No copy or RC is acquired.
-func (m *SymbolManager) CStringView(s Symbol) (ParamsStringView, error) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if e := m.checkPlain(s); e != nil {
+func SymbolCStringView(m *usymbol.Manager, s usymbol.Symbol) (ParamsStringView, error) {
+	if e := m.Validate(s); e != nil {
 		return ParamsStringView{}, e
 	}
 	if s.IsNumerical() {
 		if sourceDebug {
-			return ParamsStringView{}, ErrInvalidSymbol
+			return ParamsStringView{}, usymbol.ErrInvalid
 		}
 		return LiteralParamsStringView(""), nil
 	}
 	if s.Value == 0 {
-		return ParamsStringView{}, ErrInvalidSymbol
+		return ParamsStringView{}, usymbol.ErrInvalid
 	}
 	return ParamsStringView{symbols: m, symbol: s, Mode: 3, PresentField: true}, nil
 }
-func (c *ParamsContext) CheckServices(s *SymbolManager, q *RationalService) error {
+func (c *ParamsContext) CheckServices(s *usymbol.Manager, q *RationalService) error {
 	if c == nil || c.Self != c || c.SymbolsField != s || q != nil && c.NumeralsField != q {
 		return ErrParamsOwner
 	}
 	return nil
 }
-func (c *ParamsContext) Symbols() *SymbolManager    { return c.SymbolsField }
+func (c *ParamsContext) Symbols() *usymbol.Manager  { return c.SymbolsField }
 func (c *ParamsContext) Numerals() *RationalService { return c.NumeralsField }
 func (c *ParamsContext) Budget() *arena.Budget      { return c.BudgetField }
 func (g *GlobalParamsService) CheckOwner(c *ParamsContext, b *arena.Budget) error {
@@ -78,6 +67,6 @@ func (c *ParamsContext) EmptyValue() ParamsRef { return ParamsRef{Owner: c.Owner
 
 func (r ParamsRef) Initialized() bool { return r.Owner != 0 }
 
-func (g *GlobalParams) CheckOpen() error        { return g.open() }
-func (g *GlobalParams) Context() *ParamsContext { return g.ContextField }
-func (g *GlobalParams) Symbols() *SymbolManager { return g.SymbolsField }
+func (g *GlobalParams) CheckOpen() error          { return g.open() }
+func (g *GlobalParams) Context() *ParamsContext   { return g.ContextField }
+func (g *GlobalParams) Symbols() *usymbol.Manager { return g.SymbolsField }

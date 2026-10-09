@@ -3,7 +3,8 @@ package ast
 
 import (
 	"errors"
-	"github.com/glycerine/g3/pkg/util"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // ASTLess follows the original field comparisons and first differing AST tail
@@ -213,7 +214,7 @@ start:
 		}
 		switch kind {
 		case ASTSort, ASTFuncDecl:
-			var nameA, nameB util.Symbol
+			var nameA, nameB usymbol.Symbol
 			if kind == ASTSort {
 				nameA = m.sortAt(a.slot).name
 				nameB = m.sortAt(b.slot).name

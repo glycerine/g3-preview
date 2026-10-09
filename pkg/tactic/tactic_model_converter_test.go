@@ -6,10 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/model"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // A virtual-boundary fixture records dispatch and can mutate the actual
@@ -20,7 +19,7 @@ type modelConverterTestLeaf struct {
 	calls  *[]string
 	refs   uint32
 	closed bool
-	label  util.Symbol
+	label  usymbol.Symbol
 	run    func(*ModelRef, uint32) error
 	fail   error
 }
@@ -142,7 +141,7 @@ func TestTacticModelConcatStarSubgoalDispatchAndDestruction(t *testing.T) {
 	b.label = astTestSymbol(t, m, "b-label")
 	root.label = astTestSymbol(t, m, "root-label")
 	satOK(t, c.ApplyLabels(&labels, 4))
-	if !reflect.DeepEqual(labels.Values, []util.Symbol{b.label, root.label}) {
+	if !reflect.DeepEqual(labels.Values, []usymbol.Symbol{b.label, root.label}) {
 		t.Fatal("star labels", labels.Values)
 	}
 	calls = nil

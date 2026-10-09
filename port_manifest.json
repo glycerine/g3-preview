@@ -9583,7 +9583,7 @@
         "pkg/ast/ast_basic_plugin_kinds.go",
         "pkg/ast/ast_basic_plugin_proof.go",
         "pkg/ast/ast_builtin_plugins.go",
-        "pkg/util/util_symbol_dictionary_int32.go",
+        "pkg/util/symbol/dictionary_int32.go",
         "pkg/ast/ast_builtin_plugins_user.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_core.go",
@@ -10568,7 +10568,7 @@
             "TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit"
           ],
           "go_targets": [
-            "pkg/util/util_symbol_dictionary_int32_test.go"
+            "pkg/util/symbol/dictionary_int32_test.go"
           ]
         },
         {
@@ -10970,7 +10970,7 @@
         "pkg/ast/ast_basic_plugin_kinds.go",
         "pkg/ast/ast_basic_plugin_proof.go",
         "pkg/ast/ast_builtin_plugins.go",
-        "pkg/util/util_symbol_dictionary_int32.go",
+        "pkg/util/symbol/dictionary_int32.go",
         "pkg/ast/ast_builtin_plugins_user.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_core.go",
@@ -11722,7 +11722,7 @@
             "TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit"
           ],
           "go_targets": [
-            "pkg/util/util_symbol_dictionary_int32_test.go"
+            "pkg/util/symbol/dictionary_int32_test.go"
           ]
         },
         {
@@ -109465,10 +109465,14 @@
       "role": "test",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_symbol.go"
+        "pkg/util/symbol/encoding.go",
+        "pkg/util/symbol/bytes.go",
+        "pkg/util/symbol/hash.go",
+        "pkg/util/symbol/symbol.go"
       ],
       "tests": [
-        "TestSymbolNativeInternGrowthAndBorrowedViewLifetime",
+        "TestSymbolSpellingHashSourceGolden",
+        "TestSymbolNativeInternGrowthAndStringLifetime",
         "TestSymbolSourceAssertions",
         "TestSymbolTagsNullBytesAndCachedHash",
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
@@ -109576,7 +109580,7 @@
         {
           "name": "tst1/tst_symbol all23 active ENSUREs and exact output",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -109588,7 +109592,7 @@
         }
       ],
       "ownership": [
-        "Owner-local SymbolManager uses map[string]uint32 and a concrete entry slice containing immutable Go spellings and cached source hashes. Handles remain pointer-free owner/ID/generation/tag values; IDs are not recycled. Interning and teardown are serialized. Only the service/manager headers remain arena-budgeted; maps, entries and strings are Go-managed. Borrowed views check the manager lifetime when read."
+        "The util/symbol leaf imports only arena and standard-library packages. Its owner-local Manager uses map[string]uint32 and a concrete entry slice containing immutable Go spellings and cached source hashes. Handles remain pointer-free owner/ID/generation/tag values; IDs are not recycled. Interning and teardown are serialized. Only the service/manager headers remain arena-budgeted; maps, entries and strings are Go-managed. Borrowed views check the manager lifetime when read."
       ],
       "deviations": [
         "Native tagged pointers become scalar tags/IDs and owner-bound opaque tokens; foreign owners and forged generations are rejected. Numerical symbols retain the source uint32 domain and signed rendering. Legacy arena geometry fields are ignored for Go-managed spellings.",
@@ -147113,7 +147117,7 @@
       "role": "production",
       "status": "platform_replacement",
       "go_targets": [
-        "pkg/util/util_symbol.go",
+        "pkg/util/symbol/symbol.go",
         "pkg/util/util_debug_context.go"
       ],
       "tests": [
@@ -147136,7 +147140,7 @@
         {
           "name": "Go string maps replace the char-pointer hash/equality specialization",
           "status": "platform_replacement",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_targets": ["pkg/util/symbol/symbol.go", "pkg/util/util_debug_context.go"],
           "tests": [
             "TestSymbolDuplicateLookupAndInvalidTokens",
             "TestDebugContextUsesOwnedGoStrings"
@@ -147312,12 +147316,16 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/util_symbol.go",
-        "pkg/util/util_symbol_service.go",
-        "pkg/util/util_symbol_service_source_test.go"
+        "pkg/util/symbol/encoding.go",
+        "pkg/util/symbol/bytes.go",
+        "pkg/util/symbol/hash.go",
+        "pkg/util/symbol/symbol.go",
+        "pkg/util/symbol/service.go",
+        "pkg/util/symbol/service_test.go"
       ],
       "tests": [
-        "TestSymbolNativeInternGrowthAndBorrowedViewLifetime",
+        "TestSymbolSpellingHashSourceGolden",
+        "TestSymbolNativeInternGrowthAndStringLifetime",
         "TestSymbolSourceAssertions",
         "TestSymbolTagsNullBytesAndCachedHash",
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
@@ -147372,7 +147380,7 @@
         {
           "name": "internal_symbol_table get_str and explicit initialize/finalize owner lifecycle",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147385,7 +147393,7 @@
         {
           "name": "numeric/string/null construction and string assignment",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147398,7 +147406,7 @@
         {
           "name": "is_marked/mark/unmark/dummy/is_numerical/get_num",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147411,7 +147419,7 @@
         {
           "name": "symbol identity/CString equality/hash predicates",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147424,7 +147432,7 @@
         {
           "name": "str/ostream/string_buffer/bare_str nullable rendering",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147437,7 +147445,7 @@
         {
           "name": "contains/size/source signed-char lt",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147450,7 +147458,7 @@
         {
           "name": "c_ptr/mk_symbol_from_c_ptr opaque token adaptation",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147463,7 +147471,7 @@
         {
           "name": "initialize_symbols/finalize_symbols explicit table pointer: completed publication, null finalize, identity-preserving shortcut and reinitialize",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol_service.go",
+          "go_target": "pkg/util/symbol/service.go",
           "tests": [
             "TestSymbolServiceSourcePublicationAndReinitialize",
             "TestSymbolServiceSourceEveryConstructorReservation",
@@ -147472,7 +147480,7 @@
         }
       ],
       "ownership": [
-        "Owner-local SymbolManager uses map[string]uint32 and a concrete entry slice containing immutable Go spellings and cached source hashes. Handles remain pointer-free owner/ID/generation/tag values; IDs are not recycled. Interning and teardown are serialized. Only the service/manager headers remain arena-budgeted; maps, entries and strings are Go-managed. Borrowed views check the manager lifetime when read.",
+        "The util/symbol leaf imports only arena and standard-library packages. Its owner-local Manager uses map[string]uint32 and a concrete entry slice containing immutable Go spellings and cached source hashes. Handles remain pointer-free owner/ID/generation/tag values; IDs are not recycled. Interning and teardown are serialized. Only the service/manager headers remain arena-budgeted; maps, entries and strings are Go-managed. Borrowed views check the manager lifetime when read.",
         "Explicit SymbolService holds a nullable manager pointer, publishes only a completed manager, preserves initialization identity, and clears the pointer after manager close. Reinitialization creates a fresh identity domain. Separate Close retires the service header. Process singleton/global Runtime accounting remain open."
       ],
       "deviations": [
@@ -147487,16 +147495,20 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/util_symbol.go",
+        "pkg/util/symbol/encoding.go",
+        "pkg/util/symbol/bytes.go",
+        "pkg/util/symbol/hash.go",
+        "pkg/util/symbol/symbol.go",
         "pkg/util/util_string_buffer.go",
-        "pkg/util/util_symbol_service.go",
-        "pkg/util/util_symbol_service_source_test.go",
+        "pkg/util/symbol/service.go",
+        "pkg/util/symbol/service_test.go",
         "pkg/util/util_gparams_service_ops.go",
         "pkg/util/util_numeric_stream_symbol_source.go",
         "pkg/smtcore/util_smt_params_source_test.go"
       ],
       "tests": [
-        "TestSymbolNativeInternGrowthAndBorrowedViewLifetime",
+        "TestSymbolSpellingHashSourceGolden",
+        "TestSymbolNativeInternGrowthAndStringLifetime",
         "TestSymbolSourceAssertions",
         "TestSymbolTagsNullBytesAndCachedHash",
         "TestSymbolOwnerFailureLifetimeAndWarmIntern",
@@ -147564,7 +147576,7 @@
         {
           "name": "internal_symbol_table get_str and explicit initialize/finalize owner lifecycle",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147577,7 +147589,7 @@
         {
           "name": "numeric/string/null construction and string assignment",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147590,7 +147602,7 @@
         {
           "name": "is_marked/mark/unmark/dummy/is_numerical/get_num",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147603,7 +147615,7 @@
         {
           "name": "symbol identity/CString equality/hash predicates",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147616,7 +147628,7 @@
         {
           "name": "str/ostream/bare_str nullable rendering",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147629,7 +147641,7 @@
         {
           "name": "contains/size/source signed-char lt",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147642,7 +147654,7 @@
         {
           "name": "c_ptr/mk_symbol_from_c_ptr opaque token adaptation",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol.go",
+          "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
             "TestSymbolSourceAssertions",
             "TestSymbolTagsNullBytesAndCachedHash",
@@ -147669,7 +147681,7 @@
         {
           "name": "initialize_symbols/finalize_symbols explicit table pointer: completed publication, null finalize, identity-preserving shortcut and reinitialize",
           "status": "ported",
-          "go_target": "pkg/util/util_symbol_service.go",
+          "go_target": "pkg/util/symbol/service.go",
           "tests": [
             "TestSymbolServiceSourcePublicationAndReinitialize",
             "TestSymbolServiceSourceEveryConstructorReservation",
@@ -147695,7 +147707,7 @@
         }
       ],
       "ownership": [
-        "Owner-local SymbolManager uses map[string]uint32 and a concrete entry slice containing immutable Go spellings and cached source hashes. Handles remain pointer-free owner/ID/generation/tag values; IDs are not recycled. Interning and teardown are serialized. Only the service/manager headers remain arena-budgeted; maps, entries and strings are Go-managed. Borrowed views check the manager lifetime when read.",
+        "The util/symbol leaf imports only arena and standard-library packages. Its owner-local Manager uses map[string]uint32 and a concrete entry slice containing immutable Go spellings and cached source hashes. Handles remain pointer-free owner/ID/generation/tag values; IDs are not recycled. Interning and teardown are serialized. Only the service/manager headers remain arena-budgeted; maps, entries and strings are Go-managed. Borrowed views check the manager lifetime when read.",
         "Selected buffer insertion borrows SymbolManager only during the call, reads checked spelling bytes directly, and charges destination growth without intermediate Symbol.String text. See PORT_PROGRESS.md#audit-string-buffer-port-status-md.",
         "Explicit SymbolService holds a nullable manager pointer, publishes only a completed manager, preserves initialization identity, and clears the pointer after manager close. Reinitialization creates a fresh identity domain. Separate Close retires the service header. Process singleton/global Runtime accounting remain open.",
         "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal.",

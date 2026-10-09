@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTExprVisitorSourceCountSharedAndAllMarks(t *testing.T) {
@@ -74,7 +74,7 @@ func TestASTExprVisitorSourceSkolemAndQuantifierNoPatterns(t *testing.T) {
 	astTestMust(t, e)
 	s, e := m.MkApp(ds, []ASTHandle{v})
 	astTestMust(t, e)
-	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []util.Symbol{astTestSymbol(t, m, "x")}, Body: c, NoPatterns: []ASTHandle{s}})
+	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []usymbol.Symbol{astTestSymbol(t, m, "x")}, Body: c, NoPatterns: []ASTHandle{s}})
 	astTestMust(t, e)
 	astTestPin(t, m, q)
 	yes, e = m.HasSkolemFunctions(q)
@@ -204,7 +204,7 @@ func TestASTExprVisitorSourceEarlyFoundErasesLaterMarkAllocation(t *testing.T) {
 	c, e := m.MkConst(astTestSymbol(t, m, "later-shared"), b)
 	astTestMust(t, e)
 	astTestPin(t, m, c)
-	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []util.Symbol{astTestSymbol(t, m, "qv")}, Body: s, NoPatterns: []ASTHandle{c}})
+	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []usymbol.Symbol{astTestSymbol(t, m, "qv")}, Body: s, NoPatterns: []ASTHandle{c}})
 	astTestMust(t, e)
 	astTestPin(t, m, q)
 	before := m.BudgetField.Used()
@@ -560,7 +560,7 @@ func TestASTExprVisitorSourcePatternBodyOrderAndAllMarkedUnreadStack(t *testing.
 	astTestMust(t, e)
 	p, e := m.MkFamilyApp(2, 0, nil, []ASTHandle{a})
 	astTestMust(t, e)
-	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []util.Symbol{astTestSymbol(t, m, "pv")}, Body: a, Patterns: []ASTHandle{p}})
+	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []usymbol.Symbol{astTestSymbol(t, m, "pv")}, Body: a, Patterns: []ASTHandle{p}})
 	astTestMust(t, e)
 	astTestPin(t, m, q)
 	want := exprVisitorCountOracle(t, m, q, make(map[ASTHandle]bool), false)

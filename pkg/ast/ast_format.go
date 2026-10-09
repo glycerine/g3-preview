@@ -5,7 +5,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 const (
@@ -54,7 +54,7 @@ func (m *ASTManager) endFormatInfo() {
 	m.formatLexical.info = astInfoRecord{}
 	m.formatLexical.parameter = astParameterRecord{}
 }
-func (m *ASTManager) formatSortCreate(name util.Symbol, id FamilyID) (astNodeRef, error) {
+func (m *ASTManager) formatSortCreate(name usymbol.Symbol, id FamilyID) (astNodeRef, error) {
 	if e := m.beginFormatInfo(true, id, 0, nil); e != nil {
 		return astNodeRef{}, e
 	}

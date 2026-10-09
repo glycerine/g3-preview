@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTBitVectorOriginalNameCallbacks(t *testing.T) {
@@ -18,7 +18,7 @@ func TestASTBitVectorOriginalNameCallbacks(t *testing.T) {
 	want := []string{"bit1", "bit0", "bvneg", "bvadd", "bvsub", "bvmul", "bvsdiv", "bvudiv", "bvsrem", "bvurem", "bvsmod", "bvule", "bvsle", "bvuge", "bvsge", "bvult", "bvslt", "bvugt", "bvsgt", "bvand", "bvor", "bvnot", "bvxor", "bvnand", "bvnor", "bvxnor", "concat", "sign_extend", "zero_extend", "extract", "repeat", "bvredor", "bvredand", "bvcomp", "bvshl", "bvlshr", "bvashr", "rotate_left", "rotate_right", "bvumul_noovfl", "bvsmul_noovfl", "bvsmul_noudfl", "bvsdiv0", "bvudiv0", "bvsrem0", "bvurem0", "bvsmod0", "bvsdiv_i", "bvudiv_i", "bvsrem_i", "bvurem_i", "bvsmod_i", "ext_rotate_left", "ext_rotate_right", "int2bv", "bv2int", "bv2nat", "mkbv"}
 	extendedKinds := []int32{52, 53, 54, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 50, 51, 57, 58, 58, 56}
 	for _, logicText := range []string{"", "ALL", "QF_BV", "QF_UFBV", "NRA"} {
-		logic := util.Symbol{}
+		logic := usymbol.Symbol{}
 		if logicText != "" {
 			logic = astTestSymbol(t, m, logicText)
 		}
@@ -78,18 +78,18 @@ func TestASTBitVectorNameVectorEveryWarmReservationAndAppend(t *testing.T) {
 	astTestMust(t, e)
 	var names ASTBuiltinNames
 	defer names.Close()
-	astTestMust(t, m.GetBitVectorOpNames(&names, util.Symbol{})) // warm literals
+	astTestMust(t, m.GetBitVectorOpNames(&names, usymbol.Symbol{})) // warm literals
 	names.Close()
 	for fault := int64(0); fault < 32; fault++ {
 		m.Budget().FailAfter(fault)
-		e = m.GetBitVectorOpNames(&names, util.Symbol{})
+		e = m.GetBitVectorOpNames(&names, usymbol.Symbol{})
 		m.Budget().FailAfter(-1)
 		if e == nil {
 			if len(names.Items()) != 58 {
 				t.Fatal("complete vector")
 			}
 			first := names.Items()[0]
-			astTestMust(t, m.GetBitVectorSortNames(&names, util.Symbol{}))
+			astTestMust(t, m.GetBitVectorSortNames(&names, usymbol.Symbol{}))
 			if len(names.Items()) != 60 || names.Items()[0] != first {
 				t.Fatal("callback erased existing prefix")
 			}

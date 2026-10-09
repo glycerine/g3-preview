@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestParamsBorrowedStringSymbolCopyAndOwnership(t *testing.T) {
@@ -102,7 +103,7 @@ func TestParamsBorrowedStringSymbolProvenanceAndLifetimeGuards(t *testing.T) {
 	spelling, e := s.Intern("live")
 	paramsMust(t, e)
 	before := c.Stats()
-	for _, bad := range []Symbol{Symbol{}, NumericalSymbol(1), DummySymbol()} {
+	for _, bad := range []usymbol.Symbol{usymbol.Symbol{}, usymbol.Numerical(1), usymbol.Dummy()} {
 		if e = c.SetStringSymbol(&v, k, bad); e == nil {
 			t.Fatal("invalid bare string accepted")
 		}
@@ -113,7 +114,7 @@ func TestParamsBorrowedStringSymbolProvenanceAndLifetimeGuards(t *testing.T) {
 	_, foreign, _ := paramsTestOwner(t)
 	f, e := foreign.Intern("foreign")
 	paramsMust(t, e)
-	if e = c.SetStringSymbol(&v, k, f); !errors.Is(e, ErrSymbolOwner) {
+	if e = c.SetStringSymbol(&v, k, f); !errors.Is(e, usymbol.ErrOwner) {
 		t.Fatal(e)
 	}
 	paramsMust(t, c.SetStringSymbol(&v, k, spelling))

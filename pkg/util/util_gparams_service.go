@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var ErrGlobalParamsUninitialized = errors.New("g3: source global parameter pointer is null")
@@ -17,7 +18,7 @@ var ErrGlobalParamsUninitialized = errors.New("g3: source global parameter point
 type GlobalParamsService struct {
 	self                        *GlobalParamsService
 	namespaceAssertions         *DebugContext
-	Symbols                     *SymbolManager
+	Symbols                     *usymbol.Manager
 	Context                     *ParamsContext
 	Config                      GlobalParamsConfig
 	Current, Superseded, Failed *GlobalParams
@@ -25,7 +26,7 @@ type GlobalParamsService struct {
 	closed                      bool
 }
 
-func NewGlobalParamsService(s *SymbolManager, p *ParamsContext, c GlobalParamsConfig) (*GlobalParamsService, error) {
+func NewGlobalParamsService(s *usymbol.Manager, p *ParamsContext, c GlobalParamsConfig) (*GlobalParamsService, error) {
 	if s == nil || p == nil || p.SymbolsField != s {
 		return nil, ErrGlobalParamsOwner
 	}

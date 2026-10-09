@@ -1,5 +1,5 @@
 // Source: src/test/symbol.cpp, with finite ownership and byte-policy extensions.
-package util
+package symbol
 
 import (
 	"errors"
@@ -13,9 +13,9 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func symbolManagerTest(t *testing.T, b *arena.Budget, direct bool) *SymbolManager {
+func symbolManagerTest(t *testing.T, b *arena.Budget, direct bool) *Manager {
 	t.Helper()
-	m, e := NewSymbolManager(SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2, DirectOnly: direct})
+	m, e := NewManager(Config{Budget: b, PageSize: 64, DescriptorPageSize: 2, DirectOnly: direct})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -26,7 +26,7 @@ func symbolManagerTest(t *testing.T, b *arena.Budget, direct bool) *SymbolManage
 	})
 	return m
 }
-func internSymbol(t *testing.T, m *SymbolManager, text string) Symbol {
+func internSymbol(t *testing.T, m *Manager, text string) Symbol {
 	t.Helper()
 	s, e := m.Intern(text)
 	if e != nil {
@@ -34,7 +34,7 @@ func internSymbol(t *testing.T, m *SymbolManager, text string) Symbol {
 	}
 	return s
 }
-func symbolText(t *testing.T, m *SymbolManager, s Symbol) string {
+func symbolText(t *testing.T, m *Manager, s Symbol) string {
 	t.Helper()
 	v, e := m.String(s)
 	if e != nil {
@@ -84,9 +84,9 @@ func TestSymbolSourceAssertions(t *testing.T) {
 		{internSymbol(t, m, "abcd"), internSymbol(t, m, "abcc"), false},
 		{internSymbol(t, m, "abc"), internSymbol(t, m, "abcc"), true},
 		{internSymbol(t, m, "abcd"), internSymbol(t, m, "abc"), false},
-		{NumericalSymbol(10), s1, true}, {s1, NumericalSymbol(10), false},
-		{NumericalSymbol(10), NumericalSymbol(20), true}, {NumericalSymbol(20), NumericalSymbol(10), false},
-		{NumericalSymbol(10), NumericalSymbol(10), false},
+		{Numerical(10), s1, true}, {s1, Numerical(10), false},
+		{Numerical(10), Numerical(20), true}, {Numerical(20), Numerical(10), false},
+		{Numerical(10), Numerical(10), false},
 		{internSymbol(t, m, "a"), internSymbol(t, m, "b"), true},
 		{internSymbol(t, m, "z"), internSymbol(t, m, "b"), false},
 		{internSymbol(t, m, "zzz"), internSymbol(t, m, "b"), false},
@@ -112,7 +112,7 @@ func TestSymbolTagsNullBytesAndCachedHash(t *testing.T) {
 		}{
 			{0, "k!0", 4}, {10, "k!10", 7}, {math.MaxUint32, "k!-1", 35},
 		} {
-			s := NumericalSymbol(f.value)
+			s := Numerical(f.value)
 			if !s.IsNumerical() || s.IsMarked() {
 				t.Fatal("numeric tag")
 			}
@@ -143,7 +143,7 @@ func TestSymbolTagsNullBytesAndCachedHash(t *testing.T) {
 			if e != nil || plain != s {
 				t.Fatal("unmark", e)
 			}
-			if _, e := m.String(marked); !errors.Is(e, ErrInvalidSymbol) {
+			if _, e := m.String(marked); !errors.Is(e, ErrInvalid) {
 				t.Fatal("marked string", e)
 			}
 		}
@@ -163,16 +163,16 @@ func TestSymbolTagsNullBytesAndCachedHash(t *testing.T) {
 		if ok, e := m.EqualString(null, nil); e != nil || !ok {
 			t.Fatal("null equality", e)
 		}
-		if _, e := m.Size(null); !errors.Is(e, ErrInvalidSymbol) {
+		if _, e := m.Size(null); !errors.Is(e, ErrInvalid) {
 			t.Fatal("null size", e)
 		}
-		if _, e := m.Contains(null, 0); !errors.Is(e, ErrInvalidSymbol) {
+		if _, e := m.Contains(null, 0); !errors.Is(e, ErrInvalid) {
 			t.Fatal("null contains", e)
 		}
-		if DummySymbol() != (Symbol{Tag: 2}) || !DummySymbol().IsMarked() {
+		if Dummy() != (Symbol{Tag: 2}) || !Dummy().IsMarked() {
 			t.Fatal("dummy tag")
 		}
-		if _, e := null.Number(); !errors.Is(e, ErrInvalidSymbol) {
+		if _, e := null.Number(); !errors.Is(e, ErrInvalid) {
 			t.Fatal("null number", e)
 		}
 		s := internSymbol(t, m, "foo\x00ignored")
@@ -182,7 +182,7 @@ func TestSymbolTagsNullBytesAndCachedHash(t *testing.T) {
 		if text, present, e := m.BareString(s); e != nil || !present || text != "foo" {
 			t.Fatal("source bare spelling", text, present, e)
 		}
-		if _, _, e := m.BareString(NumericalSymbol(1)); !errors.Is(e, ErrInvalidSymbol) {
+		if _, _, e := m.BareString(Numerical(1)); !errors.Is(e, ErrInvalid) {
 			t.Fatal("bare string numerical precondition", e)
 		}
 		if h, e := m.Hash(s); e != nil || h != 1484660743 {
@@ -211,7 +211,7 @@ func TestSymbolTagsNullBytesAndCachedHash(t *testing.T) {
 		if round, e := m.FromToken(s.Token()); e != nil || round != s {
 			t.Fatal("opaque identity roundtrip", e)
 		}
-		if e := m.AssignString(&s, nil); !errors.Is(e, ErrInvalidSymbol) {
+		if e := m.AssignString(&s, nil); !errors.Is(e, ErrInvalid) {
 			t.Fatal("assignment null precondition", e)
 		}
 		text := "boo"
@@ -225,7 +225,7 @@ func TestSymbolOwnerFailureLifetimeAndWarmIntern(t *testing.T) {
 	for prefix := int64(0); prefix < 2; prefix++ {
 		b := arena.NewBudget(1 << 20)
 		b.FailAfter(prefix)
-		m, e := NewSymbolManager(SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+		m, e := NewManager(Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		if e == nil {
 			m.Close()
 		} else if !errors.Is(e, arena.ErrInjectedFailure) {
@@ -240,10 +240,10 @@ func TestSymbolOwnerFailureLifetimeAndWarmIntern(t *testing.T) {
 	if a == b {
 		t.Fatal("foreign owner identity collision")
 	}
-	if _, e := n.String(a); !errors.Is(e, ErrSymbolOwner) {
+	if _, e := n.String(a); !errors.Is(e, ErrOwner) {
 		t.Fatal("foreign symbol accepted", e)
 	}
-	if _, e := n.FromToken(a.Token()); !errors.Is(e, ErrSymbolOwner) {
+	if _, e := n.FromToken(a.Token()); !errors.Is(e, ErrOwner) {
 		t.Fatal("foreign token accepted", e)
 	}
 	for i := 0; i < 12; i++ {
@@ -308,7 +308,7 @@ func sourceSymbolOrderOracle(a, b string) bool {
 func TestSymbolIndependentBytesAndPrefixOrder(t *testing.T) {
 	for _, width := range []uint32{4, 8} {
 		b := arena.NewBudget(1 << 20)
-		m, e := NewSymbolManager(SymbolConfig{Budget: b, Alignment: width, PageSize: 64, DescriptorPageSize: 2})
+		m, e := NewManager(Config{Budget: b, Alignment: width, PageSize: 64, DescriptorPageSize: 2})
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -390,7 +390,7 @@ func TestSymbolDuplicateLookupAndInvalidTokens(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	for _, same := range []Symbol{marked, DummySymbol()} {
+	for _, same := range []Symbol{marked, Dummy()} {
 		if less, e := m.Less(same, same); e != nil || less {
 			t.Fatal("source identity check precedes marked-data dereference", less, e)
 		}
@@ -398,24 +398,24 @@ func TestSymbolDuplicateLookupAndInvalidTokens(t *testing.T) {
 	if plain, e := marked.unmark(); e != nil || plain != first {
 		t.Fatal("string mark", e)
 	}
-	if _, e := marked.Mark(); !errors.Is(e, ErrInvalidSymbol) {
+	if _, e := marked.Mark(); !errors.Is(e, ErrInvalid) {
 		t.Fatal("double mark", e)
 	}
-	if _, e := first.unmark(); !errors.Is(e, ErrInvalidSymbol) {
+	if _, e := first.unmark(); !errors.Is(e, ErrInvalid) {
 		t.Fatal("unmarked unmark", e)
 	}
-	for _, s := range []Symbol{marked, DummySymbol()} {
-		if _, e := m.Hash(s); !errors.Is(e, ErrInvalidSymbol) {
+	for _, s := range []Symbol{marked, Dummy()} {
+		if _, e := m.Hash(s); !errors.Is(e, ErrInvalid) {
 			t.Fatal("marked hash", e)
 		}
 	}
-	if ok, e := m.EqualString(NumericalSymbol(math.MaxUint32), func() *string { s := "k!-1\x00tail"; return &s }()); e != nil || !ok {
+	if ok, e := m.EqualString(Numerical(math.MaxUint32), func() *string { s := "k!-1\x00tail"; return &s }()); e != nil || !ok {
 		t.Fatal("numerical C string equality", e)
 	}
 }
 
 // Native storage must not acquire the arena failure surface of C++ regions.
-func TestSymbolNativeInternGrowthAndBorrowedViewLifetime(t *testing.T) {
+func TestSymbolNativeInternGrowthAndStringLifetime(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	m := symbolManagerTest(t, b, false)
 	initial := b.Used()
@@ -425,10 +425,6 @@ func TestSymbolNativeInternGrowthAndBorrowedViewLifetime(t *testing.T) {
 	if e != nil || !present || text != "kept" {
 		t.Fatal(text, present, e)
 	}
-	view, e := m.CStringView(first)
-	if e != nil {
-		t.Fatal(e)
-	}
 	for i := 0; i < 1024; i++ {
 		internSymbol(t, m, strconv.Itoa(i))
 	}
@@ -437,17 +433,6 @@ func TestSymbolNativeInternGrowthAndBorrowedViewLifetime(t *testing.T) {
 	}
 	if got, e := m.Intern("kept"); e != nil || got != first {
 		t.Fatal("identity after growth", got, e)
-	}
-	for i := 0; i < len(text); i++ {
-		if ch, e := view.Byte(uint64(i)); e != nil || ch != text[i] {
-			t.Fatal("borrowed view after growth", ch, e)
-		}
-	}
-	if ch, e := view.Byte(uint64(len(text))); e != nil || ch != 0 {
-		t.Fatal("virtual terminator", ch, e)
-	}
-	if _, e := view.Byte(uint64(len(text) + 1)); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("view bounds", e)
 	}
 	invalid := first
 	invalid.Generation++
@@ -460,7 +445,5 @@ func TestSymbolNativeInternGrowthAndBorrowedViewLifetime(t *testing.T) {
 	if text != "kept" {
 		t.Fatal("returned Go string changed")
 	}
-	if _, e := view.Byte(0); !errors.Is(e, arena.ErrClosed) {
-		t.Fatal("borrowed view owner lifetime", e)
-	}
+
 }

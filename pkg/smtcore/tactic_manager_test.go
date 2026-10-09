@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/tactic"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"math"
 	"reflect"
 	"testing"
@@ -270,7 +271,7 @@ func TestTacticManagerCopiedForeignAndClosedGuards(t *testing.T) {
 		t.Fatal("copied registry acquired teardown authority")
 	}
 	foreign := astTestManager(t)
-	if _, e := r.FindTactic(astTestSymbol(t, foreign, "foreign")); !errors.Is(e, util.ErrSymbolOwner) {
+	if _, e := r.FindTactic(astTestSymbol(t, foreign, "foreign")); !errors.Is(e, usymbol.ErrOwner) {
 		t.Fatal("foreign symbol query", e)
 	}
 	var events []int

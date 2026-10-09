@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -265,7 +266,7 @@ func TestASTSMT2BitVectorFalseNumeralActualActionAndErasure(t *testing.T) {
 		t.Run(command, func(t *testing.T) {
 			_, d, _, input, streams := debugActionFixture(t, command)
 			b := d.BudgetField
-			sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+			sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 			paramsMust(t, e)
 			q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 			paramsMust(t, e)

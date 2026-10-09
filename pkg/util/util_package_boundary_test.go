@@ -2,13 +2,16 @@ package util
 
 import (
 	"errors"
-	"github.com/glycerine/g3/pkg/arena"
+	"strconv"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestSymbolPackageBoundaryBorrowAndEncoding(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	m, e := NewSymbolManager(SymbolConfig{Budget: b})
+	m, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -21,9 +24,12 @@ func TestSymbolPackageBoundaryBorrowAndEncoding(t *testing.T) {
 		t.Fatal("byte interner ignored CString terminator")
 	}
 	before := b.Used()
-	view, e := m.CStringView(s)
+	view, e := SymbolCStringView(m, s)
 	if e != nil {
 		t.Fatal(e)
+	}
+	for i := uint32(0); i < 128; i++ {
+		internSymbol(t, m, strconv.FormatUint(uint64(i), 10))
 	}
 	n, e := view.Length()
 	if e != nil || n != 2 {
@@ -42,7 +48,7 @@ func TestSymbolPackageBoundaryBorrowAndEncoding(t *testing.T) {
 	if b.Used() != before {
 		t.Fatal("borrow/encoding allocated source storage")
 	}
-	if _, e = m.CStringView(Symbol{}); !errors.Is(e, ErrInvalidSymbol) {
+	if _, e = SymbolCStringView(m, usymbol.Symbol{}); !errors.Is(e, usymbol.ErrInvalid) {
 		t.Fatal(e)
 	}
 	if e = m.Close(); e != nil {
@@ -58,21 +64,21 @@ func TestSymbolPackageBoundaryBorrowAndEncoding(t *testing.T) {
 
 func TestSymbolDictionaryPackageBoundaryGrowthAndCleanup(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	m, e := NewSymbolManager(SymbolConfig{Budget: b})
+	m, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	if e != nil {
 		t.Fatal(e)
 	}
-	var d SymbolDictionaryInt32
+	var d usymbol.DictionaryInt32
 	if e = d.Init(m); e != nil {
 		t.Fatal(e)
 	}
 	for i := uint32(0); i < 128; i++ {
-		if e = d.Insert(NumericalSymbol(i), int32(i*3)); e != nil {
+		if e = d.Insert(usymbol.Numerical(i), int32(i*3)); e != nil {
 			t.Fatal(e)
 		}
 	}
 	for i := uint32(0); i < 128; i++ {
-		v, ok, e := d.Find(NumericalSymbol(i))
+		v, ok, e := d.Find(usymbol.Numerical(i))
 		if e != nil || !ok || v != int32(i*3) {
 			t.Fatal(i, v, ok, e)
 		}
@@ -80,10 +86,10 @@ func TestSymbolDictionaryPackageBoundaryGrowthAndCleanup(t *testing.T) {
 	if d.Size() != 128 {
 		t.Fatal(d.Size())
 	}
-	if e = d.Remove(NumericalSymbol(63)); e != nil {
+	if e = d.Remove(usymbol.Numerical(63)); e != nil {
 		t.Fatal(e)
 	}
-	if _, ok, e := d.Find(NumericalSymbol(63)); e != nil || ok {
+	if _, ok, e := d.Find(usymbol.Numerical(63)); e != nil || ok {
 		t.Fatal(ok, e)
 	}
 	d.Close()

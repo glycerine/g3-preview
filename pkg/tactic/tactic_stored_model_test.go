@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestTacticStoredModelLabelsSnapshotAndAppend(t *testing.T) {
@@ -16,11 +16,11 @@ func TestTacticStoredModelLabelsSnapshotAndAppend(t *testing.T) {
 		t.Run(fmt.Sprint(n), func(t *testing.T) {
 			m := astTestManager(t)
 			md := modelTestCore(t, m)
-			labels := make([]util.Symbol, n)
+			labels := make([]usymbol.Symbol, n)
 			for i := range labels {
 				labels[i] = astTestSymbol(t, m, fmt.Sprintf("stored-label-%d", i))
 			}
-			snapshot := append([]util.Symbol(nil), labels...)
+			snapshot := append([]usymbol.Symbol(nil), labels...)
 			prefix := astTestSymbol(t, m, "prefix")
 			before := m.BudgetField.Used()
 			satOK(t, md.IncRef())
@@ -33,7 +33,7 @@ func TestTacticStoredModelLabelsSnapshotAndAppend(t *testing.T) {
 			satOK(t, out.Append(prefix))
 			satOK(t, c.ApplyLabels(&out, 123))
 			satOK(t, c.ApplyLabels(&out, 0))
-			want := append([]util.Symbol{prefix}, snapshot...)
+			want := append([]usymbol.Symbol{prefix}, snapshot...)
 			want = append(want, snapshot...)
 			if !reflect.DeepEqual(out.Values, want) {
 				t.Fatal("stored labels did not copy/append", out.Values, want)
@@ -54,7 +54,7 @@ func TestTacticStoredModelLabelsSnapshotAndAppend(t *testing.T) {
 func TestTacticStoredModelLabelAppendUsesNativeSliceStorage(t *testing.T) {
 	m := astTestManager(t)
 	md := modelTestCore(t, m)
-	labels := []util.Symbol{astTestSymbol(t, m, "first"), astTestSymbol(t, m, "second"), astTestSymbol(t, m, "third")}
+	labels := []usymbol.Symbol{astTestSymbol(t, m, "first"), astTestSymbol(t, m, "second"), astTestSymbol(t, m, "third")}
 	c, e := newTacticStoredModelWithLabels(md, labels)
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, c.Close()) })
@@ -68,7 +68,7 @@ func TestTacticStoredModelLabelAppendUsesNativeSliceStorage(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	if !reflect.DeepEqual(out.Values, []util.Symbol{prefix, labels[0], labels[1], labels[2]}) {
+	if !reflect.DeepEqual(out.Values, []usymbol.Symbol{prefix, labels[0], labels[1], labels[2]}) {
 		t.Fatal("label order", out.Values)
 	}
 	if md.References != 1 || md.Closed {
@@ -85,7 +85,7 @@ func TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards(t *testing.T) {
 	if c != nil {
 		t.Fatal("null model allocated wrapper")
 	}
-	c, e = newTacticStoredModelWithLabels(nil, []util.Symbol{{}})
+	c, e = newTacticStoredModelWithLabels(nil, []usymbol.Symbol{{}})
 	satOK(t, e)
 	if c != nil {
 		t.Fatal("null model/labels allocated wrapper")

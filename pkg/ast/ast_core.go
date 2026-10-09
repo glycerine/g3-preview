@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/idgen"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func NewASTManager(c ASTManagerConfig) (*ASTManager, error)       { return newASTManager(c, false) }
@@ -40,7 +41,7 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFi
 		return nil, ErrASTDomain
 	}
 	// Validate borrowed owners before publishing the concrete cold header.
-	if _, e := c.Symbols.Hash(util.Symbol{}); e != nil {
+	if _, e := c.Symbols.Hash(usymbol.Symbol{}); e != nil {
 		return nil, e
 	}
 	if _, e := c.Numerals.Stats(); e != nil {

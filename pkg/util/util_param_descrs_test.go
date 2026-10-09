@@ -6,10 +6,11 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func pdstr(s string) *string { return &s }
-func pdnew(t *testing.T, m *SymbolManager, b *arena.Budget) *ParamDescrs {
+func pdnew(t *testing.T, m *usymbol.Manager, b *arena.Budget) *ParamDescrs {
 	t.Helper()
 	d, e := NewParamDescrs(m, ParamDescrsConfig{Budget: b, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2}}})
 	if e != nil {
@@ -64,10 +65,10 @@ func TestParamDescrsSourceHistoryDefaultsAndDisplay(t *testing.T) {
 	if e = d.Insert(a, ParamBool, nil, nil, nil); e != ErrParamDescrsPrecondition {
 		t.Fatal("kind assertion", e)
 	}
-	if e = d.Insert(NumericalSymbol(7), ParamBool, nil, nil, nil); e != ErrParamDescrsPrecondition {
+	if e = d.Insert(usymbol.Numerical(7), ParamBool, nil, nil, nil); e != ErrParamDescrsPrecondition {
 		t.Fatal(e)
 	}
-	if k, e := d.Kind(NumericalSymbol(7)); e != nil || k != ParamInvalid {
+	if k, e := d.Kind(usymbol.Numerical(7)); e != nil || k != ParamInvalid {
 		t.Fatal(k, e)
 	}
 }
@@ -97,13 +98,13 @@ func TestParamDescrsSourceModuleAndNullKinds(t *testing.T) {
 	if e != nil || k != ParamString || symbolText(t, m, s) != "empty" {
 		t.Fatal(k, e)
 	}
-	if e = d.Insert(Symbol{}, ParamInvalid, nil, nil, nil); e != nil {
+	if e = d.Insert(usymbol.Symbol{}, ParamInvalid, nil, nil, nil); e != nil {
 		t.Fatal(e)
 	}
-	if p, e := d.Contains(Symbol{}); !p || e != nil {
+	if p, e := d.Contains(usymbol.Symbol{}); !p || e != nil {
 		t.Fatal(p, e)
 	}
-	s = Symbol{}
+	s = usymbol.Symbol{}
 	if _, e = d.KindInModule(&s); e != ErrParamDescrsPrecondition {
 		t.Fatal("source null strchr guard", e)
 	}
@@ -154,7 +155,7 @@ func TestParamDescrsCopyInsertionOrderLifetimeAndPrefix(t *testing.T) {
 		pdinsert(t, src, fmt.Sprintf("copy%d", i), ParamUInt, pdstr(fmt.Sprintf("D%d", i)), pdstr("0"), nil)
 	}
 	pdinsert(t, dst, "copy3", ParamUInt, pdstr("retain"), nil, nil)
-	order := []Symbol{}
+	order := []usymbol.Symbol{}
 	for key := range src.entries.All() {
 		if key != internSymbol(t, m, "copy3") {
 			order = append(order, key)
@@ -189,7 +190,7 @@ func TestParamDescrsDictionaryBehaviorAndHistory(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	d := pdnew(t, m, nil)
 	live := map[string]string{}
-	history := []Symbol{}
+	history := []usymbol.Symbol{}
 	seed := uint32(91)
 	for step := 0; step < 1800; step++ {
 		seed = seed*1664525 + 1013904223
@@ -320,10 +321,10 @@ func TestParamDescrsOwnershipNullableMetadataAndGuards(t *testing.T) {
 		t.Fatal(v, p, e)
 	}
 	fk := internSymbol(t, other, "foreign")
-	if e := d.Insert(fk, ParamUInt, nil, nil, nil); e != ErrSymbolOwner {
+	if e := d.Insert(fk, ParamUInt, nil, nil, nil); e != usymbol.ErrOwner {
 		t.Fatal(e)
 	}
-	if _, e := d.Contains(fk); e != ErrSymbolOwner {
+	if _, e := d.Contains(fk); e != usymbol.ErrOwner {
 		t.Fatal(e)
 	}
 	foreign := pdnew(t, other, nil)
@@ -337,7 +338,7 @@ func TestParamDescrsOwnershipNullableMetadataAndGuards(t *testing.T) {
 	if e := copied.Close(); e != ErrParamDescrsPrecondition {
 		t.Fatal(e)
 	}
-	if e := d.Insert(DummySymbol(), ParamUInt, nil, nil, nil); e != ErrInvalidSymbol {
+	if e := d.Insert(usymbol.Dummy(), ParamUInt, nil, nil, nil); e != usymbol.ErrInvalid {
 		t.Fatal(e)
 	}
 	pdinsert(t, d, "undescribed", ParamUInt, nil, nil, nil)
@@ -384,7 +385,7 @@ func TestParamDescrsCopyDisplayFaultPrefixesAndPlateau(t *testing.T) {
 		if (s.Live != s.Names && s.Live != s.Names+1) || s.Text.Live != 2*s.Live || pdtotal(s) != b.Used() {
 			t.Fatal(prefix, e, s, b.Used())
 		}
-		order := []Symbol{}
+		order := []usymbol.Symbol{}
 		for key := range src.entries.All() {
 			order = append(order, key)
 		}

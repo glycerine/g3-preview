@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var ErrGlobalParamsOwner = errors.New("g3: global parameters owner or lifetime mismatch")
@@ -35,7 +36,7 @@ type GlobalParams struct {
 	catalog                                 *GlobalParamsCatalog
 	mu                                      sync.Mutex
 	self                                    *GlobalParams
-	SymbolsField                            *SymbolManager
+	SymbolsField                            *usymbol.Manager
 	ContextField                            *ParamsContext
 	Budget                                  *arena.Budget
 	Register                                func(GlobalParamsRegistrar) error
@@ -80,7 +81,7 @@ func (r GlobalParamsRegistrar) RegisterGlobal(d *ParamDescrs) error {
 	}
 	return r.owner.GlobalDescriptors.Copy(d)
 }
-func newSourceGlobalParams(s *SymbolManager, p *ParamsContext, c GlobalParamsConfig) (*GlobalParams, error) {
+func newSourceGlobalParams(s *usymbol.Manager, p *ParamsContext, c GlobalParamsConfig) (*GlobalParams, error) {
 	if s == nil || p == nil || p.SymbolsField != s {
 		return nil, ErrGlobalParamsOwner
 	}
@@ -178,7 +179,7 @@ func (g *GlobalParams) ensureRegistered() error {
 	defer func() { g.registering = false }()
 	return g.Register(GlobalParamsRegistrar{g})
 }
-func (g *GlobalParams) moduleDescriptor(k Symbol) (*ParamDescrs, error) {
+func (g *GlobalParams) moduleDescriptor(k usymbol.Symbol) (*ParamDescrs, error) {
 	if e := g.ensureRegistered(); e != nil {
 		return nil, e
 	}
@@ -248,14 +249,14 @@ func (g *GlobalParams) RegisterGlobal(d *ParamDescrs) error {
 	}
 	return g.GlobalDescriptors.Copy(d)
 }
-func (g *GlobalParams) GetParams(k Symbol) (*ParamsRef, error) {
+func (g *GlobalParams) GetParams(k usymbol.Symbol) (*ParamsRef, error) {
 	if e := g.open(); e != nil {
 		return nil, e
 	}
 	if _, e := g.SymbolsField.Hash(k); e != nil {
 		return nil, e
 	}
-	if k == (Symbol{}) {
+	if k == (usymbol.Symbol{}) {
 		return &g.globalParams, nil
 	}
 	if n, ok := g.ModuleParams.get(k); ok {
@@ -291,7 +292,7 @@ func (g *GlobalParams) GetParams(k Symbol) (*ParamsRef, error) {
 	}
 	return &cell.value, nil
 }
-func (g *GlobalParams) getModule(k Symbol) (ParamsRef, error) {
+func (g *GlobalParams) getModule(k usymbol.Symbol) (ParamsRef, error) {
 	if e := g.open(); e != nil {
 		return ParamsRef{}, e
 	}
@@ -312,7 +313,7 @@ func (g *GlobalParams) getModule(k Symbol) (ParamsRef, error) {
 	}
 	return v, nil
 }
-func (g *GlobalParams) GetModule(k Symbol) (ParamsRef, error) {
+func (g *GlobalParams) GetModule(k usymbol.Symbol) (ParamsRef, error) {
 	if g == nil {
 		return ParamsRef{}, ErrGlobalParamsOwner
 	}

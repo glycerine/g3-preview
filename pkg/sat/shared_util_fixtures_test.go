@@ -6,6 +6,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/statistics"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func paramsMust(t *testing.T, e error) {
@@ -14,10 +15,10 @@ func paramsMust(t *testing.T, e error) {
 		t.Fatal(e)
 	}
 }
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *util.SymbolManager, *util.RationalService) {
+func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -50,7 +51,7 @@ func statFixture(t *testing.T) *statistics.Statistics {
 	return statistics.New()
 }
 func statKey(v string) statistics.Key { return statistics.Key(v) }
-func pdnew(t *testing.T, m *util.SymbolManager, b *arena.Budget) *util.ParamDescrs {
+func pdnew(t *testing.T, m *usymbol.Manager, b *arena.Budget) *util.ParamDescrs {
 	t.Helper()
 	d, e := util.NewParamDescrs(m, util.ParamDescrsConfig{Budget: b, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2}}})
 	if e != nil {
@@ -59,9 +60,9 @@ func pdnew(t *testing.T, m *util.SymbolManager, b *arena.Budget) *util.ParamDesc
 	t.Cleanup(func() { d.Close() })
 	return d
 }
-func symbolManagerTest(t *testing.T, b *arena.Budget, direct bool) *util.SymbolManager {
+func symbolManagerTest(t *testing.T, b *arena.Budget, direct bool) *usymbol.Manager {
 	t.Helper()
-	m, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2, DirectOnly: direct})
+	m, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2, DirectOnly: direct})
 	if e != nil {
 		t.Fatal(e)
 	}

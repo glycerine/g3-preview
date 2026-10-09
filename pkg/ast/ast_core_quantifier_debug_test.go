@@ -3,7 +3,7 @@ package ast
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTQuantifierSourcePatternDiagnosticBeforeAllocation(t *testing.T) {
@@ -12,7 +12,7 @@ func TestASTQuantifierSourcePatternDiagnosticBeforeAllocation(t *testing.T) {
 	astTestMust(t, e)
 	truth, e := m.MkFamilyApp(0, ASTOpTrue, nil, nil)
 	astTestMust(t, e)
-	spec := ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: truth, Patterns: []ASTHandle{truth}}
+	spec := ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: truth, Patterns: []ASTHandle{truth}}
 	before := m.Stats()
 	next := m.nextNode
 	ids := m.ExprIDs.Range()

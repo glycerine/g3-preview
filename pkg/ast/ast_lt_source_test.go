@@ -4,7 +4,7 @@ package ast
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"testing"
 )
 
@@ -176,7 +176,7 @@ func TestASTLessOriginalQuantifierPriority(t *testing.T) {
 	astTestMust(t, e)
 	astTestPin(t, m, v)
 	makeQuant := func(forall bool, weight int32, n string) ASTHandle {
-		h, e := m.MkQuantifier(ASTQuantifierSpec{Forall: forall, Sorts: []ASTHandle{b}, Names: []util.Symbol{astTestSymbol(t, m, n)}, Body: v, Weight: weight})
+		h, e := m.MkQuantifier(ASTQuantifierSpec{Forall: forall, Sorts: []ASTHandle{b}, Names: []usymbol.Symbol{astTestSymbol(t, m, n)}, Body: v, Weight: weight})
 		astTestMust(t, e)
 		astTestPin(t, m, h)
 		return h

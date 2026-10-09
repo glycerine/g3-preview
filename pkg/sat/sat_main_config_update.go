@@ -2,6 +2,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -9,10 +10,10 @@ import (
 // params_ref typed local->module->literal fallback. Symbol default construction
 // is evaluated even when the local value is present, as in generated C++.
 
-func (m *satMainConfig) symbol(p, g *util.ParamsRef, key, def string) (util.Symbol, error) {
+func (m *satMainConfig) symbol(p, g *util.ParamsRef, key, def string) (usymbol.Symbol, error) {
 	d, e := m.symbols.Intern(def)
 	if e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	return m.context.GetSymbolFallbackName(p, &key, g, d)
 }

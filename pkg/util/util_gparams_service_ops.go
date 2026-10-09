@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var ErrGlobalParamsAssertion = errors.New("g3: global parameters source assertion")
@@ -74,7 +75,7 @@ func (s *GlobalParamsService) SourceSetName(name, value string) error {
 	}
 	return g.SetName(name, value)
 }
-func (s *GlobalParamsService) SourceSetSymbol(name Symbol, value string) error {
+func (s *GlobalParamsService) SourceSetSymbol(name usymbol.Symbol, value string) error {
 	g, e := s.namespaceImpAt(569)
 	if e != nil {
 		return e
@@ -100,7 +101,7 @@ func (s *GlobalParamsService) SourceGetValueName(name string) (string, error) {
 	}
 	return g.GetValueName(name)
 }
-func (s *GlobalParamsService) SourceGetValueSymbol(name Symbol) (string, error) {
+func (s *GlobalParamsService) SourceGetValueSymbol(name usymbol.Symbol) (string, error) {
 	g, e := s.namespaceImpAt(579)
 	if e != nil {
 		return "", e
@@ -150,7 +151,7 @@ func (s *GlobalParamsService) SourceGetModuleName(name string) (ParamsRef, error
 	}
 	return s.SourceGetModuleSymbol(key)
 }
-func (s *GlobalParamsService) SourceGetModuleSymbol(name Symbol) (ParamsRef, error) {
+func (s *GlobalParamsService) SourceGetModuleSymbol(name usymbol.Symbol) (ParamsRef, error) {
 	g, e := s.namespaceImpAt(603)
 	if e != nil {
 		return ParamsRef{}, e

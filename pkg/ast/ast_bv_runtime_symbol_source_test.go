@@ -6,13 +6,14 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTBitVectorRuntimeCStringInternActualBorrow(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, SizeTBits: 64})
 	astTestMust(t, e)
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
 	var buf astBVCharBuffer16
 	text := "#b010101010101010101010101010101010101"
@@ -20,7 +21,7 @@ func TestASTBitVectorRuntimeCStringInternActualBorrow(t *testing.T) {
 		astTestMust(t, buf.push(r, text[i]))
 	}
 	astTestMust(t, buf.push(r, 0))
-	got, e := sy.InternRuntimeCString(r, buf.raw, 0, uint64(buf.pos))
+	got, e := util.InternSymbolRuntimeCString(sy, r, buf.raw, 0, uint64(buf.pos))
 	astTestMust(t, e)
 	want, e := sy.Intern(text)
 	astTestMust(t, e)
@@ -28,7 +29,7 @@ func TestASTBitVectorRuntimeCStringInternActualBorrow(t *testing.T) {
 		t.Fatal("same interning source engine", got, want)
 	}
 	b.FailAfter(0)
-	again, e := sy.InternRuntimeCString(r, buf.raw, 0, uint64(buf.pos))
+	again, e := util.InternSymbolRuntimeCString(sy, r, buf.raw, 0, uint64(buf.pos))
 	astTestMust(t, e)
 	if again != got {
 		t.Fatal("warm actual borrowed identity")

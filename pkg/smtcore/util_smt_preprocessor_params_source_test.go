@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument(t *testing.T) {
@@ -267,7 +268,7 @@ func TestSMTPreprocessorEveryUnwarmedSharedModuleAcquisitionReservation(t *testi
 	for ordinal := int64(0); ordinal < 64; ordinal++ {
 		_, _, q := paramsTestOwner(t)
 		b := arena.NewBudget(^uint64(0))
-		sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+		sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		bc := arena.NewBudget(^uint64(0))
 		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
@@ -368,7 +369,7 @@ func TestSMTPreprocessorConcreteLexicalStopProtectsBasesAndNextMutation(t *testi
 	paramsMust(t, e)
 	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)

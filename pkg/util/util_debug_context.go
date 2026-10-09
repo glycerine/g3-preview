@@ -70,7 +70,7 @@ func (d *DebugContext) AssertionsEnabled() (bool, error) {
 	return d.assertions, nil
 }
 
-func debugTagName(tag string) string { return tag[:cSymbolLength(tag)] }
+func debugTagName(tag string) string { return tag[:nulStringLength(tag)] }
 
 func (d *DebugContext) EnableDebug(tag string) error {
 	if e := d.open(); e != nil {

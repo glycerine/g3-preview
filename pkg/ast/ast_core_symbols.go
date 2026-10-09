@@ -6,12 +6,13 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Source string_buffer<64> keeps its first64 bytes on the stack, doubles on
 // overflow and appends a NUL via c_str(). The byte interner avoids a Go string
 // intermediate even for long names. All overflow arrays have lexical ownership.
-func (m *ASTManager) modelValueName(sortName util.Symbol, index int32) (util.Symbol, error) {
+func (m *ASTManager) modelValueName(sortName usymbol.Symbol, index int32) (usymbol.Symbol, error) {
 	var initial [64]byte
 	buffer := initial[:0]
 	var charged uint64
@@ -34,7 +35,7 @@ func (m *ASTManager) modelValueName(sortName util.Symbol, index int32) (util.Sym
 		buffer = append(buffer, v)
 		return nil
 	}
-	view, e := m.Symbols.CStringView(sortName)
+	view, e := util.SymbolCStringView(m.Symbols, sortName)
 	if e == nil && (sortName.IsNumerical() || sortName.IsNull()) {
 		e = ErrASTDomain
 	}
@@ -57,22 +58,22 @@ func (m *ASTManager) modelValueName(sortName util.Symbol, index int32) (util.Sym
 	}
 
 	if e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	for i := 0; i < len("!val!"); i++ {
 		if e = appendByte("!val!"[i]); e != nil {
-			return util.Symbol{}, e
+			return usymbol.Symbol{}, e
 		}
 	}
 	var digits [24]byte
 	number := strconv.AppendInt(digits[:0], int64(index), 10)
 	for _, v := range number {
 		if e = appendByte(v); e != nil {
-			return util.Symbol{}, e
+			return usymbol.Symbol{}, e
 		}
 	}
 	if e = appendByte(0); e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	return m.Symbols.InternBytes(buffer)
 }

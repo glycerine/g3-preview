@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // No registered gparams destructor ENSURE campaign exists. These fixtures test
@@ -20,7 +21,7 @@ func TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners(t *testing.T) {
 			g, e := NewGlobalParams(sy, ctx, gparamsTestConfig(b))
 			paramsMust(t, e)
 			var snapshots []ParamsRef
-			var keys []Symbol
+			var keys []usymbol.Symbol
 			for i := 0; i < n; i++ {
 				module, e := sy.Intern("finite-module-" + strconv.Itoa(i))
 				paramsMust(t, e)

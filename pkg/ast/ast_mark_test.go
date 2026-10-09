@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func markTestNodes(t *testing.T, m *ASTManager, n uint32) []ASTHandle {
@@ -401,7 +401,7 @@ func TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau(t *testing.T) {
 	astTestMust(t, e)
 	decl, e := m.GetDecl(app)
 	astTestMust(t, e)
-	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []util.Symbol{{}}, Body: app})
+	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []usymbol.Symbol{{}}, Body: app})
 	astTestMust(t, e)
 	all := []ASTHandle{v, app, q, b, decl}
 	marker, e := NewASTMark(m)

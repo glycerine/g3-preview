@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type astFormatPPPair struct {
@@ -130,8 +131,8 @@ func (m *ASTManager) formatParameter(r astNodeRef) (*astParameterRecord, error) 
 	}
 	return m.parameter(token)
 }
-func (m *ASTManager) formatSymbolView(s util.Symbol) (util.ParamsStringView, error) {
-	return m.Symbols.CStringView(s)
+func (m *ASTManager) formatSymbolView(s usymbol.Symbol) (util.ParamsStringView, error) {
+	return util.SymbolCStringView(m.Symbols, s)
 }
 func (m *ASTManager) formatSpaceToBreak(r astNodeRef, g *util.GlobalParamsService) (uint32, bool, error) {
 	if e := m.ppAssertFormat(r, g, 25); e != nil {

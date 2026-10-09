@@ -2,7 +2,7 @@
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func (m *ASTManager) GetDecl(h ASTHandle) (ASTHandle, error) {
@@ -129,14 +129,14 @@ func (m *ASTManager) SortIsVeryBig(h ASTHandle) (bool, error) {
 	}
 	return v.size.IsVeryBig(), nil
 }
-func (m *ASTManager) GetASTName(h ASTHandle) (util.Symbol, error) {
+func (m *ASTManager) GetASTName(h ASTHandle) (usymbol.Symbol, error) {
 	if e := m.lock(); e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	defer m.mu.Unlock()
 	r, e := m.internal(h)
 	if e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	switch m.nodeAt(r.slot).kind {
 	case ASTSort:
@@ -144,7 +144,7 @@ func (m *ASTManager) GetASTName(h ASTHandle) (util.Symbol, error) {
 	case ASTFuncDecl:
 		return m.declAt(r.slot).name, nil
 	}
-	return util.Symbol{}, ErrASTDomain
+	return usymbol.Symbol{}, ErrASTDomain
 }
 func (m *ASTManager) GetQuantifierBody(h ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
@@ -184,18 +184,18 @@ func (m *ASTManager) GetDeclarationSort(h ASTHandle, i uint32) (ASTHandle, error
 	r, e = m.readInternal(v.sorts, i)
 	return m.external(r), e
 }
-func (m *ASTManager) GetDeclarationName(h ASTHandle, i uint32) (util.Symbol, error) {
+func (m *ASTManager) GetDeclarationName(h ASTHandle, i uint32) (usymbol.Symbol, error) {
 	if e := m.lock(); e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	defer m.mu.Unlock()
 	r, e := m.requireKind(h, ASTQuantifier)
 	if e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	v := m.quantifierAt(r.slot)
 	if i >= v.count {
-		return util.Symbol{}, ErrASTDomain
+		return usymbol.Symbol{}, ErrASTDomain
 	}
 	return m.readSymbol(v.names, i)
 }
@@ -221,14 +221,14 @@ func (m *ASTManager) IsForall(h ASTHandle) (bool, error) {
 	}
 	return m.quantifierAt(r.slot).forall, nil
 }
-func (m *ASTManager) GetQuantifierIDs(h ASTHandle) (util.Symbol, util.Symbol, error) {
+func (m *ASTManager) GetQuantifierIDs(h ASTHandle) (usymbol.Symbol, usymbol.Symbol, error) {
 	if e := m.lock(); e != nil {
-		return util.Symbol{}, util.Symbol{}, e
+		return usymbol.Symbol{}, usymbol.Symbol{}, e
 	}
 	defer m.mu.Unlock()
 	r, e := m.requireKind(h, ASTQuantifier)
 	if e != nil {
-		return util.Symbol{}, util.Symbol{}, e
+		return usymbol.Symbol{}, usymbol.Symbol{}, e
 	}
 	v := m.quantifierAt(r.slot)
 	return v.qid, v.skolemID, nil

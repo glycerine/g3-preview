@@ -8,7 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/model"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var ErrModelConverterOwner = errors.New("model converter: invalid, copied or retired owner")
@@ -92,11 +92,11 @@ func (r *ModelRef) Close() error {
 // ModelLabels borrows symbol identities, which stay valid with the source
 // symbol manager. Its typed slice is ordinary Go-managed storage.
 type ModelLabels struct {
-	Values []util.Symbol
+	Values []usymbol.Symbol
 	Budget *arena.Budget
 }
 
-func (l *ModelLabels) Append(value util.Symbol) error {
+func (l *ModelLabels) Append(value usymbol.Symbol) error {
 	if l == nil {
 		return ErrModelConverterOwner
 	}

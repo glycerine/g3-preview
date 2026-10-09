@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"os"
 )
 
@@ -72,10 +73,10 @@ func numericStorageReservationRefusal(err error) bool {
 	var physical util.Failure
 	return errors.As(err, &physical) && physical.Kind == util.FailureMemout && physical.ErrorCode() == 101
 }
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *util.SymbolManager, *util.RationalService) {
+func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	if e != nil {
 		t.Fatal(e)
 	}

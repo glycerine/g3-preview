@@ -5,11 +5,11 @@ package tactic
 import (
 	"fmt"
 	"github.com/glycerine/g3/pkg/model"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks(t *testing.T) {
@@ -47,7 +47,7 @@ func TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks(t *testing.T)
 	satOK(t, c.ApplyLabels(&labels, 99))
 	satOK(t, c.ApplyLabels(nil, 0))
 	satOK(t, c.Cancel())
-	if !reflect.DeepEqual(labels.Values, []util.Symbol{prefix}) {
+	if !reflect.DeepEqual(labels.Values, []usymbol.Symbol{prefix}) {
 		t.Fatal("filter changed labels")
 	}
 	m.BudgetField.FailAfter(-1)

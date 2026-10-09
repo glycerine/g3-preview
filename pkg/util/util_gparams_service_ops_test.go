@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func gparamsNamespaceFixture(t *testing.T) (*GlobalParamsService, *arena.Budget) {
@@ -52,7 +53,7 @@ func TestGlobalParamsNamespaceNullAndSourceArgumentOrder(t *testing.T) {
 	if s.Symbols.Stats().Symbols != before {
 		t.Fatal("display_module touched symbol before current assertion")
 	}
-	if e := s.SourceSetSymbol(NumericalSymbol(1), "unused"); !namespaceNullError(e) {
+	if e := s.SourceSetSymbol(usymbol.Numerical(1), "unused"); !namespaceNullError(e) {
 		t.Fatal("bare_str numeric assertion preceded g_imp assertion", e)
 	}
 	if e := s.SourceReset(); !namespaceNullError(e) {
@@ -136,13 +137,13 @@ func TestGlobalParamsNamespaceEveryNullForwardLeavesUnusedArgumentsUnread(t *tes
 		call func() error
 	}{
 		{"set-name", func() error { return s.SourceSetName("unused", "unused") }},
-		{"set-symbol", func() error { return s.SourceSetSymbol(NumericalSymbol(1), "unused") }},
+		{"set-symbol", func() error { return s.SourceSetSymbol(usymbol.Numerical(1), "unused") }},
 		{"get-name", func() error { _, e := s.SourceGetValueName("unused"); return e }},
-		{"get-symbol", func() error { _, e := s.SourceGetValueSymbol(NumericalSymbol(1)); return e }},
+		{"get-symbol", func() error { _, e := s.SourceGetValueSymbol(usymbol.Numerical(1)); return e }},
 		{"register-global", func() error { return s.SourceRegisterGlobal(nil) }},
 		{"register-module", func() error { return s.SourceRegisterModule("unused", nil) }},
 		{"register-description", func() error { return s.SourceRegisterModuleDescription("unused", nil, arena.BytesRegionRef{}, 0) }},
-		{"get-module-symbol", func() error { _, e := s.SourceGetModuleSymbol(NumericalSymbol(1)); return e }},
+		{"get-module-symbol", func() error { _, e := s.SourceGetModuleSymbol(usymbol.Numerical(1)); return e }},
 		{"get-ref", func() error { _, e := s.SourceGetRef(); return e }},
 		{"display", func() error { return s.SourceDisplayInto(nil, 0, false, true) }},
 		{"display-modules", func() error { return s.SourceDisplayModulesInto(nil) }},
@@ -167,7 +168,7 @@ func TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion(t *testing.T) {
 	paramsMust(t, s.InitializeSource())
 	g, e := s.Manager()
 	paramsMust(t, e)
-	numeric := NumericalSymbol(1)
+	numeric := usymbol.Numerical(1)
 	if GlobalParamsSourceDebug {
 		if _, e := s.SourceGetValueSymbol(numeric); !errors.Is(e, ErrGlobalParamsAssertion) {
 			t.Fatal("bare_str actual numeric SASSERT", e)

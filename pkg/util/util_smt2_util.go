@@ -1,10 +1,11 @@
-// Translation of src/util/smt2_util.h/.cpp, Leonardo de Moura.
+// Source: src/util/smt2_util.h; src/util/smt2_util.cpp.
 package util
 
 import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var ErrSMT2NeedsQuoting = errors.New("g3: SMT2 symbol does not satisfy quoting precondition")
@@ -20,7 +21,7 @@ func IsSMT2QuotedCString(text *string) bool {
 		return false
 	}
 	s := *text
-	n := cSymbolLength(s)
+	n := nulStringLength(s)
 	s = s[:n]
 	if n > 0 && s[0] >= '0' && s[0] <= '9' {
 		return true
@@ -42,39 +43,33 @@ func IsSMT2QuotedCString(text *string) bool {
 	}
 	return false
 }
-func smt2QuotedSymbolLocked(m *SymbolManager, s Symbol) (bool, error) {
-	if e := m.checkPlain(s); e != nil {
+func smt2QuotedSymbol(m *usymbol.Manager, s usymbol.Symbol) (bool, error) {
+	if e := m.Validate(s); e != nil {
 		return false, e
 	}
 	if s.IsNumerical() || s.Value == 0 {
 		return false, nil
 	}
-	text, e := m.spelling(s)
+	text, _, e := m.BareString(s)
 	if e != nil {
 		return false, e
 	}
 	return IsSMT2QuotedCString(&text), nil
 }
-func IsSMT2QuotedSymbol(m *SymbolManager, s Symbol) (bool, error) {
+func IsSMT2QuotedSymbol(m *usymbol.Manager, s usymbol.Symbol) (bool, error) {
 	if m == nil {
-		return false, ErrInvalidSymbol
+		return false, usymbol.ErrInvalid
 	}
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	return smt2QuotedSymbolLocked(m, s)
+	return smt2QuotedSymbol(m, s)
 }
 
-// MkSMT2QuotedSymbol holds only a symbol-manager lock and an unpublished local
-// buffer. Its private scalar buffer operations take no shared-buffer mutex, so
-// they cannot invert AppendSymbol's shared-buffer -> symbol-manager lock order.
-// Temporary owned storage is budgeted; the sole returned string is caller-owned.
-func MkSMT2QuotedSymbol(m *SymbolManager, s Symbol, _ *arena.Budget) (string, error) {
+// MkSMT2QuotedSymbol reads an immutable spelling from its checked owner and
+// returns the quoted Go string. Temporary formatting storage is Go-managed.
+func MkSMT2QuotedSymbol(m *usymbol.Manager, s usymbol.Symbol, _ *arena.Budget) (string, error) {
 	if m == nil {
-		return "", ErrInvalidSymbol
+		return "", usymbol.ErrInvalid
 	}
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	needed, e := smt2QuotedSymbolLocked(m, s)
+	needed, e := smt2QuotedSymbol(m, s)
 	if e != nil {
 		return "", e
 	}
@@ -89,7 +84,7 @@ func MkSMT2QuotedSymbol(m *SymbolManager, s Symbol, _ *arena.Budget) (string, er
 	if e = b.AppendByte('|'); e != nil {
 		return "", e
 	}
-	text, e := m.spelling(s)
+	text, _, e := m.BareString(s)
 	if e != nil {
 		return "", e
 	}

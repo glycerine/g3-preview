@@ -3,6 +3,7 @@ package ast
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // FormatBuffer64 evaluates the source c_str argument before reaching mk_string.
@@ -40,11 +41,11 @@ func (m *ASTManager) formatBVCharacters(b *astBVCharBuffer16) (ASTHandle, error)
 		return ASTHandle{}, e
 	}
 	defer f.unlockFormat()
-	var name util.Symbol
+	var name usymbol.Symbol
 	if b.cap == 0 {
-		name, e = f.Symbols.InternInitializedBytes(b.inline[:], b.initialized)
+		name, e = util.InternSymbolInitializedBytes(f.Symbols, b.inline[:], b.initialized)
 	} else {
-		name, e = f.Symbols.InternRuntimeCString(m.numerals.RuntimeOwner(), b.raw, 0, uint64(b.capacity()))
+		name, e = util.InternSymbolRuntimeCString(f.Symbols, m.numerals.RuntimeOwner(), b.raw, 0, uint64(b.capacity()))
 	}
 	if e != nil {
 		return ASTHandle{}, e

@@ -6,7 +6,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 const astRefBytes uint32 = 8
@@ -73,7 +73,7 @@ func (m *ASTManager) readInternal(p arena.SmallBytesRef, index uint32) (astNodeR
 	g, e := m.readWord(p, offset+4)
 	return astNodeRef{s, g}, e
 }
-func (m *ASTManager) writeSymbol(p arena.SmallBytesRef, index uint32, s util.Symbol) error {
+func (m *ASTManager) writeSymbol(p arena.SmallBytesRef, index uint32, s usymbol.Symbol) error {
 	// Symbol is local to package g3. Its scalar fields are encoded by name;
 	// opaque mpnum numerals are never encoded through this representation.
 	off, e := astPayloadOffset(index, astSymbolBytes)
@@ -91,16 +91,16 @@ func (m *ASTManager) writeSymbol(p arena.SmallBytesRef, index uint32, s util.Sym
 	}
 	return nil
 }
-func (m *ASTManager) readSymbol(p arena.SmallBytesRef, index uint32) (util.Symbol, error) {
+func (m *ASTManager) readSymbol(p arena.SmallBytesRef, index uint32) (usymbol.Symbol, error) {
 	offset, e := astPayloadOffset(index, astSymbolBytes)
 	if e != nil {
-		return util.Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	var v [5]uint32
 	for i := range v {
 		w, e := m.readWord(p, offset+uint32(i)*4)
 		if e != nil {
-			return util.Symbol{}, e
+			return usymbol.Symbol{}, e
 		}
 		v[i] = w
 	}
@@ -140,7 +140,7 @@ func (m *ASTManager) newASTPayloadArguments(hs AppArguments) (arena.SmallBytesRe
 	}
 	return p, nil
 }
-func (m *ASTManager) newSymbolPayload(ss []util.Symbol) (arena.SmallBytesRef, error) {
+func (m *ASTManager) newSymbolPayload(ss []usymbol.Symbol) (arena.SmallBytesRef, error) {
 	if len(ss) == 0 {
 		return arena.SmallBytesRef{}, nil
 	}

@@ -10,6 +10,7 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var (
@@ -42,14 +43,14 @@ func (h SexprHandle) IsNull() bool { return h == SexprHandle{} }
 type SexprConfig struct {
 	Budget              *arena.Budget
 	PageSize, SlotLimit uint32
-	Symbols             *SymbolManager
+	Symbols             *usymbol.Manager
 	Rationals           *RationalService
 }
 type sexprRecord struct {
 	Kind                   SexprKind
 	refs, line, pos, width uint32
 	Numeral                OwnedRational
-	symbol                 Symbol
+	symbol                 usymbol.Symbol
 	children               arena.VectorRef
 	text                   arena.SmallBytesRef
 	length                 uint32
@@ -408,16 +409,14 @@ func (m *SexprManager) MkString(s string, line, pos uint32) (SexprHandle, error)
 	return h, nil
 }
 func (m *SexprManager) MkCString(s string, line, pos uint32) (SexprHandle, error) {
-	return m.MkString(s[:cSymbolLength(s)], line, pos)
+	return m.MkString(s[:nulStringLength(s)], line, pos)
 }
-func (m *SexprManager) mkSymbol(s Symbol, line, pos uint32, kind SexprKind) (SexprHandle, error) {
+func (m *SexprManager) mkSymbol(s usymbol.Symbol, line, pos uint32, kind SexprKind) (SexprHandle, error) {
 	if e := m.lock(); e != nil {
 		return SexprHandle{}, e
 	}
 	defer m.mu.Unlock()
-	m.Config.Symbols.mu.Lock()
-	e := m.Config.Symbols.checkPlain(s)
-	m.Config.Symbols.mu.Unlock()
+	e := m.Config.Symbols.Validate(s)
 	if e != nil {
 		return SexprHandle{}, e
 	}
@@ -428,10 +427,10 @@ func (m *SexprManager) mkSymbol(s Symbol, line, pos uint32, kind SexprKind) (Sex
 	}
 	return h, e
 }
-func (m *SexprManager) MkSymbol(s Symbol, line, pos uint32) (SexprHandle, error) {
+func (m *SexprManager) MkSymbol(s usymbol.Symbol, line, pos uint32) (SexprHandle, error) {
 	return m.mkSymbol(s, line, pos, SexprSymbol)
 }
-func (m *SexprManager) MkKeyword(s Symbol, line, pos uint32) (SexprHandle, error) {
+func (m *SexprManager) MkKeyword(s usymbol.Symbol, line, pos uint32) (SexprHandle, error) {
 	return m.mkSymbol(s, line, pos, SexprKeyword)
 }
 func (m *SexprManager) Kind(h SexprHandle) (SexprKind, error) {
@@ -524,17 +523,17 @@ func (m *SexprManager) BVSize(h SexprHandle) (uint32, error) {
 	}
 	return r.width, nil
 }
-func (m *SexprManager) Symbol(h SexprHandle) (Symbol, error) {
+func (m *SexprManager) Symbol(h SexprHandle) (usymbol.Symbol, error) {
 	if e := m.lock(); e != nil {
-		return Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	defer m.mu.Unlock()
 	r, e := m.record(h)
 	if e != nil {
-		return Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	if r.Kind != SexprSymbol && r.Kind != SexprKeyword {
-		return Symbol{}, ErrSexprKind
+		return usymbol.Symbol{}, ErrSexprKind
 	}
 	return r.symbol, nil
 }
@@ -662,11 +661,9 @@ func (m *SexprManager) formatNumeral(v *OwnedRational, n *uint32) error {
 	}
 	return nil
 }
-func (m *SexprManager) formatSymbol(s Symbol, n *uint32) error {
+func (m *SexprManager) formatSymbol(s usymbol.Symbol, n *uint32) error {
 	owner := m.Config.Symbols
-	owner.mu.Lock()
-	defer owner.mu.Unlock()
-	if e := owner.checkPlain(s); e != nil {
+	if e := owner.Validate(s); e != nil {
 		return e
 	}
 	if s.IsNumerical() {
@@ -701,7 +698,7 @@ func (m *SexprManager) formatSymbol(s Symbol, n *uint32) error {
 	if s.Value == 0 {
 		return m.literal(n, "null")
 	}
-	text, e := owner.spelling(s)
+	text, _, e := owner.BareString(s)
 	if e != nil {
 		return e
 	}

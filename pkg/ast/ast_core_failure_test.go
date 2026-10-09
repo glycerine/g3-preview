@@ -3,10 +3,10 @@ package ast
 import (
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func astTestSymbolGraph(s *util.SymbolManager) uint64 {
+func astTestSymbolGraph(s *usymbol.Manager) uint64 {
 	x := s.Stats()
 	d := x.Region.Descriptors
 	return x.OwnerBytes + x.Table.OwnerBytes + x.Table.TableBytes + x.Table.DirectoryBytes + x.Region.OwnerBytes + x.Region.PayloadBytes + x.Region.PageHeaderBytes + x.Region.DirectoryBytes + x.Region.LogBytes + x.Region.ScopeBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop(t *testing.T) {
@@ -17,7 +18,7 @@ func TestParamsReferenceResetKeyRejectsOrdinaryReplayAfterActualLeafStop(t *test
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -117,7 +118,7 @@ func TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop(t *testing.T) {
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -333,7 +334,7 @@ func TestParamsReferenceResetKeyFiniteAscendingShiftAndNoReservation(t *testing.
 					c, sy, _ := paramsTestOwner(t)
 					v, e := c.NewValue()
 					paramsMust(t, e)
-					keys := make([]Symbol, n+1)
+					keys := make([]usymbol.Symbol, n+1)
 					names := make([]string, n+1)
 					for i := range keys {
 						names[i] = "key" + strconv.Itoa(i)

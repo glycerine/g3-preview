@@ -7,6 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func satSolverCheckFixture(t *testing.T) (*sat.Solver, *util.ParamsContext, util.ParamsRef) {
@@ -33,10 +34,10 @@ func satOK(t *testing.T, e error) {
 		t.Fatal(e)
 	}
 }
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *util.SymbolManager, *util.RationalService) {
+func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	if e != nil {
 		t.Fatal(e)
 	}

@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var (
@@ -105,7 +106,7 @@ func (b *StringBuffer64) AppendCString(v string) error {
 	if err := b.open(); err != nil {
 		return err
 	}
-	_, err := b.buffer.WriteString(v[:cSymbolLength(v)])
+	_, err := b.buffer.WriteString(v[:nulStringLength(v)])
 	return err
 }
 
@@ -134,16 +135,14 @@ func (b *StringBuffer64) AppendBool(v bool) error {
 	return b.AppendCString("false")
 }
 
-func (b *StringBuffer64) AppendSymbol(m *SymbolManager, v Symbol) error {
+func (b *StringBuffer64) AppendSymbol(m *usymbol.Manager, v usymbol.Symbol) error {
 	if err := b.open(); err != nil {
 		return err
 	}
 	if m == nil {
-		return ErrInvalidSymbol
+		return usymbol.ErrInvalid
 	}
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if err := m.checkPlain(v); err != nil {
+	if err := m.Validate(v); err != nil {
 		return err
 	}
 	if v.IsNumerical() {
@@ -155,7 +154,7 @@ func (b *StringBuffer64) AppendSymbol(m *SymbolManager, v Symbol) error {
 	if v.Value == 0 {
 		return b.AppendCString("null")
 	}
-	text, err := m.spelling(v)
+	text, _, err := m.BareString(v)
 	if err != nil {
 		return err
 	}

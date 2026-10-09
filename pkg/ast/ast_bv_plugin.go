@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type astBitVectorPluginOwner struct {
@@ -19,7 +20,7 @@ type astBitVectorPluginOwner struct {
 	next                                   *astBitVectorPluginOwner
 	self                                   *astBitVectorPluginOwner
 	owner                                  *ASTManager
-	names                                  [10]util.Symbol
+	names                                  [10]usymbol.Symbol
 	fields                                 [5]astNodeRef
 	fieldAcquired                          [5]bool
 	sortAcquired                           []byte // charged cold leaf receipts, not a second pointer table

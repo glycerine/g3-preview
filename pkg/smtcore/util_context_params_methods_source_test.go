@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -257,7 +258,7 @@ func TestContextParamsMergeEveryContextCOWReservationPreservesInputAndExactRetur
 	for ordinal := int64(0); ordinal < 32; ordinal++ {
 		_, _, q := paramsTestOwner(t) // unrelated borrowed numeral service survives.
 		bc, bs, b := arena.NewBudget(1<<24), arena.NewBudget(1<<24), arena.NewBudget(1<<24)
-		sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+		sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 		paramsMust(t, e)
 		c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 		paramsMust(t, e)
@@ -333,7 +334,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	paramsMust(t, e)
 	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -613,7 +614,7 @@ func TestContextParamsActualCOWAppendRefusalCleanupStopRetainsImmutableChildTupl
 	paramsMust(t, e)
 	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Memory: r, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := util.NewParamsContext(sy, q, util.ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)

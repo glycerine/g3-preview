@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var ErrSATMainConfigOwner = errors.New("g3: SAT main configuration owner or lifetime mismatch")
@@ -97,10 +98,10 @@ type satMainConfig struct {
 	self       *satMainConfig
 	globals    *util.GlobalParams
 	context    *util.ParamsContext
-	symbols    *util.SymbolManager
+	symbols    *usymbol.Manager
 	budget     *arena.Budget
 	state      satMainConfigState
-	cached     [11]util.Symbol
+	cached     [11]usymbol.Symbol
 	ownerBytes uint64
 	closed     bool
 }

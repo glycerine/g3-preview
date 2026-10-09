@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTTraceFactoriesOnlyActualNewNodesAndLiteralArgumentChains(t *testing.T) {
@@ -34,7 +35,7 @@ func TestASTTraceFactoriesOnlyActualNewNodesAndLiteralArgumentChains(t *testing.
 	if again != v {
 		t.Fatal("source interned var")
 	}
-	d, e := m.MkFuncDecl(util.NumericalSymbol(17), []ASTHandle{bs}, bs, ASTFuncDeclInfo{})
+	d, e := m.MkFuncDecl(usymbol.Numerical(17), []ASTHandle{bs}, bs, ASTFuncDeclInfo{})
 	paramsMust(t, e)
 	app, e := m.MkApp(d, []ASTHandle{v})
 	paramsMust(t, e)
@@ -51,7 +52,7 @@ func TestASTTraceFactoriesOnlyActualNewNodesAndLiteralArgumentChains(t *testing.
 	defer func() { paramsMust(t, m.DecRef(pat)) }()
 	bound, e := sy.Intern("x")
 	paramsMust(t, e)
-	spec := ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{bs}, Names: []util.Symbol{bound}, Body: app, QID: util.NumericalSymbol(23), Patterns: []ASTHandle{pat}}
+	spec := ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{bs}, Names: []usymbol.Symbol{bound}, Body: app, QID: usymbol.Numerical(23), Patterns: []ASTHandle{pat}}
 	quant, e := m.MkQuantifier(spec)
 	paramsMust(t, e)
 	paramsMust(t, m.IncRef(quant))
@@ -68,7 +69,7 @@ func TestASTTraceFactoriesOnlyActualNewNodesAndLiteralArgumentChains(t *testing.
 	}
 	spec.Patterns = nil
 	spec.NoPatterns = []ASTHandle{app}
-	spec.QID = util.NumericalSymbol(24)
+	spec.QID = usymbol.Numerical(24)
 	noPattern, e := m.MkQuantifier(spec)
 	paramsMust(t, e)
 	paramsMust(t, m.IncRef(noPattern))

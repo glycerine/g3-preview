@@ -9,9 +9,10 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func satConfigFixture(t *testing.T) (*util.ParamsContext, *util.SymbolManager, *util.GlobalParams, *arena.Budget, *util.ParamsRef, *satMainConfig) {
+func satConfigFixture(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.GlobalParams, *arena.Budget, *util.ParamsRef, *satMainConfig) {
 	t.Helper()
 	c, sy, g, b := satMainConfigTestRuntime(t)
 	p, e := c.NewValue()
@@ -22,7 +23,7 @@ func satConfigFixture(t *testing.T) (*util.ParamsContext, *util.SymbolManager, *
 	t.Cleanup(func() { paramsMust(t, m.Close()) })
 	return c, sy, g, b, &p, m
 }
-func satConfigSymbol(t *testing.T, c *util.ParamsContext, sy *util.SymbolManager, p *util.ParamsRef, key, value string) {
+func satConfigSymbol(t *testing.T, c *util.ParamsContext, sy *usymbol.Manager, p *util.ParamsRef, key, value string) {
 	t.Helper()
 	s, e := sy.Intern(value)
 	paramsMust(t, e)
@@ -419,7 +420,7 @@ func TestSATMainConfigConstructorPolicyFailureKeepsOnlyBorrowedPrefixes(t *testi
 func TestSATMainConfigInitialMaskAndUnusedDimacsCore(t *testing.T) {
 	c, sy, _, b, p, m := satConfigFixture(t)
 	paramsMust(t, arena.ValidateRecordType(reflect.TypeOf(satMainConfigState{})))
-	paramsMust(t, arena.ValidateRecordType(reflect.TypeOf([11]util.Symbol{})))
+	paramsMust(t, arena.ValidateRecordType(reflect.TypeOf([11]usymbol.Symbol{})))
 	s, e := m.State()
 	paramsMust(t, e)
 	want := satConfigAllFieldsMask & ^(satConfigGCSmallLBDMask | satConfigGCKMask)

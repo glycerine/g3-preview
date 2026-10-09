@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC(t *testing.T) {
@@ -18,7 +19,7 @@ func TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC(t *testing.T)
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -99,7 +100,7 @@ func TestParamsReferenceInitFailedCopySkipsOldDEC(t *testing.T) {
 		done := false
 		t.Run(strconv.FormatInt(fault, 10), func(t *testing.T) {
 			c, sy, _ := paramsTestOwner(t)
-			keys := []Symbol{internSymbol(t, sy, "first"), internSymbol(t, sy, "second"), internSymbol(t, sy, "third"), internSymbol(t, sy, "fourth"), internSymbol(t, sy, "fifth"), internSymbol(t, sy, "sixth")}
+			keys := []usymbol.Symbol{internSymbol(t, sy, "first"), internSymbol(t, sy, "second"), internSymbol(t, sy, "third"), internSymbol(t, sy, "fourth"), internSymbol(t, sy, "fifth"), internSymbol(t, sy, "sixth")}
 			v, e := c.NewValue()
 			paramsMust(t, e)
 			for i, key := range keys[:5] {
@@ -165,7 +166,7 @@ func TestParamsReferenceInitFrameOwnAbortActualLeafReceipt(t *testing.T) {
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -262,7 +263,7 @@ func TestParamsReferenceInitFrameOwnAbortActualLeafReceipt(t *testing.T) {
 
 func TestParamsReferenceTwoFramesAndFreshInvocationReuse(t *testing.T) {
 	c, sy, _ := paramsTestOwner(t)
-	keys := []Symbol{internSymbol(t, sy, "one"), internSymbol(t, sy, "two"), internSymbol(t, sy, "three"), internSymbol(t, sy, "four"), internSymbol(t, sy, "five"), internSymbol(t, sy, "six")}
+	keys := []usymbol.Symbol{internSymbol(t, sy, "one"), internSymbol(t, sy, "two"), internSymbol(t, sy, "three"), internSymbol(t, sy, "four"), internSymbol(t, sy, "five"), internSymbol(t, sy, "six")}
 	var current, shared [2]ParamsRef
 	for n := range current {
 		v, e := c.NewValue()
@@ -356,7 +357,7 @@ func TestParamsReferenceNullAssignmentOldDECStop(t *testing.T) {
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -456,7 +457,7 @@ func TestParamsReferenceContextCloseConsumesExactStoppedFrame(t *testing.T) {
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)

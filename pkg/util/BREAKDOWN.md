@@ -212,8 +212,12 @@ adapter.
 
 These should follow after the first independent moves:
 
-* `util/symbol` can own `symbol`, `symbol_table`, and their Go-native string
-  handling. It must not reintroduce C++ string classes.
+* `util/symbol` now owns symbol identities, native Go spelling interning,
+  cached symbol hashes, the explicit initialization/finalization service, and
+  the live concrete int32 dictionary. Its only nonstandard dependency is
+  `arena`; it imports neither root `util` nor any numerical package. Consumers
+  import it directly, without a root compatibility facade. Further live
+  `symbol_table` specializations belong here when their consumers are ported.
 * `util/params` can own `params` and environment parameter parsing and import
   `util/symbol` if necessary.
 * `util/statistics` now owns `statistics.h/.cpp`. String keys, typed slices,
@@ -435,6 +439,17 @@ Parameter name formatting and comparison now read native strings directly.
 This removes the spelling-storage dependency on `region.h` without changing
 symbol identity or source call ordering. Manager/service headers remain in
 explicit budget accounting for now.
+
+The interner and its identity/lifecycle tests are now physically in
+`util/symbol`. Its full tests run independently of root numerical tests.
+Parameters, S-expressions, and formatting no longer lock or inspect the
+interner's internals; they acquire immutable Go spellings through checked
+public methods. Runtime-backed producer reads and numeric stream adapters
+remain beside their owning runtime/stream APIs, with concrete function
+arguments rather than a reverse import into root `util`. The retained Z3
+spelling-hash computation is private to the leaf and checked against existing
+C++ golden values; it does not introduce a Go hash-table abstraction.
+
 
 The live parameter-descriptor dictionary now uses
 `insdict.Dict[Symbol, paramDescrInfo]`. Copy traversal follows stable insertion

@@ -1,5 +1,7 @@
 package util
 
+import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+
 import "github.com/glycerine/g3/pkg/arena"
 
 // DisplayInto emits source param_descrs::display into a borrowed byte buffer.
@@ -16,7 +18,7 @@ func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, incl
 	if e := d.open(); e != nil {
 		return e
 	}
-	var names []Symbol
+	var names []usymbol.Symbol
 	for key := range d.entries.All() {
 		names = append(names, key)
 	}
@@ -86,17 +88,15 @@ func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, incl
 	}
 	return nil
 }
-func (d *ParamDescrs) writeNameInto(dst *StringBuffer64, k Symbol, smt2 bool) error {
+func (d *ParamDescrs) writeNameInto(dst *StringBuffer64, k usymbol.Symbol, smt2 bool) error {
 	m := d.manager
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if e := m.checkPlain(k); e != nil {
+	if e := m.Validate(k); e != nil {
 		return e
 	}
 	if k.Value == 0 || k.IsNumerical() {
 		return ErrParamDescrsPrecondition
 	}
-	text, e := m.spelling(k)
+	text, _, e := m.BareString(k)
 	if e != nil {
 		return e
 	}

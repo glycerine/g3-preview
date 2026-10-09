@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -48,11 +49,11 @@ type paramsText struct {
 	borrowed bool
 }
 type paramEntry struct {
-	key    Symbol
+	key    usymbol.Symbol
 	Kind   ParamKind
 	bits   uint64
 	text   paramsText
-	symbol Symbol
+	symbol usymbol.Symbol
 	Rat    OwnedRational
 }
 type paramsEntryState struct {
@@ -75,7 +76,7 @@ type ParamsStats struct {
 type ParamsContext struct {
 	mu                sync.Mutex
 	Self              *ParamsContext
-	SymbolsField      *SymbolManager
+	SymbolsField      *usymbol.Manager
 	NumeralsField     *RationalService
 	BudgetField       *arena.Budget
 	Texts             *arena.Words
@@ -99,11 +100,11 @@ func paramsPageBytes(p paramsEntryPage) uint64 {
 	return paramsBytes(cap(p.entries), reflect.TypeOf(paramEntry{})) + paramsBytes(cap(p.states), reflect.TypeOf(paramsEntryState{}))
 }
 func paramsDirectoryBytes(n int) uint64 { return paramsBytes(n, reflect.TypeOf(paramsEntryPage{})) }
-func NewParamsContext(s *SymbolManager, q *RationalService, c ParamsConfig) (*ParamsContext, error) {
+func NewParamsContext(s *usymbol.Manager, q *RationalService, c ParamsConfig) (*ParamsContext, error) {
 	if s == nil || q == nil || c.Text.Descriptors.Budget != c.Budget {
 		return nil, arena.ErrConfig
 	}
-	if _, e := s.Hash(Symbol{}); e != nil {
+	if _, e := s.Hash(usymbol.Symbol{}); e != nil {
 		return nil, e
 	}
 	r, e := q.NewValue()
@@ -148,7 +149,7 @@ func (c *ParamsContext) open() error {
 	if c == nil || c.Self != c || c.Closed {
 		return ErrParamsOwner
 	}
-	if _, e := c.SymbolsField.Hash(Symbol{}); e != nil {
+	if _, e := c.SymbolsField.Hash(usymbol.Symbol{}); e != nil {
 		return e
 	}
 	return nil
@@ -505,8 +506,8 @@ func (c *ParamsContext) Copy(dst, src *ParamsRef) error {
 	return c.copyCore(dst.Slot, src.Slot)
 }
 func (c *ParamsContext) Append(dst, src *ParamsRef) error { return c.Copy(dst, src) }
-func (c *ParamsContext) keyCheck(k Symbol) error          { _, e := c.SymbolsField.Hash(k); return e }
-func (c *ParamsContext) find(v *ParamsRef, k Symbol, name *string, byName bool, kind ParamKind, matchAnyKind bool) (*paramEntry, error) {
+func (c *ParamsContext) keyCheck(k usymbol.Symbol) error  { _, e := c.SymbolsField.Hash(k); return e }
+func (c *ParamsContext) find(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, kind ParamKind, matchAnyKind bool) (*paramEntry, error) {
 	if e := c.check(v); e != nil {
 		return nil, e
 	}
@@ -535,7 +536,7 @@ func (c *ParamsContext) find(v *ParamsRef, k Symbol, name *string, byName bool, 
 	}
 	return nil, nil
 }
-func (c *ParamsContext) Contains(v *ParamsRef, k Symbol) (bool, error) {
+func (c *ParamsContext) Contains(v *ParamsRef, k usymbol.Symbol) (bool, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	x, e := c.find(v, k, nil, false, 0, true)
@@ -544,7 +545,7 @@ func (c *ParamsContext) Contains(v *ParamsRef, k Symbol) (bool, error) {
 func (c *ParamsContext) ContainsName(v *ParamsRef, k *string) (bool, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	x, e := c.find(v, Symbol{}, k, true, 0, true)
+	x, e := c.find(v, usymbol.Symbol{}, k, true, 0, true)
 	return x != nil, e
 }
 func (c *ParamsContext) Empty(v *ParamsRef) (bool, error) {
@@ -567,7 +568,7 @@ func (c *ParamsContext) ResetTracked(v *ParamsRef, receipt *ParamsResetReceipt) 
 	}
 	return c.resetBlock(v.Slot, receipt)
 }
-func (c *ParamsContext) resetKey(v *ParamsRef, k Symbol, name *string, byName bool, receipt *ParamsResetKeyReceipt) error {
+func (c *ParamsContext) resetKey(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, receipt *ParamsResetKeyReceipt) error {
 	if e := c.check(v); e != nil {
 		return e
 	}
@@ -604,8 +605,10 @@ func (c *ParamsContext) resetKey(v *ParamsRef, k Symbol, name *string, byName bo
 	}
 	return nil
 }
-func (c *ParamsContext) ResetKey(v *ParamsRef, k Symbol) error { return c.ResetKeyTracked(v, k, nil) }
-func (c *ParamsContext) ResetKeyTracked(v *ParamsRef, k Symbol, receipt *ParamsResetKeyReceipt) error {
+func (c *ParamsContext) ResetKey(v *ParamsRef, k usymbol.Symbol) error {
+	return c.ResetKeyTracked(v, k, nil)
+}
+func (c *ParamsContext) ResetKeyTracked(v *ParamsRef, k usymbol.Symbol, receipt *ParamsResetKeyReceipt) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	return c.resetKey(v, k, nil, false, receipt)
@@ -616,7 +619,7 @@ func (c *ParamsContext) ResetKeyName(v *ParamsRef, k *string) error {
 func (c *ParamsContext) ResetKeyNameTracked(v *ParamsRef, k *string, receipt *ParamsResetKeyReceipt) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.resetKey(v, Symbol{}, k, true, receipt)
+	return c.resetKey(v, usymbol.Symbol{}, k, true, receipt)
 }
 func (c *ParamsContext) storeText(s *string, source *paramsText) (paramsText, error) {
 	n := uint32(0)
@@ -673,7 +676,7 @@ func (c *ParamsContext) storeText(s *string, source *paramsText) (paramsText, er
 	}
 	return out, nil
 }
-func (c *ParamsContext) setCore(slot uint32, k Symbol, kind ParamKind, bits uint64, sym Symbol, str *string, rat *OwnedRational, text *paramsText) error {
+func (c *ParamsContext) setCore(slot uint32, k usymbol.Symbol, kind ParamKind, bits uint64, sym usymbol.Symbol, str *string, rat *OwnedRational, text *paramsText) error {
 	b := &c.Blocks[slot-1]
 	var x *paramEntry
 	var matched uint32
@@ -755,7 +758,7 @@ func (c *ParamsContext) setCore(slot uint32, k Symbol, kind ParamKind, bits uint
 	b.Size++
 	return nil
 }
-func (c *ParamsContext) set(v *ParamsRef, k Symbol, name *string, byName bool, kind ParamKind, bits uint64, sym Symbol, str *string, rat *OwnedRational) error {
+func (c *ParamsContext) set(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, kind ParamKind, bits uint64, sym usymbol.Symbol, str *string, rat *OwnedRational) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.check(v); e != nil {
@@ -792,40 +795,40 @@ func (c *ParamsContext) set(v *ParamsRef, k Symbol, name *string, byName bool, k
 	}
 	return c.setCore(v.Slot, k, kind, bits, sym, str, rat, nil)
 }
-func (c *ParamsContext) SetBool(v *ParamsRef, k Symbol, b bool) error {
+func (c *ParamsContext) SetBool(v *ParamsRef, k usymbol.Symbol, b bool) error {
 	var n uint64
 	if b {
 		n = 1
 	}
-	return c.set(v, k, nil, false, ParamBool, n, Symbol{}, nil, nil)
+	return c.set(v, k, nil, false, ParamBool, n, usymbol.Symbol{}, nil, nil)
 }
 func (c *ParamsContext) SetBoolName(v *ParamsRef, k *string, b bool) error {
 	var n uint64
 	if b {
 		n = 1
 	}
-	return c.set(v, Symbol{}, k, true, ParamBool, n, Symbol{}, nil, nil)
+	return c.set(v, usymbol.Symbol{}, k, true, ParamBool, n, usymbol.Symbol{}, nil, nil)
 }
-func (c *ParamsContext) SetUInt(v *ParamsRef, k Symbol, n uint32) error {
-	return c.set(v, k, nil, false, ParamUInt, uint64(n), Symbol{}, nil, nil)
+func (c *ParamsContext) SetUInt(v *ParamsRef, k usymbol.Symbol, n uint32) error {
+	return c.set(v, k, nil, false, ParamUInt, uint64(n), usymbol.Symbol{}, nil, nil)
 }
 func (c *ParamsContext) SetUIntName(v *ParamsRef, k *string, n uint32) error {
-	return c.set(v, Symbol{}, k, true, ParamUInt, uint64(n), Symbol{}, nil, nil)
+	return c.set(v, usymbol.Symbol{}, k, true, ParamUInt, uint64(n), usymbol.Symbol{}, nil, nil)
 }
-func (c *ParamsContext) SetDouble(v *ParamsRef, k Symbol, n float64) error {
-	return c.set(v, k, nil, false, ParamDouble, math.Float64bits(n), Symbol{}, nil, nil)
+func (c *ParamsContext) SetDouble(v *ParamsRef, k usymbol.Symbol, n float64) error {
+	return c.set(v, k, nil, false, ParamDouble, math.Float64bits(n), usymbol.Symbol{}, nil, nil)
 }
 func (c *ParamsContext) SetDoubleName(v *ParamsRef, k *string, n float64) error {
-	return c.set(v, Symbol{}, k, true, ParamDouble, math.Float64bits(n), Symbol{}, nil, nil)
+	return c.set(v, usymbol.Symbol{}, k, true, ParamDouble, math.Float64bits(n), usymbol.Symbol{}, nil, nil)
 }
-func (c *ParamsContext) SetString(v *ParamsRef, k Symbol, s *string) error {
-	return c.set(v, k, nil, false, ParamString, 0, Symbol{}, s, nil)
+func (c *ParamsContext) SetString(v *ParamsRef, k usymbol.Symbol, s *string) error {
+	return c.set(v, k, nil, false, ParamString, 0, usymbol.Symbol{}, s, nil)
 }
 
 // SetStringSymbol retains the source interned bare-str pointer as a canonical
 // scalar symbol. The borrowed SymbolManager must outlive every retained Ref.
 // It never allocates or owns a second spelling payload.
-func (c *ParamsContext) SetStringSymbol(v *ParamsRef, k, spelling Symbol) error {
+func (c *ParamsContext) SetStringSymbol(v *ParamsRef, k, spelling usymbol.Symbol) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.check(v); e != nil {
@@ -835,12 +838,10 @@ func (c *ParamsContext) SetStringSymbol(v *ParamsRef, k, spelling Symbol) error 
 		return e
 	}
 	m := c.SymbolsField
-	m.mu.Lock()
-	e := m.checkPlain(spelling)
+	e := m.Validate(spelling)
 	if e == nil && (spelling.IsNumerical() || spelling.Value == 0) {
 		e = ErrParamsPrecondition
 	}
-	m.mu.Unlock()
 	if e != nil {
 		return e
 	}
@@ -852,21 +853,21 @@ func (c *ParamsContext) SetStringSymbol(v *ParamsRef, k, spelling Symbol) error 
 }
 
 func (c *ParamsContext) SetStringName(v *ParamsRef, k, s *string) error {
-	return c.set(v, Symbol{}, k, true, ParamString, 0, Symbol{}, s, nil)
+	return c.set(v, usymbol.Symbol{}, k, true, ParamString, 0, usymbol.Symbol{}, s, nil)
 }
-func (c *ParamsContext) SetSymbol(v *ParamsRef, k, s Symbol) error {
+func (c *ParamsContext) SetSymbol(v *ParamsRef, k, s usymbol.Symbol) error {
 	return c.set(v, k, nil, false, ParamSymbol, 0, s, nil, nil)
 }
-func (c *ParamsContext) SetSymbolName(v *ParamsRef, k *string, s Symbol) error {
-	return c.set(v, Symbol{}, k, true, ParamSymbol, 0, s, nil, nil)
+func (c *ParamsContext) SetSymbolName(v *ParamsRef, k *string, s usymbol.Symbol) error {
+	return c.set(v, usymbol.Symbol{}, k, true, ParamSymbol, 0, s, nil, nil)
 }
-func (c *ParamsContext) SetRat(v *ParamsRef, k Symbol, r *OwnedRational) error {
-	return c.set(v, k, nil, false, ParamNumeral, 0, Symbol{}, nil, r)
+func (c *ParamsContext) SetRat(v *ParamsRef, k usymbol.Symbol, r *OwnedRational) error {
+	return c.set(v, k, nil, false, ParamNumeral, 0, usymbol.Symbol{}, nil, r)
 }
 func (c *ParamsContext) SetRatName(v *ParamsRef, k *string, r *OwnedRational) error {
-	return c.set(v, Symbol{}, k, true, ParamNumeral, 0, Symbol{}, nil, r)
+	return c.set(v, usymbol.Symbol{}, k, true, ParamNumeral, 0, usymbol.Symbol{}, nil, r)
 }
-func (c *ParamsContext) get(v *ParamsRef, k Symbol, name *string, byName bool, kind ParamKind, fallback *ParamsRef) (paramEntry, bool, error) {
+func (c *ParamsContext) get(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, kind ParamKind, fallback *ParamsRef) (paramEntry, bool, error) {
 	x, e := c.find(v, k, name, byName, kind, false)
 	if e != nil {
 		return paramEntry{}, false, e
@@ -876,7 +877,7 @@ func (c *ParamsContext) get(v *ParamsRef, k Symbol, name *string, byName bool, k
 			return paramEntry{}, false, e
 		}
 		if x == nil {
-			x, e = c.find(fallback, Symbol{}, name, true, kind, false)
+			x, e = c.find(fallback, usymbol.Symbol{}, name, true, kind, false)
 			if e != nil {
 				return paramEntry{}, false, e
 			}
@@ -887,7 +888,7 @@ func (c *ParamsContext) get(v *ParamsRef, k Symbol, name *string, byName bool, k
 	}
 	return *x, true, nil
 }
-func (c *ParamsContext) getBool(v *ParamsRef, k Symbol, name *string, byName bool, f *ParamsRef, d bool) (bool, error) {
+func (c *ParamsContext) getBool(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, f *ParamsRef, d bool) (bool, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	x, ok, e := c.get(v, k, name, byName, ParamBool, f)
@@ -896,16 +897,16 @@ func (c *ParamsContext) getBool(v *ParamsRef, k Symbol, name *string, byName boo
 	}
 	return x.bits != 0, nil
 }
-func (c *ParamsContext) GetBool(v *ParamsRef, k Symbol, d bool) (bool, error) {
+func (c *ParamsContext) GetBool(v *ParamsRef, k usymbol.Symbol, d bool) (bool, error) {
 	return c.getBool(v, k, nil, false, nil, d)
 }
 func (c *ParamsContext) GetBoolName(v *ParamsRef, k *string, d bool) (bool, error) {
-	return c.getBool(v, Symbol{}, k, true, nil, d)
+	return c.getBool(v, usymbol.Symbol{}, k, true, nil, d)
 }
 func (c *ParamsContext) GetBoolFallbackName(v *ParamsRef, k *string, f *ParamsRef, d bool) (bool, error) {
-	return c.getBool(v, Symbol{}, k, true, f, d)
+	return c.getBool(v, usymbol.Symbol{}, k, true, f, d)
 }
-func (c *ParamsContext) getUInt(v *ParamsRef, k Symbol, name *string, byName bool, f *ParamsRef, d uint32) (uint32, error) {
+func (c *ParamsContext) getUInt(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, f *ParamsRef, d uint32) (uint32, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	x, ok, e := c.get(v, k, name, byName, ParamUInt, f)
@@ -914,16 +915,16 @@ func (c *ParamsContext) getUInt(v *ParamsRef, k Symbol, name *string, byName boo
 	}
 	return uint32(x.bits), nil
 }
-func (c *ParamsContext) GetUInt(v *ParamsRef, k Symbol, d uint32) (uint32, error) {
+func (c *ParamsContext) GetUInt(v *ParamsRef, k usymbol.Symbol, d uint32) (uint32, error) {
 	return c.getUInt(v, k, nil, false, nil, d)
 }
 func (c *ParamsContext) GetUIntName(v *ParamsRef, k *string, d uint32) (uint32, error) {
-	return c.getUInt(v, Symbol{}, k, true, nil, d)
+	return c.getUInt(v, usymbol.Symbol{}, k, true, nil, d)
 }
 func (c *ParamsContext) GetUIntFallbackName(v *ParamsRef, k *string, f *ParamsRef, d uint32) (uint32, error) {
-	return c.getUInt(v, Symbol{}, k, true, f, d)
+	return c.getUInt(v, usymbol.Symbol{}, k, true, f, d)
 }
-func (c *ParamsContext) getDouble(v *ParamsRef, k Symbol, name *string, byName bool, f *ParamsRef, d float64) (float64, error) {
+func (c *ParamsContext) getDouble(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, f *ParamsRef, d float64) (float64, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	x, ok, e := c.get(v, k, name, byName, ParamDouble, f)
@@ -932,20 +933,20 @@ func (c *ParamsContext) getDouble(v *ParamsRef, k Symbol, name *string, byName b
 	}
 	return math.Float64frombits(x.bits), nil
 }
-func (c *ParamsContext) GetDouble(v *ParamsRef, k Symbol, d float64) (float64, error) {
+func (c *ParamsContext) GetDouble(v *ParamsRef, k usymbol.Symbol, d float64) (float64, error) {
 	return c.getDouble(v, k, nil, false, nil, d)
 }
 func (c *ParamsContext) GetDoubleName(v *ParamsRef, k *string, d float64) (float64, error) {
-	return c.getDouble(v, Symbol{}, k, true, nil, d)
+	return c.getDouble(v, usymbol.Symbol{}, k, true, nil, d)
 }
 func (c *ParamsContext) GetDoubleFallbackName(v *ParamsRef, k *string, f *ParamsRef, d float64) (float64, error) {
-	return c.getDouble(v, Symbol{}, k, true, f, d)
+	return c.getDouble(v, usymbol.Symbol{}, k, true, f, d)
 }
-func (c *ParamsContext) getSymbol(v *ParamsRef, k Symbol, name *string, byName bool, f *ParamsRef, d Symbol) (Symbol, error) {
+func (c *ParamsContext) getSymbol(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, f *ParamsRef, d usymbol.Symbol) (usymbol.Symbol, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.keyCheck(d); e != nil {
-		return Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	x, ok, e := c.get(v, k, name, byName, ParamSymbol, f)
 	if e != nil || !ok {
@@ -953,18 +954,18 @@ func (c *ParamsContext) getSymbol(v *ParamsRef, k Symbol, name *string, byName b
 	}
 	return x.symbol, nil
 }
-func (c *ParamsContext) GetSymbol(v *ParamsRef, k, d Symbol) (Symbol, error) {
+func (c *ParamsContext) GetSymbol(v *ParamsRef, k, d usymbol.Symbol) (usymbol.Symbol, error) {
 	return c.getSymbol(v, k, nil, false, nil, d)
 }
-func (c *ParamsContext) GetSymbolName(v *ParamsRef, k *string, d Symbol) (Symbol, error) {
-	return c.getSymbol(v, Symbol{}, k, true, nil, d)
+func (c *ParamsContext) GetSymbolName(v *ParamsRef, k *string, d usymbol.Symbol) (usymbol.Symbol, error) {
+	return c.getSymbol(v, usymbol.Symbol{}, k, true, nil, d)
 }
-func (c *ParamsContext) GetSymbolFallbackName(v *ParamsRef, k *string, f *ParamsRef, d Symbol) (Symbol, error) {
-	return c.getSymbol(v, Symbol{}, k, true, f, d)
+func (c *ParamsContext) GetSymbolFallbackName(v *ParamsRef, k *string, f *ParamsRef, d usymbol.Symbol) (usymbol.Symbol, error) {
+	return c.getSymbol(v, usymbol.Symbol{}, k, true, f, d)
 }
 
 // String results are caller-owned copies; bool distinguishes null from empty.
-func (c *ParamsContext) getString(v *ParamsRef, k Symbol, name *string, byName bool, f *ParamsRef, d *string) (string, bool, error) {
+func (c *ParamsContext) getString(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, f *ParamsRef, d *string) (string, bool, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	x, ok, e := c.get(v, k, name, byName, ParamString, f)
@@ -986,16 +987,16 @@ func (c *ParamsContext) getString(v *ParamsRef, k Symbol, name *string, byName b
 	}
 	return string(c.workspace), true, nil
 }
-func (c *ParamsContext) GetString(v *ParamsRef, k Symbol, d *string) (string, bool, error) {
+func (c *ParamsContext) GetString(v *ParamsRef, k usymbol.Symbol, d *string) (string, bool, error) {
 	return c.getString(v, k, nil, false, nil, d)
 }
 func (c *ParamsContext) GetStringName(v *ParamsRef, k, d *string) (string, bool, error) {
-	return c.getString(v, Symbol{}, k, true, nil, d)
+	return c.getString(v, usymbol.Symbol{}, k, true, nil, d)
 }
 func (c *ParamsContext) GetStringFallbackName(v *ParamsRef, k *string, f *ParamsRef, d *string) (string, bool, error) {
-	return c.getString(v, Symbol{}, k, true, f, d)
+	return c.getString(v, usymbol.Symbol{}, k, true, f, d)
 }
-func (c *ParamsContext) getRat(v *ParamsRef, k Symbol, name *string, byName bool, d *OwnedRational) (OwnedRational, error) {
+func (c *ParamsContext) getRat(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, d *OwnedRational) (OwnedRational, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if _, e := c.NumeralsField.IsRational(d); e != nil {
@@ -1024,11 +1025,11 @@ func (c *ParamsContext) getRat(v *ParamsRef, k Symbol, name *string, byName bool
 	}
 	return r, nil
 }
-func (c *ParamsContext) GetRat(v *ParamsRef, k Symbol, d *OwnedRational) (OwnedRational, error) {
+func (c *ParamsContext) GetRat(v *ParamsRef, k usymbol.Symbol, d *OwnedRational) (OwnedRational, error) {
 	return c.getRat(v, k, nil, false, d)
 }
 func (c *ParamsContext) GetRatName(v *ParamsRef, k *string, d *OwnedRational) (OwnedRational, error) {
-	return c.getRat(v, Symbol{}, k, true, d)
+	return c.getRat(v, usymbol.Symbol{}, k, true, d)
 }
 func paramsCString(s string) string {
 	if i := strings.IndexByte(s, 0); i >= 0 {
@@ -1099,11 +1100,9 @@ func (c *ParamsContext) appendEntryText(x *paramEntry) error {
 	return c.appendText(c.Texts, x.text.ref, x.text.size)
 }
 
-func (c *ParamsContext) appendSymbol(k Symbol, strMode, normalize bool) error {
+func (c *ParamsContext) appendSymbol(k usymbol.Symbol, strMode, normalize bool) error {
 	m := c.SymbolsField
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if e := m.checkPlain(k); e != nil {
+	if e := m.Validate(k); e != nil {
 		return e
 	}
 	if k.IsNumerical() {
@@ -1127,7 +1126,7 @@ func (c *ParamsContext) appendSymbol(k Symbol, strMode, normalize bool) error {
 		}
 		return c.appendString("null")
 	}
-	text, e := m.spelling(k)
+	text, _, e := m.BareString(k)
 	if e != nil {
 		return e
 	}
@@ -1208,7 +1207,7 @@ func (c *ParamsContext) appendValue(x *paramEntry) error {
 	c.workspace = append(c.workspace, b...)
 	return nil
 }
-func (c *ParamsContext) format(v *ParamsRef, key *Symbol, module *string, d *ParamDescrs) error {
+func (c *ParamsContext) format(v *ParamsRef, key *usymbol.Symbol, module *string, d *ParamDescrs) error {
 	if e := c.check(v); e != nil {
 		return e
 	}
@@ -1312,7 +1311,7 @@ func (c *ParamsContext) FormatInto(v *ParamsRef, dst []byte) (int, error) {
 	}
 	return copy(dst, c.workspace), nil
 }
-func (c *ParamsContext) DisplayKey(v *ParamsRef, k Symbol) (string, error) {
+func (c *ParamsContext) DisplayKey(v *ParamsRef, k usymbol.Symbol) (string, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.format(v, &k, nil, nil); e != nil {
@@ -1340,7 +1339,7 @@ func (c *ParamsContext) DisplaySMT2(v *ParamsRef, module *string, d *ParamDescrs
 	return string(c.workspace), nil
 }
 func (c *ParamsContext) appendDescrs(d *ParamDescrs) error {
-	var names []Symbol
+	var names []usymbol.Symbol
 	for key := range d.entries.All() {
 		names = append(names, key)
 	}
@@ -1572,7 +1571,7 @@ func (c *ParamsContext) DisplayKeyName(v *ParamsRef, name *string) (string, erro
 	}
 	return string(c.workspace), nil
 }
-func (c *ParamsContext) FormatKeyInto(v *ParamsRef, k Symbol, dst []byte) (int, error) {
+func (c *ParamsContext) FormatKeyInto(v *ParamsRef, k usymbol.Symbol, dst []byte) (int, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if e := c.format(v, &k, nil, nil); e != nil {
@@ -1601,12 +1600,12 @@ func (c *ParamsContext) FormatSMT2Into(v *ParamsRef, module *string, d *ParamDes
 }
 
 // Caller holds d.mu throughout validation, including prefix publication.
-func paramsDescrKindInModule(d *ParamDescrs, name *Symbol) (ParamKind, error) {
+func paramsDescrKindInModule(d *ParamDescrs, name *usymbol.Symbol) (ParamKind, error) {
 	k, e := d.kind(*name)
 	if e != nil || k != ParamInvalid || name.IsNumerical() {
 		return k, e
 	}
-	if *name == (Symbol{}) {
+	if *name == (usymbol.Symbol{}) {
 		return ParamInvalid, ErrParamDescrsPrecondition
 	}
 	prefix, suffix, split, e := d.splitName(*name)

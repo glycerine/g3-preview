@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Actual lexical headers live inline in the charged manager. The pointer stack
@@ -421,7 +422,9 @@ func (p *astLowLevelPrinter) parameters(info *astInfoRecord) (bool, error) {
 	}
 	return all, nil
 }
-func (p *astLowLevelPrinter) symbol(s util.Symbol) error { return appendASTSymbol(p.out, p.manager, s) }
+func (p *astLowLevelPrinter) symbol(s usymbol.Symbol) error {
+	return appendASTSymbol(p.out, p.manager, s)
+}
 func (p *astLowLevelPrinter) ref(r astNodeRef) error {
 	if e := p.out.AppendCString("#"); e != nil {
 		return e
@@ -947,7 +950,7 @@ func (p *astLowLevelPrinter) process(r astNodeRef) error {
 	return ErrASTDomain
 }
 
-func appendASTSymbol(out *util.NumericTextStream, m *ASTManager, s util.Symbol) error {
+func appendASTSymbol(out *util.NumericTextStream, m *ASTManager, s usymbol.Symbol) error {
 	if ASTSourceDebug && s.IsMarked() {
 		return ErrASTDomain
 	}
@@ -955,7 +958,7 @@ func appendASTSymbol(out *util.NumericTextStream, m *ASTManager, s util.Symbol) 
 		if s.IsNull() {
 			return out.AppendCString("null")
 		}
-		v, e := m.Symbols.CStringView(s)
+		v, e := util.SymbolCStringView(m.Symbols, s)
 		if e != nil {
 			return e
 		}

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Public reallocs reach the source LP64 signed-overflow guarded domain. They
@@ -59,7 +60,7 @@ func TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop(t 
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -131,7 +132,7 @@ func TestParamsReferenceCleanupDecrementActualLeafReceipt(t *testing.T) {
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -238,7 +239,7 @@ func TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration(t *test
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -337,7 +338,7 @@ func TestParamsReferenceIndependentStoppedBlocksAndReplacementGeneration(t *test
 
 // Cold graph uses the actual named owners and their typed backing capacities.
 // Source allocation counters remain separate from this physical Go charge.
-func paramsDecAuditColdGraph(t *testing.T, q *RationalService, m *IntegerManager, r *Runtime, bn *arena.Budget, c *ParamsContext, bc *arena.Budget, sy *SymbolManager, bs *arena.Budget) {
+func paramsDecAuditColdGraph(t *testing.T, q *RationalService, m *IntegerManager, r *Runtime, bn *arena.Budget, c *ParamsContext, bc *arena.Budget, sy *usymbol.Manager, bs *arena.Budget) {
 	t.Helper()
 	qv := reflect.ValueOf(q).Elem()
 	qm := testFieldBySourceName(qv, "manager").Elem()

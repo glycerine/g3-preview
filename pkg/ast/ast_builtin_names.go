@@ -6,12 +6,12 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type ASTBuiltinName struct {
 	Kind int32
-	Name util.Symbol
+	Name usymbol.Symbol
 }
 
 // Caller-owned concrete svector<builtin_name> counterpart. Items borrows the
@@ -30,7 +30,7 @@ func (v *ASTBuiltinNames) Close() {
 	}
 	v.items, v.budget = nil, nil
 }
-func (v *ASTBuiltinNames) push(b *arena.Budget, name util.Symbol, kind int32) error {
+func (v *ASTBuiltinNames) push(b *arena.Budget, name usymbol.Symbol, kind int32) error {
 	if v.budget != nil && v.budget != b {
 		return ErrASTDomain
 	}
@@ -65,7 +65,7 @@ func (m *ASTManager) appendBuiltinName(names *ASTBuiltinNames, text string, kind
 
 // Source: src/ast/arith_decl_plugin.cpp:542;
 // src/ast/bv_decl_plugin.cpp:673,720.
-func (m *ASTManager) builtinAllLogic(logic util.Symbol) (bool, error) {
+func (m *ASTManager) builtinAllLogic(logic usymbol.Symbol) (bool, error) {
 	if logic.IsNull() {
 		return true, nil
 	}

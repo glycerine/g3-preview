@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTProofArgumentGrowthUsesGoSliceStorage(t *testing.T) {
@@ -62,7 +63,7 @@ func TestASTProofUnitResolutionCountShortCircuit(t *testing.T) {
 func TestASTProofUnitResolutionLexicalScratchPeak(t *testing.T) {
 	fixture := func(limit uint64) (*ASTManager, []ASTHandle) {
 		b := arena.NewBudget(limit)
-		s, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+		s, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
 		q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
 		astTestMust(t, e)

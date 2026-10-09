@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTModelValueNameInlineAndOverflowAccounting(t *testing.T) {
@@ -21,7 +21,7 @@ func TestASTModelValueNameInlineAndOverflowAccounting(t *testing.T) {
 	}
 	before := m.BudgetField.Used()
 	m.BudgetField.FailAfter(0)
-	var got util.Symbol
+	var got usymbol.Symbol
 	var failure error
 	n := testing.AllocsPerRun(100, func() { got, failure = m.modelValueName(name, -2147483648) })
 	m.BudgetField.FailAfter(-1)
@@ -45,7 +45,7 @@ func TestASTModelValueNameInlineAndOverflowAccounting(t *testing.T) {
 
 func TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	s, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+	s, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -89,7 +89,7 @@ func TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit(t *testing.T) {
 	}
 	baseline := s.Stats()
 	b.FailAfter(0)
-	var got util.Symbol
+	var got usymbol.Symbol
 	var failure error
 	allocations := testing.AllocsPerRun(100, func() { got, failure = s.InternBytes(input) })
 	if failure != nil || got != value || allocations != 1 {
@@ -108,7 +108,7 @@ func TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit(t *testing.T) {
 
 func TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
-	s, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+	s, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	if e != nil {
 		t.Fatal(e)
 	}

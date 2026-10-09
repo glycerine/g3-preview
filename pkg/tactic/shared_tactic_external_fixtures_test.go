@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func goalTestNew(t *testing.T, m *ast.ASTManager, proofs, cores bool) *tactic.Goal {
@@ -62,7 +63,7 @@ type modelConverterTestLeaf struct {
 	calls  *[]string
 	refs   uint32
 	closed bool
-	label  util.Symbol
+	label  usymbol.Symbol
 	run    func(*tactic.ModelRef, uint32) error
 	fail   error
 }
@@ -130,10 +131,10 @@ func proofTestBool(t *testing.T, m *ast.ASTManager, name string) ast.ASTHandle {
 	astTestMust(t, e)
 	return h
 }
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *util.SymbolManager, *util.RationalService) {
+func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	if e != nil {
 		t.Fatal(e)
 	}

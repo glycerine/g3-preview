@@ -1,5 +1,5 @@
 // Source: src/util/symbol.cpp:70-83.
-package util
+package symbol
 
 import (
 	"errors"
@@ -11,12 +11,12 @@ import (
 
 func TestSymbolServiceSourcePublicationAndReinitialize(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
-	s, e := NewSymbolService(SymbolConfig{Budget: b})
+	s, e := NewService(Config{Budget: b})
 	if e != nil {
 		t.Fatal(e)
 	}
 	header := b.Used()
-	if _, e = s.Manager(); !errors.Is(e, ErrSymbolServiceUninitialized) {
+	if _, e = s.Manager(); !errors.Is(e, ErrServiceUninitialized) {
 		t.Fatal("static null pointer", e)
 	}
 	if e = s.FinalizeSource(); e != nil || b.Used() != header {
@@ -45,7 +45,7 @@ func TestSymbolServiceSourcePublicationAndReinitialize(t *testing.T) {
 	if e = s.FinalizeSource(); e != nil || b.Used() != header {
 		t.Fatal("finalize", e, b.Used())
 	}
-	if _, e = s.Manager(); !errors.Is(e, ErrSymbolServiceUninitialized) {
+	if _, e = s.Manager(); !errors.Is(e, ErrServiceUninitialized) {
 		t.Fatal("pointer cleared", e)
 	}
 	if _, e = m.Intern("dead"); !errors.Is(e, arena.ErrClosed) {
@@ -60,7 +60,7 @@ func TestSymbolServiceSourcePublicationAndReinitialize(t *testing.T) {
 	if e != nil || fresh == old {
 		t.Fatal("fresh owner", e)
 	}
-	if _, e = next.String(old); !errors.Is(e, ErrSymbolOwner) {
+	if _, e = next.String(old); !errors.Is(e, ErrOwner) {
 		t.Fatal("stale identity accepted", e)
 	}
 	if e = s.Close(); e != nil || b.Used() != 0 {
@@ -79,7 +79,7 @@ func TestSymbolServiceSourceEveryConstructorReservation(t *testing.T) {
 		success := false
 		for prefix := int64(0); prefix < 40; prefix++ {
 			b := arena.NewBudget(1 << 24)
-			s, e := NewSymbolService(SymbolConfig{Budget: b, DirectOnly: direct})
+			s, e := NewService(Config{Budget: b, DirectOnly: direct})
 			if e != nil {
 				t.Fatal(e)
 			}
@@ -131,25 +131,25 @@ func TestSymbolServiceSourceEveryConstructorReservation(t *testing.T) {
 func TestSymbolServiceSourceCopiedOwnerAndPrepareFailure(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	b.FailAfter(0)
-	if s, e := NewSymbolService(SymbolConfig{Budget: b}); s != nil || !errors.Is(e, arena.ErrInjectedFailure) || b.Used() != 0 {
+	if s, e := NewService(Config{Budget: b}); s != nil || !errors.Is(e, arena.ErrInjectedFailure) || b.Used() != 0 {
 		t.Fatal("cold owner refusal", s, e, b.Used())
 	}
 	b.FailAfter(-1)
-	s, e := NewSymbolService(SymbolConfig{Budget: b})
+	s, e := NewService(Config{Budget: b})
 	if e != nil {
 		t.Fatal(e)
 	}
-	copy := new(SymbolService)
+	copy := new(Service)
 	reflect.ValueOf(copy).Elem().Set(reflect.ValueOf(s).Elem())
 	used := b.Used()
 	b.FailAfter(0)
-	if e = copy.InitializeSource(); !errors.Is(e, ErrSymbolServiceOwner) {
+	if e = copy.InitializeSource(); !errors.Is(e, ErrServiceOwner) {
 		t.Fatal("copied init", e)
 	}
-	if e = copy.FinalizeSource(); !errors.Is(e, ErrSymbolServiceOwner) {
+	if e = copy.FinalizeSource(); !errors.Is(e, ErrServiceOwner) {
 		t.Fatal("copied finalize", e)
 	}
-	if e = copy.Close(); !errors.Is(e, ErrSymbolServiceOwner) || b.Used() != used {
+	if e = copy.Close(); !errors.Is(e, ErrServiceOwner) || b.Used() != used {
 		t.Fatal("copied cleanup", e)
 	}
 	b.FailAfter(-1)

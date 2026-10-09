@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTArithmeticSourceRegistrationAndDeclarations(t *testing.T) {
@@ -106,7 +106,7 @@ func TestASTArithmeticSourceEverySymbolAndMemberAcquisition(t *testing.T) {
 	success := false
 	for ordinal := int64(0); ordinal < 256; ordinal++ {
 		b := arena.NewBudget(1 << 30)
-		sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+		sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
 		m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
 		astTestMust(t, e)

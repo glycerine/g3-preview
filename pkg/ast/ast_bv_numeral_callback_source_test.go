@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Actual returning Go ErrorTransport profile; no native C++ callback equivalence.
@@ -60,7 +61,7 @@ func TestASTBitVectorNumericalPowerRealCallbackOwnerGuard(t *testing.T) {
 		astTestMust(t, e)
 		target, e = q.NewValue()
 		astTestMust(t, e)
-		sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+		sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
 		m, e := NewASTManager(ASTManagerConfig{Budget: b, Symbols: sy, Numerals: q})
 		astTestMust(t, e)

@@ -5,7 +5,7 @@ package ast
 import (
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Actual symbol-member owners. Source symbols borrow the symbol table; they
@@ -15,7 +15,7 @@ type astAuxiliaryPluginOwner struct {
 	self                 *astAuxiliaryPluginOwner
 	owner                *ASTManager
 	next                 *astAuxiliaryPluginOwner
-	symbols              [17]util.Symbol
+	symbols              [17]usymbol.Symbol
 	kind                 astPluginKind
 	initialized          uint32
 	family               FamilyID

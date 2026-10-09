@@ -3,6 +3,8 @@ package util
 
 import (
 	"reflect"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Prepared cold storage retains the actual acquired new_entry value when
@@ -20,7 +22,7 @@ type ParamsSetReceipt struct {
 }
 
 func paramsSetFrameBytes(n int) uint64 { return paramsBytes(n, reflect.TypeOf(paramsSetFrame{})) }
-func (c *ParamsContext) setNewNumeral(slot uint32, key Symbol, value *OwnedRational) error {
+func (c *ParamsContext) setNewNumeral(slot uint32, key usymbol.Symbol, value *OwnedRational) error {
 	frame := &c.SetFrames[slot-1]
 	if frame.Active {
 		return ErrParamsPrecondition

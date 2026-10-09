@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTSequenceSourceSetManagerAndRecursiveSignatureInitialization(t *testing.T) {
@@ -80,7 +80,7 @@ func TestASTSequenceEveryActualConstructorAndSignatureReservation(t *testing.T) 
 	failed, complete := false, false
 	for ordinal := int64(0); ordinal < 512; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+		sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
 		m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
 		astTestMust(t, e)
@@ -146,7 +146,7 @@ func TestASTSequenceSourceFinalizeRetainsUnjoinedSignatureUntilContextEnd(t *tes
 	reached := false
 	for ordinal := int64(0); ordinal < 110; ordinal++ {
 		b := arena.NewBudget(1 << 28)
-		sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+		sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 		astTestMust(t, e)
 		m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
 		astTestMust(t, e)

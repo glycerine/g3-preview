@@ -8,7 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // The two source dictionaries hold scalar indices into their cold descriptor
@@ -18,9 +18,9 @@ import (
 
 type tacticManager struct {
 	self                      *tacticManager
-	symbols                   *util.SymbolManager
+	symbols                   *usymbol.Manager
 	budget                    *arena.Budget
-	nameToTactic, nameToProbe util.SymbolDictionaryInt32
+	nameToTactic, nameToProbe usymbol.DictionaryInt32
 	tactics                   []*tacticCmd
 	probes                    []*tacticProbeInfo
 	pendingTactic             *tacticCmd
@@ -29,11 +29,11 @@ type tacticManager struct {
 	closed                    bool
 }
 
-func newTacticManager(s *util.SymbolManager, b *arena.Budget) (*tacticManager, error) {
+func newTacticManager(s *usymbol.Manager, b *arena.Budget) (*tacticManager, error) {
 	if s == nil {
-		return nil, util.ErrSymbolOwner
+		return nil, usymbol.ErrOwner
 	}
-	if _, e := s.Hash(util.Symbol{}); e != nil {
+	if _, e := s.Hash(usymbol.Symbol{}); e != nil {
 		return nil, e
 	}
 	n := uint64(reflect.TypeOf(tacticManager{}).Size())
@@ -57,7 +57,7 @@ func (r *tacticManager) open() error {
 	if r == nil || r.self != r || r.closed {
 		return errTacticRegistryOwner
 	}
-	_, e := r.symbols.Hash(util.Symbol{})
+	_, e := r.symbols.Hash(usymbol.Symbol{})
 	return e
 }
 func (r *tacticManager) InsertTactic(cmd *tacticCmd) error {
@@ -152,7 +152,7 @@ func (r *tacticManager) InsertProbe(info *tacticProbeInfo) error {
 	r.pendingProbe = nil
 	return nil
 }
-func (r *tacticManager) FindTactic(name util.Symbol) (*tacticCmd, error) {
+func (r *tacticManager) FindTactic(name usymbol.Symbol) (*tacticCmd, error) {
 	if e := r.open(); e != nil {
 		return nil, e
 	}
@@ -169,7 +169,7 @@ func (r *tacticManager) FindTactic(name util.Symbol) (*tacticCmd, error) {
 	}
 	return nil, errTacticRegistryOwner
 }
-func (r *tacticManager) FindProbe(name util.Symbol) (*tacticProbeInfo, error) {
+func (r *tacticManager) FindProbe(name usymbol.Symbol) (*tacticProbeInfo, error) {
 	if e := r.open(); e != nil {
 		return nil, e
 	}

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestSMT2SimpleExhaustiveBytes(t *testing.T) {
@@ -55,11 +56,11 @@ func TestSMT2QuotedCStringSourceBranches(t *testing.T) {
 	}
 }
 func TestSMT2SymbolSourcePreconditionAndLifetime(t *testing.T) {
-	m, e := NewSymbolManager(SymbolConfig{})
+	m, e := usymbol.NewManager(usymbol.Config{})
 	if e != nil {
 		t.Fatal(e)
 	}
-	foreign, _ := NewSymbolManager(SymbolConfig{})
+	foreign, _ := usymbol.NewManager(usymbol.Config{})
 	defer foreign.Close()
 	s, _ := m.Intern("a |\\\xff")
 	want := "|a \\|\\\\\xff|"
@@ -67,7 +68,7 @@ func TestSMT2SymbolSourcePreconditionAndLifetime(t *testing.T) {
 	if e != nil || got != want {
 		t.Fatalf("%q %v", got, e)
 	}
-	for _, v := range []Symbol{{}, NumericalSymbol(5)} {
+	for _, v := range []usymbol.Symbol{{}, usymbol.Numerical(5)} {
 		q, e := IsSMT2QuotedSymbol(m, v)
 		if e != nil || q {
 			t.Fatal(q, e)
@@ -82,15 +83,15 @@ func TestSMT2SymbolSourcePreconditionAndLifetime(t *testing.T) {
 		t.Fatal(e)
 	}
 	marked, _ := s.Mark()
-	for _, v := range []Symbol{marked, DummySymbol()} {
-		if _, e = IsSMT2QuotedSymbol(m, v); !errors.Is(e, ErrInvalidSymbol) {
+	for _, v := range []usymbol.Symbol{marked, usymbol.Dummy()} {
+		if _, e = IsSMT2QuotedSymbol(m, v); !errors.Is(e, usymbol.ErrInvalid) {
 			t.Fatal(e)
 		}
 	}
-	if _, e = IsSMT2QuotedSymbol(foreign, s); !errors.Is(e, ErrSymbolOwner) {
+	if _, e = IsSMT2QuotedSymbol(foreign, s); !errors.Is(e, usymbol.ErrOwner) {
 		t.Fatal(e)
 	}
-	if _, e = IsSMT2QuotedSymbol(nil, s); !errors.Is(e, ErrInvalidSymbol) {
+	if _, e = IsSMT2QuotedSymbol(nil, s); !errors.Is(e, usymbol.ErrInvalid) {
 		t.Fatal(e)
 	}
 	stale := s
@@ -108,7 +109,7 @@ func TestSMT2SymbolSourcePreconditionAndLifetime(t *testing.T) {
 }
 func TestSMT2QuoteGoBufferAndIndependentBytes(t *testing.T) {
 	ownerBudget := arena.NewBudget(^uint64(0))
-	m, _ := NewSymbolManager(SymbolConfig{Budget: ownerBudget})
+	m, _ := usymbol.NewManager(usymbol.Config{Budget: ownerBudget})
 	defer m.Close()
 	for _, n := range []int{61, 62, 63, 64, 65, 200} {
 		raw := strings.Repeat("x", n) + "|\\\xff"
@@ -124,7 +125,7 @@ func TestSMT2QuoteGoBufferAndIndependentBytes(t *testing.T) {
 
 func TestSMT2QuoteLongGoBufferAndNoBorrowCharges(t *testing.T) {
 	ownerBudget := arena.NewBudget(^uint64(0))
-	m, _ := NewSymbolManager(SymbolConfig{Budget: ownerBudget})
+	m, _ := usymbol.NewManager(usymbol.Config{Budget: ownerBudget})
 	defer m.Close()
 	s, _ := m.Intern(" " + strings.Repeat("x", 125))
 	baseline := ownerBudget.Used()

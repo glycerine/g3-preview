@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay(t *testing.T) {
@@ -17,7 +18,7 @@ func TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay(t *testing.T)
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -125,7 +126,7 @@ func TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops(t *testing.T) 
 				paramsMust(t, e)
 				q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 				paramsMust(t, e)
-				sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+				sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 				paramsMust(t, e)
 				c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 				paramsMust(t, e)
@@ -231,8 +232,8 @@ func TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops(t *testing.T) 
 					t.Fatal(beforeRoots, stopped)
 				}
 				paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
-				absent := Symbol{} // Numerical key 17 never appears in this actual fixture.
-				absent = NumericalSymbol(17)
+				absent := usymbol.Symbol{} // Numerical key 17 never appears in this actual fixture.
+				absent = usymbol.Numerical(17)
 				oldSerial := c.sourceSerial
 				sentinel := ParamsResetKeyReceipt{invocation: 123, index: 456}
 				paramsMust(t, c.ResetKeyTracked(&v, absent, &sentinel))
@@ -325,7 +326,7 @@ func TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish(t *testing.
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -436,7 +437,7 @@ func TestParamsReferenceMatchedReplacementAllPreparedTextPrefixes(t *testing.T) 
 			paramsMust(t, e)
 			q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 			paramsMust(t, e)
-			sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+			sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 			paramsMust(t, e)
 			c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 			paramsMust(t, e)
@@ -551,7 +552,7 @@ func TestParamsReferenceMatchedReplacementIndependentFramesAndReuse(t *testing.T
 	paramsMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Memory: r, Profile: SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
 	paramsMust(t, e)
-	sy, e := NewSymbolManager(SymbolConfig{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
 	paramsMust(t, e)
 	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
 	paramsMust(t, e)
@@ -657,7 +658,7 @@ func TestParamsReferenceMatchedReplacementIndependentFramesAndReuse(t *testing.T
 	if !errors.Is(c.CompleteSetReplacement(&w, second), ErrParamsPrecondition) {
 		t.Fatal("double completion")
 	}
-	got, e := c.GetSymbol(&w, k, Symbol{})
+	got, e := c.GetSymbol(&w, k, usymbol.Symbol{})
 	paramsMust(t, e)
 	if got != replacement {
 		t.Fatal("actual second symbol field")

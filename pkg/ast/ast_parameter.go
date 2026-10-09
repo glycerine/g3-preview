@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func (m *ASTManager) parameter(p ASTParameter) (*astParameterRecord, error) {
@@ -117,7 +118,7 @@ func (m *ASTManager) NewParameterAST(value ASTHandle) (ASTParameter, error) {
 	defer m.mu.Unlock()
 	return m.newParameterAST(value)
 }
-func (m *ASTManager) newParameterSymbol(value util.Symbol) (ASTParameter, error) {
+func (m *ASTManager) newParameterSymbol(value usymbol.Symbol) (ASTParameter, error) {
 	if _, e := m.Symbols.Hash(value); e != nil {
 		return ASTParameter{}, e
 	}
@@ -129,7 +130,7 @@ func (m *ASTManager) newParameterSymbol(value util.Symbol) (ASTParameter, error)
 	}
 	return p, e
 }
-func (m *ASTManager) NewParameterSymbol(value util.Symbol) (ASTParameter, error) {
+func (m *ASTManager) NewParameterSymbol(value usymbol.Symbol) (ASTParameter, error) {
 	if e := m.lock(); e != nil {
 		return ASTParameter{}, e
 	}

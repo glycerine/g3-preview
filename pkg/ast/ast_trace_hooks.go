@@ -2,7 +2,7 @@
 // src/util/symbol.h:97-110.
 package ast
 
-import ()
+import "github.com/glycerine/g3/pkg/util"
 
 func (m *ASTManager) traceApp(r astNodeRef) error {
 	if m.TraceStream == nil {
@@ -25,7 +25,7 @@ func (m *ASTManager) traceApp(r astNodeRef) error {
 		// Actual strcmp against the literal name reads borrowed spelling here,
 		// before the source else-if label predicate and low-level printer.
 		if !d.name.IsNumerical() && !d.name.IsMarked() && !d.name.IsNull() {
-			view, e := m.Symbols.CStringView(d.name)
+			view, e := util.SymbolCStringView(m.Symbols, d.name)
 			if e != nil {
 				return e
 			}

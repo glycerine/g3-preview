@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func sharedTestApp(t *testing.T, m *ASTManager, args ...ASTHandle) ASTHandle {
@@ -179,7 +179,7 @@ func TestASTSharedOccurrencesAllTraversalPolicies(t *testing.T) {
 	astTestMust(t, e)
 	b, e := m.MkBoolSort()
 	astTestMust(t, e)
-	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: sub, Patterns: []ASTHandle{pattern}})
+	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: sub, Patterns: []ASTHandle{pattern}})
 	astTestMust(t, e)
 	// sub occurs once as body and once under the pattern. RC alone does not
 	// qualify it: actual traversal must encounter it twice.

@@ -5,11 +5,12 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // The special token denotes only this manager's active lexical info object.
 // registerNode/copyInfo creates the real owned info before node publication.
-func (m *ASTManager) mkFreshFuncDecl(prefix, suffix util.Symbol, domain []ASTHandle, sort ASTHandle) (astNodeRef, error) {
+func (m *ASTManager) mkFreshFuncDecl(prefix, suffix usymbol.Symbol, domain []ASTHandle, sort ASTHandle) (astNodeRef, error) {
 	if m.freshInfoActive || m.freshInfoEpoch == math.MaxUint32 {
 		return astNodeRef{}, ErrASTPending
 	}
@@ -20,8 +21,8 @@ func (m *ASTManager) mkFreshFuncDecl(prefix, suffix util.Symbol, domain []ASTHan
 	info := ASTFuncDeclInfo{m.origin, math.MaxUint32, m.freshInfoEpoch}
 	var d astNodeRef
 	var e error
-	if prefix == (util.Symbol{}) && suffix == (util.Symbol{}) {
-		d, e = m.mkFuncDeclInfo(util.NumericalSymbol(m.freshID), domain, sort, info, false)
+	if prefix == (usymbol.Symbol{}) && suffix == (usymbol.Symbol{}) {
+		d, e = m.mkFuncDeclInfo(usymbol.Numerical(m.freshID), domain, sort, info, false)
 	} else {
 		d, e = m.freshNamedDecl(prefix, suffix, domain, sort, info)
 	}
@@ -45,7 +46,7 @@ func (m *ASTManager) mkFreshFuncDecl(prefix, suffix util.Symbol, domain []ASTHan
 	return d, nil
 }
 
-func (m *ASTManager) MkFreshFuncDecl(prefix, suffix util.Symbol, domain []ASTHandle, sort ASTHandle) (ASTHandle, error) {
+func (m *ASTManager) MkFreshFuncDecl(prefix, suffix usymbol.Symbol, domain []ASTHandle, sort ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}
@@ -70,7 +71,7 @@ func (m *ASTManager) MkFreshConstNullable(prefix *string, sort ASTHandle) (ASTHa
 	if e != nil {
 		return ASTHandle{}, e
 	}
-	d, e := m.mkFreshFuncDecl(p, util.Symbol{}, nil, sort)
+	d, e := m.mkFreshFuncDecl(p, usymbol.Symbol{}, nil, sort)
 	if e != nil {
 		return ASTHandle{}, e
 	}
@@ -79,13 +80,13 @@ func (m *ASTManager) MkFreshConstNullable(prefix *string, sort ASTHandle) (ASTHa
 }
 
 // This concrete source else scope destroys buffer before fresh_id publication.
-func (m *ASTManager) freshNamedDecl(prefix, suffix util.Symbol, domain []ASTHandle, sort ASTHandle, info ASTFuncDeclInfo) (astNodeRef, error) {
+func (m *ASTManager) freshNamedDecl(prefix, suffix usymbol.Symbol, domain []ASTHandle, sort ASTHandle, info ASTFuncDeclInfo) (astNodeRef, error) {
 	var buffer util.StringBuffer64
 	defer buffer.Close()
 	if e := buffer.AppendSymbol(m.Symbols, prefix); e != nil {
 		return astNodeRef{}, e
 	}
-	if prefix == (util.Symbol{}) {
+	if prefix == (usymbol.Symbol{}) {
 		if e := buffer.AppendCString("sk"); e != nil {
 			return astNodeRef{}, e
 		}
@@ -93,7 +94,7 @@ func (m *ASTManager) freshNamedDecl(prefix, suffix util.Symbol, domain []ASTHand
 	if e := buffer.AppendCString("!"); e != nil {
 		return astNodeRef{}, e
 	}
-	if suffix != (util.Symbol{}) {
+	if suffix != (usymbol.Symbol{}) {
 		if e := buffer.AppendSymbol(m.Symbols, suffix); e != nil {
 			return astNodeRef{}, e
 		}

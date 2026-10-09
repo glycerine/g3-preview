@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestRewriterCoreOriginalScopedCachesAndRootRestoration(t *testing.T) {
@@ -180,7 +180,7 @@ func TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields(t *testing.T)
 	pat, e := m.MkFamilyApp(2, 0, nil, []ast.ASTHandle{app})
 	satOK(t, e)
 	astTestPin(t, m, pat)
-	quant, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: app, Patterns: []ast.ASTHandle{pat}})
+	quant, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: app, Patterns: []ast.ASTHandle{pat}})
 	satOK(t, e)
 	astTestPin(t, m, quant)
 	c.frames = c.frames[:0]
@@ -198,7 +198,7 @@ func TestRewriterCoreSharedFramesQuantifierChildrenAndPackedFields(t *testing.T)
 		t.Fatal("grandchild accepted")
 	}
 	c.frames = c.frames[:0]
-	noPat, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []util.Symbol{util.NumericalSymbol(0)}, Body: app, NoPatterns: []ast.ASTHandle{q}})
+	noPat, e := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b}, Names: []usymbol.Symbol{usymbol.Numerical(0)}, Body: app, NoPatterns: []ast.ASTHandle{q}})
 	satOK(t, e)
 	astTestPin(t, m, noPat)
 	satOK(t, c.pushFrameCore(noPat, false, 0, 3))

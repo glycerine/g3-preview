@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // This concrete owner is embedded in the actual parameter facade header. No
@@ -186,16 +187,16 @@ func (m *ModuleParamsOwner) FrameStringView(f *ModuleParamsFrame, key string, de
 
 // Source: scripts/mk_genfile_common.py:842-851,895-921.
 // The symbol default is a real constructor expression before the Params getter.
-func (m *ModuleParamsOwner) FrameSymbol(f *ModuleParamsFrame, key, def string) (Symbol, error) {
+func (m *ModuleParamsOwner) FrameSymbol(f *ModuleParamsFrame, key, def string) (usymbol.Symbol, error) {
 	if e := m.ExecutingFrame(f); e != nil {
-		return Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	if !f.Acquired || f.DestructorStarted {
-		return Symbol{}, ErrParamsPrecondition
+		return usymbol.Symbol{}, ErrParamsPrecondition
 	}
 	d, e := m.Context.SymbolsField.Intern(def)
 	if e != nil {
-		return Symbol{}, e
+		return usymbol.Symbol{}, e
 	}
 	return m.Context.GetSymbolFallbackName(f.Local, &key, &f.Value, d)
 }

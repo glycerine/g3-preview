@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTProofCanonicalTrueFalseComplements(t *testing.T) {
@@ -135,9 +135,9 @@ func TestASTProofQuantifierRewriteAndNNFFamilies(t *testing.T) {
 	a, b := proofTestBool(t, m, "a"), proofTestBool(t, m, "b")
 	sort, e := m.MkBoolSort()
 	astTestMust(t, e)
-	q1, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{sort}, Names: []util.Symbol{astTestSymbol(t, m, "x")}, Body: a})
+	q1, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{sort}, Names: []usymbol.Symbol{astTestSymbol(t, m, "x")}, Body: a})
 	astTestMust(t, e)
-	q2, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{sort}, Names: []util.Symbol{astTestSymbol(t, m, "x")}, Body: b})
+	q2, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{sort}, Names: []usymbol.Symbol{astTestSymbol(t, m, "x")}, Body: b})
 	astTestMust(t, e)
 	p, e := m.MkProofRewrite(a, b)
 	astTestMust(t, e)

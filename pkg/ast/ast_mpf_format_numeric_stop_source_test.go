@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"math"
 	"reflect"
 	"testing"
@@ -51,7 +52,7 @@ func TestASTCheckpointMPFFormatTextYoungerNumeralStopProtectsNonemptyResult(t *t
 	config := util.IntegerConfig{Memory: rt, Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}}
 	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: config})
 	astTestMust(t, e)
-	symbols, e := util.NewSymbolManager(util.SymbolConfig{Budget: b})
+	symbols, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	astTestMust(t, e)
 	parent, e := NewASTManager(ASTManagerConfig{Symbols: symbols, Numerals: q, Budget: b})
 	astTestMust(t, e)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func binaryManager(t *testing.T) (*util.BinaryRationalManager, *arena.Budget) {
@@ -710,9 +711,9 @@ func rationalPublicationDirectOwner(t *testing.T, synch bool) (*util.RationalMan
 	})
 	return m, b
 }
-func sxOwner(t *testing.T, b *arena.Budget) (*util.SexprManager, *util.SymbolManager, *util.RationalService) {
+func sxOwner(t *testing.T, b *arena.Budget) (*util.SexprManager, *usymbol.Manager, *util.RationalService) {
 	t.Helper()
-	s, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+	s, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	sxMust(t, e)
 	q, e := util.NewRationalService(util.RationalServiceConfig{Integers: util.IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 2}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}}})
 	sxMust(t, e)
@@ -728,7 +729,7 @@ func sxOwner(t *testing.T, b *arena.Budget) (*util.SexprManager, *util.SymbolMan
 	})
 	return m, s, q
 }
-func internSymbol(t *testing.T, m *util.SymbolManager, text string) util.Symbol {
+func internSymbol(t *testing.T, m *usymbol.Manager, text string) usymbol.Symbol {
 	t.Helper()
 	s, e := m.Intern(text)
 	if e != nil {

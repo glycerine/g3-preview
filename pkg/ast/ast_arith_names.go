@@ -1,9 +1,9 @@
 // Source: src/ast/arith_decl_plugin.cpp:511-559.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 
-func (m *ASTManager) GetArithmeticSortNames(names *ASTBuiltinNames, logic util.Symbol) error {
+func (m *ASTManager) GetArithmeticSortNames(names *ASTBuiltinNames, logic usymbol.Symbol) error {
 	if e := m.lock(); e != nil {
 		return e
 	}
@@ -32,7 +32,7 @@ func (m *ASTManager) GetArithmeticSortNames(names *ASTBuiltinNames, logic util.S
 	return m.appendBuiltinName(names, "Real", 0)
 }
 
-func (m *ASTManager) GetArithmeticOpNames(names *ASTBuiltinNames, logic util.Symbol) error {
+func (m *ASTManager) GetArithmeticOpNames(names *ASTBuiltinNames, logic usymbol.Symbol) error {
 	if e := m.lock(); e != nil {
 		return e
 	}

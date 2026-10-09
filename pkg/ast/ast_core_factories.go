@@ -8,7 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func (m *ASTManager) requireKind(h ASTHandle, kind ASTKind) (astNodeRef, error) {
@@ -31,7 +31,7 @@ func (m *ASTManager) requireExpr(h ASTHandle) (astNodeRef, error) {
 	}
 	return r, nil
 }
-func (m *ASTManager) mkSort(name util.Symbol, info ASTSortInfo) (astNodeRef, error) {
+func (m *ASTManager) mkSort(name usymbol.Symbol, info ASTSortInfo) (astNodeRef, error) {
 	if info != (ASTSortInfo{}) {
 		if _, e := m.sortInfo(info); e != nil {
 			return astNodeRef{}, e
@@ -44,7 +44,7 @@ func (m *ASTManager) mkSort(name util.Symbol, info ASTSortInfo) (astNodeRef, err
 	*m.sortAt(r.slot) = astSortRecord{name: name, info: info}
 	return m.registerNode(r)
 }
-func (m *ASTManager) MkSort(name util.Symbol, info ASTSortInfo) (ASTHandle, error) {
+func (m *ASTManager) MkSort(name usymbol.Symbol, info ASTSortInfo) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}
@@ -52,10 +52,10 @@ func (m *ASTManager) MkSort(name util.Symbol, info ASTSortInfo) (ASTHandle, erro
 	r, e := m.mkSort(name, info)
 	return m.external(r), e
 }
-func (m *ASTManager) mkFuncDecl(name util.Symbol, domain []ASTHandle, rangeSort ASTHandle, info ASTFuncDeclInfo) (astNodeRef, error) {
+func (m *ASTManager) mkFuncDecl(name usymbol.Symbol, domain []ASTHandle, rangeSort ASTHandle, info ASTFuncDeclInfo) (astNodeRef, error) {
 	return m.mkFuncDeclInfo(name, domain, rangeSort, info, true)
 }
-func (m *ASTManager) mkFuncDeclInfo(name util.Symbol, domain []ASTHandle, rangeSort ASTHandle, info ASTFuncDeclInfo, collapseNull bool) (astNodeRef, error) {
+func (m *ASTManager) mkFuncDeclInfo(name usymbol.Symbol, domain []ASTHandle, rangeSort ASTHandle, info ASTFuncDeclInfo, collapseNull bool) (astNodeRef, error) {
 	if uint64(len(domain)) > math.MaxUint32 {
 		return astNodeRef{}, arena.ErrBounds
 	}
@@ -97,7 +97,7 @@ func (m *ASTManager) mkFuncDeclInfo(name util.Symbol, domain []ASTHandle, rangeS
 	}
 	return m.registerNode(r)
 }
-func (m *ASTManager) MkFuncDecl(name util.Symbol, domain []ASTHandle, rangeSort ASTHandle, info ASTFuncDeclInfo) (ASTHandle, error) {
+func (m *ASTManager) MkFuncDecl(name usymbol.Symbol, domain []ASTHandle, rangeSort ASTHandle, info ASTFuncDeclInfo) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}
@@ -108,7 +108,7 @@ func (m *ASTManager) MkFuncDecl(name util.Symbol, domain []ASTHandle, rangeSort 
 
 // MkFuncDeclWithInfo translates the source pointer overload. A nonzero
 // metadata token is preserved even when info.is_null() is true.
-func (m *ASTManager) MkFuncDeclWithInfo(name util.Symbol, domain []ASTHandle, rangeSort ASTHandle, info ASTFuncDeclInfo) (ASTHandle, error) {
+func (m *ASTManager) MkFuncDeclWithInfo(name usymbol.Symbol, domain []ASTHandle, rangeSort ASTHandle, info ASTFuncDeclInfo) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}
@@ -116,7 +116,7 @@ func (m *ASTManager) MkFuncDeclWithInfo(name util.Symbol, domain []ASTHandle, ra
 	r, e := m.mkFuncDeclInfo(name, domain, rangeSort, info, false)
 	return m.external(r), e
 }
-func (m *ASTManager) MkConst(name util.Symbol, sort ASTHandle) (ASTHandle, error) {
+func (m *ASTManager) MkConst(name usymbol.Symbol, sort ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}

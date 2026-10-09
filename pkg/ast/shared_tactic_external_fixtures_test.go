@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func goalTestAtom(t *testing.T, m *ast.ASTManager, name string) ast.ASTHandle {
@@ -42,10 +43,10 @@ func proofTestBool(t *testing.T, m *ast.ASTManager, name string) ast.ASTHandle {
 	astTestMust(t, e)
 	return h
 }
-func paramsTestOwner(t *testing.T) (*util.ParamsContext, *util.SymbolManager, *util.RationalService) {
+func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
-	sy, e := util.NewSymbolManager(util.SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -79,7 +80,7 @@ func satOK(t *testing.T, e error) {
 		t.Fatal(e)
 	}
 }
-func astTestSymbol(t *testing.T, m *ast.ASTManager, text string) util.Symbol {
+func astTestSymbol(t *testing.T, m *ast.ASTManager, text string) usymbol.Symbol {
 	t.Helper()
 	s, e := m.Symbols.Intern(text)
 	astTestMust(t, e)

@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func sxMust(t *testing.T, e error) {
@@ -19,9 +20,9 @@ func sxMust(t *testing.T, e error) {
 		t.Fatal(e)
 	}
 }
-func sxOwner(t *testing.T, b *arena.Budget) (*SexprManager, *SymbolManager, *RationalService) {
+func sxOwner(t *testing.T, b *arena.Budget) (*SexprManager, *usymbol.Manager, *RationalService) {
 	t.Helper()
-	s, e := NewSymbolManager(SymbolConfig{Budget: b, PageSize: 64, DescriptorPageSize: 2})
+	s, e := usymbol.NewManager(usymbol.Config{Budget: b, PageSize: 64, DescriptorPageSize: 2})
 	sxMust(t, e)
 	q, e := NewRationalService(RationalServiceConfig{Integers: IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 2}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b, PageSize: 2}}}})
 	sxMust(t, e)
@@ -709,10 +710,10 @@ func TestSexprAccessorsAndScalarIterator(t *testing.T) {
 	}
 	sxMust(t, m.CloseRef(&reference))
 	// Symbols have no RC; raw numeral values are copied at factory construction.
-	numeric, e := m.MkSymbol(NumericalSymbol(math.MaxUint32), 0, 0)
+	numeric, e := m.MkSymbol(usymbol.Numerical(math.MaxUint32), 0, 0)
 	sxMust(t, e)
 	sxRender(t, m, numeric, "k!-1", ErrSexprDisplayContinuation)
-	null, e := m.MkSymbol(Symbol{}, 0, 0)
+	null, e := m.MkSymbol(usymbol.Symbol{}, 0, 0)
 	sxMust(t, e)
 	sxRender(t, m, null, "null", ErrSexprDisplayContinuation)
 }

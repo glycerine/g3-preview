@@ -1,9 +1,9 @@
 // Source: src/ast/bv_decl_plugin.cpp:672-743.
 package ast
 
-import "github.com/glycerine/g3/pkg/util"
+import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 
-func (m *ASTManager) GetBitVectorSortNames(names *ASTBuiltinNames, logic util.Symbol) error {
+func (m *ASTManager) GetBitVectorSortNames(names *ASTBuiltinNames, logic usymbol.Symbol) error {
 	if e := m.lock(); e != nil {
 		return e
 	}
@@ -23,7 +23,7 @@ func (m *ASTManager) GetBitVectorSortNames(names *ASTBuiltinNames, logic util.Sy
 	return m.appendBuiltinName(names, "BitVec", 0)
 }
 
-func (m *ASTManager) GetBitVectorOpNames(names *ASTBuiltinNames, logic util.Symbol) error {
+func (m *ASTManager) GetBitVectorOpNames(names *ASTBuiltinNames, logic usymbol.Symbol) error {
 	if e := m.lock(); e != nil {
 		return e
 	}

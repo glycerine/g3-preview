@@ -296,7 +296,7 @@ func (s *NumericTextStream) AppendCString(v string) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	n := cSymbolLength(v)
+	n := nulStringLength(v)
 	if s.FileBad || s.fileFail {
 		return nil
 	}
