@@ -1,46 +1,33 @@
 // Source: src/model/func_interp.cpp:108-149,287-326.
 package model
 
-import (
-	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
-	"reflect"
-)
+import "github.com/glycerine/g3/pkg/ast"
 
 // Lexical ptr_vector<expr> used by set_else; resize completes all capacity
 // reservations before publishing the new length and default pointer suffix.
 type functionArgumentVector struct {
 	values []ast.ASTHandle
-	bytes  uint64
 }
 
-func (v *functionArgumentVector) resize(m *ast.ASTManager, n uint32) error {
-	for uint64(cap(v.values)) < uint64(n) {
-		width := uint64(reflect.TypeOf(ast.ASTHandle{}).Size())
-		capacity, e := util.SourceVectorCapacity(cap(v.values), width)
-		if e != nil {
-			return e
-		}
-		bytes := uint64(capacity) * width
-		if e = m.Budget().Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]ast.ASTHandle, len(v.values), capacity)
-		copy(next, v.values)
-		m.Budget().Release(v.bytes)
-		v.values = next
-		v.bytes = bytes
+func (v *functionArgumentVector) resize(_ *ast.ASTManager, n uint32) error {
+	if uint64(n) > uint64(int(^uint(0)>>1)) {
+		return ast.ErrASTDomain
 	}
 	old := len(v.values)
-	v.values = v.values[:n]
+	newLen := int(n)
+	if newLen > cap(v.values) {
+		next := make([]ast.ASTHandle, newLen)
+		copy(next, v.values)
+		v.values = next
+	} else {
+		v.values = v.values[:newLen]
+	}
 	for i := old; i < len(v.values); i++ {
 		v.values[i] = ast.ASTHandle{}
 	}
 	return nil
 }
-func (v *functionArgumentVector) close(m *ast.ASTManager) {
-	m.Budget().Release(v.bytes)
-	v.bytes = 0
+func (v *functionArgumentVector) close(_ *ast.ASTManager) {
 	v.values = nil
 }
 func functionIsOp(m *ast.ASTManager, h ast.ASTHandle, op int32) (bool, error) {

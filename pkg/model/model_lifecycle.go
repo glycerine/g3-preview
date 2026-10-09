@@ -9,7 +9,6 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 type modelUniverseCell struct {
@@ -240,24 +239,6 @@ func (md *Model) RegisterUniverse(s ast.ASTHandle, values []ast.ASTHandle) (err 
 			return errors.Join(e, m.DecRef(s))
 		}
 		u := &modelUniverse{sortOwned: true, ownerBytes: bytes}
-		// Directory metadata provides the Go counterpart of the allocated vector
-		// pointer. It is charged separately from source pointer-free map records.
-		if len(md.directory) == cap(md.directory) {
-			stride := uint64(reflect.TypeOf((*modelUniverse)(nil)).Size())
-			n, e := util.SourceVectorCapacity(cap(md.directory), stride)
-			if e != nil {
-				m.Budget().Release(bytes)
-				return errors.Join(e, m.DecRef(s))
-			}
-			if e = m.Budget().Reserve(uint64(n) * stride); e != nil {
-				m.Budget().Release(bytes)
-				return errors.Join(e, m.DecRef(s))
-			}
-			next := make([]*modelUniverse, len(md.directory), n)
-			copy(next, md.directory)
-			m.Budget().Release(uint64(cap(md.directory)) * stride)
-			md.directory = next
-		}
 		for _, v := range values {
 			if e = u.values.push(m, v); e != nil {
 				u.values.close(m)
@@ -339,7 +320,6 @@ func (md *Model) Close() error {
 	}
 	md.Universes.close(m)
 	md.sorts.close(m)
-	m.Budget().Release(uint64(cap(md.directory)) * uint64(reflect.TypeOf((*modelUniverse)(nil)).Size()))
 	md.directory = nil
 	if e := md.CoreField.closeCoreMembers(); e != nil {
 		return e

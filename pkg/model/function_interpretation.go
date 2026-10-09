@@ -2,11 +2,11 @@
 package model
 
 import (
+	"reflect"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
-	"github.com/glycerine/g3/pkg/util"
-	"reflect"
 )
 
 // FunctionInterpretation retains the original ordered function graph, fallback
@@ -21,7 +21,7 @@ type FunctionInterpretation struct {
 	fallback, cached, replacement ast.ASTHandle
 	argsAreValues                 bool
 	substitution                  *rewriter.VarSubstitution
-	bytes, entryBytes             uint64
+	bytes                         uint64
 	closing, closed               bool
 	drain                         uint32
 	cause                         error
@@ -136,24 +136,6 @@ func (f *FunctionInterpretation) InsertNewEntry(args []ast.ASTHandle, result ast
 	}
 	if !f.pending.argsAreValues {
 		f.argsAreValues = false
-	}
-	if len(f.entries) == cap(f.entries) {
-		width := uint64(reflect.TypeOf((*FunctionEntry)(nil)).Size())
-		n, e := util.SourceVectorCapacity(cap(f.entries), width)
-		if e != nil {
-			f.cause = e
-			return e
-		}
-		bytes := uint64(n) * width
-		if e = f.manager.Budget().Reserve(bytes); e != nil {
-			f.cause = e
-			return e
-		}
-		next := make([]*FunctionEntry, len(f.entries), n)
-		copy(next, f.entries)
-		f.manager.Budget().Release(f.entryBytes)
-		f.entries = next
-		f.entryBytes = bytes
 	}
 	f.entries = append(f.entries, f.pending)
 	f.pending = nil
@@ -303,8 +285,6 @@ func (f *FunctionInterpretation) Close() error {
 		}
 		*h = ast.ASTHandle{}
 	}
-	f.manager.Budget().Release(f.entryBytes)
-	f.entryBytes = 0
 	f.entries = nil
 	if f.pending != nil {
 		if e := f.pending.close(); e != nil {

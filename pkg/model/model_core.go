@@ -18,7 +18,6 @@ type ModelCore struct {
 	Constants                          modelConstantMap
 	Functions                          modelFunctionMap
 	functionDirectory                  []*FunctionInterpretation
-	functionDirectoryBytes             uint64
 	removedFunction                    *FunctionInterpretation
 	copiedFunction                     *FunctionInterpretation
 	removedDeclaration                 ast.ASTHandle
@@ -328,8 +327,6 @@ func (md *ModelCore) closeCoreMembers() error {
 	if e := md.finishFunctionRemoval(); e != nil {
 		return e
 	}
-	m.Budget().Release(md.functionDirectoryBytes)
-	md.functionDirectoryBytes = 0
 	md.functionDirectory = nil
 	md.functionDeclarations.close(m)
 	md.ConstantDeclarations.close(m)

@@ -4,9 +4,9 @@ package model
 
 import (
 	"errors"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
-	"reflect"
 )
 
 // Actual lexical vector<expr_ref_vector>, expr_ref and current row/argument
@@ -14,7 +14,6 @@ import (
 type arrayExpansion struct {
 	active             bool
 	stores             []ast.ASTRefVector
-	bytes              uint64
 	drain              int
 	row, copyRow, args ast.ASTRefVector
 	elseCase           ast.ASTRef
@@ -63,22 +62,6 @@ func (f *arrayExpansion) publishRow(m *ast.ASTManager) error {
 	return m.DelRefVector(&f.row)
 }
 func (f *arrayExpansion) appendRowCopy(m *ast.ASTManager, input ast.ASTRefVector) error {
-	if len(f.stores) == cap(f.stores) {
-		width := uint64(reflect.TypeOf(ast.ASTRefVector{}).Size())
-		n, e := util.SourceVectorCapacity(cap(f.stores), width)
-		if e != nil {
-			return e
-		}
-		bytes := uint64(n) * width
-		if e = m.Budget().Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]ast.ASTRefVector, len(f.stores), n)
-		copy(next, f.stores)
-		m.Budget().Release(f.bytes)
-		f.bytes = bytes
-		f.stores = next
-	}
 	var e error
 	f.copyRow, e = m.NewRefVector()
 	if e != nil {
@@ -151,7 +134,6 @@ func (f *arrayExpansion) closeStores(m *ast.ASTManager) error {
 		}
 		f.drain++
 	}
-	m.Budget().Release(f.bytes)
 	*f = arrayExpansion{}
 	return nil
 }

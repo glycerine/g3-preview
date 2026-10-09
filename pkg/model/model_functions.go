@@ -5,8 +5,6 @@ package model
 import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
-	"reflect"
 )
 
 // Prepare cold provenance before source publication. Scalar table indices keep
@@ -16,22 +14,6 @@ func (md *ModelCore) functionSlot() (uint32, error) {
 		if fi == nil {
 			return uint32(i + 1), nil
 		}
-	}
-	if len(md.functionDirectory) == cap(md.functionDirectory) {
-		width := uint64(reflect.TypeOf((*FunctionInterpretation)(nil)).Size())
-		n, e := util.SourceVectorCapacity(cap(md.functionDirectory), width)
-		if e != nil {
-			return 0, e
-		}
-		bytes := uint64(n) * width
-		if e = md.manager.Budget().Reserve(bytes); e != nil {
-			return 0, e
-		}
-		next := make([]*FunctionInterpretation, len(md.functionDirectory), n)
-		copy(next, md.functionDirectory)
-		md.manager.Budget().Release(md.functionDirectoryBytes)
-		md.functionDirectory = next
-		md.functionDirectoryBytes = bytes
 	}
 	md.functionDirectory = append(md.functionDirectory, nil)
 	return uint32(len(md.functionDirectory)), nil
