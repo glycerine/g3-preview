@@ -36368,6 +36368,9 @@
         "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
         "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
         "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+        "TestPolynomialEvaluationNativeRationalDirectory",
+        "TestPolynomialEvaluationNativeIntegerDirectory",
+        "TestPolynomialEvaluationNativeIntervalDirectory",
         "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
         "TestPolynomialCompositionEveryReservation",
         "TestPolynomialCompositionBigScalarOverloadEveryReservation",
@@ -39454,6 +39457,9 @@
             "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
             "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
             "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+            "TestPolynomialEvaluationNativeRationalDirectory",
+            "TestPolynomialEvaluationNativeIntegerDirectory",
+            "TestPolynomialEvaluationNativeIntervalDirectory",
             "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
           ]
         },
@@ -41502,6 +41508,9 @@
         "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
         "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
         "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+        "TestPolynomialEvaluationNativeRationalDirectory",
+        "TestPolynomialEvaluationNativeIntegerDirectory",
+        "TestPolynomialEvaluationNativeIntervalDirectory",
         "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
         "TestPolynomialCompositionEveryReservation",
         "TestPolynomialCompositionBigScalarOverloadEveryReservation",
@@ -43056,6 +43065,9 @@
             "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
             "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
             "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+            "TestPolynomialEvaluationNativeRationalDirectory",
+            "TestPolynomialEvaluationNativeIntegerDirectory",
+            "TestPolynomialEvaluationNativeIntervalDirectory",
             "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
           ]
         },
@@ -106672,6 +106684,9 @@
         "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
         "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
         "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+        "TestPolynomialEvaluationNativeRationalDirectory",
+        "TestPolynomialEvaluationNativeIntegerDirectory",
+        "TestPolynomialEvaluationNativeIntervalDirectory",
         "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
         "TestPolynomialCompositionEveryReservation",
         "TestPolynomialCompositionBigScalarOverloadEveryReservation",
@@ -107153,6 +107168,9 @@
             "TestPolynomialEvaluationReachedDegreeAfterVariableBreak",
             "TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots",
             "TestPolynomialEvaluationLiveCallerClosePreservesCachedFrames",
+            "TestPolynomialEvaluationNativeRationalDirectory",
+            "TestPolynomialEvaluationNativeIntegerDirectory",
+            "TestPolynomialEvaluationNativeIntervalDirectory",
             "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
           ]
         },

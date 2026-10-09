@@ -32295,3 +32295,38 @@ sexpr arguments, followed by retained AST/SAT collections and text streams.
 Root util still has internal numeric/text/parameter cycles; the fresh file graph
 continues to show 287 files, 104 components and a largest 164-file component.
 Do not treat the locator conversion as proof of package-split readiness.
+
+## Native polynomial lexical frame directories
+
+Rational, integer and interval evaluation-frame pointer directories now use
+native Go append without capacity arithmetic, allocation overlap charges or
+capacity refunds. The same cleanup applies to GCD, ICCP and factor-core frame
+pointer directories. Each actual frame object/header remains charged once, with
+its own real numerical/reference fields and stopped-source cleanup. Cached frame
+identity, parent/child receipts, invocation generations and active/borrowed owner
+checks are unchanged. Physical audits count the actual frames, excluding native
+pointer-directory capacity.
+
+Three new native evaluation-directory tests each construct 4097 concrete frames
+through the same frame acquisition/destruction helpers used by evaluation. One
+real header reservation per cold frame suffices even at directory growth; a cold
+header refusal leaves the directory empty. Every frame address remains stable,
+an actual BIG numeral token survives growth and ends at frame destruction, and
+all cached frames can be reconstructed/reused with reservations disabled. These
+are storage-domain checks, not a claim that retained mathematical evaluation
+inputs reach a recursion depth of 4097. Existing independent evaluation results,
+full numeric-prefix physical censuses, cancellation, stopped younger destructor,
+GCD/ICCP and factor-core receipt/ownership campaigns remain.
+
+Validation: focused native evaluation passed (0.093s), new native frame-directory
+checks passed (0.015s), full native polynomial passed (34.718s). Focused g3debug
+evaluation, ICCP, GCD cancellation and factor-core/minimum-variable groups passed
+(3.584s). Module-wide compilation, polynomial vet, portcheck, gofmt and diff checks
+passed. Manifest statuses/counts remain 63 ported, 284 partial, 1727 unported and
+two dead/deleted of 2102 units; all 677 API operations remain unported. The
+22:43–22:45 UTC full native module checkpoint remains current.
+
+The overall util knot/split remains active. Remaining polynomial native-container
+work includes retained history/orphan collections and sexpr arguments. Then
+continue retained AST/SAT collections and text-stream consumers, and break the
+internal root-util numeric/text/parameter cycles before the actual package split.

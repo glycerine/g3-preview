@@ -98,18 +98,6 @@ func (m *MultivariatePolynomialManager) beginGCDFunction() (*polynomialGCDFuncti
 			return nil, ErrPolynomialPending
 		}
 	} else {
-		old, n := cap(m.gcdFrames), cap(m.gcdFrames)
-		if len(m.gcdFrames) == n {
-			n = n*2 + 1
-			stride := uint64(reflect.TypeOf((*polynomialGCDFunctionScope)(nil)).Size())
-			if e := m.core.integer.Budget().Reserve(uint64(n) * stride); e != nil {
-				return nil, e
-			}
-			next := make([]*polynomialGCDFunctionScope, len(m.gcdFrames), n)
-			copy(next, m.gcdFrames)
-			m.gcdFrames = next
-			m.core.integer.Budget().Release(uint64(old) * stride)
-		}
 		h := uint64(reflect.TypeOf(polynomialGCDFunctionScope{}).Size())
 		if e := m.core.integer.Budget().Reserve(h); e != nil {
 			return nil, e
@@ -298,13 +286,11 @@ func (m *MultivariatePolynomialManager) closeGCDMetadata() error {
 		m.originalBudget.Release(s.header)
 		s.header = 0
 	}
-	m.originalBudget.Release(uint64(cap(m.gcdFrames)) * uint64(reflect.TypeOf((*polynomialGCDFunctionScope)(nil)).Size()))
 	m.gcdFrames = nil
 	for _, s := range m.iccpFrames {
 		m.originalBudget.Release(s.header)
 		s.header = 0
 	}
-	m.originalBudget.Release(uint64(cap(m.iccpFrames)) * uint64(reflect.TypeOf((*polynomialICCPScope)(nil)).Size()))
 	m.iccpFrames = nil
 	return nil
 }

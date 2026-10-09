@@ -107,8 +107,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	public = append(public, input...)
 	adapterBytes += uint64(cap(full.squareRoot.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	adapterBytes += uint64(cap(full.squareRoot.orphanInvocations)) * 8
-
-	adapterBytes += uint64(cap(full.gcdFrames)) * uint64(reflect.TypeOf((*polynomialGCDFunctionScope)(nil)).Size())
 	for _, f := range full.gcdFrames {
 		adapterBytes += f.header
 		if !f.active {
@@ -124,12 +122,10 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 			references = append(references, &f.refs[i])
 		}
 	}
-	adapterBytes += uint64(cap(full.iccpFrames)) * uint64(reflect.TypeOf((*polynomialICCPScope)(nil)).Size())
 	for _, f := range full.iccpFrames {
 		adapterBytes += f.header
 	}
 	adapterBytes += uint64(cap(m.substitution.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
-	adapterBytes += uint64(cap(full.factorFrames)) * uint64(reflect.TypeOf((*polynomialFactorCoreFrame)(nil)).Size())
 	for _, frame := range full.factorFrames {
 		adapterBytes += frame.header
 		if frame.minimum != nil {
@@ -148,9 +144,9 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		public = append(public, &f.numeral)
 	}
 	es := &full.evaluation
-	adapterBytes += uint64(cap(es.rationalFrames))*uint64(reflect.TypeOf((*polynomialEvalRationalFrame)(nil)).Size()) + uint64(len(es.rationalFrames))*uint64(reflect.TypeOf(polynomialEvalRationalFrame{}).Size())
-	adapterBytes += uint64(cap(es.integerFrames))*uint64(reflect.TypeOf((*polynomialEvalIntegerFrame)(nil)).Size()) + uint64(len(es.integerFrames))*uint64(reflect.TypeOf(polynomialEvalIntegerFrame{}).Size())
-	adapterBytes += uint64(cap(es.intervalFrames))*uint64(reflect.TypeOf((*polynomialEvalIntervalFrame)(nil)).Size()) + uint64(len(es.intervalFrames))*uint64(reflect.TypeOf(polynomialEvalIntervalFrame{}).Size())
+	adapterBytes += uint64(len(es.rationalFrames)) * uint64(reflect.TypeOf(polynomialEvalRationalFrame{}).Size())
+	adapterBytes += uint64(len(es.integerFrames)) * uint64(reflect.TypeOf(polynomialEvalIntegerFrame{}).Size())
+	adapterBytes += uint64(len(es.intervalFrames)) * uint64(reflect.TypeOf(polynomialEvalIntervalFrame{}).Size())
 	for _, f := range es.rationalFrames {
 		public = append(public, &(*f.aux.BorrowNumerator()), &(*f.aux.BorrowDenominator()))
 	}

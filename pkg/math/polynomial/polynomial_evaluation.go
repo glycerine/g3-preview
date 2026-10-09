@@ -25,8 +25,8 @@ type polynomialEvalRationalFrame struct {
 }
 
 // Cached concrete Go frame objects represent lexical stack storage which must
-// remain reachable on a stopped destructor. Their actual headers and pointer
-// directory are charged; no source Runtime allocation ticket is generated.
+// remain reachable on a stopped destructor. Their actual headers are charged; the
+// pointer directories use native slices without simulated container charges.
 type polynomialEvaluationScope struct {
 	rationalFrames                       []*polynomialEvalRationalFrame
 	depth                                uint32
@@ -47,17 +47,6 @@ func (m *MultivariatePolynomialManager) evaluationRationalFrame() (*polynomialEv
 	s := &m.evaluation
 	i := int(s.depth)
 	if i == len(s.rationalFrames) {
-		if len(s.rationalFrames) == cap(s.rationalFrames) {
-			n := cap(s.rationalFrames)*2 + 1
-			bytes := uint64(n) * uint64(reflect.TypeOf((*polynomialEvalRationalFrame)(nil)).Size())
-			if e := m.originalBudget.Reserve(bytes); e != nil {
-				return nil, e
-			}
-			next := make([]*polynomialEvalRationalFrame, len(s.rationalFrames), n)
-			copy(next, s.rationalFrames)
-			m.originalBudget.Release(uint64(cap(s.rationalFrames)) * uint64(reflect.TypeOf((*polynomialEvalRationalFrame)(nil)).Size()))
-			s.rationalFrames = next
-		}
 		if e := m.originalBudget.Reserve(uint64(reflect.TypeOf(polynomialEvalRationalFrame{}).Size())); e != nil {
 			return nil, e
 		}
@@ -583,10 +572,10 @@ func (m *MultivariatePolynomialManager) closeEvaluationFrames() error {
 		return ErrPolynomialPending
 	}
 	size := uint64(reflect.TypeOf(polynomialEvalRationalFrame{}).Size())
-	m.originalBudget.Release(size*uint64(len(m.evaluation.rationalFrames)) + uint64(cap(m.evaluation.rationalFrames))*uint64(reflect.TypeOf((*polynomialEvalRationalFrame)(nil)).Size()))
+	m.originalBudget.Release(size * uint64(len(m.evaluation.rationalFrames)))
 	m.evaluation.rationalFrames = nil
-	m.originalBudget.Release(uint64(len(m.evaluation.integerFrames))*uint64(reflect.TypeOf(polynomialEvalIntegerFrame{}).Size()) + uint64(cap(m.evaluation.integerFrames))*uint64(reflect.TypeOf((*polynomialEvalIntegerFrame)(nil)).Size()))
-	m.originalBudget.Release(uint64(len(m.evaluation.intervalFrames))*uint64(reflect.TypeOf(polynomialEvalIntervalFrame{}).Size()) + uint64(cap(m.evaluation.intervalFrames))*uint64(reflect.TypeOf((*polynomialEvalIntervalFrame)(nil)).Size()))
+	m.originalBudget.Release(uint64(len(m.evaluation.integerFrames)) * uint64(reflect.TypeOf(polynomialEvalIntegerFrame{}).Size()))
+	m.originalBudget.Release(uint64(len(m.evaluation.intervalFrames)) * uint64(reflect.TypeOf(polynomialEvalIntervalFrame{}).Size()))
 	m.evaluation.integerFrames = nil
 	m.evaluation.intervalFrames = nil
 	return nil
@@ -622,17 +611,6 @@ func (m *MultivariatePolynomialManager) evaluationIntegerFrame() (*polynomialEva
 	s := &m.evaluation
 	i := int(s.depth)
 	if i == len(s.integerFrames) {
-		if len(s.integerFrames) == cap(s.integerFrames) {
-			n := cap(s.integerFrames)*2 + 1
-			bytes := uint64(n) * uint64(reflect.TypeOf((*polynomialEvalIntegerFrame)(nil)).Size())
-			if e := m.originalBudget.Reserve(bytes); e != nil {
-				return nil, e
-			}
-			next := make([]*polynomialEvalIntegerFrame, len(s.integerFrames), n)
-			copy(next, s.integerFrames)
-			m.originalBudget.Release(uint64(cap(s.integerFrames)) * uint64(reflect.TypeOf((*polynomialEvalIntegerFrame)(nil)).Size()))
-			s.integerFrames = next
-		}
 		if e := m.originalBudget.Reserve(uint64(reflect.TypeOf(polynomialEvalIntegerFrame{}).Size())); e != nil {
 			return nil, e
 		}
@@ -881,17 +859,6 @@ func (m *MultivariatePolynomialManager) evaluationIntervalFrame() (*polynomialEv
 	s := &m.evaluation
 	i := int(s.depth)
 	if i == len(s.intervalFrames) {
-		if len(s.intervalFrames) == cap(s.intervalFrames) {
-			n := cap(s.intervalFrames)*2 + 1
-			bytes := uint64(n) * uint64(reflect.TypeOf((*polynomialEvalIntervalFrame)(nil)).Size())
-			if e := m.originalBudget.Reserve(bytes); e != nil {
-				return nil, e
-			}
-			next := make([]*polynomialEvalIntervalFrame, len(s.intervalFrames), n)
-			copy(next, s.intervalFrames)
-			m.originalBudget.Release(uint64(cap(s.intervalFrames)) * uint64(reflect.TypeOf((*polynomialEvalIntervalFrame)(nil)).Size()))
-			s.intervalFrames = next
-		}
 		if e := m.originalBudget.Reserve(uint64(reflect.TypeOf(polynomialEvalIntervalFrame{}).Size())); e != nil {
 			return nil, e
 		}

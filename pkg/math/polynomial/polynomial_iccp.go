@@ -42,18 +42,6 @@ func (m *MultivariatePolynomialManager) iccpFrame() (*polynomialICCPScope, error
 		}
 		return s, nil
 	}
-	old, capacity := cap(m.iccpFrames), cap(m.iccpFrames)
-	if len(m.iccpFrames) == capacity {
-		capacity = capacity*2 + 1
-		bytes := uint64(capacity) * uint64(reflect.TypeOf((*polynomialICCPScope)(nil)).Size())
-		if e := m.core.integer.Budget().Reserve(bytes); e != nil {
-			return nil, e
-		}
-		frames := make([]*polynomialICCPScope, len(m.iccpFrames), capacity)
-		copy(frames, m.iccpFrames)
-		m.iccpFrames = frames
-		m.core.integer.Budget().Release(uint64(old) * uint64(reflect.TypeOf((*polynomialICCPScope)(nil)).Size()))
-	}
 	h := uint64(reflect.TypeOf(polynomialICCPScope{}).Size())
 	if e := m.core.integer.Budget().Reserve(h); e != nil {
 		return nil, e

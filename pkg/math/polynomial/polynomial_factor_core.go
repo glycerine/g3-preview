@@ -58,18 +58,6 @@ func (m *MultivariatePolynomialManager) beginFactorCore(r *PolynomialFactors) (*
 	if m.factorCoreInvocation == ^uint64(0) {
 		return nil, arena.ErrBounds
 	}
-	old := cap(m.factorFrames)
-	if len(m.factorFrames) == old {
-		n := old + old/2 + 1
-		stride := uint64(reflect.TypeOf((*polynomialFactorCoreFrame)(nil)).Size())
-		if e := m.originalBudget.Reserve(uint64(n) * stride); e != nil {
-			return nil, e
-		}
-		next := make([]*polynomialFactorCoreFrame, len(m.factorFrames), n)
-		copy(next, m.factorFrames)
-		m.factorFrames = next
-		m.originalBudget.Release(uint64(old) * stride)
-	}
 	size := uint64(reflect.TypeOf(polynomialFactorCoreFrame{}).Size())
 	if e := m.originalBudget.Reserve(size); e != nil {
 		return nil, e
@@ -664,7 +652,6 @@ func (m *MultivariatePolynomialManager) closeFactorCoreHistory() {
 	for _, s := range m.factorFrames {
 		m.originalBudget.Release(s.header)
 	}
-	m.originalBudget.Release(uint64(cap(m.factorFrames)) * uint64(reflect.TypeOf((*polynomialFactorCoreFrame)(nil)).Size()))
 	m.factorFrames = nil
 }
 
