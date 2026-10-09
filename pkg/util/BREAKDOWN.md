@@ -1511,3 +1511,33 @@ polynomial vet and portcheck passed. The full native module checkpoint remains
 and package split remain open. Next: remove the remaining shared monomial buffer
 from its actual conversion/interpolation consumers, then remaining concrete
 reference/numeral vector storage.
+
+## Native borrowed monomial locals
+
+Cross-manager conversion and sparse interpolation now collect borrowed monomial
+handles in `[]Monomial`. Conversion's separate native orphan slice retains only
+actual newly created zero-reference monomials, without custom capacity charges.
+Actual coefficient/numeral ownership, solver algorithms, degree filtering,
+monomial conversion and polynomial factory publication remain unchanged.
+
+Deleted the last shared inline128/spill monomial buffer and its codecs, Runtime
+expansion/pending/free paths, and the unused inline/raw factory span variants.
+The borrowed factory view accepts native handles and its remaining concrete
+polynomialVector consumer. Source destruction clears the native locals after the
+appropriate younger numeral/solver destruction; owning continuation retains real
+numeric/factory/monomial roots and exact foreign-owner protections.
+
+A 4097-entry lexical conversion regression grows both native locals with Runtime
+reservations disabled and checks the real returned factory root through source
+and owning cleanup. The former TLS pointer-buffer-free stop is retired with that
+removed backing. A 129-group single-sample sparse interpolation reconstructs the
+independent polynomial twice and checks all coefficient/monomial associations.
+Native borrowed-span tests preserve reset-before-read and unread-tail behavior.
+
+Validation: focused native and debug conversion/sparse/indexed-factory/GCD/imp
+checks passed (1.06s/1.10s), as did module-wide test compilation, polynomial vet
+and portcheck. The last full native polynomial checkpoint passed at the previous
+chunk (35.67s); the full native module checkpoint remains 20:08–20:11 UTC and is
+not due again yet. Counts remain 2102 units / 677 APIs: 63 ported, 284 partial,
+1727 unported and two dead/deleted. The complete util knot and package split
+remain open. Next: remaining concrete polynomial reference and numeral vectors.

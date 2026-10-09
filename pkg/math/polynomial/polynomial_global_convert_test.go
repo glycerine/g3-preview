@@ -203,77 +203,43 @@ func TestPolynomialGlobalConvertExactNumericForeignReplacement(t *testing.T) {
 	polynomialImpPhysicalAuditNamed(t, tm, nil, []*util.Int{&foreign}, 0)
 }
 
-// The published buffers and returned factory value are genuine. The public
-// signed-host counter recipe proves lexical stop order, not ordinary valid OOM.
-func TestPolynomialGlobalConvertReturnedResultSourceStop(t *testing.T) {
-	budget := arena.NewBudget(1 << 27)
-	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
-	serviceMust(t, e)
-	z, e := util.NewIntegerManager(util.IntegerConfig{Memory: rt, Profile: util.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
-	serviceMust(t, e)
-	m, e := NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: z, Checkpoint: func() bool { panic("local helper no checkpoint") }, Cooperation: func() error { panic("local helper no cooperation") }}})
-	serviceMust(t, e)
-	defer func() {
-		contextTLSFinish(t, rt, m.CleanupConversion)
-		contextTLSFinish(t, rt, m.CloseChecked)
-		contextTLSFinish(t, rt, z.CloseChecked)
-		contextTLSFinish(t, rt, rt.Close)
-		if budget.Used() != 0 {
-			t.Fatal("whole named graph", budget.Used())
-		}
-	}()
-	// Ordinary allocations establish genuine ID teardown capacities beforehand.
-	var warm [5]Polynomial
-	for i := range warm {
-		a := util.NewInt(int32(i + 9))
-		warm[i], e = m.core.MkConstantTake(&a)
-		serviceMust(t, e)
-		serviceMust(t, m.core.IncRef(warm[i]))
-	}
-	for _, p := range warm {
-		serviceMust(t, m.core.DecRef(p))
-	}
-	x, e := m.core.monomials.MkVar()
-	serviceMust(t, e)
-	term, e := m.core.monomials.MkVariable(x, 7)
-	serviceMust(t, e)
-	serviceMust(t, m.core.monomials.IncRef(term))
-	serviceMust(t, m.core.monomials.DecRef(term))
+func TestPolynomialGlobalConvertReturnedResultNativeMonomials(t *testing.T) {
+	m, _, _ := polynomialEvalFixture(t, nil)
 	serviceMust(t, m.beginConversion())
 	s := &m.conversion
+	t.Cleanup(func() { m.core.integer.Budget().FailAfter(-1); serviceMust(t, m.CleanupConversion()) })
 	unit, e := m.core.monomials.Unit()
 	serviceMust(t, e)
+	before, used := m.core.memory.Stats(), m.core.integer.Budget().Used()
+	m.core.integer.Budget().FailAfter(0)
 	zero := util.Int{}
-	for i := uint32(0); i < 16384; i++ {
-		serviceMust(t, s.ms.push(m.core, unit))
+	for i := 0; i < 4097; i++ {
+		s.ms = append(s.ms, unit)
 		serviceMust(t, s.as.Push(&zero))
 	}
+	if m.core.memory.Stats() != before || m.core.integer.Budget().Used() != used {
+		t.Fatal("native lexical storage charged Runtime")
+	}
+	m.core.integer.Budget().FailAfter(-1)
 	one := util.NewInt(1)
 	serviceMust(t, s.as.Set(0, &one))
 	av, e := s.as.View()
 	serviceMust(t, e)
-	mv := monomialArrayView{runtime: rt, raw: s.ms.raw, stride: 16, count: s.ms.size}
 	serviceMust(t, m.core.som.reset())
-	p, e := m.core.mkTermsSource(s.as.Count(), polynomialUnivariateCoefficients{array: av, indexed: true}, mv)
+	p, e := m.core.mkTermsSource(s.as.Count(), polynomialUnivariateCoefficients{array: av, indexed: true}, monomialArrayView{values: s.ms, count: uint32(len(s.ms))})
 	serviceMust(t, e)
 	if !s.ownsResult || s.result != p {
 		t.Fatal("actual source return expression ownership")
 	}
-	older := s.ms.raw
 	polynomialImpPhysicalAudit(t, m)
-	contextTLSNearMinimum(t, rt)
-	cause := m.finishConversion(nil)
-	if !errors.Is(cause, arena.ErrBounds) || s.as.Count() != 0 || s.ms.raw != (util.Block{}) || s.ms.raw == older || !s.ownsResult {
-		t.Fatal("native numeral buffer completed before pointer-buffer release stop", cause)
+	serviceMust(t, m.finishConversion(nil))
+	if s.as.Count() != 0 || s.ms != nil || !s.ownsResult {
+		t.Fatal("source lexical destruction lost returned root")
 	}
 	polynomialImpPhysicalAudit(t, m)
-	state, stats := rt.State(), rt.Stats()
-	if again := m.finishConversion(nil); again != cause || rt.State() != state || rt.Stats() != stats {
-		t.Fatal("literal sticky source stop", again)
-	}
-	contextTLSFinish(t, rt, m.CleanupConversion)
-	if s.result != (Polynomial{}) || s.sourceCause != cause || s.as.SourceCause() != nil {
-		t.Fatal("own abort/history")
+	serviceMust(t, m.CleanupConversion())
+	if s.result != (Polynomial{}) || s.active || s.orphans != nil {
+		t.Fatal("owning completion retained native scope")
 	}
 	polynomialImpPhysicalAudit(t, m)
 }

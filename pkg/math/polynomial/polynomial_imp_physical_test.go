@@ -48,8 +48,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		}
 	}
 
-	external = append(external, full.conversion.ms.raw, full.conversion.ms.pending)
-	adapterBytes += uint64(cap(full.conversion.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size())
 	if b := &full.conversion.as; b.Constructed {
 		for i := uint32(0); i < b.Count(); i++ {
 			a, e := b.Physical(i)

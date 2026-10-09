@@ -2,17 +2,12 @@
 // src/util/scoped_numeral_buffer.h.
 package polynomial
 
-import (
-	"reflect"
+import "github.com/glycerine/g3/pkg/util"
 
-	"github.com/glycerine/g3/pkg/util"
-)
-
-// Actual lexical buffers are embedded in the charged class object. The cold
-// orphan backing records only newly returned zero-reference monomials; it is a
-// Go owning-abort adaptation, not a C++ allocation or pointer-buffer ownership.
+// The native monomial slice borrows handles; numeral elements own their values.
+// orphans retains only newly created zero-reference monomials for owning abort.
 type polynomialGlobalConversionScope struct {
-	ms                                   skeletonMonomialBuffer
+	ms                                   []Monomial
 	as                                   util.ScopedIntegerModularBuffer128
 	orphans                              []Monomial
 	result                               Polynomial
@@ -70,9 +65,7 @@ func ConvertPolynomial(sm *MultivariatePolynomialManager, p Polynomial, tm *Mult
 				return Polynomial{}, e
 			}
 		}
-		if e = s.ms.push(tm.core, term); e != nil {
-			return Polynomial{}, e
-		}
+		s.ms = append(s.ms, term)
 		zero := util.Int{}
 		if e = s.as.Push(&zero); e != nil {
 			return Polynomial{}, e
@@ -89,10 +82,7 @@ func ConvertPolynomial(sm *MultivariatePolynomialManager, p Polynomial, tm *Mult
 	if e != nil {
 		return Polynomial{}, e
 	}
-	mv := monomialArrayView{inline: &s.ms.initial, count: s.ms.size}
-	if s.ms.raw != (util.Block{}) {
-		mv = monomialArrayView{runtime: tm.core.memory, raw: s.ms.raw, stride: 16, count: s.ms.size}
-	}
+	mv := monomialArrayView{values: s.ms, count: uint32(len(s.ms))}
 	if e = tm.core.som.reset(); e != nil {
 		return Polynomial{}, e
 	}
@@ -105,7 +95,6 @@ func (m *MultivariatePolynomialManager) beginConversion() error {
 	}
 	old := s.orphans
 	*s = polynomialGlobalConversionScope{orphans: old[:0], active: true, executing: true}
-	s.ms.capacity = 128            // first source constructor
 	s.as.Construct(m.core.modular) // second source constructor
 	m.core.conversionOwner = s
 	return nil
@@ -138,17 +127,6 @@ func (m *MultivariatePolynomialManager) conversionSet(i uint32, source *util.Int
 func (m *MultivariatePolynomialManager) conversionMonomial(source *MonomialManager, a Monomial) (Monomial, error) {
 	s := &m.conversion
 	c := m.core
-	if len(s.orphans) == cap(s.orphans) {
-		n := cap(s.orphans)*2 + 1
-		bytes := uint64(n) * uint64(reflect.TypeOf(Monomial{}).Size())
-		if e := m.originalBudget.Reserve(bytes); e != nil {
-			return Monomial{}, e
-		}
-		v := make([]Monomial, len(s.orphans), n)
-		copy(v, s.orphans)
-		m.originalBudget.Release(uint64(cap(s.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size()))
-		s.orphans = v
-	}
 	before, e := c.monomials.allocator.PendingRoots()
 	if e != nil {
 		return Monomial{}, e
@@ -188,8 +166,8 @@ func (m *MultivariatePolynomialManager) finishConversion(body error) error {
 		return polynomialNewtonJoin(body, s.sourceCause)
 	}
 	e := s.as.SourceClose()
-	if e == nil && s.ms.raw != (util.Block{}) {
-		e = m.core.memory.Deallocate(&s.ms.raw)
+	if e == nil {
+		s.ms = nil
 	}
 	if e != nil {
 		s.sourceCause = e
@@ -231,13 +209,7 @@ func (m *MultivariatePolynomialManager) CleanupConversion() error {
 	if e := s.as.Cleanup(); e != nil {
 		return fail(e)
 	}
-	for _, r := range []*util.Block{&s.ms.raw, &s.ms.pending} {
-		if *r != (util.Block{}) {
-			if e := c.memory.Deallocate(r); e != nil {
-				return fail(e)
-			}
-		}
-	}
+	s.ms = nil
 	for i := range s.orphans {
 		if s.orphans[i] != (Monomial{}) {
 			if e := c.monomials.CleanupValue(&s.orphans[i]); e != nil {
@@ -264,7 +236,6 @@ func (m *MultivariatePolynomialManager) CleanupConversion() error {
 		}
 		s.monomialRaw = [3]util.Block{}
 	}
-	m.originalBudget.Release(uint64(cap(s.orphans)) * uint64(reflect.TypeOf(Monomial{}).Size()))
 	s.orphans = nil
 	s.active = false
 	s.cleanupCause = nil

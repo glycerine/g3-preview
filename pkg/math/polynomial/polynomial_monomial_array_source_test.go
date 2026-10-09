@@ -9,16 +9,15 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestPolynomialTermsIndexedActualInlineAndResetBeforeRead(t *testing.T) {
+func TestPolynomialTermsIndexedNativeSliceAndResetBeforeRead(t *testing.T) {
 	m := polynomialCellFixture(t)
 	var as polynomialVector
 	as.width = 12
 	serviceMust(t, as.appendCoefficient(m, util.NewInt(3)))
 	unit, e := m.monomials.Unit()
 	serviceMust(t, e)
-	var inline [128]Monomial
-	inline[0] = unit
-	p, e := m.mkTermsIndexed(&as, monomialArrayView{inline: &inline, count: 1})
+	values := []Monomial{unit}
+	p, e := m.mkTermsIndexed(&as, monomialArrayView{values: values, count: 1})
 	serviceMust(t, e)
 	p = polynomialCaller(t, m, p)
 	a, e := m.coefficientCore(p, 0)
@@ -40,35 +39,31 @@ func TestPolynomialTermsIndexedActualInlineAndResetBeforeRead(t *testing.T) {
 	serviceMust(t, as.close(m))
 }
 
-func TestPolynomialTermsIndexedActualRuntimeAndUnreachedTail(t *testing.T) {
+func TestPolynomialTermsIndexedNativeSliceAndUnreachedTail(t *testing.T) {
 	m := polynomialCellFixture(t)
 	var as polynomialVector
 	as.width = 12
 	serviceMust(t, as.appendCoefficient(m, util.NewInt(5)))
 	unit, e := m.monomials.Unit()
 	serviceMust(t, e)
-	raw, e := m.memory.Allocate(16)
-	serviceMust(t, e)
-	serviceMust(t, skeletonWriteMonomial(m.memory, raw, 0, unit))
-	view := monomialArrayView{runtime: m.memory, raw: raw, count: 19, stride: 16}
+	view := monomialArrayView{values: []Monomial{unit}, count: 19}
 	p, e := m.mkTermsIndexed(&as, view)
 	serviceMust(t, e)
 	p = polynomialCaller(t, m, p)
 	a, e := m.coefficientCore(p, 0)
 	serviceMust(t, e)
 	if a != util.NewInt(5) {
-		t.Fatal("actual Runtime pointer span", a)
+		t.Fatal("actual borrowed monomial slice", a)
 	}
 	serviceMust(t, as.reset(m))
-	empty, e := m.mkTermsIndexed(&as, monomialArrayView{runtime: &util.Runtime{}, count: 19})
+	empty, e := m.mkTermsIndexed(&as, monomialArrayView{count: 19})
 	serviceMust(t, e)
 	_ = polynomialCaller(t, m, empty)
 	serviceMust(t, as.appendCoefficient(m, util.NewInt(1)))
-	view.offset = 16
+	view.values = nil
 	_, e = m.mkTermsIndexed(&as, view)
 	if !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("reached physical mono boundary", e)
+		t.Fatal("reached native mono boundary", e)
 	}
 	serviceMust(t, as.close(m))
-	serviceMust(t, m.memory.Deallocate(&raw))
 }

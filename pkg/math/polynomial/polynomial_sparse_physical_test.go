@@ -45,7 +45,6 @@ func polynomialSparsePhysical(t *testing.T, s *PolynomialSparseInterpolator, out
 			public = append(public, &v.retired[i])
 		}
 	}
-	raw = append(raw, s.interpolation.mons.raw, s.interpolation.mons.pending)
 	solver := &s.interpolation.solver
 	if s.interpolation.solverConstructed {
 		extra += solver.header + uint64(cap(solver.rows))*uint64(reflect.TypeOf(linearNumeralVector{}).Size())

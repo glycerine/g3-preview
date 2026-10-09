@@ -12,7 +12,7 @@ import (
 // at their declaration sites. The scalar cursor stops before older destruction.
 type polynomialSparseInterpolationScope struct {
 	vectors                                              [3]polynomialVector // cs, new_as, as
-	mons                                                 skeletonMonomialBuffer
+	mons                                                 []Monomial
 	aux                                                  util.Int
 	solver                                               ModularLinearSolver
 	active, solverConstructed, sourceFinalized, topOwner bool
@@ -112,11 +112,7 @@ func (s *PolynomialSparseInterpolator) finishInterpolationSource() (err error) {
 		f.cursor = 2
 	}
 	if f.cursor == 2 {
-		if f.mons.raw != (util.Block{}) {
-			if e := m.memory.Deallocate(&f.mons.raw); e != nil {
-				return e
-			}
-		}
+		f.mons = nil
 		f.cursor = 3
 	}
 	for f.cursor < 6 {
@@ -172,13 +168,7 @@ func (s *PolynomialSparseInterpolator) CleanupInterpolation() error {
 	if e := m.deleteNumeral(&f.aux); e != nil {
 		return e
 	}
-	for _, p := range []*util.Block{&f.mons.raw, &f.mons.pending} {
-		if *p != (util.Block{}) {
-			if e := m.memory.Deallocate(p); e != nil {
-				return e
-			}
-		}
-	}
+	f.mons = nil
 	for i := 2; i >= 0; i-- {
 		if e := f.vectors[i].close(m); e != nil {
 			return e
@@ -217,7 +207,7 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 	if e := m.pscEnter(); e != nil {
 		return false, e
 	}
-	*f = polynomialSparseInterpolationScope{active: true, topOwner: topOwner, generation: m.pscReceipts.generation, mons: skeletonMonomialBuffer{capacity: 128}}
+	*f = polynomialSparseInterpolationScope{active: true, topOwner: topOwner, generation: m.pscReceipts.generation}
 	for i := range f.vectors {
 		f.vectors[i].width = 12
 	}
@@ -228,7 +218,7 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 			err = errors.Join(err, e)
 			return
 		}
-		pending := f.mons.pending != (util.Block{}) || (f.topOwner && m.pscPending()) || s.numeric.PendingObject() != (util.ObjectRef{})
+		pending := (f.topOwner && m.pscPending()) || s.numeric.PendingObject() != (util.ObjectRef{})
 		for _, root := range s.numeric.PendingAllocatorBlocks() {
 			pending = pending || root != (util.Block{})
 		}
@@ -336,15 +326,10 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 			if e != nil {
 				return false, e
 			}
-			if e = f.mons.push(m, mono); e != nil {
-				return false, e
-			}
+			f.mons = append(f.mons, mono)
 		}
 	}
-	view := monomialArrayView{inline: &f.mons.initial, count: f.mons.size}
-	if f.mons.raw != (util.Block{}) {
-		view = monomialArrayView{runtime: m.memory, raw: f.mons.raw, count: f.mons.size, stride: 16}
-	}
+	view := monomialArrayView{values: f.mons, count: uint32(len(f.mons))}
 	before, x := s.numericBefore()
 	if x != nil {
 		return false, x
