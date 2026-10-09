@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/luby"
 )
 
 func TestSATSolverGCFrozenAllReactivationArities(t *testing.T) {
@@ -152,13 +153,13 @@ func TestSATSolverGCRefusalRootsAndReactivationPrefix(t *testing.T) {
 func TestSATSolverGCFloatDomainsAndLubyEdges(t *testing.T) {
 	want := []uint32{1, 1, 2, 1, 1, 2, 4, 1, 1, 2, 1, 1, 2, 4, 8}
 	for i, x := range want {
-		v, e := satGCLuby(uint32(i + 1))
+		v, e := luby.Value(uint32(i + 1))
 		satOK(t, e)
 		if v != x {
 			t.Fatal(i, v, x)
 		}
 	}
-	if v, e := satGCLuby(^uint32(0)); e != nil || v != 0 {
+	if v, e := luby.Value(^uint32(0)); e != nil || v != 0 {
 		t.Fatal("literal log0/equality/pow(-Inf) returns0", v, e)
 	}
 	g, s := satGCFixture(t, 1)

@@ -26,7 +26,8 @@ one package per C++ header. If a facility has no production C++ consumer,
 delete or defer the port instead of giving dead code a new home.
 
 The extraction work now includes `util/filepath`, `util/approx`,
-`util/messages`, `util/natset`, `util/stack`, and `util/bitset`. The bitset
+`util/messages`, `util/natset`, `util/stack`, `util/bitset`, and `util/luby`.
+The bitset
 package owns the native variable-width, fast-reset, fixed-width, and unsigned
 set implementations. It imports `arena` directly for fixed-width pooled
 storage and keeps its source-compatible hash routine private beside its two
@@ -163,7 +164,7 @@ Very small leaf facilities such as `file_path`, `luby`, and `version` should
 still become distinct Go package leaves. This makes their consumers visible in
 the import graph, gives them an enforceable boundary, and makes later deletion
 straightforward. Package size alone is not a reason to leave unrelated code in
-root `util`.
+root `util`. These three leaves have now been extracted.
 
 The current Go versions of `list`, `scoped_vector`, and `backtrackable_set` use
 `any`. Each C++ template has a small set of concrete production instantiations.

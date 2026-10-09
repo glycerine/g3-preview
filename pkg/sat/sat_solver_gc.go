@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/luby"
 )
 
 var ErrSATGCUninitialized = errors.New("sat: source GC field is indeterminate before initialization")
@@ -121,29 +122,6 @@ func satGCUnsigned(x float64) (uint32, error) {
 	return uint32(x), nil
 }
 
-// Source: src/util/luby.cpp:21–31. Preserve float log/equality/pow and uint wrap.
-func satGCLuby(i uint32) (uint32, error) {
-	if i == 1 {
-		return 1, nil
-	}
-	k := math.Log(float64(i+1)) / math.Log(2)
-	if k == math.Floor(k+.5) {
-		return satGCUnsigned(math.Pow(2, k-1))
-	}
-	v, e := satGCUnsigned(math.Floor(k))
-	if e != nil {
-		return 0, e
-	}
-	n, e := satGCUnsigned(math.Pow(2, float64(v)))
-	if e != nil {
-		return 0, e
-	}
-	next := i - n + 1
-	if next == i {
-		return 0, arena.ErrBounds
-	}
-	return satGCLuby(next)
-}
 func (g *satSolverGC) restart() error {
 	if e := g.open(); e != nil {
 		return e
@@ -171,7 +149,7 @@ func (g *satSolverGC) restart() error {
 		g.restartThreshold = v
 	case satRestartLuby:
 		g.lubyIndex++
-		v, e := satGCLuby(g.lubyIndex)
+		v, e := luby.Value(g.lubyIndex)
 		if e != nil {
 			return e
 		}

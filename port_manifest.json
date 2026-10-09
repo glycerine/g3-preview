@@ -124768,13 +124768,12 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/sat/sat_solver_gc.go",
-        "pkg/sat/sat_solver_gc_model_test.go",
-        "pkg/sat/sat_solver_gc_test.go"
+        "pkg/util/luby/luby.go",
+        "pkg/util/luby/luby_test.go"
       ],
       "tests": [
-        "TestSATSolverGCFloatDomainsAndLubyEdges",
-        "TestSATSolverGCSearchInitAndRestartPolicies"
+        "TestSourceSequence",
+        "TestSourceUint32Wrap"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -124782,10 +124781,10 @@
         {
           "name": "get_luby complete scalar recursive log/floor/equality/pow algorithm with uint32 source wrap",
           "status": "ported",
-          "go_target": "pkg/sat/sat_solver_gc.go",
+          "go_target": "pkg/util/luby/luby.go",
           "tests": [
-            "TestSATSolverGCFloatDomainsAndLubyEdges",
-            "TestSATSolverGCSearchInitAndRestartPolicies"
+            "TestSourceSequence",
+            "TestSourceUint32Wrap"
           ]
         }
       ],
@@ -124802,13 +124801,12 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/sat/sat_solver_gc.go",
-        "pkg/sat/sat_solver_gc_model_test.go",
-        "pkg/sat/sat_solver_gc_test.go"
+        "pkg/util/luby/luby.go",
+        "pkg/util/luby/luby_test.go"
       ],
       "tests": [
-        "TestSATSolverGCFloatDomainsAndLubyEdges",
-        "TestSATSolverGCSearchInitAndRestartPolicies"
+        "TestSourceSequence",
+        "TestSourceUint32Wrap"
       ],
       "conditionals": [
         {
@@ -124826,10 +124824,10 @@
         {
           "name": "get_luby complete scalar recursive log/floor/equality/pow algorithm with uint32 source wrap",
           "status": "ported",
-          "go_target": "pkg/sat/sat_solver_gc.go",
+          "go_target": "pkg/util/luby/luby.go",
           "tests": [
-            "TestSATSolverGCFloatDomainsAndLubyEdges",
-            "TestSATSolverGCSearchInitAndRestartPolicies"
+            "TestSourceSequence",
+            "TestSourceUint32Wrap"
           ]
         }
       ],
