@@ -48,8 +48,8 @@ func TestScopedBufferReviewDestructiveCopyBeforeSourceDestructor(t *testing.T) {
 	state := r.State()
 	stats := r.Stats()
 	source := b.sourceClose()
-	if !errors.Is(source, arena.ErrInvalidSlot) || b.count != 1 || b.closed || r.State() != state || r.Stats() != stats {
-		t.Fatal("literal source leaf acknowledged already-consumed old block", source, b.count, b.closed, r.State(), state)
+	if !errors.Is(source, arena.ErrInvalidSlot) || uint32(len(b.values)) != 1 || b.closed || r.State() != state || r.Stats() != stats {
+		t.Fatal("literal source leaf acknowledged already-consumed old block", source, uint32(len(b.values)), b.closed, r.State(), state)
 	}
 }
 
@@ -77,8 +77,8 @@ func TestScopedBufferReviewStoppedSourceBlocksMutation(t *testing.T) {
 	before := r.Stats()
 	contextTLSNearMinimum(t, r)
 	cause := b.sourceClose()
-	if !errors.Is(cause, arena.ErrBounds) || b.count != 2 || !ValidNumericRef(z.Cells, first.Cell) || !z.Cell(first.Cell).Released {
-		t.Fatal("actual first payload physically consumed before source stop", cause, b.count, r.State())
+	if !errors.Is(cause, arena.ErrBounds) || uint32(len(b.values)) != 2 || !ValidNumericRef(z.Cells, first.Cell) || !z.Cell(first.Cell).Released {
+		t.Fatal("actual first payload physically consumed before source stop", cause, uint32(len(b.values)), r.State())
 	}
 	now, e := b.get(1)
 	serviceMust(t, e)
@@ -91,15 +91,15 @@ func TestScopedBufferReviewStoppedSourceBlocksMutation(t *testing.T) {
 		t.Fatal("source stop replayed physical accounting", again, cause)
 	}
 	scopedBufferAudit(t, &b, &input)
-	count := b.count
+	count := uint32(len(b.values))
 	zero := NewInt(0)
 	for name, call := range map[string]func() error{
 		"push":   func() error { return b.push(&zero) },
 		"set":    func() error { return b.set(1, &zero) },
 		"resize": func() error { return b.Resize(count + 1) },
 	} {
-		if e := call(); e != cause || b.count != count || r.State() != state || r.Stats() != stats {
-			t.Errorf("stopped ordinary %s changed source context: %v count%d want%d", name, e, b.count, count)
+		if e := call(); e != cause || uint32(len(b.values)) != count || r.State() != state || r.Stats() != stats {
+			t.Errorf("stopped ordinary %s changed source context: %v count%d want%d", name, e, uint32(len(b.values)), count)
 		}
 	}
 	contextTLSFinish(t, r, b.cleanup)
@@ -126,7 +126,7 @@ func TestScopedBufferReviewReleaseShrinkAboveSize(t *testing.T) {
 	} else if e != nil {
 		t.Fatal("release source performs no indexed access or count change", e)
 	}
-	if b.count != 3 {
-		t.Fatal("source count changed", b.count)
+	if uint32(len(b.values)) != 3 {
+		t.Fatal("source count changed", uint32(len(b.values)))
 	}
 }

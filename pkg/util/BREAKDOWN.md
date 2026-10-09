@@ -807,3 +807,10 @@ The arithmetic continuation still binds an unfinished write to its exact owner,
 invocation, row, and value, while native slice relocation no longer appears as
 observable block identity. This removed the final production use of the copied
 `VectorGrowth` arithmetic, so that helper and its representation test are gone.
+
+The live polynomial `scoped_numeral_buffer<mpz,128>` specialization now stores
+its concrete owned `Int` values in `[]Int`. Deep copy, modular normalization,
+ascending source deletion, stopped-cleanup state, and borrowed views remain;
+inline/spill capacity, Runtime relocation blocks, and their allocation-failure
+tests are gone. Future specializations should likewise be typed at their actual
+consumer rather than restoring a universal buffer abstraction.

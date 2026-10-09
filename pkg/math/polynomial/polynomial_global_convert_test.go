@@ -263,8 +263,8 @@ func TestPolynomialGlobalConvertReturnedResultSourceStop(t *testing.T) {
 	polynomialImpPhysicalAudit(t, m)
 	contextTLSNearMinimum(t, rt)
 	cause := m.finishConversion(nil)
-	if !errors.Is(cause, arena.ErrBounds) || s.as.Raw != (util.Block{}) || s.ms.raw != older || !s.ownsResult {
-		t.Fatal("younger consumed raw stop preserves older pointer buffer/result", cause)
+	if !errors.Is(cause, arena.ErrBounds) || s.as.Count() != 0 || s.ms.raw != (util.Block{}) || s.ms.raw == older || !s.ownsResult {
+		t.Fatal("native numeral buffer completed before pointer-buffer release stop", cause)
 	}
 	polynomialImpPhysicalAudit(t, m)
 	state, stats := rt.State(), rt.Stats()
@@ -272,7 +272,7 @@ func TestPolynomialGlobalConvertReturnedResultSourceStop(t *testing.T) {
 		t.Fatal("literal sticky source stop", again)
 	}
 	contextTLSFinish(t, rt, m.CleanupConversion)
-	if s.result != (Polynomial{}) || s.sourceCause != cause || s.as.SourceCause() != cause {
+	if s.result != (Polynomial{}) || s.sourceCause != cause || s.as.SourceCause() != nil {
 		t.Fatal("own abort/history")
 	}
 	polynomialImpPhysicalAudit(t, m)

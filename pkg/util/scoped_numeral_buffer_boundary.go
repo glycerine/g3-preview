@@ -2,14 +2,14 @@
 package util
 
 // ScopedIntegerModularBuffer128 is the concrete source scoped buffer. Its
-// enclosing caller owns its lifetime; expansion and numeral ownership stay in
-// this utility implementation.
+// enclosing caller owns its lifetime; its native slice stores explicitly owned
+// numerals whose copy and destruction stay in this utility implementation.
 type ScopedIntegerModularBuffer128 = scopedIntegerModularBuffer128
 
 func (b *scopedIntegerModularBuffer128) Construct(m *IntegerModularManager) { b.construct(m) }
 func (b *scopedIntegerModularBuffer128) Check() error                       { return b.open() }
 func (b *scopedIntegerModularBuffer128) Manager() *IntegerModularManager    { return b.manager }
-func (b *scopedIntegerModularBuffer128) Count() uint32                      { return b.count }
+func (b *scopedIntegerModularBuffer128) Count() uint32                      { return uint32(len(b.values)) }
 func (b *scopedIntegerModularBuffer128) Physical(i uint32) (Int, error)     { return b.physical(i) }
 func (b *scopedIntegerModularBuffer128) Get(i uint32) (Int, error)          { return b.get(i) }
 func (b *scopedIntegerModularBuffer128) Store(i uint32, a Int) error        { return b.store(i, a) }

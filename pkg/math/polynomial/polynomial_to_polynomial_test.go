@@ -187,10 +187,9 @@ func TestPolynomialToPolynomialExactNumericForeignReplacement(t *testing.T) {
 	polynomialImpPhysicalAuditNamed(t, m, nil, []*util.Int{&foreign}, 0)
 }
 
-// Actual completed buffer and mk_univariate return expression followed by a
-// public signed-host-domain raw destructor stop. This owner-primitive proof
-// does not claim naturally reached mathematical allocation exhaustion.
-func TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop(t *testing.T) {
+// A completed native coefficient buffer finalizes without introducing a
+// Runtime release frontier before the retained mk_univariate result.
+func TestPolynomialToPolynomialReturnedResultAfterNativeBufferFinalize(t *testing.T) {
 	budget := arena.NewBudget(1 << 26)
 	rt, e := util.NewRuntime(util.RuntimeConfig{Budget: budget, SizeTBits: 64, ThreadLocal: true})
 	serviceMust(t, e)
@@ -241,8 +240,8 @@ func TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop(t *testing.
 	s.executing = false // actual mk return expression has completed
 	contextTLSNearMinimum(t, rt)
 	cause := m.finishToPolynomial(nil)
-	if !errors.Is(cause, arena.ErrBounds) || s.buffer.Raw != (util.Block{}) || !m.core.matchesFactoryInvocation(&s.factory) || s.factory.frame.result != p || s.buffer.Count() != 0 {
-		t.Fatal("actual raw release before result publication", cause)
+	if cause != nil || !m.core.matchesFactoryInvocation(&s.factory) || s.factory.frame.result != p || s.buffer.Count() != 0 {
+		t.Fatal("native buffer finalization before result publication", cause)
 	}
 	polynomialImpPhysicalAuditNamed(t, m, nil, nil, 0)
 	state := rt.State()
@@ -250,13 +249,8 @@ func TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop(t *testing.
 	if again := m.finishToPolynomial(nil); again != cause || rt.State() != state || rt.Stats() != stats {
 		t.Fatal("source retry replayed release or changed cause", again)
 	}
-	saved := s.sourceCause
-	olderStarted, olderStage, olderCursor := m.sourceStarted, m.bodyStage, m.memberStage
-	if got := m.SourceFinalize(); got != saved || m.sourceStarted != olderStarted || m.bodyStage != olderStage || m.memberStage != olderCursor {
-		t.Errorf("younger conversion source stop did not protect older full class prefix: %v", got)
-	}
 	contextTLSFinish(t, rt, m.CleanupToPolynomial)
-	if m.core.matchesFactoryInvocation(&s.factory) || s.sourceCause != saved || s.buffer.SourceCause() != cause {
+	if m.core.matchesFactoryInvocation(&s.factory) || s.sourceCause != nil || s.buffer.SourceCause() != nil {
 		t.Fatal("owning abort erased history or retained result")
 	}
 	polynomialImpPhysicalAuditNamed(t, m, nil, nil, 0)

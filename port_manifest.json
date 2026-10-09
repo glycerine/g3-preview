@@ -36492,7 +36492,7 @@
         "TestPolynomialToPolynomialZeroKeepsOlderStoppedLocal",
         "TestPolynomialToPolynomialModularSourceSets",
         "TestPolynomialToPolynomialExactNumericForeignReplacement",
-        "TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop",
+        "TestPolynomialToPolynomialReturnedResultAfterNativeBufferFinalize",
         "TestPolynomialDisplayLiteralSourceQuirks",
         "TestPolynomialDisplayZeroAndRefVectorSuffix",
         "TestPolynomialDisplayScalarCStringAliveAndNested",
@@ -39597,7 +39597,7 @@
             "TestPolynomialToPolynomialZeroKeepsOlderStoppedLocal",
             "TestPolynomialToPolynomialModularSourceSets",
             "TestPolynomialToPolynomialExactNumericForeignReplacement",
-            "TestPolynomialToPolynomialReturnedResultBeforeRawDestructorStop"
+            "TestPolynomialToPolynomialReturnedResultAfterNativeBufferFinalize"
           ]
         },
         {
@@ -144370,15 +144370,11 @@
         "pkg/util/scoped_numeral_buffer_review_test.go"
       ],
       "tests": [
-        "TestScopedNumeralBufferInlineGrowthResetAndResize",
+        "TestScopedNumeralBufferNativeGrowthResetAndResize",
         "TestScopedNumeralBufferBigCopiesAndFieldNormalization",
-        "TestScopedNumeralBufferEveryActualReservationPrefix",
+        "TestScopedNumeralBufferNativeResizeIgnoresArenaFailure",
         "TestScopedNumeralBufferSourceStopBeforeOlderNumeral",
-        "TestScopedNumeralBufferReturnedGrowthAllocationSourceAndAbort",
-        "TestScopedNumeralBufferDescriptorRefusalAndForeignReplacement",
-        "TestScopedNumeralBufferPhysicalDestructorSignedGuardAndOwningRetry",
-        "TestScopedNumeralBufferSecondGrowthEveryActualPrefix",
-        "TestScopedNumeralBufferBorrowedActualInlineAndRuntimeViews",
+        "TestScopedNumeralBufferBorrowedNativeView",
         "TestScopedBufferReviewDestructiveCopyBeforeSourceDestructor",
         "TestScopedBufferReviewStoppedSourceBlocksMutation",
         "TestScopedBufferReviewReleaseShrinkAboveSize"
@@ -144397,19 +144393,15 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Concrete mpzzp128 ctor/manager/reset/push/shrink/resize/dtor with actual inline and Runtime-expanded backing",
+          "name": "Concrete mpzzp buffer ctor/manager/reset/push/shrink/resize/destructor over native []Int storage",
           "status": "ported",
           "go_target": "pkg/util/scoped_numeral_buffer.go",
           "tests": [
-            "TestScopedNumeralBufferInlineGrowthResetAndResize",
+            "TestScopedNumeralBufferNativeGrowthResetAndResize",
             "TestScopedNumeralBufferBigCopiesAndFieldNormalization",
-            "TestScopedNumeralBufferEveryActualReservationPrefix",
+            "TestScopedNumeralBufferNativeResizeIgnoresArenaFailure",
             "TestScopedNumeralBufferSourceStopBeforeOlderNumeral",
-            "TestScopedNumeralBufferReturnedGrowthAllocationSourceAndAbort",
-            "TestScopedNumeralBufferDescriptorRefusalAndForeignReplacement",
-            "TestScopedNumeralBufferPhysicalDestructorSignedGuardAndOwningRetry",
-            "TestScopedNumeralBufferSecondGrowthEveryActualPrefix",
-            "TestScopedNumeralBufferBorrowedActualInlineAndRuntimeViews",
+            "TestScopedNumeralBufferBorrowedNativeView",
             "TestScopedBufferReviewDestructiveCopyBeforeSourceDestructor",
             "TestScopedBufferReviewStoppedSourceBlocksMutation",
             "TestScopedBufferReviewReleaseShrinkAboveSize"
@@ -144417,11 +144409,11 @@
         }
       ],
       "ownership": [
-        "The concrete inline128 NUM fields reside once in the reflected enclosing header; expanded12-byte scalar codec relocates owning references without NUM Copy. Ascending source Del stops before older elements and pending backing; own abort matches exact physical receipts. Borrowed views are actual source fields, not a clone."
+        "Concrete []Int elements retain numeral ownership. Deep copy and ascending source deletion remain explicit; a stopped deletion leaves older elements untouched, and borrowed views reference the live slice rather than a clone."
       ],
       "deviations": [
-        "The live polynomial mpzzp inline128 specialization is concrete and pointer-free in its numeral storage. Other source instantiations remain partial until their real Go callers need concrete typed buffers; no any-valued universal buffer is retained.",
-        "Expanded const-reference alias after source old-buffer destruction is undefined and not promoted as supported."
+        "The live polynomial mpzzp specialization uses concrete []Int storage. Other source instantiations remain partial until their real Go callers need typed buffers; no any-valued universal buffer is retained.",
+        "Borrowed views remain valid only while the owning buffer is live and unchanged."
       ]
     },
     {
