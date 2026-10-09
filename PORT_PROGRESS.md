@@ -31169,3 +31169,21 @@ and checked/debug debug tests passed (0.09s/0.08s), sorting-network/native span
 tests passed (0.39s native, 0.48s checked/debug), module-wide test compilation
 passed, and AST/SAT/util vet and portcheck passed. The latest full native module
 checkpoint remains 18:07–18:12 UTC.
+
+## Store actual SAT activity in native uint32 slices
+
+Converted the solver activity member to `satSolverActivity` with `[]uint32`
+backing. Source increment/decay/rescale arithmetic and queue notification order
+are preserved. Queue copies/moves borrow the same concrete native activity
+owner, while Runtime-backed queue construction now takes its Runtime explicitly.
+Native activity no longer borrows a Runtime just to store scores. Scope pop
+clears/truncates discarded scores; recreated variables receive zero activity.
+Removed the obsolete activity TLS allocation-refusal fixture and physical
+backing assertions; remaining Runtime root counts and level refusal fixtures
+now reflect actual allocations. Renamed the implementation and manifest targets.
+
+Validation: complete native SAT (0.99s) and checked/debug SAT (1.24s) suites passed,
+including threshold/wrap/rescale behavior, current comparator borrowing after
+growth/copy/move, no allocator changes during native score mutation/rescaling,
+and retained/fresh scope-regrowth values. Module-wide compilation, SAT vet, and
+portcheck passed. Latest full native module checkpoint remains 18:07–18:12 UTC.

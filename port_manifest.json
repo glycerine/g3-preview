@@ -71049,7 +71049,7 @@
         "pkg/sat/sat_solver_assignment_storage_test.go",
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/sat/sat_solver_scalar_runtime_test.go",
-        "pkg/sat/sat_solver_runtime_activity.go",
+        "pkg/sat/sat_solver_activity.go",
         "pkg/sat/sat_solver_runtime_trail.go",
         "pkg/sat/sat_solver_runtime_activity_trail_test.go",
         "pkg/sat/sat_solver_runtime_justification.go",
@@ -71241,14 +71241,13 @@
         "TestSATSolverScalarUnsignedGrowthLiteralWidths",
         "TestSATSolverScalarLevelTLSFailureRetainsNamedPendingAndPrefix",
         "TestSATSolverScalarReverseMemberRawDestruction",
-        "TestSATSolverActivityAndLiteralTrailUseActualRuntime",
+        "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
         "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
-        "TestSATSolverRuntimeActivityQueueCopiesKeepConcreteBorrow",
+        "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
         "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
         "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-        "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
         "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
-        "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards",
+        "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards",
         "TestSATSolverJustificationActualEightByteSourceAllocation",
         "TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy",
         "TestSATSolverJustificationPushSizePublishesBeforeProvenanceRefusal",
@@ -72077,18 +72076,17 @@
           ]
         },
         {
-          "name": "Selected actual unsigned activity and literal32 trail Runtime storage; source increment/decay/rescale and queue activity borrow; broader solver storage remains open",
+          "name": "Selected native []uint32 activity and remaining literal32 trail Runtime storage; source uint32 increment/decay/rescale and current native activity borrowing across queue growth/copy/move; broader solver storage remains open",
           "status": "partial",
-          "go_target": "pkg/sat/sat_solver_runtime_activity.go",
+          "go_target": "pkg/sat/sat_solver_activity.go",
           "tests": [
-            "TestSATSolverActivityAndLiteralTrailUseActualRuntime",
+            "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
             "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
-            "TestSATSolverRuntimeActivityQueueCopiesKeepConcreteBorrow",
+            "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
             "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
             "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-            "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
             "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
-            "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards"
+            "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards"
           ]
         },
         {
@@ -72899,7 +72897,7 @@
         "pkg/sat/sat_solver_assignment_storage_test.go",
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/sat/sat_solver_scalar_runtime_test.go",
-        "pkg/sat/sat_solver_runtime_activity.go",
+        "pkg/sat/sat_solver_activity.go",
         "pkg/sat/sat_solver_runtime_trail.go",
         "pkg/sat/sat_solver_runtime_activity_trail_test.go",
         "pkg/sat/sat_solver_runtime_justification.go",
@@ -73079,14 +73077,13 @@
         "TestSATSolverScalarUnsignedGrowthLiteralWidths",
         "TestSATSolverScalarLevelTLSFailureRetainsNamedPendingAndPrefix",
         "TestSATSolverScalarReverseMemberRawDestruction",
-        "TestSATSolverActivityAndLiteralTrailUseActualRuntime",
+        "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
         "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
-        "TestSATSolverRuntimeActivityQueueCopiesKeepConcreteBorrow",
+        "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
         "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
         "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-        "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
         "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
-        "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards",
+        "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards",
         "TestSATSolverJustificationActualEightByteSourceAllocation",
         "TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy",
         "TestSATSolverJustificationPushSizePublishesBeforeProvenanceRefusal",
@@ -73425,18 +73422,17 @@
           ]
         },
         {
-          "name": "Selected actual unsigned activity and literal32 trail Runtime storage; source increment/decay/rescale and queue activity borrow; broader solver storage remains open",
+          "name": "Selected native []uint32 activity and remaining literal32 trail Runtime storage; source uint32 increment/decay/rescale and current native activity borrowing across queue growth/copy/move; broader solver storage remains open",
           "status": "partial",
-          "go_target": "pkg/sat/sat_solver_runtime_activity.go",
+          "go_target": "pkg/sat/sat_solver_activity.go",
           "tests": [
-            "TestSATSolverActivityAndLiteralTrailUseActualRuntime",
+            "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
             "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
-            "TestSATSolverRuntimeActivityQueueCopiesKeepConcreteBorrow",
+            "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
             "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
             "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-            "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
             "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
-            "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards"
+            "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards"
           ]
         },
         {
@@ -74387,7 +74383,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/sat/sat_var_queue.go",
-        "pkg/sat/sat_solver_runtime_activity.go",
+        "pkg/sat/sat_solver_activity.go",
         "pkg/sat/sat_solver_runtime_trail.go",
         "pkg/sat/sat_solver_runtime_activity_trail_test.go",
         "pkg/sat/sat_var_queue_runtime.go",
@@ -74399,14 +74395,13 @@
         "TestSATVarQueueRealActivityPriorityEventsAndLifecycle",
         "TestSATVarQueueSourceGhostAndEmptyReset",
         "TestSATVarQueueUnsignedNegativeIndexBoundary",
-        "TestSATSolverActivityAndLiteralTrailUseActualRuntime",
+        "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
         "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
-        "TestSATSolverRuntimeActivityQueueCopiesKeepConcreteBorrow",
+        "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
         "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
         "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-        "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
         "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
-        "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards",
+        "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards",
         "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
         "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
         "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
@@ -74463,18 +74458,17 @@
           "tests": []
         },
         {
-          "name": "Selected actual unsigned activity and literal32 trail Runtime storage; source increment/decay/rescale and queue activity borrow; broader solver storage remains open",
+          "name": "Selected native []uint32 activity and remaining literal32 trail Runtime storage; source uint32 increment/decay/rescale and current native activity borrowing across queue growth/copy/move; broader solver storage remains open",
           "status": "partial",
-          "go_target": "pkg/sat/sat_solver_runtime_activity.go",
+          "go_target": "pkg/sat/sat_solver_activity.go",
           "tests": [
-            "TestSATSolverActivityAndLiteralTrailUseActualRuntime",
+            "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
             "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
-            "TestSATSolverRuntimeActivityQueueCopiesKeepConcreteBorrow",
+            "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
             "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
             "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-            "TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix",
             "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
-            "TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards"
+            "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards"
           ]
         },
         {

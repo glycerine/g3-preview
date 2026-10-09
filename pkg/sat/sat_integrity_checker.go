@@ -398,10 +398,7 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		if e = v.activity.open(); e != nil {
 			return false, e
 		}
-		activitySize, e := v.activity.values.Size()
-		if e != nil {
-			return false, e
-		}
+		activitySize := uint32(len(v.activity.values))
 		if activitySize != n {
 			return false, ErrSATAssertion
 		}

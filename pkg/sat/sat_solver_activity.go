@@ -1,39 +1,35 @@
+// Source: src/sat/sat_solver.h:517-528; src/sat/sat_solver.cpp:2804-2812.
 package sat
 
 import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
-// Actual solver m_activity. Its uint32 payload belongs solely to the borrowed
-// Runtime. This cold owner is distinct from the separately ported public domain.
-type satSolverRuntimeActivity struct {
-	self       *satSolverRuntimeActivity
-	values     RuntimeUintColumn
+// Actual solver m_activity uses native uint32 scores. Queue comparisons borrow
+// this owner and always read its current slice.
+type satSolverActivity struct {
+	self       *satSolverActivity
+	values     []uint32
 	budget     *arena.Budget
 	ownerBytes uint64
 	closed     bool
 }
 
-func newSATSolverRuntimeActivity(b *arena.Budget, r *util.Runtime) (*satSolverRuntimeActivity, error) {
-	if r == nil {
-		return nil, ErrSATOwner
+func newSATSolverActivity(b *arena.Budget) (*satSolverActivity, error) {
+	if b == nil {
+		return nil, arena.ErrConfig
 	}
-	if _, e := r.AllocationSize(); e != nil {
-		return nil, e
-	}
-	n := uint64(reflect.TypeOf(satSolverRuntimeActivity{}).Size())
+	n := uint64(reflect.TypeOf(satSolverActivity{}).Size())
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	a := &satSolverRuntimeActivity{budget: b, ownerBytes: n}
+	a := &satSolverActivity{budget: b, ownerBytes: n}
 	a.self = a
-	a.values.Bind(r)
 	return a, nil
 }
-func (a *satSolverRuntimeActivity) open() error {
+func (a *satSolverActivity) open() error {
 	if a == nil || a.self != a {
 		return ErrSATOwner
 	}
@@ -42,47 +38,52 @@ func (a *satSolverRuntimeActivity) open() error {
 	}
 	return nil
 }
-func (a *satSolverRuntimeActivity) Get(i uint32) (uint32, error) {
+func (a *satSolverActivity) Get(i uint32) (uint32, error) {
 	if e := a.open(); e != nil {
 		return 0, e
 	}
-	return a.values.Read(i)
+	if uint64(i) >= uint64(len(a.values)) {
+		if satStorageSourceDebug {
+			return 0, ErrSATAssertion
+		}
+		return 0, arena.ErrBounds
+	}
+	return a.values[i], nil
 }
-func (a *satSolverRuntimeActivity) Set(i, x uint32) error {
+func (a *satSolverActivity) Set(i, x uint32) error {
+	if _, e := a.Get(i); e != nil {
+		return e
+	}
+	a.values[i] = x
+	return nil
+}
+func (a *satSolverActivity) Push(x uint32) error {
 	if e := a.open(); e != nil {
 		return e
 	}
-	return a.values.Write(i, x)
+	a.values = append(a.values, x)
+	return nil
 }
-func (a *satSolverRuntimeActivity) Push(x uint32) error {
-	if e := a.open(); e != nil {
-		return e
-	}
-	return a.values.Push(x)
-}
-func (a *satSolverRuntimeActivity) Size() uint32 {
+func (a *satSolverActivity) Size() uint32 {
 	if a.open() != nil {
 		return 0
 	}
-	n, _ := a.values.Size()
-	return n
+	return uint32(len(a.values))
 }
-func (a *satSolverRuntimeActivity) Stats() satStorageVectorStats {
+func (a *satSolverActivity) Stats() satStorageVectorStats {
 	if a.open() != nil {
 		return satStorageVectorStats{}
 	}
 	return satStorageVectorStats{OwnerBytes: a.ownerBytes}
 }
-func (a *satSolverRuntimeActivity) Close() error {
+func (a *satSolverActivity) Close() error {
 	if a == nil || a.self != a {
 		return ErrSATOwner
 	}
 	if a.closed {
 		return nil
 	}
-	if e := a.values.Finalize(); e != nil {
-		return e
-	}
+	a.values = nil
 	a.budget.Release(a.ownerBytes)
 	a.ownerBytes = 0
 	a.closed = true
@@ -119,20 +120,11 @@ func (v *satSolverVariableState) rescaleActivity() error {
 	if e := v.open(); e != nil {
 		return e
 	}
-	c := &v.activity.values.Raw
-	n, e := c.Size()
-	if e != nil {
+	if e := v.activity.open(); e != nil {
 		return e
 	}
-	h := c.Block
-	for i := uint32(0); i < n; i++ {
-		x, e := ReadRuntimeWord(c.Runtime, h, 8+4*uint64(i))
-		if e != nil {
-			return e
-		}
-		if e = WriteRuntimeWord(c.Runtime, h, 8+4*uint64(i), x>>14); e != nil {
-			return e
-		}
+	for i := range v.activity.values {
+		v.activity.values[i] >>= 14
 	}
 	v.activityInc >>= 14
 	return nil

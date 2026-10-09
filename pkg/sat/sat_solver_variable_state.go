@@ -23,7 +23,7 @@ type satSolverVariableState struct {
 	mark, literalMark                               []bool
 	justification                                   satSolverRuntimeJustificationColumn
 	level                                           RuntimeUintColumn
-	activity                                        *satSolverRuntimeActivity
+	activity                                        *satSolverActivity
 	queue                                           *satVarQueue
 	trail                                           *satSolverRuntimeTrail
 	trailRef                                        satSolverLiteralListRef
@@ -72,10 +72,10 @@ func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.
 	}
 	s.watches, e = newSATSolverWatchLists(b, c)
 	if e == nil {
-		s.activity, e = newSATSolverRuntimeActivity(b, raw)
+		s.activity, e = newSATSolverActivity(b)
 	}
 	if e == nil {
-		s.queue, e = newSATSolverRuntimeVarQueue(s.activity, b)
+		s.queue, e = newSATSolverRuntimeVarQueue(s.activity, b, raw)
 	}
 	if e == nil {
 		s.trail, s.trailRef, e = newSATSolverRuntimeTrail(b, raw)

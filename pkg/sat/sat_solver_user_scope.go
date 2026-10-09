@@ -294,9 +294,14 @@ func (s *Solver) gcVar(v uint32) error {
 	}
 	clear(x.external[v:])
 	x.external = x.external[:v]
-	if e = x.activity.values.Shrink(v); e != nil {
-		return e
+	if uint64(v) > uint64(len(x.activity.values)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
+		return arena.ErrBounds
 	}
+	clear(x.activity.values[v:])
+	x.activity.values = x.activity.values[:v]
 	if e = x.level.Shrink(v); e != nil {
 		return e
 	}

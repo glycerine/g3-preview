@@ -16,7 +16,7 @@ func TestSATSolverJustificationActualEightByteSourceAllocation(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 80+600 || v.memory.Stats().LiveBlocks != 5 {
+	if n != 56+600 || v.memory.Stats().LiveBlocks != 4 {
 		t.Fatal("actual source justification allocation absent", n, v.memory.Stats())
 	}
 }

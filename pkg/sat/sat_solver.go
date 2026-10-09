@@ -188,11 +188,11 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.Variables.watches, err = newSATSolverWatchLists(c.Budget, vc); err != nil {
 		return s, err
 	}
-	if s.Variables.activity, err = newSATSolverRuntimeActivity(c.Budget, c.Runtime.memory); err != nil {
+	if s.Variables.activity, err = newSATSolverActivity(c.Budget); err != nil {
 		return s, err
 	}
 	s.Variables.activityInc = 128
-	if s.Variables.queue, err = newSATSolverRuntimeVarQueue(s.Variables.activity, c.Budget); err != nil {
+	if s.Variables.queue, err = newSATSolverRuntimeVarQueue(s.Variables.activity, c.Budget, c.Runtime.memory); err != nil {
 		return s, err
 	}
 	s.Variables.qhead = 0

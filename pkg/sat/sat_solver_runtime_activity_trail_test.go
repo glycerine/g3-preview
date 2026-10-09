@@ -11,19 +11,19 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestSATSolverActivityAndLiteralTrailUseActualRuntime(t *testing.T) {
+func TestSATSolverNativeActivityAndRuntimeTrailAccounting(t *testing.T) {
 	v, _, _ := satVariableStateFixture(t)
 	_, e := v.mkVar(false, true)
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 80+600 || v.memory.Stats().LiveBlocks != 5 {
-		t.Fatal("actual activity source allocation missing", n, v.memory.Stats())
+	if n != 56+600 || v.memory.Stats().LiveBlocks != 4 {
+		t.Fatal("remaining source allocations", n, v.memory.Stats())
 	}
 	satOK(t, v.trailPush(MakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 104+600 || v.memory.Stats().LiveBlocks != 6 {
+	if n != 80+600 || v.memory.Stats().LiveBlocks != 5 {
 		t.Fatal("actual literal32 trail allocation missing", n, v.memory.Stats())
 	}
 }
@@ -41,7 +41,7 @@ func TestSATSolverActivityIncrementDecayAndRescaleSourceOrder(t *testing.T) {
 	next, e := v.queue.NextVar()
 	satOK(t, e)
 	if next != 0 {
-		t.Fatal("real current Runtime activity comparator", next)
+		t.Fatal("current native activity comparator", next)
 	}
 	v.decayActivity()
 	if v.activityInc != 140 {
@@ -69,7 +69,7 @@ func TestSATSolverActivityIncrementDecayAndRescaleSourceOrder(t *testing.T) {
 	}
 }
 
-func TestSATSolverRuntimeActivityQueueCopiesKeepConcreteBorrow(t *testing.T) {
+func TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow(t *testing.T) {
 	v, _, _ := satVariableStateFixture(t)
 	for i := 0; i < 3; i++ {
 		_, e := v.mkVar(false, true)
@@ -79,7 +79,7 @@ func TestSATSolverRuntimeActivityQueueCopiesKeepConcreteBorrow(t *testing.T) {
 	satOK(t, v.queue.ActivityIncreased(2))
 	copy, e := v.queue.Clone(v.budget)
 	satOK(t, e)
-	if copy.runtimeActivity != v.activity {
+	if copy.solverActivity != v.activity {
 		satOK(t, copy.Close())
 		t.Fatal("source copied comparator lost actual borrowed activity")
 	}
@@ -91,7 +91,7 @@ func TestSATSolverRuntimeActivityQueueCopiesKeepConcreteBorrow(t *testing.T) {
 	satOK(t, copy.Close())
 	moved, e := v.queue.MoveClone(v.budget)
 	satOK(t, e)
-	if moved.runtimeActivity != v.activity {
+	if moved.solverActivity != v.activity {
 		satOK(t, moved.Close())
 		t.Fatal("source moved comparator lost actual borrowed activity")
 	}
@@ -196,36 +196,6 @@ func TestSATSolverRuntimeTrailAllActualRefusalPrefixes(t *testing.T) {
 	}
 	t.Log("actual trail refusal horizon", failures, success)
 }
-func TestSATSolverRuntimeActivityTLSFailurePendingSourcePrefix(t *testing.T) {
-	b := arena.NewBudget(^uint64(0))
-	todo, e := newSATSolverUintSet(b)
-	satOK(t, e)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true})
-	satOK(t, e)
-	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, r)
-	satOK(t, e)
-	prefix, e := r.Allocate(99352)
-	satOK(t, e)
-	satOK(t, r.SetMaxSize(1))
-	_, e = v.mkVar(true, true)
-	if !satRuntimeActualRefusal(r, e) || v.activity.values.Raw.Pending == (util.Block{}) || v.activity.values.Raw.Block != (util.Block{}) {
-		t.Fatal("actual activity owned malloc error", e, r.State())
-	}
-	if uint32(len(v.external)) != 1 || v.activity.Size() != 0 || satScalarTestUintSize(t, &v.level) != 0 {
-		t.Fatal("source activity/level publication sequence")
-	}
-	satScalarAuditOwner(t, v, prefix)
-	if _, e = r.Read(v.activity.values.Raw.Pending, 0); !errors.Is(e, util.ErrRuntimeUninitialized) {
-		t.Fatal(e)
-	}
-	satOK(t, v.Close())
-	satOK(t, r.Deallocate(&prefix))
-	satOK(t, todo.Close())
-	satOK(t, r.Close())
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
-	}
-}
 func TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	todo, e := newSATSolverUintSet(b)
@@ -258,19 +228,23 @@ func TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix(t *testing.T) {
 	}
 }
 
-func TestSATSolverRuntimeActivityCurrentBorrowAfterGrowthAndColdGuards(t *testing.T) {
+func TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards(t *testing.T) {
 	v, _, _ := satVariableStateFixture(t)
 	for i := 0; i < 2; i++ {
 		_, e := v.mkVar(false, true)
 		satOK(t, e)
 	}
-	old := v.activity.values.Raw.Block
 	for i := 2; i < 8; i++ {
 		_, e := v.mkVar(false, true)
 		satOK(t, e)
 	}
-	if _, e := v.memory.Read(old, 8); e == nil {
-		t.Fatal("captured old activity backing")
+	used, raw := v.budget.Used(), v.memory.State()
+	v.budget.FailAfter(0)
+	satOK(t, v.activity.Set(0, 1))
+	satOK(t, v.rescaleActivity())
+	v.budget.FailAfter(-1)
+	if v.budget.Used() != used || v.memory.State() != raw {
+		t.Fatal("native activity mutation/rescaling changed allocation state")
 	}
 	satOK(t, v.activity.Set(7, 100))
 	satOK(t, v.queue.ActivityIncreased(7))

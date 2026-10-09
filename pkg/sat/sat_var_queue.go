@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util"
 )
 
 type satVarQueue struct {
@@ -16,7 +17,7 @@ type satVarQueue struct {
 	runtimeClosing                                            bool
 	self                                                      *satVarQueue
 	activity                                                  *satActivityDomain
-	runtimeActivity                                           *satSolverRuntimeActivity
+	solverActivity                                            *satSolverActivity
 	values, indices                                           []int32
 	budget                                                    *arena.Budget
 	ownerBytes, epoch                                         uint64
@@ -525,7 +526,7 @@ func (q *satVarQueue) Clone(b *arena.Budget) (*satVarQueue, error) {
 	if e != nil {
 		return nil, e
 	}
-	v.runtimeActivity = q.runtimeActivity
+	v.solverActivity = q.solverActivity
 	v.literalSource = q.literalSource
 	n := uint64(cap(q.values)) * 4
 	if e = b.Reserve(n); e != nil {
@@ -558,7 +559,7 @@ func (q *satVarQueue) MoveClone(b *arena.Budget) (*satVarQueue, error) {
 	if e != nil {
 		return nil, e
 	}
-	v.runtimeActivity = q.runtimeActivity
+	v.solverActivity = q.solverActivity
 	v.literalSource = q.literalSource
 	n := uint64(cap(q.values)+cap(q.indices)) * 4
 	if b != q.budget {
@@ -579,24 +580,24 @@ func (q *satVarQueue) MoveClone(b *arena.Budget) (*satVarQueue, error) {
 }
 
 func (q *satVarQueue) getActivity(i uint32) (uint32, error) {
-	if q.runtimeActivity != nil {
-		return q.runtimeActivity.Get(i)
+	if q.solverActivity != nil {
+		return q.solverActivity.Get(i)
 	}
 	return q.activity.Get(i)
 }
-func newSATSolverRuntimeVarQueue(a *satSolverRuntimeActivity, b *arena.Budget) (*satVarQueue, error) {
+func newSATSolverRuntimeVarQueue(a *satSolverActivity, b *arena.Budget, r *util.Runtime) (*satVarQueue, error) {
 	if e := a.open(); e != nil {
 		return nil, e
 	}
-	if b == nil || a.budget != b || a.values.Raw.Runtime.Budget() != b {
+	if b == nil || a.budget != b || r == nil || r.Budget() != b {
 		return nil, ErrSATOwner
 	}
 	q, e := newSATVarQueue(nil, b)
 	if e != nil {
 		return nil, e
 	}
-	q.runtimeActivity = a
-	q.bindRuntime(a.values.Raw.Runtime)
+	q.solverActivity = a
+	q.bindRuntime(r)
 	if e = q.initialize(); e != nil {
 		if cleanup := q.Close(); cleanup != nil {
 			return q, errors.Join(e, cleanup)

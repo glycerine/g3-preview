@@ -1160,3 +1160,19 @@ vector test census were deleted. The VERIFY macro test uses the actual Runtime
 byte read/write operations directly, so debug testing does not retain a vector
 codec dependency. Native/checked SAT and focused debug/sorting-network tests,
 module-wide compilation, vet, and portcheck verify the new package boundary.
+
+## Native SAT activity scores
+
+The actual solver activity owner now stores `[]uint32` in `sat_solver_activity.go`.
+Increment/decay retain uint32 overflow and threshold behavior; rescaling walks
+the native slice. The queue borrows this concrete owner independently of its
+own remaining Runtime backing. Queue construction receives that Runtime
+explicitly, and copied/moved queues retain the same current-member activity
+borrow. Scope pop clears/truncates removed scores and regrowth starts at zero.
+The activity-specific Runtime allocation/destruction census and TLS refusal
+fixture are gone; remaining real Runtime failures still have their own tests.
+
+Validation: full native SAT (0.99s), checked/debug SAT (1.24s), module-wide
+compilation, SAT vet, and portcheck passed. Existing threshold/wrap, decay,
+rescaling, queue copy/move/growth, and native scope-regrowth tests remain live.
+A regression verifies that score mutation/rescaling changes no allocator state.

@@ -120,11 +120,11 @@ func (q *satVarQueue) lessRuntime(a, b int32) (bool, error) {
 		y, e := q.literalSource.literalWeight(uint32(b))
 		return x < y, e
 	}
-	x, e := q.runtimeActivity.Get(uint32(a))
+	x, e := q.solverActivity.Get(uint32(a))
 	if e != nil {
 		return false, e
 	}
-	y, e := q.runtimeActivity.Get(uint32(b))
+	y, e := q.solverActivity.Get(uint32(b))
 	return x > y, e
 }
 func (q *satVarQueue) upRuntime(i int32) error {
@@ -672,7 +672,7 @@ func (q *satVarQueue) cloneRuntime(b *arena.Budget) (*satVarQueue, error) {
 	if e != nil {
 		return nil, e
 	}
-	v.runtimeActivity = q.runtimeActivity
+	v.solverActivity = q.solverActivity
 	v.literalSource = q.literalSource
 	v.bindRuntime(q.runtimeValues.Raw.Runtime)
 	v.runtimeCompleted = 0
@@ -702,7 +702,7 @@ func (q *satVarQueue) moveRuntime(b *arena.Budget) (*satVarQueue, error) {
 	if e != nil {
 		return nil, e
 	}
-	v.runtimeActivity = q.runtimeActivity
+	v.solverActivity = q.solverActivity
 	v.literalSource = q.literalSource
 	v.runtimeValues = q.runtimeValues
 	v.runtimeValues.Raw.Self = &v.runtimeValues.Raw

@@ -16,9 +16,9 @@ import (
 func TestSATCaseSplitHeapConstructorRealRuntimeAccounting(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
 	before := s.runtime.memory.Stats().LiveBlocks
-	a, e := newSATSolverRuntimeActivity(s.budget, s.runtime.memory)
+	a, e := newSATSolverActivity(s.budget)
 	satOK(t, e)
-	q, e := newSATSolverRuntimeVarQueue(a, s.budget)
+	q, e := newSATSolverRuntimeVarQueue(a, s.budget, s.runtime.memory)
 	satOK(t, e)
 	// Actual heap ctor constructs source values {-1} and indices resized128.
 	// These must be two real Runtime allocations, never just Budget events.
@@ -240,9 +240,9 @@ func TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true})
 	satOK(t, e)
-	a, e := newSATSolverRuntimeActivity(b, r)
+	a, e := newSATSolverActivity(b)
 	satOK(t, e)
-	q, e := newSATSolverRuntimeVarQueue(a, b)
+	q, e := newSATSolverRuntimeVarQueue(a, b, r)
 	satOK(t, e)
 	satOK(t, q.reserveRuntime(50000))
 	values := q.runtimeValues.Raw.Block
@@ -282,7 +282,7 @@ func TestSATCaseSplitHeapSourceDestructorPostPhysicalTLSCursor(t *testing.T) {
 	}
 }
 
-func satHeapRuntimeAudit(t *testing.T, q *satVarQueue, a *satSolverRuntimeActivity, r *util.Runtime, b *arena.Budget, extra ...*satVarQueue) {
+func satHeapRuntimeAudit(t *testing.T, q *satVarQueue, a *satSolverActivity, r *util.Runtime, b *arena.Budget, extra ...*satVarQueue) {
 	t.Helper()
 	roots := []util.Block{}
 	var header uint64
@@ -313,10 +313,10 @@ func TestSATCaseSplitHeapConstructorEveryActualRefusal(t *testing.T) {
 			b := arena.NewBudget(^uint64(0))
 			r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
 			satOK(t, e)
-			a, e := newSATSolverRuntimeActivity(b, r)
+			a, e := newSATSolverActivity(b)
 			satOK(t, e)
 			b.FailAfter(ordinal)
-			q, e := newSATSolverRuntimeVarQueue(a, b)
+			q, e := newSATSolverRuntimeVarQueue(a, b, r)
 			if e != nil {
 				failures++
 				if !satRuntimeActualRefusal(r, e) {
@@ -375,9 +375,9 @@ func TestSATCaseSplitHeapReserveAllCapacitiesBeforeSizePublication(t *testing.T)
 			b := arena.NewBudget(^uint64(0))
 			r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
 			satOK(t, e)
-			a, e := newSATSolverRuntimeActivity(b, r)
+			a, e := newSATSolverActivity(b)
 			satOK(t, e)
-			q, e := newSATSolverRuntimeVarQueue(a, b)
+			q, e := newSATSolverRuntimeVarQueue(a, b, r)
 			satOK(t, e)
 			b.FailAfter(ordinal)
 			e = q.reserveRuntime(1000)
@@ -505,9 +505,9 @@ func TestSATCaseSplitHeapCopyEveryActualRefusal(t *testing.T) {
 			b := arena.NewBudget(^uint64(0))
 			r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
 			satOK(t, e)
-			a, e := newSATSolverRuntimeActivity(b, r)
+			a, e := newSATSolverActivity(b)
 			satOK(t, e)
-			q, e := newSATSolverRuntimeVarQueue(a, b)
+			q, e := newSATSolverRuntimeVarQueue(a, b, r)
 			satOK(t, e)
 			sourceValues, sourceIndices := q.runtimeValues.Raw.Block, q.runtimeIndices.Raw.Block
 			b.FailAfter(ordinal)
@@ -551,9 +551,9 @@ func TestSATCaseSplitHeapFailedCopyCompletedMemberBeforeOwningAbort(t *testing.T
 	b := arena.NewBudget(^uint64(0))
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
 	satOK(t, e)
-	a, e := newSATSolverRuntimeActivity(b, r)
+	a, e := newSATSolverActivity(b)
 	satOK(t, e)
-	q, e := newSATSolverRuntimeVarQueue(a, b)
+	q, e := newSATSolverRuntimeVarQueue(a, b, r)
 	satOK(t, e)
 	satOK(t, WriteRuntimeWord(r, q.runtimeIndices.Raw.Block, 4, 129))
 	copied, e := q.Clone(b)
@@ -591,9 +591,9 @@ func TestSATCaseSplitHeapNullPopReachedSourceDereference(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
 	satOK(t, e)
-	a, e := newSATSolverRuntimeActivity(b, r)
+	a, e := newSATSolverActivity(b)
 	satOK(t, e)
-	q, e := newSATSolverRuntimeVarQueue(a, b)
+	q, e := newSATSolverRuntimeVarQueue(a, b, r)
 	satOK(t, e)
 	moved, e := q.MoveClone(b)
 	satOK(t, e)
@@ -659,7 +659,7 @@ func TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve(t *testing.T) {
 			var e error
 			switch op {
 			case "construct":
-				created, e = newSATSolverRuntimeVarQueue(s.Variables.activity, foreign)
+				created, e = newSATSolverRuntimeVarQueue(s.Variables.activity, foreign, s.runtime.memory)
 			case "copy":
 				created, e = q.Clone(foreign)
 			case "move":
@@ -725,9 +725,9 @@ func TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased(t 
 	b := arena.NewBudget(^uint64(0))
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
 	satOK(t, e)
-	a, e := newSATSolverRuntimeActivity(b, r)
+	a, e := newSATSolverActivity(b)
 	satOK(t, e)
-	q, e := newSATSolverRuntimeVarQueue(a, b)
+	q, e := newSATSolverRuntimeVarQueue(a, b, r)
 	satOK(t, e)
 	clone, e := q.Clone(b)
 	satOK(t, e)
