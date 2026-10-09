@@ -36335,11 +36335,9 @@
         "TestPolynomialTranslateIndependentFiniteGrid",
         "TestPolynomialTranslateWrapperColdOwnerBeforeReads",
         "TestPolynomialLexSortIndependentRecursiveOrder",
-        "TestPolynomialLexSortEveryReservationPreservesTermPairs",
         "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
-        "TestPolynomialLexSortRetainedScratchOnlyGuardsReachedReuse",
+        "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse",
         "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
-        "TestPolynomialLexSortNestedGrowthEveryReservation",
         "TestPolynomialLexSortWrappedDegreeReachedBucket",
         "TestPolynomialLexSortActualBigCoefficientOwnership",
         "TestPolynomialTranslateImpEveryReservationAndLexSort",
@@ -36637,11 +36635,10 @@
         "TestPolynomialDerivativeOwnsActualMonomialAllocatorLeaf",
         "TestPolynomialDerivativeMonomialAllocatorForeignReplacementPreserved",
         "TestMonomialAllocatorOwnAcknowledgesPostphysicalRelease",
-        "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+        "TestPolynomialLexNativeMappingCyclesPreserveTermPairs",
         "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
         "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
         "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
-        "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
         "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
         "TestScalarDivDirectNumericNilContextSourceMath",
         "TestScalarDivDirectBigActualAllocationPrefixes",
@@ -36917,7 +36914,9 @@
         "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
         "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel",
         "TestPolynomialCompositionNativeDegreeCacheNoRuntimeGrowth",
-        "TestPolynomialCompositionNativeDegreeCacheSparseHornerReuse"
+        "TestPolynomialCompositionNativeDegreeCacheSparseHornerReuse",
+        "TestPolynomialLexSortNativeScratchGrowthAndReuse",
+        "TestPolynomialLexSortNativeLargeBucketsIndependentGrid"
       ],
       "conditionals": [
         {
@@ -39369,19 +39368,20 @@
           ]
         },
         {
-          "name": "Selected recursive lex_sort1315-1366 and1440-1460, public7022-7024: actual unsigned buckets and raw numeral/monomial permutation cycles",
+          "name": "Selected recursive lex_sort polynomial.cpp:1315-1366,1440-1460,7022-7024: native unsigned bucket/permutation storage and original coefficient/monomial cycle algorithm",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_lex_sort.go",
           "tests": [
             "TestPolynomialLexSortIndependentRecursiveOrder",
-            "TestPolynomialLexSortEveryReservationPreservesTermPairs",
             "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
-            "TestPolynomialLexSortRetainedScratchOnlyGuardsReachedReuse",
+            "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse",
             "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
-            "TestPolynomialLexSortNestedGrowthEveryReservation",
             "TestPolynomialLexSortWrappedDegreeReachedBucket",
             "TestPolynomialLexSortActualBigCoefficientOwnership",
-            "TestPolynomialTranslateImpEveryReservationAndLexSort"
+            "TestPolynomialTranslateImpEveryReservationAndLexSort",
+            "TestPolynomialLexSortNativeScratchGrowthAndReuse",
+            "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
+            "TestPolynomialLexNativeMappingCyclesPreserveTermPairs"
           ]
         },
         {
@@ -39999,22 +39999,22 @@
           ]
         },
         {
-          "name": "actual polynomial lex recursive raw NUM/monomial cycle consumers and captured Runtime mapping; stable actual allocation layout and literal nested bucket size/append/capacity source reads",
+          "name": "Polynomial recursive lex sorting with native unsigned bucket/permutation slices, signed in-place mapping cycles and captured actual coefficient/monomial payload guards",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_lex_sort.go",
           "tests": [
-            "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+            "TestPolynomialLexNativeMappingCyclesPreserveTermPairs",
             "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
             "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
             "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
-            "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
             "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
             "TestPolynomialLexSortIndependentRecursiveOrder",
-            "TestPolynomialLexSortEveryReservationPreservesTermPairs",
             "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
-            "TestPolynomialLexSortNestedGrowthEveryReservation",
             "TestPolynomialLexSortActualBigCoefficientOwnership",
-            "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
+            "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
+            "TestPolynomialLexSortNativeScratchGrowthAndReuse",
+            "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
+            "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse"
           ]
         },
         {
@@ -40967,7 +40967,8 @@
         "GCD variable/degree pairs and their persistent variable-to-position cache now use concrete Go slices. The power-pair sbuffer inline/spill capacity, raw/pending Runtime blocks, copied/initialized masks, source buffer free failures and hand-translated heapsort are removed. Go sort.Slice applies the original ascending unsigned variable-only or degree-only comparator; equal-key library comparison/swap order is not a fidelity requirement. Degree collection retains first occurrence, Max/Min selection and sentinel reset. Native source/owning cleanup releases slices in the existing enclosing scope order, and physical audits exclude them. Tests cover large cold growth with Runtime reservations disabled, unsigned pair sorting, equal-degree multiplicities, warmed append reuse and repeated degree cache reset; actual numeral/reference allocations and source lifetime guards remain live. No whole-unit completion credit is added.",
         "ICCP coefficient counters and first-occurrence degree lists, and the modular-GCD recursion variable list, now use plain Go uint32 slices. The unsigned128 and variable32 sbuffer translations, Runtime expansion/pending blocks, initialized/copy masks and buffer destructor refusal paths are deleted. Existing ICCP/GCD invocation scope ordering clears the native slices at source/owning end; recursion borrows the variable slice without a container owner. Coefficient counting, first encounter order, degree-driven variable order, independent content/primitive results and terminal Euclid behavior remain. The stale ICCP receipt test now uses a real large-coefficient numeral allocation failure and requires an active replacement frame; snapshots include native slice contents. High-degree tests cover former capacity boundaries and repeated cleanup. Actual numeral/reference ownership and fault campaigns remain; tests dedicated to deleted C++ buffer topology are retired. No whole-unit completion credit is added.",
         "GCD monomial reference storage now uses a concrete []Monomial slice. Original IncRef-before-publication, generated ownership transfer, ordered DecRef/reset and resumable actual monomial destruction remain. Deleted inline/spill payloads, Runtime expansion blocks, copied/pending growth state and incoming ownership needed only by fallible backing writes. Native append has no custom Runtime refusal event. Duplicate references across growth/reuse, generated transfer, real last-reference destructor refusal/owning continuation and independent GF11[x] content factorization with 33 coefficient monomials are tested. The synthetic consumed-old-growth test is retired; younger reference release before an older source stop remains checked by actual reference counts. No whole-unit completion credit is added.",
-        "Composition degree-to-term positions now use a native []uint32 cache initialized with UINT_MAX for absent degrees. Removed vector headers, Runtime expansion/pending storage and destructor refusal for this member. Save/reset retain source term positions, partial-constructor progress on actual polynomial/monomial read failure, scoped cancellation cleanup and the original Horner arithmetic. Source/owning member destruction releases the slice at its existing boundary. Native cache growth/reuse under disabled Runtime reservations and independent sparse p(y^2) composition through degree 257 are checked. The unsigned n+1 wrap test now reports arena.ErrBounds in release mode (source debug assertion unchanged), with no allocation or fabricated constructor completion. No whole-unit completion credit is added."
+        "Composition degree-to-term positions now use a native []uint32 cache initialized with UINT_MAX for absent degrees. Removed vector headers, Runtime expansion/pending storage and destructor refusal for this member. Save/reset retain source term positions, partial-constructor progress on actual polynomial/monomial read failure, scoped cancellation cleanup and the original Horner arithmetic. Source/owning member destruction releases the slice at its existing boundary. Native cache growth/reuse under disabled Runtime reservations and independent sparse p(y^2) composition through degree 257 are checked. The unsigned n+1 wrap test now reports arena.ErrBounds in release mode (source debug assertion unchanged), with no allocation or fabricated constructor completion. No whole-unit completion credit is added.",
+        "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added."
       ]
     },
     {
@@ -41478,11 +41479,9 @@
         "TestPolynomialTranslateIndependentFiniteGrid",
         "TestPolynomialTranslateWrapperColdOwnerBeforeReads",
         "TestPolynomialLexSortIndependentRecursiveOrder",
-        "TestPolynomialLexSortEveryReservationPreservesTermPairs",
         "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
-        "TestPolynomialLexSortRetainedScratchOnlyGuardsReachedReuse",
+        "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse",
         "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
-        "TestPolynomialLexSortNestedGrowthEveryReservation",
         "TestPolynomialLexSortWrappedDegreeReachedBucket",
         "TestPolynomialLexSortActualBigCoefficientOwnership",
         "TestPolynomialTranslateImpEveryReservationAndLexSort",
@@ -42980,11 +42979,9 @@
           "go_target": "pkg/math/polynomial/polynomial_lex_sort.go",
           "tests": [
             "TestPolynomialLexSortIndependentRecursiveOrder",
-            "TestPolynomialLexSortEveryReservationPreservesTermPairs",
             "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
-            "TestPolynomialLexSortRetainedScratchOnlyGuardsReachedReuse",
+            "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse",
             "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
-            "TestPolynomialLexSortNestedGrowthEveryReservation",
             "TestPolynomialLexSortWrappedDegreeReachedBucket",
             "TestPolynomialLexSortActualBigCoefficientOwnership",
             "TestPolynomialTranslateImpEveryReservationAndLexSort"
@@ -140053,18 +140050,18 @@
         "TestPermutationCyclesUnreadAndSignedCountBranches",
         "TestPermutationCyclesOverlappingActualBorrow",
         "TestPermutationCyclesReachedSourceAssertionAndDuplicateCycle",
-        "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+        "TestPolynomialLexNativeMappingCyclesPreserveTermPairs",
         "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
         "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
         "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
-        "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
         "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
         "TestPolynomialLexSortIndependentRecursiveOrder",
-        "TestPolynomialLexSortEveryReservationPreservesTermPairs",
         "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
-        "TestPolynomialLexSortNestedGrowthEveryReservation",
         "TestPolynomialLexSortActualBigCoefficientOwnership",
-        "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
+        "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
+        "TestPolynomialLexSortNativeScratchGrowthAndReuse",
+        "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
+        "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse"
       ],
       "conditionals": [
         {
@@ -140118,22 +140115,22 @@
           ]
         },
         {
-          "name": "actual polynomial lex recursive raw NUM/monomial cycle consumers and captured Runtime mapping; stable actual allocation layout and literal nested bucket size/append/capacity source reads",
+          "name": "Polynomial recursive lex sorting with native unsigned bucket/permutation slices, signed in-place mapping cycles and captured actual coefficient/monomial payload guards",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_lex_raw_pointer.go",
           "tests": [
-            "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+            "TestPolynomialLexNativeMappingCyclesPreserveTermPairs",
             "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
             "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
             "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
-            "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
             "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
             "TestPolynomialLexSortIndependentRecursiveOrder",
-            "TestPolynomialLexSortEveryReservationPreservesTermPairs",
             "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
-            "TestPolynomialLexSortNestedGrowthEveryReservation",
             "TestPolynomialLexSortActualBigCoefficientOwnership",
-            "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
+            "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
+            "TestPolynomialLexSortNativeScratchGrowthAndReuse",
+            "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
+            "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse"
           ]
         }
       ],
@@ -140143,7 +140140,8 @@
       ],
       "deviations": [
         "Only concrete uint32 and polynomial payload consumers are represented; future consumers receive their own typed slice implementation without a generic container wrapper.",
-        "The registered permutation test body is disabled by #if 0, so independent finite tests provide algorithm evidence without registered-driver credit."
+        "The registered permutation test body is disabled by #if 0, so independent finite tests provide algorithm evidence without registered-driver credit.",
+        "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added."
       ]
     },
     {
@@ -148999,16 +148997,13 @@
         "TestHeapAssignmentSourceDestroyedFirstMember",
         "TestHeapFindLESourceOutputBeforeChildGrowth",
         "TestHeapLegacyCopiedCloseRejectsBeforeRefund",
-        "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+        "TestPolynomialLexNativeMappingCyclesPreserveTermPairs",
         "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
         "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
         "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
-        "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
         "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
         "TestPolynomialLexSortIndependentRecursiveOrder",
-        "TestPolynomialLexSortEveryReservationPreservesTermPairs",
         "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
-        "TestPolynomialLexSortNestedGrowthEveryReservation",
         "TestPolynomialLexSortActualBigCoefficientOwnership",
         "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
         "TestDebugMacroUnreachableIgnoresAssertionSwitch",
@@ -149040,7 +149035,10 @@
         "TestPolynomialGCDPowersNativeGrowthAndReuse",
         "TestPolynomialGCDVariableDegreesNativeCache",
         "TestPolynomialCompositionNativeDegreeCacheNoRuntimeGrowth",
-        "TestPolynomialCompositionNativeDegreeCacheSparseHornerReuse"
+        "TestPolynomialCompositionNativeDegreeCacheSparseHornerReuse",
+        "TestPolynomialLexSortNativeScratchGrowthAndReuse",
+        "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
+        "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse"
       ],
       "conditionals": [
         {
@@ -149464,22 +149462,22 @@
           ]
         },
         {
-          "name": "actual polynomial lex recursive raw NUM/monomial cycle consumers and captured Runtime mapping; stable actual allocation layout and literal nested bucket size/append/capacity source reads",
+          "name": "Polynomial recursive lex sorting with native unsigned bucket/permutation slices, signed in-place mapping cycles and captured actual coefficient/monomial payload guards",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_lex_sort.go",
           "tests": [
-            "TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset",
+            "TestPolynomialLexNativeMappingCyclesPreserveTermPairs",
             "TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject",
             "TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread",
             "TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard",
-            "TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion",
             "TestPolynomialLexCapturedPayloadRejectsRealDeletedReusedSlot",
             "TestPolynomialLexSortIndependentRecursiveOrder",
-            "TestPolynomialLexSortEveryReservationPreservesTermPairs",
             "TestPolynomialLexSortNestedGrowthIndependentFiniteModel",
-            "TestPolynomialLexSortNestedGrowthEveryReservation",
             "TestPolynomialLexSortActualBigCoefficientOwnership",
-            "TestPolynomialLexSortFreshNullCoefficientRawPermutation"
+            "TestPolynomialLexSortFreshNullCoefficientRawPermutation",
+            "TestPolynomialLexSortNativeScratchGrowthAndReuse",
+            "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
+            "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse"
           ]
         },
         {
@@ -149650,7 +149648,8 @@
         "Literal uint32 arithmetic is retained for n+1 and degree/exponent differences; defective zero-gap loop casts unsigned endpoints to signed int32. Bounded owner budgets refuse oversized range allocation before signed-gap execution. Source signed overflow beyond defined loop domain gains no mathematical completion claim.",
         "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence.",
         "GCD variable/degree pairs and their persistent variable-to-position cache now use concrete Go slices. The power-pair sbuffer inline/spill capacity, raw/pending Runtime blocks, copied/initialized masks, source buffer free failures and hand-translated heapsort are removed. Go sort.Slice applies the original ascending unsigned variable-only or degree-only comparator; equal-key library comparison/swap order is not a fidelity requirement. Degree collection retains first occurrence, Max/Min selection and sentinel reset. Native source/owning cleanup releases slices in the existing enclosing scope order, and physical audits exclude them. Tests cover large cold growth with Runtime reservations disabled, unsigned pair sorting, equal-degree multiplicities, warmed append reuse and repeated degree cache reset; actual numeral/reference allocations and source lifetime guards remain live. No whole-unit completion credit is added.",
-        "Composition degree-to-term positions now use a native []uint32 cache initialized with UINT_MAX for absent degrees. Removed vector headers, Runtime expansion/pending storage and destructor refusal for this member. Save/reset retain source term positions, partial-constructor progress on actual polynomial/monomial read failure, scoped cancellation cleanup and the original Horner arithmetic. Source/owning member destruction releases the slice at its existing boundary. Native cache growth/reuse under disabled Runtime reservations and independent sparse p(y^2) composition through degree 257 are checked. The unsigned n+1 wrap test now reports arena.ErrBounds in release mode (source debug assertion unchanged), with no allocation or fabricated constructor completion. No whole-unit completion credit is added."
+        "Composition degree-to-term positions now use a native []uint32 cache initialized with UINT_MAX for absent degrees. Removed vector headers, Runtime expansion/pending storage and destructor refusal for this member. Save/reset retain source term positions, partial-constructor progress on actual polynomial/monomial read failure, scoped cancellation cleanup and the original Horner arithmetic. Source/owning member destruction releases the slice at its existing boundary. Native cache growth/reuse under disabled Runtime reservations and independent sparse p(y^2) composition through degree 257 are checked. The unsigned n+1 wrap test now reports arena.ErrBounds in release mode (source debug assertion unchanged), with no allocation or fabricated constructor completion. No whole-unit completion credit is added.",
+        "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added."
       ]
     },
     {

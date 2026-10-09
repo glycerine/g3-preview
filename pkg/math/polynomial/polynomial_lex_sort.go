@@ -1,162 +1,11 @@
 // Source: src/math/polynomial/polynomial.cpp:1315-1366,1440-1460,2462-2464,7022-7024;
-// src/util/permutation.h:57-91; src/util/vector.h:60-98,422-437.
+// src/util/permutation.h:57-91.
 package polynomial
 
 import (
-	"reflect"
-
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/arena"
 )
 
-// Runtime slots encode concrete child bindings; the charged directory contains
-// the actual unsigned-vector owners. It never duplicates numeral storage.
-func (b *polynomialImpBuckets) reserve(n uint32) error {
-	m := b.owner
-	if b.data.interrupted || b.data.pending != (util.Block{}) || b.data.old != (util.Block{}) {
-		return ErrPolynomialPending
-	}
-	size, e := b.data.size(m)
-	if e != nil {
-		return e
-	}
-	if n <= size {
-		return nil
-	}
-	for {
-		cap, e := b.data.capacity(m)
-		if e != nil {
-			return e
-		}
-		if n <= cap {
-			break
-		}
-		if e = b.expandClasses(); e != nil {
-			return e
-		}
-	}
-	if uint64(n) > uint64(cap(b.children)) {
-		stride := uint64(reflect.TypeOf(polynomialVector{}).Size())
-		if e = m.integer.Budget().Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		next := make([]polynomialVector, len(b.children), int(n))
-		copy(next, b.children)
-		m.integer.Budget().Release(uint64(cap(b.children)) * stride)
-		b.children = next
-	}
-	if e = b.data.publishSize(m, n); e != nil {
-		return e
-	}
-	for b.data.initialized < n {
-		i := b.data.initialized
-		// Source placement constructs a default unsigned_vector at this slot.
-		if e = b.data.write64(m, 8+uint64(i)*8, uint64(i)+1); e != nil {
-			return e
-		}
-		b.children = append(b.children, polynomialVector{width: 4})
-		b.data.initialized++
-	}
-	return nil
-}
-func (b *polynomialImpBuckets) expandClasses() error {
-	m := b.owner
-	v := &b.data
-	if polynomialSourceDebug && v.raw != (util.Block{}) {
-		cap, e := v.capacity(m)
-		if e != nil {
-			return e
-		}
-		if cap == 0 {
-			return ErrPolynomialAssertion
-		}
-	}
-	oldCap, e := v.capacity(m)
-	if e != nil {
-		return e
-	}
-	n := uint32(2)
-	if v.raw != (util.Block{}) {
-		n = (3*oldCap + 1) >> 1
-	}
-	bytes := uint32(8*n + 8)
-	oldBytes := uint32(8*oldCap + 8)
-	if v.raw != (util.Block{}) && (n <= oldCap || bytes <= oldBytes) {
-		return util.Failure{Kind: util.FailureVectorOverflow}
-	}
-	v.pending, e = m.memory.Allocate(uint64(bytes))
-	if e != nil {
-		return e
-	}
-	if v.raw == (util.Block{}) {
-		if e = m.memory.WriteUint32(v.pending, 0, n); e != nil {
-			return e
-		}
-		if e = m.memory.WriteUint32(v.pending, 4, 0); e != nil {
-			return e
-		}
-		v.raw = v.pending
-		v.pending = util.Block{}
-		v.initialized = 0
-		return nil
-	}
-	size, e := v.size(m)
-	if e != nil {
-		return e
-	}
-	if e = m.memory.WriteUint32(v.pending, 4, size); e != nil {
-		return e
-	}
-	v.old = v.raw
-	v.oldInitialized = v.initialized
-	v.raw = v.pending
-	v.pending = util.Block{}
-	v.initialized = 0
-	v.moved = 0
-	v.interrupted = true
-	old := polynomialVector{raw: v.old, width: 8}
-	for v.moved < size {
-		id, e := old.read64(m, 8+uint64(v.moved)*8)
-		if e != nil {
-			return e
-		}
-		if e = v.write64(m, 8+uint64(v.moved)*8, id); e != nil {
-			return e
-		}
-		// unsigned_vector's move constructor leaves its old pointer null.
-		if e = old.write64(m, 8+uint64(v.moved)*8, 0); e != nil {
-			return e
-		}
-		v.moved++
-		v.initialized++
-	}
-	if v.old != (util.Block{}) {
-		if e = m.memory.Deallocate(&v.old); e != nil {
-			return e
-		}
-	}
-	if e = m.memory.WriteUint32(v.raw, 0, n); e != nil {
-		return e
-	}
-	v.interrupted = false
-	return nil
-}
-func (b *polynomialImpBuckets) at(i uint32) (*polynomialVector, error) {
-	n, e := b.data.size(b.owner)
-	if e != nil {
-		return nil, e
-	}
-	if polynomialSourceDebug && i >= n {
-		return nil, ErrPolynomialAssertion
-	}
-	id, e := b.data.read64(b.owner, 8+uint64(i)*8)
-	if e != nil {
-		return nil, e
-	}
-	if id == 0 || id > uint64(len(b.children)) {
-		return nil, ErrPolynomialPartial
-	}
-	return &b.children[id-1], nil
-}
 func polynomialUnsignedAppend(m *MultivariatePolynomialCore, v *polynomialVector, x uint32) error {
 	i, e := v.appendSlot(m)
 	if e != nil {
@@ -219,67 +68,32 @@ func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uin
 		if e != nil {
 			return e
 		}
-		if e = m.lexBuckets.reserve(d + 1); e != nil {
-			return e
+		n := d + 1
+		if uint64(n) > uint64(len(m.lexBuckets)) {
+			m.lexBuckets = append(m.lexBuckets, make([][]uint32, int(n)-len(m.lexBuckets))...)
 		}
-		b, e := m.lexBuckets.at(d)
-		if e != nil {
-			return e
+		if uint64(d) >= uint64(len(m.lexBuckets)) {
+			if polynomialSourceDebug {
+				return ErrPolynomialAssertion
+			}
+			return arena.ErrBounds
 		}
-		if e = polynomialUnsignedAppend(c, b, j); e != nil {
-			return e
-		}
+		m.lexBuckets[d] = append(m.lexBuckets[d], j)
 		if d > maxDegree {
 			maxDegree = d
 		}
 	}
-	if e := m.lexPermutation.reset(c); e != nil {
-		return e
-	}
+	m.lexPermutation = m.lexPermutation[:0]
 	for i := maxDegree + 1; i > 0; {
 		i--
-		b, e := m.lexBuckets.at(i)
-		if e != nil {
-			return e
-		}
-		for j := uint32(0); ; j++ {
-			n, e := b.size(c)
-			if e != nil {
-				return e
-			}
-			if j >= n {
-				break
-			}
-			v, e := polynomialUnsignedRead(c, b, j)
-			if e != nil {
-				return e
-			}
-			if e = polynomialUnsignedAppend(c, &m.lexPermutation, v); e != nil {
-				return e
-			}
-		}
-		if e = b.reset(c); e != nil {
-			return e
-		}
+		m.lexPermutation = append(m.lexPermutation, m.lexBuckets[i]...)
+		m.lexBuckets[i] = m.lexBuckets[i][:0]
 	}
-	if polynomialSourceDebug {
-		n, e := m.lexPermutation.size(c)
-		if e != nil {
-			return e
-		}
-		if n != end-start {
-			return ErrPolynomialAssertion
-		}
-	}
-	n, e := m.lexPermutation.size(c)
-	if e != nil {
-		return e
+	n := uint32(len(m.lexPermutation))
+	if polynomialSourceDebug && n != end-start {
+		return ErrPolynomialAssertion
 	}
 	if e = m.lexApplyPermutation(p, start, n, true); e != nil {
-		return e
-	}
-	n, e = m.lexPermutation.size(c)
-	if e != nil {
 		return e
 	}
 	if e = m.lexApplyPermutation(p, start, n, false); e != nil {
@@ -416,7 +230,7 @@ func (m *MultivariatePolynomialManager) LexSort(p Polynomial) error {
 	return nil
 }
 
-// CleanupLexSort is an explicit owning abort of actual primitive scratch roots.
+// CleanupLexSort releases native scratch retained by a stopped invocation.
 // It does not undo polynomial publications or reexecute the stopped source call.
 func (m *MultivariatePolynomialManager) CleanupLexSort() error {
 	if e := m.ready(); e != nil {
@@ -428,15 +242,8 @@ func (m *MultivariatePolynomialManager) cleanupLexSort() error {
 	if !m.lexPending {
 		return nil
 	}
-	if e := m.lexBuckets.close(); e != nil {
-		return e
-	}
-	if e := m.lexPermutation.close(m.core); e != nil {
-		return e
-	}
-	m.lexBuckets.data = polynomialVector{width: 8}
-	m.lexBuckets.cursor = 0
-	m.lexPermutation = polynomialVector{width: 4}
+	m.lexBuckets = nil
+	m.lexPermutation = nil
 	m.lexPending = false
 	return nil
 }

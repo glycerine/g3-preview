@@ -29,14 +29,9 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	refvectors := []*PolynomialRefVector{}
 	lazy := []*PolynomialNewtonVector{&full.newton}
 	handlers := []*PolynomialDeletionHandler{}
-	external := []util.Block{m.tmp1.raw, m.tmp1.pending, full.lexPermutation.raw, full.lexPermutation.pending, m.substitution.found.raw, m.substitution.found.pending}
+	external := []util.Block{m.tmp1.raw, m.tmp1.pending, m.substitution.found.raw, m.substitution.found.pending}
 	external = append(external, extraRaw...)
-	external = append(external, full.lexBuckets.data.raw, full.lexBuckets.data.pending, full.lexBuckets.data.old)
-	for i := range full.lexBuckets.children {
-		v := &full.lexBuckets.children[i]
-		external = append(external, v.raw, v.pending, v.old)
-	}
-	adapterBytes := uint64(cap(m.variableNumeralHistory))*uint64(reflect.TypeOf(polynomialVariableNumeralHistory{}).Size()) + uint64(cap(m.quasiHistory))*uint64(reflect.TypeOf(polynomialQuasiResultantHistory{}).Size()) + full.header + uint64(cap(full.lexBuckets.children))*uint64(reflect.TypeOf(polynomialVector{}).Size())
+	adapterBytes := uint64(cap(m.variableNumeralHistory))*uint64(reflect.TypeOf(polynomialVariableNumeralHistory{}).Size()) + uint64(cap(m.quasiHistory))*uint64(reflect.TypeOf(polynomialQuasiResultantHistory{}).Size()) + full.header
 	public := []*util.Int{&full.derivative.n, &full.derivative.a, &full.composition.a}
 	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
 		public = append(public, &b.cohortMovingCoefficient, &b.appendScope.movingCoefficient, &b.arithmeticScope.transport)

@@ -3,59 +3,10 @@
 package polynomial
 
 import (
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// The actual lex-bucket member is a vector of unsigned-vector objects. Its
-// directory records the concrete child objects, not numeral ownership inferred
-// from a registry. The outer Runtime vector contains their scalar bindings.
-type polynomialImpBuckets struct {
-	owner    *MultivariatePolynomialCore
-	data     polynomialVector
-	children []polynomialVector
-	cursor   uint32
-}
-
-func (b *polynomialImpBuckets) sourceFinalize() error {
-	n, e := b.data.size(b.owner)
-	if e != nil {
-		return e
-	}
-	for b.cursor < n {
-		child, e := b.at(b.cursor)
-		if e != nil {
-			return e
-		}
-		if e := polynomialImpRawSource(b.owner, child); e != nil {
-			return e
-		}
-		b.cursor++
-	}
-	return polynomialImpRawSource(b.owner, &b.data)
-}
-func (b *polynomialImpBuckets) close() error {
-	for i := range b.children {
-		if e := b.children[i].close(b.owner); e != nil {
-			return e
-		}
-	}
-	if b.data.old != (util.Block{}) {
-		if e := b.owner.memory.Deallocate(&b.data.old); e != nil {
-			return e
-		}
-	}
-	if e := b.data.close(b.owner); e != nil {
-		return e
-	}
-	if cap(b.children) > 0 {
-		b.owner.integer.Budget().Release(uint64(cap(b.children)) * uint64(reflect.TypeOf(polynomialVector{}).Size()))
-	}
-	b.children = nil
-	return nil
-}
 func polynomialImpRawSource(m *MultivariatePolynomialCore, v *polynomialVector) error {
 	if v.raw != (util.Block{}) {
 		return m.memory.Deallocate(&v.raw)
@@ -94,9 +45,9 @@ func (m *MultivariatePolynomialManager) destroyMembers() error {
 			case 7:
 				e = m.core.substitution.found.sourceFinalize()
 			case 8:
-				e = polynomialImpRawSource(m.core, &m.lexPermutation)
+				m.lexPermutation = nil
 			case 9:
-				e = m.lexBuckets.sourceFinalize()
+				m.lexBuckets = nil
 			case 10:
 				e = m.sourceBufferMembers(&m.core.cheap2, false)
 			case 11:

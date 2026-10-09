@@ -5,6 +5,7 @@ package polynomial
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -239,67 +240,52 @@ func TestPolynomialEvaluationWarmInlineSourceLocals(t *testing.T) {
 }
 
 func TestPolynomialEvaluationLexReceiptForeignReplacement(t *testing.T) {
-	found := false
-	for ordinal := int64(0); ordinal < 30 && !found; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{3, 0, 0}}, {2, [3]uint32{1, 0, 0}}, {7, [3]uint32{}}})
-			q := m.core.config.Rationals
-			v := polynomialEvalRationalMap{manager: q}
-			for i := range v.values {
-				v.values[i] = util.NewRational()
-				serviceMust(t, q.SetInt32(&v.values[i], 2))
-			}
-			out := util.NewRational()
-			q.Budget().FailAfter(ordinal)
-			e := m.EvaluateRational(p, &v, &out)
-			polynomialEvaluationAudit(t, m, p, &v, &out)
-			q.Budget().FailAfter(-1)
-			if m.evaluation.lexGeneration != 0 {
-				found = true
-				if e == nil || !numericPhysicalReservationRefusal(e) {
-					t.Fatal("expected actually reached first LexSort refusal", e)
-				}
-				old := m.evaluation.lexGeneration
-				serviceMust(t, m.CleanupLexSort())
-				first, e := m.core.monomials.MkVariable(0, 100)
-				serviceMust(t, e)
-				second, e := m.core.monomials.MkVariable(0, 1)
-				serviceMust(t, e)
-				unit, e := m.core.monomials.Unit()
-				serviceMust(t, e)
-				foreign, e := m.core.MkTerms([]util.Int{util.NewInt(3), util.NewInt(5), util.NewInt(11)}, []Monomial{first, second, unit})
-				serviceMust(t, e)
-				serviceMust(t, m.core.IncRef(foreign))
-				defer func() { serviceMust(t, m.core.DecRef(foreign)) }()
-				q.Budget().FailAfter(0)
-				e = m.LexSort(foreign)
-				q.Budget().FailAfter(-1)
-				if e == nil || !numericPhysicalReservationRefusal(e) || !m.lexPending || m.lexGeneration == old {
-					t.Fatal("expected actual later distinct LexSort", e)
-				}
-				generation, cause := m.lexGeneration, m.lexCause
-				raw, pending := m.lexBuckets.data.raw, m.lexBuckets.data.pending
-				inputs := []*util.Int{&(*out.BorrowNumerator()), &(*out.BorrowDenominator())}
-				for i := range v.values {
-					inputs = append(inputs, &(*v.values[i].BorrowNumerator()), &(*v.values[i].BorrowDenominator()))
-				}
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, foreign}, inputs, 0)
-				serviceMust(t, m.CleanupEvaluation())
-				if !m.lexPending || m.lexGeneration != generation || m.lexCause != cause || m.lexBuckets.data.raw != raw || m.lexBuckets.data.pending != pending {
-					t.Fatal("stale operation receipt aborted later foreign LexSort")
-				}
-				polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, foreign}, inputs, 0)
-				serviceMust(t, m.CleanupLexSort())
-			} else {
-				serviceMust(t, m.CleanupEvaluation())
-			}
-			for i := range v.values {
-				serviceMust(t, q.Del(&v.values[i]))
-			}
-			serviceMust(t, q.Del(&out))
-		})
+	m, _, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{}}})
+	p := polynomialLexWrappedPolynomial(t, m)
+	q := m.core.config.Rationals
+	values := polynomialEvalRationalMap{manager: q}
+	for i := range values.values {
+		values.values[i] = util.NewRational()
+		serviceMust(t, q.SetInt32(&values.values[i], 2))
 	}
-	if !found {
-		t.Fatal("no reached original LexSort continuation")
+	out := util.NewRational()
+	t.Cleanup(func() {
+		serviceMust(t, m.CleanupEvaluation())
+		serviceMust(t, m.CleanupLexSort())
+		for i := range values.values {
+			serviceMust(t, q.Del(&values.values[i]))
+		}
+		serviceMust(t, q.Del(&out))
+	})
+	cause := m.EvaluateRational(p, &values, &out)
+	expected := error(arena.ErrBounds)
+	if polynomialSourceDebug {
+		expected = ErrPolynomialAssertion
 	}
+	if cause != expected || m.evaluation.lexGeneration == 0 {
+		t.Fatal("evaluation did not reach native LexSort bounds stop", cause)
+	}
+	old := m.evaluation.lexGeneration
+	serviceMust(t, m.CleanupLexSort())
+	foreign := polynomialLexWrappedPolynomial(t, m)
+	cause = m.LexSort(foreign)
+	if cause != expected || !m.lexPending || m.lexGeneration == old {
+		t.Fatal("later distinct LexSort did not stop", cause)
+	}
+	generation := m.lexGeneration
+	buckets := make([][]uint32, len(m.lexBuckets))
+	for i, b := range m.lexBuckets {
+		if b != nil {
+			buckets[i] = make([]uint32, len(b))
+			copy(buckets[i], b)
+		}
+	}
+	permutation := append([]uint32(nil), m.lexPermutation...)
+	polynomialEvaluationAudit(t, m, p, &values, &out)
+	serviceMust(t, m.CleanupEvaluation())
+	if !m.lexPending || m.lexGeneration != generation || m.lexCause != cause || !reflect.DeepEqual(m.lexBuckets, buckets) || !reflect.DeepEqual(m.lexPermutation, permutation) {
+		t.Fatal("stale evaluator receipt changed later LexSort scratch")
+	}
+	polynomialEvaluationAudit(t, m, p, &values, &out)
+	serviceMust(t, m.CleanupLexSort())
 }

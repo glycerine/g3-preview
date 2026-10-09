@@ -327,9 +327,9 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 				e = m.core.substitution.found.close()
 			}
 		case 8:
-			e = m.lexPermutation.close(m.core)
+			m.lexPermutation = nil
 		case 9:
-			e = m.lexBuckets.close()
+			m.lexBuckets = nil
 		case 10:
 			m.degree2pos = nil
 		case 11:

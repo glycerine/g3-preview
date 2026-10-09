@@ -147,7 +147,7 @@ func (v polynomialMonomialPointer) write(i uint32, x Monomial) error {
 }
 func (m *MultivariatePolynomialManager) lexApplyPermutation(p Polynomial, start, n uint32, numerals bool) error {
 	c := m.core
-	perm := util.BorrowRuntimeUint32(c.memory, m.lexPermutation.raw, 8)
+	perm := m.lexPermutation
 	as, e := c.captureCoefficientPointer(p, start)
 	if e != nil {
 		return e
@@ -157,10 +157,10 @@ func (m *MultivariatePolynomialManager) lexApplyPermutation(p Polynomial, start,
 		return e
 	}
 	for i := int32(0); i < int32(n); i++ {
-		x, e := perm.Read(uint32(i))
-		if e != nil {
-			return e
+		if uint64(i) >= uint64(len(perm)) {
+			return arena.ErrBounds
 		}
+		x := perm[i]
 		if int32(x) < 0 {
 			continue
 		}
@@ -169,10 +169,10 @@ func (m *MultivariatePolynomialManager) lexApplyPermutation(p Polynomial, start,
 			if polynomialSourceDebug && j < 0 {
 				return ErrPolynomialAssertion
 			}
-			next, e := perm.Read(uint32(j))
-			if e != nil {
-				return e
+			if uint64(j) >= uint64(len(perm)) {
+				return arena.ErrBounds
 			}
+			next := perm[j]
 			k := int32(next)
 			if polynomialSourceDebug && (k < 0 || k >= int32(n)) {
 				return ErrPolynomialAssertion
@@ -180,9 +180,7 @@ func (m *MultivariatePolynomialManager) lexApplyPermutation(p Polynomial, start,
 			if k == math.MinInt32 {
 				return arena.ErrBounds
 			}
-			if e = perm.Write(uint32(j), uint32(-k-1)); e != nil {
-				return e
-			}
+			perm[j] = uint32(-k - 1)
 			if k == i {
 				break
 			}
@@ -224,16 +222,14 @@ func (m *MultivariatePolynomialManager) lexApplyPermutation(p Polynomial, start,
 	}
 	if numerals {
 		for i := uint32(0); i < n; i++ {
-			x, e := perm.Read(i)
-			if e != nil {
-				return e
+			if uint64(i) >= uint64(len(perm)) {
+				return arena.ErrBounds
 			}
+			x := perm[i]
 			if int32(x) == math.MinInt32 {
 				return arena.ErrBounds
 			}
-			if e = perm.Write(i, uint32(-int32(x)-1)); e != nil {
-				return e
-			}
+			perm[i] = uint32(-int32(x) - 1)
 		}
 	}
 	return nil

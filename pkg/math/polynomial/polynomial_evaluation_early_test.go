@@ -5,93 +5,90 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPolynomialEvaluationEarlyRoutesLeaveRetainedInvocationUntouched(t *testing.T) {
-	found := false
-	for ordinal := int64(0); ordinal < 30 && !found; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			s, _ := serviceNew(t)
-			q := s.Manager
-			m, p, _ := polynomialEvalFixtureWithRationals(t, q, []polynomialEvalTerm{{1, [3]uint32{3, 2, 0}}, {2, [3]uint32{1, 0, 0}}, {7, [3]uint32{}}})
-			bounds, e := util.NewBinaryRationalManager(q.Z, util.BinaryRationalConfig{Diagnostics: s})
-			serviceMust(t, e)
-			t.Cleanup(bounds.Close)
-			vm, e := util.NewBinaryIntervalManager(bounds)
-			serviceMust(t, e)
-			t.Cleanup(vm.Close)
-			v := polynomialEvalRationalMap{manager: q}
-			for i := range v.values {
-				v.values[i] = util.NewRational()
-				serviceMust(t, q.SetInt32(&v.values[i], 2))
-			}
-			output := util.NewRational()
-			q.BudgetField.FailAfter(ordinal)
-			e = m.EvaluateRational(p, &v, &output)
-			// Census the endangered prefix before the fault epoch is lifted.
-			iv := polynomialEvalIntervalMap{manager: vm}
-			io := util.NewBinaryInterval()
-			defer func() {
-				q.BudgetField.FailAfter(-1)
-				serviceMust(t, m.CleanupEvaluation())
-				serviceMust(t, vm.Del(&io))
-				for i := range v.values {
-					serviceMust(t, q.Del(&v.values[i]))
-				}
-				serviceMust(t, q.Del(&output))
-			}()
-			polynomialEvaluationIntervalAudit(t, m, s, vm, p, &iv, &io)
-			q.BudgetField.FailAfter(-1)
-			if e != nil && m.evaluation.active {
-				if !numericPhysicalReservationRefusal(e) {
-					t.Fatal(e)
-				}
-				found = true
-				lex, groups, cell, raw := m.evaluation.lexGeneration, m.evaluation.groups, m.evaluation.numericPending, m.evaluation.allocatorPending
-				oldCause := m.evaluation.bodyCause
-				early := util.NewRational()
-				serviceMust(t, q.SetInt32(&early, 19))
-				serviceMust(t, m.EvaluateRational(m.core.zero, &v, &early))
-				if early != util.NewRational() {
-					t.Fatal("source zero reset", early)
-				}
-				serviceMust(t, m.EvaluateRational(m.core.unit, &v, &early))
-				if (*early.BorrowNumerator()) != util.NewInt(1) || (*early.BorrowDenominator()) != util.NewInt(1) {
-					t.Fatal("source constant set", early)
-				}
-				serviceMust(t, vm.SetInteger(&io, &(*early.BorrowNumerator())))
-				serviceMust(t, m.EvaluateInterval(m.core.zero, &iv, &io))
-				if (*(*io.BorrowLower()).BorrowNumerator()) != util.NewInt(0) || (*(*io.BorrowUpper()).BorrowNumerator()) != util.NewInt(0) {
-					t.Fatal("source interval zero reset")
-				}
-				serviceMust(t, m.EvaluateInterval(m.core.unit, &iv, &io))
-				if (*(*io.BorrowLower()).BorrowNumerator()) != util.NewInt(1) || (*(*io.BorrowUpper()).BorrowNumerator()) != util.NewInt(1) {
-					t.Fatal("source interval constant set")
-				}
-				if !m.evaluation.active || m.evaluation.lexGeneration != lex || m.evaluation.groups != groups || m.evaluation.numericPending != cell || m.evaluation.allocatorPending != raw || m.evaluation.bodyCause != oldCause {
-					t.Fatal("early route changed unrelated retained invocation")
-				}
-				serviceMust(t, q.Del(&early))
-			}
-			serviceMust(t, m.CleanupEvaluation())
-			serviceMust(t, vm.Del(&io))
-			for i := range v.values {
-				serviceMust(t, q.Del(&v.values[i]))
-			}
-			serviceMust(t, q.Del(&output))
-		})
+	s, _ := serviceNew(t)
+	q := s.Manager
+	m, _, _ := polynomialEvalFixtureWithRationals(t, q, []polynomialEvalTerm{{1, [3]uint32{}}})
+	p := polynomialLexWrappedPolynomial(t, m)
+	bounds, e := util.NewBinaryRationalManager(q.Z, util.BinaryRationalConfig{Diagnostics: s})
+	serviceMust(t, e)
+	t.Cleanup(bounds.Close)
+	vm, e := util.NewBinaryIntervalManager(bounds)
+	serviceMust(t, e)
+	t.Cleanup(vm.Close)
+	v := polynomialEvalRationalMap{manager: q}
+	for i := range v.values {
+		v.values[i] = util.NewRational()
+		serviceMust(t, q.SetInt32(&v.values[i], 2))
 	}
-	if !found {
-		t.Fatal("real retained invocation not reached")
+	output := util.NewRational()
+	e = m.EvaluateRational(p, &v, &output)
+	// Audit the retained bounds stop before exercising early result branches.
+	iv := polynomialEvalIntervalMap{manager: vm}
+	io := util.NewBinaryInterval()
+	defer func() {
+		q.BudgetField.FailAfter(-1)
+		serviceMust(t, m.CleanupEvaluation())
+		serviceMust(t, vm.Del(&io))
+		for i := range v.values {
+			serviceMust(t, q.Del(&v.values[i]))
+		}
+		serviceMust(t, q.Del(&output))
+	}()
+	polynomialEvaluationIntervalAudit(t, m, s, vm, p, &iv, &io)
+	q.BudgetField.FailAfter(-1)
+	if e == nil || !m.evaluation.active || !m.lexPending || m.evaluation.lexGeneration == 0 {
+		t.Fatal("native bounds fixture did not retain evaluation", e)
 	}
+
+	if e != arena.ErrBounds && e != ErrPolynomialAssertion {
+		t.Fatal(e)
+	}
+
+	lex, groups, cell, raw := m.evaluation.lexGeneration, m.evaluation.groups, m.evaluation.numericPending, m.evaluation.allocatorPending
+	oldCause := m.evaluation.bodyCause
+	early := util.NewRational()
+	serviceMust(t, q.SetInt32(&early, 19))
+	serviceMust(t, m.EvaluateRational(m.core.zero, &v, &early))
+	if early != util.NewRational() {
+		t.Fatal("source zero reset", early)
+	}
+	serviceMust(t, m.EvaluateRational(m.core.unit, &v, &early))
+	if (*early.BorrowNumerator()) != util.NewInt(1) || (*early.BorrowDenominator()) != util.NewInt(1) {
+		t.Fatal("source constant set", early)
+	}
+	serviceMust(t, vm.SetInteger(&io, &(*early.BorrowNumerator())))
+	serviceMust(t, m.EvaluateInterval(m.core.zero, &iv, &io))
+	if (*(*io.BorrowLower()).BorrowNumerator()) != util.NewInt(0) || (*(*io.BorrowUpper()).BorrowNumerator()) != util.NewInt(0) {
+		t.Fatal("source interval zero reset")
+	}
+	serviceMust(t, m.EvaluateInterval(m.core.unit, &iv, &io))
+	if (*(*io.BorrowLower()).BorrowNumerator()) != util.NewInt(1) || (*(*io.BorrowUpper()).BorrowNumerator()) != util.NewInt(1) {
+		t.Fatal("source interval constant set")
+	}
+	if !m.evaluation.active || m.evaluation.lexGeneration != lex || m.evaluation.groups != groups || m.evaluation.numericPending != cell || m.evaluation.allocatorPending != raw || m.evaluation.bodyCause != oldCause {
+		t.Fatal("early route changed unrelated retained invocation")
+	}
+	serviceMust(t, q.Del(&early))
+
+	serviceMust(t, m.CleanupEvaluation())
+	serviceMust(t, vm.Del(&io))
+	for i := range v.values {
+		serviceMust(t, q.Del(&v.values[i]))
+	}
+	serviceMust(t, q.Del(&output))
 }
 
 func TestPolynomialEvaluationEarlyCopyCapturesOnlyNewPhysicalRoots(t *testing.T) {
 	found, success := false, false
 	for ordinal := int64(0); ordinal < 50; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{3, 2, 0}}, {2, [3]uint32{1, 0, 0}}, {7, [3]uint32{}}})
+			m, _, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{}}})
+			p := polynomialLexWrappedPolynomial(t, m)
 			q := m.core.config.Rationals
 			digits := make([]uint32, 80)
 			digits[0], digits[79] = 3, 1
@@ -126,11 +123,10 @@ func TestPolynomialEvaluationEarlyCopyCapturesOnlyNewPhysicalRoots(t *testing.T)
 			for i := range v.values {
 				inputs = append(inputs, &(*v.values[i].BorrowNumerator()), &(*v.values[i].BorrowDenominator()))
 			}
-			q.Budget().FailAfter(0)
 			e = m.EvaluateRational(p, &v, &oldOutput)
 			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, constant}, inputs, 0)
 			q.Budget().FailAfter(-1)
-			if !numericPhysicalReservationRefusal(e) || !m.lexPending || !m.evaluation.active {
+			if (e != arena.ErrBounds && e != ErrPolynomialAssertion) || !m.lexPending || !m.evaluation.active {
 				t.Fatal("actual earlier lexical stop", e)
 			}
 			oldLex, oldCause := m.evaluation.lexGeneration, m.evaluation.bodyCause

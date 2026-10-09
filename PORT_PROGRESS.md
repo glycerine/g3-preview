@@ -31389,3 +31389,35 @@ vet and portcheck passed. The hourly full native module checkpoint remains
 The lexicographic sorter still has nested vector scratch and a borrowed raw
 permutation mapping; convert those together next, preserving its project sorting
 algorithm and coefficient/monomial pairing.
+
+## Native recursive lex-sort scratch
+
+Polynomial lex sorting now stores degree buckets in `[][]uint32` and its mapping
+in `[]uint32`. Deleted the outer class/binding directory, copied/moved class
+metadata, custom Runtime headers/blocks, interrupted expansion state and nested
+buffer free failures. Source and owning member destruction clear native slices
+at their existing boundaries. Stopped-invocation cleanup clears only its scratch;
+it does not undo polynomial publications.
+
+The project recursive highest-variable/descending-degree algorithm and signed
+in-place permutation cycles remain. Coefficient and monomial columns retain
+actual borrowed payload guards and representation swaps. Independent native
+checks cover cold/warm recursion and a 405-term three-variable grid with Runtime
+reservations disabled. Big numeral identity, failed-null numeral representation,
+cycle marking before a payload guard, captured object lifetime and wrapped-degree
+bounds coverage remain.
+
+Retired tests of eliminated vector allocation/capacity/spare-mapping topology.
+Evaluator stale/early-invocation tests now use the existing wrapped-degree bounds
+stop to retain a real LexSort generation. Their actual numeral Copy allocation
+campaigns, receipt protection and root ownership checks remain. An early-route
+check no longer searches allocation ordinals for the removed lex-vector failure.
+The bounds fixture is an explicitly guarded invalid-input domain, not ordinary
+mathematical exhaustion or defined C++ exception behavior.
+
+Validation: full native polynomial (36.84s), focused native and debug lex/evaluator/
+manager checks, module-wide test compilation, polynomial vet and portcheck passed.
+The latest full native module checkpoint remains 19:07–19:12 UTC; its next hourly
+run is not yet due. Manifest counts remain 2102 units / 677 APIs: 63 ported,
+284 partial, 1727 unported and two dead/deleted. No whole-unit completion claim
+or replacement container package is added.

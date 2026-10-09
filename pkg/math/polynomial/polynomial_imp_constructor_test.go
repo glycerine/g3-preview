@@ -100,11 +100,12 @@ func TestPolynomialImpSourceDestructorSeparateOwningClose(t *testing.T) {
 	serviceMust(t, e)
 	before := mm.managerRefs
 	m.reserveCompositionDegrees(17)
-	serviceMust(t, m.lexPermutation.expand(m.core))
+	m.lexPermutation = []uint32{1, 0}
+	m.lexBuckets = [][]uint32{{0}, {1}}
 	m.varDegrees = []uint32{1, 2, 3}
 	serviceMust(t, m.core.substitution.found.reserve(5))
 	serviceMust(t, m.SourceFinalize())
-	if !m.sourceFinalized || m.closed || m.bodyStage != 11 || m.memberStage != 23 || m.header == 0 || !m.upm.sourceFinalized || m.core.tmp1.raw != (util.Block{}) || mm.managerRefs != before-1 || m.varDegrees != nil || m.degree2pos != nil {
+	if !m.sourceFinalized || m.closed || m.bodyStage != 11 || m.memberStage != 23 || m.header == 0 || !m.upm.sourceFinalized || m.core.tmp1.raw != (util.Block{}) || mm.managerRefs != before-1 || m.varDegrees != nil || m.degree2pos != nil || m.lexPermutation != nil || m.lexBuckets != nil {
 		t.Fatal("literal complete body/member order or retained owner", m.bodyStage, m.memberStage)
 	}
 	count, e := q.Integers().Memory.AllocationCount()

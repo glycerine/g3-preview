@@ -1,18 +1,17 @@
 // Source: src/math/polynomial/polynomial.cpp:1315-1366,1440-1448;
-// src/util/permutation.h:56-91; src/util/vector.h:449-451.
+// src/util/permutation.h:56-91.
 package polynomial
 
 import (
 	"errors"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// Direct raw cycle fixture: Reset leaves initialized spare mapping words. This
-// is a defined apply_permutation pointer contract, not a high-level lexRange
-// input (which asserts logical mapping.size == end-start).
-func TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset(t *testing.T) {
+// The concrete native mapping is borrowed by the two column permutations.
+func TestPolynomialLexNativeMappingCyclesPreserveTermPairs(t *testing.T) {
 	m, p, _ := polynomialLexFixture(t)
 	oldA := make([]util.Int, 5)
 	oldM := make([]Monomial, 5)
@@ -24,10 +23,7 @@ func TestPolynomialLexRawCycleReadsInitializedSpareMappingAfterReset(t *testing.
 		serviceMust(t, e)
 	}
 	mapping := []uint32{1, 0, 2, 3, 4}
-	for _, v := range mapping {
-		serviceMust(t, polynomialUnsignedAppend(m.core, &m.lexPermutation, v))
-	}
-	serviceMust(t, m.lexPermutation.reset(m.core))
+	m.lexPermutation = append([]uint32(nil), mapping...)
 	state, used := m.core.memory.State(), m.core.integer.Budget().Used()
 	m.core.integer.Budget().FailAfter(0)
 	defer m.core.integer.Budget().FailAfter(-1)
@@ -93,11 +89,11 @@ func TestPolynomialLexCapturedPayloadViewsKeepStableColumnAndExactObject(t *test
 func TestPolynomialLexRawCycleSignedSkippedLoopLeavesPayloadProviderUnread(t *testing.T) {
 	m, p, _ := polynomialLexFixture(t)
 	// The signed core does no accesses; unsigned restoring loop subsequently
-	// reaches its null mapping guard. No polynomial SIZE/index read is required.
+	// reaches its empty mapping guard. No polynomial SIZE/index read is required.
 	e := m.lexApplyPermutation(p, 0, 0x80000000, false)
 	serviceMust(t, e)
 	e = m.lexApplyPermutation(p, 0, 0x80000000, true)
-	if !errors.Is(e, util.ErrRuntimeOwner) {
+	if !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("restoring mapping reached guard", e)
 	}
 	polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
@@ -107,9 +103,7 @@ func TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard(t *test
 	m, p, _ := polynomialLexFixture(t)
 	old, e := m.core.coefficientCore(p, 4)
 	serviceMust(t, e)
-	serviceMust(t, polynomialUnsignedAppend(m.core, &m.lexPermutation, 1))
-	serviceMust(t, polynomialUnsignedAppend(m.core, &m.lexPermutation, 0))
-	serviceMust(t, m.lexPermutation.reset(m.core))
+	m.lexPermutation = []uint32{1, 0}
 	state, used := m.core.memory.State(), m.core.integer.Budget().Used()
 	m.core.integer.Budget().FailAfter(0)
 	defer m.core.integer.Budget().FailAfter(-1)
@@ -119,13 +113,11 @@ func TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard(t *test
 	if !errors.Is(e, ErrPolynomialPartial) {
 		t.Fatal("reached NUM initialized prefix", e)
 	}
-	x, e := m.core.memory.ReadUint32(m.lexPermutation.raw, 8)
-	serviceMust(t, e)
+	x := m.lexPermutation[0]
 	if x != ^uint32(1) {
 		t.Fatal("mark before guarded payload read", x)
 	}
-	x, e = m.core.memory.ReadUint32(m.lexPermutation.raw, 12)
-	serviceMust(t, e)
+	x = m.lexPermutation[1]
 	if x != 0 {
 		t.Fatal("later marker untouched", x)
 	}
@@ -137,33 +129,6 @@ func TestPolynomialLexRawCycleMarkPrecedesReachedConstructedPayloadGuard(t *test
 	if m.core.memory.State() != state || m.core.integer.Budget().Used() != used {
 		t.Fatal("guard kernel allocated")
 	}
-	polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
-}
-func TestPolynomialLexBucketExpansionReachedSourceCapacityAssertion(t *testing.T) {
-	m, p, _ := polynomialLexFixture(t)
-	serviceMust(t, m.lexBuckets.reserve(2))
-	cap, e := m.lexBuckets.data.capacity(m.core)
-	serviceMust(t, e)
-	serviceMust(t, m.core.memory.WriteUint32(m.lexBuckets.data.raw, 0, 0))
-	defer func() { serviceMust(t, m.core.memory.WriteUint32(m.lexBuckets.data.raw, 0, cap)) }()
-	state, used := m.core.memory.State(), m.core.integer.Budget().Used()
-	m.core.integer.Budget().FailAfter(0)
-	defer m.core.integer.Budget().FailAfter(-1)
-	e = m.lexBuckets.reserve(3)
-	if polynomialSourceDebug {
-		if !errors.Is(e, ErrPolynomialAssertion) {
-			t.Fatal("source capacity assertion before overflow/allocation", e)
-		}
-	} else {
-		var failure util.Failure
-		if !errors.As(e, &failure) || failure.Kind != util.FailureVectorOverflow {
-			t.Fatal("release exact overflow branch", e)
-		}
-	}
-	if m.core.memory.State() != state || m.core.integer.Budget().Used() != used {
-		t.Fatal("assertion allocated")
-	}
-	serviceMust(t, m.core.memory.WriteUint32(m.lexBuckets.data.raw, 0, cap))
 	polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
 }
 

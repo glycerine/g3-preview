@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -12,7 +13,8 @@ func TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots(t *testing.T)
 	found, success := false, false
 	for ordinal := int64(0); ordinal < 50; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{3, 2, 0}}, {2, [3]uint32{1, 0, 0}}, {7, [3]uint32{}}})
+			m, _, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{}}})
+			p := polynomialLexWrappedPolynomial(t, m)
 			q := m.core.config.Rationals
 			digits := make([]uint32, 80)
 			digits[0], digits[79] = 3, 1
@@ -48,11 +50,10 @@ func TestPolynomialEvaluationModularEarlyCopyCapturesPhysicalRoots(t *testing.T)
 			for i := range v.values {
 				inputs = append(inputs, &(*v.values[i].BorrowNumerator()), &(*v.values[i].BorrowDenominator()))
 			}
-			q.Budget().FailAfter(0)
 			e = m.EvaluateRational(p, &v, &oldOutput)
 			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, constant}, inputs, 0)
 			q.Budget().FailAfter(-1)
-			if !numericPhysicalReservationRefusal(e) || !m.lexPending || !m.evaluation.active {
+			if (e != arena.ErrBounds && e != ErrPolynomialAssertion) || !m.lexPending || !m.evaluation.active {
 				t.Fatal("actual earlier lexical stop", e)
 			}
 			oldLex, oldCause := m.evaluation.lexGeneration, m.evaluation.bodyCause

@@ -3,7 +3,6 @@
 package polynomial
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -66,56 +65,6 @@ func TestPolynomialLexSortIndependentRecursiveOrder(t *testing.T) {
 	}
 }
 
-func TestPolynomialLexSortEveryReservationPreservesTermPairs(t *testing.T) {
-	success := false
-	failures := 0
-	for ordinal := int64(0); ordinal < 100; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m, p, ms := polynomialLexFixture(t)
-			b := m.core.integer.Budget()
-			b.FailAfter(ordinal)
-			e := m.LexSort(p)
-			if e != nil {
-				failures++
-				if !numericPhysicalReservationRefusal(e) {
-					t.Fatal("actual source/cold reservation refusal", e)
-				}
-			} else {
-				success = true
-			}
-			polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
-			for i := uint32(0); i < 5; i++ {
-				term, read := m.core.monomialCore(p, i)
-				serviceMust(t, read)
-				a, read := m.core.coefficientCore(p, i)
-				serviceMust(t, read)
-				found := false
-				for j, original := range ms {
-					if term == original {
-						found = true
-						if (a).Cell != 0 || a.NativeScalar() != []int32{11, 13, 17, 19, 23}[j] {
-							t.Fatal("source prefix changed coefficient association", ordinal, i, a)
-						}
-					}
-				}
-				if !found {
-					t.Fatal("source prefix manufactured monomial")
-				}
-			}
-			b.FailAfter(-1)
-			if e != nil {
-				serviceMust(t, m.CleanupLexSort())
-			}
-		})
-		if success {
-			break
-		}
-	}
-	if failures == 0 || !success {
-		t.Fatal("source failure campaign incomplete", failures, success)
-	}
-}
-
 // The source permutation swaps mpz representation fields; it does not call
 // numeral_manager.swap or query normalization/digits. An actual failed fresh
 // Copy records a defined source-null pointer, although public Go reads reject it.
@@ -157,47 +106,6 @@ func TestPolynomialLexSortFreshNullCoefficientRawPermutation(t *testing.T) {
 		t.Fatal("actual source term disappeared")
 	}
 	polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
-}
-
-func TestPolynomialLexSortRetainedScratchOnlyGuardsReachedReuse(t *testing.T) {
-	reached := false
-	for ordinal := int64(0); ordinal < 20 && !reached; ordinal++ {
-		m, p, _ := polynomialLexFixture(t)
-		b := m.core.integer.Budget()
-		b.FailAfter(ordinal)
-		e := m.LexSort(p)
-		retained := m.lexBuckets.data.raw != (util.Block{}) || m.lexBuckets.data.pending != (util.Block{})
-		polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
-		b.FailAfter(-1)
-		if e == nil {
-			continue
-		}
-		if !numericPhysicalReservationRefusal(e) {
-			t.Fatal(e)
-		}
-		if !retained {
-			serviceMust(t, m.CleanupLexSort())
-			continue
-		}
-		reached = true
-		state := m.core.memory.Stats()
-		used := b.Used()
-		if again := m.LexSort(p); again != ErrPolynomialPending {
-			t.Fatal("retained actual scratch reuse", again)
-		}
-		// The source size0/1 branches never read these bucket owners.
-		serviceMust(t, m.LexSort(m.core.zero))
-		serviceMust(t, m.LexSort(m.core.unit))
-		if m.core.memory.Stats() != state || b.Used() != used || !m.lexPending {
-			t.Fatal("unread scratch was freed or allocated")
-		}
-		polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
-		serviceMust(t, m.CleanupLexSort())
-		serviceMust(t, m.LexSort(p))
-	}
-	if !reached {
-		t.Fatal("no genuine retained scratch prefix")
-	}
 }
 
 func polynomialLexNestedFixture(t *testing.T) (*MultivariatePolynomialManager, Polynomial, []Monomial, []int32) {
@@ -260,72 +168,6 @@ func TestPolynomialLexSortNestedGrowthIndependentFiniteModel(t *testing.T) {
 		t.Fatal("independent finite evaluation", sum)
 	}
 	polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
-}
-
-// Degree17 grows the bucket class array only after the highest-variable
-// permutation has already published a new term order. Each real refusal must
-// preserve the actual pair graph rather than restore the original ordering.
-func TestPolynomialLexSortNestedGrowthEveryReservation(t *testing.T) {
-	success, permutedFailure := false, false
-	failures := 0
-	for ordinal := int64(0); ordinal < 150; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m, p, ms, values := polynomialLexNestedFixture(t)
-			original := make([]Monomial, 6)
-			for i := range original {
-				var e error
-				original[i], e = m.core.monomialCore(p, uint32(i))
-				serviceMust(t, e)
-			}
-			b := m.core.integer.Budget()
-			b.FailAfter(ordinal)
-			e := m.LexSort(p)
-			if e != nil {
-				failures++
-				if !numericPhysicalReservationRefusal(e) {
-					t.Fatal(e)
-				}
-			} else {
-				success = true
-			}
-			polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
-			changed := false
-			for i := uint32(0); i < 6; i++ {
-				term, read := m.core.monomialCore(p, i)
-				serviceMust(t, read)
-				a, read := m.core.coefficientCore(p, i)
-				serviceMust(t, read)
-				if term != original[i] {
-					changed = true
-				}
-				found := false
-				for j, known := range ms {
-					if term == known {
-						found = true
-						if a != util.NewInt(values[j]) {
-							t.Fatal("completed source permutation lost coefficient", ordinal, i, a)
-						}
-					}
-				}
-				if !found {
-					t.Fatal("source prefix lost actual monomial", ordinal, i)
-				}
-			}
-			if e != nil && changed {
-				permutedFailure = true
-			}
-			b.FailAfter(-1)
-			if e != nil {
-				serviceMust(t, m.CleanupLexSort())
-			}
-		})
-		if success {
-			break
-		}
-	}
-	if !success || failures == 0 || !permutedFailure {
-		t.Fatal("nested reached source frontier incomplete", failures, success, permutedFailure)
-	}
 }
 
 // Source d+1 is unsigned32. UINT_MAX therefore does not reserve an enormous
@@ -410,4 +252,140 @@ func TestPolynomialLexSortActualBigCoefficientOwnership(t *testing.T) {
 		}
 	}
 	polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
+}
+
+func TestPolynomialLexSortNativeScratchGrowthAndReuse(t *testing.T) {
+	m, original, ms, values := polynomialLexNestedFixture(t)
+	defer m.core.integer.Budget().FailAfter(-1)
+	for pass := 0; pass < 2; pass++ {
+		p := original
+		if pass != 0 {
+			as := make([]util.Int, len(values))
+			for i, v := range values {
+				as[i] = util.NewInt(v)
+			}
+			var e error
+			p, e = m.core.MkTerms(as, ms)
+			serviceMust(t, e)
+			serviceMust(t, m.core.IncRef(p))
+			t.Cleanup(func() { serviceMust(t, m.core.DecRef(p)) })
+		}
+		stats, used := m.core.memory.Stats(), m.core.integer.Budget().Used()
+		m.core.integer.Budget().FailAfter(0)
+		serviceMust(t, m.LexSort(p))
+		m.core.integer.Budget().FailAfter(-1)
+		if m.core.memory.Stats() != stats || m.core.integer.Budget().Used() != used {
+			t.Fatal("native lex scratch charged Runtime")
+		}
+		for i, index := range []int{4, 0, 1, 3, 2, 5} {
+			term, e := m.core.monomialCore(p, uint32(i))
+			serviceMust(t, e)
+			a, e := m.core.coefficientCore(p, uint32(i))
+			serviceMust(t, e)
+			if term != ms[index] || a != util.NewInt(values[index]) {
+				t.Fatal("native lex growth/reuse changed term pair", pass, i)
+			}
+		}
+		for _, b := range m.lexBuckets {
+			if len(b) != 0 {
+				t.Fatal("recursive sort retained bucket terms")
+			}
+		}
+		polynomialImpPhysicalAuditValues(t, m, []Polynomial{original, p})
+	}
+}
+
+// This invalid unsigned-degree fixture reaches the native bucket bounds guard
+// after completing the higher-variable permutation. No giant allocation occurs.
+func polynomialLexWrappedPolynomial(t *testing.T, m *MultivariatePolynomialManager) Polynomial {
+	t.Helper()
+	x, e := m.core.monomials.MkMonomial([]MonomialPower{{0, ^uint32(0)}})
+	serviceMust(t, e)
+	y, e := m.core.monomials.MkMonomial([]MonomialPower{{1, 1}})
+	serviceMust(t, e)
+	p, e := m.core.MkTerms([]util.Int{util.NewInt(7), util.NewInt(11)}, []Monomial{x, y})
+	serviceMust(t, e)
+	serviceMust(t, m.core.IncRef(p))
+	t.Cleanup(func() { serviceMust(t, m.core.DecRef(p)) })
+	return p
+}
+
+func TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse(t *testing.T) {
+	m, p, _ := polynomialLexFixture(t)
+	invalid := polynomialLexWrappedPolynomial(t, m)
+	e := m.LexSort(invalid)
+	expected := error(arena.ErrBounds)
+	if polynomialSourceDebug {
+		expected = ErrPolynomialAssertion
+	}
+	if e != expected || !m.lexPending {
+		t.Fatal("fixture did not reach native bucket guard", e)
+	}
+	stats, used := m.core.memory.Stats(), m.core.integer.Budget().Used()
+	if again := m.LexSort(p); again != ErrPolynomialPending {
+		t.Fatal("stopped scratch reuse", again)
+	}
+	serviceMust(t, m.LexSort(m.core.zero))
+	serviceMust(t, m.LexSort(m.core.unit))
+	if m.core.memory.Stats() != stats || m.core.integer.Budget().Used() != used || !m.lexPending {
+		t.Fatal("early branches changed stopped scratch")
+	}
+	serviceMust(t, m.CleanupLexSort())
+	if m.lexBuckets != nil || m.lexPermutation != nil {
+		t.Fatal("owning cleanup retained native scratch")
+	}
+	serviceMust(t, m.LexSort(p))
+}
+
+func TestPolynomialLexSortNativeLargeBucketsIndependentGrid(t *testing.T) {
+	m, _, _, _ := polynomialLexNestedFixture(t)
+	ms := make([]Monomial, 0, 405)
+	as := make([]util.Int, 0, 405)
+	for z := uint32(0); z < 3; z++ {
+		for y := uint32(0); y < 5; y++ {
+			for x := uint32(0); x < 27; x++ {
+				var powers []MonomialPower
+				for v, degree := range [3]uint32{x, y, z} {
+					if degree != 0 {
+						powers = append(powers, MonomialPower{uint32(v), degree})
+					}
+				}
+				term, e := m.core.monomials.MkMonomial(powers)
+				serviceMust(t, e)
+				ms = append(ms, term)
+				as = append(as, util.NewInt(int32(len(ms))))
+			}
+		}
+	}
+	defer m.core.integer.Budget().FailAfter(-1)
+	for pass := 0; pass < 2; pass++ {
+		p, e := m.core.MkTerms(as, ms)
+		serviceMust(t, e)
+		serviceMust(t, m.core.IncRef(p))
+		t.Cleanup(func() { serviceMust(t, m.core.DecRef(p)) })
+		stats, used := m.core.memory.Stats(), m.core.integer.Budget().Used()
+		m.core.integer.Budget().FailAfter(0)
+		serviceMust(t, m.LexSort(p))
+		m.core.integer.Budget().FailAfter(-1)
+		if m.core.memory.Stats() != stats || m.core.integer.Budget().Used() != used {
+			t.Fatal("native large lex scratch charged Runtime")
+		}
+		// Construction enumerates ascending z, then y, then x; lex order reverses it.
+		for i := range ms {
+			index := len(ms) - 1 - i
+			term, e := m.core.monomialCore(p, uint32(i))
+			serviceMust(t, e)
+			a, e := m.core.coefficientCore(p, uint32(i))
+			serviceMust(t, e)
+			if term != ms[index] || a != as[index] {
+				t.Fatal("independent grid lex order/pair mismatch", pass, i)
+			}
+		}
+		for _, bucket := range m.lexBuckets {
+			if len(bucket) != 0 {
+				t.Fatal("native bucket not reset")
+			}
+		}
+		polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
+	}
 }
