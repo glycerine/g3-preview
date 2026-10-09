@@ -34,21 +34,19 @@ type PsortASTNetwork struct {
 	frames          *psortASTVectorFrame
 	serial          uint64
 	running, closed bool
-	destructorCause error
 	sourceDone      bool
 }
 type psortASTVectorFrame struct {
-	next                                 *psortASTVectorFrame
-	owner                                *PsortASTNetwork
-	invocation, header                   uint64
-	vectors                              []RuntimeASTLiteralVector
-	cursor                               uint32
-	sourceDone                           bool
-	bodyCause, destructorCause, ownCause error
+	next               *psortASTVectorFrame
+	owner              *PsortASTNetwork
+	invocation, header uint64
+	vectors            []ASTLiteralVector
+	cursor             uint32
+	sourceDone         bool
 }
 
 // psortASTPointer denotes a call-local source pointer. Small literal arrays
-// remain actual inline values; dynamic pointers keep their actual Runtime token.
+// remain inline values; dynamic pointers borrow a captured native slice.
 type psortASTPointer struct {
 	span   ASTLiteralVectorSpan
 	inline *[3]ASTHandle
@@ -72,8 +70,8 @@ func (p psortASTPointer) at(i uint32) (ASTHandle, error) {
 	return p.span.At(uint32(index))
 }
 func (p psortASTPointer) add(n uint32) psortASTPointer { p.offset += uint64(n); return p }
-func psortVectorPointer(v *RuntimeASTLiteralVector) (psortASTPointer, error) {
-	p, e := v.CPtr()
+func psortVectorPointer(v *ASTLiteralVector) (psortASTPointer, error) {
+	p, e := v.Span()
 	return psortASTPointer{span: p}, e
 }
 func NewPsortASTNetwork(c *PsortASTContext, r *util.Runtime, b *arena.Budget, d *util.DebugContext) (*PsortASTNetwork, error) {
@@ -104,9 +102,6 @@ func (s *PsortASTNetwork) open() error {
 	if s.running {
 		return ErrASTPending
 	}
-	if s.destructorCause != nil {
-		return s.destructorCause
-	}
 	return s.context.open()
 }
 func (s *PsortASTNetwork) assertions() (bool, error) {
@@ -131,19 +126,17 @@ func (s *PsortASTNetwork) beginFrame(n uint32) (*psortASTVectorFrame, error) {
 	if s.serial == math.MaxUint64 {
 		return nil, arena.ErrSlotLimit
 	}
-	bytes := uint64(reflect.TypeOf(psortASTVectorFrame{}).Size()) + uint64(n)*uint64(reflect.TypeOf(RuntimeASTLiteralVector{}).Size())
+	bytes := uint64(reflect.TypeOf(psortASTVectorFrame{}).Size()) + uint64(n)*uint64(reflect.TypeOf(ASTLiteralVector{}).Size())
 	if e := s.budget.Reserve(bytes); e != nil {
 		return nil, e
 	}
 	s.serial++
-	f := &psortASTVectorFrame{owner: s, invocation: s.serial, header: bytes, vectors: make([]RuntimeASTLiteralVector, n), next: s.frames}
+	f := &psortASTVectorFrame{owner: s, invocation: s.serial, header: bytes, vectors: make([]ASTLiteralVector, n), next: s.frames}
 	s.frames = f
 	for i := range f.vectors {
 		v := &f.vectors[i]
 		v.self = v
 		v.budget = s.budget
-		v.debug = s.debug
-		v.raw.Bind(s.runtime)
 	}
 	return f, nil
 }
@@ -151,13 +144,9 @@ func (s *PsortASTNetwork) sourceFrame(f *psortASTVectorFrame) error {
 	if f.owner != s || f.invocation == 0 || f.invocation > s.serial {
 		return ErrASTHandle
 	}
-	if f.destructorCause != nil {
-		return f.destructorCause
-	}
 	for f.cursor != 0 {
 		v := &f.vectors[f.cursor-1]
 		if e := v.SourceFinalize(); e != nil {
-			f.destructorCause = e
 			return e
 		}
 		f.cursor--
@@ -171,16 +160,7 @@ func (s *PsortASTNetwork) ownFrame(f *psortASTVectorFrame) error {
 	}
 	for i := len(f.vectors) - 1; i >= 0; i-- {
 		v := &f.vectors[i]
-		var e error
-		if v.destructorCause != nil {
-			e = v.CleanupStopped()
-		} else {
-			e = v.Close()
-		}
-		if e != nil {
-			if f.ownCause == nil {
-				f.ownCause = e
-			}
+		if e := v.Close(); e != nil {
 			return e
 		}
 	}
@@ -197,41 +177,12 @@ func (s *PsortASTNetwork) ownFrame(f *psortASTVectorFrame) error {
 	return nil
 }
 func (s *PsortASTNetwork) finishFrame(f *psortASTVectorFrame, body error) error {
-	if f.bodyCause == nil {
-		f.bodyCause = body
-	}
-	// A younger lexical destructor stop bars all older source actions.
-	if s.destructorCause != nil {
-		return errors.Join(body, s.destructorCause)
-	}
-	e := s.sourceFrame(f)
-	if e != nil {
-		if s.destructorCause == nil {
-			s.destructorCause = e
-		}
+	if e := s.sourceFrame(f); e != nil {
 		return errors.Join(body, e)
 	}
-	// Source epilogues never invoke owning abort. Incomplete constructors and
-	// unjoined acquisitions remain named until an explicit caller Close.
-	for i := range f.vectors {
-		v := &f.vectors[i]
-		if !v.constructed || !v.sourceDone || v.raw.Block != (util.Block{}) || v.raw.Pending != (util.Block{}) || v.copyAcquisitions != nil || v.growthAcquisitions != nil {
-			return body
-		}
+	if e := s.ownFrame(f); e != nil {
+		return errors.Join(body, e)
 	}
-	link := &s.frames
-	for *link != nil && *link != f {
-		link = &(*link).next
-	}
-	if *link != f {
-		return errors.Join(body, ErrASTHandle)
-	}
-	*link = f.next
-	for i := range f.vectors {
-		f.vectors[i].closed = true
-	}
-	s.budget.Release(f.header)
-	f.header = 0
 	return body
 }
 func (s *PsortASTNetwork) Close() error {
@@ -248,11 +199,8 @@ func (s *PsortASTNetwork) Close() error {
 	defer func() { s.running = false }()
 	for s.frames != nil {
 		f := s.frames
-		if !f.sourceDone && f.destructorCause == nil {
+		if !f.sourceDone {
 			if e := s.sourceFrame(f); e != nil {
-				if s.destructorCause == nil {
-					s.destructorCause = e
-				}
 				return e
 			}
 		}
@@ -302,7 +250,7 @@ func (s *PsortASTNetwork) clause(n uint32, p psortASTPointer) (result error) {
 	if e = s.rangeVector(f, 0, n, p); e != nil {
 		return e
 	}
-	span, e := tmp.CPtr()
+	span, e := tmp.Span()
 	if e != nil {
 		return e
 	}
@@ -316,7 +264,7 @@ func (s *PsortASTNetwork) clause3(a, b, c ASTHandle) error {
 	ls := [3]ASTHandle{a, b, c}
 	return s.clause(3, psortASTPointer{inline: &ls})
 }
-func (s *PsortASTNetwork) clauseVector(v *RuntimeASTLiteralVector) error {
+func (s *PsortASTNetwork) clauseVector(v *ASTLiteralVector) error {
 	n, e := v.Size()
 	if e != nil {
 		return e
@@ -327,7 +275,7 @@ func (s *PsortASTNetwork) clauseVector(v *RuntimeASTLiteralVector) error {
 	}
 	return s.clause(n, p)
 }
-func (s *PsortASTNetwork) appendPointer(v *RuntimeASTLiteralVector, n uint32, p psortASTPointer) error {
+func (s *PsortASTNetwork) appendPointer(v *ASTLiteralVector, n uint32, p psortASTPointer) error {
 	for i := uint32(0); i < n; i++ {
 		h, e := p.at(i)
 		if e != nil {
@@ -427,7 +375,7 @@ func (s *PsortASTNetwork) Eq(full bool, k, n uint32, p ASTLiteralVectorSpan) (AS
 	defer func() { s.running = false }()
 	return s.eq(full, k, n, psortASTPointer{span: p})
 }
-func (s *PsortASTNetwork) Sorting(n uint32, p ASTLiteralVectorSpan, out *RuntimeASTLiteralVector) error {
+func (s *PsortASTNetwork) Sorting(n uint32, p ASTLiteralVectorSpan, out *ASTLiteralVector) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -439,10 +387,6 @@ func (s *PsortASTNetwork) Sorting(n uint32, p ASTLiteralVectorSpan, out *Runtime
 	return s.sorting(n, psortASTPointer{span: p}, out)
 }
 
-func (v *RuntimeASTLiteralVector) constructionBorrow() bool {
-	f := v.constructionFrame
-	return f != nil && f.owner != nil && f.owner.self == f.owner && f.owner.running && f.invocation != 0 && f.invocation <= f.owner.serial && v.constructionIndex == f.cursor && int(v.constructionIndex) < len(f.vectors) && &f.vectors[v.constructionIndex] == v && !v.constructed
-}
 func (s *PsortASTNetwork) defaultVector(f *psortASTVectorFrame, i uint32) error {
 	if f.owner != s || f.invocation == 0 || f.invocation > s.serial || i != f.cursor || int(i) >= len(f.vectors) {
 		return ErrASTHandle
@@ -464,24 +408,13 @@ func (s *PsortASTNetwork) rangeVector(f *psortASTVectorFrame, i, n uint32, p pso
 		return ErrASTHandle
 	}
 	v := &f.vectors[i]
-	v.constructionFrame = f
-	v.constructionIndex = i
 	for j := uint32(0); j < n; j++ {
 		h, e := p.at(j)
 		if e != nil {
 			return e
 		}
-		if !v.constructionBorrow() {
-			return ErrASTHandle
-		}
-		if e = v.raw.Open(); e != nil {
-			return e
-		}
-		if e = v.pushReached(h); e != nil {
-			return e
-		}
+		v.values = append(v.values, h)
 	}
-	v.constructionFrame = nil
 	v.constructed = true
 	f.cursor++
 	return nil
@@ -496,8 +429,8 @@ func (s *PsortASTNetwork) ResetStats() error {
 	return nil
 }
 
-// SourceFinalize performs only reached lexical source destruction, never
-// owning acquisition/archive release. Stopped source history remains sticky.
+// SourceFinalize invalidates captured spans from live recursive scratch.
+// Close also releases the charged network and frame owner headers.
 func (s *PsortASTNetwork) SourceFinalize() error {
 	if s == nil || s.self != s {
 		return ErrASTHandle
@@ -508,16 +441,10 @@ func (s *PsortASTNetwork) SourceFinalize() error {
 	if s.closed || s.sourceDone {
 		return nil
 	}
-	if s.destructorCause != nil {
-		return s.destructorCause
-	}
 	s.running = true
 	defer func() { s.running = false }()
 	for f := s.frames; f != nil; f = f.next {
 		if e := s.sourceFrame(f); e != nil {
-			if s.destructorCause == nil {
-				s.destructorCause = e
-			}
 			return e
 		}
 	}

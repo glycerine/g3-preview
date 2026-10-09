@@ -8,16 +8,6 @@ import (
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-// RuntimeVectorGrowthOwner supplies caller-specific ownership tracking while
-// the column preserves vector.h's allocation and publication order.
-// Hooks are synchronous and borrowed for one expansion; the column stores none.
-type RuntimeVectorGrowthOwner interface {
-	MatchVectorGrowthColumn(*RuntimeVectorColumn) error
-	StartVectorGrowth(*RuntimeVectorColumn) error
-	RecordVectorGrowth(error, bool)
-	EndVectorGrowth()
-}
-
 var ErrRuntimeVectorOwner = errors.New("sat: foreign or copied storage owner")
 var ErrRuntimeVectorAssertion = errors.New("sat: source assertion failure")
 
@@ -101,17 +91,6 @@ func (c *RuntimeVectorColumn) ExpandStride(stride uint32) error {
 // The default byte-column adapter remains assertion-enabled. The concrete general heap
 // may borrow the actual global switch at this one reached source SASSERT site.
 func (c *RuntimeVectorColumn) ExpandStrideDebug(stride uint32, debug *DebugContext) error {
-	return c.expandStrideConcreteOwners(stride, debug, nil)
-}
-func (c *RuntimeVectorColumn) ExpandStrideOwned(stride uint32, debug *DebugContext, owner RuntimeVectorGrowthOwner) error {
-	return c.expandStrideConcreteOwners(stride, debug, owner)
-}
-func (c *RuntimeVectorColumn) expandStrideConcreteOwners(stride uint32, debug *DebugContext, growthOwner RuntimeVectorGrowthOwner) error {
-	if growthOwner != nil {
-		if e := growthOwner.MatchVectorGrowthColumn(c); e != nil {
-			return e
-		}
-	}
 	if c.Block != (Block{}) && sourceDebug {
 		enabled := true
 		if debug != nil {
@@ -146,20 +125,11 @@ func (c *RuntimeVectorColumn) expandStrideConcreteOwners(stride uint32, debug *D
 	if e != nil {
 		return e
 	}
-	if growthOwner != nil {
-		if e = growthOwner.StartVectorGrowth(c); e != nil {
-			return e
-		}
-		defer growthOwner.EndVectorGrowth()
-	}
 	if c.Block == (Block{}) {
 		h, e := c.Runtime.Allocate(uint64(request))
 		if e != nil {
 			if h != (Block{}) {
 				c.Pending = h
-			}
-			if growthOwner != nil {
-				growthOwner.RecordVectorGrowth(e, h != (Block{}))
 			}
 			return e
 		}
@@ -169,9 +139,6 @@ func (c *RuntimeVectorColumn) expandStrideConcreteOwners(stride uint32, debug *D
 		}
 		if e != nil {
 			c.Pending = h
-			if growthOwner != nil {
-				growthOwner.RecordVectorGrowth(e, true)
-			}
 			return e
 		}
 		c.Block = h
@@ -182,9 +149,6 @@ func (c *RuntimeVectorColumn) expandStrideConcreteOwners(stride uint32, debug *D
 		if h != c.Block {
 			c.Pending = h
 			c.PendingReplaces = true
-		}
-		if growthOwner != nil {
-			growthOwner.RecordVectorGrowth(e, h != c.Block && h != (Block{}))
 		}
 		return e
 	}

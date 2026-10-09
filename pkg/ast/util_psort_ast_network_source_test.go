@@ -90,7 +90,7 @@ func TestPsortASTNetworkFiniteCardinalityClauseSemantics(t *testing.T) {
 					astTestMust(t, e)
 					s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 					astTestMust(t, e)
-					in, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
+					in, e := NewASTLiteralVector(m.BudgetField)
 					astTestMust(t, e)
 					var inputs []ASTHandle
 					sort, e := m.MkBoolSort()
@@ -102,7 +102,7 @@ func TestPsortASTNetworkFiniteCardinalityClauseSemantics(t *testing.T) {
 						inputs = append(inputs, h)
 						astTestMust(t, in.Push(h))
 					}
-					span, e := in.CPtr()
+					span, e := in.Span()
 					astTestMust(t, e)
 					var result ASTHandle
 					switch mode {

@@ -213,7 +213,7 @@ func (s *PsortASTNetwork) eq(full bool, k, n uint32, p psortASTPointer) (result 
 	}
 	return s.minimum(a, b)
 }
-func (s *PsortASTNetwork) dualize(k *uint32, n uint32, p psortASTPointer, in *RuntimeASTLiteralVector) (bool, error) {
+func (s *PsortASTNetwork) dualize(k *uint32, n uint32, p psortASTPointer, in *ASTLiteralVector) (bool, error) {
 	on, e := s.assertions()
 	if e != nil {
 		return false, e
@@ -294,7 +294,7 @@ func (s *PsortASTNetwork) makeOr2(a, b ASTHandle) (ASTHandle, error) {
 	ls := [3]ASTHandle{a, b}
 	return s.makeOr(2, psortASTPointer{inline: &ls})
 }
-func (s *PsortASTNetwork) makeOrVector(v *RuntimeASTLiteralVector) (ASTHandle, error) {
+func (s *PsortASTNetwork) makeOrVector(v *ASTLiteralVector) (ASTHandle, error) {
 	n, e := v.Size()
 	if e != nil {
 		return ASTHandle{}, e
@@ -305,7 +305,7 @@ func (s *PsortASTNetwork) makeOrVector(v *RuntimeASTLiteralVector) (ASTHandle, e
 	}
 	return s.makeOr(n, p)
 }
-func (s *PsortASTNetwork) impliesAnd(l ASTHandle, v *RuntimeASTLiteralVector) error {
+func (s *PsortASTNetwork) impliesAnd(l ASTHandle, v *ASTLiteralVector) error {
 	for j := uint32(0); ; j++ {
 		n, e := v.Size()
 		if e != nil {
@@ -327,7 +327,7 @@ func (s *PsortASTNetwork) impliesAnd(l ASTHandle, v *RuntimeASTLiteralVector) er
 		}
 	}
 }
-func (s *PsortASTNetwork) andImplies(l ASTHandle, v *RuntimeASTLiteralVector) (err error) {
+func (s *PsortASTNetwork) andImplies(l ASTHandle, v *ASTLiteralVector) (err error) {
 	f, e := s.beginFrame(1)
 	if e != nil {
 		return e
@@ -362,7 +362,7 @@ func (s *PsortASTNetwork) andImplies(l ASTHandle, v *RuntimeASTLiteralVector) (e
 	}
 	return s.clauseVector(lits)
 }
-func (s *PsortASTNetwork) makeAnd(v *RuntimeASTLiteralVector) (ASTHandle, error) {
+func (s *PsortASTNetwork) makeAnd(v *ASTLiteralVector) (ASTHandle, error) {
 	n, e := v.Size()
 	if e != nil {
 		return ASTHandle{}, e
@@ -428,7 +428,7 @@ func (s *PsortASTNetwork) exactlyOne(full bool, n uint32, p psortASTPointer) (re
 	}
 	return r, s.impliesOr(r, sz, ptr)
 }
-func (s *PsortASTNetwork) atMostOne(full bool, n uint32, p psortASTPointer, ors *RuntimeASTLiteralVector, useOrs bool) (result ASTHandle, err error) {
+func (s *PsortASTNetwork) atMostOne(full bool, n uint32, p psortASTPointer, ors *ASTLiteralVector, useOrs bool) (result ASTHandle, err error) {
 	// Source n>=4 && false erases the entire bimander call on this actual path.
 	f, e := s.beginFrame(2)
 	if e != nil {
@@ -508,7 +508,7 @@ func (s *PsortASTNetwork) atMostOne(full bool, n uint32, p psortASTPointer, ors 
 	}
 	return r, nil
 }
-func (s *PsortASTNetwork) atMostOneSmall(full bool, n uint32, p psortASTPointer, result ASTHandle, ands *RuntimeASTLiteralVector) error {
+func (s *PsortASTNetwork) atMostOneSmall(full bool, n uint32, p psortASTPointer, result ASTHandle, ands *ASTLiteralVector) error {
 	on, e := s.assertions()
 	if e != nil {
 		return e
@@ -646,7 +646,7 @@ func (s *PsortASTNetwork) atMostOnePairwise(n uint32, p psortASTPointer) (result
 	}
 	return s.makeAnd(ands)
 }
-func (s *PsortASTNetwork) atMostOneBimander(full bool, n uint32, p psortASTPointer, ors *RuntimeASTLiteralVector) (result ASTHandle, err error) {
+func (s *PsortASTNetwork) atMostOneBimander(full bool, n uint32, p psortASTPointer, ors *ASTLiteralVector) (result ASTHandle, err error) {
 	f, e := s.beginFrame(3)
 	if e != nil {
 		return result, e

@@ -1,7 +1,7 @@
 // Source: src/util/sorting_network.h:597-1046.
 package ast
 
-func (s *PsortASTNetwork) card(k, n uint32, p psortASTPointer, out *RuntimeASTLiteralVector) (err error) {
+func (s *PsortASTNetwork) card(k, n uint32, p psortASTPointer, out *ASTLiteralVector) (err error) {
 	if n <= k {
 		return s.sorting(n, p, out)
 	}
@@ -46,7 +46,7 @@ func (s *PsortASTNetwork) card(k, n uint32, p psortASTPointer, out *RuntimeASTLi
 	}
 	return s.mergeSmall(k, az, ap, bz, bp, out)
 }
-func (s *PsortASTNetwork) sorting(n uint32, p psortASTPointer, out *RuntimeASTLiteralVector) (err error) {
+func (s *PsortASTNetwork) sorting(n uint32, p psortASTPointer, out *ASTLiteralVector) (err error) {
 	switch n {
 	case 0:
 		return nil
@@ -100,7 +100,7 @@ func (s *PsortASTNetwork) sorting(n uint32, p psortASTPointer, out *RuntimeASTLi
 	}
 	return s.merge(az, ap, bz, bp, out)
 }
-func (s *PsortASTNetwork) merge(a uint32, ap psortASTPointer, b uint32, bp psortASTPointer, out *RuntimeASTLiteralVector) (err error) {
+func (s *PsortASTNetwork) merge(a uint32, ap psortASTPointer, b uint32, bp psortASTPointer, out *ASTLiteralVector) (err error) {
 	if a == 1 && b == 1 {
 		x, e := ap.at(0)
 		if e != nil {
@@ -196,7 +196,7 @@ func (s *PsortASTNetwork) merge(a uint32, ap psortASTPointer, b uint32, bp psort
 	}
 	return s.interleave(x, y, out)
 }
-func (s *PsortASTNetwork) mergeVectors(a, b, out *RuntimeASTLiteralVector) error {
+func (s *PsortASTNetwork) mergeVectors(a, b, out *ASTLiteralVector) error {
 	az, e := a.Size()
 	if e != nil {
 		return e
@@ -215,7 +215,7 @@ func (s *PsortASTNetwork) mergeVectors(a, b, out *RuntimeASTLiteralVector) error
 	}
 	return s.merge(az, ap, bz, bp, out)
 }
-func (s *PsortASTNetwork) split(n uint32, p psortASTPointer, even, odd *RuntimeASTLiteralVector) error {
+func (s *PsortASTNetwork) split(n uint32, p psortASTPointer, even, odd *ASTLiteralVector) error {
 	for i := uint32(0); i < n; i += 2 {
 		h, e := p.at(i)
 		if e != nil {
@@ -236,7 +236,7 @@ func (s *PsortASTNetwork) split(n uint32, p psortASTPointer, even, odd *RuntimeA
 	}
 	return nil
 }
-func (s *PsortASTNetwork) assertNotEmpty(v *RuntimeASTLiteralVector, line uint32, text string) error {
+func (s *PsortASTNetwork) assertNotEmpty(v *ASTLiteralVector, line uint32, text string) error {
 	on, e := s.assertions()
 	if e != nil {
 		return e
@@ -252,7 +252,7 @@ func (s *PsortASTNetwork) assertNotEmpty(v *RuntimeASTLiteralVector, line uint32
 	}
 	return nil
 }
-func (s *PsortASTNetwork) interleave(a, b, out *RuntimeASTLiteralVector) error {
+func (s *PsortASTNetwork) interleave(a, b, out *ASTLiteralVector) error {
 	on, e := s.assertions()
 	if e != nil {
 		return e
@@ -411,7 +411,7 @@ func (s *PsortASTNetwork) interleave(a, b, out *RuntimeASTLiteralVector) error {
 	}
 	return nil
 }
-func (s *PsortASTNetwork) mergeSmall(c, a uint32, ap psortASTPointer, b uint32, bp psortASTPointer, out *RuntimeASTLiteralVector) (err error) {
+func (s *PsortASTNetwork) mergeSmall(c, a uint32, ap psortASTPointer, b uint32, bp psortASTPointer, out *ASTLiteralVector) (err error) {
 	if a == 1 && b == 1 && c == 1 {
 		x, e := ap.at(0)
 		if e != nil {
@@ -632,7 +632,7 @@ func (s *PsortASTNetwork) mergeSmall(c, a uint32, ap psortASTPointer, b uint32, 
 	}
 	return nil
 }
-func (s *PsortASTNetwork) mergeSmallVectors(c uint32, a, b, out *RuntimeASTLiteralVector) error {
+func (s *PsortASTNetwork) mergeSmallVectors(c uint32, a, b, out *ASTLiteralVector) error {
 	az, e := a.Size()
 	if e != nil {
 		return e
@@ -651,7 +651,7 @@ func (s *PsortASTNetwork) mergeSmallVectors(c uint32, a, b, out *RuntimeASTLiter
 	}
 	return s.mergeSmall(c, az, ap, bz, bp, out)
 }
-func (s *PsortASTNetwork) assertMergeResult(out, a, b *RuntimeASTLiteralVector, c, line uint32, text string) error {
+func (s *PsortASTNetwork) assertMergeResult(out, a, b *ASTLiteralVector, c, line uint32, text string) error {
 	on, e := s.assertions()
 	if e != nil {
 		return e
@@ -675,7 +675,7 @@ func (s *PsortASTNetwork) assertMergeResult(out, a, b *RuntimeASTLiteralVector, 
 	}
 	return nil
 }
-func (s *PsortASTNetwork) directMerge(c, a uint32, ap psortASTPointer, b uint32, bp psortASTPointer, out *RuntimeASTLiteralVector) (err error) {
+func (s *PsortASTNetwork) directMerge(c, a uint32, ap psortASTPointer, b uint32, bp psortASTPointer, out *ASTLiteralVector) (err error) {
 	on, e := s.assertions()
 	if e != nil {
 		return e
@@ -883,7 +883,7 @@ func (s *PsortASTNetwork) directMerge(c, a uint32, ap psortASTPointer, b uint32,
 	}
 	return nil
 }
-func (s *PsortASTNetwork) directSort(m, n uint32, p psortASTPointer, out *RuntimeASTLiteralVector) (err error) {
+func (s *PsortASTNetwork) directSort(m, n uint32, p psortASTPointer, out *ASTLiteralVector) (err error) {
 	on, e := s.assertions()
 	if e != nil {
 		return e
@@ -959,7 +959,7 @@ func (s *PsortASTNetwork) directSort(m, n uint32, p psortASTPointer, out *Runtim
 	}
 	return nil
 }
-func (s *PsortASTNetwork) addSubset(polarity bool, k, offset uint32, lits *RuntimeASTLiteralVector, n uint32, p psortASTPointer) error {
+func (s *PsortASTNetwork) addSubset(polarity bool, k, offset uint32, lits *ASTLiteralVector, n uint32, p psortASTPointer) error {
 	on, e := s.assertions()
 	if e != nil {
 		return e

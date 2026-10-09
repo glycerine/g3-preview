@@ -9,11 +9,11 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func psortNamedGraph(t *testing.T, s *PsortASTNetwork, c *PsortASTContext, in, out *RuntimeASTLiteralVector, other uint64) {
+func psortNamedGraph(t *testing.T, s *PsortASTNetwork, c *PsortASTContext, in, out *ASTLiteralVector, other uint64) {
 	t.Helper()
 	m := c.manager
 	cold := other + m.Stats().AllocatedBytes + astTestSymbolGraph(m.Symbols) + m.Symbols.Stats().Table.RetainedBytes + s.header + c.header
-	vectors := []*RuntimeASTLiteralVector{in}
+	vectors := []*ASTLiteralVector{in}
 	if out != nil {
 		vectors = append(vectors, out)
 	}
@@ -24,7 +24,7 @@ func psortNamedGraph(t *testing.T, s *PsortASTNetwork, c *PsortASTContext, in, o
 		cold += f.header
 		for i := range f.vectors {
 			v := &f.vectors[i]
-			if v.header != 0 || v.self != v || v.raw.Runtime != s.runtime {
+			if v.header != 0 || v.self != v {
 				t.Fatal("inline vector header double charge/identity")
 			}
 			vectors = append(vectors, v)
@@ -50,7 +50,7 @@ func TestPsortASTNetworkEveryActualBoundReservationNamedBeforeFaultLift(t *testi
 				astTestMust(t, e)
 				s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 				astTestMust(t, e)
-				in, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
+				in, e := NewASTLiteralVector(m.BudgetField)
 				astTestMust(t, e)
 				sort, e := m.MkBoolSort()
 				astTestMust(t, e)
@@ -60,7 +60,7 @@ func TestPsortASTNetworkEveryActualBoundReservationNamedBeforeFaultLift(t *testi
 					astTestPin(t, m, h)
 					astTestMust(t, in.Push(h))
 				}
-				span, e := in.CPtr()
+				span, e := in.Span()
 				astTestMust(t, e)
 				other := m.BudgetField.Used() - m.Stats().AllocatedBytes - astTestSymbolGraph(m.Symbols) - m.Symbols.Stats().Table.RetainedBytes - r.Stats().TotalBytes - s.header - c.header - in.header
 				m.BudgetField.FailAfter(ordinal)

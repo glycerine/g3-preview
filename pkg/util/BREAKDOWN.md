@@ -810,8 +810,9 @@ coverage; the util-only public facade and representation tests were removed.
 
 The concrete unsigned32 Runtime column and its copy specialization are likewise
 SAT-only and now live in `sat_solver_scalar_runtime.go`. Root
-`RuntimeVectorColumn` remains in `util` because both AST and SAT use its common
-checked byte-vector storage and growth protocol.
+`RuntimeVectorColumn` now has only SAT production consumers. AST sorting-network
+literal scratch has moved to native typed slices; the remaining SAT storage
+protocol is a candidate for further conversion or relocation out of root util.
 
 
 Only the currently consumed `StringBuffer64` specialization remains; the 32/128 variants and cross-width test matrix were removed. `StringBuffer64` now uses `bytes.Buffer`, and its callers no longer reach through a C++-style state/inline/overflow representation or charge Go-managed text storage to an arena budget.
@@ -1102,3 +1103,27 @@ Validation: complete SAT suites passed in native (1.06s) and checked/debug
 cancellation, and allocation refusal campaigns. Module-wide test compilation,
 SAT vet, and portcheck passed. The latest full native checkpoint remains the
 18:07–18:12 UTC run; it was not repeated for this focused change.
+
+
+## Native AST sorting-network literal scratch
+
+`ast.ASTLiteralVector` now stores borrowed handles in a concrete `[]ASTHandle`.
+It imports only `arena` for the existing owner-header charge; the native slice
+has no numeric Runtime allocation, serialized handle payload, copied C++
+capacity schedule, or acquisition history. Captured spans retain their slice
+across growth and reject reads after owner finalization/close. Reset/pop clear
+removed handles without changing AST reference counts.
+
+The copied vector clone/assignment implementations had no production caller
+and were deleted, along with their storage-specific tests. Unused reserve,
+resize, capacity, and append-array scaffolding is gone. Sorting-network range
+construction still reads input in order; a reached read error releases native
+partial scratch and recursive frame headers. AST registration/reference owners
+remain separate and keep their real allocation-failure audits. The unused root
+`RuntimeVectorGrowthOwner` callback interface and hook branches were removed
+with their last concrete implementation.
+
+Validation includes the independent recursive clause oracle, every remaining
+bound allocation refusal, the short-range cleanup regression, native capture
+lifetime/reference checks, and full native AST/SAT tests. Root Runtime vector
+columns now serve SAT alone; the numeric Runtime itself remains live elsewhere.

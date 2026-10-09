@@ -1,15 +1,14 @@
-// Source: src/util/vector.h:43-125,215-240,350-365,389-433,449-455,531-546.
-// Source: src/test/sorting_network.cpp:150-181; src/util/sorting_network.h:120-1046.
+// Source: src/util/sorting_network.h:120-1046; src/test/sorting_network.cpp:150-181.
 package ast
 
 import (
-	"testing"
-
+	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"testing"
 )
 
-func TestASTLiteralVectorActualPointerPayloadAndNonowningReset(t *testing.T) {
+func TestASTLiteralVectorNativeBorrowGrowthAndNonowningReset(t *testing.T) {
 	m := astTestManager(t)
 	sort, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -19,187 +18,67 @@ func TestASTLiteralVectorActualPointerPayloadAndNonowningReset(t *testing.T) {
 	y, e := m.MkFreshConst("y", sort)
 	astTestMust(t, e)
 	astTestPin(t, m, y)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField})
+	v, e := NewASTLiteralVector(m.BudgetField)
 	astTestMust(t, e)
-	v, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
-	astTestMust(t, e)
-	before, e := m.GetRefCount(x)
+	refs, e := m.GetRefCount(x)
 	astTestMust(t, e)
 	astTestMust(t, v.Push(x))
 	astTestMust(t, v.Push(y))
-	capacity, e := v.Capacity()
-	astTestMust(t, e)
-	if capacity != 2 {
-		t.Fatal("source first capacity", capacity)
-	}
-	size, e := v.Size()
-	astTestMust(t, e)
-	if size != 2 {
-		t.Fatal("source size", size)
-	}
-	span, e := v.CPtr()
+	span, e := v.Span()
 	astTestMust(t, e)
 	astTestMust(t, v.Set(0, y))
 	got, e := span.At(0)
 	astTestMust(t, e)
 	if got != y {
-		t.Fatal("same-cap mutation", got)
+		t.Fatal("borrow lost same-backing mutation", got)
 	}
-	astTestMust(t, v.Reset())
+	used := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	for i := 0; i < 100; i++ {
+		astTestMust(t, v.Push(x))
+	}
+	m.BudgetField.FailAfter(-1)
+	if m.BudgetField.Used() != used {
+		t.Fatal("native backing charged to arena")
+	}
 	got, e = span.At(1)
 	astTestMust(t, e)
 	if got != y {
-		t.Fatal("source raw spare remains initialized", got)
+		t.Fatal("native growth invalidated captured slice", got)
 	}
-	after, e := m.GetRefCount(x)
+	astTestMust(t, v.Reset())
+	n, e := v.Size()
 	astTestMust(t, e)
-	if after != before {
-		t.Fatal("ptr_vector changed AST references", before, after)
+	now, e := m.GetRefCount(x)
+	astTestMust(t, e)
+	if n != 0 || now != refs {
+		t.Fatal("borrowed handles changed AST references", n, refs, now)
 	}
 	astTestMust(t, v.Close())
-	if _, e = span.At(0); e == nil {
-		t.Fatal("destroyed actual captured backing")
+	if _, e = span.At(0); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("closed owner left capture usable", e)
 	}
-	astTestMust(t, r.Close())
 }
-
-func astLiteralNamedGraph(t *testing.T, b *arena.Budget, r *util.Runtime, external uint64, owners []*RuntimeASTLiteralVector, anchors ...util.Block) {
+func astLiteralNamedGraph(t *testing.T, b *arena.Budget, r *util.Runtime, external uint64, owners []*ASTLiteralVector, anchors ...util.Block) {
 	t.Helper()
-	roots := map[util.Block]bool{}
 	cold := external
-	add := func(h util.Block) {
+	roots := map[util.Block]bool{}
+	for _, h := range anchors {
 		if h == (util.Block{}) {
-			return
+			continue
 		}
 		if roots[h] {
-			t.Fatal("duplicate physical root", h)
+			t.Fatal("duplicate actual Runtime root", h)
 		}
 		roots[h] = true
 		_, e := r.Size(h)
 		astTestMust(t, e)
 	}
-	for _, h := range anchors {
-		add(h)
-	}
 	for _, v := range owners {
 		cold += v.header
-		if !v.raw.PendingReplaces && !v.assignmentDestroyed {
-			add(v.raw.Block)
-		} else {
-			if _, e := r.Size(v.raw.Block); e == nil {
-				t.Fatal("consumed realloc pointer still physical")
-			}
-		}
-		add(v.raw.Pending)
-		for n := v.growthAcquisitions; n != nil; n = n.next {
-			if n.owner != v || n.runtime != r || n.invocation == 0 || n.invocation > v.growthSerial {
-				t.Fatal("actual archive authority")
-			}
-			cold += n.header
-			add(n.block)
-		}
-		for n := v.copyAcquisitions; n != nil; n = n.next {
-			if n.owner != v || n.runtime != r || n.invocation == 0 || n.invocation > v.copySerial {
-				t.Fatal("exact copy invocation")
-			}
-			cold += n.header
-			add(n.block)
-		}
 	}
 	stats := r.Stats()
 	if stats.LiveBlocks != uint32(len(roots)) || b.Used() != stats.TotalBytes+cold {
-		t.Fatal("named literal raw/cold graph", stats, len(roots), b.Used(), cold)
+		t.Fatal("native literal owner and actual Runtime graph", stats, len(roots), b.Used(), cold)
 	}
-}
-func TestASTLiteralVectorEveryActualResizeReservation(t *testing.T) {
-	for _, bits := range []uint8{32, 64} {
-		reached := int64(-1)
-		for ordinal := int64(0); ordinal < 32; ordinal++ {
-			m := astTestManager(t)
-			sort, e := m.MkBoolSort()
-			astTestMust(t, e)
-			h, e := m.MkFreshConst("x", sort)
-			astTestMust(t, e)
-			astTestPin(t, m, h)
-			r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField, SizeTBits: bits})
-			astTestMust(t, e)
-			v, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
-			astTestMust(t, e)
-			// The caller AST graph is unchanged by nonowning literal storage.
-			external := m.BudgetField.Used() - r.Stats().TotalBytes - v.header
-			refs, e := m.GetRefCount(h)
-			astTestMust(t, e)
-			m.BudgetField.FailAfter(ordinal)
-			cause := v.Resize(33, h)
-			astLiteralNamedGraph(t, m.BudgetField, r, external, []*RuntimeASTLiteralVector{v})
-			size, e := v.Size()
-			astTestMust(t, e)
-			now, e := m.GetRefCount(h)
-			astTestMust(t, e)
-			if now != refs {
-				t.Fatal("ptr resize owns AST", ordinal)
-			}
-			if cause != nil && size != 0 {
-				t.Fatal("reserve all capacities before SIZE", ordinal, size, cause)
-			}
-			if cause == nil {
-				reached = ordinal
-				if size != 33 {
-					t.Fatal(size)
-				}
-				for i := uint32(0); i < 33; i++ {
-					got, e := v.At(i)
-					astTestMust(t, e)
-					if got != h {
-						t.Fatal("ascending placement", i)
-					}
-				}
-			}
-			m.BudgetField.FailAfter(-1)
-			astTestMust(t, v.Close())
-			astTestMust(t, r.Close())
-			if reached >= 0 {
-				t.Log("actual literal resize first success", bits, reached)
-				break
-			}
-		}
-		if reached < 0 {
-			t.Fatal("no actual complete allocation horizon", bits)
-		}
-	}
-}
-func TestASTLiteralVectorRealNullRetryAndSourceDestructorRoots(t *testing.T) {
-	m := astTestManager(t)
-	sort, e := m.MkBoolSort()
-	astTestMust(t, e)
-	h, e := m.MkFreshConst("x", sort)
-	astTestMust(t, e)
-	astTestPin(t, m, h)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField, ThreadLocal: true})
-	astTestMust(t, e)
-	v, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
-	astTestMust(t, e)
-	external := m.BudgetField.Used() - r.Stats().TotalBytes - v.header
-	anchor := astUnsignedGrowthPrime(t, r)
-	cause := v.Push(h)
-	if cause == nil || v.raw.Block != (util.Block{}) || v.raw.Pending == (util.Block{}) {
-		t.Fatal("real lower returned NULL acquisition", cause, v.raw)
-	}
-	old := v.raw.Pending
-	astLiteralNamedGraph(t, m.BudgetField, r, external, []*RuntimeASTLiteralVector{v}, anchor)
-	astTestMust(t, r.SetMaxSize(0))
-	astTestMust(t, v.Push(h))
-	got, e := v.At(0)
-	astTestMust(t, e)
-	if got != h {
-		t.Fatal("retry source pointer publication")
-	}
-	astLiteralNamedGraph(t, m.BudgetField, r, external, []*RuntimeASTLiteralVector{v}, anchor)
-	astTestMust(t, v.SourceFinalize())
-	_, e = r.Size(old)
-	astTestMust(t, e)
-	astLiteralNamedGraph(t, m.BudgetField, r, external, []*RuntimeASTLiteralVector{v}, anchor)
-	astTestMust(t, v.Close())
-	astTestMust(t, r.Deallocate(&anchor))
-	astTestMust(t, r.Close())
 }

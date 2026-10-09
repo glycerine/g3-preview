@@ -17,9 +17,9 @@ func TestPsortASTNetworkDefinedPairwiseAndErasedBimanderHelpers(t *testing.T) {
 			astTestMust(t, e)
 			s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 			astTestMust(t, e)
-			in, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
+			in, e := NewASTLiteralVector(m.BudgetField)
 			astTestMust(t, e)
-			ors, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
+			ors, e := NewASTLiteralVector(m.BudgetField)
 			astTestMust(t, e)
 			sort, e := m.MkBoolSort()
 			astTestMust(t, e)
@@ -31,7 +31,7 @@ func TestPsortASTNetworkDefinedPairwiseAndErasedBimanderHelpers(t *testing.T) {
 				inputs = append(inputs, h)
 				astTestMust(t, in.Push(h))
 			}
-			p, e := in.CPtr()
+			p, e := in.Span()
 			astTestMust(t, e)
 			// Direct kernel fixtures cover actual source definitions. Bimander remains
 			// unreachable through the literal n>=4 && false public policy.
@@ -96,9 +96,9 @@ func TestPsortASTNetworkDirectMergeAppendPrefixAndLexicalScopeRetirement(t *test
 	astTestMust(t, e)
 	s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 	astTestMust(t, e)
-	in, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
+	in, e := NewASTLiteralVector(m.BudgetField)
 	astTestMust(t, e)
-	out, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
+	out, e := NewASTLiteralVector(m.BudgetField)
 	astTestMust(t, e)
 	sort, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -108,7 +108,7 @@ func TestPsortASTNetworkDirectMergeAppendPrefixAndLexicalScopeRetirement(t *test
 		astTestPin(t, m, h)
 		astTestMust(t, in.Push(h))
 	}
-	p, e := in.CPtr()
+	p, e := in.Span()
 	astTestMust(t, e)
 	// Empty one-sided merge copies actual raw handles, even with m_t unread.
 	s.running = true

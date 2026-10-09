@@ -162,7 +162,7 @@ func TestPsortASTNetworkRecursiveFamiliesIndependentClauseOracle(t *testing.T) {
 				astTestMust(t, e)
 				s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 				astTestMust(t, e)
-				in, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
+				in, e := NewASTLiteralVector(m.BudgetField)
 				astTestMust(t, e)
 				sort, e := m.MkBoolSort()
 				astTestMust(t, e)
@@ -174,7 +174,7 @@ func TestPsortASTNetworkRecursiveFamiliesIndependentClauseOracle(t *testing.T) {
 					inputs = append(inputs, h)
 					astTestMust(t, in.Push(h))
 				}
-				p, e := in.CPtr()
+				p, e := in.Span()
 				astTestMust(t, e)
 				var result ASTHandle
 				switch mode {

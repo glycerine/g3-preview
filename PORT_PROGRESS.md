@@ -31105,3 +31105,29 @@ Updated the remaining physical allocation census and manifest evidence.
 Validation: complete native SAT tests passed (1.06s), checked/debug SAT tests
 passed (1.24s), module-wide test compilation passed, and SAT vet/portcheck passed.
 The latest full native checkpoint remains 18:07–18:12 UTC.
+
+## Replace AST sorting-network literal vectors with native slices
+
+`ASTLiteralVector` now stores borrowed handles in `[]ASTHandle`, with native
+append/reset/pop and captured typed spans. Slice growth preserves old captured
+slices; owner finalization/close rejects subsequent span reads. No operation
+changes AST reference ownership. The constructor takes only its owner budget;
+there is no Runtime or debug dependency in literal storage. The sorting-network
+algorithm still uses its actual assertion provider and AST context.
+
+Removed the unused vector clone/destructive-assignment, capacity/reserve/resize,
+and append-array branches, plus serialized pointer codecs, copy/growth
+acquisition lists, failed vector constructors, and vector-destructor stop state.
+Native recursive frame cleanup releases partial range scratch on input errors;
+its regression exercises the real bound algorithm with a short input span.
+The independent recursive clause oracle and real AST allocation-refusal campaigns
+remain. Their census now counts native owner headers and actual AST/Runtime
+allocations separately. Removed the unused root vector growth-owner hook
+interface after its last implementation disappeared. Shared Runtime columns
+now have SAT-only production consumers.
+
+Validation: full native AST (27.01s) and SAT (1.01s) tests passed. After removing
+obsolete frame destruction fields, focused native AST tests passed (0.39s) and
+full checked/debug AST (28.41s) and SAT (1.10s) tests passed. Module-wide test
+compilation, AST/SAT vet, and portcheck passed. The latest full native module
+checkpoint remains 18:07–18:12 UTC; no full module execution was repeated.

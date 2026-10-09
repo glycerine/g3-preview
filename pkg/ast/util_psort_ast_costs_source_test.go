@@ -32,7 +32,7 @@ func TestPsortASTCostActualBoundModeSelection(t *testing.T) {
 		astTestMust(t, e)
 		s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
 		astTestMust(t, e)
-		in, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
+		in, e := NewASTLiteralVector(m.BudgetField)
 		astTestMust(t, e)
 		sort, e := m.MkBoolSort()
 		astTestMust(t, e)
@@ -42,7 +42,7 @@ func TestPsortASTCostActualBoundModeSelection(t *testing.T) {
 			astTestPin(t, m, h)
 			astTestMust(t, in.Push(h))
 		}
-		p, e := in.CPtr()
+		p, e := in.Span()
 		astTestMust(t, e)
 		switch mode {
 		case 0:

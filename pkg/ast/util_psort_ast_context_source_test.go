@@ -61,10 +61,10 @@ func TestPsortASTContextUnpublishedClauseConsumedCleanupRetry(t *testing.T) {
 	astTestMust(t, e)
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField})
 	astTestMust(t, e)
-	v, e := NewRuntimeASTLiteralVector(r, m.BudgetField, nil)
+	v, e := NewASTLiteralVector(m.BudgetField)
 	astTestMust(t, e)
 	astTestMust(t, v.Push(h))
-	span, e := v.CPtr()
+	span, e := v.Span()
 	astTestMust(t, e)
 	external := m.BudgetField.Used() - m.Stats().AllocatedBytes - r.Stats().TotalBytes - c.header - v.header
 	graph := func() {
