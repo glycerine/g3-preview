@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/messages"
 )
 
 // The source OpenMP critical section is process-wide, including recursive
@@ -99,9 +100,9 @@ func (r *Reslimit) Pop() {
 func (r *Reslimit) CancelFlag() bool { return r.cancelCount.Load() > 0 && !r.suspended }
 func (r *Reslimit) CancelMessage() string {
 	if r.cancelCount.Load() > 0 {
-		return Z3CanceledMessage
+		return messages.Canceled
 	}
-	return Z3MaxResourceMessage
+	return messages.MaxResource
 }
 func (r *Reslimit) PushChild(child *Reslimit) error {
 	utilReslimitCancelMu.Lock()

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"testing"
 )
 
@@ -127,7 +128,7 @@ func TestVarSubstitutionCancellationPreservesOutputAndReuses(t *testing.T) {
 	m.Limit.IncCancel()
 	e = s.Substitute(v, []ast.ASTHandle{a}, out)
 	m.Limit.DecCancel()
-	if e == nil || e.Error() != util.Z3CanceledMessage {
+	if e == nil || e.Error() != messages.Canceled {
 		t.Fatal(e)
 	}
 	got, e := m.RefGet(out)

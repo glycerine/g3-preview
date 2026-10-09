@@ -8,7 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/messages"
 )
 
 type rewriterException struct{ message string }
@@ -239,13 +239,13 @@ func (r *rewriterEngine) Close() error {
 }
 func (r *rewriterEngine) pushFrame(t ast.ASTHandle, cache bool, depth uint32) error {
 	if r.cfg.maxFramesExceeded(uint32(len(r.core.frames))) {
-		return rewriterException{util.Z3MaxFramesMessage}
+		return rewriterException{messages.MaxFrames}
 	}
 	return r.core.pushFrameCore(t, cache, 0, depth)
 }
 func (r *rewriterEngine) beginScope() error {
 	if r.cfg.maxScopesExceeded(uint32(len(r.core.scopes))) {
-		return rewriterException{util.Z3MaxScopesMessage}
+		return rewriterException{messages.MaxScopes}
 	}
 	return r.core.beginScope()
 }
@@ -1025,7 +1025,7 @@ func (r *rewriterEngine) Resume(out ast.ASTRef) error {
 			return err
 		}
 		if exceeded {
-			return rewriterException{util.Z3MaxStepsMessage}
+			return rewriterException{messages.MaxSteps}
 		}
 		fr := c.frames[len(c.frames)-1]
 		t := fr.curr

@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"reflect"
 )
 
@@ -303,7 +304,7 @@ func (c *evaluatorConfiguration) MaxStepsExceeded(n uint32) (bool, error) {
 		return false, e
 	}
 	if size > c.maxMemory {
-		return false, errors.New(util.Z3MaxMemoryMessage)
+		return false, errors.New(messages.MaxMemory)
 	}
 	return n > c.maxSteps, nil
 }

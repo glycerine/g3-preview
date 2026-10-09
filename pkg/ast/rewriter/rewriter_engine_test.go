@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/messages"
 )
 
 func TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables(t *testing.T) {
@@ -157,7 +158,7 @@ func TestBoolRewriterStarITEConstantFoldAndCancelReset(t *testing.T) {
 	m.Limit.IncCancel()
 	e = rw.Rewrite(deep, out)
 	m.Limit.DecCancel()
-	if e == nil || e.Error() != util.Z3CanceledMessage {
+	if e == nil || e.Error() != messages.Canceled {
 		t.Fatal("source cancellation exception", e)
 	}
 	if len(rw.engine.core.frames) != 0 || len(rw.engine.core.scopes) != 0 {
@@ -333,7 +334,7 @@ func TestRewriterEngineOriginalMaxStepsResumeAndCleanup(t *testing.T) {
 	defer func() { satOK(t, rw.Close()) }()
 	out := astTestPin(t, m, a)
 	e = rw.Rewrite(term, out)
-	if e == nil || e.Error() != util.Z3MaxStepsMessage || rw.numSteps != 4 || len(rw.core.frames) != 4 {
+	if e == nil || e.Error() != messages.MaxSteps || rw.numSteps != 4 || len(rw.core.frames) != 4 {
 		t.Fatal("source interrupted frame prefix", e, rw.numSteps, len(rw.core.frames))
 	}
 	got, e := m.RefGet(out)
@@ -478,7 +479,7 @@ func TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel(t *testing.T) {
 	defer func() { satOK(t, rw.Close()) }()
 	out := astTestPin(t, m, a)
 	e = rw.Rewrite(term, out)
-	if e == nil || e.Error() != util.Z3MaxFramesMessage || len(rw.core.frames) != 2 {
+	if e == nil || e.Error() != messages.MaxFrames || len(rw.core.frames) != 2 {
 		t.Fatal("source frame-limit exception", e, len(rw.core.frames))
 	}
 	cfg.frameLimit = 0
@@ -490,7 +491,7 @@ func TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel(t *testing.T) {
 	satOK(t, e)
 	astTestPin(t, m, q)
 	e = rw.Rewrite(q, out)
-	if e == nil || e.Error() != util.Z3MaxScopesMessage || len(rw.core.scopes) != 0 || len(rw.bindings) != 0 {
+	if e == nil || e.Error() != messages.MaxScopes || len(rw.core.scopes) != 0 || len(rw.bindings) != 0 {
 		t.Fatal("scope check before entering", e, rw.core.scopes, rw.bindings)
 	}
 	cfg.rejectScopes = false

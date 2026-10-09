@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/messages"
 )
 
 var ErrSATMissingSourceExtBinding = errors.New("g3: missing source SAT extension binding")
@@ -119,7 +120,7 @@ func (s *satSolverPropagationState) checkpoint() error {
 		}
 		s.variables.modelIsCurrent = false
 		s.variables.modelKnown = true
-		return SATSolverException{util.NewDefaultException(util.Z3CanceledMessage)}
+		return SATSolverException{util.NewDefaultException(messages.Canceled)}
 	}
 	s.numCheckpoints++
 	if s.numCheckpoints < 10 {
@@ -135,7 +136,7 @@ func (s *satSolverPropagationState) checkpoint() error {
 		return e
 	}
 	if n > cfg.MaxMemory {
-		return SATSolverException{util.NewDefaultException(util.Z3MaxMemoryMessage)}
+		return SATSolverException{util.NewDefaultException(messages.MaxMemory)}
 	}
 	return nil
 }

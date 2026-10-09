@@ -5,7 +5,7 @@ package rewriter
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"testing"
 )
 
@@ -38,7 +38,7 @@ func TestTraversalClientResourceFailureAndResume(t *testing.T) {
 	d := rewriterTestDecl(t, m, "public-f")
 	term := rewriterTestApp(t, m, d, a)
 	out := astTestPin(t, m, b)
-	failure := errors.New(util.Z3MaxMemoryMessage)
+	failure := errors.New(messages.MaxMemory)
 	cfg := traversalClient{manager: m, decl: d, result: a, resourceError: failure}
 	rw, e := NewTraversal(m, &cfg)
 	satOK(t, e)
@@ -60,7 +60,7 @@ func TestTraversalClientResourceFailureAndResume(t *testing.T) {
 	}
 	satOK(t, rw.Reset())
 	cfg.limit = 1
-	if e = rw.Rewrite(rewriterTestApp(t, m, d, term), out); e == nil || e.Error() != util.Z3MaxStepsMessage {
+	if e = rw.Rewrite(rewriterTestApp(t, m, d, term), out); e == nil || e.Error() != messages.MaxSteps {
 		t.Fatal("source step limit", e)
 	}
 	cfg.limit = 0

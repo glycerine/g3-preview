@@ -6,6 +6,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"testing"
 )
 
@@ -150,7 +151,7 @@ func TestModelEvaluatorResourceLimitsAndReset(t *testing.T) {
 	key := "max_steps"
 	astTestMust(t, c.SetUIntName(p, &key, 0))
 	astTestMust(t, ev.UpdtParams(p))
-	if e = ev.Evaluate(term, out); e == nil || e.Error() != util.Z3MaxStepsMessage {
+	if e = ev.Evaluate(term, out); e == nil || e.Error() != messages.MaxSteps {
 		t.Fatal("step limit", e)
 	}
 	got, e := m.RefGet(out)
@@ -168,7 +169,7 @@ func TestModelEvaluatorResourceLimitsAndReset(t *testing.T) {
 	astTestMust(t, e)
 	e = ev.Evaluate(term, out)
 	astTestMust(t, memory.Deallocate(&block))
-	if e == nil || e.Error() != util.Z3MaxMemoryMessage {
+	if e == nil || e.Error() != messages.MaxMemory {
 		t.Fatal("source memory precedes step limit", e)
 	}
 	astTestMust(t, ev.Cleanup(nil))

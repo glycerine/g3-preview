@@ -601,3 +601,9 @@ implementations. Both depend only on the standard library. Formatting now uses
 `String`, and set traversal uses a typed callback; the translated numeric
 ostream edge and C++ iterator object were deleted. There were no current Go
 consumers requiring a root compatibility facade.
+
+`util/messages` owns the seven common Z3 message strings as constants. A
+whole-source scan found no reassignment of the corresponding C++ static pointer
+bindings, so the root mutable globals and tests of pointer rebinding were
+deleted. Resource limits, SAT, rewriting, and model evaluation import the leaf
+directly.

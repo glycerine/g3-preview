@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
+	"github.com/glycerine/g3/pkg/util/messages"
 )
 
 func TestASTResourceLimitSourceCanceledCountsAndScopes(t *testing.T) {
@@ -126,9 +127,9 @@ func TestSATGoalTranslatorUsesASTManagerResourceLimit(t *testing.T) {
 			if cause == "solver-only" {
 				astTestMust(t, e)
 			} else {
-				want := util.Z3CanceledMessage
+				want := messages.Canceled
 				if cause == "steps" {
-					want = util.Z3MaxResourceMessage
+					want = messages.MaxResource
 				}
 				if e == nil || !strings.Contains(e.Error(), want) {
 					t.Fatalf("source checkpoint: %v, want %s", e, want)
