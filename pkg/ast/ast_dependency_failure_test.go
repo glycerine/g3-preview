@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestASTDependencyDeletionRefusalCompletesPhysicalGraphImmediately(t *testing.T) {
@@ -413,11 +412,11 @@ func TestASTDependencyArrayMalformedCopyReadDropsAcquiredPrefix(t *testing.T) {
 	astTestMust(t, e)
 	// Deliberately malformed adapter metadata, not a valid source root: only
 	// the first read can succeed. Check acquired references before teardown.
-	astTestMust(t, m.dependencyArrays.write(c.link, util.PArrayCapacityHeader, 4, 1))
+	astTestMust(t, m.dependencyArrays.write(c.link, astPArrayCapacityHeader, 4, 1))
 	live := m.allocator.Stats().Live
 	blocks := m.dependencyArrays.liveBlocks
 	block, _, e := m.dependencyArrays.getValues(a.cell)
-	if !errors.Is(e, arena.ErrBounds) || !util.PArrayNull(block) {
+	if !errors.Is(e, arena.ErrBounds) || !astPArrayNull(block) {
 		t.Fatal(block, e)
 	}
 	if rc, e := m.DependencyRefCount(first); e != nil || rc != 1 {
@@ -426,7 +425,7 @@ func TestASTDependencyArrayMalformedCopyReadDropsAcquiredPrefix(t *testing.T) {
 	if m.allocator.Stats().Live != live || m.dependencyArrays.liveBlocks != blocks {
 		t.Fatal("lost temporary backing before Close")
 	}
-	astTestMust(t, m.dependencyArrays.write(c.link, util.PArrayCapacityHeader, 4, 2))
+	astTestMust(t, m.dependencyArrays.write(c.link, astPArrayCapacityHeader, 4, 2))
 	astTestMust(t, m.DependencyArrayDel(&a))
 }
 

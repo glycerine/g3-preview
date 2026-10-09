@@ -549,7 +549,7 @@ hwf                    inf_eps_rational        inf_int_rational
 luby                   max_cliques             min_cut
 mpbqi                  mpff                    mpfx
 mpq_inf                mpzzp                   nat_set
-numeral_buffer         parray                  plugin_manager
+numeral_buffer                                 plugin_manager
 pool                   prime_generator         scoped_ctrl_c
 scoped_numeral_buffer
 scoped_ptr_vector      scoped_vector           sexpr
@@ -572,6 +572,12 @@ The Go port should represent that operation as an ordinary `float64` return or
 assignment. The manager's arithmetic maps directly to Go operators and `math`,
 and its unused `atof`, `ostringstream`, parameter, and hash surfaces should not
 be carried into Go.
+
+The standalone concrete `Int32PArrayManager` was also removed after a
+whole-source scan. Its exact int configuration occurs only in
+`src/test/parray.cpp`. Production `parray_manager` instantiations belong to the
+AST expression/dependency owners and subpaving bounds, so those concrete
+consumer packages should own their typed implementations.
 
 `s_integer` and `inf_s_integer` now form the pointer-free `util/smallint` leaf.
 It retains the signed32 value and lexicographic infinitesimal algebra used by SMT

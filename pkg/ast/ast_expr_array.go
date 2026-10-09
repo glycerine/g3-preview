@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 // Source capacity prefix is8 bytes. Go additionally charges a4-byte initialized
@@ -44,7 +43,7 @@ func (m *astExprArrayManager) valid(r *ASTExprArray) error {
 	if r == nil {
 		return ErrASTHandle
 	}
-	if util.PArrayNull(r.cell) {
+	if astPArrayNull(r.cell) {
 		if r.origin != 0 && r.origin != m.id {
 			return ErrASTHandle
 		}
@@ -82,7 +81,7 @@ func (m *astExprArrayManager) cell(r arena.SmallBytesRef) (astExprArrayCell, err
 		return astExprArrayCell{}, ErrASTHandle
 	}
 	n, e := m.allocator.Size(r)
-	if e != nil || n != util.PArrayCellBytes {
+	if e != nil || n != astPArrayCellBytes {
 		return astExprArrayCell{}, ErrASTHandle
 	}
 	a, e := m.read(r, 0, 4)
@@ -109,10 +108,10 @@ func (m *astExprArrayManager) cell(r arena.SmallBytesRef) (astExprArrayCell, err
 	if e != nil {
 		return astExprArrayCell{}, e
 	}
-	return astExprArrayCell{uint32(a) & util.PArrayMaxRC, uint32(a) >> 30, uint32(i), astNodeRef{uint32(v), uint32(vg)}, arena.SmallBytesRef{Slot: arena.Slot(s), Generation: arena.Generation(g)}}, nil
+	return astExprArrayCell{uint32(a) & astPArrayMaxRC, uint32(a) >> 30, uint32(i), astNodeRef{uint32(v), uint32(vg)}, arena.SmallBytesRef{Slot: arena.Slot(s), Generation: arena.Generation(g)}}, nil
 }
 func (m *astExprArrayManager) store(r arena.SmallBytesRef, c astExprArrayCell) error {
-	if e := m.write(r, 0, 4, uint64((c.kind<<30)|(c.rc&util.PArrayMaxRC))); e != nil {
+	if e := m.write(r, 0, 4, uint64((c.kind<<30)|(c.rc&astPArrayMaxRC))); e != nil {
 		return e
 	}
 	if e := m.write(r, 4, 4, uint64(c.idx)); e != nil {
@@ -130,7 +129,7 @@ func (m *astExprArrayManager) store(r arena.SmallBytesRef, c astExprArrayCell) e
 	return m.write(r, 20, 4, uint64(c.link.Generation))
 }
 func (m *astExprArrayManager) mkCell(kind uint32) (arena.SmallBytesRef, error) {
-	r, e := m.allocator.Allocate(util.PArrayCellBytes)
+	r, e := m.allocator.Allocate(astPArrayCellBytes)
 	if e != nil {
 		return r, e
 	}
@@ -141,25 +140,25 @@ func (m *astExprArrayManager) mkCell(kind uint32) (arena.SmallBytesRef, error) {
 	return r, nil
 }
 func (m *astExprArrayManager) freeCell(r arena.SmallBytesRef) {
-	if e := m.allocator.Deallocate(util.PArrayCellBytes, r); e != nil {
+	if e := m.allocator.Deallocate(astPArrayCellBytes, r); e != nil {
 		panic(e)
 	}
 	m.liveCells--
 }
 func (m *astExprArrayManager) inc(r arena.SmallBytesRef) error {
-	if util.PArrayNull(r) {
+	if astPArrayNull(r) {
 		return nil
 	}
 	c, e := m.cell(r)
 	if e != nil {
 		return e
 	}
-	c.rc = (c.rc + 1) & util.PArrayMaxRC
+	c.rc = (c.rc + 1) & astPArrayMaxRC
 	return m.store(r, c)
 }
 func (m *astExprArrayManager) dec(r arena.SmallBytesRef) error {
 	var failure error
-	for !util.PArrayNull(r) {
+	for !astPArrayNull(r) {
 		c, e := m.cell(r)
 		if e != nil || c.rc == 0 {
 			return ErrASTHandle
@@ -172,15 +171,15 @@ func (m *astExprArrayManager) dec(r arena.SmallBytesRef) error {
 			return failure
 		}
 		next := c.link
-		if c.kind == util.PArrayRoot {
-			if !util.PArrayNull(c.link) {
+		if c.kind == astPArrayRoot {
+			if !astPArrayNull(c.link) {
 				if e = m.dropOwnedValues(c.link, c.idx); failure == nil {
 					failure = e
 				}
 			}
 			next = arena.SmallBytesRef{}
 		}
-		if c.kind == util.PArraySet || c.kind == util.PArrayPush {
+		if c.kind == astPArraySet || c.kind == astPArrayPush {
 			_, e = m.owner.decNode(c.elem)
 			if failure == nil {
 				failure = e
@@ -192,10 +191,10 @@ func (m *astExprArrayManager) dec(r arena.SmallBytesRef) error {
 	return failure
 }
 func (m *astExprArrayManager) capacity(r arena.SmallBytesRef) (uint64, error) {
-	if util.PArrayNull(r) {
+	if astPArrayNull(r) {
 		return 0, nil
 	}
-	return m.read(r, 0, util.PArrayCapacityHeader)
+	return m.read(r, 0, astPArrayCapacityHeader)
 }
 func (m *astExprArrayManager) allocateValues(capacity uint64) (arena.SmallBytesRef, error) {
 	if capacity > (math.MaxUint32-uint64(astExprArrayHeaderBytes))/8 {
@@ -208,10 +207,10 @@ func (m *astExprArrayManager) allocateValues(capacity uint64) (arena.SmallBytesR
 	}
 	m.liveBlocks++
 	m.valueBytes += uint64(bytes)
-	if e = m.write(r, 0, util.PArrayCapacityHeader, capacity); e != nil {
+	if e = m.write(r, 0, astPArrayCapacityHeader, capacity); e != nil {
 		panic(e)
 	}
-	if e = m.write(r, util.PArrayCapacityHeader, 4, 0); e != nil {
+	if e = m.write(r, astPArrayCapacityHeader, 4, 0); e != nil {
 		panic(e)
 	}
 	return r, nil
@@ -228,7 +227,7 @@ func (m *astExprArrayManager) freeValues(r arena.SmallBytesRef) {
 	m.valueBytes -= uint64(n)
 }
 func (m *astExprArrayManager) value(r arena.SmallBytesRef, i uint32) (astNodeRef, error) {
-	initialized, e := m.read(r, util.PArrayCapacityHeader, 4)
+	initialized, e := m.read(r, astPArrayCapacityHeader, 4)
 	if e != nil {
 		return astNodeRef{}, e
 	}
@@ -257,12 +256,12 @@ func (m *astExprArrayManager) setValue(r arena.SmallBytesRef, i uint32, v astNod
 	if e = m.write(r, off+4, 4, uint64(v.generation)); e != nil {
 		return e
 	}
-	initialized, e := m.read(r, util.PArrayCapacityHeader, 4)
+	initialized, e := m.read(r, astPArrayCapacityHeader, 4)
 	if e != nil {
 		return e
 	}
 	if uint64(i) >= initialized {
-		return m.write(r, util.PArrayCapacityHeader, 4, uint64(i)+1)
+		return m.write(r, astPArrayCapacityHeader, 4, uint64(i)+1)
 	}
 	return nil
 }
@@ -284,7 +283,7 @@ func (m *astExprArrayManager) expand(r *arena.SmallBytesRef) error {
 	}
 	// Source copies the entire old capacity, including retained/uninitialized
 	// tail bytes. Copy raw encoding without inventing initialized pointers.
-	if !util.PArrayNull(*r) {
+	if !astPArrayNull(*r) {
 		for offset := uint32(0); uint64(offset) < old*8; offset++ {
 			b, e := m.read(*r, astExprArrayHeaderBytes+offset, 1)
 			if e != nil {
@@ -296,17 +295,17 @@ func (m *astExprArrayManager) expand(r *arena.SmallBytesRef) error {
 				return e
 			}
 		}
-		initialized, e := m.read(*r, util.PArrayCapacityHeader, 4)
+		initialized, e := m.read(*r, astPArrayCapacityHeader, 4)
 		if e != nil {
 			m.freeValues(next)
 			return e
 		}
-		if e = m.write(next, util.PArrayCapacityHeader, 4, initialized); e != nil {
+		if e = m.write(next, astPArrayCapacityHeader, 4, initialized); e != nil {
 			m.freeValues(next)
 			return e
 		}
 	}
-	if !util.PArrayNull(*r) {
+	if !astPArrayNull(*r) {
 		m.freeValues(*r)
 	}
 	*r = next
@@ -362,19 +361,19 @@ func (m *astExprArrayManager) scratchPush(a *[]arena.SmallBytesRef, r arena.Smal
 	return nil
 }
 func (m *astExprArrayManager) sizeCell(r arena.SmallBytesRef) (uint32, error) {
-	for !util.PArrayNull(r) {
+	for !astPArrayNull(r) {
 		c, e := m.cell(r)
 		if e != nil {
 			return 0, e
 		}
 		switch c.kind {
-		case util.PArraySet:
+		case astPArraySet:
 			r = c.link
-		case util.PArrayPush:
+		case astPArrayPush:
 			return c.idx + 1, nil
-		case util.PArrayPop:
+		case astPArrayPop:
 			return c.idx - 1, nil
-		case util.PArrayRoot:
+		case astPArrayRoot:
 			return c.idx, nil
 		}
 	}
@@ -392,7 +391,7 @@ func (m *astExprArrayManager) Mk(out *ASTExprArray) error {
 	if err != nil {
 		return err
 	}
-	r, e := m.mkCell(util.PArrayRoot)
+	r, e := m.mkCell(astPArrayRoot)
 	if e != nil {
 		return e
 	}
@@ -426,7 +425,7 @@ func (m *astExprArrayManager) Copy(src, out *ASTExprArray) error {
 		return err
 	}
 	*out = ASTExprArray{cell: r}
-	if !util.PArrayNull(r) {
+	if !astPArrayNull(r) {
 		out.origin = m.id
 	}
 	return err
@@ -472,10 +471,10 @@ func (m *astExprArrayManager) Get(ref *ASTExprArray, index uint32) (astNodeRef, 
 		if e != nil {
 			return astNodeRef{}, e
 		}
-		if c.kind == util.PArrayRoot {
+		if c.kind == astPArrayRoot {
 			return m.value(c.link, index)
 		}
-		if (c.kind == util.PArraySet || c.kind == util.PArrayPush) && c.idx == index {
+		if (c.kind == astPArraySet || c.kind == astPArrayPush) && c.idx == index {
 			return c.elem, nil
 		}
 		trail++
@@ -535,24 +534,24 @@ func (m *astExprArrayManager) PopBackFrom(src, out *ASTExprArray) error {
 // Shared ROOT reversal publishes the new root before its final requested update.
 func (m *astExprArrayManager) reverseRoot(ref *ASTExprArray, c astExprArrayCell, operation, i uint32) (astExprArrayCell, error) {
 	ref.updates++
-	r, e := m.mkCell(util.PArrayRoot)
+	r, e := m.mkCell(astPArrayRoot)
 	if e != nil {
 		return astExprArrayCell{}, e
 	}
-	root := astExprArrayCell{rc: 2, kind: util.PArrayRoot, idx: c.idx, link: c.link}
+	root := astExprArrayCell{rc: 2, kind: astPArrayRoot, idx: c.idx, link: c.link}
 	if e = m.store(r, root); e != nil {
 		panic(e)
 	}
 	switch operation {
-	case util.PArraySet:
-		c.kind = util.PArraySet
+	case astPArraySet:
+		c.kind = astPArraySet
 		c.idx = i
 		c.elem, e = m.value(c.link, i)
-	case util.PArrayPush:
-		c.kind = util.PArrayPop
+	case astPArrayPush:
+		c.kind = astPArrayPop
 		c.idx = root.idx + 1
-	case util.PArrayPop:
-		c.kind = util.PArrayPush
+	case astPArrayPop:
+		c.kind = astPArrayPush
 		c.idx = root.idx - 1
 		c.elem, e = m.value(c.link, c.idx)
 	}
@@ -560,7 +559,7 @@ func (m *astExprArrayManager) reverseRoot(ref *ASTExprArray, c astExprArrayCell,
 		m.freeCell(r)
 		return astExprArrayCell{}, e
 	}
-	if c.kind == util.PArraySet || c.kind == util.PArrayPush {
+	if c.kind == astPArraySet || c.kind == astPArrayPush {
 		if e = m.owner.incNode(c.elem); e != nil {
 			m.freeCell(r)
 			return astExprArrayCell{}, e
@@ -591,7 +590,7 @@ func (m *astExprArrayManager) Set(ref *ASTExprArray, i uint32, v astNodeRef) err
 	if e != nil {
 		return e
 	}
-	if c.kind == util.PArrayRoot {
+	if c.kind == astPArrayRoot {
 		if c.rc == 1 {
 			return m.rootSet(c.link, i, v)
 		}
@@ -602,14 +601,14 @@ func (m *astExprArrayManager) Set(ref *ASTExprArray, i uint32, v astNodeRef) err
 				}
 				return m.Set(ref, i, v)
 			}
-			root, e := m.reverseRoot(ref, c, util.PArraySet, i)
+			root, e := m.reverseRoot(ref, c, astPArraySet, i)
 			if e != nil {
 				return e
 			}
 			return m.rootSet(root.link, i, v)
 		}
 	}
-	r, e := m.mkCell(util.PArraySet)
+	r, e := m.mkCell(astPArraySet)
 	if e != nil {
 		return e
 	}
@@ -617,7 +616,7 @@ func (m *astExprArrayManager) Set(ref *ASTExprArray, i uint32, v astNodeRef) err
 		m.freeCell(r)
 		return e
 	}
-	if e = m.store(r, astExprArrayCell{rc: 1, kind: util.PArraySet, idx: i, elem: v, link: ref.cell}); e != nil {
+	if e = m.store(r, astExprArrayCell{rc: 1, kind: astPArraySet, idx: i, elem: v, link: ref.cell}); e != nil {
 		panic(e)
 	}
 	ref.cell = r
@@ -628,7 +627,7 @@ func (m *astExprArrayManager) PushBack(ref *ASTExprArray, v astNodeRef) error {
 	if e := m.valid(ref); e != nil {
 		return e
 	}
-	if util.PArrayNull(ref.cell) {
+	if astPArrayNull(ref.cell) {
 		if e := m.Mk(ref); e != nil {
 			return e
 		}
@@ -637,7 +636,7 @@ func (m *astExprArrayManager) PushBack(ref *ASTExprArray, v astNodeRef) error {
 	if e != nil {
 		return e
 	}
-	if c.kind == util.PArrayRoot {
+	if c.kind == astPArrayRoot {
 		if c.rc == 1 {
 			if e = m.rootPush(&c, v); e != nil {
 				return e
@@ -651,7 +650,7 @@ func (m *astExprArrayManager) PushBack(ref *ASTExprArray, v astNodeRef) error {
 				}
 				return m.PushBack(ref, v)
 			}
-			root, e := m.reverseRoot(ref, c, util.PArrayPush, 0)
+			root, e := m.reverseRoot(ref, c, astPArrayPush, 0)
 			if e != nil {
 				return e
 			}
@@ -665,7 +664,7 @@ func (m *astExprArrayManager) PushBack(ref *ASTExprArray, v astNodeRef) error {
 	if e != nil {
 		return e
 	}
-	r, e := m.mkCell(util.PArrayPush)
+	r, e := m.mkCell(astPArrayPush)
 	if e != nil {
 		return e
 	}
@@ -673,7 +672,7 @@ func (m *astExprArrayManager) PushBack(ref *ASTExprArray, v astNodeRef) error {
 		m.freeCell(r)
 		return e
 	}
-	if e = m.store(r, astExprArrayCell{rc: 1, kind: util.PArrayPush, idx: n, elem: v, link: ref.cell}); e != nil {
+	if e = m.store(r, astExprArrayCell{rc: 1, kind: astPArrayPush, idx: n, elem: v, link: ref.cell}); e != nil {
 		panic(e)
 	}
 	ref.cell = r
@@ -690,14 +689,14 @@ func (m *astExprArrayManager) PopBack(ref *ASTExprArray) error {
 	if ASTSourceDebug && n == 0 {
 		return ErrASTDomain
 	}
-	if util.PArrayNull(ref.cell) {
+	if astPArrayNull(ref.cell) {
 		return arena.ErrBounds
 	}
 	c, e := m.cell(ref.cell)
 	if e != nil {
 		return e
 	}
-	if c.kind == util.PArrayRoot {
+	if c.kind == astPArrayRoot {
 		if n == 0 {
 			return arena.ErrBounds
 		}
@@ -715,7 +714,7 @@ func (m *astExprArrayManager) PopBack(ref *ASTExprArray) error {
 				}
 				return m.PopBack(ref)
 			}
-			root, e := m.reverseRoot(ref, c, util.PArrayPop, 0)
+			root, e := m.reverseRoot(ref, c, astPArrayPop, 0)
 			if e != nil {
 				return e
 			}
@@ -726,11 +725,11 @@ func (m *astExprArrayManager) PopBack(ref *ASTExprArray) error {
 			return err
 		}
 	}
-	r, e := m.mkCell(util.PArrayPop)
+	r, e := m.mkCell(astPArrayPop)
 	if e != nil {
 		return e
 	}
-	if e = m.store(r, astExprArrayCell{rc: 1, kind: util.PArrayPop, idx: n, link: ref.cell}); e != nil {
+	if e = m.store(r, astExprArrayCell{rc: 1, kind: astPArrayPop, idx: n, link: ref.cell}); e != nil {
 		panic(e)
 	}
 	ref.cell = r
@@ -743,7 +742,7 @@ func (m *astExprArrayManager) getValues(r arena.SmallBytesRef) (block arena.Smal
 		if e != nil {
 			return block, 0, e
 		}
-		if c.kind == util.PArrayRoot {
+		if c.kind == astPArrayRoot {
 			size = c.idx
 			cap, e := m.capacity(c.link)
 			if e != nil {
@@ -777,7 +776,7 @@ func (m *astExprArrayManager) getValues(r arena.SmallBytesRef) (block arena.Smal
 	}
 	// The temporary block remains lexical ownership until complete publication.
 	defer func() {
-		if err != nil && !util.PArrayNull(block) {
+		if err != nil && !astPArrayNull(block) {
 			m.dropOwnedValues(block, size)
 			block = arena.SmallBytesRef{}
 		}
@@ -789,14 +788,14 @@ func (m *astExprArrayManager) getValues(r arena.SmallBytesRef) (block arena.Smal
 			return block, size, e
 		}
 		switch c.kind {
-		case util.PArraySet:
+		case astPArraySet:
 			err = m.rootSet(block, c.idx, c.elem)
-		case util.PArrayPush:
+		case astPArrayPush:
 			root := astExprArrayCell{idx: size, link: block}
 			err = m.rootPush(&root, c.elem)
 			block = root.link
 			size = root.idx
-		case util.PArrayPop:
+		case astPArrayPop:
 			if size == 0 {
 				return block, size, ErrASTHandle
 			}
@@ -815,7 +814,7 @@ func (m *astExprArrayManager) unfoldCell(r arena.SmallBytesRef) error {
 	if e != nil {
 		return e
 	}
-	if c.kind == util.PArrayRoot {
+	if c.kind == astPArrayRoot {
 		return nil
 	}
 	block, n, e := m.getValues(r)
@@ -827,13 +826,13 @@ func (m *astExprArrayManager) unfoldCell(r arena.SmallBytesRef) error {
 		m.dropOwnedValues(block, n)
 		return failure
 	}
-	if c.kind == util.PArraySet || c.kind == util.PArrayPush {
+	if c.kind == astPArraySet || c.kind == astPArrayPush {
 		_, e = m.owner.decNode(c.elem)
 		if failure == nil {
 			failure = e
 		}
 	}
-	c.kind = util.PArrayRoot
+	c.kind = astPArrayRoot
 	c.idx = n
 	c.link = block
 	if e = m.store(r, c); e != nil {
@@ -845,14 +844,14 @@ func (m *astExprArrayManager) Unfold(ref *ASTExprArray) error {
 	if e := m.valid(ref); e != nil {
 		return e
 	}
-	if util.PArrayNull(ref.cell) {
+	if astPArrayNull(ref.cell) {
 		return ErrASTHandle
 	}
 	c, e := m.cell(ref.cell)
 	if e != nil {
 		return e
 	}
-	if c.kind == util.PArrayRoot {
+	if c.kind == astPArrayRoot {
 		return nil
 	}
 	if e = m.unfoldCell(ref.cell); e != nil {
@@ -865,17 +864,17 @@ func (m *astExprArrayManager) Unshare(ref *ASTExprArray) error {
 	if e := m.valid(ref); e != nil {
 		return e
 	}
-	if util.PArrayNull(ref.cell) {
+	if astPArrayNull(ref.cell) {
 		return ErrASTHandle
 	}
 	c, e := m.cell(ref.cell)
 	if e != nil {
 		return e
 	}
-	if c.kind == util.PArrayRoot && c.rc == 1 {
+	if c.kind == astPArrayRoot && c.rc == 1 {
 		return nil
 	}
-	r, e := m.mkCell(util.PArrayRoot)
+	r, e := m.mkCell(astPArrayRoot)
 	if e != nil {
 		return e
 	}
@@ -884,7 +883,7 @@ func (m *astExprArrayManager) Unshare(ref *ASTExprArray) error {
 		m.freeCell(r)
 		return e
 	}
-	if e = m.store(r, astExprArrayCell{rc: 1, kind: util.PArrayRoot, idx: n, link: block}); e != nil {
+	if e = m.store(r, astExprArrayCell{rc: 1, kind: astPArrayRoot, idx: n, link: block}); e != nil {
 		panic(e)
 	}
 	consumed, err := m.decConsumed(ref.cell)
@@ -901,14 +900,14 @@ func (m *astExprArrayManager) Reroot(ref *ASTExprArray) error {
 	if e := m.valid(ref); e != nil {
 		return e
 	}
-	if util.PArrayNull(ref.cell) {
+	if astPArrayNull(ref.cell) {
 		return ErrASTHandle
 	}
 	c, e := m.cell(ref.cell)
 	if e != nil {
 		return e
 	}
-	if c.kind == util.PArrayRoot {
+	if c.kind == astPArrayRoot {
 		return nil
 	}
 	m.rerootTmp = m.rerootTmp[:0]
@@ -922,7 +921,7 @@ func (m *astExprArrayManager) Reroot(ref *ASTExprArray) error {
 		if e != nil {
 			return e
 		}
-		if c.kind == util.PArrayRoot {
+		if c.kind == astPArrayRoot {
 			break
 		}
 		if e = m.scratchPush(&m.rerootTmp, r); e != nil {
@@ -934,7 +933,7 @@ func (m *astExprArrayManager) Reroot(ref *ASTExprArray) error {
 	if e != nil {
 		return e
 	}
-	if c.kind != util.PArrayRoot {
+	if c.kind != astPArrayRoot {
 		if e = m.unfoldCell(r); e != nil {
 			return e
 		}
@@ -954,7 +953,7 @@ func (m *astExprArrayManager) Reroot(ref *ASTExprArray) error {
 		block := c.link
 		// Preflight before source's destructive ROOT->POP tag change. That source
 		// exception continuation would otherwise interpret a values pointer as next.
-		if pc.kind == util.PArrayPush {
+		if pc.kind == astPArrayPush {
 			cap, e := m.capacity(block)
 			if e != nil {
 				return e
@@ -970,8 +969,8 @@ func (m *astExprArrayManager) Reroot(ref *ASTExprArray) error {
 			}
 		}
 		switch pc.kind {
-		case util.PArraySet:
-			c.kind = util.PArraySet
+		case astPArraySet:
+			c.kind = astPArraySet
 			c.idx = pc.idx
 			c.elem, e = m.value(block, pc.idx)
 			if e != nil {
@@ -980,19 +979,19 @@ func (m *astExprArrayManager) Reroot(ref *ASTExprArray) error {
 			if e = m.setValue(block, pc.idx, pc.elem); e != nil {
 				return e
 			}
-		case util.PArrayPush:
-			c.kind = util.PArrayPop
+		case astPArrayPush:
+			c.kind = astPArrayPop
 			c.idx = size
 			if e = m.setValue(block, size, pc.elem); e != nil {
 				return e
 			}
 			size++
-		case util.PArrayPop:
+		case astPArrayPop:
 			if size == 0 {
 				return ErrASTHandle
 			}
 			size--
-			c.kind = util.PArrayPush
+			c.kind = astPArrayPush
 			c.idx = size
 			c.elem, e = m.value(block, size)
 			if e != nil {
@@ -1001,7 +1000,7 @@ func (m *astExprArrayManager) Reroot(ref *ASTExprArray) error {
 		default:
 			return ErrASTHandle
 		}
-		pc.rc = (pc.rc + 1) & util.PArrayMaxRC
+		pc.rc = (pc.rc + 1) & astPArrayMaxRC
 		if e = m.store(p, pc); e != nil {
 			panic(e)
 		}
@@ -1017,7 +1016,7 @@ func (m *astExprArrayManager) Reroot(ref *ASTExprArray) error {
 		if e != nil {
 			return e
 		}
-		pc.kind = util.PArrayRoot
+		pc.kind = astPArrayRoot
 		pc.idx = size
 		pc.link = block
 		if e = m.store(p, pc); e != nil {

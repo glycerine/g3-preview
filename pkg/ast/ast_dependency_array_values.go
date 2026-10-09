@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func astDependencyArrayOffset(i uint32) (uint32, error) {
@@ -74,7 +73,7 @@ func (m *astDependencyArrayManager) closeAfterNodeTeardown() {
 // report an emergency-worklist error. Callers must publish/clear their token
 // after that error rather than retaining a dangling source union pointer.
 func (m *astDependencyArrayManager) decConsumed(r arena.SmallBytesRef) (bool, error) {
-	if util.PArrayNull(r) {
+	if astPArrayNull(r) {
 		return true, nil
 	}
 	c, e := m.cell(r)
