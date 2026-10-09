@@ -336,6 +336,13 @@ probing array, cached hashes, growth code, and tests of physical bucket counts
 have been deleted; normal and SMT2 rendering still sort keys explicitly because
 those output formats require canonical order.
 
+The live `SymbolDictionaryInt32` specialization now stores its values in a
+built-in `map[Symbol]int32`. Its AST and tactic-manager consumers never iterate
+the dictionary, so no ordering layer is needed. Symbol-owner validation remains
+at dictionary operations, while bucket storage, tombstone cleanup, cached
+hashes, simulated table allocation, and out-of-memory callbacks have been
+removed.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before

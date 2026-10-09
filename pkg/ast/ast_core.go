@@ -123,13 +123,13 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFi
 		}
 		m.Format = child
 	}
-	if e = m.initManager(c.OutOfMemory); e != nil {
+	if e = m.initManager(); e != nil {
 		return fail(e)
 	}
 	m.constructorComplete = true
 	return m, nil
 }
-func (m *ASTManager) initManager(oom func() bool) error {
+func (m *ASTManager) initManager() error {
 	for _, name := range [...]string{"basic", "label", "pattern", "model-value", "user-sort", "arith"} {
 		s, e := m.Symbols.Intern(name)
 		if e != nil {
@@ -183,7 +183,7 @@ func (m *ASTManager) initManager(oom func() bool) error {
 	if e := m.setPlugin(3, astModelValuePlugin); e != nil {
 		return e
 	}
-	if e = m.builtin.userTable.Init(m.Symbols, m.BudgetField, oom); e != nil {
+	if e = m.builtin.userTable.Init(m.Symbols); e != nil {
 		return e
 	}
 	if e := m.setPlugin(4, astUserSortPlugin); e != nil {

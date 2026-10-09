@@ -55,7 +55,7 @@ func (m *ASTManager) freshUserPlugin() (*astFreshUserPlugin, error) {
 		return nil, e
 	}
 	p := &astFreshUserPlugin{budget: m.BudgetField, ownerBytes: bytes}
-	if e := p.dictionary.Init(m.Symbols, m.BudgetField, m.builtin.userTable.OutOfMemory()); e != nil {
+	if e := p.dictionary.Init(m.Symbols); e != nil {
 		p.close()
 		return nil, e
 	}

@@ -29,7 +29,7 @@ type tacticManager struct {
 	closed                    bool
 }
 
-func newTacticManager(s *util.SymbolManager, b *arena.Budget, oom func() bool) (*tacticManager, error) {
+func newTacticManager(s *util.SymbolManager, b *arena.Budget) (*tacticManager, error) {
 	if s == nil {
 		return nil, util.ErrSymbolOwner
 	}
@@ -42,11 +42,11 @@ func newTacticManager(s *util.SymbolManager, b *arena.Budget, oom func() bool) (
 	}
 	r := &tacticManager{symbols: s, budget: b, ownerBytes: n}
 	r.self = r
-	if e := r.nameToTactic.Init(s, b, oom); e != nil {
+	if e := r.nameToTactic.Init(s); e != nil {
 		b.Release(n)
 		return nil, e
 	}
-	if e := r.nameToProbe.Init(s, b, oom); e != nil {
+	if e := r.nameToProbe.Init(s); e != nil {
 		r.nameToTactic.Close()
 		b.Release(n)
 		return nil, e

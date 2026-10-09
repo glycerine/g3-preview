@@ -63,7 +63,7 @@ func TestSymbolDictionaryPackageBoundaryGrowthAndCleanup(t *testing.T) {
 		t.Fatal(e)
 	}
 	var d SymbolDictionaryInt32
-	if e = d.Init(m, b, nil); e != nil {
+	if e = d.Init(m); e != nil {
 		t.Fatal(e)
 	}
 	for i := uint32(0); i < 128; i++ {

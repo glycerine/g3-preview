@@ -70,7 +70,7 @@ func tacticRegistryFixture(t *testing.T) (*tacticManager, *util.ParamsContext, *
 	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: sy, Numerals: q, Budget: c.Budget()})
 	astTestMust(t, e)
 	t.Cleanup(func() { astTestMust(t, m.Close()) })
-	r, e := newTacticManager(sy, c.Budget(), m.ExprIDs.OutOfMemory)
+	r, e := newTacticManager(sy, c.Budget())
 	astTestMust(t, e)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	return r, c, m
