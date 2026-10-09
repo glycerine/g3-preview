@@ -760,10 +760,16 @@ interrupted-destruction, and malformed-header tests without removing a live Go
 consumer.
 
 `util/stopwatch` owns `Stopwatch`, `ScopedWatch`, and the Linux/portable clock
-adapters. SAT reporting imports the leaf directly. Root `Timer` and `Timeit`
-retain their existing persistence behavior through the leaf's typed `State`
-snapshot and constructor, without exposing stopwatch fields or retaining a
-root alias. The leaf has no project-package dependency.
+adapters. SAT reporting imports the leaf directly. `Timer` now lives in the
+same leaf and owns a concrete stopwatch directly;
+its copied 32-byte C++ layout, Runtime binding, and byte serialization are gone.
+`Timeit` has also moved into the leaf. It uses Go strings and `fmt` with an
+`io.Writer`, plus an optional typed callback for memory statistics. Its copied
+56-byte imp layout, Runtime dependency, root stream/parameter dependencies,
+and persistent C++ ostream flags are gone. Reporting preserves clock, memory,
+write, and flush errors, callback reentry guards, and borrowed writer lifetime.
+Live upstream reports are in SMT context and Spacer context code. The leaf has
+no project-package dependency.
 
 `util/cooperate` owns the no-OpenMP cooperation section/task state and its
 debug/release assertion profiles. It imports only `arena`; model evaluation,

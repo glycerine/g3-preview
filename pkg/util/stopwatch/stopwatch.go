@@ -23,10 +23,6 @@ type State struct {
 
 func New(clock func() (uint64, error)) Stopwatch { return Stopwatch{clock: clock} }
 
-func FromState(state State, clock func() (uint64, error)) Stopwatch {
-	return Stopwatch{elapsed: state.Elapsed, start: state.Start, running: state.Running, clock: clock}
-}
-
 func (w *Stopwatch) State() State {
 	return State{Elapsed: w.elapsed, Start: w.start, Running: w.running}
 }

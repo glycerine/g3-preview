@@ -147827,16 +147827,15 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/timeit.go",
-        "pkg/util/timeit_test.go"
+        "pkg/util/stopwatch/timeit.go",
+        "pkg/util/stopwatch/timeit_test.go"
       ],
       "tests": [
         "TestTimeitOriginalMemoryCaptureAndFormatting",
-        "TestTimeitDisabledErasureAndDefaultStreamBorrow",
-        "TestTimeitEveryColdConstructorAndOutputReservation",
-        "TestTimeitClockAndBorrowFailurePrefixes",
-        "TestTimeitNullStaleAndClosedOutputBorrow",
-        "TestTimeitTLSAccountingLimitAndReentry"
+        "TestTimeitDisabledErasureAndDefaultOutput",
+        "TestTimeitOutputFailureAndFlush",
+        "TestTimeitClockAndMemoryFailurePrefixes",
+        "TestTimeitProviderReentryAndBorrowedOutput"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -147844,22 +147843,21 @@
         {
           "name": "Complete timeit and imp constructors/destructors: enable guard, watch start/stop, memory captures, exact report insertion/manipulators and endl (timeit.h:25-31; timeit.cpp:25-58)",
           "status": "ported",
-          "go_target": "pkg/util/timeit.go",
+          "go_target": "pkg/util/stopwatch/timeit.go",
           "tests": [
             "TestTimeitOriginalMemoryCaptureAndFormatting",
-            "TestTimeitDisabledErasureAndDefaultStreamBorrow",
-            "TestTimeitEveryColdConstructorAndOutputReservation",
-            "TestTimeitClockAndBorrowFailurePrefixes",
-            "TestTimeitNullStaleAndClosedOutputBorrow",
-            "TestTimeitTLSAccountingLimitAndReentry"
+            "TestTimeitDisabledErasureAndDefaultOutput",
+            "TestTimeitOutputFailureAndFlush",
+            "TestTimeitClockAndMemoryFailurePrefixes",
+            "TestTimeitProviderReentryAndBorrowedOutput"
           ]
         }
       ],
       "ownership": [
-        "Caller supplies Timeit control storage. Enabled imp owns a real 56-byte Linux 64-bit Runtime block holding stopwatch state and the start_memory double. Message and output pointer fields use borrowed checked Go references, without string copies or extra timer allocation. Constructor memory capture includes the live imp allocation; destructor captures end memory before any insertion and frees only after successful report/flush. Failed prefixes remain owned with sticky source error; Cleanup releases ownership without repeating output or claiming source destructor completion."
+        "Timeit in util/stopwatch embeds a Go stopwatch and scalar memory baseline, retains its immutable message string, and borrows an io.Writer and optional byte-count callback. Output defaults to os.Stderr. No Runtime block, source-layout allocation, root util dependency, or ostream flag state remains. End memory is captured before reporting; clock, memory-provider, write, and flush errors remain sticky. Cleanup ends a failed scope without replaying output."
       ],
       "deviations": [
-        "Selected Linux 64-bit stopwatch/imp layout and existing NumericTextStream profile; Windows/Darwin and native raw pointer-byte ABI are not claimed. Runtime TLS accounting follows its actual synchronization semantics, including an unsynchronized zero baseline. Explicit Construct/Close/Cleanup replace C++ stack construction/destruction/exception ABI. Default stderr is borrowed from an explicitly supplied MemoryStandardStreams service; disabled construction erases providers. No dedicated C++ timeit test exists in src/test; upolynomial.cpp only uses it to report durations."
+        "Native Go fields and fmt formatting replace the C++ imp allocation and ostream machinery. Go storage adds no fabricated extent to memory snapshots. Callers select memory statistics through a typed optional callback; omitted statistics report zero. Optional writer Flush is honored. Immutable strings replace dangling/null C message pointers and preserve NUL-terminated source name semantics. Explicit Construct/Close/Cleanup replace stack lifetime. Live production reports occur in src/smt/smt_context.cpp and src/muz/spacer/spacer_context.cpp."
       ]
     },
     {
@@ -147868,16 +147866,15 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/timeit.go",
-        "pkg/util/timeit_test.go"
+        "pkg/util/stopwatch/timeit.go",
+        "pkg/util/stopwatch/timeit_test.go"
       ],
       "tests": [
         "TestTimeitOriginalMemoryCaptureAndFormatting",
-        "TestTimeitDisabledErasureAndDefaultStreamBorrow",
-        "TestTimeitEveryColdConstructorAndOutputReservation",
-        "TestTimeitClockAndBorrowFailurePrefixes",
-        "TestTimeitNullStaleAndClosedOutputBorrow",
-        "TestTimeitTLSAccountingLimitAndReentry"
+        "TestTimeitDisabledErasureAndDefaultOutput",
+        "TestTimeitOutputFailureAndFlush",
+        "TestTimeitClockAndMemoryFailurePrefixes",
+        "TestTimeitProviderReentryAndBorrowedOutput"
       ],
       "conditionals": [
         {
@@ -147895,22 +147892,21 @@
         {
           "name": "Complete timeit and imp constructors/destructors: enable guard, watch start/stop, memory captures, exact report insertion/manipulators and endl (timeit.h:25-31; timeit.cpp:25-58)",
           "status": "ported",
-          "go_target": "pkg/util/timeit.go",
+          "go_target": "pkg/util/stopwatch/timeit.go",
           "tests": [
             "TestTimeitOriginalMemoryCaptureAndFormatting",
-            "TestTimeitDisabledErasureAndDefaultStreamBorrow",
-            "TestTimeitEveryColdConstructorAndOutputReservation",
-            "TestTimeitClockAndBorrowFailurePrefixes",
-            "TestTimeitNullStaleAndClosedOutputBorrow",
-            "TestTimeitTLSAccountingLimitAndReentry"
+            "TestTimeitDisabledErasureAndDefaultOutput",
+            "TestTimeitOutputFailureAndFlush",
+            "TestTimeitClockAndMemoryFailurePrefixes",
+            "TestTimeitProviderReentryAndBorrowedOutput"
           ]
         }
       ],
       "ownership": [
-        "Caller supplies Timeit control storage. Enabled imp owns a real 56-byte Linux 64-bit Runtime block holding stopwatch state and the start_memory double. Message and output pointer fields use borrowed checked Go references, without string copies or extra timer allocation. Constructor memory capture includes the live imp allocation; destructor captures end memory before any insertion and frees only after successful report/flush. Failed prefixes remain owned with sticky source error; Cleanup releases ownership without repeating output or claiming source destructor completion."
+        "Timeit in util/stopwatch embeds a Go stopwatch and scalar memory baseline, retains its immutable message string, and borrows an io.Writer and optional byte-count callback. Output defaults to os.Stderr. No Runtime block, source-layout allocation, root util dependency, or ostream flag state remains. End memory is captured before reporting; clock, memory-provider, write, and flush errors remain sticky. Cleanup ends a failed scope without replaying output."
       ],
       "deviations": [
-        "Selected Linux 64-bit stopwatch/imp layout and existing NumericTextStream profile; Windows/Darwin and native raw pointer-byte ABI are not claimed. Runtime TLS accounting follows its actual synchronization semantics, including an unsynchronized zero baseline. Explicit Construct/Close/Cleanup replace C++ stack construction/destruction/exception ABI. Default stderr is borrowed from an explicitly supplied MemoryStandardStreams service; disabled construction erases providers. No dedicated C++ timeit test exists in src/test; upolynomial.cpp only uses it to report durations."
+        "Native Go fields and fmt formatting replace the C++ imp allocation and ostream machinery. Go storage adds no fabricated extent to memory snapshots. Callers select memory statistics through a typed optional callback; omitted statistics report zero. Optional writer Flush is honored. Immutable strings replace dangling/null C message pointers and preserve NUL-terminated source name semantics. Explicit Construct/Close/Cleanup replace stack lifetime. Live production reports occur in src/smt/smt_context.cpp and src/muz/spacer/spacer_context.cpp."
       ]
     },
     {
@@ -147955,14 +147951,12 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/timer.go",
-        "pkg/util/timer_test.go"
+        "pkg/util/stopwatch/timer.go",
+        "pkg/util/stopwatch/timer_test.go"
       ],
       "tests": [
         "TestTimerOriginalStartQueriesAndStrictTimeouts",
         "TestTimerClockFailureAndReentryPrefixes",
-        "TestTimerEveryColdConstructorReservation",
-        "TestTimerRuntimeLimitRetainsReachedAllocationPrefix",
         "TestTimerActualProcessClock"
       ],
       "methods_audited": true,
@@ -147971,21 +147965,19 @@
         {
           "name": "Complete timer construction, destruction, start/get_seconds and short-circuit strict timeouts (timer.h:27-36; timer.cpp:24-39)",
           "status": "ported",
-          "go_target": "pkg/util/timer.go",
+          "go_target": "pkg/util/stopwatch/timer.go",
           "tests": [
             "TestTimerOriginalStartQueriesAndStrictTimeouts",
             "TestTimerClockFailureAndReentryPrefixes",
-            "TestTimerEveryColdConstructorReservation",
-            "TestTimerRuntimeLimitRetainsReachedAllocationPrefix",
             "TestTimerActualProcessClock"
           ]
         }
       ],
       "ownership": [
-        "Borrowed Runtime/clock; separately charged Go control metadata owns an actual 32-byte Linux stopwatch Runtime allocation. Elapsed, running and reached timespec fields live in that block, including invalid padding and unreached timespec bytes. Constructor errors return the retained owner prefix; Close deallocates valid blocks before metadata, including TLS post-allocation failures. Stop publishes its state before the restart clock read; copied/stopped/reentrant owner checks prevent duplicate ownership."
+        "Timer owns a concrete Go stopwatch in util/stopwatch, borrowing only its optional clock. No Runtime block, byte serialization, header charge, or Runtime configuration remains. Stop publishes its state before the restart clock read; copied, closed, and reentrant owner checks remain. Constructor clock errors return the initialized owner and Close ends its lifetime."
       ],
       "deviations": [
-        "Selected Linux 64-bit stopwatch profile; 32-bit Runtime layouts are rejected explicitly. Native Windows/Darwin stopwatch behavior is not claimed by this wrapper. Existing Go stopwatch clock-error adaptation returns errors; failed clock queries preserve reached state, and constructor errors remain replayable until owning Close. Native C++ exception/destructor ABI and automatic stack cleanup are represented through explicit error/Close operations."
+        "Native Go stopwatch storage replaces the C++ allocation layout. Platform CPU clock behavior is provided by util/stopwatch. Clock failures return errors while preserving reached state; constructor errors remain sticky until Close. Explicit Close replaces source stack destruction."
       ]
     },
     {
@@ -147994,14 +147986,12 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/timer.go",
-        "pkg/util/timer_test.go"
+        "pkg/util/stopwatch/timer.go",
+        "pkg/util/stopwatch/timer_test.go"
       ],
       "tests": [
         "TestTimerOriginalStartQueriesAndStrictTimeouts",
         "TestTimerClockFailureAndReentryPrefixes",
-        "TestTimerEveryColdConstructorReservation",
-        "TestTimerRuntimeLimitRetainsReachedAllocationPrefix",
         "TestTimerActualProcessClock"
       ],
       "conditionals": [
@@ -148020,21 +148010,19 @@
         {
           "name": "Complete timer construction, destruction, start/get_seconds and short-circuit strict timeouts (timer.h:27-36; timer.cpp:24-39)",
           "status": "ported",
-          "go_target": "pkg/util/timer.go",
+          "go_target": "pkg/util/stopwatch/timer.go",
           "tests": [
             "TestTimerOriginalStartQueriesAndStrictTimeouts",
             "TestTimerClockFailureAndReentryPrefixes",
-            "TestTimerEveryColdConstructorReservation",
-            "TestTimerRuntimeLimitRetainsReachedAllocationPrefix",
             "TestTimerActualProcessClock"
           ]
         }
       ],
       "ownership": [
-        "Borrowed Runtime/clock; separately charged Go control metadata owns an actual 32-byte Linux stopwatch Runtime allocation. Elapsed, running and reached timespec fields live in that block, including invalid padding and unreached timespec bytes. Constructor errors return the retained owner prefix; Close deallocates valid blocks before metadata, including TLS post-allocation failures. Stop publishes its state before the restart clock read; copied/stopped/reentrant owner checks prevent duplicate ownership."
+        "Timer owns a concrete Go stopwatch in util/stopwatch, borrowing only its optional clock. No Runtime block, byte serialization, header charge, or Runtime configuration remains. Stop publishes its state before the restart clock read; copied, closed, and reentrant owner checks remain. Constructor clock errors return the initialized owner and Close ends its lifetime."
       ],
       "deviations": [
-        "Selected Linux 64-bit stopwatch profile; 32-bit Runtime layouts are rejected explicitly. Native Windows/Darwin stopwatch behavior is not claimed by this wrapper. Existing Go stopwatch clock-error adaptation returns errors; failed clock queries preserve reached state, and constructor errors remain replayable until owning Close. Native C++ exception/destructor ABI and automatic stack cleanup are represented through explicit error/Close operations."
+        "Native Go stopwatch storage replaces the C++ allocation layout. Platform CPU clock behavior is provided by util/stopwatch. Clock failures return errors while preserving reached state; constructor errors remain sticky until Close. Explicit Close replaces source stack destruction."
       ]
     },
     {
