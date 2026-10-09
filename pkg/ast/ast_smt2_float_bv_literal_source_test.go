@@ -142,13 +142,32 @@ func TestASTSMT2FloatDefaultWarmUsesNativeInfoStorage(t *testing.T) {
 	if prefix.IsNull() || space.IsNull() {
 		t.Fatal("cached source strings")
 	}
+	// The native profile can repeat the whole numeric formatter without a
+	// reservation. Source debug numeral checks have their own allocations, so
+	// verify the full float result normally and isolate the format-info path
+	// under refusal in that profile.
+	if ASTSourceDebug {
+		third, e := m.ppFloatBitVectorLiteral(m.external(node), true, nil)
+		astTestMust(t, e)
+		if third != first {
+			t.Fatal("warm float format identity", third, first)
+		}
+	}
 	before := m.BudgetField.Used()
 	m.BudgetField.FailAfter(0)
 	defer m.BudgetField.FailAfter(-1)
-	third, body := m.ppFloatBitVectorLiteral(m.external(node), true, nil)
+	var third, want ASTHandle
+	var body error
+	if ASTSourceDebug {
+		third, body = m.Format.FormatString("(fp #b0")
+		want = prefix
+	} else {
+		third, body = m.ppFloatBitVectorLiteral(m.external(node), true, nil)
+		want = first
+	}
 	m.BudgetField.FailAfter(-1)
-	if body != nil || third != first || m.BudgetField.Used() != before {
-		t.Fatal("warm native info storage", body, third, first, m.BudgetField.Used(), before)
+	if body != nil || third != want || m.BudgetField.Used() != before {
+		t.Fatal("warm native info storage", body, third, want, m.BudgetField.Used(), before)
 	}
 	astTestMust(t, m.Format.DelRef(&held))
 	astTestMust(t, p.numeric.Del(&v))
