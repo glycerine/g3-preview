@@ -3,6 +3,7 @@
 package polynomial
 
 import (
+	"reflect"
 	"strconv"
 	"testing"
 
@@ -105,11 +106,11 @@ func TestPolynomialFactorZeroPreservesExistingOutputRows(t *testing.T) {
 	serviceMust(t, out.Push(p, 3))
 	before, e := out.Distinct()
 	serviceMust(t, e)
-	factors, degrees := out.factors, out.degrees
+	factors, degrees := append([]Polynomial(nil), out.factors...), append([]uint32(nil), out.degrees...)
 	serviceMust(t, full.Factor(full.core.zero, out, DefaultUPolynomialFactorParams()))
 	after, e := out.Distinct()
 	serviceMust(t, e)
-	if out.constant != util.NewInt(0) || before != after || factors.raw != out.factors.raw || factors.pending != out.factors.pending || degrees.raw != out.degrees.raw {
+	if out.constant != util.NewInt(0) || before != after || !reflect.DeepEqual(factors, out.factors) || !reflect.DeepEqual(degrees, out.degrees) {
 		t.Fatal("zero wrapper must preserve rows", before, after)
 	}
 	serviceMust(t, out.CloseChecked())

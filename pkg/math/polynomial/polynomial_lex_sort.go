@@ -6,28 +6,6 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func polynomialUnsignedAppend(m *MultivariatePolynomialCore, v *polynomialVector, x uint32) error {
-	i, e := v.appendSlot(m)
-	if e != nil {
-		return e
-	}
-	if e = m.memory.WriteUint32(v.raw, 8+uint64(i)*4, x); e != nil {
-		return e
-	}
-	return v.publishSize(m, i+1)
-}
-func polynomialUnsignedRead(m *MultivariatePolynomialCore, v *polynomialVector, i uint32) (uint32, error) {
-	if polynomialSourceDebug {
-		n, e := v.size(m)
-		if e != nil {
-			return 0, e
-		}
-		if i >= n {
-			return 0, ErrPolynomialAssertion
-		}
-	}
-	return m.memory.ReadUint32(v.raw, 8+uint64(i)*4)
-}
 func (m *MultivariatePolynomialManager) lexMaximumBelow(p Polynomial, start, end, x uint32) (uint32, error) {
 	max := ^uint32(0)
 	ms, e := m.core.captureMonomialPointer(p, 0)

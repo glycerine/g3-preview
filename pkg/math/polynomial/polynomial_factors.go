@@ -10,9 +10,9 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// The class owns the actual constant and two Runtime vectors. The pointer
-// payload uses the existing 16-byte checked polynomial codec, not a shadow
-// handle slice. Charged byte phases record INC and destructive progress only.
+// Factors own one polynomial reference per successfully acquired entry and an
+// actual numeral constant. Native slices store handles, multiplicities and
+// destructor progress; stopped polynomial destruction remains resumable.
 type PolynomialFactors struct {
 	memberSet                                                          polynomialFactorMemberSetScope
 	memberSetHistory                                                   []polynomialFactorMemberSetHistory
@@ -22,7 +22,8 @@ type PolynomialFactors struct {
 	displayGeneration                                                  uint64
 	self                                                               *PolynomialFactors
 	manager                                                            *MultivariatePolynomialManager
-	factors, degrees                                                   polynomialVector
+	factors                                                            []Polynomial
+	degrees                                                            []uint32
 	constant                                                           util.Int
 	total                                                              uint32
 	phases                                                             []uint8
@@ -65,7 +66,7 @@ func NewPolynomialFactors(m *MultivariatePolynomialManager) (*PolynomialFactors,
 	if e := m.core.integer.Budget().Reserve(h); e != nil {
 		return nil, e
 	}
-	f := &PolynomialFactors{manager: m, header: h, factors: polynomialVector{width: 16}, degrees: polynomialVector{width: 4}}
+	f := &PolynomialFactors{manager: m, header: h}
 	f.self = f
 	// Empty vector members are complete before the constructor body SET.
 	if e := f.setMemberConstantOne(); e != nil {
@@ -118,7 +119,7 @@ func (f *PolynomialFactors) Distinct() (uint32, error) {
 	if e := f.ready(); e != nil {
 		return 0, e
 	}
-	return f.factors.size(f.manager.core)
+	return uint32(len(f.factors)), nil
 }
 func (f *PolynomialFactors) Total() (uint32, error) {
 	if e := f.ready(); e != nil {
@@ -138,53 +139,34 @@ func (f *PolynomialFactors) Degree(i uint32) (uint32, error) {
 	if e := f.ready(); e != nil {
 		return 0, e
 	}
-	return polynomialUnsignedRead(f.manager.core, &f.degrees, i)
+	return f.degree(i)
 }
 func (f *PolynomialFactors) sourceSize() (uint32, error) {
 	if e := f.identity(); e != nil {
 		return 0, e
 	}
-	return f.factors.size(f.manager.core)
+	return uint32(len(f.factors)), nil
+}
+func (f *PolynomialFactors) degree(i uint32) (uint32, error) {
+	if uint64(i) >= uint64(len(f.degrees)) {
+		if polynomialSourceDebug {
+			return 0, ErrPolynomialAssertion
+		}
+		return 0, arena.ErrBounds
+	}
+	return f.degrees[i], nil
 }
 func (f *PolynomialFactors) factor(i uint32) (Polynomial, error) {
 	if e := f.identity(); e != nil {
 		return Polynomial{}, e
 	}
-	m := f.manager.core
-	if polynomialSourceDebug {
-		n, e := f.factors.size(m)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if i >= n {
+	if uint64(i) >= uint64(len(f.factors)) {
+		if polynomialSourceDebug {
 			return Polynomial{}, ErrPolynomialAssertion
 		}
+		return Polynomial{}, arena.ErrBounds
 	}
-	a, e := f.factors.monomial(m, i)
-	return Polynomial{owner: a.owner, slot: a.slot, generation: a.generation}, e
-}
-func (f *PolynomialFactors) reservePhase(n uint32) error {
-	if uint64(n) > uint64(int(^uint(0)>>1)) {
-		return arena.ErrBounds
-	}
-	if int(n) <= cap(f.phases) {
-		if int(n) > len(f.phases) {
-			f.phases = f.phases[:n]
-		}
-		return nil
-	}
-	c := cap(f.phases) * 2
-	if c < int(n) {
-		c = int(n)
-	}
-	if e := f.manager.core.integer.Budget().Reserve(uint64(c)); e != nil {
-		return e
-	}
-	p := make([]uint8, n, c)
-	copy(p, f.phases)
-	f.manager.core.integer.Budget().Release(uint64(cap(f.phases)))
-	f.phases = p
-	return nil
+	return f.factors[i], nil
 }
 func (f *PolynomialFactors) Push(p Polynomial, d uint32) (err error) {
 	if e := f.open(); e != nil {
@@ -194,14 +176,9 @@ func (f *PolynomialFactors) Push(p Polynomial, d uint32) (err error) {
 		return ErrPolynomialAssertion
 	}
 	m := f.manager.core
-	n, e := f.factors.size(m)
-	if e != nil {
-		return e
-	}
-	// Cold progress storage precedes the source vector push. It does not emit
-	// a source Runtime allocation, and its distinct failure is an adapter prefix.
-	if e = f.reservePhase(n + 1); e != nil {
-		return e
+	n := len(f.factors)
+	if uint64(n) == uint64(^uint32(0)) {
+		return arena.ErrBounds
 	}
 	defer func() {
 		if err != nil {
@@ -209,15 +186,11 @@ func (f *PolynomialFactors) Push(p Polynomial, d uint32) (err error) {
 			f.resetting = true
 		}
 	}()
-	if e = f.factors.appendMonomial(m, Monomial{owner: p.owner, slot: p.slot, generation: p.generation}); e != nil {
-		return e
-	}
-	f.phases[n] = factorPublished
-	if e = polynomialUnsignedAppend(m, &f.degrees, d); e != nil {
-		return e
-	}
+	f.factors = append(f.factors, p)
+	f.phases = append(f.phases, factorPublished)
+	f.degrees = append(f.degrees, d)
 	f.total += d
-	if e = m.incRefCore(p); e != nil {
+	if e := m.incRefCore(p); e != nil {
 		return e
 	}
 	f.phases[n] = factorReferenced
@@ -230,14 +203,12 @@ func (f *PolynomialFactors) SetDegree(i, d uint32) error {
 	if polynomialSourceDebug && i == 0 {
 		return ErrPolynomialAssertion
 	}
-	old, e := polynomialUnsignedRead(f.manager.core, &f.degrees, i)
+	old, e := f.degree(i)
 	if e != nil {
 		return e
 	}
 	f.total -= old
-	if e = f.manager.core.memory.WriteUint32(f.degrees.raw, 8+uint64(i)*4, d); e != nil {
-		return e
-	}
+	f.degrees[i] = d
 	f.total += d
 	return nil
 }
@@ -278,11 +249,7 @@ func (f *PolynomialFactors) sourceReset() error {
 	m := f.manager.core
 	f.resetting = true
 	for {
-		n, e := f.factors.size(m)
-		if e != nil {
-			f.sourceCause = e
-			return e
-		}
+		n := uint32(len(f.factors))
 		if f.resetIndex >= n {
 			break
 		}
@@ -306,14 +273,8 @@ func (f *PolynomialFactors) sourceReset() error {
 		f.phases[f.resetIndex] = factorDrained
 		f.resetIndex++
 	}
-	if e := f.factors.reset(m); e != nil {
-		f.sourceCause = e
-		return e
-	}
-	if e := f.degrees.reset(m); e != nil {
-		f.sourceCause = e
-		return e
-	}
+	f.factors = f.factors[:0]
+	f.degrees = f.degrees[:0]
 	f.total = 0
 	// Literal nm.SET(int) first executes Del. Public owning SET accepts dead
 	// cleanup carriers, so the strict source leaf supplies this reached action.
@@ -382,18 +343,14 @@ func (f *PolynomialFactors) SourceFinalize() error {
 		}
 		f.sourceStage = 2
 	}
-	// Reverse completed members: degree svector, then pointer vector. Raw source
-	// dtors do not consume unpublished allocation prefixes.
-	for f.sourceStage < 4 {
-		v := &f.degrees
-		if f.sourceStage == 3 {
-			v = &f.factors
-		}
-		if e := displayDeallocatePublished(f.manager.core.memory, &v.raw); e != nil {
-			f.sourceCause = e
-			return e
-		}
-		f.sourceStage++
+	// Reverse members release native degree storage before polynomial handles.
+	if f.sourceStage == 2 {
+		f.degrees = nil
+		f.sourceStage = 3
+	}
+	if f.sourceStage == 3 {
+		f.factors = nil
+		f.sourceStage = 4
 	}
 	return nil
 }
@@ -459,12 +416,8 @@ func (f *PolynomialFactors) Cleanup() error {
 	if e := f.numeric.cleanup(m.integer); e != nil {
 		return e
 	}
-	if e := f.factors.reset(m); e != nil {
-		return e
-	}
-	if e := f.degrees.reset(m); e != nil {
-		return e
-	}
+	f.factors = f.factors[:0]
+	f.degrees = f.degrees[:0]
 	f.phases = f.phases[:0]
 	f.total = 0
 	f.resetIndex = 0
@@ -486,13 +439,9 @@ func (f *PolynomialFactors) CloseChecked() error {
 		f.cleanupCause = e
 		return e
 	}
-	if e := f.degrees.close(f.manager.core); e != nil {
-		return e
-	}
-	if e := f.factors.close(f.manager.core); e != nil {
-		return e
-	}
-	f.manager.core.integer.Budget().Release(f.header + uint64(cap(f.phases)) + uint64(cap(f.memberSetHistory))*uint64(reflect.TypeOf(polynomialFactorMemberSetHistory{}).Size()) + uint64(cap(f.constantHistory))*uint64(reflect.TypeOf(polynomialFactorConstantHistory{}).Size()))
+	f.degrees = nil
+	f.factors = nil
+	f.manager.core.integer.Budget().Release(f.header + uint64(cap(f.memberSetHistory))*uint64(reflect.TypeOf(polynomialFactorMemberSetHistory{}).Size()) + uint64(cap(f.constantHistory))*uint64(reflect.TypeOf(polynomialFactorConstantHistory{}).Size()))
 	f.constantHistory = nil
 	f.memberSetHistory = nil
 	f.header = 0

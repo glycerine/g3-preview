@@ -11,49 +11,6 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestPolynomialFactorsPushEveryReservation(t *testing.T) {
-	success := -1
-	for fail := int64(0); fail < 60; fail++ {
-		completed := false
-		t.Run(strconv.FormatInt(fail, 10), func(t *testing.T) {
-			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{7, [3]uint32{1, 0, 0}}})
-			f, e := NewPolynomialFactors(m)
-			serviceMust(t, e)
-			before, e := m.core.readWord(p, 0)
-			serviceMust(t, e)
-			m.core.integer.Budget().FailAfter(fail)
-			e = f.Push(p, 3)
-			polynomialFactorsAudit(t, f, []Polynomial{p}, nil)
-			if e != nil && !numericPhysicalReservationRefusal(e) {
-				t.Fatal("actual push reservation", e)
-			}
-			if e != nil {
-				rc, x := m.core.readWord(p, 0)
-				serviceMust(t, x)
-				if rc != before {
-					t.Fatal("push refusal before INC changed caller count", rc, before)
-				}
-			}
-			m.core.integer.Budget().FailAfter(-1)
-			serviceMust(t, f.CloseChecked())
-			after, x := m.core.readWord(p, 0)
-			serviceMust(t, x)
-			if after != before {
-				t.Fatal("own abort consumed unacquired caller INC", after, before)
-			}
-			polynomialImpPhysicalAuditValues(t, m, []Polynomial{p})
-			completed = e == nil
-		})
-		if completed {
-			success = int(fail)
-			break
-		}
-	}
-	if success < 0 {
-		t.Fatal("missing bounded actual success")
-	}
-	t.Log("actual push failure prefixes", success)
-}
 func TestPolynomialFactorsConstructorColdRefusal(t *testing.T) {
 	m, p, _ := polynomialEvalFixture(t, nil)
 	used := m.core.integer.Budget().Used()
@@ -234,38 +191,6 @@ func TestPolynomialFactorsDisplayEveryReservation(t *testing.T) {
 	}
 	t.Log("actual display prefixes", success)
 }
-func TestPolynomialFactorsFailedPushScalarQueries(t *testing.T) {
-	found := false
-	for fail := int64(0); fail < 30 && !found; fail++ {
-		t.Run(strconv.FormatInt(fail, 10), func(t *testing.T) {
-			m, p, _ := polynomialEvalFixture(t, nil)
-			f, e := NewPolynomialFactors(m)
-			serviceMust(t, e)
-			m.core.integer.Budget().FailAfter(fail)
-			e = f.Push(p, 3)
-			n, x := f.factors.size(m.core)
-			serviceMust(t, x)
-			d, x := f.degrees.size(m.core)
-			serviceMust(t, x)
-			polynomialFactorsAudit(t, f, []Polynomial{p}, nil)
-			if e != nil && n == 1 && d == 0 {
-				found = true
-				actual, x := f.Distinct()
-				serviceMust(t, x)
-				total, x := f.Total()
-				serviceMust(t, x)
-				if actual != 1 || total != 0 {
-					t.Fatal("source scalar queries after pointer-first failure", actual, total)
-				}
-			}
-			m.core.integer.Budget().FailAfter(-1)
-			serviceMust(t, f.CloseChecked())
-		})
-	}
-	if !found {
-		t.Fatal("no actual pointer-before-degree source prefix")
-	}
-}
 
 func TestPolynomialFactorsConstantFactoryOwnsSingleton(t *testing.T) {
 	q, budget := rationalManager(t, false)
@@ -403,5 +328,55 @@ func TestPolynomialFactorsConstantHelpersEveryReservation(t *testing.T) {
 			}
 			t.Log("actual helper prefixes", success)
 		})
+	}
+}
+
+func TestPolynomialFactorsNativePushGrowthAndReferenceOwnership(t *testing.T) {
+	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{7, [3]uint32{1, 0, 0}}})
+	f, e := NewPolynomialFactors(m)
+	serviceMust(t, e)
+	defer func() { m.core.integer.Budget().FailAfter(-1); serviceMust(t, f.CloseChecked()) }()
+	before, e := m.core.readWord(p, 0)
+	serviceMust(t, e)
+	for _, count := range []uint32{4097, 129} {
+		stats, used := m.core.memory.Stats(), m.core.integer.Budget().Used()
+		m.core.integer.Budget().FailAfter(0)
+		for i := uint32(0); i < count; i++ {
+			serviceMust(t, f.Push(p, 3))
+		}
+		serviceMust(t, f.SetDegree(1, 7))
+		n, e := f.Distinct()
+		serviceMust(t, e)
+		total, e := f.Total()
+		serviceMust(t, e)
+		refs, e := m.core.readWord(p, 0)
+		serviceMust(t, e)
+		if n != count || total != 3*count+4 || refs != before+count {
+			t.Fatal("native factor growth lost entries or references", n, total, refs)
+		}
+		for i := uint32(0); i < count; i++ {
+			factor, e := f.factor(i)
+			serviceMust(t, e)
+			degree, e := f.Degree(i)
+			serviceMust(t, e)
+			want := uint32(3)
+			if i == 1 {
+				want = 7
+			}
+			if factor != p || degree != want {
+				t.Fatal("factor/multiplicity association changed", i, degree)
+			}
+		}
+		if m.core.memory.Stats() != stats || m.core.integer.Budget().Used() != used {
+			t.Fatal("native factor storage charged Runtime")
+		}
+		polynomialFactorsAudit(t, f, []Polynomial{p}, nil)
+		m.core.integer.Budget().FailAfter(-1)
+		serviceMust(t, f.Reset())
+		refs, e = m.core.readWord(p, 0)
+		serviceMust(t, e)
+		if refs != before || len(f.factors) != 0 || len(f.degrees) != 0 || f.total != 0 {
+			t.Fatal("reset failed to release factor references", refs, before)
+		}
 	}
 }

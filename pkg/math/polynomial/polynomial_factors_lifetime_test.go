@@ -75,7 +75,7 @@ func TestPolynomialFactorsResetActualConsumedDrop(t *testing.T) {
 		t.Fatal("reached real Copy refusal after source last DEC", e, state.calls, f.phases, state.foreign)
 	}
 	// Caller-created handler roots are explicitly named; factors never owns them.
-	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p, q}, []*util.Int{&f.constant, &f.local, &state.source, &state.foreign}, f.header+uint64(cap(f.phases))+h.header, []util.Block{f.factors.raw, f.factors.pending, f.degrees.raw, f.degrees.pending})
+	polynomialImpPhysicalAuditNamedExtra(t, m, []Polynomial{p, q}, []*util.Int{&f.constant, &f.local, &state.source, &state.foreign}, f.header+h.header, nil)
 	cause := f.sourceCause
 	before := m.core.memory.State()
 	used := m.core.integer.Budget().Used()

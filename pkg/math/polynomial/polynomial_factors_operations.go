@@ -99,13 +99,13 @@ func (f *PolynomialFactors) Multiply(out *PolynomialRef) (cause error) {
 			if e = f.current.assign(m, p); e != nil {
 				return e
 			}
-			d, e := polynomialUnsignedRead(m, &f.degrees, i)
+			d, e := f.degree(i)
 			if e != nil {
 				return e
 			}
 			if d > 1 {
 				// The source evaluates m_degrees[i] again for the pw argument.
-				d, e = polynomialUnsignedRead(m, &f.degrees, i)
+				d, e = f.degree(i)
 				if e != nil {
 					return e
 				}
@@ -308,7 +308,7 @@ func (f *PolynomialFactors) DisplayInto(sink PolynomialTextSink) (cause error) {
 		if e = frame.WriteLiteral(")^"); e != nil {
 			return e
 		}
-		d, e := polynomialUnsignedRead(m, &f.degrees, i)
+		d, e := f.degree(i)
 		if e != nil {
 			return e
 		}

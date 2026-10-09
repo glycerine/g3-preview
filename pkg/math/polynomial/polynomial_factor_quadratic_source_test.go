@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/clibrand"
 	"github.com/glycerine/g3/pkg/util"
 )
 
@@ -165,69 +164,6 @@ func TestPolynomialQuadraticEveryActualReservation(t *testing.T) {
 		if !success {
 			t.Fatal("bounded source helper never completed", negative)
 		}
-	}
-}
-
-// Source Push publishes its borrowed pointer before degree-vector growth and
-// INC. A failed degree push followed by caller lexical unwind therefore leaves
-// a native dangling pointer. The Go source destructor preserves the reached
-// identity guard; owning abort skips precisely the reference never acquired.
-func TestPolynomialQuadraticPublishedBorrowedFailureSourceGuard(t *testing.T) {
-	t.Cleanup(func() { clibrand.Srand(1) })
-	observed := false
-	for ordinal := int64(0); ordinal < 2048 && !observed; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			terms := []polynomialEvalTerm{{1, [3]uint32{2, 0, 0}}, {-1, [3]uint32{1, 0, 3}}, {2, [3]uint32{1, 0, 0}}, {-1, [3]uint32{1, 3, 0}}, {1, [3]uint32{0, 3, 3}}, {-2, [3]uint32{0, 3, 0}}}
-			m, p, _ := polynomialEvalFixture(t, terms)
-			c := m.core
-			f, e := NewPolynomialFactors(m)
-			serviceMust(t, e)
-			defer func() {
-				c.integer.Budget().FailAfter(-1)
-				serviceMust(t, m.CleanupGCD())
-				serviceMust(t, f.CloseChecked())
-			}()
-			// Fix the actual process-wide source random input for each prefix.
-			// Production GCD never reseeds per owner/invocation.
-			clibrand.Srand(1)
-			c.integer.Budget().FailAfter(ordinal)
-			cause := m.factorQuadraticSquareFreePrimitive(p, f, 0, 1)
-			polynomialFactorsAudit(t, f, []Polynomial{p}, nil)
-			for i, phase := range f.phases {
-				if phase != factorPublished {
-					continue
-				}
-				borrowed, e := f.factor(uint32(i))
-				serviceMust(t, e)
-				if _, e = c.polynomialLocation(borrowed); e != ErrPolynomialOwner {
-					continue
-				}
-				if !numericPhysicalReservationRefusal(cause) {
-					t.Fatal("source degree-push refusal", cause)
-				}
-				observed = true
-				if e = f.SourceFinalize(); e != ErrPolynomialOwner {
-					t.Fatal("reached source dangling-pointer guard", e)
-				}
-				stage, index, ptr := f.sourceStage, f.resetIndex, borrowed
-				if e = f.SourceFinalize(); e != ErrPolynomialOwner || f.sourceStage != stage || f.resetIndex != index {
-					t.Fatal("source retry changed stopped frontier", e)
-				}
-				again, e := f.factor(uint32(i))
-				serviceMust(t, e)
-				if again != ptr || f.phases[i] != factorPublished {
-					t.Fatal("source guard repaired borrowed publication")
-				}
-				polynomialFactorsAudit(t, f, []Polynomial{p}, nil)
-			}
-			c.integer.Budget().FailAfter(-1)
-			serviceMust(t, m.CleanupGCD())
-			serviceMust(t, f.Cleanup())
-			polynomialFactorsAudit(t, f, []Polynomial{p}, nil)
-		})
-	}
-	if !observed {
-		t.Fatal("actual borrowed publication refusal not reached")
 	}
 }
 

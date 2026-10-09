@@ -36485,13 +36485,11 @@
         "TestPolynomialFactorsConstructorColdRefusal",
         "TestPolynomialFactorsDisplayEveryReservation",
         "TestPolynomialFactorsDisplayReachesSizeAfterCallback",
-        "TestPolynomialFactorsFailedPushScalarQueries",
         "TestPolynomialFactorsFreshNullVersusDestroyedConstant",
         "TestPolynomialFactorsLiteralDisplayAndConstantHelpers",
         "TestPolynomialFactorsModularAndZeroDegreeSource",
         "TestPolynomialFactorsMultiplyEveryReservation",
         "TestPolynomialFactorsMultiplyFiniteAndAlias",
-        "TestPolynomialFactorsPushEveryReservation",
         "TestPolynomialFactorsResetActualConsumedDrop",
         "TestPolynomialFactorsResetActualTLSConsumedConstant",
         "TestPolynomialFactorsSingletonForeignReplacement",
@@ -36721,7 +36719,6 @@
         "TestPolynomialQuadraticFactorDormantInputAndParity",
         "TestPolynomialQuadraticForeignCallbackRootsSurviveOwnAbort",
         "TestPolynomialQuadraticIrreducibleNegativeReturnsBeforeParityFlip",
-        "TestPolynomialQuadraticPublishedBorrowedFailureSourceGuard",
         "TestPolynomialQuadraticYoungerSqrtSourceStopPreservesOlderLocal",
         "TestPolynomialScalarExactDivActualTransportGuardsWholeOwner",
         "TestPolynomialScalarExactDivCompiledAssertionCapturesActualBoolNUM",
@@ -36916,7 +36913,8 @@
         "TestPolynomialCompositionNativeDegreeCacheNoRuntimeGrowth",
         "TestPolynomialCompositionNativeDegreeCacheSparseHornerReuse",
         "TestPolynomialLexSortNativeScratchGrowthAndReuse",
-        "TestPolynomialLexSortNativeLargeBucketsIndependentGrid"
+        "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
+        "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership"
       ],
       "conditionals": [
         {
@@ -39608,14 +39606,13 @@
           "go_target": "pkg/math/polynomial/polynomial_factors.go",
           "tests": [
             "TestPolynomialFactorsConstructorColdRefusal",
-            "TestPolynomialFactorsFailedPushScalarQueries",
             "TestPolynomialFactorsFreshNullVersusDestroyedConstant",
-            "TestPolynomialFactorsPushEveryReservation",
             "TestPolynomialFactorsResetActualConsumedDrop",
             "TestPolynomialFactorsResetActualTLSConsumedConstant",
             "TestPolynomialFactorsSourceControlAndOwnership",
             "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
-            "TestPolynomialFactorsSourceFinalizeAndClosedGuards"
+            "TestPolynomialFactorsSourceFinalizeAndClosedGuards",
+            "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership"
           ]
         },
         {
@@ -40329,7 +40326,6 @@
             "TestPolynomialQuadraticFactorDormantInputAndParity",
             "TestPolynomialQuadraticForeignCallbackRootsSurviveOwnAbort",
             "TestPolynomialQuadraticIrreducibleNegativeReturnsBeforeParityFlip",
-            "TestPolynomialQuadraticPublishedBorrowedFailureSourceGuard",
             "TestPolynomialQuadraticYoungerSqrtSourceStopPreservesOlderLocal"
           ]
         },
@@ -40669,7 +40665,6 @@
             "TestPolynomialQuadraticFactorDormantInputAndParity",
             "TestPolynomialQuadraticIrreducibleNegativeReturnsBeforeParityFlip",
             "TestPolynomialQuadraticEveryActualReservation",
-            "TestPolynomialQuadraticPublishedBorrowedFailureSourceGuard",
             "TestPolynomialQuadraticEveryActualCheckpoint",
             "TestPolynomialQuadraticForeignCallbackRootsSurviveOwnAbort",
             "TestPolynomialQuadraticYoungerSqrtSourceStopPreservesOlderLocal",
@@ -40968,7 +40963,8 @@
         "ICCP coefficient counters and first-occurrence degree lists, and the modular-GCD recursion variable list, now use plain Go uint32 slices. The unsigned128 and variable32 sbuffer translations, Runtime expansion/pending blocks, initialized/copy masks and buffer destructor refusal paths are deleted. Existing ICCP/GCD invocation scope ordering clears the native slices at source/owning end; recursion borrows the variable slice without a container owner. Coefficient counting, first encounter order, degree-driven variable order, independent content/primitive results and terminal Euclid behavior remain. The stale ICCP receipt test now uses a real large-coefficient numeral allocation failure and requires an active replacement frame; snapshots include native slice contents. High-degree tests cover former capacity boundaries and repeated cleanup. Actual numeral/reference ownership and fault campaigns remain; tests dedicated to deleted C++ buffer topology are retired. No whole-unit completion credit is added.",
         "GCD monomial reference storage now uses a concrete []Monomial slice. Original IncRef-before-publication, generated ownership transfer, ordered DecRef/reset and resumable actual monomial destruction remain. Deleted inline/spill payloads, Runtime expansion blocks, copied/pending growth state and incoming ownership needed only by fallible backing writes. Native append has no custom Runtime refusal event. Duplicate references across growth/reuse, generated transfer, real last-reference destructor refusal/owning continuation and independent GF11[x] content factorization with 33 coefficient monomials are tested. The synthetic consumed-old-growth test is retired; younger reference release before an older source stop remains checked by actual reference counts. No whole-unit completion credit is added.",
         "Composition degree-to-term positions now use a native []uint32 cache initialized with UINT_MAX for absent degrees. Removed vector headers, Runtime expansion/pending storage and destructor refusal for this member. Save/reset retain source term positions, partial-constructor progress on actual polynomial/monomial read failure, scoped cancellation cleanup and the original Horner arithmetic. Source/owning member destruction releases the slice at its existing boundary. Native cache growth/reuse under disabled Runtime reservations and independent sparse p(y^2) composition through degree 257 are checked. The unsigned n+1 wrap test now reports arena.ErrBounds in release mode (source debug assertion unchanged), with no allocation or fabricated constructor completion. No whole-unit completion credit is added.",
-        "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added."
+        "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added.",
+        "PolynomialFactors stores polynomial handles, unsigned multiplicities and actual reference-destruction progress in concrete native Go slices. Removed byte-encoded pointer/degree vectors, Runtime expansion/pending blocks and custom charged phase-slice growth. Push retains pointer then degree publication, unsigned total update then actual polynomial INC; SetDegree keeps the source index-zero assertion quirk and unsigned wrap. Reset/source destruction/owning cleanup retain real polynomial and constant lifetime order and stopped destructor continuation. Native storage is excluded from Runtime root/byte audits. Cold/warm growth through 4097 references verifies exact counts and multiplicity association under disabled Runtime reservations. Tests requiring a pointer-before-degree allocation failure and its resulting borrowed dangling row are retired; actual numeral/reference allocation and failure campaigns remain. The last shared polynomialUnsigned byte-vector helper is removed. No whole-unit completion credit is added."
       ]
     },
     {
@@ -41603,13 +41599,11 @@
         "TestPolynomialFactorsConstructorColdRefusal",
         "TestPolynomialFactorsDisplayEveryReservation",
         "TestPolynomialFactorsDisplayReachesSizeAfterCallback",
-        "TestPolynomialFactorsFailedPushScalarQueries",
         "TestPolynomialFactorsFreshNullVersusDestroyedConstant",
         "TestPolynomialFactorsLiteralDisplayAndConstantHelpers",
         "TestPolynomialFactorsModularAndZeroDegreeSource",
         "TestPolynomialFactorsMultiplyEveryReservation",
         "TestPolynomialFactorsMultiplyFiniteAndAlias",
-        "TestPolynomialFactorsPushEveryReservation",
         "TestPolynomialFactorsResetActualConsumedDrop",
         "TestPolynomialFactorsResetActualTLSConsumedConstant",
         "TestPolynomialFactorsSingletonForeignReplacement",
@@ -41764,7 +41758,6 @@
         "TestPolynomialQuadraticFactorDormantInputAndParity",
         "TestPolynomialQuadraticIrreducibleNegativeReturnsBeforeParityFlip",
         "TestPolynomialQuadraticEveryActualReservation",
-        "TestPolynomialQuadraticPublishedBorrowedFailureSourceGuard",
         "TestPolynomialQuadraticEveryActualCheckpoint",
         "TestPolynomialQuadraticForeignCallbackRootsSurviveOwnAbort",
         "TestPolynomialQuadraticYoungerSqrtSourceStopPreservesOlderLocal",
@@ -41810,7 +41803,8 @@
         "TestPolynomialFactorResetSETOneEveryFieldReservationPrefix",
         "TestPolynomialFactorConstantSuppliedReceiptRefusalBeforeBIGBody",
         "TestPolynomialFactorMinimumVariableLiteralEncounterTie",
-        "TestPolynomialFactorMinimumVariableEveryActualConstructorPrefix"
+        "TestPolynomialFactorMinimumVariableEveryActualConstructorPrefix",
+        "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership"
       ],
       "conditionals": [
         {
@@ -43162,14 +43156,13 @@
           "go_target": "pkg/math/polynomial/polynomial_factors.go",
           "tests": [
             "TestPolynomialFactorsConstructorColdRefusal",
-            "TestPolynomialFactorsFailedPushScalarQueries",
             "TestPolynomialFactorsFreshNullVersusDestroyedConstant",
-            "TestPolynomialFactorsPushEveryReservation",
             "TestPolynomialFactorsResetActualConsumedDrop",
             "TestPolynomialFactorsResetActualTLSConsumedConstant",
             "TestPolynomialFactorsSourceControlAndOwnership",
             "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
-            "TestPolynomialFactorsSourceFinalizeAndClosedGuards"
+            "TestPolynomialFactorsSourceFinalizeAndClosedGuards",
+            "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership"
           ]
         },
         {
@@ -43404,7 +43397,6 @@
             "TestPolynomialQuadraticFactorDormantInputAndParity",
             "TestPolynomialQuadraticIrreducibleNegativeReturnsBeforeParityFlip",
             "TestPolynomialQuadraticEveryActualReservation",
-            "TestPolynomialQuadraticPublishedBorrowedFailureSourceGuard",
             "TestPolynomialQuadraticEveryActualCheckpoint",
             "TestPolynomialQuadraticForeignCallbackRootsSurviveOwnAbort",
             "TestPolynomialQuadraticYoungerSqrtSourceStopPreservesOlderLocal",
@@ -43576,7 +43568,8 @@
         "Historical missing-API RED and actual Integer/Rational Copy/PN owner callback REDs retained. Requested-size-only pending metadata and the first sorted nonunit term fixture were oracle corrections, not algorithm failures; budget0 did not reach Runtime transport.",
         "Native foreign PN reservation prefixes retain no untransferred pending leaf: successful direct allocation publishes shared member storage atomically. The native proof preserves those actual members/caller NUM and independently checks remainder2^338+17; checked DEBUG verification yields the genuinely retained foreign PN child. Physical/cold audits remain unchanged for every prefix.",
         "FactorHigher literal TODO at polynomial.cpp:6727-6735 is preserved; this is the original degree dispatcher rather than a dense or degree-specific replacement. Default generator pointer selection prime_generator.cpp:99-107 is explicit borrowed Go config, with a guarded DefaultPrimeService accessor; no hidden global generator. tst_mfact is dormant after polynomial.cpp test driver return at1825: active original-driver credit remains0. Signed-host TLS DEBUG destructor fixtures qualify owner primitives; guard-copy and returning Go callbacks are separate domains. Broader polynomial/NLSAT units remain partial/unported.",
-        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit."
+        "Integer and polynomial decimal character storage uses native Go byte slices. C++ inline/spill capacity, Runtime backing charges, character-constructor allocation failures and character-destructor failures are intentionally removed. Exact invocation/borrow lifetimes and MPN numerical-workspace failure cleanup remain explicit.",
+        "PolynomialFactors stores polynomial handles, unsigned multiplicities and actual reference-destruction progress in concrete native Go slices. Removed byte-encoded pointer/degree vectors, Runtime expansion/pending blocks and custom charged phase-slice growth. Push retains pointer then degree publication, unsigned total update then actual polynomial INC; SetDegree keeps the source index-zero assertion quirk and unsigned wrap. Reset/source destruction/owning cleanup retain real polynomial and constant lifetime order and stopped destructor continuation. Native storage is excluded from Runtime root/byte audits. Cold/warm growth through 4097 references verifies exact counts and multiplicity association under disabled Runtime reservations. Tests requiring a pointer-before-degree allocation failure and its resulting borrowed dangling row are retired; actual numeral/reference allocation and failure campaigns remain. The last shared polynomialUnsigned byte-vector helper is removed. No whole-unit completion credit is added."
       ]
     },
     {
@@ -149038,7 +149031,8 @@
         "TestPolynomialCompositionNativeDegreeCacheSparseHornerReuse",
         "TestPolynomialLexSortNativeScratchGrowthAndReuse",
         "TestPolynomialLexSortNativeLargeBucketsIndependentGrid",
-        "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse"
+        "TestPolynomialLexSortStoppedScratchOnlyGuardsReachedReuse",
+        "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership"
       ],
       "conditionals": [
         {
@@ -149649,7 +149643,8 @@
         "Dormant psc_chain1 gains zero active registered-driver assertion credit; polynomial.cpp:5897-5902 still dispatches optimized PSC. Degree-indexed zero slots and source equal-degree limitation remain inherited from literal Subchain. uint32 sz-1 expression retained. Source RAW DT proof is qualified signed-host TLS owner-primitive domain, callback/copied owner guards are separate Go owner-boundary coverage. Native invalid-index bounds guard is not C++ undefined-access equivalence.",
         "GCD variable/degree pairs and their persistent variable-to-position cache now use concrete Go slices. The power-pair sbuffer inline/spill capacity, raw/pending Runtime blocks, copied/initialized masks, source buffer free failures and hand-translated heapsort are removed. Go sort.Slice applies the original ascending unsigned variable-only or degree-only comparator; equal-key library comparison/swap order is not a fidelity requirement. Degree collection retains first occurrence, Max/Min selection and sentinel reset. Native source/owning cleanup releases slices in the existing enclosing scope order, and physical audits exclude them. Tests cover large cold growth with Runtime reservations disabled, unsigned pair sorting, equal-degree multiplicities, warmed append reuse and repeated degree cache reset; actual numeral/reference allocations and source lifetime guards remain live. No whole-unit completion credit is added.",
         "Composition degree-to-term positions now use a native []uint32 cache initialized with UINT_MAX for absent degrees. Removed vector headers, Runtime expansion/pending storage and destructor refusal for this member. Save/reset retain source term positions, partial-constructor progress on actual polynomial/monomial read failure, scoped cancellation cleanup and the original Horner arithmetic. Source/owning member destruction releases the slice at its existing boundary. Native cache growth/reuse under disabled Runtime reservations and independent sparse p(y^2) composition through degree 257 are checked. The unsigned n+1 wrap test now reports arena.ErrBounds in release mode (source debug assertion unchanged), with no allocation or fabricated constructor completion. No whole-unit completion credit is added.",
-        "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added."
+        "Recursive polynomial lex sorting now uses [][]uint32 degree buckets and []uint32 permutation storage. Removed Runtime vector headers, child-binding directory, manual class movement/capacity publication, pending growth and bucket destructor failures. The project recursive highest-variable/descending-degree algorithm, in-place signed cycle markers, representation swaps and actual coefficient/monomial borrowed payload guards remain. Source/owning member destruction clears native slices; cleanup of a stopped invocation releases its own scratch without undoing published polynomial order. Cold/warm sorting under disabled Runtime reservations covers nested recursion and an independent 405-term three-variable grid. Obsolete vector allocation/capacity/spare-mapping topology tests are retired or replaced by native mapping/pair tests. Evaluator stale/early invocation checks now reach the existing wrapped-degree bounds guard to retain LexSort; actual numeral Copy failure campaigns and ownership assertions remain. No whole-unit completion credit is added.",
+        "PolynomialFactors stores polynomial handles, unsigned multiplicities and actual reference-destruction progress in concrete native Go slices. Removed byte-encoded pointer/degree vectors, Runtime expansion/pending blocks and custom charged phase-slice growth. Push retains pointer then degree publication, unsigned total update then actual polynomial INC; SetDegree keeps the source index-zero assertion quirk and unsigned wrap. Reset/source destruction/owning cleanup retain real polynomial and constant lifetime order and stopped destructor continuation. Native storage is excluded from Runtime root/byte audits. Cold/warm growth through 4097 references verifies exact counts and multiplicity association under disabled Runtime reservations. Tests requiring a pointer-before-degree allocation failure and its resulting borrowed dangling row are retired; actual numeral/reference allocation and failure campaigns remain. The last shared polynomialUnsigned byte-vector helper is removed. No whole-unit completion credit is added."
       ]
     },
     {

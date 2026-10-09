@@ -1415,3 +1415,34 @@ The latest full native module checkpoint remains 19:07–19:12 UTC; its next hou
 run is not yet due. Manifest counts remain 2102 units / 677 APIs: 63 ported,
 284 partial, 1727 unported and two dead/deleted. No whole-unit completion claim
 or replacement container package is added.
+
+## Native polynomial factor entries and multiplicities
+
+`PolynomialFactors` now stores `[]Polynomial`, `[]uint32` multiplicities and
+native byte-sized cleanup progress. Deleted the pointer/degree byte-vector
+codecs, Runtime expansion/pending roots and charged phase growth. The last
+shared polynomialUnsigned append/read helpers are gone. Actual polynomial INC,
+DEC, destructor continuation, numeral constant ownership and invoked child
+receipts remain. Push retains pointer/degree publication then total update then
+INC; SetDegree retains the source index-zero assertion and unsigned wrap.
+Source/owning destruction releases native slices at the original boundaries.
+
+A cold/warm ownership regression grows through 4097 duplicate entries, updates
+a multiplicity, checks exact total/reference counts and term-degree association,
+then resets and reuses storage. Native storage is excluded from custom Runtime
+root/byte audits. The zero-factorization no-change test snapshots slice contents.
+Removed tests whose required failure existed only between pointer and degree
+vector allocation, including the resulting quadratic borrowed dangling row.
+Actual quadratic allocation/cancellation, factor multiplication/display/constant
+allocation and stopped reference/numeral destructor campaigns remain.
+
+Validation: focused native factors/quadratic checks (0.20s), corresponding debug
+checks (1.08s), polynomial vet and portcheck passed. The hourly full native module
+checkpoint ran 20:08–20:11 UTC and passed all packages. Manifest counts remain
+2102 units / 677 APIs: 63 ported, 284 partial, 1727 unported and two dead/deleted.
+No whole-unit completion claim or replacement container package is added.
+
+Next concrete storage group: skeleton, SOM and Newton class-owner vectors still
+encode child IDs in Runtime vectors while retaining the actual typed children
+in separate directories. Replace that container bookkeeping with native typed
+storage while preserving real child construction and source/owning destruction.
