@@ -9,7 +9,7 @@ import (
 )
 
 func TestUPolynomialFactorsLifecycleCopySwapCountersAndMultiply(t *testing.T) {
-	m, _, _ := upolySourceOwner(t)
+	m, _, budget := upolySourceOwner(t)
 	fs, e := m.NewFactors()
 	if e != nil {
 		t.Fatal(e)
@@ -24,7 +24,11 @@ func TestUPolynomialFactorsLifecycleCopySwapCountersAndMultiply(t *testing.T) {
 	}
 	p := upolySourceNew(t, m, []int32{1, 1})
 	v := mustUPolyView(t, m, p)
-	if e = fs.PushCopy(v, 3); e != nil {
+	// Only the outer factor owner buffer is still charged; multiplicities are native.
+	budget.FailAfter(1)
+	e = fs.PushCopy(v, 3)
+	budget.FailAfter(-1)
+	if e != nil {
 		t.Fatal(e)
 	}
 	if n, e := fs.TotalFactors(); e != nil || n != 3 {

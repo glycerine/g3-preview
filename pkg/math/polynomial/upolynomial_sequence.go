@@ -1,4 +1,4 @@
-// Actual flat upolynomial_sequence and svector<unsigned> specialization.
+// Flat polynomial sequence with native row-offset and row-size metadata.
 package polynomial
 
 import (
@@ -9,13 +9,9 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-type upolySequenceUnsigned struct {
-	values            []uint32
-	size, initialized uint32
-}
 type upolySequenceState struct {
 	coefficients  upolyVectorState
-	begins, sizes upolySequenceUnsigned
+	begins, sizes []uint32
 }
 type UPolynomialSequence struct {
 	callerBinding util.NumericCallerBinding
@@ -31,50 +27,12 @@ type UPolynomialSequenceStats struct {
 	BeginCount, SizeCount, CoefficientCount, BeginCapacity, SizeCapacity, CoefficientCapacity, OwnedNumeralCells uint32
 }
 
-func upolySequenceSourceCapacity(old uint32) (n, oldBytes, newBytes uint32, e error) {
-	if old == 0 {
-		return 2, 0, 16, nil
-	}
-	oldBytes = 4*old + 8
-	n = (3*old + 1) >> 1
-	newBytes = 4*n + 8
-	if n <= old || newBytes <= oldBytes {
-		e = arena.ErrBounds
-	}
-	return
-}
-func upolySequenceNextCapacity(old uint32, host uint64) (uint32, uint64, error) {
-	n, _, _, e := upolySequenceSourceCapacity(old)
-	if e != nil {
-		return 0, 0, e
-	}
-	if uint64(n)*4+8 > math.MaxUint32 || uint64(n) > host/4 {
-		return 0, 0, arena.ErrBounds
-	}
-	return n, uint64(n) * 4, nil
-}
-func (m *UPolynomialManager) sequenceUnsignedPush(s *upolySequenceUnsigned, v uint32) error {
-	if s.size == math.MaxUint32 {
+// Append metadata through native storage, retaining the public uint32 domain.
+func upolyUnsignedPush(s *[]uint32, v uint32) error {
+	if uint64(len(*s)) >= math.MaxUint32 || len(*s) == int(^uint(0)>>1) {
 		return arena.ErrBounds
 	}
-	if uint64(s.size) == uint64(cap(s.values)) {
-		n, bytes, e := upolySequenceNextCapacity(uint32(cap(s.values)), uint64(int(^uint(0)>>1)))
-		if e != nil {
-			return e
-		}
-		if e = m.config.Integer.Budget().Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]uint32, n)
-		copy(next, s.values)
-		m.config.Integer.Budget().Release(uint64(cap(s.values)) * 4)
-		s.values = next
-	}
-	s.values[s.size] = v
-	s.size++
-	if s.size > s.initialized {
-		s.initialized = s.size
-	}
+	*s = append(*s, v)
 	return nil
 }
 func (m *UPolynomialManager) NewSequence() (*UPolynomialSequence, error) {
@@ -103,10 +61,10 @@ func (s *UPolynomialSequence) check() error {
 	return s.manager.check()
 }
 func (m *UPolynomialManager) sequencePush(s *upolySequenceState, v UPolynomialView, move bool) error {
-	if e := m.sequenceUnsignedPush(&s.begins, s.coefficients.size); e != nil {
+	if e := upolyUnsignedPush(&s.begins, s.coefficients.size); e != nil {
 		return e
 	}
-	if e := m.sequenceUnsignedPush(&s.sizes, v.count); e != nil {
+	if e := upolyUnsignedPush(&s.sizes, v.count); e != nil {
 		return e
 	}
 	for i := uint32(0); i < v.count; i++ {
@@ -148,29 +106,29 @@ func (s *UPolynomialSequence) Size() (uint32, error) {
 	if e := s.check(); e != nil {
 		return 0, e
 	}
-	return s.state.sizes.size, nil
+	return uint32(len(s.state.sizes)), nil
 }
-func upolySequenceUnsignedRead(s *upolySequenceUnsigned, i uint32) (uint32, error) {
-	if polynomialSourceDebug && i >= s.size {
+func upolyUnsignedRead(s []uint32, i uint32) (uint32, error) {
+	if polynomialSourceDebug && uint64(i) >= uint64(len(s)) {
 		return 0, ErrUPolynomialAssertion
 	}
-	if i >= s.initialized {
+	if uint64(i) >= uint64(len(s)) {
 		return 0, arena.ErrBounds
 	}
-	return s.values[i], nil
+	return s[i], nil
 }
 func (s *UPolynomialSequence) RowSize(i uint32) (uint32, error) {
 	if e := s.check(); e != nil {
 		return 0, e
 	}
-	return upolySequenceUnsignedRead(&s.state.sizes, i)
+	return upolyUnsignedRead(s.state.sizes, i)
 }
 func (m *UPolynomialManager) sequenceRow(s *upolySequenceState, i uint32) (UPolynomialView, error) {
-	begin, e := upolySequenceUnsignedRead(&s.begins, i)
+	begin, e := upolyUnsignedRead(s.begins, i)
 	if e != nil {
 		return UPolynomialView{}, e
 	}
-	n, e := upolySequenceUnsignedRead(&s.sizes, i)
+	n, e := upolyUnsignedRead(s.sizes, i)
 	if e != nil {
 		return UPolynomialView{}, e
 	}
@@ -189,8 +147,8 @@ func (m *UPolynomialManager) sequenceReset(s *upolySequenceState) error {
 	if e := m.reset(&s.coefficients); e != nil {
 		return e
 	}
-	s.sizes.size = 0
-	s.begins.size = 0
+	s.sizes = s.sizes[:0]
+	s.begins = s.begins[:0]
 	return nil
 }
 func (s *UPolynomialSequence) Reset() error {
@@ -206,10 +164,8 @@ func (m *UPolynomialManager) sequenceDestroy(s *upolySequenceState) error {
 	if e := m.sequenceReset(s); e != nil {
 		return e
 	}
-	m.config.Integer.Budget().Release(uint64(cap(s.sizes.values)) * 4)
-	s.sizes = upolySequenceUnsigned{}
-	m.config.Integer.Budget().Release(uint64(cap(s.begins.values)) * 4)
-	s.begins = upolySequenceUnsigned{}
+	s.sizes = nil
+	s.begins = nil
 	m.freeBacking(&s.coefficients)
 	return nil
 }
@@ -230,14 +186,14 @@ func (s *UPolynomialSequence) Close() error {
 	return nil
 }
 
-// Coefficients use native slices. TotalBytes counts the distinct cold owner
-// and the remaining sequence metadata; ManagerBackingBytes stays zero.
+// Coefficients and row metadata use native slices. TotalBytes counts only the
+// distinct cold owner; MetadataBytes and ManagerBackingBytes stay zero.
 func (s *UPolynomialSequence) Stats() UPolynomialSequenceStats {
 	if s == nil || s.self != s || s.closed || s.manager.check() != nil {
 		return UPolynomialSequenceStats{}
 	}
 	a := &s.state
-	r := UPolynomialSequenceStats{OwnerBytes: s.header, MetadataBytes: uint64(cap(a.begins.values)+cap(a.sizes.values)) * 4, BeginCount: a.begins.size, SizeCount: a.sizes.size, CoefficientCount: a.coefficients.size, BeginCapacity: uint32(cap(a.begins.values)), SizeCapacity: uint32(cap(a.sizes.values)), CoefficientCapacity: uint32(cap(s.manager.values(&a.coefficients)))}
+	r := UPolynomialSequenceStats{OwnerBytes: s.header, BeginCount: uint32(len(a.begins)), SizeCount: uint32(len(a.sizes)), CoefficientCount: a.coefficients.size, BeginCapacity: uint32(cap(a.begins)), SizeCapacity: uint32(cap(a.sizes)), CoefficientCapacity: uint32(cap(s.manager.values(&a.coefficients)))}
 	r.TotalBytes = r.OwnerBytes + r.MetadataBytes
 	for i := uint32(0); i < a.coefficients.size; i++ {
 		if s.manager.config.Integer.IsLiveCellToken(s.manager.values(&a.coefficients)[i].NativeCellToken()) {

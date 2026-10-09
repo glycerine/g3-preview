@@ -16,7 +16,7 @@ type UPolynomialFactors struct {
 	manager                   *UPolynomialManager
 	factors                   []upolyVectorState
 	count                     uint32
-	degrees                   upolySequenceUnsigned
+	degrees                   []uint32
 	constant                  util.Int
 	totalFactors, totalDegree uint32
 	header                    uint64
@@ -132,13 +132,13 @@ func (fs *UPolynomialFactors) multiplicity(index uint32) (uint32, error) {
 	if e := fs.check(); e != nil {
 		return 0, e
 	}
-	if polynomialSourceDebug && index >= fs.degrees.size {
+	if polynomialSourceDebug && index >= uint32(len(fs.degrees)) {
 		return 0, ErrUPolynomialAssertion
 	}
-	if index >= fs.degrees.initialized {
+	if index >= uint32(len(fs.degrees)) {
 		return 0, arena.ErrBounds
 	}
-	return fs.degrees.values[index], nil
+	return fs.degrees[index], nil
 }
 func (fs *UPolynomialFactors) Manager() (*UPolynomialManager, error) {
 	if e := fs.check(); e != nil {
@@ -223,7 +223,7 @@ func (fs *UPolynomialFactors) SetMultiplicity(index, degree uint32) error {
 	}
 	fs.totalDegree -= upolyStateDegree(s) * old
 	fs.totalFactors -= old
-	fs.degrees.values[index] = degree
+	fs.degrees[index] = degree
 	fs.totalFactors += degree
 	fs.totalDegree += upolyStateDegree(s) * degree
 	return nil
@@ -242,7 +242,7 @@ func (fs *UPolynomialFactors) pushCopyWithSourceContext(v UPolynomialView, degre
 	if e != nil {
 		return e
 	}
-	if e = fs.manager.sequenceUnsignedPush(&fs.degrees, degree); e != nil {
+	if e = upolyUnsignedPush(&fs.degrees, degree); e != nil {
 		return e
 	}
 	if e = fs.manager.setViewWithSourceContext(out, v, context); e != nil {
@@ -260,7 +260,7 @@ func (fs *UPolynomialFactors) pushSwap(source *UPolynomialManager, p *upolyVecto
 	if e != nil {
 		return e
 	}
-	if e = fs.manager.sequenceUnsignedPush(&fs.degrees, degree); e != nil {
+	if e = upolyUnsignedPush(&fs.degrees, degree); e != nil {
 		return e
 	}
 	if e = fs.manager.adoptState(source, p); e != nil {
@@ -367,7 +367,7 @@ func (fs *UPolynomialFactors) clearBody() error {
 		m.freeBacking(&fs.factors[i])
 	}
 	fs.count = 0
-	fs.degrees.size = 0
+	fs.degrees = fs.degrees[:0]
 	if e := m.modular.SetInt32(&fs.constant, 1); e != nil {
 		return e
 	}
@@ -395,8 +395,7 @@ func (fs *UPolynomialFactors) Close() error {
 	}
 	// Reverse source member destruction after destructor body: degrees, factors.
 	b := m.config.Integer.Budget()
-	b.Release(uint64(cap(fs.degrees.values)) * 4)
-	fs.degrees = upolySequenceUnsigned{}
+	fs.degrees = nil
 	b.Release(uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size()))
 	fs.factors = nil
 	b.Release(fs.header)
@@ -476,7 +475,7 @@ func (fs *UPolynomialFactors) Stats() UPolynomialFactorsStats {
 	if fs == nil || fs.self != fs || fs.closed || fs.manager == nil || fs.manager.closed {
 		return UPolynomialFactorsStats{}
 	}
-	st := UPolynomialFactorsStats{OwnerBytes: fs.header, Count: fs.count, MultiplicityCount: fs.degrees.size, Capacity: uint32(cap(fs.factors)), MultiplicityCapacity: uint32(cap(fs.degrees.values)), OuterBytes: uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size()), MultiplicityBytes: uint64(cap(fs.degrees.values)) * 4}
+	st := UPolynomialFactorsStats{OwnerBytes: fs.header, Count: fs.count, MultiplicityCount: uint32(len(fs.degrees)), Capacity: uint32(cap(fs.factors)), MultiplicityCapacity: uint32(cap(fs.degrees)), OuterBytes: uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size()), MultiplicityBytes: 0}
 	z := fs.manager.config.Integer
 	if z.IsLiveCellToken(fs.constant.NativeCellToken()) {
 		st.OwnedNumeralCells++

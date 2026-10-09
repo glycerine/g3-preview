@@ -44083,7 +44083,6 @@
         "pkg/math/polynomial/upolynomial_sturm.go",
         "pkg/math/polynomial/upolynomial_transforms.go",
         "pkg/math/polynomial/upolynomial_root_bounds.go",
-        "pkg/math/polynomial/upolynomial_sequence_test.go",
         "pkg/math/polynomial/upolynomial_sequence_source_test.go",
         "pkg/math/polynomial/upolynomial_sturm_source_test.go",
         "pkg/math/polynomial/upolynomial_transform_model_test.go",
@@ -44226,9 +44225,8 @@
         "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
         "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
         "TestUPolynomialModularGCDCRALateFailureRootSweep",
-        "TestUPolynomialSequenceUnsignedVectorExtent",
+        "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
         "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-        "TestUPolynomialSequenceExactMetadataFailurePrefixes",
         "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
         "TestUPolynomialHalfRootStackDivisorNoReservation",
         "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -45180,7 +45178,7 @@
           "go_target": "pkg/math/polynomial/upolynomial_sequence_source_test.go",
           "tests": [
             "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
             "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
             "TestUPolynomialHalfRootStackDivisorNoReservation",
             "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -45202,7 +45200,7 @@
           "go_target": "pkg/math/polynomial/upolynomial_sturm_source_test.go",
           "tests": [
             "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
             "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
             "TestUPolynomialHalfRootStackDivisorNoReservation",
             "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -45224,7 +45222,7 @@
           "go_target": "pkg/math/polynomial/upolynomial_transform_model_test.go",
           "tests": [
             "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
             "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
             "TestUPolynomialHalfRootStackDivisorNoReservation",
             "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -45246,7 +45244,7 @@
           "go_target": "pkg/math/polynomial/upolynomial_transform_model_test.go",
           "tests": [
             "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
             "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
             "TestUPolynomialHalfRootStackDivisorNoReservation",
             "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -45263,11 +45261,11 @@
           ]
         },
         {
-          "name": "unsigned sequence vector source capacity and bounded physical extent arithmetic",
+          "name": "native sequence row metadata growth, reset and independent coefficient readback",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_sequence.go",
           "tests": [
-            "TestUPolynomialSequenceUnsignedVectorExtent"
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset"
           ]
         },
         {
@@ -45594,7 +45592,8 @@
         "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
         "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
         "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added.",
-        "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked."
+        "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked.",
+        "Sequence row offsets/sizes and factor multiplicities now use direct []uint32 slices with native append, reslicing on reset and nil on destruction. Removed unsigned-vector capacity/header arithmetic, size/initialized masks, container-only reservation faults and metadata backing-byte charges. Actual sequence/factor owners and numeral allocation/copy/destruction remain explicit; uint32 index bounds remain checked."
       ]
     },
     {
@@ -45623,7 +45622,6 @@
         "pkg/math/polynomial/upolynomial_sturm.go",
         "pkg/math/polynomial/upolynomial_transforms.go",
         "pkg/math/polynomial/upolynomial_root_bounds.go",
-        "pkg/math/polynomial/upolynomial_sequence_test.go",
         "pkg/math/polynomial/upolynomial_sequence_source_test.go",
         "pkg/math/polynomial/upolynomial_sturm_source_test.go",
         "pkg/math/polynomial/upolynomial_transform_model_test.go",
@@ -45700,9 +45698,8 @@
         "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
         "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
         "TestUPolynomialModularGCDCRALateFailureRootSweep",
-        "TestUPolynomialSequenceUnsignedVectorExtent",
+        "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
         "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-        "TestUPolynomialSequenceExactMetadataFailurePrefixes",
         "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
         "TestUPolynomialHalfRootStackDivisorNoReservation",
         "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -46006,7 +46003,7 @@
           "go_target": "pkg/math/polynomial/upolynomial_sequence_source_test.go",
           "tests": [
             "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
             "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
             "TestUPolynomialHalfRootStackDivisorNoReservation",
             "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -46028,7 +46025,7 @@
           "go_target": "pkg/math/polynomial/upolynomial_sturm_source_test.go",
           "tests": [
             "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
             "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
             "TestUPolynomialHalfRootStackDivisorNoReservation",
             "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -46050,7 +46047,7 @@
           "go_target": "pkg/math/polynomial/upolynomial_transform_model_test.go",
           "tests": [
             "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
             "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
             "TestUPolynomialHalfRootStackDivisorNoReservation",
             "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -46072,7 +46069,7 @@
           "go_target": "pkg/math/polynomial/upolynomial_transform_model_test.go",
           "tests": [
             "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
             "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
             "TestUPolynomialHalfRootStackDivisorNoReservation",
             "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -46089,11 +46086,11 @@
           ]
         },
         {
-          "name": "unsigned sequence vector source capacity and bounded physical extent arithmetic",
+          "name": "native sequence row metadata growth, reset and independent coefficient readback",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_sequence.go",
           "tests": [
-            "TestUPolynomialSequenceUnsignedVectorExtent"
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset"
           ]
         },
         {
@@ -46234,7 +46231,8 @@
         "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added.",
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
         "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added.",
-        "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked."
+        "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked.",
+        "Sequence row offsets/sizes and factor multiplicities now use direct []uint32 slices with native append, reslicing on reset and nil on destruction. Removed unsigned-vector capacity/header arithmetic, size/initialized masks, container-only reservation faults and metadata backing-byte charges. Actual sequence/factor owners and numeral allocation/copy/destruction remain explicit; uint32 index bounds remain checked."
       ]
     },
     {
@@ -109764,7 +109762,6 @@
         "pkg/math/polynomial/upolynomial_sturm.go",
         "pkg/math/polynomial/upolynomial_transforms.go",
         "pkg/math/polynomial/upolynomial_root_bounds.go",
-        "pkg/math/polynomial/upolynomial_sequence_test.go",
         "pkg/math/polynomial/upolynomial_sequence_source_test.go",
         "pkg/math/polynomial/upolynomial_sturm_source_test.go",
         "pkg/math/polynomial/upolynomial_transform_model_test.go",
@@ -109827,9 +109824,8 @@
         "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
         "TestUPolynomialContentRawEarlyOneAndLateReadPrefix",
         "TestUPolynomialModularGCDCRALateFailureRootSweep",
-        "TestUPolynomialSequenceUnsignedVectorExtent",
+        "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
         "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-        "TestUPolynomialSequenceExactMetadataFailurePrefixes",
         "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
         "TestUPolynomialHalfRootStackDivisorNoReservation",
         "TestUPolynomialSequenceBigCopyFailureImmediateGraph",
@@ -110163,7 +110159,7 @@
           "go_target": "pkg/math/polynomial/upolynomial_sturm_source_test.go",
           "tests": [
             "TestUPolynomialSequenceCopyMoveAndRetainedRows",
-            "TestUPolynomialSequenceExactMetadataFailurePrefixes",
+            "TestUPolynomialSequenceNativeMetadataGrowthAndReset",
             "TestUPolynomialSequencePhysicalOwnerAndCloseGuard",
             "TestUPolynomialHalfRootStackDivisorNoReservation",
             "TestUPolynomialSequenceBigCopyFailureImmediateGraph",

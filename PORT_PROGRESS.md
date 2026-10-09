@@ -32084,3 +32084,39 @@ The full util knot/split remains open. Continue with sequence/multiplicity unsig
 metadata, factor outer collections/degree sets and binary-rational vectors, then
 retained AST/SAT containers and text consumers. Internal util numeric/text/params
 cycles must also be removed before moving root files into actual subpackages.
+
+## Native sequence metadata and factor multiplicities
+
+Sequence row offsets/sizes and factor multiplicities are now direct []uint32
+slices. Removed the shared unsigned-vector wrapper, source capacity/header
+arithmetic, separate size/initialized fields, manual grow/copy/reserve/refund
+paths and metadata buffer charges. Native append retains the public uint32/host
+index domain guards; reset reslices to zero and source/owning destruction clears
+native references. Sturm/Fourier sequence consumers, multivariate factor copying,
+prime-trial source destruction and both prepared-factor cleanup paths use these
+actual slices. Numeric coefficient ownership/copies and real sequence/factor cold
+owners remain explicit. The factor outer owner buffer is still charged and is
+separate remaining work.
+
+The old unsigned capacity/overflow arithmetic test and scalar metadata-allocation
+failure fixture are replaced by native sequence stress: 4097 three-coefficient
+rows under disabled reservations, every independently expected offset/size and
+coefficient, reset/reuse and unchanged numeric Runtime accounting. Exact existing
+factor lifecycle/product/counter coverage now permits just the actual outer owner
+buffer reservation on its first cold insertion; multiplicity publication and the
+coefficient copy need no further reservation. BIG sequence copy refusal campaigns,
+physical root censuses, source cleanup guards and ownership checks still pass.
+Stats report zero native MetadataBytes/MultiplicityBytes. Factor-service physical
+censuses exclude native multiplicity capacity while retaining real owner charges.
+
+Validation: focused native sequence/factor checks passed (17.570s); full native
+polynomial passed (34.070s); focused g3debug sequence/Sturm/factors/prime-trial and
+recombination checks passed (0.741s). Module-wide compilation, polynomial vet,
+portcheck, gofmt and diff checks passed. Manifest counts/statuses unchanged.
+The 22:43–22:45 UTC full native module checkpoint remains current; no additional
+full-module run was needed.
+
+The full util knot/split goal remains open. Next remove factor outer owner-vector
+and degree-set container machinery, then binary-rational vectors, retained AST/SAT
+containers and text consumers. Internal root-util numeric/text/parameter cycles
+also need resolution before splitting those files into actual subpackages.

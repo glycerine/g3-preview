@@ -144,7 +144,7 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveUnivariateWithR
 			return ErrPolynomialAssertion
 		}
 	}
-	if s.fs.count == 1 && s.fs.degrees.values[0] == 1 {
+	if s.fs.count == 1 && s.fs.degrees[0] == 1 {
 		return r.Push(p, k)
 	}
 	s.conditionalReference = true // actual f constructor only in else
@@ -154,7 +154,7 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveUnivariateWithR
 		if e != nil {
 			return e
 		}
-		multiplicity := s.fs.degrees.values[i]
+		multiplicity := s.fs.degrees[i]
 		result, e := m.toPolynomialWithReceipt(vector.size, m.upm.values(vector), x, &s.toPolynomial)
 		if e != nil {
 			return e

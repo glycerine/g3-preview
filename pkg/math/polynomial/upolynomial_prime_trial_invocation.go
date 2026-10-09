@@ -194,7 +194,7 @@ func (s *UPolynomialFactorizationService) finishPrimeCurrentSource(q *upolyPrime
 				m.freeBacking(&fs.factors[i])
 			}
 			fs.count = 0
-			fs.degrees.size = 0
+			fs.degrees = fs.degrees[:0]
 			q.factorStage++
 		case 2:
 			// A stopped source DEL is not an owning acknowledgement at this SET.
@@ -217,8 +217,7 @@ func (s *UPolynomialFactorizationService) finishPrimeCurrentSource(q *upolyPrime
 			q.factorStage++
 		case 4:
 			b := z.Budget()
-			b.Release(uint64(cap(fs.degrees.values)) * 4)
-			fs.degrees = upolySequenceUnsigned{}
+			fs.degrees = nil
 			b.Release(uint64(cap(fs.factors)) * upolyFactorVectorStride())
 			fs.factors = nil
 			b.Release(fs.header)

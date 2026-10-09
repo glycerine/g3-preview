@@ -260,7 +260,7 @@ func primeTrialPhysicalAuditAll(t *testing.T, q *util.RationalManager, s *UPolyn
 			continue
 		}
 		namedFactors[fs] = true
-		n += fs.header + uint64(cap(fs.degrees.values))*4 + uint64(cap(fs.factors))*uint64(reflect.TypeOf(upolyVectorState{}).Size())
+		n += fs.header + uint64(cap(fs.factors))*uint64(reflect.TypeOf(upolyVectorState{}).Size())
 		roots = append(roots, &fs.constant)
 		for i := uint32(0); i < fs.count; i++ {
 			appendState(fs.manager, &fs.factors[i])

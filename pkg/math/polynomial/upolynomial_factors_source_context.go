@@ -47,7 +47,7 @@ func (fs *UPolynomialFactors) closeWithSourceContext(st *upolyPreparedFactorCurs
 				m.freeBacking(&fs.factors[i])
 			}
 			fs.count = 0
-			fs.degrees.size = 0
+			fs.degrees = fs.degrees[:0]
 			st.stage = 2
 		}
 		if st.stage == 2 {
@@ -66,8 +66,7 @@ func (fs *UPolynomialFactors) closeWithSourceContext(st *upolyPreparedFactorCurs
 		}
 		if !fs.closed {
 			budget := z.Budget()
-			budget.Release(uint64(cap(fs.degrees.values)) * 4)
-			fs.degrees = upolySequenceUnsigned{}
+			fs.degrees = nil
 			budget.Release(uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size()))
 			fs.factors = nil
 			budget.Release(fs.header)
@@ -104,8 +103,7 @@ func (fs *UPolynomialFactors) closeWithSourceContext(st *upolyPreparedFactorCurs
 	}
 	if !fs.closed {
 		b := z.Budget()
-		b.Release(uint64(cap(fs.degrees.values)) * 4)
-		fs.degrees = upolySequenceUnsigned{}
+		fs.degrees = nil
 		b.Release(uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size()))
 		fs.factors = nil
 		b.Release(fs.header)

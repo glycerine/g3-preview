@@ -77,43 +77,47 @@ func TestUPolynomialSequenceCopyMoveAndRetainedRows(t *testing.T) {
 	}
 }
 
-func TestUPolynomialSequenceExactMetadataFailurePrefixes(t *testing.T) {
-	for fault := int64(0); fault <= 2; fault++ {
-		m, _, b := upolySourceOwner(t)
-		p := upolySourceNew(t, m, []int32{7})
-		seq := upolySturmSequence(t, m)
-		b.FailAfter(fault)
-		e := seq.PushCopy(mustUPolyView(t, m, p))
-		stats := seq.Stats()
-		owned := m.Stats()
-		if owned.IntegerLiveCells != owned.IntegerCachedCells+owned.OwnedNumeralCells || stats.OwnedNumeralCells != 0 {
-			t.Fatal("immediate scalar graph", fault, owned, stats)
+func TestUPolynomialSequenceNativeMetadataGrowthAndReset(t *testing.T) {
+	m, q, b := upolySourceOwner(t)
+	p := upolySourceNew(t, m, []int32{7, -3, 1})
+	seq := upolySturmSequence(t, m)
+	before, used := q.Integers().Memory.Stats(), b.Used()
+	b.FailAfter(0)
+	t.Cleanup(func() { b.FailAfter(-1) })
+	for i := 0; i < 4097; i++ {
+		serviceMust(t, seq.PushCopy(mustUPolyView(t, m, p)))
+	}
+	stats := seq.Stats()
+	if stats.BeginCount != 4097 || stats.SizeCount != 4097 || stats.CoefficientCount != 3*4097 || stats.MetadataBytes != 0 || stats.TotalBytes != stats.OwnerBytes {
+		t.Fatal("native sequence metadata", stats)
+	}
+	for i := uint32(0); i < 4097; i++ {
+		row, e := seq.RowView(i)
+		serviceMust(t, e)
+		if row.start != 3*i || row.count != 3 {
+			t.Fatal(i, row)
 		}
-		upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Sequences: []*UPolynomialSequence{seq}})
-		b.FailAfter(-1)
-		if fault == 2 {
-			if e != nil || stats.BeginCount != 1 || stats.SizeCount != 1 || stats.CoefficientCount != 1 {
-				t.Fatal("two metadata reservations suffice for native coefficient copy", e, stats)
-			}
-			row, e := seq.RowView(0)
-			serviceMust(t, e)
+		for j, want := range []int64{7, -3, 1} {
 			var n util.Int
-			serviceMust(t, m.ReadView(row, 0, &n))
-			value, e := m.IntegerManager().Int64(&n)
-			if e != nil || value != 7 {
-				t.Fatal(value, e)
+			serviceMust(t, m.ReadView(row, uint32(j), &n))
+			got, e := m.IntegerManager().Int64(&n)
+			if e != nil || got != want {
+				t.Fatal(i, j, got, want, e)
 			}
 			serviceMust(t, m.IntegerManager().Del(&n))
-			continue
-		}
-		if !numericStorageReservationRefusal(e) {
-			t.Fatal(fault, e)
-		}
-		wantBegin := uint32(fault)
-		if stats.BeginCount != wantBegin || stats.SizeCount != 0 || stats.CoefficientCount != 0 {
-			t.Fatal("source metadata publication", fault, stats)
 		}
 	}
+	serviceMust(t, seq.Reset())
+	serviceMust(t, seq.PushCopy(mustUPolyView(t, m, p)))
+	row, e := seq.RowView(0)
+	serviceMust(t, e)
+	if row.start != 0 || row.count != 3 {
+		t.Fatal("reset metadata", row)
+	}
+	if q.Integers().Memory.Stats() != before || b.Used() != used {
+		t.Fatal("native metadata changed numeric accounting")
+	}
+	b.FailAfter(-1)
 }
 
 func TestUPolynomialSequencePhysicalOwnerAndCloseGuard(t *testing.T) {

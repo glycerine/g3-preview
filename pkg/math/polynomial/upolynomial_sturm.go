@@ -20,7 +20,7 @@ func (m *UPolynomialManager) sturmSequenceCore(s *upolySequenceState) error {
 	var r upolyVectorState
 	defer m.dropLocalVector(&r)
 	for {
-		n := s.sizes.size
+		n := uint32(len(s.sizes))
 		a, e := m.sequenceRow(s, n-2)
 		if e != nil {
 			return e
@@ -120,7 +120,7 @@ func (m *UPolynomialManager) FourierSequence(p UPolynomialView, s *UPolynomialSe
 		return nil
 	}
 	for i := uint32(0); i < p.count-1; i++ {
-		v, e := m.sequenceRow(&s.state, s.state.sizes.size-1)
+		v, e := m.sequenceRow(&s.state, uint32(len(s.state.sizes))-1)
 		if e != nil {
 			return e
 		}
@@ -137,18 +137,18 @@ func (m *UPolynomialManager) FourierSequence(p UPolynomialView, s *UPolynomialSe
 	return nil
 }
 func (m *UPolynomialManager) sequenceVariations(s *upolySequenceState, location uint8, b *util.BinaryRational) (uint32, error) {
-	if s.sizes.size <= 1 {
+	if uint32(len(s.sizes)) <= 1 {
 		return 0, nil
 	}
 	var result uint32
 	previous := 0
-	for i := uint32(0); i < s.sizes.size; i++ {
+	for i := uint32(0); i < uint32(len(s.sizes)); i++ {
 		// Source reads size(i) before coeffs(i). Preserve that assertion/read order.
-		n, e := upolySequenceUnsignedRead(&s.sizes, i)
+		n, e := upolyUnsignedRead(s.sizes, i)
 		if e != nil {
 			return 0, e
 		}
-		begin, e := upolySequenceUnsignedRead(&s.begins, i)
+		begin, e := upolyUnsignedRead(s.begins, i)
 		if e != nil {
 			return 0, e
 		}

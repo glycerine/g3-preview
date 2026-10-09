@@ -71,7 +71,7 @@ func polynomialFactorBackendNamedRoots(t *testing.T, full *MultivariatePolynomia
 		if !fs.closed {
 			bytes += fs.header
 		}
-		bytes += uint64(cap(fs.factors))*uint64(reflect.TypeOf(upolyVectorState{}).Size()) + uint64(cap(fs.degrees.values))*4
+		bytes += uint64(cap(fs.factors)) * uint64(reflect.TypeOf(upolyVectorState{}).Size())
 		roots = append(roots, &fs.constant)
 		for i := range fs.factors {
 			vector(fs.manager, &fs.factors[i])
