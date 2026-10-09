@@ -2,7 +2,6 @@ package util
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -111,9 +110,6 @@ func TestParamDescrsSourceModuleAndNullKinds(t *testing.T) {
 	if _, e = d.Display(0, false, false); e != ErrParamDescrsPrecondition {
 		t.Fatal("source display null guard", e)
 	}
-	if d.Entries[d.findHash(Symbol{}, 0x9e3779d9)].hash != 0x9e3779d9 {
-		t.Fatal("null hash")
-	}
 }
 func TestParamDescrsSourceKindLabelsAndHelpers(t *testing.T) {
 	labels := []string{"unsigned int", "bool", "double", "rational", "rational", "string", "optional-value", "keyword", "symbol", "symbol-list", "sort", "sort-list", "expression", "expression-list", "declaration", "declaration-list", "sorted-variable", "sorted-variable-list", "s-expression", "unknown"}
@@ -149,7 +145,7 @@ func TestParamDescrsSourceKindLabelsAndHelpers(t *testing.T) {
 		}
 	}
 }
-func TestParamDescrsCopyBucketOrderLifetimeAndPrefix(t *testing.T) {
+func TestParamDescrsCopyInsertionOrderLifetimeAndPrefix(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	b := arena.NewBudget(^uint64(0))
 	src := pdnew(t, m, b)
@@ -159,9 +155,9 @@ func TestParamDescrsCopyBucketOrderLifetimeAndPrefix(t *testing.T) {
 	}
 	pdinsert(t, dst, "copy3", ParamUInt, pdstr("retain"), nil, nil)
 	order := []Symbol{}
-	for _, x := range src.Entries {
-		if x.state == 2 && x.key != internSymbol(t, m, "copy3") {
-			order = append(order, x.key)
+	for key := range src.entries.All() {
+		if key != internSymbol(t, m, "copy3") {
+			order = append(order, key)
 		}
 	}
 	if e := dst.Copy(src); e != nil {
@@ -170,7 +166,7 @@ func TestParamDescrsCopyBucketOrderLifetimeAndPrefix(t *testing.T) {
 	for i, s := range order {
 		v, e := dst.ParamName(uint32(i + 1))
 		if e != nil || v != s {
-			t.Fatal("physical bucket replay", i, e)
+			t.Fatal("insertion order replay", i, e)
 		}
 	}
 	before := dst.Stats()
@@ -189,55 +185,51 @@ func TestParamDescrsCopyBucketOrderLifetimeAndPrefix(t *testing.T) {
 		t.Fatal(v, p, e)
 	}
 }
-func TestParamDescrsIndependentDictionaryStateMachine(t *testing.T) {
+func TestParamDescrsDictionaryBehaviorAndHistory(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	d := pdnew(t, m, nil)
 	live := map[string]string{}
-	hist := []Symbol{}
+	history := []Symbol{}
 	seed := uint32(91)
 	for step := 0; step < 1800; step++ {
 		seed = seed*1664525 + 1013904223
-		n := fmt.Sprintf("key%d", seed%75)
-		s := internSymbol(t, m, n)
+		name := fmt.Sprintf("key%d", seed%75)
+		key := internSymbol(t, m, name)
 		if seed&4 == 0 {
-			if e := d.Erase(s); e != nil {
+			if e := d.Erase(key); e != nil {
 				t.Fatal(e)
 			}
-			delete(live, n)
+			delete(live, name)
 		} else {
-			v := fmt.Sprint(step)
-			_, had := live[n]
-			if e := d.Insert(s, ParamString, &v, nil, nil); e != nil {
+			value := fmt.Sprint(step)
+			_, existed := live[name]
+			if e := d.Insert(key, ParamString, &value, nil, nil); e != nil {
 				t.Fatal(e)
 			}
-			if !had {
-				live[n] = v
-				hist = append(hist, s)
+			if !existed {
+				live[name] = value
+				history = append(history, key)
 			}
 		}
-		for name, w := range live {
-			v, p, e := d.DescriptionName(name)
-			if e != nil || !p || v != w {
-				t.Fatal(step, name, v, w, p, e)
+		for name, want := range live {
+			got, present, e := d.DescriptionName(name)
+			if e != nil || !present || got != want {
+				t.Fatal(step, name, got, want, present, e)
 			}
 		}
-		nlive := d.Stats().Live
-		if nlive != uint32(len(live)) {
-			t.Fatal(step, nlive, len(live))
+		if got := d.Stats().Live; got != uint32(len(live)) {
+			t.Fatal(step, got, len(live))
 		}
-		historySize, _ := d.Size()
-		if int(historySize) != len(hist) {
-			t.Fatal(step, historySize, len(hist))
+		n, e := d.Size()
+		if e != nil || int(n) != len(history) {
+			t.Fatal(step, n, len(history), e)
 		}
-		for i, s := range hist {
-			v, _ := d.ParamName(uint32(i))
-			if v != s {
-				t.Fatal(step, i)
+		for i, want := range history {
+			got, e := d.ParamName(uint32(i))
+			if e != nil || got != want {
+				t.Fatal(step, i, e)
 			}
 		}
-	}
-	if e := arena.ValidateRecordType(reflect.TypeOf(paramDescrEntry{})); e != nil {
-		t.Fatal(e)
 	}
 }
 func TestParamDescrsBudgetFailuresAndWarmDuplicate(t *testing.T) {
@@ -305,135 +297,10 @@ func TestParamDescrsBudgetFailuresAndWarmDuplicate(t *testing.T) {
 	}
 }
 
-func pdcollisions(t *testing.T, m *SymbolManager, count int, mask, bucket uint32) []Symbol {
-	t.Helper()
-	r := []Symbol{}
-	for i := 0; len(r) < count; i++ {
-		s := internSymbol(t, m, fmt.Sprintf("collision_%d", i))
-		h, e := m.Hash(s)
-		if e != nil {
-			t.Fatal(e)
-		}
-		if h&mask == bucket {
-			r = append(r, s)
-		}
-	}
-	return r
-}
 func pdtotal(s ParamDescrsStats) uint64 {
 	v := s.Text
 	a := v.Descriptors
 	return s.OwnerBytes + s.TableBytes + s.NamesBytes + v.OwnerBytes + v.PayloadBytes + v.BlockMetadataBytes + v.DirectoryBytes + a.OwnerBytes + a.RecordBytes + a.MetadataBytes + a.DirectoryBytes
-}
-func TestParamDescrsSourceProbeThresholdAndCleanup(t *testing.T) {
-	m := symbolManagerTest(t, nil, false)
-	keys := pdcollisions(t, m, 8, 15, 14)
-	d, e := NewParamDescrs(m, ParamDescrsConfig{InitialCapacity: 16})
-	if e != nil {
-		t.Fatal(e)
-	}
-	defer d.Close()
-	for _, s := range keys[:6] {
-		if e = d.Insert(s, ParamUInt, pdstr("D"), nil, nil); e != nil {
-			t.Fatal(e)
-		}
-	}
-	first, _ := d.find(keys[0])
-	second, _ := d.find(keys[1])
-	if first != 14 || second != 15 {
-		t.Fatal(first, second)
-	}
-	d.Erase(keys[0])
-	d.Erase(keys[1])
-	if d.Stats().Deleted != 2 {
-		t.Fatal(d.Stats())
-	}
-	if e = d.Insert(keys[6], ParamUInt, pdstr("N"), nil, nil); e != nil {
-		t.Fatal(e)
-	}
-	where, _ := d.find(keys[6])
-	if where != second || d.Entries[first].state != 1 {
-		t.Fatal("source last-deleted probe", where, d.Stats())
-	}
-	// Strict pre-insertion >75%: seven can occupy a table of eight; duplicate
-	// pre-find returns before the eighth insertion would trigger growth.
-	x, e := NewParamDescrs(m, ParamDescrsConfig{})
-	if e != nil {
-		t.Fatal(e)
-	}
-	defer x.Close()
-	for _, s := range keys[:7] {
-		if e = x.Insert(s, ParamBool, pdstr("d"), nil, nil); e != nil {
-			t.Fatal(e)
-		}
-	}
-	if x.Stats().Capacity != 8 {
-		t.Fatal(x.Stats())
-	}
-	if e = x.Insert(keys[0], ParamBool, nil, nil, nil); e != nil || x.Stats().Capacity != 8 {
-		t.Fatal(e, x.Stats())
-	}
-	if e = x.Insert(keys[7], ParamBool, nil, nil, nil); e != nil || x.Stats().Capacity != 16 {
-		t.Fatal(e, x.Stats())
-	}
-	// 80 colliding records force consecutive DELETED buckets across wrap.
-	keys = pdcollisions(t, m, 80, 255, 250)
-	for _, mode := range []string{"normal", "oom", "failure"} {
-		b := arena.NewBudget(^uint64(0))
-		oom := mode == "oom"
-		calls := 0
-		z, e := NewParamDescrs(m, ParamDescrsConfig{Budget: b, InitialCapacity: 256, OutOfMemory: func() bool { calls++; return oom }})
-		if e != nil {
-			t.Fatal(e)
-		}
-		for _, s := range keys {
-			if e = z.Insert(s, ParamUInt, pdstr("live"), nil, nil); e != nil {
-				t.Fatal(e)
-			}
-		}
-		for _, s := range keys[:64] {
-			if e = z.Erase(s); e != nil {
-				t.Fatal(e)
-			}
-		}
-		if z.Stats().Deleted != 64 || calls != 0 {
-			t.Fatal(z.Stats(), calls)
-		}
-		before := b.Used()
-		if mode == "failure" {
-			b.FailAfter(0)
-		}
-		e = z.Erase(keys[64])
-		b.FailAfter(-1)
-		if mode == "failure" {
-			if e != arena.ErrInjectedFailure || z.Stats().Deleted != 65 || b.Used() != before {
-				t.Fatal(mode, e, z.Stats(), before, b.Used())
-			}
-		} else if e != nil {
-			t.Fatal(e)
-		}
-		if mode == "normal" && z.Stats().Deleted != 0 {
-			t.Fatal(z.Stats())
-		}
-		if mode == "oom" && z.Stats().Deleted != 65 {
-			t.Fatal(z.Stats())
-		}
-		if calls != 1 || z.Stats().Live != 15 || z.Texts.Stats().Live != 15 {
-			t.Fatal(mode, calls, z.Stats())
-		}
-		for _, s := range keys[65:] {
-			if p, e := z.Contains(s); e != nil || !p {
-				t.Fatal(mode, e, p)
-			}
-		}
-		if pdtotal(z.Stats()) != b.Used() {
-			t.Fatal("complete graph", pdtotal(z.Stats()), b.Used())
-		}
-		z.Close()
-		if b.Used() != 0 {
-			t.Fatal(b.Used())
-		}
-	}
 }
 func TestParamDescrsOwnershipNullableMetadataAndGuards(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
@@ -518,10 +385,8 @@ func TestParamDescrsCopyDisplayFaultPrefixesAndPlateau(t *testing.T) {
 			t.Fatal(prefix, e, s, b.Used())
 		}
 		order := []Symbol{}
-		for _, x := range src.Entries {
-			if x.state == 2 {
-				order = append(order, x.key)
-			}
+		for key := range src.entries.All() {
+			order = append(order, key)
 		}
 		for i := uint32(0); i < s.Names; i++ {
 			got, _ := dst.ParamName(i)
@@ -575,35 +440,7 @@ func TestParamDescrsCopyDisplayFaultPrefixesAndPlateau(t *testing.T) {
 		t.Fatal(b.Used())
 	}
 }
-func TestParamDescrsSourceNamesFailureKeepsDictionaryPublication(t *testing.T) {
-	m := symbolManagerTest(t, nil, false)
-	k := internSymbol(t, m, "published_without_history")
-	b := arena.NewBudget(^uint64(0))
-	d := pdnew(t, m, b)
-	before := b.Used()
-	b.FailAfter(0)
-	e := d.Insert(k, ParamUInt, nil, nil, nil)
-	b.FailAfter(-1)
-	if e != arena.ErrInjectedFailure {
-		t.Fatal(e)
-	}
-	yes, e := d.Contains(k)
-	kind, _ := d.Kind(k)
-	n, _ := d.Size()
-	if !yes || e != nil || kind != ParamUInt || n != 0 || d.Stats().Live != 1 || b.Used() != before {
-		t.Fatal("source insert then names.push_back prefix", yes, kind, n, e, d.Stats(), b.Used(), before)
-	}
-	b.FailAfter(0)
-	if e = d.Insert(k, ParamUInt, pdstr("ignored"), nil, nil); e != nil {
-		t.Fatal("source duplicate retry does not append", e)
-	}
-	b.FailAfter(-1)
-	n, _ = d.Size()
-	if n != 0 {
-		t.Fatal(n)
-	}
-}
-func TestParamDescrsModuleScratchFailuresAndMetadataPublication(t *testing.T) {
+func TestParamDescrsModuleGoScratchAndMetadataPublication(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	b := arena.NewBudget(^uint64(0))
 	d := pdnew(t, m, b)
@@ -631,10 +468,11 @@ func TestParamDescrsModuleScratchFailuresAndMetadataPublication(t *testing.T) {
 			t.Fatal("module temporary graph leak", prefix, b.Used(), baseline)
 		}
 	}
-	if failed == 0 || passed == 0 {
+	if failed != 0 || passed != 15 {
 		t.Fatal(failed, passed)
 	}
-	// Warm text and descriptors, then fill names capacity. Only names must reserve.
+	// Reusing freed arena text requires no reservation; ordinary Go name/map
+	// growth does not add an artificial Budget failure point.
 	k0 := internSymbol(t, m, "warm0")
 	k1 := internSymbol(t, m, "warm1")
 	k2 := internSymbol(t, m, "warm2")
@@ -650,29 +488,26 @@ func TestParamDescrsModuleScratchFailuresAndMetadataPublication(t *testing.T) {
 	b.FailAfter(0)
 	e := z.Insert(k2, ParamString, pdstr("retained"), nil, nil)
 	b.FailAfter(-1)
-	if e != arena.ErrInjectedFailure {
+	if e != nil {
 		t.Fatal(e)
 	}
 	text, p, e := z.Description(k2)
 	n, _ := z.Size()
-	if e != nil || !p || text != "retained" || n != 2 || z.Stats().Live != 2 || b.Used() != before || z.Texts.Stats().Live != 2 {
+	if e != nil || !p || text != "retained" || n != 3 || z.Stats().Live != 2 || b.Used() != before || z.Texts.Stats().Live != 2 {
 		t.Fatal(text, p, e, n, z.Stats(), b.Used(), before)
 	}
 }
-func TestParamDescrsSourcePrefixConstructorUsesPushGrowth(t *testing.T) {
+func TestParamDescrsSourcePrefixUsesGoTemporaryStorage(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	name := internSymbol(t, m, "four.key")
 	b := arena.NewBudget(^uint64(0))
 	d := pdnew(t, m, b)
 	base := b.Used()
-	// vector(s,data) loops push_back: prefix length4 grows2,3,5; adding
-	// terminator needs no growth. Then prefix string and suffix buffer/string
-	// bridges reserve, totaling6 successful reservations in this Go adapter.
-	b.FailAfter(5)
-	_, _, split, e := d.splitName(name)
+	b.FailAfter(0)
+	prefix, suffix, split, e := d.splitName(name)
 	b.FailAfter(-1)
-	if e != arena.ErrInjectedFailure || split || b.Used() != base {
-		t.Fatal("source character push growth", split, e, b.Used(), base)
+	if e != nil || !split || symbolText(t, m, prefix) != "four" || symbolText(t, m, suffix) != "key" || b.Used() != base {
+		t.Fatal("Go temporary storage must not consume arena budget", split, e, b.Used(), base)
 	}
 }
 func TestParamDescrsCheckedCapacityBoundaries(t *testing.T) {
@@ -690,9 +525,11 @@ func TestParamDescrsCheckedCapacityBoundaries(t *testing.T) {
 	}
 	m := symbolManagerTest(t, nil, false)
 	for _, cap := range []uint32{3, 6, 7} {
-		if _, e := NewParamDescrs(m, ParamDescrsConfig{InitialCapacity: cap}); e != ErrParamDescrsPrecondition {
+		d, e := NewParamDescrs(m, ParamDescrsConfig{InitialCapacity: cap})
+		if e != nil {
 			t.Fatal(cap, e)
 		}
+		paramsMust(t, d.Close())
 	}
 	b := arena.NewBudget(^uint64(0))
 	if _, e := NewParamDescrs(m, ParamDescrsConfig{Budget: b, Text: arena.VectorConfig{PageSize: 3}}); e != arena.ErrConfig || b.Used() != 0 {

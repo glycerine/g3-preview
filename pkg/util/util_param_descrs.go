@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/insdict"
 )
 
 type ParamKind uint32
@@ -82,13 +83,10 @@ func (k ParamKind) String() string {
 var ErrParamDescrsPrecondition = errors.New("g3: parameter descriptors source precondition")
 var paramDescrsCopyMutex sync.Mutex
 
-// OutOfMemory models the source global memory diagnostic for tombstone cleanup.
-// Its environment is borrowed, must not reenter, and is not charged to Budget.
 type ParamDescrsConfig struct {
 	Budget          *arena.Budget
 	InitialCapacity uint32
 	Text            arena.VectorConfig
-	OutOfMemory     func() bool
 }
 type paramDescrText struct {
 	ref    arena.VectorRef
@@ -97,11 +95,6 @@ type paramDescrText struct {
 type paramDescrInfo struct {
 	kind               ParamKind
 	descr, def, module paramDescrText
-}
-type paramDescrEntry struct {
-	key         Symbol
-	hash, state uint32
-	info        paramDescrInfo
 }
 type ParamDescrsStats struct {
 	Live, Deleted, Capacity, Names, NamesCapacity uint32
@@ -120,10 +113,8 @@ type ParamDescrs struct {
 	manager              *SymbolManager
 	Budget               *arena.Budget
 	Texts                *arena.Words
-	Entries              []paramDescrEntry
+	entries              *insdict.Dict[Symbol, paramDescrInfo]
 	Names                []Symbol
-	size, deleted        uint32
-	outOfMemory          func() bool
 	closed               bool
 	constructorReady     bool
 	constructorCompleted uint8
@@ -131,8 +122,6 @@ type ParamDescrs struct {
 	OwnerBytes           uint64
 }
 
-func ParamDescriptorEntryBytes(n int) uint64 { return uint64(n) * uint64(reflect.TypeOf(paramDescrEntry{}).Size()) }
-func ParamDescriptorNameBytes(n int) uint64  { return uint64(n) * uint64(reflect.TypeOf(Symbol{}).Size()) }
 func pdGrowth(n int) (int, error) {
 	if n == 0 {
 		return 2, nil
@@ -157,10 +146,7 @@ func prepareSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (ParamDescr
 	if n == 0 {
 		n = 8
 	}
-	if n&(n-1) != 0 {
-		return c, ErrParamDescrsPrecondition
-	}
-	if uint64(n) > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(paramDescrEntry{}).Size()) {
+	if uint64(n) > uint64(^uint(0)>>1) {
 		return c, arena.ErrBounds
 	}
 	if c.Text.Descriptors.Budget != nil && c.Text.Descriptors.Budget != c.Budget {
@@ -185,7 +171,7 @@ func newSourceParamDescrs(m *SymbolManager, c ParamDescrsConfig) (*ParamDescrs, 
 	if e := c.Budget.Reserve(owner); e != nil {
 		return nil, e
 	}
-	d := &ParamDescrs{manager: m, Budget: c.Budget, outOfMemory: c.OutOfMemory, OwnerBytes: owner}
+	d := &ParamDescrs{manager: m, Budget: c.Budget, OwnerBytes: owner}
 	d.Self = d
 	if e := d.constructSourceMembers(c); e != nil {
 		return d, e
@@ -203,14 +189,10 @@ func (d *ParamDescrs) constructSourceMembers(c ParamDescrsConfig) error {
 		return e
 	}
 	d.Texts = text
-	if e = c.Budget.Reserve(ParamDescriptorEntryBytes(int(c.InitialCapacity))); e != nil {
-		d.constructorCause = e
-		return e
-	}
-	d.Entries = make([]paramDescrEntry, c.InitialCapacity)
-	for i := range d.Entries {
-		d.Entries[i].info.kind = ParamInvalid
-	}
+	d.entries = insdict.NewDictFuncSize[Symbol, paramDescrInfo](func(k Symbol) uint64 {
+		h := (k.owner ^ uint64(k.Value)<<32) | uint64(k.Tag)
+		return h ^ uint64(k.Generation)*0x9e3779b97f4a7c15
+	}, int(c.InitialCapacity))
 	d.constructorCompleted = 1 // actual info dictionary completed
 	d.Names = nil              // source null names vector default construction cannot fail
 	d.constructorCompleted = 2
@@ -230,73 +212,13 @@ func (d *ParamDescrs) open() error {
 	_, e := d.manager.Hash(Symbol{})
 	return e
 }
-func (d *ParamDescrs) findHash(k Symbol, h uint32) int {
-	mask := uint32(len(d.Entries)) - 1
-	for n := uint32(0); n <= mask; n++ {
-		i := int((h + n) & mask)
-		x := d.Entries[i]
-		if x.state == 0 {
-			return -1
-		}
-		if x.state == 2 && x.hash == h && x.key == k {
-			return i
-		}
-	}
-	return -1
-}
-func (d *ParamDescrs) find(k Symbol) (int, error) {
-	h, e := d.manager.Hash(k)
+func (d *ParamDescrs) find(k Symbol) (paramDescrInfo, bool, error) {
+	_, e := d.manager.Hash(k)
 	if e != nil {
-		return -1, e
+		return paramDescrInfo{}, false, e
 	}
-	return d.findHash(k, h), nil
-}
-func (d *ParamDescrs) rehash(n int) error {
-	if uint64(n) > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(paramDescrEntry{}).Size()) {
-		return arena.ErrBounds
-	}
-	if e := d.Budget.Reserve(ParamDescriptorEntryBytes(n)); e != nil {
-		return e
-	}
-	next := make([]paramDescrEntry, n)
-	mask := uint32(n - 1)
-	for _, x := range d.Entries {
-		if x.state != 2 {
-			continue
-		}
-		i := x.hash & mask
-		for next[i].state != 0 {
-			i = (i + 1) & mask
-		}
-		next[i] = x
-	}
-	d.Budget.Release(ParamDescriptorEntryBytes(len(d.Entries)))
-	d.Entries = next
-	d.deleted = 0
-	return nil
-}
-func (d *ParamDescrs) growNames() error {
-	if uint64(len(d.Names)) >= uint64(^uint32(0)) {
-		return arena.ErrBounds
-	}
-	if len(d.Names) < cap(d.Names) {
-		return nil
-	}
-	n, e := pdGrowth(cap(d.Names))
-	if e != nil {
-		return e
-	}
-	if uint64(n) > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(Symbol{}).Size()) {
-		return arena.ErrBounds
-	}
-	if e = d.Budget.Reserve(ParamDescriptorNameBytes(n)); e != nil {
-		return e
-	}
-	a := make([]Symbol, len(d.Names), n)
-	copy(a, d.Names)
-	d.Budget.Release(ParamDescriptorNameBytes(cap(d.Names)))
-	d.Names = a
-	return nil
+	v, ok := d.entries.Get2(k)
+	return v, ok, nil
 }
 func (d *ParamDescrs) store(s *string) (paramDescrText, error) {
 	if s == nil {
@@ -350,59 +272,36 @@ func (d *ParamDescrs) drop(i paramDescrInfo) {
 		}
 	}
 }
-func (d *ParamDescrs) prepareInsert(k Symbol, kind ParamKind) (uint32, bool, error) {
-	h, e := d.manager.Hash(k)
+func (d *ParamDescrs) prepareInsert(k Symbol, kind ParamKind) (bool, error) {
+	_, e := d.manager.Hash(k)
 	if e != nil {
-		return 0, false, e
+		return false, e
 	}
 	if k.IsNumerical() {
-		return 0, false, ErrParamDescrsPrecondition
+		return false, ErrParamDescrsPrecondition
 	}
-	if i := d.findHash(k, h); i >= 0 {
-		if d.Entries[i].info.kind != kind {
-			return 0, false, ErrParamDescrsPrecondition
+	if info, found := d.entries.Get2(k); found {
+		if info.kind != kind {
+			return false, ErrParamDescrsPrecondition
 		}
-		return h, true, nil
+		return true, nil
 	}
-	if (uint64(d.size)+uint64(d.deleted))*4 > uint64(len(d.Entries))*3 {
-		if len(d.Entries) > int(^uint(0)>>1)/2 {
-			return 0, false, arena.ErrBounds
-		}
-		if e = d.rehash(len(d.Entries) * 2); e != nil {
-			return 0, false, e
-		}
-	}
-	return h, false, nil
+	return false, nil
 }
-func (d *ParamDescrs) publishInsert(k Symbol, h uint32, info paramDescrInfo) error {
+func (d *ParamDescrs) publishInsert(k Symbol, info paramDescrInfo) error {
 	// Preserve source insertion publication before names.push_back. A names
-	// allocation failure keeps the descriptor live with the old history length.
-	mask := uint32(len(d.Entries)) - 1
-	deleted := -1
-	for n := uint32(0); n <= mask; n++ {
-		i := int((h + n) & mask)
-		switch d.Entries[i].state {
-		case 1:
-			deleted = i
-		case 0:
-			if deleted >= 0 {
-				i = deleted
-				d.deleted--
-			}
-			d.Entries[i] = paramDescrEntry{k, h, 2, info}
-			d.size++
-			if e := d.growNames(); e != nil {
-				return e
-			}
-			d.Names = append(d.Names, k)
-			return nil
-		}
+	// history records the first successful insertion.
+	d.entries.Put(k, info)
+	if uint64(len(d.Names)) >= uint64(^uint32(0)) {
+		d.entries.Del(k)
+		d.drop(info)
+		return arena.ErrBounds
 	}
-	d.drop(info)
-	return ErrParamDescrsPrecondition
+	d.Names = append(d.Names, k)
+	return nil
 }
 func (d *ParamDescrs) insert(k Symbol, kind ParamKind, descr, def, module *string) error {
-	h, existing, e := d.prepareInsert(k, kind)
+	existing, e := d.prepareInsert(k, kind)
 	if e != nil || existing {
 		return e
 	}
@@ -418,7 +317,7 @@ func (d *ParamDescrs) insert(k Symbol, kind ParamKind, descr, def, module *strin
 		d.drop(info)
 		return e
 	}
-	return d.publishInsert(k, h, info)
+	return d.publishInsert(k, info)
 }
 func (d *ParamDescrs) copyText(source *ParamDescrs, old paramDescrText) (paramDescrText, error) {
 	if old.ref == (arena.VectorRef{}) {
@@ -445,24 +344,24 @@ func (d *ParamDescrs) copyText(source *ParamDescrs, old paramDescrText) (paramDe
 	}
 	return paramDescrText{r, old.length}, nil
 }
-func (d *ParamDescrs) insertCopy(source *ParamDescrs, x paramDescrEntry) error {
-	h, existing, e := d.prepareInsert(x.key, x.info.kind)
+func (d *ParamDescrs) insertCopy(source *ParamDescrs, key Symbol, sourceInfo paramDescrInfo) error {
+	existing, e := d.prepareInsert(key, sourceInfo.kind)
 	if e != nil || existing {
 		return e
 	}
-	info := paramDescrInfo{kind: x.info.kind}
-	if info.descr, e = d.copyText(source, x.info.descr); e != nil {
+	info := paramDescrInfo{kind: sourceInfo.kind}
+	if info.descr, e = d.copyText(source, sourceInfo.descr); e != nil {
 		return e
 	}
-	if info.def, e = d.copyText(source, x.info.def); e != nil {
+	if info.def, e = d.copyText(source, sourceInfo.def); e != nil {
 		d.drop(info)
 		return e
 	}
-	if info.module, e = d.copyText(source, x.info.module); e != nil {
+	if info.module, e = d.copyText(source, sourceInfo.module); e != nil {
 		d.drop(info)
 		return e
 	}
-	return d.publishInsert(x.key, h, info)
+	return d.publishInsert(key, info)
 }
 func (d *ParamDescrs) Insert(k Symbol, kind ParamKind, descr, def, module *string) error {
 	d.mu.Lock()
@@ -484,7 +383,7 @@ func (d *ParamDescrs) InsertName(name string, kind ParamKind, descr, def, module
 	}
 	return d.insert(k, kind, descr, def, module)
 }
-func (d *ParamDescrs) contains(k Symbol) (bool, error) { i, e := d.find(k); return i >= 0, e }
+func (d *ParamDescrs) contains(k Symbol) (bool, error) { _, found, e := d.find(k); return found, e }
 func (d *ParamDescrs) Contains(k Symbol) (bool, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -506,22 +405,12 @@ func (d *ParamDescrs) ContainsName(name string) (bool, error) {
 	return d.contains(k)
 }
 func (d *ParamDescrs) erase(k Symbol) error {
-	i, e := d.find(k)
-	if e != nil || i < 0 {
+	info, found, e := d.find(k)
+	if e != nil || !found {
 		return e
 	}
-	d.drop(d.Entries[i].info)
-	next := (i + 1) & (len(d.Entries) - 1)
-	if d.Entries[next].state == 0 {
-		d.Entries[i].state = 0
-	} else {
-		d.Entries[i].state = 1
-		d.deleted++
-	}
-	d.size--
-	if d.Entries[i].state == 1 && d.deleted > d.size && d.deleted > 64 && (d.outOfMemory == nil || !d.outOfMemory()) {
-		return d.rehash(len(d.Entries))
-	}
+	d.drop(info)
+	d.entries.Del(k)
 	return nil
 }
 func (d *ParamDescrs) Erase(k Symbol) error {
@@ -545,11 +434,11 @@ func (d *ParamDescrs) EraseName(name string) error {
 	return d.erase(k)
 }
 func (d *ParamDescrs) kind(k Symbol) (ParamKind, error) {
-	i, e := d.find(k)
-	if e != nil || i < 0 {
+	info, found, e := d.find(k)
+	if e != nil || !found {
 		return ParamInvalid, e
 	}
-	return d.Entries[i].info.kind, nil
+	return info.kind, nil
 }
 func (d *ParamDescrs) Kind(k Symbol) (ParamKind, error) {
 	d.mu.Lock()
@@ -572,16 +461,16 @@ func (d *ParamDescrs) KindName(name string) (ParamKind, error) {
 	return d.kind(k)
 }
 func (d *ParamDescrs) text(k Symbol, which uint32) (string, bool, error) {
-	i, e := d.find(k)
-	if e != nil || i < 0 {
+	info, found, e := d.find(k)
+	if e != nil || !found {
 		return "", false, e
 	}
-	r := d.Entries[i].info.descr
+	r := info.descr
 	if which == 1 {
-		r = d.Entries[i].info.def
+		r = info.def
 	}
 	if which == 2 {
-		r = d.Entries[i].info.module
+		r = info.module
 	}
 	return d.load(r)
 }
@@ -645,16 +534,6 @@ func (d *ParamDescrs) symbolByte(k Symbol, index uint32) (byte, error) {
 	return m.region.Read(arena.BytesRegionRef{Slot: arena.Slot(k.Value), Generation: k.Generation}, m.pointerWidth+index)
 }
 func (d *ParamDescrs) internBytes(b []byte) (Symbol, error) {
-	// Go's immutable string bridge is temporary owner storage, distinct from the
-	// borrowed manager's subsequently interned spelling graph.
-	if len(b) == 0 {
-		return d.manager.Intern("")
-	}
-	amount := uint64(len(b))
-	if e := d.Budget.Reserve(amount); e != nil {
-		return Symbol{}, e
-	}
-	defer d.Budget.Release(amount)
 	return d.manager.Intern(string(b))
 }
 func (d *ParamDescrs) internSymbolRange(k Symbol, start, n uint32) (Symbol, error) {
@@ -664,10 +543,6 @@ func (d *ParamDescrs) internSymbolRange(k Symbol, start, n uint32) (Symbol, erro
 	if n == 0 {
 		return d.manager.Intern("")
 	}
-	if e := d.Budget.Reserve(uint64(n)); e != nil {
-		return Symbol{}, e
-	}
-	defer d.Budget.Release(uint64(n))
 	b := make([]byte, n)
 	for i := uint32(0); i < n; i++ {
 		v, e := d.symbolByte(k, start+i)
@@ -688,10 +563,6 @@ func (d *ParamDescrs) internText(r paramDescrText) (Symbol, error) {
 	if uint64(r.length) > uint64(^uint(0)>>1) {
 		return Symbol{}, arena.ErrBounds
 	}
-	if e := d.Budget.Reserve(uint64(r.length)); e != nil {
-		return Symbol{}, e
-	}
-	defer d.Budget.Release(uint64(r.length))
 	b := make([]byte, r.length)
 	for i := uint32(0); i < r.length; i++ {
 		v, e := d.Texts.Read(r.ref, i/4)
@@ -721,34 +592,14 @@ func (d *ParamDescrs) splitName(name Symbol) (Symbol, Symbol, bool, error) {
 	if dot == n {
 		return Symbol{}, Symbol{}, false, nil
 	}
-	// vector(s,data) pushes each prefix character, then push_back(0).
-	// Preserve every capacity growth and its old-plus-new allocation peak.
-	var prefixBytes []byte
-	defer func() { d.Budget.Release(uint64(cap(prefixBytes))) }()
-	for i := uint32(0); i <= dot; i++ {
-		if len(prefixBytes) == cap(prefixBytes) {
-			n, e := pdGrowth(cap(prefixBytes))
-			if e != nil {
-				return Symbol{}, Symbol{}, false, e
-			}
-			if e = d.Budget.Reserve(uint64(n)); e != nil {
-				return Symbol{}, Symbol{}, false, e
-			}
-			next := make([]byte, len(prefixBytes), n)
-			copy(next, prefixBytes)
-			d.Budget.Release(uint64(cap(prefixBytes)))
-			prefixBytes = next
+	prefixBytes := make([]byte, dot)
+	for i := uint32(0); i < dot; i++ {
+		prefixBytes[i], e = d.symbolByte(name, i)
+		if e != nil {
+			return Symbol{}, Symbol{}, false, e
 		}
-		var v byte
-		if i < dot {
-			v, e = d.symbolByte(name, i)
-			if e != nil {
-				return Symbol{}, Symbol{}, false, e
-			}
-		}
-		prefixBytes = append(prefixBytes, v)
 	}
-	prefix, e := d.internBytes(prefixBytes[:dot])
+	prefix, e := d.internBytes(prefixBytes)
 	if e != nil {
 		return Symbol{}, Symbol{}, false, e
 	}
@@ -782,11 +633,14 @@ func (d *ParamDescrs) KindInModule(name *Symbol) (ParamKind, error) {
 	if e != nil || k == ParamInvalid {
 		return k, e
 	}
-	i, e := d.find(suffix)
+	info, found, e := d.find(suffix)
 	if e != nil {
 		return ParamInvalid, e
 	}
-	module, e := d.internText(d.Entries[i].info.module)
+	if !found {
+		return ParamInvalid, ErrParamDescrsPrecondition
+	}
+	module, e := d.internText(info.module)
 	if e != nil {
 		return ParamInvalid, e
 	}
@@ -921,38 +775,21 @@ func (d *ParamDescrs) Display(indent uint32, smt2, includeDescr bool) (string, e
 		return "", e
 	}
 	var names []Symbol
-	defer func() { d.Budget.Release(ParamDescriptorNameBytes(cap(names))) }()
-	for _, x := range d.Entries {
-		if x.state != 2 {
-			continue
-		}
-		if len(names) == cap(names) {
-			n, e := pdGrowth(cap(names))
-			if e != nil {
-				return "", e
-			}
-			if uint64(n) > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(Symbol{}).Size()) {
-				return "", arena.ErrBounds
-			}
-			if e = d.Budget.Reserve(ParamDescriptorNameBytes(n)); e != nil {
-				return "", e
-			}
-			next := make([]Symbol, len(names), n)
-			copy(next, names)
-			d.Budget.Release(ParamDescriptorNameBytes(cap(names)))
-			names = next
-		}
-		names = append(names, x.key)
+	for key := range d.entries.All() {
+		names = append(names, key)
 	}
 	for _, k := range names {
 		if _, e := d.symbolCompare(k, k); e != nil {
 			return "", e
 		}
-		i, e := d.find(k)
+		info, found, e := d.find(k)
 		if e != nil {
 			return "", e
 		}
-		if d.Entries[i].info.descr.ref == (arena.VectorRef{}) {
+		if !found {
+			return "", ErrParamDescrsPrecondition
+		}
+		if info.descr.ref == (arena.VectorRef{}) {
 			return "", ErrParamDescrsPrecondition
 		}
 	}
@@ -970,11 +807,13 @@ func (d *ParamDescrs) Display(indent uint32, smt2, includeDescr bool) (string, e
 		if e := d.writeName(&out, key, smt2); e != nil {
 			return "", e
 		}
-		idx, e := d.find(key)
+		info, found, e := d.find(key)
 		if e != nil {
 			return "", e
 		}
-		info := d.Entries[idx].info
+		if !found {
+			return "", ErrParamDescrsPrecondition
+		}
 		out.WriteString(" (")
 		out.WriteString(info.kind.String())
 		out.WriteByte(')')
@@ -1017,11 +856,8 @@ func (d *ParamDescrs) Copy(other *ParamDescrs) error {
 	if d.manager != other.manager {
 		return ErrParamDescrsPrecondition
 	}
-	for _, x := range other.Entries {
-		if x.state != 2 {
-			continue
-		}
-		if e := d.insertCopy(other, x); e != nil {
+	for key, info := range other.entries.All() {
+		if e := d.insertCopy(other, key, info); e != nil {
 			return e
 		}
 	}
@@ -1037,7 +873,11 @@ func (d *ParamDescrs) Stats() ParamDescrsStats {
 	if d.Texts != nil {
 		text = d.Texts.Stats()
 	}
-	return ParamDescrsStats{d.size, d.deleted, uint32(len(d.Entries)), uint32(len(d.Names)), uint32(cap(d.Names)), d.OwnerBytes, ParamDescriptorEntryBytes(len(d.Entries)), ParamDescriptorNameBytes(cap(d.Names)), text}
+	live := uint32(0)
+	if d.entries != nil {
+		live = uint32(d.entries.Len())
+	}
+	return ParamDescrsStats{Live: live, Names: uint32(len(d.Names)), NamesCapacity: uint32(cap(d.Names)), OwnerBytes: d.OwnerBytes, Text: text}
 }
 func (d *ParamDescrs) Close() error {
 	d.mu.Lock()
@@ -1052,12 +892,10 @@ func (d *ParamDescrs) Close() error {
 		return ErrParamDescrsPrecondition
 	}
 	d.Texts.Close()
-	d.Budget.Release(ParamDescriptorEntryBytes(len(d.Entries)) + ParamDescriptorNameBytes(cap(d.Names)) + d.OwnerBytes)
+	d.Budget.Release(d.OwnerBytes)
 	d.OwnerBytes = 0
-	d.Entries = nil
+	d.entries = nil
 	d.Names = nil
-	d.size = 0
-	d.deleted = 0
 	d.closed = true
 	return nil
 }
@@ -1097,12 +935,8 @@ func (d *ParamDescrs) sourceFinalizeMembers() error {
 
 // Caller holds mu; each consumed concrete backing is cleared immediately.
 func (d *ParamDescrs) closeSourceMembers() error {
-	d.Budget.Release(ParamDescriptorNameBytes(cap(d.Names)))
 	d.Names = nil
-	d.Budget.Release(ParamDescriptorEntryBytes(len(d.Entries)))
-	d.Entries = nil
-	d.size = 0
-	d.deleted = 0
+	d.entries = nil
 	d.Texts.Close()
 	d.Budget.Release(d.OwnerBytes)
 	d.OwnerBytes = 0

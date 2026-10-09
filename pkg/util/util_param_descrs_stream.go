@@ -1,10 +1,6 @@
 package util
 
-import (
-	"reflect"
-
-	"github.com/glycerine/g3/pkg/arena"
-)
+import "github.com/glycerine/g3/pkg/arena"
 
 // DisplayInto emits source param_descrs::display into a borrowed charged byte
 // destination. Lock order is destination→descriptors→symbols; private writes
@@ -27,29 +23,8 @@ func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, incl
 		return e
 	}
 	var names []Symbol
-	defer func() { d.Budget.Release(ParamDescriptorNameBytes(cap(names))) }()
-	for _, x := range d.Entries {
-		if x.state != 2 {
-			continue
-		}
-		if len(names) == cap(names) {
-			capacity, e := pdStreamNameCapacity(uint32(cap(names)), d.manager.pointerWidth)
-			n := int(capacity)
-			if e != nil {
-				return e
-			}
-			if uint64(n) > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(Symbol{}).Size()) {
-				return arena.ErrBounds
-			}
-			if e = d.Budget.Reserve(ParamDescriptorNameBytes(n)); e != nil {
-				return e
-			}
-			next := make([]Symbol, len(names), n)
-			copy(next, names)
-			d.Budget.Release(ParamDescriptorNameBytes(cap(names)))
-			names = next
-		}
-		names = append(names, x.key)
+	for key := range d.entries.All() {
+		names = append(names, key)
 	}
 	if e := d.sortSymbols(names); e != nil {
 		return e
@@ -68,14 +43,13 @@ func (d *ParamDescrs) DisplayInto(dst *StringBuffer64, indent uint32, smt2, incl
 		if e := d.writeNameInto(dst, key, smt2); e != nil {
 			return e
 		}
-		idx, e := d.find(key)
+		info, found, e := d.find(key)
 		if e != nil {
 			return e
 		}
-		if idx < 0 {
+		if !found {
 			return ErrParamDescrsPrecondition
 		}
-		info := d.Entries[idx].info
 		if paramDescrsStreamSourceDebug && info.descr.ref == (arena.VectorRef{}) {
 			return ErrParamDescrsPrecondition
 		}
@@ -160,23 +134,4 @@ func (d *ParamDescrs) writeTextInto(dst *StringBuffer64, r paramDescrText) error
 		}
 	}
 	return nil
-}
-
-// Source vector<symbol> SZ is uint32. Source pointer width and translated
-// Go Symbol physical stride are distinct; actual host-byte bounds are checked
-// separately before Reserve/make in DisplayInto.
-func pdStreamNameCapacity(old, width uint32) (uint32, error) {
-	if width != 4 && width != 8 {
-		return 0, arena.ErrBounds
-	}
-	if old == 0 {
-		return 2, nil
-	}
-	n := (3*old + 1) >> 1
-	oldBytes := old*width + 8
-	newBytes := n*width + 8
-	if n <= old || newBytes <= oldBytes {
-		return 0, arena.ErrBounds
-	}
-	return n, nil
 }

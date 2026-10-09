@@ -80,7 +80,7 @@ func gparamsConstructorAudit(t *testing.T, g *GlobalParams, b *arena.Budget) {
 		if d.Self != d || d.Budget != b || d.constructorReady || d.closed || d == g.GlobalDescriptors {
 			t.Fatal("actual unfinished child identity")
 		}
-		n += d.OwnerBytes + ParamDescriptorEntryBytes(len(d.Entries)) + ParamDescriptorNameBytes(cap(d.Names))
+		n += d.OwnerBytes
 		if d.Texts != nil {
 			n += gparamsVectorGraph(d.Texts.Stats())
 		}

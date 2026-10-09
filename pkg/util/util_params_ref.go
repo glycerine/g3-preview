@@ -1247,11 +1247,11 @@ func (c *ParamsContext) format(v *ParamsRef, key *Symbol, module *string, d *Par
 				return c.appendValue(x)
 			}
 			if d != nil {
-				idx, e := d.find(x.key)
+				_, found, e := d.find(x.key)
 				if e != nil {
 					return e
 				}
-				if idx < 0 {
+				if !found {
 					continue
 				}
 				if e = c.appendString("(set-option :"); e != nil {
@@ -1346,35 +1346,21 @@ func (c *ParamsContext) DisplaySMT2(v *ParamsRef, module *string, d *ParamDescrs
 }
 func (c *ParamsContext) appendDescrs(d *ParamDescrs) error {
 	var names []Symbol
-	defer func() { c.BudgetField.Release(ParamDescriptorNameBytes(cap(names))) }()
-	for _, x := range d.Entries {
-		if x.state != 2 {
-			continue
-		}
-		if len(names) == cap(names) {
-			n, e := pdGrowth(cap(names))
-			if e != nil {
-				return e
-			}
-			if e = c.BudgetField.Reserve(ParamDescriptorNameBytes(n)); e != nil {
-				return e
-			}
-			next := make([]Symbol, len(names), n)
-			copy(next, names)
-			c.BudgetField.Release(ParamDescriptorNameBytes(cap(names)))
-			names = next
-		}
-		names = append(names, x.key)
+	for key := range d.entries.All() {
+		names = append(names, key)
 	}
 	for _, k := range names {
 		if _, e := d.symbolCompare(k, k); e != nil {
 			return e
 		}
-		i, e := d.find(k)
+		info, found, e := d.find(k)
 		if e != nil {
 			return e
 		}
-		if d.Entries[i].info.descr.ref == (arena.VectorRef{}) {
+		if !found {
+			return ErrParamDescrsPrecondition
+		}
+		if info.descr.ref == (arena.VectorRef{}) {
 			return ErrParamDescrsPrecondition
 		}
 	}
@@ -1388,11 +1374,13 @@ func (c *ParamsContext) appendDescrs(d *ParamDescrs) error {
 		if e := c.appendSymbol(k, false, true); e != nil {
 			return e
 		}
-		i, e := d.find(k)
+		info, found, e := d.find(k)
 		if e != nil {
 			return e
 		}
-		info := d.Entries[i].info
+		if !found {
+			return ErrParamDescrsPrecondition
+		}
 		if e = c.appendString(" ("); e != nil {
 			return e
 		}
@@ -1635,11 +1623,14 @@ func paramsDescrKindInModule(d *ParamDescrs, name *Symbol) (ParamKind, error) {
 	if e != nil || k == ParamInvalid {
 		return k, e
 	}
-	i, e := d.find(suffix)
+	info, found, e := d.find(suffix)
 	if e != nil {
 		return ParamInvalid, e
 	}
-	module, e := d.internText(d.Entries[i].info.module)
+	if !found {
+		return ParamInvalid, ErrParamDescrsPrecondition
+	}
+	module, e := d.internText(info.module)
 	if e != nil {
 		return ParamInvalid, e
 	}

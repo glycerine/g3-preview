@@ -333,14 +333,13 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *StringBuffer64, name 
 	if e = d.open(); e != nil {
 		return e
 	}
-	i, e := d.find(param)
+	info, found, e := d.find(param)
 	if e != nil {
 		return e
 	}
-	if i < 0 {
+	if !found {
 		return ErrParamDescrsPrecondition
 	}
-	info := d.Entries[i].info
 	if e = out.State.AppendCString(out.Inline[:], "  type:           "); e != nil {
 		return e
 	}

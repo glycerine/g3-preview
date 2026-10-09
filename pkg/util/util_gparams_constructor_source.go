@@ -52,12 +52,10 @@ func (d *ParamDescrs) abortConstructor() error {
 	// Ordinary failure reaches no source allocation between completed info and
 	// the infallible default names-vector construction.
 	if d.constructorCompleted >= 2 {
-		d.Budget.Release(ParamDescriptorNameBytes(cap(d.Names)))
 		d.Names = nil
 	}
 	if d.constructorCompleted >= 1 {
-		d.Budget.Release(ParamDescriptorEntryBytes(len(d.Entries)))
-		d.Entries = nil
+		d.entries = nil
 	}
 	if d.Texts != nil {
 		d.Texts.Close()

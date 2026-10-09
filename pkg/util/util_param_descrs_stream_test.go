@@ -67,7 +67,7 @@ func TestParamDescrsDisplayIntoNullDescriptionActualAction(t *testing.T) {
 		}
 	}
 }
-func TestParamDescrsDisplayIntoBudgetsScratchAndHugeIndentPrefix(t *testing.T) {
+func TestParamDescrsDisplayIntoHugeIndentPrefix(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	db := arena.NewBudget(^uint64(0))
 	d := pdnew(t, m, db)
@@ -75,14 +75,6 @@ func TestParamDescrsDisplayIntoBudgetsScratchAndHugeIndentPrefix(t *testing.T) {
 	b := pdStreamBuffer(t, nil)
 	paramsMust(t, b.AppendCString("prefix"))
 	baseline := db.Used()
-	db.FailAfter(0)
-	if e := d.DisplayInto(b, 0, false, true); !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	if db.Used() != baseline || b.Position() != 6 {
-		t.Fatal("sort scratch failure root/prefix", db.Used(), baseline, b.Position())
-	}
-	db.FailAfter(-1)
 	bb := arena.NewBudget(^uint64(0))
 	out := pdStreamBuffer(t, bb)
 	paramsMust(t, out.AppendByte('p'))
@@ -99,7 +91,7 @@ func TestParamDescrsDisplayIntoBudgetsScratchAndHugeIndentPrefix(t *testing.T) {
 		}
 	}
 	if db.Used() != baseline {
-		t.Fatal("source temporary names leak")
+		t.Fatal("descriptor arena usage changed")
 	}
 	st := out.Stats()
 	if bb.Used() != st.OwnerBytes+st.OverflowBytes || st.OwnerBytes != uint64(reflect.TypeOf(StringBuffer64{}).Size()) {
@@ -133,26 +125,5 @@ func TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner(t *testing.T) {
 	paramsMust(t, b.Close())
 	if e := d.DisplayInto(b, 0, false, false); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
-	}
-}
-
-func TestParamDescrsDisplayIntoSourceScratchCapacityWidths(t *testing.T) {
-	for _, x := range []struct {
-		old, width, next uint32
-		overflow         bool
-	}{
-		{0, 4, 2, false}, {0, 8, 2, false}, {2, 8, 3, false}, {3, 8, 5, false}, {5, 4, 8, false},
-		{357913940, 8, 536870910, false}, {357913941, 8, 0, true},
-		{715827880, 4, 1073741820, false}, {715827881, 4, 0, true},
-		{1431655765, 4, 0, true}, {^uint32(0), 8, 0, true},
-	} {
-		got, e := pdStreamNameCapacity(x.old, x.width)
-		if x.overflow {
-			if !errors.Is(e, arena.ErrBounds) {
-				t.Fatal("source capacity byte overflow", x, got, e)
-			}
-		} else if e != nil || got != x.next {
-			t.Fatal(x, got, e)
-		}
 	}
 }

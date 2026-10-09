@@ -79,7 +79,7 @@ func gparamsServiceAudit(t *testing.T, s *GlobalParamsService, b *arena.Budget) 
 			if d.Self != d || d.Budget != b || d.constructorReady || d == g.GlobalDescriptors {
 				t.Fatal("actual uncompleted descriptor")
 			}
-			n += d.OwnerBytes + ParamDescriptorEntryBytes(len(d.Entries)) + ParamDescriptorNameBytes(cap(d.Names))
+			n += d.OwnerBytes
 			if d.Texts != nil {
 				n += gparamsVectorGraph(d.Texts.Stats())
 			}

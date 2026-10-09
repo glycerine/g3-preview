@@ -350,6 +350,16 @@ module descriptions use built-in maps because they are lookup-only. Destruction
 walks the existing indexed owner slices, so cached hashes, tombstones, bucket
 geometry, table allocation accounting, and shrink-failure states are gone.
 
+The live parameter-descriptor dictionary now uses
+`insdict.Dict[Symbol, paramDescrInfo]`. Copy traversal follows stable insertion
+order, while display continues to sort names explicitly for canonical output.
+The separate names slice remains because the source API exposes registration
+history, including names later erased from the live dictionary. Cached hashes,
+tombstones, probing and rehash code, table geometry, and simulated allocation
+failures for Go maps, slices, strings, and temporary sort/name buffers have
+been removed. Arena-owned copies of descriptor text remain explicitly budgeted
+and lifetime checked.
+
 The first two counts make wholesale deletion unsafe. They describe migration
 cost, not a reason to preserve the design. The latter two observations identify
 good early simplifications, subject to checking future C++ consumers before
