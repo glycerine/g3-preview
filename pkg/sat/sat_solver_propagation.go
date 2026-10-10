@@ -5,38 +5,37 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-// These raw positions capture the actual source payload/end. A moved/freed
-// backing is rejected at dereference, never kept alive by an owning Go slice.
-func satPropagationCursorRecord(i *satSolverWatchIterator, n uint32) (satSolverWatchListRecord, error) {
+// Cursor borrows follow the captured native backing, with explicit lifetime and
+// current logical bounds checks before each propagation read/write.
+func satPropagationCursorRecord(i *satSolverWatchIterator, n uint32) (*satWatchBacking, error) {
+	if i == nil || i.store == nil {
+		return nil, ErrSATOwner
+	}
 	if e := i.store.open(); e != nil {
-		return satSolverWatchListRecord{}, e
+		return nil, e
 	}
-	if !i.store.payloads.IsLive(i.payload) || !i.store.lifetimes.IsLive(i.lifetime) {
-		return satSolverWatchListRecord{}, arena.ErrInvalidSlot
+	if i.backing == nil || !i.backing.alive {
+		return nil, arena.ErrInvalidSlot
 	}
-	x := satSolverWatchListRecord{payload: i.payload, lifetime: i.lifetime, capacity: i.capacity}
-	live, e := i.store.initialized(&x, n)
-	if e != nil {
-		return x, e
+	if uint64(n) >= uint64(len(i.backing.data)) {
+		return nil, arena.ErrBounds
 	}
-	if !live {
-		return x, arena.ErrBounds
-	}
-	return x, nil
+	return i.backing, nil
 }
 func satPropagationCursorRead(i *satSolverWatchIterator, n uint32) (satWatched, error) {
 	x, e := satPropagationCursorRecord(i, n)
 	if e != nil {
 		return satWatched{}, e
 	}
-	return i.store.decode(&x, n)
+	return x.data[n], nil
 }
 func satPropagationCursorWrite(i *satSolverWatchIterator, n uint32, w satWatched) error {
 	x, e := satPropagationCursorRecord(i, n)
 	if e != nil {
 		return e
 	}
-	return i.store.encode(&x, n, w)
+	x.data[n] = w
+	return nil
 }
 func (s *satSolverPropagationState) propagationConflictCleanup(i *satSolverWatchIterator, from uint32, to *uint32, w satSolverWatchListView) error {
 	for ; from < i.end; from++ {
@@ -379,7 +378,7 @@ func (s *satSolverPropagationState) finishPropagationList(i *satSolverWatchItera
 	if e != nil {
 		return e
 	}
-	if x.payload != i.payload || x.lifetime != i.lifetime {
+	if x.backing != i.backing {
 		return arena.ErrInvalidSlot
 	}
 	return w.SetEnd(n)

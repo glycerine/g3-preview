@@ -14,14 +14,14 @@ func (s *satSolverWatchStore) sortByKindWithWork(r satSolverWatchListRef, work *
 	if work != nil {
 		*work = satWatchSortWork{}
 	}
-	if x.length == 0 {
+	if uint32(len(x.values())) == 0 {
 		return nil
 	}
 	ternary, e := newSATTernaryWatch(2, 4)
 	if e != nil {
 		return e
 	}
-	binaryEnd, e := s.stableWatchPartition(r, 0, x.length, ternary, work)
+	binaryEnd, e := s.stableWatchPartition(r, 0, uint32(len(x.values())), ternary, work)
 	if e != nil {
 		return e
 	}
@@ -29,7 +29,7 @@ func (s *satSolverWatchStore) sortByKindWithWork(r satSolverWatchListRef, work *
 	if e != nil {
 		return e
 	}
-	_, e = s.stableWatchPartition(r, binaryEnd, x.length, clause, work)
+	_, e = s.stableWatchPartition(r, binaryEnd, uint32(len(x.values())), clause, work)
 	return e
 }
 

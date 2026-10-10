@@ -17,7 +17,7 @@ func satVariableBinaryWatch(t *testing.T, l Literal, learned bool) satWatched {
 func satVariableWatchFixture(t *testing.T) (*satSolverWatchLists, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(^uint64(0))
-	w, e := newSATSolverWatchLists(b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}})
+	w, e := newSATSolverWatchLists(b)
 	satOK(t, e)
 	t.Cleanup(func() {
 		satOK(t, w.Close())
@@ -38,6 +38,7 @@ func TestSATSolverWatchListsRealRelocationAndPayloadLifetime(t *testing.T) {
 	satOK(t, e)
 	epoch := w.backingID
 	before := w.store.Stats()
+	w.lists = w.lists[:len(w.lists):len(w.lists)]
 	satOK(t, w.PushEmpty())
 	if w.backingID == epoch {
 		t.Fatal("expected outer source relocation")
@@ -45,7 +46,7 @@ func TestSATSolverWatchListsRealRelocationAndPayloadLifetime(t *testing.T) {
 	if _, e = v.Size(); e != ErrSATOwner {
 		t.Fatal("old inline object address", e)
 	}
-	if !w.store.IsLive(ref) || w.store.Stats().Payloads.Live != before.Payloads.Live {
+	if !w.store.IsLive(ref) || w.store.Stats().Lists != before.Lists+1 {
 		t.Fatal("move must not clone/free payload", w.store.Stats(), before)
 	}
 	moved, e := w.Get(0)
@@ -85,22 +86,20 @@ func TestSATSolverWatchListsRealRelocationAndPayloadLifetime(t *testing.T) {
 		t.Fatal("ascending child destruction", lastRef)
 	}
 }
-func TestSATSolverWatchListsPlacementRefusalAndConstructorUnwind(t *testing.T) {
+func TestSATSolverWatchListsNativePlacementAndColdUnwind(t *testing.T) {
 	w, b := satVariableWatchFixture(t)
 	base := b.Used()
-	b.FailAfter(1)
+	b.FailAfter(0)
 	e := w.PushEmpty()
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	if len(w.lists) != 0 || cap(w.lists) != 2 || b.Used() != base+32 {
-		t.Fatal("outer growth precedes child placement", w.Stats(), b.Used(), base)
-	}
 	b.FailAfter(-1)
+	satOK(t, e)
+	if len(w.lists) != 1 || b.Used() != base {
+		t.Fatal("native placement reserved backing", w.Stats(), b.Used(), base)
+	}
 	for fail := int64(0); fail < 20; fail++ {
 		bb := arena.NewBudget(^uint64(0))
 		bb.FailAfter(fail)
-		x, e := newSATSolverWatchLists(bb, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: bb}})
+		x, e := newSATSolverWatchLists(bb)
 		bb.FailAfter(-1)
 		if e == nil {
 			satOK(t, x.Close())
@@ -114,4 +113,47 @@ func TestSATSolverWatchListsPlacementRefusalAndConstructorUnwind(t *testing.T) {
 			break
 		}
 	}
+}
+
+func TestSATSolverNativeOuterWatchGrowthAndShrink(t *testing.T) {
+	w, b := satVariableWatchFixture(t)
+	before := b.Used()
+	b.FailAfter(0)
+	refs := make([]satSolverWatchListRef, 257)
+	for i := uint32(0); i < 257; i++ {
+		satOK(t, w.PushEmpty())
+		view, e := w.Get(i)
+		satOK(t, e)
+		refs[i], e = view.ref()
+		satOK(t, e)
+		satOK(t, view.Push(satVariableBinaryWatch(t, Literal(2*i), false)))
+	}
+	if b.Used() != before || w.Stats().TotalBytes != before {
+		t.Fatal("native outer/inner watch backing reserved", w.Stats(), before)
+	}
+	for i := uint32(0); i < 257; i++ {
+		view, e := w.Get(i)
+		satOK(t, e)
+		value, e := view.Read(0)
+		satOK(t, e)
+		if value != satVariableBinaryWatch(t, Literal(2*i), false) {
+			t.Fatal(i, value)
+		}
+	}
+	satOK(t, w.Shrink(128))
+	for i, r := range refs {
+		if w.store.IsLive(r) != (i < 128) {
+			t.Fatal("child lifetime after shrink", i)
+		}
+	}
+	satOK(t, w.Finalize())
+	for i, r := range refs {
+		if w.store.IsLive(r) {
+			t.Fatal("child survived finalize", i)
+		}
+	}
+	if w.Stats().TotalBytes != before || b.Used() != before {
+		t.Fatal("native cleanup changed cold header ownership")
+	}
+	b.FailAfter(-1)
 }

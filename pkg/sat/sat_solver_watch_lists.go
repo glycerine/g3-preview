@@ -6,30 +6,27 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// Scalar tokens represent the actual moved inline list states. One store owns
-// all child payloads; relocation copies tokens without duplicating ownership.
+// Native outer slices retain checked child references. Relocation copies tokens
+// without duplicating ownership; native backing has no simulated budget charge.
 type satSolverWatchLists struct {
-	self                                *satSolverWatchLists
-	store                               *satSolverWatchStore
-	budget                              *arena.Budget
-	lists                               []satSolverWatchListRef
-	ownerBytes, backingBytes, backingID uint64
-	closed                              bool
+	self                  *satSolverWatchLists
+	store                 *satSolverWatchStore
+	budget                *arena.Budget
+	lists                 []satSolverWatchListRef
+	ownerBytes, backingID uint64
+	closed                bool
 }
 type satSolverWatchListsStats struct {
-	OwnerBytes, BackingBytes, StoreBytes, TotalBytes uint64
-	Size, Capacity                                   uint32
+	OwnerBytes, StoreBytes, TotalBytes uint64
+	Size, Capacity                     uint32
 }
 
-func newSATSolverWatchLists(b *arena.Budget, c arena.VectorConfig) (*satSolverWatchLists, error) {
-	if c.Descriptors.Budget != b {
-		return nil, arena.ErrConfig
-	}
+func newSATSolverWatchLists(b *arena.Budget) (*satSolverWatchLists, error) {
 	n := uint64(reflect.TypeOf(satSolverWatchLists{}).Size())
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	store, e := newSATSolverWatchStore(c)
+	store, e := newSATSolverWatchStore(b)
 	if e != nil {
 		b.Release(n)
 		return nil, e
@@ -51,31 +48,18 @@ func (w *satSolverWatchLists) PushEmpty() error {
 	if e := w.open(); e != nil {
 		return e
 	}
-	if len(w.lists) == cap(w.lists) {
-		if w.backingID == ^uint64(0) {
-			return arena.ErrSlotLimit
-		}
-		n, bytes, e := satVariableNextCapacity(uint32(cap(w.lists)), uint64(reflect.TypeOf(satSolverWatchListRef{}).Size()), 8, uint64(^uint(0)>>1))
-		if e != nil {
-			return e
-		}
-		if e = w.budget.Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]satSolverWatchListRef, len(w.lists), int(n))
-		copy(next, w.lists)
-		w.budget.Release(w.backingBytes)
-		w.lists = next
-		w.backingBytes = bytes
-		w.backingID++
+	if len(w.lists) == cap(w.lists) && w.backingID == ^uint64(0) {
+		return arena.ErrSlotLimit
 	}
-	// The empty temporary source watch_list exists before push without any heap
-	// action. Descriptor placement here is an explicit charged Go metadata action.
+	oldCapacity := cap(w.lists)
 	r, e := w.store.NewList()
 	if e != nil {
 		return e
 	}
 	w.lists = append(w.lists, r)
+	if cap(w.lists) != oldCapacity {
+		w.backingID++
+	}
 	return nil
 }
 func (w *satSolverWatchLists) Stats() satSolverWatchListsStats {
@@ -83,7 +67,7 @@ func (w *satSolverWatchLists) Stats() satSolverWatchListsStats {
 		return satSolverWatchListsStats{}
 	}
 	store := w.store.Stats().ChargedBytes
-	return satSolverWatchListsStats{w.ownerBytes, w.backingBytes, store, w.ownerBytes + w.backingBytes + store, uint32(len(w.lists)), uint32(cap(w.lists))}
+	return satSolverWatchListsStats{w.ownerBytes, store, w.ownerBytes + store, uint32(len(w.lists)), uint32(cap(w.lists))}
 }
 func (w *satSolverWatchLists) Get(i uint32) (satSolverWatchListView, error) {
 	if e := w.open(); e != nil {
@@ -177,8 +161,6 @@ func (w *satSolverWatchLists) Finalize() error {
 			w.lists[i] = satSolverWatchListRef{}
 		}
 	}
-	w.budget.Release(w.backingBytes)
-	w.backingBytes = 0
 	w.lists = nil
 	w.backingID++
 	return nil
@@ -211,7 +193,7 @@ func (w *satSolverWatchLists) Shrink(n uint32) error {
 	if satStorageSourceDebug && uint64(n) > uint64(len(w.lists)) {
 		return ErrSATAssertion
 	}
-	if uint64(n) > uint64(cap(w.lists)) {
+	if uint64(n) > uint64(len(w.lists)) {
 		return arena.ErrBounds
 	}
 	old := uint32(len(w.lists))

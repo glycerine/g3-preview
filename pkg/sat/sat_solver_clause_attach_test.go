@@ -207,9 +207,8 @@ func TestSATSolverAttachBinaryAndTernaryFiniteMatrices(t *testing.T) {
 		}
 	}
 }
-func TestSATSolverAttachNaryReorderAndWatchFaultPrefixes(t *testing.T) {
+func TestSATSolverAttachNaryReorderAndNativeWatchPublication(t *testing.T) {
 	success, failures := 0, 0
-	firstOnly := false
 	for fault := int64(0); fault < 96; fault++ {
 		done := false
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
@@ -236,10 +235,10 @@ func TestSATSolverAttachNaryReorderAndWatchFaultPrefixes(t *testing.T) {
 				satOK(t, e)
 				record, e := w.owner.store.record(r)
 				satOK(t, e)
-				for record.length < record.capacity {
+				for len(record.values()) < cap(record.values()) {
 					satOK(t, w.Push(filler))
 				}
-				old[k] = record.length
+				old[k] = uint32(len(record.values()))
 			}
 			b.FailAfter(fault)
 			c, e := s.mkNaryClause(4, []Literal{0, 2, 4, 6}, false)
@@ -269,10 +268,7 @@ func TestSATSolverAttachNaryReorderAndWatchFaultPrefixes(t *testing.T) {
 				satOK(t, x)
 				n2, x := w2.Size()
 				satOK(t, x)
-				if n == old[0]+1 && n2 == old[1] {
-					firstOnly = true
-				}
-				if n > old[0]+1 || n2 > old[1]+1 || n2 > old[1] && n == old[0] {
+				if !(n == old[0] && n2 == old[1] || n == old[0]+1 && n2 == old[1]+1) || e == nil && n == old[0] {
 					t.Fatal("ordered watch prefixes", n, n2)
 				}
 			}
@@ -282,7 +278,7 @@ func TestSATSolverAttachNaryReorderAndWatchFaultPrefixes(t *testing.T) {
 			break
 		}
 	}
-	if failures == 0 || success != 1 || !firstOnly {
-		t.Fatal("genuine both watcher boundaries", failures, success, firstOnly)
+	if failures == 0 || success != 1 {
+		t.Fatal("real clause reservation prefixes", failures, success)
 	}
 }

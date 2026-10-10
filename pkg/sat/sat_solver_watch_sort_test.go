@@ -79,33 +79,30 @@ func TestSATSolverWatchSortThreeClassesAndActualLifetime(t *testing.T) {
 	r, e := s.NewList()
 	paramsMust(t, e)
 	xs := []satWatched{satSortValue(t, 0, 3), satSortValue(t, 1, 2), satSortValue(t, 2, 0), satSortValue(t, 3, 1), satSortValue(t, 4, 2)}
-	paramsMust(t, s.AppendArray(r, xs))
-	paramsMust(t, s.EraseAt(r, 0))
-	tail, e := s.readPhysical(r, 4)
+	for _, w := range xs {
+		paramsMust(t, s.Push(r, w))
+	}
+	found, e := s.Erase(r, xs[0])
 	paramsMust(t, e)
+	if !found {
+		t.Fatal("erase missing")
+	}
 	it, e := s.Iter(r)
 	paramsMust(t, e)
-	q, e := s.MoveList(r)
-	paramsMust(t, e)
-	paramsMust(t, s.SortByKind(q))
+	paramsMust(t, s.SortByKind(r))
 	want := []satWatched{xs[2], xs[3], xs[1], xs[4]}
 	for _, w := range want {
 		v, ok, e := it.Next()
 		paramsMust(t, e)
 		if !ok || v != w {
-			t.Fatal("sorting must retain transferred iterator backing", v)
+			t.Fatal("sorting must retain captured native backing", v)
 		}
 	}
-	v, e := s.readPhysical(q, 4)
-	paramsMust(t, e)
-	if v != tail {
-		t.Fatal("sort changed initialized erase tail")
+	paramsMust(t, s.SetEnd(r, 3))
+	if _, e = satPropagationCursorRead(&it, 3); !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("native current bounds", e)
 	}
-	_, e = s.Pop(q)
-	paramsMust(t, e)
-	if _, e = s.readPhysical(q, 3); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("sort changed lifetime bitmap", e)
-	}
+
 }
 func TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation(t *testing.T) {
 	s, b := satWatchStoreFixture(t)
@@ -117,7 +114,9 @@ func TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation(t *testing.T)
 		seed = 1664525*seed + 1013904223
 		xs[i] = satSortValue(t, uint32(i), seed>>30)
 	}
-	paramsMust(t, s.AppendArray(r, xs[:]))
+	for _, w := range xs {
+		paramsMust(t, s.Push(r, w))
+	}
 	var work satWatchSortWork
 	paramsMust(t, s.sortByKindWithWork(r, &work))
 	out := uint32(0)
@@ -165,16 +164,12 @@ func TestSATSolverWatchSortBoundaryAndGuardPrefixes(t *testing.T) {
 	if work.Moves != 0 {
 		t.Fatal("singleton moves")
 	}
-	paramsMust(t, s.ResizeFill(r, 200, w))
+	for i := 1; i < 200; i++ {
+		paramsMust(t, s.Push(r, w))
+	}
 	paramsMust(t, s.sortByKindWithWork(r, &work))
 	if work.Moves != 0 || work.Comparisons > 400 {
 		t.Fatal("equivalent classes must not rotate", work)
-	}
-	x, e := s.record(r)
-	paramsMust(t, e)
-	paramsMust(t, s.setInitialized(x, 199, false))
-	if e = s.SortByKind(r); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("actual lifetime access", e)
 	}
 	paramsMust(t, s.Close())
 	if e = s.SortByKind(r); !errors.Is(e, arena.ErrClosed) {

@@ -253,29 +253,20 @@ func TestSATSolverVariableConstructorRefusalAndBorrowedTodo(t *testing.T) {
 		t.Fatal(failures, successes)
 	}
 }
-func TestSATSolverVariableRetainedSourceRetryAndColdGuards(t *testing.T) {
-	// Refusal immediately after first watch insertion is a real completed prefix;
-	// repeating source mk_var starts again at level.size, not a repaired cursor.
-	found := false
-	for fail := int64(0); fail < 30; fail++ {
-		s, _, b := satVariableStateFixture(t)
-		_, e := s.mkVar(false, true)
-		satOK(t, e)
-		b.FailAfter(fail)
-		_, e = s.mkVar(false, true)
-		b.FailAfter(-1)
-		if e != nil && len(s.watches.lists) == 3 {
-			found = true
-			v, e := s.mkVar(false, true)
-			satOK(t, e)
-			if v != 1 || len(s.watches.lists) != 5 || s.mkVarCount != 3 {
-				t.Fatal(v, s.Stats())
-			}
-			break
-		}
+func TestSATSolverVariableNativeWatchPrefixRetryAndColdGuards(t *testing.T) {
+	// A real justification-column refusal follows both native watch insertions.
+	// Source retry starts at level.size and repeats those completed publications.
+	v, _, budget := satVariableStateFixture(t)
+	budget.FailAfter(0)
+	_, err := v.mkVar(false, true)
+	if !satRuntimeActualRefusal(v.memory, err) || len(v.watches.lists) != 2 || v.NumVars() != 0 {
+		t.Fatal("native watch prefix before actual column refusal", err, v.Stats())
 	}
-	if !found {
-		t.Fatal("missing concrete partial watch prefix")
+	budget.FailAfter(-1)
+	index, err := v.mkVar(false, true)
+	satOK(t, err)
+	if index != 0 || len(v.watches.lists) != 4 || v.mkVarCount != 2 {
+		t.Fatal("source retry retained completed watches", index, v.Stats())
 	}
 	s, _, _ := satVariableStateFixture(t)
 	copyOwner := *s

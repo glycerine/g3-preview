@@ -69,7 +69,7 @@ func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.
 	if e != nil {
 		return nil, e
 	}
-	s.watches, e = newSATSolverWatchLists(b, c)
+	s.watches, e = newSATSolverWatchLists(b)
 	if e == nil {
 		s.activity, e = newSATSolverActivity(b)
 	}

@@ -32994,3 +32994,55 @@ units/677 APIs: 63 ported, 284 partial, 1727 unported, two dead/deleted. The uti
 knot/split objective remains active; SAT watch/Runtime storage, retained AST
 reference/printer storage, NumericTextStream consumers and internal util cycles
 still require conversion/refactoring.
+
+## Native solver watch backing and outer list directory
+
+Compiler-resolved production consumers require only watch-list construction,
+read/write/push, logical shrink/set_end, equality/clause/ternary erase, contains,
+forward iteration, display/sort and lifetime/owner checks. Removed unused
+copy/move/assignment/swap, reverse iteration, fill/resize/reserve, append,
+get-default/back and template constructor helpers. Live watch records now own
+native []satWatched backing through a borrowed iterator identity. Removed four-word
+payload codecs, arena payload/lifetime stores, bitmaps, initialized spare-slot
+reads, source capacity geometry and simulated growth/refusal bookkeeping. The
+outer reference slice and store record directory also use native append. Only
+actual cold outer/store headers remain budgeted; constructors borrow Budget
+without an unused arena.VectorConfig. Shared arena graph accounting helper is
+now test-only for the other retained SAT stores.
+
+Iterator reads/writes operate on the captured native backing. Real slice growth,
+finalize/free and close invalidate prior backing identities and drop retained
+payload slices. Current logical bounds reject discarded tails. Source watch
+tag/equality/locator behavior, clause/ternary first-match erase, propagation
+compaction/order and captured-end processing remain. Native outer relocation
+invalidates old inline views while preserving surviving child references;
+ascending shrink/finalize retires child generations with exact slot-reuse guards.
+Native erase clears discarded logical values instead of preserving C++ spare
+objects. Native allocations introduce no Runtime or Budget refusal events.
+
+Retired 19 dead-API/backing-simulation test groups. Retained real display/stable
+sort, independent class ordering/work bounds, actual stale watch/iterator
+checks, exhaustive SAT propagation/cleaner/SCC/solver fixtures and cold owner
+unwind checks. New tests cover 4097 watch values, a 4096-operation independent
+sequence oracle, 257 native directory entries, unchanged cold budget under
+FailAfter(0), typed iterator mutation/bounds/growth/finalization/free/closed
+lifetimes, slot reuse, shallow owner rejection, zero-allocation warm forward
+iteration and exact cold-header refund. Native outer growth/shrink tests verify
+257 actual children and ascending lifetime retirement without backing charges.
+
+Fixtures depending on removed watch refusal events now check native publication
+or actual retained failures: nary clause allocation prefixes publish either both
+watches or neither; watch movement/compaction succeeds with reservations disabled;
+cleaner interruption uses a real ID-recycling refusal and retains the unread
+suffix; first-variable retry checks both native watch insertions preceding a real
+justification-column refusal. Existing owning cleanup/callback/graph audits remain.
+Manifest evidence and ownership notes now describe these native consumers without
+C++ generic container implementation credit.
+
+Validation: final full native SAT passed (0.681s), final full g3debug SAT passed
+(0.787s). Module-wide compilation, SAT vet, manifest evidence, gofmt and diff checks
+passed. No full native module rerun inside the hourly interval. Counts remain
+2102 units/677 APIs: 63 ported, 284 partial, 1727 unported, two dead/deleted.
+The util knot and complete split remain active: other retained SAT Runtime
+columns/literal storage, AST reference/printer storage, NumericTextStream
+consumers and internal util numeric/text/parameter dependency cycles remain.

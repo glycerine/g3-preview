@@ -185,8 +185,8 @@ func TestSATSolverPropagationIndependentTruthTables(t *testing.T) {
 		}
 	}
 }
-func TestSATSolverPropagationClauseBranchCompactionAndMoveRefusal(t *testing.T) {
-	t.Run("move-refusal", func(t *testing.T) {
+func TestSATSolverPropagationClauseBranchCompactionAndNativeMove(t *testing.T) {
+	t.Run("native-move", func(t *testing.T) {
 		s, v, b := satPropagationFixture(t, 3)
 		c, e := s.clauses.MkClause([]Literal{1, 2, 4}, false)
 		satOK(t, e)
@@ -206,15 +206,13 @@ func TestSATSolverPropagationClauseBranchCompactionAndMoveRefusal(t *testing.T) 
 		satOK(t, e)
 		record, e := v.watches.store.record(r)
 		satOK(t, e)
-		for record.length < record.capacity {
+		for len(record.values()) < cap(record.values()) {
 			satOK(t, dest.Push(filler))
 		}
 		satOK(t, s.assign(0, satJustification{}))
 		b.FailAfter(0)
 		_, e = s.propagateCore(false)
-		if !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal(e)
-		}
+		satOK(t, e)
 		x, e := s.clauses.Literal(c, 1)
 		satOK(t, e)
 		y, e := s.clauses.Literal(c, 2)
@@ -226,7 +224,7 @@ func TestSATSolverPropagationClauseBranchCompactionAndMoveRefusal(t *testing.T) 
 		satOK(t, e)
 		n, e := src.Size()
 		satOK(t, e)
-		if n != 1 {
+		if n != 0 {
 			t.Fatal(n)
 		}
 		satPropagationAssertGraph(t, s)

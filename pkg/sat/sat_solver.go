@@ -185,7 +185,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	s.propagation.inconsistent = false
 	// Empty clause headers and num_frozen precede watches/columns; the actual
 	// m_case_split_queue heap initialization occurs only at its member site.
-	if s.Variables.watches, err = newSATSolverWatchLists(c.Budget, vc); err != nil {
+	if s.Variables.watches, err = newSATSolverWatchLists(c.Budget); err != nil {
 		return s, err
 	}
 	if s.Variables.activity, err = newSATSolverActivity(c.Budget); err != nil {

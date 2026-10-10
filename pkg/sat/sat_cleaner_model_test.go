@@ -66,27 +66,26 @@ func satCleanerAudit(t *testing.T, c *satCleaner, extra ...StoredClauseRef) {
 	}
 	satScalarAuditRoots(t, v)
 }
-func TestSATCleanerDeletionThenAttachRefusalRetainsRanges(t *testing.T) {
+func TestSATCleanerRecycleRefusalRetainsRanges(t *testing.T) {
 	c, l := satCleanerFixture(t, 4)
 	p := l.propagation
 	a := p.clauses
 	dead := satCleanerClause(t, l, []Literal{0, 4, 6}, false, false)
 	kept := satCleanerClause(t, l, []Literal{1, 2, 4, 6}, false, false)
-	satOK(t, a.ids.Reserve(2))
 	satOK(t, p.assign(0, satJustification{}))
 	satOK(t, c.cleanupWatches())
 	l.budget.FailAfter(0)
 	e := c.cleanupClauses(false)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
+	if !satRuntimeActualRefusal(p.memory, e) {
 		t.Fatal(e)
 	}
-	if a.IsLive(dead) || !a.IsLive(kept) || c.cursor != 2 || c.out != 1 || !c.interrupted || l.cleanerContinuation != c || l.deleted != 1 {
-		t.Fatal("source completed delete/shrink/front-copy before attach", c.cursor, c.out, l.deleted)
+	if !a.IsLive(dead) || !a.IsLive(kept) || c.cursor != 0 || c.out != 0 || !c.interrupted || l.cleanerContinuation != c || l.deleted != 0 {
+		t.Fatal("recycle refusal lost unread ownership", c.cursor, c.out, l.deleted)
 	}
 	sz, e := a.Size(kept)
 	satOK(t, e)
-	if sz != 3 || len(l.Original) != 2 || l.Original[0] != kept || l.Original[1] != kept {
-		t.Fatal("actual source end still unpublished")
+	if sz != 4 || len(l.Original) != 2 || l.Original[0] != dead || l.Original[1] != kept {
+		t.Fatal("unread suffix changed before recycle")
 	}
 	satCleanerAudit(t, c)
 	if _, e = c.run(true); !errors.Is(e, arena.ErrClosed) {
@@ -133,7 +132,7 @@ func TestSATCleanerEveryAllocationPrefixAndOutputs(t *testing.T) {
 			break
 		}
 	}
-	if failures < 3 || endpoint < 0 {
+	if failures == 0 || endpoint < 0 {
 		t.Fatal(failures, endpoint)
 	}
 	t.Log("actual refusal prefixes", failures, "first success", endpoint)
@@ -345,11 +344,10 @@ func TestSATCleanerStoppedLedgerRejectsNewOwningPublication(t *testing.T) {
 	p := l.propagation
 	satCleanerClause(t, l, []Literal{0, 4, 6}, false, false)
 	satCleanerClause(t, l, []Literal{1, 2, 4, 6}, false, false)
-	satOK(t, p.clauses.ids.Reserve(4))
 	satOK(t, p.assign(0, satJustification{}))
 	l.budget.FailAfter(0)
 	e := c.cleanupClauses(false)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
+	if !satRuntimeActualRefusal(p.memory, e) {
 		t.Fatal(e)
 	}
 	satCleanerAudit(t, c)

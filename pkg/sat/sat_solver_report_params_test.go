@@ -137,5 +137,5 @@ func TestSATSolverReportStatusActualEliminatedInconsistentAndExternalInspection(
 	// This is raw external-record inspection, not a concrete extension subclass or
 	// successful EXT algorithm binding. Caller removes its own record before the
 	// genuine destructor invariant, which does require a valid solver world.
-	satOK(t, s.Variables.watches.store.EraseAt(ref, 0))
+	satOK(t, s.Variables.watches.store.eraseAt(ref, 0))
 }
