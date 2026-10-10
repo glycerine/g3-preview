@@ -20,8 +20,8 @@ type satSolverProbing struct {
 	lifecycle                                 *satSolverClauseLifecycle
 	budget                                    *arena.Budget
 	assigned                                  satLiteralSetStorage
-	toAssert                                  RuntimeUintColumn
-	cacheWork                                 RuntimeUintColumn // charged cold workspace; scalar tokens move back on return.
+	toAssert                                  satUintColumn
+	cacheWork                                 satUintColumn // embedded workspace; native slices move back on return.
 	cache                                     satProbingCache
 	stoppedAt, limit, numAssigned             uint32
 	cacheLimit, ownerBytes                    uint64
@@ -174,9 +174,7 @@ func (s *satSolverProbing) cacheBins(l Literal, old uint32) error {
 	if e = s.cache.reserve(s, l.index()+1); e != nil {
 		return e
 	}
-	if e = s.propagation().memory.Write(s.cache.block, 8+16*uint64(l.index()), 1); e != nil {
-		return e
-	}
+	s.cache.rows[l.index()].available = true
 	out, e := s.cache.workRow(s, l.index())
 	if e != nil {
 		return e
@@ -215,14 +213,10 @@ func (s *satSolverProbing) cachedImpliedLits(l Literal) (satProbingCacheBorrow, 
 	if l.index() >= n {
 		return satProbingCacheBorrow{}, false, nil
 	}
-	a, e := s.propagation().memory.Read(s.cache.block, 8+16*uint64(l.index()))
-	if e != nil {
-		return satProbingCacheBorrow{}, false, e
-	}
-	if a == 0 {
+	if !s.cache.rows[l.index()].available {
 		return satProbingCacheBorrow{}, false, nil
 	}
-	return satProbingCacheBorrow{s, s.cache.block, l.index()}, true, nil
+	return satProbingCacheBorrow{s, s.cache.epoch, l.index()}, true, nil
 }
 func (s *satSolverProbing) resetCache(l Literal) error {
 	if e := s.open(); e != nil {
@@ -235,9 +229,7 @@ func (s *satSolverProbing) resetCache(l Literal) error {
 	if l.index() >= n {
 		return nil
 	}
-	if e = s.propagation().memory.Write(s.cache.block, 8+16*uint64(l.index()), 0); e != nil {
-		return e
-	}
+	s.cache.rows[l.index()].available = false
 	out, e := s.cache.workRow(s, l.index())
 	if e != nil {
 		return e
@@ -252,7 +244,7 @@ func (s *satSolverProbing) finalize() error {
 		return e
 	}
 	s.toAssert.Bind(s.propagation().memory)
-	s.toAssert.Raw.Closed = false
+	s.toAssert.closed = false
 	return s.cache.finalize(s)
 }
 func (s *satSolverProbing) Close() error {

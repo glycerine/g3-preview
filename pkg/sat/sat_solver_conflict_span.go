@@ -3,21 +3,21 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	"sort"
 )
 
 // A borrowed literal span over caller Go storage, native literal backing, or
-// a retained Runtime column. Captured backing is never silently rebound.
+// a native unsigned column. Captured backing is never silently rebound.
 type satSolverLiteralSpan struct {
 	literals []Literal
-	runtime  *util.Runtime
-	block    util.Block
+	uints    []uint32
+	column   *satUintColumn
 	store    *satSolverLiteralStore
 	backing  *satLiteralBacking
 }
 
-func satConflictRuntimeSpan(c *RuntimeUintColumn) satSolverLiteralSpan {
-	return satSolverLiteralSpan{runtime: c.Raw.Runtime, block: c.Raw.Block}
+func satConflictColumnSpan(c *satUintColumn) satSolverLiteralSpan {
+	return satSolverLiteralSpan{column: c, uints: c.values}
 }
 
 // Captures the actual c_ptr payload; later growth never silently rebinds it.
@@ -29,9 +29,14 @@ func satSimplifierCapturedSpan(s *satSolverLiteralStore, r satSolverLiteralListR
 	return satSolverLiteralSpan{store: s, backing: rec.backing}, nil
 }
 func (s satSolverLiteralSpan) literal(i uint32) (Literal, error) {
-	if s.runtime != nil {
-		v, e := ReadRuntimeWord(s.runtime, s.block, 8+4*uint64(i))
-		return Literal(v), e
+	if s.column != nil {
+		if e := s.column.open(); e != nil {
+			return 0, e
+		}
+		if uint64(i) >= uint64(len(s.uints)) {
+			return 0, arena.ErrBounds
+		}
+		return Literal(s.uints[i]), nil
 	}
 	if s.store != nil {
 		if e := s.store.open(); e != nil {
@@ -53,8 +58,15 @@ func (s satSolverLiteralSpan) literal(i uint32) (Literal, error) {
 
 // Writes the actual captured pointer; it never rebinds to a relocated member.
 func (s satSolverLiteralSpan) setLiteral(i uint32, l Literal) error {
-	if s.runtime != nil {
-		return s.runtime.WriteUint32(s.block, 8+4*uint64(i), uint32(l))
+	if s.column != nil {
+		if e := s.column.open(); e != nil {
+			return e
+		}
+		if uint64(i) >= uint64(len(s.uints)) {
+			return arena.ErrBounds
+		}
+		s.uints[i] = uint32(l)
+		return nil
 	}
 	if s.store != nil {
 		if e := s.store.open(); e != nil {
@@ -76,75 +88,35 @@ func (s satSolverLiteralSpan) setLiteral(i uint32, l Literal) error {
 	return nil
 }
 
-// Concrete library sort adapter on a captured raw span. Errors occur only at
-// actual reads/writes; the source library's comparison schedule is unspecified.
+// Sort captured native values with Go's standard sorting implementation.
 func satSortClauseSpan(s satSolverLiteralSpan, n uint32) error {
-	if s.runtime == nil && s.store == nil {
-		satSortClauseLiterals(s.literals[:n])
+	if s.column != nil {
+		if e := s.column.open(); e != nil {
+			return e
+		}
+		if uint64(n) > uint64(len(s.uints)) {
+			return arena.ErrBounds
+		}
+		values := s.uints[:n]
+		sort.Slice(values, func(i, j int) bool { return values[i] < values[j] })
 		return nil
 	}
-	swap := func(i, j uint32) error {
-		a, e := s.literal(i)
-		if e != nil {
+	if s.store != nil {
+		if e := s.store.open(); e != nil {
 			return e
 		}
-		b, e := s.literal(j)
-		if e != nil {
-			return e
+		if s.backing == nil || !s.backing.alive {
+			return arena.ErrInvalidSlot
 		}
-		if e = s.setLiteral(i, b); e != nil {
-			return e
+		if uint64(n) > uint64(len(s.backing.data)) {
+			return arena.ErrBounds
 		}
-		return s.setLiteral(j, a)
-	}
-	sift := func(root, end uint32) error {
-		for root < end/2 {
-			child := 2*root + 1
-			if child+1 < end {
-				a, e := s.literal(child)
-				if e != nil {
-					return e
-				}
-				b, e := s.literal(child + 1)
-				if e != nil {
-					return e
-				}
-				if a < b {
-					child++
-				}
-			}
-			a, e := s.literal(root)
-			if e != nil {
-				return e
-			}
-			b, e := s.literal(child)
-			if e != nil {
-				return e
-			}
-			if a >= b {
-				return nil
-			}
-			if e = swap(root, child); e != nil {
-				return e
-			}
-			root = child
-		}
+		satSortClauseLiterals(s.backing.data[:n])
 		return nil
 	}
-	for root := n / 2; root > 0; {
-		root--
-		if e := sift(root, n); e != nil {
-			return e
-		}
+	if uint64(n) > uint64(len(s.literals)) {
+		return arena.ErrBounds
 	}
-	for end := n; end > 1; {
-		end--
-		if e := swap(0, end); e != nil {
-			return e
-		}
-		if e := sift(0, end); e != nil {
-			return e
-		}
-	}
+	satSortClauseLiterals(s.literals[:n])
 	return nil
 }

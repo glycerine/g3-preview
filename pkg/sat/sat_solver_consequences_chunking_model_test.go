@@ -36,9 +36,9 @@ func TestSATConsequenceChunkIndependentBinaryCNFs(t *testing.T) {
 				if r != lbool.True {
 					t.Fatal(r)
 				}
-				var mdl RuntimeUintColumn
+				var mdl satUintColumn
 				mdl.Bind(s.runtime.memory)
-				satOK(t, copyRuntimeColumn(&mdl.Raw, &s.model.Raw, 4))
+				satOK(t, mdl.copyFrom(&s.model))
 				defer func() { satOK(t, mdl.Finalize()) }()
 				out, e := newSATSolverLiteralRows(s.runtime.memory, s.budget)
 				satOK(t, e)
@@ -94,7 +94,7 @@ func TestSATConsequenceChunkMultipleCoreUsesBruteForce(t *testing.T) {
 		satOK(t, e)
 	}
 	satOK(t, s.MkClause([]Literal{0, 2}))
-	var model RuntimeUintColumn
+	var model satUintColumn
 	model.Bind(s.runtime.memory)
 	for i := 0; i < 2; i++ {
 		satOK(t, model.Push(uint32(lbool.True)))

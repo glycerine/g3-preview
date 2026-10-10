@@ -8,9 +8,9 @@ import (
 	"testing"
 )
 
-func satLiteralRowsTestInput(t *testing.T, r *util.Runtime) *RuntimeUintColumn {
+func satLiteralRowsTestInput(t *testing.T, r *util.Runtime) *satUintColumn {
 	t.Helper()
-	c := &RuntimeUintColumn{}
+	c := &satUintColumn{}
 	c.Bind(r)
 	t.Cleanup(func() { satOK(t, c.Finalize()) })
 	return c
@@ -69,8 +69,8 @@ func TestSATSolverLiteralRowsFailedInputPreservesPublishedRows(t *testing.T) {
 	satOK(t, out.appendLiterals([]Literal{2}))
 	src := satLiteralRowsTestInput(t, s.runtime.memory)
 	satOK(t, src.Push(6))
-	satOK(t, s.runtime.memory.WriteUint32(src.Raw.Block, 4, ^uint32(0)))
-	if e := out.appendColumn(src); !errors.Is(e, util.ErrRuntimeUninitialized) {
+	satOK(t, src.Finalize())
+	if e := out.appendColumn(src); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
 	}
 	n, e := out.rowCount()
@@ -78,8 +78,9 @@ func TestSATSolverLiteralRowsFailedInputPreservesPublishedRows(t *testing.T) {
 	if n != 1 {
 		t.Fatal("failed input published a row", n)
 	}
-	// After the input is repaired, a retry publishes an independent copy.
-	satOK(t, s.runtime.memory.WriteUint32(src.Raw.Block, 4, 1))
+	// A fresh native input publishes an independent copy.
+	src.Bind(s.runtime.memory)
+	satOK(t, src.Push(6))
 	satOK(t, out.appendColumn(src))
 	satOK(t, src.Write(0, 8))
 	satOK(t, src.Finalize())
@@ -88,7 +89,7 @@ func TestSATSolverLiteralRowsFailedInputPreservesPublishedRows(t *testing.T) {
 	got, e := row.read(0)
 	satOK(t, e)
 	if got != 6 {
-		t.Fatal("result aliases Runtime input", got)
+		t.Fatal("result aliases native input", got)
 	}
 	satFullSolverRuntimeAudit(t, s, out)
 }

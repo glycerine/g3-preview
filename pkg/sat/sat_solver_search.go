@@ -63,7 +63,7 @@ func (s *Solver) MkClause(lits []Literal) error {
 	if e != nil {
 		return e
 	}
-	_, e = s.Lifecycle.mkClauseCoreSpan(size, satConflictRuntimeSpan(&s.auxLiterals), false)
+	_, e = s.Lifecycle.mkClauseCoreSpan(size, satConflictColumnSpan(&s.auxLiterals), false)
 	return e
 }
 func (s *Solver) resetAssumptions() error {

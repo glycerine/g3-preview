@@ -33392,3 +33392,40 @@ a separate 35-file parameter/debug service group. Both counts include method
 placement requirements, not just file-use cycles. The complete external native
 storage migration and root util package split remain active. Retained SAT scalar
 Runtime columns, AST ref-vector storage and other consumers still require work.
+
+## Native SAT unsigned work columns and probing cache
+
+Recovered the interrupted unsigned-column conversion after the power outage.
+SAT lemma/minimization, assumptions/core, model, consequence scopes and probing
+work columns now use concrete native []uint32 backing. Probing cache rows own
+native availability flags and unsigned slices. Removed sat_runtime_column.go,
+its byte codecs, emulated vector headers/capacity geometry, pending allocations,
+and Runtime backing-growth/free paths. Copies duplicate logical values; model
+and scoped-append regrowth initialize defaults. Captured slices keep their actual
+backing across growth/reset; checked column/parent closure still rejects access.
+Clause sorting now uses Go standard sort instead of translated STL heap internals.
+The retained cache cutoff still checks the actual caller Runtime counter; native
+backing does not manufacture Runtime allocation events or Budget reservations.
+
+Retired four tests confined to emulated growth/wrapped headers/pending TLS
+allocations. Converted remaining storage-refusal fixtures to native successful
+operations with Runtime reservations disabled while preserving solver outputs,
+mark/activity order, temporary-mark cleanup, independent copies and ownership
+checks. Retained actual cold/clause-allocation refusal tests; their prefix counts
+reflect the remaining real allocations. Invalid empty-lemma operations now stop
+at checked native bounds rather than relying on spare Runtime bytes or unsigned
+underflow. Existing independent finite DAG, conflict, consequence, MUS, model,
+probing and complete SAT solver tests remain. Manifest evidence removes deleted
+implementation targets and retired tests; native replacement adds no generic C++
+vector or STL implementation credit.
+
+Validation: full native and g3debug SAT suites passed; module-wide compilation,
+SAT vet, manifest evidence, gofmt and diff checks passed. Counts remain 2102 units,
+677 APIs: 62 ported, 283 partial, 1729 unported, two dead/deleted. No full native
+module suite rerun for this SAT-only checkpoint.
+
+The complete external caller migration and util subpackage split remain unfinished.
+AST reference vectors still retain Runtime-backed payloads. This SAT change does
+not change util's root file graph: the last receiver-aware placement audit still
+has 286 files, 40 components and a largest coupled group of 190 files. The knot
+is not resolved, and the complete root util split is not yet ready.

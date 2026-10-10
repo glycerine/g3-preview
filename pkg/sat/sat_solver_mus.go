@@ -21,7 +21,7 @@ type satMUSFrame struct {
 	innerCoreCompleted bool
 	next               *satMUSFrame
 	sets               [3]satMUSLiteralSet
-	vector             RuntimeUintColumn
+	vector             satUintColumn
 	setsUsed           uint32
 	vectorUsed         bool
 	drain              uint32
@@ -91,7 +91,7 @@ func (m *satSolverMUSMembers) cleanup() error {
 	}
 	return nil
 }
-func satMUSAppend(dst, src *RuntimeUintColumn) error {
+func satMUSAppend(dst, src *satUintColumn) error {
 	for i := uint32(0); ; i++ {
 		n, e := src.Size()
 		if e != nil {
@@ -109,7 +109,7 @@ func satMUSAppend(dst, src *RuntimeUintColumn) error {
 		}
 	}
 }
-func satMUSContains(v *RuntimeUintColumn, l uint32) (bool, error) {
+func satMUSContains(v *satUintColumn, l uint32) (bool, error) {
 	for i := uint32(0); ; i++ {
 		n, e := v.Size()
 		if e != nil {
@@ -233,7 +233,7 @@ func (m *satSolverMUSMembers) run() (lbool.LBool, error) {
 	}
 	return m.mus1()
 }
-func (m *satSolverMUSMembers) scopedCheck(core *RuntimeUintColumn, lit Literal) (r lbool.LBool, e error) {
+func (m *satSolverMUSMembers) scopedCheck(core *satUintColumn, lit Literal) (r lbool.LBool, e error) {
 	cfg := &m.solver.config.state
 	oldRestart := cfg.RestartMax
 	cfg.RestartMax = m.maxNumRestarts
@@ -259,7 +259,7 @@ func (m *satSolverMUSMembers) scopedCheck(core *RuntimeUintColumn, lit Literal) 
 	if e != nil {
 		return lbool.Undef, e
 	}
-	return m.solver.checkSpan(count, satConflictRuntimeSpan(&m.mus))
+	return m.solver.checkSpan(count, satConflictColumnSpan(&m.mus))
 }
 func (m *satSolverMUSMembers) mus1() (lbool.LBool, error) {
 	partial := m.solver.config.state.CoreMinimizePartial
@@ -380,7 +380,7 @@ func (m *satSolverMUSMembers) mus1() (lbool.LBool, error) {
 	}
 	return lbool.True, nil
 }
-func (m *satSolverMUSMembers) setFromColumn(dst *satMUSLiteralSet, src *RuntimeUintColumn) error {
+func (m *satSolverMUSMembers) setFromColumn(dst *satMUSLiteralSet, src *satUintColumn) error {
 	for i := uint32(0); ; i++ {
 		n, e := src.Size()
 		if e != nil {
@@ -398,7 +398,7 @@ func (m *satSolverMUSMembers) setFromColumn(dst *satMUSLiteralSet, src *RuntimeU
 		}
 	}
 }
-func (m *satSolverMUSMembers) toVector(set *satMUSLiteralSet, dst *RuntimeUintColumn) error {
+func (m *satSolverMUSMembers) toVector(set *satMUSLiteralSet, dst *satUintColumn) error {
 	// Named return-value move is explicit: one source result vector, whose
 	// lexical caller owns its destruction. Captured begin/end never rebind.
 	n := set.size()
@@ -583,7 +583,7 @@ func (m *satSolverMUSMembers) qxCheck(a, b *satMUSLiteralSet) (r lbool.LBool, e 
 	if e != nil {
 		return lbool.Undef, e
 	}
-	r, e = m.solver.checkSpan(n, satConflictRuntimeSpan(&m.mus))
+	r, e = m.solver.checkSpan(n, satConflictColumnSpan(&m.mus))
 	if e != nil {
 		return r, e
 	}
@@ -605,7 +605,7 @@ func (m *satSolverMUSMembers) qxCheck(a, b *satMUSLiteralSet) (r lbool.LBool, e 
 	return r, nil
 }
 
-func (s *Solver) setModel(src *RuntimeUintColumn) error {
+func (s *Solver) setModel(src *satUintColumn) error {
 	if e := s.model.Shrink(0); e != nil {
 		return e
 	}
@@ -620,47 +620,17 @@ func (s *Solver) setModel(src *RuntimeUintColumn) error {
 	return nil
 }
 
-func (m *satSolverMUSMembers) verifyCore(core *RuntimeUintColumn) error {
+func (m *satSolverMUSMembers) verifyCore(core *satUintColumn) error {
 	n, e := core.Size()
 	if e != nil {
 		return e
 	}
-	_, e = m.solver.checkSpan(n, satConflictRuntimeSpan(core))
+	_, e = m.solver.checkSpan(n, satConflictColumnSpan(core))
 	return e
 }
-func (m *satSolverMUSMembers) isActiveSource() bool         { return m.isActive }
-func (m *satSolverMUSMembers) getModel() *RuntimeUintColumn { return &m.model }
+func (m *satSolverMUSMembers) isActiveSource() bool     { return m.isActive }
+func (m *satSolverMUSMembers) getModel() *satUintColumn { return &m.model }
 
-// Source vector resize publishes the new size before ascending value placement.
-// scoped_append uses this full operation, including growth if its borrower was
-// mutated; retained old bytes do not substitute for T() initialization.
-func satMUSResize(v *RuntimeUintColumn, n uint32) error {
-	old, e := v.Size()
-	if e != nil {
-		return e
-	}
-	if n <= old {
-		return v.Shrink(n)
-	}
-	for {
-		capacity, e := v.Capacity()
-		if e != nil {
-			return e
-		}
-		if capacity >= n {
-			break
-		}
-		if e = v.Raw.ExpandStride(4); e != nil {
-			return e
-		}
-	}
-	if e = WriteRuntimeWord(v.Raw.Runtime, v.Raw.Block, 4, n); e != nil {
-		return e
-	}
-	for i := old; i < n; i++ {
-		if e = WriteRuntimeWord(v.Raw.Runtime, v.Raw.Block, 8+4*uint64(i), 0); e != nil {
-			return e
-		}
-	}
-	return nil
-}
+// Scoped append restores its saved length, including value-initialized growth
+// if the borrower shrank the native slice during the call.
+func satMUSResize(v *satUintColumn, n uint32) error { return v.resize(n, 0) }

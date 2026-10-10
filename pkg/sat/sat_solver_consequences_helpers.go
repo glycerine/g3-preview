@@ -133,7 +133,7 @@ func (s *Solver) extractConsequenceAssumptions(lit Literal, target *satSolverInd
 		if e = s.analysis.fillExtAntecedents(lit, j); e != nil {
 			return false, e
 		}
-		span := satConflictRuntimeSpan(&s.analysis.extAntecedents)
+		span := satConflictColumnSpan(&s.analysis.extAntecedents)
 		n, e := s.analysis.extAntecedents.Size()
 		if e != nil {
 			return false, e

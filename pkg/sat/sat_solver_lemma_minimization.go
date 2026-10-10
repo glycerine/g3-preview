@@ -4,8 +4,8 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-// Source sat_solver.cpp:2238-2253. In particular mark precedes BOTH vector
-// allocations. Errors preserve every completed mark/vector publication.
+// Source sat_solver.cpp:2238-2253. In particular mark precedes both native work-list
+// appends. Checked errors preserve completed mark/work-list publication.
 
 func (s *satSolverConflictAnalysis) processAntecedentForMinimization(l Literal) (bool, error) {
 	if e := s.open(); e != nil {

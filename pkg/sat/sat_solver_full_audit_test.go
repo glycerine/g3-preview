@@ -11,54 +11,9 @@ func satFullSolverRuntimeAudit(t *testing.T, s *Solver, outputs ...*satSolverLit
 	t.Helper()
 	satScalarAuditRoots(t, s.Variables, satFullSolverRuntimeRoots(s, outputs...)...)
 }
-func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []util.Block {
-	roots := []util.Block{}
-	add := func(b util.Block) {
-		if b != (util.Block{}) {
-			roots = append(roots, b)
-		}
-	}
-	raw := func(c *satRuntimeColumn) {
-		if !c.PendingReplaces {
-			add(c.Block)
-		}
-		add(c.Pending)
-	}
-	col := func(c *RuntimeUintColumn) { raw(&c.Raw) }
-	p := s.probing
-	c := s.conflict
-	a := s.analysis
-	add(p.cache.block)
-	add(p.cache.pending)
-	add(p.cache.retired)
-	for _, row := range p.cache.rows {
-		if !row.pendingReplaces {
-			add(row.block)
-		}
-		add(row.pending)
-	}
-	for _, v := range []*RuntimeUintColumn{&p.toAssert, &p.cacheWork, &c.assumptions, &c.userScopeLiterals, &c.core, &c.minCore, &a.lemma, &a.extAntecedents, &a.minStack, &a.unmark, &s.auxLiterals, &s.todoAntecedents, &s.model, &s.mus.core, &s.mus.mus, &s.mus.model, &s.simplifier.elimination.vars} {
-		col(v)
-	}
-	for f := s.mus.frames; f != nil; f = f.next {
-		if f.vectorUsed {
-			col(&f.vector)
-		}
-	}
-	for f := s.consequenceFrames; f != nil; f = f.next {
-		for i := uint32(0); i < f.used; i++ {
-			tag := f.order[i]
-			if tag >= 3 && tag < 6 {
-				col(&f.vectors[tag-3])
-			}
-		}
-	}
 
-	for i := range s.binaryClauseGraph {
-		col(&s.binaryClauseGraph[i])
-	}
-	return roots
-}
+// Native SAT containers own no Runtime payload blocks.
+func satFullSolverRuntimeRoots(_ *Solver, _ ...*satSolverLiteralRows) []util.Block { return nil }
 func satFullSolverUserClauseAudit(t *testing.T, s *Solver) {
 	t.Helper()
 	refs := []StoredClauseRef{}

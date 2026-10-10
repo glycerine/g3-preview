@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func satChunkFixture(t *testing.T, multi bool) (*Solver, *RuntimeUintColumn, *satSolverLiteralRows) {
+func satChunkFixture(t *testing.T, multi bool) (*Solver, *satUintColumn, *satSolverLiteralRows) {
 	s, _, _ := satSolverCheckFixture(t)
 	for i := 0; i < 2; i++ {
 		_, e := s.MkVar(true, true)
@@ -25,7 +25,7 @@ func satChunkFixture(t *testing.T, multi bool) (*Solver, *RuntimeUintColumn, *sa
 	if r != lbool.True {
 		t.Fatal(r)
 	}
-	model := &RuntimeUintColumn{}
+	model := &satUintColumn{}
 	model.Bind(s.runtime.memory)
 	for i := 0; i < 2; i++ {
 		satOK(t, model.Push(uint32(lbool.True)))
@@ -37,7 +37,7 @@ func satChunkFixture(t *testing.T, multi bool) (*Solver, *RuntimeUintColumn, *sa
 	satOK(t, out.appendLiterals([]Literal{8}))
 	return s, model, out
 }
-func satChunkAudit(t *testing.T, s *Solver, m *RuntimeUintColumn, out *satSolverLiteralRows) {
+func satChunkAudit(t *testing.T, s *Solver, m *satUintColumn, out *satSolverLiteralRows) {
 	roots := satFullSolverRuntimeRoots(s, out)
 	roots = append(roots, satMutexColumnRoots(m)...)
 	satScalarAuditRoots(t, s.Variables, satMutexNonzero(roots)...)

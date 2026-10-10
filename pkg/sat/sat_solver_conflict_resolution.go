@@ -20,7 +20,7 @@ type satSolverConflictResolution struct {
 	self                                                                            *satSolverConflictResolution
 	analysis                                                                        *satSolverConflictAnalysis
 	dynamic                                                                         *satSolverDynamicSubsumption
-	assumptions, userScopeLiterals, core, minCore                                   RuntimeUintColumn
+	assumptions, userScopeLiterals, core, minCore                                   satUintColumn
 	assumptionSet                                                                   satLiteralSetStorage
 	conflictLevel, conflictStat, conflicts, conflictsSinceRestart, conflictsSinceGC uint32
 	phaseCounter                                                                    uint32
@@ -45,7 +45,7 @@ func newSATSolverConflictResolution(a *satSolverConflictAnalysis, d *satSolverDy
 	}
 	s := &satSolverConflictResolution{analysis: a, dynamic: d, ownerBytes: n}
 	s.self = s
-	for _, c := range []*RuntimeUintColumn{&s.assumptions, &s.userScopeLiterals, &s.core, &s.minCore} {
+	for _, c := range []*satUintColumn{&s.assumptions, &s.userScopeLiterals, &s.core, &s.minCore} {
 		c.Bind(a.propagation.memory)
 	}
 	return s, nil
@@ -84,13 +84,13 @@ func (s *satSolverConflictResolution) Close() error {
 	s.closing = true
 	// Source reverse relevant declaration order: user-scope literals, min_core,
 	// core, assumption_set, assumptions (sat_solver.h:130–132,344,443).
-	for _, c := range []*RuntimeUintColumn{&s.userScopeLiterals, &s.minCore, &s.core} {
+	for _, c := range []*satUintColumn{&s.userScopeLiterals, &s.minCore, &s.core} {
 		if e := c.Finalize(); e != nil {
 			return e
 		}
 	}
 	s.assumptionSet.Finalize()
-	for _, c := range []*RuntimeUintColumn{&s.assumptions} {
+	for _, c := range []*satUintColumn{&s.assumptions} {
 		if e := c.Finalize(); e != nil {
 			return e
 		}
@@ -247,7 +247,7 @@ func (s *satSolverConflictResolution) resolveConflictCore() (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	span := satConflictRuntimeSpan(&a.lemma)
+	span := satConflictColumnSpan(&a.lemma)
 	newLevel := uint32(0)
 	for i := uint32(1); i < n; i++ {
 		lit, e := span.literal(i)

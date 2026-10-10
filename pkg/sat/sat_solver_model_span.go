@@ -6,12 +6,12 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-// Concrete model& borrow. Runtime reads resolve the current member backing at
+// Concrete model& borrow. Native reads resolve the current member backing at
 // every operator[]; the preexisting caller-owned slice route is unchanged.
 // The source lbool enum is signed32, unlike the solver's char assignments.
 type satSolverModelSpan struct {
 	slice  Model
-	column *RuntimeUintColumn
+	column *satUintColumn
 }
 
 func (m satSolverModelSpan) read(v BoolVar) (lbool.LBool, error) {
@@ -44,35 +44,6 @@ func (m satSolverModelSpan) value(l Literal) (lbool.LBool, error) {
 	}
 	return v, nil
 }
-func satSolverResizeModel(c *RuntimeUintColumn, n uint32) error {
-	old, e := c.Size()
-	if e != nil {
-		return e
-	}
-	if n <= old {
-		return c.Shrink(n)
-	}
-	for {
-		cap, e := c.Capacity()
-		if e != nil {
-			return e
-		}
-		if n <= cap {
-			break
-		}
-		if e = c.Raw.ExpandStride(4); e != nil {
-			return e
-		}
-	}
-	// Source size is published before ascending placement construction, unlike
-	// repeated push_back. Each enum is written into the sole Runtime allocation.
-	if e = WriteRuntimeWord(c.Raw.Runtime, c.Raw.Block, 4, n); e != nil {
-		return e
-	}
-	for i := old; i < n; i++ {
-		if e = c.Write(i, uint32(lbool.Undef)); e != nil {
-			return e
-		}
-	}
-	return nil
+func satSolverResizeModel(c *satUintColumn, n uint32) error {
+	return c.resize(n, uint32(lbool.Undef))
 }

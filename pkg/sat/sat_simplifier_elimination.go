@@ -15,18 +15,18 @@ type satSimplifierVarCost struct{ variable, cost uint32 }
 type satSimplifierElimination struct {
 	costs        []satSimplifierVarCost
 	sortScratch  []satSimplifierVarCost
-	vars         RuntimeUintColumn
+	vars         satUintColumn
 	reportActive bool
 }
 
 func (s *satSimplifier) closeElimination() error {
 	x := &s.elimination
 	s.closeEliminationCosts()
-	if x.vars.Raw.Runtime != nil {
+	if x.vars.runtime != nil {
 		if e := x.vars.Finalize(); e != nil {
 			return e
 		}
-		x.vars = RuntimeUintColumn{}
+		x.vars = satUintColumn{}
 	}
 	if x.reportActive {
 		if e := s.elimReport.Stop(); e != nil {

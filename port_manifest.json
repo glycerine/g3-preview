@@ -67077,8 +67077,8 @@
         "TestSATSolverConflictFirstUIPDefaultPipeline",
         "TestSATSolverConflictLevelZeroCountersAndOwners",
         "TestSATSolverConflictAssumptionCoreAndReinit",
-        "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-        "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+        "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+        "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
         "TestSATSolverConflictWholeOperationAllocationPrefixes",
         "TestSATSolverConflictClauseReasonBothWatchedPositions",
         "TestSATSolverConflictFiniteImplicationOracle",
@@ -67198,8 +67198,8 @@
             "TestSATSolverConflictFirstUIPDefaultPipeline",
             "TestSATSolverConflictLevelZeroCountersAndOwners",
             "TestSATSolverConflictAssumptionCoreAndReinit",
-            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+            "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
             "TestSATSolverConflictWholeOperationAllocationPrefixes",
             "TestSATSolverConflictClauseReasonBothWatchedPositions",
             "TestSATSolverConflictFiniteImplicationOracle",
@@ -69344,12 +69344,11 @@
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
         "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
         "TestSATSolverMUSActualThreeNecessaryAssumptions",
-        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSCapturedNativeAssumptions",
         "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
         "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
         "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
-        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph"
       ],
       "assertions": [
         {
@@ -69374,22 +69373,23 @@
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
             "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
             "TestSATSolverMUSActualThreeNecessaryAssumptions",
-            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSCapturedNativeAssumptions",
             "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
             "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
             "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
-            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph"
           ]
         }
       ],
       "ownership": [
         "MUS and consequence literal sets use native bool/literal slices and deep assignment. Set growth and destruction no longer acquire Runtime storage or expose physical failure states. Retained unsigned/model result vectors still use Runtime storage. Dynamic lexical frames retain charged cold headers and named roots for those remaining allocations; borrowed recursion inputs do not duplicate ownership.",
-        "Source full-expression result vector is destroyed before nested Check; completed inner core before older scoped_append, reverse flet restoration, exact stopped cleanup roots retained for explicit owning abort."
+        "Source full-expression result vector is destroyed before nested Check; completed inner core before older scoped_append, reverse flet restoration, exact stopped cleanup roots retained for explicit owning abort.",
+        "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
         "TRACE/verbose/verify_core diagnostic output and global source assertion bindings remain open. Empty qx native nontermination retains first split/union prefix before typed repeated-recursion guard, never success.",
-        "Named vector return move is a Go ABI adapter; optional C++ copy elision allocation schedule is not claimed. No additional registered source-test assertion credit; independent CNF and actual refusal campaigns only."
+        "Named vector return move is a Go ABI adapter; optional C++ copy elision allocation schedule is not claimed. No additional registered source-test assertion credit; independent CNF and actual refusal campaigns only.",
+        "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit."
       ]
     },
     {
@@ -69410,12 +69410,11 @@
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
         "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
         "TestSATSolverMUSActualThreeNecessaryAssumptions",
-        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSCapturedNativeAssumptions",
         "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
         "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
         "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
-        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph"
       ],
       "conditionals": [
         {
@@ -69444,22 +69443,23 @@
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
             "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
             "TestSATSolverMUSActualThreeNecessaryAssumptions",
-            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSCapturedNativeAssumptions",
             "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
             "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
             "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
-            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph"
           ]
         }
       ],
       "ownership": [
         "MUS and consequence literal sets use native bool/literal slices and deep assignment. Set growth and destruction no longer acquire Runtime storage or expose physical failure states. Retained unsigned/model result vectors still use Runtime storage. Dynamic lexical frames retain charged cold headers and named roots for those remaining allocations; borrowed recursion inputs do not duplicate ownership.",
-        "Source full-expression result vector is destroyed before nested Check; completed inner core before older scoped_append, reverse flet restoration, exact stopped cleanup roots retained for explicit owning abort."
+        "Source full-expression result vector is destroyed before nested Check; completed inner core before older scoped_append, reverse flet restoration, exact stopped cleanup roots retained for explicit owning abort.",
+        "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
         "TRACE/verbose/verify_core diagnostic output and global source assertion bindings remain open. Empty qx native nontermination retains first split/union prefix before typed repeated-recursion guard, never success.",
-        "Named vector return move is a Go ABI adapter; optional C++ copy elision allocation schedule is not claimed. No additional registered source-test assertion credit; independent CNF and actual refusal campaigns only."
+        "Named vector return move is a Go ABI adapter; optional C++ copy elision allocation schedule is not claimed. No additional registered source-test assertion credit; independent CNF and actual refusal campaigns only.",
+        "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit."
       ]
     },
     {
@@ -69660,11 +69660,10 @@
         "TestSATSolverProbingAllPhysicalRefusalPrefixes",
         "TestSATSolverProbingAssignedResetAndReuse",
         "TestSATSolverProbingAssignedNativeGrowth",
-        "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+        "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
         "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
         "TestSATSolverProbingCacheBorrowAndReset",
-        "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-        "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+        "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
         "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
         "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
         "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -69678,7 +69677,6 @@
         "TestSATSolverProbingSourceDefaultsAndTypo",
         "TestSATSolverProbingSourceFinalizePermitsNextRound",
         "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-        "TestSATSolverProbingTLSPostAllocationPendingCache",
         "TestSATSolverProbingWarmProcessAndUnsignedDec",
         "TestSATSolverProbingZeroQuotaAndActualCancellation"
       ],
@@ -69730,11 +69728,10 @@
             "TestSATSolverProbingAllPhysicalRefusalPrefixes",
             "TestSATSolverProbingAssignedResetAndReuse",
             "TestSATSolverProbingAssignedNativeGrowth",
-            "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+            "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
             "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
             "TestSATSolverProbingCacheBorrowAndReset",
-            "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-            "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+            "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
             "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
             "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
             "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -69748,7 +69745,6 @@
             "TestSATSolverProbingSourceDefaultsAndTypo",
             "TestSATSolverProbingSourceFinalizePermitsNextRound",
             "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-            "TestSATSolverProbingTLSPostAllocationPendingCache",
             "TestSATSolverProbingWarmProcessAndUnsignedDec",
             "TestSATSolverProbingZeroQuotaAndActualCancellation"
           ]
@@ -69768,11 +69764,10 @@
             "TestSATSolverProbingAllPhysicalRefusalPrefixes",
             "TestSATSolverProbingAssignedResetAndReuse",
             "TestSATSolverProbingAssignedNativeGrowth",
-            "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+            "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
             "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
             "TestSATSolverProbingCacheBorrowAndReset",
-            "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-            "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+            "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
             "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
             "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
             "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -69786,7 +69781,6 @@
             "TestSATSolverProbingSourceDefaultsAndTypo",
             "TestSATSolverProbingSourceFinalizePermitsNextRound",
             "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-            "TestSATSolverProbingTLSPostAllocationPendingCache",
             "TestSATSolverProbingWarmProcessAndUnsignedDec",
             "TestSATSolverProbingZeroQuotaAndActualCancellation"
           ]
@@ -69798,10 +69792,12 @@
         }
       ],
       "ownership": [
-        "Same Runtime owns actual assigned membership char+values uint, toAssert uint, cache outer16-byte entries and inner uint vectors. Explicit source finalize assigned then toAssert then cache; destructor reverse member order; partial allocations/published size/available and mark-before-list mutation retained. Actual cached entry/payload borrowers bind outer and captured inner allocation identities. Embedded charged scalar row workspace prevents per-operation self-pointer escape; ownership tokens transfer from row to workspace and back on every return. Sidecar rows contain only actual raw/pending Block provenance, no registry-derived owners."
+        "Same Runtime owns actual assigned membership char+values uint, toAssert uint, cache outer16-byte entries and inner uint vectors. Explicit source finalize assigned then toAssert then cache; destructor reverse member order; partial allocations/published size/available and mark-before-list mutation retained. Actual cached entry/payload borrowers bind outer and captured inner allocation identities. Embedded charged scalar row workspace prevents per-operation self-pointer escape; ownership tokens transfer from row to workspace and back on every return. Sidecar rows contain only actual raw/pending Block provenance, no registry-derived owners.",
+        "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
-        "Native inner pointer ABI is explicit scalar provenance sidecar adaptation: actual16-byte raw outer entries carry authoritative available/header, plus actual40-byte cold rows charged with old/new overlap before raw allocation. Accepted uint32-wrapped cache extent is preserved; only host-sidecar representability guards remain. Actual utiltime CPU clock scope replaces platform stopwatch, first body error preserved on deferred stop. Owner-local debug tag switches defaultfalse reflect initially empty source tags; missing actual integrity_checker dispatch errors only after real limit.inc succeeds. No success stub, fake quota, synthetic buffer or cache-default workaround. Full SAT Check and sat_user_scope42 campaign remain open; no registered probing ENSURE credit."
+        "Native inner pointer ABI is explicit scalar provenance sidecar adaptation: actual16-byte raw outer entries carry authoritative available/header, plus actual40-byte cold rows charged with old/new overlap before raw allocation. Accepted uint32-wrapped cache extent is preserved; only host-sidecar representability guards remain. Actual utiltime CPU clock scope replaces platform stopwatch, first body error preserved on deferred stop. Owner-local debug tag switches defaultfalse reflect initially empty source tags; missing actual integrity_checker dispatch errors only after real limit.inc succeeds. No success stub, fake quota, synthetic buffer or cache-default workaround. Full SAT Check and sat_user_scope42 campaign remain open; no registered probing ENSURE credit.",
+        "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit."
       ]
     },
     {
@@ -69827,11 +69823,10 @@
         "TestSATSolverProbingAllPhysicalRefusalPrefixes",
         "TestSATSolverProbingAssignedResetAndReuse",
         "TestSATSolverProbingAssignedNativeGrowth",
-        "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+        "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
         "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
         "TestSATSolverProbingCacheBorrowAndReset",
-        "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-        "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+        "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
         "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
         "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
         "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -69845,7 +69840,6 @@
         "TestSATSolverProbingSourceDefaultsAndTypo",
         "TestSATSolverProbingSourceFinalizePermitsNextRound",
         "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-        "TestSATSolverProbingTLSPostAllocationPendingCache",
         "TestSATSolverProbingWarmProcessAndUnsignedDec",
         "TestSATSolverProbingZeroQuotaAndActualCancellation"
       ],
@@ -69877,11 +69871,10 @@
             "TestSATSolverProbingAllPhysicalRefusalPrefixes",
             "TestSATSolverProbingAssignedResetAndReuse",
             "TestSATSolverProbingAssignedNativeGrowth",
-            "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+            "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
             "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
             "TestSATSolverProbingCacheBorrowAndReset",
-            "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-            "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+            "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
             "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
             "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
             "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -69895,7 +69888,6 @@
             "TestSATSolverProbingSourceDefaultsAndTypo",
             "TestSATSolverProbingSourceFinalizePermitsNextRound",
             "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-            "TestSATSolverProbingTLSPostAllocationPendingCache",
             "TestSATSolverProbingWarmProcessAndUnsignedDec",
             "TestSATSolverProbingZeroQuotaAndActualCancellation"
           ]
@@ -69915,11 +69907,10 @@
             "TestSATSolverProbingAllPhysicalRefusalPrefixes",
             "TestSATSolverProbingAssignedResetAndReuse",
             "TestSATSolverProbingAssignedNativeGrowth",
-            "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+            "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
             "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
             "TestSATSolverProbingCacheBorrowAndReset",
-            "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-            "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+            "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
             "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
             "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
             "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -69933,7 +69924,6 @@
             "TestSATSolverProbingSourceDefaultsAndTypo",
             "TestSATSolverProbingSourceFinalizePermitsNextRound",
             "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-            "TestSATSolverProbingTLSPostAllocationPendingCache",
             "TestSATSolverProbingWarmProcessAndUnsignedDec",
             "TestSATSolverProbingZeroQuotaAndActualCancellation"
           ]
@@ -69945,10 +69935,12 @@
         }
       ],
       "ownership": [
-        "Same Runtime owns actual assigned membership char+values uint, toAssert uint, cache outer16-byte entries and inner uint vectors. Explicit source finalize assigned then toAssert then cache; destructor reverse member order; partial allocations/published size/available and mark-before-list mutation retained. Actual cached entry/payload borrowers bind outer and captured inner allocation identities. Embedded charged scalar row workspace prevents per-operation self-pointer escape; ownership tokens transfer from row to workspace and back on every return. Sidecar rows contain only actual raw/pending Block provenance, no registry-derived owners."
+        "Same Runtime owns actual assigned membership char+values uint, toAssert uint, cache outer16-byte entries and inner uint vectors. Explicit source finalize assigned then toAssert then cache; destructor reverse member order; partial allocations/published size/available and mark-before-list mutation retained. Actual cached entry/payload borrowers bind outer and captured inner allocation identities. Embedded charged scalar row workspace prevents per-operation self-pointer escape; ownership tokens transfer from row to workspace and back on every return. Sidecar rows contain only actual raw/pending Block provenance, no registry-derived owners.",
+        "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
-        "Native inner pointer ABI is explicit scalar provenance sidecar adaptation: actual16-byte raw outer entries carry authoritative available/header, plus actual40-byte cold rows charged with old/new overlap before raw allocation. Accepted uint32-wrapped cache extent is preserved; only host-sidecar representability guards remain. Actual utiltime CPU clock scope replaces platform stopwatch, first body error preserved on deferred stop. Owner-local debug tag switches defaultfalse reflect initially empty source tags; missing actual integrity_checker dispatch errors only after real limit.inc succeeds. No success stub, fake quota, synthetic buffer or cache-default workaround. Full SAT Check and sat_user_scope42 campaign remain open; no registered probing ENSURE credit."
+        "Native inner pointer ABI is explicit scalar provenance sidecar adaptation: actual16-byte raw outer entries carry authoritative available/header, plus actual40-byte cold rows charged with old/new overlap before raw allocation. Accepted uint32-wrapped cache extent is preserved; only host-sidecar representability guards remain. Actual utiltime CPU clock scope replaces platform stopwatch, first body error preserved on deferred stop. Owner-local debug tag switches defaultfalse reflect initially empty source tags; missing actual integrity_checker dispatch errors only after real limit.inc succeeds. No success stub, fake quota, synthetic buffer or cache-default workaround. Full SAT Check and sat_user_scope42 campaign remain open; no registered probing ENSURE credit.",
+        "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit."
       ]
     },
     {
@@ -70918,7 +70910,6 @@
         "pkg/sat/sat_solver_clause_attach_test.go",
         "pkg/sat/sat_solver_backtrack.go",
         "pkg/sat/sat_solver_backtrack_test.go",
-        "pkg/sat/sat_runtime_column.go",
         "pkg/sat/sat_solver_assignment_storage_test.go",
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/sat/sat_solver_scalar_runtime_test.go",
@@ -71108,7 +71099,6 @@
         "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
         "TestSATSolverPushActualStatementReadTiming",
         "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
-        "TestSATSolverScalarUnsignedGrowthLiteralWidths",
         "TestSATSolverNativeActivityAndTrailAccounting",
         "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
         "TestSATSolverNativeTrailGrowthBoundsAndStableRoot",
@@ -71118,10 +71108,10 @@
         "TestSATSolverNativeJustificationFiveKindsGrowthBoundsAndWarmWrites",
         "TestSATSolverNativeJustificationStaleGenerationAndForeignAllocator",
         "TestSATSolverLemmaMinimizationOwnedHeaderAndLifetime",
-        "TestSATSolverLemmaAntecedentActualAllocationPrefixes",
-        "TestSATSolverLemmaMinimizationWholeOperationFaultPublication",
+        "TestSATSolverLemmaAntecedentNativeAppend",
+        "TestSATSolverLemmaMinimizationNativeWorkLists",
         "TestSATSolverLemmaMinimizationConstructorBudgetIdentityAndRefusal",
-        "TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes",
+        "TestSATSolverLemmaMinimizationNativeDeepAntecedents",
         "TestSATSolverLemmaMinimizationIndependentFiniteDAG",
         "TestSATSolverLemmaMinimizationSourceCompactionAndApproxCollision",
         "TestSATSolverLemmaMinimizationClauseBranchesAndRejectedSuffix",
@@ -71139,11 +71129,10 @@
         "TestSATSolverProbingAllPhysicalRefusalPrefixes",
         "TestSATSolverProbingAssignedResetAndReuse",
         "TestSATSolverProbingAssignedNativeGrowth",
-        "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+        "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
         "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
         "TestSATSolverProbingCacheBorrowAndReset",
-        "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-        "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+        "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
         "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
         "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
         "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -71157,14 +71146,13 @@
         "TestSATSolverProbingSourceDefaultsAndTypo",
         "TestSATSolverProbingSourceFinalizePermitsNextRound",
         "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-        "TestSATSolverProbingTLSPostAllocationPendingCache",
         "TestSATSolverProbingWarmProcessAndUnsignedDec",
         "TestSATSolverProbingZeroQuotaAndActualCancellation",
         "TestSATSolverConflictFirstUIPDefaultPipeline",
         "TestSATSolverConflictLevelZeroCountersAndOwners",
         "TestSATSolverConflictAssumptionCoreAndReinit",
-        "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-        "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+        "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+        "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
         "TestSATSolverConflictWholeOperationAllocationPrefixes",
         "TestSATSolverConflictClauseReasonBothWatchedPositions",
         "TestSATSolverConflictFiniteImplicationOracle",
@@ -71254,11 +71242,11 @@
         "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
         "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
         "TestSATSolverSourceModelUsesRealAssignmentAndConverter",
-        "TestSATSolverSourceModelPublishesCurrentBeforeAllocationFailure",
-        "TestSATSolverActualRuntimeModelConverterMatchesSlice",
-        "TestSATSolverModelResizePublishesSizeBeforeDefaultPlacement",
+        "TestSATSolverSourceModelNativeGrowthPublishesCurrent",
+        "TestSATSolverNativeModelConverterMatchesSlice",
+        "TestSATSolverNativeModelResizeInitializesDefaultEnums",
         "TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice",
-        "TestSATSolverMutableCapturedSpanRejectsActualFreedPayload",
+        "TestSATSolverMutableCapturedSpanRejectsClosedColumn",
         "TestSATFullRuntimeActualOwnersAndColdUnwind",
         "TestSATFullRuntimeRejectsForeignBudgetBeforeReservation",
         "TestSATSolverDefaultCheckEveryActualRefusalKeepsNamedRuntimeRoots",
@@ -71281,12 +71269,11 @@
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
         "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
         "TestSATSolverMUSActualThreeNecessaryAssumptions",
-        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSCapturedNativeAssumptions",
         "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
         "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
         "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
         "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix",
         "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
         "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
         "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners",
@@ -71910,7 +71897,6 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_variable_state.go",
           "tests": [
-            "TestSATSolverScalarUnsignedGrowthLiteralWidths",
             "TestSATSolverNativeLevelsCurrentBorrowAndGuards",
             "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
             "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards"
@@ -71943,15 +71929,15 @@
           ]
         },
         {
-          "name": "Source lemma minimization and actual conflict-analysis Runtime vectors; selected FIRST-UIP family recorded separately, complete default search and real extension dispatch remain open",
+          "name": "Source lemma minimization with native unsigned work slices; selected FIRST-UIP family recorded separately, complete default search and real extension dispatch remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_lemma_minimization.go",
           "tests": [
             "TestSATSolverLemmaMinimizationOwnedHeaderAndLifetime",
-            "TestSATSolverLemmaAntecedentActualAllocationPrefixes",
-            "TestSATSolverLemmaMinimizationWholeOperationFaultPublication",
+            "TestSATSolverLemmaAntecedentNativeAppend",
+            "TestSATSolverLemmaMinimizationNativeWorkLists",
             "TestSATSolverLemmaMinimizationConstructorBudgetIdentityAndRefusal",
-            "TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes",
+            "TestSATSolverLemmaMinimizationNativeDeepAntecedents",
             "TestSATSolverLemmaMinimizationIndependentFiniteDAG",
             "TestSATSolverLemmaMinimizationSourceCompactionAndApproxCollision",
             "TestSATSolverLemmaMinimizationClauseBranchesAndRejectedSuffix",
@@ -71976,11 +71962,10 @@
             "TestSATSolverProbingAllPhysicalRefusalPrefixes",
             "TestSATSolverProbingAssignedResetAndReuse",
             "TestSATSolverProbingAssignedNativeGrowth",
-            "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+            "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
             "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
             "TestSATSolverProbingCacheBorrowAndReset",
-            "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-            "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+            "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
             "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
             "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
             "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -71994,7 +71979,6 @@
             "TestSATSolverProbingSourceDefaultsAndTypo",
             "TestSATSolverProbingSourceFinalizePermitsNextRound",
             "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-            "TestSATSolverProbingTLSPostAllocationPendingCache",
             "TestSATSolverProbingWarmProcessAndUnsignedDec",
             "TestSATSolverProbingZeroQuotaAndActualCancellation"
           ]
@@ -72014,11 +71998,10 @@
             "TestSATSolverProbingAllPhysicalRefusalPrefixes",
             "TestSATSolverProbingAssignedResetAndReuse",
             "TestSATSolverProbingAssignedNativeGrowth",
-            "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+            "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
             "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
             "TestSATSolverProbingCacheBorrowAndReset",
-            "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-            "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+            "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
             "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
             "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
             "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -72032,7 +72015,6 @@
             "TestSATSolverProbingSourceDefaultsAndTypo",
             "TestSATSolverProbingSourceFinalizePermitsNextRound",
             "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-            "TestSATSolverProbingTLSPostAllocationPendingCache",
             "TestSATSolverProbingWarmProcessAndUnsignedDec",
             "TestSATSolverProbingZeroQuotaAndActualCancellation"
           ]
@@ -72045,8 +72027,8 @@
             "TestSATSolverConflictFirstUIPDefaultPipeline",
             "TestSATSolverConflictLevelZeroCountersAndOwners",
             "TestSATSolverConflictAssumptionCoreAndReinit",
-            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+            "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
             "TestSATSolverConflictWholeOperationAllocationPrefixes",
             "TestSATSolverConflictClauseReasonBothWatchedPositions",
             "TestSATSolverConflictFiniteImplicationOracle",
@@ -72062,8 +72044,8 @@
             "TestSATSolverConflictFirstUIPDefaultPipeline",
             "TestSATSolverConflictLevelZeroCountersAndOwners",
             "TestSATSolverConflictAssumptionCoreAndReinit",
-            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+            "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
             "TestSATSolverConflictWholeOperationAllocationPrefixes",
             "TestSATSolverConflictClauseReasonBothWatchedPositions",
             "TestSATSolverConflictFiniteImplicationOracle",
@@ -72079,8 +72061,8 @@
             "TestSATSolverConflictFirstUIPDefaultPipeline",
             "TestSATSolverConflictLevelZeroCountersAndOwners",
             "TestSATSolverConflictAssumptionCoreAndReinit",
-            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+            "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
             "TestSATSolverConflictWholeOperationAllocationPrefixes",
             "TestSATSolverConflictClauseReasonBothWatchedPositions",
             "TestSATSolverConflictFiniteImplicationOracle",
@@ -72089,15 +72071,15 @@
           ]
         },
         {
-          "name": "Concrete borrowed Runtime lemma span without copied or boxed literals; captured block lifetime checked at actual source dereferences",
+          "name": "Borrowed native unsigned/literal slices for retained clause and glue algorithms; captured values remain bound to their actual backing and owner lifetime",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_span.go",
           "tests": [
             "TestSATSolverConflictFirstUIPDefaultPipeline",
             "TestSATSolverConflictLevelZeroCountersAndOwners",
             "TestSATSolverConflictAssumptionCoreAndReinit",
-            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+            "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
             "TestSATSolverConflictWholeOperationAllocationPrefixes",
             "TestSATSolverConflictClauseReasonBothWatchedPositions",
             "TestSATSolverConflictFiniteImplicationOracle",
@@ -72251,14 +72233,14 @@
           ]
         },
         {
-          "name": "Selected actual signed32 Runtime model mk_model/check_model and existing model-converter bridge; clone/TRACE/printer branches remain open",
+          "name": "Selected actual native unsigned enum-slice model mk_model/check_model and existing model-converter bridge; clone/TRACE/printer branches remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_model.go",
           "tests": [
             "TestSATSolverSourceModelUsesRealAssignmentAndConverter",
-            "TestSATSolverSourceModelPublishesCurrentBeforeAllocationFailure",
-            "TestSATSolverActualRuntimeModelConverterMatchesSlice",
-            "TestSATSolverModelResizePublishesSizeBeforeDefaultPlacement"
+            "TestSATSolverSourceModelNativeGrowthPublishesCurrent",
+            "TestSATSolverNativeModelConverterMatchesSlice",
+            "TestSATSolverNativeModelResizeInitializesDefaultEnums"
           ]
         },
         {
@@ -72274,12 +72256,12 @@
           ]
         },
         {
-          "name": "Concrete in-place captured Runtime/Words mutable literal span for actual source aux clause consumer; slice boundary preserved, library comparison schedule adapter",
+          "name": "Borrowed native unsigned/literal slices for retained clause and glue algorithms; captured values remain bound to their actual backing and owner lifetime",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_span.go",
           "tests": [
             "TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice",
-            "TestSATSolverMutableCapturedSpanRejectsActualFreedPayload"
+            "TestSATSolverMutableCapturedSpanRejectsClosedColumn"
           ]
         },
         {
@@ -72288,11 +72270,11 @@
           "go_target": "pkg/sat/sat_solver.go",
           "tests": [
             "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
-            "TestSATSolverSourceModelPublishesCurrentBeforeAllocationFailure"
+            "TestSATSolverSourceModelNativeGrowthPublishesCurrent"
           ]
         },
         {
-          "name": "Actual MUS dispatch and set_model; Check/checkCore/initAssumptions concrete captured Runtime literal spans",
+          "name": "Actual MUS dispatch and set_model; Check/checkCore/initAssumptions concrete captured native literal slices",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_mus.go",
           "tests": [
@@ -72305,12 +72287,11 @@
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
             "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
             "TestSATSolverMUSActualThreeNecessaryAssumptions",
-            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSCapturedNativeAssumptions",
             "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
             "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
             "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
-            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph"
           ]
         },
         {
@@ -72672,7 +72653,8 @@
         "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added.",
         "The solver assignment trail owns native []Literal backing with a stable checked root identity. Runtime word encoding, vector geometry, captured physical byte backing, pending allocations and TLS refusal simulation are removed from this consumer. Only its actual cold header remains charged. Push/Read/Shrink retain ordered literal values and enforce current logical bounds; Free/Close retire the root and drop native storage. Source assignment/backtrack order, extension-boundary prefix and GC reactivation remain tested. Growth of 4097 values, exact cold-header refusal/refund, root guards, no-reservation assignment and independence from a borrowed Runtime TLS checkpoint are covered. Other scalar columns are separate work; no generic vector credit is added.",
         "Solver justifications use native []satJustification values, retaining source kind/literal words and complete checked clause locators together. Removed Runtime payload encoding, source vector geometry, separately charged provenance arrays, interrupted provenance publication and TLS/backing refusal simulation. Embedded member storage is covered by the actual variable-state cold header; native push/write/growth introduces no Budget reservations. Fixed allocator binding rejects foreign writes before mutation; original clause generations are preserved and stale values fail at actual clause dereference. Native logical bounds, shrink/current-member growth, shallow-copy/closed guards, 4097 mixed values, zero-allocation warm writes and actual clause-backed assignment under FailAfter(0) are covered. Compact source physical clause offsets remain a separate open contract; no generic vector implementation credit is added.",
-        "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added."
+        "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added.",
+        "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
@@ -72688,7 +72670,8 @@
         "Listed static consequences3157-3249 now implemented and directly tested: source undef falls through existing core, last-duplicate swap removal and real Check/clause effects. Hardcoded false dispatch unchanged. K0/repeatedundef nontermination is source behavior, not repaired; verbose/AST registered6/global bindings remain OPEN. Actual named charged nested scopes with reverse completed destruction and separate owning abort. Supersedes earlier static-helper-open notes only for listed methods. See PORT_PROGRESS.md.",
         "Complete selected source copy75-127, across actual source/destination Runtime and Budget. Captured source vector cap detects actual proven monotone backing replacement only at reached dereference; same-cap self-copy source behavior preserved. Packed full-word88 predicate retained. Clone macro is disabled and its cpp739 two-arg constructor is illformed against actual3-arg declaration; no inferred runnable constructor or clone success stub. Parallel/global storage/TRACE/full source unit remain OPEN. No directly registered copy source assertions credited. See PORT_PROGRESS.md.",
         "Listed display_status and mk_stat source bodies use actual shared Runtime allocation getter and persistent fixed/precision2 memory-stream formatting. External std::endl flush/global verbose dispatch/process-wide source allocation integration remain OPEN. Unsigned learned-minus-frozen wraps literally. Unchanged set_model/updt_params consumers additionally exercised; no registered source assertion or whole-unit completion credit. See PORT_PROGRESS.md.",
-        "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added."
+        "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added.",
+        "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit."
       ]
     },
     {
@@ -72718,7 +72701,6 @@
         "pkg/sat/sat_solver_clause_attach_test.go",
         "pkg/sat/sat_solver_backtrack.go",
         "pkg/sat/sat_solver_backtrack_test.go",
-        "pkg/sat/sat_runtime_column.go",
         "pkg/sat/sat_solver_assignment_storage_test.go",
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/sat/sat_solver_scalar_runtime_test.go",
@@ -72897,7 +72879,6 @@
         "TestSATSolverReinitIncreasingShrinkRetainedSourceSlots",
         "TestSATSolverPushActualStatementReadTiming",
         "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
-        "TestSATSolverScalarUnsignedGrowthLiteralWidths",
         "TestSATSolverNativeActivityAndTrailAccounting",
         "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
         "TestSATSolverNativeTrailGrowthBoundsAndStableRoot",
@@ -72907,10 +72888,10 @@
         "TestSATSolverNativeJustificationFiveKindsGrowthBoundsAndWarmWrites",
         "TestSATSolverNativeJustificationStaleGenerationAndForeignAllocator",
         "TestSATSolverLemmaMinimizationOwnedHeaderAndLifetime",
-        "TestSATSolverLemmaAntecedentActualAllocationPrefixes",
-        "TestSATSolverLemmaMinimizationWholeOperationFaultPublication",
+        "TestSATSolverLemmaAntecedentNativeAppend",
+        "TestSATSolverLemmaMinimizationNativeWorkLists",
         "TestSATSolverLemmaMinimizationConstructorBudgetIdentityAndRefusal",
-        "TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes",
+        "TestSATSolverLemmaMinimizationNativeDeepAntecedents",
         "TestSATSolverLemmaMinimizationIndependentFiniteDAG",
         "TestSATSolverLemmaMinimizationSourceCompactionAndApproxCollision",
         "TestSATSolverLemmaMinimizationClauseBranchesAndRejectedSuffix",
@@ -72921,8 +72902,8 @@
         "TestSATSolverConflictFirstUIPDefaultPipeline",
         "TestSATSolverConflictLevelZeroCountersAndOwners",
         "TestSATSolverConflictAssumptionCoreAndReinit",
-        "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-        "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+        "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+        "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
         "TestSATSolverConflictWholeOperationAllocationPrefixes",
         "TestSATSolverConflictClauseReasonBothWatchedPositions",
         "TestSATSolverConflictFiniteImplicationOracle",
@@ -73001,11 +72982,11 @@
         "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
         "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
         "TestSATSolverSourceModelUsesRealAssignmentAndConverter",
-        "TestSATSolverSourceModelPublishesCurrentBeforeAllocationFailure",
-        "TestSATSolverActualRuntimeModelConverterMatchesSlice",
-        "TestSATSolverModelResizePublishesSizeBeforeDefaultPlacement",
+        "TestSATSolverSourceModelNativeGrowthPublishesCurrent",
+        "TestSATSolverNativeModelConverterMatchesSlice",
+        "TestSATSolverNativeModelResizeInitializesDefaultEnums",
         "TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice",
-        "TestSATSolverMutableCapturedSpanRejectsActualFreedPayload",
+        "TestSATSolverMutableCapturedSpanRejectsClosedColumn",
         "TestSATFullRuntimeActualOwnersAndColdUnwind",
         "TestSATFullRuntimeRejectsForeignBudgetBeforeReservation",
         "TestSATSolverDefaultCheckEveryActualRefusalKeepsNamedRuntimeRoots",
@@ -73028,12 +73009,11 @@
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
         "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
         "TestSATSolverMUSActualThreeNecessaryAssumptions",
-        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSCapturedNativeAssumptions",
         "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
         "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
         "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
         "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix",
         "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput",
         "TestSATSolverConsequencesIndependentAllTwoVariableBinaryCNFs",
         "TestSATSolverConsequencesEveryActualRefusalPreservesNamedOwners",
@@ -73226,7 +73206,6 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_variable_state.go",
           "tests": [
-            "TestSATSolverScalarUnsignedGrowthLiteralWidths",
             "TestSATSolverNativeLevelsCurrentBorrowAndGuards",
             "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
             "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards"
@@ -73259,15 +73238,15 @@
           ]
         },
         {
-          "name": "Source lemma minimization and actual conflict-analysis Runtime vectors; selected FIRST-UIP family recorded separately, complete default search and real extension dispatch remain open",
+          "name": "Source lemma minimization with native unsigned work slices; selected FIRST-UIP family recorded separately, complete default search and real extension dispatch remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_lemma_minimization.go",
           "tests": [
             "TestSATSolverLemmaMinimizationOwnedHeaderAndLifetime",
-            "TestSATSolverLemmaAntecedentActualAllocationPrefixes",
-            "TestSATSolverLemmaMinimizationWholeOperationFaultPublication",
+            "TestSATSolverLemmaAntecedentNativeAppend",
+            "TestSATSolverLemmaMinimizationNativeWorkLists",
             "TestSATSolverLemmaMinimizationConstructorBudgetIdentityAndRefusal",
-            "TestSATSolverLemmaMinimizationDeepVectorGrowthFaultPrefixes",
+            "TestSATSolverLemmaMinimizationNativeDeepAntecedents",
             "TestSATSolverLemmaMinimizationIndependentFiniteDAG",
             "TestSATSolverLemmaMinimizationSourceCompactionAndApproxCollision",
             "TestSATSolverLemmaMinimizationClauseBranchesAndRejectedSuffix",
@@ -73285,8 +73264,8 @@
             "TestSATSolverConflictFirstUIPDefaultPipeline",
             "TestSATSolverConflictLevelZeroCountersAndOwners",
             "TestSATSolverConflictAssumptionCoreAndReinit",
-            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+            "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
             "TestSATSolverConflictWholeOperationAllocationPrefixes",
             "TestSATSolverConflictClauseReasonBothWatchedPositions",
             "TestSATSolverConflictFiniteImplicationOracle",
@@ -73302,8 +73281,8 @@
             "TestSATSolverConflictFirstUIPDefaultPipeline",
             "TestSATSolverConflictLevelZeroCountersAndOwners",
             "TestSATSolverConflictAssumptionCoreAndReinit",
-            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+            "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
             "TestSATSolverConflictWholeOperationAllocationPrefixes",
             "TestSATSolverConflictClauseReasonBothWatchedPositions",
             "TestSATSolverConflictFiniteImplicationOracle",
@@ -73319,8 +73298,8 @@
             "TestSATSolverConflictFirstUIPDefaultPipeline",
             "TestSATSolverConflictLevelZeroCountersAndOwners",
             "TestSATSolverConflictAssumptionCoreAndReinit",
-            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+            "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
             "TestSATSolverConflictWholeOperationAllocationPrefixes",
             "TestSATSolverConflictClauseReasonBothWatchedPositions",
             "TestSATSolverConflictFiniteImplicationOracle",
@@ -73329,15 +73308,15 @@
           ]
         },
         {
-          "name": "Concrete borrowed Runtime lemma span without copied or boxed literals; captured block lifetime checked at actual source dereferences",
+          "name": "Borrowed native unsigned/literal slices for retained clause and glue algorithms; captured values remain bound to their actual backing and owner lifetime",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_span.go",
           "tests": [
             "TestSATSolverConflictFirstUIPDefaultPipeline",
             "TestSATSolverConflictLevelZeroCountersAndOwners",
             "TestSATSolverConflictAssumptionCoreAndReinit",
-            "TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix",
-            "TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue",
+            "TestSATSolverConflictPhaseHelpersAndNativeMarkedPush",
+            "TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue",
             "TestSATSolverConflictWholeOperationAllocationPrefixes",
             "TestSATSolverConflictClauseReasonBothWatchedPositions",
             "TestSATSolverConflictFiniteImplicationOracle",
@@ -73473,14 +73452,14 @@
           ]
         },
         {
-          "name": "Selected actual signed32 Runtime model mk_model/check_model and existing model-converter bridge; clone/TRACE/printer branches remain open",
+          "name": "Selected actual native unsigned enum-slice model mk_model/check_model and existing model-converter bridge; clone/TRACE/printer branches remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_model.go",
           "tests": [
             "TestSATSolverSourceModelUsesRealAssignmentAndConverter",
-            "TestSATSolverSourceModelPublishesCurrentBeforeAllocationFailure",
-            "TestSATSolverActualRuntimeModelConverterMatchesSlice",
-            "TestSATSolverModelResizePublishesSizeBeforeDefaultPlacement"
+            "TestSATSolverSourceModelNativeGrowthPublishesCurrent",
+            "TestSATSolverNativeModelConverterMatchesSlice",
+            "TestSATSolverNativeModelResizeInitializesDefaultEnums"
           ]
         },
         {
@@ -73496,12 +73475,12 @@
           ]
         },
         {
-          "name": "Concrete in-place captured Runtime/Words mutable literal span for actual source aux clause consumer; slice boundary preserved, library comparison schedule adapter",
+          "name": "Borrowed native unsigned/literal slices for retained clause and glue algorithms; captured values remain bound to their actual backing and owner lifetime",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_span.go",
           "tests": [
             "TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice",
-            "TestSATSolverMutableCapturedSpanRejectsActualFreedPayload"
+            "TestSATSolverMutableCapturedSpanRejectsClosedColumn"
           ]
         },
         {
@@ -73510,7 +73489,7 @@
           "go_target": "pkg/sat/sat_solver.go",
           "tests": [
             "TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges",
-            "TestSATSolverSourceModelPublishesCurrentBeforeAllocationFailure"
+            "TestSATSolverSourceModelNativeGrowthPublishesCurrent"
           ]
         },
         {
@@ -73527,12 +73506,11 @@
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
             "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
             "TestSATSolverMUSActualThreeNecessaryAssumptions",
-            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSCapturedNativeAssumptions",
             "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
             "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
             "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
-            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph"
           ]
         },
         {
@@ -73690,7 +73668,8 @@
         "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added.",
         "The solver assignment trail owns native []Literal backing with a stable checked root identity. Runtime word encoding, vector geometry, captured physical byte backing, pending allocations and TLS refusal simulation are removed from this consumer. Only its actual cold header remains charged. Push/Read/Shrink retain ordered literal values and enforce current logical bounds; Free/Close retire the root and drop native storage. Source assignment/backtrack order, extension-boundary prefix and GC reactivation remain tested. Growth of 4097 values, exact cold-header refusal/refund, root guards, no-reservation assignment and independence from a borrowed Runtime TLS checkpoint are covered. Other scalar columns are separate work; no generic vector credit is added.",
         "Solver justifications use native []satJustification values, retaining source kind/literal words and complete checked clause locators together. Removed Runtime payload encoding, source vector geometry, separately charged provenance arrays, interrupted provenance publication and TLS/backing refusal simulation. Embedded member storage is covered by the actual variable-state cold header; native push/write/growth introduces no Budget reservations. Fixed allocator binding rejects foreign writes before mutation; original clause generations are preserved and stale values fail at actual clause dereference. Native logical bounds, shrink/current-member growth, shallow-copy/closed guards, 4097 mixed values, zero-allocation warm writes and actual clause-backed assignment under FailAfter(0) are covered. Compact source physical clause offsets remain a separate open contract; no generic vector implementation credit is added.",
-        "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added."
+        "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added.",
+        "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
@@ -73704,7 +73683,8 @@
         "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
         "Complete selected source copy75-127, across actual source/destination Runtime and Budget. Captured source vector cap detects actual proven monotone backing replacement only at reached dereference; same-cap self-copy source behavior preserved. Packed full-word88 predicate retained. Clone macro is disabled and its cpp739 two-arg constructor is illformed against actual3-arg declaration; no inferred runnable constructor or clone success stub. Parallel/global storage/TRACE/full source unit remain OPEN. No directly registered copy source assertions credited. See PORT_PROGRESS.md.",
         "Current named-member borrows introduce no owning arrays or retains. Clause pointer/backing guards are proven by actual current strict-cap growth route, preserving captured end and same-cap mutations; future same-cap backing replacement requires revisiting this binding. Pointer8 source versus Go24 reference storage ABI/global allocator/optional full solver services remain OPEN. No registered source assertion credit. See PORT_PROGRESS.md.",
-        "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added."
+        "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added.",
+        "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit."
       ]
     },
     {
@@ -73857,11 +73837,10 @@
         "TestSATSolverProbingAllPhysicalRefusalPrefixes",
         "TestSATSolverProbingAssignedResetAndReuse",
         "TestSATSolverProbingAssignedNativeGrowth",
-        "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+        "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
         "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
         "TestSATSolverProbingCacheBorrowAndReset",
-        "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-        "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+        "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
         "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
         "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
         "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -73875,7 +73854,6 @@
         "TestSATSolverProbingSourceDefaultsAndTypo",
         "TestSATSolverProbingSourceFinalizePermitsNextRound",
         "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-        "TestSATSolverProbingTLSPostAllocationPendingCache",
         "TestSATSolverProbingWarmProcessAndUnsignedDec",
         "TestSATSolverProbingZeroQuotaAndActualCancellation",
         "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
@@ -73887,12 +73865,11 @@
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
         "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
         "TestSATSolverMUSActualThreeNecessaryAssumptions",
-        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSCapturedNativeAssumptions",
         "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
         "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
         "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
         "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
         "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestSATSolverStatDisplaySourceConditionalFields",
@@ -74107,11 +74084,10 @@
             "TestSATSolverProbingAllPhysicalRefusalPrefixes",
             "TestSATSolverProbingAssignedResetAndReuse",
             "TestSATSolverProbingAssignedNativeGrowth",
-            "TestSATSolverProbingAvailableBeforeInnerAllocationRefusal",
+            "TestSATSolverProbingNativeAvailableAndAppendWithoutReservations",
             "TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop",
             "TestSATSolverProbingCacheBorrowAndReset",
-            "TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff",
-            "TestSATSolverProbingCacheSourceGrowthAndHostBounds",
+            "TestSATSolverProbingNativeCacheAndStrictMemoryCutoff",
             "TestSATSolverProbingCachedTryLitAndFailedBranchStatistic",
             "TestSATSolverProbingCommonConsequenceAndNormalFinalize",
             "TestSATSolverProbingConditionalDiagnosticsSourceSites",
@@ -74125,7 +74101,6 @@
             "TestSATSolverProbingSourceDefaultsAndTypo",
             "TestSATSolverProbingSourceFinalizePermitsNextRound",
             "TestSATSolverProbingStatisticsAndDescriptorNoOp",
-            "TestSATSolverProbingTLSPostAllocationPendingCache",
             "TestSATSolverProbingWarmProcessAndUnsignedDec",
             "TestSATSolverProbingZeroQuotaAndActualCancellation"
           ]
@@ -74144,12 +74119,11 @@
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
             "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
             "TestSATSolverMUSActualThreeNecessaryAssumptions",
-            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSCapturedNativeAssumptions",
             "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
             "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
             "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
-            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph"
           ]
         },
         {
@@ -102216,8 +102190,7 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/heap/heap_test.go",
-        "pkg/util/heap/heap.go",
-        "pkg/sat/sat_runtime_column.go"
+        "pkg/util/heap/heap.go"
       ],
       "tests": [
         "TestHeapSourceAssertions",
@@ -112267,7 +112240,6 @@
         "pkg/util/util_debug_context.go",
         "pkg/util/util_debug_context_test.go",
         "pkg/util/heap/heap.go",
-        "pkg/sat/sat_runtime_column.go",
         "pkg/util/util_debug_notification.go",
         "pkg/util/util_debug_notification_source_test.go",
         "pkg/util/util_numeric_char_input.go",
@@ -112452,7 +112424,6 @@
         "pkg/util/util_debug_context.go",
         "pkg/util/util_debug_context_test.go",
         "pkg/util/heap/heap.go",
-        "pkg/sat/sat_runtime_column.go",
         "pkg/util/small_allocator_assertions.go",
         "pkg/util/util_small_object_allocator_assertions_test.go",
         "pkg/util/util_small_object_allocator.go",
@@ -115078,7 +115049,6 @@
         "pkg/util/heap/heap_test.go",
         "pkg/util/heap/source_frontier_test.go",
         "pkg/util/heap/owner_test.go",
-        "pkg/sat/sat_runtime_column.go",
         "pkg/util/util_debug_macros.go",
         "pkg/util/util_debug_macro_source_test.go",
         "pkg/util/heap/source_prefix_test.go",
@@ -148322,7 +148292,6 @@
         "pkg/ast/ast_shared_occs.go",
         "pkg/math/polynomial/upolynomial_binary_vector.go",
         "pkg/math/polynomial/upolynomial_isolation_storage_test.go",
-        "pkg/sat/sat_runtime_column.go",
         "pkg/sat/sat_solver_assignment_storage_test.go",
         "pkg/math/polynomial/polynomial_monomial_positions.go",
         "pkg/sat/sat_solver_mus_set.go",
@@ -148453,12 +148422,11 @@
         "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
         "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
         "TestSATSolverMUSActualThreeNecessaryAssumptions",
-        "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+        "TestSATSolverMUSCapturedNativeAssumptions",
         "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
         "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
         "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
         "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-        "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix",
         "TestPolynomialVariableDegreesSparseDefaultsAndRejectedMaxIndex",
         "TestPolynomialModDIndependentMultivariateFilter",
         "TestPolynomialPseudoModDActualSharedBranches",
@@ -148825,8 +148793,8 @@
           ]
         },
         {
-          "name": "MUS source copy_core size-before-capacity reads, actual size_t32/64 request conversion, header publication and ascending payload copy; full scoped unsigned-vector resize",
-          "status": "ported",
+          "name": "Retained MUS copy_core and scoped append consumers use independent native literal/unsigned slices with value-initialized regrowth; no generic vector capacity, wrapped header or template implementation credit",
+          "status": "partial",
           "go_target": "pkg/sat/sat_solver_mus_set.go",
           "tests": [
             "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
@@ -148838,12 +148806,11 @@
             "TestSATSolverMUSActualCancellationPublishesRemainingCoreAndRestoresFlets",
             "TestSATSolverMUSActualQXSixtyFiveNecessaryAssumptions",
             "TestSATSolverMUSActualThreeNecessaryAssumptions",
-            "TestSATSolverMUSCapturedRuntimeAssumptionsUseActualPointer",
+            "TestSATSolverMUSCapturedNativeAssumptions",
             "TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots",
             "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
             "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
-            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
-            "TestSATMUSCopyCoreActualSizeT32WrapPublishesEmptyHeaderPrefix"
+            "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph"
           ]
         },
         {
@@ -149064,7 +149031,8 @@
         "Retained SAT clause/wrapper/activity/binary consumers use native typed slices and native borrowed allocator maps. The unused standalone watched-vector adapter and template-only methods were deleted. Only real cold owner headers are budgeted; native backing growth is uncharged. This conversion gives no generic C++ vector implementation credit.",
         "The solver assignment trail owns native []Literal backing with a stable checked root identity. Runtime word encoding, vector geometry, captured physical byte backing, pending allocations and TLS refusal simulation are removed from this consumer. Only its actual cold header remains charged. Push/Read/Shrink retain ordered literal values and enforce current logical bounds; Free/Close retire the root and drop native storage. Source assignment/backtrack order, extension-boundary prefix and GC reactivation remain tested. Growth of 4097 values, exact cold-header refusal/refund, root guards, no-reservation assignment and independence from a borrowed Runtime TLS checkpoint are covered. Other scalar columns are separate work; no generic vector credit is added.",
         "Solver justifications use native []satJustification values, retaining source kind/literal words and complete checked clause locators together. Removed Runtime payload encoding, source vector geometry, separately charged provenance arrays, interrupted provenance publication and TLS/backing refusal simulation. Embedded member storage is covered by the actual variable-state cold header; native push/write/growth introduces no Budget reservations. Fixed allocator binding rejects foreign writes before mutation; original clause generations are preserved and stale values fail at actual clause dereference. Native logical bounds, shrink/current-member growth, shallow-copy/closed guards, 4097 mixed values, zero-allocation warm writes and actual clause-backed assignment under FailAfter(0) are covered. Compact source physical clause offsets remain a separate open contract; no generic vector implementation credit is added.",
-        "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added."
+        "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added.",
+        "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
@@ -149135,7 +149103,8 @@
         "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added.",
         "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added.",
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
-        "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero."
+        "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero.",
+        "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit."
       ]
     },
     {

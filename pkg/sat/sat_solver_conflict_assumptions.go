@@ -251,7 +251,7 @@ func (s *satSolverConflictResolution) resolveConflictForUnsatCore() error {
 				if e = s.core.Shrink(0); e != nil {
 					return e
 				}
-				span := satConflictRuntimeSpan(&s.minCore)
+				span := satConflictColumnSpan(&s.minCore)
 				for i := uint32(0); i < mn; i++ {
 					l, e := span.literal(i)
 					if e != nil {
@@ -437,7 +437,7 @@ func (s *satSolverConflictResolution) resolveConflictForInit() (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	_, e = s.dynamic.probing.lifecycle.mkClauseCoreSpan(n, satConflictRuntimeSpan(&a.lemma), true)
+	_, e = s.dynamic.probing.lifecycle.mkClauseCoreSpan(n, satConflictColumnSpan(&a.lemma), true)
 	if e != nil {
 		return false, e
 	}

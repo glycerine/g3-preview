@@ -141,7 +141,7 @@ func TestSATSolverConflictAssumptionCoreAndReinit(t *testing.T) {
 		t.Fatal("pop0 still reinitializes assumptions")
 	}
 }
-func TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix(t *testing.T) {
+func TestSATSolverConflictPhaseHelpersAndNativeMarkedPush(t *testing.T) {
 	s := satConflictFixture(t, 3)
 	satConflictDAGSmall(t, s)
 	p := s.analysis.propagation
@@ -164,7 +164,7 @@ func TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix(t *testing.T) {
 	if x != 2 {
 		t.Fatal(x)
 	}
-	// Fill current capacity to force source lemma growth after mark and activity.
+	// Native lemma growth succeeds while Runtime reservations are disabled.
 	satOK(t, s.analysis.lemma.Push(2))
 	satOK(t, s.analysis.lemma.Push(4))
 	before, e := v.activity.Get(0)
@@ -172,15 +172,13 @@ func TestSATSolverConflictPhaseHelpersAndMarkedPushPrefix(t *testing.T) {
 	s.analysis.budget.FailAfter(0)
 	marks := uint32(0)
 	e = s.processAntecedent(0, &marks)
-	if !satRuntimeActualRefusal(p.memory, e) {
-		t.Fatal(e)
-	}
+	satOK(t, e)
 	marked, xerr := s.analysis.marked(0)
 	satOK(t, xerr)
 	act, xerr := v.activity.Get(0)
 	satOK(t, xerr)
-	if !marked || act != before+128 || marks != 0 {
-		t.Fatal("actual completed mark/activity prefix", marked, act, marks)
+	if !marked || act != before+128 || marks != 0 || satScalarTestUintSize(t, &s.analysis.lemma) != 3 || satScalarTestUint(t, &s.analysis.lemma, 2) != 1 {
+		t.Fatal("completed mark/activity and lemma append", marked, act, marks)
 	}
 	s.analysis.budget.FailAfter(-1)
 }
@@ -192,21 +190,21 @@ func satConflictDAGSmall(t *testing.T, s *satSolverConflictResolution) {
 	satConflictPush(t, s)
 	satOK(t, p.assign(2, satJustification{}))
 }
-func TestSATSolverConflictRuntimeLemmaSpanLifetimeAndGlue(t *testing.T) {
+func TestSATSolverConflictNativeLemmaSpanLifetimeAndGlue(t *testing.T) {
 	s := satConflictFixture(t, 3)
 	satConflictDAGSmall(t, s)
 	a := s.analysis
 	satOK(t, a.lemma.Push(1))
 	satOK(t, a.lemma.Push(3))
-	span := satConflictRuntimeSpan(&a.lemma)
+	span := satConflictColumnSpan(&a.lemma)
 	n, e := a.propagation.numDiffLevelsSpan(2, span)
 	satOK(t, e)
 	if n != 2 {
 		t.Fatal(n)
 	}
 	satOK(t, a.lemma.Push(5))
-	if _, e = span.literal(0); e == nil {
-		t.Fatal("captured raw pointer must die on realloc")
+	if got, e := span.literal(0); e != nil || got != 1 {
+		t.Fatal("captured native slice remains readable after append", got, e)
 	}
 }
 

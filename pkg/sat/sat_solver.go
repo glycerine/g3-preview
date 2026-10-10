@@ -45,14 +45,14 @@ type Solver struct {
 	asymm                        *satAsymmBranch
 	probing                      *satSolverProbing
 	gc                           *satSolverGC
-	model                        RuntimeUintColumn
+	model                        satUintColumn
 	mus                          satSolverMUSMembers
 	params                       util.ParamsRef
 	elimTodo                     *satSolverUintSet
 	antecedents                  *satSolverIndexMap
-	auxLiterals, todoAntecedents RuntimeUintColumn
+	auxLiterals, todoAntecedents satUintColumn
 	userBinClauses               []BinaryLiteralPair
-	binaryClauseGraph            []RuntimeUintColumn
+	binaryClauseGraph            []satUintColumn
 	closeSourceCause             error
 	closeGuardAcknowledged       bool
 	userGC                       satSolverUserGC
@@ -72,7 +72,7 @@ type Solver struct {
 type satSolverMUSMembers struct {
 	solver           *Solver
 	frames           *satMUSFrame
-	core, mus, model RuntimeUintColumn
+	core, mus, model satUintColumn
 	isActive         bool
 	maxNumRestarts   uint32
 	constructed      bool
@@ -372,7 +372,7 @@ func (s *Solver) closeMembers() error {
 				s.binaryClauseGraph = nil
 			}
 		case 4:
-			if s.todoAntecedents.Raw.Self != nil {
+			if s.todoAntecedents.self != nil {
 				e = s.todoAntecedents.Finalize()
 			}
 		case 5:
@@ -382,7 +382,7 @@ func (s *Solver) closeMembers() error {
 		case 6:
 			s.userBinClauses = nil
 		case 7:
-			if s.auxLiterals.Raw.Self != nil {
+			if s.auxLiterals.self != nil {
 				e = s.auxLiterals.Finalize()
 			}
 		case 8:
@@ -486,7 +486,7 @@ func (s *Solver) closeMembers() error {
 				e = s.converter.Close()
 			}
 		case 31:
-			if s.model.Raw.Self != nil {
+			if s.model.self != nil {
 				e = s.model.Finalize()
 			}
 		case 32:

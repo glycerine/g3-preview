@@ -5,13 +5,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func satMutexColumnRoots(c *RuntimeUintColumn) []util.Block {
-	r := []util.Block{c.Raw.Pending}
-	if !c.Raw.PendingReplaces {
-		r = append(r, c.Raw.Block)
-	}
-	return r
-}
+func satMutexColumnRoots(_ *satUintColumn) []util.Block { return nil }
 func satMutexNonzero(roots []util.Block) []util.Block {
 	n := 0
 	for _, r := range roots {

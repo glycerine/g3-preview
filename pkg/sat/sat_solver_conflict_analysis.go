@@ -14,7 +14,7 @@ type satSolverConflictAnalysis struct {
 	self                                    *satSolverConflictAnalysis
 	propagation                             *satSolverPropagationState
 	budget                                  *arena.Budget
-	lemma, extAntecedents, unmark, minStack RuntimeUintColumn
+	lemma, extAntecedents, unmark, minStack satUintColumn
 	levelSet                                satApproxSet
 	minimizedLits                           uint32
 	ownerBytes                              uint64
@@ -34,7 +34,7 @@ func newSATSolverConflictAnalysis(p *satSolverPropagationState, b *arena.Budget)
 	}
 	s := &satSolverConflictAnalysis{propagation: p, budget: b, ownerBytes: n}
 	s.self = s
-	for _, c := range []*RuntimeUintColumn{&s.lemma, &s.extAntecedents, &s.unmark, &s.minStack} {
+	for _, c := range []*satUintColumn{&s.lemma, &s.extAntecedents, &s.unmark, &s.minStack} {
 		c.Bind(p.memory)
 	}
 	return s, nil
@@ -68,7 +68,7 @@ func (s *satSolverConflictAnalysis) Close() error {
 	// Source reverse member declaration order: min-stack, unmark, external
 	// antecedents, lemma. The scalar approximate set has no destructor action.
 	// Never repair marks left by interrupted source minimization.
-	for _, c := range []*RuntimeUintColumn{&s.minStack, &s.unmark, &s.extAntecedents, &s.lemma} {
+	for _, c := range []*satUintColumn{&s.minStack, &s.unmark, &s.extAntecedents, &s.lemma} {
 		if e := c.Finalize(); e != nil {
 			return e
 		}

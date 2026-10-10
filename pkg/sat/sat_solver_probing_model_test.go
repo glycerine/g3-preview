@@ -19,36 +19,9 @@ func satProbingAudit(t *testing.T, s *satSolverProbing, analysis *satSolverConfl
 	v := p.variables
 	l := s.lifecycle
 	roots := append([]util.Block(nil), external...)
-	add := func(h util.Block) {
-		if h != (util.Block{}) {
-			roots = append(roots, h)
-		}
-	}
-	add(s.cache.block)
-	add(s.cache.pending)
-	add(s.cache.retired)
-	addColumn := func(c *RuntimeUintColumn) {
-		if !c.Raw.PendingReplaces {
-			add(c.Raw.Block)
-		}
-		add(c.Raw.Pending)
-	}
-	addColumn(&s.toAssert)
-	addColumn(&s.cacheWork)
-	for _, row := range s.cache.rows {
-		if !row.pendingReplaces {
-			add(row.block)
-		}
-		add(row.pending)
-	}
-	if analysis != nil {
-		for _, c := range []*RuntimeUintColumn{&analysis.lemma, &analysis.extAntecedents, &analysis.unmark, &analysis.minStack} {
-			addColumn(c)
-		}
-	}
 	satScalarAuditRoots(t, v, roots...)
 	// Exact named physical graph, once-only Runtime and all genuine cold backing.
-	want := s.ownerBytes + uint64(cap(s.cache.rows))*uint64(reflect.TypeOf(satProbingCacheRow{}).Size())
+	want := s.ownerBytes
 
 	if analysis != nil {
 		want += analysis.ownerBytes
@@ -179,7 +152,7 @@ func TestSATSolverProbingAllPhysicalRefusalPrefixes(t *testing.T) {
 	}
 	t.Log("real refusal prefixes", failed, "first success", success)
 }
-func TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff(t *testing.T) {
+func TestSATSolverProbingNativeCacheAndStrictMemoryCutoff(t *testing.T) {
 	s, life := satProbingFixture(t, 3)
 	p := life.propagation
 	satOK(t, p.assignCore(2, satJustification{}))
@@ -205,18 +178,12 @@ func TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff(t *testing.T) {
 			t.Fatal(x)
 		}
 	}
-	// actual available byte + LP64 empty/source pointer storage region16.
-	raw, e := p.memory.Size(s.cache.block)
-	satOK(t, e)
-	if raw != 40 {
-		t.Fatal(raw)
-	}
-	available, e := p.memory.Read(s.cache.block, 8)
-	satOK(t, e)
-	if available != 1 {
-		t.Fatal(available)
+	if !s.cache.rows[0].available {
+		t.Fatal("native availability flag")
 	}
 	satProbingAudit(t, s, nil, nil)
+	prefix, e := p.memory.Allocate(1)
+	satOK(t, e)
 	s.cacheLimit = 0
 	satOK(t, s.cacheBins(2, 0))
 	_, yes, e = s.cachedImpliedLits(2)
@@ -224,9 +191,12 @@ func TestSATSolverProbingCachePhysicalAndStrictMemoryCutoff(t *testing.T) {
 	if yes {
 		t.Fatal("cutoff should not publish")
 	}
+	satOK(t, p.memory.Deallocate(&prefix))
 	satOK(t, s.resetCache(0))
-	if _, e = borrow.readCaptured(block, 0); e == nil {
-		t.Fatal("freed inner iterator")
+	got, e := borrow.readCaptured(block, 0)
+	satOK(t, e)
+	if got != 2 {
+		t.Fatal("captured native backing changed on cache reset", got)
 	}
 	satProbingAudit(t, s, nil, nil)
 }
@@ -285,13 +255,17 @@ func TestSATSolverProbingEveryActualCancellationPrefix(t *testing.T) {
 	}
 	t.Log("actual canceled prefixes", failures, "success", success)
 }
-func TestSATSolverProbingAvailableBeforeInnerAllocationRefusal(t *testing.T) {
+func TestSATSolverProbingNativeAvailableAndAppendWithoutReservations(t *testing.T) {
 	s, life := satProbingFixture(t, 2)
 	satOK(t, s.cacheBins(0, 0)) // actual empty entry, no inner payload.
 	satOK(t, life.propagation.assignCore(2, satJustification{}))
 	s.budget.FailAfter(0)
+	before := s.budget.Used()
 	e := s.cacheBins(0, 0)
-	satProbingExpectedRefusal(t, life.propagation, e)
+	satOK(t, e)
+	if s.budget.Used() != before {
+		t.Fatal("native cache used arena", s.budget.Used(), before)
+	}
 	borrow, found, readErr := s.cachedImpliedLits(0)
 	satOK(t, readErr)
 	if !found {
@@ -299,68 +273,18 @@ func TestSATSolverProbingAvailableBeforeInnerAllocationRefusal(t *testing.T) {
 	}
 	n, readErr := borrow.size()
 	satOK(t, readErr)
-	if n != 0 {
-		t.Fatal("failed first append did not publish size")
+	if n != 1 {
+		t.Fatal("native cached assignment missing", n)
+	}
+	values, _, readErr := borrow.capture()
+	satOK(t, readErr)
+	lit, readErr := borrow.readCaptured(values, 0)
+	satOK(t, readErr)
+	if lit != 2 {
+		t.Fatal("actual native cached literal", lit)
 	}
 	satProbingAudit(t, s, nil, nil)
 	s.budget.FailAfter(-1)
 	satOK(t, s.resetCache(0))
 	satProbingAudit(t, s, nil, nil)
-}
-
-func TestSATSolverProbingTLSPostAllocationPendingCache(t *testing.T) {
-	b := arena.NewBudget(^uint64(0))
-	raw, e := util.NewRuntime(util.RuntimeConfig{Budget: b, ThreadLocal: true})
-	satOK(t, e)
-	todo, e := newSATSolverUintSet(b)
-	satOK(t, e)
-	v, e := newSATSolverVariableState(todo, b, arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}}, raw)
-	satOK(t, e)
-	allocator, e := NewSATClauseAllocator(satClauseAllocatorConfig{Storage: arena.SmallBytesConfig{Descriptors: arena.Config{Budget: b}}})
-	satOK(t, e)
-	converter, e := newSATModelConverter(b)
-	satOK(t, e)
-	limit, e := control.NewReslimit(b)
-	satOK(t, e)
-	ctx, _, g, cb := satMainConfigTestRuntime(t)
-	params, e := ctx.NewValue()
-	satOK(t, e)
-	cfg, e := newSATMainConfig(g, &params, cb)
-	satOK(t, e)
-	propagation, e := newSATSolverPropagationState(v, allocator, converter, limit, raw, cfg, b)
-	satOK(t, e)
-	life, e := newSATSolverClauseLifecycle(propagation, b)
-	satOK(t, e)
-	probe, e := newSATSolverProbing(life, ctx, &params, b)
-	satOK(t, e)
-	// Position the remaining real cache allocation at its TLS checkpoint.
-	prefix, e := raw.Allocate(uint64(99998 - raw.State().LocalSize - 8))
-	satOK(t, e)
-	satOK(t, raw.SetMaxSize(1))
-	e = probe.cacheBins(0, 0)
-	satProbingExpectedRefusal(t, propagation, e)
-	if probe.cache.block != (util.Block{}) || probe.cache.pending == (util.Block{}) {
-		t.Fatal("post-allocation/pre-header retained ownership")
-	}
-	if _, e = raw.Read(probe.cache.pending, 0); !errors.Is(e, util.ErrRuntimeUninitialized) {
-		t.Fatal("source header not yet written", e)
-	}
-	satProbingAudit(t, probe, nil, nil, prefix)
-	// Owning cleanup drains the named unpublished actual malloc, with no counter
-	// restoration, header construction or source-call retry.
-	satOK(t, probe.Close())
-	satOK(t, raw.Deallocate(&prefix))
-	satOK(t, life.Close())
-	satOK(t, propagation.Close())
-	satOK(t, allocator.Close())
-	satOK(t, converter.Close())
-	limit.Close()
-	satOK(t, cfg.Close())
-	satOK(t, ctx.Del(&params))
-	satOK(t, v.Close())
-	satOK(t, todo.Close())
-	satOK(t, raw.Close())
-	if b.Used() != 0 {
-		t.Fatal("complete actual borrowed graph teardown", b.Used())
-	}
 }

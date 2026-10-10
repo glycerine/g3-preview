@@ -11,7 +11,7 @@ import (
 // while c_ptr() captures its actual payload only at the source call site. The
 // caller-array forms are explicit concrete input-boundary adapters, not owners.
 type satConsequenceInput struct {
-	column    *RuntimeUintColumn
+	column    *satUintColumn
 	literals  []Literal
 	variables []BoolVar
 	raw       satSolverLiteralSpan
@@ -43,7 +43,7 @@ func (v satConsequenceInput) read(i uint32) (uint32, error) {
 }
 func (v satConsequenceInput) cPtr() satSolverLiteralSpan {
 	if v.column != nil {
-		return satConflictRuntimeSpan(v.column)
+		return satConflictColumnSpan(v.column)
 	}
 	if v.literals != nil {
 		return satSolverLiteralSpan{literals: v.literals}
@@ -53,14 +53,14 @@ func (v satConsequenceInput) cPtr() satSolverLiteralSpan {
 func satConsequenceLiterals(v []Literal) satConsequenceInput {
 	return satConsequenceInput{literals: v, count: uint32(len(v))}
 }
-func satConsequenceColumn(v *RuntimeUintColumn) satConsequenceInput {
+func satConsequenceColumn(v *satUintColumn) satConsequenceInput {
 	return satConsequenceInput{column: v}
 }
 
 type satConsequenceFrame struct {
 	next                *satConsequenceFrame
 	sets                [3]satMUSLiteralSet
-	vectors             [3]RuntimeUintColumn
+	vectors             [3]satUintColumn
 	index               satSolverIndexSet
 	order               [7]uint8
 	completed           [7]bool
@@ -150,14 +150,14 @@ func (f *satConsequenceFrame) set(s *Solver, i uint8, input *satConsequenceInput
 		}
 	}
 }
-func (f *satConsequenceFrame) vector(s *Solver, i uint8, copy *RuntimeUintColumn) error {
+func (f *satConsequenceFrame) vector(s *Solver, i uint8, copy *satUintColumn) error {
 	k := f.used
 	f.order[k] = i + 3
 	f.completed[k] = copy == nil
 	f.used++
 	f.vectors[i].Bind(s.runtime.memory)
 	if copy != nil {
-		if e := copyRuntimeColumn(&f.vectors[i].Raw, &copy.Raw, 4); e != nil {
+		if e := f.vectors[i].copyFrom(copy); e != nil {
 			return e
 		}
 		f.completed[k] = true

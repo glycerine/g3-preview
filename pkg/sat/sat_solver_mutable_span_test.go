@@ -14,7 +14,7 @@ func TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
 	satOK(t, e)
-	var c RuntimeUintColumn
+	var c satUintColumn
 	c.Bind(r)
 	input := []Literal{4, 0, 2, 2, 4}
 	for mask := 0; mask < 27; mask++ {
@@ -35,7 +35,7 @@ func TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice(t *testing.T) {
 			n, z := uint32(len(input)), uint32(len(input))
 			want, e := state.simplifyClause(scope, &n, native)
 			satOK(t, e)
-			got, e := state.simplifyClauseSpan(scope, &z, satConflictRuntimeSpan(&c))
+			got, e := state.simplifyClauseSpan(scope, &z, satConflictColumnSpan(&c))
 			satOK(t, e)
 			if got != want || n != z {
 				t.Fatal(mask, scope, got, want, n, z)
@@ -55,14 +55,14 @@ func TestSATSolverMutableRuntimeClauseSpanMatchesFiniteSlice(t *testing.T) {
 		t.Fatal(b.Used())
 	}
 }
-func TestSATSolverMutableCapturedSpanRejectsActualFreedPayload(t *testing.T) {
+func TestSATSolverMutableCapturedSpanRejectsClosedColumn(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
 	satOK(t, e)
-	var c RuntimeUintColumn
+	var c satUintColumn
 	c.Bind(r)
 	satOK(t, c.Push(2))
-	span := satConflictRuntimeSpan(&c)
+	span := satConflictColumnSpan(&c)
 	satOK(t, c.Finalize())
 	state := satSolverClauseState{assignment: []int8{0, 0, 0, 0}}
 	n := uint32(1)

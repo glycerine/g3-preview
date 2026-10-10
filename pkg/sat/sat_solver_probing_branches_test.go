@@ -9,7 +9,6 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/lbool"
-	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSATSolverProbingCachedTryLitAndFailedBranchStatistic(t *testing.T) {
@@ -232,50 +231,6 @@ func TestSATSolverProbingBinaryWatchFiltersAndNonbinaryStop(t *testing.T) {
 	})
 }
 
-func TestSATSolverProbingCacheSourceGrowthAndHostBounds(t *testing.T) {
-	for _, c := range []struct{ old, next, bytes uint32 }{{0, 2, 40}, {2, 3, 56}, {3, 5, 88}, {5, 8, 136}} {
-		n, bytes, side, e := satProbingCacheNext(c.old, ^uint64(0))
-		satOK(t, e)
-		if n != c.next || bytes != c.bytes || side != uint64(n)*uint64(reflect.TypeOf(satProbingCacheRow{}).Size()) {
-			t.Fatal(n, bytes, side)
-		}
-	}
-	// Source permits this wrapped extent: 16*old+8=505032712 and
-	// 16*next+8=2905032712 in unsigned32, despite wide extent >UINT_MAX.
-	n, request, side, e := satProbingCacheNext(300000000, ^uint64(0))
-	if e != nil || n != 450000000 || request != 2905032712 || side != uint64(n)*uint64(reflect.TypeOf(satProbingCacheRow{}).Size()) {
-		t.Fatal("literal source accepted wrapped request", n, request, side, e)
-	}
-	// Nonallocating actual Go typed-array boundary, separate from source overflow.
-	stride := uint64(reflect.TypeOf(satProbingCacheRow{}).Size())
-	_, _, _, e = satProbingCacheNext(2, 3*stride-1)
-	if !errors.Is(e, arena.ErrBounds) {
-		t.Fatal(e)
-	}
-	_, _, _, e = satProbingCacheNext(^uint32(0), ^uint64(0))
-	var ex z3exception.DefaultException
-	if !errors.As(e, &ex) || ex.Message() != "Overflow encountered when expanding vector" {
-		t.Fatal(e)
-	}
-	s, _ := satProbingFixture(t, 1)
-	satOK(t, s.cacheBins(0, 0))
-	old := s.cache.block
-	before := s.budget.Used()
-	satOK(t, WriteRuntimeWord(s.propagation().memory, s.cache.block, 0, 0))
-	e = s.cache.expand(s)
-	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATAssertion) {
-			t.Fatal(e)
-		}
-	} else {
-		if !errors.As(e, &ex) || ex.Message() != "Overflow encountered when expanding vector" {
-			t.Fatal(e)
-		}
-	}
-	if s.cache.block != old || s.budget.Used() != before {
-		t.Fatal("source capacity refusal before physical change")
-	}
-}
 func TestSATSolverProbingStatisticsAndDescriptorNoOp(t *testing.T) {
 	s, _ := satProbingFixture(t, 0)
 	st := statFixture(t)

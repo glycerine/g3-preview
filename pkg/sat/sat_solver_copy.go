@@ -191,7 +191,7 @@ func (s *Solver) copyOriginalClauses(src *Solver) (err error) {
 		if e != nil {
 			return e
 		}
-		if _, err = s.Lifecycle.mkClauseCoreSpan(n, satConflictRuntimeSpan(buffer), false); err != nil {
+		if _, err = s.Lifecycle.mkClauseCoreSpan(n, satConflictColumnSpan(buffer), false); err != nil {
 			return err
 		}
 	}

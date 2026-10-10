@@ -184,7 +184,9 @@ func TestSATSolverDynamicSubsumptionDuplicateMarkFailureAndRetainedEmpty(t *test
 			t.Fatal(e)
 		}
 	} else {
-		satOK(t, e)
+		if !errors.Is(e, arena.ErrBounds) {
+			t.Fatal("empty lemma bounds guard", e)
+		}
 	}
 	satProbingAudit(t, probe, a, d)
 }

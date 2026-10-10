@@ -81,11 +81,11 @@ func (o *satSolverLiteralRows) appendUnsigned(input []uint32) error {
 	o.rows = append(o.rows, row)
 	return nil
 }
-func (o *satSolverLiteralRows) appendColumn(src *RuntimeUintColumn) error {
+func (o *satSolverLiteralRows) appendColumn(src *satUintColumn) error {
 	if e := o.open(); e != nil {
 		return e
 	}
-	if src == nil || src.Raw.Runtime != o.runtime {
+	if src == nil || src.runtime != o.runtime {
 		return ErrSATOwner
 	}
 	n, e := src.Size()

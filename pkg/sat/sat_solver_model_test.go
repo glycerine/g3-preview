@@ -9,7 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestSATSolverActualRuntimeModelConverterMatchesSlice(t *testing.T) {
+func TestSATSolverNativeModelConverterMatchesSlice(t *testing.T) {
 	mc, b := satConverterTestOwner(t)
 	e, e1 := mc.Mk(satModelElimVar, 0)
 	satOK(t, e1)
@@ -19,7 +19,7 @@ func TestSATSolverActualRuntimeModelConverterMatchesSlice(t *testing.T) {
 	satOK(t, mc.InsertBinary(e, 3, 4))
 	r, err := util.NewRuntime(util.RuntimeConfig{Budget: b})
 	satOK(t, err)
-	var col RuntimeUintColumn
+	var col satUintColumn
 	col.Bind(r)
 	satOK(t, satSolverResizeModel(&col, 3))
 	native := Model{lbool.Undef, lbool.Undef, lbool.False}
@@ -41,21 +41,17 @@ func TestSATSolverActualRuntimeModelConverterMatchesSlice(t *testing.T) {
 	if a != z {
 		t.Fatal(a, z)
 	}
-	extent, err := r.Size(col.Raw.Block)
-	satOK(t, err)
-	cap, err := col.Capacity()
-	satOK(t, err)
-	if extent != 8+4*uint64(cap) {
-		t.Fatal("actual enum stride/header", extent, cap)
+	if r.Stats().LiveBlocks != 0 {
+		t.Fatal("native model columns allocated Runtime backing", r.Stats())
 	}
 	satOK(t, col.Finalize())
 	satOK(t, r.Close())
 }
-func TestSATSolverModelResizePublishesSizeBeforeDefaultPlacement(t *testing.T) {
+func TestSATSolverNativeModelResizeInitializesDefaultEnums(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	r, e := util.NewRuntime(util.RuntimeConfig{Budget: b})
 	satOK(t, e)
-	var col RuntimeUintColumn
+	var col satUintColumn
 	col.Bind(r)
 	satOK(t, satSolverResizeModel(&col, 5))
 	n, e := col.Size()

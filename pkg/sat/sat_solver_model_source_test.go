@@ -38,17 +38,17 @@ func TestSATSolverSourceModelUsesRealAssignmentAndConverter(t *testing.T) {
 	}
 }
 
-func TestSATSolverSourceModelPublishesCurrentBeforeAllocationFailure(t *testing.T) {
+func TestSATSolverSourceModelNativeGrowthPublishesCurrent(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
 	_, e := s.Variables.mkVar(false, true)
 	satOK(t, e)
 	s.Variables.modelIsCurrent = false
 	s.budget.FailAfter(0)
 	e = s.mkModel()
-	if !satRuntimeActualRefusal(s.runtime.memory, e) || !s.Variables.modelIsCurrent {
-		t.Fatal("source reset/current/allocation ordering", e)
+	if e != nil || !s.Variables.modelIsCurrent {
+		t.Fatal("native model growth/current publication", e)
 	}
-	if n, e := s.model.Size(); e != nil || n != 0 {
+	if n, e := s.model.Size(); e != nil || n != 1 {
 		t.Fatal(n, e)
 	}
 	satFullSolverRuntimeAudit(t, s)

@@ -7,13 +7,12 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/random"
 )
 
 func TestSATSolverReportModelConsumerCopySelfAndGuardedReadPrefix(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
-	var source RuntimeUintColumn
+	var source satUintColumn
 	source.Bind(s.runtime.memory)
 	t.Cleanup(func() { satOK(t, source.Finalize()) })
 	for _, v := range [2]lbool.LBool{lbool.True, lbool.False} {
@@ -38,27 +37,22 @@ func TestSATSolverReportModelConsumerCopySelfAndGuardedReadPrefix(t *testing.T) 
 		t.Fatal("source self reset before append", n)
 	}
 
-	// Malformed/source-undefined count publishes an uninitialized second word.
-	// The actual guarded read must follow the first completed destination push;
-	// no allocation failure or source constructor behavior is invented.
-	var bad RuntimeUintColumn
+	// The actual destination reset precedes a closed source's Size guard.
+	var bad satUintColumn
 	bad.Bind(s.runtime.memory)
-	t.Cleanup(func() { satOK(t, bad.Finalize()) })
 	satOK(t, bad.Push(uint32(lbool.True)))
-	satOK(t, WriteRuntimeWord(s.runtime.memory, bad.Raw.Block, 4, 2))
+	satOK(t, bad.Finalize())
 	satOK(t, s.mkModel())
 	e = s.setModel(&bad)
-	if !errors.Is(e, util.ErrRuntimeUninitialized) {
+	if !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
 	}
 	n, x := s.model.Size()
 	satOK(t, x)
-	if n != 1 || !s.Variables.modelIsCurrent {
-		t.Fatal("completed append versus final flag publication", n, s.Variables.modelIsCurrent)
+	if n != 0 || !s.Variables.modelIsCurrent {
+		t.Fatal("completed reset before failed source read", n, s.Variables.modelIsCurrent)
 	}
-	roots := satFullSolverRuntimeRoots(s)
-	roots = append(roots, source.Raw.Block, bad.Raw.Block)
-	satScalarAuditRoots(t, s.Variables, roots...)
+	satScalarAuditRoots(t, s.Variables)
 	satOK(t, bad.Finalize())
 	satOK(t, source.Finalize())
 	satFullSolverRuntimeAudit(t, s)

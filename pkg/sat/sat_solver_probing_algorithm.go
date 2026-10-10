@@ -109,12 +109,9 @@ func (s *satSolverProbing) tryLit(l Literal, updateCache bool) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		block := s.toAssert.Raw.Block
+		values := s.toAssert.values
 		for i := uint32(0); i < end; i++ {
-			x, e := ReadRuntimeWord(p.memory, block, 8+4*uint64(i))
-			if e != nil {
-				return false, e
-			}
+			x := values[i]
 			if e = p.assign(Literal(x), satJustification{}); e != nil {
 				return false, e
 			}

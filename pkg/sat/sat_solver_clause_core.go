@@ -83,7 +83,7 @@ func (s *satSolverClauseState) simplifyClauseSpan(scope uint32, n *uint32, span 
 	if n == nil {
 		return false, arena.ErrBounds
 	}
-	if span.runtime == nil && span.store == nil && uint64(*n) > uint64(len(span.literals)) {
+	if span.column == nil && span.store == nil && uint64(*n) > uint64(len(span.literals)) {
 		return false, arena.ErrBounds
 	}
 	if e := satSortClauseSpan(span, *n); e != nil {

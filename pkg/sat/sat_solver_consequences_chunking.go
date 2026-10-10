@@ -6,7 +6,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-func satConsequencePruneUnfixed(lambda, model *RuntimeUintColumn) error {
+func satConsequencePruneUnfixed(lambda, model *satUintColumn) error {
 	for i := uint32(0); ; i++ {
 		n, e := lambda.Size()
 		if e != nil {
@@ -49,7 +49,7 @@ func satConsequencePruneUnfixed(lambda, model *RuntimeUintColumn) error {
 		}
 	}
 }
-func satConsequenceBackRemove(lits *RuntimeUintColumn, l uint32) error {
+func satConsequenceBackRemove(lits *satUintColumn, l uint32) error {
 	n, e := lits.Size()
 	if e != nil {
 		return e
@@ -151,7 +151,7 @@ func (s *Solver) bruteForceConsequenceOne(asms satConsequenceInput, nlit uint32,
 	if e != nil {
 		return e
 	}
-	r, e := s.checkSpan(n, satConflictRuntimeSpan(&f.vectors[0]))
+	r, e := s.checkSpan(n, satConflictColumnSpan(&f.vectors[0]))
 	if e != nil {
 		return e
 	}
@@ -160,7 +160,7 @@ func (s *Solver) bruteForceConsequenceOne(asms satConsequenceInput, nlit uint32,
 	}
 	return nil
 }
-func (s *Solver) coreChunking(model *RuntimeUintColumn, vars, asms satConsequenceInput, out *satSolverLiteralRows, K uint32) (result lbool.LBool, err error) {
+func (s *Solver) coreChunking(model *satUintColumn, vars, asms satConsequenceInput, out *satSolverLiteralRows, K uint32) (result lbool.LBool, err error) {
 	if err = s.consequenceEntry(out); err != nil {
 		return lbool.Undef, err
 	}
@@ -208,7 +208,7 @@ func (s *Solver) coreChunking(model *RuntimeUintColumn, vars, asms satConsequenc
 		}
 	}
 }
-func (s *Solver) coreChunk(lambda *RuntimeUintColumn, asms satConsequenceInput, out *satSolverLiteralRows, K uint32) (err error) {
+func (s *Solver) coreChunk(lambda *satUintColumn, asms satConsequenceInput, out *satSolverLiteralRows, K uint32) (err error) {
 	n, e := lambda.Size()
 	if e != nil {
 		return e
@@ -255,7 +255,7 @@ func (s *Solver) coreChunk(lambda *RuntimeUintColumn, asms satConsequenceInput, 
 		}
 	}
 }
-func (s *Solver) coreChunkCheck(lambda, gamma, omega *RuntimeUintColumn, asms satConsequenceInput, out *satSolverLiteralRows) (done bool, err error) {
+func (s *Solver) coreChunkCheck(lambda, gamma, omega *satUintColumn, asms satConsequenceInput, out *satSolverLiteralRows) (done bool, err error) {
 	f, e := s.consequenceFrame()
 	if e != nil {
 		return false, e
@@ -271,7 +271,7 @@ func (s *Solver) coreChunkCheck(lambda, gamma, omega *RuntimeUintColumn, asms sa
 	if e != nil {
 		return false, e
 	}
-	r, e := s.checkSpan(n, satConflictRuntimeSpan(&f.vectors[0]))
+	r, e := s.checkSpan(n, satConflictColumnSpan(&f.vectors[0]))
 	if e != nil {
 		return false, e
 	}

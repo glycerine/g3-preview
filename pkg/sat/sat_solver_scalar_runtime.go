@@ -1,4 +1,4 @@
-// Source: src/util/vector.h.
+// Concrete native unsigned work columns for retained SAT consumers.
 package sat
 
 import (
@@ -6,123 +6,115 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// RuntimeUintColumn is SAT's concrete svector<unsigned> storage. It keeps the
-// source unsigned32 header and payload layout in the shared checked Runtime.
-type RuntimeUintColumn struct{ Raw satRuntimeColumn }
+type satUintColumn struct {
+	self    *satUintColumn
+	runtime *util.Runtime
+	values  []uint32
+	closed  bool
+}
 
-func (c *RuntimeUintColumn) Bind(r *util.Runtime)      { c.Raw.Bind(r) }
-func (c *RuntimeUintColumn) Size() (uint32, error)     { return c.Raw.Size() }
-func (c *RuntimeUintColumn) Capacity() (uint32, error) { return c.Raw.Capacity() }
-func (c *RuntimeUintColumn) Shrink(n uint32) error     { return c.Raw.Shrink(n) }
-func (c *RuntimeUintColumn) Finalize() error           { return c.Raw.Finalize() }
-func (c *RuntimeUintColumn) Push(v uint32) error {
-	if e := c.Raw.Open(); e != nil {
-		return e
-	}
-	if c.Raw.Pending != (util.Block{}) {
+func (c *satUintColumn) Bind(r *util.Runtime) { *c = satUintColumn{runtime: r}; c.self = c }
+func (c *satUintColumn) open() error {
+	if c == nil || c.self != c || c.runtime == nil {
 		return ErrSATOwner
 	}
-	n, e := c.Size()
-	if e != nil {
-		return e
+	if c.closed {
+		return arena.ErrClosed
 	}
-	capacity, e := c.Capacity()
-	if e != nil {
-		return e
-	}
-	if n == capacity {
-		if e = c.Raw.ExpandStride(4); e != nil {
-			return e
-		}
-	}
-	if e = WriteRuntimeWord(c.Raw.Runtime, c.Raw.Block, 8+4*uint64(n), v); e != nil {
-		return e
-	}
-	return WriteRuntimeWord(c.Raw.Runtime, c.Raw.Block, 4, n+1)
+	return c.runtime.CheckOpen()
 }
-func (c *RuntimeUintColumn) Read(i uint32) (uint32, error) {
-	if e := c.Raw.Open(); e != nil {
+func (c *satUintColumn) Size() (uint32, error) {
+	if e := c.open(); e != nil {
 		return 0, e
 	}
-	if satStorageSourceDebug {
-		n, e := c.Size()
-		if e != nil {
-			return 0, e
-		}
-		if i >= n {
-			return 0, ErrSATAssertion
-		}
-	}
-	if c.Raw.Block == (util.Block{}) {
-		return 0, arena.ErrBounds
-	}
-	return ReadRuntimeWord(c.Raw.Runtime, c.Raw.Block, 8+4*uint64(i))
+	return uint32(len(c.values)), nil
 }
-func (c *RuntimeUintColumn) Write(i, v uint32) error {
-	if e := c.Raw.Open(); e != nil {
+func (c *satUintColumn) Shrink(n uint32) error {
+	if e := c.open(); e != nil {
 		return e
 	}
-	if satStorageSourceDebug {
-		n, e := c.Size()
-		if e != nil {
-			return e
-		}
-		if i >= n {
+	if uint64(n) > uint64(len(c.values)) {
+		if satStorageSourceDebug {
 			return ErrSATAssertion
 		}
-	}
-	if c.Raw.Block == (util.Block{}) {
 		return arena.ErrBounds
 	}
-	return WriteRuntimeWord(c.Raw.Runtime, c.Raw.Block, 8+4*uint64(i), v)
+	c.values = c.values[:n]
+	return nil
 }
-
-// copyRuntimeColumn implements the source vector copy constructor.
-// Callers bind dst to the same Runtime as src and retain failed-copy roots.
-func copyRuntimeColumn(dst, src *satRuntimeColumn, stride uint32) error {
-	if src.Block == (util.Block{}) {
-		dst.Block = util.Block{}
-		return nil
+func (c *satUintColumn) Finalize() error {
+	if c == nil || c.self != c {
+		return ErrSATOwner
 	}
-	n, e := src.Size()
-	if e != nil {
+	c.values = nil
+	c.closed = true
+	return nil
+}
+func (c *satUintColumn) Push(v uint32) error {
+	if e := c.open(); e != nil {
 		return e
 	}
-	capacity, e := src.Capacity()
-	if e != nil {
-		return e
+	if uint64(len(c.values)) >= uint64(^uint32(0)) {
+		return arena.ErrBounds
 	}
-	h, e := src.Runtime.Allocate(satVectorCopyRequest(capacity, stride, src.Runtime.SizeTBits()))
-	dst.Pending = h
-	if e != nil {
-		return e
+	c.values = append(c.values, v)
+	return nil
+}
+func (c *satUintColumn) Read(i uint32) (uint32, error) {
+	if e := c.open(); e != nil {
+		return 0, e
 	}
-	if e = WriteRuntimeWord(src.Runtime, h, 0, capacity); e != nil {
-		return e
-	}
-	if e = WriteRuntimeWord(src.Runtime, h, 4, n); e != nil {
-		return e
-	}
-	dst.Block = h
-	dst.Pending = util.Block{}
-	for i := uint32(0); i < n; i++ {
-		for k := uint32(0); k < stride; k++ {
-			b, e := src.Runtime.Read(src.Block, 8+uint64(i)*uint64(stride)+uint64(k))
-			if e != nil {
-				return e
-			}
-			if e = dst.Runtime.Write(h, 8+uint64(i)*uint64(stride)+uint64(k), b); e != nil {
-				return e
-			}
+	if uint64(i) >= uint64(len(c.values)) {
+		if satStorageSourceDebug {
+			return 0, ErrSATAssertion
 		}
+		return 0, arena.ErrBounds
+	}
+	return c.values[i], nil
+}
+func (c *satUintColumn) Write(i, v uint32) error {
+	if e := c.open(); e != nil {
+		return e
+	}
+	if uint64(i) >= uint64(len(c.values)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
+		return arena.ErrBounds
+	}
+	c.values[i] = v
+	return nil
+}
+func (c *satUintColumn) copyFrom(src *satUintColumn) error {
+	if e := c.open(); e != nil {
+		return e
+	}
+	if e := src.open(); e != nil {
+		return e
+	}
+	if c.runtime != src.runtime {
+		return ErrSATOwner
+	}
+	if c != src {
+		c.values = append(c.values[:0], src.values...)
 	}
 	return nil
 }
-
-func satVectorCopyRequest(capacity, stride uint32, bits uint8) uint64 {
-	n := uint64(capacity)*uint64(stride) + 8
-	if bits == 32 {
-		return uint64(uint32(n))
+func (c *satUintColumn) resize(n uint32, value uint32) error {
+	if e := c.open(); e != nil {
+		return e
 	}
-	return n
+	if uint64(n) > uint64(^uint(0)>>1) {
+		return arena.ErrBounds
+	}
+	old := len(c.values)
+	if int(n) <= old {
+		c.values = c.values[:n]
+		return nil
+	}
+	c.values = append(c.values, make([]uint32, int(n)-old)...)
+	for i := old; i < len(c.values); i++ {
+		c.values[i] = value
+	}
+	return nil
 }

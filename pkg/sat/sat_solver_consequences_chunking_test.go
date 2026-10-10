@@ -8,7 +8,7 @@ import (
 
 func TestSATConsequenceChunkPruneAndLastDuplicateRemoval(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
-	var model, lambda RuntimeUintColumn
+	var model, lambda satUintColumn
 	model.Bind(s.runtime.memory)
 	lambda.Bind(s.runtime.memory)
 	defer func() { satOK(t, lambda.Finalize()); satOK(t, model.Finalize()) }()
@@ -89,7 +89,7 @@ func TestSATConsequenceChunkUsesActualCheckAndAppendsCore(t *testing.T) {
 // a later model read reaches an absent payload; no prevalidation or repair.
 func TestSATConsequenceChunkPruneReachedGuardPreservesSwapPrefix(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
-	var model, lambda RuntimeUintColumn
+	var model, lambda satUintColumn
 	model.Bind(s.runtime.memory)
 	lambda.Bind(s.runtime.memory)
 	defer func() { satOK(t, lambda.Finalize()); satOK(t, model.Finalize()) }()

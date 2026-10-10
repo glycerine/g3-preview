@@ -276,15 +276,14 @@ func TestSATSolverLemmaMinimizationEmptyAndFirstUIPDebugRoutes(t *testing.T) {
 				t.Fatal(e, s.minimizedLits)
 			}
 		} else {
-			satOK(t, e)
-			if s.minimizedLits != ^uint32(0) {
-				t.Fatal("source sz-j unsigned underflow", s.minimizedLits)
+			if !errors.Is(e, arena.ErrBounds) || s.minimizedLits != 0 {
+				t.Fatal("empty lemma bounds guard before counters", e, s.minimizedLits)
 			}
 		}
 		n, e := s.lemma.Size()
 		satOK(t, e)
 		if n != 0 {
-			t.Fatal("null source shrink release no-op", n)
+			t.Fatal("empty lemma unchanged", n)
 		}
 		e = s.resetLemmaVarMarks()
 		if satStorageSourceDebug {
