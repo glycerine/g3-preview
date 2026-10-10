@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 89.2,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native LP89.2% (7474/8375) verified2026-10-10 at16:04 UTC includes exact dense tails, indexed normalization receipts and floating LU initial factorization/solves. Subsequent focused tests strengthen sparse degeneration and tail-error branches. Complete debug coverage predates sparse basis storage; current focused component evidence is recorded in PORT_STATUS.md. Exact LU orchestration, updates and full solver integration remain open.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. The complete native LP89.2% (7474/8375) snapshot verified2026-10-10 at16:04 UTC predates exact LU orchestration. Current exact/floating LU focused component evidence is recorded in PORT_STATUS.md. Complete debug coverage predates sparse basis storage. Indexed column solves, updates and full solver integration remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -847,7 +847,12 @@
         "pkg/util/lp/lu_state.go",
         "pkg/util/lp/lu_float.go",
         "pkg/util/lp/lu_float_solve.go",
-        "pkg/util/lp/lu_float_test.go"
+        "pkg/util/lp/lu_float_test.go",
+        "pkg/util/lp/lu_exact.go",
+        "pkg/util/lp/lu_exact_factorization.go",
+        "pkg/util/lp/lu_exact_solve.go",
+        "pkg/util/lp/lu_exact_test.go",
+        "pkg/util/lp/lu_exact_failure_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -863,7 +868,12 @@
         "TestLPFloatLUDegenerationAndLifetime",
         "TestLPFloatLUInputFailureAndStoppedSolve",
         "TestLPFloatLUDensityUnsignedAndDropBoundaries",
-        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening",
+        "TestLPExactLUIndependentFactorizationAndSolves",
+        "TestLPExactLUConstructorGuardsAndDegeneration",
+        "TestLPExactLUAllocationFailureCensus",
+        "TestLPExactLULeavesOlderComparisonOwned",
+        "TestLPExactLUBorrowedStoppedSource"
       ]
     },
     {
@@ -879,7 +889,12 @@
         "pkg/util/lp/lu_state.go",
         "pkg/util/lp/lu_float.go",
         "pkg/util/lp/lu_float_solve.go",
-        "pkg/util/lp/lu_float_test.go"
+        "pkg/util/lp/lu_float_test.go",
+        "pkg/util/lp/lu_exact.go",
+        "pkg/util/lp/lu_exact_factorization.go",
+        "pkg/util/lp/lu_exact_solve.go",
+        "pkg/util/lp/lu_exact_test.go",
+        "pkg/util/lp/lu_exact_failure_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -895,7 +910,12 @@
         "TestLPFloatLUDegenerationAndLifetime",
         "TestLPFloatLUInputFailureAndStoppedSolve",
         "TestLPFloatLUDensityUnsignedAndDropBoundaries",
-        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening",
+        "TestLPExactLUIndependentFactorizationAndSolves",
+        "TestLPExactLUConstructorGuardsAndDegeneration",
+        "TestLPExactLUAllocationFailureCensus",
+        "TestLPExactLULeavesOlderComparisonOwned",
+        "TestLPExactLUBorrowedStoppedSource"
       ]
     },
     {
@@ -905,7 +925,12 @@
         "pkg/util/lp/lu_state.go",
         "pkg/util/lp/lu_float.go",
         "pkg/util/lp/lu_float_solve.go",
-        "pkg/util/lp/lu_float_test.go"
+        "pkg/util/lp/lu_float_test.go",
+        "pkg/util/lp/lu_exact.go",
+        "pkg/util/lp/lu_exact_factorization.go",
+        "pkg/util/lp/lu_exact_solve.go",
+        "pkg/util/lp/lu_exact_test.go",
+        "pkg/util/lp/lu_exact_failure_test.go"
       ],
       "tests": [
         "TestLPFloatLUIndependentFactorizationAndSolves",
@@ -915,7 +940,12 @@
         "TestLPFloatLUDegenerationAndLifetime",
         "TestLPFloatLUInputFailureAndStoppedSolve",
         "TestLPFloatLUDensityUnsignedAndDropBoundaries",
-        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening",
+        "TestLPExactLUIndependentFactorizationAndSolves",
+        "TestLPExactLUConstructorGuardsAndDegeneration",
+        "TestLPExactLUAllocationFailureCensus",
+        "TestLPExactLULeavesOlderComparisonOwned",
+        "TestLPExactLUBorrowedStoppedSource"
       ]
     },
     {

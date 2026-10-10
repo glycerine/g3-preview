@@ -11,10 +11,11 @@ code that has not been ported.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
-| Floating initial sparse/dense LU factorization and solves | 180 independent rectangular-source/basis worlds each run sparse and forced-dense; verify tail-product identity and known column/dense-indexed row solutions; two upstream initial-basis fixtures, singular dense prefix, malformed/stopped/closed inputs, strict tiny-pivot/drop, density-wrap and ignored unit-shortening boundaries | Core 81.1% native (99/122), 84.4% debug/checked (103/122); solve orchestration 80.9% (38/47) both. Remaining paths propagate child errors behind valid construction invariants or belong to the other assertion profile; exact orchestration, updates and full upstream driver remain open |
+| Exact scalar/pair initial LU factorization and solves | 56 independent rational matrix worlds run sparse and forced-dense; exact factorization identity and scalar/pair column plus dense/indexed row solutions; 32 pooled/direct refusal campaigns through first success (4,595 native / 8,718 debug refusals), borrowed-source and named-cell census, failed eta/dense publication, precise tiny values, constructor/owner guards and older comparison ownership | Shared coefficient orchestration 83.9% native (115/137), 87.6% debug/checked (120/137); typed owners 87.5% (42/48), all six solve methods 100% (82/82) both. Remaining statements propagate cleanup/child errors behind valid construction invariants or belong to the other assertion profile; updates, indexed column solves and full upstream driver remain open |
+| Floating initial sparse/dense LU factorization and solves | 180 independent rectangular-source/basis worlds each run sparse and forced-dense; verify tail-product identity and known column/dense-indexed row solutions; two upstream initial-basis fixtures, singular dense prefix, malformed/stopped/closed inputs, strict tiny-pivot/drop, density-wrap and ignored unit-shortening boundaries | Core 81.1% native (99/122), 84.4% debug/checked (103/122); solve orchestration 80.9% (38/47) both. Remaining paths propagate child errors behind valid construction invariants or belong to the other assertion profile; updates and full upstream driver remain open |
 | Exact dense scalar/pair tail applications, conjugation and diagnostics | 120 independently factored rational worlds verify five application routes after conjugation; duplicate/hidden/trailing/growth/cancellation behavior, 22 genuine-fraction allocation campaigns, actual pair X-before-Y and index-before-copy failures, stopped caller and debug-view refusal | Scalar applications 190/230 (82.6%) and pair 88/105 (83.8%) in each profile; debug L check 24/26 (92.3%), view 20/21 (95.2%); gaps propagate cleanup/child errors or guard invariant-protected mappings; native L check returns true without debug traversal |
 | Exact dense-block sparse parent publication | 120 independent factorization worlds verify sparse upper and dense lower matrices, reciprocal links and row maxima; staged missing-diagonal/common/cancellation/fill tests, physical refusal campaigns and older comparison ownership | 91.5% (108/118) in native and debug/checked; gaps propagate cleanup/capture errors or guard invariant-protected predicates/mappings |
-| Exact dense-block construction and pivot stages | 120 independent rational elimination worlds checked at every pivot; pooled/direct actual allocation refusals through success, partial L publication, borrowed parent and older comparison ownership; precise tiny coefficients and reached bounds/assertion prefixes | 82.8% native (207/250), 87.2% debug (218/250); gaps propagate child/cleanup errors, guard invariant-protected offsets or belong to the other profile; exact LU orchestration remains open |
+| Exact dense-block construction and pivot stages | 120 independent rational elimination worlds checked at every pivot; pooled/direct actual allocation refusals through success, partial L publication, borrowed parent and older comparison ownership; precise tiny coefficients and reached bounds/assertion prefixes | 82.8% native (207/250), 87.2% debug (218/250); gaps propagate child/cleanup errors, guard invariant-protected offsets or belong to the other profile; remaining LU updates and solver integration remain open |
 | `int_set.h` | Original `test_int_set`; dense swap order, resizing, reached invalid-domain clear prefix, 10,000-step independent map oracle, output/error cases | 100% |
 | Four live `stacked_value.h` scalar types | Original `test_stacked_unsigned`; signed, status and strategy restoration, nested/excess/zero pops, unsigned wrap | 100% |
 | Three concrete `stacked_vector.h` element types | Original `test_stacked_vector` with strengthened assertions; 12,000 operations against independent snapshots, repeated replacements, popped tails, baseline journals and checked scope/index guards | 100% |
@@ -56,12 +57,16 @@ code that has not been ported.
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-The complete native LP run verified at16:04 UTC on2026-10-10 reported
+The complete native LP run verified at16:04 UTC on2026-10-10, before exact LU
+orchestration, reported
 **89.2%** statement coverage (7474/8375 existing Go statements), including exact
 dense tails, indexed normalization receipts and floating initial LU factorization
 and solves; it passed in164.276s. Later focused checks strengthen sparse
 degeneration and tail-error branches. Broader debug/checked LU/matrix integration
-passed in114.852s; floating LU checks and vet pass in both profiles. The latest
+passed in114.852s; floating LU checks and vet pass in both profiles. Subsequent exact/floating LU
+checks passed56.266s native and111.268s combined debug/checked, including
+strengthened arbitrary-precision allocation campaigns; these add exact LU
+orchestration after the full native coverage snapshot. The latest
 full native module suite passed at15:28 UTC, before exact dense applications and
 LU orchestration; its log is
 `/mnt/oldrog/tmp/g3-exact-dense-parent-module-native-final.log`. The last

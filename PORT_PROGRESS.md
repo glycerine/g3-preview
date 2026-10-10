@@ -36337,3 +36337,65 @@ Next: rational/rational and rational/pair LU constructors and solves with exact
 ownership/failure campaigns, followed by indexed column preparation/solves,
 Suhl updates and error-check/refinement orchestration. Scaling, simplex/LAR/MPS
 and remaining upstream tests remain required. The full LP goal stays active.
+
+
+## Exact rational and rational-pair LU initial factorization and solves
+
+Added concrete RationalLU and PairLU owners for the retained mpq/mpq and
+mpq/numeric_pair<mpq> source instances. Both use shared concrete rational
+coefficient pivot/factorization algorithms, with separate typed X permutations
+and tail applications. There is no any-valued algebra or callback adapter.
+Construct Q/R/RWave before U, and only construct subsequent exact work members
+after U completes. Preserve the precise-tableau debug assertion before stats,
+unit-column ignored shortening bool, sparse pivot before density switch,
+conjugation and tail publication order. Exact pivots and solutions below
+floating tolerances remain nonzero. Dense B*y, dense y*B and indexed y*B now
+compose the actual exact child algorithms for both X types.
+
+Each failed constructor returns a closeable partial owner. Completed tail
+prefixes transfer into the actual scalar or pair tail wrappers without numeric
+copies. Unpublished eta and dense blocks retain their separate exact owners;
+LU never captures another child's numerical invocation receipts. Close walks
+published tails forward, then unpublished children, reverse work members, U
+and reverse typed permutations. A refused numerical call freezes ordinary LU
+operations while allowing explicit cleanup; caller RHS, source matrix, settings
+and manager remain borrowed. Exact pair applications own pair arithmetic work
+rather than routing through scalar or universal adapters.
+
+56 independent rational worlds, sizes1..7, run sparse and forced-dense policies
+for both exact types (224 constructors). Independent big.Rat matrix products
+verify tail-product factorization identities and known scalar/pair column plus
+dense/indexed row solutions, including arbitrary-precision RHS and permutations.
+24 forced dense worlds execute. Empty, short/outside/duplicate basis, precise
+tableau profile, zero/dependent singular bases, tiny2^-100 pivots/solutions,
+status/refactor boundaries, stopped/closed guards and failed eta/dense
+publication are checked. Borrowed source values are verified after closing LU.
+
+32 pooled/direct allocation campaigns walk ordinals through first success for
+construction and all three solve routes in both exact types and sparse/dense
+modes:4595 actual native refusals and8718 combined debug/checked refusals, with
+maximum1078 before first success. Distinct large genuine fractions avoid
+cancelling all elimination ratios to inline values; large known solutions force
+physical allocation failures after tail application, in Q/U/R and final parent
+publication too. Every partial cleanup checks unchanged borrowed source values,
+all named live numerical cells, direct objects and pending physical blocks.
+An older refused comparison remains with its actual caller after LU constructor
+failure/Close. A stopped static source rejects before U/work construction and
+its earlier numerical receipt remains source-owned.
+
+Final exact/floating LU checks passed56.266s native and111.268s combined
+g3debug+g3checked. Exact shared coefficient orchestration115/137 (83.9%) native
+and120/137 (87.6%) debug; typed owners42/48 (87.5%) both, with both constructors
+100%; all six exact solve methods82/82 (100%) both. Remaining guards propagate
+cleanup/child failures behind valid construction invariants, reject an exact
+zero diagonal excluded by pivot selection, or belong to the other assertion
+profile. Both vets, source inventory, executable evidence, no-generics and diff
+checks pass. The full native89.2% coverage snapshot at16:04 UTC predates these
+new exact files; the hourly full-module suite was not repeated.
+
+Graph remains64 production packages with unchanged dependency edges and three
+new exact LU production files. LP ledger remains48 partial/62 unported source
+units; no complete LP solver is claimed. Next: indexed entering-column
+preparation/solves for all retained concrete types, Suhl updates and error-check/
+refinement orchestration. Dimension extension, scaling/simplex/LAR/MPS and
+remaining upstream test scenarios continue to be required by the active goal.

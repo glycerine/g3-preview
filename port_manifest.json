@@ -121930,7 +121930,12 @@
         "pkg/util/lp/lu_state.go",
         "pkg/util/lp/lu_float.go",
         "pkg/util/lp/lu_float_solve.go",
-        "pkg/util/lp/lu_float_test.go"
+        "pkg/util/lp/lu_float_test.go",
+        "pkg/util/lp/lu_exact.go",
+        "pkg/util/lp/lu_exact_factorization.go",
+        "pkg/util/lp/lu_exact_solve.go",
+        "pkg/util/lp/lu_exact_test.go",
+        "pkg/util/lp/lu_exact_failure_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -121946,7 +121951,12 @@
         "TestLPFloatLUDegenerationAndLifetime",
         "TestLPFloatLUInputFailureAndStoppedSolve",
         "TestLPFloatLUDensityUnsignedAndDropBoundaries",
-        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening",
+        "TestLPExactLUIndependentFactorizationAndSolves",
+        "TestLPExactLUConstructorGuardsAndDegeneration",
+        "TestLPExactLUAllocationFailureCensus",
+        "TestLPExactLULeavesOlderComparisonOwned",
+        "TestLPExactLUBorrowedStoppedSource"
       ],
       "conditionals": [
         {
@@ -122074,16 +122084,34 @@
             "TestLPFloatLUDensityUnsignedAndDropBoundaries",
             "TestLPFloatLUTinyPivotAndUnitColumnShortening"
           ]
+        },
+        {
+          "name": "retained mpq/mpq and mpq/numeric_pair initial LU construction, shared exact coefficient factorization, typed tail/permutation ownership, dense X column and dense/indexed T row solves",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_exact.go",
+          "go_targets": [
+            "pkg/util/lp/lu_exact_factorization.go",
+            "pkg/util/lp/lu_exact_solve.go"
+          ],
+          "tests": [
+            "TestLPExactLUIndependentFactorizationAndSolves",
+            "TestLPExactLUConstructorGuardsAndDegeneration",
+            "TestLPExactLUAllocationFailureCensus",
+            "TestLPExactLULeavesOlderComparisonOwned",
+            "TestLPExactLUBorrowedStoppedSource"
+          ]
         }
       ],
       "ownership": [
         "Diagonal tail owns coefficient and debug reciprocal in a borrowed manager. Exact construction copies the by-value parameter before its member and destroys the parameter after debug reciprocal construction. Matrix owns only new numerical calls/lexical temporaries; destination owns completed/partial quotient fields. Close releases stopped calls/work, reciprocal then coefficient and roots, preserving caller values. Pair division publishes X before Y. Foreign/stopped indexed destinations reject before tail arithmetic and retain their original receipts.",
-        "FloatLU borrows static source/settings, owns permutations and U, and publishes conjugated eta/dense tails in source order. Failed dense construction/factorization retains the attempted block without publishing it. Close releases floating Go storage; operations after error/Close return explicit stopped/closed errors. Exact numerical LU ownership is not claimed."
+        "FloatLU borrows static source/settings, owns permutations and U, and publishes conjugated eta/dense tails in source order. Failed dense construction/factorization retains the attempted block without publishing it. Close releases floating Go storage; operations after error/Close return explicit stopped/closed errors. Exact numerical LU ownership is not claimed.",
+        "Exact LU borrows static coefficients/settings/manager. Construct Q,R,RWave before U; construct exact work vectors only after U succeeds. Partial U, unpublished eta/dense blocks and completed tail prefixes retain separate child numerical receipts. Typed scalar/pair owners transfer actual coefficient tails without numeric copies, close published tails forward, then unpublished children, work members, U and reverse-order permutations. LU captures no delegated numerical receipts; source/caller older receipts remain independently owned."
       ],
       "deviations": [
-        "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Floating LU initial factorization and dense column/dense-indexed row solves are now implemented; exact LU orchestration, updates, remaining solve/refinement routes and full upstream-driver integration remain open.",
+        "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Floating LU initial factorization and dense column/dense-indexed row solves are now implemented; remaining indexed column/refinement routes, updates and full upstream-driver integration remain open.",
         "240 independent dense-matrix worlds check scalar/pair results and conjugation; literal tests cover tolerance boundaries, negative zero, NaN/infinity, duplicate index erasure, hidden data and dense0/0 vs sparse zero skip. Fourteen pooled/direct campaigns walk real reservation ordinals through first success; warm pooled native constructor copies need no new backing, so no synthetic refusal is claimed. Actual receipts, caller ownership census and pair X-complete/Y-old failure are verified. Selected owner guards adapt Go lifetime/invalid domains; no complete solver or registered upstream-driver credit.",
-        "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Rational and pair LU orchestration, indexed column preparation/solves, Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters."
+        "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Exact initial LU construction/solves are now implemented; indexed column preparation/solves, Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters.",
+        "Retained exact scalar/pair initial LU factorization and dense column/dense-indexed row solves now execute actual source stages. Shared state contains concrete rational coefficient algorithms only; concrete typed pair buffers/tails implement pair X applications. Precise tableaux are rejected at the source debug assertion after member construction; tiny nonzero exact pivots/solutions are never dropped. Indexed entering-column preparation/solves, Suhl updates, refinement/error-check orchestration, dimension extension and full upstream LU driver remain open. No universal algebra adapter or unused template instantiation is added."
       ]
     },
     {
@@ -122101,7 +122129,12 @@
         "pkg/util/lp/lu_state.go",
         "pkg/util/lp/lu_float.go",
         "pkg/util/lp/lu_float_solve.go",
-        "pkg/util/lp/lu_float_test.go"
+        "pkg/util/lp/lu_float_test.go",
+        "pkg/util/lp/lu_exact.go",
+        "pkg/util/lp/lu_exact_factorization.go",
+        "pkg/util/lp/lu_exact_solve.go",
+        "pkg/util/lp/lu_exact_test.go",
+        "pkg/util/lp/lu_exact_failure_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -122117,7 +122150,12 @@
         "TestLPFloatLUDegenerationAndLifetime",
         "TestLPFloatLUInputFailureAndStoppedSolve",
         "TestLPFloatLUDensityUnsignedAndDropBoundaries",
-        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening",
+        "TestLPExactLUIndependentFactorizationAndSolves",
+        "TestLPExactLUConstructorGuardsAndDegeneration",
+        "TestLPExactLUAllocationFailureCensus",
+        "TestLPExactLULeavesOlderComparisonOwned",
+        "TestLPExactLUBorrowedStoppedSource"
       ],
       "conditionals": [
         {
@@ -122405,16 +122443,34 @@
             "TestLPFloatLUDensityUnsignedAndDropBoundaries",
             "TestLPFloatLUTinyPivotAndUnitColumnShortening"
           ]
+        },
+        {
+          "name": "retained mpq/mpq and mpq/numeric_pair initial LU construction, shared exact coefficient factorization, typed tail/permutation ownership, dense X column and dense/indexed T row solves",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_exact.go",
+          "go_targets": [
+            "pkg/util/lp/lu_exact_factorization.go",
+            "pkg/util/lp/lu_exact_solve.go"
+          ],
+          "tests": [
+            "TestLPExactLUIndependentFactorizationAndSolves",
+            "TestLPExactLUConstructorGuardsAndDegeneration",
+            "TestLPExactLUAllocationFailureCensus",
+            "TestLPExactLULeavesOlderComparisonOwned",
+            "TestLPExactLUBorrowedStoppedSource"
+          ]
         }
       ],
       "ownership": [
         "Diagonal tail owns coefficient and debug reciprocal in a borrowed manager. Exact construction copies the by-value parameter before its member and destroys the parameter after debug reciprocal construction. Matrix owns only new numerical calls/lexical temporaries; destination owns completed/partial quotient fields. Close releases stopped calls/work, reciprocal then coefficient and roots, preserving caller values. Pair division publishes X before Y. Foreign/stopped indexed destinations reject before tail arithmetic and retain their original receipts.",
-        "FloatLU borrows static source/settings, owns permutations and U, and publishes conjugated eta/dense tails in source order. Failed dense construction/factorization retains the attempted block without publishing it. Close releases floating Go storage; operations after error/Close return explicit stopped/closed errors. Exact numerical LU ownership is not claimed."
+        "FloatLU borrows static source/settings, owns permutations and U, and publishes conjugated eta/dense tails in source order. Failed dense construction/factorization retains the attempted block without publishing it. Close releases floating Go storage; operations after error/Close return explicit stopped/closed errors. Exact numerical LU ownership is not claimed.",
+        "Exact LU borrows static coefficients/settings/manager. Construct Q,R,RWave before U; construct exact work vectors only after U succeeds. Partial U, unpublished eta/dense blocks and completed tail prefixes retain separate child numerical receipts. Typed scalar/pair owners transfer actual coefficient tails without numeric copies, close published tails forward, then unpublished children, work members, U and reverse-order permutations. LU captures no delegated numerical receipts; source/caller older receipts remain independently owned."
       ],
       "deviations": [
-        "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Floating LU initial factorization and dense column/dense-indexed row solves are now implemented; exact LU orchestration, updates, remaining solve/refinement routes and full upstream-driver integration remain open.",
+        "Concrete FloatDiagonalMatrix/RationalDiagonalMatrix/PairDiagonalMatrix implement the retained LU tail; no universal arithmetic adapter. Sparse right floating cleanup uses strict fixed1e-14, sparse left uses settings, both skip exact zero before division and never insert missing indices. Exact left returns before settings/drop and exact right tests zero only. Debug-only inverse is constructed/cached and copied by Element; dimension/view methods compile only with g3debug. Source copy constructor has no retained caller and is not ported. Floating LU initial factorization and dense column/dense-indexed row solves are now implemented; remaining indexed column/refinement routes, updates and full upstream-driver integration remain open.",
         "240 independent dense-matrix worlds check scalar/pair results and conjugation; literal tests cover tolerance boundaries, negative zero, NaN/infinity, duplicate index erasure, hidden data and dense0/0 vs sparse zero skip. Fourteen pooled/direct campaigns walk real reservation ordinals through first success; warm pooled native constructor copies need no new backing, so no synthetic refusal is claimed. Actual receipts, caller ownership census and pair X-complete/Y-old failure are verified. Selected owner guards adapt Go lifetime/invalid domains; no complete solver or registered upstream-driver credit.",
-        "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Rational and pair LU orchestration, indexed column preparation/solves, Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters."
+        "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Exact initial LU construction/solves are now implemented; indexed column preparation/solves, Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters.",
+        "Retained exact scalar/pair initial LU factorization and dense column/dense-indexed row solves now execute actual source stages. Shared state contains concrete rational coefficient algorithms only; concrete typed pair buffers/tails implement pair X applications. Precise tableaux are rejected at the source debug assertion after member construction; tiny nonzero exact pivots/solutions are never dropped. Indexed entering-column preparation/solves, Suhl updates, refinement/error-check orchestration, dimension extension and full upstream LU driver remain open. No universal algebra adapter or unused template instantiation is added."
       ]
     },
     {
@@ -122426,7 +122482,12 @@
         "pkg/util/lp/lu_state.go",
         "pkg/util/lp/lu_float.go",
         "pkg/util/lp/lu_float_solve.go",
-        "pkg/util/lp/lu_float_test.go"
+        "pkg/util/lp/lu_float_test.go",
+        "pkg/util/lp/lu_exact.go",
+        "pkg/util/lp/lu_exact_factorization.go",
+        "pkg/util/lp/lu_exact_solve.go",
+        "pkg/util/lp/lu_exact_test.go",
+        "pkg/util/lp/lu_exact_failure_test.go"
       ],
       "tests": [
         "TestLPFloatLUIndependentFactorizationAndSolves",
@@ -122436,7 +122497,12 @@
         "TestLPFloatLUDegenerationAndLifetime",
         "TestLPFloatLUInputFailureAndStoppedSolve",
         "TestLPFloatLUDensityUnsignedAndDropBoundaries",
-        "TestLPFloatLUTinyPivotAndUnitColumnShortening"
+        "TestLPFloatLUTinyPivotAndUnitColumnShortening",
+        "TestLPExactLUIndependentFactorizationAndSolves",
+        "TestLPExactLUConstructorGuardsAndDegeneration",
+        "TestLPExactLUAllocationFailureCensus",
+        "TestLPExactLULeavesOlderComparisonOwned",
+        "TestLPExactLUBorrowedStoppedSource"
       ],
       "conditionals": [
         {
@@ -122469,13 +122535,31 @@
             "TestLPFloatLUDensityUnsignedAndDropBoundaries",
             "TestLPFloatLUTinyPivotAndUnitColumnShortening"
           ]
+        },
+        {
+          "name": "retained mpq/mpq and mpq/numeric_pair initial LU construction, shared exact coefficient factorization, typed tail/permutation ownership, dense X column and dense/indexed T row solves",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lu_exact.go",
+          "go_targets": [
+            "pkg/util/lp/lu_exact_factorization.go",
+            "pkg/util/lp/lu_exact_solve.go"
+          ],
+          "tests": [
+            "TestLPExactLUIndependentFactorizationAndSolves",
+            "TestLPExactLUConstructorGuardsAndDegeneration",
+            "TestLPExactLUAllocationFailureCensus",
+            "TestLPExactLULeavesOlderComparisonOwned",
+            "TestLPExactLUBorrowedStoppedSource"
+          ]
         }
       ],
       "ownership": [
-        "FloatLU borrows static source/settings, owns permutations and U, and publishes conjugated eta/dense tails in source order. Failed dense construction/factorization retains the attempted block without publishing it. Close releases floating Go storage; operations after error/Close return explicit stopped/closed errors. Exact numerical LU ownership is not claimed."
+        "FloatLU borrows static source/settings, owns permutations and U, and publishes conjugated eta/dense tails in source order. Failed dense construction/factorization retains the attempted block without publishing it. Close releases floating Go storage; operations after error/Close return explicit stopped/closed errors. Exact numerical LU ownership is not claimed.",
+        "Exact LU borrows static coefficients/settings/manager. Construct Q,R,RWave before U; construct exact work vectors only after U succeeds. Partial U, unpublished eta/dense blocks and completed tail prefixes retain separate child numerical receipts. Typed scalar/pair owners transfer actual coefficient tails without numeric copies, close published tails forward, then unpublished children, work members, U and reverse-order permutations. LU captures no delegated numerical receipts; source/caller older receipts remain independently owned."
       ],
       "deviations": [
-        "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Rational and pair LU orchestration, indexed column preparation/solves, Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters."
+        "Retained double/double initial sparse/dense factorization and dense column/dense-indexed row solves are implemented. Preserve source density unsigned-square wrap, sparse pivot before dense switch, unit-column ignored shortening result, tail conjugation/publication order and strict small-pivot/drop thresholds. Exact initial LU construction/solves are now implemented; indexed column preparation/solves, Suhl updates, refinement orchestration and full upstream LU driver remain open. Native Go floating owners use slices; explicit Close and stopped-operation guards expose partial/error lifetimes without numeric ownership adapters.",
+        "Retained exact scalar/pair initial LU factorization and dense column/dense-indexed row solves now execute actual source stages. Shared state contains concrete rational coefficient algorithms only; concrete typed pair buffers/tails implement pair X applications. Precise tableaux are rejected at the source debug assertion after member construction; tiny nonzero exact pivots/solutions are never dropped. Indexed entering-column preparation/solves, Suhl updates, refinement/error-check orchestration, dimension extension and full upstream LU driver remain open. No universal algebra adapter or unused template instantiation is added."
       ]
     },
     {
