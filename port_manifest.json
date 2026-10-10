@@ -102966,7 +102966,9 @@
         "pkg/util/lp/lu_upstream_test.go",
         "pkg/util/lp/primal_solve_float_test.go",
         "pkg/util/lp/primal_initial_float.go",
-        "pkg/util/lp/primal_initial_float_test.go"
+        "pkg/util/lp/primal_initial_float_test.go",
+        "pkg/util/lp/mps_reader_float.go",
+        "pkg/util/lp/mps_reader_float_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
@@ -103013,7 +103015,16 @@
         "TestLPFloatPrimalInitialIndependentPredicate",
         "TestLPFloatPrimalInitialIEEEAndOutput",
         "TestLPFloatPrimalZeroLowConstructorPublication",
-        "TestLPFloatPrimalInitialMetadataPrefixes"
+        "TestLPFloatPrimalInitialMetadataPrefixes",
+        "TestLPFloatMPSIndependentOptima",
+        "TestLPFloatMPSFileBoundsRangesIntegration",
+        "TestLPFloatMPSAllBoundsAndRanges",
+        "TestLPFloatMPSFixedFieldsAndPublication",
+        "TestLPFloatMPSMalformedAndStreamPrefixes",
+        "TestLPFloatMPSFileReadFailure",
+        "TestLPFloatMPSDiagnosticRefusalCampaigns",
+        "TestLPFloatMPSSourceDomainPrefixes",
+        "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes"
       ],
       "conditionals": [
         {
@@ -103678,6 +103689,22 @@
             "TestLPFloatPrimalInitialMetadataPrefixes",
             "TestLPFloatPrimalSolveOriginalNumericalFixtures"
           ]
+        },
+        {
+          "name": "solve_mps_double retained primal parsing/construction/optimization path with independent fixtures; dual/compare, CLI setup/printing/timing and exact/LAR scenarios remain open",
+          "status": "partial",
+          "go_target": "pkg/util/lp/mps_reader_float.go",
+          "tests": [
+            "TestLPFloatMPSIndependentOptima",
+            "TestLPFloatMPSFileBoundsRangesIntegration",
+            "TestLPFloatMPSAllBoundsAndRanges",
+            "TestLPFloatMPSFixedFieldsAndPublication",
+            "TestLPFloatMPSMalformedAndStreamPrefixes",
+            "TestLPFloatMPSFileReadFailure",
+            "TestLPFloatMPSDiagnosticRefusalCampaigns",
+            "TestLPFloatMPSSourceDomainPrefixes",
+            "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -103692,7 +103719,8 @@
         "Original debug-selected test_small_lu numerical scenario now includes its two-row extension after four replacements, checked against independent original-basis products in native and debug Go profiles. No native upstream debug-driver execution or diagnostic-stream completion is claimed; --test_lu and remaining scenarios stay open.",
         "All four --test_lu mathematical scenarios now execute in Go: small fixture and two-row extension, cyclic-square larger fixture, holes fixture including its replacement and default-random fixture with both replacements. Larger fixtures run source density0.7 plus forced sparse/dense policies and independent basis factorization/known row-column/refined-solve checks. Source global g_rand starts at random_gen default0; independent Go test owner preserves that recurrence and first-row golden draws. Actual command parsing, diagnostic output and whole upstream driver execution remain open; no complete src/test/lp.cpp promotion.",
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
-        "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver."
+        "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver.",
+        "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; exact/dual/LAR creation and complete upstream CLI remain open."
       ]
     },
     {
@@ -124660,9 +124688,22 @@
       "path": "src/util/lp/mps_reader.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/mps_reader_float.go",
+        "pkg/util/lp/mps_reader_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatMPSIndependentOptima",
+        "TestLPFloatMPSFileBoundsRangesIntegration",
+        "TestLPFloatMPSAllBoundsAndRanges",
+        "TestLPFloatMPSFixedFieldsAndPublication",
+        "TestLPFloatMPSMalformedAndStreamPrefixes",
+        "TestLPFloatMPSFileReadFailure",
+        "TestLPFloatMPSDiagnosticRefusalCampaigns",
+        "TestLPFloatMPSSourceDomainPrefixes",
+        "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes"
+      ],
       "assertions": [
         {
           "line": 178,
@@ -124699,9 +124740,50 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Floating MPS file/stream input, NAME/ROWS/COLUMNS/RHS/BOUNDS/RANGES parsing and fixed-column fallbacks",
+          "status": "ported",
+          "go_target": "pkg/util/lp/mps_reader_float.go",
+          "tests": [
+            "TestLPFloatMPSIndependentOptima",
+            "TestLPFloatMPSFileBoundsRangesIntegration",
+            "TestLPFloatMPSAllBoundsAndRanges",
+            "TestLPFloatMPSFixedFieldsAndPublication",
+            "TestLPFloatMPSMalformedAndStreamPrefixes",
+            "TestLPFloatMPSFileReadFailure",
+            "TestLPFloatMPSDiagnosticRefusalCampaigns",
+            "TestLPFloatMPSSourceDomainPrefixes",
+            "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes"
+          ]
+        },
+        {
+          "name": "Floating bound updates, duplicate publication, signed/zero range expansion and primal rows-before-columns construction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/mps_reader_float.go",
+          "tests": [
+            "TestLPFloatMPSIndependentOptima",
+            "TestLPFloatMPSFileBoundsRangesIntegration",
+            "TestLPFloatMPSAllBoundsAndRanges",
+            "TestLPFloatMPSFixedFieldsAndPublication",
+            "TestLPFloatMPSMalformedAndStreamPrefixes",
+            "TestLPFloatMPSFileReadFailure",
+            "TestLPFloatMPSDiagnosticRefusalCampaigns",
+            "TestLPFloatMPSSourceDomainPrefixes",
+            "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes"
+          ]
+        },
+        {
+          "name": "Exact MPS values, dual solver creation, LAR variable/constraint construction and full upstream CLI scenarios",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Native Go strings/bufio/strconv and insertion-ordered dictionaries replace STL streams/containers and libc numeric conversion. ASCII space/tab token/trim rules, fixed-field 8-byte row names/25-byte stride and column continuation preserve project parsing. Numeric tokens use Go ParseFloat on the first field; malformed libc atof prefix grammar is not emulated. Native writer errors and real file errors return reached publication prefixes; EOF retains source two-count line increment. Non-advancing ROWS header loop returns ErrMPSStalled, bare throw/undefined token domains become explicit errors. Source MI retains default lower flag, marker line still registers a column, LIMITMAX source shift assertion and zero/negative/IEEE range transformations are preserved. Dictionary insertion order defines deterministic replacement/source unordered traversal; partial constructed solvers are returned for cleanup. Native owner/file Close replaces source stream/container destruction. Dead string utility adapters and unused solver_row_count/range_count helpers are excluded; exact/dual/LAR creation and complete upstream CLI remain open."
+      ]
     },
     {
       "path": "src/util/lp/numeric_pair.h",

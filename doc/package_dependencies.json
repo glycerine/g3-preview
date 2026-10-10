@@ -1208,6 +1208,7 @@
         "lu_state.go",
         "lu_update_exact.go",
         "lu_update_float.go",
+        "mps_reader_float.go",
         "numeric_pair.go",
         "pair_priority_queue.go",
         "pair_queue_index.go",

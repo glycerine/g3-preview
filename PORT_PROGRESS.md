@@ -37491,3 +37491,55 @@ no-generics verifier pass. LP remains66 partial/44 unported. Last native full
 module snapshot is20:03 UTC90.0%, predating these additions. Graph regeneration
 adds the production file without changing imports. Exact/tableau, dual, full
 LAR/parser and complete original driver scope remains unfinished.
+
+
+### Floating MPS parser and actual primal consumer — 2026-10-10
+
+Ported the retained double mps_reader.h input-to-primal path: native file/
+buffered stream ownership, NAME/ROWS/COLUMNS/RHS/BOUNDS/RANGES, fixed-field
+fallbacks, all retained bound forms, range row construction and actual
+rows-before-columns primal creation. Native strings, bufio, strconv and
+insertion-ordered dictionaries replace STL/libc machinery. Float conversion
+uses Go ParseFloat on the first field and accepts range-result infinities;
+libc malformed prefix grammar is not emulated. Missing file open remains
+unobserved until Read, EOF has the source two-increment line count, and
+real file/writer failures preserve reached publication prefixes.
+
+Preserved project quirks: MI retains the default zero lower flag; marker
+records still register a named column; blank column fields continue the
+previous name; duplicates replace coefficients/rows; fixed names have8-byte
+width and25-byte pair stride; LIMITMAX reaches the literal source shift
+assertion in debug. Signed, zero, NaN and infinite ranges retain source
+relation/RHS/clone publication. The non-advancing ROWS header loop becomes
+ErrMPSStalled rather than spinning; bare throws/undefined index domains
+reach explicit guards. Dead string wrappers and unused row-count helpers
+are excluded. Exact, dual and LAR reader consumers remain open.
+
+120 independently generated MPS models parse, construct actual LU primal
+solvers and match dense vertex-enumeration maxima, with original equation/
+nonnegative and named-feasibility checks. Stored test_vectors/mps_small.mps
+adds fixed costs/columns, explicit bounds and range inequalities, optimum24
+at x=2,y=4,f=2. An unranged equality/greater-than model independently reaches
+optimum16. Tests cover all bounds, both section orders, range collisions,
+embedded-space fixed fields, continuation/marker/duplicate prefixes,
+missing metadata, real closed-file errors, malformed native numbers, source
+operator[] publication and diagnostic refusal campaigns through success.
+
+Focused native core/primal/MPS/presolve/solver/column/scaler/static/LU checks
+pass0.956s; combined debug/checked1.024s. Final additional MPS-only checks
+pass0.045s native/0.048s debug. Current reader353/376 (93.9%) native,
+356/376 (94.7%) debug; remaining gaps mostly propagate writer/host errors,
+include opposite-profile guards, and NewSettings child failure under fresh
+constructor invariants. Profiles: /mnt/oldrog/tmp/g3-mps-{native,debug}.cover.
+Both LP vets and source/evidence/no-generics verifier pass. MPS source unit
+becomes partial:LP67 partial/43 unported; global62 ported/348 partial/1665
+unported/two dead-deleted. Reproducible graph adds the new production file
+without new dependency edges.
+
+Hourly native full module suite passed at21:11 UTC:LP324.009s,89.6%
+(11189/12482). Other unchanged packages reused valid test cache entries.
+Log/profile: /mnt/oldrog/tmp/g3-mps-module-native.{log,cover}. This snapshot
+was launched before final MPS diagnostic/metadata strengthening and NAME
+state publication correction; final focused profiles and vets cover current
+code. No immediate full-suite repeat is needed. Complete source port and
+upstream CLI, exact/tableau/dual/LAR integration remain unfinished.
