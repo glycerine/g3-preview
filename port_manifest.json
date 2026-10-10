@@ -118686,12 +118686,17 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/sparse_matrix_float.go"
+        "pkg/util/lp/sparse_matrix_float.go",
+        "pkg/util/lp/sparse_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
         "TestLPFloatSparseBasisIndependentOracle",
-        "TestLPFloatSparseBasisLiteralStops"
+        "TestLPFloatSparseBasisLiteralStops",
+        "TestLPExactSparseBasisIndependentOracle",
+        "TestLPExactSparseBasisAllocationFailureCensus",
+        "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -118715,13 +118720,26 @@
             "TestLPFloatSparseBasisIndependentOracle",
             "TestLPFloatSparseBasisLiteralStops"
           ]
+        },
+        {
+          "name": "retained mpq coefficient basis construction, six reached owning copies per coordinate, reciprocal offsets, first-match borrowed queries and permutation-adjusted lowest row/swaps",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact.go",
+          "tests": [
+            "TestLPExactSparseBasisIndependentOracle",
+            "TestLPExactSparseBasisAllocationFailureCensus",
+            "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+            "TestLPExactSparseBasisLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently."
+        "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently.",
+        "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned."
       ],
       "deviations": [
-        "Only retained floating basis storage and queries are implemented. Exact rational storage, sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage."
+        "Only retained floating basis storage and queries are implemented. Sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
+        "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added."
       ]
     },
     {
@@ -123378,12 +123396,17 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/sparse_matrix_float.go"
+        "pkg/util/lp/sparse_matrix_float.go",
+        "pkg/util/lp/sparse_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
         "TestLPFloatSparseBasisIndependentOracle",
-        "TestLPFloatSparseBasisLiteralStops"
+        "TestLPFloatSparseBasisLiteralStops",
+        "TestLPExactSparseBasisIndependentOracle",
+        "TestLPExactSparseBasisAllocationFailureCensus",
+        "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -123461,13 +123484,26 @@
             "TestLPFloatSparseBasisIndependentOracle",
             "TestLPFloatSparseBasisLiteralStops"
           ]
+        },
+        {
+          "name": "retained mpq coefficient basis construction, six reached owning copies per coordinate, reciprocal offsets, first-match borrowed queries and permutation-adjusted lowest row/swaps",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact.go",
+          "tests": [
+            "TestLPExactSparseBasisIndependentOracle",
+            "TestLPExactSparseBasisAllocationFailureCensus",
+            "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+            "TestLPExactSparseBasisLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently."
+        "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently.",
+        "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned."
       ],
       "deviations": [
-        "Only retained floating basis storage and queries are implemented. Exact rational storage, sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage."
+        "Only retained floating basis storage and queries are implemented. Sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
+        "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added."
       ]
     },
     {
@@ -123476,12 +123512,17 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/sparse_matrix_float.go"
+        "pkg/util/lp/sparse_matrix_float.go",
+        "pkg/util/lp/sparse_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
         "TestLPFloatSparseBasisIndependentOracle",
-        "TestLPFloatSparseBasisLiteralStops"
+        "TestLPFloatSparseBasisLiteralStops",
+        "TestLPExactSparseBasisIndependentOracle",
+        "TestLPExactSparseBasisAllocationFailureCensus",
+        "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -123743,13 +123784,26 @@
             "TestLPFloatSparseBasisIndependentOracle",
             "TestLPFloatSparseBasisLiteralStops"
           ]
+        },
+        {
+          "name": "retained mpq coefficient basis construction, six reached owning copies per coordinate, reciprocal offsets, first-match borrowed queries and permutation-adjusted lowest row/swaps",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact.go",
+          "tests": [
+            "TestLPExactSparseBasisIndependentOracle",
+            "TestLPExactSparseBasisAllocationFailureCensus",
+            "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+            "TestLPExactSparseBasisLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently."
+        "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently.",
+        "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned."
       ],
       "deviations": [
-        "Only retained floating basis storage and queries are implemented. Exact rational storage, sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage."
+        "Only retained floating basis storage and queries are implemented. Sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
+        "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added."
       ]
     },
     {
@@ -123758,12 +123812,17 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/sparse_matrix_float.go"
+        "pkg/util/lp/sparse_matrix_float.go",
+        "pkg/util/lp/sparse_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
         "TestLPFloatSparseBasisIndependentOracle",
-        "TestLPFloatSparseBasisLiteralStops"
+        "TestLPFloatSparseBasisLiteralStops",
+        "TestLPExactSparseBasisIndependentOracle",
+        "TestLPExactSparseBasisAllocationFailureCensus",
+        "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -123787,13 +123846,26 @@
             "TestLPFloatSparseBasisIndependentOracle",
             "TestLPFloatSparseBasisLiteralStops"
           ]
+        },
+        {
+          "name": "retained mpq coefficient basis construction, six reached owning copies per coordinate, reciprocal offsets, first-match borrowed queries and permutation-adjusted lowest row/swaps",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact.go",
+          "tests": [
+            "TestLPExactSparseBasisIndependentOracle",
+            "TestLPExactSparseBasisAllocationFailureCensus",
+            "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+            "TestLPExactSparseBasisLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently."
+        "Native typed row and column slices each own their floating coefficient. Both reciprocal offsets are captured before column-then-row publication; active count increments after both. Construction retains completed descending-column prefix on invalid input and preserves duplicates and explicit zeros. Permutations, pivot queue, processed flags and -1 pivot workspace initialize independently.",
+        "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned."
       ],
       "deviations": [
-        "Only retained floating basis storage and queries are implemented. Exact rational storage, sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage."
+        "Only retained floating basis storage and queries are implemented. Sparse mutation/elimination, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
+        "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added."
       ]
     },
     {

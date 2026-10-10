@@ -35549,3 +35549,45 @@ storage, sparse elimination, Markovitz selection, LU and solver integration rema
 required. Four newly reached source units are partial: LP42 partial/68 unported;
 repository62 ported/323 partial/1689 unported/two dead-deleted. This checkpoint
 also records the preceding term/fill source-ledger changes omitted from5e48841d.
+
+## Exact sparse basis coefficient storage
+
+Added the concrete mpq coefficient owner shared by the retained rational/rational
+and rational/pair sparse basis instances. Construction traverses selected static
+columns in descending basis order, captures reciprocal offsets before copying,
+and publishes column then row with the active count following both. Each direction
+owns actual indexed_value argument/member/stored copies; the argument is retained
+through its full expression and temporary/argument values are destroyed after
+publication. Native slice relocation transfers existing numeral ownership without
+emulating vector capacity copies. Close cleans newly owned numeric calls and
+lexical values, then columns before rows in ascending source vector order.
+
+Queries borrow the first matching coefficient or initialized zero; permutations
+retain forward row/reverse column semantics. Pending owners reject queries/swaps.
+Partial construction remains owned by its nonnil return; borrowed stopped static
+sources are rejected before construction, and older stopped comparison generations
+remain caller-owned. No numeric-pair matrix adapter or universal callbacks were
+added; pair right-hand sides remain future concrete solve work.
+
+Tests cover120 independent arbitrary-precision worlds with zeros/duplicate entries
+and basis columns,12 permutation rounds each, exact backlink/index ordering,
+first-match queries, source destruction independence and a named owning-cell/direct
+object census for source plus both sparse directions. Two actual physical refusal
+campaigns walk through first success and require column-only publication stops and
+real numerical receipts; every failure cleans through owning Close and preserves
+the source. Bounds fixtures retain actual reverse-column copy prefixes. A separate
+real comparison refusal verifies older-generation identity through construction,
+queries and cleanup. Focused native4.786s/debug-checked5.154s pass with114/121
+statements (94.2%) in both profiles. Remaining statements propagate cleanup errors
+or guard fresh constructor state; no corrupt numeral handles were manufactured for
+coverage. LP vet passes. Source counts stay42 partial/68 unported; exact sparse
+mutation/elimination, LU, scaling and complete primal/dual/LAR solvers remain open.
+
+Full native LP regression passes112.211s at90.3% statement coverage. Final combined
+sparse focused suites pass native4.908s/debug-checked5.090s after strengthening
+the older-comparison fixture to use real1000-digit coefficient copies. Exact
+sparse component remains94.2% and floating sparse component100% in both profiles.
+The last full debug/checked percentage predates sparse storage and is explicitly
+identified as such; no focused coverage is presented as whole-source coverage.
+LP vet, source ledger,64-package graph regeneration and diff checks pass. No graph
+edges changed, and no redundant full native module suite was run.

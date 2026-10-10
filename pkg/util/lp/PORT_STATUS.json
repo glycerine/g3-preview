@@ -1,8 +1,8 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 90.1,
-  "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
+  "native_statement_coverage_of_current_go_code": 90.3,
+  "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms. Native complete LP coverage includes exact sparse basis storage; the last complete debug/checked percentage predates sparse basis storage, whose focused debug/checked coverage is recorded in PORT_STATUS.md.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -345,12 +345,17 @@
       "source": "src/util/lp/indexed_value.h",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/sparse_matrix_float.go"
+        "pkg/util/lp/sparse_matrix_float.go",
+        "pkg/util/lp/sparse_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
         "TestLPFloatSparseBasisIndependentOracle",
-        "TestLPFloatSparseBasisLiteralStops"
+        "TestLPFloatSparseBasisLiteralStops",
+        "TestLPExactSparseBasisIndependentOracle",
+        "TestLPExactSparseBasisAllocationFailureCensus",
+        "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
       ]
     },
     {
@@ -1099,36 +1104,51 @@
       "source": "src/util/lp/sparse_matrix.h",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/sparse_matrix_float.go"
+        "pkg/util/lp/sparse_matrix_float.go",
+        "pkg/util/lp/sparse_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
         "TestLPFloatSparseBasisIndependentOracle",
-        "TestLPFloatSparseBasisLiteralStops"
+        "TestLPFloatSparseBasisLiteralStops",
+        "TestLPExactSparseBasisIndependentOracle",
+        "TestLPExactSparseBasisAllocationFailureCensus",
+        "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
       ]
     },
     {
       "source": "src/util/lp/sparse_matrix.hpp",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/sparse_matrix_float.go"
+        "pkg/util/lp/sparse_matrix_float.go",
+        "pkg/util/lp/sparse_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
         "TestLPFloatSparseBasisIndependentOracle",
-        "TestLPFloatSparseBasisLiteralStops"
+        "TestLPFloatSparseBasisLiteralStops",
+        "TestLPExactSparseBasisIndependentOracle",
+        "TestLPExactSparseBasisAllocationFailureCensus",
+        "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
       ]
     },
     {
       "source": "src/util/lp/sparse_matrix_instances.cpp",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/sparse_matrix_float.go"
+        "pkg/util/lp/sparse_matrix_float.go",
+        "pkg/util/lp/sparse_matrix_exact.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
         "TestLPFloatSparseBasisIndependentOracle",
-        "TestLPFloatSparseBasisLiteralStops"
+        "TestLPFloatSparseBasisLiteralStops",
+        "TestLPExactSparseBasisIndependentOracle",
+        "TestLPExactSparseBasisAllocationFailureCensus",
+        "TestLPExactSparseBasisBoundsAndBorrowedOwner",
+        "TestLPExactSparseBasisLeavesOlderComparisonOwned"
       ]
     },
     {
