@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 )
 
 // MPQInf is the source rational pair. Initialize with NewMPQInf and never
@@ -238,7 +239,7 @@ func (p *MPQInfManager) Hash(a *MPQInf) (h uint32, e error) {
 		return
 	}
 	second, e := p.m.Hash(&a.Second)
-	return UintPair(first, second), e
+	return uhash.UintPair(first, second), e
 }
 func (p *MPQInfManager) IsInt(a *MPQInf) (yes bool, e error) {
 	if e = p.begin(a); e != nil {

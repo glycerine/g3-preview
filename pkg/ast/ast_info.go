@@ -6,7 +6,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 )
 
 func (m *ASTManager) info(slot, generation uint32) (*astInfoRecord, error) {
@@ -256,7 +256,7 @@ func (m *ASTManager) infoHash(slot, generation uint32) (uint32, error) {
 	var childErr error
 	c := uint32(0)
 	if r.count != 0 {
-		c = util.Composite(17, r.count, func(i uint32) uint32 {
+		c = uhash.Composite(17, r.count, func(i uint32) uint32 {
 			p, x := m.infoParameter(r, i)
 			if x != nil {
 				childErr = x
@@ -272,7 +272,7 @@ func (m *ASTManager) infoHash(slot, generation uint32) (uint32, error) {
 	if childErr != nil {
 		return 0, childErr
 	}
-	return util.Mix(uint32(r.family), uint32(r.kind), c), nil
+	return uhash.Mix(uint32(r.family), uint32(r.kind), c), nil
 }
 func astFuncFlagsEqual(a, b ASTFuncFlags) bool {
 	return a.LeftAssociative == b.LeftAssociative && a.RightAssociative == b.RightAssociative && a.FlatAssociative == b.FlatAssociative && a.Commutative == b.Commutative && a.Chainable == b.Chainable && a.Pairwise == b.Pairwise && a.Injective == b.Injective && a.Skolem == b.Skolem

@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 )
 
 func mpqInfFixture(t *testing.T, sync bool) (*MPQInfManager, *arena.Budget) {
@@ -296,7 +297,7 @@ func TestMPQInfScalarKindsSettersAndUnaryBranches(t *testing.T) {
 		serviceMust(t, e)
 		h2, e := p.m.Hash(&y.Second)
 		serviceMust(t, e)
-		if h != UintPair(h1, h2) {
+		if h != uhash.UintPair(h1, h2) {
 			t.Fatal("combined source hashes")
 		}
 		serviceMust(t, p.Reset(&x))

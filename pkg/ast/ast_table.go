@@ -71,36 +71,3 @@ func (m *ASTManager) tableEraseCaptured(key astNodeRef, hash uint32) error {
 	}
 	return ErrASTHandle
 }
-
-// Full three-register macro state is needed for successive source array
-// triples; util.Mix exports only its final c register.
-func astMix(a, b, c uint32) (uint32, uint32, uint32) {
-	a -= b
-	a -= c
-	a ^= c >> 13
-	b -= c
-	b -= a
-	b ^= a << 8
-	c -= a
-	c -= b
-	c ^= b >> 13
-	a -= b
-	a -= c
-	a ^= c >> 12
-	b -= c
-	b -= a
-	b ^= a << 16
-	c -= a
-	c -= b
-	c ^= b >> 5
-	a -= b
-	a -= c
-	a ^= c >> 3
-	b -= c
-	b -= a
-	b ^= a << 10
-	c -= a
-	c -= b
-	c ^= b >> 15
-	return a, b, c
-}

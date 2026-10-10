@@ -3,7 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 	"sort"
 )
 
@@ -54,7 +54,7 @@ func (m *MonomialManager) renameObject(a Monomial, xs []uint32) error {
 		}
 	}
 	var problem error
-	hash := util.WordReader(n*8, 11, func(i uint32) uint32 {
+	hash := uhash.WordReader(n*8, 11, func(i uint32) uint32 {
 		l, e := m.location(a)
 		if e != nil {
 			problem = e

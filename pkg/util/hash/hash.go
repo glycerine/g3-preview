@@ -1,5 +1,5 @@
 // Translation of src/util/hash.h and hash.cpp
-package util
+package hash
 
 import (
 	"encoding/binary"
@@ -32,7 +32,9 @@ func Combine(h1, h2 uint32) uint32 {
 	return h2
 }
 func UintPair(a, b uint32) uint32 { return Combine(Uint(a), Uint(b)) }
-func mix(a, b, c uint32) (uint32, uint32, uint32) {
+
+// MixState preserves all three words after one source mixing round.
+func MixState(a, b, c uint32) (uint32, uint32, uint32) {
 	a -= b
 	a -= c
 	a ^= c >> 13
@@ -62,7 +64,7 @@ func mix(a, b, c uint32) (uint32, uint32, uint32) {
 	c ^= b >> 15
 	return a, b, c
 }
-func Mix(a, b, c uint32) uint32 { _, _, c = mix(a, b, c); return c }
+func Mix(a, b, c uint32) uint32 { _, _, c = MixState(a, b, c); return c }
 
 // String preserves source baseline little-endian word loads and signed-char tails.
 // Embedded NULs participate in the hash.
@@ -92,7 +94,7 @@ func hashBytes(n, init uint32, word, character func(uint32) uint32) uint32 {
 		a += word(i)
 		b += word(i + 4)
 		c += word(i + 8)
-		a, b, c = mix(a, b, c)
+		a, b, c = MixState(a, b, c)
 		i += 12
 	}
 	c += n
@@ -130,7 +132,7 @@ func Composite(kind, n uint32, child func(uint32) uint32) uint32 {
 		a += child(0)
 		b += child(1)
 		c += child(2)
-		a, b, c = mix(a, b, c)
+		a, b, c = MixState(a, b, c)
 		a += kind
 		return Mix(a, b, c)
 	}
@@ -141,7 +143,7 @@ func Composite(kind, n uint32, child func(uint32) uint32) uint32 {
 		b += child(n)
 		n--
 		c += child(n)
-		a, b, c = mix(a, b, c)
+		a, b, c = MixState(a, b, c)
 	}
 	a += kind
 	if n == 2 {

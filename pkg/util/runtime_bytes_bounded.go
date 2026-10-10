@@ -3,6 +3,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 )
 
 // Concrete call-local readers own no storage. The inline variant addresses the
@@ -96,7 +97,7 @@ func runtimeHashBytes(s runtimeHashSource, n, seed uint32) (uint32, error) {
 			return 0, e
 		}
 		c += x
-		a, b, c = mix(a, b, c)
+		a, b, c = uhash.MixState(a, b, c)
 		i += 12
 	}
 	c += n
@@ -115,5 +116,5 @@ func runtimeHashBytes(s runtimeHashSource, n, seed uint32) (uint32, error) {
 			c += v << ((j - 7) * 8)
 		}
 	}
-	return Mix(a, b, c), nil
+	return uhash.Mix(a, b, c), nil
 }

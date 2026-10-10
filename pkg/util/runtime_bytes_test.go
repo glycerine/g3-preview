@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 )
 
 func TestRuntimeBytesSourceLengthAndSignedTail(t *testing.T) {
@@ -30,8 +31,8 @@ func TestRuntimeBytesSourceLengthAndSignedTail(t *testing.T) {
 		if e != nil {
 			t.Fatal(e)
 		}
-		if got != String(string(s), 17) {
-			t.Fatal(n, got, String(string(s), 17))
+		if got != uhash.String(string(s), 17) {
+			t.Fatal(n, got, uhash.String(string(s), 17))
 		}
 	}
 	if e = r.Deallocate(&raw); e != nil {

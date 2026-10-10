@@ -3,7 +3,7 @@ package ast
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 )
 
 func astHashArray(n, init uint32, hash func(uint32) uint32) uint32 {
@@ -11,11 +11,11 @@ func astHashArray(n, init uint32, hash func(uint32) uint32) uint32 {
 	case 0:
 		return init
 	case 1:
-		return util.Combine(hash(0), init)
+		return uhash.Combine(hash(0), init)
 	case 2:
-		return util.Combine(util.Combine(hash(0), hash(1)), init)
+		return uhash.Combine(uhash.Combine(hash(0), hash(1)), init)
 	case 3:
-		return util.Combine(util.Combine(hash(0), hash(1)), util.Combine(hash(2), init))
+		return uhash.Combine(uhash.Combine(hash(0), hash(1)), uhash.Combine(hash(2), init))
 	}
 	a, b, c := uint32(0x9e3779b9), uint32(0x9e3779b9), init
 	for n >= 3 {
@@ -25,7 +25,7 @@ func astHashArray(n, init uint32, hash func(uint32) uint32) uint32 {
 		b += hash(n)
 		n--
 		c += hash(n)
-		a, b, c = astMix(a, b, c)
+		a, b, c = uhash.MixState(a, b, c)
 	}
 	if n == 2 {
 		b += hash(1)
@@ -33,7 +33,7 @@ func astHashArray(n, init uint32, hash func(uint32) uint32) uint32 {
 	if n >= 1 {
 		c += hash(0)
 	}
-	return util.Mix(a, b, c)
+	return uhash.Mix(a, b, c)
 }
 func (m *ASTManager) hashPayload(p arena.SmallBytesRef, count, init uint32) (uint32, error) {
 	var err error
@@ -67,7 +67,7 @@ func (m *ASTManager) nodeHash(r astNodeRef) (uint32, error) {
 			return h, nil
 		}
 		ih, e := m.infoHash(v.info.slot, v.info.generation)
-		return util.Combine(h, ih), e
+		return uhash.Combine(h, ih), e
 	case ASTFuncDecl:
 		v := m.declAt(r.slot)
 		h, e := m.Symbols.Hash(v.name)
@@ -79,7 +79,7 @@ func (m *ASTManager) nodeHash(r astNodeRef) (uint32, error) {
 			if e != nil {
 				return 0, e
 			}
-			h = util.Combine(h, ih)
+			h = uhash.Combine(h, ih)
 		}
 		return m.hashPayload(v.domain, v.arity, h)
 	case ASTApp:
@@ -93,7 +93,7 @@ func (m *ASTManager) nodeHash(r astNodeRef) (uint32, error) {
 		if e := m.validNode(v.sort); e != nil {
 			return 0, e
 		}
-		return util.Combine(v.index, m.nodeAt(v.sort.slot).hash), nil
+		return uhash.Combine(v.index, m.nodeAt(v.sort.slot).hash), nil
 	case ASTQuantifier:
 		v := m.quantifierAt(r.slot)
 		init := uint32(19)
@@ -107,7 +107,7 @@ func (m *ASTManager) nodeHash(r astNodeRef) (uint32, error) {
 		if e = m.validNode(v.body); e != nil {
 			return 0, e
 		}
-		return util.Mix(a, v.patternCount, m.nodeAt(v.body.slot).hash), nil
+		return uhash.Mix(a, v.patternCount, m.nodeAt(v.body.slot).hash), nil
 	}
 	return 0, ErrASTDomain
 }

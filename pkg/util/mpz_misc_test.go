@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 	"math"
 	"math/big"
 	"math/rand"
@@ -221,7 +222,7 @@ func TestIntegerScalarHashRepresentation(t *testing.T) {
 		}
 		want := digits[0]
 		if n > 1 {
-			want = String(string(bytes), 17)
+			want = uhash.String(string(bytes), 17)
 		}
 		for sign := 0; sign < 2; sign++ {
 			got, e := m.Hash(&a)

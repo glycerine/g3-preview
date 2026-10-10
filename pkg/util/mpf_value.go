@@ -4,6 +4,7 @@ package util
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 )
 
 // ArbitraryFloat is the actual pointer-free MPF numeral. An initialized BIG
@@ -61,12 +62,12 @@ func (m *ArbitraryFloatManager) Hash(a *ArbitraryFloat) (uint32, error) {
 	if e != nil {
 		return 0, e
 	}
-	v := NewInt(int32(Uint64(uint64(a.exponent))))
+	v := NewInt(int32(uhash.Uint64(uint64(a.exponent))))
 	k, e := m.integer.Hash(&v)
 	if e != nil {
 		return 0, e
 	}
-	return UintPair(h, k), nil
+	return uhash.UintPair(h, k), nil
 }
 
 // EqCore preserves each source short circuit. A different format or sign does

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 )
 
 func TestArbitraryFloatValueGeometryStructuralEqualityAndHash(t *testing.T) {
@@ -32,7 +33,7 @@ func TestArbitraryFloatValueGeometryStructuralEqualityAndHash(t *testing.T) {
 		serviceMust(t, e)
 		hc, e := m.Hash(&c)
 		serviceMust(t, e)
-		want := UintPair(1, Uint64(uint64(exponent)))
+		want := uhash.UintPair(1, uhash.Uint64(uint64(exponent)))
 		if ha != want || hc != want {
 			t.Fatal(exponent, ha, hc, want)
 		}

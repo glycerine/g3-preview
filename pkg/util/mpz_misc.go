@@ -1,6 +1,8 @@
 // Scalar inspection from src/util/mpz.h/.cpp, internal 32-bit digit baseline.
 package util
 
+import uhash "github.com/glycerine/g3/pkg/util/hash"
+
 func (m *IntegerManager) Precise() bool { return true }
 func (m *IntegerManager) Field() bool   { return false }
 
@@ -113,7 +115,7 @@ func (m *IntegerManager) Hash(a *Int) (uint32, error) {
 	if size == 1 {
 		return m.Digit(a.Cell, 0), nil
 	}
-	return WordReader(size*4, 17, func(i uint32) uint32 { return m.Digit(a.Cell, i) }), nil
+	return uhash.WordReader(size*4, 17, func(i uint32) uint32 { return m.Digit(a.Cell, i) }), nil
 }
 
 // PowerOfTwoMultiple follows the source repeated divisibility checks. Zero has

@@ -34497,3 +34497,40 @@ Module-wide compilation, AST/tactic vet, manifest and diff checks passed. No
 full native module rerun within the hourly interval. Root util still has286
 production files and43 dependency components; internal private boundaries and
 the requested complete subpackage split remain unfinished.
+
+## Extract independent util/hash package
+
+Moved hash.go, its golden tests and source_hash.json into util/hash with no
+root util compatibility aliases. Compiler-resolved local references and direct
+AST/polynomial imports now use the new package. Numerical hash algorithms keep
+the same words, seeds and source callback order. The new package imports only
+encoding/binary and has no dependency on root util, runtime or numeral owners.
+
+MixState exposes the existing three-word source mixing round required by actual
+runtime-backed byte readers and AST array hashing. Those callers retain their
+real storage/read order. AST and symbol duplicate mix/string-hash bodies now
+use this common implementation; no unused template or adapter was introduced.
+Golden vectors remain in test_vectors, alongside the package that embeds them.
+Manifest paths and ownership notes follow the new package; counts remain2102
+units/677 APIs:62 ported,281 partial,1731 unported,two dead/deleted.
+
+The private-boundary grouping audit now includes cycles introduced by merging
+components: preserving every private access by grouping alone recreates a255-file
+numeral/parameter/string component. That is not the requested useful split.
+A16-file runtime/allocator/accounting component has no outgoing root-file
+dependencies and is a candidate for extraction, with mixed test/helper ownership
+still requiring audit. Root util now has285 production files; all remaining
+files must still move into meaningful subpackages after boundary resolution.
+
+Validation correction: recent resumed-work reports of debug checks used
+-tags debug, which does not enable this repository's source debug branches.
+The correct tag is g3debug. Full current AST and tactic suites now passed with
+-tags g3debug (20.565s/0.022s), covering the migrated goal ownership and adapter
+removals as well as this extraction. Correct g3debug hash/symbol/root util hash
+checks passed (0.004s/0.004s/2.068s).
+
+Native hash/symbol/root util focused hash/runtime/MPQInf checks passed
+(0.003s/0.003s/2.668s). Full native AST and polynomial passed
+(18.806s/31.652s). Module-wide compilation, hash/symbol/AST/polynomial vet,
+manifest and diff checks passed. Import audit verifies util/hash only imports
+encoding/binary. No full native module rerun within the hourly interval.

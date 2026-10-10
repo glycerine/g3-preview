@@ -3,7 +3,7 @@ package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 )
 
 const monomialHeaderBytes uint64 = 20
@@ -61,7 +61,7 @@ func (m *MonomialManager) tempInit(t *monomialTemp, p []MonomialPower) error {
 }
 
 func (m *MonomialManager) tempHash(t *monomialTemp) (uint32, error) {
-	t.hash = util.WordReader(uint32(len(t.powers))*8, 11, func(i uint32) uint32 {
+	t.hash = uhash.WordReader(uint32(len(t.powers))*8, 11, func(i uint32) uint32 {
 		p := t.powers[i/2]
 		if i%2 == 0 {
 			return p.Var

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
 )
 
 func TestRuntimeBytesBoundedActualReachedLoads(t *testing.T) {
@@ -31,7 +32,7 @@ func TestRuntimeBytesBoundedActualReachedLoads(t *testing.T) {
 		t.Fatal("descending byte10 before initialized byte0", e)
 	}
 	got, e := RuntimeBytesBounded(nil, Block{}, ^uint64(0), 0, 0, 9)
-	if e != nil || got != String("", 9) {
+	if e != nil || got != uhash.String("", 9) {
 		t.Fatal("zero no provider access", got, e)
 	}
 	if e = r.Deallocate(&h); e != nil {
@@ -56,11 +57,11 @@ func TestInlineWordBytesActualColdAndReadOrder(t *testing.T) {
 	word = ^uint32(0)
 	initialized = 0xF
 	got, e := InlineWordBytes(&word, &initialized, 4, 1, 8)
-	if e != nil || got != String(string([]byte{255}), 8) {
+	if e != nil || got != uhash.String(string([]byte{255}), 8) {
 		t.Fatal(got, e)
 	}
 	got, e = InlineWordBytes(nil, nil, 0, 0, 3)
-	if e != nil || got != String("", 3) {
+	if e != nil || got != uhash.String("", 3) {
 		t.Fatal(got, e)
 	}
 }
