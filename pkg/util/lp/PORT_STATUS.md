@@ -5,12 +5,13 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently66 partial source units and44 unported units. No complete
-LP solver is available yet. A green Go coverage report does not measure the C++
+There are currently66 partial source units and44 unported units. The floating stage-one core now exposes Solve; outer primal, exact, dual and LAR
+solver integration is still incomplete. A green Go coverage report does not measure the C++
 code that has not been ported.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Floating stage-one solve and iteration/statistics control | Two original numerical fixtures and100 independent bounded standard-form LPs compared with exhaustive dense vertex enumeration; feasible-only/infeasible/unbounded/cancellation/limit exits, seeded entering budgets, output/clock failures, IEEE and mutation guards | Solve72.6% native (61/84),78.6% debug (66/84); statistics78.3% (54/69),94.2% (65/69). Gaps include rare numerical rechecks, qualified child errors and other-profile assertions. Original upper-only constructor/default profile, outer/exact/dual/LAR solvers remain open |
 | Floating primal pivot comparison and advance orchestration | 180 independent ray/basis worlds through sparse/forced-dense LU; bound flips, feasibility-cost transitions, degenerate pivots, actual stale-LU recovery, singular refusal/rollback, drift and two-observation status transitions; mutation/output guards | Native82.0% (137/167), debug/checked90.4% (151/167). Gaps qualify child/index errors or opposite-profile assertions. Full solve/iteration/resource/statistics loop and exact/tableau advance remain open |
 | Floating primal reduced-cost refresh and steepest-edge updates | 160 independent basis-coordinate worlds with sparse/forced-dense LU, independent transposed beta solves, new-basis norms and reduced costs; drift/profitability/tolerance classification, periodic seeded reset, infeasibility-cost transitions, fixed/duplicate/IEEE and mutation guards | Native94.6% (105/111), debug/checked100% (111/111). Native gaps are erased source assertions. Floating pivot orchestration is implemented; full optimization loop and exact/tableau paths remain open |
 | Floating Harris and breakpoint leaving/step selection | 500 independent Harris bound worlds and600 signed breakpoint crossing worlds; independent hinge slope jumps, source double first-crossing behavior, queue/order/publication guards, bound flips and full floating dispatch | Harris98.5% native/100% debug; breakpoint/dispatch93.3% native (112/120),95.8% debug (115/120). Remaining gaps propagate queue errors behind valid metadata or belong to the other assertion profile. Exact/tableau paths and full optimization remain open |
@@ -286,3 +287,41 @@ metadata or belong to the other assertion profile. Profiles:
 no-generics verification pass. LP stays66 partial/44 unported. Last full native
 module snapshot remains20:03 UTC90.0%, predating these additions; no immediate
 full rerun. Regenerated graph has unchanged edges plus the new production file.
+
+
+### Floating stage-one core solve and iteration control — 2026-10-10
+
+The retained double stage-one core now exposes Solve, connecting actual
+initialization, randomized entering budgets, one-iteration status decisions,
+pivot/flip advance, optimum refactor/recheck and tentative-unbounded/unstable
+recovery. Preserved source do-while <= limits without inventing an exhausted
+status, early feasible-only return before residual validation, normalized
+objective costs, post-increment per-core/global statistics and cancellation
+status. Floating cost/zero-nonbasis assertions and actual U/static nonzero
+counts are implemented. Native Go writers and classic six-digit number text
+replace STL stream state; no locale/flag emulation. Definition-only done() is
+excluded. Original upper-only constructor/default tableau smoke profile,
+find_feasible_solution diagnostic wrapper, exact/tableau loops and outer primal/
+dual/LAR solvers remain open.
+
+Both original test_lp_0/test_lp_1 numerical fixtures now solve through the
+retained stage-one LU profile, with optimum/equation/nonnegative assertions
+strengthened beyond the source smoke calls.100 independent positive-constraint
+bounded LP worlds also solve to exhaustive dense Gauss-Jordan vertex maxima.
+These are numerical fixture ports, not completion credit for the original
+constructor/default profile or complete upstream driver. Tests cover infeasible,
+unbounded, feasible-only/residual rejection, source iteration-limit exits,
+actual borrowed cancellation/host errors, unsigned seeded entering-budget
+arithmetic, counter wrap, printed cadence/cost/nonzero/IEEE text and writer/
+metadata mutation guards. Repeated Solve with default cost backup reaches a
+source debug nonempty-backup assertion; clock tests construct fresh owners.
+
+Focused native core/primal/presolve/solver/column/scaler/static/LU checks pass
+0.922s; combined debug/checked1.052s. Solve61/84 (72.6%) native,66/84 (78.6%)
+debug; statistics54/69 (78.3%),65/69 (94.2%). Gaps include rare numerical status
+rechecks, child-error propagation under invalid metadata and opposite-profile
+assertions; no replacement numerical callbacks fabricate those paths. Profiles:
+/mnt/oldrog/tmp/g3-solve-{native,debug}.cover. Both LP vets and source/evidence/
+no-generics verification pass. LP remains66 partial/44 unported. Last full
+native90.0% snapshot remains20:03 UTC, predating these additions; no immediate
+full rerun. Graph regenerated with unchanged edges and both new production files.

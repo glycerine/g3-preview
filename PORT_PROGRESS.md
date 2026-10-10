@@ -37312,3 +37312,41 @@ metadata or belong to the other assertion profile. Profiles:
 no-generics verification pass. LP stays66 partial/44 unported. Last full native
 module snapshot remains20:03 UTC90.0%, predating these additions; no immediate
 full rerun. Regenerated graph has unchanged edges plus the new production file.
+
+
+### Floating stage-one core solve and iteration control — 2026-10-10
+
+The retained double stage-one core now exposes Solve, connecting actual
+initialization, randomized entering budgets, one-iteration status decisions,
+pivot/flip advance, optimum refactor/recheck and tentative-unbounded/unstable
+recovery. Preserved source do-while <= limits without inventing an exhausted
+status, early feasible-only return before residual validation, normalized
+objective costs, post-increment per-core/global statistics and cancellation
+status. Floating cost/zero-nonbasis assertions and actual U/static nonzero
+counts are implemented. Native Go writers and classic six-digit number text
+replace STL stream state; no locale/flag emulation. Definition-only done() is
+excluded. Original upper-only constructor/default tableau smoke profile,
+find_feasible_solution diagnostic wrapper, exact/tableau loops and outer primal/
+dual/LAR solvers remain open.
+
+Both original test_lp_0/test_lp_1 numerical fixtures now solve through the
+retained stage-one LU profile, with optimum/equation/nonnegative assertions
+strengthened beyond the source smoke calls.100 independent positive-constraint
+bounded LP worlds also solve to exhaustive dense Gauss-Jordan vertex maxima.
+These are numerical fixture ports, not completion credit for the original
+constructor/default profile or complete upstream driver. Tests cover infeasible,
+unbounded, feasible-only/residual rejection, source iteration-limit exits,
+actual borrowed cancellation/host errors, unsigned seeded entering-budget
+arithmetic, counter wrap, printed cadence/cost/nonzero/IEEE text and writer/
+metadata mutation guards. Repeated Solve with default cost backup reaches a
+source debug nonempty-backup assertion; clock tests construct fresh owners.
+
+Focused native core/primal/presolve/solver/column/scaler/static/LU checks pass
+0.922s; combined debug/checked1.052s. Solve61/84 (72.6%) native,66/84 (78.6%)
+debug; statistics54/69 (78.3%),65/69 (94.2%). Gaps include rare numerical status
+rechecks, child-error propagation under invalid metadata and opposite-profile
+assertions; no replacement numerical callbacks fabricate those paths. Profiles:
+/mnt/oldrog/tmp/g3-solve-{native,debug}.cover. Both LP vets and source/evidence/
+no-generics verification pass. LP remains66 partial/44 unported. Last full
+native90.0% snapshot remains20:03 UTC, predating these additions; no immediate
+full rerun. Graph regenerated with unchanged edges and both new production files.
