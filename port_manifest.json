@@ -120561,7 +120561,8 @@
         "pkg/util/lp/lar_model.go",
         "pkg/util/lp/lar_model_terms.go",
         "pkg/util/lp/lar_model_bounds.go",
-        "pkg/util/lp/lar_model_test.go"
+        "pkg/util/lp/lar_model_test.go",
+        "pkg/util/lp/lar_row_dispatch.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -120581,7 +120582,11 @@
         "TestLARModelNestedTableauAndRowPropagation",
         "TestLARModelPhysicalFailurePrefixes",
         "TestLARModelDeferredEmptyTermsAndSourceGuards",
-        "TestLARModelLeavesOlderComparisonOwned"
+        "TestLARModelLeavesOlderComparisonOwned",
+        "TestLARRowDispatchIndependentIntervals",
+        "TestLARRowDispatchGuardsAndCutoff",
+        "TestLARRowDispatchPhysicalFailureOwnership",
+        "TestLARRowDispatchModeAndForeignOwner"
       ],
       "conditionals": [
         {
@@ -120975,7 +120980,7 @@
           ]
         },
         {
-          "name": "remaining full LAR constructor/lifecycle, constraint scopes, term/matrix/basis integration, solve, propagation and explanations",
+          "name": "remaining whole-model constraint scopes, exact optimization, pivot-row calculation and term substitution, row scheduling and explanations",
           "status": "unported",
           "tests": []
         },
@@ -121029,17 +121034,30 @@
             "TestLARModelDeferredEmptyTermsAndSourceGuards",
             "TestLARModelLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "analyze_new_bounds_on_row_tableau length cutoff and actual row; analyze_new_bounds_on_row over prepared precise pivot row and unit basis",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_row_dispatch.go",
+          "tests": [
+            "TestLARRowDispatchIndependentIntervals",
+            "TestLARRowDispatchGuardsAndCutoff",
+            "TestLARRowDispatchPhysicalFailureOwnership",
+            "TestLARRowDispatchModeAndForeignOwner"
+          ]
         }
       ],
       "ownership": [
-        "LARBounds is the owning concrete bound component with borrowed RationalManager. Status, infeasible column and witness/type state use the actual existing typed scoped owners; exact lower/upper journals retain completed and partial values. Full solver, term, matrix and constraint ownership remains open.",
+        "LARBounds is the owning concrete bound component with borrowed RationalManager. Status, infeasible column and witness/type state use existing typed scoped owners; exact lower/upper journals retain completed and partial values. The actual LAR core owns this component and the outer model aliases it; whole-model scope/optimization ownership remains incomplete.",
         "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
-        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction."
+        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction.",
+        "Solver owns the lexical row iterator and analyzer until successful completion or explicit Close after failure. Analyzer closes before iterator, and both close before matrices/terms/core. Borrowed propagator keeps ownership of published bounds and virtual-hook calls. No model-level numeric capture adopts child calls; stopped dispatch preserves numeric generations. Source zero RHS is a nonallocating initialized local value copied into the actual analyzer."
       ],
       "deviations": [
-        "Only source bound/witness state and its concrete update consumers are implemented. No full LAR constructor, AddVar/AddConstraint, scope, propagation or optimization completion is claimed.",
+        "Bound/witness state, actual model/core construction and variable/term/bound registration, and tableau/prepared-pivot row analysis are implemented. Whole-model scopes, pivot-row computation/substitution, row scheduling, explanations and optimization remain incomplete.",
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
-        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication."
+        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication.",
+        "Tableau cutoff is strictly row length > maximum and precedes mode assertion/propagator access. Debug mode assertions preserve iterator construction order; native erases them. Pivot dispatch consumes actual already prepared precise pivot vector and source basis, without claiming calculate_implied_bounds_for_row, automatic pivot calculation or term substitution. Invalid row and nil/foreign propagator domains return explicit typed errors. No whole-unit promotion."
       ]
     },
     {

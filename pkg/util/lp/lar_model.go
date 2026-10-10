@@ -26,6 +26,8 @@ type LARSolver struct {
 	pendingConstraint                                  LARStoredConstraint
 	pendingTerm                                        *LARTerm
 	pendingIterator                                    *LARTermIterator
+	pendingRowIterator                                 RationalLinearIterator
+	pendingRowAnalyzer                                 *LARRowBoundAnalyzer
 	work                                               *IndexedPairVector
 	rationalWork                                       *IndexedRationalVector
 	calls                                              exactEtaCalls
@@ -51,7 +53,7 @@ func NewLARSolver(m *numeral.RationalManager) (solver *LARSolver, err error) {
 	return solver, err
 }
 func (s *LARSolver) ready() error {
-	if s.stopped || s.Core == nil || s.Core.stopped || s.pendingConstraint != nil || s.pendingTerm != nil || s.pendingIterator != nil || s.work != nil || s.rationalWork != nil || s.calls.pending() {
+	if s.stopped || s.Core == nil || s.Core.stopped || s.pendingConstraint != nil || s.pendingTerm != nil || s.pendingIterator != nil || s.pendingRowIterator != nil || s.pendingRowAnalyzer != nil || s.work != nil || s.rationalWork != nil || s.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -229,6 +231,9 @@ func (s *LARSolver) NewBoundPropagator() *LARBoundPropagator {
 }
 func (s *LARSolver) Close() error {
 	if err := s.calls.cleanupRaw(s.manager); err != nil {
+		return err
+	}
+	if err := s.closeRowAnalysis(); err != nil {
 		return err
 	}
 	if s.pendingConstraint != nil {

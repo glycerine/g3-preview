@@ -1209,6 +1209,7 @@
         "lar_model.go",
         "lar_model_bounds.go",
         "lar_model_terms.go",
+        "lar_row_dispatch.go",
         "lar_term.go",
         "lu_column_exact.go",
         "lu_column_float.go",

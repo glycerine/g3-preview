@@ -38216,3 +38216,43 @@ final assertion-wrapper correction and extra stopped-entry/older-comparison
 checks, which pass in final focused native/debug profiles. Module-wide native
 compilation likewise has a completed passing log. The lower aggregate coverage
 reflects newly implemented statements; it does not measure missing C++ code.
+
+
+### Bind row-bound analysis to actual LAR solver rows — 2026-10-10
+
+Ported analyze_new_bounds_on_row_tableau and analyze_new_bounds_on_row from
+lar_solver.h. The tableau path checks the actual row length and skips strictly
+oversized rows before assertion or propagator access. Iterator construction
+precedes its tableau-mode assertion. The pivot path asserts non-tableau mode
+before creating an iterator over the actual prepared precise pivot vector and
+unit source basis coefficient. Both construct the actual analyzer with zero RHS.
+Pivot computation, basis substitution in terms and calculate_implied_bounds_for_row
+scheduling are separate source steps and remain open.
+
+LARSolver retains concrete partial lexical analyzer/iterator owners on failure;
+Close releases analyzer then iterator before borrowed model/core data. The
+propagator remains caller-owned, including bounds published before a later
+failure. No enclosing model numeric capture adopts child calls. Successful
+analysis closes lexical owners and permits repeated strongest-bound filtering.
+Invalid row and nil/foreign-provider domains have explicit typed errors.
+
+160 independent interval worlds exercise positive/negative coefficients, strict
+endpoints, constant restoration, actual tableau rows and prepared pivot vectors,
+unit basis and term evidence. Four pooled/direct physical allocation campaigns
+run through success and observe partially published bound prefixes, stopped
+public entries with unchanged numeric generations, separate child ownership and
+named numeric-root cleanup. Source mode assertion/construction order, erased
+native assertions, cutoff equality/oversize behavior and foreign-owner constructor
+prefix are verified. Final combined model/dispatch suites pass38.688s native and
+38.471s combined g3debug/g3checked. Dispatch coverage35/40 (87.5%) native and
+37/40 (92.5%) debug/checked. Missing statements are invariant-protected iterator/
+cleanup error returns and native-erased assertions. Logs/profiles:
+/mnt/oldrog/tmp/g3-lar-dispatch-{native,debug}.{log,cover}.
+
+Both LP vets pass; dependency graph adds one production filename and no edges.
+Source unit counts remain83 partial/27 unported for LP, with no whole-file
+promotion. The23:33 UTC broader native checkpoint predates this dispatch; no
+hourly full-suite repeat is due. Whole exact/LAR optimization, pivot calculation,
+term substitution, scopes, explanations and upstream drivers remain unfinished.
+
+Final native module-wide test compilation and source/evidence verifier pass.
