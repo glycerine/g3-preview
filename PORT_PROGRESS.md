@@ -32522,3 +32522,42 @@ The util knot/split remains active. Other retained AST hash/storage collections,
 SAT collections, text consumers and internal util numeric/text/parameter cycles
 still remain. The last full native module checkpoint remains 23:46–23:48 UTC;
 no repeat runtime module suite was needed in this chunk.
+
+## Native main AST canonical table and teardown root collection
+
+The AST canonical table now uses native map[uint32][]astNodeRef hash buckets
+and insdict.Dict[uint64, astNodeRef] v0.10.1 for deterministic insertion-order
+traversal. Dictionary tokens encode the complete slot and generation. Project
+hashes and compareNodes still determine structural canonicalization. Captured
+cleanup erases only the exact token/hash and does not dereference a freed source
+placement or a reused slab generation. Removed chained bucket/cellar allocation,
+manual expansion/rehashing/free lists, synthetic table capacity faults, physical
+bucket counters and capacity charges. Actual node/object storage remains.
+
+Constructor/member cleanup, debug registration scans and containing-manager
+teardown now use the native canonical entries. Teardown's root snapshot is a
+native slice; removed its geometric reservations, duplicate linked sequence and
+allocation-refusal emergency path, including unused per-node closeNext metadata.
+Dependency marking, root selection, actual deleteNode and stopped source/own
+cleanup remain. Table/root traversal follows insertion order rather than source
+container bucket geometry.
+
+New TestASTNativeCanonicalTableGrowthCollisionIdentityAndGeneration forces 257
+colliding project hashes through actual var records, checks independent identity,
+ordered traversal, duplicate structural canonicalization and exact erasure with
+reservations disabled and unchanged actual storage. It then frees and reuses a
+real slab slot, verifies captured old-token removal cannot inspect/consume the
+replacement, and rejects stale cleanup after publishing the later generation.
+Existing trace-catch tests retain per-INC history and stopped freed-placement
+ownership checks. The format-history test now verifies allocation-free native
+source finalization drains canonical nodes while retaining diagnostics until the
+containing owner ends; its old root-vector reservation frontier no longer exists.
+
+Focused native table/trace/ownership groups passed (0.016s); g3debug canonical,
+trace, FPA and activity groups passed (0.107s); full rewriter passed (13.975s).
+Module-wide compilation, AST/rewriter vet, manifest evidence, gofmt and diff
+checks passed. Full AST passed (27.406s) after correcting the obsolete native
+root-collection refusal fixture. Manifest renames both affected tests in all
+source/method evidence; source/API statuses remain unchanged. The util knot/split
+remains active: other retained AST collection owners, SAT containers, text
+consumers and internal util numeric/text/parameter cycles still need conversion.

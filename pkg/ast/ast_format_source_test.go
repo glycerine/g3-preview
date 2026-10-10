@@ -253,7 +253,7 @@ func TestASTFormatSourceEveryFlatAllocationAndImmediateGraph(t *testing.T) {
 	t.Log("first success", first)
 }
 
-func TestASTFormatFlatHistorySurvivesActualLaterSourceFinalizeRefusal(t *testing.T) {
+func TestASTFormatFlatHistorySurvivesNativeSourceFinalize(t *testing.T) {
 	sy, q, _ := astTestOwners(t)
 	b := arena.NewBudget(1 << 30)
 	m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
@@ -272,17 +272,17 @@ func TestASTFormatFlatHistorySurvivesActualLaterSourceFinalizeRefusal(t *testing
 		t.Fatal("actual acquired frame")
 	}
 	originalHeader, originalInvocation := frame.header, frame.invocation
-	// Source collection's root vector needs its real allocation after plugin DT.
+	// Native canonical iteration and root collection need no arena reservation.
 	b.FailAfter(0)
-	stop := f.SourceFinalize()
-	if !errors.Is(stop, arena.ErrInjectedFailure) || f.Closed {
-		t.Fatal("actual later source table collection stop", stop, f.Closed)
+	astTestMust(t, f.SourceFinalize())
+	if f.Closed || f.table.size != 0 {
+		t.Fatal("source finalization must drain nodes and retain the enclosing owner")
 	}
 	if f.formatFrames != frame || frame.header != originalHeader || frame.invocation != originalInvocation || frame.bodyCause != body {
 		t.Fatal("history cannot retire before containing owner ends")
 	}
 	if b.Used() != m.Stats().AllocatedBytes {
-		t.Fatal("immediate stopped context graph", b.Used(), m.Stats())
+		t.Fatal("immediate finalized context graph", b.Used(), m.Stats())
 	}
 	b.FailAfter(-1)
 	astTestMust(t, m.Close())

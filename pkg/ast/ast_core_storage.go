@@ -60,7 +60,6 @@ type ASTManagerConfig struct {
 type ASTManagerStats struct {
 	LiveNodes, LiveParameters, LiveInfos, LiveReferences, ArrayLiveCells uint32
 	AllocatedBytes, OwnerBytes, PageBytes, DirectoryBytes                uint64
-	TableSlots, TableUsedSlots, TableCollisions                          uint32
 }
 type ASTParameter struct {
 	origin           uint64
@@ -113,7 +112,7 @@ type astNodeRecord struct {
 	kind                                          ASTKind
 	live, mark1, mark2, shared, closeMark         bool
 	markOwner1, markOwner2                        uint64
-	deleteNext, deleteParent, closeNext           astNodeRef
+	deleteNext, deleteParent                      astNodeRef
 	deletePhase, deleteIndex                      uint32
 	deleting                                      bool
 }
@@ -282,7 +281,7 @@ type ASTManager struct {
 	nextNode, freeNode, nextParameter, freeParameter, nextInfo, freeInfo, nextReference, freeReference uint32
 	liveNodes, liveParameters, liveInfos, liveReferences                                               uint32
 	pageBytes, directoryBytes, ownerBytes                                                              uint64
-	table                                                                                              astChainTable
+	table                                                                                              astCanonicalTable
 	plugins                                                                                            astPluginVector
 	basic                                                                                              astBasicPluginState
 	builtin                                                                                            astBuiltinPluginState

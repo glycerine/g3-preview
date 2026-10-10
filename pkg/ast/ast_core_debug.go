@@ -11,27 +11,21 @@ func (m *ASTManager) registrationBefore(r astNodeRef) (bool, error) {
 	}
 	if !contains && m.debugNondeterminism {
 		count := uint32(0)
-		for bucket := uint32(0); bucket < m.table.slots; bucket++ {
-			if m.table.cells[bucket].next == astChainFree {
-				continue
+		for _, curr := range m.table.entries.All() {
+			equal, e := m.compareNodes(curr, r)
+			if e != nil {
+				return false, e
 			}
-			for i := bucket; i != astChainEnd; i = m.table.cells[i].next {
-				curr := m.table.cells[i].node
-				equal, e := m.compareNodes(curr, r)
-				if e != nil {
-					return false, e
-				}
-				if equal {
+			if equal {
+				return false, ErrASTDomain
+			}
+			if m.nodeAt(curr.slot).kind == ASTApp && m.nodeAt(r.slot).kind == ASTApp {
+				a, b := m.appAt(curr.slot), m.appAt(r.slot)
+				if a.decl == b.decl && a.count == 0 && b.count == 0 {
 					return false, ErrASTDomain
 				}
-				if m.nodeAt(curr.slot).kind == ASTApp && m.nodeAt(r.slot).kind == ASTApp {
-					a, b := m.appAt(curr.slot), m.appAt(r.slot)
-					if a.decl == b.decl && a.count == 0 && b.count == 0 {
-						return false, ErrASTDomain
-					}
-				}
-				count++
 			}
+			count++
 		}
 		if count != m.table.size {
 			return false, ErrASTDomain

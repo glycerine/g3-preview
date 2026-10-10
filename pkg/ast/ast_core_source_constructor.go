@@ -65,9 +65,7 @@ func (m *ASTManager) unwindConstructorMembers() error {
 	}
 	if m.constructorMemberStage == 2 {
 		if m.constructorMembers&astCtorTable != 0 {
-			m.BudgetField.Release(astChainBytes(uint32(len(m.table.cells))))
-			m.table.cells = nil
-			m.table.size = 0
+			m.table = astCanonicalTable{}
 			m.traceConstructorTableEnded()
 		}
 		m.constructorMemberStage = 3

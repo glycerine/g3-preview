@@ -9788,7 +9788,7 @@
         "TestASTSourceNineAssertions",
         "TestASTSourcePArrayMillionUpdates",
         "TestASTSourceRefcountUint32ReleaseDebugDistinction",
-        "TestASTStructuralTableCollisionHeadCopyIdentityAndDuplicateGrowth",
+        "TestASTNativeCanonicalTableGrowthCollisionIdentityAndGeneration",
         "TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph",
         "TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit",
         "TestASTSymbolCodecRejectsClosedSpellingOwner",
@@ -10536,7 +10536,7 @@
             "TestASTAllFiveKindsAndQuantifierIdentity",
             "TestASTArrayHashPermanentActualSourceVectors",
             "TestASTEagerNormalAndFormatConstructors",
-            "TestASTStructuralTableCollisionHeadCopyIdentityAndDuplicateGrowth"
+            "TestASTNativeCanonicalTableGrowthCollisionIdentityAndGeneration"
           ]
         },
         {
@@ -11172,7 +11172,7 @@
         "TestASTSourceNineAssertions",
         "TestASTSourcePArrayMillionUpdates",
         "TestASTSourceRefcountUint32ReleaseDebugDistinction",
-        "TestASTStructuralTableCollisionHeadCopyIdentityAndDuplicateGrowth",
+        "TestASTNativeCanonicalTableGrowthCollisionIdentityAndGeneration",
         "TestASTSymbolBytesGrowthBeforeDuplicateAndActualGraph",
         "TestASTSymbolBytesInputOwnsSpellingAndWarmLongHit",
         "TestASTSymbolCodecRejectsClosedSpellingOwner",
@@ -11691,7 +11691,7 @@
             "TestASTAllFiveKindsAndQuantifierIdentity",
             "TestASTArrayHashPermanentActualSourceVectors",
             "TestASTEagerNormalAndFormatConstructors",
-            "TestASTStructuralTableCollisionHeadCopyIdentityAndDuplicateGrowth"
+            "TestASTNativeCanonicalTableGrowthCollisionIdentityAndGeneration"
           ]
         },
         {
@@ -15032,7 +15032,7 @@
         "TestASTFormatSourceLexicalParameterAndCopiedInfo",
         "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
         "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
-        "TestASTFormatFlatHistorySurvivesActualLaterSourceFinalizeRefusal",
+        "TestASTFormatFlatHistorySurvivesNativeSourceFinalize",
         "TestASTFormatBorrowedBufferUsesActualStringEngine"
       ],
       "conditionals": [
@@ -15088,7 +15088,7 @@
             "TestASTFormatSourceLexicalParameterAndCopiedInfo",
             "TestASTFormatSourceFlatLiteralChoiceAndSharedChildren",
             "TestASTFormatSourceEveryFlatAllocationAndImmediateGraph",
-            "TestASTFormatFlatHistorySurvivesActualLaterSourceFinalizeRefusal"
+            "TestASTFormatFlatHistorySurvivesNativeSourceFinalize"
           ]
         },
         {

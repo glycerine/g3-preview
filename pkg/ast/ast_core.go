@@ -93,9 +93,7 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFi
 	m.dependencies = astDependencyManager{owner: m, allocator: m.allocator}
 	m.dependencyArrays = astDependencyArrayManager{owner: m, allocator: m.allocator, budget: m.BudgetField, id: m.origin, preserve: true}
 	m.constructorMembers |= astCtorArrays
-	if e = m.initTable(); e != nil {
-		return fail(e)
-	}
+	m.initTable()
 	m.constructorMembers |= astCtorTable | astCtorIDGenerators
 	m.DebugFreeIndices = make(map[uint32]struct{})
 	m.debugFreeComplete = true
@@ -311,26 +309,41 @@ func (m *ASTManager) closeCore(source bool) error {
 		return e
 	}
 	m.destroyPluginBacking()
-	// The source manager collects every physical table root after plugins are
-	// gone. Dedicated charged directory marks replace the temporary ast_mark;
-	// the root list is a charged source-growth vector retained for one pass.
+	// Collect the remaining canonical roots after plugins are gone. Directory
+	// marks identify dependencies; a native slice retains each root pass.
 	for m.table.size != 0 {
 		for s := uint32(1); s < m.nextNode; s++ {
 			if m.nodeAt(s).live {
 				m.nodeAt(s).closeMark = false
 			}
 		}
-		for bucket := uint32(0); bucket < m.table.slots; bucket++ {
-			if m.table.cells[bucket].next == astChainFree {
-				continue
+		for _, r := range m.table.entries.All() {
+			if e := m.validNode(r); e != nil {
+				return e
 			}
-			for j := bucket; j != astChainEnd; j = m.table.cells[j].next {
-				r := m.table.cells[j].node
-				if e := m.validNode(r); e != nil {
-					return e
+			for c := uint32(0); c < m.nodeChildCount(r); c++ {
+				child, e := m.nodeChild(r, c)
+				if e != nil {
+					note(e)
+					if source && failure != nil {
+						return failure
+					}
+					continue
 				}
-				for c := uint32(0); c < m.nodeChildCount(r); c++ {
-					child, e := m.nodeChild(r, c)
+				m.nodeAt(child.slot).closeMark = true
+			}
+			slot, g := m.infoForNode(r)
+			if slot != 0 {
+				info, e := m.info(slot, g)
+				if e != nil {
+					note(e)
+					if source && failure != nil {
+						return failure
+					}
+					continue
+				}
+				for c := uint32(0); c < info.count; c++ {
+					p, e := m.infoParameter(info, c)
 					if e != nil {
 						note(e)
 						if source && failure != nil {
@@ -338,11 +351,7 @@ func (m *ASTManager) closeCore(source bool) error {
 						}
 						continue
 					}
-					m.nodeAt(child.slot).closeMark = true
-				}
-				slot, g := m.infoForNode(r)
-				if slot != 0 {
-					info, e := m.info(slot, g)
+					v, e := m.parameter(p)
 					if e != nil {
 						note(e)
 						if source && failure != nil {
@@ -350,94 +359,29 @@ func (m *ASTManager) closeCore(source bool) error {
 						}
 						continue
 					}
-					for c := uint32(0); c < info.count; c++ {
-						p, e := m.infoParameter(info, c)
-						if e != nil {
-							note(e)
-							if source && failure != nil {
-								return failure
-							}
-							continue
-						}
-						v, e := m.parameter(p)
-						if e != nil {
-							note(e)
-							if source && failure != nil {
-								return failure
-							}
-							continue
-						}
-						if v.Kind == ASTParameterAST && v.ast.slot != 0 {
-							m.nodeAt(v.ast.slot).closeMark = true
-						}
+					if v.Kind == ASTParameterAST && v.ast.slot != 0 {
+						m.nodeAt(v.ast.slot).closeMark = true
 					}
 				}
 			}
 		}
-		// Select physical bucket+chain order, preserving source USED iteration.
+		// Select roots in native dictionary order, then delete that snapshot.
 		var roots []astNodeRef
-		var bytes uint64
-		var head, tail astNodeRef
-		emergency := false
-		for bucket := uint32(0); bucket < m.table.slots; bucket++ {
-			if m.table.cells[bucket].next == astChainFree {
-				continue
-			}
-			for j := bucket; j != astChainEnd; j = m.table.cells[j].next {
-				r := m.table.cells[j].node
-				if m.nodeAt(r.slot).closeMark {
-					continue
-				}
-				m.nodeAt(r.slot).closeNext = astNodeRef{}
-				if tail.slot == 0 {
-					head = r
-				} else {
-					m.nodeAt(tail.slot).closeNext = r
-				}
-				tail = r
-				if emergency {
-					continue
-				}
-				if len(roots) == cap(roots) {
-					width := uint64(reflect.TypeOf(astNodeRef{}).Size())
-					n, e := astDirectoryGrowth(uint32(cap(roots)), uint32(len(roots)+1), width)
-					if e == nil {
-						e = m.BudgetField.Reserve(uint64(n) * width)
-					}
-					if e != nil {
-						note(e)
-						if source && failure != nil {
-							return failure
-						}
-						emergency = true
-						continue
-					}
-					nextBytes := uint64(n) * width
-					next := make([]astNodeRef, len(roots), int(n))
-					copy(next, roots)
-					m.BudgetField.Release(bytes)
-					bytes = nextBytes
-					roots = next
-				}
+		for _, r := range m.table.entries.All() {
+			if !m.nodeAt(r.slot).closeMark {
 				roots = append(roots, r)
 			}
 		}
-		if head.slot == 0 {
-			m.BudgetField.Release(bytes)
+		if len(roots) == 0 {
 			return ErrASTDomain
 		}
-		// On source's unsafe allocation-exception continuation, the already charged
-		// node directory keeps the exact root sequence; finish rather than orphan it.
-		for r := head; r.slot != 0; {
-			next := m.nodeAt(r.slot).closeNext
+		for _, r := range roots {
 			m.nodeAt(r.slot).rc = 0
 			note(m.deleteNode(r))
 			if source && failure != nil {
 				return failure
 			}
-			r = next
 		}
-		m.BudgetField.Release(bytes)
 
 	}
 	// Caller-owned info/parameter wrapper tokens are invalidated after dropping
@@ -500,9 +444,7 @@ func (m *ASTManager) closeCore(source bool) error {
 	}
 	m.declIDs.Cleanup(1 << 31)
 	m.ExprIDs.Cleanup(0)
-	m.BudgetField.Release(astChainBytes(uint32(len(m.table.cells))))
-	m.table.cells = nil
-	m.table.size = 0
+	m.table = astCanonicalTable{}
 	if !source && m.vectorAllocator != nil {
 		m.vectorAllocator.Close()
 		m.vectorAllocator = nil
