@@ -66851,12 +66851,10 @@
         "TestSATClauseCheckedIterationAndApproxCount",
         "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
         "TestSATLargeClauseBackendLedgerBudgetAndFaults",
-        "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
         "TestSATStorageSourceTextAndWidthActions",
         "TestSATStorageWarmNoAllocationsAndClosedBorrow",
         "TestSATStorageOwnerIdentityExhaustionAndOOMRecycle",
-        "TestSATBinClauseVectorRealSpecialization",
-        "TestSATClauseVectorBorrowedForeignCopyLifetime"
+        "TestSATNativeClauseVectorBorrowedCopyLifetime"
       ],
       "conditionals": [
         {
@@ -67018,12 +67016,10 @@
             "TestSATClauseCheckedIterationAndApproxCount",
             "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
             "TestSATLargeClauseBackendLedgerBudgetAndFaults",
-            "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
             "TestSATStorageSourceTextAndWidthActions",
             "TestSATStorageWarmNoAllocationsAndClosedBorrow",
             "TestSATStorageOwnerIdentityExhaustionAndOOMRecycle",
-            "TestSATBinClauseVectorRealSpecialization",
-            "TestSATClauseVectorBorrowedForeignCopyLifetime"
+            "TestSATNativeClauseVectorBorrowedCopyLifetime"
           ]
         },
         {
@@ -67033,7 +67029,7 @@
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence."
+        "Concrete scalar clause locators are distinct from source IDs. Retained physical clause storage and its actual cold headers/directories/backing remain budgeted. Live clause, wrapper, binary-clause and activity consumers now use native Go slices; clause vectors retain borrowed allocator bindings in a native map. Only their actual cold owner headers are charged. The unused standalone watched-vector adapter and its template-only operations, iterator factories and slot metadata were removed. Runtime watch-store storage remains a separate retained consumer with its own lifetime checks."
       ],
       "deviations": [
         "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
@@ -67063,15 +67059,11 @@
         "TestSATClauseCheckedIterationAndApproxCount",
         "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
         "TestSATLargeClauseBackendLedgerBudgetAndFaults",
-        "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
         "TestSATStorageSourceTextAndWidthActions",
         "TestSATStorageWarmNoAllocationsAndClosedBorrow",
         "TestSATStorageOwnerIdentityExhaustionAndOOMRecycle",
-        "TestSATBinClauseVectorRealSpecialization",
-        "TestSATClauseVectorBorrowedForeignCopyLifetime",
-        "TestSATScalarVectorReleaseRetainedBodies",
-        "TestSATScalarSetEndSourcePublication",
-        "TestSATScalarExpansionRetainsBackingPrefix",
+        "TestSATNativeClauseVectorBorrowedCopyLifetime",
+        "TestSATNativeActivityGrowthAndLogicalBounds",
         "TestSATSolverConflictFirstUIPDefaultPipeline",
         "TestSATSolverConflictLevelZeroCountersAndOwners",
         "TestSATSolverConflictAssumptionCoreAndReinit",
@@ -67084,7 +67076,9 @@
         "TestSATSolverConflictStaleSpanRetainsAllocatedCandidate",
         "TestSATClauseNativeIDFreeListAndLIFO",
         "TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips",
-        "TestSATClauseIDBorrowedOOMProviderLifetime"
+        "TestSATClauseIDBorrowedOOMProviderLifetime",
+        "TestSATNativeClauseVectorIndependentOperations",
+        "TestSATNativeWrapperAndBinarySliceGrowth"
       ],
       "conditionals": [
         {
@@ -67174,15 +67168,11 @@
             "TestSATClauseCheckedIterationAndApproxCount",
             "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
             "TestSATLargeClauseBackendLedgerBudgetAndFaults",
-            "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
             "TestSATStorageSourceTextAndWidthActions",
             "TestSATStorageWarmNoAllocationsAndClosedBorrow",
             "TestSATStorageOwnerIdentityExhaustionAndOOMRecycle",
-            "TestSATBinClauseVectorRealSpecialization",
-            "TestSATClauseVectorBorrowedForeignCopyLifetime",
-            "TestSATScalarVectorReleaseRetainedBodies",
-            "TestSATScalarSetEndSourcePublication",
-            "TestSATScalarExpansionRetainsBackingPrefix"
+            "TestSATNativeClauseVectorBorrowedCopyLifetime",
+            "TestSATNativeActivityGrowthAndLogicalBounds"
           ]
         },
         {
@@ -67219,8 +67209,9 @@
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence.",
-        "SAT clause IDs use the native typed idgen free list on the allocator budget. The borrowed Runtime supplies sticky OOM state and failure transport; recycle checks its provenance and lifetime before publishing an ID, and allocation refusal leaves the clause live for retry."
+        "Concrete scalar clause locators are distinct from source IDs. Retained physical clause storage and its actual cold headers/directories/backing remain budgeted. Live clause, wrapper, binary-clause and activity consumers now use native Go slices; clause vectors retain borrowed allocator bindings in a native map. Only their actual cold owner headers are charged. The unused standalone watched-vector adapter and its template-only operations, iterator factories and slot metadata were removed. Runtime watch-store storage remains a separate retained consumer with its own lifetime checks.",
+        "SAT clause IDs use the native typed idgen free list on the allocator budget. The borrowed Runtime supplies sticky OOM state and failure transport; recycle checks its provenance and lifetime before publishing an ID, and allocation refusal leaves the clause live for retry.",
+        "Live SAT storage-vector consumers now use concrete native Go slices with actual cold owner header charges; native backing does not simulate C++ capacity allocation events. Clause scalar handles and allocator bindings remain borrowed."
       ],
       "deviations": [
         "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
@@ -67295,7 +67286,7 @@
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence."
+        "Concrete scalar clause locators are distinct from source IDs. Retained physical clause storage and its actual cold headers/directories/backing remain budgeted. Live clause, wrapper, binary-clause and activity consumers now use native Go slices; clause vectors retain borrowed allocator bindings in a native map. Only their actual cold owner headers are charged. The unused standalone watched-vector adapter and its template-only operations, iterator factories and slot metadata were removed. Runtime watch-store storage remains a separate retained consumer with its own lifetime checks."
       ],
       "deviations": [
         "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
@@ -67311,10 +67302,7 @@
       ],
       "tests": [
         "TestSATClauseSetSourceOrderAndGhostPrefixes",
-        "TestSATClauseSetActualCopyMoveFailureOrder",
-        "TestSATVectorIteratorEpochRetiresWithoutWrap",
-        "TestSATIteratorConcreteValueContracts",
-        "TestSATIteratorEscapingValuesNoAllocations"
+        "TestSATClauseSetActualCopyMoveFailureOrder"
       ],
       "conditionals": [
         {
@@ -67335,10 +67323,7 @@
           "go_target": "pkg/sat/sat_clause_set.go",
           "tests": [
             "TestSATClauseSetSourceOrderAndGhostPrefixes",
-            "TestSATClauseSetActualCopyMoveFailureOrder",
-            "TestSATVectorIteratorEpochRetiresWithoutWrap",
-            "TestSATIteratorConcreteValueContracts",
-            "TestSATIteratorEscapingValuesNoAllocations"
+            "TestSATClauseSetActualCopyMoveFailureOrder"
           ]
         },
         {
@@ -67348,7 +67333,7 @@
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence."
+        "Concrete scalar clause locators are distinct from source IDs. Retained physical clause storage and its actual cold headers/directories/backing remain budgeted. Live clause, wrapper, binary-clause and activity consumers now use native Go slices; clause vectors retain borrowed allocator bindings in a native map. Only their actual cold owner headers are charged. The unused standalone watched-vector adapter and its template-only operations, iterator factories and slot metadata were removed. Runtime watch-store storage remains a separate retained consumer with its own lifetime checks."
       ],
       "deviations": [
         "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
@@ -67365,26 +67350,25 @@
         "pkg/sat/sat_solver_clause_use_lists_test.go"
       ],
       "tests": [
-        "TestSATClauseUseListActualColdAndGrowthPeakCharges",
+        "TestSATClauseUseListNativeGrowthAtColdBudgetLimit",
         "TestSATClauseUseListAtEndScalarAfterVectorClose",
         "TestSATClauseUseListBeginConsumeAndDestructorCompletion",
         "TestSATClauseUseListCloneReservationSweep",
-        "TestSATClauseUseListConstructCloneAssignFailureAccounting",
+        "TestSATClauseUseListNativeCloneAssignAndColdRefusals",
         "TestSATClauseUseListEverySourceAssertionSite",
         "TestSATClauseUseListFiniteIndependentStableCompaction",
         "TestSATClauseUseListImplicitAssignmentCurrentVectorAndRealBindings",
         "TestSATClauseUseListInsertEraseNotRemovedReset",
-        "TestSATClauseUseListInsertGrowthFailureAndWarmIteratorNoAllocation",
+        "TestSATClauseUseListNativeInsertAndWarmIteratorNoAllocation",
         "TestSATClauseUseListIteratorCurrentBackingAfterGrowth",
-        "TestSATClauseUseListIteratorCurrentLogicalDebugRetainedRelease",
-        "TestSATClauseUseListIteratorFollowsVectorSwap",
+        "TestSATClauseUseListIteratorNativeLogicalBounds",
+        "TestSATClauseUseListIteratorFollowsNativeBackingExchange",
         "TestSATClauseUseListIteratorPhysicalBoundAndClosedOwner",
         "TestSATClauseUseListLazyEraseAndUnsignedUnderflow",
         "TestSATClauseUseListNextRemovedAssertionAndCurrentCopy",
         "TestSATClauseUseListPartialIterationFinishesAndAllRemoved",
         "TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal",
         "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
-        "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes",
         "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
         "TestSATClauseUseListsSameAddressReconstruction",
         "TestSATClauseUseListsOuterGrowthInvalidatesChild",
@@ -67444,26 +67428,25 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_use_list.go",
           "tests": [
-            "TestSATClauseUseListActualColdAndGrowthPeakCharges",
+            "TestSATClauseUseListNativeGrowthAtColdBudgetLimit",
             "TestSATClauseUseListAtEndScalarAfterVectorClose",
             "TestSATClauseUseListBeginConsumeAndDestructorCompletion",
             "TestSATClauseUseListCloneReservationSweep",
-            "TestSATClauseUseListConstructCloneAssignFailureAccounting",
+            "TestSATClauseUseListNativeCloneAssignAndColdRefusals",
             "TestSATClauseUseListEverySourceAssertionSite",
             "TestSATClauseUseListFiniteIndependentStableCompaction",
             "TestSATClauseUseListImplicitAssignmentCurrentVectorAndRealBindings",
             "TestSATClauseUseListInsertEraseNotRemovedReset",
-            "TestSATClauseUseListInsertGrowthFailureAndWarmIteratorNoAllocation",
+            "TestSATClauseUseListNativeInsertAndWarmIteratorNoAllocation",
             "TestSATClauseUseListIteratorCurrentBackingAfterGrowth",
-            "TestSATClauseUseListIteratorCurrentLogicalDebugRetainedRelease",
-            "TestSATClauseUseListIteratorFollowsVectorSwap",
+            "TestSATClauseUseListIteratorNativeLogicalBounds",
+            "TestSATClauseUseListIteratorFollowsNativeBackingExchange",
             "TestSATClauseUseListIteratorPhysicalBoundAndClosedOwner",
             "TestSATClauseUseListLazyEraseAndUnsignedUnderflow",
             "TestSATClauseUseListNextRemovedAssertionAndCurrentCopy",
             "TestSATClauseUseListPartialIterationFinishesAndAllRemoved",
             "TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal",
-            "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
-            "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes"
+            "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies"
           ]
         },
         {
@@ -67493,7 +67476,7 @@
         }
       ],
       "ownership": [
-        "Charged concrete cold list owns actual clause vector and borrows real clause allocators. By-value iterator borrows current vector object, captures only scalar count/indexes and preserves actual read/write/callback prefixes; see PORT_PROGRESS.md#audit-sat-solver-clause-use-list-port-status-md.",
+        "The concrete cold list owns a native clause slice owner and borrows real clause allocators through native bindings. Actual list/vector cold headers are charged; native slice/map backing is uncharged. The by-value iterator borrows the current vector object, captures scalar count/indexes and retains actual callback, read/write, compaction and destruction order. Native growth and assignment do not introduce backing reservation refusal events.",
         "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md."
       ],
       "deviations": [
@@ -67512,26 +67495,25 @@
         "pkg/sat/sat_solver_clause_use_lists_test.go"
       ],
       "tests": [
-        "TestSATClauseUseListActualColdAndGrowthPeakCharges",
+        "TestSATClauseUseListNativeGrowthAtColdBudgetLimit",
         "TestSATClauseUseListAtEndScalarAfterVectorClose",
         "TestSATClauseUseListBeginConsumeAndDestructorCompletion",
         "TestSATClauseUseListCloneReservationSweep",
-        "TestSATClauseUseListConstructCloneAssignFailureAccounting",
+        "TestSATClauseUseListNativeCloneAssignAndColdRefusals",
         "TestSATClauseUseListEverySourceAssertionSite",
         "TestSATClauseUseListFiniteIndependentStableCompaction",
         "TestSATClauseUseListImplicitAssignmentCurrentVectorAndRealBindings",
         "TestSATClauseUseListInsertEraseNotRemovedReset",
-        "TestSATClauseUseListInsertGrowthFailureAndWarmIteratorNoAllocation",
+        "TestSATClauseUseListNativeInsertAndWarmIteratorNoAllocation",
         "TestSATClauseUseListIteratorCurrentBackingAfterGrowth",
-        "TestSATClauseUseListIteratorCurrentLogicalDebugRetainedRelease",
-        "TestSATClauseUseListIteratorFollowsVectorSwap",
+        "TestSATClauseUseListIteratorNativeLogicalBounds",
+        "TestSATClauseUseListIteratorFollowsNativeBackingExchange",
         "TestSATClauseUseListIteratorPhysicalBoundAndClosedOwner",
         "TestSATClauseUseListLazyEraseAndUnsignedUnderflow",
         "TestSATClauseUseListNextRemovedAssertionAndCurrentCopy",
         "TestSATClauseUseListPartialIterationFinishesAndAllRemoved",
         "TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal",
         "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
-        "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes",
         "TestSATClauseUseListsLiteralRoutingAndEraseExcept",
         "TestSATClauseUseListsSameAddressReconstruction",
         "TestSATClauseUseListsOuterGrowthInvalidatesChild",
@@ -67699,26 +67681,25 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_use_list.go",
           "tests": [
-            "TestSATClauseUseListActualColdAndGrowthPeakCharges",
+            "TestSATClauseUseListNativeGrowthAtColdBudgetLimit",
             "TestSATClauseUseListAtEndScalarAfterVectorClose",
             "TestSATClauseUseListBeginConsumeAndDestructorCompletion",
             "TestSATClauseUseListCloneReservationSweep",
-            "TestSATClauseUseListConstructCloneAssignFailureAccounting",
+            "TestSATClauseUseListNativeCloneAssignAndColdRefusals",
             "TestSATClauseUseListEverySourceAssertionSite",
             "TestSATClauseUseListFiniteIndependentStableCompaction",
             "TestSATClauseUseListImplicitAssignmentCurrentVectorAndRealBindings",
             "TestSATClauseUseListInsertEraseNotRemovedReset",
-            "TestSATClauseUseListInsertGrowthFailureAndWarmIteratorNoAllocation",
+            "TestSATClauseUseListNativeInsertAndWarmIteratorNoAllocation",
             "TestSATClauseUseListIteratorCurrentBackingAfterGrowth",
-            "TestSATClauseUseListIteratorCurrentLogicalDebugRetainedRelease",
-            "TestSATClauseUseListIteratorFollowsVectorSwap",
+            "TestSATClauseUseListIteratorNativeLogicalBounds",
+            "TestSATClauseUseListIteratorFollowsNativeBackingExchange",
             "TestSATClauseUseListIteratorPhysicalBoundAndClosedOwner",
             "TestSATClauseUseListLazyEraseAndUnsignedUnderflow",
             "TestSATClauseUseListNextRemovedAssertionAndCurrentCopy",
             "TestSATClauseUseListPartialIterationFinishesAndAllRemoved",
             "TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal",
-            "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies",
-            "TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes"
+            "TestSATClauseUseListSourceDebugPreconditionsAndReleaseBodies"
           ]
         },
         {
@@ -67748,7 +67729,7 @@
         }
       ],
       "ownership": [
-        "Charged concrete cold list owns actual clause vector and borrows real clause allocators. By-value iterator borrows current vector object, captures only scalar count/indexes and preserves actual read/write/callback prefixes; see PORT_PROGRESS.md#audit-sat-solver-clause-use-list-port-status-md.",
+        "The concrete cold list owns a native clause slice owner and borrows real clause allocators through native bindings. Actual list/vector cold headers are charged; native slice/map backing is uncharged. The by-value iterator borrows the current vector object, captures scalar count/indexes and retains actual callback, read/write, compaction and destruction order. Native growth and assignment do not introduce backing reservation refusal events.",
         "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md."
       ],
       "deviations": [
@@ -68716,7 +68697,7 @@
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence."
+        "Concrete scalar clause locators are distinct from source IDs. Retained physical clause storage and its actual cold headers/directories/backing remain budgeted. Live clause, wrapper, binary-clause and activity consumers now use native Go slices; clause vectors retain borrowed allocator bindings in a native map. Only their actual cold owner headers are charged. The unused standalone watched-vector adapter and its template-only operations, iterator factories and slot metadata were removed. Runtime watch-store storage remains a separate retained consumer with its own lifetime checks."
       ],
       "deviations": [
         "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
@@ -70508,7 +70489,11 @@
         "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
         "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
         "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
-        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
+        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased",
+        "TestSATNativeClauseVectorIndependentOperations",
+        "TestSATNativeClauseVectorBorrowedCopyLifetime",
+        "TestSATNativeWrapperAndBinarySliceGrowth",
+        "TestSATNativeActivityGrowthAndLogicalBounds"
       ],
       "conditionals": [
         {
@@ -70704,7 +70689,8 @@
       "ownership": [
         "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md.",
         "Charged concrete visited storage and cold borrowed allocator/use-list views; original collector and resolution publication/failure prefixes. Full simplifier owner integration remains open.",
-        "Concrete charged simplifier owns actual children/workspaces and borrows actual lifecycle/cleaner/decision RNG/MkVar elimTodo. Dummy routes only explicit actual tmp-clause owner. Captured arena Words span does not clone literals. Partial sort/cleanup owns exact moved prefix and unread ranges with phase cursors; lifecycle Close drains actual continuation before ordinary vectors. Completed destructor explicitly finalizes before reverse constructed members; failed constructor skips destructor body."
+        "Concrete charged simplifier owns actual children/workspaces and borrows actual lifecycle/cleaner/decision RNG/MkVar elimTodo. Dummy routes only explicit actual tmp-clause owner. Captured arena Words span does not clone literals. Partial sort/cleanup owns exact moved prefix and unread ranges with phase cursors; lifecycle Close drains actual continuation before ordinary vectors. Completed destructor explicitly finalizes before reverse constructed members; failed constructor skips destructor body.",
+        "Live SAT storage-vector consumers now use concrete native Go slices with actual cold owner header charges; native backing does not simulate C++ capacity allocation events. Clause scalar handles and allocator bindings remain borrowed."
       ],
       "deviations": [
         "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed.",
@@ -70805,7 +70791,11 @@
         "TestSATSimplifierActualSeparateDummyAllocator",
         "TestSATSimplifierCapturedResolventPayload",
         "TestSATSimplifierCleanupAll27AssignmentsAndUseCounts",
-        "TestSATSimplifierActualNumVarsUsesLevelAtRead"
+        "TestSATSimplifierActualNumVarsUsesLevelAtRead",
+        "TestSATNativeClauseVectorIndependentOperations",
+        "TestSATNativeClauseVectorBorrowedCopyLifetime",
+        "TestSATNativeWrapperAndBinarySliceGrowth",
+        "TestSATNativeActivityGrowthAndLogicalBounds"
       ],
       "conditionals": [
         {
@@ -70898,7 +70888,8 @@
       "ownership": [
         "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md.",
         "Charged concrete visited storage and cold borrowed allocator/use-list views; original collector and resolution publication/failure prefixes. Full simplifier owner integration remains open.",
-        "Concrete charged simplifier owns actual children/workspaces and borrows actual lifecycle/cleaner/decision RNG/MkVar elimTodo. Dummy routes only explicit actual tmp-clause owner. Captured arena Words span does not clone literals. Partial sort/cleanup owns exact moved prefix and unread ranges with phase cursors; lifecycle Close drains actual continuation before ordinary vectors. Completed destructor explicitly finalizes before reverse constructed members; failed constructor skips destructor body."
+        "Concrete charged simplifier owns actual children/workspaces and borrows actual lifecycle/cleaner/decision RNG/MkVar elimTodo. Dummy routes only explicit actual tmp-clause owner. Captured arena Words span does not clone literals. Partial sort/cleanup owns exact moved prefix and unread ranges with phase cursors; lifecycle Close drains actual continuation before ordinary vectors. Completed destructor explicitly finalizes before reverse constructed members; failed constructor skips destructor body.",
+        "Live SAT storage-vector consumers now use concrete native Go slices with actual cold owner header charges; native backing does not simulate C++ capacity allocation events. Clause scalar handles and allocator bindings remain borrowed."
       ],
       "deviations": [
         "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed.",
@@ -74436,7 +74427,8 @@
         "TestSATCaseSplitHeapDirectEraseSourcePreconditionAndWrapperGuard",
         "TestSATCaseSplitHeapForeignBudgetRejectedBeforeColdReserve",
         "TestSATCaseSplitHeapLegacySignaturesExposeActualTypedReadFailure",
-        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased"
+        "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased",
+        "TestSATNativeActivityGrowthAndLogicalBounds"
       ],
       "conditionals": [
         {
@@ -74515,7 +74507,8 @@
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence."
+        "Concrete scalar clause locators are distinct from source IDs. Retained physical clause storage and its actual cold headers/directories/backing remain budgeted. Live clause, wrapper, binary-clause and activity consumers now use native Go slices; clause vectors retain borrowed allocator bindings in a native map. Only their actual cold owner headers are charged. The unused standalone watched-vector adapter and its template-only operations, iterator factories and slot metadata were removed. Runtime watch-store storage remains a separate retained consumer with its own lifetime checks.",
+        "Live SAT storage-vector consumers now use concrete native Go slices with actual cold owner header charges; native backing does not simulate C++ capacity allocation events. Clause scalar handles and allocator bindings remain borrowed."
       ],
       "deviations": [
         "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
@@ -74554,8 +74547,6 @@
         "TestSATSolverWatchStoreSourceHelpersAndReverse",
         "TestSATSolverWatchStoreSourceProfileBoundaries",
         "TestSATStorageSourceTextAndWidthActions",
-        "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
-        "TestSATWatchLifetimeMetadataBudget",
         "TestSATWatchedSourceTagsWidthDefectAndErase"
       ],
       "methods_audited": false,
@@ -74567,8 +74558,6 @@
           "go_target": "pkg/sat/sat_watched.go",
           "tests": [
             "TestSATStorageSourceTextAndWidthActions",
-            "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
-            "TestSATWatchLifetimeMetadataBudget",
             "TestSATWatchedSourceTagsWidthDefectAndErase"
           ]
         },
@@ -74607,7 +74596,7 @@
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence.",
+        "Concrete scalar clause locators are distinct from source IDs. Retained physical clause storage and its actual cold headers/directories/backing remain budgeted. Live clause, wrapper, binary-clause and activity consumers now use native Go slices; clause vectors retain borrowed allocator bindings in a native map. Only their actual cold owner headers are charged. The unused standalone watched-vector adapter and its template-only operations, iterator factories and slot metadata were removed. Runtime watch-store storage remains a separate retained consumer with its own lifetime checks.",
         "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see PORT_PROGRESS.md#audit-sat-solver-watch-store-port-status-md."
       ],
       "deviations": [
@@ -74631,14 +74620,9 @@
         "pkg/sat/sat_solver_copy_test.go"
       ],
       "tests": [
-        "TestSATBinClauseVectorRealSpecialization",
-        "TestSATClauseVectorBorrowedForeignCopyLifetime",
-        "TestSATConcreteVectorIndependentOperations",
-        "TestSATConcreteVectorSourceCapacityAndCopyPolicies",
-        "TestSATIteratorConcreteValueContracts",
-        "TestSATIteratorEscapingValuesNoAllocations",
+        "TestSATNativeClauseVectorBorrowedCopyLifetime",
         "TestSATPackedSourceGetterSetterDomains",
-        "TestSATScalarVectorReleaseRetainedBodies",
+        "TestSATNativeActivityGrowthAndLogicalBounds",
         "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
         "TestSATSolverWatchStoreAssignmentConstructionGuardPrefix",
         "TestSATSolverWatchStoreBitmapWordBoundaryAndRawClauseBorrow",
@@ -74660,11 +74644,6 @@
         "TestSATSolverWatchStoreOwnerLedgerRetirement",
         "TestSATSolverWatchStoreSourceHelpersAndReverse",
         "TestSATSolverWatchStoreSourceProfileBoundaries",
-        "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
-        "TestSATVectorCrossBudgetSwapAndMoveFailure",
-        "TestSATVectorIteratorEpochRetiresWithoutWrap",
-        "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
-        "TestSATWatchLifetimeMetadataBudget",
         "TestSATWatchedSourceTagsWidthDefectAndErase",
         "TestSATSolverWatchSortLargeStableOrderAndWorkBound",
         "TestSATSolverWatchSortThreeClassesAndActualLifetime",
@@ -74799,18 +74778,8 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_watched.go",
           "tests": [
-            "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
-            "TestSATConcreteVectorSourceCapacityAndCopyPolicies",
-            "TestSATBinClauseVectorRealSpecialization",
-            "TestSATClauseVectorBorrowedForeignCopyLifetime",
-            "TestSATScalarVectorReleaseRetainedBodies",
-            "TestSATConcreteVectorIndependentOperations",
-            "TestSATVectorCrossBudgetSwapAndMoveFailure",
-            "TestSATVectorIteratorEpochRetiresWithoutWrap",
-            "TestSATIteratorConcreteValueContracts",
-            "TestSATIteratorEscapingValuesNoAllocations",
-            "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
-            "TestSATWatchLifetimeMetadataBudget",
+            "TestSATNativeClauseVectorBorrowedCopyLifetime",
+            "TestSATNativeActivityGrowthAndLogicalBounds",
             "TestSATWatchedSourceTagsWidthDefectAndErase",
             "TestSATPackedSourceGetterSetterDomains"
           ]
@@ -74869,7 +74838,7 @@
         }
       ],
       "ownership": [
-        "Concrete scalar clause locators are distinct from source IDs. Actual cold headers/directories/backing and allocation overlap are budgeted; small versus wide physical clause storage uses real allocations. Activity queues borrow actual mutable vectors; sets/vectors retain source bindings and copy/move prefixes. Watched erase retains live tails while actual destruction ends per-slot lifetime tracked by fully charged metadata. All twelve iterator factories return scalar values with zero escaping-wrapper allocation. See PORT_PROGRESS.md#audit-sat-storage-port-status-md for exact16-file/40-test evidence.",
+        "Concrete scalar clause locators are distinct from source IDs. Retained physical clause storage and its actual cold headers/directories/backing remain budgeted. Live clause, wrapper, binary-clause and activity consumers now use native Go slices; clause vectors retain borrowed allocator bindings in a native map. Only their actual cold owner headers are charged. The unused standalone watched-vector adapter and its template-only operations, iterator factories and slot metadata were removed. Runtime watch-store storage remains a separate retained consumer with its own lifetime checks.",
         "Actual four-uint64 watch payloads preserve val1/val2 plus widened scalar clause provenance; separate charged lifetime bitmap tracks erased live tails and destroyed holes. Common cold owner/directories and all arena descriptor/page/free storage and old/new overlaps charged. Exact nested copies, destroy-before-assignment, backing-transferring move/swap and real display/erase routes; see PORT_PROGRESS.md#audit-sat-solver-watch-store-port-status-md.",
         "In-place stable partition/rotation uses scalar stack records only; no heap scratch/header or generic sorting. Existing logical slot lifetime bits and erased live tails retained; actual work counters are caller-owned diagnostics. See PORT_PROGRESS.md#audit-sat-watch-sort-port-status-md."
       ],
@@ -148914,16 +148883,8 @@
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceKindLabelsAndHelpers",
         "TestParamDescrsSourceModuleAndNullKinds",
-        "TestSATBinClauseVectorRealSpecialization",
-        "TestSATClauseVectorBorrowedForeignCopyLifetime",
-        "TestSATConcreteSourceConstructorsAndFillRecursion",
-        "TestSATConcreteVectorIndependentOperations",
-        "TestSATConcreteVectorSourceCapacityAndCopyPolicies",
-        "TestSATIteratorConcreteValueContracts",
-        "TestSATIteratorEscapingValuesNoAllocations",
-        "TestSATScalarExpansionRetainsBackingPrefix",
-        "TestSATScalarSetEndSourcePublication",
-        "TestSATScalarVectorReleaseRetainedBodies",
+        "TestSATNativeClauseVectorBorrowedCopyLifetime",
+        "TestSATNativeActivityGrowthAndLogicalBounds",
         "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
         "TestSATSolverModelConverterActualCollectVars",
         "TestSATSolverModelConverterConstructorAndInsertFaults",
@@ -148963,12 +148924,7 @@
         "TestSATSolverWatchStoreSourceHelpersAndReverse",
         "TestSATSolverWatchStoreSourceProfileBoundaries",
         "TestSATStoragePointerFreeOwnershipAndConstructorFailure",
-        "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
         "TestSATVarQueueConstructorCloneFailureAndMovedReset",
-        "TestSATVectorCrossBudgetSwapAndMoveFailure",
-        "TestSATVectorIteratorEpochRetiresWithoutWrap",
-        "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
-        "TestSATWatchLifetimeMetadataBudget",
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
         "TestASTSharedOccurrencesAllTraversalPolicies",
         "TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence",
@@ -149155,7 +149111,9 @@
         "TestPolynomialNativeNumeralGrowthResetAndBounds",
         "TestPolynomialNativeNumeralResetRetainsActualBIG",
         "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
-        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
+        "TestSATNativeClauseVectorIndependentOperations",
+        "TestSATNativeWrapperAndBinarySliceGrowth"
       ],
       "conditionals": [
         {
@@ -149279,23 +149237,15 @@
           ]
         },
         {
-          "name": "concrete SAT watched/clause-pointer/wrapper/activity/binary-vector valid constructor and operation specializations",
+          "name": "retained SAT native clause, wrapper, activity and binary consumer slices",
           "status": "partial",
           "go_target": "pkg/sat/sat_storage_vector.go",
           "tests": [
-            "TestSATStorageVectorFailurePrefixesAndBudgetPeaks",
-            "TestSATConcreteVectorSourceCapacityAndCopyPolicies",
-            "TestSATBinClauseVectorRealSpecialization",
-            "TestSATClauseVectorBorrowedForeignCopyLifetime",
-            "TestSATScalarVectorReleaseRetainedBodies",
-            "TestSATConcreteVectorIndependentOperations",
-            "TestSATVectorCrossBudgetSwapAndMoveFailure",
-            "TestSATVectorIteratorEpochRetiresWithoutWrap",
-            "TestSATScalarSetEndSourcePublication",
-            "TestSATScalarExpansionRetainsBackingPrefix",
-            "TestSATWatchEraseRetainedLifetimesAndGrowthPrefix",
-            "TestSATWatchLifetimeMetadataBudget",
-            "TestSATWatchedSourceTagsWidthDefectAndErase"
+            "TestSATNativeClauseVectorIndependentOperations",
+            "TestSATNativeClauseVectorBorrowedCopyLifetime",
+            "TestSATNativeWrapperAndBinarySliceGrowth",
+            "TestSATNativeActivityGrowthAndLogicalBounds",
+            "TestSATClauseUseListNativeGrowthAtColdBudgetLimit"
           ]
         },
         {
@@ -149701,7 +149651,8 @@
         "One reflected class owner header includes true constructor-completion fields and both embedded vectors. Generated copy constructs currentv then nextv using source size/capacity/exact allocation/ascending SIZE placements. Only after completion do current/next copy original member addresses, borrowed until reached dereference. Next-member failure source-destructs completed current before return; failed member has no source DT, and actual returned allocation/published partial field stays named for distinct owning Close. Every actual constructor reservation and first/second postphysical failure retains original, caller output and separate failed/successful later class graphs before lift.",
         "Actual embedded full-manager frame and nonwrapping invocation; only real SET incoming INC and three constructed references are acquired. Child completed source suffix precedes older newS/prem/R destruction; unjoined assignment/child ownership abort follows older declarations. Caller output range remains independent.",
         "SET source INC precedes actual vector operator[] assertion and old-slot read (ref_vector.h:128-132; vector.h:303-311). Actual n+1 unsigned wrap test retains incoming INC before checked assertion/native bounds guard; exact own abort never reads or writes an old slot that was not reached. Native invalid-range memory access remains a Go guard qualification, not C++ undefined-access equivalence.",
-        "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority."
+        "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority.",
+        "Retained SAT clause/wrapper/activity/binary consumers use native typed slices and native borrowed allocator maps. The unused standalone watched-vector adapter and template-only methods were deleted. Only real cold owner headers are budgeted; native backing growth is uncharged. This conversion gives no generic C++ vector implementation credit."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",

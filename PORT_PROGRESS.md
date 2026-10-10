@@ -32921,3 +32921,42 @@ passed. Counts remain 2102 units/677 APIs: 63 ported, 284 partial, 1727 unported
 and two dead/deleted. The util knot and complete split remain active. SAT
 storage/Runtime scalar vectors, retained AST reference/printer storage,
 NumericTextStream consumers and internal util dependency cycles still remain.
+
+## Native retained SAT storage vectors; dead watch adapter removed
+
+A compiler-resolved production consumer audit found no live users of the
+standalone satWatchList adapter; retained solver watches use satSolverWatchStore.
+Removed that unused adapter and its template-only constructors, iterators,
+slot metadata and operations. Four retained concrete owners now store native
+Go slices: clause handles, clause wrappers, binary clauses and mutable activity.
+Clause handles remain borrowed, with foreign allocator bindings in a native map.
+Only actual cold owner headers are charged; native slice/map backing does not
+simulate C++ capacity geometry, spare-slot lifetime or allocation refusal events.
+Retained project clause equality, use-list compaction/callback order, queue
+comparators and actual allocator lifetime guards remain. Shared capacity helpers
+still used by other retained SAT stores were kept.
+
+Native clause assignment and clone copy independent backing; clone can refuse
+its real cold header. Clear/shrink erase discarded logical references, finalize
+releases native backing, and close refunds each real cold header once. Current
+logical bounds apply in both profiles. Removed tests that exercised only dead
+watch-vector/template APIs or simulated backing refusal/epoch behavior. Updated
+use-list fixtures for native growth and assignment, preserving callback order,
+captured iterator count, current-vector access and zero-allocation warm iterator
+checks. New tests cover 4097-element growth with reservations disabled, a
+4096-operation independent clause sequence model, foreign allocator closure,
+borrowed clause survival, independent copies, activity shrink/regrowth zeroing,
+owner-copy rejection and exact header refunds. Manifest evidence and ownership
+notes now describe these native consumers without generic vector credit.
+
+Validation: full native SAT passed (0.871s), full g3debug SAT passed (0.963s).
+Module-wide compilation, SAT vet, manifest evidence, gofmt and diff checks passed.
+The full native module was not repeated inside the hourly interval. Counts stay
+2102 units/677 APIs: 63 ported, 284 partial, 1727 unported, two dead/deleted.
+
+The util knot remains unresolved. Refreshed compiler-resolved file dependencies
+find 287 root production files, 104 strongly connected components and a largest
+component of 164 files. Remaining SAT Runtime/watch storage, AST reference/printer
+storage, NumericTextStream consumers and internal numeric/text/parameter cycles
+must be addressed before the complete util subpackage split. Native external
+collections alone do not remove those internal dependency cycles.

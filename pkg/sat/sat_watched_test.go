@@ -4,8 +4,6 @@ import (
 	"errors"
 	"math"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/arena"
 )
 
 func TestSATBinaryEncodedEqualityAndWrapper(t *testing.T) {
@@ -100,43 +98,7 @@ func TestSATWatchedSourceTagsWidthDefectAndErase(t *testing.T) {
 	if !satWatchedLess(b, ter) || !satWatchedLess(ter, c) || satWatchedLess(c, ter) {
 		t.Fatal("source ordering")
 	}
-	list, e := NewSATWatchList(nil)
-	satOK(t, e)
-	defer list.Close()
-	for _, v := range []satWatched{ter, c, b, c, ter} {
-		satOK(t, list.Push(v))
-	}
-	ok, e := list.EraseClauseWatch(off)
-	if !ok || e != nil {
-		t.Fatal(ok, e)
-	}
-	got, _ := list.Get(1)
-	if !got.Equal(b) {
-		t.Fatal("clause erase must shift")
-	}
-	satOK(t, list.EraseTernaryWatch(8, 2))
-	got, _ = list.Get(0)
-	if !got.Equal(b) {
-		t.Fatal("ternary erase must shift")
-	}
-	clone, e := list.Clone(nil)
-	satOK(t, e)
-	defer clone.Close()
-	satOK(t, list.Reset())
-	if clone.Size() != 3 {
-		t.Fatal(clone.Size())
-	}
-	moved, e := clone.MoveClone(nil)
-	satOK(t, e)
-	defer moved.Close()
-	if clone.Size() != 0 || moved.Size() != 3 {
-		t.Fatal("move constructor")
-	}
-	satOK(t, list.MoveAssign(moved))
-	if moved.Size() != 0 || list.Size() != 3 {
-		t.Fatal("vector has genuine move assignment")
-	}
-	_ = arena.ErrBounds
+
 }
 func TestSATPackedSourceGetterSetterDomains(t *testing.T) {
 	a := satStore(t, nil)

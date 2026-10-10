@@ -156,6 +156,7 @@ func TestSATClauseUseListIteratorCurrentBackingAfterGrowth(t *testing.T) {
 	if x != r[2] {
 		t.Fatal("current cached original buffer/value", x)
 	}
+	u.vector.data = u.vector.data[:len(u.vector.data):len(u.vector.data)]
 	old := u.vector.Capacity()
 	satOK(t, u.Insert(r[0]))
 	if satStorageSourceDebug { // r[0] no longer occurs after the direct Set above.
@@ -176,7 +177,7 @@ func TestSATClauseUseListIteratorCurrentBackingAfterGrowth(t *testing.T) {
 		t.Fatal("captured-end destructor drops appended tail, does not repair size", u.Size(), u.vector.Size())
 	}
 }
-func TestSATClauseUseListIteratorFollowsVectorSwap(t *testing.T) {
+func TestSATClauseUseListIteratorFollowsNativeBackingExchange(t *testing.T) {
 	a, u, r, b := satUseFixture(t, 3)
 	it, e := u.Begin()
 	satOK(t, e)
@@ -186,7 +187,7 @@ func TestSATClauseUseListIteratorFollowsVectorSwap(t *testing.T) {
 	for _, x := range []StoredClauseRef{r[2], r[1], r[0]} {
 		satOK(t, other.Push(x))
 	}
-	satOK(t, u.vector.Swap(other))
+	u.vector.data, other.data = other.data, u.vector.data
 	x, e := it.Current()
 	satOK(t, e)
 	if x != r[2] {
@@ -200,25 +201,25 @@ func TestSATClauseUseListIteratorFollowsVectorSwap(t *testing.T) {
 		t.Fatal(x)
 	}
 }
-func TestSATClauseUseListIteratorCurrentLogicalDebugRetainedRelease(t *testing.T) {
+func TestSATClauseUseListIteratorNativeLogicalBounds(t *testing.T) {
 	_, u, r, _ := satUseFixture(t, 3)
 	it, e := u.Begin()
 	satOK(t, e)
 	satOK(t, u.vector.Shrink(1))
 	e = it.Next()
-	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATAssertion) || it.i != 1 || it.j != 1 {
-			t.Fatal("actual operator[] guard after index increments", it, e)
-		}
-	} else {
-		satOK(t, e)
-		x, e := it.Current()
-		satOK(t, e)
-		if x != r[1] {
-			t.Fatal(x)
-		}
+	if it.i != 1 || it.j != 1 {
+		t.Fatal("iterator increments before bounds guard", it)
 	}
-	satOK(t, u.vector.SetEnd(3))
+	if satStorageSourceDebug {
+		if !errors.Is(e, ErrSATAssertion) {
+			t.Fatal(e)
+		}
+	} else if !errors.Is(e, arena.ErrBounds) {
+		t.Fatal(e)
+	}
+	// Restore logical values through native append, never retained capacity reads.
+	satOK(t, u.vector.Push(r[1]))
+	satOK(t, u.vector.Push(r[2]))
 	satOK(t, it.Close())
 	if u.vector.Size() != 3 {
 		t.Fatal("source destructor uses captured count", u.vector.Size())
@@ -319,7 +320,7 @@ func TestSATClauseUseListPayloadFailurePrefixAndReleaseInvariantTraversal(t *tes
 		t.Fatal("fixture dead scalar payload")
 	}
 }
-func TestSATClauseUseListConstructCloneAssignFailureAccounting(t *testing.T) {
+func TestSATClauseUseListNativeCloneAssignAndColdRefusals(t *testing.T) {
 	a, u, r, b := satUseFixture(t, 3)
 	before := b.Used()
 	for _, fail := range []int64{0, 1} {
@@ -333,7 +334,7 @@ func TestSATClauseUseListConstructCloneAssignFailureAccounting(t *testing.T) {
 	n, e := u.Clone(b)
 	satOK(t, e)
 	defer func() { satOK(t, n.Close()) }()
-	if n.Size() != u.Size() || n.vector.Capacity() != u.vector.Capacity() {
+	if n.Size() != u.Size() || n.vector.Size() != u.vector.Size() {
 		t.Fatal("implicit field copy")
 	}
 	satOK(t, n.vector.Set(0, r[2]))
@@ -343,12 +344,12 @@ func TestSATClauseUseListConstructCloneAssignFailureAccounting(t *testing.T) {
 		t.Fatal("copy aliases backing")
 	}
 	satOK(t, n.Assign(n))
-	oldCount := n.Size()
+	beforeAssign := b.Used()
 	b.FailAfter(0)
 	e = n.Assign(u)
 	b.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || n.vector.Size() != 0 || n.Size() != oldCount {
-		t.Fatal("member assignment finalizes vector before allocation, count assigned last", e, n.Size(), n.vector.Size())
+	if e != nil || n.vector.Size() != u.vector.Size() || n.Size() != u.Size() || b.Used() != beforeAssign {
+		t.Fatal("native assignment did not complete without backing reservations", e, n.Size(), n.vector.Size())
 	}
 	satOK(t, n.Assign(u))
 	if n.Size() != u.Size() {
@@ -360,17 +361,16 @@ func TestSATClauseUseListConstructCloneAssignFailureAccounting(t *testing.T) {
 		}
 	}
 }
-func TestSATClauseUseListInsertGrowthFailureAndWarmIteratorNoAllocation(t *testing.T) {
+func TestSATClauseUseListNativeInsertAndWarmIteratorNoAllocation(t *testing.T) {
 	a, u, r, b := satUseFixture(t, 2)
 	x := satMk(t, a, satLs(20, 22), false)
 	oldSize := u.Size()
-	oldCap := u.vector.Capacity()
 	before := b.Used()
 	b.FailAfter(0)
 	e := u.Insert(x)
 	b.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || u.Size() != oldSize || u.vector.Size() != oldSize || u.vector.Capacity() != oldCap || b.Used() != before {
-		t.Fatal("push failure before size increment", e, u.Size(), u.vector.Size())
+	if e != nil || u.Size() != oldSize+1 || u.vector.Size() != oldSize+1 || b.Used() != before {
+		t.Fatal("native push publishes both counts without backing reservation", e, u.Size(), u.vector.Size())
 	}
 	if allocs := testing.AllocsPerRun(50, func() {
 		it, e := u.Begin()
@@ -398,7 +398,7 @@ func TestSATClauseUseListIteratorPhysicalBoundAndClosedOwner(t *testing.T) {
 	other, e := NewSATClauseVector(a, b)
 	satOK(t, e)
 	defer func() { satOK(t, other.Close()) }()
-	satOK(t, u.vector.Swap(other))
+	u.vector.data, other.data = other.data, u.vector.data
 	if _, e = it.Current(); satStorageSourceDebug {
 		if !errors.Is(e, ErrSATAssertion) {
 			t.Fatal(e)
@@ -416,14 +416,10 @@ func TestSATClauseUseListIteratorPhysicalBoundAndClosedOwner(t *testing.T) {
 	}
 }
 
-func TestSATClauseUseListActualColdAndGrowthPeakCharges(t *testing.T) {
+func TestSATClauseUseListNativeGrowthAtColdBudgetLimit(t *testing.T) {
 	a := satStore(t, nil)
 	header := uint64(reflect.TypeOf(satClauseUseList{}).Size()) + uint64(reflect.TypeOf(satClauseVector{}).Size())
-	stride := uint64(reflect.TypeOf(StoredClauseRef{}).Size())
-	// Source capacity2 then3: both backing arrays physically coexist during the
-	// next reserve. Refuse one byte below that real peak, rather than source-width
-	// phantom accounting or charging only the final net backing difference.
-	b := arena.NewBudget(header + 5*stride - 1)
+	b := arena.NewBudget(header)
 	u, e := newSATClauseUseList(a, b)
 	satOK(t, e)
 	defer func() {
@@ -432,23 +428,27 @@ func TestSATClauseUseListActualColdAndGrowthPeakCharges(t *testing.T) {
 			t.Fatal(b.Used())
 		}
 	}()
-	if b.Used() != header {
-		t.Fatal("actual cold hierarchy", b.Used(), header)
-	}
-	for i := uint32(0); i < 2; i++ {
+	var refs []StoredClauseRef
+	b.FailAfter(0)
+	for i := uint32(0); i < 257; i++ {
 		r := satMk(t, a, satLs(i*2, i*2+3), false)
+		refs = append(refs, r)
 		satOK(t, u.Insert(r))
 	}
-	if b.Used() != header+2*stride {
-		t.Fatal("full physical vector backing charge", b.Used())
+	it, e := u.Begin()
+	satOK(t, e)
+	satOK(t, it.Close())
+	if u.Size() != 257 || u.vector.Size() != 257 || b.Used() != header {
+		t.Fatal("native backing charged", u.Size(), b.Used(), header)
 	}
-	r := satMk(t, a, satLs(20, 22), false)
-	e = u.Insert(r)
-	if !errors.Is(e, arena.ErrBudget) || u.Size() != 2 || u.vector.Size() != 2 || b.Used() != header+2*stride {
-		t.Fatal("growth peak refusal publication", e, b.Used(), u.Size())
+	satOK(t, u.Reset())
+	if b.Used() != header {
+		t.Fatal("native reset changed header charge")
 	}
-	if !a.IsLive(r) {
-		t.Fatal("failed list insertion released caller clause")
+	for _, r := range refs {
+		if !a.IsLive(r) {
+			t.Fatal("borrowed clause released", r)
+		}
 	}
 }
 
@@ -605,25 +605,6 @@ func TestSATClauseUseListEverySourceAssertionSite(t *testing.T) {
 	} else if !errors.Is(e, arena.ErrBounds) || it.i != 1 || it.j != 1 {
 		t.Fatal("release source increments before actual bounds guard", e, it)
 	}
-}
-
-func TestSATClauseUseListSourceReadThenWriteAndResetRefusalPrefixes(t *testing.T) {
-	_, u, _, _ := satUseFixture(t, 2)
-	it, e := u.Begin()
-	satOK(t, e)
-	oldEpoch := u.vector.epoch
-	u.vector.epoch = ^uint64(0)
-	e = it.Next()
-	if !errors.Is(e, arena.ErrSlotLimit) || it.i != 1 || it.j != 1 || u.vector.Size() != 2 {
-		t.Fatal("increment/read prefix before write refusal", e, it)
-	}
-	oldCount := u.Size()
-	e = u.Reset()
-	if !errors.Is(e, arena.ErrSlotLimit) || u.Size() != oldCount || u.vector.Size() != 2 {
-		t.Fatal("reset publishes count0 only after finalize", e)
-	}
-	u.vector.epoch = oldEpoch
-	satOK(t, it.Close())
 }
 
 func TestSATClauseUseListCloneReservationSweep(t *testing.T) {

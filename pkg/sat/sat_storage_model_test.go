@@ -103,48 +103,7 @@ func TestSATLargeClauseBackendLedgerBudgetAndFaults(t *testing.T) {
 		t.Fatal(b.Used())
 	}
 }
-func TestSATStorageVectorFailurePrefixesAndBudgetPeaks(t *testing.T) {
-	b := arena.NewBudget(1 << 20)
-	v, e := NewSATWatchList(b)
-	satOK(t, e)
-	header := b.Used()
-	x, _ := newSATBinaryWatch(2, true)
-	stride := uint64(reflect.TypeOf(x).Size()) + uint64(reflect.TypeOf(false).Size())
-	b.FailAfter(2)
-	e = v.ResizeFill(10, x)
-	if !errors.Is(e, arena.ErrInjectedFailure) || v.Size() != 0 || v.Capacity() != 3 || b.Used() != header+3*stride {
-		t.Fatal("completed growth prefix", v.Size(), v.Capacity(), b.Used(), e)
-	}
-	b.FailAfter(-1)
-	satOK(t, v.ResizeFill(3, x))
-	peakBudget := arena.NewBudget(header + 7*stride)
-	peak, e := NewSATWatchList(peakBudget)
-	satOK(t, e)
-	satOK(t, peak.ResizeFill(3, x))
-	e = peak.Push(x)
-	if !errors.Is(e, arena.ErrBudget) || peak.Size() != 3 || peak.Capacity() != 3 {
-		t.Fatal("old plus new backing peak", e)
-	}
-	peak.Close()
-	if peakBudget.Used() != 0 {
-		t.Fatal(peakBudget.Used())
-	}
-	satOK(t, v.Push(x))
-	dst, e := NewSATWatchList(b)
-	satOK(t, e)
-	satOK(t, dst.Push(x))
-	b.FailAfter(0)
-	e = dst.Assign(v)
-	if !errors.Is(e, arena.ErrInjectedFailure) || dst.Size() != 0 || dst.Capacity() != 0 {
-		t.Fatal("copy assignment destroys before allocation", e)
-	}
-	b.FailAfter(-1)
-	v.Close()
-	dst.Close()
-	if b.Used() != 0 {
-		t.Fatal(b.Used())
-	}
-}
+
 func TestSATVarQueueIndependentMutableActivityModel(t *testing.T) {
 	a, e := NewSATActivityDomain(nil)
 	satOK(t, e)
@@ -219,31 +178,13 @@ func TestSATStorageSourceTextAndWidthActions(t *testing.T) {
 	if text != "(0 -1)x+*|(0 -1)" {
 		t.Fatal(text)
 	}
-	list, e := NewSATWatchList(nil)
-	satOK(t, e)
-	defer list.Close()
-	bin, _ := newSATBinaryWatch(2, true)
-	ter, _ := newSATTernaryWatch(2, 4)
-	off, _ := a.Offset(r)
-	cls, _ := newSATClauseWatch(6, off)
-	ext, _ := newSATExternalWatch(3)
-	for _, w := range []satWatched{ext, cls, ter, bin, ter} {
-		satOK(t, list.Push(w))
-	}
-	satOK(t, list.SortByKind())
-	satOK(t, s.AppendCString("|"))
-	satOK(t, list.DisplayInto(a, s))
-	text, _ = s.String()
-	if text != "(0 -1)x+*|(0 -1)|1* (1 2) (1 2) 3 (3 (0 -1)x+*)" {
-		t.Fatal(text)
-	}
 	satOK(t, s.AppendCString("|"))
 	satOK(t, s.SetWidth(4))
 	satOK(t, satLiteralInto(s, 0))
 	satOK(t, s.SetWidth(4))
 	satOK(t, satLiteralInto(s, 3))
 	text, _ = s.String()
-	if text != "(0 -1)x+*|(0 -1)|1* (1 2) (1 2) 3 (3 (0 -1)x+*)|    0   -1" {
+	if text != "(0 -1)x+*|(0 -1)|    0   -1" {
 		t.Fatal(text)
 	}
 	if s.State().Width != 0 {
