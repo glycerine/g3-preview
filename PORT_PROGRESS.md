@@ -33178,3 +33178,37 @@ units/677 APIs: 63 ported, 284 partial, 1727 unported and two dead/deleted.
 No full native module rerun inside the hourly interval. The knot and full split
 remain active: retained justification/queue/other Runtime columns, AST reference
 storage, NumericTextStream consumers and internal util dependency cycles remain.
+
+## Native solver justification values
+
+Replaced Runtime byte columns and separate charged provenance arrays with
+[]satJustification in the actual variable-state member. Complete values retain
+source kind/literal words and exact checked clause locators together. Removed
+source vector geometry, Runtime payload encoding, pending allocation and
+interrupted provenance-publication/TLS refusal simulation. No backing reservation
+occurs during native push/write/growth. The embedded member is included in the
+actual variable-state cold header and now has its own shallow-copy/closed guard.
+Source assignment, conflict, minimization, scope shrink and backtrack consumers
+continue through the actual member. Fixed allocator binding rejects foreign
+writes before mutation. Stale generation is preserved until actual clause
+access; it is never inferred from the recycled registry slot.
+
+Replaced eight raw-layout/backing/metadata fixtures with native checks covering
+4097 mixed values of all five kinds, exact locator retention, current bounds,
+shrink followed by native append, zero-allocation warm writes, copied/closed
+owners, foreign writes preserving the prior value and actual recycled-clause
+dereference. Clause-backed scoped assignment completes its scalar, phase,
+GC-assigned and trail statements under FailAfter(0) without Runtime changes.
+First-variable creation now completes its native columns, preallocated queue
+insertion and todo publication without a reservation; obsolete first-column
+refusal/retry tests now verify that full publication. Actual later queue
+allocation refusal and constructor-prefix sweeps remain. Graph root/accounting
+checks omit removed justification payload and provenance bytes.
+
+Validation: full native SAT passed (0.807s), full g3debug SAT passed (0.685s),
+module-wide compilation, SAT vet, manifest evidence, gofmt and diff checks passed.
+Counts remain 2102 units/677 APIs: 63 ported, 284 partial, 1727 unported and two
+dead/deleted. Full native module was not rerun inside the hourly interval.
+The util knot and complete split remain active: retained queue/other Runtime
+columns, AST reference storage, NumericTextStream consumers and internal util
+numeric/text/parameter dependencies still remain.

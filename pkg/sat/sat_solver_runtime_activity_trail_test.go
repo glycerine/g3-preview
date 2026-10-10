@@ -16,13 +16,13 @@ func TestSATSolverNativeActivityAndTrailAccounting(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 32+600 || v.memory.Stats().LiveBlocks != 3 {
+	if n != 600 || v.memory.Stats().LiveBlocks != 2 {
 		t.Fatal("remaining source allocations", n, v.memory.Stats())
 	}
 	satOK(t, v.trailPush(MakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 32+600 || v.memory.Stats().LiveBlocks != 3 {
+	if n != 600 || v.memory.Stats().LiveBlocks != 2 {
 		t.Fatal("native trail changed Runtime allocation", n, v.memory.Stats())
 	}
 }

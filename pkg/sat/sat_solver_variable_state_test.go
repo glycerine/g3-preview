@@ -106,43 +106,22 @@ func satVariableAssertFirstPrefix(t *testing.T, s *satSolverVariableState) {
 		t.Fatal("todo before real heap insertion")
 	}
 }
-func TestSATSolverMkVarAllActualReservationPrefixes(t *testing.T) {
-	failures, successes := 0, 0
-	for fail := int64(0); fail < 160; fail++ {
-		t.Run(fmt.Sprint(fail), func(t *testing.T) {
-			s, _, b := satVariableStateFixture(t)
-			b.FailAfter(fail)
-			v, e := s.mkVar(true, false)
-			if v != 0 {
-				t.Fatal(v)
-			}
-			satVariableAssertFirstPrefix(t, s)
-			// Census is before fault disable: every raw scalar block has a named owner.
-			satScalarAuditOwner(t, s)
-			if e2 := s.checkPhysicalOwners(); e2 != nil {
-				t.Fatal(fail, e2)
-			}
-			if e != nil {
-				failures++
-				if !satRuntimeActualRefusal(s.memory, e) {
-					t.Fatal(fail, e)
-				}
-			} else {
-				if !s.elimTodo.Contains(0) || s.elimTodo.Size() != 1 {
-					t.Fatal("completed queue/todo publication")
-				}
-				successes++
-			}
-			b.FailAfter(-1)
-		})
-		if successes != 0 {
-			break
-		}
+func TestSATSolverNativeMkVarFirstPublicationWithoutBackingReservation(t *testing.T) {
+	s, todo, b := satVariableStateFixture(t)
+	before, raw := b.Used(), s.memory.State()
+	b.FailAfter(0)
+	v, e := s.mkVar(true, false)
+	b.FailAfter(-1)
+	satOK(t, e)
+	if v != 0 || !todo.Contains(0) || todo.Size() != 1 {
+		t.Fatal("complete native columns and queue/todo publication", v)
 	}
-	if failures == 0 || successes != 1 {
-		t.Fatal(failures, successes)
+	if b.Used() != before || s.memory.State() != raw {
+		t.Fatal("first variable allocated native column backing through Runtime")
 	}
-	t.Log("all actual first-variable reservations", failures, successes)
+	satVariableAssertFirstPrefix(t, s)
+	satScalarAuditOwner(t, s)
+	satOK(t, s.checkPhysicalOwners())
 }
 
 func TestSATSolverMkVarLateHeapIndexPublicationBeforeRefusal(t *testing.T) {
@@ -253,20 +232,21 @@ func TestSATSolverVariableConstructorRefusalAndBorrowedTodo(t *testing.T) {
 		t.Fatal(failures, successes)
 	}
 }
-func TestSATSolverVariableNativeWatchPrefixRetryAndColdGuards(t *testing.T) {
-	// A real justification-column refusal follows both native watch insertions.
-	// Source retry starts at level.size and repeats those completed publications.
+func TestSATSolverVariableNativeWatchPublicationAndColdGuards(t *testing.T) {
+	// The first variable's native columns complete without a reservation;
+	// the already constructed queue has room for its first insertion.
 	v, _, budget := satVariableStateFixture(t)
 	budget.FailAfter(0)
-	_, err := v.mkVar(false, true)
-	if !satRuntimeActualRefusal(v.memory, err) || len(v.watches.lists) != 2 || v.NumVars() != 0 {
-		t.Fatal("native watch prefix before actual column refusal", err, v.Stats())
-	}
-	budget.FailAfter(-1)
 	index, err := v.mkVar(false, true)
+	budget.FailAfter(-1)
 	satOK(t, err)
-	if index != 0 || len(v.watches.lists) != 4 || v.mkVarCount != 2 {
-		t.Fatal("source retry retained completed watches", index, v.Stats())
+	if index != 0 || len(v.watches.lists) != 2 || v.NumVars() != 1 || v.mkVarCount != 1 {
+		t.Fatal("native watch/column publication", index, v.Stats())
+	}
+	index, err = v.mkVar(false, true)
+	satOK(t, err)
+	if index != 1 || len(v.watches.lists) != 4 || v.mkVarCount != 2 {
+		t.Fatal("subsequent variable publication", index, v.Stats())
 	}
 	s, _, _ := satVariableStateFixture(t)
 	copyOwner := *s

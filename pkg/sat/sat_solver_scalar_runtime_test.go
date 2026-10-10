@@ -14,7 +14,7 @@ func TestSATSolverScalarColumnsReachSameRuntime(t *testing.T) {
 	satOK(t, e)
 	amount, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if amount != 32+24+576 || v.memory.Stats().LiveBlocks != 3 {
+	if amount != 24+576 || v.memory.Stats().LiveBlocks != 2 {
 		t.Fatal("all actual scalar source allocations", amount, v.memory.Stats())
 	}
 }
@@ -35,14 +35,6 @@ func satScalarTestUintSize(t *testing.T, c *RuntimeUintColumn) uint32 {
 func satScalarAuditRoots(t *testing.T, v *satSolverVariableState, external ...util.Block) {
 	t.Helper()
 	roots := append([]util.Block{}, external...)
-	for _, c := range []*satRuntimeColumn{&v.justification.raw} {
-		if !c.PendingReplaces && c.Block != (util.Block{}) {
-			roots = append(roots, c.Block)
-		}
-		if c.Pending != (util.Block{}) {
-			roots = append(roots, c.Pending)
-		}
-	}
 	if v.queue != nil && v.queue.runtimeBacked() {
 		for _, c := range []*satRuntimeColumn{&v.queue.runtimeValues.Raw, &v.queue.runtimeIndices.Raw} {
 			if !c.PendingReplaces && c.Block != (util.Block{}) {
@@ -81,7 +73,7 @@ func TestSATSolverScalarReverseMemberRawDestruction(t *testing.T) {
 	satOK(t, e)
 	// Actual Runtime release cursors verify source reverse declaration order;
 	// other arena-only members introduce no invented Runtime release events.
-	order := []util.Block{v.queue.runtimeIndices.Raw.Block, v.queue.runtimeValues.Raw.Block, v.justification.raw.Block}
+	order := []util.Block{v.queue.runtimeIndices.Raw.Block, v.queue.runtimeValues.Raw.Block}
 	satOK(t, v.Close())
 	records := testFieldBySourceName(reflect.ValueOf(v.memory).Elem(), "blocks")
 	for i, h := range order {

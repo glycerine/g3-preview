@@ -21,7 +21,7 @@ type satSolverVariableState struct {
 	phase, previousPhase                            []int8
 	decision, eliminated, external, assignedSinceGC []bool
 	mark, literalMark                               []bool
-	justification                                   satSolverRuntimeJustificationColumn
+	justification                                   satSolverJustifications
 	level                                           []uint32
 	activity                                        *satSolverActivity
 	queue                                           *satVarQueue
@@ -60,7 +60,7 @@ func newSATColdVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.Ve
 	s := &satSolverVariableState{budget: b, elimTodo: todo, ownerBytes: n, activityInc: 128}
 	s.self = s
 	s.memory = raw
-	s.justification.bind(raw, b)
+	s.justification.bind()
 	return s, nil
 }
 
@@ -345,7 +345,6 @@ func (s *satSolverVariableState) Stats() satSolverVariableStats {
 		return satSolverVariableStats{}
 	}
 	out := satSolverVariableStats{OwnerBytes: s.ownerBytes, NumVars: s.NumVars(), MkVarCount: s.mkVarCount}
-	out.ColumnBytes += s.justification.provenanceBytes
 	if s.watches != nil {
 		out.WatchBytes = s.watches.Stats().TotalBytes
 	}

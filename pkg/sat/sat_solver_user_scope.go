@@ -267,7 +267,7 @@ func (s *Solver) gcVar(v uint32) error {
 	}
 	clear(x.assignment[2*v:])
 	x.assignment = x.assignment[:2*v]
-	if e = x.justification.raw.Shrink(v); e != nil {
+	if e = x.justification.shrink(v); e != nil {
 		return e
 	}
 	if uint64(v) > uint64(len(x.decision)) {
