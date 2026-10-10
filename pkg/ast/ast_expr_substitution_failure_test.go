@@ -142,6 +142,16 @@ func TestASTExprSubstitutionNativeOwnerIdentityAndBorrowedProvenance(t *testing.
 	if _, e := foreign.ExprSubstitutionEmpty(s); !errors.Is(e, ErrASTHandle) {
 		t.Fatal("foreign owner accepted", e)
 	}
+	if _, e := foreign.ScopedExprSubstitutionScopeLevel(scope); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("foreign scope accepted", e)
+	}
+	staleScope := scope
+	astTestMust(t, m.DelScopedExprSubstitution(&scope))
+	scope, e = m.NewScopedExprSubstitution(s)
+	astTestMust(t, e)
+	if _, e := m.ScopedExprSubstitutionScopeLevel(staleScope); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("dead scope accepted after new owner publication", e)
+	}
 	astTestMust(t, m.DelScopedExprSubstitution(&scope))
 	stale := s
 	astTestMust(t, m.DelExprSubstitution(&s))
@@ -205,7 +215,7 @@ func TestASTExprSubstitutionNativeSparseResetReleasesDependencyRoots(t *testing.
 	astTestMust(t, m.DelExprSubstitution(&s))
 	astTestMust(t, m.DependencyDec(dep))
 }
-func TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding(t *testing.T) {
+func TestASTScopedExprSubstitutionNativeColdTrailPush(t *testing.T) {
 	m := astTestManager(t)
 	key := astDependencyExpr(t, m, 12200)
 	value := astDependencyExpr(t, m, 12201)
@@ -216,29 +226,29 @@ func TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding(t *test
 	m.BudgetField.FailAfter(0)
 	e = m.ScopedExprSubstitutionInsert(scope, key, value, ASTHandle{}, ASTDependency{})
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
+	astTestMust(t, e)
 	rc, e := m.GetRefCount(key)
 	astTestMust(t, e)
 	if rc != 3 {
-		t.Fatal("map and failed unstored trail INC", rc)
+		t.Fatal("map and native trail INC", rc)
 	}
 	a, e := m.scopedSubstState(scope)
 	astTestMust(t, e)
-	trail, e := m.vectorState(a.trail)
-	astTestMust(t, e)
-	if trail.size != 0 {
-		t.Fatal(trail)
+	if len(a.trail) != 1 {
+		t.Fatal(a.trail)
 	}
 	found, e := m.ExprSubstitutionContains(s, key)
 	astTestMust(t, e)
 	if !found {
-		t.Fatal("installed untrailed binding")
+		t.Fatal("installed trailed binding")
 	}
 	astTestMust(t, m.DelScopedExprSubstitution(&scope))
 	astTestMust(t, m.DelExprSubstitution(&s))
-	astTestMust(t, m.DecRef(key))
+	rc, e = m.GetRefCount(key)
+	astTestMust(t, e)
+	if rc != 1 {
+		t.Fatal("native trail and map release", rc)
+	}
 }
 func TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix(t *testing.T) {
 	m := astTestManager(t)
@@ -258,7 +268,7 @@ func TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix(t *testing.T
 	astTestMust(t, e)
 	a, e := m.scopedSubstState(scope)
 	astTestMust(t, e)
-	if a.operation != 0 || a.size != 0 {
+	if a.operation != 0 || len(a.limits) != 0 {
 		t.Fatal("native pop retained pending scope state", a)
 	}
 	if m.dependencies.live != 0 {

@@ -32791,3 +32791,45 @@ checks passed. Source/API statuses remain 2102 units/677 APIs: 63 ported,
 implementation credit is added. The util knot and complete split remain active:
 scoped substitution/other retained AST collections, SAT vectors, NumericTextStream
 consumers and internal util numeric/text/parameter dependency cycles remain.
+
+## Native scoped substitution trail and scope limits
+
+Converted scoped expression substitution's owning trail to []astNodeRef and
+its scope stack to []int. Removed the encoded reference-vector member,
+SmallBytes limits payload, capacity arithmetic, initialized/backing-tail reads,
+growth reservations and packed progress words. A checked 8-byte identity record
+binds a reflected native state header to the manager. Slice/map backing uses Go
+storage; actual identity/header construction remains charged and fallible.
+Explicit deletion refunds those owners, and forced manager/source teardown
+clears both scoped and ordinary substitution registries after node teardown.
+
+Actual map insertion precedes the trail key INC/append. Pop erases the requested
+trail suffix in ascending order, then DEC releases its references in ascending
+order. Explicit operation stages and native cursors retain only genuinely
+unconsumed callback work; consumed entries are zeroed. Destruction finishes a
+partially consumed tail before its surviving prefix and never resets the
+borrowed substitution map. Cleanup still forwards only to the map, preserving
+trail/scope ownership. Reset clears the map, then trail, then scope limits.
+Invalid pop underflow now returns ErrASTDomain in both profiles, rather than
+emulating a release STL read from retained capacity and wrapped resize.
+
+The independent native oracle grows through 257 nested scopes, then checks
+2000 deterministic operations including duplicate insertion, cleanup with
+retained trail roots, nested pop, reset and reuse. It verifies public lookups,
+exact per-key/map-value reference counts and levels throughout, with reservations
+disabled. Cold append succeeds without the former unjoined failed-growth INC.
+Existing actual refused reference cleanup and interrupted tail/prefix destructor
+checks still pass. Extended identity coverage rejects foreign/stale scope owners
+after new publication; manager Close and SourceFinalize/Close now cover escaped
+scoped owners and exact header refunds too. Obsolete capacity-word and retained
+unsigned-underflow fixtures were replaced, with manifest evidence updated.
+
+Validation: initial focused native/debug substitution groups passed (0.057s /
+0.055s); final g3debug coverage passed (0.068s). Full native AST passed (27.266s)
+and full native rewriter passed (13.219s). Module-wide compilation, AST/rewriter
+vet, manifest evidence, gofmt and diff checks passed. Completion counts remain
+2102 units/677 APIs: 63 ported, 284 partial, 1727 unported and two dead/deleted;
+no generic C++ vector implementation credit is added. The util knot and complete
+subpackage split remain active. Other retained AST vector/printer consumers,
+SAT collections, NumericTextStream consumers and internal util numeric/text/
+parameter dependency cycles remain to be converted or separated.

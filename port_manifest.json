@@ -14515,11 +14515,12 @@
         "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
         "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
         "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-        "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+        "TestASTScopedExprSubstitutionNativeColdTrailPush",
         "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
         "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths",
-        "TestASTExprSubstitutionNativeManagerTeardown"
+        "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
+        "TestASTExprSubstitutionNativeManagerTeardown",
+        "TestASTScopedExprSubstitutionNativeGrowthIndependentModel"
       ],
       "assertions": [
         {
@@ -14578,10 +14579,10 @@
             "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
             "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
             "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNativeColdTrailPush",
             "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
             "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths",
+            "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
             "TestASTExprSubstitutionNativeManagerTeardown"
           ]
         },
@@ -14617,10 +14618,11 @@
             "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
             "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
             "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNativeColdTrailPush",
             "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
             "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+            "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
+            "TestASTScopedExprSubstitutionNativeGrowthIndependentModel"
           ]
         },
         {
@@ -14631,10 +14633,11 @@
         }
       ],
       "ownership": [
-        "The checked scalar owner uses a 16-byte charged allocator record and a reflected native Go state header containing three typed insdict.Dict tables. Dictionary backing uses native Go storage. Actual key/value INC/DEC and per-entry consumed-reference flags preserve ownership and retry progress. Manager teardown releases the native state header after node teardown. The scoped wrapper still uses its existing 48-byte encoded owner, reference-vector trail and retained limits; its native conversion remains open."
+        "Checked scalar substitution owners use 16-byte allocator records and reflected native Go state headers containing three typed insdict.Dict tables. Scoped owners use 8-byte checked identity records, reflected native state headers, an owning []astNodeRef trail and []int scope limits. Native dictionary/map/slice backing uses Go storage. Actual key/value INC/DEC and consumed-reference progress remain. Manager teardown drops both registries and refunds headers after node teardown."
       ],
       "deviations": [
-        "Container probing, buckets, capacity arithmetic, rehash reservations and reset cursors are replaced by insertion-ordered native dictionaries. Erase captures checked key identity before callbacks so removing the last key reference cannot trigger a late stale-key hash. Null-definition repeated fresh branches and optional-pointer publication before INC retain actual project source behavior. Same-entry consumed errors finish finite owned cleanup; reset stops at later callback errors, and destruction retains its owner if references remain unconsumed. Actual displays and full consumers remain open; this adds no generic C++ container completion credit."
+        "Container probing, buckets, capacity arithmetic, rehash reservations and reset cursors are replaced by insertion-ordered native dictionaries. Erase captures checked key identity before callbacks so removing the last key reference cannot trigger a late stale-key hash. Null-definition repeated fresh branches and optional-pointer publication before INC retain actual project source behavior. Same-entry consumed errors finish finite owned cleanup; reset stops at later callback errors, and destruction retains its owner if references remain unconsumed. Actual displays and full consumers remain open; this adds no generic C++ container completion credit.",
+        "Scoped trail and limit growth use native append with no simulated backing reservations. Erase-before-trail-DEC order, ascending callbacks, borrowed-map destruction and actual partial cleanup progress remain; explicit stages and native cursors replace packed source-capacity progress words. Invalid scope underflow returns ErrASTDomain in both profiles instead of reading retained STL backing or synthesizing wrapped unsigned resizes. A 257-level, 2000-operation independent oracle covers cleanup, duplicate trail ownership, nested pop, reset, reference counts and reuse with reservations disabled. No generic C++ vector implementation credit is added."
       ]
     },
     {
@@ -14679,11 +14682,12 @@
         "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
         "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
         "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-        "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+        "TestASTScopedExprSubstitutionNativeColdTrailPush",
         "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
         "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths",
-        "TestASTExprSubstitutionNativeManagerTeardown"
+        "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
+        "TestASTExprSubstitutionNativeManagerTeardown",
+        "TestASTScopedExprSubstitutionNativeGrowthIndependentModel"
       ],
       "conditionals": [
         {
@@ -14730,10 +14734,10 @@
             "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
             "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
             "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNativeColdTrailPush",
             "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
             "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths",
+            "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
             "TestASTExprSubstitutionNativeManagerTeardown"
           ]
         },
@@ -14769,10 +14773,11 @@
             "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
             "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
             "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNativeColdTrailPush",
             "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
             "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+            "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
+            "TestASTScopedExprSubstitutionNativeGrowthIndependentModel"
           ]
         },
         {
@@ -14783,10 +14788,11 @@
         }
       ],
       "ownership": [
-        "The checked scalar owner uses a 16-byte charged allocator record and a reflected native Go state header containing three typed insdict.Dict tables. Dictionary backing uses native Go storage. Actual key/value INC/DEC and per-entry consumed-reference flags preserve ownership and retry progress. Manager teardown releases the native state header after node teardown. The scoped wrapper still uses its existing 48-byte encoded owner, reference-vector trail and retained limits; its native conversion remains open."
+        "Checked scalar substitution owners use 16-byte allocator records and reflected native Go state headers containing three typed insdict.Dict tables. Scoped owners use 8-byte checked identity records, reflected native state headers, an owning []astNodeRef trail and []int scope limits. Native dictionary/map/slice backing uses Go storage. Actual key/value INC/DEC and consumed-reference progress remain. Manager teardown drops both registries and refunds headers after node teardown."
       ],
       "deviations": [
-        "Container probing, buckets, capacity arithmetic, rehash reservations and reset cursors are replaced by insertion-ordered native dictionaries. Erase captures checked key identity before callbacks so removing the last key reference cannot trigger a late stale-key hash. Null-definition repeated fresh branches and optional-pointer publication before INC retain actual project source behavior. Same-entry consumed errors finish finite owned cleanup; reset stops at later callback errors, and destruction retains its owner if references remain unconsumed. Actual displays and full consumers remain open; this adds no generic C++ container completion credit."
+        "Container probing, buckets, capacity arithmetic, rehash reservations and reset cursors are replaced by insertion-ordered native dictionaries. Erase captures checked key identity before callbacks so removing the last key reference cannot trigger a late stale-key hash. Null-definition repeated fresh branches and optional-pointer publication before INC retain actual project source behavior. Same-entry consumed errors finish finite owned cleanup; reset stops at later callback errors, and destruction retains its owner if references remain unconsumed. Actual displays and full consumers remain open; this adds no generic C++ container completion credit.",
+        "Scoped trail and limit growth use native append with no simulated backing reservations. Erase-before-trail-DEC order, ascending callbacks, borrowed-map destruction and actual partial cleanup progress remain; explicit stages and native cursors replace packed source-capacity progress words. Invalid scope underflow returns ErrASTDomain in both profiles instead of reading retained STL backing or synthesizing wrapped unsigned resizes. A 257-level, 2000-operation independent oracle covers cleanup, duplicate trail ownership, nested pop, reset, reference counts and reuse with reservations disabled. No generic C++ vector implementation credit is added."
       ]
     },
     {
@@ -115080,10 +115086,10 @@
         "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
         "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
         "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-        "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+        "TestASTScopedExprSubstitutionNativeColdTrailPush",
         "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
         "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths",
+        "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
         "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
         "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
         "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
@@ -115356,10 +115362,10 @@
             "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
             "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
             "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNativeColdTrailPush",
             "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
             "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+            "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop"
           ]
         },
         {
@@ -137809,10 +137815,10 @@
         "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
         "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
         "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-        "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+        "TestASTScopedExprSubstitutionNativeColdTrailPush",
         "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
         "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths",
+        "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
         "TestBVTrailingConstructorBorrowsExtractionOwner",
         "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
@@ -137916,10 +137922,10 @@
             "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
             "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
             "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNativeColdTrailPush",
             "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
             "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+            "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop"
           ]
         },
         {
@@ -142194,10 +142200,10 @@
         "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
         "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
         "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-        "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+        "TestASTScopedExprSubstitutionNativeColdTrailPush",
         "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
         "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-        "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+        "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop"
       ],
       "conditionals": [
         {
@@ -142244,10 +142250,10 @@
             "TestASTScopedExprSubstitutionNativeDependencyPopFinishesSuffix",
             "TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop",
             "TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix",
-            "TestASTScopedExprSubstitutionFailedTrailPushRetainsInstalledBinding",
+            "TestASTScopedExprSubstitutionNativeColdTrailPush",
             "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
             "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
-            "TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths"
+            "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop"
           ]
         },
         {

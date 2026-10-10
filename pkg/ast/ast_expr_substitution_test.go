@@ -14,20 +14,26 @@ func TestASTExprSubstitutionNativeManagerTeardown(t *testing.T) {
 			astTestMust(t, e)
 			s, e := m.NewExprSubstitution()
 			astTestMust(t, e)
+			scope, e := m.NewScopedExprSubstitution(s)
+			astTestMust(t, e)
 			nodes := markTestNodes(t, m, 2)
-			astTestMust(t, m.ExprSubstitutionInsert(s, nodes[0], nodes[1], ASTHandle{}, ASTDependency{}))
+			astTestMust(t, m.ScopedExprSubstitutionPush(scope))
+			astTestMust(t, m.ScopedExprSubstitutionInsert(scope, nodes[0], nodes[1], ASTHandle{}, ASTDependency{}))
 			if source {
 				astTestMust(t, m.SourceFinalize())
-				if len(m.exprSubstitutions) != 0 {
+				if len(m.exprSubstitutions) != 0 || len(m.scopedExprSubstitutions) != 0 {
 					t.Fatal("source teardown retained native dictionaries")
 				}
 			}
 			astTestMust(t, m.Close())
-			if len(m.exprSubstitutions) != 0 || budget.Used() != baseline {
+			if len(m.exprSubstitutions) != 0 || len(m.scopedExprSubstitutions) != 0 || budget.Used() != baseline {
 				t.Fatal("manager teardown retained substitution storage", budget.Used(), baseline)
 			}
 			if _, e = m.ExprSubstitutionEmpty(s); e == nil {
 				t.Fatal("escaped owner accepted after manager teardown")
+			}
+			if _, e = m.ScopedExprSubstitutionScopeLevel(scope); e == nil {
+				t.Fatal("escaped scope accepted after manager teardown")
 			}
 			astTestMust(t, m.Close())
 			if budget.Used() != baseline {

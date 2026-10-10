@@ -97,6 +97,10 @@ func (m *ASTManager) releaseExprSubstitutionsAfterNodeTeardown() {
 		m.BudgetField.Release(s.header)
 	}
 	m.exprSubstitutions = nil
+	for _, s := range m.scopedExprSubstitutions {
+		m.BudgetField.Release(s.header)
+	}
+	m.scopedExprSubstitutions = nil
 }
 func (m *ASTManager) NewExprSubstitution() (ASTExprSubstitution, error) {
 	if e := m.lock(); e != nil {

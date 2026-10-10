@@ -3,8 +3,6 @@ package ast
 import (
 	"errors"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/arena"
 )
 
 func TestASTScopedExprSubstitutionActualTrailAndBorrowedDestructor(t *testing.T) {
@@ -67,10 +65,8 @@ func TestASTScopedExprSubstitutionCleanupKeepsTrailAndNestedScopes(t *testing.T)
 	astTestMust(t, m.ScopedExprSubstitutionCleanup(scope))
 	a, e := m.scopedSubstState(scope)
 	astTestMust(t, e)
-	trail, e := m.vectorState(a.trail)
-	astTestMust(t, e)
-	if a.size != 1 || trail.size != 1 {
-		t.Fatal("cleanup must not reset limits/trail", a, trail)
+	if len(a.limits) != 1 || len(a.trail) != 1 {
+		t.Fatal("cleanup must not reset limits/trail", a)
 	}
 	empty, e := m.ScopedExprSubstitutionEmpty(scope)
 	astTestMust(t, e)
@@ -132,7 +128,7 @@ func TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed(t *te
 	}
 	a, e := m.scopedSubstState(scope)
 	astTestMust(t, e)
-	if a.operation != ^uint32(0) || a.index != 1 {
+	if a.operation != astScopedSubstDestroyPrefix || a.index != 1 {
 		t.Fatal("only consumed trail prefix advances", a)
 	}
 	rc, e := m.GetRefCount(first)
@@ -153,48 +149,32 @@ func TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed(t *te
 	astTestMust(t, m.DelScopedExprSubstitution(&scope))
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
-func TestASTScopedExprSubstitutionRetainedLimitsReleaseResizePaths(t *testing.T) {
+func TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitution()
 	astTestMust(t, e)
 	scope, e := m.NewScopedExprSubstitution(s)
 	astTestMust(t, e)
-	value := astDependencyExpr(t, m, 17000)
-	for i := uint32(0); i < 2; i++ {
-		key := astDependencyExpr(t, m, 17001+i)
-		astTestMust(t, m.ScopedExprSubstitutionInsert(scope, key, value, ASTHandle{}, ASTDependency{}))
-	}
+	key := astDependencyExpr(t, m, 17001)
+	value := astDependencyExpr(t, m, 17002)
 	astTestMust(t, m.ScopedExprSubstitutionPush(scope))
-	key := astDependencyExpr(t, m, 17003)
 	astTestMust(t, m.ScopedExprSubstitutionInsert(scope, key, value, ASTHandle{}, ASTDependency{}))
-	astTestMust(t, m.ScopedExprSubstitutionPush(scope))
+	for _, n := range []uint32{2, ^uint32(0)} {
+		if e = m.ScopedExprSubstitutionPop(scope, n); !errors.Is(e, ErrASTDomain) {
+			t.Fatal(n, e)
+		}
+		level, e := m.ScopedExprSubstitutionScopeLevel(scope)
+		astTestMust(t, e)
+		rc, e := m.GetRefCount(key)
+		astTestMust(t, e)
+		if level != 1 || rc != 3 {
+			t.Fatal("invalid pop changed scopes or references", level, rc)
+		}
+	}
+	astTestMust(t, m.ScopedExprSubstitutionPop(scope, 1))
 	astTestMust(t, m.ScopedExprSubstitutionReset(scope))
-	e = m.ScopedExprSubstitutionPop(scope, ^uint32(0))
-	if ASTSourceDebug {
-		if !errors.Is(e, ErrASTDomain) {
-			t.Fatal(e)
-		}
-	} else {
-		astTestMust(t, e)
-		a, e := m.scopedSubstState(scope)
-		astTestMust(t, e)
-		trail, e := m.vectorState(a.trail)
-		astTestMust(t, e)
-		if trail.size != 3 || a.size != 1 {
-			t.Fatal(trail, a)
-		}
-		for i := uint32(0); i < 3; i++ {
-			h, e := m.RefVectorGet(a.trail, i)
-			astTestMust(t, e)
-			if !h.IsNull() {
-				t.Fatal("source resize constructs NULL, not retained pointer", i, h)
-			}
-		}
-		limit, e := m.scopedSubstLimit(a, 0)
-		astTestMust(t, e)
-		if limit != 0 {
-			t.Fatal("source unsigned resize constructs zero", limit)
-		}
+	if e = m.ScopedExprSubstitutionPop(scope, ^uint32(0)); !errors.Is(e, ErrASTDomain) {
+		t.Fatal(e)
 	}
 	astTestMust(t, m.DelScopedExprSubstitution(&scope))
 	astTestMust(t, m.DelExprSubstitution(&s))
@@ -227,20 +207,6 @@ func TestASTScopedExprSubstitutionDestructorAfterNativeDependencyPop(t *testing.
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
 func TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix(t *testing.T) {
-	limit := uint32((^uint32(0) - 12) / 8)
-	if limit >= 1<<29 {
-		t.Fatal("actual trail capacity must fit stage payload")
-	}
-	for _, target := range []uint32{0, 1, limit} {
-		word, e := astScopedExprSubstDestructionWord(target)
-		astTestMust(t, e)
-		if word>>30 != 3 || word&((1<<30)-1) != target || word == ^uint32(0) {
-			t.Fatal(word, target)
-		}
-	}
-	if _, e := astScopedExprSubstDestructionWord(1 << 29); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal(e)
-	}
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitution()
 	astTestMust(t, e)
@@ -265,7 +231,7 @@ func TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix(t *testing
 	}
 	a, e := m.scopedSubstState(scope)
 	astTestMust(t, e)
-	if a.operation>>30 != 2 || a.index != 2 {
+	if a.operation != astScopedSubstRelease || a.index != 2 {
 		t.Fatal(a)
 	}
 	e = m.DelScopedExprSubstitution(&scope)
@@ -274,7 +240,7 @@ func TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix(t *testing
 	}
 	a, e = m.scopedSubstState(scope)
 	astTestMust(t, e)
-	if a.operation>>30 != 3 || a.operation&((1<<30)-1) != 1 || a.index != 2 || a.capacity != 0 {
+	if a.operation != astScopedSubstDestroyTail || a.target != 1 || a.index != 2 || len(a.limits) != 0 {
 		t.Fatal("limits destroyed before refused tail continuation", a)
 	}
 	m.nodeAt(third.slot).rc = 2
@@ -297,4 +263,114 @@ func TestASTScopedExprSubstitutionDestructorInterruptedTailThenPrefix(t *testing
 	if rc != 1 {
 		t.Fatal(rc)
 	}
+}
+
+func TestASTScopedExprSubstitutionNativeGrowthIndependentModel(t *testing.T) {
+	m := astTestManager(t)
+	keys := markTestNodes(t, m, 257)
+	for _, key := range keys {
+		astTestMust(t, m.IncRef(key))
+		defer m.DecRef(key)
+	}
+	value := astDependencyExpr(t, m, 19000)
+	s, e := m.NewExprSubstitution()
+	astTestMust(t, e)
+	scope, e := m.NewScopedExprSubstitution(s)
+	astTestMust(t, e)
+	// The oracle records the source algorithm using ordinary integer identities.
+	present := make(map[int]bool)
+	var trail, limits []int
+	push := func() {
+		astTestMust(t, m.ScopedExprSubstitutionPush(scope))
+		limits = append(limits, len(trail))
+	}
+	insert := func(i int) {
+		astTestMust(t, m.ScopedExprSubstitutionInsert(scope, keys[i], value, ASTHandle{}, ASTDependency{}))
+		if !present[i] {
+			present[i] = true
+			trail = append(trail, i)
+		}
+	}
+	check := func() {
+		counts := make([]uint32, len(keys))
+		for _, i := range trail {
+			counts[i]++
+		}
+		level, e := m.ScopedExprSubstitutionScopeLevel(scope)
+		astTestMust(t, e)
+		if int(level) != len(limits) {
+			t.Fatal("scope level", level, len(limits))
+		}
+		for i, key := range keys {
+			got, e := m.ScopedExprSubstitutionFindValue(scope, key)
+			astTestMust(t, e)
+			want, rcWant := key, 1+counts[i]
+			if present[i] {
+				want = value
+				rcWant++
+			}
+			rc, e := m.GetRefCount(key)
+			astTestMust(t, e)
+			if got != want || rc != rcWant {
+				t.Fatal("oracle", i, got, want, rc, rcWant)
+			}
+		}
+		rc, e := m.GetRefCount(value)
+		astTestMust(t, e)
+		if rc != uint32(1+len(present)) {
+			t.Fatal("value owners", rc, len(present))
+		}
+	}
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	for i := range keys {
+		push()
+		insert(i)
+	}
+	check()
+	seed := uint32(0x193ac5)
+	for step := 0; step < 2000; step++ {
+		seed = seed*1664525 + 1013904223
+		switch seed % 11 {
+		case 0, 1:
+			push()
+		case 2, 3:
+			n := 0
+			if len(limits) != 0 {
+				n = 1 + int((seed>>8)%uint32(len(limits)))
+			}
+			astTestMust(t, m.ScopedExprSubstitutionPop(scope, uint32(n)))
+			if n != 0 {
+				level := len(limits) - n
+				target := limits[level]
+				for _, i := range trail[target:] {
+					delete(present, i)
+				}
+				trail, limits = trail[:target], limits[:level]
+			}
+		case 4:
+			astTestMust(t, m.ScopedExprSubstitutionCleanup(scope))
+			clear(present)
+		case 5:
+			astTestMust(t, m.ScopedExprSubstitutionReset(scope))
+			clear(present)
+			trail, limits = nil, nil
+		default:
+			insert(int((seed >> 8) % uint32(len(keys))))
+		}
+		if step%17 == 0 {
+			check()
+		}
+	}
+	check()
+	astTestMust(t, m.ScopedExprSubstitutionReset(scope))
+	clear(present)
+	trail, limits = nil, nil
+	check()
+	m.BudgetField.FailAfter(-1)
+	if m.BudgetField.Used() != before {
+		t.Fatal("native growth changed charged storage", m.BudgetField.Used(), before)
+	}
+	astTestMust(t, m.DelScopedExprSubstitution(&scope))
+	astTestMust(t, m.DelExprSubstitution(&s))
 }
