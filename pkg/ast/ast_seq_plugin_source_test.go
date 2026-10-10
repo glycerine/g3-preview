@@ -40,7 +40,7 @@ func TestASTSequenceSourceSetManagerAndRecursiveSignatureInitialization(t *testi
 			t.Fatal("source member symbol order", i, string(s), text)
 		}
 	}
-	if len(p.signatures.words) == 0 || p.signatures.words[1] != 44 {
+	if len(p.signatures) != 44 {
 		t.Fatal("literal LAST_SEQ_OP vector resize", p.signatures)
 	}
 	for _, tc := range []struct {
@@ -51,18 +51,18 @@ func TestASTSequenceSourceSetManagerAndRecursiveSignatureInitialization(t *testi
 		{0, "seq.unit", 1, 1}, {2, "seq.++", 1, 2}, {6, "seq.extract", 1, 3},
 		{13, "re.+", 1, 1}, {22, "re.empty", 1, 0}, {27, "int.to.str", 0, 1}, {43, "_re.unroll", 0, 2},
 	} {
-		sig, e := p.signature(tc.index)
-		astTestMust(t, e)
+		sig := p.signatures[tc.index]
+		if sig == nil {
+			t.Fatal("missing signature", tc.index)
+		}
 		text, e := m.Symbols.String(sig.name)
 		astTestMust(t, e)
-		state, e := m.vectorState(sig.domain)
-		astTestMust(t, e)
-		if string(text) != tc.name || sig.parameters != tc.params || state.size != tc.size || !sig.completed {
-			t.Fatal("actual signature constructor fields", tc, string(text), sig, state)
+		if string(text) != tc.name || sig.parameters != tc.params || uint32(len(sig.domain)) != tc.size || !sig.completed {
+			t.Fatal("actual signature constructor fields", tc, string(text), sig)
 		}
 	}
-	if p.signatures.words[2+26] != 0 || p.signatures.words[2+42] != 0 {
-		t.Fatal("source unused signature slots must remain null", p.signatures.words)
+	if p.signatures[26] != nil || p.signatures[42] != nil {
+		t.Fatal("source unused signature slots must remain null", p.signatures)
 	}
 	// mk_sort calls init first, then uses the actual Char identity shortcut.
 	param, e := m.NewParameterAST(m.external(p.char))
@@ -104,7 +104,7 @@ func TestASTSequenceEveryActualConstructorAndSignatureReservation(t *testing.T) 
 			if p != nil {
 				init := p.initialized
 				first := p.bodyCause
-				slots := p.signatures.sizeSequence()
+				slots := len(p.signatures)
 				// Already-published source plugin causes registration to return without
 				// repeating set_manager/init or overwriting a failed source invocation.
 				b.FailAfter(-1)
@@ -115,13 +115,13 @@ func TestASTSequenceEveryActualConstructorAndSignatureReservation(t *testing.T) 
 				if b.Used() != m.Stats().AllocatedBytes+astTestSymbolGraph(sy) {
 					t.Fatal("actual duplicate family preparation graph", ordinal, b.Used())
 				}
-				if p.initialized != init || p.bodyCause != first || slots != p.signatures.sizeSequence() {
+				if p.initialized != init || p.bodyCause != first || slots != len(p.signatures) {
 					t.Fatal("published failed init prefix was replayed", ordinal, p)
 				}
 			}
 		} else {
 			complete = true
-			if p == nil || !p.initialized || p.signatures.sizeSequence() != 44 {
+			if p == nil || !p.initialized || len(p.signatures) != 44 {
 				t.Fatal("all actual signatures reached", ordinal, p)
 			}
 		}
@@ -141,69 +141,48 @@ func TestASTSequenceEveryActualConstructorAndSignatureReservation(t *testing.T) 
 	}
 }
 
-func TestASTSequenceSourceFinalizeRetainsUnjoinedSignatureUntilContextEnd(t *testing.T) {
-	_, q, _ := astTestOwners(t)
-	reached := false
-	for ordinal := int64(0); ordinal < 110; ordinal++ {
-		b := arena.NewBudget(1 << 28)
-		sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
-		astTestMust(t, e)
-		m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
-		astTestMust(t, e)
-		_, e = m.RegisterArithmeticPlugin()
-		astTestMust(t, e)
-		_, e = m.RegisterBitVectorPlugin()
-		astTestMust(t, e)
-		_, e = m.RegisterArrayPlugin()
-		astTestMust(t, e)
-		b.FailAfter(ordinal)
-		_, call := m.RegisterSequencePlugin()
-		if b.Used() != m.Stats().AllocatedBytes+astTestSymbolGraph(sy) {
-			t.Fatal("before lift constructor cold graph", ordinal, b.Used())
-		}
-		p := m.sequencePlugin
-		var stopped *astSequenceSignature
-		if p != nil {
-			for s := p.owned; s != nil; s = s.next {
-				if s.push.acquired && !s.push.published {
-					stopped = s
-					break
-				}
-			}
-		}
-		b.FailAfter(-1)
-		if stopped != nil {
-			if call == nil || stopped.completed || stopped.bodyCause == nil {
-				t.Fatal("actual unfinished append constructor", ordinal, stopped, call)
-			}
-			invocation, node, body := stopped.push.invocation, stopped.push.node, stopped.bodyCause
-			astTestMust(t, m.SourceFinalize())
-			if m.sequencePlugin != p || stopped.header == 0 || !stopped.contextEnded || stopped.push.invocation != invocation || stopped.push.node != node || stopped.bodyCause != body {
-				t.Fatal("actual source context end lost retained tuple", ordinal, p, stopped)
-			}
-			if b.Used() != m.Stats().AllocatedBytes+astTestSymbolGraph(sy) {
-				t.Fatal("charged source-ended metadata", ordinal, b.Used(), m.Stats())
-			}
-			astTestMust(t, m.Close())
-			if stopped.header != 0 || stopped.push.invocation != invocation || stopped.bodyCause != body {
-				t.Fatal("own context-end history", ordinal, stopped)
-			}
-			if b.Used() != astTestSymbolGraph(sy) {
-				t.Fatal("borrowed symbols must survive", ordinal, b.Used(), sy.Stats())
-			}
-			reached = true
-		} else {
-			astTestMust(t, m.Close())
-		}
-		astTestMust(t, sy.Close())
-		if b.Used() != 0 {
-			t.Fatal("closed owned metadata", ordinal, b.Used())
-		}
-		if reached {
-			break
+func TestASTSequenceNativeSignatureOwnershipAndFinalize(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterArrayPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterSequencePlugin()
+	astTestMust(t, e)
+	p := m.sequencePlugin
+	// The actual seq.++ signature retains its common sort three times: once
+	// for its range and once for each of its two identical domain arguments.
+	s := p.signatures[2]
+	if len(s.domain) != 2 || s.domain[0] != s.rangeSort || s.domain[1] != s.rangeSort {
+		t.Fatal("actual concat signature domains", s)
+	}
+	before, e := m.GetRefCount(m.external(s.rangeSort))
+	astTestMust(t, e)
+	astTestMust(t, p.destroySignature(s, false))
+	after, e := m.GetRefCount(m.external(s.rangeSort))
+	astTestMust(t, e)
+	if after != before-3 || len(s.domain) != 0 || s.rangeAcquired || !s.ended {
+		t.Fatal("signature cleanup must consume all three actual references", before, after, s)
+	}
+	astTestMust(t, p.destroySignature(s, true))
+	repeated, e := m.GetRefCount(m.external(s.rangeSort))
+	astTestMust(t, e)
+	if repeated != after {
+		t.Fatal("completed signature cleanup replayed a DEC", after, repeated)
+	}
+	astTestMust(t, m.SourceFinalize())
+	for s := p.owned; s != nil; s = s.next {
+		if !s.contextEnded || len(s.domain) != 0 || s.rangeAcquired {
+			t.Fatal("source finalization retained signature references", s)
 		}
 	}
-	if !reached {
-		t.Fatal("no real unjoined signature INC frontier")
+	if m.sequencePlugin != p || p.header == 0 {
+		t.Fatal("source-ended owner metadata must remain until owning close")
+	}
+	astTestMust(t, m.Close())
+	if p.header != 0 || p.signatures != nil {
+		t.Fatal("owning close retained signature storage")
 	}
 }

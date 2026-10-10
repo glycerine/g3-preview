@@ -28428,7 +28428,7 @@
       "tests": [
         "TestASTSequenceSourceSetManagerAndRecursiveSignatureInitialization",
         "TestASTSequenceEveryActualConstructorAndSignatureReservation",
-        "TestASTSequenceSourceFinalizeRetainsUnjoinedSignatureUntilContextEnd"
+        "TestASTSequenceNativeSignatureOwnershipAndFinalize"
       ],
       "conditionals": [
         {
@@ -28500,15 +28500,16 @@
           "tests": [
             "TestASTSequenceSourceSetManagerAndRecursiveSignatureInitialization",
             "TestASTSequenceEveryActualConstructorAndSignatureReservation",
-            "TestASTSequenceSourceFinalizeRetainsUnjoinedSignatureUntilContextEnd"
+            "TestASTSequenceNativeSignatureOwnershipAndFinalize"
           ]
         }
       ],
       "ownership": [
-        "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end."
+        "Actual signature owners retain range/domain AST references independently of native slice backing. Completed signatures retire in operation-index order; each range retires before ascending domain entries. Consumed references advance the cursor before errors are returned. Failed-constructor cleanup and body/source/own causes remain until actual manager context end; there is no container-growth-only pending acquisition."
       ],
       "deviations": [
-        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence."
+        "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
+        "The retained sequence signature registry now uses []*astSequenceSignature directly, with owning []astNodeRef domains. Each actual INC is immediately followed by native append; no fallible vector growth, raw vector allocation or unjoined push receipt remains. Range retirement precedes ascending domain retirement with consumed DEC progress. Original recursive initialization, operation-index publication, null unused slots and actual plugin/signature owner-header checks remain. Source allocation-failure geometry and vector internals are excluded; declaration matching/factory operations outside the retained registration/sort paths remain open."
       ]
     },
     {
@@ -28538,7 +28539,9 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The retained sequence signature registry now uses []*astSequenceSignature directly, with owning []astNodeRef domains. Each actual INC is immediately followed by native append; no fallible vector growth, raw vector allocation or unjoined push receipt remains. Range retirement precedes ascending domain retirement with consumed DEC progress. Original recursive initialization, operation-index publication, null unused slots and actual plugin/signature owner-header checks remain. Source allocation-failure geometry and vector internals are excluded; declaration matching/factory operations outside the retained registration/sort paths remain open."
+      ]
     },
     {
       "path": "src/ast/shared_occs.cpp",

@@ -1,5 +1,5 @@
 // Source: src/ast/seq_decl_plugin.cpp:343-357,500-610;
-// src/ast/seq_decl_plugin.h:126-175; src/util/ref_vector.h:28-217.
+// src/ast/seq_decl_plugin.h:126-175.
 package ast
 
 import (
@@ -7,23 +7,21 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-// IDs encode only the source pointer slots. The separately charged concrete
-// cold owners hold actual members and stopped leaf receipts, without boxing.
+// Concrete signature owners retain actual sort references. Native slices hold
+// published signatures and each owning domain in source declaration order.
 type astSequenceSignature struct {
-	next                                                       *astSequenceSignature
-	owner                                                      *astSequencePluginOwner
-	name                                                       usymbol.Symbol
-	parameters, id, cursor                                     uint32
-	domain                                                     ASTRefVector
-	rangeSort                                                  astNodeRef
-	push                                                       ASTRefVectorPushReceipt
-	header                                                     uint64
-	domainReady, rangeAcquired, completed, ended, contextEnded bool
-	bodyCause, sourceCause, ownCause                           error
+	next                                          *astSequenceSignature
+	owner                                         *astSequencePluginOwner
+	name                                          usymbol.Symbol
+	parameters, id, cursor                        uint32
+	domain                                        []astNodeRef
+	rangeSort                                     astNodeRef
+	header                                        uint64
+	rangeAcquired, completed, ended, contextEnded bool
+	bodyCause, sourceCause, ownCause              error
 }
 type astSequencePluginOwner struct {
 	next                    *astSequencePluginOwner
@@ -31,7 +29,7 @@ type astSequencePluginOwner struct {
 	owner                   *ASTManager
 	names                   [2]usymbol.Symbol
 	family                  FamilyID
-	signatures              astPluginVector
+	signatures              []*astSequenceSignature
 	owned                   *astSequenceSignature
 	char, stringSort, regex astNodeRef
 	acquired                [3]bool // exact successful String, Char, RE INC leaves
@@ -41,58 +39,6 @@ type astSequencePluginOwner struct {
 	bodyCause, sourceCause  error
 }
 
-func (p *astSequencePluginOwner) signature(i uint32) (*astSequenceSignature, error) {
-	if p == nil || p.self != p || len(p.signatures.words) == 0 || i >= p.signatures.words[1] {
-		return nil, ErrASTHandle
-	}
-	id := p.signatures.words[2+i]
-	if id == 0 {
-		return nil, ErrASTHandle
-	}
-	for s := p.owned; s != nil; s = s.next {
-		if s.id == id && s.owner == p {
-			return s, nil
-		}
-	}
-	return nil, ErrASTHandle
-}
-func (p *astSequencePluginOwner) resize(n uint32) error {
-	v := &p.signatures
-	for uint32(v.sizeSequence()) < n {
-		var size, capacity uint32
-		if len(v.words) != 0 {
-			size, capacity = v.words[1], v.words[0]
-		}
-		if size == capacity {
-			next := (uint64(capacity)*3 + 1) / 2
-			if next < 2 {
-				next = 2
-			}
-			if next > math.MaxUint32 || next+2 > uint64(^uint(0)>>1)/4 {
-				return arena.ErrBounds
-			}
-			if e := p.owner.BudgetField.Reserve((next + 2) * 4); e != nil {
-				return e
-			}
-			a := make([]uint32, int(next)+2)
-			a[0], a[1] = uint32(next), size
-			for i := uint32(0); i < size; i++ {
-				a[2+i] = v.words[2+i]
-			}
-			p.owner.BudgetField.Release(v.bytes())
-			v.words = a
-		}
-		v.words[2+size] = 0
-		v.words[1]++
-	}
-	return nil
-}
-func (v *astPluginVector) sizeSequence() uint32 {
-	if len(v.words) == 0 {
-		return 0
-	}
-	return v.words[1]
-}
 func (p *astSequencePluginOwner) newSignature(name string, n uint32, dom []astNodeRef, rng astNodeRef) (_s *astSequenceSignature, _body error) {
 	m := p.owner
 	if p.serial == math.MaxUint32 {
@@ -117,25 +63,16 @@ func (p *astSequencePluginOwner) newSignature(name string, n uint32, dom []astNo
 		return s, e
 	}
 	s.parameters = n
-	s.domain, e = m.newRefVector()
-	if e != nil {
-		return s, e
-	}
-	s.domainReady = true
 	s.rangeSort = rng
 	if e = m.incNode(rng); e != nil {
 		return s, e
 	}
 	s.rangeAcquired = true
 	for _, r := range dom {
-		if e = m.pushVectorTracked(s.domain, r, &s.push); e != nil {
+		if e = m.incNode(r); e != nil {
 			return s, e
 		}
-		// The actual vector slot now owns this successful INC. No unjoined
-		// invocation remains, so the call-local receipt storage may be reused.
-		if s.push.published {
-			s.push = ASTRefVectorPushReceipt{}
-		}
+		s.domain = append(s.domain, r)
 	}
 	s.completed = true
 	return s, nil
@@ -175,54 +112,21 @@ func (p *astSequencePluginOwner) destroySignature(s *astSequenceSignature, own b
 			return stop(e)
 		}
 	}
-	if s.domainReady {
-		st, e := m.vectorState(s.domain)
+	for s.cursor < uint32(len(s.domain)) {
+		consumed, e := m.decNode(s.domain[s.cursor])
+		if consumed {
+			s.domain[s.cursor] = astNodeRef{}
+			s.cursor++
+		}
 		if e != nil {
 			return stop(e)
 		}
-		for s.cursor < st.size {
-			r, e := m.vectorValue(st, s.cursor)
-			if e != nil {
-				return stop(e)
-			}
-			consumed, e := m.decNode(r)
-			if consumed {
-				s.cursor++
-			}
-			if e != nil {
-				return stop(e)
-			}
+		if !consumed {
+			return stop(ErrASTPending)
 		}
-		if st.capacity != 0 {
-			if e = m.vectorAllocator.Deallocate(st.capacity*8+astRefVectorHeaderBytes, st.payload); e != nil {
-				return stop(e)
-			}
-		}
-		if e = m.allocator.Deallocate(astRefVectorRecordBytes, s.domain.record); e != nil {
-			return stop(e)
-		}
-		s.domainReady = false
 	}
-	if own && s.push.acquired && !s.push.published && !s.push.acknowledged {
-		r := &s.push
-		if r.self != r || r.owner != m || r.vector != s.domain || r.invocation == 0 || r.invocation > m.refVectorPushSerial {
-			return stop(ErrASTHandle)
-		}
-		if !r.consumed {
-			consumed, e := m.decNode(r.node)
-			if consumed {
-				r.consumed = true
-			}
-			if e != nil {
-				return stop(e)
-			}
-		}
-		r.acknowledged = true
-	}
-	// Incomplete constructor unjoined INC is never a source destructor action.
-	if !s.push.acquired || s.push.published || s.push.acknowledged {
-		s.ended = true
-	}
+	s.domain = nil
+	s.ended = true
 	return nil
 }
 func (m *ASTManager) sequencePluginBytes() uint64 {
@@ -231,7 +135,7 @@ func (m *ASTManager) sequencePluginBytes() uint64 {
 		if p == nil {
 			return
 		}
-		n += p.header + p.signatures.bytes()
+		n += p.header
 		for s := p.owned; s != nil; s = s.next {
 			n += s.header
 		}
@@ -262,7 +166,7 @@ func (m *ASTManager) releaseSequencePluginHeaders() {
 	}
 	for p := m.sequencePlugin; p != nil; {
 		next := p.next
-		p.signatures.close(m.BudgetField)
+		p.signatures = nil
 		for s := p.owned; s != nil; s = s.next {
 			m.BudgetField.Release(s.header)
 			s.header = 0
@@ -277,7 +181,7 @@ func (m *ASTManager) releaseSequencePluginHeaders() {
 	}
 	for p := m.sequencePluginFailed; p != nil; {
 		next := p.next
-		p.signatures.close(m.BudgetField)
+		p.signatures = nil
 		for s := p.owned; s != nil; s = s.next {
 			m.BudgetField.Release(s.header)
 			s.header = 0
@@ -296,15 +200,11 @@ func (m *ASTManager) finalizeSequencePlugin() error {
 	if m.sourceClosing && p.sourceCause != nil {
 		return p.sourceCause
 	}
-	for i := uint32(0); i < p.signatures.sizeSequence(); i++ {
-		if p.signatures.words[2+i] == 0 {
+	for _, s := range p.signatures {
+		if s == nil {
 			continue
 		}
-		s, e := p.signature(i)
-		if e == nil {
-			e = p.destroySignature(s, !m.sourceClosing)
-		}
-		if e != nil {
+		if e := p.destroySignature(s, !m.sourceClosing); e != nil {
 			if p.sourceCause == nil && m.sourceClosing {
 				p.sourceCause = e
 			}
@@ -495,9 +395,7 @@ func (m *ASTManager) initializeSequence(p *astSequencePluginOwner) error {
 	if e != nil {
 		return e
 	}
-	if e = p.resize(44); e != nil {
-		return e
-	}
+	p.signatures = make([]*astSequenceSignature, 44)
 	type row struct {
 		index      uint32
 		name       string
@@ -555,7 +453,7 @@ func (m *ASTManager) initializeSequence(p *astSequencePluginOwner) error {
 		if e != nil {
 			return e
 		}
-		p.signatures.words[2+r.index] = sig.id // only completed new-expression return
+		p.signatures[r.index] = sig // only completed signature construction
 	}
 	return nil
 }

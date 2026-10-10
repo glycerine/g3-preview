@@ -34136,3 +34136,36 @@ allocation-failure geometry and do not promote whole units.
 Further retained collection consumers remain in proof binding/hyper-resolution,
 sequence/scoped AST reference-vector paths and other packages. Internal util
 cycles and the complete requested root subpackage split remain unfinished.
+
+## Native sequence signature registry and owning domains
+
+Sequence registration/recursive sort initialization now publishes signatures
+into []*astSequenceSignature directly. Removed raw ID-slot growth/resize and
+lookup indirection. Each actual signature domain is an owning []astNodeRef:
+actual INC immediately precedes append. Removed ASTRefVector records/backing,
+fallible native-container emulation and the growth-only push receipt. Actual
+signature/plugin owner headers, operation-index publication, two null unused
+slots, recursive-init guard and original source sort identities remain.
+
+Signature cleanup retires its range then its domain in ascending order, advancing
+consumed DEC state before returning errors. Existing real constructor-reservation
+campaign still reaches success and audits immediate complete owner graphs.
+Removed its growth-only unjoined-signature test. Replacement coverage uses the
+actual concat signature's three equal range/domain references, checks exact
+reference retirement and idempotent owning continuation, then SourceFinalize
+and Close with real context-end/header release checks.
+
+Validation: focused native/debug sequence/plugin tests passed (0.044s/0.050s).
+Full native AST/rewriter/tactic/model/SAT tactic/API passed
+(20.280s/11.902s/0.026s/0.053s/0.111s/0.012s); full debug AST passed (21.566s).
+AST vet, manifest, gofmt and diff checks passed. No full native module rerun
+inside the hourly interval. Counts unchanged:2102 units/677 APIs:62 ported,
+283 partial,1729 unported,two dead/deleted. No source vector internals or
+allocation-refusal geometry are credited.
+
+The next retained-consumer audit found scoped_mark only at its own definitions
+in src/ and pkg C++ mirrors, and ASTScopedMark only in its implementation and
+wrapper tests. It is unused and should be removed rather than migrated.
+Proof hyper-resolution/bindings, retained sorting-network test consumers and
+other actual collection consumers remain before internal util cycle cleanup
+and the full requested root subpackage split.
