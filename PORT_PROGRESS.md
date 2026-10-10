@@ -37068,3 +37068,57 @@ optimization, dual/LAR, bounds/evidence, MPS and complete upstream drivers stay 
 
 Source inventory/evidence/no-generics and diff checks pass. Regenerated graph
 remains64 packages with unchanged edges and the new iteration production file.
+
+
+### Floating core value reconstruction, pivot rows and numerical basis/X updates — 2026-10-10
+
+Ported retained floating rs_minus_Anx, descending basic-value copy and correction,
+find_error_in_BxB, solve_Ax_eq_b/find_x_by_solving, full/indexed residual checks,
+LU/tableau update_x and restore_x, actual refined inverse/pivot-row construction,
+update_basis_and_x and restore_x_and_refactor. Native slices own local RHS and
+correction buffers; actual LU, indexed Ed/W, pivot rows, saved CopyXB and borrowed
+solver vectors participate directly. Whole-source retained caller scan includes
+primal, dual and LAR. copy_right_side has only declaration/definition and is not
+ported; no unused generic numerical adapters are introduced.
+
+The source floating correction subtracts its solved residual from basic values.
+This literal quirk is preserved and tested with a real matrix change and stale
+factorization: oldB=1/currentB=2/rhs=4 produces8 before a real refactor produces2.
+Residuals use strict abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), preserving IEEE
+NaN/infinity, zero and negative tolerances. Indexed validation checks only the
+supplied rows. LU X updates capture each basic value before its subtraction;
+tableau updates use actual sparse column values and do not capture CopyXB.
+Zero restoration returns before any index/scratch access.
+
+Numerical update preserves source residual reconstruction/retry, actual Suhl
+replacement, forced/full refactor and singular rollback. Feasible-only failure
+publishes UNSTABLE and deletes its new LU while retaining the changed basis;
+normal rollback restores basis, saved values and real factorization, then updates
+source status/iteration counters. Output writer failures preserve completed
+mutations and precede status writes under the Go output profile. Source debug
+assertions are erased in native; signed arguments convert at actual uint callers.
+
+100 independently assembled known-solution worlds verify reconstruction and
+nullspace update/restoration.120 dense diagonally-dominant B*d worlds verify
+actual refined inverse/pivot rows, new X, headings and new-basis LU solutions,
+through sparse/forced-dense Suhl and full-refactor paths. Singular zero/nonzero
+steps, feasible-only behavior, trace cancellation, real stale-factor recovery,
+real drop-settings refusal followed by successful restoration, unsigned iteration
+wrap, stopped children, output refusal and borrowed-vector publication prefixes
+are covered. Pivot-vector clear/append/drop/error behavior uses actual owners.
+
+Focused core/primal/presolve/solver/column/scaler/static/LU regressions pass0.939s
+native/0.962s combined debug/checked. Values118/124 (95.2%) native,119/124 (96.0%)
+debug; numerical updates79/90 (87.8%),82/90 (91.1%); pivot rows25/26 (96.2%),26/26
+(100%). Remaining gaps are other-profile assertions, child errors behind successful
+vector invariants and final non-OK refactor after restored feasible X. These are
+not represented by fake numerical callbacks or claimed tested. Profiles:
+/mnt/oldrog/tmp/g3-core-update-{native,debug}.cover. Both LP vets pass.
+
+The full native module19:01 UTC89.8% LP snapshot predates current core additions;
+no within-hour full-suite repeat is needed. LP stays62 partial/48 unported units.
+Exact core/values, remaining bound/ratio/iteration helpers, primal/dual/LAR
+optimization, bounds/evidence, MPS and complete original drivers stay required.
+
+Source inventory/evidence/no-generics and diff checks pass. Regenerated graph
+remains64 packages with unchanged edges and three added core production files.

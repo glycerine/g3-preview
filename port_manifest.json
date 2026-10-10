@@ -120494,7 +120494,12 @@
         "pkg/util/lp/core_base_float_test.go",
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/core_iteration_float.go",
-        "pkg/util/lp/core_iteration_float_test.go"
+        "pkg/util/lp/core_iteration_float_test.go",
+        "pkg/util/lp/core_values_float.go",
+        "pkg/util/lp/core_update_float.go",
+        "pkg/util/lp/core_pivot_float.go",
+        "pkg/util/lp/core_values_float_test.go",
+        "pkg/util/lp/core_update_float_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -120506,7 +120511,18 @@
         "TestLPFloatCoreReducedCostsAndEnteringColumnIndependentOracle",
         "TestLPFloatCoreIterationPublicationPrefixes",
         "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
-        "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
+        "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation",
+        "TestLPFloatCoreValueReconstructionIndependentOracle",
+        "TestLPFloatCoreValueLiteralCorrectionAndTableau",
+        "TestLPFloatCoreResidualToleranceAndIEEE",
+        "TestLPFloatCoreValuePublicationGuards",
+        "TestLPFloatCoreNumericalBasisUpdateIndependentOracle",
+        "TestLPFloatCoreNumericalUpdateSingularRollback",
+        "TestLPFloatCoreNumericalUpdateResidualRecovery",
+        "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
+        "TestLPFloatCoreNumericalUpdateAndPivotGuards",
+        "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
+        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
       ],
       "assertions": [
         {
@@ -120592,15 +120608,39 @@
             "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
             "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
           ]
+        },
+        {
+          "name": "Retained floating RHS-minus-nonbasic reconstruction, residual/correction solve, full/indexed Ax checks, LU/tableau X update and restoration, inverse/pivot row construction, numerical basis/X update with Suhl/refactor/recovery/rollback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/core_values_float.go",
+            "pkg/util/lp/core_update_float.go",
+            "pkg/util/lp/core_pivot_float.go"
+          ],
+          "tests": [
+            "TestLPFloatCoreValueReconstructionIndependentOracle",
+            "TestLPFloatCoreValueLiteralCorrectionAndTableau",
+            "TestLPFloatCoreResidualToleranceAndIEEE",
+            "TestLPFloatCoreValuePublicationGuards",
+            "TestLPFloatCoreNumericalBasisUpdateIndependentOracle",
+            "TestLPFloatCoreNumericalUpdateSingularRollback",
+            "TestLPFloatCoreNumericalUpdateResidualRecovery",
+            "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
+            "TestLPFloatCoreNumericalUpdateAndPivotGuards",
+            "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
+            "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
+          ]
         }
       ],
       "ownership": [
         "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally.",
-        "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair."
+        "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair.",
+        "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization."
       ],
       "deviations": [
-        "Floating initialization/feasibility layer only. Exact instantiations, numerical pivot/basis updates, primal-value reconstruction, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
-        "Floating basis bookkeeping and reduced-cost/entering-column layer only. Actual numerical pivot/update and optimization remain open. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added."
+        "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
+        "Floating basis bookkeeping and reduced-cost/entering-column layer only. Full primal/dual/LAR optimization remains open; floating numerical pivot/update is now implemented. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added.",
+        "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced."
       ]
     },
     {
@@ -120613,7 +120653,12 @@
         "pkg/util/lp/core_base_float_test.go",
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/core_iteration_float.go",
-        "pkg/util/lp/core_iteration_float_test.go"
+        "pkg/util/lp/core_iteration_float_test.go",
+        "pkg/util/lp/core_values_float.go",
+        "pkg/util/lp/core_update_float.go",
+        "pkg/util/lp/core_pivot_float.go",
+        "pkg/util/lp/core_values_float_test.go",
+        "pkg/util/lp/core_update_float_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -120625,7 +120670,18 @@
         "TestLPFloatCoreReducedCostsAndEnteringColumnIndependentOracle",
         "TestLPFloatCoreIterationPublicationPrefixes",
         "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
-        "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
+        "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation",
+        "TestLPFloatCoreValueReconstructionIndependentOracle",
+        "TestLPFloatCoreValueLiteralCorrectionAndTableau",
+        "TestLPFloatCoreResidualToleranceAndIEEE",
+        "TestLPFloatCoreValuePublicationGuards",
+        "TestLPFloatCoreNumericalBasisUpdateIndependentOracle",
+        "TestLPFloatCoreNumericalUpdateSingularRollback",
+        "TestLPFloatCoreNumericalUpdateResidualRecovery",
+        "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
+        "TestLPFloatCoreNumericalUpdateAndPivotGuards",
+        "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
+        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
       ],
       "conditionals": [
         {
@@ -120817,15 +120873,39 @@
             "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
             "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
           ]
+        },
+        {
+          "name": "Retained floating RHS-minus-nonbasic reconstruction, residual/correction solve, full/indexed Ax checks, LU/tableau X update and restoration, inverse/pivot row construction, numerical basis/X update with Suhl/refactor/recovery/rollback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/core_values_float.go",
+            "pkg/util/lp/core_update_float.go",
+            "pkg/util/lp/core_pivot_float.go"
+          ],
+          "tests": [
+            "TestLPFloatCoreValueReconstructionIndependentOracle",
+            "TestLPFloatCoreValueLiteralCorrectionAndTableau",
+            "TestLPFloatCoreResidualToleranceAndIEEE",
+            "TestLPFloatCoreValuePublicationGuards",
+            "TestLPFloatCoreNumericalBasisUpdateIndependentOracle",
+            "TestLPFloatCoreNumericalUpdateSingularRollback",
+            "TestLPFloatCoreNumericalUpdateResidualRecovery",
+            "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
+            "TestLPFloatCoreNumericalUpdateAndPivotGuards",
+            "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
+            "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
+          ]
         }
       ],
       "ownership": [
         "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally.",
-        "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair."
+        "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair.",
+        "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization."
       ],
       "deviations": [
-        "Floating initialization/feasibility layer only. Exact instantiations, numerical pivot/basis updates, primal-value reconstruction, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
-        "Floating basis bookkeeping and reduced-cost/entering-column layer only. Actual numerical pivot/update and optimization remain open. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added."
+        "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
+        "Floating basis bookkeeping and reduced-cost/entering-column layer only. Full primal/dual/LAR optimization remains open; floating numerical pivot/update is now implemented. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added.",
+        "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced."
       ]
     },
     {
@@ -120838,7 +120918,12 @@
         "pkg/util/lp/core_base_float_test.go",
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/core_iteration_float.go",
-        "pkg/util/lp/core_iteration_float_test.go"
+        "pkg/util/lp/core_iteration_float_test.go",
+        "pkg/util/lp/core_values_float.go",
+        "pkg/util/lp/core_update_float.go",
+        "pkg/util/lp/core_pivot_float.go",
+        "pkg/util/lp/core_values_float_test.go",
+        "pkg/util/lp/core_update_float_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -120850,7 +120935,18 @@
         "TestLPFloatCoreReducedCostsAndEnteringColumnIndependentOracle",
         "TestLPFloatCoreIterationPublicationPrefixes",
         "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
-        "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
+        "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation",
+        "TestLPFloatCoreValueReconstructionIndependentOracle",
+        "TestLPFloatCoreValueLiteralCorrectionAndTableau",
+        "TestLPFloatCoreResidualToleranceAndIEEE",
+        "TestLPFloatCoreValuePublicationGuards",
+        "TestLPFloatCoreNumericalBasisUpdateIndependentOracle",
+        "TestLPFloatCoreNumericalUpdateSingularRollback",
+        "TestLPFloatCoreNumericalUpdateResidualRecovery",
+        "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
+        "TestLPFloatCoreNumericalUpdateAndPivotGuards",
+        "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
+        "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -120878,15 +120974,39 @@
             "TestLPFloatCoreBasisChangeSourceGuardsAndDetachedColumn",
             "TestLPFloatCoreIterationStoppedChildAndLiteralAccumulation"
           ]
+        },
+        {
+          "name": "Retained floating RHS-minus-nonbasic reconstruction, residual/correction solve, full/indexed Ax checks, LU/tableau X update and restoration, inverse/pivot row construction, numerical basis/X update with Suhl/refactor/recovery/rollback",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/core_values_float.go",
+            "pkg/util/lp/core_update_float.go",
+            "pkg/util/lp/core_pivot_float.go"
+          ],
+          "tests": [
+            "TestLPFloatCoreValueReconstructionIndependentOracle",
+            "TestLPFloatCoreValueLiteralCorrectionAndTableau",
+            "TestLPFloatCoreResidualToleranceAndIEEE",
+            "TestLPFloatCoreValuePublicationGuards",
+            "TestLPFloatCoreNumericalBasisUpdateIndependentOracle",
+            "TestLPFloatCoreNumericalUpdateSingularRollback",
+            "TestLPFloatCoreNumericalUpdateResidualRecovery",
+            "TestLPFloatCoreRestoreRefactorOutputAndFailurePrefixes",
+            "TestLPFloatCoreNumericalUpdateAndPivotGuards",
+            "TestLPFloatCoreNumericalUpdateBorrowedInputErrorPrefixes",
+            "TestLPFloatCoreNumericalRollbackRestoresNonzeroStep"
+          ]
         }
       ],
       "ownership": [
         "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally.",
-        "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair."
+        "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair.",
+        "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization."
       ],
       "deviations": [
-        "Floating initialization/feasibility layer only. Exact instantiations, numerical pivot/basis updates, primal-value reconstruction, solve/update/optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
-        "Floating basis bookkeeping and reduced-cost/entering-column layer only. Actual numerical pivot/update and optimization remain open. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added."
+        "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
+        "Floating basis bookkeeping and reduced-cost/entering-column layer only. Full primal/dual/LAR optimization remains open; floating numerical pivot/update is now implemented. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added.",
+        "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced."
       ]
     },
     {
