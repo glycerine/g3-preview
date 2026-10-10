@@ -5,14 +5,14 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently 80 partial source units and 30 unported units. The floating
+There are currently 81 partial source units and 29 unported units. The floating
 primal and dual cores expose Solve, and outer LU primal/dual integration is implemented.
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
 Latest hourly native module checkpoint passed at 22:14 UTC: LP 326.657s,
 89.8% (12347/13752). It includes floating dual outer and MPS primal/dual integration
-and predates the implied-bound, owning-constraint, bound-update and propagator additions. Focused native/debug checks validate that
+and predates the implied-bound, owning-constraint, bound-update and propagator/row-analyzer additions. Focused native/debug checks validate those
 additions. Log/profile: `/mnt/oldrog/tmp/g3-mps-dual-module-native.{log,cover}`.
 
 Known source limitation: the outer primal path flips upper-only coordinates but
@@ -42,6 +42,7 @@ from the120 independently verified bounded optima.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Exact row-bound analyzer and retained static entry point | 240 independent rational elimination worlds; strict endpoint exclusion, all five column types, single/multiple missing bounds, cursor/early-stop/persistent counters and literal RHS profiles; actual row/pivot iterators, foreign-manager and borrowed-provider guards; six pooled/direct physical refusal campaigns through success | Native80.9% (190/235), debug/checked84.7% (199/235). Gaps mostly child cleanup/guard errors and fresh-zero assertion failures. Full LAR row/tableau solver dispatch and explanations remain open |
 | Exact LAR bound propagation and typed virtual providers | 1200 independent strongest-bound worlds with term aliases, strict ties and first-discovery evidence order; term constant restoration before filter, live model directories/getters, output and separately owned hook division; 14 pooled/direct physical refusal campaigns through success with map/copy/publication prefixes | Native/debug 89.5% (119/133). Remaining gaps mostly invariant-protected lookup/child-cleanup errors. Row analysis, full LAR model/explanation and SMT integration remain open |
 | LAR exact bound dispatch, all five column-type updates and scoped witnesses | 300 independent exact open/closed interval worlds; source conflict/status/witness prefixes, unknown relations, invalid metadata/debug profiles, real scoped owners/aliased RHS and multi-column behavior; 30 pooled/direct physical refusal campaigns through success | Native 80.5% (293/364), debug/checked 85.7% (312/364); scoped witness specialization 100% (31/31). Remaining gaps mostly child-error/invariant guards; native omits debug assertion statements. Full registration, matrix/basis, whole-solver scopes, propagation and optimization remain open |
 | Owning LAR variable/term/general constraints and bound witnesses | 120 independent exact copy/borrow worlds; all relations, duplicate/zero coefficients and empty vectors; seven physical refusal campaigns through success with partial element/evidence prefixes, source isolation and exact root census; stopped-term/foreign-manager guards; witness value copies and stream refusal prefixes | Native/debug constraints 92.8% (77/83); witnesses/stream 100% (10/10). Full LAR constraint insertion/scopes, bound updates and quick_xplain solving remain open |

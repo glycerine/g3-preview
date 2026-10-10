@@ -10,6 +10,8 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 // remain stable during traversal. Close owns only the iterator's numeric calls.
 // Source clone and the vector-of-pairs iterator have no retained call sites.
 type RationalLinearIterator interface {
+	// NumeralManager identifies the borrowed numeric owner before any value copy.
+	NumeralManager() *numeral.RationalManager
 	Next(out *numeral.Rational) (index uint32, ok bool, err error)
 	NextIndex() (index uint32, ok bool, err error)
 	Reset() error
@@ -263,3 +265,12 @@ var _ RationalLinearIterator = (*RationalRowIterator)(nil)
 var _ RationalLinearIterator = (*RationalColumnIterator)(nil)
 var _ RationalLinearIterator = (*RationalIndexedIterator)(nil)
 var _ RationalLinearIterator = (*RationalPivotRowIterator)(nil)
+
+func (it *RationalRowIterator) NumeralManager() *numeral.RationalManager    { return it.manager }
+func (it *RationalColumnIterator) NumeralManager() *numeral.RationalManager { return it.matrix.manager }
+func (it *RationalIndexedIterator) NumeralManager() *numeral.RationalManager {
+	return it.vector.manager
+}
+func (it *RationalPivotRowIterator) NumeralManager() *numeral.RationalManager {
+	return it.inner.vector.manager
+}

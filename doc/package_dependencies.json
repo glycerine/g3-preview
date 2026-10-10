@@ -1245,6 +1245,7 @@
         "priority_queue_exact.go",
         "priority_queue_native.go",
         "rational_iterators.go",
+        "row_bound_analyzer.go",
         "row_eta_matrix_exact.go",
         "row_eta_matrix_float.go",
         "scaler_float.go",

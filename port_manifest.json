@@ -118229,9 +118229,19 @@
       "path": "src/util/lp/bound_analyzer_on_row.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/row_bound_analyzer.go",
+        "pkg/util/lp/row_bound_analyzer_test.go"
+      ],
+      "tests": [
+        "TestLARRowBoundAnalyzerIndependentEliminationOracle",
+        "TestLARRowBoundAnalyzerCursorRHSAndBorrowedLifetime",
+        "TestLARRowBoundAnalyzerPhysicalFailurePrefixes",
+        "TestLARRowBoundAnalyzerSourceRHSProfilesAndPivot",
+        "TestLARRowBoundAnalyzerForeignIteratorAndCurrentCursor",
+        "TestLARRowBoundAnalyzerLeavesHookInvocationOwned"
+      ],
       "assertions": [
         {
           "line": 109,
@@ -118252,9 +118262,97 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constructor owning RHS copy, destructor/Close and concrete analyze_row entry point",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_bound_analyzer.go",
+          "tests": [
+            "TestLARRowBoundAnalyzerIndependentEliminationOracle",
+            "TestLARRowBoundAnalyzerCursorRHSAndBorrowedLifetime",
+            "TestLARRowBoundAnalyzerPhysicalFailurePrefixes",
+            "TestLARRowBoundAnalyzerSourceRHSProfilesAndPivot",
+            "TestLARRowBoundAnalyzerForeignIteratorAndCurrentCursor",
+            "TestLARRowBoundAnalyzerLeavesHookInvocationOwned"
+          ]
+        },
+        {
+          "name": "analyze current-cursor classification, persistent missing-monoid counters and advance_u/advance_l",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_bound_analyzer.go",
+          "tests": [
+            "TestLARRowBoundAnalyzerIndependentEliminationOracle",
+            "TestLARRowBoundAnalyzerCursorRHSAndBorrowedLifetime",
+            "TestLARRowBoundAnalyzerPhysicalFailurePrefixes",
+            "TestLARRowBoundAnalyzerSourceRHSProfilesAndPivot",
+            "TestLARRowBoundAnalyzerForeignIteratorAndCurrentCursor",
+            "TestLARRowBoundAnalyzerLeavesHookInvocationOwned"
+          ]
+        },
+        {
+          "name": "upper/low availability assertions, ub/lb and retained strict min/max multiplied and borrowed endpoint overloads",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_bound_analyzer.go",
+          "tests": [
+            "TestLARRowBoundAnalyzerIndependentEliminationOracle",
+            "TestLARRowBoundAnalyzerCursorRHSAndBorrowedLifetime",
+            "TestLARRowBoundAnalyzerPhysicalFailurePrefixes",
+            "TestLARRowBoundAnalyzerSourceRHSProfilesAndPivot",
+            "TestLARRowBoundAnalyzerForeignIteratorAndCurrentCursor",
+            "TestLARRowBoundAnalyzerLeavesHookInvocationOwned"
+          ]
+        },
+        {
+          "name": "limit_all_monoids_from_below/above with exact compound arithmetic, own strict endpoint exclusion and source zero-total assertions",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_bound_analyzer.go",
+          "tests": [
+            "TestLARRowBoundAnalyzerIndependentEliminationOracle",
+            "TestLARRowBoundAnalyzerCursorRHSAndBorrowedLifetime",
+            "TestLARRowBoundAnalyzerPhysicalFailurePrefixes",
+            "TestLARRowBoundAnalyzerSourceRHSProfilesAndPivot",
+            "TestLARRowBoundAnalyzerForeignIteratorAndCurrentCursor",
+            "TestLARRowBoundAnalyzerLeavesHookInvocationOwned"
+          ]
+        },
+        {
+          "name": "limit_monoid_u_from_below/limit_monoid_l_from_above, copied unique coefficient and literal negative-RHS initialization",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_bound_analyzer.go",
+          "tests": [
+            "TestLARRowBoundAnalyzerIndependentEliminationOracle",
+            "TestLARRowBoundAnalyzerCursorRHSAndBorrowedLifetime",
+            "TestLARRowBoundAnalyzerPhysicalFailurePrefixes",
+            "TestLARRowBoundAnalyzerSourceRHSProfilesAndPivot",
+            "TestLARRowBoundAnalyzerForeignIteratorAndCurrentCursor",
+            "TestLARRowBoundAnalyzerLeavesHookInvocationOwned"
+          ]
+        },
+        {
+          "name": "limit_j exact direction/sign/strictness/row handoff to owning bound propagator",
+          "status": "ported",
+          "go_target": "pkg/util/lp/row_bound_analyzer.go",
+          "tests": [
+            "TestLARRowBoundAnalyzerIndependentEliminationOracle",
+            "TestLARRowBoundAnalyzerCursorRHSAndBorrowedLifetime",
+            "TestLARRowBoundAnalyzerPhysicalFailurePrefixes",
+            "TestLARRowBoundAnalyzerSourceRHSProfilesAndPivot",
+            "TestLARRowBoundAnalyzerForeignIteratorAndCurrentCursor",
+            "TestLARRowBoundAnalyzerLeavesHookInvocationOwned"
+          ]
+        }
+      ],
+      "ownership": [
+        "Analyzer borrows iterator, propagator and numeric manager; owns copied RHS pair plus lexical Analyze coefficient and separate helper-phase values. Actual exact arithmetic return-expression copies and temporaries remain until source destruction or explicit stopped-owner Close. Constructor returns partial owner even on refusal.",
+        "Numeric tracking ends before each iterator Next/Reset and propagator TryAddBound, then resumes only after success. Borrowed child/provider arithmetic retains its own real invocation generations; analyzer Close never destroys those owners. Physical failure campaigns inspect distinct stopped generations before cleanup and audit named numeral roots afterward.",
+        "All five concrete exact iterator types expose borrowed NumeralManager identity. Construction rejects a foreign iterator before cursor advancement or coefficient copy. Iterator still owns only its copy-call receipts; analyzer owns its published coefficient slots."
+      ],
+      "deviations": [
+        "Full LAR solver row/tableau dispatch and explanation integration remain open; this source unit stays partial despite implemented retained row arithmetic. Static AnalyzeLARRow returns its lexical owner for explicit Close on success/error so stopped source prefixes remain inspectable.",
+        "Retained lar_solver callers pass zero RHS. Source all-column paths ignore RHS entirely; unique-column paths begin at -RHS.X, and RHS.Y is unused. Nonzero-RHS source behavior is explicitly tested, not credited as generally correct equation propagation.",
+        "Initial scan deliberately does not Reset; counters persist across Analyze calls and stop further reads once both are -2. Helper scans Reset. Zero coefficient division remains the source numeric profile; retained static matrix rows remove zeros.",
+        "No retained callers exist for the non-strict monoid min/max overloads, commented evidence/bound_is_available helper, unused public j, or standalone test_bound_analyzer callback apparatus. These unused adapters were not introduced. Independent big.Rat elimination tests exercise the actual retained implementation instead."
+      ]
     },
     {
       "path": "src/util/lp/breakpoint.h",
@@ -120828,7 +120926,8 @@
         }
       ],
       "ownership": [
-        "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer."
+        "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer.",
+        "Concrete exact iterators expose borrowed numeric-manager provenance for row-analyzer validation before copying any coefficient; this accessor adds no ownership or numeric operations."
       ],
       "deviations": [
         "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."

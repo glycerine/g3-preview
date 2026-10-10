@@ -96,3 +96,5 @@ func (it *LARTermIterator) Close() error {
 }
 
 var _ RationalLinearIterator = (*LARTermIterator)(nil)
+
+func (it *LARTermIterator) NumeralManager() *numeral.RationalManager { return it.term.manager }

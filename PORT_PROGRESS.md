@@ -38017,3 +38017,58 @@ Next is the actual row analyzer using already ported exact iterators/propagator;
 retained lar_solver row callers pass zero numeric-pair RHS. Full row analysis,
 LAR model/matrix/basis/scopes/optimization, explanations and original drivers
 remain open. The complete LP implementation/test goal is unfinished.
+
+
+### Exact LAR row-bound analyzer — 2026-10-10
+
+Ported the retained bound_analyzer_on_row constructor, current-cursor Analyze,
+missing-monoid classification/counters, availability/endpoint assertions, strict
+minimum/maximum helpers, all-column and unique-column arithmetic, limit_j and
+static analyze_row entry point. LARRowBoundAnalyzer borrows the exact iterator
+and propagator, owns its copied RHS and lexical arithmetic values, and returns
+an explicit owner for Close on success or stopped construction/analysis. All
+five precise iterator types expose their borrowed numeral manager so foreign
+provenance is rejected before copying a coefficient or advancing a cursor.
+
+Initial classification does not Reset; missing counters persist across calls,
+and both -2 counters stop further row reads. Helper passes Reset. All-column
+paths retain source total/a + own endpoint arithmetic, excluding that endpoint's
+strict flag. Unique paths copy their actual coefficient and start at -RHS.X.
+Source all-column paths ignore RHS; RHS.Y is unused. Retained lar_solver callers
+pass zero RHS. Explicit nonzero fixtures preserve source behavior without
+claiming generally correct arbitrary-RHS equation propagation. Unused non-strict
+helper overloads, commented evidence callback apparatus and uncalled standalone
+test_bound_analyzer adapter were not introduced.
+
+Numeric tracking stops around each borrowed iterator/propagator call and resumes
+only after success; exact return-expression copies and source lexical lifetimes
+remain owned by the analyzer. Six pooled/direct physical failure campaigns cover
+construction, all-column and unique-column analysis through successful prefixes.
+They verify separately owned stopped generations before cleanup and named roots
+afterward. An actual interest-provider aliased division refusal demonstrates that
+closing analyzer and propagator preserves the provider's exact active division
+state for its own cleanup. No borrower destruction acquires that invocation.
+
+240 independent big.Rat worlds derive each target by eliminating the other row
+terms directly, independently of total-minus-own-term implementation. They cover
+all column types, coefficient signs, strict endpoints and missing-bound cases.
+Additional tests cover early stopping, repeated counters, copied RHS isolation,
+current cursor, source debug availability assertion versus erased native checks,
+actual pivot iterator, foreign-manager rejection and borrowed lifetimes.
+
+Final focused analyzer/propagator/exact-iterator native suite passes104.098s;
+combined g3debug/g3checked115.503s. Analyzer coverage190/235 (80.9%) native,
+199/235 (84.7%) debug/checked. Remaining gaps mainly propagate invariant-protected
+child/cleanup errors or qualify fresh-zero assertions. Profiles/logs:
+/mnt/oldrog/tmp/g3-row-analyzer-{native,debug}.{cover,log}. Both LP vets,
+source/evidence/no-generics verifier and native module-wide test compilation pass.
+The regenerated64-package graph adds one filename and no import edges.
+
+LP81 partial/29 unported; global2103 units/677 APIs,62 ported/362 partial/
+1651 unported/two dead-deleted. Full native checkpoint remains22:14 UTC,
+89.8% (12347/13752), predating LAR additions; hourly repeat is not due.
+Full LAR model construction and external-variable/term registration, exact
+matrix/basis/core, whole-solver scopes, row/tableau dispatch, optimization,
+explanations and original drivers remain open. The complete LP port goal remains
+unfinished. Next connect the actual model/core fields needed by retained LAR
+registration and solver-row consumers; this analyzer is not a complete solver.
