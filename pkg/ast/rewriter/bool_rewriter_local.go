@@ -8,10 +8,9 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-func (rw *boolRewriter) simpNestedNotOr(app ast.ASTHandle, neg *ast.ASTFastMark1, pos *ast.ASTFastMark2, out ast.ASTRef) (simplified bool, err error) {
+func (rw *boolRewriter) simpNestedNotOr(app ast.ASTHandle, neg, pos map[ast.ASTHandle]bool, out ast.ASTRef) (simplified bool, err error) {
 	m := rw.manager
-	var newArgs ast.ASTHandleBuffer
-	defer newArgs.Close(m.Budget())
+	var newArgs []ast.ASTHandle
 	n, e := m.GetNumArgs(app)
 	if e != nil {
 		return false, e
@@ -23,10 +22,7 @@ func (rw *boolRewriter) simpNestedNotOr(app ast.ASTHandle, neg *ast.ASTFastMark1
 		if e != nil {
 			return false, e
 		}
-		marked, e := neg.IsMarked(arg)
-		if e != nil {
-			return false, e
-		}
+		marked := neg[arg]
 		if marked {
 			h, e := m.MkFalse()
 			if e != nil {
@@ -34,10 +30,7 @@ func (rw *boolRewriter) simpNestedNotOr(app ast.ASTHandle, neg *ast.ASTFastMark1
 			}
 			return true, m.SetRef(out, h)
 		}
-		marked, e = pos.IsMarked(arg)
-		if e != nil {
-			return false, e
-		}
+		marked = pos[arg]
 		if marked {
 			simp = true
 			continue
@@ -47,18 +40,12 @@ func (rw *boolRewriter) simpNestedNotOr(app ast.ASTHandle, neg *ast.ASTFastMark1
 			return false, e
 		}
 		if negative {
-			marked, e = neg.IsMarked(atom)
-			if e != nil {
-				return false, e
-			}
+			marked = neg[atom]
 			if marked {
 				simp = true
 				continue
 			}
-			marked, e = pos.IsMarked(atom)
-			if e != nil {
-				return false, e
-			}
+			marked = pos[atom]
 			if marked {
 				h, e := m.MkFalse()
 				if e != nil {
@@ -67,14 +54,12 @@ func (rw *boolRewriter) simpNestedNotOr(app ast.ASTHandle, neg *ast.ASTFastMark1
 				return true, m.SetRef(out, h)
 			}
 		}
-		if e = newArgs.Push(m.Budget(), arg); e != nil {
-			return false, e
-		}
+		newArgs = append(newArgs, arg)
 	}
 	if !simp {
 		return false, nil
 	}
-	args := newArgs.Slice()
+	args := newArgs
 	switch len(args) {
 	case 0:
 		h, e := m.MkTrue()
@@ -97,7 +82,7 @@ func (rw *boolRewriter) simpNestedNotOr(app ast.ASTHandle, neg *ast.ASTFastMark1
 	}
 }
 
-func (rw *boolRewriter) simpLocalArg(arg ast.ASTHandle, neg *ast.ASTFastMark1, pos *ast.ASTFastMark2, modified *bool) (ast.ASTHandle, error) {
+func (rw *boolRewriter) simpLocalArg(arg ast.ASTHandle, neg, pos map[ast.ASTHandle]bool, modified *bool) (ast.ASTHandle, error) {
 	m := rw.manager
 	negative, atom, e := m.IsNot(arg)
 	if e != nil {
@@ -106,18 +91,12 @@ func (rw *boolRewriter) simpLocalArg(arg ast.ASTHandle, neg *ast.ASTFastMark1, p
 	if !negative {
 		atom = arg
 	}
-	marked, e := neg.IsMarked(atom)
-	if e != nil {
-		return ast.ASTHandle{}, e
-	}
+	marked := neg[atom]
 	if marked {
 		*modified = true
 		return m.MkBoolVal(!negative)
 	}
-	marked, e = pos.IsMarked(atom)
-	if e != nil {
-		return ast.ASTHandle{}, e
-	}
+	marked = pos[atom]
 	if marked {
 		*modified = true
 		return m.MkBoolVal(negative)
@@ -278,7 +257,7 @@ func (rw *boolRewriter) mkNestedITE(c, t, f ast.ASTHandle, out ast.ASTRef) (err 
 	return m.SetRef(out, h)
 }
 
-func (rw *boolRewriter) simpNestedEqITE(arg ast.ASTHandle, neg *ast.ASTFastMark1, pos *ast.ASTFastMark2, out ast.ASTRef) (bool, error) {
+func (rw *boolRewriter) simpNestedEqITE(arg ast.ASTHandle, neg, pos map[ast.ASTHandle]bool, out ast.ASTRef) (bool, error) {
 	rw.localContextCost += 3
 	negative, atom, e := rw.manager.IsNot(arg)
 	if e != nil {
@@ -366,72 +345,45 @@ func (rw *boolRewriter) simpNestedEqITE(arg ast.ASTHandle, neg *ast.ASTFastMark1
 	return true, nil
 }
 
-func (rw *boolRewriter) pushLocalArg(arg ast.ASTHandle, v ast.ASTRefVector, neg *ast.ASTFastMark1, pos *ast.ASTFastMark2) error {
+func (rw *boolRewriter) pushLocalArg(arg ast.ASTHandle, v *[]ast.ASTHandle, neg, pos map[ast.ASTHandle]bool) error {
 	negative, atom, e := rw.manager.IsNot(arg)
 	if e != nil {
 		return e
 	}
 	if negative {
-		marked, e := neg.IsMarked(atom)
-		if e != nil {
-			return e
-		}
+		marked := neg[atom]
 		if marked {
 			return nil
 		}
-		if e = neg.Mark(atom, true); e != nil {
-			return e
-		}
+		neg[atom] = true
 	} else {
-		marked, e := pos.IsMarked(arg)
-		if e != nil {
-			return e
-		}
+		marked := pos[arg]
 		if marked {
 			return nil
 		}
-		if e = pos.Mark(arg, true); e != nil {
-			return e
-		}
+		pos[arg] = true
 	}
-	return rw.manager.RefVectorPush(v, arg)
-}
-
-// A concrete borrowed vector argument reader avoids cloning the source c_ptr
-// when publishing the final OR. It grants no additional AST ownership.
-func (rw *boolRewriter) localOrVector(v ast.ASTRefVector) (ast.ASTHandle, error) {
-	return rw.manager.MkOrVector(v)
+	return appendRewriterRoot(rw.manager, v, arg)
 }
 
 func (rw *boolRewriter) localContextSimplify(args []ast.ASTHandle, out ast.ASTRef) (simplified bool, err error) {
 	m := rw.manager
-	oldArgs, e := m.NewRefVector()
+	if rw.localActive {
+		return false, ast.ErrASTPending
+	}
+	rw.localActive = true
+	defer func() { err = errors.Join(err, rw.closeLocalContext()) }()
+	oldArgs, newArgs := &rw.localOld, &rw.localNew
+	var e error
+	rw.localArg, e = m.NewRef(ast.ASTHandle{})
 	if e != nil {
 		return false, e
 	}
-	defer func() { err = errors.Join(err, m.DelRefVector(&oldArgs)) }()
-	newArgs, e := m.NewRefVector()
-	if e != nil {
-		return false, e
-	}
-	defer func() { err = errors.Join(err, m.DelRefVector(&newArgs)) }()
-	newArg, e := m.NewRef(ast.ASTHandle{})
-	if e != nil {
-		return false, e
-	}
-	defer func() { err = errors.Join(err, m.DelRef(&newArg)) }()
-	neg, e := ast.NewASTFastMark1(m)
-	if e != nil {
-		return false, e
-	}
-	defer func() { err = errors.Join(err, neg.Close()) }()
-	pos, e := ast.NewASTFastMark2(m)
-	if e != nil {
-		return false, e
-	}
-	defer func() { err = errors.Join(err, pos.Close()) }()
+	newArg := rw.localArg
+	neg := make(map[ast.ASTHandle]bool)
+	pos := make(map[ast.ASTHandle]bool)
 	simp, modified, forward := false, false, true
-	fromVector := false
+	fromOwned := false
 	n := uint32(len(args))
 	truth, e := m.MkTrue()
 	if e != nil {
@@ -443,13 +395,10 @@ func (rw *boolRewriter) localContextSimplify(args []ast.ASTHandle, out ast.ASTRe
 	}
 	process := func(i uint32) (done bool, err error) {
 		var arg ast.ASTHandle
-		if fromVector {
-			arg, e = m.RefVectorGet(oldArgs, i)
+		if fromOwned {
+			arg = (*oldArgs)[i]
 		} else {
 			arg = args[i]
-		}
-		if e != nil {
-			return false, e
 		}
 		negative, atom, e := m.IsNot(arg)
 		if e != nil {
@@ -544,45 +493,56 @@ func (rw *boolRewriter) localContextSimplify(args []ast.ASTHandle, out ast.ASTRe
 					return false, nil
 				}
 				var h ast.ASTHandle
-				if fromVector {
-					h, e = rw.localOrVector(oldArgs)
-				} else {
-					switch len(args) {
-					case 0:
-						h, e = m.MkFalse()
-					case 1:
-						h = args[0]
-					default:
-						h, e = m.MkOrArgs(args)
-					}
+				remaining := args
+				if fromOwned {
+					remaining = *oldArgs
+				}
+				switch len(remaining) {
+				case 0:
+					h, e = m.MkFalse()
+				case 1:
+					h = remaining[0]
+				default:
+					h, e = m.MkOrArgs(remaining)
 				}
 				if e != nil {
 					return false, e
 				}
 				return true, m.SetRef(out, h)
 			}
-			if e = m.RefVectorReverse(newArgs); e != nil {
-				return false, e
+			for i, j := 0, len(*newArgs)-1; i < j; i, j = i+1, j-1 {
+				(*newArgs)[i], (*newArgs)[j] = (*newArgs)[j], (*newArgs)[i]
 			}
 			modified = false
 			forward = true
 		}
-		if e = pos.Reset(); e != nil {
+		clear(pos)
+		clear(neg)
+		if e = shrinkRewriterRoots(m, oldArgs, 0); e != nil {
 			return false, e
 		}
-		if e = neg.Reset(); e != nil {
-			return false, e
-		}
-		if e = m.RefVectorReset(oldArgs); e != nil {
-			return false, e
-		}
-		if e = m.SwapRefVectors(oldArgs, newArgs); e != nil {
-			return false, e
-		}
-		fromVector = true
-		n, e = m.RefVectorSize(oldArgs)
-		if e != nil {
-			return false, e
+		*oldArgs, *newArgs = *newArgs, *oldArgs
+		fromOwned = true
+		n = uint32(len(*oldArgs))
+	}
+}
+
+// Keep stopped numerical/AST destruction reachable on the actual rewriter.
+func (rw *boolRewriter) closeLocalContext() error {
+	m := rw.manager
+	if rw.localArg != (ast.ASTRef{}) {
+		if e := m.DelRef(&rw.localArg); e != nil {
+			return e
 		}
 	}
+	if e := shrinkRewriterRoots(m, &rw.localNew, 0); e != nil {
+		return e
+	}
+	rw.localNew = nil
+	if e := shrinkRewriterRoots(m, &rw.localOld, 0); e != nil {
+		return e
+	}
+	rw.localOld = nil
+	rw.localActive = false
+	return nil
 }

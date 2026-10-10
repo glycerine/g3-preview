@@ -42,21 +42,17 @@ func (rw *boolRewriter) mkDistinctCoreArguments(args ast.AppArguments, out ast.A
 		}
 		return brRewrite2, m.SetRef(out, h)
 	}
-	visited, e := ast.NewASTFastMark1(m)
-	if e != nil {
-		return brFailed, e
-	}
-	defer func() { err = errors.Join(err, visited.Close()) }()
+	visited := make(map[ast.ASTHandle]bool)
 	allValue := true
 	for i := uint32(0); i < args.Count(); i++ {
 		arg, e := args.At(i)
 		if e != nil {
 			return brFailed, e
 		}
-		marked, e := visited.IsMarked(arg)
-		if e != nil {
+		if _, e := m.GetKind(arg); e != nil {
 			return brFailed, e
 		}
+		marked := visited[arg]
 		if marked {
 			h, e := m.MkFalse()
 			if e != nil {
@@ -64,9 +60,7 @@ func (rw *boolRewriter) mkDistinctCoreArguments(args ast.AppArguments, out ast.A
 			}
 			return brDone, m.SetRef(out, h)
 		}
-		if e = visited.Mark(arg, true); e != nil {
-			return brFailed, e
-		}
+		visited[arg] = true
 		value, e := m.IsUniqueValue(arg)
 		if e != nil {
 			return brFailed, e
@@ -98,8 +92,7 @@ func (rw *boolRewriter) mkDistinctCoreArguments(args ast.AppArguments, out ast.A
 		return brDone, m.SetRef(out, h)
 	}
 	if rw.blastDistinct && uint64(args.Count()) < uint64(rw.blastDistinctThreshold) {
-		var diseqs ast.ASTHandleBuffer
-		defer diseqs.Close(m.Budget())
+		var diseqs []ast.ASTHandle
 		for i := uint32(0); i < args.Count(); i++ {
 			for j := i + 1; j < args.Count(); j++ {
 				a, e := args.At(i)
@@ -118,12 +111,10 @@ func (rw *boolRewriter) mkDistinctCoreArguments(args ast.AppArguments, out ast.A
 				if e != nil {
 					return brFailed, e
 				}
-				if e = diseqs.Push(m.Budget(), h); e != nil {
-					return brFailed, e
-				}
+				diseqs = append(diseqs, h)
 			}
 		}
-		h, e := m.MkAndArgs(diseqs.Slice())
+		h, e := m.MkAndArgs(diseqs)
 		if e != nil {
 			return brFailed, e
 		}

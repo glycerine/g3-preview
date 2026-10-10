@@ -20476,7 +20476,8 @@
         "pkg/ast/rewriter/rewriter_engine.go",
         "pkg/ast/rewriter/rewriter_configuration.go",
         "pkg/ast/rewriter/bool_rewriter_public.go",
-        "pkg/ast/rewriter/bool_rewriter_bv_distinct_test.go"
+        "pkg/ast/rewriter/bool_rewriter_bv_distinct_test.go",
+        "pkg/ast/rewriter/bool_rewriter_native_context_test.go"
       ],
       "tests": [
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -20506,7 +20507,9 @@
         "TestBetaReducerOriginalPatternAndNoPatternReplacement",
         "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
         "TestBoolRewriterPublicCoreThroughOriginalTraversal",
-        "TestBoolRewriterOriginalBitVectorOffsetEquality"
+        "TestBoolRewriterOriginalBitVectorOffsetEquality",
+        "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+        "TestBoolRewriterNativeMembershipLeavesForeignMarks"
       ],
       "conditionals": [
         {
@@ -20578,7 +20581,9 @@
           "tests": [
             "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
             "TestBoolRewriterACOneLevelFlatteningAndSpill",
-            "TestBoolRewriterACIndependentAssignmentsThroughCDCL"
+            "TestBoolRewriterACIndependentAssignmentsThroughCDCL",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20590,7 +20595,9 @@
             "TestBoolRewriterACOneLevelFlatteningAndSpill",
             "TestBoolRewriterACIndependentAssignmentsThroughCDCL",
             "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning",
-            "TestBoolRewriterLocalContextEntryLimitWrapAndSpill"
+            "TestBoolRewriterLocalContextEntryLimitWrapAndSpill",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20619,7 +20626,9 @@
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bool_rewriter_ite.go",
           "tests": [
-            "TestBoolRewriterDistinctCardinalityThresholdAndPairOrder"
+            "TestBoolRewriterDistinctCardinalityThresholdAndPairOrder",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20630,7 +20639,9 @@
             "TestBoolRewriterITEExactBranchesAndIndependentTruthTables",
             "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape",
             "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning",
-            "TestBoolRewriterLocalContextEntryLimitWrapAndSpill"
+            "TestBoolRewriterLocalContextEntryLimitWrapAndSpill",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20638,7 +20649,9 @@
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bool_rewriter_config.go",
           "tests": [
-            "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention"
+            "TestBoolRewriterConstructorDefaultsFallbackAndCostRetention",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20648,7 +20661,9 @@
           "tests": [
             "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables",
             "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning",
-            "TestBoolRewriterLocalContextEntryLimitWrapAndSpill"
+            "TestBoolRewriterLocalContextEntryLimitWrapAndSpill",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20659,7 +20674,9 @@
             "TestBoolRewriterAppDispatcherAndFallbackDepths",
             "TestBoolRewriterDispatcherFamilyAssertionAndNativeFallback",
             "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning",
-            "TestBoolRewriterLocalContextEntryLimitWrapAndSpill"
+            "TestBoolRewriterLocalContextEntryLimitWrapAndSpill",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20669,7 +20686,9 @@
           "tests": [
             "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning",
             "TestBoolRewriterLocalContextEntryLimitWrapAndSpill",
-            "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches"
+            "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20678,7 +20697,9 @@
           "go_target": "pkg/ast/rewriter/bool_rewriter_local.go",
           "tests": [
             "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches",
-            "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning"
+            "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20700,11 +20721,12 @@
         }
       ],
       "ownership": [
-        "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
+        "Borrowed scratch uses native Go slices; output assignment retains AST ownership. Boolean membership maps are local and independent of AST mark planes. Owning context/AND rows retain actual AST references and stopped cleanup on the rewriter."
       ],
       "deviations": [
         "Boolean callbacks now integrate with the original no-proof bool_rewriter_star iterative engine through actual borrowed result-stack arguments. Default pattern skipping, associative flattening and source family dispatch are preserved. Whole-class method/ownership audits and exhaustive failure campaigns remain incomplete. Go guards reject invalid short arrays outside the source defined domain; family assertion is debug-only. No whole Boolean source unit, model evaluator or public API completion is credited.",
-        "The exported BoolRewriter names the existing concrete reducer without another owner allocation or duplicated algorithm. NewBoolRewriter uses its existing constructor; Flat, SetFlat and MkAppCore expose the original evaluator dependency with configured-owner guards. This does not credit theory-aware model evaluation or remaining Boolean source methods."
+        "The exported BoolRewriter names the existing concrete reducer without another owner allocation or duplicated algorithm. NewBoolRewriter uses its existing constructor; Flat, SetFlat and MkAppCore expose the original evaluator dependency with configured-owner guards. This does not credit theory-aware model evaluation or remaining Boolean source methods.",
+        "Native Boolean collections: AND/OR flattening, nested NOT/OR and DISTINCT scratch use []ASTHandle; positive/negative/visited membership uses local map[ASTHandle]bool instead of shared AST planes. Local-context owning old/new rows and recursive AND-as-OR argument rows use native slices with explicit INC/consumed-DEC cleanup, retained on the real rewriter if lexical destruction stops. Completed rows retire before later cleanup; Close drains retained younger rows before older owners. Alternating forward/backward passes, reversal, survivor order, source unsigned cost/entry-limit behavior, raw nested ITE construction and actual AST construction failures remain. Shared foreign marks are neither read nor changed. Removed vector/ref-buffer codecs, emulated backing growth and mark-owner/trail allocation events at these callers. Prior inline/doubling/fast-mark storage claims are superseded; no generic C++ container/STL implementation credit is added."
       ]
     },
     {
@@ -20720,7 +20742,8 @@
         "pkg/ast/rewriter/bool_rewriter_local.go",
         "pkg/ast/rewriter/rewriter_engine.go",
         "pkg/ast/rewriter/rewriter_configuration.go",
-        "pkg/ast/rewriter/bool_rewriter_public.go"
+        "pkg/ast/rewriter/bool_rewriter_public.go",
+        "pkg/ast/rewriter/bool_rewriter_native_context_test.go"
       ],
       "tests": [
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
@@ -20749,7 +20772,9 @@
         "TestRewriterEngineOriginalMacroExpansionUnderBinder",
         "TestBetaReducerOriginalPatternAndNoPatternReplacement",
         "TestRewriterEngineOriginalFrameScopeLimitsAndDisabledCancel",
-        "TestBoolRewriterPublicCoreThroughOriginalTraversal"
+        "TestBoolRewriterPublicCoreThroughOriginalTraversal",
+        "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+        "TestBoolRewriterNativeMembershipLeavesForeignMarks"
       ],
       "conditionals": [
         {
@@ -20777,7 +20802,9 @@
           "tests": [
             "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
             "TestBoolRewriterACOneLevelFlatteningAndSpill",
-            "TestBoolRewriterACIndependentAssignmentsThroughCDCL"
+            "TestBoolRewriterACIndependentAssignmentsThroughCDCL",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20805,7 +20832,9 @@
           "tests": [
             "TestBoolRewriterITEExactBranchesAndIndependentTruthTables",
             "TestBoolRewriterDistinctCardinalityThresholdAndPairOrder",
-            "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape"
+            "TestBoolRewriterITENonBooleanBranchesPreserveSourceSortAndShape",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20817,7 +20846,9 @@
             "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables",
             "TestBoolRewriterAppDispatcherAndFallbackDepths",
             "TestBoolRewriterConstructorHelperRefusalRetiresReachedHeader",
-            "TestBoolRewriterDispatcherFamilyAssertionAndNativeFallback"
+            "TestBoolRewriterDispatcherFamilyAssertionAndNativeFallback",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20827,7 +20858,9 @@
           "tests": [
             "TestBoolRewriterLocalContextExactOrderCostAndIndependentMeaning",
             "TestBoolRewriterLocalContextEntryLimitWrapAndSpill",
-            "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches"
+            "TestBoolRewriterNestedITEUsesRawNonrecursiveBranches",
+            "TestBoolRewriterNativeLocalContextGrowthAndReferences",
+            "TestBoolRewriterNativeMembershipLeavesForeignMarks"
           ]
         },
         {
@@ -20841,11 +20874,12 @@
         }
       ],
       "ownership": [
-        "Borrowed input handles use original sixteen-slot inline/doubling pointer buffers; output assignment retains AST ownership; source negative/positive fast marks retire in reverse declaration order."
+        "Borrowed scratch uses native Go slices; output assignment retains AST ownership. Boolean membership maps are local and independent of AST mark planes. Owning context/AND rows retain actual AST references and stopped cleanup on the rewriter."
       ],
       "deviations": [
         "Boolean callbacks now integrate with the original no-proof bool_rewriter_star iterative engine through actual borrowed result-stack arguments. Default pattern skipping, associative flattening and source family dispatch are preserved. Whole-class method/ownership audits and exhaustive failure campaigns remain incomplete. Go guards reject invalid short arrays outside the source defined domain; family assertion is debug-only. No whole Boolean source unit, model evaluator or public API completion is credited.",
-        "The exported BoolRewriter names the existing concrete reducer without another owner allocation or duplicated algorithm. NewBoolRewriter uses its existing constructor; Flat, SetFlat and MkAppCore expose the original evaluator dependency with configured-owner guards. This does not credit theory-aware model evaluation or remaining Boolean source methods."
+        "The exported BoolRewriter names the existing concrete reducer without another owner allocation or duplicated algorithm. NewBoolRewriter uses its existing constructor; Flat, SetFlat and MkAppCore expose the original evaluator dependency with configured-owner guards. This does not credit theory-aware model evaluation or remaining Boolean source methods.",
+        "Native Boolean collections: AND/OR flattening, nested NOT/OR and DISTINCT scratch use []ASTHandle; positive/negative/visited membership uses local map[ASTHandle]bool instead of shared AST planes. Local-context owning old/new rows and recursive AND-as-OR argument rows use native slices with explicit INC/consumed-DEC cleanup, retained on the real rewriter if lexical destruction stops. Completed rows retire before later cleanup; Close drains retained younger rows before older owners. Alternating forward/backward passes, reversal, survivor order, source unsigned cost/entry-limit behavior, raw nested ITE construction and actual AST construction failures remain. Shared foreign marks are neither read nor changed. Removed vector/ref-buffer codecs, emulated backing growth and mark-owner/trail allocation events at these callers. Prior inline/doubling/fast-mark storage claims are superseded; no generic C++ container/STL implementation credit is added."
       ]
     },
     {
@@ -111406,7 +111440,8 @@
         "GCD monomial reference storage now uses a concrete []Monomial slice. Original IncRef-before-publication, generated ownership transfer, ordered DecRef/reset and resumable actual monomial destruction remain. Deleted inline/spill payloads, Runtime expansion blocks, copied/pending growth state and incoming ownership needed only by fallible backing writes. Native append has no custom Runtime refusal event. Duplicate references across growth/reuse, generated transfer, real last-reference destructor refusal/owning continuation and independent GF11[x] content factorization with 33 coefficient monomials are tested. The synthetic consumed-old-growth test is retired; younger reference release before an older source stop remains checked by actual reference counts. No whole-unit completion credit is added.",
         "PolynomialSkeleton now uses []PolynomialSkeletonEntry, []uint32 powers and []Monomial originals, with local borrowed []Monomial sorting scratch and Go sort.Slice. Deleted Runtime payload vector codecs, inline128 class emulation, growth/free fault states, charged retired-reference arrays and transfer cursors. Failed constructors retain exactly their actual INC references in the native payload until owning Close; they do not invoke the source class destructor. Source destruction still releases entries before originals, and stopped real monomial destruction remains resumable by explicit owning cleanup. Pure-power growth through 129 terms succeeds with only the actual owner-header reservation and no Runtime allocation. Native bounds retain unsigned index wrap and debug assertions, with release bounds errors instead of exposing vector spare capacity. Retired raw uninitialized-entry/header mutation fixtures; added actual display callback owner-lifetime and native bounds coverage. The remaining shared byte-backed monomial buffer has since been removed from both sparse interpolation and cross-manager conversion; their borrowed handles use native slices. Platform sort comparator dispatch order is not claimed. No whole-unit completion credit is added.",
         "Sparse interpolation and cross-manager conversion now use borrowed []Monomial locals; their actual scoped numeral cleanup, linear solver, degree filtering, target-manager monomial conversion and polynomial publication remain. Conversion retains only newly created zero-reference monomials in its native orphan slice, without custom capacity charges or allocation failures. Removed the shared inline128/spill monomial buffer, Runtime pending/free branches and codecs. The indexed factory monomial span now accepts only borrowed native handles; unused inline/raw Runtime and polynomialVector variants are deleted. Real monomial/numeric/factory failure campaigns and foreign-owner protections remain. A 4097-entry lexical conversion fixture verifies no Runtime reservations and preserves the real returned factory root through source/owning cleanup; a 129-group single-sample interpolation independently reconstructs all coefficients and monomials twice. The old TLS pointer-buffer-free stop is retired with its removed storage. No whole-unit completion credit is added.",
-        "Polynomial PSC H reference storage now uses a concrete []Polynomial slice. Removed inline16 capacity emulation, Runtime payload growth/free, scalar-handle codecs, copied/pending/sourceRaw state and the unjoined INC whose only failure point was container publication. Actual INC-before-append and ascending DEC remain; a stopped real destructor retains its exact row and drain state until explicit owning cleanup. Native growth/reuse through 4097 rows succeeds with Runtime reservations disabled; an independent 129-row last-reference deletion fixture stops at row17 and verifies source retry refusal, exact owning continuation and no duplicate callback. Existing PSC mathematical identities, cancellation, actual numeric/factory refusal campaigns, lexical unwind and foreign-invocation guards remain. Three container-topology/failure tests are retired. No whole-unit completion credit is added."
+        "Polynomial PSC H reference storage now uses a concrete []Polynomial slice. Removed inline16 capacity emulation, Runtime payload growth/free, scalar-handle codecs, copied/pending/sourceRaw state and the unjoined INC whose only failure point was container publication. Actual INC-before-append and ascending DEC remain; a stopped real destructor retains its exact row and drain state until explicit owning cleanup. Native growth/reuse through 4097 rows succeeds with Runtime reservations disabled; an independent 129-row last-reference deletion fixture stops at row17 and verifies source retry refusal, exact owning continuation and no duplicate callback. Existing PSC mathematical identities, cancellation, actual numeric/factory refusal campaigns, lexical unwind and foreign-invocation guards remain. Three container-topology/failure tests are retired. No whole-unit completion credit is added.",
+        "Native Boolean collections: AND/OR flattening, nested NOT/OR and DISTINCT scratch use []ASTHandle; positive/negative/visited membership uses local map[ASTHandle]bool instead of shared AST planes. Local-context owning old/new rows and recursive AND-as-OR argument rows use native slices with explicit INC/consumed-DEC cleanup, retained on the real rewriter if lexical destruction stops. Completed rows retire before later cleanup; Close drains retained younger rows before older owners. Alternating forward/backward passes, reversal, survivor order, source unsigned cost/entry-limit behavior, raw nested ITE construction and actual AST construction failures remain. Shared foreign marks are neither read nor changed. Removed vector/ref-buffer codecs, emulated backing growth and mark-owner/trail allocation events at these callers. Prior inline/doubling/fast-mark storage claims are superseded; no generic C++ container/STL implementation credit is added."
       ]
     },
     {
@@ -141754,7 +141789,8 @@
       "deviations": [
         "No generic RefBuffer exists in Go. Current AST and polynomial targets are concrete typed owners in their consumer packages; remaining specializations should follow that pattern.",
         "GCD monomial reference storage now uses a concrete []Monomial slice. Original IncRef-before-publication, generated ownership transfer, ordered DecRef/reset and resumable actual monomial destruction remain. Deleted inline/spill payloads, Runtime expansion blocks, copied/pending growth state and incoming ownership needed only by fallible backing writes. Native append has no custom Runtime refusal event. Duplicate references across growth/reuse, generated transfer, real last-reference destructor refusal/owning continuation and independent GF11[x] content factorization with 33 coefficient monomials are tested. The synthetic consumed-old-growth test is retired; younger reference release before an older source stop remains checked by actual reference counts. No whole-unit completion credit is added.",
-        "Polynomial PSC H reference storage now uses a concrete []Polynomial slice. Removed inline16 capacity emulation, Runtime payload growth/free, scalar-handle codecs, copied/pending/sourceRaw state and the unjoined INC whose only failure point was container publication. Actual INC-before-append and ascending DEC remain; a stopped real destructor retains its exact row and drain state until explicit owning cleanup. Native growth/reuse through 4097 rows succeeds with Runtime reservations disabled; an independent 129-row last-reference deletion fixture stops at row17 and verifies source retry refusal, exact owning continuation and no duplicate callback. Existing PSC mathematical identities, cancellation, actual numeric/factory refusal campaigns, lexical unwind and foreign-invocation guards remain. Three container-topology/failure tests are retired. No whole-unit completion credit is added."
+        "Polynomial PSC H reference storage now uses a concrete []Polynomial slice. Removed inline16 capacity emulation, Runtime payload growth/free, scalar-handle codecs, copied/pending/sourceRaw state and the unjoined INC whose only failure point was container publication. Actual INC-before-append and ascending DEC remain; a stopped real destructor retains its exact row and drain state until explicit owning cleanup. Native growth/reuse through 4097 rows succeeds with Runtime reservations disabled; an independent 129-row last-reference deletion fixture stops at row17 and verifies source retry refusal, exact owning continuation and no duplicate callback. Existing PSC mathematical identities, cancellation, actual numeric/factory refusal campaigns, lexical unwind and foreign-invocation guards remain. Three container-topology/failure tests are retired. No whole-unit completion credit is added.",
+        "Native Boolean collections: AND/OR flattening, nested NOT/OR and DISTINCT scratch use []ASTHandle; positive/negative/visited membership uses local map[ASTHandle]bool instead of shared AST planes. Local-context owning old/new rows and recursive AND-as-OR argument rows use native slices with explicit INC/consumed-DEC cleanup, retained on the real rewriter if lexical destruction stops. Completed rows retire before later cleanup; Close drains retained younger rows before older owners. Alternating forward/backward passes, reversal, survivor order, source unsigned cost/entry-limit behavior, raw nested ITE construction and actual AST construction failures remain. Shared foreign marks are neither read nor changed. Removed vector/ref-buffer codecs, emulated backing growth and mark-owner/trail allocation events at these callers. Prior inline/doubling/fast-mark storage claims are superseded; no generic C++ container/STL implementation credit is added."
       ]
     },
     {
@@ -142253,7 +142289,8 @@
       "deviations": [
         "No generic RefVectorCore, RefVector, or SRefVector exists in Go. Current AST, polynomial, and s-expression targets use concrete typed owners; remaining specializations should stay beside their consumers.",
         "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added.",
-        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added."
+        "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
+        "Native Boolean collections: AND/OR flattening, nested NOT/OR and DISTINCT scratch use []ASTHandle; positive/negative/visited membership uses local map[ASTHandle]bool instead of shared AST planes. Local-context owning old/new rows and recursive AND-as-OR argument rows use native slices with explicit INC/consumed-DEC cleanup, retained on the real rewriter if lexical destruction stops. Completed rows retire before later cleanup; Close drains retained younger rows before older owners. Alternating forward/backward passes, reversal, survivor order, source unsigned cost/entry-limit behavior, raw nested ITE construction and actual AST construction failures remain. Shared foreign marks are neither read nor changed. Removed vector/ref-buffer codecs, emulated backing growth and mark-owner/trail allocation events at these callers. Prior inline/doubling/fast-mark storage claims are superseded; no generic C++ container/STL implementation credit is added."
       ]
     },
     {

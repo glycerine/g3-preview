@@ -130,6 +130,15 @@ func (rw *boolRewriter) Close() error {
 	if rw.closed {
 		return nil
 	}
+	if rw.andDepth != 0 {
+		return ast.ErrASTPending
+	}
+	if e := rw.closeLocalContext(); e != nil {
+		return e
+	}
+	if e := rw.closeAndArguments(0); e != nil {
+		return e
+	}
 	if e := rw.params.CloseHelpers(); e != nil {
 		return e
 	}
@@ -155,40 +164,21 @@ func (rw *boolRewriter) mkOrCore(args []ast.ASTHandle, out ast.ASTRef) (brStatus
 	return rw.mkNFlatOrCore(args, out)
 }
 
-// Concrete expr_ref_buffer: the typed handle slice carries owning AST
-// references here, including repeated entries.
-type boolRewriterRefBuffer struct {
-	values ast.ASTHandleBuffer
-}
-
-func (b *boolRewriterRefBuffer) push(m *ast.ASTManager, h ast.ASTHandle) error {
-	if e := m.IncRef(h); e != nil {
-		return e
-	}
-	if e := b.values.Push(m.Budget(), h); e != nil {
-		return errors.Join(e, m.DecRef(h))
-	}
-	return nil
-}
-func (b *boolRewriterRefBuffer) close(m *ast.ASTManager) error {
-	for i, h := range b.values.Slice() {
-		if !h.IsNull() {
-			if e := m.DecRef(h); e != nil {
-				return e
-			}
-			b.values.Slice()[i] = ast.ASTHandle{}
-		}
-	}
-	b.values.Close(m.Budget())
-	return nil
-}
 func (rw *boolRewriter) mkAndAsOr(args []ast.ASTHandle, out ast.ASTRef) (err error) {
 	return rw.mkAndAsOrArguments(astSliceArguments(args), out)
 }
 func (rw *boolRewriter) mkAndAsOrArguments(args ast.AppArguments, out ast.ASTRef) (err error) {
 	m := rw.manager
-	var newArgs boolRewriterRefBuffer
-	defer func() { err = errors.Join(err, newArgs.close(m)) }()
+	if rw.andDepth == 0 && len(rw.andArgs) != 0 {
+		return ast.ErrASTPending
+	}
+	depth := len(rw.andArgs)
+	rw.andArgs = append(rw.andArgs, nil)
+	rw.andDepth++
+	defer func() {
+		err = errors.Join(err, rw.closeAndArguments(depth))
+		rw.andDepth--
+	}()
 	for i := uint32(0); i < args.Count(); i++ {
 		arg, e := args.At(i)
 		if e != nil {
@@ -207,7 +197,7 @@ func (rw *boolRewriter) mkAndAsOrArguments(args ast.AppArguments, out ast.ASTRef
 			if e != nil {
 				return e
 			}
-			return newArgs.push(m, h)
+			return appendRewriterRoot(m, &rw.andArgs[depth], h)
 		}()
 		if e != nil {
 			return e
@@ -218,7 +208,7 @@ func (rw *boolRewriter) mkAndAsOrArguments(args ast.AppArguments, out ast.ASTRef
 		return e
 	}
 	defer func() { err = errors.Join(err, m.DelRef(&tmp)) }()
-	if e = rw.mkOr(newArgs.values.Slice(), tmp); e != nil {
+	if e = rw.mkOr(rw.andArgs[depth], tmp); e != nil {
 		return e
 	}
 	h, e := m.RefGet(tmp)
@@ -241,4 +231,21 @@ func (rw *boolRewriter) mkApp(decl ast.ASTHandle, args []ast.ASTHandle, out ast.
 }
 func (rw *boolRewriter) GetParamDescrs(d *util.ParamDescrs) error {
 	return catalogCollectBoolRewriterParams(d)
+}
+
+// Each recursive AND-as-OR invocation owns a native row until its lexical
+// cleanup finishes. Stopped younger rows remain reachable before older rows.
+func (rw *boolRewriter) closeAndArguments(depth int) error {
+	for len(rw.andArgs) > depth {
+		last := len(rw.andArgs) - 1
+		if e := shrinkRewriterRoots(rw.manager, &rw.andArgs[last], 0); e != nil {
+			return e
+		}
+		rw.andArgs[last] = nil
+		rw.andArgs = rw.andArgs[:last]
+	}
+	if depth == 0 {
+		rw.andArgs = nil
+	}
+	return nil
 }

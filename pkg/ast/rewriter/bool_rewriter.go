@@ -3,8 +3,6 @@
 package rewriter
 
 import (
-	"errors"
-
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
 )
@@ -23,6 +21,11 @@ type boolRewriter struct {
 	flat, iteExtraRules                 bool
 	localContext                        bool
 	localContextCost, localContextLimit uint32
+	localOld, localNew                  []ast.ASTHandle
+	localArg                            ast.ASTRef
+	localActive                         bool
+	andArgs                             [][]ast.ASTHandle
+	andDepth                            uint32
 }
 
 func (rw *boolRewriter) isOperator(h ast.ASTHandle, op int32) (bool, error) {
@@ -49,18 +52,9 @@ func (rw *boolRewriter) mkNFlatOrCore(args []ast.ASTHandle, out ast.ASTRef) (brS
 // Keep that source branch after mark reset and before the changed-result test.
 func (rw *boolRewriter) mkNFlatCore(args ast.AppArguments, out ast.ASTRef, disjunction bool) (status brStatus, err error) {
 	m := rw.manager
-	var buffer ast.ASTHandleBuffer
-	defer buffer.Close(m.Budget())
-	neg, e := ast.NewASTFastMark1(m)
-	if e != nil {
-		return brFailed, e
-	}
-	defer func() { err = errors.Join(err, neg.Close()) }()
-	pos, e := ast.NewASTFastMark2(m)
-	if e != nil {
-		return brFailed, e
-	}
-	defer func() { err = errors.Join(err, pos.Close()) }()
+	var buffer []ast.ASTHandle
+	neg := make(map[ast.ASTHandle]bool)
+	pos := make(map[ast.ASTHandle]bool)
 	unit, e := m.MkBoolVal(!disjunction)
 	if e != nil {
 		return brFailed, e
@@ -87,49 +81,31 @@ func (rw *boolRewriter) mkNFlatCore(args ast.AppArguments, out ast.ASTRef, disju
 			return brFailed, e
 		}
 		if negative {
-			marked, e := neg.IsMarked(atom)
-			if e != nil {
-				return brFailed, e
-			}
+			marked := neg[atom]
 			if marked {
 				changed = true
 				continue
 			}
-			marked, e = pos.IsMarked(atom)
-			if e != nil {
-				return brFailed, e
-			}
+			marked = pos[atom]
 			if marked {
 				return brDone, m.SetRef(out, absorb)
 			}
-			if e = neg.Mark(atom, true); e != nil {
-				return brFailed, e
-			}
+			neg[atom] = true
 		} else {
-			marked, e := pos.IsMarked(arg)
-			if e != nil {
-				return brFailed, e
-			}
+			marked := pos[arg]
 			if marked {
 				changed = true
 				continue
 			}
-			marked, e = neg.IsMarked(arg)
-			if e != nil {
-				return brFailed, e
-			}
+			marked = neg[arg]
 			if marked {
 				return brDone, m.SetRef(out, absorb)
 			}
-			if e = pos.Mark(arg, true); e != nil {
-				return brFailed, e
-			}
+			pos[arg] = true
 		}
-		if e = buffer.Push(m.Budget(), arg); e != nil {
-			return brFailed, e
-		}
+		buffer = append(buffer, arg)
 	}
-	remaining := buffer.Slice()
+	remaining := buffer
 	switch len(remaining) {
 	case 0:
 		return brDone, m.SetRef(out, unit)
@@ -137,12 +113,8 @@ func (rw *boolRewriter) mkNFlatCore(args ast.AppArguments, out ast.ASTRef, disju
 		return brDone, m.SetRef(out, remaining[0])
 	}
 	if disjunction && rw.localContext && rw.localContextCost <= rw.localContextLimit {
-		if e = neg.Reset(); e != nil {
-			return brFailed, e
-		}
-		if e = pos.Reset(); e != nil {
-			return brFailed, e
-		}
+		clear(neg)
+		clear(pos)
 		simplified, e := rw.localContextSimplify(remaining, out)
 		if e != nil {
 			return brFailed, e
@@ -195,16 +167,13 @@ func (rw *boolRewriter) mkFlatCore(args ast.AppArguments, out ast.ASTRef, disjun
 		return rw.mkNFlatCore(args, out, disjunction)
 	}
 	m := rw.manager
-	var flat ast.ASTHandleBuffer
-	defer flat.Close(m.Budget())
+	var flat []ast.ASTHandle
 	for j := uint32(0); j < i; j++ {
 		arg, e := args.At(j)
 		if e != nil {
 			return brFailed, e
 		}
-		if e = flat.Push(m.Budget(), arg); e != nil {
-			return brFailed, e
-		}
+		flat = append(flat, arg)
 	}
 	for ; i < args.Count(); i++ {
 		arg, e := args.At(i)
@@ -216,9 +185,7 @@ func (rw *boolRewriter) mkFlatCore(args ast.AppArguments, out ast.ASTRef, disjun
 			return brFailed, e
 		}
 		if !nested {
-			if e = flat.Push(m.Budget(), arg); e != nil {
-				return brFailed, e
-			}
+			flat = append(flat, arg)
 			continue
 		}
 		n, e := m.GetNumArgs(arg)
@@ -230,21 +197,19 @@ func (rw *boolRewriter) mkFlatCore(args ast.AppArguments, out ast.ASTRef, disjun
 			if e != nil {
 				return brFailed, e
 			}
-			if e = flat.Push(m.Budget(), h); e != nil {
-				return brFailed, e
-			}
+			flat = append(flat, h)
 		}
 	}
-	status, e := rw.mkNFlatCore(astSliceArguments(flat.Slice()), out, disjunction)
+	status, e := rw.mkNFlatCore(astSliceArguments(flat), out, disjunction)
 	if e != nil {
 		return brFailed, e
 	}
 	if status == brFailed {
 		var result ast.ASTHandle
 		if disjunction {
-			result, e = m.MkOrArgs(flat.Slice())
+			result, e = m.MkOrArgs(flat)
 		} else {
-			result, e = m.MkAndArgs(flat.Slice())
+			result, e = m.MkAndArgs(flat)
 		}
 		if e != nil {
 			return brFailed, e

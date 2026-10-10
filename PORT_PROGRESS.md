@@ -33653,3 +33653,40 @@ No full native module rerun inside the hourly interval. Counts remain
 The primary traversal engine and variable shifters now use native collection
 backing throughout. Other Boolean/BV/proof/sequence AST collections remain, and
 the complete external native caller audit and root util split are unfinished.
+
+## Native Boolean simplifier collections and local membership
+
+Boolean AND/OR flattening, nested NOT/OR and DISTINCT scratch now use native
+[]ASTHandle. Positive/negative/visited membership uses call-local Go maps; no
+Boolean production caller uses ASTFastMark planes or ASTHandleBuffer wrappers.
+Local-context old/new owning rows and recursive AND-as-OR argument rows now use
+native owning slices with explicit INC and consumed-DEC cleanup. Local/AND roots
+remain named on the actual rewriter if destruction stops, and Close drains the
+retained rows before older parameter owners. Recursive AND invocations retain
+separate owning rows; ordinary completed calls clear all their fields.
+
+Preserved alternating forward/backward passes, survivor reversal/order, unsigned
+cost accumulation and entry-limit semantics, raw nonrecursive nested ITE
+construction, actual AST construction and output publication. Removed vector/
+ref-buffer backing policies, mark wrapper/trail allocations and shared plane
+interference at these callers. Foreign caller marks are untouched. These native
+replacements add no generic C++ container/STL implementation credit.
+
+Validation: full Boolean tests passed (0.786s), full native rewriter passed
+(12.121s), and remaining g3debug rewriter passed (16.383s) with the same three
+verified baseline warm-allocation exclusions. Final focused native/debug local
+context and native membership fixtures passed (0.096s/0.081s). A 257-atom context
+checks cold slice/map growth with arena reservations disabled after warming only
+the actual temporary AST-reference owner, exact 10*n cost, unchanged output and
+all reference counts, and no surviving context fields. Foreign planes remain
+marked across duplicate filtering, local-context passes and DISTINCT rejection
+of unreduced uninterpreted constants. Existing independent Boolean truth/status/
+order, unsigned cost-wrap and constructor-refusal tests remain. Full native
+model/API/tactic/SAT tactic passed (0.050s/0.012s/0.024s/0.101s). Module-wide
+compilation, rewriter vet, manifest and diff checks passed. No full native module
+rerun. Counts remain 2102 units/677 APIs: 62 ported, 283 partial,
+1729 unported, two dead/deleted.
+
+Boolean caller storage is now native; BV/proof/sequence and other AST collection
+consumers still need auditing/migration. The complete external native caller
+migration and requested util root subpackage split remain unfinished.
