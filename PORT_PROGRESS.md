@@ -37828,3 +37828,41 @@ source/evidence/no-generics verifier and graph regeneration run without import
 edge changes. LP remains72 partial/38 unported. Exact/LAR input/solvers and
 complete original drivers remain open; whole LP goal unfinished. Last whole
 module checkpoint21:11 UTC predates these additions; hourly refresh follows.
+
+### Exact LAR implied-bound ownership and relation kinds — 2026-10-10
+
+Ported implied_bound's exact rational construction, generated assignment,
+strict/non-strict relation kind and six-field equality in source short-circuit
+order. Bound copies precede evidence publication. Each owner borrows its actual
+RationalManager and independently owns its copied rational. Stopped physical
+copies retain actual partial values/invocation receipts until explicit Close;
+a stopped flag also handles refusals that publish a partial scalar without an
+arithmetic frame. Cross-manager operations are rejected. Added the signed
+lconstraint_kind enum, flip_kind and source relation formatting, including
+unknown-kind native empty string/debug assertion behavior.
+
+160 independently generated big.Rat worlds validate exact values, each evidence
+field, input mutation isolation, independent destruction, self-assignment and
+replacement. Constructor and assignment campaigns enumerate physical allocation
+refusals through success using 1000-digit numerator/denominator values; tests
+verify evidence prefixes, stopped read/assignment guards, independent source
+survival and exact live-root census after cleanup. Native and combined
+ g3debug/g3checked focused implied-bound/LAR-term/MPS-dual checks pass
+7.828s/9.063s. New file53/58 statements (91.4%) in both profiles; five gaps
+qualify earlier pending-state checks or raw/value/root cleanup errors. Both LP
+vets and source/evidence/no-generics verifier pass.
+
+Hourly full native module suite passed at22:14 UTC: LP326.657s,
+89.8% (12347/13752), including floating dual outer and MPS primal/dual work,
+but predating implied_bound.go. Log/profile:
+/mnt/oldrog/tmp/g3-mps-dual-module-native.{log,cover}. Current focused profiles:
+/mnt/oldrog/tmp/g3-implied-{native,debug}.cover. No new imports or graph edges.
+
+Corrected lp_dual_simplex_instances.cpp from unported to partial for the actual
+floating find_maximal_solution/get_current_cost instantiations implemented in
+previous commits; rational instantiations remain unported. Relations-only
+lar_constraints.h/ul_pair.h and implied_bound.h now have explicit partial
+evidence. LP76 partial/34 unported; repository2103 units/677 APIs,
+62 ported/357 partial/1656 unported/two dead-deleted (other classifications
+unchanged). Full owning constraints, bound propagator, row analysis, exact/LAR
+solver integration and complete original drivers remain open; LP goal unfinished.

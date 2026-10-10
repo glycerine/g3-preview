@@ -118898,14 +118898,55 @@
       "path": "src/util/lp/implied_bound.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/implied_bound.go",
+        "pkg/util/lp/implied_bound_test.go"
+      ],
+      "tests": [
+        "TestLPImpliedBoundKindsAndStrings",
+        "TestLPImpliedBoundIndependentExactAndEvidence",
+        "TestLPImpliedBoundConstructionPhysicalRefusals",
+        "TestLPImpliedBoundAssignmentPhysicalRefusals"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "owning rational constructor and generated assignment, source member publication order",
+          "status": "ported",
+          "go_target": "pkg/util/lp/implied_bound.go",
+          "tests": [
+            "TestLPImpliedBoundIndependentExactAndEvidence",
+            "TestLPImpliedBoundConstructionPhysicalRefusals",
+            "TestLPImpliedBoundAssignmentPhysicalRefusals"
+          ]
+        },
+        {
+          "name": "kind and six-field equality including exact rational comparison",
+          "status": "ported",
+          "go_target": "pkg/util/lp/implied_bound.go",
+          "tests": [
+            "TestLPImpliedBoundKindsAndStrings",
+            "TestLPImpliedBoundIndependentExactAndEvidence"
+          ]
+        },
+        {
+          "name": "owning cleanup of partial rational copies and stopped invocation receipts",
+          "status": "ported",
+          "go_target": "pkg/util/lp/implied_bound.go",
+          "tests": [
+            "TestLPImpliedBoundConstructionPhysicalRefusals",
+            "TestLPImpliedBoundAssignmentPhysicalRefusals"
+          ]
+        }
+      ],
+      "ownership": [
+        "Bound is independently owned in a borrowed RationalManager. Stopped copies retain partial values and actual invocation receipts until explicit Close. Evidence fields publish only after the rational copy succeeds."
+      ],
+      "deviations": [
+        "Retained scalar fields, kind, equality and generated copy assignment are implemented. Full LAR bound-propagator, row analyzer and explanation integration remain unported. Source default constructor leaves scalar evidence unspecified; Go zero fields are not credited as initialized source evidence."
+      ]
     },
     {
       "path": "src/util/lp/indexed_value.h",
@@ -119766,9 +119807,14 @@
       "path": "src/util/lp/lar_constraints.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/implied_bound.go",
+        "pkg/util/lp/implied_bound_test.go"
+      ],
+      "tests": [
+        "TestLPImpliedBoundKindsAndStrings"
+      ],
       "assertions": [
         {
           "line": 43,
@@ -119781,9 +119827,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "flip_kind and lconstraint_kind_string",
+          "status": "ported",
+          "go_target": "pkg/util/lp/implied_bound.go",
+          "tests": [
+            "TestLPImpliedBoundKindsAndStrings"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Only relation reversal and formatting are implemented here; owning base/variable/term/general constraints and their LAR consumers remain open. Unknown relation returns the source empty string and debug assertion error."
+      ]
     },
     {
       "path": "src/util/lp/lar_core_solver.h",
@@ -122012,14 +122069,40 @@
       "path": "src/util/lp/lp_dual_simplex_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/dual_solver_float.go",
+        "pkg/util/lp/dual_solver_float_test.go",
+        "pkg/util/lp/mps_dual_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDualOuterIndependentVertices",
+        "TestLPFloatDualOuterRelationsFreeAndStatuses",
+        "TestLPFloatMPSDualIndependentMinMax"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "double/double find_maximal_solution and get_current_cost concrete instantiations",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solver_float.go",
+          "tests": [
+            "TestLPFloatDualOuterIndependentVertices",
+            "TestLPFloatDualOuterRelationsFreeAndStatuses",
+            "TestLPFloatMPSDualIndependentMinMax"
+          ]
+        },
+        {
+          "name": "mpq/mpq find_maximal_solution and get_current_cost instantiations",
+          "status": "unported",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Floating instantiations execute actual two-stage LU solve and original-coordinate objective reconstruction; exact rational instantiations remain open. Source default tableau and documented floating source discrepancies are not credited as generally correct optimization."
+      ]
     },
     {
       "path": "src/util/lp/lp_params.hpp",
@@ -129436,14 +129519,30 @@
       "path": "src/util/lp/ul_pair.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/implied_bound.go",
+        "pkg/util/lp/implied_bound_test.go"
+      ],
+      "tests": [
+        "TestLPImpliedBoundKindsAndStrings"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "lconstraint_kind signed relation encoding",
+          "status": "ported",
+          "go_target": "pkg/util/lp/implied_bound.go",
+          "tests": [
+            "TestLPImpliedBoundKindsAndStrings"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Only the relation enum is implemented; ul_pair bound-index bookkeeping remains unported."
+      ]
     },
     {
       "path": "src/util/luby.cpp",
