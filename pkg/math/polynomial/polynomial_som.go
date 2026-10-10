@@ -1033,7 +1033,6 @@ func (b *polynomialSOM) close() error {
 	if e = b.as.close(m); e != nil {
 		return e
 	}
-	m.integer.Budget().Release(uint64(cap(b.coefficientOwners)+cap(b.monomialOwners)+cap(b.coefficientTransferred)+cap(b.monomialTransferred)) * 8)
 	b.coefficientOwners = nil
 	b.monomialOwners = nil
 	b.coefficientTransferred, b.monomialTransferred = nil, nil

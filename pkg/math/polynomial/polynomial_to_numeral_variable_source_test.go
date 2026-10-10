@@ -98,7 +98,9 @@ func TestPolynomialToNumeralSelectedVariableActualOwnerReentry(t *testing.T) {
 }
 
 func TestPolynomialToNumeralSelectedVariableHistoryAcrossActualReuse(t *testing.T) {
-	full := polynomialPSCFullFixture(t)
+	full := polynomialArithmeticDirectObjectFixture(t)
+	_, e := full.core.monomials.MkVar()
+	serviceMust(t, e)
 	p := polynomialQueryTerms(t, full.core, []int32{6, 9}, [][]MonomialPower{{}, {{0, 1}}})
 	var output upolyVectorState
 	var old polynomialFactorNumeralVectorReceipt
@@ -114,7 +116,7 @@ func TestPolynomialToNumeralSelectedVariableHistoryAcrossActualReuse(t *testing.
 	full.upm.freeBacking(&output)
 	serviceMust(t, full.cleanupFactorNumeralVector(&old, true))
 	before, ok := full.factorNumeralVectorDiagnostic(&old)
-	if !ok || before.bodyCause == nil {
+	if !ok || !numericPhysicalReservationRefusal(before.bodyCause) {
 		t.Fatal("actual returned body history missing", before)
 	}
 	invocation := full.factorNumeralVector.invocation

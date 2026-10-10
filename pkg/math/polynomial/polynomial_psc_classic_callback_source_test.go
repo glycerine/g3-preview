@@ -149,7 +149,9 @@ func TestPolynomialPSCClassicCompiledConstantGuards(t *testing.T) {
 }
 
 func TestPolynomialPSCClassicOldChildTuplePreservesLaterForeignCoefficient(t *testing.T) {
-	full := polynomialPSCFullFixture(t)
+	full := polynomialArithmeticDirectObjectFixture(t)
+	_, e := full.core.monomials.MkVar()
+	serviceMust(t, e)
 	c := full.core
 	p := polynomialQueryTerms(t, c, []int32{1, 2, 1}, [][]MonomialPower{{{0, 4}}, {{0, 1}}, nil})
 	q := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 2}}, nil})

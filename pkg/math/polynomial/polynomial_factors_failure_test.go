@@ -124,7 +124,10 @@ func TestPolynomialFactorsAbortOwnsReachedCalleesOnly(t *testing.T) {
 	completed := false
 	for fail := int64(0); fail < 100 && !completed; fail++ {
 		func() {
-			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{1, 0, 0}}, {1, [3]uint32{}}})
+			m := polynomialArithmeticDirectObjectFixture(t)
+			_, e := m.core.monomials.MkVar()
+			serviceMust(t, e)
+			p := polynomialQueryTerms(t, m.core, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, nil})
 			f, e := NewPolynomialFactors(m)
 			serviceMust(t, e)
 			serviceMust(t, f.Push(p, 3))

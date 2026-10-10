@@ -175,7 +175,6 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 		add(b.cohortMovingCoefficient)
 		add(b.appendScope.movingCoefficient)
 		add(b.arithmeticScope.transport)
-		extraBytes += uint64(cap(b.coefficientOwners)+cap(b.monomialOwners)+cap(b.coefficientTransferred)+cap(b.monomialTransferred)) * 8
 		vectors = append(vectors, &b.as)
 	}
 	for _, v := range vectors {

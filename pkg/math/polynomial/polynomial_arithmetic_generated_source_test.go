@@ -56,56 +56,47 @@ func TestPolynomialRegularProductActualCalleeAcquisition(t *testing.T) {
 // Source: src/math/polynomial/polynomial.cpp:1885-2156,810-851.
 // An actual created product is transferred or consumed at its real leaf.
 func TestPolynomialRegularCreatedProductGenericConsumptionAcknowledgesExactScope(t *testing.T) {
-	for ordinal := int64(0); ordinal < 80; ordinal++ {
-		full := polynomialArithmeticDirectObjectFixture(t)
-		c, mm := full.core, full.core.monomials
-		for i := 0; i < 2; i++ {
-			_, e := mm.MkVar()
-			serviceMust(t, e)
-		}
-		p, e := c.MkVariable(0, 1)
+	full := polynomialArithmeticDirectObjectFixture(t)
+	c, mm := full.core, full.core.monomials
+	for i := 0; i < 2; i++ {
+		_, e := mm.MkVar()
 		serviceMust(t, e)
-		serviceMust(t, c.IncRef(p))
-		term, e := mm.MkVariable(1, 1)
-		serviceMust(t, e)
-		var r polynomialArithmeticInvocationReceipt
-		serviceMust(t, c.som.acquireArithmeticInvocation(&r))
-		one := util.NewInt(1)
-		c.integer.Budget().FailAfter(ordinal)
-		body := (c.som).addMulWithArithmeticReceipt(&one, term, p, &r)
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
-		captured := body != nil && c.generatedActive && r.frame.generated == c.generatedMonomial
-		c.integer.Budget().FailAfter(-1)
-		serviceMust(t, mm.CleanupCreation())
-		serviceMust(t, c.cleanupGeneratedMonomial())
-		if captured && r.frame.generated != (Monomial{}) {
-			t.Fatal("actual owning consumption left stale generated authority", ordinal, body, r.frame.generated)
-		}
-		var replacement Monomial
-		if captured {
-			base, e := c.monomialCore(p, 0)
-			serviceMust(t, e)
-			replacement, e = c.generatedProduct(term, base)
-			serviceMust(t, e)
-			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
-		}
-		serviceMust(t, c.cleanupArithmeticInvocation(&r, false))
-		serviceMust(t, c.cleanupArithmeticInvocation(&r, true))
-		if captured && (!c.generatedActive || c.generatedMonomial != replacement) {
-			t.Fatal("old generated receipt swept later actual foreign generation")
-		}
-		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
-		serviceMust(t, c.cleanupGeneratedMonomial())
-		serviceMust(t, c.DecRef(p))
-		serviceMust(t, mm.CleanupValue(&term))
-		if captured {
-			return
-		}
-		if body == nil {
-			t.Fatal("source-created interrupted product prefix not reached", ordinal)
-		}
 	}
-	t.Fatal("source-created interrupted product horizon")
+	p, e := c.MkVariable(0, 1)
+	serviceMust(t, e)
+	serviceMust(t, c.IncRef(p))
+	term, e := mm.MkVariable(1, 1)
+	serviceMust(t, e)
+	base, e := c.monomialCore(p, 0)
+	serviceMust(t, e)
+	var r polynomialArithmeticInvocationReceipt
+	serviceMust(t, c.som.acquireArithmeticInvocation(&r))
+	// Native publication no longer allocates between product creation and INC.
+	// Exercise generic consumption at the real creation leaf, before transfer.
+	r.frame.executing = true
+	product, e := c.som.arithmeticProduct(term, base, &r)
+	r.frame.executing = false
+	serviceMust(t, e)
+	if !c.generatedActive || r.frame.generated != product {
+		t.Fatal("actual created product absent from owning scope")
+	}
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
+	serviceMust(t, c.cleanupGeneratedMonomial())
+	if r.frame.generated != (Monomial{}) {
+		t.Fatal("actual owning consumption left stale generated authority")
+	}
+	replacement, e := c.generatedProduct(term, base)
+	serviceMust(t, e)
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
+	serviceMust(t, c.cleanupArithmeticInvocation(&r, false))
+	serviceMust(t, c.cleanupArithmeticInvocation(&r, true))
+	if !c.generatedActive || c.generatedMonomial != replacement {
+		t.Fatal("old generated receipt swept later actual foreign generation")
+	}
+	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
+	serviceMust(t, c.cleanupGeneratedMonomial())
+	serviceMust(t, c.DecRef(p))
+	serviceMust(t, mm.CleanupValue(&term))
 }
 
 func TestPolynomialRegularCreatedProductActualINCTransfersExactScope(t *testing.T) {

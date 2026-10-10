@@ -6,30 +6,16 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// These scalar tags identify actual slot acquisitions; payload authority stays
-// in the original source numeral/monomial vectors. Cold backing is charged
-// before publishing any tag and never counted as a source malloc event.
-
+// Native scalar tags identify actual slot acquisitions. Payload authority stays
+// in the original numeral/monomial fields; tags do not reserve backing storage.
 func (b *polynomialSOM) prepareAppendTags(need uint32) error {
+	if uint64(need) > uint64(^uint(0)>>1) {
+		return arena.ErrBounds
+	}
 	for _, slot := range [](*[]uint64){&b.coefficientOwners, &b.monomialOwners, &b.coefficientTransferred, &b.monomialTransferred} {
-		old := len(*slot)
-		if uint64(old) >= uint64(need) {
-			continue
+		for len(*slot) < int(need) {
+			*slot = append(*slot, 0)
 		}
-		n := old + old/2 + 1
-		if uint64(n) < uint64(need) {
-			n = int(need)
-		}
-		if uint64(n) > uint64(^uint(0)>>1)/8 {
-			return arena.ErrBounds
-		}
-		if e := b.owner.integer.Budget().Reserve(uint64(n) * 8); e != nil {
-			return e
-		}
-		next := make([]uint64, n)
-		copy(next, *slot)
-		*slot = next
-		b.owner.integer.Budget().Release(uint64(old) * 8)
 	}
 	return nil
 }
@@ -50,9 +36,8 @@ func (b *polynomialSOM) cleanupTaggedAppendInvocation(r *polynomialCheapAppendIn
 		if e != nil {
 			return e
 		}
-		// A cold metadata refusal precedes every actual owned-slot acquisition.
-		// No member payload belongs to this invocation; exact leaf numeric roots
-		// remain separate and are acknowledged before releasing its metadata.
+		// An invocation with no owned-slot acquisition has no member payload to
+		// retire. Exact leaf numeric roots remain separately owned.
 		if s.coefficientClaims == 0 && s.monomialClaims == 0 && s.pending == (Monomial{}) && !b.hasPendingReference && s.compactionStage == 0 && s.compactIndex == 0 && s.retirePhase == 0 {
 			if e = s.numeric.cleanup(m.integer); e != nil {
 				return e

@@ -122,7 +122,7 @@ func TestPolynomialSquareFreeLiteralGF2AndAbsentVariable(t *testing.T) {
 }
 
 func TestPolynomialSquareFreeEarlyRoutesPreserveOlderDerivative(t *testing.T) {
-	m := polynomialPrimitiveFixture(t)
+	m := polynomialPrimitiveFixtureWithProfile(t, util.SmallAllocatorProfile{PointerBits: 64, Debug: true})
 	c := m.core
 	p := polynomialQueryTerms(t, c, []int32{1}, [][]MonomialPower{{{0, 2}}})
 	constant := polynomialQueryTerms(t, c, []int32{7}, [][]MonomialPower{nil})

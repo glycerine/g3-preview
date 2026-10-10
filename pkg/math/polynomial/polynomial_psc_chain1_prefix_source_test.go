@@ -13,7 +13,11 @@ import (
 func TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix(t *testing.T) {
 	success, coefficientFailure := false, false
 	for prefix := int64(0); prefix < 1024; prefix++ {
-		m := polynomialPSCFullFixture(t)
+		m := polynomialArithmeticDirectObjectFixture(t)
+		for i := 0; i < 2; i++ {
+			_, e := m.core.monomials.MkVar()
+			serviceMust(t, e)
+		}
 		c := m.core
 		var big util.Int
 		serviceMust(t, c.integer.SetLimbs(&big, []uint32{11, 7, 1 << 20}))

@@ -79,7 +79,9 @@ func TestPolynomialFactorToNumeralVectorEveryActualBigPrefix(t *testing.T) {
 }
 
 func TestPolynomialFactorToNumeralVectorRetainsHistoryAcrossActualReuse(t *testing.T) {
-	full := polynomialPSCFullFixture(t)
+	full := polynomialArithmeticDirectObjectFixture(t)
+	_, e := full.core.monomials.MkVar()
+	serviceMust(t, e)
 	p := polynomialQueryTerms(t, full.core, []int32{6, 9}, [][]MonomialPower{{}, {{0, 1}}})
 	var output upolyVectorState
 	var old polynomialFactorNumeralVectorReceipt
@@ -87,7 +89,7 @@ func TestPolynomialFactorToNumeralVectorRetainsHistoryAcrossActualReuse(t *testi
 	z.Budget().FailAfter(0)
 	cause := full.toNumeralVectorWithReceipt(p, &output, &old)
 	if cause == nil || !numericPhysicalReservationRefusal(cause) {
-		t.Fatal("actual first body refusal", cause)
+		t.Fatal("actual first source refusal", cause)
 	}
 	z.Budget().FailAfter(-1)
 	serviceMust(t, full.cleanupFactorNumeralVector(&old, false))
@@ -95,8 +97,9 @@ func TestPolynomialFactorToNumeralVectorRetainsHistoryAcrossActualReuse(t *testi
 	full.upm.freeBacking(&output)
 	serviceMust(t, full.cleanupFactorNumeralVector(&old, true))
 	before, ok := full.factorNumeralVectorDiagnostic(&old)
-	if !ok || before.bodyCause == nil {
-		t.Fatal("actual returned body history missing", before)
+	// Refuse a real normalization object allocation in each invocation.
+	if !ok || !numericPhysicalReservationRefusal(before.bodyCause) {
+		t.Fatal("actual returned source history missing", before)
 	}
 	invocation := full.factorNumeralVector.invocation
 	z.Budget().FailAfter(0)

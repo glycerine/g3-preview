@@ -13,8 +13,9 @@ func TestPolynomialExactDivPreludeActualRowsBeforeNUMDeclaration(t *testing.T) {
 	for prefix := int64(0); prefix < 40; prefix++ {
 		full := polynomialArithmeticDirectNumericFixture(t)
 		c := full.core
-		seven, one := util.NewInt(7), util.NewInt(1)
-		p, e := c.MkConstantTakeCopy(&seven)
+		// The prelude must copy an actual BIG numeral before declaring NUM.
+		one := util.NewInt(1)
+		p, e := c.MkConstantTakeCopy(&c.integer.Two64)
 		serviceMust(t, e)
 		serviceMust(t, c.IncRef(p))
 		q, e := c.MkConstantTakeCopy(&one)

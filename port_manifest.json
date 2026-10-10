@@ -36547,6 +36547,7 @@
         "TestPolynomialFactoryReceiptCheapTransferOwnsActualFactory",
         "TestPolynomialFactoryReceiptPreservesUnreceiptedReplacement",
         "TestPolynomialCheapAppendReceiptActualActionsAndZeroGuard",
+        "TestPolynomialNativeSOMTagsPreserveAcquisitionAndForeignRows",
         "TestPolynomialCheapAppendReceiptEveryActualConstructionPrefix",
         "TestPolynomialCheapAppendReceiptMixedForeignRefusal",
         "TestPolynomialCheapAppendReceiptUniqueReplacement",

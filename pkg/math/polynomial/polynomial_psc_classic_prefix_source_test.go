@@ -21,7 +21,9 @@ func TestPolynomialPSCClassicActualEveryReservationPrefix(t *testing.T) {
 		success := false
 		ctor12, ctor13 := false, false
 		for prefix := int64(0); prefix < 1024; prefix++ {
-			full := polynomialPSCFullFixture(t)
+			full := polynomialArithmeticDirectObjectFixture(t)
+			_, e := full.core.monomials.MkVar()
+			serviceMust(t, e)
 			c := full.core
 			var p, q Polynomial
 			want := []int32{8, -2}

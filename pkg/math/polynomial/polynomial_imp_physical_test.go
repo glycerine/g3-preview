@@ -136,7 +136,7 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		}
 	}
 	adapterBytes += externalHeaders
-	adapterBytes += uint64(cap(m.display.frames))*uint64(reflect.TypeOf((*polynomialDisplayFrame)(nil)).Size()) + uint64(len(m.display.frames))*uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size())
+	adapterBytes += uint64(len(m.display.frames)) * uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size())
 	for _, f := range m.display.frames {
 		public = append(public, &f.numeral)
 	}
@@ -466,9 +466,6 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 	}
 	if q != nil {
 		bytes += q.HeaderBytes
-	}
-	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
-		bytes += uint64(cap(b.coefficientOwners)+cap(b.monomialOwners)+cap(b.coefficientTransferred)+cap(b.monomialTransferred)) * 8
 	}
 	for _, h := range handlers {
 		if h == nil || h.self != h || h.budget != z.Budget() {

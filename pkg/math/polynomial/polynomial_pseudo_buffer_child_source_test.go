@@ -82,7 +82,11 @@ func polynomialPseudoBufferChildPrefixes(t *testing.T, degree uint32, verificati
 func TestPolynomialPseudoMatchedAbortPreservesForeignQuotientRow(t *testing.T) {
 	proof := false
 	for prefix := int64(0); prefix < 160 && !proof; prefix++ {
-		full := polynomialPSCFullFixture(t)
+		full := polynomialArithmeticDirectObjectFixture(t)
+		for i := 0; i < 3; i++ {
+			_, e := full.core.monomials.MkVar()
+			serviceMust(t, e)
+		}
 		c := full.core
 		p := polynomialQueryTerms(t, c, []int32{2, 1}, [][]MonomialPower{{{0, 1}}, nil})
 		q := polynomialQueryTerms(t, c, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, nil})

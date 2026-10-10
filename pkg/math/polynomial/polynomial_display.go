@@ -99,17 +99,7 @@ func (m *MultivariatePolynomialCore) displayFrame(sink PolynomialTextSink) (*pol
 			return f, nil
 		}
 	}
-	if len(s.frames) == cap(s.frames) {
-		n := cap(s.frames)*2 + 1
-		bytes := uint64(n) * uint64(reflect.TypeOf((*polynomialDisplayFrame)(nil)).Size())
-		if e := m.integer.Budget().Reserve(bytes); e != nil {
-			return nil, e
-		}
-		next := make([]*polynomialDisplayFrame, len(s.frames), n)
-		copy(next, s.frames)
-		m.integer.Budget().Release(uint64(cap(s.frames)) * uint64(reflect.TypeOf((*polynomialDisplayFrame)(nil)).Size()))
-		s.frames = next
-	}
+
 	if e := m.integer.Budget().Reserve(uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size())); e != nil {
 		return nil, e
 	}
@@ -397,7 +387,7 @@ func (m *MultivariatePolynomialCore) closeDisplayMetadata() error {
 	if m.displayPending() {
 		return ErrPolynomialPending
 	}
-	m.integer.Budget().Release(uint64(len(m.display.frames))*uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size()) + uint64(cap(m.display.frames))*uint64(reflect.TypeOf((*polynomialDisplayFrame)(nil)).Size()))
+	m.integer.Budget().Release(uint64(len(m.display.frames)) * uint64(reflect.TypeOf(polynomialDisplayFrame{}).Size()))
 	m.display.frames = nil
 	return nil
 }

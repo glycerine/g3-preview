@@ -32417,3 +32417,40 @@ manual polynomial storage in SOM scalar cohort-tag arrays and display-frame
 pointer directories. Review those next, along with separate linked diagnostic
 records, then retained AST/SAT collections and text consumers. Internal root-util
 numeric/text/parameter cycles still precede the remaining subpackage split.
+
+## Native SOM ownership tags and display frame directory
+
+The four SOM scalar ownership/transfer tag arrays now grow with native append.
+Removed geometric reserve/refund and final capacity charges. Actual numeral and
+monomial slot acquisition, transfer tags, exact invocation checks and matched
+cleanup remain. The polynomial display frame pointer directory likewise uses
+native append; actual cold frame headers and numerical formatting owners remain
+charged. Physical audits exclude both native container capacities.
+
+TestPolynomialNativeSOMTagsPreserveAcquisitionAndForeignRows grows 257 actual
+receipted rows after an older foreign row with reservations disabled. It checks
+all acquisition/transfer tags, unchanged numerical/object storage, exact matched
+retirement, surviving foreign value and caller monomial references, then audits
+the physical graph. Fault campaigns whose former stopping point was container
+metadata now use supported direct object allocation or actual BIG numeral copies.
+This preserves genuine reached child/factory and partial-row cleanup coverage.
+The created-product generic-consumption test now exercises the actual creation
+leaf before INC: native publication leaves no fallible allocation between these
+two source actions. It still verifies acknowledgment of the consumed receipt and
+preservation of a later foreign generated product. The separate direct-object
+failure campaign and actual INC transfer test remain.
+
+Validation: full native polynomial passed (32.108s); focused g3debug tags,
+created products, derivative, prelude, factors, PSC, pseudo-division, square-free
+and display passed (0.118s), with final selected-variable/converter/PSC/derivative
+groups passed (0.068s). Module-wide compilation, polynomial vet, manifest evidence,
+gofmt and diff checks passed. Manifest adds the native tag test and preserves all
+source/API statuses: 2102 units/677 APIs, 63 ported, 284 partial, 1727 unported and
+two dead/deleted. The 23:46–23:48 UTC full-module checkpoint remains current.
+
+The util knot is not resolved and no further file split is claimed. Remaining
+external native-container work includes AST activity/FPA tables, SAT storage
+vectors/runtime columns, and NumericTextStream consumers. Separate linked
+polynomial diagnostic records still need classification. Internal root-util
+numeric/text/parameter dependency cycles also remain before the remaining files
+can move into independent subpackages.

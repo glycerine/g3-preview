@@ -143,9 +143,6 @@ func polynomialPhysicalAuditWithHandlers(t *testing.T, m *MultivariatePolynomial
 	if q != nil {
 		bytes += q.HeaderBytes
 	}
-	for _, b := range []*polynomialSOM{&m.som, &m.som2, &m.cheap, &m.cheap2} {
-		bytes += uint64(cap(b.coefficientOwners)+cap(b.monomialOwners)+cap(b.coefficientTransferred)+cap(b.monomialTransferred)) * 8
-	}
 	for _, h := range handlers {
 		if h == nil || h.self != h || h.budget != z.Budget() {
 			t.Fatal("invalid named handler")

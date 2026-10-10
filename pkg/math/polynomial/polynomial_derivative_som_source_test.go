@@ -81,13 +81,21 @@ func TestPolynomialDerivativeAbortPreservesLaterForeignSourceRow(t *testing.T) {
 	found := false
 	for ordinal := int64(0); ordinal < 96 && !found; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m := polynomialPSCFullFixture(t)
+			m := polynomialArithmeticDirectNumericFixture(t)
+			for i := 0; i < 2; i++ {
+				_, e := m.core.monomials.MkVar()
+				serviceMust(t, e)
+			}
 			c := m.core
-			p := polynomialICCPUnownedTerms(t, c, []int32{7, 11}, [][]MonomialPower{{{0, 2}}, {{0, 1}}})
+			first, e := c.monomials.MkVariable(0, 2)
+			serviceMust(t, e)
+			second, e := c.monomials.MkVariable(0, 1)
+			serviceMust(t, e)
+			// Stop on a real later BIG copy, after completing the scalar row.
+			p, e := c.MkTerms([]util.Int{util.NewInt(7), c.integer.Two64}, []Monomial{first, second})
+			serviceMust(t, e)
 			serviceMust(t, c.IncRef(p))
 			defer func() { serviceMust(t, c.DecRef(p)) }()
-			_, e := c.monomials.MkVar()
-			serviceMust(t, e)
 			foreign, e := c.monomials.MkVariable(1, 1)
 			serviceMust(t, e)
 			serviceMust(t, c.monomials.IncRef(foreign))
