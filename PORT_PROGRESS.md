@@ -38072,3 +38072,64 @@ matrix/basis/core, whole-solver scopes, row/tableau dispatch, optimization,
 explanations and original drivers remain open. The complete LP port goal remains
 unfinished. Next connect the actual model/core fields needed by retained LAR
 registration and solver-row consumers; this analyzer is not a complete solver.
+
+
+### Retained exact primal core construction and LU entry points — 2026-10-10
+
+The next LAR registration paths require actual mpq/impq primal-core fields.
+Ported that concrete base/primal prerequisite: borrowed source vector headers,
+exact rational/pair scratch, base FEASIBLE and derived UNKNOWN construction,
+real PairLU initialization under LU strategy, duplicate constructor heading
+initialization, exact epsilon1/10000000 and precise converted-Harris zero,
+threshold1000, scoped-input borrows and owning destruction. No generic numeric
+adapter or floating approximation is used. Definition-only enter-price epsilon
+remains excluded under the existing retained-call audit.
+
+Added source basis/nonbasic inverse headings and diagnostics, exact below/above/
+at-bound checks, boxed interval validation, all column feasibility types and
+current infeasibility-set queries. Precise pair order is lexicographic, including
+infinitesimal components; floating feasibility tolerance is ignored as required.
+The derived core initializes infeasible membership only for basic columns in
+ascending column order and returns the literal lower-first delta sign. Source
+constructors initialize bookkeeping, not a feasible solution.
+
+FillCB owns direct cost-copy invocations into caller-owned outputs. SolveYB
+copies before invoking actual PairLU error-check solve. Both SolveBd overloads
+use actual LU methods; the internal overload publishes source column nonzero
+estimates after numerical success, and indexed overload preserves the tableau
+debug assertion versus erased native lazy initialization. Child LU calls keep
+their own real stopped generations, separate from core comparison/copy receipts.
+A stopped older caller comparison remains the same active generation after core
+Close. Derived cleanup precedes base factorization-body and reverse scratch
+cleanup; the borrowed model/matrix/manager remain independently owned.
+
+100 independent rational basis worlds generate known row and entering-column
+solutions by dense products and verify real LU solves, exact metadata and scratch
+extents.320 independent rational-pair interval worlds verify all column types,
+infinitesimal order, equality, directional signs, boxed intervals and basic-only
+infeasibility membership. Tests also cover missing references, empty model,
+boxed constructor assertion/native profile, real input header growth, foreign
+output provenance, partial cost publication and source metadata diagnostics.
+Sixteen pooled/direct physical failure campaigns enumerate actual constructor,
+cost-copy, comparison, indexed/internal/row solve, inf-set and delta calls through
+success. They verify stopped guards and separate LU/core ownership before cleanup,
+then named live numeral roots after closing the concrete owners.
+
+Focused native suite passes45.316s and combined g3debug/g3checked73.119s.
+Base coverage149/196 (76.0%) native,161/196 (82.1%) debug/checked; precise primal
+76/99 (76.8%) both. Remaining gaps mainly qualify child/cleanup and metadata guards,
+opposite-profile assertions and small-integer epsilon initialization failures.
+Older comparison test added afterward passes0.081s native/0.086s debug/checked.
+Profiles/logs: /mnt/oldrog/tmp/g3-pair-core-{native,debug}.{cover,log}; separate
+older-comparison logs use g3-pair-core-older-{native,debug}.log. Both LP vets and
+native module-wide compilation, source/evidence/no-generics verifier and graph
+checks pass. The graph adds two production filenames without import edges.
+
+All affected source units were already partial: LP81 partial/29 unported and
+global2103 units/677 APIs,62 ported/362 partial/1651 unported/two dead-deleted.
+Full native checkpoint remains22:14 UTC,89.8% (12347/13752), predating recent
+LAR additions; hourly repeat not yet due. Complete exact pricing/tableau/Solve,
+LAR model construction/registration/scopes, whole-core solve and original driver
+integration remain open. The full LP implementation/test/coverage goal remains
+unfinished; actual LAR construction can now bind the implemented exact primal
+core rather than introducing a placeholder solver.

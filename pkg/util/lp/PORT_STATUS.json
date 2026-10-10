@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 89.8,
-  "coverage_warning": "Latest full native module checkpoint passed 2026-10-10 at 22:14 UTC: LP 326.657s, 89.8% (12347/13752). Log/profile: /mnt/oldrog/tmp/g3-mps-dual-module-native.{log,cover}. This includes floating dual outer and MPS primal/dual integration and predates implied-bound, owning-constraint, LAR bound-update and propagator additions. Implied-bound focused native and combined g3debug/g3checked checks cover 53/58 statements (91.4%); remaining guards qualify invocation cleanup errors or earlier pending-state checks. Exact rational ownership, 160 independent big.Rat/evidence worlds, source member publication and physical construction/assignment refusal campaigns are tested. Coverage measures existing Go statements, not unported C++ functionality. Component table and per-source units retain the evidence for older layers. Full exact/tableau/LAR solvers, bounds/constraints/explanations and original command drivers remain incomplete. Owning variable/term/general LAR constraints subsequently pass 120 independent exact-copy/borrow worlds, seven physical refusal campaigns through success, constructor/export prefixes and stopped-term/foreign-manager guards. Native and combined debug/checked constraint file 77/83 statements (92.8%); witness record and relation stream file 10/10 (100%). Full constraint/bound/explanation and exact LAR solver integration remains open. LAR bound dispatch and all five source column-type updates subsequently pass 300 independent exact interval worlds, explicit conflict/publication and debug profiles, scoped-owner/alias and multi-column checks, plus 30 pooled/direct physical allocation refusal campaigns through success. Bound updates cover 293/364 statements (80.5%) native and 312/364 (85.7%) combined debug/checked; scoped witness specialization covers 31/31 (100%) in both. Native excludes covered debug assertion statements; remaining gaps mostly qualify child errors and prior invariants. Full external variable/term registration, matrix/basis, whole-solver scopes and propagation/optimization remain open. Exact bound propagation subsequently passes 1200 independent strongest-bound worlds with aliases/strict ties and constant restoration, live directory/getter/filter/evidence/stream checks, 14 pooled/direct physical failure campaigns and an actual separately owned stopped hook division. New file 119/133 statements (89.5%) in native and combined debug/checked profiles. Remaining gaps mainly qualify invariant-protected lookup/child cleanup errors. Full row/tableau dispatch integration, complete LAR model/explanation and original solver drivers remain open. Exact row-bound analysis subsequently passes 240 independent big.Rat elimination worlds, source cursor/early-stop/persistent-counter and RHS profiles, actual pivot/row iterators, foreign-owner guards and a separately owned stopped virtual-provider division. Six pooled/direct physical refusal campaigns run constructor/all-column/unique-column paths through success, verify distinct borrowed invocation generations before cleanup and named roots afterward. Final focused analyzer/propagator/iterator native suite passes104.098s and combined g3debug/g3checked115.503s. Analyzer statement coverage is190/235 (80.9%) native and199/235 (84.7%) debug/checked. Remaining gaps primarily qualify child cleanup/guard errors and source assertions whose fresh-zero invariant cannot fail. Full exact LAR solver integration remains incomplete.",
+  "coverage_warning": "Latest full native module checkpoint passed 2026-10-10 at 22:14 UTC: LP 326.657s, 89.8% (12347/13752). Log/profile: /mnt/oldrog/tmp/g3-mps-dual-module-native.{log,cover}. This includes floating dual outer and MPS primal/dual integration and predates implied-bound, owning-constraint, LAR bound-update and propagator additions. Implied-bound focused native and combined g3debug/g3checked checks cover 53/58 statements (91.4%); remaining guards qualify invocation cleanup errors or earlier pending-state checks. Exact rational ownership, 160 independent big.Rat/evidence worlds, source member publication and physical construction/assignment refusal campaigns are tested. Coverage measures existing Go statements, not unported C++ functionality. Component table and per-source units retain the evidence for older layers. Full exact/tableau/LAR solvers, bounds/constraints/explanations and original command drivers remain incomplete. Owning variable/term/general LAR constraints subsequently pass 120 independent exact-copy/borrow worlds, seven physical refusal campaigns through success, constructor/export prefixes and stopped-term/foreign-manager guards. Native and combined debug/checked constraint file 77/83 statements (92.8%); witness record and relation stream file 10/10 (100%). Full constraint/bound/explanation and exact LAR solver integration remains open. LAR bound dispatch and all five source column-type updates subsequently pass 300 independent exact interval worlds, explicit conflict/publication and debug profiles, scoped-owner/alias and multi-column checks, plus 30 pooled/direct physical allocation refusal campaigns through success. Bound updates cover 293/364 statements (80.5%) native and 312/364 (85.7%) combined debug/checked; scoped witness specialization covers 31/31 (100%) in both. Native excludes covered debug assertion statements; remaining gaps mostly qualify child errors and prior invariants. Full external variable/term registration, matrix/basis, whole-solver scopes and propagation/optimization remain open. Exact bound propagation subsequently passes 1200 independent strongest-bound worlds with aliases/strict ties and constant restoration, live directory/getter/filter/evidence/stream checks, 14 pooled/direct physical failure campaigns and an actual separately owned stopped hook division. New file 119/133 statements (89.5%) in native and combined debug/checked profiles. Remaining gaps mainly qualify invariant-protected lookup/child cleanup errors. Full row/tableau dispatch integration, complete LAR model/explanation and original solver drivers remain open. Exact row-bound analysis subsequently passes 240 independent big.Rat elimination worlds, source cursor/early-stop/persistent-counter and RHS profiles, actual pivot/row iterators, foreign-owner guards and a separately owned stopped virtual-provider division. Six pooled/direct physical refusal campaigns run constructor/all-column/unique-column paths through success, verify distinct borrowed invocation generations before cleanup and named roots afterward. Final focused analyzer/propagator/iterator native suite passes104.098s and combined g3debug/g3checked115.503s. Analyzer statement coverage is190/235 (80.9%) native and199/235 (84.7%) debug/checked. Remaining gaps primarily qualify child cleanup/guard errors and source assertions whose fresh-zero invariant cannot fail. Full exact LAR solver integration remains incomplete. Retained mpq/impq base/primal construction and LU entry points subsequently pass100 independent basis/known-solution systems and320 independent lexicographic bound worlds, exact constructor/error/publication profiles,16 pooled/direct physical failure campaigns through success and older caller comparison ownership. Base file149/196 (76.0%) native and161/196 (82.1%) debug/checked; precise primal file76/99 (76.8%) in both. Native focused suite45.316s and debug/checked73.119s; older-comparison additions separately pass0.081s/0.086s. Gaps mostly qualify assertion profiles, metadata/cleanup errors and small-integer epsilon-construction guards. Full precise pricing/tableau/optimization and LAR model/core integration remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -764,7 +764,9 @@
         "pkg/util/lp/core_statistics_float.go",
         "pkg/util/lp/primal_feasible_float.go",
         "pkg/util/lp/core_dual_float.go",
-        "pkg/util/lp/dual_ratio_float.go"
+        "pkg/util/lp/dual_ratio_float.go",
+        "pkg/util/lp/core_base_exact.go",
+        "pkg/util/lp/core_base_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -821,7 +823,12 @@
         "TestLPFloatDualRatioReachedGuards",
         "TestLPFloatDualFlipFailurePrefixes",
         "TestLPFloatDualRatioActualPivotAndFlips",
-        "TestLPFloatDualFlipReachedStorageErrors"
+        "TestLPFloatDualFlipReachedStorageErrors",
+        "TestLPPairCoreIndependentBasisAndExactLUSolves",
+        "TestLPPairCoreIndependentLexicographicFeasibility",
+        "TestLPPairCorePhysicalFailurePrefixes",
+        "TestLPPairCoreSourceAssertionsAndPublication",
+        "TestLPPairCoreLeavesOlderComparisonOwned"
       ]
     },
     {
@@ -841,7 +848,9 @@
         "pkg/util/lp/primal_advance_float.go",
         "pkg/util/lp/core_statistics_float.go",
         "pkg/util/lp/core_dual_float.go",
-        "pkg/util/lp/dual_ratio_float.go"
+        "pkg/util/lp/dual_ratio_float.go",
+        "pkg/util/lp/core_base_exact.go",
+        "pkg/util/lp/core_base_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -895,7 +904,12 @@
         "TestLPFloatDualRatioReachedGuards",
         "TestLPFloatDualFlipFailurePrefixes",
         "TestLPFloatDualRatioActualPivotAndFlips",
-        "TestLPFloatDualFlipReachedStorageErrors"
+        "TestLPFloatDualFlipReachedStorageErrors",
+        "TestLPPairCoreIndependentBasisAndExactLUSolves",
+        "TestLPPairCoreIndependentLexicographicFeasibility",
+        "TestLPPairCorePhysicalFailurePrefixes",
+        "TestLPPairCoreSourceAssertionsAndPublication",
+        "TestLPPairCoreLeavesOlderComparisonOwned"
       ]
     },
     {
@@ -1173,7 +1187,9 @@
         "pkg/util/lp/primal_solve_float.go",
         "pkg/util/lp/primal_feasible_float.go",
         "pkg/util/lp/primal_initial_float.go",
-        "pkg/util/lp/primal_initial_float_test.go"
+        "pkg/util/lp/primal_initial_float_test.go",
+        "pkg/util/lp/primal_core_exact.go",
+        "pkg/util/lp/core_base_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -1222,7 +1238,12 @@
         "TestLPFloatPrimalInitialIndependentPredicate",
         "TestLPFloatPrimalInitialIEEEAndOutput",
         "TestLPFloatPrimalZeroLowConstructorPublication",
-        "TestLPFloatPrimalInitialMetadataPrefixes"
+        "TestLPFloatPrimalInitialMetadataPrefixes",
+        "TestLPPairCoreIndependentBasisAndExactLUSolves",
+        "TestLPPairCoreIndependentLexicographicFeasibility",
+        "TestLPPairCorePhysicalFailurePrefixes",
+        "TestLPPairCoreSourceAssertionsAndPublication",
+        "TestLPPairCoreLeavesOlderComparisonOwned"
       ]
     },
     {

@@ -121133,7 +121133,9 @@
         "pkg/util/lp/core_statistics_float.go",
         "pkg/util/lp/primal_feasible_float.go",
         "pkg/util/lp/core_dual_float.go",
-        "pkg/util/lp/dual_ratio_float.go"
+        "pkg/util/lp/dual_ratio_float.go",
+        "pkg/util/lp/core_base_exact.go",
+        "pkg/util/lp/core_base_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121190,7 +121192,12 @@
         "TestLPFloatDualRatioReachedGuards",
         "TestLPFloatDualFlipFailurePrefixes",
         "TestLPFloatDualRatioActualPivotAndFlips",
-        "TestLPFloatDualFlipReachedStorageErrors"
+        "TestLPFloatDualFlipReachedStorageErrors",
+        "TestLPPairCoreIndependentBasisAndExactLUSolves",
+        "TestLPPairCoreIndependentLexicographicFeasibility",
+        "TestLPPairCorePhysicalFailurePrefixes",
+        "TestLPPairCoreSourceAssertionsAndPublication",
+        "TestLPPairCoreLeavesOlderComparisonOwned"
       ],
       "assertions": [
         {
@@ -121373,12 +121380,61 @@
             "TestLPFloatDualRatioActualPivotAndFlips",
             "TestLPFloatDualFlipReachedStorageErrors"
           ]
+        },
+        {
+          "name": "retained mpq/impq constructor, init and allocate_basis_heading with concrete PairLU lifecycle and independently owned exact scratch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_exact.go",
+          "tests": [
+            "TestLPPairCoreIndependentBasisAndExactLUSolves",
+            "TestLPPairCoreIndependentLexicographicFeasibility",
+            "TestLPPairCorePhysicalFailurePrefixes",
+            "TestLPPairCoreSourceAssertionsAndPublication",
+            "TestLPPairCoreLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "retained mpq/impq basis heading/nonbasic construction and inverse/duplicate validators",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_exact.go",
+          "tests": [
+            "TestLPPairCoreIndependentBasisAndExactLUSolves",
+            "TestLPPairCoreIndependentLexicographicFeasibility",
+            "TestLPPairCorePhysicalFailurePrefixes",
+            "TestLPPairCoreSourceAssertionsAndPublication",
+            "TestLPPairCoreLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "retained mpq/impq precise below/above/at bounds, boxed-bound validator, column feasibility and current infeasibility-set queries",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_exact.go",
+          "tests": [
+            "TestLPPairCoreIndependentBasisAndExactLUSolves",
+            "TestLPPairCoreIndependentLexicographicFeasibility",
+            "TestLPPairCorePhysicalFailurePrefixes",
+            "TestLPPairCoreSourceAssertionsAndPublication",
+            "TestLPPairCoreLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "retained mpq/impq FillCB, SolveYB and both SolveBd overloads through actual PairLU, with precise column nonzero publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_exact.go",
+          "tests": [
+            "TestLPPairCoreIndependentBasisAndExactLUSolves",
+            "TestLPPairCoreIndependentLexicographicFeasibility",
+            "TestLPPairCorePhysicalFailurePrefixes",
+            "TestLPPairCoreSourceAssertionsAndPublication",
+            "TestLPPairCoreLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
         "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally.",
         "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair.",
-        "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization."
+        "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization.",
+        "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -121386,7 +121442,8 @@
         "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced.",
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
-        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open."
+        "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
+        "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard."
       ]
     },
     {
@@ -121408,7 +121465,9 @@
         "pkg/util/lp/primal_advance_float.go",
         "pkg/util/lp/core_statistics_float.go",
         "pkg/util/lp/core_dual_float.go",
-        "pkg/util/lp/dual_ratio_float.go"
+        "pkg/util/lp/dual_ratio_float.go",
+        "pkg/util/lp/core_base_exact.go",
+        "pkg/util/lp/core_base_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121462,7 +121521,12 @@
         "TestLPFloatDualRatioReachedGuards",
         "TestLPFloatDualFlipFailurePrefixes",
         "TestLPFloatDualRatioActualPivotAndFlips",
-        "TestLPFloatDualFlipReachedStorageErrors"
+        "TestLPFloatDualFlipReachedStorageErrors",
+        "TestLPPairCoreIndependentBasisAndExactLUSolves",
+        "TestLPPairCoreIndependentLexicographicFeasibility",
+        "TestLPPairCorePhysicalFailurePrefixes",
+        "TestLPPairCoreSourceAssertionsAndPublication",
+        "TestLPPairCoreLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -121741,19 +121805,69 @@
             "TestLPFloatDualRatioActualPivotAndFlips",
             "TestLPFloatDualFlipReachedStorageErrors"
           ]
+        },
+        {
+          "name": "retained mpq/impq constructor, init and allocate_basis_heading with concrete PairLU lifecycle and independently owned exact scratch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_exact.go",
+          "tests": [
+            "TestLPPairCoreIndependentBasisAndExactLUSolves",
+            "TestLPPairCoreIndependentLexicographicFeasibility",
+            "TestLPPairCorePhysicalFailurePrefixes",
+            "TestLPPairCoreSourceAssertionsAndPublication",
+            "TestLPPairCoreLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "retained mpq/impq basis heading/nonbasic construction and inverse/duplicate validators",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_exact.go",
+          "tests": [
+            "TestLPPairCoreIndependentBasisAndExactLUSolves",
+            "TestLPPairCoreIndependentLexicographicFeasibility",
+            "TestLPPairCorePhysicalFailurePrefixes",
+            "TestLPPairCoreSourceAssertionsAndPublication",
+            "TestLPPairCoreLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "retained mpq/impq precise below/above/at bounds, boxed-bound validator, column feasibility and current infeasibility-set queries",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_exact.go",
+          "tests": [
+            "TestLPPairCoreIndependentBasisAndExactLUSolves",
+            "TestLPPairCoreIndependentLexicographicFeasibility",
+            "TestLPPairCorePhysicalFailurePrefixes",
+            "TestLPPairCoreSourceAssertionsAndPublication",
+            "TestLPPairCoreLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "retained mpq/impq FillCB, SolveYB and both SolveBd overloads through actual PairLU, with precise column nonzero publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_base_exact.go",
+          "tests": [
+            "TestLPPairCoreIndependentBasisAndExactLUSolves",
+            "TestLPPairCoreIndependentLexicographicFeasibility",
+            "TestLPPairCorePhysicalFailurePrefixes",
+            "TestLPPairCoreSourceAssertionsAndPublication",
+            "TestLPPairCoreLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
         "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally.",
         "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair.",
-        "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization."
+        "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization.",
+        "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
         "Floating basis bookkeeping and reduced-cost/entering-column layer only. Full primal/dual/LAR optimization remains open; floating numerical pivot/update is now implemented. Unconditional exchange restores missing nonbasic slots before reading leaving heading. Regular source signed INT_MIN unary-minus overflow has an explicit Go guard; later invalid slot guards preserve prior entering/basic/leaving writes. Reduced costs initialize descending columns, then traverse descending rows and literal insertion-order cells; zero multipliers skip row reads. Source indexed_vector<double>::is_OK is a true stub, so its false assertion paths are unreachable. No dead pointer fill_cb overload or unused floating faster-column adapter is added.",
         "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced.",
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
-        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded."
+        "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
+        "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard."
       ]
     },
     {
@@ -122682,7 +122796,9 @@
         "pkg/util/lp/primal_solve_float.go",
         "pkg/util/lp/primal_feasible_float.go",
         "pkg/util/lp/primal_initial_float.go",
-        "pkg/util/lp/primal_initial_float_test.go"
+        "pkg/util/lp/primal_initial_float_test.go",
+        "pkg/util/lp/primal_core_exact.go",
+        "pkg/util/lp/core_base_exact_test.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -122731,7 +122847,12 @@
         "TestLPFloatPrimalInitialIndependentPredicate",
         "TestLPFloatPrimalInitialIEEEAndOutput",
         "TestLPFloatPrimalZeroLowConstructorPublication",
-        "TestLPFloatPrimalInitialMetadataPrefixes"
+        "TestLPFloatPrimalInitialMetadataPrefixes",
+        "TestLPPairCoreIndependentBasisAndExactLUSolves",
+        "TestLPPairCoreIndependentLexicographicFeasibility",
+        "TestLPPairCorePhysicalFailurePrefixes",
+        "TestLPPairCoreSourceAssertionsAndPublication",
+        "TestLPPairCoreLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -123000,10 +123121,35 @@
             "TestLPFloatPrimalInitialMetadataPrefixes",
             "TestLPFloatPrimalSolveOriginalNumericalFixtures"
           ]
+        },
+        {
+          "name": "retained mpq/impq stage-one constructor, exact epsilon expression and owning destruction; no precise Solve/pricing/tableau credit",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_core_exact.go",
+          "tests": [
+            "TestLPPairCoreIndependentBasisAndExactLUSolves",
+            "TestLPPairCoreIndependentLexicographicFeasibility",
+            "TestLPPairCorePhysicalFailurePrefixes",
+            "TestLPPairCoreSourceAssertionsAndPublication",
+            "TestLPPairCoreLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "retained mpq/impq init_inf_set and out-of-bounds delta sign with actual basic-column and lexicographic pair bounds",
+          "status": "ported",
+          "go_target": "pkg/util/lp/primal_core_exact.go",
+          "tests": [
+            "TestLPPairCoreIndependentBasisAndExactLUSolves",
+            "TestLPPairCoreIndependentLexicographicFeasibility",
+            "TestLPPairCorePhysicalFailurePrefixes",
+            "TestLPPairCoreSourceAssertionsAndPublication",
+            "TestLPPairCoreLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order."
+        "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order.",
+        "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive."
       ],
       "deviations": [
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
@@ -123014,7 +123160,8 @@
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
         "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
-        "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver."
+        "Zero-low constructor preserves base FEASIBLE status, beta/Harris initialization, debug predicate before dummy resize, and borrowed header identity. The Go header is safely empty before base construction; boxed debug reads guard the C++ not-yet-constructed dummy member domain. Source omitted pricing fields are not credited before InitRun; dead enter-price epsilon assignment is excluded because no retained read exists. Initial checks use exact zero/upper comparisons, not stored lower bounds/tolerance. Original smoke fixtures now use the actual constructor with empty upper bounds: explicit LU verifies independent optima; unchanged source default strategy instead hits !use_tableau assertion in debug and missing factorization ErrBounds guard in release. This does not claim default source solver correctness or completion of the whole upstream driver.",
+        "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard."
       ]
     },
     {
