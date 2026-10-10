@@ -26154,14 +26154,15 @@
         "TestBVPolynomialNonflatMultiplicationCoefficientsAndNestedProduct",
         "TestBVPolynomialNonflatMultiplicationDistributionAndOrdering",
         "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit",
-        "TestBVPolynomialNonflatMultiplicationEveryCartesianSpillReservation",
+        "TestBVPolynomialMultiplicationNativeSortingWithoutArenaReservations",
+        "TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation",
         "TestBVPolynomialNonflatMultiplicationEveryActualCoefficientReservation",
         "TestBVPolynomialNonflatMultiplicationCheapGuardAndHeaderRefusal",
         "TestBVPolynomialNonflatMultiplicationIntermediateReferencePublication",
         "TestASTBitVectorPolynomialMultiplicationNumeralsPlacementAndShadowLifetime",
         "TestASTBitVectorPolynomialMultiplicationNumeralsHeaderAndCopyGuards",
         "TestBVPolynomialFlatMultiplicationRecursiveFactorsAndCoefficientGuard",
-        "TestBVPolynomialFlatMultiplicationEveryStackSpillAndFallbackReservation",
+        "TestBVPolynomialFlatMultiplicationEveryCoreAndFallbackReservation",
         "TestBVPolynomialMultiplicationCallerSingletonAndOriginalFallback",
         "TestBVPolynomialMultiplicationCallerSelectionAndConvenience",
         "TestBVPolynomialFlatMultiplicationPropagatesCartesianRewriteDepth",
@@ -26409,14 +26410,15 @@
           ]
         },
         {
-          "name": "selected complete BV mk_nflat_mul_core: cheap guard, physical coefficient folding, nested coefficient merging, scalar distribution, ordering, intermediate result assignment and Cartesian expansion with strict blowup check (src/ast/rewriter/poly_rewriter_def.h:198-367)",
+          "name": "selected BV mk_nflat_mul_core: cheap guard, physical coefficient folding, nested coefficient merging, scalar distribution, source comparator through Go sort, intermediate result assignment and Cartesian expansion with strict blowup check; native slices and explicit AST roots replace source storage without container/STL credit (src/ast/rewriter/poly_rewriter_def.h:198-367)",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/bv_polynomial_mul_core.go",
           "tests": [
             "TestBVPolynomialNonflatMultiplicationCoefficientsAndNestedProduct",
             "TestBVPolynomialNonflatMultiplicationDistributionAndOrdering",
             "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit",
-            "TestBVPolynomialNonflatMultiplicationEveryCartesianSpillReservation",
+            "TestBVPolynomialMultiplicationNativeSortingWithoutArenaReservations",
+            "TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation",
             "TestBVPolynomialNonflatMultiplicationEveryActualCoefficientReservation",
             "TestBVPolynomialNonflatMultiplicationCheapGuardAndHeaderRefusal",
             "TestBVPolynomialNonflatMultiplicationIntermediateReferencePublication"
@@ -26432,12 +26434,12 @@
           ]
         },
         {
-          "name": "selected complete BV mk_flat_mul_core: coefficient-form guard, prefix append, reverse-child stack push, recursive flatten and FAILED fallback (src/ast/rewriter/poly_rewriter_def.h:140-194)",
+          "name": "selected BV mk_flat_mul_core: coefficient-form guard, prefix append, reverse-child stack push, recursive flatten and FAILED fallback through native slices without source storage-failure credit (src/ast/rewriter/poly_rewriter_def.h:140-194)",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/bv_polynomial_flat_mul.go",
           "tests": [
             "TestBVPolynomialFlatMultiplicationRecursiveFactorsAndCoefficientGuard",
-            "TestBVPolynomialFlatMultiplicationEveryStackSpillAndFallbackReservation",
+            "TestBVPolynomialFlatMultiplicationEveryCoreAndFallbackReservation",
             "TestBVPolynomialFlatMultiplicationPropagatesCartesianRewriteDepth"
           ]
         },
@@ -26656,14 +26658,15 @@
         "TestBVPolynomialNonflatMultiplicationCoefficientsAndNestedProduct",
         "TestBVPolynomialNonflatMultiplicationDistributionAndOrdering",
         "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit",
-        "TestBVPolynomialNonflatMultiplicationEveryCartesianSpillReservation",
+        "TestBVPolynomialMultiplicationNativeSortingWithoutArenaReservations",
+        "TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation",
         "TestBVPolynomialNonflatMultiplicationEveryActualCoefficientReservation",
         "TestBVPolynomialNonflatMultiplicationCheapGuardAndHeaderRefusal",
         "TestBVPolynomialNonflatMultiplicationIntermediateReferencePublication",
         "TestASTBitVectorPolynomialMultiplicationNumeralsPlacementAndShadowLifetime",
         "TestASTBitVectorPolynomialMultiplicationNumeralsHeaderAndCopyGuards",
         "TestBVPolynomialFlatMultiplicationRecursiveFactorsAndCoefficientGuard",
-        "TestBVPolynomialFlatMultiplicationEveryStackSpillAndFallbackReservation",
+        "TestBVPolynomialFlatMultiplicationEveryCoreAndFallbackReservation",
         "TestBVPolynomialMultiplicationCallerSingletonAndOriginalFallback",
         "TestBVPolynomialMultiplicationCallerSelectionAndConvenience",
         "TestBVPolynomialFlatMultiplicationPropagatesCartesianRewriteDepth",

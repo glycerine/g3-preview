@@ -117,8 +117,14 @@ func TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit(t *testing.T) {
 			if !errors.Is(body, ErrBVPolynomialMonomialBlowup) || got != xs[4] {
 				t.Fatal("blowup publication", limit, body)
 			}
-			count, e := m.RefVectorSize(p.sum)
-			astTestMust(t, e)
+			count := uint32(len(p.sum))
+			for _, h := range p.sum {
+				refs, e := m.GetRefCount(h)
+				astTestMust(t, e)
+				if refs == 0 {
+					t.Fatal("retained Cartesian root lost its reference")
+				}
+			}
 			if count != limit+1 {
 				t.Fatal("strict limit frontier", limit, count)
 			}
@@ -144,7 +150,7 @@ func TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit(t *testing.T) {
 	}
 }
 
-func TestBVPolynomialNonflatMultiplicationEveryCartesianSpillReservation(t *testing.T) {
+func TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation(t *testing.T) {
 	complete, failures := false, 0
 	for ordinal := int64(0); ordinal < 300 && !complete; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -360,5 +366,36 @@ func TestBVPolynomialNonflatMultiplicationIntermediateReferencePublication(t *te
 	}
 	if !complete || intermediateFailures == 0 {
 		t.Fatal("intermediate publication frontier", complete, intermediateFailures)
+	}
+}
+
+func TestBVPolynomialMultiplicationNativeSortingWithoutArenaReservations(t *testing.T) {
+	m, _ := bvAddFixture(t)
+	xs := bvMergeVars(t, m, 257)
+	currentSort, e := m.GetSort(xs[0])
+	astTestMust(t, e)
+	family, e := m.GetFamilyID(currentSort)
+	astTestMust(t, e)
+	p, e := NewBVPolynomialMultiplicationCore(m)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, p.Close()) }()
+	before := m.Budget().Used()
+	for _, astOrder := range []bool{false, true} {
+		m.Budget().FailAfter(0)
+		for i := len(xs) - 1; i >= 0; i-- {
+			p.terms = append(p.terms, xs[i])
+		}
+		e = p.sort(family, BVPolynomialMultiplicationOptions{ASTOrder: astOrder})
+		m.Budget().FailAfter(-1)
+		astTestMust(t, e)
+		for i, h := range p.terms {
+			if h != xs[i] {
+				t.Fatal("native factor ordering", astOrder, i)
+			}
+		}
+		if m.Budget().Used() != before {
+			t.Fatal("native sorting changed arena charge")
+		}
+		p.terms = nil
 	}
 }

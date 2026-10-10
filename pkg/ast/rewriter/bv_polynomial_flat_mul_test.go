@@ -84,7 +84,7 @@ func TestBVPolynomialMultiplicationCallerSingletonAndOriginalFallback(t *testing
 	}
 }
 
-func TestBVPolynomialFlatMultiplicationEveryStackSpillAndFallbackReservation(t *testing.T) {
+func TestBVPolynomialFlatMultiplicationEveryCoreAndFallbackReservation(t *testing.T) {
 	complete, failures, completeFlattenFailures, fallbackFailures := false, 0, 0, 0
 	for ordinal := int64(0); ordinal < 200 && !complete; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -110,9 +110,9 @@ func TestBVPolynomialFlatMultiplicationEveryStackSpillAndFallbackReservation(t *
 				if !numericHoistRefusal(body) {
 					t.Fatal("unexpected refusal", ordinal, body)
 				}
-				if p.numeric == nil && len(p.flatArgs.Slice()) == 48 {
+				if p.numeric == nil && len(p.flatArgs) == 48 {
 					completeFlattenFailures++
-					for i, h := range p.flatArgs.Slice() {
+					for i, h := range p.flatArgs {
 						if h != xs[i] {
 							t.Fatal("recursive stack order before core", i)
 						}

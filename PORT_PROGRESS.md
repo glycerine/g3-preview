@@ -33721,3 +33721,35 @@ module rerun. Counts remain 2102 units/677 APIs: 62 ported, 283 partial,
 Remaining BV addition/multiplication/trailing frames and other AST collection
 consumers still need migration. The complete native caller audit and requested
 root util subpackage split remain active and unfinished.
+
+## Native BV multiplication collections and Cartesian roots
+
+Nonflat/flat multiplication terms, monomial scratch, recursive traversal stack,
+flattened factors, Cartesian sizes/iterator and borrowed sum views now use plain
+Go slices. Removed the unsigned/view buffer wrappers. Cartesian result roots
+use native owning []ASTHandle with explicit INC and consumed-DEC cleanup, retaining
+unreleased roots on the invocation if destruction stops. Removed reference-vector
+placement, saved-vector and unpublished push-growth receipts. Factor sorting now
+uses Go sort.Slice with the original monomial comparator, retaining its first
+error without making further domain calls. No C++ library sorting internals or
+container storage-failure fidelity is credited.
+
+Preserved numerical coefficient folding, source numeric scopes, intermediate
+output publication, first-coordinate-fastest Cartesian order, strict size >
+monomial-limit frontier, recursive factor order, source history and actual
+factory/owner refusals. Fault campaigns now describe actual owner/core/factory
+reservations. Cartesian limit cases verify retained roots have live references.
+A 257-factor cold native slice/sort fixture checks both comparator modes with
+arena reservations disabled and verifies unchanged arena charge.
+
+Validation: focused multiplication native/debug passed (0.486s/0.659s). Final
+full native rewriter passed (12.067s), and remaining g3debug rewriter passed
+(16.746s) with the same three previously verified baseline exclusions recorded
+above. Full native model/API/tactic/SAT tactic passed
+(0.050s/0.012s/0.024s/0.101s). Module-wide compilation, rewriter vet, manifest,
+gofmt and diff checks passed. No full native module suite rerun. Counts remain
+2102 units/677 APIs: 62 ported, 283 partial, 1729 unported, two dead/deleted.
+
+BV addition/coefficient hoisting and other BV/proof/sequence/AST collection
+consumers still need auditing/migration. The external native caller migration
+and requested util root subpackage split are unfinished.

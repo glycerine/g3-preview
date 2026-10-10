@@ -5,6 +5,7 @@ package rewriter
 import (
 	"errors"
 	"reflect"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -19,7 +20,7 @@ type BVPolynomialMultiplicationOptions struct {
 // BVPolynomialMultiplicationCore names a single nonflat source invocation.
 // All inputs and argument views borrow caller lifetimes through scope exit.
 type BVPolynomialMultiplicationCore struct {
-	flatArgs, todo                       ast.ASTHandleBuffer
+	flatArgs, todo                       []ast.ASTHandle
 	pair                                 [2]ast.ASTHandle
 	currentSort                          ast.ASTHandle
 	sortBinding                          *ast.ASTHandle
@@ -27,13 +28,10 @@ type BVPolynomialMultiplicationCore struct {
 	self                                 *BVPolynomialMultiplicationCore
 	manager                              *ast.ASTManager
 	numeric                              *ast.BitVectorPolynomialMultiplicationNumerals
-	terms, monomial                      ast.ASTHandleBuffer
-	sizes, iterator                      bvPolynomialUnsignedBuffer
-	sums                                 bvPolynomialSumViews
-	sum, savedSum                        ast.ASTRefVector
-	sumPlaced                            bool
-	push                                 ast.ASTRefVectorPushReceipt
-	pushed                               ast.ASTHandle
+	terms, monomial                      []ast.ASTHandle
+	sizes, iterator                      []uint32
+	sums                                 []ast.AppArguments
+	sum                                  []ast.ASTHandle
 	factory                              ast.ASTBitVectorNumeralInvocation
 	header                               uint64
 	started, running, sourceDone, closed bool
@@ -58,50 +56,19 @@ func (p *BVPolynomialMultiplicationCore) assign(out ast.ASTRef, node ast.ASTHand
 	}
 	return RewriteDone, p.manager.SetRef(out, node)
 }
-func (p *BVPolynomialMultiplicationCore) less(fid ast.FamilyID, o BVPolynomialMultiplicationOptions, a, b int) (bool, error) {
-	v := p.terms.Slice()
-	return bvMonomialLess(p.manager, fid, o.ASTOrder, v[a], v[b])
-}
-func (p *BVPolynomialMultiplicationCore) sift(fid ast.FamilyID, o BVPolynomialMultiplicationOptions, root, end int) error {
-	for root < end/2 {
-		child := root*2 + 1
-		if child+1 < end {
-			less, e := p.less(fid, o, child, child+1)
-			if e != nil {
-				return e
-			}
-			if less {
-				child++
-			}
-		}
-		less, e := p.less(fid, o, root, child)
-		if e != nil {
-			return e
-		}
-		if !less {
-			return nil
-		}
-		v := p.terms.Slice()
-		v[root], v[child] = v[child], v[root]
-		root = child
-	}
-	return nil
-}
+
+// The source comparator defines the order; sorting storage uses Go's library.
 func (p *BVPolynomialMultiplicationCore) sort(fid ast.FamilyID, o BVPolynomialMultiplicationOptions) error {
-	n := len(p.terms.Slice())
-	for i := n / 2; i > 0; i-- {
-		if e := p.sift(fid, o, i-1, n); e != nil {
-			return e
+	var cause error
+	sort.Slice(p.terms, func(i, j int) bool {
+		if cause != nil {
+			return false
 		}
-	}
-	for end := n; end > 1; end-- {
-		v := p.terms.Slice()
-		v[0], v[end-1] = v[end-1], v[0]
-		if e := p.sift(fid, o, 0, end-1); e != nil {
-			return e
-		}
-	}
-	return nil
+		var less bool
+		less, cause = bvMonomialLess(p.manager, fid, o.ASTOrder, p.terms[i], p.terms[j])
+		return less
+	})
+	return cause
 }
 func (p *BVPolynomialMultiplicationCore) body(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialMultiplicationOptions) (RewriteStatus, error) {
 	m := p.manager
@@ -295,11 +262,9 @@ func (p *BVPolynomialMultiplicationCore) body(sort ast.ASTHandle, args ast.AppAr
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = p.terms.Push(m.Budget(), node); e != nil {
-				return RewriteFailed, e
-			}
+			p.terms = append(p.terms, node)
 		}
-		node, e := m.MkBitVectorPolynomialAddWithInvocation(sort, ast.SliceArguments(p.terms.Slice()), &p.factory)
+		node, e := m.MkBitVectorPolynomialAddWithInvocation(sort, ast.SliceArguments(p.terms), &p.factory)
 		if e != nil {
 			return RewriteFailed, e
 		}
@@ -333,9 +298,7 @@ func (p *BVPolynomialMultiplicationCore) body(sort ast.ASTHandle, args ast.AppAr
 					ordered = false
 				}
 			}
-			if e = p.terms.Push(m.Budget(), curr); e != nil {
-				return RewriteFailed, e
-			}
+			p.terms = append(p.terms, curr)
 			prev = curr
 		}
 		if ordered && numCoeffs == 0 {
@@ -346,7 +309,7 @@ func (p *BVPolynomialMultiplicationCore) body(sort ast.ASTHandle, args ast.AppAr
 				return RewriteFailed, e
 			}
 		}
-		node, e := m.MkBitVectorPolynomialMulWithInvocation(sort, ast.SliceArguments(p.terms.Slice()), &p.factory)
+		node, e := m.MkBitVectorPolynomialMulWithInvocation(sort, ast.SliceArguments(p.terms), &p.factory)
 		if e != nil {
 			return RewriteFailed, e
 		}
@@ -361,9 +324,7 @@ func (p *BVPolynomialMultiplicationCore) body(sort ast.ASTHandle, args ast.AppAr
 func (p *BVPolynomialMultiplicationCore) expand(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialMultiplicationOptions) (RewriteStatus, error) {
 	m := p.manager
 	for i := uint32(0); i < args.Count(); i++ {
-		if e := p.iterator.push(m, 0); e != nil {
-			return RewriteFailed, e
-		}
+		p.iterator = append(p.iterator, 0)
 		arg, e := args.At(i)
 		if e != nil {
 			return RewriteFailed, e
@@ -381,59 +342,35 @@ func (p *BVPolynomialMultiplicationCore) expand(sort ast.ASTHandle, args ast.App
 		if e != nil {
 			return RewriteFailed, e
 		}
-		if e = p.sums.push(m, view); e != nil {
-			return RewriteFailed, e
-		}
-		if e = p.sizes.push(m, view.Count()); e != nil {
-			return RewriteFailed, e
-		}
+		p.sums = append(p.sums, view)
+		p.sizes = append(p.sizes, view.Count())
 	}
-	var e error
-	p.sum, e = m.NewRefVector()
-	if e != nil {
-		return RewriteFailed, e
-	}
-	p.savedSum = p.sum
-	p.sumPlaced = true
 	for {
-		size, e := m.RefVectorSize(p.sum)
-		if e != nil {
-			return RewriteFailed, e
-		}
+		size := uint32(len(p.sum))
 		if size > o.MonomialLimit {
 			return RewriteFailed, ErrBVPolynomialMonomialBlowup
 		}
-		p.monomial.Reset()
+		clear(p.monomial)
+		p.monomial = p.monomial[:0]
 		for i := uint32(0); i < args.Count(); i++ {
-			arg, e := p.sums.data()[i].At(p.iterator.data()[i])
+			arg, e := p.sums[i].At(p.iterator[i])
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = p.monomial.Push(m.Budget(), arg); e != nil {
-				return RewriteFailed, e
-			}
+			p.monomial = append(p.monomial, arg)
 		}
-		node, e := m.MkBitVectorPolynomialMulWithInvocation(sort, ast.SliceArguments(p.monomial.Slice()), &p.factory)
+		node, e := m.MkBitVectorPolynomialMulWithInvocation(sort, ast.SliceArguments(p.monomial), &p.factory)
 		if e != nil {
 			return RewriteFailed, e
 		}
-		p.pushed = node
-		if e = m.RefVectorPushTracked(p.sum, node, &p.push); e != nil {
+		if e = appendRewriterRoot(m, &p.sum, node); e != nil {
 			return RewriteFailed, e
 		}
-		p.push = ast.ASTRefVectorPushReceipt{}
-		if !bvPolynomialProductNext(p.sizes.data(), p.iterator.data()) {
+		if !bvPolynomialProductNext(p.sizes, p.iterator) {
 			break
 		}
 	}
-	count, e := m.RefVectorSize(p.sum)
-	if e != nil {
-		return RewriteFailed, e
-	}
-	view, e := m.RefVectorArgumentsRange(p.sum, 0, count)
-	if e != nil {
-		return RewriteFailed, e
-	}
+	view := ast.SliceArguments(p.sum)
 	node, e := m.MkBitVectorPolynomialAddWithInvocation(sort, view, &p.factory)
 	if e != nil {
 		return RewriteFailed, e
@@ -449,17 +386,18 @@ func (p *BVPolynomialMultiplicationCore) childrenSource() error {
 	return p.manager.BitVectorNumeralInvocationSourceReady(&p.factory)
 }
 func (p *BVPolynomialMultiplicationCore) releaseBuffers() error {
-	p.monomial.Close(p.manager.Budget())
-	if p.sumPlaced {
-		if e := p.manager.DelRefVector(&p.sum); e != nil {
-			return e
-		}
-		p.sumPlaced = false
+	clear(p.monomial)
+	p.monomial = nil
+	if e := shrinkRewriterRoots(p.manager, &p.sum, 0); e != nil {
+		return e
 	}
-	p.sums.close(p.manager)
-	p.iterator.close(p.manager)
-	p.sizes.close(p.manager)
-	p.terms.Close(p.manager.Budget())
+	p.sum = nil
+	clear(p.sums)
+	p.sums = nil
+	p.iterator = nil
+	p.sizes = nil
+	clear(p.terms)
+	p.terms = nil
 	return nil
 }
 
@@ -497,8 +435,10 @@ func (p *BVPolynomialMultiplicationCore) sourceEnd() error {
 	return nil
 }
 func (p *BVPolynomialMultiplicationCore) endFlat() {
-	p.todo.Close(p.manager.Budget())
-	p.flatArgs.Close(p.manager.Budget())
+	clear(p.todo)
+	p.todo = nil
+	clear(p.flatArgs)
+	p.flatArgs = nil
 }
 func (p *BVPolynomialMultiplicationCore) rewrite(sort ast.ASTHandle, args ast.AppArguments, out ast.ASTRef, o BVPolynomialMultiplicationOptions, flat, application, fallback bool) (RewriteStatus, error) {
 	if p == nil || p.self != p || p.closed {
@@ -589,17 +529,8 @@ func (p *BVPolynomialMultiplicationCore) Close() error {
 	if e := p.releaseBuffers(); e != nil {
 		return e
 	}
-	pending, e := p.push.Unpublished()
-	if e != nil {
-		return e
-	}
-	if pending {
-		if e = p.manager.CompleteRefVectorPush(p.savedSum, p.pushed, &p.push); e != nil {
-			return e
-		}
-	}
 	if p.numeric != nil {
-		if e = p.numeric.Close(); e != nil {
+		if e := p.numeric.Close(); e != nil {
 			return e
 		}
 	}

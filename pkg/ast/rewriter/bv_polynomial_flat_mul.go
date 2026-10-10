@@ -65,9 +65,7 @@ func (p *BVPolynomialMultiplicationCore) flatBody(sort ast.ASTHandle, args ast.A
 		if e != nil {
 			return RewriteFailed, e
 		}
-		if e = p.flatArgs.Push(m.Budget(), arg); e != nil {
-			return RewriteFailed, e
-		}
+		p.flatArgs = append(p.flatArgs, arg)
 	}
 	for j := i; j < args.Count(); j++ {
 		arg, e := args.At(j)
@@ -79,20 +77,15 @@ func (p *BVPolynomialMultiplicationCore) flatBody(sort ast.ASTHandle, args ast.A
 			return RewriteFailed, e
 		}
 		if !mul {
-			if e = p.flatArgs.Push(m.Budget(), arg); e != nil {
-				return RewriteFailed, e
-			}
+			p.flatArgs = append(p.flatArgs, arg)
 			continue
 		}
-		if e = p.todo.Push(m.Budget(), arg); e != nil {
-			return RewriteFailed, e
-		}
-		for len(p.todo.Slice()) != 0 {
-			stack := p.todo.Slice()
+		p.todo = append(p.todo, arg)
+		for len(p.todo) != 0 {
+			stack := p.todo
 			curr := stack[len(stack)-1]
-			if e = p.todo.PopBack(); e != nil {
-				return RewriteFailed, e
-			}
+			p.todo[len(p.todo)-1] = ast.ASTHandle{}
+			p.todo = p.todo[:len(p.todo)-1]
 			mul, e := m.IsBitVectorOperation(curr, 6)
 			if e != nil {
 				return RewriteFailed, e
@@ -108,16 +101,14 @@ func (p *BVPolynomialMultiplicationCore) flatBody(sort ast.ASTHandle, args ast.A
 					if e != nil {
 						return RewriteFailed, e
 					}
-					if e = p.todo.Push(m.Budget(), h); e != nil {
-						return RewriteFailed, e
-					}
+					p.todo = append(p.todo, h)
 				}
-			} else if e = p.flatArgs.Push(m.Budget(), curr); e != nil {
-				return RewriteFailed, e
+			} else {
+				p.flatArgs = append(p.flatArgs, curr)
 			}
 		}
 	}
-	flat := ast.SliceArguments(p.flatArgs.Slice())
+	flat := ast.SliceArguments(p.flatArgs)
 	st, e := p.body(sort, flat, out, o)
 	if e != nil {
 		return st, e
