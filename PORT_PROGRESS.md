@@ -37253,3 +37253,31 @@ Both LP vets pass. One source unit becomes partial: LP66 partial/44 unported.
 The20:03 full native module90.0% aggregate predates Harris/breakpoint additions;
 no immediate full rerun is needed. Source/evidence/no-generics and diff checks
 pass; graph regenerated with unchanged edges and the new production file.
+
+
+### Floating reduced-cost and steepest-edge updates — 2026-10-10
+
+Ported floating pivot-row reduced-cost updates, entering-cost refresh with
+source drift/profitability return codes, cost-switch predicate, actual indexed
+LU transposed beta solve, indexed entering norm, norm update/reset counter and
+steepest-edge recurrence. Source nonbreakpoint infeasibility transition subtracts
+then zeros leaving cost after publishing the new reduced cost. Preserved
+source descending refresh sum, sparse duplicates, native IEEE comparisons,
+first-operand std::max on NaN, fixed-column dot product before the no-write
+branch and mutation prefixes at malformed native bounds. Uncalled debug
+calculate_column_norm_exactly is excluded. Actual pivot/advance/optimization
+orchestration and exact/tableau updates remain open.
+
+160 independent upper-triangular basis/coordinate worlds run actual sparse and
+forced-dense LU, compare beta against independent transposed substitution and
+compare recurrence norms/reduced costs against explicit new-basis coordinates.
+Actual new-basis refactor/entering solves then verify refreshed costs. Tests
+cover drift/profitability thresholds, source RNG periodic resets, cost-mode
+switches, infeasibility-cost changes, norm floor/fixed columns/duplicates/IEEE
+and reached publication/error guards. Focused native core/primal/presolve/solver/
+column/scaler/static/LU checks pass0.936s; debug/checked pass0.975s. New code105/111
+(94.6%) native and111/111 (100%) debug; native gaps are erased assertions.
+Profiles: /mnt/oldrog/tmp/g3-refresh-{native,debug}.cover. Both LP vets and source/
+evidence/no-generics verification pass. LP stays66 partial/44 unported. The20:03
+full native90.0% aggregate predates these additions; no full repeat is due.
+Graph regenerated with unchanged edges and the new production file.

@@ -121387,7 +121387,8 @@
         "pkg/util/lp/primal_price_float_test.go",
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/primal_harris_float.go",
-        "pkg/util/lp/primal_breakpoint_float.go"
+        "pkg/util/lp/primal_breakpoint_float.go",
+        "pkg/util/lp/primal_refresh_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -121409,7 +121410,12 @@
         "TestLPFloatPrimalBreakpointIndependentSlope",
         "TestLPFloatPrimalLeavingPathIntegration",
         "TestLPFloatPrimalBreakpointPublicationAndGuards",
-        "TestLPFloatPrimalLeavingReachedErrors"
+        "TestLPFloatPrimalLeavingReachedErrors",
+        "TestLPFloatPrimalRefreshIndependentBasisWorlds",
+        "TestLPFloatPrimalRefreshClassificationAndNormLifecycle",
+        "TestLPFloatPrimalRefreshIEEEAndCostTransitions",
+        "TestLPFloatPrimalRefreshPublicationAndGuards",
+        "TestLPFloatPrimalNormUpdateReachedBounds"
       ],
       "conditionals": [
         {
@@ -121609,6 +121615,20 @@
             "TestLPFloatPrimalBreakpointPublicationAndGuards",
             "TestLPFloatPrimalLeavingReachedErrors"
           ]
+        },
+        {
+          "name": "Retained floating reduced-cost pivot recurrence, entering reduced-cost refresh/drift/profitability classification, cost-switch predicate, actual indexed LU beta solve, entering norm, periodic norm initialization and steepest-edge norm updates",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_refresh_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalRefreshIndependentBasisWorlds",
+            "TestLPFloatPrimalRefreshClassificationAndNormLifecycle",
+            "TestLPFloatPrimalRefreshIEEEAndCostTransitions",
+            "TestLPFloatPrimalRefreshPublicationAndGuards",
+            "TestLPFloatPrimalNormUpdateReachedBounds"
+          ]
         }
       ],
       "ownership": [
@@ -121618,7 +121638,8 @@
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
         "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced.",
         "Harris output pointers require nonnil Go storage. Undefined source indices and empty leaving modulo-zero return ErrBounds after reached mutations; empty leaving selection consumes the source RNG and leaves converted epsilon zero. Exact/tableau variants, breakpoint selection and full find_leaving_and_t integration remain open. Definition-only checked feasible-positive helper is not copied.",
-        "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open."
+        "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open.",
+        "Floating norm/price updates preserve sparse index iteration including duplicates, absolute-source IEEE comparisons, first-operand std::max NaN behavior, fixed-column dot product before skipping writes, and reached mutation prefixes at native bounds guards. Definition-only calculate_column_norm_exactly debug helper is not copied. Exact/tableau recurrences and complete primal optimization integration remain open."
       ]
     },
     {
@@ -121633,7 +121654,8 @@
         "pkg/util/lp/primal_price_float_test.go",
         "pkg/util/lp/primal_prepare_float_test.go",
         "pkg/util/lp/primal_harris_float.go",
-        "pkg/util/lp/primal_breakpoint_float.go"
+        "pkg/util/lp/primal_breakpoint_float.go",
+        "pkg/util/lp/primal_refresh_float.go"
       ],
       "tests": [
         "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
@@ -121655,7 +121677,12 @@
         "TestLPFloatPrimalBreakpointIndependentSlope",
         "TestLPFloatPrimalLeavingPathIntegration",
         "TestLPFloatPrimalBreakpointPublicationAndGuards",
-        "TestLPFloatPrimalLeavingReachedErrors"
+        "TestLPFloatPrimalLeavingReachedErrors",
+        "TestLPFloatPrimalRefreshIndependentBasisWorlds",
+        "TestLPFloatPrimalRefreshClassificationAndNormLifecycle",
+        "TestLPFloatPrimalRefreshIEEEAndCostTransitions",
+        "TestLPFloatPrimalRefreshPublicationAndGuards",
+        "TestLPFloatPrimalNormUpdateReachedBounds"
       ],
       "conditionals": [
         {
@@ -121983,6 +122010,20 @@
             "TestLPFloatPrimalBreakpointPublicationAndGuards",
             "TestLPFloatPrimalLeavingReachedErrors"
           ]
+        },
+        {
+          "name": "Retained floating reduced-cost pivot recurrence, entering reduced-cost refresh/drift/profitability classification, cost-switch predicate, actual indexed LU beta solve, entering norm, periodic norm initialization and steepest-edge norm updates",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_refresh_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalRefreshIndependentBasisWorlds",
+            "TestLPFloatPrimalRefreshClassificationAndNormLifecycle",
+            "TestLPFloatPrimalRefreshIEEEAndCostTransitions",
+            "TestLPFloatPrimalRefreshPublicationAndGuards",
+            "TestLPFloatPrimalNormUpdateReachedBounds"
+          ]
         }
       ],
       "ownership": [
@@ -121992,7 +122033,8 @@
         "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
         "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced.",
         "Harris output pointers require nonnil Go storage. Undefined source indices and empty leaving modulo-zero return ErrBounds after reached mutations; empty leaving selection consumes the source RNG and leaves converted epsilon zero. Exact/tableau variants, breakpoint selection and full find_leaving_and_t integration remain open. Definition-only checked feasible-positive helper is not copied.",
-        "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open."
+        "Go native FloatBreakpoint value slice replaces C++ vector records; scalar values have no independent ownership. Source double advance always stops after the first queued crossing even if slope remains beneficial; exact multi-breakpoint continuation is not claimed. Entering boxed breakpoint uses full bound span rather than distance from current X. Invalid source index/empty queue uses reached typed bounds/assertion guards; errors preserve earlier record/queue mutations. Exact records/solver, diagnostic printing and complete optimization loop remain open.",
+        "Floating norm/price updates preserve sparse index iteration including duplicates, absolute-source IEEE comparisons, first-operand std::max NaN behavior, fixed-column dot product before skipping writes, and reached mutation prefixes at native bounds guards. Definition-only calculate_column_norm_exactly debug helper is not copied. Exact/tableau recurrences and complete primal optimization integration remain open."
       ]
     },
     {
