@@ -198,6 +198,11 @@ func TestBVRewriterIteEveryColdReservationAndPublication(t *testing.T) {
 				m.Budget().FailAfter(-1)
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 				} else {
 					if !numericHoistRefusal(body) {
 						t.Fatal(body)

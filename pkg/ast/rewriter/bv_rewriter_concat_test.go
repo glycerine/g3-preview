@@ -133,6 +133,11 @@ func TestBVRewriterConcatEveryColdReservationAndPublication(t *testing.T) {
 				m.Budget().FailAfter(-1)
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 					if (st == RewriteFailed) != (mode == "failed") {
 						t.Fatal(mode, st)
 					}
@@ -189,7 +194,7 @@ func TestBVConcatRefBufferPushPopAndForwardDestruction(t *testing.T) {
 	if rc != before {
 		t.Fatal("pending/spilled ownership", rc)
 	}
-	// An unpinned 32-child node forces a real consumed decrement refusal.
+	// An unpinned 32-child node grows the native deletion worklist.
 	makeOwned := func() ast.ASTHandle {
 		sort, e := m.BitVectorSort(8)
 		astTestMust(t, e)
@@ -207,7 +212,7 @@ func TestBVConcatRefBufferPushPopAndForwardDestruction(t *testing.T) {
 	m.Budget().FailAfter(0)
 	body = b.pop(m)
 	m.Budget().FailAfter(-1)
-	if body == nil || len(b.values.Slice()) != 0 || !b.pending.IsNull() {
+	if body != nil || len(b.values.Slice()) != 0 || !b.pending.IsNull() {
 		t.Fatal("pop before consumed DEC", body)
 	}
 	astTestMust(t, b.close(m))
@@ -219,9 +224,8 @@ func TestBVConcatRefBufferPushPopAndForwardDestruction(t *testing.T) {
 	m.Budget().FailAfter(-1)
 	rc, e = m.GetRefCount(x)
 	astTestMust(t, e)
-	hs := b.values.Slice()
-	if body == nil || len(hs) != 2 || !hs[0].IsNull() || hs[1] != x || rc != before+1 {
-		t.Fatal("forward DT consumed prefix", body, rc)
+	if body != nil || len(b.values.Slice()) != 0 || rc != before {
+		t.Fatal("native forward destruction", body, rc)
 	}
 	astTestMust(t, b.close(m))
 	astTestMust(t, b.close(m))

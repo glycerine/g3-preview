@@ -193,7 +193,7 @@ func TestBVRewriterMultiplicationCallerNaryCoreResultAndStatusBypass(t *testing.
 	}
 }
 
-func TestBVRewriterMultiplicationCallerConsumedFinalAssignmentFailure(t *testing.T) {
+func TestBVRewriterMultiplicationCallerNativeWideFinalAssignment(t *testing.T) {
 	complete := false
 	sawPublished := false
 	for ordinal := int64(0); ordinal < 256 && !complete; ordinal++ {
@@ -227,6 +227,19 @@ func TestBVRewriterMultiplicationCallerConsumedFinalAssignmentFailure(t *testing
 			astTestMust(t, e)
 			if body == nil {
 				complete = true
+				nativeResult, nativeErr := m.RefGet(out)
+				astTestMust(t, nativeErr)
+				if nativeResult != old {
+					sawPublished = true
+				}
+				yes, e := m.IsBitVectorOperation(nativeResult, 37)
+				astTestMust(t, e)
+				if !yes {
+					t.Fatal("native replacement shape", nativeResult)
+				}
+				if _, e := m.GetRefCount(old); e == nil {
+					t.Fatal("native assignment retained the old root")
+				}
 				if st != Rewrite2 {
 					t.Fatal(st)
 				}
@@ -254,6 +267,6 @@ func TestBVRewriterMultiplicationCallerConsumedFinalAssignmentFailure(t *testing
 		})
 	}
 	if !complete || !sawPublished {
-		t.Fatal("missing consumed final assignment failure", complete, sawPublished)
+		t.Fatal("native final assignment did not publish", complete, sawPublished)
 	}
 }

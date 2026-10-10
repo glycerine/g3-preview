@@ -195,6 +195,11 @@ func TestBVRewriterBit2BoolEveryColdReservation(t *testing.T) {
 			m.Budget().FailAfter(-1)
 			if body == nil {
 				complete = true
+				nativeResult, nativeErr := m.RefGet(out)
+				astTestMust(t, nativeErr)
+				if nativeResult != old {
+					sawIntermediate = true
+				}
 				if st != Rewrite3 || p.bitBool != nil {
 					t.Fatal(st)
 				}

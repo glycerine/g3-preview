@@ -104,17 +104,11 @@ type ASTQuantifierSpec struct {
 	Patterns, NoPatterns []ASTHandle
 }
 
-// All continuation fields are actual charged directory metadata. A zero-RC
-// node awaiting destruction remains owned by this manager's deletion graph;
-// it cannot be recycled while current/queued/recursive-frame state owns it.
 type astNodeRecord struct {
 	generation, nextFree, id, hash, rc, kindIndex uint32
 	kind                                          ASTKind
 	live, mark1, mark2, shared, closeMark         bool
 	markOwner1, markOwner2                        uint64
-	deleteNext, deleteParent                      astNodeRef
-	deletePhase, deleteIndex                      uint32
-	deleting                                      bool
 }
 type astSortRecord struct {
 	nextFree uint32

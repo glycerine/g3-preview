@@ -196,6 +196,11 @@ func TestBVRewriterUnsignedRemainderEveryColdReservationAndPublication(t *testin
 					m.Budget().FailAfter(-1)
 					if body == nil {
 						complete = true
+						nativeResult, nativeErr := m.RefGet(out)
+						astTestMust(t, nativeErr)
+						if nativeResult != old {
+							published = true
+						}
 						want := RewriteDone
 						if mode == "zero" && !hi {
 							want = Rewrite1

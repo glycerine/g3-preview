@@ -128,6 +128,11 @@ func TestBVRewriterLEConcatEveryColdReservationAndPublication(t *testing.T) {
 				astTestMust(t, e)
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 					if st != want || p.leConcat != nil || want == RewriteFailed && got != old {
 						t.Fatal("source return", st, want)
 					}

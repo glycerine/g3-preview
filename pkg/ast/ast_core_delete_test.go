@@ -4,13 +4,13 @@ import (
 	"testing"
 )
 
-func TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder(t *testing.T) {
+func TestASTDeletionNativeWorklistActualIDRecycleLIFO(t *testing.T) {
 	for _, fail := range []bool{false, true} {
 		m := astTestManager(t)
 		b, e := m.MkBoolSort()
 		astTestMust(t, e)
-		var args [32]ASTHandle
-		var ids [32]uint32
+		var args [257]ASTHandle
+		var ids [257]uint32
 		for i := range args {
 			args[i], e = m.MkVar(uint32(i+1000), b)
 			astTestMust(t, e)
@@ -28,21 +28,15 @@ func TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder(t *testing.T) {
 			m.BudgetField.FailAfter(0)
 		}
 		e = m.DelRef(&ref)
-		if fail {
-			if e == nil {
-				t.Fatal("emergency path not exercised")
-			}
-		} else {
-			astTestMust(t, e)
-		}
+		astTestMust(t, e)
 		m.BudgetField.FailAfter(-1)
 		got := m.ExprIDs.FreeIDs()[before:]
-		if len(got) != 33 || got[0] != id {
+		if len(got) != len(args)+1 || got[0] != id {
 			t.Fatal("source parent recycled before children", got, id)
 		}
-		for i := 0; i < 32; i++ {
-			if got[i+1] != ids[31-i] {
-				t.Fatal("ascending push must produce real LIFO child destruction", fail, i, got[i+1], ids[31-i])
+		for i := 0; i < len(args); i++ {
+			if got[i+1] != ids[len(args)-1-i] {
+				t.Fatal("ascending push must produce real LIFO child destruction", fail, i, got[i+1], ids[len(args)-1-i])
 			}
 		}
 		if ref != (ASTRef{}) || m.pendingDeletionCurrent != (astNodeRef{}) || m.pendingDeletionHead != (astNodeRef{}) {

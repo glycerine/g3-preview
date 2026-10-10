@@ -226,7 +226,7 @@ func TestBVRewriterAdditionAfterCoreEveryColdReservation(t *testing.T) {
 					sentinel = original
 				}
 				// Original inputs remain pinned, so final assignment cannot create a
-				// deletion-worklist refusal after publishing the new result.
+				// destruction callback error after publishing the new result.
 				before := make([]uint32, len(args))
 				for i, h := range args {
 					var e error
@@ -280,8 +280,8 @@ func TestBVRewriterAdditionAfterCoreEveryColdReservation(t *testing.T) {
 	}
 }
 
-func TestBVRewriterAdditionAfterCoreAssignmentDECRefusal(t *testing.T) {
-	success, reachedDEC := false, false
+func TestBVRewriterAdditionAfterCoreNativeWideAssignment(t *testing.T) {
+	success, failures := false, 0
 	for ordinal := int64(0); ordinal < 512; ordinal++ {
 		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
 			m, _ := bvAddFixture(t)
@@ -296,7 +296,7 @@ func TestBVRewriterAdditionAfterCoreAssignmentDECRefusal(t *testing.T) {
 			}
 			old, e := m.MkBitVectorOr(older)
 			astTestMust(t, e)
-			out := astTestPin(t, m, old) // sole reference; deleting it reaches worklist growth.
+			out := astTestPin(t, m, old) // sole reference; deletion grows the native worklist.
 			m.Budget().FailAfter(ordinal)
 			st, body := RewriteBitVectorAdditionAfterCore(m, RewriteFailed, ast.SliceArguments(args), out)
 			m.Budget().FailAfter(-1)
@@ -309,37 +309,33 @@ func TestBVRewriterAdditionAfterCoreAssignmentDECRefusal(t *testing.T) {
 						t.Fatal("unexpected refusal", body)
 					}
 				}
+				failures++
 				if got != old {
-					reachedDEC = true
-					if st != Rewrite1 {
-						t.Fatal("consumed assignment status", st)
-					}
-					// Assignment records the consumed old DEC and owns the new OR even
-					// though deletion refused a later worklist reservation.
-					n, e := m.GetNumArgs(got)
-					astTestMust(t, e)
-					if n != 3 {
-						t.Fatal("published replacement arity", n)
-					}
-					if count, e := m.GetRefCount(old); e == nil && count != 0 {
-						t.Fatal("old DEC not consumed", count)
-					}
+					t.Fatal("failed replacement changed the old reference", got, old)
 				}
 			} else {
 				success = true
 				if st != Rewrite1 || got == old {
 					t.Fatal("completed assignment", st)
 				}
+				if _, e := m.GetRefCount(old); e == nil {
+					t.Fatal("completed assignment retained old root")
+				}
+				n, e := m.GetNumArgs(got)
+				astTestMust(t, e)
+				if n != 3 {
+					t.Fatal("published replacement arity", n)
+				}
 			}
 			// Fixture closure destroys only the reference currently in out; the
-			// manager owns the stopped deletion worklist and numerical contexts.
+			// manager owns the remaining AST and numerical contexts.
 		})
 		if success {
 			break
 		}
 	}
-	if !success || !reachedDEC {
-		t.Fatal("assignment refusal horizon", success, reachedDEC)
+	if !success {
+		t.Fatal("native assignment horizon", success, failures)
 	}
 }
 

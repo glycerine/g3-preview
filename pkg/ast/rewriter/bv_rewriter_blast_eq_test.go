@@ -162,6 +162,11 @@ func TestBVRewriterBlastEqualityEveryColdReservation(t *testing.T) {
 			m.Budget().FailAfter(-1)
 			if body == nil {
 				complete = true
+				nativeResult, nativeErr := m.RefGet(out)
+				astTestMust(t, nativeErr)
+				if nativeResult != old {
+					sawAssignment = true
+				}
 				if st != Rewrite3 || p.blastEquality != nil {
 					t.Fatal(st)
 				}

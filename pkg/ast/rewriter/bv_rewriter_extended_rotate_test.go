@@ -97,6 +97,11 @@ func TestBVRewriterExtendedRotationEveryColdReservation(t *testing.T) {
 					astTestMust(t, e)
 					if body == nil {
 						complete = true
+						nativeResult, nativeErr := m.RefGet(out)
+						astTestMust(t, nativeErr)
+						if nativeResult != old {
+							published = true
+						}
 						want := Rewrite2
 						if mode == "identity" {
 							want = RewriteDone

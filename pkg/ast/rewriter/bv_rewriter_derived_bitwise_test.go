@@ -133,6 +133,11 @@ func TestBVRewriterDerivedBitwiseEveryColdReservation(t *testing.T) {
 				astTestMust(t, e)
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 					want := Rewrite2
 					if op == "and" {
 						want = Rewrite3
@@ -170,7 +175,7 @@ func TestBVRewriterDerivedBitwiseEveryColdReservation(t *testing.T) {
 			})
 		}
 		if !complete || !published {
-			t.Fatal("campaign incomplete or post-publication DEC absent", op, complete, published)
+			t.Fatal("native publication campaign incomplete", op, complete, published)
 		}
 		if (op == "and" || op == "nand") && !retained {
 			t.Fatal("stopped borrowed buffer not retained", op)

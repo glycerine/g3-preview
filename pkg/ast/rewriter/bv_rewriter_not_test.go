@@ -252,6 +252,11 @@ func TestBVRewriterNotEveryColdReservation(t *testing.T) {
 				astTestMust(t, e)
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 					if st != wantStatus {
 						t.Fatal("status", st, wantStatus)
 					}
@@ -300,7 +305,7 @@ func TestBVRewriterNotEveryColdReservation(t *testing.T) {
 			t.Fatal("campaign incomplete", mode)
 		}
 		if mode != "failed" && mode != "addrightfailed" && mode != "addleftfailed" && !published {
-			t.Fatal("old DEC frontier absent", mode)
+			t.Fatal("native replacement was not published", mode)
 		}
 	}
 }

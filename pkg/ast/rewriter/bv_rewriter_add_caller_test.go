@@ -146,7 +146,7 @@ func TestBVRewriterAdditionCallerEveryColdReservation(t *testing.T) {
 	}
 }
 
-func TestBVRewriterAdditionCallerConsumedFinalAssignmentFailure(t *testing.T) {
+func TestBVRewriterAdditionCallerNativeWideFinalAssignment(t *testing.T) {
 	complete := false
 	sawPublished := false
 	for ordinal := int64(0); ordinal < 256 && !complete; ordinal++ {
@@ -183,6 +183,19 @@ func TestBVRewriterAdditionCallerConsumedFinalAssignmentFailure(t *testing.T) {
 			astTestMust(t, e)
 			if body == nil {
 				complete = true
+				nativeResult, nativeErr := m.RefGet(out)
+				astTestMust(t, nativeErr)
+				if nativeResult != old {
+					sawPublished = true
+				}
+				yes, e := m.IsBitVectorOperation(nativeResult, 31)
+				astTestMust(t, e)
+				if !yes {
+					t.Fatal("native replacement shape", nativeResult)
+				}
+				if _, e := m.GetRefCount(old); e == nil {
+					t.Fatal("native assignment retained the old root")
+				}
 				if st != Rewrite1 {
 					t.Fatal(st)
 				}
@@ -210,6 +223,6 @@ func TestBVRewriterAdditionCallerConsumedFinalAssignmentFailure(t *testing.T) {
 		})
 	}
 	if !complete || !sawPublished {
-		t.Fatal("missing consumed final assignment failure", complete, sawPublished)
+		t.Fatal("native final assignment did not publish", complete, sawPublished)
 	}
 }

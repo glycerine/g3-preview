@@ -357,7 +357,7 @@ func TestBVTrailingEveryColdCountReservation(t *testing.T) {
 	}
 }
 
-func TestBVTrailingResetConsumedKeyAfterDeletionFailure(t *testing.T) {
+func TestBVTrailingNativeWideDeletionReset(t *testing.T) {
 	m, p, _ := bvTrailingFixture(t)
 	sort, e := m.BitVectorSort(8)
 	satOK(t, e)
@@ -379,24 +379,14 @@ func TestBVTrailingResetConsumedKeyAfterDeletionFailure(t *testing.T) {
 	m.Budget().FailAfter(0)
 	body := p.ResetCache(0)
 	m.Budget().FailAfter(-1)
-	if !errors.Is(body, arena.ErrInjectedFailure) {
-		t.Fatal("actual deletion worklist refusal", body)
-	}
-	table := p.tables[5]
-	if table == nil {
-		t.Fatal("failed reset lost exact table")
-	}
-	found := false
-	for _, entry := range table.entries.All() {
-		if entry.key == root {
-			found = true
-			if entry.owned {
-				t.Fatal("consumed key reference was retained")
-			}
+	satOK(t, body)
+	for _, table := range p.tables {
+		if table != nil {
+			t.Fatal("native reset retained a cache table")
 		}
 	}
-	if !found {
-		t.Fatal("consumed source key pointer not retained")
+	if _, e := m.GetRefCount(root); e == nil {
+		t.Fatal("native reset retained the sole-owned root")
 	}
 	satOK(t, p.Close())
 }

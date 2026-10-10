@@ -144,6 +144,11 @@ func TestBVRewriterExtractEveryColdReservationAndPublication(t *testing.T) {
 				astTestMust(t, e)
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 					if st != wantStatus || p.extraction != nil || mode == "failed" && got != old {
 						t.Fatal("source status/end", st, wantStatus)
 					}

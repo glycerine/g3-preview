@@ -141,6 +141,11 @@ func TestBVRewriterDerivedExtendRepeatEveryColdReservation(t *testing.T) {
 				astTestMust(t, e)
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 					want := Rewrite1
 					if tc.repeat && tc.n == 1 || !tc.repeat && tc.n == 0 {
 						want = RewriteDone
@@ -180,7 +185,7 @@ func TestBVRewriterDerivedExtendRepeatEveryColdReservation(t *testing.T) {
 			})
 		}
 		if !complete || !published {
-			t.Fatal("campaign incomplete or old DEC absent", tc, complete, published)
+			t.Fatal("native publication campaign incomplete", tc, complete, published)
 		}
 	}
 }

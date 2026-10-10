@@ -880,7 +880,7 @@ func TestASTDependencyRefResumedConsumedErrorStillFinishesRequestedDestruction(t
 		}
 		m.BudgetField.FailAfter(-1)
 		if !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal("actual consumed AST worklist refusal", e)
+			t.Fatal("actual dependency deletion worklist refusal", e)
 		}
 		if m.dependencies.live != 0 || v != (ASTDependencyRefVector{}) || b != (ASTDependencyRefBuffer{}) {
 			t.Fatal("completed resumed phase must not abandon still-owned prefix", buffer, e, m.dependencies.live, v, b)

@@ -2,13 +2,10 @@
 package ast
 
 import (
-	"errors"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestASTDecRefConsumedActualDeletionRefusal(t *testing.T) {
+func TestASTDecRefConsumedNativeWideDeletion(t *testing.T) {
 	m := astTestManager(t)
 	sort, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -23,10 +20,10 @@ func TestASTDecRefConsumedActualDeletionRefusal(t *testing.T) {
 	m.Budget().FailAfter(0)
 	consumed, body := m.DecRefConsumed(h)
 	m.Budget().FailAfter(-1)
-	if !consumed || !errors.Is(body, arena.ErrInjectedFailure) {
+	if !consumed || body != nil {
 		t.Fatal("actual deletion consumption", consumed, body)
 	}
-	// The emergency deletion transport completes the graph despite refusal.
+	// Native worklist growth completes the graph without budget reservations.
 	if _, e = m.internal(h); e != ErrASTHandle {
 		t.Fatal("consumed parent still live", e)
 	}

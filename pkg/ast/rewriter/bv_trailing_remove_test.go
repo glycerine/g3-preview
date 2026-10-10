@@ -137,7 +137,7 @@ func TestBVTrailingRemovalEveryColdReservation(t *testing.T) {
 	}
 }
 
-func TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector(t *testing.T) {
+func TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction(t *testing.T) {
 	m, p, _ := bvTrailingFixture(t)
 	sort, e := m.BitVectorSort(8)
 	satOK(t, e)
@@ -170,18 +170,9 @@ func TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector(t *testing.T) {
 	f.finish(&body)
 	parent.finish(&body)
 	m.Budget().FailAfter(-1)
-	if !errors.Is(body, arena.ErrInjectedFailure) || f.refs[0] != (ast.ASTRef{}) || !f.vectorPlaced || f.sourceDone {
-		t.Fatal("reached source DEC prefix", body, f.refs[0], f.vectorPlaced, f.sourceDone)
-	}
-	rc, e := m.GetRefCount(held)
-	satOK(t, e)
-	if rc != 1 {
-		t.Fatal("older vector ended past stopped ref DT", rc)
-	}
-	rc, e = m.GetRefCount(older)
-	satOK(t, e)
-	if rc != 1 || parent.refs[0] == (ast.ASTRef{}) || !parent.vectorPlaced || parent.sourceDone {
-		t.Fatal("parent crossed its exact stopped structural child", rc, parent.sourceDone)
+	satOK(t, body)
+	if f.refs[0] != (ast.ASTRef{}) || f.vectorPlaced || !f.sourceDone || parent.refs[0] != (ast.ASTRef{}) || parent.vectorPlaced || !parent.sourceDone {
+		t.Fatal("native frame destruction did not finish children and parent")
 	}
 	satOK(t, p.Close())
 	if _, e := m.GetRefCount(held); !errors.Is(e, ast.ErrASTHandle) {
@@ -190,8 +181,8 @@ func TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector(t *testing.T) {
 	if _, e := m.GetRefCount(older); !errors.Is(e, ast.ErrASTHandle) {
 		t.Fatal("parent vector ref retained", e)
 	}
-	if e := call.sourceReady(m); !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal("owning closure resumed source DT", e)
+	if e := call.sourceReady(m); e != nil {
+		t.Fatal("completed native source DT not ready", e)
 	}
 }
 

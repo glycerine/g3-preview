@@ -245,6 +245,11 @@ func TestBVRewriterBV2IntEveryColdReservationAndPublication(t *testing.T) {
 				astTestMust(t, e)
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 					want := Rewrite2
 					if mode == "numeric" {
 						want = RewriteDone
@@ -284,7 +289,7 @@ func TestBVRewriterBV2IntEveryColdReservationAndPublication(t *testing.T) {
 			t.Fatal("cold campaign incomplete", mode)
 		}
 		if mode != "unsafe" && mode != "failed" && !published {
-			t.Fatal("old BOR DEC publication frontier not reached", mode)
+			t.Fatal("native replacement was not published", mode)
 		}
 	}
 }
@@ -311,11 +316,12 @@ func TestBV2IntVectorReplacementConsumedOldReference(t *testing.T) {
 	m.Budget().FailAfter(0)
 	body := v.set(m, 0, replacement)
 	m.Budget().FailAfter(-1)
-	if body == nil || !numericHoistRefusal(body) {
-		t.Fatal("old DEC frontier absent", body)
+	astTestMust(t, body)
+	if !v.pending.IsNull() || v.values.Slice()[0] != replacement {
+		t.Fatal("native replacement did not publish acquired reference")
 	}
-	if v.pending != replacement || !v.values.Slice()[0].IsNull() {
-		t.Fatal("acquired replacement or consumed old lost")
+	if _, e := m.GetRefCount(old); e == nil {
+		t.Fatal("native replacement retained old root")
 	}
 	astTestMust(t, v.close(m))
 	astTestMust(t, v.close(m))

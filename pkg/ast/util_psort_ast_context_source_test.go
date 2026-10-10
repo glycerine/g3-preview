@@ -46,7 +46,7 @@ func TestPsortASTContextActualFactoriesClausesAndTrail(t *testing.T) {
 	}
 }
 
-func TestPsortASTContextUnpublishedClauseConsumedCleanupRetry(t *testing.T) {
+func TestPsortASTContextUnpublishedClauseNativeCleanup(t *testing.T) {
 	m := astTestManager(t)
 	sort, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -98,15 +98,12 @@ func TestPsortASTContextUnpublishedClauseConsumedCleanupRetry(t *testing.T) {
 	}
 	m.BudgetField.FailAfter(0)
 	cleanup := c.Close()
-	if !errors.Is(cleanup, arena.ErrInjectedFailure) || c.pending == nil || !c.pending.receipt.consumed {
-		t.Fatal("actual consumed deletion warning", cleanup)
+	astTestMust(t, cleanup)
+	if !c.closed || c.pending != nil {
+		t.Fatal("native cleanup did not acknowledge the acquired reference")
 	}
-	first := c.pending.receipt.cleanupCause
 	graph()
 	astTestMust(t, c.Close())
-	if first != cleanup || !c.closed || c.pending != nil {
-		t.Fatal("owning exact consumed ACK")
-	}
 	graph()
 	m.BudgetField.FailAfter(-1)
 	astTestMust(t, v.Close())
@@ -148,7 +145,7 @@ func TestPsortASTContextActualConstructorRefusalPrefixes(t *testing.T) {
 	t.Log("actual constructor first success", success)
 }
 
-func TestPsortASTContextStoppedTrailKeepsLaterClausesAndSourceCause(t *testing.T) {
+func TestPsortASTContextNativeWideTrailAndClauseFinalization(t *testing.T) {
 	m := astTestManager(t)
 	sort, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -169,26 +166,21 @@ func TestPsortASTContextStoppedTrailKeepsLaterClausesAndSourceCause(t *testing.T
 	external := m.BudgetField.Used() - m.Stats().AllocatedBytes - c.header
 	m.BudgetField.FailAfter(0)
 	cause := c.SourceFinalize()
-	if !errors.Is(cause, arena.ErrInjectedFailure) || c.stage != 0 || c.destructorCause != cause {
-		t.Fatal("actual first reached trail stop", cause, c.stage)
-	}
-	size, e := m.RefVectorSize(c.clauses)
-	astTestMust(t, e)
-	if size != 1 {
-		t.Fatal("later declared clause member traversed after source stop", size)
+	astTestMust(t, cause)
+	if c.stage != 2 || c.destructorCause != nil {
+		t.Fatal("native trail and clause finalization", c.stage, c.destructorCause)
 	}
 	if m.BudgetField.Used() != m.Stats().AllocatedBytes+c.header+external {
-		t.Fatal("actual stopped member graph")
+		t.Fatal("actual finalized member graph")
 	}
 	before := m.Stats()
-	if c.SourceFinalize() != cause || m.Stats() != before {
-		t.Fatal("source teardown replay or changed sticky cause")
+	astTestMust(t, c.SourceFinalize())
+	if m.Stats() != before {
+		t.Fatal("repeated finalization changed AST ownership")
 	}
-	// The real child helper has consumed the dead references but retained its
-	// SIZE-zero descriptor. Owning close finishes that child before clauses.
 	astTestMust(t, c.Close())
-	if c.destructorCause != cause || c.stage != 2 || !c.closed {
-		t.Fatal("owning continuation lost source boundary")
+	if c.destructorCause != nil || c.stage != 2 || !c.closed {
+		t.Fatal("native owning closure")
 	}
 	m.BudgetField.FailAfter(-1)
 }

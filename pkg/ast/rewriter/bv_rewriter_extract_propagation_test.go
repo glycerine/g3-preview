@@ -159,6 +159,11 @@ func TestBVRewriterExtractPropagationEveryColdReservation(t *testing.T) {
 				astTestMust(t, e)
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 					if p.propagation != nil || p.extraction != nil || parent && st != wantStatus || !parent && removed != wantRemoved || mode == "order-failed" && got != old {
 						t.Fatal("source return", removed, st)
 					}

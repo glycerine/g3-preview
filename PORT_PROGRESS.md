@@ -32619,3 +32619,43 @@ and diff checks passed. This checkpoint was recovered after the power loss.
 The util knot is not resolved: retained AST substitution/shared-occurrence
 collections, SAT vectors and NumericTextStream consumers still need conversion,
 and internal util dependency cycles still precede the complete subpackage split.
+
+## Native AST deletion worklist and actual publication checks
+
+AST deleteNode now pushes ascending children onto a native Go slice and pops
+in LIFO order. The existing inline sixteen-element backing keeps small warm
+deletions allocation-free; larger worklists use append without simulated source
+capacity charges or an intrusive emergency transport. Removed unused per-node
+queue links, parent links, phase/index fields and deleting flag: repository-wide
+reader inspection found these were written only by deletion/free code and were
+never used to resume cleanup. Actual reference consumption, nested info-parameter
+destruction, external plugin callbacks, canonical removal, ID recycling and
+manager pending-root diagnostics remain.
+
+The main deletion test grows to 257 children with budget reservations disabled
+and checks every recycled ID in parent-first/LIFO-child order. Updated array,
+shared-occurrence, trailing-cache, psort and reference-vector receipt fixtures
+verify complete native deletion rather than requiring a removed vector-growth
+refusal. Failed vector publication still preserves its actual acquired INC and
+original cause; native cleanup acknowledges it once and rejects replay.
+Rewriter allocation campaigns retain real AST/numeric fault sweeps and now count
+successful replacement publication as well as any actual callback failure after
+publication. Addition/multiplication caller fixtures also verify the resulting
+BOR/concat shape and destruction of their old wide root. Native BV2Int vector
+replacement and concat buffer pop/destruction now complete without a synthetic
+old-root deletion error. Separate dependency worklist allocation failures remain
+real and their coverage remains in place. Manifest renames affected tests in all
+source/method evidence; no source or API completion statuses changed.
+
+Validation: full native AST passed (27.310s), full native rewriter passed
+(12.345s). Focused g3debug AST and broad rewriter allocation/publication groups
+passed (0.053s and 7.582s); final strengthened native caller checks passed
+(0.019s), with their g3debug checks passing too. Module-wide compilation,
+AST/rewriter vet, manifest evidence and diff checks passed. An earlier broader
+debug selection exposed existing NAND/AND warm-buffer test failures; both were
+reproduced using the pre-change deletion/storage/allocation production files in
+/mnt/oldrog/tmp/g3-deletion-baseline-pkg. They assume pooled AST allocation reuse
+under the debug direct allocator and are independent of this worklist change.
+The util knot and complete subpackage split remain unfinished. AST substitution
+and shared-occurrence collections, other retained containers, SAT vectors,
+NumericTextStream consumers and internal util dependency cycles still remain.

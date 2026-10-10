@@ -81,7 +81,7 @@ func TestASTDependencyArrayDeletionASTFailureConsumesAllRoots(t *testing.T) {
 	m.BudgetField.FailAfter(0)
 	e = m.DependencyArrayDel(&a)
 	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
+		t.Fatal("actual dependency worklist refusal", e)
 	}
 	if a != (ASTDependencyArray{}) || m.dependencies.live != 0 || m.dependencyArrays.liveCells != 0 || m.dependencyArrays.liveBlocks != 0 || m.liveNodes != baseline {
 		t.Fatal("immediate owned callback graph", a, m.dependencies.live, m.dependencyArrays.liveCells, m.dependencyArrays.liveBlocks, m.liveNodes, baseline)

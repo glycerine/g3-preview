@@ -144,7 +144,6 @@ func (m *ASTManager) freeNodeStorage(r astNodeRef) error {
 	}
 	m.freeKindRecord(r.slot)
 	n.live = false
-	n.deleting = false
 	n.nextFree = m.freeNode
 	m.freeNode = r.slot
 	m.liveNodes--

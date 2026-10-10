@@ -133,6 +133,11 @@ func TestBVRewriterSignedRemainderEveryColdReservationAndPublication(t *testing.
 					m.Budget().FailAfter(-1)
 					if body == nil {
 						complete = true
+						nativeResult, nativeErr := m.RefGet(out)
+						astTestMust(t, nativeErr)
+						if nativeResult != old {
+							published = true
+						}
 						if st == RewriteFailed {
 							t.Fatal("source must produce result", hi, mode)
 						}

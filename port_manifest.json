@@ -9677,7 +9677,7 @@
         "TestASTBuiltinValueAndDefaultPluginPolicies",
         "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
         "TestASTConstructorRejectsClosedBorrowedNumeralOwnerBeforeGrowth",
-        "TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder",
+        "TestASTDeletionNativeWorklistActualIDRecycleLIFO",
         "TestASTDeletionInlineWorklistWarmZeroAllocations",
         "TestASTDependencyActualLIFOCallbacksNormalAndIntrusiveFailure",
         "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
@@ -9707,7 +9707,7 @@
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
         "TestASTEagerNormalAndFormatConstructors",
         "TestASTExprArrayActualValueCallbacksAndReroot",
-        "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
+        "TestASTExprArrayNativeDeletionConsumesRefAndFinishesOwnedGraph",
         "TestASTExprArrayEmptyNonrootPopSourcePrefix",
         "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
         "TestASTExprArrayNonrootSetArbitraryIndex",
@@ -9844,7 +9844,7 @@
         "TestASTArithmeticOriginalMixedApplications",
         "TestASTArithmeticExpressionOverloadReadErasure",
         "TestASTArithmeticAppCoercionEveryWarmReservation",
-        "TestASTDecRefConsumedActualDeletionRefusal",
+        "TestASTDecRefConsumedNativeWideDeletion",
         "TestASTBitVectorConcatBorrowedSuffix",
         "TestASTBitVectorAddBorrowedCommonSuffix"
       ],
@@ -10545,7 +10545,7 @@
           "go_target": "pkg/ast/ast_core_register.go",
           "tests": [
             "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
-            "TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder",
+            "TestASTDeletionNativeWorklistActualIDRecycleLIFO",
             "TestASTDeletionInlineWorklistWarmZeroAllocations",
             "TestASTMetadataIgnoredFields",
             "TestASTRationalInfoFactoryFailureHasImmediateRootAccounting",
@@ -10594,7 +10594,7 @@
           "go_target": "pkg/ast/ast_expr_array.go",
           "tests": [
             "TestASTExprArrayActualValueCallbacksAndReroot",
-            "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
+            "TestASTExprArrayNativeDeletionConsumesRefAndFinishesOwnedGraph",
             "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
             "TestASTExprArrayNonrootSetArbitraryIndex",
             "TestASTExprArrayRetainedRootGetAndSet",
@@ -10899,7 +10899,7 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_core_accessors.go",
           "tests": [
-            "TestASTDecRefConsumedActualDeletionRefusal"
+            "TestASTDecRefConsumedNativeWideDeletion"
           ]
         },
         {
@@ -11061,7 +11061,7 @@
         "TestASTBuiltinValueAndDefaultPluginPolicies",
         "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
         "TestASTConstructorRejectsClosedBorrowedNumeralOwnerBeforeGrowth",
-        "TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder",
+        "TestASTDeletionNativeWorklistActualIDRecycleLIFO",
         "TestASTDeletionInlineWorklistWarmZeroAllocations",
         "TestASTDependencyActualLIFOCallbacksNormalAndIntrusiveFailure",
         "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
@@ -11091,7 +11091,7 @@
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
         "TestASTEagerNormalAndFormatConstructors",
         "TestASTExprArrayActualValueCallbacksAndReroot",
-        "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
+        "TestASTExprArrayNativeDeletionConsumesRefAndFinishesOwnedGraph",
         "TestASTExprArrayEmptyNonrootPopSourcePrefix",
         "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
         "TestASTExprArrayNonrootSetArbitraryIndex",
@@ -11195,7 +11195,7 @@
         "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
         "TestASTSharedOccurrencesMarkInlineFailurePrefix",
         "TestASTSharedOccurrencesPhysicalBucketIterator",
-        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesNativeWideDeletionReset",
         "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
         "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
         "TestASTSparseMarkActualIdentityAndNoRetains",
@@ -11248,7 +11248,7 @@
         "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
         "TestASTRefVectorPushForeignAndIndependentAcquisitions",
         "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure",
-        "TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay",
+        "TestASTRefVectorPushNativeWideCleanupAcknowledgesWithoutReplay",
         "TestASTRefVectorPushStaleInvocationVectorAndNodeGeneration",
         "TestASTRefVectorPushNonwrappingNonceGuardDomain",
         "TestASTBasicConvenienceFactoriesPreserveLiteralKindsAndInputs",
@@ -11700,7 +11700,7 @@
           "go_target": "pkg/ast/ast_core_register.go",
           "tests": [
             "TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph",
-            "TestASTDeletionActualIDRecycleLIFOAndEmergencyOrder",
+            "TestASTDeletionNativeWorklistActualIDRecycleLIFO",
             "TestASTDeletionInlineWorklistWarmZeroAllocations",
             "TestASTMetadataIgnoredFields",
             "TestASTRationalInfoFactoryFailureHasImmediateRootAccounting",
@@ -11749,7 +11749,7 @@
           "go_target": "pkg/ast/ast_expr_array.go",
           "tests": [
             "TestASTExprArrayActualValueCallbacksAndReroot",
-            "TestASTExprArrayDeletionFailureConsumesRefAndFinishesOwnedGraph",
+            "TestASTExprArrayNativeDeletionConsumesRefAndFinishesOwnedGraph",
             "TestASTExprArrayEscapedCloseReclaimsPhysicalGraph",
             "TestASTExprArrayNonrootSetArbitraryIndex",
             "TestASTExprArrayRetainedRootGetAndSet",
@@ -11947,7 +11947,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -12023,7 +12023,7 @@
             "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
             "TestASTRefVectorPushForeignAndIndependentAcquisitions",
             "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure",
-            "TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay",
+            "TestASTRefVectorPushNativeWideCleanupAcknowledgesWithoutReplay",
             "TestASTRefVectorPushStaleInvocationVectorAndNodeGeneration",
             "TestASTRefVectorPushNonwrappingNonceGuardDomain"
           ]
@@ -21355,18 +21355,18 @@
         "TestBVRewriterAdditionAfterCoreNumeralsAndBorrowedResult",
         "TestBVRewriterAdditionAfterCoreSymbolicDisjointSemantics",
         "TestBVRewriterAdditionAfterCoreEveryColdReservation",
-        "TestBVRewriterAdditionAfterCoreAssignmentDECRefusal",
+        "TestBVRewriterAdditionAfterCoreNativeWideAssignment",
         "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild",
         "TestBVRewriterAdditionCallerConnectsCoreAndDisjointBits",
         "TestBVRewriterAdditionCallerUsesAssignedCoreArgsAndPassesFullStatus",
         "TestBVRewriterAdditionCallerEveryColdReservation",
-        "TestBVRewriterAdditionCallerConsumedFinalAssignmentFailure",
+        "TestBVRewriterAdditionCallerNativeWideFinalAssignment",
         "TestBVRewriterAdditionCallerEveryActualBitReadReservation",
         "TestBVRewriterMultiplicationPowerOfTwoCaller",
         "TestBVRewriterMultiplicationCallerOriginalGuards",
         "TestBVRewriterMultiplicationCallerEveryColdReservation",
         "TestBVRewriterMultiplicationCallerNaryCoreResultAndStatusBypass",
-        "TestBVRewriterMultiplicationCallerConsumedFinalAssignmentFailure",
+        "TestBVRewriterMultiplicationCallerNativeWideFinalAssignment",
         "TestBVRewriterMultiplicationCallerEveryActualNumericReservation",
         "TestASTBitVectorMultiplicationNumeralLocalLifetime",
         "TestBVRewriterBit2BoolOriginalORAndXOR",
@@ -22092,12 +22092,12 @@
             "TestBVRewriterAdditionAfterCoreNumeralsAndBorrowedResult",
             "TestBVRewriterAdditionAfterCoreSymbolicDisjointSemantics",
             "TestBVRewriterAdditionAfterCoreEveryColdReservation",
-            "TestBVRewriterAdditionAfterCoreAssignmentDECRefusal",
+            "TestBVRewriterAdditionAfterCoreNativeWideAssignment",
             "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild",
             "TestBVRewriterAdditionCallerConnectsCoreAndDisjointBits",
             "TestBVRewriterAdditionCallerUsesAssignedCoreArgsAndPassesFullStatus",
             "TestBVRewriterAdditionCallerEveryColdReservation",
-            "TestBVRewriterAdditionCallerConsumedFinalAssignmentFailure",
+            "TestBVRewriterAdditionCallerNativeWideFinalAssignment",
             "TestBVRewriterAdditionCallerEveryActualBitReadReservation"
           ]
         },
@@ -22110,7 +22110,7 @@
             "TestBVRewriterMultiplicationCallerOriginalGuards",
             "TestBVRewriterMultiplicationCallerEveryColdReservation",
             "TestBVRewriterMultiplicationCallerNaryCoreResultAndStatusBypass",
-            "TestBVRewriterMultiplicationCallerConsumedFinalAssignmentFailure",
+            "TestBVRewriterMultiplicationCallerNativeWideFinalAssignment",
             "TestBVRewriterMultiplicationCallerEveryActualNumericReservation"
           ]
         },
@@ -23131,7 +23131,7 @@
         "TestBVRewriterAdditionAfterCoreNumeralsAndBorrowedResult",
         "TestBVRewriterAdditionAfterCoreSymbolicDisjointSemantics",
         "TestBVRewriterAdditionAfterCoreEveryColdReservation",
-        "TestBVRewriterAdditionAfterCoreAssignmentDECRefusal",
+        "TestBVRewriterAdditionAfterCoreNativeWideAssignment",
         "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild",
         "TestASTBitVectorCoefficientNormalizationIndependentModulo",
         "TestASTBitVectorCoefficientSortGuardBeforeNumericalAcquisition",
@@ -23172,13 +23172,13 @@
         "TestBVRewriterAdditionCallerConnectsCoreAndDisjointBits",
         "TestBVRewriterAdditionCallerUsesAssignedCoreArgsAndPassesFullStatus",
         "TestBVRewriterAdditionCallerEveryColdReservation",
-        "TestBVRewriterAdditionCallerConsumedFinalAssignmentFailure",
+        "TestBVRewriterAdditionCallerNativeWideFinalAssignment",
         "TestBVRewriterAdditionCallerEveryActualBitReadReservation",
         "TestBVRewriterMultiplicationPowerOfTwoCaller",
         "TestBVRewriterMultiplicationCallerOriginalGuards",
         "TestBVRewriterMultiplicationCallerEveryColdReservation",
         "TestBVRewriterMultiplicationCallerNaryCoreResultAndStatusBypass",
-        "TestBVRewriterMultiplicationCallerConsumedFinalAssignmentFailure",
+        "TestBVRewriterMultiplicationCallerNativeWideFinalAssignment",
         "TestBVRewriterMultiplicationCallerEveryActualNumericReservation",
         "TestASTBitVectorMultiplicationNumeralLocalLifetime",
         "TestBVRewriterBit2BoolOriginalORAndXOR",
@@ -23385,12 +23385,12 @@
             "TestBVRewriterAdditionAfterCoreNumeralsAndBorrowedResult",
             "TestBVRewriterAdditionAfterCoreSymbolicDisjointSemantics",
             "TestBVRewriterAdditionAfterCoreEveryColdReservation",
-            "TestBVRewriterAdditionAfterCoreAssignmentDECRefusal",
+            "TestBVRewriterAdditionAfterCoreNativeWideAssignment",
             "TestBVRewriterAdditionAfterCoreActualRuntimeNumeralChild",
             "TestBVRewriterAdditionCallerConnectsCoreAndDisjointBits",
             "TestBVRewriterAdditionCallerUsesAssignedCoreArgsAndPassesFullStatus",
             "TestBVRewriterAdditionCallerEveryColdReservation",
-            "TestBVRewriterAdditionCallerConsumedFinalAssignmentFailure",
+            "TestBVRewriterAdditionCallerNativeWideFinalAssignment",
             "TestBVRewriterAdditionCallerEveryActualBitReadReservation"
           ]
         },
@@ -23488,7 +23488,7 @@
             "TestBVRewriterMultiplicationCallerOriginalGuards",
             "TestBVRewriterMultiplicationCallerEveryColdReservation",
             "TestBVRewriterMultiplicationCallerNaryCoreResultAndStatusBypass",
-            "TestBVRewriterMultiplicationCallerConsumedFinalAssignmentFailure",
+            "TestBVRewriterMultiplicationCallerNativeWideFinalAssignment",
             "TestBVRewriterMultiplicationCallerEveryActualNumericReservation"
           ]
         },
@@ -24412,7 +24412,7 @@
         "TestBVTrailingConstructorBorrowsExtractionOwner",
         "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
-        "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+        "TestBVTrailingNativeWideDeletionReset",
         "TestASTBitVectorNumeralScopeOriginalLifetime",
         "TestASTBitVectorNumeralScopeErasedGuard",
         "TestASTBitVectorNumeralScopeEveryReachedReservation",
@@ -24422,7 +24422,7 @@
         "TestBVTrailingRemovalUnknownAndShallowGuards",
         "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
         "TestBVTrailingRemovalEveryColdReservation",
-        "TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector",
+        "TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction",
         "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
         "TestBVTrailingRemovalActualRuntimeNumeralChild",
         "TestBVTrailingOriginalEqualityReduction",
@@ -24546,7 +24546,7 @@
             "TestBVTrailingConstructorBorrowsExtractionOwner",
             "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
-            "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
+            "TestBVTrailingNativeWideDeletionReset"
           ]
         },
         {
@@ -24579,7 +24579,7 @@
             "TestBVTrailingRemovalUnknownAndShallowGuards",
             "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
             "TestBVTrailingRemovalEveryColdReservation",
-            "TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector",
+            "TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction",
             "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
             "TestBVTrailingRemovalActualRuntimeNumeralChild",
             "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard"
@@ -24628,12 +24628,12 @@
         "TestBVTrailingConstructorBorrowsExtractionOwner",
         "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
-        "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+        "TestBVTrailingNativeWideDeletionReset",
         "TestBVTrailingOriginalStructuralRemoval",
         "TestBVTrailingRemovalUnknownAndShallowGuards",
         "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
         "TestBVTrailingRemovalEveryColdReservation",
-        "TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector",
+        "TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction",
         "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
         "TestBVTrailingRemovalActualRuntimeNumeralChild",
         "TestBVTrailingOriginalEqualityReduction",
@@ -24673,7 +24673,7 @@
             "TestBVTrailingConstructorBorrowsExtractionOwner",
             "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
-            "TestBVTrailingResetConsumedKeyAfterDeletionFailure"
+            "TestBVTrailingNativeWideDeletionReset"
           ]
         },
         {
@@ -24685,7 +24685,7 @@
             "TestBVTrailingRemovalUnknownAndShallowGuards",
             "TestBVTrailingRemovalZeroCoefficientReachedInvalidRead",
             "TestBVTrailingRemovalEveryColdReservation",
-            "TestBVTrailingRemovalSourceRefDTConsumedBeforeOlderVector",
+            "TestBVTrailingRemovalNativeWideRefAndOlderVectorDestruction",
             "TestBVTrailingRemovalConcatUnchangedOutputSourceEdge",
             "TestBVTrailingRemovalActualRuntimeNumeralChild",
             "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard"
@@ -25693,7 +25693,7 @@
       "tests": [
         "TestMkExtractProcOriginalCacheIdentityAndReferenceOrder",
         "TestMkExtractProcReplacementEveryColdReservation",
-        "TestASTDecRefConsumedActualDeletionRefusal"
+        "TestASTDecRefConsumedNativeWideDeletion"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -25728,7 +25728,7 @@
       "tests": [
         "TestMkExtractProcOriginalCacheIdentityAndReferenceOrder",
         "TestMkExtractProcReplacementEveryColdReservation",
-        "TestASTDecRefConsumedActualDeletionRefusal"
+        "TestASTDecRefConsumedNativeWideDeletion"
       ],
       "conditionals": [
         {
@@ -28436,7 +28436,7 @@
         "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
         "TestASTSharedOccurrencesMarkInlineFailurePrefix",
         "TestASTSharedOccurrencesPhysicalBucketIterator",
-        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesNativeWideDeletionReset",
         "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
         "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
         "TestASTSparseMarkActualIdentityAndNoRetains",
@@ -28489,7 +28489,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -28517,7 +28517,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -28545,7 +28545,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -28589,7 +28589,7 @@
         "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
         "TestASTSharedOccurrencesMarkInlineFailurePrefix",
         "TestASTSharedOccurrencesPhysicalBucketIterator",
-        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesNativeWideDeletionReset",
         "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
         "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
         "TestASTSparseMarkActualIdentityAndNoRetains",
@@ -28634,7 +28634,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -28662,7 +28662,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -28690,7 +28690,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -28724,7 +28724,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -108875,9 +108875,9 @@
       ],
       "tests": [
         "TestPsortASTContextActualFactoriesClausesAndTrail",
-        "TestPsortASTContextUnpublishedClauseConsumedCleanupRetry",
+        "TestPsortASTContextUnpublishedClauseNativeCleanup",
         "TestPsortASTContextActualConstructorRefusalPrefixes",
-        "TestPsortASTContextStoppedTrailKeepsLaterClausesAndSourceCause"
+        "TestPsortASTContextNativeWideTrailAndClauseFinalization"
       ],
       "assertions": [
         {
@@ -108942,9 +108942,9 @@
           "go_target": "pkg/ast/util_psort_ast_context.go",
           "tests": [
             "TestPsortASTContextActualFactoriesClausesAndTrail",
-            "TestPsortASTContextUnpublishedClauseConsumedCleanupRetry",
+            "TestPsortASTContextUnpublishedClauseNativeCleanup",
             "TestPsortASTContextActualConstructorRefusalPrefixes",
-            "TestPsortASTContextStoppedTrailKeepsLaterClausesAndSourceCause"
+            "TestPsortASTContextNativeWideTrailAndClauseFinalization"
           ]
         }
       ],
@@ -111405,7 +111405,7 @@
         "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
         "TestASTSharedOccurrencesMarkInlineFailurePrefix",
         "TestASTSharedOccurrencesPhysicalBucketIterator",
-        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesNativeWideDeletionReset",
         "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
         "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
         "TestASTSparseMarkActualIdentityAndNoRetains",
@@ -111578,7 +111578,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -115038,7 +115038,7 @@
         "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
         "TestASTSharedOccurrencesMarkInlineFailurePrefix",
         "TestASTSharedOccurrencesPhysicalBucketIterator",
-        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesNativeWideDeletionReset",
         "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
         "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
         "TestASTSparseMarkActualIdentityAndNoRetains",
@@ -115096,7 +115096,7 @@
         "TestBVTrailingConstructorBorrowsExtractionOwner",
         "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
-        "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+        "TestBVTrailingNativeWideDeletionReset",
         "TestBVTrailingEveryColdCountReservation"
       ],
       "conditionals": [
@@ -115312,7 +115312,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -115400,7 +115400,7 @@
             "TestBVTrailingConstructorBorrowsExtractionOwner",
             "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
-            "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+            "TestBVTrailingNativeWideDeletionReset",
             "TestBVTrailingEveryColdCountReservation"
           ]
         }
@@ -137767,7 +137767,7 @@
         "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
         "TestASTSharedOccurrencesMarkInlineFailurePrefix",
         "TestASTSharedOccurrencesPhysicalBucketIterator",
-        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesNativeWideDeletionReset",
         "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
         "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
         "TestASTSparseMarkActualIdentityAndNoRetains",
@@ -137812,7 +137812,7 @@
         "TestBVTrailingConstructorBorrowsExtractionOwner",
         "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
-        "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+        "TestBVTrailingNativeWideDeletionReset",
         "TestBVTrailingEveryColdCountReservation"
       ],
       "conditionals": [
@@ -137866,7 +137866,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",
@@ -137926,7 +137926,7 @@
             "TestBVTrailingConstructorBorrowsExtractionOwner",
             "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
             "TestBVTrailingCacheGrowthAndEqualThresholdReset",
-            "TestBVTrailingResetConsumedKeyAfterDeletionFailure",
+            "TestBVTrailingNativeWideDeletionReset",
             "TestBVTrailingEveryColdCountReservation"
           ]
         }
@@ -142376,7 +142376,7 @@
         "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
         "TestASTRefVectorPushForeignAndIndependentAcquisitions",
         "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure",
-        "TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay",
+        "TestASTRefVectorPushNativeWideCleanupAcknowledgesWithoutReplay",
         "TestASTRefVectorPushStaleInvocationVectorAndNodeGeneration",
         "TestASTRefVectorPushNonwrappingNonceGuardDomain",
         "TestPolynomialSubresultantChainResetCallbackBeforeLocalConstructorsRefusesOwnerClose",
@@ -142571,7 +142571,7 @@
             "TestASTRefVectorPushExactAcquiredReferenceBeforeGrowthRefusal",
             "TestASTRefVectorPushForeignAndIndependentAcquisitions",
             "TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure",
-            "TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay",
+            "TestASTRefVectorPushNativeWideCleanupAcknowledgesWithoutReplay",
             "TestASTRefVectorPushStaleInvocationVectorAndNodeGeneration",
             "TestASTRefVectorPushNonwrappingNonceGuardDomain"
           ]
@@ -145916,9 +145916,9 @@
       ],
       "tests": [
         "TestPsortASTContextActualFactoriesClausesAndTrail",
-        "TestPsortASTContextUnpublishedClauseConsumedCleanupRetry",
+        "TestPsortASTContextUnpublishedClauseNativeCleanup",
         "TestPsortASTContextActualConstructorRefusalPrefixes",
-        "TestPsortASTContextStoppedTrailKeepsLaterClausesAndSourceCause",
+        "TestPsortASTContextNativeWideTrailAndClauseFinalization",
         "TestPsortASTCostLiteralWrapTieAndReset",
         "TestPsortASTCostActualBoundModeSelection",
         "TestPsortASTNetworkBoundContinueThenThrowActualSourcePrefix",
@@ -146108,9 +146108,9 @@
           "go_target": "pkg/ast/util_psort_ast_network.go",
           "tests": [
             "TestPsortASTContextActualFactoriesClausesAndTrail",
-            "TestPsortASTContextUnpublishedClauseConsumedCleanupRetry",
+            "TestPsortASTContextUnpublishedClauseNativeCleanup",
             "TestPsortASTContextActualConstructorRefusalPrefixes",
-            "TestPsortASTContextStoppedTrailKeepsLaterClausesAndSourceCause",
+            "TestPsortASTContextNativeWideTrailAndClauseFinalization",
             "TestPsortASTCostLiteralWrapTieAndReset",
             "TestPsortASTCostActualBoundModeSelection",
             "TestPsortASTNetworkBoundContinueThenThrowActualSourcePrefix",
@@ -148978,7 +148978,7 @@
         "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
         "TestASTSharedOccurrencesMarkInlineFailurePrefix",
         "TestASTSharedOccurrencesPhysicalBucketIterator",
-        "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+        "TestASTSharedOccurrencesNativeWideDeletionReset",
         "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
         "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
         "TestASTSparseMarkActualIdentityAndNoRetains",
@@ -149368,7 +149368,7 @@
             "TestASTSharedOccurrencesWarmInlineAndHeaderRefusal",
             "TestASTSharedOccurrencesFrameFailureCursorPrefix",
             "TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets",
-            "TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated",
+            "TestASTSharedOccurrencesNativeWideDeletionReset",
             "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
             "TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges",
             "TestASTSharedOccurrencesFrameSourceExtentAndHostBounds",

@@ -319,7 +319,7 @@ func TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets(t *testing.T) 
 	}
 }
 
-func TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated(t *testing.T) {
+func TestASTSharedOccurrencesNativeWideDeletionReset(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 20)
 	root := sharedTestApp(t, m, h...)
@@ -341,11 +341,9 @@ func TestASTSharedOccurrencesResetConsumedDeletionFailureIsNotRepeated(t *testin
 	m.BudgetField.FailAfter(0)
 	e = c.Reset()
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal("actual source inline16 deletion overflow fault", e)
-	}
-	if m.validNode(r) == nil || m.liveNodes != before-21 || c.table.size != 1 || c.resetPhase != 1 {
-		t.Fatal("consumed callback prefix immediately before retry", m.liveNodes, before, c.table.size, c.resetPhase)
+	astTestMust(t, e)
+	if m.validNode(r) == nil || m.liveNodes != before-21 || c.table.size != 0 || c.resetPhase != 0 {
+		t.Fatal("native wide deletion reset", m.liveNodes, before, c.table.size, c.resetPhase)
 	}
 	astTestMust(t, c.Reset())
 	if c.table.size != 0 || c.resetPhase != 0 || m.liveNodes != before-21 {

@@ -180,6 +180,11 @@ func TestBVRewriterOwnerEveryConfiguredMultiplicationReservation(t *testing.T) {
 			m.Budget().FailAfter(-1)
 			if body == nil {
 				complete = true
+				nativeResult, nativeErr := m.RefGet(out)
+				astTestMust(t, nativeErr)
+				if nativeResult != old {
+					sawPublished = true
+				}
 				if st != Rewrite2 {
 					t.Fatal(st)
 				}

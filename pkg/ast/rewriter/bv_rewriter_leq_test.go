@@ -233,6 +233,11 @@ func TestBVRewriterLEEveryColdReservationAndPublication(t *testing.T) {
 				astTestMust(t, e)
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 					if st != want || p.leq != nil || p.leConcat != nil || p.leOverflow != nil || want == RewriteFailed && got != old {
 						t.Fatal("source return", st, want)
 					}

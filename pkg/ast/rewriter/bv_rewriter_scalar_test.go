@@ -128,6 +128,11 @@ func TestBVRewriterScalarEveryColdReservationAndPublication(t *testing.T) {
 				failed := mode == "or-failed" || mode == "and-failed"
 				if body == nil {
 					complete = true
+					nativeResult, nativeErr := m.RefGet(out)
+					astTestMust(t, nativeErr)
+					if nativeResult != old {
+						published = true
+					}
 					want := RewriteDone
 					if failed {
 						want = RewriteFailed

@@ -155,7 +155,7 @@ func TestASTRefVectorPushSuccessfulTransferAndNullReceiptErasure(t *testing.T) {
 	}
 }
 
-func TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay(t *testing.T) {
+func TestASTRefVectorPushNativeWideCleanupAcknowledgesWithoutReplay(t *testing.T) {
 	m := astTestManager(t)
 	sort, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -174,15 +174,14 @@ func TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay(t *tes
 	if !errors.Is(cause, arena.ErrInjectedFailure) {
 		t.Fatal("actual unjoined source INC", cause)
 	}
-	// More than sixteen newly dead children reach the real deletion worklist
-	// reservation. Its owning emergency continuation finishes physical deletion
-	// while still returning that first allocation warning.
+	// Cleanup grows a native worklist even while the original vector allocation
+	// refusal remains armed, and acknowledges the exact acquired reference.
 	cleanup := m.CompleteRefVectorPush(v, h, &receipt)
-	if !errors.Is(cleanup, arena.ErrInjectedFailure) || !receipt.consumed || receipt.acknowledged || receipt.cleanupCause != cleanup || receipt.cause != cause {
-		t.Fatal("actual consumed leaf warning", cleanup, receipt)
+	if cleanup != nil || !receipt.consumed || !receipt.acknowledged || receipt.cleanupCause != nil || receipt.cause != cause {
+		t.Fatal("native cleanup acknowledgement", cleanup, receipt)
 	}
 	if m.pendingDeletionCurrent != (astNodeRef{}) || m.pendingDeletionHead != (astNodeRef{}) {
-		t.Fatal("completed actual emergency deletion retained pending roots")
+		t.Fatal("completed native deletion retained pending roots")
 	}
 	for _, leaf := range append(args[:], h) {
 		if _, e = m.GetRefCount(leaf); e == nil {
@@ -190,10 +189,6 @@ func TestASTRefVectorPushConsumedDeletionWarningAcknowledgesWithoutReplay(t *tes
 		}
 	}
 	before := m.Stats()
-	astTestMust(t, m.CompleteRefVectorPush(v, h, &receipt))
-	if m.Stats() != before || receipt.cleanupCause != cleanup || receipt.cause != cause {
-		t.Fatal("matching acknowledgement replayed consumed leaf or lost cause")
-	}
 	if e = m.CompleteRefVectorPush(v, h, &receipt); e == nil || m.Stats() != before {
 		t.Fatal("double acknowledgement", e)
 	}

@@ -203,6 +203,11 @@ func TestBVRewriterConcatEqualityEveryColdReservation(t *testing.T) {
 			m.Budget().FailAfter(-1)
 			if body == nil {
 				complete = true
+				nativeResult, nativeErr := m.RefGet(out)
+				astTestMust(t, nativeErr)
+				if nativeResult != old {
+					sawAssignment = true
+				}
 				if st != Rewrite3 || p.concatEquality != nil {
 					t.Fatal(st)
 				}
