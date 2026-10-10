@@ -1184,6 +1184,8 @@
         "indexed_vector.go",
         "int_set.go",
         "lar_term.go",
+        "lu_column_exact.go",
+        "lu_column_float.go",
         "lu_exact.go",
         "lu_exact_factorization.go",
         "lu_exact_solve.go",

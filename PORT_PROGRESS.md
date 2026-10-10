@@ -36399,3 +36399,77 @@ units; no complete LP solver is claimed. Next: indexed entering-column
 preparation/solves for all retained concrete types, Suhl updates and error-check/
 refinement orchestration. Dimension extension, scaling/simplex/LAR/MPS and
 remaining upstream test scenarios continue to be required by the active goal.
+
+
+## LU entering-column preparation and indexed column solves
+
+Implemented retained FloatLU/RationalLU/PairLU PrepareEntering and SolveBd,
+plus PairLU's actual core-solver SolveBdFaster caller. Preparation clears the
+old indexed workspace, extracts the source column, applies real tails and Q's
+inverse indexed permutation. SolveBd uses the source strict unsigned size
+comparison against the destination's size BEFORE assignment: ratio120 for
+double,10 for mpq. Sparse assignment copies the indexed representation, then
+uses actual graph solves (and floating residual correction); dense assignment
+copies all dense slots, clears the index afterward, solves, applies R's inverse
+T permutation and appends nonzeros in descending dimension order. Precise
+columns never use floating drop thresholds. Only the retained pair faster route
+was added; the source indexed-X solve_By assertion stub is not replaced with an
+invented implementation.
+
+Native Go slices replace vector internals. Exact full-data assignment deep-copies
+concrete project rationals with destination-owned call receipts; it does not
+alias numerical handles or capture receipts around delegated calls. Sparse
+self-assignment zeros its old indexed values as source; dense self-assignment
+preserves data before the algorithm clears the index. Hidden unindexed data in
+workspace and old destination remain different between dense and sparse routes.
+Clear-before-bounds, whole-copy-before-index-clear and failed-triangular-solve
+prefixes execute, including short callers whose source extraction succeeds
+before a later eta/triangular read fails. Failed LU operations freeze subsequent
+ordinary calls while preserving cleanup and borrowed caller/source ownership.
+
+48 independent original-matrix/known-solution worlds verify all three types,
+forced-dense/sparse factorization policies, prepared U*R*x values, exact/floating
+column solutions and output index membership/order. Actual routing boundaries
+10/11 and120/121 execute both sides and their alias cases. Independent literal
+cases cover hidden data, strict tolerance, unsigned route wrap, old destination
+indices, extent/closed/stopped errors and foreign dense-assignment ownership.
+The first prepare_entering(2,w) from upstream test_small_lu executes with its
+original matrix; its independent basis solution is checked. Its Suhl update
+sequence and full --test_lu driver remain open.
+
+28 pooled/direct exact failure campaigns walk physical allocation ordinals
+through first success for preparation, dense/sparse solves and the actual pair
+faster route, with sparse/dense tails:3765 real native refusals and7354 combined
+debug/checked refusals, maximum411 before success. Every partial cleanup closes
+LU children before destination and workspace, verifies all borrowed static
+coefficients and uses the named-cell/direct-object/pending-block census. Failed
+copies may retain partial owned values without an active raw arithmetic frame;
+no fabricated raw invocation is required or credited. Separate real failed Add
+proves a stopped caller's numerical receipt remains caller-owned when full-data
+assignment rejects it.
+
+Column campaign/property checks pass21.897s native and45.695s debug/checked.
+Subsequent targeted guard/ownership checks pass0.027s/0.028s. Coverage is the
+union of matching mode:set blocks from those focused runs, avoiding a redundant
+rerun of the fault campaigns. Exact column file92/95 (96.8%) and floating37/40
+(92.5%) in each profile; every public entering-column method is100%. Remaining
+returns propagate resize/zero-predicate/child errors or guard index bounds
+already enforced by preceding valid triangular/permutation operations. Both LP
+vets, source inventory, executable evidence, no-generics and diff checks pass.
+
+Hourly FULL native module suite passed at16:39 UTC Oct10, log
+/mnt/oldrog/tmp/g3-lu-column-module-native.log: LP249.555s, numeral88.454s,
+AST17.840s and polynomial32.172s. It includes current column production code;
+the later focused guard additions also pass both profiles. Full coverage was
+not rerun: the89.2% native coverage snapshot at16:04 predates exact and column
+LU orchestration and remains explicitly historical. Dependency graph remains64
+packages with unchanged edges and two new production files. LP inventory stays
+48 partial/62 unported units.
+
+Next source prerequisite is sparse set_row_from_work_vector_and_clean_work_vector
+_not_adjusted (sparse_matrix.hpp:337-400): reverse existing-row publication and
+zero removal, column mapping, new-entry addition, clearing consumed work values
+and row-maximum refresh. Suhl updates consume it to restore the upper-triangular
+basis after the bump. Then complete retained column updates, error-check/
+refinement orchestration and dimension extension. Scaling/simplex/LAR/MPS and
+remaining upstream scenarios stay required by the active full LP goal.

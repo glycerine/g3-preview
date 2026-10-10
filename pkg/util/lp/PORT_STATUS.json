@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 89.2,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. The complete native LP89.2% (7474/8375) snapshot verified2026-10-10 at16:04 UTC predates exact LU orchestration. Current exact/floating LU focused component evidence is recorded in PORT_STATUS.md. Complete debug coverage predates sparse basis storage. Indexed column solves, updates and full solver integration remain open.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. The complete native LP89.2% (7474/8375) coverage snapshot verified2026-10-10 at16:04 UTC predates exact LU and indexed entering-column orchestration. Full native module tests passed2026-10-10 at16:39 UTC including current production columns; current focused component coverage is recorded in PORT_STATUS.md. Complete debug coverage predates sparse basis storage. Suhl updates, row restoration, error-check/refinement, extension and full solver integration remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -776,13 +776,26 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/types.go",
-        "pkg/util/lp/settings.go"
+        "pkg/util/lp/settings.go",
+        "pkg/util/lp/lu_column_float.go",
+        "pkg/util/lp/lu_column_exact.go",
+        "pkg/util/lp/lu_column_test.go",
+        "pkg/util/lp/lu_column_failure_test.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
         "TestLPSourceStatusFallbackAndParserAsymmetry",
         "TestLPSettingsDefaultsAndServices",
-        "TestLPSettingsFloatToleranceEdges"
+        "TestLPSettingsFloatToleranceEdges",
+        "TestLPLUEnteringColumnIndependentOracle",
+        "TestLPLUEnteringColumnSparseBoundaryAndAlias",
+        "TestLPLUEnteringColumnUnindexedDataAndDropPolicy",
+        "TestLPLUEnteringColumnUpstreamSmallPreparation",
+        "TestLPLUEnteringColumnAllocationFailureCensus",
+        "TestLPLUEnteringColumnLiteralStopsAndOwnership",
+        "TestLPLUColumnDenseAssignmentGuardAndCopyPrefixes",
+        "TestLPLUColumnDenseAssignmentLeavesStoppedCallerOwned",
+        "TestLPLUEnteringColumnTailReadAfterExtraction"
       ]
     },
     {
@@ -852,7 +865,11 @@
         "pkg/util/lp/lu_exact_factorization.go",
         "pkg/util/lp/lu_exact_solve.go",
         "pkg/util/lp/lu_exact_test.go",
-        "pkg/util/lp/lu_exact_failure_test.go"
+        "pkg/util/lp/lu_exact_failure_test.go",
+        "pkg/util/lp/lu_column_float.go",
+        "pkg/util/lp/lu_column_exact.go",
+        "pkg/util/lp/lu_column_test.go",
+        "pkg/util/lp/lu_column_failure_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -873,7 +890,16 @@
         "TestLPExactLUConstructorGuardsAndDegeneration",
         "TestLPExactLUAllocationFailureCensus",
         "TestLPExactLULeavesOlderComparisonOwned",
-        "TestLPExactLUBorrowedStoppedSource"
+        "TestLPExactLUBorrowedStoppedSource",
+        "TestLPLUEnteringColumnIndependentOracle",
+        "TestLPLUEnteringColumnSparseBoundaryAndAlias",
+        "TestLPLUEnteringColumnUnindexedDataAndDropPolicy",
+        "TestLPLUEnteringColumnUpstreamSmallPreparation",
+        "TestLPLUEnteringColumnAllocationFailureCensus",
+        "TestLPLUEnteringColumnLiteralStopsAndOwnership",
+        "TestLPLUColumnDenseAssignmentGuardAndCopyPrefixes",
+        "TestLPLUColumnDenseAssignmentLeavesStoppedCallerOwned",
+        "TestLPLUEnteringColumnTailReadAfterExtraction"
       ]
     },
     {
@@ -894,7 +920,11 @@
         "pkg/util/lp/lu_exact_factorization.go",
         "pkg/util/lp/lu_exact_solve.go",
         "pkg/util/lp/lu_exact_test.go",
-        "pkg/util/lp/lu_exact_failure_test.go"
+        "pkg/util/lp/lu_exact_failure_test.go",
+        "pkg/util/lp/lu_column_float.go",
+        "pkg/util/lp/lu_column_exact.go",
+        "pkg/util/lp/lu_column_test.go",
+        "pkg/util/lp/lu_column_failure_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -915,7 +945,16 @@
         "TestLPExactLUConstructorGuardsAndDegeneration",
         "TestLPExactLUAllocationFailureCensus",
         "TestLPExactLULeavesOlderComparisonOwned",
-        "TestLPExactLUBorrowedStoppedSource"
+        "TestLPExactLUBorrowedStoppedSource",
+        "TestLPLUEnteringColumnIndependentOracle",
+        "TestLPLUEnteringColumnSparseBoundaryAndAlias",
+        "TestLPLUEnteringColumnUnindexedDataAndDropPolicy",
+        "TestLPLUEnteringColumnUpstreamSmallPreparation",
+        "TestLPLUEnteringColumnAllocationFailureCensus",
+        "TestLPLUEnteringColumnLiteralStopsAndOwnership",
+        "TestLPLUColumnDenseAssignmentGuardAndCopyPrefixes",
+        "TestLPLUColumnDenseAssignmentLeavesStoppedCallerOwned",
+        "TestLPLUEnteringColumnTailReadAfterExtraction"
       ]
     },
     {
@@ -930,7 +969,11 @@
         "pkg/util/lp/lu_exact_factorization.go",
         "pkg/util/lp/lu_exact_solve.go",
         "pkg/util/lp/lu_exact_test.go",
-        "pkg/util/lp/lu_exact_failure_test.go"
+        "pkg/util/lp/lu_exact_failure_test.go",
+        "pkg/util/lp/lu_column_float.go",
+        "pkg/util/lp/lu_column_exact.go",
+        "pkg/util/lp/lu_column_test.go",
+        "pkg/util/lp/lu_column_failure_test.go"
       ],
       "tests": [
         "TestLPFloatLUIndependentFactorizationAndSolves",
@@ -945,7 +988,16 @@
         "TestLPExactLUConstructorGuardsAndDegeneration",
         "TestLPExactLUAllocationFailureCensus",
         "TestLPExactLULeavesOlderComparisonOwned",
-        "TestLPExactLUBorrowedStoppedSource"
+        "TestLPExactLUBorrowedStoppedSource",
+        "TestLPLUEnteringColumnIndependentOracle",
+        "TestLPLUEnteringColumnSparseBoundaryAndAlias",
+        "TestLPLUEnteringColumnUnindexedDataAndDropPolicy",
+        "TestLPLUEnteringColumnUpstreamSmallPreparation",
+        "TestLPLUEnteringColumnAllocationFailureCensus",
+        "TestLPLUEnteringColumnLiteralStopsAndOwnership",
+        "TestLPLUColumnDenseAssignmentGuardAndCopyPrefixes",
+        "TestLPLUColumnDenseAssignmentLeavesStoppedCallerOwned",
+        "TestLPLUEnteringColumnTailReadAfterExtraction"
       ]
     },
     {
