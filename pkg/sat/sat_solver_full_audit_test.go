@@ -58,10 +58,6 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 		}
 	}
 
-	for f := s.mutexFrames; f != nil; f = f.next {
-		roots = append(roots, satMutexFrameRoots(f)...)
-	}
-
 	for i := range s.binaryClauseGraph {
 		col(&s.binaryClauseGraph[i])
 	}

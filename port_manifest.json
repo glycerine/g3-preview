@@ -71049,7 +71049,6 @@
         "pkg/sat/sat_solver_max_cliques_test.go",
         "pkg/sat/sat_solver_mutex_audit_test.go",
         "pkg/sat/sat_solver_mutex_fault_test.go",
-        "pkg/sat/sat_solver_mutex_pair_set.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
         "pkg/sat/sat_solver_binary_pair.go",
         "pkg/sat/sat_solver_binary_pair_test.go",
@@ -71337,9 +71336,6 @@
         "TestSourceCachePersistsAcrossQueries",
         "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
         "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
-        "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
-        "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
-        "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
         "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestSATConsequenceChunkEveryActualRefusalRetainsLocalAndOutputRoots",
@@ -71412,7 +71408,8 @@
         "TestSATCaseSplitHeapBorrowedRuntimeBlockedUntilAllCopiedBackingsReleased",
         "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards",
         "TestSATSolverNativeLevelsCurrentBorrowAndGuards",
-        "TestSATSolverNativeOuterWatchGrowthAndShrink"
+        "TestSATSolverNativeOuterWatchGrowthAndShrink",
+        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
       ],
       "conditionals": [
         {
@@ -72490,11 +72487,9 @@
             "TestSourceCachePersistsAcrossQueries",
             "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
             "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
-            "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
-            "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
-            "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
             "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-            "TestSATSolverInspectionBinaryOutputNativeGrowth"
+            "TestSATSolverInspectionBinaryOutputNativeGrowth",
+            "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
           ],
           "go_targets": [
             "pkg/util/cliques/cliques_test.go",
@@ -72730,7 +72725,8 @@
         "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call.",
         "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Binary-clause pairs use native typed slices in solver, inspection and tactic recovery; output append returns the completed prefix on error. Simulated buffer allocation and destructor failures are removed. Constructor sweeps of actual retained reservations, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success.",
         "Variable/literal marks, decision eligibility, eliminated/external status, and assignment-since-GC flags use concrete Go Boolean slices. Native backing is outside arena/Runtime accounting; creation order, typed flag reads, duplicate-mark assertions, scope truncation/regrowth, solver copy, GC reset, and retained algorithm marks remain covered.",
-        "SAT watches now use native []satWatched backing and a native outer slice/directory of checked list references. Actual cold outer/store headers are charged; native backing is uncharged. Iterator values borrow native backing identities: writes remain visible, current logical bounds reject discarded tails, and real backing growth/finalization/free invalidate stale borrows. Owner/generation guards preserve child lifetime across outer relocation and slot reuse. Removed payload codecs, lifetime bitmaps, simulated capacity growth/refusals and unused copy/move/fill/reverse/constructor helpers. Actual source tag/equality, propagation compaction, clause/ternary erase and stable class sorting remain."
+        "SAT watches now use native []satWatched backing and a native outer slice/directory of checked list references. Actual cold outer/store headers are charged; native backing is uncharged. Iterator values borrow native backing identities: writes remain visible, current logical bounds reject discarded tails, and real backing growth/finalization/free invalidate stale borrows. Owner/generation guards preserve child lifetime across outer relocation and slot reuse. Removed payload codecs, lifetime bitmaps, simulated capacity growth/refusals and unused copy/move/fill/reverse/constructor helpers. Actual source tag/equality, propagation compaction, clause/ternary erase and stable class sorting remain.",
+        "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
@@ -72883,7 +72879,6 @@
         "pkg/sat/sat_solver_max_cliques_test.go",
         "pkg/sat/sat_solver_mutex_audit_test.go",
         "pkg/sat/sat_solver_mutex_fault_test.go",
-        "pkg/sat/sat_solver_mutex_pair_set.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
         "pkg/sat/sat_solver_binary_pair.go",
         "pkg/sat/sat_solver_binary_pair_test.go",
@@ -73122,9 +73117,6 @@
         "TestSourceCachePersistsAcrossQueries",
         "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
         "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
-        "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
-        "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
-        "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
         "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
         "TestSATSolverInspectionBinaryOutputNativeGrowth",
         "TestSATSolverCopyEveryActualDestinationRefusalRetainsPublishedGraph",
@@ -73166,7 +73158,8 @@
         "TestSourceMessages",
         "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards",
         "TestSATSolverNativeLevelsCurrentBorrowAndGuards",
-        "TestSATSolverNativeOuterWatchGrowthAndShrink"
+        "TestSATSolverNativeOuterWatchGrowthAndShrink",
+        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
       ],
       "conditionals": [
         {
@@ -73614,11 +73607,9 @@
             "TestSourceCachePersistsAcrossQueries",
             "TestSATSolverFindMutexesHasNoCheckpointOrConsistencyPreflight",
             "TestSATSolverFindMutexesEveryActualRefusalPreservesNamedOwners",
-            "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
-            "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
-            "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
             "TestSATSolverUserBinaryPairPreservesFullLiteralWords",
-            "TestSATSolverInspectionBinaryOutputNativeGrowth"
+            "TestSATSolverInspectionBinaryOutputNativeGrowth",
+            "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
           ],
           "go_targets": [
             "pkg/util/cliques/cliques_test.go",
@@ -73756,7 +73747,8 @@
         "Decision cold owner charges actual RNG/statistic header and borrows conflict/lifecycle. Integrity checker is a by-value nonowning stack grouping; lifecycle borrows matching GC with its sole frozen count. Fresh disjoint ID set is constructed and closed on each reached call.",
         "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Binary-clause pairs use native typed slices in solver, inspection and tactic recovery; output append returns the completed prefix on error. Simulated buffer allocation and destructor failures are removed. Constructor sweeps of actual retained reservations, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success.",
         "Variable/literal marks, decision eligibility, eliminated/external status, and assignment-since-GC flags use concrete Go Boolean slices. Native backing is outside arena/Runtime accounting; creation order, typed flag reads, duplicate-mark assertions, scope truncation/regrowth, solver copy, GC reset, and retained algorithm marks remain covered.",
-        "SAT watches now use native []satWatched backing and a native outer slice/directory of checked list references. Actual cold outer/store headers are charged; native backing is uncharged. Iterator values borrow native backing identities: writes remain visible, current logical bounds reject discarded tails, and real backing growth/finalization/free invalidate stale borrows. Owner/generation guards preserve child lifetime across outer relocation and slot reuse. Removed payload codecs, lifetime bitmaps, simulated capacity growth/refusals and unused copy/move/fill/reverse/constructor helpers. Actual source tag/equality, propagation compaction, clause/ternary erase and stable class sorting remain."
+        "SAT watches now use native []satWatched backing and a native outer slice/directory of checked list references. Actual cold outer/store headers are charged; native backing is uncharged. Iterator values borrow native backing identities: writes remain visible, current logical bounds reject discarded tails, and real backing growth/finalization/free invalidate stale borrows. Owner/generation guards preserve child lifetime across outer relocation and slot reuse. Removed payload codecs, lifetime bitmaps, simulated capacity growth/refusals and unused copy/move/fill/reverse/constructor helpers. Actual source tag/equality, propagation compaction, clause/ternary erase and stable class sorting remain.",
+        "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
@@ -114663,17 +114655,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/hash.go",
-        "pkg/sat/sat_solver_mutex_pair_set.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
         "pkg/model/model_array_tuple_table.go"
       ],
       "tests": [
         "TestSourceHashVectors",
         "TestCompositeVisitOrder",
-        "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
-        "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
-        "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
-        "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder"
+        "TestArrayTupleOriginalCompositeHashGoldenAndReadOrder",
+        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
       ],
       "conditionals": [
         {
@@ -114758,16 +114747,6 @@
           ]
         },
         {
-          "name": "Selected combine_hash58-63/pair_hash217-229 literal pair consumer",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_solver_mutex_pair_set.go",
-          "tests": [
-            "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
-            "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
-            "TestSATMutexPairSetWrappedCopyGuardAtActualDestination"
-          ]
-        },
-        {
           "name": "selected original get_composite_hash tuple consumer and full MIX state through MixState (src/util/hash.h:72-122)",
           "status": "partial",
           "go_target": "pkg/model/model_array_tuple_table.go",
@@ -114777,7 +114756,8 @@
         }
       ],
       "ownership": [
-        "No retained caller data; baseline little-endian/signed-char policy explicit. Generic hash-table/container functors not yet audited; see PORT_PROGRESS.md#audit-utilhash-port-status-md."
+        "No retained caller data; baseline little-endian/signed-char policy explicit. Generic hash-table/container functors not yet audited; see PORT_PROGRESS.md#audit-utilhash-port-status-md.",
+        "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added."
       ],
       "deviations": []
     },
@@ -114797,7 +114777,6 @@
         "pkg/sat/sat_solver_index_map.go",
         "pkg/sat/sat_solver_index_set_test.go",
         "pkg/sat/sat_solver_index_iterator_source_test.go",
-        "pkg/sat/sat_solver_mutex_pair_set.go",
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
         "pkg/util/runtime_bytes_bounded.go",
         "pkg/model/model_array_tuple_table.go",
@@ -114868,16 +114847,14 @@
         "TestSATSolverConsequenceNativeMapGrowthAndReplacement",
         "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
         "TestSATConsequenceNativeIndexIteratorBorrowLifetime",
-        "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
-        "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
-        "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
         "TestArrayTupleOriginalReplacementGrowthAndLastTombstone",
         "TestArrayTupleOriginalDeletedCleanupAndResizeRefusal",
         "TestBVTrailingConstructorBorrowsExtractionOwner",
         "TestBVTrailingNativeCacheGrowthOwnershipAndResetThreshold",
         "TestBVTrailingCacheGrowthAndEqualThresholdReset",
         "TestBVTrailingNativeWideDeletionReset",
-        "TestBVTrailingEveryColdCountReservation"
+        "TestBVTrailingEveryColdCountReservation",
+        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
       ],
       "conditionals": [
         {
@@ -115151,16 +115128,6 @@
           ]
         },
         {
-          "name": "Selected literal-pair table actual FREE NULL member construction, grow-before-duplicate, cached pair hash and wrapped copy guard",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_solver_mutex_pair_set.go",
-          "tests": [
-            "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
-            "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
-            "TestSATMutexPairSetWrappedCopyGuardAtActualDestination"
-          ]
-        },
-        {
           "name": "selected args_table borrowed AST-row specialization: growth before replacement, last tombstone, physical bucket order, deletion cleanup and reservation refusal (src/util/hashtable.h:183-256,351-403,494-509,546-577)",
           "status": "partial",
           "go_target": "pkg/model/model_array_tuple_table.go",
@@ -115199,7 +115166,8 @@
         "Completed source DT frees only actual current table/object, null-skips after real replacement failure, retains actual unjoined NEW until explicit owning abort; failed constructors do not receive source DT. First body history and first reached destructor refusal are separate charged cold fields. Exact zero-token physical-consumption receipt permits owning continuation without source leaf replay; source cause/cursor remains sticky after owning closure. Every actual replacement allocation refusal through first success receives immediate named Runtime/cold bijection before fault lift.",
         "Legacy collision count is the existing actual embedded raw.inlineStatistics[2] source scalar, initialized only after completed constructor/copy source actions; it has no Runtime block, second mirror or synthetic event, and is charged once in existing reflected header. Runtime statistics keeps its sole physical32-byte object/lexical inline route. Every actual legacy constructor/copy/growth/replacement reservation through first success has immediate independent named table/cold/region census before fault lift, completed DT then separate failed-constructor/NEW owning abort.",
         "SourceFinalize/CloseChecked validate exact raw.self in both Runtime and legacy profiles before any allocation release/cause mutation; ordinary open and empty reset reject accidental copied or zero/unprepared Go wrappers. Real Clone constructors establish fresh exact owner identity, and retained failed-copy owners still perform separate owning abort.",
-        "Default-entry Runtime mode has NIL Go hot slice and actual wrapper24/32-byte object plus40-byte record payload. Legacy mode has actual Go backing and cold scalar capacity/counter. Acquisitions stamp exact returned allocation; lexical copies are inline owners. Current field/pending nodes and failed copy owners remain named; source-completed DT separate from owning abort; immediate raw bijection/full cold sums precede each real reservation fault lift. Accidental Go owner copies reject exact self before mutation; actual source clones prepare valid owners."
+        "Default-entry Runtime mode has NIL Go hot slice and actual wrapper24/32-byte object plus40-byte record payload. Legacy mode has actual Go backing and cold scalar capacity/counter. Acquisitions stamp exact returned allocation; lexical copies are inline owners. Current field/pending nodes and failed copy owners remain named; source-completed DT separate from owning abort; immediate raw bijection/full cold sums precede each real reservation fault lift. Accidental Go owner copies reject exact self before mutation; actual source clones prepare valid owners.",
+        "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added."
       ],
       "deviations": [
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",

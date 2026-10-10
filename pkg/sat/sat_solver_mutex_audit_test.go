@@ -12,10 +12,6 @@ func satMutexColumnRoots(c *RuntimeUintColumn) []util.Block {
 	}
 	return r
 }
-func satMutexFrameRoots(f *satMutexFrame) []util.Block {
-	r := []util.Block{f.seen.raw, f.seen.pending}
-	return satMutexNonzero(r)
-}
 func satMutexNonzero(roots []util.Block) []util.Block {
 	n := 0
 	for _, r := range roots {

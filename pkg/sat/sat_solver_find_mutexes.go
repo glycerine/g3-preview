@@ -9,12 +9,9 @@ import (
 )
 
 type satMutexFrame struct {
-	next         *satMutexFrame
-	ownerBytes   uint64
-	seen         satMutexPairSet
-	seenComplete bool
-	seenUsed     bool
-	cursor       uint32
+	next       *satMutexFrame
+	ownerBytes uint64
+	seen       map[[2]uint32]struct{}
 }
 
 func (s *Solver) mutexFrame() (*satMutexFrame, error) {
@@ -22,7 +19,7 @@ func (s *Solver) mutexFrame() (*satMutexFrame, error) {
 	if e := s.budget.Reserve(bytes); e != nil {
 		return nil, e
 	}
-	f := &satMutexFrame{next: s.mutexFrames, ownerBytes: bytes}
+	f := &satMutexFrame{next: s.mutexFrames, ownerBytes: bytes, seen: make(map[[2]uint32]struct{})}
 	s.mutexFrames = f
 	return f, nil
 }
@@ -33,26 +30,7 @@ func (s *Solver) mutexDrop(f *satMutexFrame, cause error) error {
 		}
 		return ErrSATOwner
 	}
-	for f.cursor < 2 {
-		var e error
-		switch f.cursor {
-		case 0:
-			if f.seenComplete {
-				e = f.seen.close()
-			}
-		case 1:
-			if f.seenUsed && !f.seenComplete {
-				e = f.seen.close()
-			}
-		}
-		if e != nil {
-			if cause != nil {
-				return cause
-			}
-			return e
-		}
-		f.cursor++
-	}
+	f.seen = nil
 	s.mutexFrames = f.next
 	s.budget.Release(f.ownerBytes)
 	f.ownerBytes = 0
@@ -132,21 +110,11 @@ func (s *Solver) findMutexes(lits []Literal, out *satSolverLiteralRows) (result 
 	if err = s.collectMutexBins(false); err != nil {
 		return lbool.Undef, err
 	}
-	f.seenUsed = true
-	if err = f.seen.init(s.runtime.memory); err != nil {
-		return lbool.Undef, err
-	}
-	f.seenComplete = true
 	for _, bc := range s.userBinClauses {
 		a, b := bc.Literal1().index(), bc.Literal2().index()
-		yes, e := f.seen.contains(a, b)
-		if e != nil {
-			return lbool.Undef, e
-		}
-		if !yes {
-			if err = f.seen.insert(a, b); err != nil {
-				return lbool.Undef, err
-			}
+		key := [2]uint32{a, b}
+		if _, seen := f.seen[key]; !seen {
+			f.seen[key] = struct{}{}
 			if err = graph.AddEdge(a, b); err != nil {
 				return lbool.Undef, err
 			}

@@ -33123,3 +33123,28 @@ Retained external SAT Runtime columns, AST reference/printer storage and
 NumericTextStream consumers still need idiomatic conversion. Internal util
 numeric/text/parameter cycles also need to be broken; external conversion alone
 does not remove those internal dependencies.
+
+## Native mutex pair membership
+
+The retained find_mutexes consumer only tests/inserts literal pairs and never
+iterates its set. Replaced the Runtime-backed concrete hash table with a native
+map[[2]uint32]struct{} in the lexical frame. Removed bucket capacity/state,
+cached pair hashing, default FREE member construction, rehash/copy allocation
+and partial-destructor machinery, together with three tests of that emulation.
+The actual frame header remains budgeted; clause collection, duplicate filtering,
+max-clique computation and append-only result order remain. Frame cleanup drops
+the native map and refunds the header. Runtime root audits omit removed backing.
+
+A new actual-solver test constructs a complete graph on 32 variables, observes
+496 distinct pairs twice through the two source collection passes and checks
+its unique full clique independently. Repeated queries append results without
+altering the caller prefix and complete with only one permitted cold-frame
+reservation, restoring the exact initial budget. Existing actual mutex refusal
+sweeps, source binary-watch tests and canceled/inconsistent query behavior pass.
+
+Validation: full native SAT passed (0.733s), full g3debug SAT passed (0.886s),
+SAT vet, manifest evidence and diff checks passed. Removed unused selected
+hash/table implementation credit; unit counts remain 2102 units/677 APIs:
+63 ported, 284 partial, 1727 unported and two dead/deleted. The util knot and
+complete split remain active; retained Runtime columns/trail/queue, AST storage,
+NumericTextStream consumers and internal util cycles remain.
