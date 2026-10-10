@@ -33273,3 +33273,35 @@ components and a largest strongly connected component of 164 files. External
 AST fresh-name buffers, AST reference storage and numerical text consumers remain;
 internal numeric/text/parameter cycles also require work. Native caller migration
 alone does not eliminate those internal cycles. The remaining split stays active.
+
+## Direct native fresh-name and parameter output buffers
+
+Fresh AST declaration names now use bytes.Buffer, checked SymbolManager.Display
+and strconv directly. Removed their text.Buffer construction/close and insertion
+methods. Actual null-prefix spelling, numerical-symbol signed rendering, interning,
+lexical metadata and successful fresh-ID publication order remain.
+
+Converted ParamDescrs.DisplayInto, GlobalParams display APIs, namespace display
+facades and SMT ContextParams error formatting to direct bytes.Buffer inputs and
+storage. Removed custom buffer construction, closed-owner state and cleanup from
+this entire retained call chain. Native writes preserve sorted/normalized descriptor
+names, insertion-ordered modules, diagnostics before lookup and real borrowed
+region/descriptor failure prefixes. Nil destinations use their enclosing project
+error domain. Stored descriptor strings are emitted directly; no buffer compatibility
+adapter or STL implementation credit was added. Existing tests now inspect native
+strings/bytes and continue checking real descriptor/region/namespace lifetimes.
+
+Validation: focused native util/smtcore/AST passed (0.121s/0.084s/0.018s), focused
+same-package g3debug checks passed (0.116s/0.090s/0.016s). Focused fresh-name/sorting
+checks also passed in both profiles. Module compilation, three-package vet,
+manifest evidence, gofmt and diff checks passed. Counts stay 2102 units/677 APIs:
+63 ported, 284 partial, 1727 unported and two dead/deleted. The full native module
+was not rerun inside the hourly interval.
+
+AST and smtcore production now contain no util/text.Buffer dependency. Remaining
+production typed buffer consumers are util's NumericTextStream and formatted-CString
+AppendTo, plus internal SMT2 quoting. The refreshed dependency audit is unchanged:
+287 root files, 104 components, largest cycle 164 files. In particular, numeric
+output/OwnedString files still depend on ParamsStringView and parameter error
+symbols, which connect numeric ownership back to parameter/global registries.
+The complete migration and subpackage split remain active.

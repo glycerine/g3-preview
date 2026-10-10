@@ -2,9 +2,10 @@
 package util
 
 import (
+	"bytes"
+
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // Region bindings are cold borrowed owners. The source stores char* without
@@ -60,7 +61,7 @@ func (g *GlobalParams) RegisterModuleDescription(name string, region *arena.Byte
 	defer g.mu.Unlock()
 	return g.registerModuleDescription(name, region, ref, offset)
 }
-func (g *GlobalParams) descriptionInto(out *utext.Buffer, text GlobalParamCString) error {
+func (g *GlobalParams) descriptionInto(out *bytes.Buffer, text GlobalParamCString) error {
 	if !text.Present {
 		return ErrParamsStreamFailure
 	}
@@ -82,36 +83,35 @@ func (g *GlobalParams) descriptionInto(out *utext.Buffer, text GlobalParamCStrin
 		if ch == 0 {
 			return nil
 		}
-		if e = out.AppendByte(ch); e != nil {
-			return e
-		}
+		out.WriteByte(ch)
 		if i == ^uint32(0) {
 			return arena.ErrBounds
 		}
 	}
 }
-func (g *GlobalParams) moduleHeaderInto(out *utext.Buffer, key usymbol.Symbol) error {
+func (g *GlobalParams) moduleHeaderInto(out *bytes.Buffer, key usymbol.Symbol) error {
 	if out == nil {
-		return utext.ErrOwner
+		return ErrGlobalParamsOwner
 	}
-	if e := out.AppendCString("[module] "); e != nil {
-		return e
-	}
-	if e := out.AppendSymbol(g.SymbolsField, key); e != nil {
-		return e
+	out.WriteString("[module] ")
+	{
+		text, e := g.SymbolsField.Display(key)
+		if e != nil {
+			return e
+		}
+		out.WriteString(text)
 	}
 	if _, e := g.SymbolsField.Hash(key); e != nil {
 		return e
 	}
 	if text, ok := g.ModuleDescriptions.get(key); ok {
-		if e := out.AppendCString(", description: "); e != nil {
-			return e
-		}
+		out.WriteString(", description: ")
 		if e := g.descriptionInto(out, text); e != nil {
 			return e
 		}
 	}
-	return out.AppendByte('\n')
+	out.WriteByte('\n')
+	return nil
 }
 func (g *GlobalParams) descriptorEntry(n uint32) (*ParamDescrs, error) {
 	if n == 0 || uint64(n) > uint64(len(g.Descriptors)) || g.Descriptors[n-1] == nil {
@@ -119,7 +119,7 @@ func (g *GlobalParams) descriptorEntry(n uint32) (*ParamDescrs, error) {
 	}
 	return g.Descriptors[n-1], nil
 }
-func (g *GlobalParams) DisplayInto(out *utext.Buffer, indent uint32, smt2, includeDescr bool) error {
+func (g *GlobalParams) DisplayInto(out *bytes.Buffer, indent uint32, smt2, includeDescr bool) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -129,24 +129,18 @@ func (g *GlobalParams) DisplayInto(out *utext.Buffer, indent uint32, smt2, inclu
 		return e
 	}
 	if out == nil {
-		return utext.ErrOwner
+		return ErrGlobalParamsOwner
 	}
-	if e := out.AppendCString("Global parameters\n"); e != nil {
-		return e
-	}
+	out.WriteString("Global parameters\n")
 	if e := g.ensureRegistered(); e != nil {
 		return e
 	}
 	if e := g.GlobalDescriptors.DisplayInto(out, indent+4, smt2, includeDescr); e != nil {
 		return e
 	}
-	if e := out.AppendByte('\n'); e != nil {
-		return e
-	}
+	out.WriteByte('\n')
 	if !smt2 {
-		if e := out.AppendCString("To set a module parameter, use <module-name>.<parameter-name>=value\nExample:  pp.decimal=true\n\n"); e != nil {
-			return e
-		}
+		out.WriteString("To set a module parameter, use <module-name>.<parameter-name>=value\nExample:  pp.decimal=true\n\n")
 	}
 	for key, descriptor := range g.ModuleDescriptors.values.All() {
 		if e := g.moduleHeaderInto(out, key); e != nil {
@@ -162,7 +156,7 @@ func (g *GlobalParams) DisplayInto(out *utext.Buffer, indent uint32, smt2, inclu
 	}
 	return nil
 }
-func (g *GlobalParams) DisplayModulesInto(out *utext.Buffer) error {
+func (g *GlobalParams) DisplayModulesInto(out *bytes.Buffer) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -178,7 +172,7 @@ func (g *GlobalParams) DisplayModulesInto(out *utext.Buffer) error {
 	}
 	return nil
 }
-func (g *GlobalParams) DisplayModuleInto(out *utext.Buffer, name string) error {
+func (g *GlobalParams) DisplayModuleInto(out *bytes.Buffer, name string) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -195,7 +189,7 @@ func (g *GlobalParams) DisplayModuleInto(out *utext.Buffer, name string) error {
 }
 
 // Caller owns the existing imp lock and has reached its ordinary open guard.
-func (g *GlobalParams) displayModuleKey(out *utext.Buffer, key usymbol.Symbol) error {
+func (g *GlobalParams) displayModuleKey(out *bytes.Buffer, key usymbol.Symbol) error {
 	d, found, e := g.findModuleDescriptor(key)
 	if e != nil {
 		return e
@@ -212,7 +206,7 @@ func (g *GlobalParams) displayModuleKey(out *utext.Buffer, key usymbol.Symbol) e
 // DisplayParameterInto preserves the source's unsolicited stdout line in the
 // explicit debugOut stream before descriptor lookup. Binding that stream to
 // process stdout remains the runtime caller's job; it is not a global CLI.
-func (g *GlobalParams) DisplayParameterInto(out, debugOut *utext.Buffer, name string) error {
+func (g *GlobalParams) DisplayParameterInto(out, debugOut *bytes.Buffer, name string) error {
 	if g == nil {
 		return ErrGlobalParamsOwner
 	}
@@ -226,26 +220,26 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *utext.Buffer, name st
 		return e
 	}
 	if debugOut == nil {
-		return utext.ErrOwner
+		return ErrGlobalParamsOwner
 	}
-	if e = debugOut.AppendCString(name); e != nil {
-		return e
+	debugOut.WriteString(name[:nulStringLength(name)])
+	debugOut.WriteByte(' ')
+	{
+		text, e := g.SymbolsField.Display(module)
+		if e != nil {
+			return e
+		}
+		debugOut.WriteString(text)
 	}
-	if e = debugOut.AppendByte(' '); e != nil {
-		return e
+	debugOut.WriteByte(' ')
+	{
+		text, e := g.SymbolsField.Display(param)
+		if e != nil {
+			return e
+		}
+		debugOut.WriteString(text)
 	}
-	if e = debugOut.AppendSymbol(g.SymbolsField, module); e != nil {
-		return e
-	}
-	if e = debugOut.AppendByte(' '); e != nil {
-		return e
-	}
-	if e = debugOut.AppendSymbol(g.SymbolsField, param); e != nil {
-		return e
-	}
-	if e = debugOut.AppendByte('\n'); e != nil {
-		return e
-	}
+	debugOut.WriteByte('\n')
 	var d *ParamDescrs
 	if module == (usymbol.Symbol{}) {
 		if e = g.ensureRegistered(); e != nil {
@@ -270,42 +264,45 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *utext.Buffer, name st
 		return g.unknownParameter(param, d, module)
 	}
 	if out == nil {
-		return utext.ErrOwner
+		return ErrGlobalParamsOwner
 	}
-	if e = out.AppendCString("  name:           "); e != nil {
-		return e
+	out.WriteString("  name:           ")
+	{
+		text, e := g.SymbolsField.Display(param)
+		if e != nil {
+			return e
+		}
+		out.WriteString(text)
 	}
-	if e = out.AppendSymbol(g.SymbolsField, param); e != nil {
-		return e
-	}
-	if e = out.AppendByte('\n'); e != nil {
-		return e
-	}
+	out.WriteByte('\n')
 	if module != (usymbol.Symbol{}) {
-		if e = out.AppendCString("  module:         "); e != nil {
-			return e
+		out.WriteString("  module:         ")
+		{
+			text, e := g.SymbolsField.Display(module)
+			if e != nil {
+				return e
+			}
+			out.WriteString(text)
 		}
-		if e = out.AppendSymbol(g.SymbolsField, module); e != nil {
-			return e
+		out.WriteString("\n  qualified name: ")
+		{
+			text, e := g.SymbolsField.Display(module)
+			if e != nil {
+				return e
+			}
+			out.WriteString(text)
 		}
-		if e = out.AppendCString("\n  qualified name: "); e != nil {
-			return e
+		out.WriteByte('.')
+		{
+			text, e := g.SymbolsField.Display(param)
+			if e != nil {
+				return e
+			}
+			out.WriteString(text)
 		}
-		if e = out.AppendSymbol(g.SymbolsField, module); e != nil {
-			return e
-		}
-		if e = out.AppendByte('.'); e != nil {
-			return e
-		}
-		if e = out.AppendSymbol(g.SymbolsField, param); e != nil {
-			return e
-		}
-		if e = out.AppendByte('\n'); e != nil {
-			return e
-		}
+		out.WriteByte('\n')
 	}
-	// Direct text reads use the charged descriptor words and allocate no
-	// intermediate string.
+	// Read the stored descriptor strings under their owning descriptor lock.
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	if e = d.open(); e != nil {
@@ -318,29 +315,18 @@ func (g *GlobalParams) DisplayParameterInto(out, debugOut *utext.Buffer, name st
 	if !found {
 		return ErrParamDescrsPrecondition
 	}
-	if e = out.AppendCString("  type:           "); e != nil {
-		return e
-	}
-	if e = out.AppendCString(info.kind.String()); e != nil {
-		return e
-	}
-	if e = out.AppendCString("\n  description:    "); e != nil {
-		return e
-	}
+	out.WriteString("  type:           ")
+	out.WriteString(info.kind.String())
+	out.WriteString("\n  description:    ")
 	if !info.descr.present {
 		return ErrParamsStreamFailure
 	}
-	if e = d.writeTextInto(out, info.descr); e != nil {
-		return e
-	}
-	if e = out.AppendCString("\n  default value:  "); e != nil {
-		return e
-	}
+	out.WriteString(info.descr.value)
+	out.WriteString("\n  default value:  ")
 	if !info.def.present {
 		return ErrParamsStreamFailure
 	}
-	if e = d.writeTextInto(out, info.def); e != nil {
-		return e
-	}
-	return out.AppendByte('\n')
+	out.WriteString(info.def.value)
+	out.WriteByte('\n')
+	return nil
 }

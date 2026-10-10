@@ -3,13 +3,13 @@
 package util
 
 import (
+	"bytes"
 	"errors"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func gparamsNamespaceFixture(t *testing.T) (*GlobalParamsService, *arena.Budget) {
@@ -234,22 +234,22 @@ func TestGlobalParamsNamespaceModuleSnapshotDescriptionAndDisplays(t *testing.T)
 		t.Fatal("module display literal output", got, want)
 	}
 	paramsMust(t, r.Write(raw, 0, 'B'))
-	paramsMust(t, out.Reset())
+	out.Reset()
 	paramsMust(t, s.SourceDisplayModuleInto(out, "namespace"))
 	if got := pdStreamText(t, out); got != strings.Replace(want, "borrowed", "Borrowed", 1) {
 		t.Fatal("description was copied at namespace binding", got)
 	}
-	paramsMust(t, out.Reset())
+	out.Reset()
 	paramsMust(t, s.SourceDisplayModulesInto(out))
 	if !strings.Contains(pdStreamText(t, out), "[module] namespace, description: Borrowed\n") {
 		t.Fatal("namespace display_modules route")
 	}
-	paramsMust(t, out.Reset())
+	out.Reset()
 	paramsMust(t, s.SourceDisplayInto(out, 0, true, false))
 	if got := pdStreamText(t, out); !strings.HasPrefix(got, "Global parameters\n") || !strings.Contains(got, "    :enabled (bool) (default: false)\n") {
 		t.Fatal("namespace full display", got)
 	}
-	paramsMust(t, out.Reset())
+	out.Reset()
 	paramsMust(t, s.SourceDisplayParameterInto(out, debugOut, "namespace.enabled"))
 	if got := pdStreamText(t, debugOut); got != "namespace.enabled namespace enabled\n" {
 		t.Fatal("source unsolicited parameter diagnostic", got)
@@ -284,17 +284,14 @@ func TestGlobalParamsNamespaceDisplayUsesGoBuffer(t *testing.T) {
 	paramsMust(t, e)
 	paramsMust(t, g.ensureRegistered())
 	outputBudget := arena.NewBudget(0)
-	out, e := utext.NewBuffer(utext.Config{})
-	paramsMust(t, e)
-	defer out.Close()
+	out := new(bytes.Buffer)
 	paramsMust(t, s.SourceDisplayModuleInto(out, "namespace"))
 	if outputBudget.Used() != 0 {
 		t.Fatal("Go buffer touched arena", outputBudget.Used())
 	}
 	gparamsServiceAudit(t, s, b)
 	want := "[module] namespace\n    enabled (bool) " + text + " (default: false)\n"
-	got, e := out.CStr()
-	paramsMust(t, e)
+	got := out.String()
 	if got != want {
 		t.Fatal(got, want)
 	}

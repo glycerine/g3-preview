@@ -3,6 +3,7 @@
 package smtcore
 
 import (
+	"bytes"
 	"errors"
 	"math"
 	"reflect"
@@ -10,7 +11,6 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util"
-	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -21,7 +21,7 @@ type contextParamsFrame struct {
 	invocation, header                                                       uint64
 	key                                                                      OwnedString
 	descriptor                                                               util.ParamDescrs
-	buffer                                                                   utext.Buffer
+	buffer                                                                   bytes.Buffer
 	value                                                                    util.ParamsRef
 	sourceReceipt                                                            util.ParamsSourceReceipt
 	setReceipt                                                               util.ParamsSetReceipt
@@ -79,9 +79,7 @@ func (s *ContextParams) endSourceFrame(f *contextParamsFrame, body error) error 
 		f.valueOwned = false
 	}
 	if f.bufferComplete {
-		if e := f.buffer.Close(); e != nil {
-			return errors.Join(body, e)
-		}
+		f.buffer = bytes.Buffer{}
 	}
 	if f.descriptorAttempted && f.descriptor.ConstructorReady() {
 		if e := f.descriptor.SourceFinalizeMembers(); e != nil {
@@ -144,9 +142,7 @@ func (s *ContextParams) closeSourceFrames() error {
 			f.valueOwned = false
 		}
 		if f.bufferComplete {
-			if e := f.buffer.Close(); e != nil {
-				return e
-			}
+			f.buffer = bytes.Buffer{}
 		}
 		if f.descriptorAttempted && f.descriptor.Initialized() && !f.descriptor.Closed() {
 			var e error
@@ -247,39 +243,23 @@ func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result err
 	if e = catalogCollectContextParams(&f.descriptor); e != nil {
 		return e
 	}
-	f.initBuffer(s.budget)
-	if e = f.buffer.AppendCString("unknown parameter '"); e != nil {
-		return e
-	}
+	f.bufferComplete = true
+	f.buffer.WriteString("unknown parameter '")
 	for i := uint64(0); i < f.key.Length; i++ {
 		ch, readErr := f.key.View().Byte(uint64(i))
 		if readErr != nil {
 			return readErr
 		}
-		if e = f.buffer.AppendByte(ch); e != nil {
-			return e
-		}
+		f.buffer.WriteByte(ch)
 	}
-	if e = f.buffer.AppendCString("'\n"); e != nil {
-		return e
-	}
-	if e = f.buffer.AppendCString("Legal parameters are:\n"); e != nil {
-		return e
-	}
+	f.buffer.WriteString("'\n")
+	f.buffer.WriteString("Legal parameters are:\n")
 	if e = f.descriptor.DisplayInto(&f.buffer, 2, false, false); e != nil {
 		return e
 	}
-	text, e := f.buffer.CStr()
-	if e != nil {
-		return e
-	}
-	return z3exception.NewDefaultException(text)
+	return z3exception.NewDefaultException(f.buffer.String())
 }
 
-func (f *contextParamsFrame) initBuffer(_ *arena.Budget) {
-	_ = f.buffer.Init(utext.Config{})
-	f.bufferComplete = true
-}
 func contextStringEqual(v util.ParamsStringView, text string) (bool, error) {
 	for i := 0; i <= len(text); i++ {
 		b, e := v.Byte(uint64(i))
@@ -354,7 +334,7 @@ func (s *ContextParams) setSourceUInt(f *contextParamsFrame, opt *uint32, param,
 	*opt = uint32(number)
 	return nil
 }
-func appendContextView(out *utext.Buffer, v util.ParamsStringView) error {
+func appendContextView(out *bytes.Buffer, v util.ParamsStringView) error {
 	// The selected char-pointer insertion obtains strlen before stream emission.
 	n, e := v.Length()
 	if e != nil {
@@ -365,40 +345,24 @@ func appendContextView(out *utext.Buffer, v util.ParamsStringView) error {
 		if e != nil {
 			return e
 		}
-		if e = out.AppendByte(ch); e != nil {
-			return e
-		}
+		out.WriteByte(ch)
 	}
 	return nil
 }
 func (s *ContextParams) sourceInvalidValue(f *contextParamsFrame, kind string, param, value util.ParamsStringView) error {
-	f.initBuffer(s.budget)
-	if e := f.buffer.AppendCString("invalid value '"); e != nil {
-		return e
-	}
+	f.bufferComplete = true
+	f.buffer.WriteString("invalid value '")
 	if e := appendContextView(&f.buffer, value); e != nil {
 		return e
 	}
-	if e := f.buffer.AppendCString("' for "); e != nil {
-		return e
-	}
-	if e := f.buffer.AppendCString(kind); e != nil {
-		return e
-	}
-	if e := f.buffer.AppendCString(" parameter '"); e != nil {
-		return e
-	}
+	f.buffer.WriteString("' for ")
+	f.buffer.WriteString(kind)
+	f.buffer.WriteString(" parameter '")
 	if e := appendContextView(&f.buffer, param); e != nil {
 		return e
 	}
-	if e := f.buffer.AppendCString("'"); e != nil {
-		return e
-	}
-	text, e := f.buffer.CStr()
-	if e != nil {
-		return e
-	}
-	return z3exception.NewDefaultException(text)
+	f.buffer.WriteString("'")
+	return z3exception.NewDefaultException(f.buffer.String())
 }
 
 // The returned value is one actually acquired reference; callers own its Del.

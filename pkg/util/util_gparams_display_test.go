@@ -1,12 +1,12 @@
 package util
 
 import (
+	"bytes"
 	"errors"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func gparamsDescriptionBytes(t *testing.T, r *arena.BytesRegion, s string) arena.BytesRegionRef {
@@ -33,35 +33,29 @@ func TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches(t *testing.T) {
 	}()
 	ref := gparamsDescriptionBytes(t, r, "prefixdescription\x00ignored")
 	paramsMust(t, g.RegisterModuleDescription("sat", r, ref, 6))
-	out, e := utext.NewBuffer(utext.Config{})
-	paramsMust(t, e)
-	defer out.Close()
+	out := new(bytes.Buffer)
 	paramsMust(t, g.DisplayModulesInto(out))
-	got, e := out.CStr()
-	paramsMust(t, e)
+	got := out.String()
 	if got != "[module] sat, description: description\n" {
 		t.Fatal(got)
 	}
 	// The source retains char*, so mutation is visible without registration.
 	paramsMust(t, r.Write(ref, 6, 'D'))
-	paramsMust(t, out.Reset())
+	out.Reset()
 	paramsMust(t, g.DisplayModuleInto(out, "sat"))
-	got, e = out.CStr()
-	paramsMust(t, e)
+	got = out.String()
 	if !strings.HasPrefix(got, "[module] sat, description: Description\n    enabled (bool)") {
 		t.Fatal(got)
 	}
-	paramsMust(t, out.Reset())
+	out.Reset()
 	paramsMust(t, g.DisplayInto(out, 0, true, false))
-	got, e = out.CStr()
-	paramsMust(t, e)
+	got = out.String()
 	if !strings.HasPrefix(got, "Global parameters\n    :feature-flag (bool) (default: false)\n\n[module] sat, description: Description\n") || strings.Contains(got, "To set a module") {
 		t.Fatal(got)
 	}
-	paramsMust(t, out.Reset())
+	out.Reset()
 	paramsMust(t, g.DisplayInto(out, 0, false, false))
-	got, e = out.CStr()
-	paramsMust(t, e)
+	got = out.String()
 	if !strings.Contains(got, "To set a module parameter, use <module-name>.<parameter-name>=value\nExample:  pp.decimal=true\n\n") {
 		t.Fatal(got)
 	}
@@ -69,15 +63,12 @@ func TestGlobalParamsModuleDescriptionBorrowAndDisplayBranches(t *testing.T) {
 func TestGlobalParamsDescriptionNullAndClosedReadPrefixes(t *testing.T) {
 	g, _, _, _ := gparamsRealRegistry(t)
 	paramsMust(t, g.ensureRegistered())
-	out, e := utext.NewBuffer(utext.Config{})
-	paramsMust(t, e)
-	defer out.Close()
+	out := new(bytes.Buffer)
 	paramsMust(t, g.RegisterModuleDescription("sat", nil, arena.BytesRegionRef{}, 0))
-	if e = g.DisplayModulesInto(out); !errors.Is(e, ErrParamsStreamFailure) {
+	if e := g.DisplayModulesInto(out); !errors.Is(e, ErrParamsStreamFailure) {
 		t.Fatal(e)
 	}
-	got, e := out.CStr()
-	paramsMust(t, e)
+	got := out.String()
 	if got != "[module] sat, description: " {
 		t.Fatal(got)
 	}
@@ -85,22 +76,20 @@ func TestGlobalParamsDescriptionNullAndClosedReadPrefixes(t *testing.T) {
 	paramsMust(t, e)
 	ref := gparamsDescriptionBytes(t, r, "")
 	paramsMust(t, g.RegisterModuleDescription("sat", r, ref, 0))
-	paramsMust(t, out.Reset())
+	out.Reset()
 	paramsMust(t, g.DisplayModulesInto(out))
-	got, e = out.CStr()
-	paramsMust(t, e)
+	got = out.String()
 	if got != "[module] sat, description: \n" {
 		t.Fatal(got)
 	}
 	r.Close()
-	paramsMust(t, out.Reset())
+	out.Reset()
 	// Raw retained pointer registration does not read the spelling.
 	paramsMust(t, g.RegisterModuleDescription("sat", r, ref, 0))
-	if e = g.DisplayModulesInto(out); !errors.Is(e, arena.ErrClosed) {
+	if e := g.DisplayModulesInto(out); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
 	}
-	got, e = out.CStr()
-	paramsMust(t, e)
+	got = out.String()
 	if got != "[module] sat, description: " {
 		t.Fatal(got)
 	}
@@ -108,44 +97,35 @@ func TestGlobalParamsDescriptionNullAndClosedReadPrefixes(t *testing.T) {
 
 func TestGlobalParamsDisplayParameterDiagnosticBeforeLookup(t *testing.T) {
 	g, _, _, _ := gparamsRealRegistry(t)
-	out, e := utext.NewBuffer(utext.Config{})
-	paramsMust(t, e)
-	defer out.Close()
-	debug, e := utext.NewBuffer(utext.Config{})
-	paramsMust(t, e)
-	defer debug.Close()
+	out := new(bytes.Buffer)
+	debug := new(bytes.Buffer)
 	paramsMust(t, g.DisplayParameterInto(out, debug, ":SaT.SeEd"))
-	got, e := debug.CStr()
-	paramsMust(t, e)
+	got := debug.String()
 	if got != ":SaT.SeEd sat seed\n" {
 		t.Fatal(got)
 	}
-	got, e = out.CStr()
-	paramsMust(t, e)
+	got = out.String()
 	want := "  name:           seed\n  module:         sat\n  qualified name: sat.seed\n  type:           unsigned int\n  description:    description\n  default value:  0\n"
 	if got != want {
 		t.Fatalf("%q", got)
 	}
-	paramsMust(t, out.Reset())
-	paramsMust(t, debug.Reset())
-	e = g.DisplayParameterInto(out, debug, "NO.Such")
+	out.Reset()
+	debug.Reset()
+	e := g.DisplayParameterInto(out, debug, "NO.Such")
 	if e == nil || e.Error() != "unknown module 'no'" {
 		t.Fatal(e)
 	}
-	got, e = debug.CStr()
-	paramsMust(t, e)
+	got = debug.String()
 	if got != "NO.Such no such\n" {
 		t.Fatal(got)
 	}
-	got, e = out.CStr()
-	paramsMust(t, e)
+	got = out.String()
 	if got != "" {
 		t.Fatal(got)
 	}
-	paramsMust(t, debug.Reset())
+	debug.Reset()
 	paramsMust(t, g.DisplayParameterInto(out, debug, "feature_flag"))
-	got, e = debug.CStr()
-	paramsMust(t, e)
+	got = debug.String()
 	if got != "feature_flag null feature_flag\n" {
 		t.Fatal(got)
 	}
@@ -154,14 +134,14 @@ func TestGlobalParamsDisplayParameterDiagnosticBeforeLookup(t *testing.T) {
 func TestGlobalParamsNilStreamActualActionPrefixes(t *testing.T) {
 	g, _, _, _ := gparamsRealRegistry(t)
 	// Header emission precedes lazy registration.
-	if e := g.DisplayInto(nil, 0, false, true); !errors.Is(e, utext.ErrOwner) {
+	if e := g.DisplayInto(nil, 0, false, true); !errors.Is(e, ErrGlobalParamsOwner) {
 		t.Fatal(e)
 	}
 	if g.modulesRegistered {
 		t.Fatal("registration ran before failed header action")
 	}
 	// Module lookup/registration precedes the first row output action.
-	if e := g.DisplayModulesInto(nil); !errors.Is(e, utext.ErrOwner) {
+	if e := g.DisplayModulesInto(nil); !errors.Is(e, ErrGlobalParamsOwner) {
 		t.Fatal(e)
 	}
 	if !g.modulesRegistered || len(g.Descriptors) != 1 {
@@ -170,7 +150,7 @@ func TestGlobalParamsNilStreamActualActionPrefixes(t *testing.T) {
 	if e := g.DisplayModuleInto(nil, "missing"); e == nil || e.Error() != "unknown module 'missing'" {
 		t.Fatal(e)
 	}
-	if e := g.DisplayModuleInto(nil, "sat"); !errors.Is(e, utext.ErrOwner) {
+	if e := g.DisplayModuleInto(nil, "sat"); !errors.Is(e, ErrGlobalParamsOwner) {
 		t.Fatal(e)
 	}
 	ctx, sy, _ := paramsTestOwner(t)

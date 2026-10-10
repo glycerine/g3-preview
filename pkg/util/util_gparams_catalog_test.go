@@ -1,11 +1,11 @@
 package util
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func catalogTestConfig(b *arena.Budget) GlobalParamsCatalogConfig {
@@ -97,12 +97,10 @@ func TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher(t *testing.T) {
 		if !ok {
 			t.Fatal(row)
 		}
-		out, e := utext.NewBuffer(utext.Config{})
-		paramsMust(t, e)
+		out := new(bytes.Buffer)
 		paramsMust(t, g.descriptionInto(out, entry))
-		text, e := out.CStr()
-		paramsMust(t, e)
-		paramsMust(t, out.Close())
+		text := out.String()
+
 		if text != last {
 			t.Fatal(row, text, last)
 		}
@@ -160,9 +158,8 @@ func TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix(t *t
 	}()
 	paramsMust(t, g.ensureRegistered())
 	paramsMust(t, c.Region.Write(c.descriptions[15], 0, 'T'))
-	out, e := utext.NewBuffer(utext.Config{})
-	paramsMust(t, e)
-	defer out.Close()
+	out := new(bytes.Buffer)
+
 	key, e := sy.Intern("ackermannization")
 	paramsMust(t, e)
 	entry, ok := g.ModuleDescriptions.get(key)
@@ -170,18 +167,16 @@ func TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix(t *t
 		t.Fatal("missing module description")
 	}
 	paramsMust(t, g.descriptionInto(out, entry))
-	text, e := out.CStr()
-	paramsMust(t, e)
+	text := out.String()
 	if text != "Tactics based on solving UF-theories via ackermannization (see also ackr module)" {
 		t.Fatal("borrowed final literal", text)
 	}
-	paramsMust(t, out.Reset())
+	out.Reset()
 	paramsMust(t, c.Close())
 	if e = g.DisplayModuleInto(out, "ackermannization"); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
 	}
-	text, e = out.CStr()
-	paramsMust(t, e)
+	text = out.String()
 	if text != "[module] ackermannization, description: " {
 		t.Fatal(text)
 	}

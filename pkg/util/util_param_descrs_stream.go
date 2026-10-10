@@ -1,15 +1,16 @@
 package util
 
 import (
+	"bytes"
+
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // DisplayInto emits source param_descrs::display into a borrowed byte buffer.
 // Error keeps the prefix emitted before it.
-func (d *ParamDescrs) DisplayInto(dst *utext.Buffer, indent uint32, smt2, includeDescr bool) error {
+func (d *ParamDescrs) DisplayInto(dst *bytes.Buffer, indent uint32, smt2, includeDescr bool) error {
 	if dst == nil {
-		return utext.ErrOwner
+		return ErrParamDescrsPrecondition
 	}
 	if d == nil {
 		return ErrParamDescrsPrecondition
@@ -28,14 +29,10 @@ func (d *ParamDescrs) DisplayInto(dst *utext.Buffer, indent uint32, smt2, includ
 	}
 	for _, key := range names {
 		for j := uint32(0); j < indent; j++ {
-			if e := dst.AppendByte(' '); e != nil {
-				return e
-			}
+			dst.WriteByte(' ')
 		}
 		if smt2 {
-			if e := dst.AppendByte(':'); e != nil {
-				return e
-			}
+			dst.WriteByte(':')
 		}
 		if e := d.writeNameInto(dst, key, smt2); e != nil {
 			return e
@@ -50,46 +47,28 @@ func (d *ParamDescrs) DisplayInto(dst *utext.Buffer, indent uint32, smt2, includ
 		if paramDescrsStreamSourceDebug && !info.descr.present {
 			return ErrParamDescrsPrecondition
 		}
-		if e = dst.AppendCString(" ("); e != nil {
-			return e
-		}
-		if e = dst.AppendCString(info.kind.String()); e != nil {
-			return e
-		}
-		if e = dst.AppendByte(')'); e != nil {
-			return e
-		}
+		dst.WriteString(" (")
+		dst.WriteString(info.kind.String())
+		dst.WriteByte(')')
 		if includeDescr {
-			if e = dst.AppendByte(' '); e != nil {
-				return e
-			}
+			dst.WriteByte(' ')
 			// Null CString sets source ostream failbit at this actual output action.
 			// This byte-destination adapter returns a typed failure with that prefix.
 			if !info.descr.present {
 				return ErrParamsStreamFailure
 			}
-			if e = d.writeTextInto(dst, info.descr); e != nil {
-				return e
-			}
+			dst.WriteString(info.descr.value)
 		}
 		if info.def.present {
-			if e = dst.AppendCString(" (default: "); e != nil {
-				return e
-			}
-			if e = d.writeTextInto(dst, info.def); e != nil {
-				return e
-			}
-			if e = dst.AppendByte(')'); e != nil {
-				return e
-			}
+			dst.WriteString(" (default: ")
+			dst.WriteString(info.def.value)
+			dst.WriteByte(')')
 		}
-		if e = dst.AppendByte('\n'); e != nil {
-			return e
-		}
+		dst.WriteByte('\n')
 	}
 	return nil
 }
-func (d *ParamDescrs) writeNameInto(dst *utext.Buffer, k usymbol.Symbol, smt2 bool) error {
+func (d *ParamDescrs) writeNameInto(dst *bytes.Buffer, k usymbol.Symbol, smt2 bool) error {
 	m := d.manager
 	if e := m.Validate(k); e != nil {
 		return e
@@ -110,12 +89,7 @@ func (d *ParamDescrs) writeNameInto(dst *utext.Buffer, k usymbol.Symbol, smt2 bo
 		} else if ch >= 'A' && ch <= 'Z' {
 			ch = ch - 'A' + 'a'
 		}
-		if e = dst.AppendByte(ch); e != nil {
-			return e
-		}
+		dst.WriteByte(ch)
 	}
 	return nil
-}
-func (d *ParamDescrs) writeTextInto(dst *utext.Buffer, r paramDescrText) error {
-	return dst.AppendCString(r.value)
 }

@@ -1,26 +1,21 @@
 package util
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func pdStreamBuffer(t *testing.T, b *arena.Budget) *utext.Buffer {
+func pdStreamBuffer(t *testing.T, _ *arena.Budget) *bytes.Buffer {
 	t.Helper()
-	s, e := utext.NewBuffer(utext.Config{})
-	paramsMust(t, e)
-	t.Cleanup(func() { paramsMust(t, s.Close()) })
-	return s
+	return new(bytes.Buffer)
 }
-func pdStreamText(t *testing.T, b *utext.Buffer) string {
+func pdStreamText(t *testing.T, b *bytes.Buffer) string {
 	t.Helper()
-	s, e := b.CStr()
-	paramsMust(t, e)
-	return s
+	return b.String()
 }
 func TestParamDescrsDisplayIntoSourceBranchesAndSort(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
@@ -31,7 +26,7 @@ func TestParamDescrsDisplayIntoSourceBranchesAndSort(t *testing.T) {
 	for _, smt2 := range []bool{false, true} {
 		for _, descr := range []bool{false, true} {
 			b := pdStreamBuffer(t, nil)
-			paramsMust(t, b.AppendCString("prefix\n"))
+			b.WriteString("prefix\n")
 			want, e := d.Display(2, smt2, descr)
 			paramsMust(t, e)
 			paramsMust(t, d.DisplayInto(b, 2, smt2, descr))
@@ -47,7 +42,7 @@ func TestParamDescrsDisplayIntoNullDescriptionActualAction(t *testing.T) {
 	pdinsert(t, d, "A-key", ParamUInt, nil, nil, nil)
 	for _, descr := range []bool{false, true} {
 		b := pdStreamBuffer(t, nil)
-		paramsMust(t, b.AppendCString("p"))
+		b.WriteString("p")
 		e := d.DisplayInto(b, 2, false, descr)
 		want := "p  a_key (unsigned int)\n"
 		if paramDescrsStreamSourceDebug {
@@ -74,18 +69,17 @@ func TestParamDescrsDisplayIntoGoBufferGrowth(t *testing.T) {
 	d := pdnew(t, m, db)
 	pdinsert(t, d, "name", ParamUInt, pdstr("desc"), nil, nil)
 	b := pdStreamBuffer(t, nil)
-	paramsMust(t, b.AppendCString("prefix"))
+	b.WriteString("prefix")
 	baseline := db.Used()
 	out := pdStreamBuffer(t, nil)
-	paramsMust(t, out.AppendByte('p'))
+	out.WriteByte('p')
 	const indent = uint32(4096)
 	e := d.DisplayInto(out, indent, false, true)
-	if e != nil || out.Position() <= uint64(indent) {
-		t.Fatal("standard buffer growth", e, out.Position())
+	if e != nil || out.Len() <= int(indent) {
+		t.Fatal("standard buffer growth", e, out.Len())
 	}
 	for i := uint32(1); i <= indent; i++ {
-		v, e := out.Read(uint64(i))
-		paramsMust(t, e)
+		v := out.Bytes()[i]
 		if v != ' ' {
 			t.Fatal(i, v)
 		}
@@ -98,7 +92,7 @@ func TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner(t *testing.T) {
 	m := symbolManagerTest(t, nil, false)
 	d := pdnew(t, m, nil)
 	b := pdStreamBuffer(t, nil)
-	paramsMust(t, b.AppendCString("p"))
+	b.WriteString("p")
 	paramsMust(t, d.Insert(usymbol.Symbol{}, ParamUInt, pdstr("desc"), nil, nil))
 	if e := d.DisplayInto(b, 2, false, false); !errors.Is(e, ErrParamDescrsPrecondition) {
 		t.Fatal(e)
@@ -106,7 +100,7 @@ func TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner(t *testing.T) {
 	if got := pdStreamText(t, b); got != "p  " {
 		t.Fatal("guard must occur at source name action", got)
 	}
-	if e := d.DisplayInto(nil, 0, false, false); !errors.Is(e, utext.ErrOwner) {
+	if e := d.DisplayInto(nil, 0, false, false); !errors.Is(e, ErrParamDescrsPrecondition) {
 		t.Fatal(e)
 	}
 	copied := &ParamDescrs{Self: d, manager: m}
@@ -114,10 +108,6 @@ func TestParamDescrsDisplayIntoGuardTimingAndIndependentOwner(t *testing.T) {
 		t.Fatal(e)
 	}
 	paramsMust(t, d.Close())
-	if e := d.DisplayInto(b, 0, false, false); !errors.Is(e, arena.ErrClosed) {
-		t.Fatal(e)
-	}
-	paramsMust(t, b.Close())
 	if e := d.DisplayInto(b, 0, false, false); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
 	}

@@ -2,10 +2,11 @@
 package ast
 
 import (
+	"bytes"
 	"math"
+	"strconv"
 
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // The special token denotes only this manager's active lexical info object.
@@ -79,37 +80,28 @@ func (m *ASTManager) MkFreshConstNullable(prefix *string, sort ASTHandle) (ASTHa
 	return m.external(r), e
 }
 
-// This concrete source else scope destroys buffer before fresh_id publication.
+// The native output is interned before fresh_id publication.
 func (m *ASTManager) freshNamedDecl(prefix, suffix usymbol.Symbol, domain []ASTHandle, sort ASTHandle, info ASTFuncDeclInfo) (astNodeRef, error) {
-	var buffer utext.Buffer
-	defer buffer.Close()
-	if e := buffer.AppendSymbol(m.Symbols, prefix); e != nil {
-		return astNodeRef{}, e
-	}
-	if prefix == (usymbol.Symbol{}) {
-		if e := buffer.AppendCString("sk"); e != nil {
-			return astNodeRef{}, e
-		}
-	}
-	if e := buffer.AppendCString("!"); e != nil {
-		return astNodeRef{}, e
-	}
-	if suffix != (usymbol.Symbol{}) {
-		if e := buffer.AppendSymbol(m.Symbols, suffix); e != nil {
-			return astNodeRef{}, e
-		}
-		if e := buffer.AppendCString("!"); e != nil {
-			return astNodeRef{}, e
-		}
-	}
-	if e := buffer.AppendInt32(int32(m.freshID)); e != nil {
-		return astNodeRef{}, e
-	}
-	text, e := buffer.CStr()
+	text, e := m.Symbols.Display(prefix)
 	if e != nil {
 		return astNodeRef{}, e
 	}
-	name, e := m.Symbols.InternBytes([]byte(text))
+	var buffer bytes.Buffer
+	buffer.WriteString(text)
+	if prefix == (usymbol.Symbol{}) {
+		buffer.WriteString("sk")
+	}
+	buffer.WriteByte('!')
+	if suffix != (usymbol.Symbol{}) {
+		text, e = m.Symbols.Display(suffix)
+		if e != nil {
+			return astNodeRef{}, e
+		}
+		buffer.WriteString(text)
+		buffer.WriteByte('!')
+	}
+	buffer.WriteString(strconv.FormatInt(int64(int32(m.freshID)), 10))
+	name, e := m.Symbols.InternBytes(buffer.Bytes())
 	if e != nil {
 		return astNodeRef{}, e
 	}
