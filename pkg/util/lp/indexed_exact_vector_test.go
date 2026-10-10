@@ -805,3 +805,88 @@ func TestLPIndexedPairVectorOlderRawInvocationIdentity(t *testing.T) {
 	h.must(numeral.CleanupNumericAllocationRoots(h.m.Z, &olderRoots))
 	lpExactVectorNamedCensus(t, h, nil)
 }
+
+// Genuine noninteger operands reach integer GCD/division temporaries during
+// rational normalization. Their receipts belong to the vector, alongside the
+// outer rational arithmetic frame, even after a completed coordinate prefix.
+func TestLPIndexedExactVectorNormalizationFailureOwnership(t *testing.T) {
+	integerReceipts := 0
+	for _, pair := range []bool{false, true} {
+		for _, drop := range []bool{false, true} {
+			for _, direct := range []bool{false, true} {
+				t.Run(fmt.Sprint(pair, "/", drop, "/", direct), func(t *testing.T) {
+					failures, successes := 0, 0
+					for ordinal := int64(0); ordinal < 300; ordinal++ {
+						done := false
+						t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
+							var h *lpPairHarness
+							if direct {
+								h = lpNewDirectSparseHarness(t)
+							} else {
+								h = newLPPairHarness(t)
+							}
+							xText, yText := "1"+strings.Repeat("0", 120)+"/7", "2"+strings.Repeat("0", 120)+"/13"
+							p, q := h.pair(xText, yText), h.pair(yText, xText)
+							v := NewIndexedRationalVector(h.m, 1)
+							pv := NewIndexedPairVector(h.m, 1)
+							h.must(v.SetValue(&p.X, 0))
+							h.must(pv.SetValue(p, 0))
+							h.budget.FailAfter(ordinal)
+							var err error
+							if pair {
+								if drop {
+									err = pv.AddWithDropTolerance(0, q)
+								} else {
+									err = pv.Add(0, q)
+								}
+							} else {
+								if drop {
+									err = v.AddWithDropTolerance(0, &p.Y)
+								} else {
+									err = v.Add(0, &p.Y)
+								}
+							}
+							h.budget.FailAfter(-1)
+							if err != nil {
+								if !lpExactPriorityPhysicalRefusal(err) {
+									t.Fatal(err)
+								}
+								failures++
+								calls := &v.calls
+								if pair {
+									calls = &pv.calls
+								}
+								if calls.integerDivision.Invocation != 0 || calls.gcd.Invocation != 0 {
+									integerReceipts++
+								}
+							} else {
+								successes++
+								done = true
+								x, _ := new(big.Rat).SetString(xText)
+								y, _ := new(big.Rat).SetString(yText)
+								want := new(big.Rat).Add(x, y)
+								if pair {
+									h.check(&pv.Data[0], want, want)
+								} else {
+									lpSparseRationalCheck(t, h, &v.Data[0], want)
+								}
+							}
+							h.must(v.Close())
+							h.must(pv.Close())
+							lpExactVectorNamedCensus(t, h, nil)
+						})
+						if done {
+							break
+						}
+					}
+					if successes != 1 || (direct && failures == 0) {
+						t.Fatal("incomplete normalization campaign", failures, successes)
+					}
+				})
+			}
+		}
+	}
+	if integerReceipts == 0 {
+		t.Fatal("no actual integer normalization receipt")
+	}
+}

@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 90.1,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native90.1% (7043/7818) verified2026-10-10 at15:28 UTC, including exact dense core and parent publication. Focused exact dense core82.4% native/87.0% debug, parent publication91.5% in each profile. Complete debug coverage predates sparse basis storage; current components are recorded in PORT_STATUS.md. Exact dense tail applications and full LU/solver integration remain open.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native90.1% (7043/7818) verified2026-10-10 at15:28 UTC predates exact dense tail applications and indexed normalization receipt fix. Complete debug coverage predates sparse basis storage. Current focused component evidence is recorded in PORT_STATUS.md. Full LU/solver integration remains open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -400,7 +400,8 @@
         "TestLPIndexedPairVectorExactSparseOracle",
         "TestLPIndexedPairVectorAllocationFailureCensus",
         "TestLPIndexedRationalVectorOlderRawInvocationIdentity",
-        "TestLPIndexedPairVectorOlderRawInvocationIdentity"
+        "TestLPIndexedPairVectorOlderRawInvocationIdentity",
+        "TestLPIndexedExactVectorNormalizationFailureOwnership"
       ]
     },
     {
@@ -426,7 +427,8 @@
         "TestLPIndexedPairVectorExactSparseOracle",
         "TestLPIndexedPairVectorAllocationFailureCensus",
         "TestLPIndexedRationalVectorOlderRawInvocationIdentity",
-        "TestLPIndexedPairVectorOlderRawInvocationIdentity"
+        "TestLPIndexedPairVectorOlderRawInvocationIdentity",
+        "TestLPIndexedExactVectorNormalizationFailureOwnership"
       ]
     },
     {
@@ -452,7 +454,8 @@
         "TestLPIndexedPairVectorExactSparseOracle",
         "TestLPIndexedPairVectorAllocationFailureCensus",
         "TestLPIndexedRationalVectorOlderRawInvocationIdentity",
-        "TestLPIndexedPairVectorOlderRawInvocationIdentity"
+        "TestLPIndexedPairVectorOlderRawInvocationIdentity",
+        "TestLPIndexedExactVectorNormalizationFailureOwnership"
       ]
     },
     {
@@ -1488,7 +1491,15 @@
         "pkg/util/lp/square_dense_exact_failure_test.go",
         "pkg/util/lp/square_dense_exact_edges_test.go",
         "pkg/util/lp/square_dense_exact_parent.go",
-        "pkg/util/lp/square_dense_exact_parent_test.go"
+        "pkg/util/lp/square_dense_exact_parent_test.go",
+        "pkg/util/lp/square_dense_exact_apply.go",
+        "pkg/util/lp/square_dense_exact_pair.go",
+        "pkg/util/lp/square_dense_exact_check.go",
+        "pkg/util/lp/square_dense_exact_debug.go",
+        "pkg/util/lp/square_dense_exact_apply_test.go",
+        "pkg/util/lp/square_dense_exact_apply_failure_test.go",
+        "pkg/util/lp/square_dense_exact_apply_edges_test.go",
+        "pkg/util/lp/square_dense_exact_debug_test.go"
       ],
       "tests": [
         "TestLPFloatDenseBlockIndependentFactorization",
@@ -1507,7 +1518,13 @@
         "TestLPExactDenseBlockParentPublicationStages",
         "TestLPExactDenseBlockParentAllocationFailureCensus",
         "TestLPExactDenseBlockParentErrorPrefixes",
-        "TestLPExactDenseBlockParentLeavesOlderComparisonOwned"
+        "TestLPExactDenseBlockParentLeavesOlderComparisonOwned",
+        "TestLPExactDenseBlockIndexedLiteralInputsAndGrowth",
+        "TestLPExactDenseBlockApplicationAllocationFailureCensus",
+        "TestLPExactDenseBlockApplicationErrorPrefixes",
+        "TestLPExactDenseBlockLeavesStoppedIndexedCallerOwned",
+        "TestLPExactDenseBlockDebugViewAndLChecks",
+        "TestLPExactDenseBlockDebugViewAllocationFailure"
       ]
     },
     {
@@ -1526,7 +1543,15 @@
         "pkg/util/lp/square_dense_exact_failure_test.go",
         "pkg/util/lp/square_dense_exact_edges_test.go",
         "pkg/util/lp/square_dense_exact_parent.go",
-        "pkg/util/lp/square_dense_exact_parent_test.go"
+        "pkg/util/lp/square_dense_exact_parent_test.go",
+        "pkg/util/lp/square_dense_exact_apply.go",
+        "pkg/util/lp/square_dense_exact_pair.go",
+        "pkg/util/lp/square_dense_exact_check.go",
+        "pkg/util/lp/square_dense_exact_debug.go",
+        "pkg/util/lp/square_dense_exact_apply_test.go",
+        "pkg/util/lp/square_dense_exact_apply_failure_test.go",
+        "pkg/util/lp/square_dense_exact_apply_edges_test.go",
+        "pkg/util/lp/square_dense_exact_debug_test.go"
       ],
       "tests": [
         "TestLPFloatDenseBlockIndependentFactorization",
@@ -1545,7 +1570,13 @@
         "TestLPExactDenseBlockParentPublicationStages",
         "TestLPExactDenseBlockParentAllocationFailureCensus",
         "TestLPExactDenseBlockParentErrorPrefixes",
-        "TestLPExactDenseBlockParentLeavesOlderComparisonOwned"
+        "TestLPExactDenseBlockParentLeavesOlderComparisonOwned",
+        "TestLPExactDenseBlockIndexedLiteralInputsAndGrowth",
+        "TestLPExactDenseBlockApplicationAllocationFailureCensus",
+        "TestLPExactDenseBlockApplicationErrorPrefixes",
+        "TestLPExactDenseBlockLeavesStoppedIndexedCallerOwned",
+        "TestLPExactDenseBlockDebugViewAndLChecks",
+        "TestLPExactDenseBlockDebugViewAllocationFailure"
       ]
     },
     {
@@ -1564,7 +1595,15 @@
         "pkg/util/lp/square_dense_exact_failure_test.go",
         "pkg/util/lp/square_dense_exact_edges_test.go",
         "pkg/util/lp/square_dense_exact_parent.go",
-        "pkg/util/lp/square_dense_exact_parent_test.go"
+        "pkg/util/lp/square_dense_exact_parent_test.go",
+        "pkg/util/lp/square_dense_exact_apply.go",
+        "pkg/util/lp/square_dense_exact_pair.go",
+        "pkg/util/lp/square_dense_exact_check.go",
+        "pkg/util/lp/square_dense_exact_debug.go",
+        "pkg/util/lp/square_dense_exact_apply_test.go",
+        "pkg/util/lp/square_dense_exact_apply_failure_test.go",
+        "pkg/util/lp/square_dense_exact_apply_edges_test.go",
+        "pkg/util/lp/square_dense_exact_debug_test.go"
       ],
       "tests": [
         "TestLPFloatDenseBlockIndependentFactorization",
@@ -1583,7 +1622,13 @@
         "TestLPExactDenseBlockParentPublicationStages",
         "TestLPExactDenseBlockParentAllocationFailureCensus",
         "TestLPExactDenseBlockParentErrorPrefixes",
-        "TestLPExactDenseBlockParentLeavesOlderComparisonOwned"
+        "TestLPExactDenseBlockParentLeavesOlderComparisonOwned",
+        "TestLPExactDenseBlockIndexedLiteralInputsAndGrowth",
+        "TestLPExactDenseBlockApplicationAllocationFailureCensus",
+        "TestLPExactDenseBlockApplicationErrorPrefixes",
+        "TestLPExactDenseBlockLeavesStoppedIndexedCallerOwned",
+        "TestLPExactDenseBlockDebugViewAndLChecks",
+        "TestLPExactDenseBlockDebugViewAllocationFailure"
       ]
     },
     {
@@ -1780,7 +1825,15 @@
       "go_targets": [
         "pkg/util/lp/tail_matrix_float.go",
         "pkg/util/lp/tail_matrix_exact.go",
-        "pkg/util/lp/row_eta_matrix_exact.go"
+        "pkg/util/lp/row_eta_matrix_exact.go",
+        "pkg/util/lp/square_dense_exact_apply.go",
+        "pkg/util/lp/square_dense_exact_pair.go",
+        "pkg/util/lp/square_dense_exact_check.go",
+        "pkg/util/lp/square_dense_exact_debug.go",
+        "pkg/util/lp/square_dense_exact_apply_test.go",
+        "pkg/util/lp/square_dense_exact_apply_failure_test.go",
+        "pkg/util/lp/square_dense_exact_apply_edges_test.go",
+        "pkg/util/lp/square_dense_exact_debug_test.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -1791,7 +1844,14 @@
         "TestLPFloatEtaIEEEAndAssertionProfiles",
         "TestLPExactEtaIndependentMatrixProducts",
         "TestLPExactEtaTailComposition",
-        "TestLPExactRowEtaTailComposition"
+        "TestLPExactRowEtaTailComposition",
+        "TestLPExactDenseBlockIndependentEliminationStages",
+        "TestLPExactDenseBlockIndexedLiteralInputsAndGrowth",
+        "TestLPExactDenseBlockApplicationAllocationFailureCensus",
+        "TestLPExactDenseBlockApplicationErrorPrefixes",
+        "TestLPExactDenseBlockLeavesStoppedIndexedCallerOwned",
+        "TestLPExactDenseBlockDebugViewAndLChecks",
+        "TestLPExactDenseBlockDebugViewAllocationFailure"
       ]
     },
     {

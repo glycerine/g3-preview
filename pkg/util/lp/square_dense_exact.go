@@ -16,6 +16,7 @@ type RationalSquareDenseSubmatrix struct {
 	manager                           *numeral.RationalManager
 	calls                             exactEtaCalls
 	work                              *IndexedRationalVector
+	vectorPrefix                      uint32 // leading output-vector cells, destroyed forward
 }
 
 func NewRationalSquareDenseSubmatrix(parent *RationalSparseMatrix, start uint32) (m *RationalSquareDenseSubmatrix, err error) {
@@ -89,7 +90,7 @@ func (m *RationalSquareDenseSubmatrix) beginWork(size uint32) (exactEtaBefore, e
 func (m *RationalSquareDenseSubmatrix) finishWork(b exactEtaBefore, err *error) {
 	*err = m.calls.after(m.manager, b, *err)
 	if *err == nil {
-		*err = m.work.Close()
+		*err = m.closeWork()
 		if *err == nil {
 			m.work = nil
 		}
@@ -369,7 +370,7 @@ func (m *RationalSquareDenseSubmatrix) Close() error {
 		return err
 	}
 	if m.work != nil {
-		if err := m.work.Close(); err != nil {
+		if err := m.closeWork(); err != nil {
 			return err
 		}
 		m.work = nil
@@ -386,4 +387,25 @@ func (m *RationalSquareDenseSubmatrix) Close() error {
 	}
 	m.Data = nil
 	return m.calls.cleanupRoots(m.manager)
+}
+
+// A dense application constructs its vector before the nested arithmetic
+// locals. Source vector destruction walks forward; lexical locals unwind back.
+func (m *RationalSquareDenseSubmatrix) closeWork() error {
+	if m.vectorPrefix == 0 {
+		return m.work.Close()
+	}
+	for i := len(m.work.Data); i > int(m.vectorPrefix); {
+		i--
+		if err := m.deleteSlot(i); err != nil {
+			return err
+		}
+	}
+	for i := uint32(0); i < m.vectorPrefix; i++ {
+		if err := m.deleteSlot(int(i)); err != nil {
+			return err
+		}
+	}
+	m.vectorPrefix = 0
+	return m.work.Close()
 }

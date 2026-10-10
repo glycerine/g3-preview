@@ -7,12 +7,13 @@ import "github.com/glycerine/g3/pkg/util/numeral"
 // index in a borrowed manager. Data and Index are public for retained matrix
 // algorithms. Never shallow-copy an owning slot or change Data's length by hand;
 // use Clone/Assign/Resize and close the vector before its manager. After a
-// numerical failure Close owns all completed and partial vector-call roots.
+// numerical failure Close owns all completed and partial vector-call roots,
+// including integer GCD/division invocations reached by rational normalization.
 type IndexedRationalVector struct {
 	Data    []numeral.Rational
 	Index   []uint32
 	manager *numeral.RationalManager
-	calls   exactVectorCalls
+	calls   exactEtaCalls
 }
 
 func NewIndexedRationalVector(m *numeral.RationalManager, size uint32) *IndexedRationalVector {
@@ -290,12 +291,13 @@ func (v *IndexedRationalVector) Close() error {
 // index in a borrowed manager. Data and Index are public for retained matrix
 // algorithms. Never shallow-copy an owning slot or change Data's length by hand;
 // use Clone/Assign/Resize and close the vector before its manager. After a
-// numerical failure Close owns all completed and partial vector-call roots.
+// numerical failure Close owns all completed and partial vector-call roots,
+// including integer GCD/division invocations reached by rational normalization.
 type IndexedPairVector struct {
 	Data    []RationalPair
 	Index   []uint32
 	manager *numeral.RationalManager
-	calls   exactVectorCalls
+	calls   exactEtaCalls
 }
 
 func NewIndexedPairVector(m *numeral.RationalManager, size uint32) *IndexedPairVector {

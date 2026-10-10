@@ -18,7 +18,7 @@ func (m *RationalSquareDenseSubmatrix) beginParentUpdate() error {
 }
 func (m *RationalSquareDenseSubmatrix) finishParentUpdate(err *error) {
 	if *err == nil {
-		*err = m.work.Close()
+		*err = m.closeWork()
 		if *err == nil {
 			m.work = nil
 		}

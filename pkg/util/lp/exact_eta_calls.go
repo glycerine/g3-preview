@@ -3,8 +3,9 @@ package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 
-// Matrix division can alias its divisor with its destination, and extrema
-// start exact comparison locals. Retain only newly acquired raw generations
+// Precise matrix and indexed-vector normalization calls can retain integer
+// GCD/division locals; matrix division may also alias its divisor and extrema
+// start exact comparisons. Retain only newly acquired raw generations
 // separately from the shared vector arithmetic receipts.
 type exactEtaCalls struct {
 	numeric              exactVectorCalls

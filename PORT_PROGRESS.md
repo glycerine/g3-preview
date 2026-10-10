@@ -36238,3 +36238,56 @@ retained Go LP components through exact dense publication. Exact dense
 scalar/pair/indexed applications, conjugation/debug views, full LU
 integration and remaining scaling/simplex/LAR/MPS algorithms and retained tests
 remain required. Full LP port and solver remain incomplete.
+
+## Exact dense LU tail applications and indexed normalization ownership
+
+Ported retained mpq/mpq dense and indexed left/right applications, mpq/pair
+dense-left multiplication, permutation conjugation, selected L diagnostics and
+owning debug element copies. Exact tails now implement both actual precise tail
+interfaces. Every independently verified120-world elimination/factorization case
+also checks all five application routes against math/big.Rat matrix products
+after a random conjugation, including pair epsilon coordinates. Dense left
+retains trailing caller slots; dense right overwrites trailing slots with the
+source initialized temporary's zeros. Sparse left consumes Index only and
+rebuilds ascending output, while sparse right retains actual WorkVector Add,
+cleanup and caller Assign behavior. Hidden destination slots survive Assign;
+inside duplicates accumulate, outside entries copy, and precise cancellation
+uses exact zero. Parent growth and identity permutation fallback are tested.
+
+Output temporary vector cells are destroyed forward after reverse lexical
+arithmetic locals; row/column accumulation retains copy-left products, return
+copies and pair coordinate construction. Indexed right captures only its own
+product calls; persistent workspace operations and final caller Assign keep
+separate numerical ownership.22 pooled/direct physical campaigns walk scalar,
+indexed, pair, constructor and prefix-copy routes through first success and
+require real pair X-before-Y and caller index-before-copy publication failures.
+Stopped indexed callers retain their raw invocation when a ready dense owner
+refuses them. Debug tests cover view/diagnostic prefixes and physical copy refusal.
+
+Strengthening the campaigns to independently confirmed noninteger big fractions
+exposed an existing indexed-vector cleanup defect: exactVectorCalls retained
+outer rational/raw frames but not a newly interrupted integer GCD/division
+invocation inside normalization. IndexedRationalVector and IndexedPairVector
+now use existing exactEtaCalls, which captures those actual inner receipts.
+Eight scalar/pair Add/AddWithDropTolerance pooled/direct normalization campaigns
+prove the integer receipt is actually reached, then require complete named-cell
+and direct-object cleanup. The new indexed-right failure cases that previously
+left one orphan cell now pass. Existing foreign-generation tests remain green;
+no synthetic storage faults or replay cleanup was introduced.
+
+Broader indexed-vector, permutation, eta, diagonal and floating/exact dense-tail
+checks pass native48.995s and combined debug/checked67.166s. Component coverage:
+exact applications190/230 (82.6%) and pair88/105 (83.8%) in each profile; debug
+L check24/26 (92.3%), debug view20/21 (95.2%). Construction/pivot/owning cleanup
+now207/250 (82.8%) native and218/250 (87.2%) debug; indexed-vector file remains
+306/340 (90.0%) in each profile. Remaining statements propagate child/capture/
+cleanup errors, guard invariant-protected mappings or belong to the opposite
+assertion profile. Native L diagnostics return true without reading debug data.
+
+The complete native90.1% snapshot from15:28 UTC predates this change; no redundant
+hourly full suite was started. Production graph remains64 packages with unchanged
+edges and includes the new exact files. Inventory remains47 partial/63 unported
+LP units. Unused dense init/default constructor/indexed row product and disabled
+alternate source branches are not ported or credited. Full LU integration,
+factorization/update/solve, scaling/simplex/LAR/MPS algorithms and retained
+upstream-driver/test scenarios remain active. No complete LP solver is claimed.

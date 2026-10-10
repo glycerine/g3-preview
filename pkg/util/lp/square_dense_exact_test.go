@@ -169,6 +169,7 @@ func TestLPExactDenseBlockIndependentEliminationStages(t *testing.T) {
 				}
 			}
 			lpExactVectorNamedCensus(t, h, lpExactDenseCells(m))
+			lpExactDenseCheckApplications(t, h, m, e, rng)
 			h.must(m.Close())
 			lpExactSparseCheck(t, h, parent, wantParent)
 			h.must(parent.Close())
