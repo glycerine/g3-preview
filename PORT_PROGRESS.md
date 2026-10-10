@@ -36509,3 +36509,47 @@ Next connect retained Suhl ReplaceColumn orchestration to this primitive,
 including bump permutations, row eta solving/publication, degeneration cleanup
 and diagonal tails. Error-check/refinement, dimension extension, scaling/simplex/
 LAR/MPS and original upstream scenarios remain required by the active full goal.
+
+
+### Floating Suhl LU column updates — 2026-10-10
+
+Ported retained double/double lu.hpp:581-587,775-934 to lu_update_float.go.
+FloatLU now owns the source indexed row workspace. ReplaceColumn increments the
+counter before transforming the prepared entering column, calculates the bump
+permutation, updates U, solves the row eta system, validates a supplied nonzero
+pivot, and applies Q/R in source order. Row eta conjugates before publication.
+Row restoration consumes the remaining logical workspace into its physical row;
+the diagonal tail publishes before row division and conjugates afterwards.
+Degeneration remains a source status, not a Go error. Early degeneration clears
+all row work; Go errors stop ordinary owner calls with the completed mutation
+prefix retained. Closed owners reject before the counter changes. The uint32
+counter wraps literally, including the source 200-update refactor threshold.
+
+64 independent original-matrix worlds each perform12 nonsingular basis column
+replacements (768 updates total), across all sizes1..8 and both sparse/forced-dense
+initial policies. New columns derive from independent exact basis combinations;
+dense column, dense row and indexed row solves are checked after every update,
+along with U triangular/unit-diagonal state, work consumption and tail counts.
+All four replacements from upstream test_small_lu now execute with its actual
+matrix. Its subsequent dimension extension remains open. A241-row identity-plus-
+column fixture executes the strict sparse indexed column route, replaces that
+column and checks subsequent column/indexed row solutions. Literal tests cover
+empty/zero columns, wrong/NaN pivot checking, strict drop, exact cancellation,
+underflow assertions, small scan coefficients, zero stored terms, invalid owner
+and permutation/workspace bounds, counter wrap, and tail-before-division failure.
+
+Focused update tests pass0.149s native and0.128s combined debug/checked. Broader
+floating LU tests with current-file coverage pass0.470s/0.447s. New update file
+141/155 statements (91.0%) native and145/155 (93.5%) debug/checked. Floating core
+is now101/124 (81.5%) and105/124 (84.7%); solve orchestration38/47 (80.9%) both.
+Uncovered update statements propagate child errors behind valid scan/permutation
+invariants or belong to the opposite assertion profile. Both LP vets pass.
+Full native module last passed16:39 UTC and is not repeated within the hour;
+the full LP89.2% snapshot remains historical, before exact/column/update additions.
+
+Next port the same retained Suhl orchestration for mpq/mpq and mpq/pair, preserving
+actual by-value numerical temporaries, child-specific call receipt ownership,
+partially published row/diagonal tails and matrix-before-caller failure cleanup.
+Error-check/refinement orchestration, dimension extension, scaling/simplex/LAR/
+MPS and complete retained upstream drivers remain required. No source unit is
+promoted wholesale: LP stays48 partial/62 unported units.
