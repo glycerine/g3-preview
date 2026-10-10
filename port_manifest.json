@@ -120598,7 +120598,8 @@
         "pkg/util/lp/primal_advance_float.go",
         "pkg/util/lp/core_statistics_float.go",
         "pkg/util/lp/primal_feasible_float.go",
-        "pkg/util/lp/core_dual_float.go"
+        "pkg/util/lp/core_dual_float.go",
+        "pkg/util/lp/dual_ratio_float.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -120645,7 +120646,17 @@
         "TestLPFloatDualPricingIndependentScores",
         "TestLPFloatDualInitialPublicationAndDiagnostics",
         "TestLPFloatDualDoneSourceLimits",
-        "TestLPFloatDualInitialReachedGuards"
+        "TestLPFloatDualInitialReachedGuards",
+        "TestLPFloatDualRatioIndependentGroups",
+        "TestLPFloatDualHarrisIndependentWindows",
+        "TestLPFloatDualBreakpointSignsAndDeltaQuirks",
+        "TestLPFloatDualFlipsIndependentEquations",
+        "TestLPFloatDualRatioUnboundedAndBoundaryPositions",
+        "TestLPFloatDualRatioSourceFallthroughs",
+        "TestLPFloatDualRatioReachedGuards",
+        "TestLPFloatDualFlipFailurePrefixes",
+        "TestLPFloatDualRatioActualPivotAndFlips",
+        "TestLPFloatDualFlipReachedStorageErrors"
       ],
       "assertions": [
         {
@@ -120809,6 +120820,25 @@
             "TestLPFloatDualDoneSourceLimits",
             "TestLPFloatDualInitialReachedGuards"
           ]
+        },
+        {
+          "name": "Floating shared bound span and nonbasic boundary classification",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/dual_ratio_float.go"
+          ],
+          "tests": [
+            "TestLPFloatDualRatioIndependentGroups",
+            "TestLPFloatDualHarrisIndependentWindows",
+            "TestLPFloatDualBreakpointSignsAndDeltaQuirks",
+            "TestLPFloatDualFlipsIndependentEquations",
+            "TestLPFloatDualRatioUnboundedAndBoundaryPositions",
+            "TestLPFloatDualRatioSourceFallthroughs",
+            "TestLPFloatDualRatioReachedGuards",
+            "TestLPFloatDualFlipFailurePrefixes",
+            "TestLPFloatDualRatioActualPivotAndFlips",
+            "TestLPFloatDualFlipReachedStorageErrors"
+          ]
         }
       ],
       "ownership": [
@@ -120843,7 +120873,8 @@
         "pkg/util/lp/core_update_float_test.go",
         "pkg/util/lp/primal_advance_float.go",
         "pkg/util/lp/core_statistics_float.go",
-        "pkg/util/lp/core_dual_float.go"
+        "pkg/util/lp/core_dual_float.go",
+        "pkg/util/lp/dual_ratio_float.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -120887,7 +120918,17 @@
         "TestLPFloatDualPricingIndependentScores",
         "TestLPFloatDualInitialPublicationAndDiagnostics",
         "TestLPFloatDualDoneSourceLimits",
-        "TestLPFloatDualInitialReachedGuards"
+        "TestLPFloatDualInitialReachedGuards",
+        "TestLPFloatDualRatioIndependentGroups",
+        "TestLPFloatDualHarrisIndependentWindows",
+        "TestLPFloatDualBreakpointSignsAndDeltaQuirks",
+        "TestLPFloatDualFlipsIndependentEquations",
+        "TestLPFloatDualRatioUnboundedAndBoundaryPositions",
+        "TestLPFloatDualRatioSourceFallthroughs",
+        "TestLPFloatDualRatioReachedGuards",
+        "TestLPFloatDualFlipFailurePrefixes",
+        "TestLPFloatDualRatioActualPivotAndFlips",
+        "TestLPFloatDualFlipReachedStorageErrors"
       ],
       "conditionals": [
         {
@@ -121147,6 +121188,25 @@
             "TestLPFloatDualDoneSourceLimits",
             "TestLPFloatDualInitialReachedGuards"
           ]
+        },
+        {
+          "name": "Floating shared bound span and nonbasic boundary classification",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/dual_ratio_float.go"
+          ],
+          "tests": [
+            "TestLPFloatDualRatioIndependentGroups",
+            "TestLPFloatDualHarrisIndependentWindows",
+            "TestLPFloatDualBreakpointSignsAndDeltaQuirks",
+            "TestLPFloatDualFlipsIndependentEquations",
+            "TestLPFloatDualRatioUnboundedAndBoundaryPositions",
+            "TestLPFloatDualRatioSourceFallthroughs",
+            "TestLPFloatDualRatioReachedGuards",
+            "TestLPFloatDualFlipFailurePrefixes",
+            "TestLPFloatDualRatioActualPivotAndFlips",
+            "TestLPFloatDualFlipReachedStorageErrors"
+          ]
         }
       ],
       "ownership": [
@@ -121323,7 +121383,9 @@
       "go_targets": [
         "pkg/util/lp/dual_core_float.go",
         "pkg/util/lp/dual_core_float_test.go",
-        "pkg/util/lp/dual_initial_float.go"
+        "pkg/util/lp/dual_initial_float.go",
+        "pkg/util/lp/dual_ratio_float.go",
+        "pkg/util/lp/dual_flip_float.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -121334,7 +121396,17 @@
         "TestLPFloatDualPricingIndependentScores",
         "TestLPFloatDualInitialPublicationAndDiagnostics",
         "TestLPFloatDualDoneSourceLimits",
-        "TestLPFloatDualInitialReachedGuards"
+        "TestLPFloatDualInitialReachedGuards",
+        "TestLPFloatDualRatioIndependentGroups",
+        "TestLPFloatDualHarrisIndependentWindows",
+        "TestLPFloatDualBreakpointSignsAndDeltaQuirks",
+        "TestLPFloatDualFlipsIndependentEquations",
+        "TestLPFloatDualRatioUnboundedAndBoundaryPositions",
+        "TestLPFloatDualRatioSourceFallthroughs",
+        "TestLPFloatDualRatioReachedGuards",
+        "TestLPFloatDualFlipFailurePrefixes",
+        "TestLPFloatDualRatioActualPivotAndFlips",
+        "TestLPFloatDualFlipReachedStorageErrors"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -121350,7 +121422,7 @@
           ]
         },
         {
-          "name": "Remaining dual pricing loop, ratio/bound-flip/pivot optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "name": "Remaining dual pricing loop, pivot/beta/basis-update optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -121367,6 +121439,26 @@
             "TestLPFloatDualDoneSourceLimits",
             "TestLPFloatDualInitialReachedGuards"
           ]
+        },
+        {
+          "name": "Floating dual sign/delta and breakpoint eligibility, full Harris ratio test with ordered tight groups and bound flips, actual LU flip residual and reduced-cost updates",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/dual_ratio_float.go",
+            "pkg/util/lp/dual_flip_float.go"
+          ],
+          "tests": [
+            "TestLPFloatDualRatioIndependentGroups",
+            "TestLPFloatDualHarrisIndependentWindows",
+            "TestLPFloatDualBreakpointSignsAndDeltaQuirks",
+            "TestLPFloatDualFlipsIndependentEquations",
+            "TestLPFloatDualRatioUnboundedAndBoundaryPositions",
+            "TestLPFloatDualRatioSourceFallthroughs",
+            "TestLPFloatDualRatioReachedGuards",
+            "TestLPFloatDualFlipFailurePrefixes",
+            "TestLPFloatDualRatioActualPivotAndFlips",
+            "TestLPFloatDualFlipReachedStorageErrors"
+          ]
         }
       ],
       "ownership": [],
@@ -121382,7 +121474,9 @@
       "go_targets": [
         "pkg/util/lp/dual_core_float.go",
         "pkg/util/lp/dual_core_float_test.go",
-        "pkg/util/lp/dual_initial_float.go"
+        "pkg/util/lp/dual_initial_float.go",
+        "pkg/util/lp/dual_ratio_float.go",
+        "pkg/util/lp/dual_flip_float.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -121393,7 +121487,17 @@
         "TestLPFloatDualPricingIndependentScores",
         "TestLPFloatDualInitialPublicationAndDiagnostics",
         "TestLPFloatDualDoneSourceLimits",
-        "TestLPFloatDualInitialReachedGuards"
+        "TestLPFloatDualInitialReachedGuards",
+        "TestLPFloatDualRatioIndependentGroups",
+        "TestLPFloatDualHarrisIndependentWindows",
+        "TestLPFloatDualBreakpointSignsAndDeltaQuirks",
+        "TestLPFloatDualFlipsIndependentEquations",
+        "TestLPFloatDualRatioUnboundedAndBoundaryPositions",
+        "TestLPFloatDualRatioSourceFallthroughs",
+        "TestLPFloatDualRatioReachedGuards",
+        "TestLPFloatDualFlipFailurePrefixes",
+        "TestLPFloatDualRatioActualPivotAndFlips",
+        "TestLPFloatDualFlipReachedStorageErrors"
       ],
       "assertions": [
         {
@@ -121531,7 +121635,7 @@
           ]
         },
         {
-          "name": "Remaining dual pricing loop, ratio/bound-flip/pivot optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "name": "Remaining dual pricing loop, pivot/beta/basis-update optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -121547,6 +121651,26 @@
             "TestLPFloatDualInitialPublicationAndDiagnostics",
             "TestLPFloatDualDoneSourceLimits",
             "TestLPFloatDualInitialReachedGuards"
+          ]
+        },
+        {
+          "name": "Floating dual sign/delta and breakpoint eligibility, full Harris ratio test with ordered tight groups and bound flips, actual LU flip residual and reduced-cost updates",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/dual_ratio_float.go",
+            "pkg/util/lp/dual_flip_float.go"
+          ],
+          "tests": [
+            "TestLPFloatDualRatioIndependentGroups",
+            "TestLPFloatDualHarrisIndependentWindows",
+            "TestLPFloatDualBreakpointSignsAndDeltaQuirks",
+            "TestLPFloatDualFlipsIndependentEquations",
+            "TestLPFloatDualRatioUnboundedAndBoundaryPositions",
+            "TestLPFloatDualRatioSourceFallthroughs",
+            "TestLPFloatDualRatioReachedGuards",
+            "TestLPFloatDualFlipFailurePrefixes",
+            "TestLPFloatDualRatioActualPivotAndFlips",
+            "TestLPFloatDualFlipReachedStorageErrors"
           ]
         }
       ],

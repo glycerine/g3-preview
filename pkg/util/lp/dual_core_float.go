@@ -4,9 +4,14 @@ package lp
 
 type FloatDualCoreSolver struct {
 	*FloatCoreSolverBase
-	CanEnterBasis   *[]bool
-	AWave, Betas    []float64
-	HarrisTolerance float64
+	CanEnterBasis                         *[]bool
+	AWave, Betas                          []float64
+	HarrisTolerance                       float64
+	R, P, Q                               int32
+	SignOfAlphaR                          int
+	Delta, ThetaD, ThetaP                 float64
+	BreakpointSet, FlippedBoxed, TightSet map[uint32]bool
+	EnteringBoundaryPosition              NonBasicColumnValuePosition
 }
 
 func NewFloatDualCoreSolver(in FloatCoreInputs, canEnter *[]bool) (*FloatDualCoreSolver, error) {

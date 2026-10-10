@@ -37628,3 +37628,46 @@ already partial. Last full native module checkpoint21:11 UTC predates these
 additions; no immediate full rerun is due. Complete dual pricing loop,
 ratio/flip/pivot optimization, outer stage dispatch, exact variants and full
 upstream drivers remain open; no dual optimum/completion credit is claimed.
+
+### Floating dual Harris ratio test and actual bound-flip updates — 2026-10-10
+
+Ported dual sign/displacement classification, breakpoint eligibility and full
+floating Harris ratio test: ascending candidate traversal, strict pivot/Harris
+thresholds, minimum relaxed time, inclusive tight windows, maximum-pivot choice
+with ascending ties, boxed-group losses and flips, strict remaining displacement
+sign and retention of the final candidate group. Native maps and sorted keys
+preserve source std::set traversal without a general container adapter. Source
+std::max/min first-operand IEEE behavior is preserved. Shared bound span and
+nonbasic boundary classification provide the actual entering position.
+
+Source get_delta returns squared edge steepness for upper-only variables;
+this differs from the boxed upper violation displacement and is explicitly
+preserved/tested. Native assertion fallthroughs, sign-of-NaN initial delta,
+tentative/confirmed dual-unbounded status alternation and publication before
+later child failures remain source ordered. No whole optimization claim.
+
+Ported signed spans, actual sparse A-wave accumulation, real LU B-inverse
+bound-flip updates, reduced-cost updates and ordered endpoint flips. A real
+nonunit-basis integration computes its pivot row, chooses two flips and the
+remaining entering column, updates reduced costs/basic values and checks the
+original equation. No fake pivot/update callback or optimizer stub is used.
+
+240 independent dyadic breakpoint-group models predict entering columns,
+tight groups, flipped sets and remaining displacements.120 independent Harris
+windows verify relaxed and exact time membership.120 independent equation
+worlds verify signed bound flips and preserved A*X=B. Strict endpoints, ties,
+all column types, NaN/infinity, source fallthroughs, real closed LU, reciprocal
+column corruption, missing metadata and partial assignment/error prefixes
+are covered. Ratio260/280 (92.9%) native,266/280 (95.0%) debug; flips55/64
+(85.9%) native,63/64 (98.4%) debug. Remaining gaps predominantly are the other
+assertion profile or invariant-protected child errors. Profiles:
+/mnt/oldrog/tmp/g3-dual-ratio-{native,debug}.cover.
+
+Focused native core/primal/dual/MPS/presolve/solver/column/scaler/static/LU
+checks pass1.093s; combined g3debug/g3checked1.064s. Both LP vets pass.
+Source/evidence/no-generics verifier and graph regeneration pass; no import
+edges change. LP remains72 partial/38 unported. Last full native module
+checkpoint21:11 UTC predates these changes; a repeat is not due yet.
+Remaining dual pricing loop, beta/basis/pivot optimization and recovery,
+outer stage execution/solutions, exact variants and complete original drivers
+remain open. No dual optimum or source-unit completion credit is claimed.
