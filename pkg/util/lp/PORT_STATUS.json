@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 90.7,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. The 90.7% complete native snapshot (6210/6843 statements) predates indexed refinement, sparse LU extension and diagonal tails. Focused diagonal coverage: floating97.3% native/100% debug; exact86.1%/88.9%; debug view100%. Complete debug/checked coverage predates sparse basis storage; current component results are recorded in PORT_STATUS.md.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native90.7% (6210/6843) predates indexed refinement, sparse extension, diagonal tails and floating dense blocks. Focused floating dense core90.5% native/93.2% debug, applications81.9%/83.2%, debug L check91.7% and view93.8%. Complete debug coverage predates sparse basis storage; current components are recorded in PORT_STATUS.md.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -1474,21 +1474,72 @@
     },
     {
       "source": "src/util/lp/square_dense_submatrix.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/square_dense_float.go",
+        "pkg/util/lp/square_dense_float_apply.go",
+        "pkg/util/lp/square_dense_float_check.go",
+        "pkg/util/lp/square_dense_float_debug.go",
+        "pkg/util/lp/square_dense_float_test.go",
+        "pkg/util/lp/square_dense_float_edges_test.go",
+        "pkg/util/lp/square_dense_float_debug_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDenseBlockIndependentFactorization",
+        "TestLPFloatDenseBlockLiteralStorageAndApplications",
+        "TestLPFloatDenseBlockDuplicateSparseInput",
+        "TestLPFloatDenseBlockPublicationErrors",
+        "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
+        "TestLPFloatDenseBlockConstructorAndProductGuards",
+        "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
+        "TestLPFloatDenseBlockDebugViewAndLChecks"
+      ]
     },
     {
       "source": "src/util/lp/square_dense_submatrix.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/square_dense_float.go",
+        "pkg/util/lp/square_dense_float_apply.go",
+        "pkg/util/lp/square_dense_float_check.go",
+        "pkg/util/lp/square_dense_float_debug.go",
+        "pkg/util/lp/square_dense_float_test.go",
+        "pkg/util/lp/square_dense_float_edges_test.go",
+        "pkg/util/lp/square_dense_float_debug_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDenseBlockIndependentFactorization",
+        "TestLPFloatDenseBlockLiteralStorageAndApplications",
+        "TestLPFloatDenseBlockDuplicateSparseInput",
+        "TestLPFloatDenseBlockPublicationErrors",
+        "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
+        "TestLPFloatDenseBlockConstructorAndProductGuards",
+        "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
+        "TestLPFloatDenseBlockDebugViewAndLChecks"
+      ]
     },
     {
       "source": "src/util/lp/square_dense_submatrix_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/square_dense_float.go",
+        "pkg/util/lp/square_dense_float_apply.go",
+        "pkg/util/lp/square_dense_float_check.go",
+        "pkg/util/lp/square_dense_float_debug.go",
+        "pkg/util/lp/square_dense_float_test.go",
+        "pkg/util/lp/square_dense_float_edges_test.go",
+        "pkg/util/lp/square_dense_float_debug_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDenseBlockIndependentFactorization",
+        "TestLPFloatDenseBlockLiteralStorageAndApplications",
+        "TestLPFloatDenseBlockDuplicateSparseInput",
+        "TestLPFloatDenseBlockPublicationErrors",
+        "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
+        "TestLPFloatDenseBlockConstructorAndProductGuards",
+        "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
+        "TestLPFloatDenseBlockDebugViewAndLChecks"
+      ]
     },
     {
       "source": "src/util/lp/stacked_map.h",
@@ -1712,8 +1763,8 @@
     }
   ],
   "status_counts": {
-    "unported": 66,
-    "partial": 44
+    "unported": 63,
+    "partial": 47
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7
 }

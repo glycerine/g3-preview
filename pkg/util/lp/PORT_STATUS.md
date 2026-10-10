@@ -5,7 +5,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently forty-four partial source units and 66 unported units. No complete
+There are currently forty-seven partial source units and 63 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
@@ -47,13 +47,14 @@ code that has not been ported.
 | Floating indexed residual correction/refinement | 240 independent exact inverse-polynomial and dense-residual worlds with shuffled permutations; strict density boundary, sparse/dense tolerance divergence, hidden/trailing data, fixed cleanup/order/IEEE and reached error prefixes | 91.4% native and debug/checked (32/35); remaining returns guard invariant-protected correction errors |
 | Sparse identity extension, stored-entry count and LU permutation composition | 120 worlds with eight repeated dense-oracle permutation/growth rounds; retained workspace/queue/counters and reciprocal links; pooled/direct inline-one growth under disabled numerical reservations; native/debug shrink, real stopped-owner and publication/error prefixes | Floating 96.6% native / 100% debug; exact 91.3% / 93.5%; remaining returns propagate inline-one/capture/cleanup errors or belong to the opposite assertion profile |
 | LU one-coordinate diagonal tails for floating/rational/pair paths | 240 independent matrix/conjugation worlds; exact tiny values, strict tolerance/IEEE/index quirks, constructor ownership, fourteen pooled/direct reservation campaigns, stopped caller receipts and actual pair X-before-Y failure; cached debug view | Floating 97.3% native / 100% debug; exact 86.1% / 88.9%; debug view 100%; gaps propagate child/cleanup/capture errors, test an unreachable exact-zero quotient or belong to the other profile |
+| Floating LU dense-block factorization, parent update and tail applications | 180 independent exact elementary-elimination worlds checking E and E*A*P, column swaps, sparse parent values/backlinks and all four tail routes after conjugation; literal tolerance/IEEE/duplicate/trailing/growth cases and reached publication errors | Core 90.5% native / 93.2% debug; applications 81.9% / 83.2%; debug L check 91.7%, view 93.8%; remaining gaps are metadata/child propagation and assertion-profile paths |
 | Settings defaults, stats, float tolerance families, random state and resource limits | All numerical/strategy defaults, source RNG golden vectors, mutable thresholds, strict CPU-time boundary, borrowed limit/error propagation and stats reset | 96.3%; uncovered constructor return propagates a real host-clock start error |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
 The last complete native LP run reported **90.7%** statement coverage
 (6210/6843 existing Go statements), including sparse indexed graph traversal
-and solves, before floating indexed refinement, sparse identity extension and diagonal tails were added. The last
+and solves, before floating indexed refinement, sparse identity extension, diagonal tails and floating dense blocks were added. The last
 complete combined debug/checked run reported **91.7%** before sparse basis storage
 was added; sparse basis, elimination, pivot, active shortening, eta construction, column
 replacement and dense/indexed solve components now also pass focused debug/checked tests. Exact scoped

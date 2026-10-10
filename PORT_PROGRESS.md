@@ -36096,3 +36096,53 @@ retained original driver/test integration remain required.
 Final native and debug/checked LP vet, portcheck and diff checks pass.
 Regenerated64-package production graph retains its edges and lists the new
 diagonal tail files. The full native suite passed within this hour; no repeat.
+
+
+## Floating dense LU block factorization and applications
+
+Ported retained double/double square_dense_submatrix construction, max pivot
+selection, copied pivot/multiplier division and elimination, sparse parent
+update/fill/max ordering, dense and indexed left/right applications, permutation
+conjugation and selected debug L/dense views. Constructor uses logical parent
+rows/columns and last-wins duplicate storage. The combined buffer holds L and
+upper values until parent publication clears upper entries. Common parent row
+assignment precedes reciprocal column access; upper buffer clearing follows
+successful publication. Missing diagonals/fill are added before final row maxima.
+
+Dense left publishes dimension slots ascending and leaves trailing slots; dense
+right uses a full-size temporary and zeros trailing slots. Sparse left consumes
+indices only, accumulates a dimension temporary and rebuilds ascending output
+with settings. Sparse right reuses indexed work, fixed1e-14 cleanup and actual
+indexed Assign, preserving hidden destination data. Prefix/outside-block copies
+remain distinct from inside-block accumulation, including duplicate input behavior.
+Permutation fallback supports right applications after parent growth. Debug L
+checks read only the values actually reached by source assertions.
+
+Independent180-world exact elementary elimination tracks E and E*A*P through
+real dense column swaps, diagonal normalization and elimination. Tests verify
+logical unit-upper parent values, L tail coefficients, reciprocal links and four
+application routes after independent row/column conjugation. Fixtures preserve
+strict maximum ties/NaN, duplicate overwrite/contribution, hidden/trailing data,
+settings vs fixed cleanup, zero settings retaining zero index entries, growth
+identity area and native/debug self/zero pivot behavior. Reached constructor,
+pivot, parent backlink/fill, workspace and caller failure prefixes are checked.
+No Runtime allocation events are fabricated for native floating storage.
+
+Focused native0.055s and combined debug/checked0.045s pass. Dense core172/190
+(90.5%) native and177/190 (93.2%) debug; applications122/149 (81.9%) native and
+124/149 (83.2%) debug. Debug L check22/24 (91.7%), dense view15/16 (93.8%).
+Remaining statements propagate metadata/child errors, guard invariant-protected
+workspace/publication stages or belong to the other assertion profile; native
+IsLMatrix returns true without traversing the debug-only body.
+
+Source init/row_by_indexed_vector_product have no retained caller (only unused
+standalone test/disabled macro paths); they are not translated or credited.
+The standalone test_square_dense_submatrix has no source dispatch. Exact mpq
+and mpq/pair dense blocks, full LU integration/factorization/update/solve and
+actual retained upstream-driver work remain required. Three dense source files
+are partial:47 partial/63 unported LP units. No complete LP solver is claimed.
+Full native90.7% snapshot predates these additions and remains explicitly old.
+
+Final native/debug LP vet, portcheck and diff checks pass. Regenerated64-package
+production graph has unchanged edges and includes the new floating dense files.
+The last full native suite passed within this hour; no redundant run was started.

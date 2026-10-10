@@ -124845,9 +124845,26 @@
       "path": "src/util/lp/square_dense_submatrix.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/square_dense_float.go",
+        "pkg/util/lp/square_dense_float_apply.go",
+        "pkg/util/lp/square_dense_float_check.go",
+        "pkg/util/lp/square_dense_float_debug.go",
+        "pkg/util/lp/square_dense_float_test.go",
+        "pkg/util/lp/square_dense_float_edges_test.go",
+        "pkg/util/lp/square_dense_float_debug_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDenseBlockIndependentFactorization",
+        "TestLPFloatDenseBlockLiteralStorageAndApplications",
+        "TestLPFloatDenseBlockDuplicateSparseInput",
+        "TestLPFloatDenseBlockPublicationErrors",
+        "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
+        "TestLPFloatDenseBlockConstructorAndProductGuards",
+        "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
+        "TestLPFloatDenseBlockDebugViewAndLChecks"
+      ],
       "conditionals": [
         {
           "line": 147,
@@ -124910,17 +124927,60 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained double/double dense-block construction, pivot selection/division/elimination, sparse parent updates, dense/indexed left/right tail applications, conjugation and selected debug views/L check",
+          "status": "ported",
+          "go_target": "pkg/util/lp/square_dense_float.go",
+          "go_targets": [
+            "pkg/util/lp/square_dense_float_apply.go",
+            "pkg/util/lp/square_dense_float_check.go",
+            "pkg/util/lp/square_dense_float_debug.go"
+          ],
+          "tests": [
+            "TestLPFloatDenseBlockIndependentFactorization",
+            "TestLPFloatDenseBlockLiteralStorageAndApplications",
+            "TestLPFloatDenseBlockDuplicateSparseInput",
+            "TestLPFloatDenseBlockPublicationErrors",
+            "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
+            "TestLPFloatDenseBlockConstructorAndProductGuards",
+            "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
+            "TestLPFloatDenseBlockDebugViewAndLChecks"
+          ]
+        }
+      ],
+      "ownership": [
+        "Floating dense block owns native dense storage, two permutations and reusable indexed work; sparse parent remains borrowed through all tail applications. Constructor visits parent logical rows and literal entries, with last duplicate overwriting the same dense slot. Parent update publishes row values before reciprocal column writes, clears upper dense values only after successful common/new entry publication, and orders all row updates before all fill before all maxima. Right indexed failures retain work while caller remains unchanged until Assign; left indexed rebuilding publishes ascending index before each destination store. No synthetic source storage reservations or STL internals are added."
+      ],
+      "deviations": [
+        "Concrete floating live LU dense path is ported. Source combined elimination/L and upper storage, strict max tie, copied pivot/multiplier, physical column traversal, exact source settings drop, independent parent/dense column swaps and unsigned offsets are preserved. Dense left retains trailing input slots; dense right replaces all slots from its temporary and zeros trailing slots. Indexed left consumes only input indices and rebuilds dimension data with settings; indexed right uses retained WorkVector, fixed1e-14 cleanup and source indexed Assign, preserving hidden destination slots. Permutation access falls back to identity beyond its stored extent for parent growth. Typed reached bounds/assertion errors preserve completed prefixes.",
+        "Independent180-world arbitrary-precision elementary elimination tracks E and E*A*P, checking logical upper parent, dense lower tail, reciprocal links and all four tail applications after conjugation. Literal tests cover duplicates, zero/NaN/ties, source debug/native self/zero pivot behavior, fixed/settings tolerances, hidden/trailing slots, parent growth and failures in constructor/pivot/parent/work/caller publication. init and row_by_indexed_vector_product are used only by unreachable/disabled source paths and are not ported; sole standalone test_square_dense_submatrix definition has no dispatch. Exact mpq/mpq and mpq/pair dense blocks, complete LU and retained original drivers remain required; no whole-unit completion or registered driver credit."
+      ]
     },
     {
       "path": "src/util/lp/square_dense_submatrix.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/square_dense_float.go",
+        "pkg/util/lp/square_dense_float_apply.go",
+        "pkg/util/lp/square_dense_float_check.go",
+        "pkg/util/lp/square_dense_float_debug.go",
+        "pkg/util/lp/square_dense_float_test.go",
+        "pkg/util/lp/square_dense_float_edges_test.go",
+        "pkg/util/lp/square_dense_float_debug_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDenseBlockIndependentFactorization",
+        "TestLPFloatDenseBlockLiteralStorageAndApplications",
+        "TestLPFloatDenseBlockDuplicateSparseInput",
+        "TestLPFloatDenseBlockPublicationErrors",
+        "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
+        "TestLPFloatDenseBlockConstructorAndProductGuards",
+        "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
+        "TestLPFloatDenseBlockDebugViewAndLChecks"
+      ],
       "conditionals": [
         {
           "line": 212,
@@ -125043,17 +125103,60 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained double/double dense-block construction, pivot selection/division/elimination, sparse parent updates, dense/indexed left/right tail applications, conjugation and selected debug views/L check",
+          "status": "ported",
+          "go_target": "pkg/util/lp/square_dense_float.go",
+          "go_targets": [
+            "pkg/util/lp/square_dense_float_apply.go",
+            "pkg/util/lp/square_dense_float_check.go",
+            "pkg/util/lp/square_dense_float_debug.go"
+          ],
+          "tests": [
+            "TestLPFloatDenseBlockIndependentFactorization",
+            "TestLPFloatDenseBlockLiteralStorageAndApplications",
+            "TestLPFloatDenseBlockDuplicateSparseInput",
+            "TestLPFloatDenseBlockPublicationErrors",
+            "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
+            "TestLPFloatDenseBlockConstructorAndProductGuards",
+            "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
+            "TestLPFloatDenseBlockDebugViewAndLChecks"
+          ]
+        }
+      ],
+      "ownership": [
+        "Floating dense block owns native dense storage, two permutations and reusable indexed work; sparse parent remains borrowed through all tail applications. Constructor visits parent logical rows and literal entries, with last duplicate overwriting the same dense slot. Parent update publishes row values before reciprocal column writes, clears upper dense values only after successful common/new entry publication, and orders all row updates before all fill before all maxima. Right indexed failures retain work while caller remains unchanged until Assign; left indexed rebuilding publishes ascending index before each destination store. No synthetic source storage reservations or STL internals are added."
+      ],
+      "deviations": [
+        "Concrete floating live LU dense path is ported. Source combined elimination/L and upper storage, strict max tie, copied pivot/multiplier, physical column traversal, exact source settings drop, independent parent/dense column swaps and unsigned offsets are preserved. Dense left retains trailing input slots; dense right replaces all slots from its temporary and zeros trailing slots. Indexed left consumes only input indices and rebuilds dimension data with settings; indexed right uses retained WorkVector, fixed1e-14 cleanup and source indexed Assign, preserving hidden destination slots. Permutation access falls back to identity beyond its stored extent for parent growth. Typed reached bounds/assertion errors preserve completed prefixes.",
+        "Independent180-world arbitrary-precision elementary elimination tracks E and E*A*P, checking logical upper parent, dense lower tail, reciprocal links and all four tail applications after conjugation. Literal tests cover duplicates, zero/NaN/ties, source debug/native self/zero pivot behavior, fixed/settings tolerances, hidden/trailing slots, parent growth and failures in constructor/pivot/parent/work/caller publication. init and row_by_indexed_vector_product are used only by unreachable/disabled source paths and are not ported; sole standalone test_square_dense_submatrix definition has no dispatch. Exact mpq/mpq and mpq/pair dense blocks, complete LU and retained original drivers remain required; no whole-unit completion or registered driver credit."
+      ]
     },
     {
       "path": "src/util/lp/square_dense_submatrix_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/square_dense_float.go",
+        "pkg/util/lp/square_dense_float_apply.go",
+        "pkg/util/lp/square_dense_float_check.go",
+        "pkg/util/lp/square_dense_float_debug.go",
+        "pkg/util/lp/square_dense_float_test.go",
+        "pkg/util/lp/square_dense_float_edges_test.go",
+        "pkg/util/lp/square_dense_float_debug_test.go"
+      ],
+      "tests": [
+        "TestLPFloatDenseBlockIndependentFactorization",
+        "TestLPFloatDenseBlockLiteralStorageAndApplications",
+        "TestLPFloatDenseBlockDuplicateSparseInput",
+        "TestLPFloatDenseBlockPublicationErrors",
+        "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
+        "TestLPFloatDenseBlockConstructorAndProductGuards",
+        "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
+        "TestLPFloatDenseBlockDebugViewAndLChecks"
+      ],
       "conditionals": [
         {
           "line": 36,
@@ -125066,9 +125169,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained double/double dense-block construction, pivot selection/division/elimination, sparse parent updates, dense/indexed left/right tail applications, conjugation and selected debug views/L check",
+          "status": "ported",
+          "go_target": "pkg/util/lp/square_dense_float.go",
+          "go_targets": [
+            "pkg/util/lp/square_dense_float_apply.go",
+            "pkg/util/lp/square_dense_float_check.go",
+            "pkg/util/lp/square_dense_float_debug.go"
+          ],
+          "tests": [
+            "TestLPFloatDenseBlockIndependentFactorization",
+            "TestLPFloatDenseBlockLiteralStorageAndApplications",
+            "TestLPFloatDenseBlockDuplicateSparseInput",
+            "TestLPFloatDenseBlockPublicationErrors",
+            "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
+            "TestLPFloatDenseBlockConstructorAndProductGuards",
+            "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
+            "TestLPFloatDenseBlockDebugViewAndLChecks"
+          ]
+        }
+      ],
+      "ownership": [
+        "Floating dense block owns native dense storage, two permutations and reusable indexed work; sparse parent remains borrowed through all tail applications. Constructor visits parent logical rows and literal entries, with last duplicate overwriting the same dense slot. Parent update publishes row values before reciprocal column writes, clears upper dense values only after successful common/new entry publication, and orders all row updates before all fill before all maxima. Right indexed failures retain work while caller remains unchanged until Assign; left indexed rebuilding publishes ascending index before each destination store. No synthetic source storage reservations or STL internals are added."
+      ],
+      "deviations": [
+        "Concrete floating live LU dense path is ported. Source combined elimination/L and upper storage, strict max tie, copied pivot/multiplier, physical column traversal, exact source settings drop, independent parent/dense column swaps and unsigned offsets are preserved. Dense left retains trailing input slots; dense right replaces all slots from its temporary and zeros trailing slots. Indexed left consumes only input indices and rebuilds dimension data with settings; indexed right uses retained WorkVector, fixed1e-14 cleanup and source indexed Assign, preserving hidden destination slots. Permutation access falls back to identity beyond its stored extent for parent growth. Typed reached bounds/assertion errors preserve completed prefixes.",
+        "Independent180-world arbitrary-precision elementary elimination tracks E and E*A*P, checking logical upper parent, dense lower tail, reciprocal links and all four tail applications after conjugation. Literal tests cover duplicates, zero/NaN/ties, source debug/native self/zero pivot behavior, fixed/settings tolerances, hidden/trailing slots, parent growth and failures in constructor/pivot/parent/work/caller publication. init and row_by_indexed_vector_product are used only by unreachable/disabled source paths and are not ported; sole standalone test_square_dense_submatrix definition has no dispatch. Exact mpq/mpq and mpq/pair dense blocks, complete LU and retained original drivers remain required; no whole-unit completion or registered driver credit."
+      ]
     },
     {
       "path": "src/util/lp/stacked_map.h",
