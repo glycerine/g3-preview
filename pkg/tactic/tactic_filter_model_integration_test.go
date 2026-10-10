@@ -52,7 +52,7 @@ func TestTacticFilterModelRealSATBindingsUniverseAndReplacement(t *testing.T) {
 	satOK(t, e)
 	satOK(t, old.Derived.RegisterUniverse(sort, []ast.ASTHandle{v}))
 	var wantOrder []ast.ASTHandle
-	for _, d := range old.ConstantDeclarations.Slice() {
+	for _, d := range old.ConstantDeclarations {
 		if d != decls[2] {
 			wantOrder = append(wantOrder, d)
 		}
@@ -69,8 +69,8 @@ func TestTacticFilterModelRealSATBindingsUniverseAndReplacement(t *testing.T) {
 	if got == old || !old.Closed {
 		t.Fatal("source replacement did not retire old model")
 	}
-	if !reflect.DeepEqual(got.ConstantDeclarations.Slice(), wantOrder) {
-		t.Fatal("source constant insertion order", got.ConstantDeclarations.Slice(), wantOrder)
+	if !reflect.DeepEqual(got.ConstantDeclarations, wantOrder) {
+		t.Fatal("source constant insertion order", got.ConstantDeclarations, wantOrder)
 	}
 	removed, e := got.ConstantInterpretation(decls[2])
 	satOK(t, e)

@@ -55,12 +55,8 @@ func (md *ModelCore) RegisterFunction(d ast.ASTHandle, fi *FunctionInterpretatio
 		if e != nil {
 			return e
 		}
-		if e = md.declarations.push(md.manager, d); e != nil {
-			return e
-		}
-		if e = md.functionDeclarations.push(md.manager, d); e != nil {
-			return e
-		}
+		md.declarations = append(md.declarations, d)
+		md.functionDeclarations = append(md.functionDeclarations, d)
 		if e = md.manager.IncRef(d); e != nil {
 			return e
 		}
@@ -102,10 +98,10 @@ func (md *ModelCore) Function(i uint32) (ast.ASTHandle, error) {
 	if e := md.open(); e != nil {
 		return ast.ASTHandle{}, e
 	}
-	if uint64(i) >= uint64(len(md.functionDeclarations.Slice())) {
+	if uint64(i) >= uint64(len(md.functionDeclarations)) {
 		return ast.ASTHandle{}, arena.ErrBounds
 	}
-	return md.functionDeclarations.Slice()[i], nil
+	return md.functionDeclarations[i], nil
 }
 
 // EvalDeclaration preserves the distinct source misses: absent functions leave
@@ -157,7 +153,14 @@ func (md *ModelCore) UnregisterDeclaration(d ast.ASTHandle) error {
 	if e = md.Functions.remove(md.manager, d, hash); e != nil {
 		return e
 	}
-	md.functionDeclarations.erase(d)
+	for i, h := range md.functionDeclarations {
+		if h == d {
+			copy(md.functionDeclarations[i:], md.functionDeclarations[i+1:])
+			md.functionDeclarations[len(md.functionDeclarations)-1] = ast.ASTHandle{}
+			md.functionDeclarations = md.functionDeclarations[:len(md.functionDeclarations)-1]
+			break
+		}
+	}
 	return md.finishFunctionRemoval()
 }
 func (md *ModelCore) finishFunctionRemoval() error {

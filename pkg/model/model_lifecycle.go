@@ -87,14 +87,14 @@ func (t *modelUniverseMap) close(m *ast.ASTManager) {
 }
 
 type modelUniverse struct {
-	values     modelDeclarationVector
+	values     []ast.ASTHandle
 	sortOwned  bool
 	ownerBytes uint64
 }
 type Model struct {
 	self      *Model
 	CoreField ModelCore
-	sorts     modelDeclarationVector
+	sorts     []ast.ASTHandle
 	Universes modelUniverseMap
 	// Scalar table indices resolve cold source ptr_vector<expr> owners here.
 	directory  []*modelUniverse
@@ -161,16 +161,16 @@ func (md *Model) NumUninterpretedSorts() (uint32, error) {
 	if e := md.open(); e != nil {
 		return 0, e
 	}
-	return uint32(len(md.sorts.Slice())), nil
+	return uint32(len(md.sorts)), nil
 }
 func (md *Model) UninterpretedSort(i uint32) (ast.ASTHandle, error) {
 	if e := md.open(); e != nil {
 		return ast.ASTHandle{}, e
 	}
-	if uint64(i) >= uint64(len(md.sorts.Slice())) {
+	if uint64(i) >= uint64(len(md.sorts)) {
 		return ast.ASTHandle{}, arena.ErrBounds
 	}
-	return md.sorts.Slice()[i], nil
+	return md.sorts[i], nil
 }
 func (md *Model) HasUninterpretedSort(s ast.ASTHandle) (bool, error) {
 	hash, e := md.sortHash(s)
@@ -189,7 +189,7 @@ func (md *Model) Universe(s ast.ASTHandle) ([]ast.ASTHandle, error) {
 	if i < 0 || md.Universes.Cells[i].index == 0 {
 		return nil, ast.ErrASTDomain
 	}
-	return md.directory[md.Universes.Cells[i].index-1].values.Slice(), nil
+	return md.directory[md.Universes.Cells[i].index-1].values, nil
 }
 func (md *Model) RegisterUniverse(s ast.ASTHandle, values []ast.ASTHandle) (err error) {
 	hash, e := md.sortHash(s)
@@ -228,9 +228,7 @@ func (md *Model) RegisterUniverse(s ast.ASTHandle, values []ast.ASTHandle) (err 
 	}
 	index := md.Universes.Cells[i].index
 	if index == 0 {
-		if e = md.sorts.push(m, s); e != nil {
-			return e
-		}
+		md.sorts = append(md.sorts, s)
 		if e = m.IncRef(s); e != nil {
 			return e
 		}
@@ -239,30 +237,20 @@ func (md *Model) RegisterUniverse(s ast.ASTHandle, values []ast.ASTHandle) (err 
 			return errors.Join(e, m.DecRef(s))
 		}
 		u := &modelUniverse{sortOwned: true, ownerBytes: bytes}
-		for _, v := range values {
-			if e = u.values.push(m, v); e != nil {
-				u.values.close(m)
-				m.Budget().Release(bytes)
-				return errors.Join(e, m.DecRef(s))
-			}
-		}
+		u.values = append(u.values, values...)
 		md.directory = append(md.directory, u)
 		md.Universes.Cells[i].index = uint32(len(md.directory))
 		published = true
 	} else {
 		u := md.directory[index-1]
-		for _, old := range u.values.Slice() {
+		for _, old := range u.values {
 			if e = m.DecRef(old); e != nil {
 				return e
 			}
 		}
 		// Literal source update appends without resetting the old physical vector.
 		// Preserve that behavior; do not invent extra roots for its stale prefix.
-		for _, v := range values {
-			if e = u.values.push(m, v); e != nil {
-				return e
-			}
-		}
+		u.values = append(u.values, values...)
 		published = true
 	}
 	return nil
@@ -279,7 +267,7 @@ func (md *Model) CopyUniverseInterpretations(source *Model) error {
 	}
 	for _, cell := range source.Universes.Cells {
 		if cell.used && cell.index != 0 {
-			if e := md.RegisterUniverse(cell.sort, source.directory[cell.index-1].values.Slice()); e != nil {
+			if e := md.RegisterUniverse(cell.sort, source.directory[cell.index-1].values); e != nil {
 				return e
 			}
 		}
@@ -306,20 +294,20 @@ func (md *Model) Close() error {
 			}
 			u.sortOwned = false
 		}
-		for j, v := range u.values.Slice() {
+		for j, v := range u.values {
 			if !v.IsNull() {
 				if e := m.DecRef(v); e != nil {
 					return e
 				}
-				u.values.Slice()[j] = ast.ASTHandle{}
+				u.values[j] = ast.ASTHandle{}
 			}
 		}
-		u.values.close(m)
+		u.values = nil
 		m.Budget().Release(u.ownerBytes)
 		u.ownerBytes = 0
 	}
 	md.Universes.close(m)
-	md.sorts.close(m)
+	md.sorts = nil
 	md.directory = nil
 	if e := md.CoreField.closeCoreMembers(); e != nil {
 		return e

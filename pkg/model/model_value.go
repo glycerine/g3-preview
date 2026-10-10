@@ -12,7 +12,7 @@ func (p modelValueProc) SomeValue(s ast.ASTHandle, hash uint32) (ast.ASTHandle, 
 	md := p.model
 	i := md.Universes.find(s, hash)
 	if i >= 0 && md.Universes.Cells[i].index != 0 {
-		values := md.directory[md.Universes.Cells[i].index-1].values.Slice()
+		values := md.directory[md.Universes.Cells[i].index-1].values
 		if len(values) > 0 {
 			return values[0], nil
 		}

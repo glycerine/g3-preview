@@ -22,9 +22,9 @@ type ModelCore struct {
 	copiedFunction                     *FunctionInterpretation
 	removedDeclaration                 ast.ASTHandle
 	removedDeclarationOwned            bool
-	functionDeclarations               modelDeclarationVector
+	functionDeclarations               []ast.ASTHandle
 	Derived                            *Model
-	declarations, ConstantDeclarations modelDeclarationVector
+	declarations, ConstantDeclarations []ast.ASTHandle
 	References                         uint32
 	ownerBytes                         uint64
 	Closed                             bool
@@ -102,12 +102,8 @@ func (md *ModelCore) RegisterConstant(d, v ast.ASTHandle) error {
 	entry := &md.Constants.Cells[i]
 	m := md.manager
 	if entry.value.IsNull() {
-		if e = md.declarations.push(m, d); e != nil {
-			return e
-		}
-		if e = md.ConstantDeclarations.push(m, d); e != nil {
-			return e
-		}
+		md.declarations = append(md.declarations, d)
+		md.ConstantDeclarations = append(md.ConstantDeclarations, d)
 		if e = m.IncRef(d); e != nil {
 			return e
 		}
@@ -173,31 +169,31 @@ func (md *ModelCore) NumDeclarations() (uint32, error) {
 	if e := md.open(); e != nil {
 		return 0, e
 	}
-	return uint32(len(md.declarations.Slice())), nil
+	return uint32(len(md.declarations)), nil
 }
 func (md *ModelCore) NumConstants() (uint32, error) {
 	if e := md.open(); e != nil {
 		return 0, e
 	}
-	return uint32(len(md.ConstantDeclarations.Slice())), nil
+	return uint32(len(md.ConstantDeclarations)), nil
 }
 func (md *ModelCore) Declaration(i uint32) (ast.ASTHandle, error) {
 	if e := md.open(); e != nil {
 		return ast.ASTHandle{}, e
 	}
-	if uint64(i) >= uint64(len(md.declarations.Slice())) {
+	if uint64(i) >= uint64(len(md.declarations)) {
 		return ast.ASTHandle{}, arena.ErrBounds
 	}
-	return md.declarations.Slice()[i], nil
+	return md.declarations[i], nil
 }
 func (md *ModelCore) Constant(i uint32) (ast.ASTHandle, error) {
 	if e := md.open(); e != nil {
 		return ast.ASTHandle{}, e
 	}
-	if uint64(i) >= uint64(len(md.ConstantDeclarations.Slice())) {
+	if uint64(i) >= uint64(len(md.ConstantDeclarations)) {
 		return ast.ASTHandle{}, arena.ErrBounds
 	}
-	return md.ConstantDeclarations.Slice()[i], nil
+	return md.ConstantDeclarations[i], nil
 }
 func (md *ModelCore) UnregisterConstant(d ast.ASTHandle) error {
 	hash, e := md.checkDeclaration(d)
@@ -215,7 +211,14 @@ func (md *ModelCore) UnregisterConstant(d ast.ASTHandle) error {
 	if e = md.Constants.remove(md.manager, d, hash); e != nil {
 		return e
 	}
-	md.ConstantDeclarations.erase(d)
+	for i, h := range md.ConstantDeclarations {
+		if h == d {
+			copy(md.ConstantDeclarations[i:], md.ConstantDeclarations[i+1:])
+			md.ConstantDeclarations[len(md.ConstantDeclarations)-1] = ast.ASTHandle{}
+			md.ConstantDeclarations = md.ConstantDeclarations[:len(md.ConstantDeclarations)-1]
+			break
+		}
+	}
 	if e = md.manager.DecRef(entry.declaration); e != nil {
 		return e
 	}
@@ -328,9 +331,9 @@ func (md *ModelCore) closeCoreMembers() error {
 		return e
 	}
 	md.functionDirectory = nil
-	md.functionDeclarations.close(m)
-	md.ConstantDeclarations.close(m)
-	md.declarations.close(m)
+	md.functionDeclarations = nil
+	md.ConstantDeclarations = nil
+	md.declarations = nil
 	md.Functions.close(m)
 	md.Constants.close(m)
 	m.Budget().Release(md.ownerBytes)

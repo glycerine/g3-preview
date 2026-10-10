@@ -50460,7 +50460,8 @@
       "ownership": [],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
-        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply."
+        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
+        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe hash-table migration remains separate; no container growth/refusal implementation credit is added."
       ]
     },
     {
@@ -50535,7 +50536,8 @@
       "ownership": [],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
-        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply."
+        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
+        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe hash-table migration remains separate; no container growth/refusal implementation credit is added."
       ]
     },
     {
@@ -50677,7 +50679,8 @@
       ],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, scoped get_some_value and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
-        "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion."
+        "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion.",
+        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe hash-table migration remains separate; no container growth/refusal implementation credit is added."
       ]
     },
     {
@@ -50792,7 +50795,8 @@
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
         "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion.",
-        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply."
+        "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
+        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe hash-table migration remains separate; no container growth/refusal implementation credit is added."
       ]
     },
     {
@@ -148448,8 +148452,6 @@
         "pkg/math/polynomial/polynomial_psc_chain1_child_stop_source_test.go",
         "pkg/math/polynomial/polynomial_psc_chain1_prefix_source_test.go",
         "pkg/math/polynomial/polynomial_psc_chain1_source_test.go",
-        "pkg/ast/ast_handle_vector.go",
-        "pkg/ast/ast_handle_containers_test.go",
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/ast/ast_ref_cache_resize.go",
         "pkg/util/runtime_uint32_view.go",
@@ -148627,8 +148629,6 @@
         "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
         "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
         "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse",
-        "TestPointerVectorSourceGrowthAndErase",
-        "TestASTHandleVectorNativeGrowthAndEraseClearing",
         "TestASTLiteralVectorNativeBorrowGrowthAndNonowningReset",
         "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards",
         "TestPolynomialGCDPowersNativeGrowthAndReuse",
@@ -149207,7 +149207,8 @@
         "Binary-rational fields and DRS/Sturm stacks now use native slice append, removing C++ vector capacity/header arithmetic, initialized masks and container-only reservations/refunds. Binary logical size remains distinct from native constructed field extent; relocation transfers actual numeral fields once and clears old owning records. Root-isolation frame packing/traversal, endpoint arithmetic, ascending numeric destruction, actual cold owners and real numeric allocation failures remain. Native buffer BackingBytes is zero.",
         "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit.",
         "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added.",
-        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit."
+        "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit.",
+        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe hash-table migration remains separate; no container growth/refusal implementation credit is added."
       ]
     },
     {

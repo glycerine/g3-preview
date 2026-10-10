@@ -124,13 +124,3 @@ func (t *modelConstantMap) close(m *ast.ASTManager) {
 	t.size = 0
 	t.deleted = 0
 }
-
-type modelDeclarationVector struct {
-	ast.ASTHandleVector
-}
-
-func (v *modelDeclarationVector) push(m *ast.ASTManager, d ast.ASTHandle) error {
-	return v.Push(m.Budget(), d)
-}
-func (v *modelDeclarationVector) erase(d ast.ASTHandle)   { v.Erase(d) }
-func (v *modelDeclarationVector) close(m *ast.ASTManager) { v.Close(m.Budget()) }

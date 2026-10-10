@@ -12,5 +12,5 @@ func (m *ModelCore) Check() error             { return m.open() }
 func (m *ModelCore) DerivedModel() *Model             { return m.Derived }
 func (m *ModelCore) CheckFunctionStorageEmpty() error { return m.Functions.empty() }
 func (m *ModelCore) NumFunctionDeclarations() uint32 {
-	return uint32(len(m.functionDeclarations.Slice()))
+	return uint32(len(m.functionDeclarations))
 }

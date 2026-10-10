@@ -34070,3 +34070,29 @@ Remaining work includes model constant/function lookup and declaration storage,
 proof binding/hyper-resolution and sequence/scoped reference-vector consumers,
 other retained consumers, internal util cycles and the complete root subpackage
 split. The external-consumer cleanup and requested split are not complete.
+
+## Direct model declaration and universe slices
+
+Model all-declaration, active constant/function declaration, uninterpreted sort
+and universe-value lists now store []ast.ASTHandle directly. Registration uses
+append; active-list erasure shifts survivors and clears the vacated handle.
+Historical all-declaration entries still remain after unregister and append again
+on re-registration. Universe updates retain their literal source append behavior
+and reference-count effects. Universe lookup, copying, fallback values and owning
+destruction use the direct lists. Migrated the actual tactic filter integration
+fixture that inspects exported constant declarations.
+
+The final production ASTHandleVector consumer is gone. Removed that unused
+wrapper, modelDeclarationVector and wrapper-only tests/manifest references.
+Actual model constant/function/universe lookup hash tables remain for a separate
+migration; no source container growth or refusal behavior is credited here.
+Existing model integration tests cover registration order, stable erasure,
+historical declarations, copy independence and literal universe update ownership.
+
+Validation: final native model/tactic/SAT tactic/API passed
+(0.052s/0.022s/0.110s/0.012s); full debug model passed (0.054s). Module-wide
+compilation, model vet, manifest, gofmt and diff checks passed. No full native
+module rerun inside the hourly interval. Manifest counts remain 2102 units/677
+APIs:62 ported,283 partial,1729 unported,two dead/deleted. The requested external
+consumer migration, internal util cycle cleanup and root subpackage split are
+still incomplete.
