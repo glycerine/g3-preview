@@ -141,11 +141,10 @@ func TestASTBitVectorConversionResizeBeforeArityValidation(t *testing.T) {
 			t.Fatal(kind, e)
 		}
 		cache := &m.bitVectorPlugin.fixed[kind]
-		if cache.size() != 66 {
-			t.Fatal("resize must precede arity rejection", kind, cache.size())
+		if len(*cache) != 66 {
+			t.Fatal("resize must precede arity rejection", kind, len(*cache))
 		}
-		r, e := cache.at(65)
-		astTestMust(t, e)
+		r := (*cache)[65]
 		if r.slot != 0 {
 			t.Fatal("arity failure must precede declaration publication")
 		}
@@ -222,7 +221,7 @@ func TestASTBitVectorInt2BVParserTypeGuardsAndOwnedRationalCopy(t *testing.T) {
 	if e == nil || e.Error() != "bit-vector size must be greater than zero" {
 		t.Fatal("zero width", e)
 	}
-	if m.bitVectorPlugin.fixed[57].size() != 0 {
+	if len(m.bitVectorPlugin.fixed[57]) != 0 {
 		t.Fatal("zero-width guard must precede resize")
 	}
 	astTestMust(t, m.DelParameter(&zero))

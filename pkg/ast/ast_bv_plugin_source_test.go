@@ -131,8 +131,7 @@ func TestASTBitVectorReusedSortActualINCAcquisitionGuard(t *testing.T) {
 	if p == nil {
 		t.Fatal("actual registration publication absent", call)
 	}
-	captured, e := p.sorts.at(1)
-	astTestMust(t, e)
+	captured := p.sorts[1]
 	if captured != node {
 		t.Fatal("actual reused sort identity", captured, node)
 	}

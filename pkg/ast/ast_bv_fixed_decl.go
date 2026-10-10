@@ -119,12 +119,12 @@ func (p *astBitVectorPluginOwner) fixedDecl(k int32, width uint32) (astNodeRef, 
 		return astNodeRef{}, ErrASTPending
 	}
 	v := &p.fixed[k]
-	if e := v.resizeNull(p.owner.BudgetField, width+1); e != nil {
-		return astNodeRef{}, e
+	if uint64(len(*v)) < uint64(width+1) {
+		*v = append(*v, make([]astNodeRef, int(width+1)-len(*v))...)
 	}
-	r, e := v.at(width)
-	if e != nil || r.slot != 0 {
-		return r, e
+	r := (*v)[width]
+	if r.slot != 0 {
+		return r, nil
 	}
 	s, e := p.getSort(width)
 	if e != nil {
@@ -158,7 +158,7 @@ func (p *astBitVectorPluginOwner) publishFixed(k int32, width uint32, r astNodeR
 	v := &p.fixed[k]
 	// Source assigns before INC. Remember an interrupted INC explicitly, never
 	// infer acquisition from a non-null slot or the node's current reference count.
-	v.words[2+width*2], v.words[3+width*2] = r.slot, r.generation
+	(*v)[width] = r
 	p.fixedPending, p.fixedPendingKind, p.fixedPendingWidth = r, k, width
 	if e := p.owner.incNode(r); e != nil {
 		return e
@@ -264,16 +264,9 @@ func (m *ASTManager) bitVectorDecl(k int32, ps []ASTParameter, domain []ASTHandl
 	return r, nil
 }
 
-func (p *astBitVectorPluginOwner) fixedBytes() uint64 {
-	var n uint64
-	for _, k := range astBVFixedOrder {
-		n += p.fixed[k].bytes()
-	}
-	return n
-}
 func (p *astBitVectorPluginOwner) releaseFixed() {
 	for _, k := range astBVFixedOrder {
-		p.fixed[k].close(p.owner.BudgetField)
+		p.fixed[k] = nil
 	}
 }
 func (p *astBitVectorPluginOwner) finalizeFixedPending(own bool) error {
@@ -289,7 +282,7 @@ func (p *astBitVectorPluginOwner) finalizeFixedPending(own bool) error {
 		v = &p.bit2bool[p.fixedPendingWidth]
 		i = p.fixedPendingIndex
 	}
-	v.words[2+i*2], v.words[3+i*2] = 0, 0
+	(*v)[i] = astNodeRef{}
 	p.fixedPending = astNodeRef{}
 	return nil
 }
@@ -302,18 +295,14 @@ func (p *astBitVectorPluginOwner) finalizeFixed() error {
 	return p.finalizeBooleanBits()
 }
 
-func (p *astBitVectorPluginOwner) finalizeBitVectorCache(v *astFormatRefVector) error {
-	for i := uint32(0); i < v.size(); i++ {
-		r, e := v.at(i)
-		if e != nil {
-			return e
-		}
+func (p *astBitVectorPluginOwner) finalizeBitVectorCache(v *[]astNodeRef) error {
+	for i, r := range *v {
 		if r.slot == 0 {
 			continue
 		}
 		consumed, e := p.owner.decNode(r)
 		if consumed {
-			v.words[2+i*2], v.words[3+i*2] = 0, 0
+			(*v)[i] = astNodeRef{}
 		}
 		if e != nil {
 			if p.destructorCause == nil {

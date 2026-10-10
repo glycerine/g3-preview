@@ -19,7 +19,7 @@ func TestASTArithmeticNumeralInvocationEveryActualReservation(t *testing.T) {
 		{"15", true}, {"18446744073709551617", true},
 		{"18446744073709551617/18446744073709551619", false},
 	} {
-		complete, sawCachePending := false, false
+		complete := false
 		for ordinal := int64(0); ordinal < 256 && !complete; ordinal++ {
 			t.Run(fmt.Sprintf("%s/%d", tc.text, ordinal), func(t *testing.T) {
 				m := bvOffsetRuntimeTestManager(t)
@@ -86,10 +86,6 @@ func TestASTArithmeticNumeralInvocationEveryActualReservation(t *testing.T) {
 					t.Fatal("copied invocation", e)
 				}
 				savedBody, savedSource := call.bodyCause, call.sourceCause
-				pending := m.arithmeticPlugin.cachePending
-				if pending.slot != 0 {
-					sawCachePending = true
-				}
 				astTestMust(t, m.CleanupArithmeticNumeralInvocation(&call))
 				astTestMust(t, m.CleanupArithmeticNumeralInvocation(&call))
 				if frame.active || !call.retired {
@@ -97,9 +93,6 @@ func TestASTArithmeticNumeralInvocationEveryActualReservation(t *testing.T) {
 				}
 				if savedBody != call.bodyCause || savedSource != call.sourceCause {
 					t.Fatal("history changed")
-				}
-				if pending != m.arithmeticPlugin.cachePending {
-					t.Fatal("lexical cleanup adopted plugin cache pin")
 				}
 				if body != nil {
 					if _, e = m.ArithmeticNumeralWithInvocation(&v, tc.integer, &call); e != ErrASTPending {
@@ -111,9 +104,7 @@ func TestASTArithmeticNumeralInvocationEveryActualReservation(t *testing.T) {
 		if !complete {
 			t.Fatal("campaign incomplete", tc.text)
 		}
-		if tc.text == "15" && !sawCachePending {
-			t.Fatal("cache INC/resize frontier not reached")
-		}
+
 	}
 }
 

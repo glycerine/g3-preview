@@ -1,5 +1,4 @@
-// Source: src/ast/arith_decl_plugin.cpp:400-449;
-// src/util/vector.h:407-421,489-494.
+// Source: src/ast/arith_decl_plugin.cpp:400-449.
 package ast
 
 import (
@@ -60,17 +59,6 @@ func (f *astArithNumeralFrame) destroy(m *ASTManager, own bool) error {
 	return nil
 }
 
-// Source resize keeps the old size during every reached geometric expansion.
-// Filling the gaps and publishing the new size happen only after all growth.
-func (p *astArithmeticPluginOwner) cacheNumeral(which int, index uint32, r astNodeRef) error {
-	v := &p.small[which]
-	if e := v.resizeNull(p.owner.BudgetField, index+1); e != nil {
-		return e
-	}
-	v.words[2+index*2], v.words[3+index*2] = r.slot, r.generation
-	return nil
-}
-
 func (m *ASTManager) mkArithmeticNumeral(value *util.OwnedRational, integer bool, zero bool) (result astNodeRef, err error) {
 	return m.mkArithmeticNumeralCaptured(value, integer, zero, nil)
 }
@@ -80,7 +68,7 @@ func (m *ASTManager) mkArithmeticNumeralCaptured(value *util.OwnedRational, inte
 	if p == nil || !p.published {
 		return result, ErrASTHandle
 	}
-	if p.numeral.active || p.cachePending.slot != 0 {
+	if p.numeral.active {
 		return result, ErrASTPending
 	}
 	if integer && !zero {
@@ -113,10 +101,10 @@ func (m *ASTManager) mkArithmeticNumeralCaptured(value *util.OwnedRational, inte
 	if integer && (!cached || !p.convertIntNumerals) {
 		flag = 1
 	}
-	if cached && u < p.small[which].size() {
-		r, e := p.small[which].at(u)
-		if e != nil || r.slot != 0 {
-			return r, e
+	if cached && uint64(u) < uint64(len(p.small[which])) {
+		r := p.small[which][u]
+		if r.slot != 0 {
+			return r, nil
 		}
 	}
 	if p.numeralSerial == math.MaxUint64 {
@@ -176,11 +164,11 @@ func (m *ASTManager) mkArithmeticNumeralCaptured(value *util.OwnedRational, inte
 	if err = m.incNode(result); err != nil {
 		return result, err
 	}
-	p.cachePending = result
-	if err = p.cacheNumeral(which, u, result); err != nil {
-		return result, err
+	v := &p.small[which]
+	if int(u) >= len(*v) {
+		*v = append(*v, make([]astNodeRef, int(u)+1-len(*v))...)
 	}
-	p.cachePending = astNodeRef{}
+	(*v)[u] = result
 	return result, nil
 }
 

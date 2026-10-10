@@ -180,11 +180,11 @@ func TestASTBitVectorParameterizedLargeSortIsUncached(t *testing.T) {
 	astTestMust(t, e)
 	s, e := m.BitVectorSort(2048)
 	astTestMust(t, e)
-	oldSize := m.bitVectorPlugin.sorts.size()
+	oldSize := len(m.bitVectorPlugin.sorts)
 	d, e := m.MkFamilyFuncDecl(fid, 37, nil, []ASTHandle{s, s}, ASTHandle{})
 	astTestMust(t, e)
 	astTestPin(t, m, d)
-	if m.bitVectorPlugin.sorts.size() != oldSize {
+	if len(m.bitVectorPlugin.sorts) != oldSize {
 		t.Fatal("large get_bv_sort must bypass sort cache")
 	}
 	r, e := m.GetRange(d)

@@ -1,39 +1,9 @@
-// Source: src/ast/bv_decl_plugin.cpp:132-141,437-468;
-// src/util/vector.h:407-436,504-512.
+// Source: src/ast/bv_decl_plugin.cpp:132-141,437-468.
 package ast
 
 import (
-	"github.com/glycerine/g3/pkg/arena"
 	"math"
-	"reflect"
 )
-
-func (p *astBitVectorPluginOwner) resizeBitRows(needed uint32) error {
-	if needed <= p.bit2boolSize {
-		return nil
-	}
-	recordBytes := uint64(reflect.TypeOf(astFormatRefVector{}).Size())
-	for uint64(len(p.bit2bool)) < uint64(needed) {
-		n := (uint64(len(p.bit2bool))*3 + 1) / 2
-		if n < 2 {
-			n = 2
-		}
-		if n > math.MaxUint32 || n > uint64(^uint(0)>>1)/recordBytes {
-			return arena.ErrBounds
-		}
-		if e := p.owner.BudgetField.Reserve(n * recordBytes); e != nil {
-			return e
-		}
-		rows := make([]astFormatRefVector, int(n))
-		copy(rows, p.bit2bool[:p.bit2boolSize])
-		p.owner.BudgetField.Release(uint64(len(p.bit2bool)) * recordBytes)
-		p.bit2bool = rows
-	}
-	// Default ptr_vector construction has no child allocation. Logical size is
-	// published only after growth, preserving completed old row ownership.
-	p.bit2boolSize = needed
-	return nil
-}
 
 func (m *ASTManager) bitVectorMKBV(domain []ASTHandle) (astNodeRef, error) {
 	p := m.bitVectorPlugin
@@ -57,12 +27,12 @@ func (m *ASTManager) bitVectorMKBV(domain []ASTHandle) (astNodeRef, error) {
 	}
 	width := uint32(len(domain))
 	v := &p.fixed[56]
-	if e := v.resizeNull(m.BudgetField, width+1); e != nil {
-		return astNodeRef{}, e
+	if uint64(len(*v)) < uint64(width+1) {
+		*v = append(*v, make([]astNodeRef, int(width+1)-len(*v))...)
 	}
-	r, e := v.at(width)
-	if e != nil || r.slot != 0 {
-		return r, e
+	r := (*v)[width]
+	if r.slot != 0 {
+		return r, nil
 	}
 	result, e := p.getSort(width)
 	if e != nil {
@@ -93,12 +63,12 @@ func (m *ASTManager) bitVectorBit2Bool(width uint32, ps []ASTParameter, domain [
 	if p.fixedPending.slot != 0 {
 		return astNodeRef{}, ErrASTPending
 	}
-	if e = p.resizeBitRows(width + 1); e != nil {
-		return astNodeRef{}, e
+	if uint64(len(p.bit2bool)) < uint64(width)+1 {
+		p.bit2bool = append(p.bit2bool, make([][]astNodeRef, int(width)+1-len(p.bit2bool))...)
 	}
 	v := &p.bit2bool[width]
-	if e = v.resizeNull(m.BudgetField, width); e != nil {
-		return astNodeRef{}, e
+	if uint64(len(*v)) < uint64(width) {
+		*v = append(*v, make([]astNodeRef, int(width)-len(*v))...)
 	}
 	index := uint32(parameter.integer)
 	// Negative indices pass the original signed comparison, then convert to
@@ -107,15 +77,15 @@ func (m *ASTManager) bitVectorBit2Bool(width uint32, ps []ASTParameter, domain [
 	if index >= width {
 		return astNodeRef{}, ErrASTDomain
 	}
-	r, e := v.at(index)
-	if e != nil || r.slot != 0 {
-		return r, e
+	r := (*v)[index]
+	if r.slot != 0 {
+		return r, nil
 	}
 	r, e = m.pluginDecl(p.names[8], p.family, 55, ps, domain, m.boolSort, ASTFuncFlags{}, false)
 	if e != nil {
 		return astNodeRef{}, e
 	}
-	v.words[2+index*2], v.words[3+index*2] = r.slot, r.generation
+	(*v)[index] = r
 	p.fixedPending, p.fixedPendingKind, p.fixedPendingWidth, p.fixedPendingIndex = r, 55, width, index
 	if e = m.incNode(r); e != nil {
 		return r, e
@@ -124,24 +94,12 @@ func (m *ASTManager) bitVectorBit2Bool(width uint32, ps []ASTParameter, domain [
 	return r, nil
 }
 
-func (p *astBitVectorPluginOwner) booleanBitsBytes() uint64 {
-	n := uint64(len(p.bit2bool))*uint64(reflect.TypeOf(astFormatRefVector{}).Size()) + p.fixed[56].bytes()
-	for i := uint32(0); i < p.bit2boolSize; i++ {
-		n += p.bit2bool[i].bytes()
-	}
-	return n
-}
 func (p *astBitVectorPluginOwner) releaseBooleanBits() {
-	for i := uint32(0); i < p.bit2boolSize; i++ {
-		p.bit2bool[i].close(p.owner.BudgetField)
-	}
-	p.owner.BudgetField.Release(uint64(len(p.bit2bool)) * uint64(reflect.TypeOf(astFormatRefVector{}).Size()))
 	p.bit2bool = nil
-	p.bit2boolSize = 0
-	p.fixed[56].close(p.owner.BudgetField)
+	p.fixed[56] = nil
 }
 func (p *astBitVectorPluginOwner) finalizeBooleanBits() error {
-	for width := uint32(0); width < p.bit2boolSize; width++ {
+	for width := range p.bit2bool {
 		if e := p.finalizeBitVectorCache(&p.bit2bool[width]); e != nil {
 			return e
 		}

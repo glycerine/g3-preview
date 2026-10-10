@@ -59,8 +59,8 @@ func (p *astBitVectorPluginOwner) conversionDecl(k int32, width uint32, ps []AST
 		return astNodeRef{}, ErrASTPending
 	}
 	v := &p.fixed[k]
-	if e := v.resizeNull(m.BudgetField, width+1); e != nil {
-		return astNodeRef{}, e
+	if uint64(len(*v)) < uint64(width+1) {
+		*v = append(*v, make([]astNodeRef, int(width+1)-len(*v))...)
 	}
 	if len(domain) != 1 {
 		message := "expecting one argument to int2bv"
@@ -69,10 +69,11 @@ func (p *astBitVectorPluginOwner) conversionDecl(k int32, width uint32, ps []AST
 		}
 		return astNodeRef{}, bvDeclarationError(message)
 	}
-	r, e := v.at(width)
-	if e != nil || r.slot != 0 {
-		return r, e
+	r := (*v)[width]
+	if r.slot != 0 {
+		return r, nil
 	}
+	var e error
 	result := p.fields[4]
 	name := "bv2int"
 	if k == 57 {

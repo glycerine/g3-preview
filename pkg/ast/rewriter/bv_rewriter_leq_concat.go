@@ -175,7 +175,8 @@ func (p *BVRewriter) leConcatBody(v *bvLEConcatInvocation, signed bool, a, b ast
 				}
 				var node ast.ASTHandle
 				if width > small {
-					head, e := v.numerals.Constant(i, width-small)
+					var head ast.ASTHandle
+					head, e = v.numerals.Constant(i, width-small)
 					if e != nil {
 						return failed, RewriteFailed, e
 					}

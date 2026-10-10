@@ -204,7 +204,7 @@ func TestASTArithmeticOriginalValueAndZeroCallbacks(t *testing.T) {
 }
 
 func TestASTArithmeticNumeralEveryCachePublicationReservation(t *testing.T) {
-	succeeded, sawPending := false, false
+	succeeded := false
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m := astTestManager(t)
@@ -223,8 +223,28 @@ func TestASTArithmeticNumeralEveryCachePublicationReservation(t *testing.T) {
 			if e == nil {
 				rc, e := m.GetRefCount(h)
 				astTestMust(t, e)
-				if rc != 1 || m.arithmeticPlugin.small[0].size() != 16 {
+				if rc != 1 || len(m.arithmeticPlugin.small[0]) != 16 {
 					t.Fatal("published cache owner", ordinal, rc)
+				}
+				for _, hole := range m.arithmeticPlugin.small[0][:15] {
+					if hole.slot != 0 {
+						t.Fatal("native cache gap published a node")
+					}
+				}
+				used := m.Budget().Used()
+				m.Budget().FailAfter(0)
+				for repeat := 0; repeat < 3; repeat++ {
+					got, e := m.ArithmeticNumeral(&n, true)
+					astTestMust(t, e)
+					if got != h {
+						t.Fatal("cached numeral identity")
+					}
+				}
+				m.Budget().FailAfter(-1)
+				refs, e := m.GetRefCount(h)
+				astTestMust(t, e)
+				if refs != 1 || m.Budget().Used() != used {
+					t.Fatal("cached lookup acquired another pin or storage")
 				}
 				succeeded = true
 				return
@@ -233,26 +253,8 @@ func TestASTArithmeticNumeralEveryCachePublicationReservation(t *testing.T) {
 			if !errors.Is(e, arena.ErrInjectedFailure) && (!errors.As(e, &failure) || failure.Kind != util.FailureMemout) {
 				t.Fatal("cache refusal cause", ordinal, e)
 			}
-			p := m.arithmeticPlugin
-			if p.cachePending.slot != 0 {
-				sawPending = true
-				rc, e := m.GetRefCount(m.external(p.cachePending))
-				astTestMust(t, e)
-				if rc != 1 || p.small[0].size() != 0 {
-					t.Fatal("INC before source resize size publication", ordinal, rc, p.small[0].size())
-				}
-				if _, e := m.ArithmeticNumeral(&n, true); !errors.Is(e, ErrASTPending) {
-					t.Fatal("unjoined INC overwritten", e)
-				}
-				if e := m.SourceFinalize(); !errors.Is(e, ErrASTPending) {
-					t.Fatal("unfinished cache owner source-finalize guard", e)
-				}
-			}
 		})
 		if succeeded {
-			if !sawPending {
-				t.Fatal("cache growth failures not reached")
-			}
 			return
 		}
 	}

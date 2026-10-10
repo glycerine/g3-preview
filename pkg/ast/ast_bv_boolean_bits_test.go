@@ -170,8 +170,7 @@ func TestASTBitVectorBit2BoolGrowthPreservesRowsAndCheckedNegativeIndex(t *testi
 	_, e = m.MkFamilyFuncDecl(fid, 55, []ASTParameter{p}, []ASTHandle{s65}, ASTHandle{})
 	astTestMust(t, e)
 	astTestMust(t, m.DelParameter(&p))
-	saved, e := m.bitVectorPlugin.bit2bool[8].at(3)
-	astTestMust(t, e)
+	saved := m.bitVectorPlugin.bit2bool[8][3]
 	if m.external(saved) != first {
 		t.Fatal("outer vector growth lost inner row ownership")
 	}
@@ -181,7 +180,7 @@ func TestASTBitVectorBit2BoolGrowthPreservesRowsAndCheckedNegativeIndex(t *testi
 	if !errors.Is(e, ErrASTDomain) {
 		t.Fatal("checked source undefined index", e)
 	}
-	if m.bitVectorPlugin.bit2boolSize != 66 || m.bitVectorPlugin.bit2bool[8].size() != 8 {
+	if len(m.bitVectorPlugin.bit2bool) != 66 || len(m.bitVectorPlugin.bit2bool[8]) != 8 {
 		t.Fatal("original resize prefix must remain")
 	}
 	astTestMust(t, m.DelParameter(&negative))
@@ -209,8 +208,7 @@ func TestASTBitVectorBit2BoolPublishedBeforeRejectedINC(t *testing.T) {
 	if e != ErrASTDomain || p.fixedPending != node || p.fixedPendingKind != 55 {
 		t.Fatal("actual failed nested cache INC", e, p.fixedPending)
 	}
-	saved, e := p.bit2bool[8].at(2)
-	astTestMust(t, e)
+	saved := p.bit2bool[8][2]
 	if saved != node {
 		t.Fatal("assignment must precede INC")
 	}

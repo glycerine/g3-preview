@@ -106,7 +106,7 @@ func TestASTBitVectorFamilySortUsesExplicitCacheBeyondGetterCutoff(t *testing.T)
 	astTestMust(t, e)
 	h, e := m.MkFamilySort(fid, 0, []ASTParameter{p})
 	astTestMust(t, e)
-	if m.bitVectorPlugin.sorts.size() != 4097 || m.bitVectorPlugin.sortAcquired[4096] != 1 {
+	if len(m.bitVectorPlugin.sorts) != 4097 || m.bitVectorPlugin.sortAcquired[4096] != 1 {
 		t.Fatal("mk_sort must explicitly cache large widths")
 	}
 	r, e := m.bitVectorPlugin.getSort(4096)

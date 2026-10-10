@@ -34363,3 +34363,48 @@ package grouping or explicit API changes; moving individual SCCs alone is not a
 verified package split. Build profiles/tests and cycles after grouping still
 require audit. Arithmetic/BV caches, remaining reference specializations,
 internal util boundaries and the complete requested root split remain unfinished.
+
+## Native arithmetic and BV plugin cache slices
+
+Arithmetic small Int/Real numerals now use owning []astNodeRef caches. Successful
+INC directly precedes native gap filling/publication; removed cachePending and
+its growth-only owning continuation. Actual numeral copy/parameter invocation
+cleanup remains. Cached repeated numeral reads keep exactly one cache pin and
+succeed with arena reservations disabled; sparse cache holes stay null.
+
+BV sort/fixed/conversion caches and bit2bool rows now use native slices with
+direct indexing and zero-gap append. Removed astFormatRefVector and resizeNull,
+source geometric word/backing codecs, duplicate bit2bool logical size and arena
+capacity charges. Native sort-acquisition flags still record actual INC leaves;
+fixedPending still protects real publish-before-rejected-INC behavior. Finalizers
+retain source member/ascending slot order and clear consumed references before
+errors. Actual headers, numeric construction, validation order and undefined
+negative-index guard remain. New integration grows nested rows and4097-slot
+conversion/sort caches with arena reservations disabled, preserves earlier pins,
+checks guard prefixes and actual successful sort INC, then source-finalizes.
+
+Wider checks exposed two obsolete collection-failure expectations in addition/
+bitwise callers. Actual ordinal campaigns and semantic/status/publication checks
+remain, but no longer require after-core or cold cache-only growth refusals.
+Shifted real concat-comparison factory refusals also exposed a shadowed Go error
+variable: the head literal's branch-local e hid shortConcat failure, allowing a
+null operand into the final comparison. Head acquisition now assigns the
+existing enclosing e; the actual factory error propagates before publication.
+All partial-a/partial-b reservation cases pass with this production correction.
+Temporary diagnostic instrumentation was removed.
+
+Validation: focused arithmetic/BV checks passed (17.786s); added native/debug
+cache integration checks passed (0.015s/0.018s). Full native AST/model/tactic/
+SAT tactic/API passed (19.085s/0.056s/0.025s/0.118s/0.011s); full debug AST
+passed (20.406s). Final full native rewriter passed (10.608s), including corrected
+concat error propagation; focused native/debug affected caller campaigns passed
+(0.090s/0.183s). Module-wide compilation, AST/rewriter vet, manifest, gofmt and
+diff checks passed. No full module rerun after the05:02 UTC hourly run. Counts
+unchanged:2102 units/677 APIs:62 ported,283 partial,1729 unported,two dead/deleted.
+No C++ generic container/STL or removed allocation geometry credit is added.
+
+Production caller audit found dependency ref-vector/ref-buffer types only inside
+their own bridge implementations; audit those before removal. Goal forms/proofs
+and dependencies still use retained ASTExprArray/ASTDependencyArray owners and
+need native slice migration. The remaining consumer cleanup, internal util
+package boundaries and complete root util subpackage split remain unfinished.

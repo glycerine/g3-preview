@@ -118,8 +118,7 @@ func TestASTBitVectorFixedValidationPublicationAndApplications(t *testing.T) {
 		}
 	}
 	for _, kind := range []int32{5, 6} {
-		r, e := m.bitVectorPlugin.fixed[kind].at(8)
-		astTestMust(t, e)
+		r := m.bitVectorPlugin.fixed[kind][8]
 		if r.slot == 0 || m.nodeAt(r.slot).rc != 1 {
 			t.Fatal("validation must follow cache INC", kind, r)
 		}
@@ -175,8 +174,8 @@ func TestASTBitVectorFixedEveryColdCacheReservation(t *testing.T) {
 			t.Fatal(ordinal, call)
 		}
 		v := &m.bitVectorPlugin.fixed[4]
-		if call != nil && v.size() != 0 && v.size() != 66 {
-			t.Fatal("partial logical size publication", ordinal, v.size())
+		if call != nil && len(*v) != 0 && len(*v) != 66 {
+			t.Fatal("partial logical size publication", ordinal, len(*v))
 		}
 		if b.Used() != m.Stats().AllocatedBytes {
 			t.Fatal("actual cache backing accounting", ordinal, b.Used(), m.Stats())
@@ -217,8 +216,7 @@ func TestASTBitVectorFixedPublishedBeforeRejectedINC(t *testing.T) {
 	if e != ErrASTDomain || p.fixedPending != r {
 		t.Fatal("actual rejected cache INC", e, p.fixedPending, r)
 	}
-	captured, e := p.fixed[5].at(8)
-	astTestMust(t, e)
+	captured := p.fixed[5][8]
 	if captured != r {
 		t.Fatal("source assignment before INC", captured, r)
 	}
@@ -233,8 +231,7 @@ func TestASTBitVectorFixedPublishedBeforeRejectedINC(t *testing.T) {
 	if m.nodeAt(r.slot).rc != ^uint32(0) {
 		t.Fatal("own abort fabricated DEC")
 	}
-	captured, e = p.fixed[5].at(8)
-	astTestMust(t, e)
+	captured = p.fixed[5][8]
 	if captured.slot != 0 {
 		t.Fatal("unacquired raw slot retained", captured)
 	}

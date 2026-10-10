@@ -5,7 +5,6 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -23,15 +22,14 @@ type astBitVectorPluginOwner struct {
 	names                                  [10]usymbol.Symbol
 	fields                                 [5]astNodeRef
 	fieldAcquired                          [5]bool
-	sortAcquired                           []byte // charged cold leaf receipts, not a second pointer table
-	fixed                                  [61]astFormatRefVector
+	sortAcquired                           []byte // actual successful INC flags, alongside native sort slots
+	fixed                                  [61][]astNodeRef
 	fixedPending                           astNodeRef
 	fixedPendingKind                       int32
 	fixedPendingWidth                      uint32
 	fixedPendingIndex                      uint32
-	bit2bool                               []astFormatRefVector
-	bit2boolSize                           uint32
-	sorts                                  astFormatRefVector
+	bit2bool                               [][]astNodeRef
+	sorts                                  []astNodeRef
 	family                                 FamilyID
 	header                                 uint64
 	power                                  util.OwnedRational
@@ -42,10 +40,10 @@ type astBitVectorPluginOwner struct {
 func (m *ASTManager) bitVectorPluginBytes() uint64 {
 	var n uint64
 	if p := m.bitVectorPlugin; p != nil {
-		n += p.header + p.booleanBitsBytes() + p.fixedBytes() + p.sorts.bytes() + p.numeralBytes() + p.literalBytes() + uint64(len(p.sortAcquired))
+		n += p.header + p.numeralBytes() + p.literalBytes()
 	}
 	for p := m.bitVectorPluginFailed; p != nil; p = p.next {
-		n += p.header + p.booleanBitsBytes() + p.fixedBytes() + p.sorts.bytes() + p.numeralBytes() + p.literalBytes() + uint64(len(p.sortAcquired))
+		n += p.header + p.numeralBytes() + p.literalBytes()
 	}
 	return n
 }
@@ -56,8 +54,7 @@ func (m *ASTManager) releaseBitVectorPluginHeaders() {
 			p.releaseNumeralFrames()
 			p.releaseBooleanBits()
 			p.releaseFixed()
-			p.sorts.close(m.BudgetField)
-			m.BudgetField.Release(uint64(len(p.sortAcquired)))
+			p.sorts = nil
 			p.sortAcquired = nil
 			m.BudgetField.Release(p.header)
 			p.header = 0
@@ -73,8 +70,7 @@ func (m *ASTManager) releaseBitVectorPluginHeaders() {
 		p.releaseNumeralFrames()
 		p.releaseBooleanBits()
 		p.releaseFixed()
-		p.sorts.close(m.BudgetField)
-		m.BudgetField.Release(uint64(len(p.sortAcquired)))
+		p.sorts = nil
 		p.sortAcquired = nil
 		m.BudgetField.Release(p.header)
 		p.header = 0
@@ -133,11 +129,7 @@ func (m *ASTManager) finalizeBitVectorPlugin() error {
 			return e
 		}
 	}
-	for j := uint32(0); j < p.sorts.size(); j++ {
-		r, e := p.sorts.at(j)
-		if e != nil {
-			return e
-		}
+	for j, r := range p.sorts {
 		if r.slot == 0 {
 			continue
 		}
@@ -146,8 +138,7 @@ func (m *ASTManager) finalizeBitVectorPlugin() error {
 		}
 		consumed, e := m.decNode(r)
 		if consumed {
-			p.sorts.words[2+j*2] = 0
-			p.sorts.words[3+j*2] = 0
+			p.sorts[j] = astNodeRef{}
 			p.sortAcquired[j] = 0
 		}
 		if e != nil {
@@ -164,14 +155,14 @@ func (p *astBitVectorPluginOwner) mkSort(bits uint32) (astNodeRef, error) {
 	if bits == math.MaxUint32 {
 		return astNodeRef{}, ErrASTDomain
 	}
-	for p.sorts.size() < bits+1 {
-		if e := p.pushSortSlot(); e != nil {
-			return astNodeRef{}, e
-		}
+	if uint64(len(p.sorts)) < uint64(bits)+1 {
+		gap := int(bits) + 1 - len(p.sorts)
+		p.sorts = append(p.sorts, make([]astNodeRef, gap)...)
+		p.sortAcquired = append(p.sortAcquired, make([]byte, gap)...)
 	}
-	r, e := p.sorts.at(bits)
-	if e != nil || r.slot != 0 {
-		return r, e
+	r := p.sorts[bits]
+	if r.slot != 0 {
+		return r, nil
 	}
 	if p.powerActive {
 		return astNodeRef{}, ErrASTPending
@@ -211,8 +202,7 @@ func (p *astBitVectorPluginOwner) mkSort(bits uint32) (astNodeRef, error) {
 	if e != nil {
 		return astNodeRef{}, e
 	}
-	p.sorts.words[2+bits*2] = r.slot
-	p.sorts.words[3+bits*2] = r.generation
+	p.sorts[bits] = r
 	if e = m.incNode(r); e != nil {
 		return r, e
 	}
@@ -226,10 +216,8 @@ func (p *astBitVectorPluginOwner) setManager() error {
 			return e
 		}
 	}
-	one, e := p.sorts.at(1)
-	if e != nil {
-		return e
-	}
+	one := p.sorts[1]
+	var e error
 	p.fields[0], e = m.makePluginDeclaration(p.family, "bit0", 2, nil, one, ASTFuncFlags{})
 	if e != nil {
 		return e
@@ -351,47 +339,4 @@ func (m *ASTManager) BitVectorSort(bits uint32) (ASTHandle, error) {
 	}
 	r, e := m.bitVectorPlugin.mkSort(bits)
 	return m.external(r), e
-}
-
-// Concrete cache resize shares the existing pointer-free word codec. Coupled
-// cold receipt backing is prepared at the real Go growth boundary before NEW
-// publication; it records only each successful INC action, never inferred RC.
-func (p *astBitVectorPluginOwner) pushSortSlot() error {
-	m := p.owner
-	size := p.sorts.size()
-	var cap uint32
-	if len(p.sorts.words) != 0 {
-		cap = p.sorts.words[0]
-	}
-	if size == cap {
-		next := (uint64(cap)*3 + 1) / 2
-		if next < 2 {
-			next = 2
-		}
-		if next > math.MaxUint32 || next*2+2 > uint64(^uint(0)>>1)/4 {
-			return arena.ErrBounds
-		}
-		wordsBytes := (next*2 + 2) * 4
-		if e := m.BudgetField.Reserve(wordsBytes + next); e != nil {
-			return e
-		}
-		words := make([]uint32, int(next)*2+2)
-		receipts := make([]byte, int(next))
-		words[0] = uint32(next)
-		words[1] = size
-		for i := uint32(0); i < size*2; i++ {
-			words[2+i] = p.sorts.words[2+i]
-		}
-		for i := uint32(0); i < size; i++ {
-			receipts[i] = p.sortAcquired[i]
-		}
-		m.BudgetField.Release(p.sorts.bytes() + uint64(len(p.sortAcquired)))
-		p.sorts.words = words
-		p.sortAcquired = receipts
-	}
-	p.sorts.words[2+size*2] = 0
-	p.sorts.words[3+size*2] = 0
-	p.sortAcquired[size] = 0
-	p.sorts.words[1]++
-	return nil
 }
