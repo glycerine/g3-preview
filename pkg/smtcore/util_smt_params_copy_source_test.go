@@ -54,11 +54,11 @@ func smtCopyLongSource(t *testing.T, c *util.ParamsContext, p *util.ParamsRef, s
 	paramsMust(t, s.qi.Update(p))
 	// Source public m_qi_new_gen is not assigned by updt_params; establish
 	// its value through the actual selected std::string assignment engine.
-	paramsMust(t, s.qi.newGen.Assign(util.LiteralParamsStringView(strings.Repeat("g", 37))))
+	paramsMust(t, s.qi.newGen.Assign(strings.Repeat("g", 37)))
 	// A later shorter public string assignment retains larger capacity; copy
 	// construction must allocate source length, not source capacity.
-	paramsMust(t, s.qi.cost.Assign(util.LiteralParamsStringView(strings.Repeat("c", 44))))
-	paramsMust(t, s.qi.cost.Assign(util.LiteralParamsStringView(strings.Repeat("c", 43))))
+	paramsMust(t, s.qi.cost.Assign(strings.Repeat("c", 44)))
+	paramsMust(t, s.qi.cost.Assign(strings.Repeat("c", 43)))
 }
 func TestSMTParamsCopyConstructorPreservesAllBasesAndBorrowedPointerWithoutGetters(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
@@ -231,8 +231,8 @@ func TestSMTParamsStringCopyUsesCountedBytesAndInlineAssignmentRetainsCapacity(t
 		t.Fatal("copy is counted string, never strlen")
 	}
 	smtCopyGraph(t, g, b, src, dst)
-	paramsMust(t, src.qi.cost.Assign(util.LiteralParamsStringView("tiny")))
-	paramsMust(t, src.qi.newGen.Assign(util.LiteralParamsStringView("")))
+	paramsMust(t, src.qi.cost.Assign("tiny"))
+	paramsMust(t, src.qi.newGen.Assign(""))
 	// Go assignment preserves values independently of the numeric arena.
 
 	b.FailAfter(0)

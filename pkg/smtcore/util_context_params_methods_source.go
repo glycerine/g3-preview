@@ -190,7 +190,11 @@ func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result err
 		return e
 	}
 	defer func() { result = s.endSourceFrame(f, result) }()
-	if e = f.key.Construct(s.budget, param); e != nil {
+	key, e := param.String()
+	if e != nil {
+		return e
+	}
+	if e = f.key.Construct(s.budget, key); e != nil {
 		return e
 	}
 	f.keyComplete = true
@@ -226,9 +230,17 @@ func (s *ContextParams) SetViews(param, value util.ParamsStringView) (result err
 	case f.key.Matches("trace"):
 		return s.setSourceBool(f, &s.state.Trace, param, value)
 	case f.key.Matches("trace_file_name"):
-		return s.traceFile.Assign(value)
+		text, e := value.String()
+		if e != nil {
+			return e
+		}
+		return s.traceFile.Assign(text)
 	case f.key.Matches("dot_proof_file"):
-		return s.dotProof.Assign(value)
+		text, e := value.String()
+		if e != nil {
+			return e
+		}
+		return s.dotProof.Assign(text)
 	case f.key.Matches("unsat_core"):
 		return s.setSourceBool(f, &s.state.UnsatCore, param, value)
 	case f.key.Matches("debug_ref_count"):

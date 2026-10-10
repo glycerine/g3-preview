@@ -12,7 +12,7 @@ func (m *ArbitraryFloatManager) ToStringBinary(x *ArbitraryFloat, upperExtra, lo
 		return ErrNumericPending
 	}
 	if out == nil || out.Self != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	*s = arbitraryFloatBinaryStringScope{manager: m, invocation: s.invocation + 1, out: out, active: true, executing: true}
 	s.hooks.Policy = s
@@ -31,7 +31,7 @@ func (m *ArbitraryFloatManager) ToStringBinary(x *ArbitraryFloat, upperExtra, lo
 			s.active = false
 		}
 	}()
-	if e := out.Construct(m.budget, LiteralParamsStringView("")); e != nil {
+	if e := out.Construct(m.budget, ""); e != nil {
 		return e
 	}
 	s.outLive = true
@@ -39,11 +39,11 @@ func (m *ArbitraryFloatManager) ToStringBinary(x *ArbitraryFloat, upperExtra, lo
 }
 
 func (s *arbitraryFloatBinaryStringScope) appendExpr(text string) error {
-	return s.expr.AppendCString(LiteralParamsStringView(text))
+	return s.expr.AppendCString(text)
 }
 func (s *arbitraryFloatBinaryStringScope) beginExpr() error {
 	s.expr = OwnedString{}
-	e := s.expr.Construct(s.manager.budget, LiteralParamsStringView(""))
+	e := s.expr.Construct(s.manager.budget, "")
 	s.exprLive = s.expr.Ready
 	return e
 }
@@ -223,7 +223,7 @@ func (s *arbitraryFloatBinaryStringScope) run(x *ArbitraryFloat, upper, lower ui
 	if e := z.setInt64WithAllocationContext(&s.tmp, biased, c); e != nil {
 		return e
 	}
-	if e := s.bits.Construct(m.budget, LiteralParamsStringView("")); e != nil {
+	if e := s.bits.Construct(m.budget, ""); e != nil {
 		return e
 	}
 	s.bitsLive = true
@@ -242,7 +242,7 @@ func (s *arbitraryFloatBinaryStringScope) run(x *ArbitraryFloat, upper, lower ui
 	if e := s.appendBits(true); e != nil {
 		return e
 	}
-	if e := s.bits.Assign(LiteralParamsStringView("")); e != nil {
+	if e := s.bits.Assign(""); e != nil {
 		return e
 	}
 	if e := z.copyFromOwnerWithAllocationContext(&s.tmp, z, &x.significand, nil, c); e != nil {
@@ -257,16 +257,16 @@ func (s *arbitraryFloatBinaryStringScope) run(x *ArbitraryFloat, upper, lower ui
 			return e
 		}
 		if i == lower-1 {
-			if e := s.bits.AppendCString(LiteralParamsStringView(",")); e != nil {
+			if e := s.bits.AppendCString(","); e != nil {
 				return e
 			}
 		}
 		if i == x.SBits()+lower-2 {
-			if e := s.bits.AppendCString(LiteralParamsStringView(".")); e != nil {
+			if e := s.bits.AppendCString("."); e != nil {
 				return e
 			}
 			if i == numBits-1 {
-				if e := s.bits.AppendCString(LiteralParamsStringView(" ")); e != nil {
+				if e := s.bits.AppendCString(" "); e != nil {
 					return e
 				}
 			}
@@ -286,11 +286,11 @@ func (s *arbitraryFloatBinaryStringScope) appendBit() error {
 	if odd {
 		bit = "1"
 	}
-	return s.bits.AppendCString(LiteralParamsStringView(bit))
+	return s.bits.AppendCString(bit)
 }
 func (s *arbitraryFloatBinaryStringScope) appendBits(space bool) error {
 	s.expr = OwnedString{}
-	e := s.expr.ConstructCStringConcat(s.manager.budget, LiteralParamsStringView("#b"), s.bits.View())
+	e := s.expr.ConstructCStringConcat(s.manager.budget, "#b", s.bits.View())
 	s.exprLive = s.expr.Ready
 	if e != nil {
 		return e

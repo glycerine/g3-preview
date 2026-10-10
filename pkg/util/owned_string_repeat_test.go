@@ -68,18 +68,18 @@ func TestOwnedStringRepeatedConstructorFailureAndAuthority(t *testing.T) {
 	}
 	serviceMust(t, s.ConstructRepeated(nil, 120, 0))
 	copied := s
-	if !errors.Is(copied.Reverse(), ErrParamsPrecondition) {
+	if !errors.Is(copied.Reverse(), ErrOwnedStringOwner) {
 		t.Fatal("copied owner")
 	}
-	if !errors.Is(s.ConstructRepeated(nil, 1, 'x'), ErrParamsPrecondition) {
+	if !errors.Is(s.ConstructRepeated(nil, 1, 'x'), ErrOwnedStringOwner) {
 		t.Fatal("reconstruction")
 	}
 	s.OwnAbort()
-	if !errors.Is(s.Reverse(), ErrParamsPrecondition) {
+	if !errors.Is(s.Reverse(), ErrOwnedStringOwner) {
 		t.Fatal("closed owner")
 	}
 	var absent *OwnedString
-	if !errors.Is(absent.ConstructRepeated(nil, 1, 'x'), ErrParamsPrecondition) || !errors.Is(absent.Reverse(), ErrParamsPrecondition) {
+	if !errors.Is(absent.ConstructRepeated(nil, 1, 'x'), ErrOwnedStringOwner) || !errors.Is(absent.Reverse(), ErrOwnedStringOwner) {
 		t.Fatal("nil owner")
 	}
 }

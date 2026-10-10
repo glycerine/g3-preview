@@ -466,7 +466,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	paramsMust(t, x)
 	older, x := s3.beginSourceFrame()
 	paramsMust(t, x)
-	paramsMust(t, older.key.Construct(b, util.LiteralParamsStringView(strings.Repeat("k", 81))))
+	paramsMust(t, older.key.Construct(b, strings.Repeat("k", 81)))
 	older.keyComplete = true
 	younger, x := s3.beginSourceFrame()
 	paramsMust(t, x)

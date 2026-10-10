@@ -64,12 +64,12 @@ func (s *SMTQIParams) constructSource(c *util.ParamsContext, p *util.ParamsRef, 
 	*s = SMTQIParams{ModuleParamsOwner: util.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
-	if e := s.cost.Construct(b, util.LiteralParamsStringView("(+ weight generation)")); e != nil {
+	if e := s.cost.Construct(b, "(+ weight generation)"); e != nil {
 		s.constructorCause = e
 		return e
 	}
 	s.completed = 1
-	if e := s.newGen.Construct(b, util.LiteralParamsStringView("cost")); e != nil {
+	if e := s.newGen.Construct(b, "cost"); e != nil {
 		s.cost.SourceDestroy()
 		s.constructorCause = e
 		return e
@@ -215,7 +215,11 @@ func (s *SMTQIParams) update(local *util.ParamsRef) (result error) {
 	if e != nil {
 		return e
 	}
-	if e = s.cost.Assign(text); e != nil {
+	cost, e := text.String()
+	if e != nil {
+		return e
+	}
+	if e = s.cost.Assign(cost); e != nil {
 		return e
 	}
 	u, e = s.FrameUInt(p, "qi.max_multi_patterns", 0)

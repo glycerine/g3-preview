@@ -45,11 +45,11 @@ func NewContextParams(c *util.ParamsContext, g *util.GlobalParamsService, b *are
 	s := &ContextParams{context: c, globals: g, budget: b, header: n}
 	s.self = s
 	// Default std::string members construct in declaration order before the body.
-	if e := s.dotProof.Construct(b, util.LiteralParamsStringView("")); e != nil {
+	if e := s.dotProof.Construct(b, ""); e != nil {
 		s.constructorCause = e
 		return s, e
 	}
-	if e := s.traceFile.Construct(b, util.LiteralParamsStringView("")); e != nil {
+	if e := s.traceFile.Construct(b, ""); e != nil {
 		s.dotProof.SourceDestroy()
 		s.constructorCause = e
 		return s, e
@@ -211,7 +211,11 @@ func (s *ContextParams) update(p *util.ParamsRef) error {
 	if e != nil {
 		return e
 	}
-	if e = s.traceFile.Assign(vtraceFile); e != nil {
+	traceFileText, e := vtraceFile.String()
+	if e != nil {
+		return e
+	}
+	if e = s.traceFile.Assign(traceFileText); e != nil {
 		return e
 	}
 	kdotProof := "dot_proof_file"
@@ -220,7 +224,11 @@ func (s *ContextParams) update(p *util.ParamsRef) error {
 	if e != nil {
 		return e
 	}
-	if e = s.dotProof.Assign(vdotProof); e != nil {
+	dotProofText, e := vdotProof.String()
+	if e != nil {
+		return e
+	}
+	if e = s.dotProof.Assign(dotProofText); e != nil {
 		return e
 	}
 	kUnsatCore := "unsat_core"

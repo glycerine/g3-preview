@@ -11,7 +11,7 @@ func (m *ArbitraryFloatManager) ToRationalString(x *ArbitraryFloat, out *OwnedSt
 		return ErrNumericPending
 	}
 	if out == nil || out.Self != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	s := &m.rationalString
 	*s = arbitraryFloatRationalStringScope{manager: m, q: NewRational(), qLive: true, out: out, active: true, executing: true}

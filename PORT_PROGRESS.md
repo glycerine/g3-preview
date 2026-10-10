@@ -33334,3 +33334,35 @@ internal cycle remains 164 files. Parameter-view/error dependencies from numeric
 text/OwnedString code still join numerical ownership back to params/global
 registries. Remaining external custom storage and that internal cycle must be
 resolved before the complete util subpackage split. Goal remains active.
+
+## Separate numerical text input from parameter views
+
+OwnedString construction, assignment, CString append and prefix concatenation now
+accept native Go strings. Numerical literal/output consumers pass strings directly
+instead of manufacturing ParamsStringView values. A numerical text owner/destination
+error replaces dependencies on parameter-owner/precondition errors. The existing
+first-NUL input behavior, counted native copies, native byte storage, checked output
+view lifetime and actual numerical cleanup remain. ParamsStringView.String now owns
+the existing checked view-to-string conversion in the parameter layer; SMT context
+and QI consumers call it explicitly before native text construction/assignment.
+No generic callback interface or compatibility adapter was introduced.
+
+Validation: full native util passed (96.329s), full native smtcore passed (0.243s).
+Focused numerical formatting/owned-string/SMT parameter paths passed in native and
+g3debug profiles. Actual AST trace-file fixtures pass in both profiles after their
+ended numerical-text guard expectation changes to the new numerical error;
+parameter-CString guard expectations remain parameter errors. Module compilation,
+three-package vet, manifest evidence, gofmt and diff checks passed. Counts remain
+2102 units/677 APIs: 62 ported, 283 partial, 1729 unported, two dead/deleted.
+No full native module rerun inside the hourly interval.
+
+The type-aware file-use audit now finds 286 root files, 106 components, with a
+143-file numerical cycle and a separate 19-file parameter/global cycle (formerly
+one 164-file file-use cycle). This is useful dependency removal, not proof that
+these groups can already move into separate Go packages. A strengthened audit
+also joins each method definition to its receiver type's declaration file, as Go
+requires. That package-placement audit finds 38 components and a largest coupled
+group of 226 files. NumericTextStream's parameter-CString and global-symbol methods
+are among the remaining cross-domain bridges. The complete caller migration and
+subpackage split remain active; no readiness claim is made from file-use counts.
+Audit scripts/results are saved under /mnt/oldrog/tmp/g3-util-{file,package}-dependencies.*.

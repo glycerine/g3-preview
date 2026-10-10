@@ -752,7 +752,7 @@ func (p *MPQInfManager) formatRational(a *Rational, dst *OwnedString) error {
 	if integer {
 		return nil
 	}
-	if e = dst.AppendCString(LiteralParamsStringView("/")); e != nil {
+	if e = dst.AppendCString("/"); e != nil {
 		return e
 	}
 	s := &p.format
@@ -780,7 +780,7 @@ func (p *MPQInfManager) formatPair(a *MPQInf, dst *OwnedString) error {
 	if zero {
 		return p.formatRational(&a.First, dst)
 	}
-	if e = dst.Construct(p.m.BudgetField, LiteralParamsStringView("(")); e != nil {
+	if e = dst.Construct(p.m.BudgetField, "("); e != nil {
 		return e
 	}
 	if e = p.formatRational(&a.First, &s.number); e != nil {
@@ -799,7 +799,7 @@ func (p *MPQInfManager) formatPair(a *MPQInf, dst *OwnedString) error {
 	if negative {
 		suffix = " -e*"
 	}
-	if e = dst.AppendCString(LiteralParamsStringView(suffix)); e != nil {
+	if e = dst.AppendCString(suffix); e != nil {
 		return e
 	}
 	s.tmp = NewRational()
@@ -822,7 +822,7 @@ func (p *MPQInfManager) formatPair(a *MPQInf, dst *OwnedString) error {
 		return e
 	}
 	s.tmpLive = false
-	return dst.AppendCString(LiteralParamsStringView(")"))
+	return dst.AppendCString(")")
 }
 
 // ToString constructs the native return string in caller-provided fresh
@@ -835,7 +835,7 @@ func (p *MPQInfManager) ToString(a *MPQInf, dst *OwnedString) (e error) {
 	}
 	defer p.end(&e)
 	if dst == nil || dst.Self != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if e = p.formatPair(a, dst); e != nil {
 		return e

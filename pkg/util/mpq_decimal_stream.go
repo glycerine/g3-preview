@@ -12,7 +12,7 @@ func (m *RationalManager) DisplayDecimalInto(out RationalSourceStream, a *Ration
 		return ErrNumericPending
 	}
 	if out == nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if s.invocation == ^uint64(0) {
 		return ErrNumericPending

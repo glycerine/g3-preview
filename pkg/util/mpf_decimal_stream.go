@@ -11,7 +11,7 @@ func (m *ArbitraryFloatManager) DisplayDecimalInto(out RationalSourceStream, x *
 		return ErrNumericPending
 	}
 	if out == nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	s := &m.decimalStream
 	*s = arbitraryFloatDecimalStreamScope{manager: m, q: NewRational(), qLive: true, active: true, executing: true}

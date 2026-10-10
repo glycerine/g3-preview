@@ -110,7 +110,7 @@ func TestArbitraryFloatHexfloatComponentsWarmAndRefusedText(t *testing.T) {
 func TestArbitraryFloatHexfloatComponentsEntryAuthority(t *testing.T) {
 	m, _, b := mpfNumeralHelpersFixture(t)
 	sig := NewInt(12)
-	if _, e := m.ToStringHexfloatComponentsInto(false, 0, &sig, 8, 4, 0, nil); !errors.Is(e, ErrParamsPrecondition) {
+	if _, e := m.ToStringHexfloatComponentsInto(false, 0, &sig, 8, 4, 0, nil); !errors.Is(e, ErrOwnedStringOwner) {
 		t.Fatal("nil text", e)
 	}
 	text, e := NewArbitraryFloatFormatText(b)

@@ -12,7 +12,7 @@ func (m *RationalManager) ToOwnedString(a *Rational, out *OwnedString) (cause er
 		return ErrNumericPending
 	}
 	if out == nil || out.Self != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	s := &m.stringScope
 	if s.invocation == ^uint64(0) {
@@ -54,7 +54,7 @@ func (m *RationalManager) ToOwnedString(a *Rational, out *OwnedString) (cause er
 	if integer {
 		return nil
 	}
-	if e := out.AppendCString(LiteralParamsStringView("/")); e != nil {
+	if e := out.AppendCString("/"); e != nil {
 		return e
 	}
 	if e := s.denominatorStream.Construct(m.BudgetField); e != nil {

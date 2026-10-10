@@ -11,7 +11,7 @@ func (m *ArbitraryFloatManager) DisplaySMT2Into(out RationalSourceStream, x *Arb
 		return ErrNumericPending
 	}
 	if out == nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	s := &m.smt2Stream
 	*s = arbitraryFloatSMT2StreamScope{manager: m, q: NewRational(), qLive: true, active: true, executing: true}

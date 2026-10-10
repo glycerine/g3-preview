@@ -21,10 +21,10 @@ type OwnedStringBuffer struct {
 
 func (b *OwnedStringBuffer) Construct(budget *arena.Budget) error {
 	if b == nil || b.Self != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	b.Self = b
-	if e := b.String.Construct(budget, LiteralParamsStringView("")); e != nil {
+	if e := b.String.Construct(budget, ""); e != nil {
 		return e
 	}
 	b.String.goBuilder = &b.builder
@@ -33,7 +33,7 @@ func (b *OwnedStringBuffer) Construct(budget *arena.Budget) error {
 
 func (b *OwnedStringBuffer) put(ch byte) error {
 	if b == nil || b.Self != b || !b.String.Ready || b.String.Closed {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if b.Position >= uint64(^uint(0)>>1) {
 		return arena.ErrBounds
@@ -48,7 +48,7 @@ func (b *OwnedStringBuffer) put(ch byte) error {
 
 func (b *OwnedStringBuffer) writeString(text string) error {
 	if b == nil || b.Self != b || !b.String.Ready || b.String.Closed {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if uint64(len(text)) > uint64(^uint(0)>>1)-b.Position {
 		return arena.ErrBounds
@@ -64,10 +64,10 @@ func (b *OwnedStringBuffer) writeString(text string) error {
 // Str returns text independent of subsequent writes and buffer destruction.
 func (b *OwnedStringBuffer) Str(dst *OwnedString) error {
 	if b == nil || b.Self != b || b.String.Closed || !b.String.Ready {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if dst == nil || dst.Self != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	// CopyConstruct preserves counted bytes, including embedded NULs.
 	return dst.CopyConstruct(b.String.Budget, &b.String)
@@ -90,14 +90,14 @@ type OwnedStringStream struct {
 
 func (s *OwnedStringStream) Construct(b *arena.Budget) error {
 	if s == nil || s.Self != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	s.Self = s
 	return s.Buffer.Construct(b)
 }
 func (s *OwnedStringStream) check() error {
 	if s == nil || s.Self != s || s.Buffer.String.Closed {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	return s.Cause
 }

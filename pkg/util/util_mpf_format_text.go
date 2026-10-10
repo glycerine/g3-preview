@@ -42,7 +42,7 @@ func NewArbitraryFloatFormatText(b *arena.Budget) (*ArbitraryFloatFormatText, er
 	t := &ArbitraryFloatFormatText{budget: b, Header: n}
 	t.Self = t
 	t.Stream.owner = t
-	if e := t.Result.Construct(b, LiteralParamsStringView("")); e != nil {
+	if e := t.Result.Construct(b, ""); e != nil {
 		b.Release(n)
 		return nil, e
 	}
@@ -67,7 +67,7 @@ func (t *ArbitraryFloatFormatText) AssignLiteral(s string) error {
 	if e := t.open(); e != nil {
 		return e
 	}
-	return t.Result.Assign(LiteralParamsStringView(s))
+	return t.Result.Assign(s)
 }
 func (t *ArbitraryFloatFormatText) NewArbitraryFloatFormatStream() (ArbitraryFloatFormatStream, error) {
 	if e := t.open(); e != nil {
@@ -107,7 +107,7 @@ func (t *ArbitraryFloatFormatText) captureStreamTemporary(s *NumericTextStream) 
 }
 func CaptureNumericStreamOwnedString(q *OwnedString, s *NumericTextStream, b *arena.Budget) error {
 	if q == nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if e := s.lock(); e != nil {
 		return e
@@ -184,7 +184,7 @@ func (t *ArbitraryFloatFormatText) SourceFinalize() error {
 		return e
 	}
 	if t.Stream.NumericTextStream != nil && !t.Stream.ClosedField {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	t.Result.SourceDestroy()
 	t.SourceEndedField = true

@@ -3,11 +3,14 @@ package util
 
 import (
 	"bytes"
+	"errors"
 	"math"
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
+
+var ErrOwnedStringOwner = errors.New("g3: invalid numeric text owner or destination")
 
 // OwnedString is a checked Go text adapter for existing project APIs. Its bytes
 // are Go-managed; neither storage nor growth follows a C++ string implementation.
@@ -79,32 +82,9 @@ func (s *OwnedString) CStringByte(i uint64) (byte, error) {
 // StorageBytes reports numeric-arena storage. Go owns this adapter's memory.
 func (s *OwnedString) StorageBytes() uint64 { return 0 }
 
-func paramsStringText(v ParamsStringView) (string, error) {
-	if v.Mode == 1 && v.PresentField {
-		text := v.literal
-		if i := strings.IndexByte(text, 0); i >= 0 {
-			text = text[:i]
-		}
-		return text, nil
-	}
-	var text strings.Builder
-	for i := uint64(0); ; i++ {
-		ch, e := v.Byte(i)
-		if e != nil {
-			return "", e
-		}
-		if ch == 0 {
-			return text.String(), nil
-		}
-		if i >= uint64(^uint(0)>>1)-1 {
-			return "", arena.ErrBounds
-		}
-		text.WriteByte(ch)
-	}
-}
 func (s *OwnedString) initialize(b *arena.Budget, data []byte) error {
 	if s == nil || (s.Self != nil && !s.Closed) {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	generation := uint64(1)
 	if s.Self != nil {
@@ -117,19 +97,19 @@ func (s *OwnedString) initialize(b *arena.Budget, data []byte) error {
 	s.Self = s
 	return nil
 }
-func (s *OwnedString) Construct(b *arena.Budget, v ParamsStringView) error {
+func (s *OwnedString) Construct(b *arena.Budget, v string) error {
 	if s == nil || (s.Self != nil && !s.Closed) {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
-	text, e := paramsStringText(v)
-	if e != nil {
-		return e
+	text := v
+	if i := strings.IndexByte(text, 0); i >= 0 {
+		text = text[:i]
 	}
 	return s.initialize(b, []byte(text))
 }
 func (s *OwnedString) replace(data []byte) error {
 	if !s.valid() || s.goBuilder != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if s.Generation == math.MaxUint64 {
 		return arena.ErrBounds
@@ -139,13 +119,13 @@ func (s *OwnedString) replace(data []byte) error {
 	s.Generation++
 	return nil
 }
-func (s *OwnedString) Assign(v ParamsStringView) error {
+func (s *OwnedString) Assign(v string) error {
 	if !s.valid() || s.goBuilder != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
-	text, e := paramsStringText(v)
-	if e != nil {
-		return e
+	text := v
+	if i := strings.IndexByte(text, 0); i >= 0 {
+		text = text[:i]
 	}
 	return s.replace([]byte(text))
 }
@@ -169,7 +149,7 @@ func (s *OwnedString) OwnAbort()             { s.SourceDestroy() }
 func (s *OwnedString) View() OwnedStringView { return OwnedStringView{s, s.Generation, s.Length} }
 func (s *OwnedString) Append(v OwnedStringView) error {
 	if !s.valid() || s.goBuilder != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if v.Length >= uint64(^uint(0)>>1)-s.Length {
 		return arena.ErrBounds
@@ -189,13 +169,13 @@ func (s *OwnedString) Append(v OwnedStringView) error {
 	s.Generation++
 	return nil
 }
-func (s *OwnedString) AppendCString(v ParamsStringView) error {
+func (s *OwnedString) AppendCString(v string) error {
 	if !s.valid() || s.goBuilder != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
-	text, e := paramsStringText(v)
-	if e != nil {
-		return e
+	text := v
+	if i := strings.IndexByte(text, 0); i >= 0 {
+		text = text[:i]
 	}
 	if uint64(len(text)) >= uint64(^uint(0)>>1)-s.Length || s.Generation == math.MaxUint64 {
 		return arena.ErrBounds
@@ -207,7 +187,7 @@ func (s *OwnedString) AppendCString(v ParamsStringView) error {
 }
 func (s *OwnedString) CopyConstruct(b *arena.Budget, src *OwnedString) error {
 	if !src.valid() {
-		return ErrParamsOwner
+		return ErrOwnedStringOwner
 	}
 	text, e := src.View().String()
 	if e != nil {
@@ -217,10 +197,10 @@ func (s *OwnedString) CopyConstruct(b *arena.Budget, src *OwnedString) error {
 }
 func (s *OwnedString) CopyAssign(src *OwnedString) error {
 	if !s.valid() {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if !src.valid() {
-		return ErrParamsOwner
+		return ErrOwnedStringOwner
 	}
 	if s == src {
 		return nil
@@ -240,7 +220,7 @@ func (s *OwnedString) Matches(text string) bool {
 }
 func (s *OwnedString) Reserve(count uint64) error {
 	if !s.valid() || s.goBuilder != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if count >= uint64(^uint(0)>>1) {
 		return arena.ErrBounds
@@ -254,7 +234,7 @@ func (s *OwnedString) Reserve(count uint64) error {
 }
 func (s *OwnedString) MoveAssign(src *OwnedString) error {
 	if !s.valid() || !src.valid() || s.goBuilder != nil || src.goBuilder != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if s == src {
 		return nil
@@ -268,10 +248,10 @@ func (s *OwnedString) MoveAssign(src *OwnedString) error {
 	src.Generation++
 	return nil
 }
-func (s *OwnedString) ConstructCStringConcat(b *arena.Budget, prefix ParamsStringView, rhs OwnedStringView) error {
-	first, e := paramsStringText(prefix)
-	if e != nil {
-		return e
+func (s *OwnedString) ConstructCStringConcat(b *arena.Budget, prefix string, rhs OwnedStringView) error {
+	first := prefix
+	if i := strings.IndexByte(first, 0); i >= 0 {
+		first = first[:i]
 	}
 	last, e := rhs.String()
 	if e != nil {
@@ -281,7 +261,7 @@ func (s *OwnedString) ConstructCStringConcat(b *arena.Budget, prefix ParamsStrin
 }
 func (s *OwnedString) ConstructRepeated(b *arena.Budget, count uint64, ch byte) error {
 	if s == nil || (s.Self != nil && !s.Closed) {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if count >= uint64(^uint(0)>>1) {
 		return arena.ErrBounds
@@ -290,7 +270,7 @@ func (s *OwnedString) ConstructRepeated(b *arena.Budget, count uint64, ch byte) 
 }
 func (s *OwnedString) Reverse() error {
 	if !s.valid() || s.goBuilder != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	for left, right := 0, len(s.External)-1; left < right; left, right = left+1, right-1 {
 		s.External[left], s.External[right] = s.External[right], s.External[left]
@@ -304,7 +284,7 @@ func (out *NumericTextStream) AppendOwnedString(s *OwnedString) error {
 	}
 	defer out.mu.Unlock()
 	if s.Self != s || s.Closed || !s.Ready {
-		return ErrParamsOwner
+		return ErrOwnedStringOwner
 	}
 	view := s.View()
 	n := s.Length // actual data/size fields acquired before insertion.

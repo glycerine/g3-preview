@@ -115,12 +115,12 @@ func TestArbitraryFloatBinaryStringWarmAndLaterCalls(t *testing.T) {
 func TestArbitraryFloatBinaryStringEntryAuthority(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, false), significand: NewInt(1)}
-	if e := m.ToStringBinary(&x, 0, 0, nil); !errors.Is(e, ErrParamsPrecondition) {
+	if e := m.ToStringBinary(&x, 0, 0, nil); !errors.Is(e, ErrOwnedStringOwner) {
 		t.Fatal("nil return", e)
 	}
 	var out OwnedString
-	serviceMust(t, out.Construct(m.budget, LiteralParamsStringView("existing")))
-	if e := m.ToStringBinary(&x, 0, 0, &out); !errors.Is(e, ErrParamsPrecondition) || !out.Matches("existing") {
+	serviceMust(t, out.Construct(m.budget, "existing"))
+	if e := m.ToStringBinary(&x, 0, 0, &out); !errors.Is(e, ErrOwnedStringOwner) || !out.Matches("existing") {
 		t.Fatal("live return", e)
 	}
 	out.SourceDestroy()

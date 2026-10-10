@@ -154,7 +154,7 @@ func TestRationalDecimalStreamReachedZeroDenominatorAndAuthority(t *testing.T) {
 	a := Rational{Num: NewInt(-7), Den: NewInt(0)}
 	var out OwnedStringStream
 	serviceMust(t, out.Construct(b))
-	if e := m.rational.DisplayDecimalInto(nil, &a, 1, false); !errors.Is(e, ErrParamsPrecondition) || m.rational.decimalStream.invocation != 0 {
+	if e := m.rational.DisplayDecimalInto(nil, &a, 1, false); !errors.Is(e, ErrOwnedStringOwner) || m.rational.decimalStream.invocation != 0 {
 		t.Fatal("nil stream began invocation", e)
 	}
 	body := m.rational.DisplayDecimalInto(&out, &a, 1, false)

@@ -94,10 +94,10 @@ func TestOwnedStringStreamOwnerAndBorrowGuards(t *testing.T) {
 	var out OwnedStringStream
 	serviceMust(t, out.Construct(nil))
 	copied := out
-	if !errors.Is(copied.AppendInt32(1), ErrParamsPrecondition) {
+	if !errors.Is(copied.AppendInt32(1), ErrOwnedStringOwner) {
 		t.Fatal("copied stream")
 	}
-	if !errors.Is(out.Construct(nil), ErrParamsPrecondition) {
+	if !errors.Is(out.Construct(nil), ErrOwnedStringOwner) {
 		t.Fatal("double construct")
 	}
 	if e := out.AppendNumeralCString(NumeralCStringView{}); !errors.Is(e, arena.ErrInvalidSlot) {
@@ -110,7 +110,7 @@ func TestOwnedStringStreamOwnerAndBorrowGuards(t *testing.T) {
 		t.Fatal("replayed invalid numeral")
 	}
 	out.OwnAbort()
-	if !errors.Is(out.AppendInt32(1), ErrParamsPrecondition) {
+	if !errors.Is(out.AppendInt32(1), ErrOwnedStringOwner) {
 		t.Fatal("closed stream")
 	}
 }

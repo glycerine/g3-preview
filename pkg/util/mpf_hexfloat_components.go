@@ -16,7 +16,7 @@ func (m *ArbitraryFloatManager) ToStringHexfloatComponentsInto(sign bool, expone
 		return view, ErrNumericPending
 	}
 	if text == nil {
-		return view, ErrParamsPrecondition
+		return view, ErrOwnedStringOwner
 	}
 	*s = arbitraryFloatHexfloatComponentsScope{manager: m, invocation: s.invocation + 1, qLive: true, sigLive: true, active: true, executing: true}
 	s.hooks.Policy = s

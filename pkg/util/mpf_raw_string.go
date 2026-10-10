@@ -11,7 +11,7 @@ func (m *ArbitraryFloatManager) ToStringRaw(x *ArbitraryFloat, out *OwnedString)
 		return ErrNumericPending
 	}
 	if out == nil || out.Self != nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	s := &m.rawString
 	*s = arbitraryFloatRawStringScope{manager: m, out: out, active: true, executing: true}
@@ -34,21 +34,21 @@ func (m *ArbitraryFloatManager) ToStringRaw(x *ArbitraryFloat, out *OwnedString)
 			s.active = false
 		}
 	}()
-	if e := out.Construct(m.budget, LiteralParamsStringView("")); e != nil {
+	if e := out.Construct(m.budget, ""); e != nil {
 		return e
 	}
 	s.outLive = true
-	if e := out.AppendCString(LiteralParamsStringView("[")); e != nil {
+	if e := out.AppendCString("["); e != nil {
 		return e
 	}
 	sign := "+"
 	if x.Sign() {
 		sign = "-"
 	}
-	if e := out.AppendCString(LiteralParamsStringView(sign)); e != nil {
+	if e := out.AppendCString(sign); e != nil {
 		return e
 	}
-	if e := out.AppendCString(LiteralParamsStringView(" ")); e != nil {
+	if e := out.AppendCString(" "); e != nil {
 		return e
 	}
 	// The nested mpz::to_string owns a separate local ostringstream.
@@ -70,7 +70,7 @@ func (m *ArbitraryFloatManager) ToStringRaw(x *ArbitraryFloat, out *OwnedString)
 	}
 	s.number.SourceDestroy()
 	s.numberLive = false
-	if e := out.AppendCString(LiteralParamsStringView(" ")); e != nil {
+	if e := out.AppendCString(" "); e != nil {
 		return e
 	}
 	if e := s.exponentStream.Construct(m.budget); e != nil {
@@ -97,10 +97,10 @@ func (m *ArbitraryFloatManager) ToStringRaw(x *ArbitraryFloat, out *OwnedString)
 	if normal {
 		kind = " N"
 	}
-	if e := out.AppendCString(LiteralParamsStringView(kind)); e != nil {
+	if e := out.AppendCString(kind); e != nil {
 		return e
 	}
-	return out.AppendCString(LiteralParamsStringView("]"))
+	return out.AppendCString("]")
 }
 
 type arbitraryFloatRawStringScope struct {

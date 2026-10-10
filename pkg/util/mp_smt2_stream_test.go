@@ -94,10 +94,10 @@ func TestRationalSMT2StreamAuthorityAndPreconditions(t *testing.T) {
 	var out OwnedStringStream
 	serviceMust(t, out.Construct(b))
 	initial := m.rational.smt2Stream.invocation
-	if e := m.rational.DisplaySMT2Into(nil, &a, false); !errors.Is(e, ErrParamsPrecondition) || m.rational.smt2Stream.invocation != initial {
+	if e := m.rational.DisplaySMT2Into(nil, &a, false); !errors.Is(e, ErrOwnedStringOwner) || m.rational.smt2Stream.invocation != initial {
 		t.Fatal("nil stream began parent", e)
 	}
-	if e := m.integer.DisplaySMT2Into(nil, &a.Num, false); !errors.Is(e, ErrParamsPrecondition) || m.integer.smt2Stream.invocation != 0 {
+	if e := m.integer.DisplaySMT2Into(nil, &a.Num, false); !errors.Is(e, ErrOwnedStringOwner) || m.integer.smt2Stream.invocation != 0 {
 		t.Fatal("nil stream began child", e)
 	}
 	copied := *m.rational

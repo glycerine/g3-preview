@@ -4,6 +4,7 @@ package util
 
 import (
 	"math"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -111,4 +112,29 @@ func (c *ParamsContext) GetStringViewFallbackName(v *ParamsRef, k *string, f *Pa
 		return ParamsStringView{symbols: c.SymbolsField, symbol: x.symbol, Mode: 3, PresentField: true}, nil
 	}
 	return ParamsStringView{owned: x.text.owned, context: c, Mode: 2, PresentField: true}, nil
+}
+
+// String copies the reached C-string bytes into an independent native value.
+func (v ParamsStringView) String() (string, error) {
+	if v.Mode == 1 && v.PresentField {
+		text := v.literal
+		if i := strings.IndexByte(text, 0); i >= 0 {
+			text = text[:i]
+		}
+		return text, nil
+	}
+	var text strings.Builder
+	for i := uint64(0); ; i++ {
+		ch, e := v.Byte(i)
+		if e != nil {
+			return "", e
+		}
+		if ch == 0 {
+			return text.String(), nil
+		}
+		if i >= uint64(^uint(0)>>1)-1 {
+			return "", arena.ErrBounds
+		}
+		text.WriteByte(ch)
+	}
 }

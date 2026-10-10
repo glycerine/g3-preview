@@ -12,7 +12,7 @@ func (m *IntegerManager) DisplaySMT2Into(out RationalSourceStream, a *Int, decim
 		return ErrNumericPending
 	}
 	if out == nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if s.invocation == ^uint64(0) {
 		return ErrNumericPending
@@ -181,7 +181,7 @@ func (m *RationalManager) DisplaySMT2Into(out RationalSourceStream, a *Rational,
 		return ErrNumericPending
 	}
 	if out == nil {
-		return ErrParamsPrecondition
+		return ErrOwnedStringOwner
 	}
 	if s.invocation == ^uint64(0) {
 		return ErrNumericPending
