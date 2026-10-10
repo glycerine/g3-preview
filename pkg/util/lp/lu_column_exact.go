@@ -1,6 +1,8 @@
 // Source: src/util/lp/lu.hpp:193-229,260-276,503-523; exact T columns.
 package lp
 
+import "github.com/glycerine/g3/pkg/util/numeral"
+
 // The source multiplication uses unsigned arithmetic before comparing sizes.
 func luSparseColumnRoute(indexSize, dataSize, ratio uint32) bool {
 	return indexSize*ratio < dataSize
@@ -50,36 +52,18 @@ func (m *RationalLU) PrepareEntering(entering uint32, w *IndexedRationalVector) 
 	return m.Q.ApplyReverseLeftIndexed(w)
 }
 
-func (m *RationalLU) solveColumnIndexed(d *IndexedRationalVector) error {
-	var active []uint32
-	if err := m.U.SolveUYIndexed(d, m.Settings, &active); err != nil {
-		return err
-	}
-	return m.R.ApplyReverseLeftIndexed(d)
-}
-
-func (m *RationalLU) solveColumnDense(d *IndexedRationalVector) error {
-	if err := m.U.SolveUY(d.Data); err != nil {
-		return err
-	}
-	if err := m.R.ApplyReverseLeftToT(d.Data); err != nil {
-		return err
-	}
-	return m.appendColumnIndex(d)
-}
-
-func (m *exactLUState) appendColumnIndex(d *IndexedRationalVector) error {
+func (m *exactLUState) appendColumnIndex(data []numeral.Rational, index *[]uint32) error {
 	for i := m.Dim; i > 0; {
 		i--
-		if uint64(i) >= uint64(len(d.Data)) {
+		if uint64(i) >= uint64(len(data)) {
 			return ErrBounds
 		}
-		zero, err := m.A.manager.IsZero(&d.Data[i])
+		zero, err := m.A.manager.IsZero(&data[i])
 		if err != nil {
 			return err
 		}
 		if !zero {
-			d.Index = append(d.Index, i)
+			*index = append(*index, i)
 		}
 	}
 	return nil
@@ -97,13 +81,13 @@ func (m *RationalLU) SolveBd(entering uint32, d, w *IndexedRationalVector) (err 
 		if err = d.Assign(w); err != nil {
 			return err
 		}
-		return m.solveColumnIndexed(d)
+		return m.SolveByForTIndexedOnly(d, m.Settings)
 	}
 	if err = d.assignDenseData(w); err != nil {
 		return err
 	}
 	d.Index = d.Index[:0]
-	return m.solveColumnDense(d)
+	return m.SolveByWhenReadyForT(d.Data, &d.Index)
 }
 
 func (m *PairLU) PrepareEntering(entering uint32, w *IndexedRationalVector) (err error) {
@@ -125,24 +109,6 @@ func (m *PairLU) PrepareEntering(entering uint32, w *IndexedRationalVector) (err
 	return m.Q.ApplyReverseLeftIndexed(w)
 }
 
-func (m *PairLU) solveColumnIndexed(d *IndexedRationalVector) error {
-	var active []uint32
-	if err := m.U.SolveUYIndexed(d, m.Settings, &active); err != nil {
-		return err
-	}
-	return m.R.ApplyReverseLeftIndexed(d)
-}
-
-func (m *PairLU) solveColumnDense(d *IndexedRationalVector) error {
-	if err := m.U.SolveUY(d.Data); err != nil {
-		return err
-	}
-	if err := m.R.ApplyReverseLeftToT(d.Data); err != nil {
-		return err
-	}
-	return m.appendColumnIndex(d)
-}
-
 func (m *PairLU) SolveBd(entering uint32, d, w *IndexedRationalVector) (err error) {
 	if err = m.ready(); err != nil {
 		return err
@@ -155,13 +121,13 @@ func (m *PairLU) SolveBd(entering uint32, d, w *IndexedRationalVector) (err erro
 		if err = d.Assign(w); err != nil {
 			return err
 		}
-		return m.solveColumnIndexed(d)
+		return m.SolveByForTIndexedOnly(d, m.Settings)
 	}
 	if err = d.assignDenseData(w); err != nil {
 		return err
 	}
 	d.Index = d.Index[:0]
-	return m.solveColumnDense(d)
+	return m.SolveByWhenReadyForT(d.Data, &d.Index)
 }
 
 // SolveBdFaster is the retained mpq/numeric_pair caller's single-buffer route.
@@ -173,5 +139,5 @@ func (m *PairLU) SolveBdFaster(entering uint32, d *IndexedRationalVector) (err e
 	if err = m.PrepareEntering(entering, d); err != nil {
 		return err
 	}
-	return m.solveColumnIndexed(d)
+	return m.SolveByForTIndexedOnly(d, m.Settings)
 }

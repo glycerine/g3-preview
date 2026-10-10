@@ -16,14 +16,9 @@ func (m *RationalLU) SolveBy(y []numeral.Rational) (err error) {
 	if err = m.Q.ApplyReverseLeftToX(y); err != nil {
 		return err
 	}
-	if err = m.U.SolveUY(y); err != nil {
-		return err
-	}
-	if err = m.R.ApplyReverseLeftToX(y); err != nil {
-		return err
-	}
-	return nil
+	return m.SolveByWhenReadyForX(y)
 }
+
 func (m *RationalLU) SolveYB(y []numeral.Rational) (err error) {
 	if err = m.ready(); err != nil {
 		return err
@@ -81,14 +76,9 @@ func (m *PairLU) SolveBy(y []RationalPair) (err error) {
 	if err = m.Q.ApplyReverseLeftToX(y); err != nil {
 		return err
 	}
-	if err = m.U.SolveUYPair(y); err != nil {
-		return err
-	}
-	if err = m.R.ApplyReverseLeftToX(y); err != nil {
-		return err
-	}
-	return nil
+	return m.SolveByWhenReadyForX(y)
 }
+
 func (m *PairLU) SolveYB(y []numeral.Rational) (err error) {
 	if err = m.ready(); err != nil {
 		return err

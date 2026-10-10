@@ -16,23 +16,9 @@ func (m *FloatLU) SolveBy(y []float64) (err error) {
 	if err = m.Q.ApplyReverseLeftToX(y); err != nil {
 		return err
 	}
-	if err = m.U.DoubleSolveUY(y); err != nil {
-		return err
-	}
-	if err = m.R.ApplyReverseLeftToX(y); err != nil {
-		return err
-	}
-	for i := m.Dim; i > 0; {
-		i--
-		if uint64(i) >= uint64(len(y)) {
-			return ErrBounds
-		}
-		if y[i] != 0 && m.Settings.FloatDropSmall(y[i]) {
-			y[i] = 0
-		}
-	}
-	return nil
+	return m.SolveByWhenReadyForX(y)
 }
+
 func (m *FloatLU) SolveYB(y []float64) (err error) {
 	if err = m.ready(); err != nil {
 		return err

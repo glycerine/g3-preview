@@ -337,7 +337,7 @@ func TestLPLUEnteringColumnUpstreamSmallPreparation(t *testing.T) {
 	defer m.Close()
 	w := NewIndexedFloatVector(3)
 	lpStaticMust(t, m.PrepareEntering(2, w))
-	lpStaticMust(t, m.solveColumnIndexed(w))
+	lpStaticMust(t, m.SolveByForTIndexedOnly(w, m.Settings))
 	want := []*big.Rat{big.NewRat(39, 10), big.NewRat(0, 1), big.NewRat(-101, 550)}
 	for i := range want {
 		lpFloatBlockNear(t, w.Data[i], want[i])

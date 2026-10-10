@@ -2,11 +2,11 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 89.5,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Last complete native module tests passed2026-10-10 at17:57 UTC, LP327.475s with89.5% (8499/9501); this full snapshot predates dimension extension and lifecycle additions. Current focused native/debug coverage and test evidence are recorded in PORT_STATUS.md: lifecycle88.2% both, all four upstream LU mathematical scenarios pass. Complete debug coverage predates sparse basis storage. Full solver/scaling/LAR/MPS integration and complete upstream command drivers remain open.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Last complete native module tests passed2026-10-10 at17:57 UTC, LP327.475s with89.5% (8499/9501); this full snapshot predates dimension extension, lifecycle and prepared-solve additions. Current focused native/debug coverage and test evidence are recorded in PORT_STATUS.md: prepared exact100% and floating94.6%, lifecycle88.2% both, all four upstream LU mathematical scenarios pass. Complete debug coverage predates sparse basis storage. Full solver/scaling/LAR/MPS integration and complete upstream command drivers remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
-    "remaining LU diagnostics, prepared-solve entry points and full solver/priority-queue lifecycle integration",
+    "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
     "scaling and random updates",
     "primal/dual simplex and LAR solvers",
     "bounds/evidence, constraint scopes and explanations",
@@ -876,7 +876,11 @@
         "pkg/util/lp/lu_refine_exact.go",
         "pkg/util/lp/lu_extend_float.go",
         "pkg/util/lp/lu_extend_exact.go",
-        "pkg/util/lp/lu_lifecycle.go"
+        "pkg/util/lp/lu_lifecycle.go",
+        "pkg/util/lp/lu_ready_float.go",
+        "pkg/util/lp/lu_ready_exact.go",
+        "pkg/util/lp/lu_ready_test.go",
+        "pkg/util/lp/lu_ready_failure_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -941,7 +945,12 @@
         "TestLPLUExtensionLiteralGuardsAndPrefixes",
         "TestLPExactLUExtensionRetainsStoppedChildren",
         "TestLPLUFactorizationReplacementIndependentOracle",
-        "TestLPExactLUFactorizationReplacementAllocationCensus"
+        "TestLPExactLUFactorizationReplacementAllocationCensus",
+        "TestLPLUPreparedSolvesIndependentOracle",
+        "TestLPLUPreparedSolvesToleranceAndSettings",
+        "TestLPLUPreparedSolvesFailurePrefixes",
+        "TestLPExactLUPreparedSolvesAllocationCensus",
+        "TestLPExactLUPreparedIndexedCallerOwnership"
       ]
     },
     {
@@ -971,7 +980,11 @@
         "pkg/util/lp/lu_update_exact.go",
         "pkg/util/lp/lu_refine_float.go",
         "pkg/util/lp/lu_refine_exact.go",
-        "pkg/util/lp/lu_lifecycle.go"
+        "pkg/util/lp/lu_lifecycle.go",
+        "pkg/util/lp/lu_ready_float.go",
+        "pkg/util/lp/lu_ready_exact.go",
+        "pkg/util/lp/lu_ready_test.go",
+        "pkg/util/lp/lu_ready_failure_test.go"
       ],
       "tests": [
         "TestLPDiagonalTailIndependentMatrixOracle",
@@ -1030,7 +1043,12 @@
         "TestLPFloatLURowRefinementBoundsAndPrefixes",
         "TestLPExactLURowRefinementLeavesStoppedCallerOwned",
         "TestLPLUFactorizationReplacementIndependentOracle",
-        "TestLPExactLUFactorizationReplacementAllocationCensus"
+        "TestLPExactLUFactorizationReplacementAllocationCensus",
+        "TestLPLUPreparedSolvesIndependentOracle",
+        "TestLPLUPreparedSolvesToleranceAndSettings",
+        "TestLPLUPreparedSolvesFailurePrefixes",
+        "TestLPExactLUPreparedSolvesAllocationCensus",
+        "TestLPExactLUPreparedIndexedCallerOwnership"
       ]
     },
     {
@@ -1054,7 +1072,11 @@
         "pkg/util/lp/lu_update_exact.go",
         "pkg/util/lp/lu_refine_float.go",
         "pkg/util/lp/lu_refine_exact.go",
-        "pkg/util/lp/lu_lifecycle.go"
+        "pkg/util/lp/lu_lifecycle.go",
+        "pkg/util/lp/lu_ready_float.go",
+        "pkg/util/lp/lu_ready_exact.go",
+        "pkg/util/lp/lu_ready_test.go",
+        "pkg/util/lp/lu_ready_failure_test.go"
       ],
       "tests": [
         "TestLPFloatLUIndependentFactorizationAndSolves",
@@ -1107,7 +1129,12 @@
         "TestLPFloatLURowRefinementBoundsAndPrefixes",
         "TestLPExactLURowRefinementLeavesStoppedCallerOwned",
         "TestLPLUFactorizationReplacementIndependentOracle",
-        "TestLPExactLUFactorizationReplacementAllocationCensus"
+        "TestLPExactLUFactorizationReplacementAllocationCensus",
+        "TestLPLUPreparedSolvesIndependentOracle",
+        "TestLPLUPreparedSolvesToleranceAndSettings",
+        "TestLPLUPreparedSolvesFailurePrefixes",
+        "TestLPExactLUPreparedSolvesAllocationCensus",
+        "TestLPExactLUPreparedIndexedCallerOwnership"
       ]
     },
     {

@@ -22,40 +22,6 @@ func (m *FloatLU) PrepareEntering(entering uint32, w *IndexedFloatVector) (err e
 	return m.Q.ApplyReverseLeftIndexed(w)
 }
 
-func (m *FloatLU) solveColumnIndexed(d *IndexedFloatVector) error {
-	if err := m.U.DoubleSolveUYIndexed(d, m.Settings); err != nil {
-		return err
-	}
-	return m.R.ApplyReverseLeftIndexed(d)
-}
-
-func (m *FloatLU) solveColumnDense(d *IndexedFloatVector) error {
-	if err := m.U.DoubleSolveUY(d.Data); err != nil {
-		return err
-	}
-	if err := m.R.ApplyReverseLeftToT(d.Data); err != nil {
-		return err
-	}
-	for i := m.Dim; i > 0; {
-		i--
-		if uint64(i) >= uint64(len(d.Data)) {
-			return ErrBounds
-		}
-		if d.Data[i] == 0 {
-			continue
-		}
-		if m.Settings.FloatDropSmall(d.Data[i]) {
-			d.Data[i] = 0
-		} else {
-			d.Index = append(d.Index, i)
-		}
-	}
-	return nil
-}
-
-// SolveBd solves B*d=A[:,entering], retaining the transformed column in w.
-// The source's strict density test selects sparse assignment or a complete
-// dense data copy. These differ for unindexed values and self-assignment.
 func (m *FloatLU) SolveBd(entering uint32, d, w *IndexedFloatVector) (err error) {
 	if err = m.ready(); err != nil {
 		return err
@@ -68,9 +34,9 @@ func (m *FloatLU) SolveBd(entering uint32, d, w *IndexedFloatVector) (err error)
 		if err = d.Assign(w); err != nil {
 			return err
 		}
-		return m.solveColumnIndexed(d)
+		return m.SolveByForTIndexedOnly(d, m.Settings)
 	}
 	d.Data = append(d.Data[:0], w.Data...)
 	d.Index = d.Index[:0]
-	return m.solveColumnDense(d)
+	return m.SolveByWhenReadyForT(d.Data, &d.Index)
 }

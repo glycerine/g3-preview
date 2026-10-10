@@ -36765,3 +36765,32 @@ extension/lifecycle additions. LP stays48 partial/62 unported units. Next audit
 remaining prepared-solve entry points/debug diagnostics, then scaling, simplex,
 LAR constraints/bounds/evidence and MPS plus complete upstream drivers. The full
 LP port goal remains active and incomplete.
+
+
+### Retained LU prepared-solve entry points — 2026-10-10
+
+Ported lu.hpp:175-229 for double/double, mpq/mpq and mpq/numeric_pair: prepared
+X, dense T and indexed T stages. Full column solves now delegate these stages.
+They consume the already prepared RHS, apply U and the correct R specialization,
+and preserve descending index appends. Floating indexed solves use member
+settings; exact indexed solves pass caller settings. Dual DSE_FTran is a retained
+direct consumer, while solve_Bd and full dense solve_By reach the same stages.
+The indexed-X solve_By source assertion stub is not credited as an algorithm.
+
+Forty independent U*R*x worlds exercise all nine methods across sparse and
+forced-dense factors, with independent exact coordinates including both pair
+components. Tests cover tiny exact values, source floating drop boundaries,
+dense residual restoration, IEEE values, distinct settings, retained index
+prefixes and descending output, U/R bounds, closed/stopped LU and caller owners.
+Twelve pooled/direct physical refusal campaigns reach success:128 native and206
+debug refusals. LU closes before callers, then named-cell/source-owner census
+verifies each lifetime. Foreign and stopped callers fail before U workspace.
+
+Native integration passes25.210s; combined g3debug/g3checked49.067s. Exact
+prepared coverage46/46 (100%), floating35/37 (94.6%) in both profiles. Floating
+gaps guard bounds established by successful U/R calls; no fake state is added
+to inflate coverage. Extracted column files now74/77 exact and23/23 floating.
+Both LP vets pass. Full native suite last passed17:57 UTC; its89.5% LP coverage
+is historical before dimension extension, lifecycle and prepared additions.
+LP remains48 partial/62 unported units. Remaining retained diagnostics, scaling,
+simplex, LAR/bounds/evidence, MPS and complete upstream drivers are still open.
