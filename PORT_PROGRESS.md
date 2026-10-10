@@ -35675,3 +35675,53 @@ sparse replacement/maximum selection, triangular solves, LU and solvers remain o
 The strengthened completed-row/failed-column campaigns also pass combined
 debug/checked8.348s. Final LP vet, source ledger, graph regeneration and diff
 checks pass;64-package graph edges are unchanged.
+
+## Sparse maximum ordering and pivot preparation/selection
+
+Implemented exact maximum-first row ordering and floating/exact factorization
+preparation, pivot scores, partial-pivot threshold filtering and queue-driven
+selection/recovery. Maximum keeps the first equal absolute value, repairs both
+backlinks before its actual owning swap copy and two assignments, and retains
+all numerical locals on error. Preparation resets shortened counters before
+descending physical-row maximum ordering, then copies each actual indexed_value
+in forward queue-population order for exact storage. Typed native slices/maps
+replace vector/header/container internals without inventing capacity events.
+
+Selection publishes each dequeued physical pair immediately, drops inactive
+rows/columns and missing entries, retains small candidates in order, recomputes
+and restores rejected scores before converting an accepted pair to logical
+indices. Exhaustion preserves the last physical pair; an initially empty queue
+preserves caller output sentinels. The source local column-header copy in
+pivot_score owns coefficient copies even though only its length/counter are
+used afterward; these actual copies remain observable and owned in dynamic
+lexical slots on failure. Strict threshold equality, signed factors, unsigned
+shortened-score wrap, maximum-head bypass and IEEE comparison continuations
+remain literal. Only the live unsigned-index threshold overload is ported;
+definition-only alternate threshold/debug-best-pivot templates are excluded.
+
+Added120 independent exact/float worlds with mathematical admissible-minimum
+scores, stable maxima, bidirectional owning/link census, explicit inverse
+permutations, repeated selection and rejected-candidate retention. Literal tests
+cover inactive/stale candidates, exhaustion recovery and threshold retry, unsigned
+score wrap, NaN/infinity, empty output preservation, malformed dequeue/repair
+prefixes and the repeated-preparation debug assertion after counter reset. Six
+pooled/direct allocation-refusal campaigns walk through first success and require
+actual direct stops after backlink repair, partial queue population and rejected
+header-copy restoration before physical outputs become logical. An older real
+stopped comparison is refused by the shared manager without being adopted or
+closed by the new maximum owner; actual caller cleanup leaves no orphan cells.
+
+Focused native11.828s/debug-checked13.099s pass. Exact pivot file160/178 (89.9%)
+native and161/178 (90.4%) debug; float60/68 (88.2%) and61/68 (89.7%). Remaining
+statements propagate actual child/cleanup errors, guard malformed metadata or
+belong to the opposite assertion profile. LP vet passes. The next hourly full
+native module regression is running for this checkpoint; source counts remain
+42 partial/68 unported. Sparse replacement, active shortening/eta integration,
+triangular solves, complete LU and solver/MPS/driver work remain required.
+
+Full native module regression passes; LP127.958s at90.4% statement coverage
+(5295/5860 current Go statements). New pivot-file coverage agrees with the focused
+native profile. Full debug/checked percentage remains explicitly dated before
+sparse storage; current focused debug/checked component coverage is recorded.
+No redundant full suite was restarted. Native log/profile are
+/mnt/oldrog/tmp/g3-sparse-pivots-module-native.log and corresponding.cover.
