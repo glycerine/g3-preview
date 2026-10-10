@@ -10,7 +10,6 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/lbool"
-	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func satSCCFixture(t *testing.T, n uint32) (*satSCC, *satSolverClauseLifecycle) {
@@ -257,7 +256,7 @@ func TestSATElimEqsEmptyUnitUnaffectedAndExternal(t *testing.T) {
 		t.Fatal("external adds real clauses instead of eliminated entry")
 	}
 }
-func TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage(t *testing.T) {
+func TestSATSCCParametersAndNativeLocalStorage(t *testing.T) {
 	c, l := satSCCFixture(t, 2)
 	p := l.propagation
 	ctx := p.config.context
@@ -290,18 +289,20 @@ func TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage(t *testing.T) {
 	}
 	satOK(t, p.config.globals.SetName("sat.scc", "true"))
 	before := satSCCAllocationCount(t, c)
+	l.budget.FailAfter(0)
 	n, err := c.run()
+	l.budget.FailAfter(-1)
 	satOK(t, err)
-	if n != 0 || satSCCAllocationCount(t, c) <= before {
-		t.Fatal("fresh source vectors", n, before, p.memory.State())
+	if n != 0 || satSCCAllocationCount(t, c) != before {
+		t.Fatal("native locals do not allocate Runtime blocks", n, before, p.memory.State())
 	}
 	after := p.memory.Stats()
 	used := l.budget.Used()
 	before = satSCCAllocationCount(t, c)
 	n, err = c.run()
 	satOK(t, err)
-	if n != 0 || satSCCAllocationCount(t, c) <= before || p.memory.Stats() != after || l.budget.Used() != used {
-		t.Fatal("fresh locals then exact retained plateau", n, p.memory.State(), after, p.memory.Stats(), used, l.budget.Used())
+	if n != 0 || satSCCAllocationCount(t, c) != before || p.memory.Stats() != after || l.budget.Used() != used {
+		t.Fatal("native locals preserve exact Runtime plateau", n, p.memory.State(), after, p.memory.Stats(), used, l.budget.Used())
 	}
 	c.resetStatistics()
 	if c.numElim != 0 {
@@ -367,16 +368,7 @@ func satSCCAudit(t *testing.T, c *satSCC, extra ...StoredClauseRef) {
 	if want != l.budget.Used() {
 		t.Fatal("whole named once-only physical graph", want, l.budget.Used())
 	}
-	var raw []util.Block
-	for _, b := range [7]*satSCCVector{&c.index, &c.lowlink, &c.stack, &c.inStack, &c.roots, &c.frames, &c.toElim} {
-		if b.raw != (util.Block{}) {
-			raw = append(raw, b.raw)
-		}
-		if b.pending != (util.Block{}) {
-			raw = append(raw, b.pending)
-		}
-	}
-	satScalarAuditRoots(t, v, raw...)
+	satScalarAuditRoots(t, v)
 }
 
 func TestSATSCCActualAllocationPrefixSweep(t *testing.T) {
@@ -441,9 +433,9 @@ func TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame(t *testing.T) {
 	p.limit.ResetCancel()
 	// A source frame holds raw watch pointers, not a movable watch-list reference.
 	c.active = true
-	satOK(t, c.index.resize(p.memory, 4, ^uint32(0)))
-	satOK(t, c.lowlink.resize(p.memory, 4, ^uint32(0)))
-	satOK(t, c.inStack.resize(p.memory, 4, 0))
+	c.index = []uint32{^uint32(0), ^uint32(0), ^uint32(0), ^uint32(0)}
+	c.lowlink = append([]uint32(nil), c.index...)
+	c.inStack = make([]bool, 4)
 	satOK(t, c.newNode(0))
 	_, _, it, err := c.frame(0)
 	satOK(t, err)
@@ -514,136 +506,6 @@ func TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix(t *testing.T) {
 	}
 }
 
-func TestSATSCCVectorSourceGeometryAndConstructorPublication(t *testing.T) {
-	c, l := satSCCFixture(t, 1)
-	r := l.propagation.memory
-	c.active = true
-	for _, width := range []uint32{1, 4, 36} {
-		v := satSCCVector{width: width}
-		satOK(t, v.grow(r))
-		cap, err := v.cap(r)
-		satOK(t, err)
-		extent, err := r.Size(v.raw)
-		satOK(t, err)
-		if cap != 2 || extent != uint64(8+2*width) {
-			t.Fatal(width, cap, extent)
-		}
-		satOK(t, r.WriteUint32(v.raw, 0, ^uint32(0)))
-		before := satSCCAllocationCount(t, c)
-		err = v.grow(r)
-		var ex z3exception.DefaultException
-		if !errors.As(err, &ex) || ex.Message() != "Overflow encountered when expanding vector" || satSCCAllocationCount(t, c) != before {
-			t.Fatal(width, err)
-		}
-		satOK(t, r.WriteUint32(v.raw, 0, 2))
-		satOK(t, v.close(r))
-	}
-	// Explicit malformed retained-frame backing: a constructor is not a source
-	// published element until all captured iterator fields have been initialized.
-	satOK(t, c.frames.grow(r))
-	satOK(t, r.Reallocate(&c.frames.raw, 16))
-	satOK(t, c.index.resize(r, 2, ^uint32(0)))
-	satOK(t, c.lowlink.resize(r, 2, ^uint32(0)))
-	satOK(t, c.inStack.resize(r, 2, 0))
-	err := c.newNode(0)
-	if !errors.Is(err, arena.ErrBounds) {
-		t.Fatal(err)
-	}
-	n, err := c.frames.size(r)
-	satOK(t, err)
-	if n != 0 {
-		t.Fatal("incomplete frame constructor published source size", n)
-	}
-	satSCCAudit(t, c)
-	satOK(t, c.closeVectors())
-}
-
-func TestSATSCCVectorDebugCapacityAssertionBeforeOverflow(t *testing.T) {
-	c, l := satSCCFixture(t, 1)
-	r := l.propagation.memory
-	c.active = true
-	satOK(t, c.index.grow(r))
-	satOK(t, r.WriteUint32(c.index.raw, 0, 0))
-	before := satSCCAllocationCount(t, c)
-	err := c.index.grow(r)
-	if satStorageSourceDebug {
-		if !errors.Is(err, ErrSATAssertion) {
-			t.Fatal("source capacity SASSERT before growth", err)
-		}
-	} else {
-		var ex z3exception.DefaultException
-		if !errors.As(err, &ex) || ex.Message() != "Overflow encountered when expanding vector" {
-			t.Fatal(err)
-		}
-	}
-	if satSCCAllocationCount(t, c) != before {
-		t.Fatal("no allocation before source assertion/overflow")
-	}
-	satSCCAudit(t, c)
-	satOK(t, r.WriteUint32(c.index.raw, 0, 2))
-	satOK(t, c.closeVectors())
-}
-
-func TestSATSCCResizeWholeReservationBeforeSizeAndShrink(t *testing.T) {
-	reached := false
-	for ordinal := int64(0); ordinal < 64; ordinal++ {
-		c, l := satSCCFixture(t, 1)
-		c.active = true
-		r := l.propagation.memory
-		l.budget.FailAfter(ordinal)
-		err := c.index.resize(r, 9, 77)
-		n, e := c.index.size(r)
-		satOK(t, e)
-		capacity, e := c.index.cap(r)
-		satOK(t, e)
-		satSCCAudit(t, c)
-		if err != nil && capacity >= 2 {
-			if n != 0 {
-				t.Fatalf("later growth refusal published size %d, source retains 0 (capacity %d)", n, capacity)
-			}
-			reached = true
-		}
-		l.budget.FailAfter(-1)
-		satOK(t, c.closeVectors())
-		if reached {
-			break
-		}
-	}
-	if !reached {
-		t.Fatal("no actual later growth refusal")
-	}
-	c, l := satSCCFixture(t, 1)
-	c.active = true
-	r := l.propagation.memory
-	satOK(t, c.index.resize(r, 5, 17))
-	satOK(t, c.index.resize(r, 2, 99))
-	n, e := c.index.size(r)
-	satOK(t, e)
-	if n != 2 {
-		t.Fatal("source shrink", n)
-	}
-	satOK(t, c.index.resize(r, 2, 99))
-	x, e := c.index.get(r, 1, 0)
-	satOK(t, e)
-	if x != 17 {
-		t.Fatal("equal resize must not construct", x)
-	}
-	satOK(t, c.index.resize(r, 4, 31))
-	for i := uint32(0); i < 4; i++ {
-		x, e := c.index.get(r, i, 0)
-		satOK(t, e)
-		want := uint32(17)
-		if i >= 2 {
-			want = 31
-		}
-		if x != want {
-			t.Fatal(i, x, want)
-		}
-	}
-	satSCCAudit(t, c)
-	satOK(t, c.closeVectors())
-}
-
 func TestSATElimEqsOwningIdentityGuard(t *testing.T) {
 	_, l := satSCCFixture(t, 1)
 	e, err := newSATElimEqs(l)
@@ -662,35 +524,6 @@ func TestSATElimEqsOwningIdentityGuard(t *testing.T) {
 	}
 	satOK(t, e.Close())
 	satOK(t, e.Close())
-}
-
-func TestSATSCCResizePublishesBeforeReachedConstructorGuard(t *testing.T) {
-	c, l := satSCCFixture(t, 1)
-	c.active = true
-	r := l.propagation.memory
-	satOK(t, c.index.grow(r))
-	// Explicit malformed capacity extent: the existing physical block has two
-	// scalar slots. Source size publication precedes the endangered third write.
-	satOK(t, r.WriteUint32(c.index.raw, 0, 3))
-	err := c.index.resize(r, 3, 43)
-	if !errors.Is(err, arena.ErrBounds) {
-		t.Fatal(err)
-	}
-	n, e := c.index.size(r)
-	satOK(t, e)
-	if n != 3 {
-		t.Fatal("source size before ascending constructors", n)
-	}
-	for i := uint32(0); i < 2; i++ {
-		x, e := c.index.get(r, i, 0)
-		satOK(t, e)
-		if x != 43 {
-			t.Fatal(i, x)
-		}
-	}
-	satSCCAudit(t, c)
-	// No pointer/counter recovery; source scalar destructor frees actual backing.
-	satOK(t, c.closeVectors())
 }
 
 func TestSATElimEqsSortActualLargeBacking(t *testing.T) {
@@ -713,4 +546,104 @@ func TestSATElimEqsSortActualLargeBacking(t *testing.T) {
 	}
 	satSCCAudit(t, c, clause)
 	satOK(t, a.Delete(clause))
+}
+
+func TestSATSCCNativeFrameGrowthAndCleanup(t *testing.T) {
+	const n = 257
+	c, l := satSCCFixture(t, n)
+	p := l.propagation
+	// Each positive literal has a real binary watch, captured before native growth.
+	for i := uint32(0); i < n; i++ {
+		satOK(t, l.mkBinClause(Literal(2*i+1), Literal(2*((i+1)%n)), false))
+	}
+	c.index, c.lowlink = make([]uint32, 2*n), make([]uint32, 2*n)
+	c.inStack = make([]bool, 2*n)
+	c.active = true
+	before, blocks := l.budget.Used(), p.memory.Stats().LiveBlocks
+	l.budget.FailAfter(0)
+	for i := uint32(0); i < n; i++ {
+		satOK(t, c.newNode(2*i))
+	}
+	l.budget.FailAfter(-1)
+	if l.budget.Used() != before || p.memory.Stats().LiveBlocks != blocks {
+		t.Fatal("native SCC growth reserved Runtime backing")
+	}
+	if len(c.frames) != n || len(c.stack) != n || c.nextIndex != n {
+		t.Fatal("native traversal publication")
+	}
+	for i := uint32(0); i < n; i++ {
+		li, first, it, err := c.frame(i)
+		satOK(t, err)
+		if li != 2*i || !first || c.index[li] != i || c.lowlink[li] != i || !c.inStack[li] || c.stack[i] != li {
+			t.Fatal(i, li, first)
+		}
+		w, err := satPropagationCursorRead(&it, 0)
+		satOK(t, err)
+		lit, err := w.Literal()
+		satOK(t, err)
+		if lit != Literal(2*((i+1)%n)) {
+			t.Fatal("typed frame lost borrowed watch", i, lit)
+		}
+	}
+	satOK(t, c.closeVectors())
+	if c.index != nil || c.lowlink != nil || c.stack != nil || c.inStack != nil || c.frames != nil || c.roots != nil || c.toElim != nil || c.active {
+		t.Fatal("native traversal cleanup retained storage")
+	}
+	if l.budget.Used() != before || p.memory.Stats().LiveBlocks != blocks {
+		t.Fatal("native cleanup changed Runtime ownership")
+	}
+	satSCCAudit(t, c)
+}
+
+func TestSATSCCNativeDeepComponentsAndRepeat(t *testing.T) {
+	const n, group = 257, 17
+	c, l := satSCCFixture(t, n)
+	p := l.propagation
+	// Disjoint rings joined in one direction have exactly ceil(n/group) SCCs.
+	// The chain traverses all nodes before unwinding the first DFS stack.
+	for start := uint32(0); start < n; start += group {
+		end := start + group
+		if end > n {
+			end = n
+		}
+		for i := start; i < end; i++ {
+			next := i + 1
+			if next == end {
+				next = start
+			}
+			satOK(t, l.mkBinClause(Literal(2*i+1), Literal(2*next), false))
+		}
+		if end < n {
+			satOK(t, l.mkBinClause(Literal(2*(end-1)+1), Literal(2*end), false))
+		}
+	}
+	count, err := c.run()
+	satOK(t, err)
+	if count != n-(n+group-1)/group || p.inconsistent {
+		t.Fatal(count, p.inconsistent)
+	}
+	for _, value := range []lbool.LBool{lbool.False, lbool.True} {
+		model := make(Model, n)
+		for i := range model {
+			eliminated, err := p.variables.wasEliminated(BoolVar(i))
+			satOK(t, err)
+			if eliminated {
+				model[i] = lbool.Undef
+			} else {
+				model[i] = value
+			}
+		}
+		satOK(t, p.converter.Apply(model))
+		for i, x := range model {
+			if x != value {
+				t.Fatal("converter lost ring equivalence", i, x, value)
+			}
+		}
+	}
+	count, err = c.run()
+	satOK(t, err)
+	if count != 0 || c.active || c.reportActive || c.frames != nil || c.roots != nil {
+		t.Fatal("repeat native traversal", count)
+	}
+	satSCCAudit(t, c)
 }

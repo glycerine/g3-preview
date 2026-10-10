@@ -11,17 +11,23 @@ import (
 	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
+// Traversal arrays are native Go storage. Frames borrow the actual watch iterator;
+// no encoded frame or container backing is allocated through Runtime.
 type satSCC struct {
-	self                                                  *satSCC
-	lifecycle                                             *satSolverClauseLifecycle
-	index, lowlink, stack, inStack, roots, frames, toElim satSCCVector
-	eliminator                                            satElimEqs
-	numElim, nextIndex                                    uint32
-	header                                                uint64
-	bodyCause, cleanupCause                               error
-	report                                                stopwatch.Stopwatch
-	reportActive                                          bool
-	enabled, active, closing, closed, debugInvariant      bool
+	self                                             *satSCC
+	lifecycle                                        *satSolverClauseLifecycle
+	index, lowlink, stack                            []uint32
+	inStack                                          []bool
+	roots                                            []Literal
+	frames                                           []satSCCFrame
+	toElim                                           []BoolVar
+	eliminator                                       satElimEqs
+	numElim, nextIndex                               uint32
+	header                                           uint64
+	bodyCause, cleanupCause                          error
+	report                                           stopwatch.Stopwatch
+	reportActive                                     bool
+	enabled, active, closing, closed, debugInvariant bool
 }
 
 func newSATSCC(l *satSolverClauseLifecycle, p *util.ParamsRef) (*satSCC, error) {
@@ -34,16 +40,6 @@ func newSATSCC(l *satSolverClauseLifecycle, p *util.ParamsRef) (*satSCC, error) 
 	}
 	c := &satSCC{lifecycle: l, header: n}
 	c.self = c
-	c.index.width = 4
-	c.lowlink.width = 4
-	c.stack.width = 4
-	c.inStack.width = 1
-	c.roots.width = 4
-	// Native LP64 source frame is24 bytes (uint32, bool/padding, two pointers).
-	// The checked scalar backing encodes captured physical identities in36 bytes.
-	// Runtime charges this actual adapted stride, not source-native geometry.
-	c.frames.width = 36
-	c.toElim.width = 4
 	c.eliminator.lifecycle = l
 	c.eliminator.self = &c.eliminator
 	if e := c.Update(p); e != nil {
@@ -100,12 +96,8 @@ func (c *satSCC) collectStatistics(s *statistics.Statistics, key statistics.Key)
 	return nil
 }
 func (c *satSCC) closeVectors() error {
-	r := c.lifecycle.propagation.memory
-	for _, v := range [7]*satSCCVector{&c.toElim, &c.frames, &c.roots, &c.inStack, &c.stack, &c.lowlink, &c.index} {
-		if e := v.close(r); e != nil {
-			return e
-		}
-	}
+	c.index, c.lowlink, c.stack = nil, nil, nil
+	c.inStack, c.roots, c.frames, c.toElim = nil, nil, nil, nil
 	c.active = false
 	if c.reportActive {
 		if e := c.report.Stop(); e != nil {
@@ -136,20 +128,11 @@ func (c *satSCC) Close() error {
 }
 func (c *satSCC) newNode(lidx uint32) error {
 	p := c.lifecycle.propagation
-	r := p.memory
-	if e := c.index.put(r, lidx, 0, c.nextIndex); e != nil {
-		return e
-	}
-	if e := c.lowlink.put(r, lidx, 0, c.nextIndex); e != nil {
-		return e
-	}
+	c.index[lidx] = c.nextIndex
+	c.lowlink[lidx] = c.nextIndex
 	c.nextIndex++
-	if e := c.stack.push(r, lidx); e != nil {
-		return e
-	}
-	if e := c.inStack.put(r, lidx, 0, 1); e != nil {
-		return e
-	}
+	c.stack = append(c.stack, lidx)
+	c.inStack[lidx] = true
 	list, e := p.variables.watches.Get(lidx)
 	if e != nil {
 		return e
@@ -162,42 +145,22 @@ func (c *satSCC) newNode(lidx uint32) error {
 	if e != nil {
 		return e
 	}
-	n, e := c.frames.size(r)
-	if e != nil {
-		return e
-	}
-	capacity, e := c.frames.cap(r)
-	if e != nil {
-		return e
-	}
-	if n >= capacity {
-		if e = c.frames.grow(r); e != nil {
-			return e
-		}
-	}
-	if e = c.frames.put(r, n, 0, lidx); e != nil {
-		return e
-	}
-	vals := [8]uint32{1, 0, it.end, it.capacity, uint32(it.payload.Slot), uint32(it.payload.Generation), uint32(it.lifetime.Slot), uint32(it.lifetime.Generation)}
-	for k, x := range vals {
-		if e = c.frames.put(r, n, uint32(k+1), x); e != nil {
-			return e
-		}
-	}
-	return r.WriteUint32(c.frames.raw, 4, n+1)
+	c.frames = append(c.frames, satSCCFrame{literal: lidx, first: true, iterator: it})
+	return nil
 }
-func (c *satSCC) frame(f uint32) (uint32, uint32, satSolverWatchIterator, error) {
-	p := c.lifecycle.propagation
-	r := p.memory
-	var a [9]uint32
-	for k := range a {
-		x, e := c.frames.get(r, f, uint32(k))
-		if e != nil {
-			return 0, 0, satSolverWatchIterator{}, e
-		}
-		a[k] = x
+
+type satSCCFrame struct {
+	literal  uint32
+	first    bool
+	iterator satSolverWatchIterator
+}
+
+func (c *satSCC) frame(f uint32) (uint32, bool, satSolverWatchIterator, error) {
+	if uint64(f) >= uint64(len(c.frames)) {
+		return 0, false, satSolverWatchIterator{}, arena.ErrBounds
 	}
-	return a[0], a[1], satSolverWatchIterator{store: p.variables.watches.store, index: a[2], end: a[3], capacity: a[4], payload: arena.VectorRef{Slot: arena.Slot(a[5]), Generation: arena.Generation(a[6])}, lifetime: arena.VectorRef{Slot: arena.Slot(a[7]), Generation: arena.Generation(a[8])}}, nil
+	x := c.frames[f]
+	return x.literal, x.first, x.iterator, nil
 }
 func (c *satSCC) run() (count uint32, err error) {
 	if e := c.open(); e != nil {
@@ -234,29 +197,24 @@ func (c *satSCC) run() (count uint32, err error) {
 			}
 		}
 	}()
-	r := p.memory
 	nv, e := p.variables.numVarsChecked()
 	if e != nil {
 		return 0, e
 	}
 	nl := nv * 2
 	c.nextIndex = 0
-	for _, v := range [2]*satSCCVector{&c.index, &c.lowlink} {
-		if e := v.resize(r, nl, ^uint32(0)); e != nil {
-			return 0, e
-		}
+	c.index = make([]uint32, nl)
+	c.lowlink = make([]uint32, nl)
+	for i := range c.index {
+		c.index[i], c.lowlink[i] = ^uint32(0), ^uint32(0)
 	}
-	if e := c.inStack.resize(r, nl, 0); e != nil {
-		return 0, e
-	}
-	if e := c.roots.resize(r, nv, uint32(DefaultLiteral())); e != nil {
-		return 0, e
+	c.inStack = make([]bool, nl)
+	c.roots = make([]Literal, nv)
+	for i := range c.roots {
+		c.roots[i] = DefaultLiteral()
 	}
 	for lidx := uint32(0); lidx < nl; lidx++ {
-		ix, e := c.index.get(r, lidx, 0)
-		if e != nil {
-			return 0, e
-		}
+		ix := c.index[lidx]
 		if ix != ^uint32(0) {
 			continue
 		}
@@ -274,10 +232,7 @@ func (c *satSCC) run() (count uint32, err error) {
 			return 0, e
 		}
 		for {
-			fn, e := c.frames.size(r)
-			if e != nil {
-				return 0, e
-			}
+			fn := uint32(len(c.frames))
 			if fn == 0 {
 				break
 			}
@@ -286,7 +241,7 @@ func (c *satSCC) run() (count uint32, err error) {
 			if e != nil {
 				return 0, e
 			}
-			if first == 0 {
+			if !first {
 				w, e := satPropagationCursorRead(&it, it.index)
 				if e != nil {
 					return 0, e
@@ -295,31 +250,18 @@ func (c *satSCC) run() (count uint32, err error) {
 				if e != nil {
 					return 0, e
 				}
-				child, e := c.index.get(r, lit.index(), 0)
-				if e != nil {
-					return 0, e
-				}
+				child := c.index[lit.index()]
 				if satStorageSourceDebug && child == ^uint32(0) {
 					return 0, ErrSATAssertion
 				}
-				lo, e := c.lowlink.get(r, lit.index(), 0)
-				if e != nil {
-					return 0, e
-				}
-				here, e := c.lowlink.get(r, li, 0)
-				if e != nil {
-					return 0, e
-				}
+				lo := c.lowlink[lit.index()]
+				here := c.lowlink[li]
 				if lo < here {
-					if e = c.lowlink.put(r, li, 0, lo); e != nil {
-						return 0, e
-					}
+					c.lowlink[li] = lo
 				}
 				it.index++
 			}
-			if e = c.frames.put(r, f, 1, 0); e != nil {
-				return 0, e
-			}
+			c.frames[f].first = false
 			descend := false
 			for it.index != it.end {
 				w, e := satPropagationCursorRead(&it, it.index)
@@ -334,33 +276,20 @@ func (c *satSCC) run() (count uint32, err error) {
 				if e != nil {
 					return 0, e
 				}
-				ix, e := c.index.get(r, lit.index(), 0)
-				if e != nil {
-					return 0, e
-				}
+				ix := c.index[lit.index()]
 				if ix == ^uint32(0) {
-					if e = c.frames.put(r, f, 2, it.index); e != nil {
-						return 0, e
-					}
+					c.frames[f].iterator.index = it.index
 					if e = c.newNode(lit.index()); e != nil {
 						return 0, e
 					}
 					descend = true
 					break
 				}
-				inside, e := c.inStack.get(r, lit.index(), 0)
-				if e != nil {
-					return 0, e
-				}
-				if inside != 0 {
-					lo, e := c.lowlink.get(r, li, 0)
-					if e != nil {
-						return 0, e
-					}
+				inside := c.inStack[lit.index()]
+				if inside {
+					lo := c.lowlink[li]
 					if ix < lo {
-						if e = c.lowlink.put(r, li, 0, ix); e != nil {
-							return 0, e
-						}
+						c.lowlink[li] = ix
 					}
 				}
 				it.index++
@@ -368,17 +297,9 @@ func (c *satSCC) run() (count uint32, err error) {
 			if descend {
 				continue
 			}
-			if e = c.frames.put(r, f, 2, it.index); e != nil {
-				return 0, e
-			}
-			lo, e := c.lowlink.get(r, li, 0)
-			if e != nil {
-				return 0, e
-			}
-			ix, e = c.index.get(r, li, 0)
-			if e != nil {
-				return 0, e
-			}
+			c.frames[f].iterator.index = it.index
+			lo := c.lowlink[li]
+			ix = c.index[li]
 			if lo == ix {
 				if e = c.component(li); e != nil {
 					return 0, e
@@ -387,17 +308,13 @@ func (c *satSCC) run() (count uint32, err error) {
 					return 0, nil
 				}
 			}
-			if e = c.frames.pop(r); e != nil {
-				return 0, e
-			}
+			c.frames[len(c.frames)-1] = satSCCFrame{}
+			c.frames = c.frames[:len(c.frames)-1]
 		}
 	}
-	n, e := c.toElim.size(r)
-	if e != nil {
-		return 0, e
-	}
+	n := uint32(len(c.toElim))
 	c.numElim += n
-	if e = c.eliminator.runViews(&c.roots, &c.toElim); e != nil {
+	if e = c.eliminator.run(c.roots, c.toElim); e != nil {
 		return 0, e
 	}
 	if satStorageSourceDebug && c.debugInvariant {
@@ -409,42 +326,23 @@ func (c *satSCC) run() (count uint32, err error) {
 }
 func (c *satSCC) component(li uint32) error {
 	p := c.lifecycle.propagation
-	r := p.memory
 	l := Literal(li)
 	v := l.variable()
-	rv, e := c.roots.get(r, uint32(v), 0)
-	if e != nil {
-		return e
-	}
-	sn, e := c.stack.size(r)
-	if e != nil {
-		return e
-	}
+	rv := c.roots[v]
+	sn := uint32(len(c.stack))
 	if sn == 0 {
 		return ErrSATAssertion
 	}
-	if Literal(rv) != DefaultLiteral() {
+	if rv != DefaultLiteral() {
 		for {
-			n, e := c.stack.size(r)
-			if e != nil {
-				return e
-			}
-			x, e := c.stack.get(r, n-1, 0)
-			if e != nil {
-				return e
-			}
-			if e = c.stack.pop(r); e != nil {
-				return e
-			}
-			if e = c.inStack.put(r, x, 0, 0); e != nil {
-				return e
-			}
+			n := uint32(len(c.stack))
+			x := c.stack[n-1]
+			c.stack[len(c.stack)-1] = 0
+			c.stack = c.stack[:len(c.stack)-1]
+			c.inStack[x] = false
 			if satStorageSourceDebug {
-				rr, e := c.roots.get(r, uint32(Literal(x).variable()), 0)
-				if e != nil {
-					return e
-				}
-				if Literal(rr).variable() != Literal(rv).variable() {
+				rr := c.roots[uint32(Literal(x).variable())]
+				if rr.variable() != rv.variable() {
 					return ErrSATAssertion
 				}
 			}
@@ -457,10 +355,7 @@ func (c *satSCC) component(li uint32) error {
 	root := DefaultLiteral()
 	j := sn - 1
 	for {
-		x, e := c.stack.get(r, j, 0)
-		if e != nil {
-			return e
-		}
+		x := c.stack[j]
 		j--
 		if Literal(x) == l.Negated() {
 			p.setConflict(satJustification{}, DefaultLiteral())
@@ -482,38 +377,22 @@ func (c *satSCC) component(li uint32) error {
 		root = l
 	}
 	for {
-		n, e := c.stack.size(r)
-		if e != nil {
-			return e
-		}
-		x, e := c.stack.get(r, n-1, 0)
-		if e != nil {
-			return e
-		}
-		if e = c.stack.pop(r); e != nil {
-			return e
-		}
-		if e = c.inStack.put(r, x, 0, 0); e != nil {
-			return e
-		}
+		n := uint32(len(c.stack))
+		x := c.stack[n-1]
+		c.stack[len(c.stack)-1] = 0
+		c.stack = c.stack[:len(c.stack)-1]
+		c.inStack[x] = false
 		lit := Literal(x)
 		vv := lit.variable()
-		rr, e := c.roots.get(r, uint32(vv), 0)
-		if e != nil {
-			return e
-		}
-		if Literal(rr) == DefaultLiteral() {
-			rr = uint32(root)
+		rr := c.roots[vv]
+		if rr == DefaultLiteral() {
+			rr = root
 			if lit.sign() {
-				rr = uint32(root.Negated())
+				rr = root.Negated()
 			}
-			if e = c.roots.put(r, uint32(vv), 0, rr); e != nil {
-				return e
-			}
+			c.roots[vv] = rr
 			if vv != root.variable() {
-				if e = c.toElim.push(r, uint32(vv)); e != nil {
-					return e
-				}
+				c.toElim = append(c.toElim, vv)
 			}
 		}
 		if x == li {

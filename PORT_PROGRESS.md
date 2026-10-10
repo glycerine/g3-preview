@@ -32960,3 +32960,37 @@ component of 164 files. Remaining SAT Runtime/watch storage, AST reference/print
 storage, NumericTextStream consumers and internal numeric/text/parameter cycles
 must be addressed before the complete util subpackage split. Native external
 collections alone do not remove those internal dependency cycles.
+
+## Native SCC traversal arrays and typed watch frames
+
+SCC now owns native []uint32 index/lowlink/stack arrays, []bool stack membership,
+[]Literal roots, []BoolVar elimination order and []satSCCFrame traversal frames.
+Frames retain the actual borrowed watch iterator value. Removed the scalar
+Runtime vector implementation, encoded frame fields, capacity arithmetic,
+reallocation/pending states and constructor publication codecs. The equivalence
+eliminator now receives the native root/order slices through its existing typed
+run route; its separate vector-view path was removed. Actual cold owner headers
+remain charged; native traversal backing is uncharged. Close and deferred run
+cleanup drop all native slices, including iterator pointers in frame backing.
+
+Tarjan visit/return order, captured watch cursor positions, root selection,
+external-variable handling, cancellation checkpoints, unsigned statistics,
+clause mutation/model reconstruction and actual retained clause/model failure
+prefixes remain. Runtime root audits no longer enumerate removed SCC blocks.
+Four private capacity/overflow/malformed-header tests were retired. Parameter
+and repeated-local tests now verify unchanged Runtime allocation counts; the
+empty traversal succeeds with reservations disabled. New tests verify real
+257-frame growth/captured watch values with reservations disabled and unchanged
+Runtime blocks/budget, then complete cleanup. A 257-node chain of directed rings
+checks the independent component count, actual model reconstruction and a
+second run with no additional eliminations. Existing exhaustive 64 bounded
+graph cases and real clause/model allocation-prefix sweep remain passing.
+Manifest evidence was updated without changing any completion status.
+
+Validation: full native SAT passed (0.953s), full g3debug SAT passed (0.973s).
+Module-wide compilation, SAT vet, manifest evidence, gofmt and diff checks passed.
+No full native module rerun inside the hourly interval. Counts remain 2102
+units/677 APIs: 63 ported, 284 partial, 1727 unported, two dead/deleted. The util
+knot/split objective remains active; SAT watch/Runtime storage, retained AST
+reference/printer storage, NumericTextStream consumers and internal util cycles
+still require conversion/refactoring.

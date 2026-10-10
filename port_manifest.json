@@ -68109,7 +68109,6 @@
       "status": "partial",
       "go_targets": [
         "pkg/sat/sat_scc.go",
-        "pkg/sat/sat_scc_storage.go",
         "pkg/sat/sat_elim_eqs.go",
         "pkg/sat/sat_scc_test.go",
         "pkg/sat/sat_solver_clause_lifecycle.go"
@@ -68120,17 +68119,15 @@
         "TestSATElimEqsAllClauseAritiesAndModels",
         "TestSATSCCIndependentBoundedImplicationGraphs",
         "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-        "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+        "TestSATSCCParametersAndNativeLocalStorage",
         "TestSATSCCActualAllocationPrefixSweep",
         "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
         "TestSATSCCColdConstructionAndSourceStatWrap",
         "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
-        "TestSATSCCVectorSourceGeometryAndConstructorPublication",
-        "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
-        "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
         "TestSATElimEqsOwningIdentityGuard",
-        "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
-        "TestSATElimEqsSortActualLargeBacking"
+        "TestSATElimEqsSortActualLargeBacking",
+        "TestSATSCCNativeFrameGrowthAndCleanup",
+        "TestSATSCCNativeDeepComponentsAndRepeat"
       ],
       "assertions": [
         {
@@ -68179,25 +68176,23 @@
             "TestSATElimEqsAllClauseAritiesAndModels",
             "TestSATSCCIndependentBoundedImplicationGraphs",
             "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-            "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+            "TestSATSCCParametersAndNativeLocalStorage",
             "TestSATSCCActualAllocationPrefixSweep",
             "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
             "TestSATSCCColdConstructionAndSourceStatWrap",
             "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
-            "TestSATSCCVectorSourceGeometryAndConstructorPublication",
-            "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
-            "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
             "TestSATElimEqsOwningIdentityGuard",
-            "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
-            "TestSATElimEqsSortActualLargeBacking"
+            "TestSATElimEqsSortActualLargeBacking",
+            "TestSATSCCNativeFrameGrowthAndCleanup",
+            "TestSATSCCNativeDeepComponentsAndRepeat"
           ]
         }
       ],
       "ownership": [
-        "Fresh charged Runtime vectors per run; captured physical watch frames; actual solver model converter; disjoint clause compaction prefix and suffix; standalone eliminator self guard and lifecycle Close continuation. Allocation ordinals 0 through 30 refuse, first success 31; immediate whole named graph audit before disabling faults."
+        "Fresh native Go traversal slices per run: uint32 indexes/lowlinks/stack, bool membership, Literal roots, BoolVar elimination order and typed frames borrowing actual watch iterators. Native backing is uncharged; real SCC owner headers remain charged. Equivalence elimination borrows native root/order slices through its existing concrete run route. Actual solver model converter, disjoint clause compaction prefix/suffix and standalone eliminator owner/lifecycle guards remain. The actual retained clause/model allocation sweep audits named Runtime roots before disabling faults; removed vector/frame backing contributes no refusal events."
       ],
       "deviations": [
-        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Frame codec uses 36 bytes versus native LP64 24 bytes to retain pointer provenance. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Native typed frames borrow actual watch iterators without a frame codec. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
       ]
     },
     {
@@ -68207,7 +68202,6 @@
       "status": "partial",
       "go_targets": [
         "pkg/sat/sat_scc.go",
-        "pkg/sat/sat_scc_storage.go",
         "pkg/sat/sat_elim_eqs.go",
         "pkg/sat/sat_scc_test.go",
         "pkg/sat/sat_solver_clause_lifecycle.go"
@@ -68218,17 +68212,15 @@
         "TestSATElimEqsAllClauseAritiesAndModels",
         "TestSATSCCIndependentBoundedImplicationGraphs",
         "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-        "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+        "TestSATSCCParametersAndNativeLocalStorage",
         "TestSATSCCActualAllocationPrefixSweep",
         "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
         "TestSATSCCColdConstructionAndSourceStatWrap",
         "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
-        "TestSATSCCVectorSourceGeometryAndConstructorPublication",
-        "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
-        "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
         "TestSATElimEqsOwningIdentityGuard",
-        "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
-        "TestSATElimEqsSortActualLargeBacking"
+        "TestSATElimEqsSortActualLargeBacking",
+        "TestSATSCCNativeFrameGrowthAndCleanup",
+        "TestSATSCCNativeDeepComponentsAndRepeat"
       ],
       "conditionals": [
         {
@@ -68253,25 +68245,23 @@
             "TestSATElimEqsAllClauseAritiesAndModels",
             "TestSATSCCIndependentBoundedImplicationGraphs",
             "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-            "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+            "TestSATSCCParametersAndNativeLocalStorage",
             "TestSATSCCActualAllocationPrefixSweep",
             "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
             "TestSATSCCColdConstructionAndSourceStatWrap",
             "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
-            "TestSATSCCVectorSourceGeometryAndConstructorPublication",
-            "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
-            "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
             "TestSATElimEqsOwningIdentityGuard",
-            "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
-            "TestSATElimEqsSortActualLargeBacking"
+            "TestSATElimEqsSortActualLargeBacking",
+            "TestSATSCCNativeFrameGrowthAndCleanup",
+            "TestSATSCCNativeDeepComponentsAndRepeat"
           ]
         }
       ],
       "ownership": [
-        "Fresh charged Runtime vectors per run; captured physical watch frames; actual solver model converter; disjoint clause compaction prefix and suffix; standalone eliminator self guard and lifecycle Close continuation. Allocation ordinals 0 through 30 refuse, first success 31; immediate whole named graph audit before disabling faults."
+        "Fresh native Go traversal slices per run: uint32 indexes/lowlinks/stack, bool membership, Literal roots, BoolVar elimination order and typed frames borrowing actual watch iterators. Native backing is uncharged; real SCC owner headers remain charged. Equivalence elimination borrows native root/order slices through its existing concrete run route. Actual solver model converter, disjoint clause compaction prefix/suffix and standalone eliminator owner/lifecycle guards remain. The actual retained clause/model allocation sweep audits named Runtime roots before disabling faults; removed vector/frame backing contributes no refusal events."
       ],
       "deviations": [
-        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Frame codec uses 36 bytes versus native LP64 24 bytes to retain pointer provenance. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Native typed frames borrow actual watch iterators without a frame codec. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
       ]
     },
     {
@@ -70079,7 +70069,6 @@
       "status": "partial",
       "go_targets": [
         "pkg/sat/sat_scc.go",
-        "pkg/sat/sat_scc_storage.go",
         "pkg/sat/sat_elim_eqs.go",
         "pkg/sat/sat_scc_test.go",
         "pkg/sat/sat_solver_clause_lifecycle.go",
@@ -70094,16 +70083,12 @@
         "TestSATElimEqsAllClauseAritiesAndModels",
         "TestSATSCCIndependentBoundedImplicationGraphs",
         "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-        "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+        "TestSATSCCParametersAndNativeLocalStorage",
         "TestSATSCCActualAllocationPrefixSweep",
         "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
         "TestSATSCCColdConstructionAndSourceStatWrap",
         "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
-        "TestSATSCCVectorSourceGeometryAndConstructorPublication",
-        "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
-        "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
         "TestSATElimEqsOwningIdentityGuard",
-        "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
         "TestSATElimEqsSortActualLargeBacking",
         "TestSATIntegrityCompleteSourceMethodsAndResourceOrder",
         "TestSATIntegrityOriginalFrozenCountSourceQuirk",
@@ -70113,7 +70098,9 @@
         "TestSATIntegrityActualEnabledConsumerBindings",
         "TestSATIntegrityDisjointFreshSetEveryRefusal",
         "TestSATIntegrityNaryBlockedAndReinitProfiles",
-        "TestSATIntegrityAsymmActualEnabledWrapperSites"
+        "TestSATIntegrityAsymmActualEnabledWrapperSites",
+        "TestSATSCCNativeFrameGrowthAndCleanup",
+        "TestSATSCCNativeDeepComponentsAndRepeat"
       ],
       "assertions": [
         {
@@ -70150,17 +70137,15 @@
             "TestSATElimEqsAllClauseAritiesAndModels",
             "TestSATSCCIndependentBoundedImplicationGraphs",
             "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-            "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+            "TestSATSCCParametersAndNativeLocalStorage",
             "TestSATSCCActualAllocationPrefixSweep",
             "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
             "TestSATSCCColdConstructionAndSourceStatWrap",
             "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
-            "TestSATSCCVectorSourceGeometryAndConstructorPublication",
-            "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
-            "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
             "TestSATElimEqsOwningIdentityGuard",
-            "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
-            "TestSATElimEqsSortActualLargeBacking"
+            "TestSATElimEqsSortActualLargeBacking",
+            "TestSATSCCNativeFrameGrowthAndCleanup",
+            "TestSATSCCNativeDeepComponentsAndRepeat"
           ]
         },
         {
@@ -70176,15 +70161,17 @@
             "TestSATIntegrityActualEnabledConsumerBindings",
             "TestSATIntegrityDisjointFreshSetEveryRefusal",
             "TestSATIntegrityNaryBlockedAndReinitProfiles",
-            "TestSATIntegrityAsymmActualEnabledWrapperSites"
+            "TestSATIntegrityAsymmActualEnabledWrapperSites",
+            "TestSATSCCNativeFrameGrowthAndCleanup",
+            "TestSATSCCNativeDeepComponentsAndRepeat"
           ]
         }
       ],
       "ownership": [
-        "Fresh charged Runtime vectors per run; captured physical watch frames; actual solver model converter; disjoint clause compaction prefix and suffix; standalone eliminator self guard and lifecycle Close continuation. Allocation ordinals 0 through 30 refuse, first success 31; immediate whole named graph audit before disabling faults."
+        "Fresh native Go traversal slices per run: uint32 indexes/lowlinks/stack, bool membership, Literal roots, BoolVar elimination order and typed frames borrowing actual watch iterators. Native backing is uncharged; real SCC owner headers remain charged. Equivalence elimination borrows native root/order slices through its existing concrete run route. Actual solver model converter, disjoint clause compaction prefix/suffix and standalone eliminator owner/lifecycle guards remain. The actual retained clause/model allocation sweep audits named Runtime roots before disabling faults; removed vector/frame backing contributes no refusal events."
       ],
       "deviations": [
-        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Frame codec uses 36 bytes versus native LP64 24 bytes to retain pointer provenance. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Native typed frames borrow actual watch iterators without a frame codec. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
       ]
     },
     {
@@ -70194,7 +70181,6 @@
       "status": "partial",
       "go_targets": [
         "pkg/sat/sat_scc.go",
-        "pkg/sat/sat_scc_storage.go",
         "pkg/sat/sat_elim_eqs.go",
         "pkg/sat/sat_scc_test.go",
         "pkg/sat/sat_solver_clause_lifecycle.go"
@@ -70205,17 +70191,15 @@
         "TestSATElimEqsAllClauseAritiesAndModels",
         "TestSATSCCIndependentBoundedImplicationGraphs",
         "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-        "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+        "TestSATSCCParametersAndNativeLocalStorage",
         "TestSATSCCActualAllocationPrefixSweep",
         "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
         "TestSATSCCColdConstructionAndSourceStatWrap",
         "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
-        "TestSATSCCVectorSourceGeometryAndConstructorPublication",
-        "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
-        "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
         "TestSATElimEqsOwningIdentityGuard",
-        "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
-        "TestSATElimEqsSortActualLargeBacking"
+        "TestSATElimEqsSortActualLargeBacking",
+        "TestSATSCCNativeFrameGrowthAndCleanup",
+        "TestSATSCCNativeDeepComponentsAndRepeat"
       ],
       "conditionals": [
         {
@@ -70240,25 +70224,23 @@
             "TestSATElimEqsAllClauseAritiesAndModels",
             "TestSATSCCIndependentBoundedImplicationGraphs",
             "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-            "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+            "TestSATSCCParametersAndNativeLocalStorage",
             "TestSATSCCActualAllocationPrefixSweep",
             "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
             "TestSATSCCColdConstructionAndSourceStatWrap",
             "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
-            "TestSATSCCVectorSourceGeometryAndConstructorPublication",
-            "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
-            "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
             "TestSATElimEqsOwningIdentityGuard",
-            "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
-            "TestSATElimEqsSortActualLargeBacking"
+            "TestSATElimEqsSortActualLargeBacking",
+            "TestSATSCCNativeFrameGrowthAndCleanup",
+            "TestSATSCCNativeDeepComponentsAndRepeat"
           ]
         }
       ],
       "ownership": [
-        "Fresh charged Runtime vectors per run; captured physical watch frames; actual solver model converter; disjoint clause compaction prefix and suffix; standalone eliminator self guard and lifecycle Close continuation. Allocation ordinals 0 through 30 refuse, first success 31; immediate whole named graph audit before disabling faults."
+        "Fresh native Go traversal slices per run: uint32 indexes/lowlinks/stack, bool membership, Literal roots, BoolVar elimination order and typed frames borrowing actual watch iterators. Native backing is uncharged; real SCC owner headers remain charged. Equivalence elimination borrows native root/order slices through its existing concrete run route. Actual solver model converter, disjoint clause compaction prefix/suffix and standalone eliminator owner/lifecycle guards remain. The actual retained clause/model allocation sweep audits named Runtime roots before disabling faults; removed vector/frame backing contributes no refusal events."
       ],
       "deviations": [
-        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Frame codec uses 36 bytes versus native LP64 24 bytes to retain pointer provenance. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Native typed frames borrow actual watch iterators without a frame codec. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
       ]
     },
     {
@@ -70320,7 +70302,6 @@
       "status": "partial",
       "go_targets": [
         "pkg/sat/sat_scc.go",
-        "pkg/sat/sat_scc_storage.go",
         "pkg/sat/sat_elim_eqs.go",
         "pkg/sat/sat_scc_test.go",
         "pkg/sat/sat_solver_clause_lifecycle.go"
@@ -70331,17 +70312,15 @@
         "TestSATElimEqsAllClauseAritiesAndModels",
         "TestSATSCCIndependentBoundedImplicationGraphs",
         "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-        "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+        "TestSATSCCParametersAndNativeLocalStorage",
         "TestSATSCCActualAllocationPrefixSweep",
         "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
         "TestSATSCCColdConstructionAndSourceStatWrap",
         "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
-        "TestSATSCCVectorSourceGeometryAndConstructorPublication",
-        "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
-        "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
         "TestSATElimEqsOwningIdentityGuard",
-        "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
-        "TestSATElimEqsSortActualLargeBacking"
+        "TestSATElimEqsSortActualLargeBacking",
+        "TestSATSCCNativeFrameGrowthAndCleanup",
+        "TestSATSCCNativeDeepComponentsAndRepeat"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -70356,25 +70335,23 @@
             "TestSATElimEqsAllClauseAritiesAndModels",
             "TestSATSCCIndependentBoundedImplicationGraphs",
             "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-            "TestSATSCCParametersDefaultGlobalsAndFreshLocalStorage",
+            "TestSATSCCParametersAndNativeLocalStorage",
             "TestSATSCCActualAllocationPrefixSweep",
             "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
             "TestSATSCCColdConstructionAndSourceStatWrap",
             "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
-            "TestSATSCCVectorSourceGeometryAndConstructorPublication",
-            "TestSATSCCVectorDebugCapacityAssertionBeforeOverflow",
-            "TestSATSCCResizeWholeReservationBeforeSizeAndShrink",
             "TestSATElimEqsOwningIdentityGuard",
-            "TestSATSCCResizePublishesBeforeReachedConstructorGuard",
-            "TestSATElimEqsSortActualLargeBacking"
+            "TestSATElimEqsSortActualLargeBacking",
+            "TestSATSCCNativeFrameGrowthAndCleanup",
+            "TestSATSCCNativeDeepComponentsAndRepeat"
           ]
         }
       ],
       "ownership": [
-        "Fresh charged Runtime vectors per run; captured physical watch frames; actual solver model converter; disjoint clause compaction prefix and suffix; standalone eliminator self guard and lifecycle Close continuation. Allocation ordinals 0 through 30 refuse, first success 31; immediate whole named graph audit before disabling faults."
+        "Fresh native Go traversal slices per run: uint32 indexes/lowlinks/stack, bool membership, Literal roots, BoolVar elimination order and typed frames borrowing actual watch iterators. Native backing is uncharged; real SCC owner headers remain charged. Equivalence elimination borrows native root/order slices through its existing concrete run route. Actual solver model converter, disjoint clause compaction prefix/suffix and standalone eliminator owner/lifecycle guards remain. The actual retained clause/model allocation sweep audits named Runtime roots before disabling faults; removed vector/frame backing contributes no refusal events."
       ],
       "deviations": [
-        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Frame codec uses 36 bytes versus native LP64 24 bytes to retain pointer provenance. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Native typed frames borrow actual watch iterators without a frame codec. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
       ]
     },
     {

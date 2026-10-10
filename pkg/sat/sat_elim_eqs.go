@@ -12,7 +12,6 @@ type satElimEqs struct {
 	self                                       *satElimEqs
 	closing                                    bool
 	lifecycle                                  *satSolverClauseLifecycle
-	roots, toElim                              *satSCCVector
 	borrowedRoots                              []Literal
 	borrowedElim                               []BoolVar
 	cursor, out, end, drainPrefix, drainSuffix uint32
@@ -49,10 +48,6 @@ func (e *satElimEqs) Close() error {
 	return nil
 }
 func (e *satElimEqs) root(v BoolVar) (Literal, error) {
-	if e.roots != nil {
-		x, err := e.roots.get(e.lifecycle.propagation.memory, uint32(v), 0)
-		return Literal(x), err
-	}
 	if uint64(v) >= uint64(len(e.borrowedRoots)) {
 		return 0, arena.ErrBounds
 	}
@@ -69,12 +64,6 @@ func (e *satElimEqs) run(roots []Literal, toElim []BoolVar) error {
 	e.borrowedRoots = roots
 	e.borrowedElim = toElim
 	defer func() { e.borrowedRoots = nil; e.borrowedElim = nil }()
-	return e.execute()
-}
-func (e *satElimEqs) runViews(roots, toElim *satSCCVector) error {
-	e.roots = roots
-	e.toElim = toElim
-	defer func() { e.roots = nil; e.toElim = nil }()
 	return e.execute()
 }
 func (e *satElimEqs) execute() error {
@@ -507,25 +496,7 @@ func (e *satElimEqs) siftClause(c StoredClauseRef, root, end uint32) error {
 }
 func (e *satElimEqs) saveElim() error {
 	p := e.lifecycle.propagation
-	n := uint32(len(e.borrowedElim))
-	if e.toElim != nil {
-		var err error
-		n, err = e.toElim.size(p.memory)
-		if err != nil {
-			return err
-		}
-	}
-	for i := uint32(0); i < n; i++ {
-		var v BoolVar
-		if e.toElim != nil {
-			x, err := e.toElim.get(p.memory, i, 0)
-			if err != nil {
-				return err
-			}
-			v = BoolVar(x)
-		} else {
-			v = e.borrowedElim[i]
-		}
+	for _, v := range e.borrowedElim {
 		lit := Literal(uint32(v) << 1)
 		r, err := e.root(v)
 		if err != nil {
