@@ -125252,7 +125252,10 @@
         "TestLPFloatMPSFileReadFailure",
         "TestLPFloatMPSDiagnosticRefusalCampaigns",
         "TestLPFloatMPSSourceDomainPrefixes",
-        "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes"
+        "TestLPFloatMPSUnrangedRelationsAndNumericPrefixes",
+        "TestLPFloatMPSDualIndependentMinMax",
+        "TestLPFloatMPSDualStoredAndPopulationIsolation",
+        "TestLPFloatMPSDualPopulationErrorPrefixes"
       ],
       "assertions": [
         {
@@ -125324,10 +125327,20 @@
           ]
         },
         {
-          "name": "Exact MPS values, dual solver creation, LAR variable/constraint construction and full upstream CLI scenarios",
+          "name": "Exact MPS values, LAR variable/constraint construction and full upstream CLI scenarios",
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "Floating dual solver creation and shared concrete floating rows-before-columns population, independent primal/dual minimum/maximum workflow",
+          "status": "ported",
+          "go_target": "pkg/util/lp/mps_reader_float.go",
+          "tests": [
+            "TestLPFloatMPSDualIndependentMinMax",
+            "TestLPFloatMPSDualStoredAndPopulationIsolation",
+            "TestLPFloatMPSDualPopulationErrorPrefixes"
+          ]
         }
       ],
       "ownership": [],

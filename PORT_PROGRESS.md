@@ -37798,3 +37798,33 @@ import edges. LP remains72 partial/38 unported. MPS dual creation, exact
 variants and complete original source drivers remain open; whole LP unfinished.
 Last full module checkpoint21:11 UTC predates these additions; next hourly
 full native run is not due yet.
+
+### Floating MPS dual construction and min/max comparison workflow — 2026-10-10
+
+Added actual CreateDualSolver and shared concrete FloatLPSolver population
+with CreatePrimalSolver. Source rows-before-columns, insertion-ordered native
+row/column model traversal, cost/constraint/bound/name publication, missing
+column lookup/assertion/operator[] behavior and IsOK-independent construction
+remain unchanged. Each concrete solver owns independent copied metadata and
+coefficients; no abstract universal solver callback or adapter was introduced.
+
+120 parsed mixed-cost shifted/boxed models run in both minimum/maximum modes.
+Actual primal and dual optimization each agree with240 independent exhaustive
+Gauss-Jordan vertex optima; original external bounds/inequalities are checked.
+Source setup's initial cost flip and displayed minimum sign are explicit.
+Stored bounds/ranges/fixed fixture independently verifies cost24 and x2/y4/f2.
+Reader reuse, separately created model ownership, later construction after
+cost flipping/presolve and IsOK=false creation are tested. Missing/nil column
+population errors retain earlier constraint publication and native/debug map
+prefixes. Unchanged default tableau again fails without a core LU; only the
+explicit LU optimization profile is credited. Full upstream CLI is not claimed.
+
+Focused native core/primal/dual/MPS/presolve/solver/column/scaler/static/LU
+checks pass1.059s; combined g3debug/g3checked0.941s. Reader357/381 (93.7%)
+native,360/381 (94.5%) debug. Remaining gaps predominantly propagate real
+constructor/writer errors or qualify opposite assertion profiles. Profiles:
+/mnt/oldrog/tmp/g3-mps-dual-{native,debug}.cover. Both LP vets pass;
+source/evidence/no-generics verifier and graph regeneration run without import
+edge changes. LP remains72 partial/38 unported. Exact/LAR input/solvers and
+complete original drivers remain open; whole LP goal unfinished. Last whole
+module checkpoint21:11 UTC predates these additions; hourly refresh follows.

@@ -1,4 +1,4 @@
-// Source: src/util/lp/mps_reader.h:41-798 (floating primal consumer).
+// Source: src/util/lp/mps_reader.h:41-798 (floating primal/dual consumers).
 package lp
 
 import (
@@ -616,35 +616,46 @@ func (m *FloatMPSReader) relation(typ mpsRowType) (LPRelation, error) {
 	return 0, ErrMPSUnhandled
 }
 
-// CreatePrimalSolver follows source fill_solver rows-before-columns ordering.
-// It does not gate on IsOK, just as the source create_solver does not.
+// CreatePrimalSolver and CreateDualSolver share the concrete floating model
+// population. Source fill_solver visits rows before columns and does not gate
+// creation on IsOK. A population error returns the partially populated owner.
 func (m *FloatMPSReader) CreatePrimalSolver() (*FloatPrimalSimplex, error) {
 	solver, err := NewFloatPrimalSimplex()
 	if err != nil {
 		return nil, err
 	}
+	return solver, m.fillFloatSolver(solver.FloatLPSolver)
+}
+func (m *FloatMPSReader) CreateDualSolver() (*FloatDualSimplex, error) {
+	solver, err := NewFloatDualSimplex()
+	if err != nil {
+		return nil, err
+	}
+	return solver, m.fillFloatSolver(solver.FloatLPSolver)
+}
+func (m *FloatMPSReader) fillFloatSolver(solver *FloatLPSolver) error {
 	for _, row := range m.rows.All() {
 		cost := row.name == m.costName
 		if !cost {
 			rel, err := m.relation(row.typ)
 			if err != nil {
-				return solver, err
+				return err
 			}
 			if err := solver.AddConstraint(rel, row.rhs, row.index); err != nil {
-				return solver, err
+				return err
 			}
 		}
 		for name, v := range row.coefficients.All() {
 			col, ok := m.columns.Get2(name)
 			if !ok {
 				if err := sourceAssertionFailure(); err != nil {
-					return solver, err
+					return err
 				}
 				m.columns.Set(name, nil)
-				return solver, ErrBounds
+				return ErrBounds
 			}
 			if col == nil {
-				return solver, ErrBounds
+				return ErrBounds
 			}
 			if cost {
 				solver.GetOrCreateColumnInfo(col.index).Cost = v
@@ -655,7 +666,7 @@ func (m *FloatMPSReader) CreatePrimalSolver() (*FloatPrimalSimplex, error) {
 	}
 	for _, col := range m.columns.All() {
 		if col == nil {
-			return solver, ErrBounds
+			return ErrBounds
 		}
 		ci := solver.GetOrCreateColumnInfo(col.index)
 		b := col.bound
@@ -674,5 +685,5 @@ func (m *FloatMPSReader) CreatePrimalSolver() (*FloatPrimalSimplex, error) {
 		}
 		solver.GiveSymbolicNameToColumn(col.name, col.index)
 	}
-	return solver, nil
+	return nil
 }
