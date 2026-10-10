@@ -119465,7 +119465,11 @@
       "go_targets": [
         "pkg/util/lp/lar_bounds.go",
         "pkg/util/lp/lar_bounds_test.go",
-        "pkg/util/lp/stacked_lar_witness.go"
+        "pkg/util/lp/stacked_lar_witness.go",
+        "pkg/util/lp/lar_model.go",
+        "pkg/util/lp/lar_model_terms.go",
+        "pkg/util/lp/lar_model_bounds.go",
+        "pkg/util/lp/lar_model_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -119474,7 +119478,13 @@
         "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
         "TestLARBoundsExistingScopedOwnersAndAlias",
         "TestLARBoundsDebugInvariantProfiles",
-        "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+        "TestLARBoundsMultipleColumnsAndExistingInfeasibility",
+        "TestLARModelIndependentVariableDirectories",
+        "TestLARModelIndependentTermRowsAndBounds",
+        "TestLARModelNestedTableauAndRowPropagation",
+        "TestLARModelPhysicalFailurePrefixes",
+        "TestLARModelDeferredEmptyTermsAndSourceGuards",
+        "TestLARModelLeavesOlderComparisonOwned"
       ],
       "assertions": [
         {
@@ -119717,15 +119727,71 @@
           "name": "remaining external-variable/term registration, matrix/basis construction and strategy initialization",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "add_var, register_new_ext_var_index, add_non_basic_var_to_core_fields and exact/floating core-field growth with source statement publication order",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "add_term/add_term_undecided, add_row_for_term wrapper, add_row_from_term_no_constraint, basic-field registration and deferred tableau rows",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model_terms.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "fill_last_row_of_A_d with literal negative coefficient/negative-unit basis signs",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model_terms.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "add_var_bound ordinary and term branches, shifted original constants and constraint-before-bound versus deferred bound-before-constraint publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model_bounds.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Concrete LARBounds owns actual StackedPairVector lower/upper values and replacement snapshots in a borrowed RationalManager, plus native column types, witness journals, status, infeasible-column state and changed-column set. Numeric-pair by-value constructor parameter and result are independently copied, the parameter dies before assignment, and partial temporaries/invocation receipts survive until explicit Close. Child bound-vector copies retain their own physical allocation roots."
+        "Concrete LARBounds owns actual StackedPairVector lower/upper values and replacement snapshots in a borrowed RationalManager, plus native column types, witness journals, status, infeasible-column state and changed-column set. Numeric-pair by-value constructor parameter and result are independently copied, the parameter dies before assignment, and partial temporaries/invocation receipts survive until explicit Close. Child bound-vector copies retain their own physical allocation roots.",
+        "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
+        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction."
       ],
       "deviations": [
         "All five bound update branches and dispatch preserve source epsilon signs, strict/structural pair comparison, assignment/witness/change/status order and source conflict asymmetries. This implements the bound component, not a complete LAR solver. Full add_var/add_var_bound, matrix/basis, constraint publication/scopes and optimization remain unported.",
         "AppendFreeColumn initializes only the source bound fields, with witness/type/change-domain and low/upper publication; it does not claim complete source variable registration. Existing native scoped owners are exercised directly, without claiming whole-solver push/pop.",
-        "Source boxed-upper conflict sets Infeasible then debug-asserts before recording the infeasible column; low-only conflicting upper bound retains low-only type, while upper-only conflicting lower bound first changes to boxed. Contradictory equality can update only a witness without changing stored bounds. These transitions are explicit regressions, not corrected interval metadata."
+        "Source boxed-upper conflict sets Infeasible then debug-asserts before recording the infeasible column; low-only conflicting upper bound retains low-only type, while upper-only conflicting lower bound first changes to boxed. Contradictory equality can update only a witness without changing stored bounds. These transitions are explicit regressions, not corrected interval metadata.",
+        "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
+        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication."
       ]
     },
     {
@@ -120018,13 +120084,20 @@
         "pkg/util/lp/implied_bound.go",
         "pkg/util/lp/implied_bound_test.go",
         "pkg/util/lp/lar_constraints.go",
-        "pkg/util/lp/lar_constraints_test.go"
+        "pkg/util/lp/lar_constraints_test.go",
+        "pkg/util/lp/lar_model_test.go"
       ],
       "tests": [
         "TestLPImpliedBoundKindsAndStrings",
         "TestLARConstraintsIndependentExactCopiesAndBorrows",
         "TestLARConstraintsConstructionAndExportPhysicalRefusals",
-        "TestLARConstraintsForeignManagerAndStoppedTerm"
+        "TestLARConstraintsForeignManagerAndStoppedTerm",
+        "TestLARModelIndependentVariableDirectories",
+        "TestLARModelIndependentTermRowsAndBounds",
+        "TestLARModelNestedTableauAndRowPropagation",
+        "TestLARModelPhysicalFailurePrefixes",
+        "TestLARModelDeferredEmptyTermsAndSourceGuards",
+        "TestLARModelLeavesOlderComparisonOwned"
       ],
       "assertions": [
         {
@@ -120084,24 +120157,51 @@
             "TestLARConstraintsIndependentExactCopiesAndBorrows",
             "TestLARConstraintsConstructionAndExportPhysicalRefusals"
           ]
+        },
+        {
+          "name": "actual lar_base_constraint virtual surface as a concrete typed Go interface, borrowed base fields and registered variable/term owner dispatch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_constraints.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Each base owns an independently copied RHS and stopped copy receipts in a borrowed RationalManager. Variable constraints own no coefficient storage; term constraints borrow the live LARTerm without destroying it; general constraints own an ordered SparseRationalVector, including the unpublished partial element of a stopped copy. Export owners are independent and retain their own call receipts. FreeCoefficient writes caller-owned initialized out, whose partial value stays caller-owned on error. Derived vector cleanup precedes base RHS cleanup."
+        "Each base owns an independently copied RHS and stopped copy receipts in a borrowed RationalManager. Variable constraints own no coefficient storage; term constraints borrow the live LARTerm without destroying it; general constraints own an ordered SparseRationalVector, including the unpublished partial element of a stopped copy. Export owners are independent and retain their own call receipts. FreeCoefficient writes caller-owned initialized out, whose partial value stays caller-owned on error. Derived vector cleanup precedes base RHS cleanup.",
+        "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
+        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction."
       ],
       "deviations": [
         "Retained variable, term and general owning constraint operations are implemented with native Go slices and exact numeral owners. Full LAR constraint insertion, scope/bound updates, quick_xplain solving and upstream driver integration remain incomplete.",
         "The unused lar_constraint(const lar_base_constraint&) assertion-only constructor and its default base construction are not introduced. The retained full coefficient constructor is reached by quick_xplain; existing stale smt_reader constructors are not credited as working Go drivers.",
-        "Term coefficient order follows the existing insertion-ordered Go term dictionary rather than C++ unordered_map buckets; duplicates and explicit zeros in general coefficient vectors are copied unchanged. Native value and output adapters do not emulate C++ vector allocation/layout or ostream internals."
+        "Term coefficient order follows the existing insertion-ordered Go term dictionary rather than C++ unordered_map buckets; duplicates and explicit zeros in general coefficient vectors are copied unchanged. Native value and output adapters do not emulate C++ vector allocation/layout or ostream internals.",
+        "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
+        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication."
       ]
     },
     {
       "path": "src/util/lp/lar_core_solver.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lar_core.go",
+        "pkg/util/lp/lar_model_test.go"
+      ],
+      "tests": [
+        "TestLARModelIndependentVariableDirectories",
+        "TestLARModelIndependentTermRowsAndBounds",
+        "TestLARModelNestedTableauAndRowPropagation",
+        "TestLARModelPhysicalFailurePrefixes",
+        "TestLARModelDeferredEmptyTermsAndSourceGuards",
+        "TestLARModelLeavesOlderComparisonOwned"
+      ],
       "conditionals": [
         {
           "line": 570,
@@ -120292,17 +120392,47 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained LAR exact/floating core constructor, borrowed settings/namer, source default state, dimensions/tiny/empty and LU-mode queries, owning teardown",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_core.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned"
+          ]
+        }
+      ],
+      "ownership": [
+        "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
+        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction."
+      ],
+      "deviations": [
+        "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
+        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication."
+      ]
     },
     {
       "path": "src/util/lp/lar_core_solver.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lar_core.go",
+        "pkg/util/lp/lar_model_test.go"
+      ],
+      "tests": [
+        "TestLARModelIndependentVariableDirectories",
+        "TestLARModelIndependentTermRowsAndBounds",
+        "TestLARModelNestedTableauAndRowPropagation",
+        "TestLARModelPhysicalFailurePrefixes",
+        "TestLARModelDeferredEmptyTermsAndSourceGuards",
+        "TestLARModelLeavesOlderComparisonOwned"
+      ],
       "assertions": [
         {
           "line": 75,
@@ -120367,9 +120497,29 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained LAR constructor binding actual mpq/impq and double/double primal cores to live model vector headers",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_core.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned"
+          ]
+        }
+      ],
+      "ownership": [
+        "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
+        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction."
+      ],
+      "deviations": [
+        "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
+        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication."
+      ]
     },
     {
       "path": "src/util/lp/lar_core_solver_instances.cpp",
@@ -120407,7 +120557,11 @@
         "pkg/util/lp/lar_bounds_test.go",
         "pkg/util/lp/stacked_lar_witness.go",
         "pkg/util/lp/bound_propagator.go",
-        "pkg/util/lp/bound_propagator_test.go"
+        "pkg/util/lp/bound_propagator_test.go",
+        "pkg/util/lp/lar_model.go",
+        "pkg/util/lp/lar_model_terms.go",
+        "pkg/util/lp/lar_model_bounds.go",
+        "pkg/util/lp/lar_model_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -120421,7 +120575,13 @@
         "TestLARBoundPropagatorHooksBorrowedModelAndStreams",
         "TestLARBoundPropagatorPhysicalFailurePrefixes",
         "TestLARBoundPropagatorMappingAndOwnerGuards",
-        "TestLARBoundPropagatorLeavesHookInvocationOwned"
+        "TestLARBoundPropagatorLeavesHookInvocationOwned",
+        "TestLARModelIndependentVariableDirectories",
+        "TestLARModelIndependentTermRowsAndBounds",
+        "TestLARModelNestedTableauAndRowPropagation",
+        "TestLARModelPhysicalFailurePrefixes",
+        "TestLARModelDeferredEmptyTermsAndSourceGuards",
+        "TestLARModelLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -120830,13 +120990,56 @@
             "TestLARBoundPropagatorMappingAndOwnerGuards",
             "TestLARBoundPropagatorLeavesHookInvocationOwned"
           ]
+        },
+        {
+          "name": "LAR model construction and owning teardown, actual source naming/registration/term/size queries and pivoted-row propagation set alias",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "fill_last_row_of_A_r and exact direct basic-value reconstruction with actual return-expression rational/pair temporaries",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model_terms.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned"
+          ]
+        },
+        {
+          "name": "constraint/value/count access and actual variable/term bound registration integration",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_model_bounds.go",
+          "tests": [
+            "TestLARModelIndependentVariableDirectories",
+            "TestLARModelIndependentTermRowsAndBounds",
+            "TestLARModelNestedTableauAndRowPropagation",
+            "TestLARModelPhysicalFailurePrefixes",
+            "TestLARModelDeferredEmptyTermsAndSourceGuards",
+            "TestLARModelLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "LARBounds is the owning concrete bound component with borrowed RationalManager. Status, infeasible column and witness/type state use the actual existing typed scoped owners; exact lower/upper journals retain completed and partial values. Full solver, term, matrix and constraint ownership remains open."
+        "LARBounds is the owning concrete bound component with borrowed RationalManager. Status, infeasible column and witness/type state use the actual existing typed scoped owners; exact lower/upper journals retain completed and partial values. Full solver, term, matrix and constraint ownership remains open.",
+        "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
+        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction."
       ],
       "deviations": [
-        "Only source bound/witness state and its concrete update consumers are implemented. No full LAR constructor, AddVar/AddConstraint, scope, propagation or optimization completion is claimed."
+        "Only source bound/witness state and its concrete update consumers are implemented. No full LAR constructor, AddVar/AddConstraint, scope, propagation or optimization completion is claimed.",
+        "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
+        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication."
       ]
     },
     {

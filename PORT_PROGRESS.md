@@ -38133,3 +38133,86 @@ LAR model construction/registration/scopes, whole-core solve and original driver
 integration remain open. The full LP implementation/test/coverage goal remains
 unfinished; actual LAR construction can now bind the implemented exact primal
 core rather than introducing a placeholder solver.
+
+### Real LAR model/core construction and registration — 2026-10-10
+
+Connected actual exact and floating primal cores to live LAR model fields. The
+model owns native external/internal directories, separate working/original terms,
+constraints, scoped metadata and the actual matrices/values. LARCoreSolver owns
+one LARBounds state; the outer LARSolver aliases that state without duplicating
+bounds or closing twice. This Go composition stores outer witness/status metadata
+alongside the core type/bound fields while preserving their independent scoped
+values. Both primal cores borrow the same live type header, settings and column
+namer, with their own source exact/floating vectors and owning scratch.
+
+Ported add_var, external-index registration and exact/floating core-field growth.
+Witness publication precedes map registration; the map precedes the directory
+assertion. Exact columns grow X/lower/upper/inf-set/costs/D before headings; new
+nonbasic headings append in registration order. Floating registration runs only
+under LU and grows only its actual source vectors, without eagerly initializing
+later solve costs, infeasibility membership or other scratch. Source invalid
+external-variable throw(0) is an explicit native ErrBounds/debug assertion.
+
+Ported separate term/original construction and publication, undecided terms,
+selected tableau rows, deferred rows, basic fields and direct exact basic-value
+reconstruction with concrete source return-expression temporaries. Tableau rows
+use actual FillLastRowWithPivoting and RHS growth to column count. Rational LU
+rows retain negative coefficients/positive-unit basis; floating rows retain the
+literal source negative-unit basis and initialized floating X. Basic witness Row
+stores its column index. Only add_row_for_term wraps source size assertions;
+deferred/constraint helpers preserve map/witness publication before their own
+LU-dimension assertion. An initial overbroad assertion wrapper was corrected and
+verified against a reached source prefix, rather than changing that behavior.
+
+Ported ordinary/term bound insertion, original-constant subtraction and actual
+polymorphic lar_base_constraint ownership. Ordinary and already registered term
+constraints publish before bound updates. Deferred terms create their row, update
+the bound with the forthcoming constraint index, then construct/publish that
+constraint. Propagation restores current working-term constants; constraints
+subtract original-term constants. Parent row/shift arithmetic owns its exact
+calls, while term/constraint/iterator/matrix/bound children keep theirs. Partial
+unpublished owners remain inspectable until explicit Close. Parent arithmetic
+inputs survive child cleanup. Constraints close forward before working/original
+terms and core members. An older caller-owned comparison remains the same active
+generation after the whole model is closed.
+
+Four strategy profiles each run300 independent variable-directory steps.120
+independent exact term worlds verify row values including infinitesimals, original
+copy isolation, term identity, shifted bounds/witnesses and current propagation
+constants. Nested tableau rows eliminate an earlier basis variable; actual model
+row analysis derives term bounds5 and50 with the correct strict upper evidence.
+Deferred empty terms, propagation-disabled registration, real empty LU cores,
+invalid external IDs, live aliases and source map/dimension assertion prefixes
+are covered. Twelve pooled/direct physical campaigns enumerate undecided terms,
+tableau zero/nonzero values, mapped/deferred term bounds and ordinary bounds
+through success. They observe both real constraint/bound publication orders,
+check stopped public entry points leave publication and raw generations unchanged,
+and audit named numeral roots after cleanup.
+
+Final focused native suite passes26.929s; combined g3debug/g3checked26.729s.
+Coverage: core23/31 (74.2%) both; model121/162 (74.7%) native and128/162 (79.0%)
+debug; term registration150/197 (76.1%) and160/197 (81.2%); bound registration
+64/68 (94.1%) both. Gaps mainly qualify invariant-protected child/cleanup errors,
+metadata and source assertion profiles. Logs/profiles:
+/mnt/oldrog/tmp/g3-lar-model-{native,debug}.{log,cover}. Both LP vets, native
+module-wide compilation and source/evidence/no-generics verification pass. The
+64-package graph adds four production filenames and no import edges.
+
+LP83 partial/27 unported; global2103 units/677 APIs,62 ported/364 partial/
+1649 unported/two dead-deleted. Full LAR optimization, exact/tableau pricing and
+pivot loop, strategy selection/LU migration, whole-model scopes, row scheduling,
+explanations and original driver integration remain open. The complete LP port
+goal remains unfinished. The hourly native module suite is running; it began
+before the final assertion-wrapper correction and additional stopped-entry/older-
+comparison tests. Final focused checks above verify those updates; the full suite
+provides the broader regression checkpoint. Its terminal result is recorded next.
+
+
+Hourly checkpoint recovered from completed log at23:33 UTC Oct10: all64 module
+packages report success, no FAIL/panic entries; LP515.173s,88.8% (13701/15421).
+Log/profile: /mnt/oldrog/tmp/g3-lar-model-module-native.{log,cover}. Original
+process handles are no longer available. This full-suite snapshot predates the
+final assertion-wrapper correction and extra stopped-entry/older-comparison
+checks, which pass in final focused native/debug profiles. Module-wide native
+compilation likewise has a completed passing log. The lower aggregate coverage
+reflects newly implemented statements; it does not measure missing C++ code.

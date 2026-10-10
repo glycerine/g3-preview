@@ -190,3 +190,16 @@ func copyLARCoefficients(m *numeral.RationalManager, entries []RationalSparseEnt
 	}
 	return v, nil
 }
+
+// LARStoredConstraint is the actual polymorphic lar_base_constraint surface.
+// Base borrows its shared source fields; the returned owning vectors still
+// require Close. Concrete constructors and destructors retain their lifetimes.
+type LARStoredConstraint interface {
+	Base() *LARBaseConstraint
+	Size() uint32
+	CoefficientsAsVector() (*SparseRationalVector, error)
+	FreeCoefficient(*numeral.Rational) error
+	Close() error
+}
+
+func (c *LARBaseConstraint) Base() *LARBaseConstraint { return c }

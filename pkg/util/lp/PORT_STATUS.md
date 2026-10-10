@@ -5,15 +5,19 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently 81 partial source units and 29 unported units. The floating
+There are currently 83 partial source units and 27 unported units. The floating
 primal and dual cores expose Solve, and outer LU primal/dual integration is implemented.
 Remaining source diagnostics and default tableau, exact, dual and LAR variants
 remain incomplete. Go coverage does not measure unported C++ code.
 
-Latest hourly native module checkpoint passed at 22:14 UTC: LP 326.657s,
-89.8% (12347/13752). It includes floating dual outer and MPS primal/dual integration
-and predates the implied-bound, owning-constraint, bound-update and propagator/row-analyzer/exact-core additions. Focused native/debug checks validate those
-additions. Log/profile: `/mnt/oldrog/tmp/g3-mps-dual-module-native.{log,cover}`.
+Latest hourly native module log completed at 23:33 UTC with every package
+reporting success: LP 515.173s, 88.8% (13701/15421). The original process handle
+is no longer available; the completed log and coverage profile are retained.
+This snapshot includes LAR registration before the final assertion-wrapper
+correction and additional stopped-entry/older-comparison tests; final focused
+native/debug checks validate those changes. Coverage measures current Go code,
+not unported C++ functionality.
+Log/profile: `/mnt/oldrog/tmp/g3-lar-model-module-native.{log,cover}`.
 
 Known source limitation: the outer primal path flips upper-only coordinates but
 retains `ColumnUpperBound` with zero upper value. Its regression reports source
@@ -42,6 +46,7 @@ from the120 independently verified bounded optima.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Real LAR exact/floating model and variable/term/bound registration | Four strategy profiles with300 variable steps each;120 independent exact row/value/constant worlds; nested tableau and actual row propagation; deferred empty terms and source guard/publication profiles;12 pooled/direct physical failure campaigns through success; older caller comparison retained through destruction | Core74.2% (23/31) both; model74.7% native/79.0% debug (121/162,128/162); terms76.1%/81.2% (150/197,160/197); bound registration94.1% (64/68) both. Gaps mainly qualify invariant/child cleanup guards. Full LAR Solve/scopes/strategy migration and explanations remain open |
 | Exact mpq/impq core/primal construction, bounds and actual LU entry points | 100 independent basis and known-solution row/column systems;320 exact lexicographic interval worlds, basic infeasibility membership and delta signs; source assertion/publication and header-borrow profiles;16 pooled/direct physical failure campaigns through success; older caller comparison survives destruction | Base76.0% native (149/196),82.1% debug/checked (161/196); precise primal76.8% (76/99) both. Gaps mainly qualify metadata/cleanup guards, erased assertions and small-integer epsilon-construction failures. Exact pricing/tableau/Solve and full LAR integration remain open |
 | Exact row-bound analyzer and retained static entry point | 240 independent rational elimination worlds; strict endpoint exclusion, all five column types, single/multiple missing bounds, cursor/early-stop/persistent counters and literal RHS profiles; actual row/pivot iterators, foreign-manager and borrowed-provider guards; six pooled/direct physical refusal campaigns through success | Native80.9% (190/235), debug/checked84.7% (199/235). Gaps mostly child cleanup/guard errors and fresh-zero assertion failures. Full LAR row/tableau solver dispatch and explanations remain open |
 | Exact LAR bound propagation and typed virtual providers | 1200 independent strongest-bound worlds with term aliases, strict ties and first-discovery evidence order; term constant restoration before filter, live model directories/getters, output and separately owned hook division; 14 pooled/direct physical refusal campaigns through success with map/copy/publication prefixes | Native/debug 89.5% (119/133). Remaining gaps mostly invariant-protected lookup/child-cleanup errors. Row analysis, full LAR model/explanation and SMT integration remain open |
