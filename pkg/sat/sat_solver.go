@@ -209,7 +209,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	// Remaining declared vectors are empty until reached by their algorithms.
 	// The consequence antecedent map is nevertheless eagerly constructed.
 	s.auxLiterals.Bind(c.Runtime.memory)
-	if s.antecedents, err = newSATSolverIndexMap(c.Runtime.memory, c.Budget); err != nil {
+	if s.antecedents, err = newSATSolverIndexMap(c.Budget); err != nil {
 		return s, err
 	}
 	s.todoAntecedents.Bind(c.Runtime.memory)

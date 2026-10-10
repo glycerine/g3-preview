@@ -164,15 +164,12 @@ func (f *satConsequenceFrame) vector(s *Solver, i uint8, copy *RuntimeUintColumn
 	}
 	return nil
 }
-func (f *satConsequenceFrame) indexSet(s *Solver) error {
+func (f *satConsequenceFrame) indexSet() {
 	k := f.used
 	f.order[k] = 6
 	f.used++
-	if e := f.index.init(s.runtime.memory); e != nil {
-		return e
-	}
+	f.index = satSolverIndexSet{}
 	f.completed[k] = true
-	return nil
 }
 func satConsequenceSetRemove(s *satMUSLiteralSet, v uint32) error {
 	if !s.contains(Literal(v)) {

@@ -170,9 +170,7 @@ func (s *Solver) extractFixedConsequence1(lit Literal, assumptions, unfixed *sat
 		return false, e
 	}
 	defer func() { err = s.consequenceDrop(f, err) }()
-	if err = f.indexSet(s); err != nil {
-		return false, err
-	}
+	f.indexSet()
 	yes, e := s.antecedents.contains(uint32(lit.variable()))
 	if e != nil {
 		return false, e
@@ -423,9 +421,7 @@ func (s *Solver) fixupConsequenceCore() (err error) {
 		return e
 	}
 	defer func() { err = s.consequenceDrop(f, err) }()
-	if err = f.indexSet(s); err != nil {
-		return err
-	}
+	f.indexSet()
 	for i := uint32(0); ; i++ {
 		n, e := s.conflict.core.Size()
 		if e != nil {

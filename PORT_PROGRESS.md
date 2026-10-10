@@ -32879,3 +32879,45 @@ split remain active: other retained AST reference/printer storage, SAT
 collections, NumericTextStream consumers and internal util dependency cycles
 remain. Counts stay 2102 units/677 APIs: 63 ported, 284 partial, 1727 unported
 and two dead/deleted, with no C++ generic container implementation credit.
+
+## Native SAT antecedent map and ordered index sets
+
+SAT consequences now keep antecedents in map[uint32]*satSolverIndexSet with
+concrete insdict.Dict[uint32,struct{}] values. Removed Runtime table/entry
+payloads, nested pointer/header codecs, bucket/probe/capacity/tombstone logic,
+eager construction of unused map values, temporary copy cohorts, retained
+inactive owners and simulated growth/reset/destructor refusal progress. The
+actual cold antecedent owner header remains budgeted; native map/dictionary/view
+backing uses Go storage. Construction no longer borrows Runtime. Lexical index
+sets are zero-value members of their real consequence frames, with no table
+constructor failure event. Physical Runtime audits no longer enumerate removed
+container blocks, and actual retained solver/member/callback checks remain.
+
+Map insertion deep copies the source index values. Duplicate replacement keeps
+the mapped row identity, replaces its contents and invalidates prior borrowed
+iterators. Self assignment preserves its contents. Ordered union/assignment and
+lookup use the native dictionary directly; insertion discovery order replaces
+source physical bucket order. Borrowed iterator views are invalidated by key
+changes, assignment, reset and close, while duplicate insertion preserves them.
+Map reset/close clears mapped dictionaries and rejects stale row/iterator
+borrows; independently owned caller sets survive.
+
+New tests check cold header refusal through first success, shallow map-copy
+rejection, exact one-time header refunds, closed/stale row and iterator guards,
+independent deep values, 257-key map growth and duplicate/self replacement with
+reservations disabled and unchanged Runtime live blocks. A 4096-operation
+integer identity oracle checks ordered insert/union/assignment/reset and
+membership in both sets after every operation. Obsolete hash geometry,
+malformed raw pointer/capacity, second temporary copy and default inactive-value
+destruction fixtures were replaced. Native set constructor calls were simplified
+to their actual zero-value frame publication. Manifest test names and ownership
+notes now describe the native consumers without adding C++ template credit.
+
+Validation: initial focused native SAT antecedent/consequence groups passed
+(0.130s); final focused g3debug groups passed (0.153s). Full native SAT passed
+initially (0.889s), then after the final constructor simplification (0.959s).
+Module-wide compilation, SAT vet, manifest evidence, gofmt and diff checks
+passed. Counts remain 2102 units/677 APIs: 63 ported, 284 partial, 1727 unported
+and two dead/deleted. The util knot and complete split remain active. SAT
+storage/Runtime scalar vectors, retained AST reference/printer storage,
+NumericTextStream consumers and internal util dependency cycles still remain.

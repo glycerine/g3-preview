@@ -71425,9 +71425,9 @@
         "TestSATSolverConstructorRefusesForeignRuntimeBeforeActualHeaderReserve",
         "TestSATSolverUncompletedWrapperUnwindDoesNotRunDestructorBody",
         "TestSATSolverRealDestructorStagesKeepLaterSourceMembers",
-        "TestSATSolverAntecedentMapEagerNestedConstruction",
+        "TestSATSolverAntecedentMapNativeColdConstruction",
         "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
-        "TestSATSolverAntecedentMapAscendingDestructionGuardPrefix",
+        "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
         "TestSATSolverSourceModelUsesRealAssignmentAndConverter",
         "TestSATSolverSourceModelPublishesCurrentBeforeAllocationFailure",
         "TestSATSolverActualRuntimeModelConverterMatchesSlice",
@@ -71469,18 +71469,14 @@
         "TestSATSolverConsequenceCopiedOutputAndCurrentModelQueryLifetime",
         "TestSATSolverConsequenceRealCancellationRetainsCallerOutputPrefix",
         "TestSATSolverConsequencesWarmedActualGraphPlateau",
-        "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
-        "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
-        "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
-        "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
-        "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
-        "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
-        "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
+        "TestSATSolverConsequenceNativeIndexOrderAndDeepMapCopy",
+        "TestSATSolverConsequenceNativeSetUnionAssignmentOracle",
+        "TestSATSolverConsequenceNativeMapGrowthAndReplacement",
+        "TestSATConsequenceNativeIndexIteratorBorrowLifetime",
         "TestSATConsequenceRowsNativeCopiesAndCapturedLifetime",
         "TestSATSolverLiteralRowsFailedInputPreservesPublishedRows",
         "TestSATSolverLiteralRowsFinalizeInvalidatesViewsAndAllowsReuse",
         "TestSATSolverLiteralRowsOwnerAndInputGuards",
-        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer",
         "TestAllThreeVertexMutexGraphs",
         "TestNegatedLiteralPartition",
         "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
@@ -72409,13 +72405,13 @@
           ]
         },
         {
-          "name": "Selected constructor-stage borrows versus ordinary member readiness; eager eight actual nested index_set tables, ascending dealloc_vect entries",
+          "name": "Selected constructor-stage borrows versus ordinary member readiness; native antecedent map and independently copied ordered index dictionaries",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_index_sets.go",
           "tests": [
-            "TestSATSolverAntecedentMapEagerNestedConstruction",
+            "TestSATSolverAntecedentMapNativeColdConstruction",
             "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
-            "TestSATSolverAntecedentMapAscendingDestructionGuardPrefix"
+            "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows"
           ]
         },
         {
@@ -72893,7 +72889,8 @@
         "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
         "Listed static consequences3157-3249 now implemented and directly tested: source undef falls through existing core, last-duplicate swap removal and real Check/clause effects. Hardcoded false dispatch unchanged. K0/repeatedundef nontermination is source behavior, not repaired; verbose/AST registered6/global bindings remain OPEN. Actual named charged nested scopes with reverse completed destruction and separate owning abort. Supersedes earlier static-helper-open notes only for listed methods. See PORT_PROGRESS.md.",
         "Complete selected source copy75-127, across actual source/destination Runtime and Budget. Captured source vector cap detects actual proven monotone backing replacement only at reached dereference; same-cap self-copy source behavior preserved. Packed full-word88 predicate retained. Clone macro is disabled and its cpp739 two-arg constructor is illformed against actual3-arg declaration; no inferred runnable constructor or clone success stub. Parallel/global storage/TRACE/full source unit remain OPEN. No directly registered copy source assertions credited. See PORT_PROGRESS.md.",
-        "Listed display_status and mk_stat source bodies use actual shared Runtime allocation getter and persistent fixed/precision2 memory-stream formatting. External std::endl flush/global verbose dispatch/process-wide source allocation integration remain OPEN. Unsigned learned-minus-frozen wraps literally. Unchanged set_model/updt_params consumers additionally exercised; no registered source assertion or whole-unit completion credit. See PORT_PROGRESS.md."
+        "Listed display_status and mk_stat source bodies use actual shared Runtime allocation getter and persistent fixed/precision2 memory-stream formatting. External std::endl flush/global verbose dispatch/process-wide source allocation integration remain OPEN. Unsigned learned-minus-frozen wraps literally. Unchanged set_model/updt_params consumers additionally exercised; no registered source assertion or whole-unit completion credit. See PORT_PROGRESS.md.",
+        "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added."
       ]
     },
     {
@@ -73211,9 +73208,9 @@
         "TestSATSolverConstructorRefusesForeignRuntimeBeforeActualHeaderReserve",
         "TestSATSolverUncompletedWrapperUnwindDoesNotRunDestructorBody",
         "TestSATSolverRealDestructorStagesKeepLaterSourceMembers",
-        "TestSATSolverAntecedentMapEagerNestedConstruction",
+        "TestSATSolverAntecedentMapNativeColdConstruction",
         "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
-        "TestSATSolverAntecedentMapAscendingDestructionGuardPrefix",
+        "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
         "TestSATSolverSourceModelUsesRealAssignmentAndConverter",
         "TestSATSolverSourceModelPublishesCurrentBeforeAllocationFailure",
         "TestSATSolverActualRuntimeModelConverterMatchesSlice",
@@ -73255,18 +73252,14 @@
         "TestSATSolverConsequenceCopiedOutputAndCurrentModelQueryLifetime",
         "TestSATSolverConsequenceRealCancellationRetainsCallerOutputPrefix",
         "TestSATSolverConsequencesWarmedActualGraphPlateau",
-        "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
-        "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
-        "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
-        "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
-        "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
-        "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
-        "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
+        "TestSATSolverConsequenceNativeIndexOrderAndDeepMapCopy",
+        "TestSATSolverConsequenceNativeSetUnionAssignmentOracle",
+        "TestSATSolverConsequenceNativeMapGrowthAndReplacement",
+        "TestSATConsequenceNativeIndexIteratorBorrowLifetime",
         "TestSATConsequenceRowsNativeCopiesAndCapturedLifetime",
         "TestSATSolverLiteralRowsFailedInputPreservesPublishedRows",
         "TestSATSolverLiteralRowsFinalizeInvalidatesViewsAndAllowsReuse",
         "TestSATSolverLiteralRowsOwnerAndInputGuards",
-        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer",
         "TestAllThreeVertexMutexGraphs",
         "TestNegatedLiteralPartition",
         "TestSATSolverFindMutexesActualBinaryWatchesAppendOutput",
@@ -73654,13 +73647,13 @@
           ]
         },
         {
-          "name": "Selected constructor-stage borrows versus ordinary member readiness; eager eight actual nested index_set tables, ascending dealloc_vect entries",
+          "name": "Selected constructor-stage borrows versus ordinary member readiness; native antecedent map and independently copied ordered index dictionaries",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_index_sets.go",
           "tests": [
-            "TestSATSolverAntecedentMapEagerNestedConstruction",
+            "TestSATSolverAntecedentMapNativeColdConstruction",
             "TestSATSolverAntecedentMapAllConstructorRefusalPrefixes",
-            "TestSATSolverAntecedentMapAscendingDestructionGuardPrefix"
+            "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows"
           ]
         },
         {
@@ -73918,7 +73911,8 @@
         "Selected real finite src/test/sat_user_scope.cpp campaign executes42 original ENSURE comparisons/168 clauses and independent original-CNF oracle after pending tag removal. Whole solver remains partial: extension/parallel/MUS/clone/consequence methods, global debug tags, TRACE/printer and remaining actual source Runtime allocation accounting are open. Clause_offset physical pointer32 contract remains distinct from charged checked locator metadata. Std library sort schedule and explicit cold constructor contexts are Go adapters.",
         "Selected concrete consequences and mutex family source mapping supersedes older missing-method notes only for listed sites. Source AST/BV/datatype registered6 assertions, TRACE/verbose, extension dispatch, dormant core_chunking/static helpers, general template variants and full source units remain OPEN. Scalar slot/generation encodes selected8-byte pointer ABI; actual named cold/raw/pending roots charged; no registry-derived ownership. See PORT_PROGRESS.md.",
         "Complete selected source copy75-127, across actual source/destination Runtime and Budget. Captured source vector cap detects actual proven monotone backing replacement only at reached dereference; same-cap self-copy source behavior preserved. Packed full-word88 predicate retained. Clone macro is disabled and its cpp739 two-arg constructor is illformed against actual3-arg declaration; no inferred runnable constructor or clone success stub. Parallel/global storage/TRACE/full source unit remain OPEN. No directly registered copy source assertions credited. See PORT_PROGRESS.md.",
-        "Current named-member borrows introduce no owning arrays or retains. Clause pointer/backing guards are proven by actual current strict-cap growth route, preserving captured end and same-cap mutations; future same-cap backing replacement requires revisiting this binding. Pointer8 source versus Go24 reference storage ABI/global allocator/optional full solver services remain OPEN. No registered source assertion credit. See PORT_PROGRESS.md."
+        "Current named-member borrows introduce no owning arrays or retains. Clause pointer/backing guards are proven by actual current strict-cap growth route, preserving captured end and same-cap mutations; future same-cap backing replacement requires revisiting this binding. Pointer8 source versus Go24 reference storage ABI/global allocator/optional full solver services remain OPEN. No registered source assertion credit. See PORT_PROGRESS.md.",
+        "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added."
       ]
     },
     {
@@ -115097,14 +115091,11 @@
         "TestASTScopedExprSubstitutionNullValueIsPresentAndReturned",
         "TestASTScopedExprSubstitutionRefusedTrailCleanupResumesOnlyUnconsumed",
         "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
-        "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
-        "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
-        "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
-        "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
-        "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
-        "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
-        "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
-        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer",
+        "TestSATSolverConsequenceNativeIndexOrderAndDeepMapCopy",
+        "TestSATSolverConsequenceNativeSetUnionAssignmentOracle",
+        "TestSATSolverConsequenceNativeMapGrowthAndReplacement",
+        "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
+        "TestSATConsequenceNativeIndexIteratorBorrowLifetime",
         "TestSATMutexPairSetGrowBeforeDuplicateAndEveryPhysicalRefusal",
         "TestSATMutexPairSetDefaultConstructsBothLiteralMembers",
         "TestSATMutexPairSetWrappedCopyGuardAtActualDestination",
@@ -115376,18 +115367,15 @@
           ]
         },
         {
-          "name": "Selected consequence index_set/index_set_map actual cached hash/state/value, nested deep copies and reached captured pointer reads",
+          "name": "Selected SAT consequence native index dictionaries, independent mapped values and borrowed ordered iteration",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_index_map.go",
           "tests": [
-            "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
-            "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
-            "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
-            "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
-            "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
-            "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
-            "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
-            "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer"
+            "TestSATSolverConsequenceNativeIndexOrderAndDeepMapCopy",
+            "TestSATSolverConsequenceNativeSetUnionAssignmentOracle",
+            "TestSATSolverConsequenceNativeMapGrowthAndReplacement",
+            "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
+            "TestSATConsequenceNativeIndexIteratorBorrowLifetime"
           ]
         },
         {
@@ -115462,7 +115450,8 @@
         "Statistics config models HASHTABLE_STATISTICS compiled class profile; mixed statistics/nonstatistics swaps reject before mutation. Concrete field UINT64_MAX arithmetic codec proves unsigned wrap, not a claim that bounded fixture generated that many collisions. Source-defined selected Runtime and legacy statistics and narrow existing ostream profile are implemented; native ABI/global allocator, other pointer-specializations and full arbitrary ostream locale/exception profiles remain partial. No registered char-pointer driver credit. Source has get_num_collision, not a new display_statistics method; dump reuses exact existing insertion chain without changing collision count.",
         "These are Go owner/config guard-domain proofs, not native C++ algorithm failure or source copy-constructor credit. Four real accidental-Go-copy public actions previously returned success, with Close/source DT releasing original owner bytes; they now reject without affecting original backing/state/cause/charges. No new storage or source allocator events.",
         "Selected Runtime32/64 and legacy char-pointer/int32 engines implement literal source action/publication order and real shared assertion transport; representation geometry is not native ABI. Source source-pointer/runtime provider/borrowed spelling lifetime qualifications remain explicit. Malformed uninitialized value and dangling DT, closed assertion provider, and host ErrorTransport reentry are Go guard-domain proofs rather than ordinary native math REDs. Registered src/test/map.cpp:23-44 exact14 ENSURE credit remains unchanged, independent tests add none. Core dump key_data ostream instantiation lacks a source-defined operator<<; no fabricated value formatting is supplied. Other entry/key/value/native/global/compiler profiles remain partial.",
-        "BV trailing count-cache specialization uses concrete Go entry storage and checked AST identity handles without generics, at its rewriter consumer to avoid import cycles. It preserves selected append-only probing/growth/iteration algorithms and key reference ownership; generic map APIs, native object-pointer/sentinel/entry layout and Runtime allocator/exception/fatal ABI remain uncredited."
+        "BV trailing count-cache specialization uses concrete Go entry storage and checked AST identity handles without generics, at its rewriter consumer to avoid import cycles. It preserves selected append-only probing/growth/iteration algorithms and key reference ownership; generic map APIs, native object-pointer/sentinel/entry layout and Runtime allocator/exception/fatal ABI remain uncredited.",
+        "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added."
       ]
     },
     {
@@ -123758,14 +123747,11 @@
         "TestGlobalParamsRegistrationTrueBeforeFailureAndActualMerge",
         "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
         "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
-        "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
-        "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
-        "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
-        "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
-        "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
-        "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
-        "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
-        "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer"
+        "TestSATSolverConsequenceNativeIndexOrderAndDeepMapCopy",
+        "TestSATSolverConsequenceNativeSetUnionAssignmentOracle",
+        "TestSATSolverConsequenceNativeMapGrowthAndReplacement",
+        "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
+        "TestSATConsequenceNativeIndexIteratorBorrowLifetime"
       ],
       "conditionals": [
         {
@@ -123895,18 +123881,15 @@
           ]
         },
         {
-          "name": "Selected consequence index_set/index_set_map actual cached hash/state/value, nested deep copies and reached captured pointer reads",
+          "name": "Selected SAT consequence native index dictionaries, independent mapped values and borrowed ordered iteration",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_index_map.go",
           "tests": [
-            "TestSATSolverConsequenceIndexSetActualPhysicalIterationAndDeepMapCopy",
-            "TestSATSolverConsequenceNestedIndexSetReadsActualHeaderAtReachedSite",
-            "TestSATSolverConsequenceMapFailedSecondTemporaryUnwindsCompletedFirst",
-            "TestSATSolverConsequenceIndexSetAndMapGrowBeforeDuplicate",
-            "TestSATSolverConsequenceMapGrowthEveryActualRefusalRetainsNestedOwners",
-            "TestSATSolverConsequenceMapResetShrinksAfterFreeBeforeAllocation",
-            "TestSATSolverConsequenceNestedIndexSetReachedPointerWordsGuard",
-            "TestSATConsequenceIndexIteratorCaptureReadsActualNestedPointer"
+            "TestSATSolverConsequenceNativeIndexOrderAndDeepMapCopy",
+            "TestSATSolverConsequenceNativeSetUnionAssignmentOracle",
+            "TestSATSolverConsequenceNativeMapGrowthAndReplacement",
+            "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
+            "TestSATConsequenceNativeIndexIteratorBorrowLifetime"
           ]
         }
       ],
@@ -123923,7 +123906,8 @@
         "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal.",
         "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
         "Explicit scalar padding keeps Go default entries40bytes across architectures. Checked key replacement preserves hash/equality; scalar values remain mutable. Selected char-pointer/int32 Runtime and legacy HASHTABLE_STATISTICS profiles are implemented; other entry/key/value statistics profiles remain required. Native key_data ostream insertion lacks a defined source overload and remains uninstantiated.",
-        "Selected Runtime32/64 and legacy char-pointer/int32 engines implement literal source action/publication order and real shared assertion transport; representation geometry is not native ABI. Source source-pointer/runtime provider/borrowed spelling lifetime qualifications remain explicit. Malformed uninitialized value and dangling DT, closed assertion provider, and host ErrorTransport reentry are Go guard-domain proofs rather than ordinary native math REDs. Registered src/test/map.cpp:23-44 exact14 ENSURE credit remains unchanged, independent tests add none. Core dump key_data ostream instantiation lacks a source-defined operator<<; no fabricated value formatting is supplied. Other entry/key/value/native/global/compiler profiles remain partial."
+        "Selected Runtime32/64 and legacy char-pointer/int32 engines implement literal source action/publication order and real shared assertion transport; representation geometry is not native ABI. Source source-pointer/runtime provider/borrowed spelling lifetime qualifications remain explicit. Malformed uninitialized value and dangling DT, closed assertion provider, and host ErrorTransport reentry are Go guard-domain proofs rather than ordinary native math REDs. Registered src/test/map.cpp:23-44 exact14 ENSURE credit remains unchanged, independent tests add none. Core dump key_data ostream instantiation lacks a source-defined operator<<; no fabricated value formatting is supplied. Other entry/key/value/native/global/compiler profiles remain partial.",
+        "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added."
       ]
     },
     {

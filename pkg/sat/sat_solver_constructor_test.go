@@ -29,7 +29,7 @@ func satSolverCheckFixture(t *testing.T) (*Solver, *util.ParamsContext, util.Par
 }
 func TestSATSolverCompleteMemberConstructorHasRealDefaultChildren(t *testing.T) {
 	s, ctx, params := satSolverCheckFixture(t)
-	if s.Variables.queue == nil || s.Variables.watches == nil || s.Variables.activity == nil || s.Variables.trail == nil || s.simplifier == nil || s.scc == nil || s.asymm == nil || s.probing == nil || !s.probing.constructed || s.converter.store == nil || !s.converter.constructed || s.antecedents == nil || s.antecedents.constructedEntries != 8 {
+	if s.Variables.queue == nil || s.Variables.watches == nil || s.Variables.activity == nil || s.Variables.trail == nil || s.simplifier == nil || s.scc == nil || s.asymm == nil || s.probing == nil || !s.probing.constructed || s.converter.store == nil || !s.converter.constructed || s.antecedents == nil || s.antecedents.entries == nil {
 		t.Fatal("full constructor lacks actual source members")
 	}
 	if s.runtime.liveSolvers != 1 || s.nextSimplify != 0 || s.conflict.conflicts != 0 || s.conflict.conflictsSinceGC != 0 || s.propagation.numCheckpoints != 0 {

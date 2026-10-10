@@ -44,7 +44,7 @@ func TestSATSolverConsequenceReasonShortCircuitAndClauseDomainTodoPrefix(t *test
 			// Runtime column; it is not an extension-success callback or a shadow state.
 			satOK(t, s.propagation.assign(6, j))
 			var set satSolverIndexSet
-			satOK(t, set.init(s.runtime.memory))
+
 			t.Cleanup(func() { satOK(t, set.close()) })
 			if kind == 4 {
 				satOK(t, s.analysis.extAntecedents.Push(6))

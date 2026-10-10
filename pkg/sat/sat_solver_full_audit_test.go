@@ -58,30 +58,7 @@ func satFullSolverRuntimeRoots(s *Solver, outputs ...*satSolverLiteralRows) []ut
 			tag := f.order[i]
 			if tag >= 3 && tag < 6 {
 				col(&f.vectors[tag-3])
-			} else if tag == 6 {
-				add(f.index.raw)
-				add(f.index.pending)
 			}
-		}
-	}
-	if m := s.antecedents; m != nil {
-		add(m.raw)
-		add(m.pending)
-		for _, entry := range m.entries {
-			add(entry.raw)
-			add(entry.pending)
-		}
-		for _, entry := range m.extraEntries {
-			add(entry.raw)
-			add(entry.pending)
-		}
-		for _, entry := range m.pendingEntries {
-			add(entry.raw)
-			add(entry.pending)
-		}
-		for i := uint32(0); i < m.tempUsed; i++ {
-			add(m.temps[i].raw)
-			add(m.temps[i].pending)
 		}
 	}
 
