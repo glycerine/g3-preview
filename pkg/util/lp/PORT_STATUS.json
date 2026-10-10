@@ -1,7 +1,7 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 89.8,
+  "native_statement_coverage_of_current_go_code": 89.7,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
@@ -980,7 +980,9 @@
       "source": "src/util/lp/sparse_vector.h",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/sparse_float_vector.go"
+        "pkg/util/lp/sparse_float_vector.go",
+        "pkg/util/lp/sparse_rational_vector.go",
+        "pkg/util/lp/exact_eta_calls.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -988,7 +990,12 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPSparseRationalVectorIndependentOracle",
+        "TestLPSparseRationalVectorLiteralAliasesAndZero",
+        "TestLPSparseRationalVectorAllocationFailureCensus",
+        "TestLPSparseRationalVectorLeavesOlderDivisionOwned",
+        "TestLPExactEtaCallsRetainedIntegerDivision"
       ]
     },
     {

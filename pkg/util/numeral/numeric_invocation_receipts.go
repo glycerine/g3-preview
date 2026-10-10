@@ -9,6 +9,16 @@ type IntegerCopyAllocationReceipt = integerCopyAllocationReceipt
 type IntegerPowerInvocationReceipt = integerPowerInvocationReceipt
 type IntegerRootInvocationReceipt = integerRootInvocationReceipt
 
+// DivisionInvocation and GCDInvocation observe the actual primitive frames;
+// callers compare identities before/after their own numerical call before
+// adopting a receipt. An observation alone transfers no cleanup ownership.
+func (m *IntegerManager) DivisionInvocation() IntegerRawInvocationReceipt {
+	return integerRawInvocationReceipt{Manager: m, Frame: &m.DivisionRaw, Invocation: m.DivisionRaw.Invocation}
+}
+func (m *IntegerManager) GCDInvocation() IntegerRawInvocationReceipt {
+	return integerRawInvocationReceipt{Manager: m, Frame: &m.GcdRaw, Invocation: m.GcdRaw.Invocation}
+}
+
 func (r *integerPNormalizeInvocationReceipt) Matches(m *IntegerModularManager) bool {
 	return m != nil && m.MatchesPNormalizeInvocation(r)
 }

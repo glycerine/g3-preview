@@ -35100,3 +35100,49 @@ checks pass. The graph now includes LP's actual random/stopwatch imports.
 Repository ledger62 ported/309 partial/1703 unported/two dead-deleted. Previous
 checkpointe5839b68 saved exact queues. Full LP objective continues with exact eta
 ownership, sparse/static/dense matrices, factorization and solver integration.
+
+## Exact LP sparse coefficients and division invocation ownership
+
+Ported retained sparse_vector<mpq> coefficient storage into a concrete
+SparseRationalVector. Native entry slices retain insertion order, duplicates,
+explicit zeros and first-match value lookup. Append retains the actual owning
+value-parameter and term temporaries, publishes only a completed stored numeral,
+and keeps failed lexical values for Close. No STL capacity/reallocation behavior
+or synthetic native-container allocation budget is ported. Division uses the
+precise zero predicate rather than floating tolerance; a divisor borrowed from
+an entry is reread after each mutation, preserving the live-reference behavior.
+The native zero-divisor fixture reaches the existing integer-division-by-zero
+error; debug asserts before mutation. Neither path is silently repaired.
+
+Real fault campaigns exposed retained integer GCD RAW fields inside rational
+normalization. Added concrete observations of existing integer division/GCD
+invocation receipts and a generation-checked rational divisor-alias RAW receipt.
+Exact eta call ownership now records only newly acquired child generations and
+allocation tokens. Cleanup releases those exact children, lexical/stored values
+and allocation prefixes without adopting older invocations or repairing source
+scratch holes. The rational alias group acquires its generation before creating
+its RAW local; generation exhaustion rejects the call before destination change.
+
+Independent tests cover120 arbitrary-precision list worlds, duplicate indices,
+explicit zero entries, first-match/missing lookup, tiny exact divisors, append
+from owned-entry aliases and live divisor mutation. Fresh-manager campaigns walk
+actual append, lookup, positive/negative division and alias-division reservation
+refusals through first success. They require injected/physical allocation errors,
+verify stopped mutation guards and run named-cell/direct-object censuses after
+Close. Real integer division/GCD and rational alias replacement tests prove old
+receipts cannot consume new frames; a sparse borrower leaves an actual older
+caller's retained division intact. Every stopped numeric frame is explicitly
+checked or counted; manager teardown is not used as the leak assertion.
+
+Full LP focused coverage passes native54.876s/debug-checked74.828s,
+89.7%/91.6% package statements. Subsequent strengthened ownership tests pass
+native3.887s/debug5.737s; coefficient storage87.1%/88.7%, exact eta call receipts
+87.5%. Remaining uncovered statements are child/cleanup error propagation,
+redundant guarded begin errors and the opposite-profile assertion, not normal
+coefficient operations. Focused numeral arithmetic/division/receipt regression
+checks pass native6.275s/debug8.985s; final new boundary/identity checks pass
+debug0.330s. LP/numeral vet, portcheck, regenerated64-package graph and diff
+checks pass. No dependency edges changed. Inventory remains28 partial/82 unported
+LP units and repository62 ported/309 partial/1703 unported/two dead-deleted.
+Checkpoint5bebdc21 saved floating eta/settings. Exact eta applications, matrices,
+LU and the complete solver/test port remain required; the full goal continues.

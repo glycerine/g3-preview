@@ -628,6 +628,11 @@ func (m *RationalManager) Div(a, b, out *Rational) (_rawErr error) {
 		if r.DivActive {
 			return ErrRationalRawArithmeticPending
 		}
+		generation, e := m.beginRawGeneration()
+		if e != nil {
+			return e
+		}
+		r.divGeneration = generation
 		r.Div = Int{}
 		r.DivActive, r.divEnd, r.divGuard = true, false, false
 		r.divCursor, r.divCause = 0, nil

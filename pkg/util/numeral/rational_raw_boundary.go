@@ -49,3 +49,26 @@ func (m *RationalManager) CleanupComparisonInvocation(saved *uint64) error {
 	*saved = 0
 	return nil
 }
+
+// RationalDivisionInvocationState identifies the actual divisor/destination
+// alias temporary. A receipt never grants ownership of another caller's frame.
+type RationalDivisionInvocationState struct {
+	Active     bool
+	Generation uint64
+}
+
+func (m *RationalManager) DivisionInvocationState() RationalDivisionInvocationState {
+	r := &m.RawArithmetic
+	return RationalDivisionInvocationState{Active: r.DivActive, Generation: r.divGeneration}
+}
+
+func (m *RationalManager) CleanupDivisionInvocation(saved *uint64) error {
+	state := m.DivisionInvocationState()
+	if *saved != 0 && *saved == state.Generation {
+		if err := m.CleanupRawGroup(rationalRawDivision); err != nil {
+			return err
+		}
+	}
+	*saved = 0
+	return nil
+}

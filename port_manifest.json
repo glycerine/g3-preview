@@ -123314,7 +123314,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/sparse_float_vector.go"
+        "pkg/util/lp/sparse_float_vector.go",
+        "pkg/util/lp/sparse_rational_vector.go",
+        "pkg/util/lp/exact_eta_calls.go"
       ],
       "tests": [
         "TestLPFloatEtaIndependentMatrixProducts",
@@ -123322,7 +123324,12 @@
         "TestLPSparseFloatVectorAndEtaLiteralStorage",
         "TestLPFloatEtaSparseToleranceAndOrderContracts",
         "TestLPFloatEtaBoundsAndConjugationPrefixes",
-        "TestLPFloatEtaIEEEAndAssertionProfiles"
+        "TestLPFloatEtaIEEEAndAssertionProfiles",
+        "TestLPSparseRationalVectorIndependentOracle",
+        "TestLPSparseRationalVectorLiteralAliasesAndZero",
+        "TestLPSparseRationalVectorAllocationFailureCensus",
+        "TestLPSparseRationalVectorLeavesOlderDivisionOwned",
+        "TestLPExactEtaCallsRetainedIntegerDivision"
       ],
       "conditionals": [
         {
@@ -123355,10 +123362,23 @@
             "TestLPFloatEtaBoundsAndConjugationPrefixes",
             "TestLPFloatEtaIEEEAndAssertionProfiles"
           ]
+        },
+        {
+          "name": "retained mpq sparse coefficient append/value lookup/divide with exact zero predicate, ordered duplicates and reference-divisor aliasing",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_rational_vector.go",
+          "tests": [
+            "TestLPSparseRationalVectorIndependentOracle",
+            "TestLPSparseRationalVectorLiteralAliasesAndZero",
+            "TestLPSparseRationalVectorAllocationFailureCensus",
+            "TestLPSparseRationalVectorLeavesOlderDivisionOwned",
+            "TestLPExactEtaCallsRetainedIntegerDivision"
+          ]
         }
       ],
       "ownership": [
-        "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism."
+        "Concrete floating values and typed sparse-entry slices replace source vector/STL storage. No generic/any algebra, synthetic native-storage charges or container OOM fixtures. Literal term/index order, duplicate/explicit-zero entries, scalar snapshots versus references and source valid mutation prefixes are preserved. FloatTailMatrix expresses actual retained LU polymorphism.",
+        "Concrete rational coefficient storage borrows its manager and owns stored values plus source value-parameter/term copies during append. Failed append values remain owned until Close, with no incomplete public term. Exact division receipts identify newly acquired rational alias, integer GCD/division and normalization/allocation roots; older invocations remain with their invoking caller. Native slices replace STL capacity management."
       ],
       "deviations": [
         "Exact mpq coefficient and rational/pair applications, full LU/matrix integration and printing remain open; no whole-unit promotion. Independent matrix products replace uninstantiated upstream debug matrix scaffolding; there is no direct active eta/row-eta unit scenario in src/test/lp.cpp.",
@@ -130879,7 +130899,9 @@
         "TestLPPairPriorityQueueAllocationFailureCensus",
         "TestLPPairPriorityQueueOlderComparisonIdentity",
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
-        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestRationalDivisionBoundaryGenerationIdentity",
+        "TestRationalDivisionBoundaryGenerationExhaustion"
       ],
       "assertions": [
         {
@@ -131496,6 +131518,15 @@
           "tests": [
             "TestRationalComparisonBoundaryGenerationIdentity"
           ]
+        },
+        {
+          "name": "identity-checked observation/cleanup of actual divisor-alias RAW division invocation used by exact LP coefficients",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/rational_raw_boundary.go",
+          "tests": [
+            "TestRationalDivisionBoundaryGenerationIdentity",
+            "TestRationalDivisionBoundaryGenerationExhaustion"
+          ]
         }
       ],
       "ownership": [
@@ -131914,7 +131945,9 @@
         "TestLPPairPriorityQueueAllocationFailureCensus",
         "TestLPPairPriorityQueueOlderComparisonIdentity",
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
-        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestRationalDivisionBoundaryGenerationIdentity",
+        "TestRationalDivisionBoundaryGenerationExhaustion"
       ],
       "conditionals": [
         {
@@ -133085,6 +133118,15 @@
           "tests": [
             "TestRationalComparisonBoundaryGenerationIdentity"
           ]
+        },
+        {
+          "name": "identity-checked observation/cleanup of actual divisor-alias RAW division invocation used by exact LP coefficients",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/rational_raw_boundary.go",
+          "tests": [
+            "TestRationalDivisionBoundaryGenerationIdentity",
+            "TestRationalDivisionBoundaryGenerationExhaustion"
+          ]
         }
       ],
       "ownership": [
@@ -133696,7 +133738,8 @@
         "TestOwnedStringStreamGoBuilderIgnoresArenaFailures",
         "TestOwnedStringStreamOwnerAndNativeTextGuards",
         "TestOwnedStringStreamSourceIntegerEveryColdReservation",
-        "TestOwnedStringCopyAndReconstructionLifetime"
+        "TestOwnedStringCopyAndReconstructionLifetime",
+        "TestIntegerRawObservationGenerationIdentity"
       ],
       "conditionals": [
         {
@@ -135664,6 +135707,14 @@
             "TestRationalSMT2StreamRefusedChildDoesNotAdoptOlderCopy",
             "TestRationalSMT2StreamNegativeSourceStopProtectsContinuation"
           ]
+        },
+        {
+          "name": "concrete caller observations of existing integer division/GCD invocation identities, without manager-wide cleanup adoption",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/numeric_invocation_receipts.go",
+          "tests": [
+            "TestIntegerRawObservationGenerationIdentity"
+          ]
         }
       ],
       "ownership": [
@@ -136152,7 +136203,8 @@
         "TestOwnedStringStreamGoBuilderIgnoresArenaFailures",
         "TestOwnedStringStreamOwnerAndNativeTextGuards",
         "TestOwnedStringStreamSourceIntegerEveryColdReservation",
-        "TestOwnedStringCopyAndReconstructionLifetime"
+        "TestOwnedStringCopyAndReconstructionLifetime",
+        "TestIntegerRawObservationGenerationIdentity"
       ],
       "conditionals": [
         {
@@ -137645,6 +137697,14 @@
             "TestRationalSMT2StreamCopyTransportGuards",
             "TestRationalSMT2StreamRefusedChildDoesNotAdoptOlderCopy",
             "TestRationalSMT2StreamNegativeSourceStopProtectsContinuation"
+          ]
+        },
+        {
+          "name": "concrete caller observations of existing integer division/GCD invocation identities, without manager-wide cleanup adoption",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/numeric_invocation_receipts.go",
+          "tests": [
+            "TestIntegerRawObservationGenerationIdentity"
           ]
         }
       ],
