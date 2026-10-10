@@ -35769,3 +35769,54 @@ solver/MPS/upstream-driver work remain required.
 
 Final LP vet, portcheck, graph regeneration and diff checks pass. The64-package
 production graph has unchanged edges; its file inventory includes the new code.
+
+
+## Sparse-column eta construction and repeated-pivot integration
+
+Implemented floating/exact fill_eta_matrix with inverse column/row mappings,
+literal unit scan, ordered negated lower coefficients, diagonal assignments and
+division. Entries above the logical pivot are ignored; empty/upper-only columns
+and duplicate unit diagonals can return null/true. Explicit lower zeros still
+construct eta. Nonzero duplicate diagonal assignments overwrite earlier values;
+a zero/small reached diagonal destroys the partial eta and returns null/false
+without visiting subsequent entries. Floating epsilon is strict and keeps IEEE
+values; precise types accept every nonzero pivot, including tiny rationals.
+
+Exact unary negation owns its actual source copy through the eta Append expression.
+The sparse matrix retains that local and only its own numerical receipts on error;
+the separately returned eta retains its diagonal/member copies and child division
+receipts. Close partial eta before its stopped caller matrix. Source coefficients
+remain borrowed and unchanged. Go tuple results expose the actual published prefix;
+existing eta dimension metadata stays available in both Go profiles.
+
+Tests cover180 independently ordered/permuted column worlds, duplicate/unit/zero
+and tiny pivots, strict floating thresholds and IEEE division, bounds before and
+after eta publication, and a unit scan over large upper coefficients under zero
+allocator reservations. Four pooled/direct physical refusal campaigns walk through
+first success, validate stopped guards, distinguish parent/eta child receipts,
+close in lexical dependency order and audit all cells/objects/raw frames. A real
+older stopped comparison permits scalar inspection/copy then reaches the shared
+numeral manager's actual invalid-slot division refusal; both new owners close
+without consuming the caller comparison generation. This invalid-domain state is
+not arithmetic correctness credit, and no invalid handles were fabricated.
+
+Added120 repeated-pivot integration worlds through selection, row/column swaps,
+eta construction, elimination, division and active shortening to an upper triangular
+matrix with unit diagonal. Each intermediate logical matrix matches independent exact dense rational
+elimination; floating residuals meet relative tolerance. Signed pivot products
+match independent permutation-expansion determinants of the original matrices.
+These composed tests strengthen implemented pieces; full LU is still unported.
+
+Focused native tests pass8.943s and combined debug/checked12.685s. Construction
+file coverage64/68 (94.1%) exact and29/30 (96.7%) floating in both profiles. The
+floating Append assertion cannot fail for a strictly lower logical row; remaining
+exact statements propagate own-call capture or child scalar/cleanup errors. No
+redundant full native module suite was run21 minutes after its passing snapshot;
+that older complete-suite percentage is explicitly dated. Source counts remain
+42 partial/68 unported. Sparse replacement, triangular solves, full LU, solvers,
+MPS input and retained upstream-driver scenarios remain required.
+
+Actual large-coefficient zero-diagonal rejection also verifies destruction of the
+already populated unpublished eta in pooled/direct profiles, with named-cell and
+direct-object census. Final LP vet, source ledger and dependency graph checks pass;
+the64-package graph edges remain unchanged.
