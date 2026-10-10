@@ -2680,6 +2680,19 @@
       "deviations": []
     },
     {
+      "path": "scripts/package_dependencies.py",
+      "component": "scripts",
+      "role": "reference_tool",
+      "status": "unported",
+      "go_targets": [],
+      "tests": [],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [],
+      "ownership": [],
+      "deviations": []
+    },
+    {
       "path": "scripts/pyg2hpp.py",
       "component": "scripts",
       "role": "reference_tool",
@@ -124853,7 +124866,11 @@
         "pkg/util/lp/square_dense_float_debug.go",
         "pkg/util/lp/square_dense_float_test.go",
         "pkg/util/lp/square_dense_float_edges_test.go",
-        "pkg/util/lp/square_dense_float_debug_test.go"
+        "pkg/util/lp/square_dense_float_debug_test.go",
+        "pkg/util/lp/square_dense_exact.go",
+        "pkg/util/lp/square_dense_exact_test.go",
+        "pkg/util/lp/square_dense_exact_failure_test.go",
+        "pkg/util/lp/square_dense_exact_edges_test.go"
       ],
       "tests": [
         "TestLPFloatDenseBlockIndependentFactorization",
@@ -124863,7 +124880,12 @@
         "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
         "TestLPFloatDenseBlockConstructorAndProductGuards",
         "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
-        "TestLPFloatDenseBlockDebugViewAndLChecks"
+        "TestLPFloatDenseBlockDebugViewAndLChecks",
+        "TestLPExactDenseBlockIndependentEliminationStages",
+        "TestLPExactDenseBlockLiteralCopiesAndTinyValues",
+        "TestLPExactDenseBlockAllocationFailureCensus",
+        "TestLPExactDenseBlockBoundsAndPublication",
+        "TestLPExactDenseBlockLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -124947,14 +124969,28 @@
             "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
             "TestLPFloatDenseBlockDebugViewAndLChecks"
           ]
+        },
+        {
+          "name": "retained mpq coefficient dense-block construction, pivot selection, normalization and lower-row elimination shared by mpq/mpq and mpq/pair paths",
+          "status": "ported",
+          "go_target": "pkg/util/lp/square_dense_exact.go",
+          "tests": [
+            "TestLPExactDenseBlockIndependentEliminationStages",
+            "TestLPExactDenseBlockLiteralCopiesAndTinyValues",
+            "TestLPExactDenseBlockAllocationFailureCensus",
+            "TestLPExactDenseBlockBoundsAndPublication",
+            "TestLPExactDenseBlockLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Floating dense block owns native dense storage, two permutations and reusable indexed work; sparse parent remains borrowed through all tail applications. Constructor visits parent logical rows and literal entries, with last duplicate overwriting the same dense slot. Parent update publishes row values before reciprocal column writes, clears upper dense values only after successful common/new entry publication, and orders all row updates before all fill before all maxima. Right indexed failures retain work while caller remains unchanged until Assign; left indexed rebuilding publishes ascending index before each destination store. No synthetic source storage reservations or STL internals are added."
+        "Floating dense block owns native dense storage, two permutations and reusable indexed work; sparse parent remains borrowed through all tail applications. Constructor visits parent logical rows and literal entries, with last duplicate overwriting the same dense slot. Parent update publishes row values before reciprocal column writes, clears upper dense values only after successful common/new entry publication, and orders all row updates before all fill before all maxima. Right indexed failures retain work while caller remains unchanged until Assign; left indexed rebuilding publishes ascending index before each destination store. No synthetic source storage reservations or STL internals are added.",
+        "Exact dense coefficients own independent copies of borrowed sparse parent values. Lexical pivot/multiplier, unary minus, copy-left expression temporaries and return copies retain actual numerical ownership through failure. Child Close destroys only child-owned raw receipts and temporary roots, then dense coefficients in source forward order; parent and older comparison invocation remain owned by their original callers."
       ],
       "deviations": [
         "Concrete floating live LU dense path is ported. Source combined elimination/L and upper storage, strict max tie, copied pivot/multiplier, physical column traversal, exact source settings drop, independent parent/dense column swaps and unsigned offsets are preserved. Dense left retains trailing input slots; dense right replaces all slots from its temporary and zeros trailing slots. Indexed left consumes only input indices and rebuilds dimension data with settings; indexed right uses retained WorkVector, fixed1e-14 cleanup and source indexed Assign, preserving hidden destination slots. Permutation access falls back to identity beyond its stored extent for parent growth. Typed reached bounds/assertion errors preserve completed prefixes.",
-        "Independent180-world arbitrary-precision elementary elimination tracks E and E*A*P, checking logical upper parent, dense lower tail, reciprocal links and all four tail applications after conjugation. Literal tests cover duplicates, zero/NaN/ties, source debug/native self/zero pivot behavior, fixed/settings tolerances, hidden/trailing slots, parent growth and failures in constructor/pivot/parent/work/caller publication. init and row_by_indexed_vector_product are used only by unreachable/disabled source paths and are not ported; sole standalone test_square_dense_submatrix definition has no dispatch. Exact mpq/mpq and mpq/pair dense blocks, complete LU and retained original drivers remain required; no whole-unit completion or registered driver credit."
+        "Independent180-world arbitrary-precision elementary elimination tracks E and E*A*P, checking logical upper parent, dense lower tail, reciprocal links and all four tail applications after conjugation. Literal tests cover duplicates, zero/NaN/ties, source debug/native self/zero pivot behavior, fixed/settings tolerances, hidden/trailing slots, parent growth and failures in constructor/pivot/parent/work/caller publication. init and row_by_indexed_vector_product are used only by unreachable/disabled source paths and are not ported; sole standalone test_square_dense_submatrix definition has no dispatch. Remaining exact mpq/mpq and mpq/pair dense parent publication/applications, complete LU and retained original drivers remain required; no whole-unit completion or registered driver credit.",
+        "Exact dense core verified at every pivot stage in120 independent rational matrix worlds and actual pooled/direct reservation campaigns through success, including failure after L publication. Precise drop uses exact zero and ignores floating tolerance. Reached native zero division retains denominator-zero representation; debug assertion precedes division. Exact parent publication, dense/indexed scalar/pair applications, conjugation/debug views and full LU integration remain open; no whole-unit or unreachable test-driver credit."
       ]
     },
     {
@@ -124969,7 +125005,11 @@
         "pkg/util/lp/square_dense_float_debug.go",
         "pkg/util/lp/square_dense_float_test.go",
         "pkg/util/lp/square_dense_float_edges_test.go",
-        "pkg/util/lp/square_dense_float_debug_test.go"
+        "pkg/util/lp/square_dense_float_debug_test.go",
+        "pkg/util/lp/square_dense_exact.go",
+        "pkg/util/lp/square_dense_exact_test.go",
+        "pkg/util/lp/square_dense_exact_failure_test.go",
+        "pkg/util/lp/square_dense_exact_edges_test.go"
       ],
       "tests": [
         "TestLPFloatDenseBlockIndependentFactorization",
@@ -124979,7 +125019,12 @@
         "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
         "TestLPFloatDenseBlockConstructorAndProductGuards",
         "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
-        "TestLPFloatDenseBlockDebugViewAndLChecks"
+        "TestLPFloatDenseBlockDebugViewAndLChecks",
+        "TestLPExactDenseBlockIndependentEliminationStages",
+        "TestLPExactDenseBlockLiteralCopiesAndTinyValues",
+        "TestLPExactDenseBlockAllocationFailureCensus",
+        "TestLPExactDenseBlockBoundsAndPublication",
+        "TestLPExactDenseBlockLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -125123,14 +125168,28 @@
             "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
             "TestLPFloatDenseBlockDebugViewAndLChecks"
           ]
+        },
+        {
+          "name": "retained mpq coefficient dense-block construction, pivot selection, normalization and lower-row elimination shared by mpq/mpq and mpq/pair paths",
+          "status": "ported",
+          "go_target": "pkg/util/lp/square_dense_exact.go",
+          "tests": [
+            "TestLPExactDenseBlockIndependentEliminationStages",
+            "TestLPExactDenseBlockLiteralCopiesAndTinyValues",
+            "TestLPExactDenseBlockAllocationFailureCensus",
+            "TestLPExactDenseBlockBoundsAndPublication",
+            "TestLPExactDenseBlockLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Floating dense block owns native dense storage, two permutations and reusable indexed work; sparse parent remains borrowed through all tail applications. Constructor visits parent logical rows and literal entries, with last duplicate overwriting the same dense slot. Parent update publishes row values before reciprocal column writes, clears upper dense values only after successful common/new entry publication, and orders all row updates before all fill before all maxima. Right indexed failures retain work while caller remains unchanged until Assign; left indexed rebuilding publishes ascending index before each destination store. No synthetic source storage reservations or STL internals are added."
+        "Floating dense block owns native dense storage, two permutations and reusable indexed work; sparse parent remains borrowed through all tail applications. Constructor visits parent logical rows and literal entries, with last duplicate overwriting the same dense slot. Parent update publishes row values before reciprocal column writes, clears upper dense values only after successful common/new entry publication, and orders all row updates before all fill before all maxima. Right indexed failures retain work while caller remains unchanged until Assign; left indexed rebuilding publishes ascending index before each destination store. No synthetic source storage reservations or STL internals are added.",
+        "Exact dense coefficients own independent copies of borrowed sparse parent values. Lexical pivot/multiplier, unary minus, copy-left expression temporaries and return copies retain actual numerical ownership through failure. Child Close destroys only child-owned raw receipts and temporary roots, then dense coefficients in source forward order; parent and older comparison invocation remain owned by their original callers."
       ],
       "deviations": [
         "Concrete floating live LU dense path is ported. Source combined elimination/L and upper storage, strict max tie, copied pivot/multiplier, physical column traversal, exact source settings drop, independent parent/dense column swaps and unsigned offsets are preserved. Dense left retains trailing input slots; dense right replaces all slots from its temporary and zeros trailing slots. Indexed left consumes only input indices and rebuilds dimension data with settings; indexed right uses retained WorkVector, fixed1e-14 cleanup and source indexed Assign, preserving hidden destination slots. Permutation access falls back to identity beyond its stored extent for parent growth. Typed reached bounds/assertion errors preserve completed prefixes.",
-        "Independent180-world arbitrary-precision elementary elimination tracks E and E*A*P, checking logical upper parent, dense lower tail, reciprocal links and all four tail applications after conjugation. Literal tests cover duplicates, zero/NaN/ties, source debug/native self/zero pivot behavior, fixed/settings tolerances, hidden/trailing slots, parent growth and failures in constructor/pivot/parent/work/caller publication. init and row_by_indexed_vector_product are used only by unreachable/disabled source paths and are not ported; sole standalone test_square_dense_submatrix definition has no dispatch. Exact mpq/mpq and mpq/pair dense blocks, complete LU and retained original drivers remain required; no whole-unit completion or registered driver credit."
+        "Independent180-world arbitrary-precision elementary elimination tracks E and E*A*P, checking logical upper parent, dense lower tail, reciprocal links and all four tail applications after conjugation. Literal tests cover duplicates, zero/NaN/ties, source debug/native self/zero pivot behavior, fixed/settings tolerances, hidden/trailing slots, parent growth and failures in constructor/pivot/parent/work/caller publication. init and row_by_indexed_vector_product are used only by unreachable/disabled source paths and are not ported; sole standalone test_square_dense_submatrix definition has no dispatch. Remaining exact mpq/mpq and mpq/pair dense parent publication/applications, complete LU and retained original drivers remain required; no whole-unit completion or registered driver credit.",
+        "Exact dense core verified at every pivot stage in120 independent rational matrix worlds and actual pooled/direct reservation campaigns through success, including failure after L publication. Precise drop uses exact zero and ignores floating tolerance. Reached native zero division retains denominator-zero representation; debug assertion precedes division. Exact parent publication, dense/indexed scalar/pair applications, conjugation/debug views and full LU integration remain open; no whole-unit or unreachable test-driver credit."
       ]
     },
     {
@@ -125145,7 +125204,11 @@
         "pkg/util/lp/square_dense_float_debug.go",
         "pkg/util/lp/square_dense_float_test.go",
         "pkg/util/lp/square_dense_float_edges_test.go",
-        "pkg/util/lp/square_dense_float_debug_test.go"
+        "pkg/util/lp/square_dense_float_debug_test.go",
+        "pkg/util/lp/square_dense_exact.go",
+        "pkg/util/lp/square_dense_exact_test.go",
+        "pkg/util/lp/square_dense_exact_failure_test.go",
+        "pkg/util/lp/square_dense_exact_edges_test.go"
       ],
       "tests": [
         "TestLPFloatDenseBlockIndependentFactorization",
@@ -125155,7 +125218,12 @@
         "TestLPFloatDenseBlockNewEntriesAndLiteralPivots",
         "TestLPFloatDenseBlockConstructorAndProductGuards",
         "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
-        "TestLPFloatDenseBlockDebugViewAndLChecks"
+        "TestLPFloatDenseBlockDebugViewAndLChecks",
+        "TestLPExactDenseBlockIndependentEliminationStages",
+        "TestLPExactDenseBlockLiteralCopiesAndTinyValues",
+        "TestLPExactDenseBlockAllocationFailureCensus",
+        "TestLPExactDenseBlockBoundsAndPublication",
+        "TestLPExactDenseBlockLeavesOlderComparisonOwned"
       ],
       "conditionals": [
         {
@@ -125189,14 +125257,28 @@
             "TestLPFloatDenseBlockParentAndPermutationErrorPrefixes",
             "TestLPFloatDenseBlockDebugViewAndLChecks"
           ]
+        },
+        {
+          "name": "retained mpq coefficient dense-block construction, pivot selection, normalization and lower-row elimination shared by mpq/mpq and mpq/pair paths",
+          "status": "ported",
+          "go_target": "pkg/util/lp/square_dense_exact.go",
+          "tests": [
+            "TestLPExactDenseBlockIndependentEliminationStages",
+            "TestLPExactDenseBlockLiteralCopiesAndTinyValues",
+            "TestLPExactDenseBlockAllocationFailureCensus",
+            "TestLPExactDenseBlockBoundsAndPublication",
+            "TestLPExactDenseBlockLeavesOlderComparisonOwned"
+          ]
         }
       ],
       "ownership": [
-        "Floating dense block owns native dense storage, two permutations and reusable indexed work; sparse parent remains borrowed through all tail applications. Constructor visits parent logical rows and literal entries, with last duplicate overwriting the same dense slot. Parent update publishes row values before reciprocal column writes, clears upper dense values only after successful common/new entry publication, and orders all row updates before all fill before all maxima. Right indexed failures retain work while caller remains unchanged until Assign; left indexed rebuilding publishes ascending index before each destination store. No synthetic source storage reservations or STL internals are added."
+        "Floating dense block owns native dense storage, two permutations and reusable indexed work; sparse parent remains borrowed through all tail applications. Constructor visits parent logical rows and literal entries, with last duplicate overwriting the same dense slot. Parent update publishes row values before reciprocal column writes, clears upper dense values only after successful common/new entry publication, and orders all row updates before all fill before all maxima. Right indexed failures retain work while caller remains unchanged until Assign; left indexed rebuilding publishes ascending index before each destination store. No synthetic source storage reservations or STL internals are added.",
+        "Exact dense coefficients own independent copies of borrowed sparse parent values. Lexical pivot/multiplier, unary minus, copy-left expression temporaries and return copies retain actual numerical ownership through failure. Child Close destroys only child-owned raw receipts and temporary roots, then dense coefficients in source forward order; parent and older comparison invocation remain owned by their original callers."
       ],
       "deviations": [
         "Concrete floating live LU dense path is ported. Source combined elimination/L and upper storage, strict max tie, copied pivot/multiplier, physical column traversal, exact source settings drop, independent parent/dense column swaps and unsigned offsets are preserved. Dense left retains trailing input slots; dense right replaces all slots from its temporary and zeros trailing slots. Indexed left consumes only input indices and rebuilds dimension data with settings; indexed right uses retained WorkVector, fixed1e-14 cleanup and source indexed Assign, preserving hidden destination slots. Permutation access falls back to identity beyond its stored extent for parent growth. Typed reached bounds/assertion errors preserve completed prefixes.",
-        "Independent180-world arbitrary-precision elementary elimination tracks E and E*A*P, checking logical upper parent, dense lower tail, reciprocal links and all four tail applications after conjugation. Literal tests cover duplicates, zero/NaN/ties, source debug/native self/zero pivot behavior, fixed/settings tolerances, hidden/trailing slots, parent growth and failures in constructor/pivot/parent/work/caller publication. init and row_by_indexed_vector_product are used only by unreachable/disabled source paths and are not ported; sole standalone test_square_dense_submatrix definition has no dispatch. Exact mpq/mpq and mpq/pair dense blocks, complete LU and retained original drivers remain required; no whole-unit completion or registered driver credit."
+        "Independent180-world arbitrary-precision elementary elimination tracks E and E*A*P, checking logical upper parent, dense lower tail, reciprocal links and all four tail applications after conjugation. Literal tests cover duplicates, zero/NaN/ties, source debug/native self/zero pivot behavior, fixed/settings tolerances, hidden/trailing slots, parent growth and failures in constructor/pivot/parent/work/caller publication. init and row_by_indexed_vector_product are used only by unreachable/disabled source paths and are not ported; sole standalone test_square_dense_submatrix definition has no dispatch. Remaining exact mpq/mpq and mpq/pair dense parent publication/applications, complete LU and retained original drivers remain required; no whole-unit completion or registered driver credit.",
+        "Exact dense core verified at every pivot stage in120 independent rational matrix worlds and actual pooled/direct reservation campaigns through success, including failure after L publication. Precise drop uses exact zero and ignores floating tolerance. Reached native zero division retains denominator-zero representation; debug assertion precedes division. Exact parent publication, dense/indexed scalar/pair applications, conjugation/debug views and full LU integration remain open; no whole-unit or unreachable test-driver credit."
       ]
     },
     {

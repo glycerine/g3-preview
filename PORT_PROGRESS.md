@@ -36146,3 +36146,46 @@ Full native90.7% snapshot predates these additions and remains explicitly old.
 Final native/debug LP vet, portcheck and diff checks pass. Regenerated64-package
 production graph has unchanged edges and includes the new floating dense files.
 The last full native suite passed within this hour; no redundant run was started.
+
+## Exact dense LU block construction and elimination
+
+Ported the retained mpq coefficient core shared by mpq/mpq and mpq/pair dense
+blocks: independent coefficient construction from logical sparse parent rows,
+strict maximum pivot selection, normalization, lower-row elimination and the
+combined L/upper buffer. Precise drop uses exact zero, ignoring floating drop
+settings. Literal copy-left arithmetic, copied pivot/multiplier, unary-minus and
+return-value ownership survive numerical refusal. Close destroys child receipts
+and temporaries before forward dense coefficient destruction; the sparse parent
+remains borrowed and unchanged.
+
+Every pivot stage in120 independent rational worlds is checked against a
+math/big.Rat elementary elimination model, with arbitrary independent parent
+row/column permutations and actual dense/parent column swaps. Tiny coefficients,
+strict equal maxima, last-wins duplicate construction and zero rows are covered.
+Ten pooled/direct physical reservation campaigns walk constructor, selection,
+division, lower-row and full-pivot calls through first success. Tests require a
+real failure after the L entry is published, verify owner freeze and unchanged
+parent, and census all numerical roots/direct objects after cleanup. An older
+real stopped comparison remains owned by its caller through child construction,
+selection refusal and Close.
+
+Revalidated source edge behavior: release zero division omits the debug-only
+nonzero assertion and retains normalized denominator-zero storage for cleanup.
+The cell accessor checks flattened storage bounds, so a malformed mapped column
+may alias another row while still in storage; the bounds fixture now reaches an
+actual storage boundary rather than imposing an absent source column guard.
+Focused exact tests pass native0.555s and combined debug/checked0.811s. Exact
+core coverage is197/239 (82.4%) native and208/239 (87.0%) debug. Uncovered returns
+propagate numerical/cleanup/metadata errors, guard invariant-protected offsets
+or belong to the other assertion profile. All floating and exact dense-block
+tests together pass native0.601s and debug/checked0.876s; both LP vets pass.
+
+The source inventory gate revealed the previously saved dependency-graph script
+was absent from the ledger. Added its reference-tool entry without crediting a
+C++ algorithm:2103 units,677 APIs; LP remains47 partial/63 unported units.
+Regenerated64-package graph has unchanged edges and lists the exact core.
+Full native90.7% coverage predates these additions. Last full native suite was
+within this hour, so no redundant full suite was run. Exact dense sparse-parent
+publication, scalar/pair dense/indexed tail applications, conjugation/views,
+full LU integration and remaining scaling/simplex/LAR/MPS implementation and
+retained upstream tests remain active work; no full LP solver is available.

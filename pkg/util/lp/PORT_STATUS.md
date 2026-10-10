@@ -11,6 +11,7 @@ code that has not been ported.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Exact dense-block construction and pivot stages | 120 independent rational elimination worlds checked at every pivot; pooled/direct actual allocation refusals through success, partial L publication, borrowed parent and older comparison ownership; precise tiny coefficients and reached bounds/assertion prefixes | 82.4% native (197/239), 87.0% debug (208/239); gaps propagate child/cleanup errors, guard invariant-protected offsets or belong to the other profile; parent publication and tail applications remain open |
 | `int_set.h` | Original `test_int_set`; dense swap order, resizing, reached invalid-domain clear prefix, 10,000-step independent map oracle, output/error cases | 100% |
 | Four live `stacked_value.h` scalar types | Original `test_stacked_unsigned`; signed, status and strategy restoration, nested/excess/zero pops, unsigned wrap | 100% |
 | Three concrete `stacked_vector.h` element types | Original `test_stacked_vector` with strengthened assertions; 12,000 operations against independent snapshots, repeated replacements, popped tails, baseline journals and checked scope/index guards | 100% |
