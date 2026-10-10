@@ -27,15 +27,6 @@ func (m *ASTManager) RewriterAssociative(d ASTHandle) (bool, error) {
 	return flags.LeftAssociative && flags.RightAssociative, e
 }
 
-func (m *ASTManager) RewriterVectorArguments(v ASTRefVector) (AppArguments, error) {
-	if e := m.lock(); e != nil {
-		return AppArguments{}, e
-	}
-	defer m.mu.Unlock()
-	s, e := m.vectorState(v)
-	return AppArguments{refVector: true, vector: s, formatOwner: m, count: s.size}, e
-}
-
 func (m *ASTManager) RewriterPattern(t ASTHandle) (bool, error) {
 	kind, e := m.GetKind(t)
 	if e != nil || kind != ASTApp {
@@ -47,29 +38,6 @@ func (m *ASTManager) RewriterPattern(t ASTHandle) (bool, error) {
 	}
 	op, e := m.GetDeclKind(t)
 	return op == 0, e
-}
-
-func (m *ASTManager) MkOrVector(v ASTRefVector) (ASTHandle, error) {
-	if e := m.lock(); e != nil {
-		return ASTHandle{}, e
-	}
-	defer m.mu.Unlock()
-	s, e := m.vectorState(v)
-	if e != nil {
-		return ASTHandle{}, e
-	}
-	if s.size == 0 {
-		return m.external(m.falseApp), nil
-	}
-	if s.size == 1 {
-		r, e := m.vectorValue(s, 0)
-		return m.external(r), e
-	}
-	if !m.pluginAt(0).present {
-		return ASTHandle{}, nil
-	}
-	r, e := m.mkAppArguments(m.basic.declarations[ASTOpOr], AppArguments{refVector: true, vector: s, formatOwner: m, count: s.size})
-	return m.external(r), e
 }
 
 // AppArgumentView borrows an application's checked handle array for a source

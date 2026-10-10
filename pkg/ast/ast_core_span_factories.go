@@ -10,9 +10,6 @@ type AppArguments struct {
 	slice          []ASTHandle
 	format         *astFormatRefVector
 	formatOwner    *ASTManager
-	vector         astRefVectorState
-	vectorOffset   uint32
-	refVector      bool
 	span           ASTLiteralVectorSpan
 	count          uint32
 	raw            bool
@@ -35,13 +32,6 @@ func (a AppArguments) at(i uint32) (ASTHandle, error) {
 		}
 		child, e := m.readInternal(app.args, i)
 		return m.external(child), e
-	}
-	if a.refVector {
-		if i > ^uint32(0)-a.vectorOffset {
-			return ASTHandle{}, ErrASTDomain
-		}
-		r, e := a.formatOwner.vectorValue(a.vector, a.vectorOffset+i)
-		return a.formatOwner.external(r), e
 	}
 	if a.format != nil {
 		r, e := a.format.at(i)
@@ -82,20 +72,6 @@ func (a AppArguments) Count() uint32                  { return a.count }
 func (a AppArguments) Size() uint64                   { return a.size() }
 func SliceArguments(values []ASTHandle) AppArguments {
 	return AppArguments{slice: values, count: uint32(len(values))}
-}
-func (m *ASTManager) RefVectorArgumentsRange(v ASTRefVector, offset, count uint32) (AppArguments, error) {
-	if e := m.lock(); e != nil {
-		return AppArguments{}, e
-	}
-	defer m.mu.Unlock()
-	state, e := m.vectorState(v)
-	if e != nil {
-		return AppArguments{}, e
-	}
-	if offset > state.size || count > state.size-offset {
-		return AppArguments{}, ErrASTDomain
-	}
-	return AppArguments{refVector: true, vector: state, vectorOffset: offset, formatOwner: m, count: count}, nil
 }
 func (m *ASTManager) UpdateQuantifierArguments(q, body ASTHandle, patterns, noPatterns AppArguments) (ASTHandle, error) {
 	return m.updateQuantifierArguments(q, body, false, 0, patterns, noPatterns, astUpdatePatterns|astUpdateNoPatterns)

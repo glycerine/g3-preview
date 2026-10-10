@@ -45,7 +45,7 @@ func (m *ASTManager) dependencyBufferState(b ASTDependencyRefBuffer) (astDepende
 	s := astDependencyRefBufferState{size: a[0], capacity: a[1], payload: arena.SmallBytesRef{Slot: arena.Slot(a[2]), Generation: arena.Generation(a[3])}, inlineInitialized: a[4], initialized: a[4], decPending: a[5]&(1<<31) != 0, decTarget: a[5] &^ (uint32(1) << 31), decNext: a[6]}
 	if !dependencyNull(s.payload) {
 		var e error
-		s.initialized, e = m.vectorWord(s.payload, 8)
+		s.initialized, e = m.dependencyBufferWord(s.payload, 8)
 		if e != nil {
 			return s, e
 		}
@@ -63,10 +63,10 @@ func (m *ASTManager) dependencyStoreBuffer(b ASTDependencyRefBuffer, s astDepend
 		}
 	}
 	if !dependencyNull(s.payload) {
-		if e := m.vectorPutWord(s.payload, 4, s.size); e != nil {
+		if e := m.dependencyBufferPutWord(s.payload, 4, s.size); e != nil {
 			return e
 		}
-		return m.vectorPutWord(s.payload, 8, s.initialized)
+		return m.dependencyBufferPutWord(s.payload, 8, s.initialized)
 	}
 	return nil
 }
@@ -108,9 +108,9 @@ func (m *ASTManager) dependencyBufferPhysical(b ASTDependencyRefBuffer, s astDep
 		if off+8 > math.MaxUint32 {
 			return arena.SmallBytesRef{}, arena.ErrBounds
 		}
-		lo, e = m.vectorWord(s.payload, uint32(off))
+		lo, e = m.dependencyBufferWord(s.payload, uint32(off))
 		if e == nil {
-			hi, e = m.vectorWord(s.payload, uint32(off)+4)
+			hi, e = m.dependencyBufferWord(s.payload, uint32(off)+4)
 		}
 	}
 	return arena.SmallBytesRef{Slot: arena.Slot(lo), Generation: arena.Generation(hi)}, e
@@ -135,10 +135,10 @@ func (m *ASTManager) dependencyBufferPut(b ASTDependencyRefBuffer, s astDependen
 	if off+8 > math.MaxUint32 {
 		return arena.ErrBounds
 	}
-	if e := m.vectorPutWord(s.payload, uint32(off), uint32(v.Slot)); e != nil {
+	if e := m.dependencyBufferPutWord(s.payload, uint32(off), uint32(v.Slot)); e != nil {
 		return e
 	}
-	return m.vectorPutWord(s.payload, uint32(off)+4, uint32(v.Generation))
+	return m.dependencyBufferPutWord(s.payload, uint32(off)+4, uint32(v.Generation))
 }
 func astDependencyBufferCapacity(old, hostMax uint64) (uint32, uint32, error) {
 	if old > math.MaxUint32 {
@@ -163,9 +163,9 @@ func (m *ASTManager) dependencyGrowBuffer(b ASTDependencyRefBuffer, s *astDepend
 	next.payload = p
 	next.capacity = n
 	next.initialized = s.size
-	m.vectorPutWord(p, 0, n)
-	m.vectorPutWord(p, 4, s.size)
-	m.vectorPutWord(p, 8, s.size)
+	m.dependencyBufferPutWord(p, 0, n)
+	m.dependencyBufferPutWord(p, 4, s.size)
+	m.dependencyBufferPutWord(p, 8, s.size)
 	// Source buffer memcpy copies only logical m_pos, not the inactive tail.
 	for i := uint32(0); i < s.size; i++ {
 		v, e := m.dependencyBufferPhysical(b, *s, i)
@@ -311,4 +311,24 @@ func (m *ASTManager) DependencyRefBufferSet(b ASTDependencyRefBuffer, i uint32, 
 		return e
 	}
 	return m.dependencyBufferSet(b, i, r)
+}
+
+func (m *ASTManager) dependencyBufferWord(p arena.SmallBytesRef, offset uint32) (uint32, error) {
+	var x uint32
+	for i := uint32(0); i < 4; i++ {
+		b, e := m.vectorAllocator.Read(p, offset+i)
+		if e != nil {
+			return 0, e
+		}
+		x |= uint32(b) << (i * 8)
+	}
+	return x, nil
+}
+func (m *ASTManager) dependencyBufferPutWord(p arena.SmallBytesRef, offset, x uint32) error {
+	for i := uint32(0); i < 4; i++ {
+		if e := m.vectorAllocator.Write(p, offset+i, byte(x>>(i*8))); e != nil {
+			return e
+		}
+	}
+	return nil
 }

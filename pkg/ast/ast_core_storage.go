@@ -288,7 +288,6 @@ type ASTManager struct {
 	// Actual AST-valued dependency manager and persistent-array specialization;
 	// borrowed owners are bound eagerly and scratch backing is charged on use.
 	// Source fresh_id and lexical func_decl_info storage; included in owner header.
-	refVectorPushSerial                            uint64
 	freshID                                        uint32
 	freshInfo                                      astInfoRecord
 	freshInfoEpoch                                 uint32

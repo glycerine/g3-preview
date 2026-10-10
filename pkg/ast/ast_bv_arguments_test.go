@@ -44,10 +44,7 @@ func TestASTBitVectorBorrowedORArguments(t *testing.T) {
 	if got != expected || m.Stats() != before {
 		t.Fatal("borrowed OR changed identity/stats")
 	}
-	v, e := m.NewRefVectorFrom(args)
-	astTestMust(t, e)
-	defer func() { astTestMust(t, m.DelRefVector(&v)) }()
-	part, e := m.RefVectorArgumentsRange(v, 3, 20)
+	part, e := SliceArguments(args).Range(3, 20)
 	astTestMust(t, e)
 	got, e = m.MkBitVectorOrArguments(part)
 	astTestMust(t, e)

@@ -30,11 +30,11 @@ func (m *ASTManager) dependencyBufferBorrowState(v ASTDependencyRefBufferBorrow)
 		if !m.vectorAllocator.IsLive(v.payload) {
 			return b, s, ErrASTHandle
 		}
-		s.capacity, e = m.vectorWord(v.payload, 0)
+		s.capacity, e = m.dependencyBufferWord(v.payload, 0)
 		if e != nil {
 			return b, s, e
 		}
-		s.initialized, e = m.vectorWord(v.payload, 8)
+		s.initialized, e = m.dependencyBufferWord(v.payload, 8)
 	}
 	return b, s, e
 }

@@ -457,9 +457,15 @@ func TestASTMarkRefFastActualAscendingReleaseAndWarmOperations(t *testing.T) {
 		}
 		h[i] = n
 	}
-	pin, e := m.NewRefVectorFrom(h)
-	astTestMust(t, e)
-	defer m.DelRefVector(&pin)
+	pin := h
+	for _, n := range pin {
+		astTestMust(t, m.IncRef(n))
+	}
+	defer func() {
+		for _, n := range pin {
+			astTestMust(t, m.DecRef(n))
+		}
+	}()
 	used := m.BudgetField.Used()
 	m.BudgetField.FailAfter(0)
 	allocs := testing.AllocsPerRun(30, func() {

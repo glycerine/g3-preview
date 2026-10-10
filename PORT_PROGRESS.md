@@ -34287,3 +34287,35 @@ Production caller audit now finds ASTRefVector only in its general bridge and
 AppArguments/rewriter adapter methods. Those unused layers should be removed
 following a complete declaration/caller audit. Formatting collection migration,
 internal util cycle cleanup and the full util subpackage split remain unfinished.
+
+## Remove unused general AST reference-vector bridge
+
+After the retained callers migrated to native owning slices, production Go
+references to ASTRefVector remained only in the bridge itself and its unused
+AppArguments/rewriter adapter methods. Removed the ten bridge implementation/
+test files, unused argument representation/range/OR helpers and push serial.
+Removed eighteen bridge-only tests, including the manager-close growth-prefix
+test. Source C++ consumers are retained; their algorithms now use concrete
+native collections rather than a universal emulation of ref_vector.h.
+
+Live mark/shared-occurrence tests now acquire/release their native handle-slice
+fixtures explicitly, preserving duplicate retains and ascending release order.
+The real BV borrowed-range test uses SliceArguments.Range. Dependency-buffer
+raw word codec functions remain at their actual buffer consumer under concrete
+names; no retained dependency-buffer implementation is deleted in this change.
+Manifest removes deleted targets/tests and unused adapter method credit while
+preserving the scalar owning-reference implementation and other retained
+reference specializations. Whole-unit/API counts remain unchanged.
+
+Validation: focused ownership/dependency/borrowed BV/span/constructor checks
+passed (0.389s). Full native AST/rewriter/model/tactic/SAT tactic/API passed
+(20.187s/11.669s/0.053s/0.025s/0.113s/0.011s); full debug AST passed (21.547s).
+Module-wide compilation, AST vet, manifest and diff checks passed. Counts remain
+2102 units/677 APIs:62 ported,283 partial,1729 unported,two dead/deleted.
+No full native module rerun within the hourly interval. Search confirms no Go
+ASTRefVector or removed adapter references remain.
+
+Formatting flat traversal still uses source-shaped vectors and probing cache;
+arithmetic/BV plugin caches share that vector type. Those retained consumers
+need native slices/maps, followed by the remaining reference-specialization
+audits, internal util cycle cleanup and complete root util subpackage split.

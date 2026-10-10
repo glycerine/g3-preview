@@ -50,31 +50,3 @@ func TestASTConstructorEveryPredictablePrefixOwnsNoLostGraph(t *testing.T) {
 		t.Fatal("did not cross actual constructor reserve branches", failures)
 	}
 }
-func TestASTZeroNodeCloseRetainedSourceRefVectorPushPrefixes(t *testing.T) {
-	s, q, b := astTestOwners(t)
-	m, e := NewASTManager(ASTManagerConfig{Symbols: s, Numerals: q, Budget: b})
-	astTestMust(t, e)
-	boolSort, e := m.MkBoolSort()
-	astTestMust(t, e)
-	h, e := m.MkVar(4, boolSort)
-	astTestMust(t, e)
-	v, e := m.NewRefVector()
-	astTestMust(t, e)
-	b.FailAfter(0)
-	if e = m.RefVectorPush(v, h); e == nil {
-		t.Fatal("missing growth failure")
-	}
-	rc, e := m.GetRefCount(h)
-	astTestMust(t, e)
-	if rc != 1 {
-		t.Fatal("source retain prefix", rc)
-	}
-	b.FailAfter(-1)
-	astTestMust(t, m.DelRefVector(&v))
-	before := b.Used()
-	owned := m.Stats().AllocatedBytes
-	astTestMust(t, m.Close())
-	if b.Used() != before-owned {
-		t.Fatal("manager teardown did not reclaim source-retained node")
-	}
-}

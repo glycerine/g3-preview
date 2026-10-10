@@ -70,9 +70,15 @@ func TestASTSharedOccurrencesActualMultiplicityAndDefaults(t *testing.T) {
 func TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 1)[0]
-	pins, e := m.NewRefVectorFrom([]ASTHandle{h, h})
-	astTestMust(t, e)
-	defer m.DelRefVector(&pins)
+	pins := []ASTHandle{h, h}
+	for _, n := range pins {
+		astTestMust(t, m.IncRef(n))
+	}
+	defer func() {
+		for _, n := range pins {
+			astTestMust(t, m.DecRef(n))
+		}
+	}()
 	visited, e := NewASTSharedOccurrencesMark(m)
 	astTestMust(t, e)
 	defer visited.Close()
@@ -146,9 +152,15 @@ func TestASTSharedOccurrencesNativeVisitedGrowthAndReset(t *testing.T) {
 func TestASTSharedOccurrencesNativeDiscoveryOrderGrowthAndOwnership(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 257)
-	pins, e := m.NewRefVectorFrom(append(append([]ASTHandle{}, h...), h...))
-	astTestMust(t, e)
-	defer m.DelRefVector(&pins)
+	pins := append(append([]ASTHandle{}, h...), h...)
+	for _, n := range pins {
+		astTestMust(t, m.IncRef(n))
+	}
+	defer func() {
+		for _, n := range pins {
+			astTestMust(t, m.DecRef(n))
+		}
+	}()
 	v, e := NewASTSharedOccurrencesMark(m)
 	astTestMust(t, e)
 	defer v.Close()
@@ -293,8 +305,10 @@ func TestASTSharedOccurrencesNativeDeepFrameTraversalAndCleanup(t *testing.T) {
 func TestASTSharedOccurrencesNativeResetDiscoveryOrderDestruction(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 10)
-	pins, e := m.NewRefVectorFrom(append(append([]ASTHandle{}, h...), h...))
-	astTestMust(t, e)
+	pins := append(append([]ASTHandle{}, h...), h...)
+	for _, n := range pins {
+		astTestMust(t, m.IncRef(n))
+	}
 	v, e := NewASTSharedOccurrencesMark(m)
 	astTestMust(t, e)
 	defer v.Close()
@@ -305,8 +319,10 @@ func TestASTSharedOccurrencesNativeResetDiscoveryOrderDestruction(t *testing.T) 
 		astTestMust(t, v.Mark(n, true))
 		astTestMust(t, c.CollectWithMark(n, v))
 	}
-	astTestMust(t, v.Reset())             // borrowed visitation list must outlive its nodes
-	astTestMust(t, m.DelRefVector(&pins)) // leave the collector's sole retain
+	astTestMust(t, v.Reset()) // borrowed visitation list must outlive its nodes
+	for _, n := range pins {
+		astTestMust(t, m.DecRef(n))
+	} // leave the collector's sole retain
 	var expected []uint32
 	for _, n := range h {
 		id, e := m.GetASTID(n)
@@ -333,8 +349,10 @@ func TestASTSharedOccurrencesNativeWideDeletionReset(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 20)
 	root := sharedTestApp(t, m, h...)
-	pins, e := m.NewRefVectorFrom([]ASTHandle{root, root})
-	astTestMust(t, e)
+	pins := []ASTHandle{root, root}
+	for _, n := range pins {
+		astTestMust(t, m.IncRef(n))
+	}
 	v, e := NewASTSharedOccurrencesMark(m)
 	astTestMust(t, e)
 	defer v.Close()
@@ -344,7 +362,9 @@ func TestASTSharedOccurrencesNativeWideDeletionReset(t *testing.T) {
 	astTestMust(t, v.Mark(root, true))
 	astTestMust(t, c.CollectWithMark(root, v))
 	astTestMust(t, v.Reset())
-	astTestMust(t, m.DelRefVector(&pins))
+	for _, n := range pins {
+		astTestMust(t, m.DecRef(n))
+	}
 	r, e := m.internal(root)
 	astTestMust(t, e)
 	before := m.liveNodes
@@ -388,9 +408,15 @@ func TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow(t *testing.T) {
 func TestASTSharedOccurrencesNativeIteratorInvalidationAndDuplicates(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 2)
-	pins, e := m.NewRefVectorFrom([]ASTHandle{h[0], h[0], h[1], h[1]})
-	astTestMust(t, e)
-	defer m.DelRefVector(&pins)
+	pins := []ASTHandle{h[0], h[0], h[1], h[1]}
+	for _, n := range pins {
+		astTestMust(t, m.IncRef(n))
+	}
+	defer func() {
+		for _, n := range pins {
+			astTestMust(t, m.DecRef(n))
+		}
+	}()
 	v, e := NewASTSharedOccurrencesMark(m)
 	astTestMust(t, e)
 	defer v.Close()
@@ -459,9 +485,15 @@ func TestASTSharedOccurrencesNativeRepeatedDeepBranch(t *testing.T) {
 func TestASTSharedOccurrencesNativeIteratorCopiesEndpointsAndClose(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 1)[0]
-	pins, e := m.NewRefVectorFrom([]ASTHandle{h, h})
-	astTestMust(t, e)
-	defer m.DelRefVector(&pins)
+	pins := []ASTHandle{h, h}
+	for _, n := range pins {
+		astTestMust(t, m.IncRef(n))
+	}
+	defer func() {
+		for _, n := range pins {
+			astTestMust(t, m.DecRef(n))
+		}
+	}()
 	v, e := NewASTSharedOccurrencesMark(m)
 	astTestMust(t, e)
 	defer v.Close()
