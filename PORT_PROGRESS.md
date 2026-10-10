@@ -34953,3 +34953,45 @@ inventory remains14 partial/96 unported LP units: formatting and complete matrix
 LU integration are still open, and no full solver claim is made. Checkpoint
 691a44c0 saved the shared index and floating permutation work. The full LP goal
 continues with concrete priority queues, matrices/eta/LU and the solver layers.
+
+
+## Native LP priority and ordered-pair queues
+
+Ported actual int/unsigned/double binary_heap_priority_queue instantiations and
+the int/unsigned binary_heap_upair_queue consumers. Concrete priority algorithms
+share only unsigned/signed heap-index bookkeeping, without generic or callback
+algebra. Native slices and Go unordered IndexPair maps replace STL/container
+internals. Literal strict comparisons preserve tie order, NaN/infinity behavior,
+unsigned auto-growth shifts, stale priorities after removal and non-pruning
+resize. Pair slots grow and recycle in source LIFO order; public pair Resize
+changes only the underlying queue extent. Missing pair priority is0xFFFFFF.
+
+Translated active -tbq test_binary_priority_queue and its nested pair smoke
+scenario with stronger assertions in both Go profiles. Five independent map
+oracles exercise12000 operations each, checking minimum priority, current values,
+full heap/inverse and pair/slot membership, slot census and source diagnostics.
+The source pair smoke's100 random writes/removal/drain now use a deterministic
+independent generator and verify each dequeued minimum; this does not claim a
+port of the source test generator. Natural shrink/wrap/zero-capacity fixtures
+exercise reached valid mutation prefixes and native/debug empty-dequeue
+continuations. A stopped root replacement retains its completed heap write and
+old inverse. A failed pair enqueue retains its already-published map entry;
+the original IsCorrect diagnostic can accept that missing heap membership and
+is preserved, with an independent valid-world oracle covering both directions.
+
+Whole-source scan found dequeue_and_get_priority used only by uncalled debug
+print; neither was added as an unused template adapter. The uncalled duplicate
+put_to_heap, peek, float remove and ij_index_is_new are likewise not invented as
+retained consumers. Exact mpq/numeric_pair priorities and full primal/sparse
+matrix integration remain pending. No whole-unit promotion is claimed.
+
+Full LP focused tests pass native18.660s/debug-checked22.373s,89.5%/91.9% statement
+coverage. Scalar queue code covers85.6% in both profiles; heap index code
+87.7%/89.5%, pair wrappers92.2%, pair bookkeeping90.6%/88.7%. Remaining statements
+include child bounds-error propagation and assertion/invalid-domain paths; no
+simulated native container OOM or fabricated numerical teardown was added for
+coverage. LP vet, portcheck, regenerated64-package graphs and diff checks pass.
+LP inventory is20 partial/90 unported source units; canonical repository ledger
+is62 ported/301 partial/1711 unported/two dead-deleted. Previous checkpoint
+6f9c0856 saved exact permutations. Full LP objective remains active, with exact
+queue comparison ownership, matrices/eta/LU and the solver layers still ahead.

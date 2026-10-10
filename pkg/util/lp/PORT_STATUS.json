@@ -1,12 +1,12 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 90.5,
+  "native_statement_coverage_of_current_go_code": 89.5,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
-    "remaining exact/floating numeric traits and conversions, concrete priorities",
+    "remaining exact/floating numeric traits and conversions, exact priorities",
     "indexed/sparse/static/dense matrices and transformations",
-    "priority queues and LU/eta factorization",
+    "exact priority queues and LU/eta factorization",
     "scaling and random updates",
     "primal/dual simplex and LAR solvers",
     "bounds/evidence, constraint scopes and explanations",
@@ -22,39 +22,132 @@
     },
     {
       "source": "src/util/lp/binary_heap_priority_queue.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPriorityQueueSource",
+        "TestLPIntPriorityQueueIndependentMapOracle",
+        "TestLPIntPriorityQueueTieAndResizePrefixes",
+        "TestLPUintPriorityQueueIndependentMapOracle",
+        "TestLPUintPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIndependentMapOracle",
+        "TestLPFloatPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIEEESourceComparisons",
+        "TestLPIntPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPUintPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPFloatPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ]
     },
     {
       "source": "src/util/lp/binary_heap_priority_queue.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPriorityQueueSource",
+        "TestLPIntPriorityQueueIndependentMapOracle",
+        "TestLPIntPriorityQueueTieAndResizePrefixes",
+        "TestLPUintPriorityQueueIndependentMapOracle",
+        "TestLPUintPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIndependentMapOracle",
+        "TestLPFloatPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIEEESourceComparisons",
+        "TestLPIntPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPUintPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPFloatPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ]
     },
     {
       "source": "src/util/lp/binary_heap_priority_queue_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPriorityQueueSource",
+        "TestLPIntPriorityQueueIndependentMapOracle",
+        "TestLPIntPriorityQueueTieAndResizePrefixes",
+        "TestLPUintPriorityQueueIndependentMapOracle",
+        "TestLPUintPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIndependentMapOracle",
+        "TestLPFloatPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIEEESourceComparisons",
+        "TestLPIntPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPUintPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPFloatPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ]
     },
     {
       "source": "src/util/lp/binary_heap_upair_queue.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/pair_queue_index.go",
+        "pkg/util/lp/pair_priority_queue.go",
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ]
     },
     {
       "source": "src/util/lp/binary_heap_upair_queue.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/pair_queue_index.go",
+        "pkg/util/lp/pair_priority_queue.go",
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ]
     },
     {
       "source": "src/util/lp/binary_heap_upair_queue_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/pair_queue_index.go",
+        "pkg/util/lp/pair_priority_queue.go",
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ]
     },
     {
       "source": "src/util/lp/bound_analyzer_on_row.h",
@@ -879,8 +972,8 @@
     }
   ],
   "status_counts": {
-    "unported": 96,
-    "partial": 14
+    "unported": 90,
+    "partial": 20
   },
-  "combined_debug_checked_statement_coverage_of_current_go_code": 93.8
+  "combined_debug_checked_statement_coverage_of_current_go_code": 91.9
 }

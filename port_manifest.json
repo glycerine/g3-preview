@@ -102942,14 +102942,32 @@
         "pkg/util/lp/stacked_value_test.go",
         "pkg/util/lp/stacked_vector_test.go",
         "pkg/util/lp/numeric_pair_test.go",
-        "pkg/util/lp/permutation_test.go"
+        "pkg/util/lp/permutation_test.go",
+        "pkg/util/lp/priority_queue_test.go",
+        "pkg/util/lp/pair_priority_queue_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
         "TestLPStackedUnsignedSource",
         "TestLPStackedVectorSource",
         "TestLPRationalPairSourceAccumulation",
-        "TestLPFloatPermutationSource"
+        "TestLPFloatPermutationSource",
+        "TestLPPriorityQueueSource",
+        "TestLPIntPriorityQueueIndependentMapOracle",
+        "TestLPIntPriorityQueueTieAndResizePrefixes",
+        "TestLPUintPriorityQueueIndependentMapOracle",
+        "TestLPUintPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIndependentMapOracle",
+        "TestLPFloatPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIEEESourceComparisons",
+        "TestLPIntPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPUintPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPFloatPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
       ],
       "conditionals": [
         {
@@ -103521,6 +103539,15 @@
           "go_target": "pkg/util/lp/permutation_test.go",
           "tests": [
             "TestLPFloatPermutationSource"
+          ]
+        },
+        {
+          "name": "active -tbq test_binary_priority_queue and nested test_upair_queue scenarios with independently strengthened checks",
+          "status": "ported",
+          "go_target": "pkg/util/lp/priority_queue_test.go",
+          "tests": [
+            "TestLPPriorityQueueSource",
+            "TestLPPairPriorityQueueSource"
           ]
         }
       ],
@@ -117516,9 +117543,29 @@
       "path": "src/util/lp/binary_heap_priority_queue.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPriorityQueueSource",
+        "TestLPIntPriorityQueueIndependentMapOracle",
+        "TestLPIntPriorityQueueTieAndResizePrefixes",
+        "TestLPUintPriorityQueueIndependentMapOracle",
+        "TestLPUintPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIndependentMapOracle",
+        "TestLPFloatPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIEEESourceComparisons",
+        "TestLPIntPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPUintPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPFloatPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ],
       "conditionals": [
         {
           "line": 40,
@@ -117545,17 +117592,68 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "actual int/unsigned/double enqueue, priority change, sift directions, dequeue, clear, resize, inverse and heap consistency; retained int/unsigned remove",
+          "status": "ported",
+          "go_target": "pkg/util/lp/priority_queue_native.go",
+          "tests": [
+            "TestLPPriorityQueueSource",
+            "TestLPIntPriorityQueueIndependentMapOracle",
+            "TestLPIntPriorityQueueTieAndResizePrefixes",
+            "TestLPUintPriorityQueueIndependentMapOracle",
+            "TestLPUintPriorityQueueTieAndResizePrefixes",
+            "TestLPFloatPriorityQueueIndependentMapOracle",
+            "TestLPFloatPriorityQueueTieAndResizePrefixes",
+            "TestLPFloatPriorityQueueIEEESourceComparisons",
+            "TestLPIntPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPUintPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPFloatPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPPairPriorityQueueSource",
+            "TestLPIntPairPriorityQueueIndependentMapOracle",
+            "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+            "TestLPUintPairPriorityQueueIndependentMapOracle",
+            "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
+      ],
+      "deviations": [
+        "Exact mpq/numeric_pair priorities and complete primal/matrix integration remain open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
+        "Whole-source scan finds dequeue_and_get_priority used only by uncalled debug print; print, peek, duplicate put_to_heap and uncalled float remove are not added merely to instantiate template definitions. The unused dequeue-with-priority inverse-index omission is not silently repaired or exercised as a retained caller.",
+        "Typed Go guards retain valid prefixes after invalid source extent operations. Resize does not prune active membership. Auto-growth uses literal unsigned o<<1, including zero/wrap behavior. Strict tie comparisons and IEEE NaN/infinity behavior remain literal; native empty dequeue with existing storage retains unsigned size decrement, debug stops before mutation.",
+        "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations."
+      ]
     },
     {
       "path": "src/util/lp/binary_heap_priority_queue.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPriorityQueueSource",
+        "TestLPIntPriorityQueueIndependentMapOracle",
+        "TestLPIntPriorityQueueTieAndResizePrefixes",
+        "TestLPUintPriorityQueueIndependentMapOracle",
+        "TestLPUintPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIndependentMapOracle",
+        "TestLPFloatPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIEEESourceComparisons",
+        "TestLPIntPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPUintPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPFloatPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ],
       "conditionals": [
         {
           "line": 47,
@@ -117606,30 +117704,123 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "actual int/unsigned/double enqueue, priority change, sift directions, dequeue, clear, resize, inverse and heap consistency; retained int/unsigned remove",
+          "status": "ported",
+          "go_target": "pkg/util/lp/priority_queue_native.go",
+          "tests": [
+            "TestLPPriorityQueueSource",
+            "TestLPIntPriorityQueueIndependentMapOracle",
+            "TestLPIntPriorityQueueTieAndResizePrefixes",
+            "TestLPUintPriorityQueueIndependentMapOracle",
+            "TestLPUintPriorityQueueTieAndResizePrefixes",
+            "TestLPFloatPriorityQueueIndependentMapOracle",
+            "TestLPFloatPriorityQueueTieAndResizePrefixes",
+            "TestLPFloatPriorityQueueIEEESourceComparisons",
+            "TestLPIntPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPUintPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPFloatPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPPairPriorityQueueSource",
+            "TestLPIntPairPriorityQueueIndependentMapOracle",
+            "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+            "TestLPUintPairPriorityQueueIndependentMapOracle",
+            "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
+      ],
+      "deviations": [
+        "Exact mpq/numeric_pair priorities and complete primal/matrix integration remain open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
+        "Whole-source scan finds dequeue_and_get_priority used only by uncalled debug print; print, peek, duplicate put_to_heap and uncalled float remove are not added merely to instantiate template definitions. The unused dequeue-with-priority inverse-index omission is not silently repaired or exercised as a retained caller.",
+        "Typed Go guards retain valid prefixes after invalid source extent operations. Resize does not prune active membership. Auto-growth uses literal unsigned o<<1, including zero/wrap behavior. Strict tie comparisons and IEEE NaN/infinity behavior remain literal; native empty dequeue with existing storage retains unsigned size decrement, debug stops before mutation.",
+        "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations."
+      ]
     },
     {
       "path": "src/util/lp/binary_heap_priority_queue_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPriorityQueueSource",
+        "TestLPIntPriorityQueueIndependentMapOracle",
+        "TestLPIntPriorityQueueTieAndResizePrefixes",
+        "TestLPUintPriorityQueueIndependentMapOracle",
+        "TestLPUintPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIndependentMapOracle",
+        "TestLPFloatPriorityQueueTieAndResizePrefixes",
+        "TestLPFloatPriorityQueueIEEESourceComparisons",
+        "TestLPIntPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPUintPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPFloatPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "actual int/unsigned/double enqueue, priority change, sift directions, dequeue, clear, resize, inverse and heap consistency; retained int/unsigned remove",
+          "status": "ported",
+          "go_target": "pkg/util/lp/priority_queue_native.go",
+          "tests": [
+            "TestLPPriorityQueueSource",
+            "TestLPIntPriorityQueueIndependentMapOracle",
+            "TestLPIntPriorityQueueTieAndResizePrefixes",
+            "TestLPUintPriorityQueueIndependentMapOracle",
+            "TestLPUintPriorityQueueTieAndResizePrefixes",
+            "TestLPFloatPriorityQueueIndependentMapOracle",
+            "TestLPFloatPriorityQueueTieAndResizePrefixes",
+            "TestLPFloatPriorityQueueIEEESourceComparisons",
+            "TestLPIntPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPUintPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPFloatPriorityQueueRetainedShrinkMutationPrefixes",
+            "TestLPPairPriorityQueueSource",
+            "TestLPIntPairPriorityQueueIndependentMapOracle",
+            "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+            "TestLPUintPairPriorityQueueIndependentMapOracle",
+            "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
+      ],
+      "deviations": [
+        "Exact mpq/numeric_pair priorities and complete primal/matrix integration remain open; no whole-unit promotion. Default source empty construction is New*PriorityQueue(0); constructor required before use.",
+        "Whole-source scan finds dequeue_and_get_priority used only by uncalled debug print; print, peek, duplicate put_to_heap and uncalled float remove are not added merely to instantiate template definitions. The unused dequeue-with-priority inverse-index omission is not silently repaired or exercised as a retained caller.",
+        "Typed Go guards retain valid prefixes after invalid source extent operations. Resize does not prune active membership. Auto-growth uses literal unsigned o<<1, including zero/wrap behavior. Strict tie comparisons and IEEE NaN/infinity behavior remain literal; native empty dequeue with existing storage retains unsigned size decrement, debug stops before mutation.",
+        "Source debug inverse assertions use the existing explicit Go error profile, not process-global debugger/TRACE transport. The source consistency check does not verify every active heap object has an inverse member; independent tests check both directions for valid operations."
+      ]
     },
     {
       "path": "src/util/lp/binary_heap_upair_queue.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/pair_queue_index.go",
+        "pkg/util/lp/pair_priority_queue.go",
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ],
       "conditionals": [
         {
           "line": 56,
@@ -117642,17 +117833,47 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "actual int/unsigned pair queues, new/reused slots, updates, dequeue, remove, underlying-only resize, priority sentinel, bijection and free-slot diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/pair_priority_queue.go",
+          "tests": [
+            "TestLPPairPriorityQueueSource",
+            "TestLPIntPairPriorityQueueIndependentMapOracle",
+            "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+            "TestLPUintPairPriorityQueueIndependentMapOracle",
+            "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
+      ],
+      "deviations": [
+        "Complete sparse matrix/pivot integration remains open; no whole-unit promotion. Uncalled ij_index_is_new appears only in a commented source assertion and has no invented adapter.",
+        "Pairs use native Go unordered maps and concrete IndexPair keys. Map/slot publication precedes underlying enqueue, and a failed queue access leaves that published prefix. Source zero-capacity doubling fails instead of inventing a growth policy; native/debug stops remain distinct.",
+        "Pair consistency diagnostics preserve the source gap: map/slot uniqueness and free-slot checks need not detect a published pair absent from the underlying heap. Original upstream random pair smoke scenario is translated with a fixed independent generator and strengthened map/minimum assertions; no source generator algorithm is claimed by that fixture."
+      ]
     },
     {
       "path": "src/util/lp/binary_heap_upair_queue.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/pair_queue_index.go",
+        "pkg/util/lp/pair_priority_queue.go",
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ],
       "conditionals": [
         {
           "line": 99,
@@ -117675,22 +117896,71 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "actual int/unsigned pair queues, new/reused slots, updates, dequeue, remove, underlying-only resize, priority sentinel, bijection and free-slot diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/pair_priority_queue.go",
+          "tests": [
+            "TestLPPairPriorityQueueSource",
+            "TestLPIntPairPriorityQueueIndependentMapOracle",
+            "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+            "TestLPUintPairPriorityQueueIndependentMapOracle",
+            "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
+      ],
+      "deviations": [
+        "Complete sparse matrix/pivot integration remains open; no whole-unit promotion. Uncalled ij_index_is_new appears only in a commented source assertion and has no invented adapter.",
+        "Pairs use native Go unordered maps and concrete IndexPair keys. Map/slot publication precedes underlying enqueue, and a failed queue access leaves that published prefix. Source zero-capacity doubling fails instead of inventing a growth policy; native/debug stops remain distinct.",
+        "Pair consistency diagnostics preserve the source gap: map/slot uniqueness and free-slot checks need not detect a published pair absent from the underlying heap. Original upstream random pair smoke scenario is translated with a fixed independent generator and strengthened map/minimum assertions; no source generator algorithm is claimed by that fixture."
+      ]
     },
     {
       "path": "src/util/lp/binary_heap_upair_queue_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/pair_queue_index.go",
+        "pkg/util/lp/pair_priority_queue.go",
+        "pkg/util/lp/priority_heap.go",
+        "pkg/util/lp/priority_queue_native.go"
+      ],
+      "tests": [
+        "TestLPPairPriorityQueueSource",
+        "TestLPIntPairPriorityQueueIndependentMapOracle",
+        "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+        "TestLPUintPairPriorityQueueIndependentMapOracle",
+        "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "actual int/unsigned pair queues, new/reused slots, updates, dequeue, remove, underlying-only resize, priority sentinel, bijection and free-slot diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/pair_priority_queue.go",
+          "tests": [
+            "TestLPPairPriorityQueueSource",
+            "TestLPIntPairPriorityQueueIndependentMapOracle",
+            "TestLPIntPairPriorityQueueSlotAndFailurePrefixes",
+            "TestLPUintPairPriorityQueueIndependentMapOracle",
+            "TestLPUintPairPriorityQueueSlotAndFailurePrefixes"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed priority/heap/inverse/pair/free-slot slices and unordered Go maps replace source vector and STL container storage. No synthetic allocation charges or Go slice/map OOM fixtures. Index algorithms are concrete shared integer operations; each retained priority type uses its own actual comparisons without a callback algebra layer. Source mutation and failure prefixes remain explicit."
+      ],
+      "deviations": [
+        "Complete sparse matrix/pivot integration remains open; no whole-unit promotion. Uncalled ij_index_is_new appears only in a commented source assertion and has no invented adapter.",
+        "Pairs use native Go unordered maps and concrete IndexPair keys. Map/slot publication precedes underlying enqueue, and a failed queue access leaves that published prefix. Source zero-capacity doubling fails instead of inventing a growth policy; native/debug stops remain distinct.",
+        "Pair consistency diagnostics preserve the source gap: map/slot uniqueness and free-slot checks need not detect a published pair absent from the underlying heap. Original upstream random pair smoke scenario is translated with a fixed independent generator and strengthened map/minimum assertions; no source generator algorithm is claimed by that fixture."
+      ]
     },
     {
       "path": "src/util/lp/bound_analyzer_on_row.h",
