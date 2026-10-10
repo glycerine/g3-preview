@@ -36006,3 +36006,48 @@ test-driver integration remain required.
 Final LP vet, portcheck and diff checks pass. Dependency graph regenerated with
 64 packages and unchanged edges; its file inventory includes indexed refinement.
 The full native module suite passed less than an hour ago, so it was not repeated.
+
+
+## Sparse identity extension and retained LU interface audit
+
+Ported float/mpq sparse resize, stored-entry count and right/reverse-left
+permutation composition reached by lu.h:257,311 and lu.hpp:480-481,790-791.
+Resize appends physical row/column headers, resizes queue then permutations then
+work arrays, and only afterward inserts physical diagonal ones. Old flags, work
+values, shortening counters and queue remain; new work entries are zero rather
+than constructor -1. Queue resize does not resize its pair directory, even when
+originally empty. Count walks physical rows descending and includes all stored
+zeros/duplicates independently of active-element counters. Native shrink erases
+the source assertion and retains headers while shrinking permutation/work
+extents; debug rejects before mutation. Exact stopped owners reject before
+changes and malformed identity additions retain all published extents for Close.
+
+Added120 worlds with eight rounds of independent dense logical matrix permutation
+and identity-block extension, empty/no-op/multi-row growth, value/count/reciprocal
+checks, queue/counter/workspace retention and exact owning-cell census. Pooled
+and direct profiles grow inline ones with FailAfter(0), preserving existing large
+coefficients; no source numerical reservation or fabricated allocation failure is
+introduced. Bounds, true stopped-add owners, invalid permutation metadata and
+source debug/native shrink profiles are exercised.
+
+Focused extension plus prior indexed refinement tests pass native0.240s and
+combined debug/checked0.283s. Extension coverage:float28/29 (96.6%) native and
+29/29 (100%) debug; exact42/46 (91.3%) native and43/46 (93.5%) debug. Remaining
+returns propagate inline-one assignment/destruction or capture failures, plus
+the opposite assertion profile. Full native90.7% snapshot predates these additions.
+
+Caller audit excludes definition-only sparse diagnostics/checkers (including
+backlinks, triangular/max, queue/score/print), get_non_zero_column_in_row,
+add_columns_at_the_end/delete_column and unused adjusted-work declarations.
+Triangular checker references in LU are comments. Sparse multiply_from_left is
+used only by sparse_matrix_with_permutaions_test, whose sole dispatch follows
+unconditional return finalize(0) at src/test/lp.cpp:3240. Explicit instantiations
+and unreachable tests do not establish retained callers or registered coverage.
+Full LU factorization/update/solve and original live upstream-driver integration
+remain required; no source unit promoted. LP inventory remains42 partial/68
+unported. The next implementation target is LU and its retained dense/tail
+prerequisites.
+
+Final LP vet, portcheck, regenerated64-package graph and diff checks pass.
+Production graph edges are unchanged; new extension files appear in its inventory.
+Full native regression passed within this hour and was not redundantly rerun.

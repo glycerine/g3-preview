@@ -17,7 +17,7 @@ type FloatSparseColumn struct {
 // FloatSparseMatrix is the square basis workspace consumed by LU. Public slices
 // are borrowed. Permutations map logical rows forward and columns in reverse.
 // Construction visits basis columns backwards and retains duplicate entries.
-// Remaining factorization and solve operations are not implemented yet.
+// LU factorization and column updates consume this workspace.
 type FloatSparseMatrix struct {
 	Rows                              [][]FloatIndexedValue
 	Columns                           []FloatSparseColumn

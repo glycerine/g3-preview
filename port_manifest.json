@@ -123481,7 +123481,10 @@
         "pkg/util/lp/sparse_matrix_exact_indexed_solve.go",
         "pkg/util/lp/sparse_matrix_indexed_solve_test.go",
         "pkg/util/lp/sparse_matrix_float_refine.go",
-        "pkg/util/lp/sparse_matrix_refine_test.go"
+        "pkg/util/lp/sparse_matrix_refine_test.go",
+        "pkg/util/lp/sparse_matrix_float_extend.go",
+        "pkg/util/lp/sparse_matrix_exact_extend.go",
+        "pkg/util/lp/sparse_matrix_extend_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -123544,7 +123547,11 @@
         "TestLPSparseIndexedRefinementIndependentOracle",
         "TestLPSparseIndexedRefinementBranchBoundaryAndCopies",
         "TestLPSparseIndexedRefinementCleanupAndOrder",
-        "TestLPSparseIndexedRefinementResidualAndErrorPrefixes"
+        "TestLPSparseIndexedRefinementResidualAndErrorPrefixes",
+        "TestLPSparseExtensionIndependentBlockOracle",
+        "TestLPSparseExtensionNativeInlineOnes",
+        "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
+        "TestLPSparseExtensionPublicationErrors"
       ],
       "conditionals": [
         {
@@ -123767,6 +123774,20 @@
             "TestLPSparseIndexedRefinementCleanupAndOrder",
             "TestLPSparseIndexedRefinementResidualAndErrorPrefixes"
           ]
+        },
+        {
+          "name": "retained float/mpq LU sparse resize identity extension, stored-entry count, right and reverse-left permutation composition",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_float_extend.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_exact_extend.go"
+          ],
+          "tests": [
+            "TestLPSparseExtensionIndependentBlockOracle",
+            "TestLPSparseExtensionNativeInlineOnes",
+            "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
+            "TestLPSparseExtensionPublicationErrors"
+          ]
         }
       ],
       "ownership": [
@@ -123780,7 +123801,8 @@
         "Replacement borrows a same-manager indexed vector; matrix owns actual abs comparison locals, the w_at_i copy, set_value argument and append/swap copies, with only its new numerical receipts. Common assignments publish the column value before the row setter. Removal preserves reciprocal offsets and the source tail assignment/destruction order, then repairs a removed head maximum. Successful elements zero the caller slot at the source point; Index clears only after the full new-entry loop. Failure freezes the matrix while the vector retains its completed/partial values; close matrix before borrowed input. Ten pooled/direct campaigns observe real column-before-row, row-before-column append, completed removal and backlink-before-owning-swap prefixes; no fabricated budget event or receipt.",
         "Dense solves borrow each live source anchor through the source row/column order and preserve coefficient storage. Exact scalar product retains actual copy/multiply/result temporaries; pair scalar-left product constructs both expressions then copies X/Y into its owning product slots and subtracts X before Y. Matrix owns only new numerical receipts and lexical products; caller owns completed/partial destination values and closes them after a stopped matrix. Matrix Close preserves caller fields, with pooled/direct cell/object census and a required completed-X/old-Y failure prefix. Floating refinement copies all dense slots, solves, computes descending row residuals, solves correction and adds it descending; trailing caller slots stay unchanged.",
         "Graph traversals borrow coefficient headers without numeric copies. Left traversal marks before children; column traversal marks after children, for the retained acyclic upper-triangular workspace. Successful wrappers reset only the returned output entries, including caller prefixes; failure retains exact visitation/output prefixes. Indexed solves borrow same-manager scalar vectors; matrix owns actual anchor-first left products or coefficient-first right products and new numerical calls. Destination owns completed/partial values and its old index until rebuilding. Graph success clears visitation flags before any numerical failure. On error close matrix before borrowed destination; foreign/stopped inputs reject before graph changes and retain their original call receipts.",
-        "Floating indexed refinement copies all dense data and ordered indices into a local native Go vector, then borrows the caller destination through solve/residual/correction. No numerical ownership receipts or synthetic source allocation events are added. Errors retain the caller first-solve prefix; the temporary residual dies with the call."
+        "Floating indexed refinement copies all dense data and ordered indices into a local native Go vector, then borrows the caller destination through solve/residual/correction. No numerical ownership receipts or synthetic source allocation events are added. Errors retain the caller first-solve prefix; the temporary residual dies with the call.",
+        "Sparse extension publishes headers, queue extent, row/column permutations and work arrays before new physical diagonal entries. Native Go metadata growth has no synthetic Runtime reservations. Exact inline one uses matrix-owned lexical workspace; actual row/column numerical copies retain existing appendIndexed ownership. Stopped exact matrix rejects queries, composition and resize before mutation. Reached malformed-shape identity addition retains the new dimension and stopped workspace for Close."
       ],
       "deviations": [
         "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/active shortening, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
@@ -123793,7 +123815,9 @@
         "Floating drop tolerance applies only to new entries; existing nonzero common values are retained. Exact tolerance uses zero predicates independently of floating settings. Native typed slices replace container internals; actual project numeral copies and comparison lifetime remain. Literal duplicate old coordinates and repeated/stale/unindexed input entries retain source order and clearing behavior; zero inputs keep their stored representation. Replacement leaves pivot queue and shortened counters unchanged. Predictable errors preserve source publication prefixes; input manager/pending guards reject before mutation. Triangular solves, remaining sparse diagnostics and full LU/solver integration remain open.",
         "Source dense solves assume unit upper triangular workspace and omit diagonal division; diagonal/nontriangular inputs are not silently repaired. They retain stored duplicates/zeros, skip exact zero anchors, follow inverse permutations and expose reached bounds/mutation prefixes. Source left solve never reads the final anchor, including dimension-one empty inputs. Typed native slices replace vector copy internals; actual project numeral product and subtraction lifetimes remain. Live LU precise branches call solve_U_y and return before refinement; explicit precise refinement instantiations alone are not retained consumers and are not ported. Indexed solves/graph traversal and floating indexed refinement, remaining sparse diagnostics, full LU and solvers remain open.",
         "Native slices replace graph/vector container internals without numeric copies or universal template adapters. Stored zero terms remain structural graph edges; supplied output prefixes and repeated entries remain literal, not deduplicated. Floating drop is applied only after the full sparse solve and assigns positive zero to dropped fields; exact drop tests zero without rewriting it. Input indices select traversal reachability; absent unindexed fields stay untouched unless reached by that traversal. Left indexed products copy the y operand first, unlike dense left solves. Column recursion requires the retained upper-triangular acyclic domain; no invented cycle repair. Numeric-pair indexed/refinement explicit instantiations lack a live caller in the precise LU branch and are not credited. Floating indexed refinement, remaining sparse diagnostics, complete LU and solvers remain open.",
-        "Floating indexed refinement uses source unsigned products and strict sparse/dense density comparison, residual Add without rounding, source traversal-order sparse correction and fixed 1e-14 cleanup. Dense correction updates dimension slots descending and rebuilds the index across all dense slots, including trailing data. The copy constructor retains unindexed data; assignment would not. Precise refinement remains unreachable in retained LU and is not ported. Remaining sparse diagnostics, full LU, solvers and upstream integration remain open."
+        "Floating indexed refinement uses source unsigned products and strict sparse/dense density comparison, residual Add without rounding, source traversal-order sparse correction and fixed 1e-14 cleanup. Dense correction updates dimension slots descending and rebuilds the index across all dense slots, including trailing data. The copy constructor retains unindexed data; assignment would not. Precise refinement remains unreachable in retained LU and is not ported. Remaining sparse diagnostics, full LU, solvers and upstream integration remain open.",
+        "Retained sparse resize preserves existing workspace flags/values, shortening counters and pivot queue. New int/bool entries are zero, not constructor WorkPivot=-1. Queue Resize changes only its priority/index extent, not the pair directory, including an initially empty directory. Native shrink follows source assertion erasure: headers remain while permutation/work extents shrink; debug rejects before mutation. Counts include stored zeros/duplicates and ignore active counters. Independent120-world/eight-round dense oracle and pooled/direct zero-reservation inline-one tests cover retained behavior.",
+        "Remaining-source caller audit: sparse get_non_zero_column_in_row, full-row/triangular/max/backlink/debug queue/score/print checkers have no retained consumers; triangular checker LU references are comments, and explicit instantiations alone are not callers. Sparse add_columns_at_the_end/delete_column and unadjusted remove_zero_elements helper are definition-only; fill_reachable_indices and adjusted set_row_from_work declarations lack live bodies. Sparse multiply_from_left occurs only in sparse_matrix_with_permutaions_test, whose sole dispatch is after unconditional return finalize(0) in src/test/lp.cpp:3240. These unused methods are not ported or credited as executed upstream tests. Retained right/reverse-left compositions are reached at lu.hpp:480-481,790-791; resize at lu.h:311 and count at lu.h:257. Full LU and retained original driver integration remain open; no whole-unit promotion."
       ]
     },
     {
@@ -123826,7 +123850,10 @@
         "pkg/util/lp/sparse_matrix_exact_indexed_solve.go",
         "pkg/util/lp/sparse_matrix_indexed_solve_test.go",
         "pkg/util/lp/sparse_matrix_float_refine.go",
-        "pkg/util/lp/sparse_matrix_refine_test.go"
+        "pkg/util/lp/sparse_matrix_refine_test.go",
+        "pkg/util/lp/sparse_matrix_float_extend.go",
+        "pkg/util/lp/sparse_matrix_exact_extend.go",
+        "pkg/util/lp/sparse_matrix_extend_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -123889,7 +123916,11 @@
         "TestLPSparseIndexedRefinementIndependentOracle",
         "TestLPSparseIndexedRefinementBranchBoundaryAndCopies",
         "TestLPSparseIndexedRefinementCleanupAndOrder",
-        "TestLPSparseIndexedRefinementResidualAndErrorPrefixes"
+        "TestLPSparseIndexedRefinementResidualAndErrorPrefixes",
+        "TestLPSparseExtensionIndependentBlockOracle",
+        "TestLPSparseExtensionNativeInlineOnes",
+        "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
+        "TestLPSparseExtensionPublicationErrors"
       ],
       "conditionals": [
         {
@@ -124296,6 +124327,20 @@
             "TestLPSparseIndexedRefinementCleanupAndOrder",
             "TestLPSparseIndexedRefinementResidualAndErrorPrefixes"
           ]
+        },
+        {
+          "name": "retained float/mpq LU sparse resize identity extension, stored-entry count, right and reverse-left permutation composition",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_float_extend.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_exact_extend.go"
+          ],
+          "tests": [
+            "TestLPSparseExtensionIndependentBlockOracle",
+            "TestLPSparseExtensionNativeInlineOnes",
+            "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
+            "TestLPSparseExtensionPublicationErrors"
+          ]
         }
       ],
       "ownership": [
@@ -124309,7 +124354,8 @@
         "Replacement borrows a same-manager indexed vector; matrix owns actual abs comparison locals, the w_at_i copy, set_value argument and append/swap copies, with only its new numerical receipts. Common assignments publish the column value before the row setter. Removal preserves reciprocal offsets and the source tail assignment/destruction order, then repairs a removed head maximum. Successful elements zero the caller slot at the source point; Index clears only after the full new-entry loop. Failure freezes the matrix while the vector retains its completed/partial values; close matrix before borrowed input. Ten pooled/direct campaigns observe real column-before-row, row-before-column append, completed removal and backlink-before-owning-swap prefixes; no fabricated budget event or receipt.",
         "Dense solves borrow each live source anchor through the source row/column order and preserve coefficient storage. Exact scalar product retains actual copy/multiply/result temporaries; pair scalar-left product constructs both expressions then copies X/Y into its owning product slots and subtracts X before Y. Matrix owns only new numerical receipts and lexical products; caller owns completed/partial destination values and closes them after a stopped matrix. Matrix Close preserves caller fields, with pooled/direct cell/object census and a required completed-X/old-Y failure prefix. Floating refinement copies all dense slots, solves, computes descending row residuals, solves correction and adds it descending; trailing caller slots stay unchanged.",
         "Graph traversals borrow coefficient headers without numeric copies. Left traversal marks before children; column traversal marks after children, for the retained acyclic upper-triangular workspace. Successful wrappers reset only the returned output entries, including caller prefixes; failure retains exact visitation/output prefixes. Indexed solves borrow same-manager scalar vectors; matrix owns actual anchor-first left products or coefficient-first right products and new numerical calls. Destination owns completed/partial values and its old index until rebuilding. Graph success clears visitation flags before any numerical failure. On error close matrix before borrowed destination; foreign/stopped inputs reject before graph changes and retain their original call receipts.",
-        "Floating indexed refinement copies all dense data and ordered indices into a local native Go vector, then borrows the caller destination through solve/residual/correction. No numerical ownership receipts or synthetic source allocation events are added. Errors retain the caller first-solve prefix; the temporary residual dies with the call."
+        "Floating indexed refinement copies all dense data and ordered indices into a local native Go vector, then borrows the caller destination through solve/residual/correction. No numerical ownership receipts or synthetic source allocation events are added. Errors retain the caller first-solve prefix; the temporary residual dies with the call.",
+        "Sparse extension publishes headers, queue extent, row/column permutations and work arrays before new physical diagonal entries. Native Go metadata growth has no synthetic Runtime reservations. Exact inline one uses matrix-owned lexical workspace; actual row/column numerical copies retain existing appendIndexed ownership. Stopped exact matrix rejects queries, composition and resize before mutation. Reached malformed-shape identity addition retains the new dimension and stopped workspace for Close."
       ],
       "deviations": [
         "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/active shortening, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
@@ -124322,7 +124368,9 @@
         "Floating drop tolerance applies only to new entries; existing nonzero common values are retained. Exact tolerance uses zero predicates independently of floating settings. Native typed slices replace container internals; actual project numeral copies and comparison lifetime remain. Literal duplicate old coordinates and repeated/stale/unindexed input entries retain source order and clearing behavior; zero inputs keep their stored representation. Replacement leaves pivot queue and shortened counters unchanged. Predictable errors preserve source publication prefixes; input manager/pending guards reject before mutation. Triangular solves, remaining sparse diagnostics and full LU/solver integration remain open.",
         "Source dense solves assume unit upper triangular workspace and omit diagonal division; diagonal/nontriangular inputs are not silently repaired. They retain stored duplicates/zeros, skip exact zero anchors, follow inverse permutations and expose reached bounds/mutation prefixes. Source left solve never reads the final anchor, including dimension-one empty inputs. Typed native slices replace vector copy internals; actual project numeral product and subtraction lifetimes remain. Live LU precise branches call solve_U_y and return before refinement; explicit precise refinement instantiations alone are not retained consumers and are not ported. Indexed solves/graph traversal and floating indexed refinement, remaining sparse diagnostics, full LU and solvers remain open.",
         "Native slices replace graph/vector container internals without numeric copies or universal template adapters. Stored zero terms remain structural graph edges; supplied output prefixes and repeated entries remain literal, not deduplicated. Floating drop is applied only after the full sparse solve and assigns positive zero to dropped fields; exact drop tests zero without rewriting it. Input indices select traversal reachability; absent unindexed fields stay untouched unless reached by that traversal. Left indexed products copy the y operand first, unlike dense left solves. Column recursion requires the retained upper-triangular acyclic domain; no invented cycle repair. Numeric-pair indexed/refinement explicit instantiations lack a live caller in the precise LU branch and are not credited. Floating indexed refinement, remaining sparse diagnostics, complete LU and solvers remain open.",
-        "Floating indexed refinement uses source unsigned products and strict sparse/dense density comparison, residual Add without rounding, source traversal-order sparse correction and fixed 1e-14 cleanup. Dense correction updates dimension slots descending and rebuilds the index across all dense slots, including trailing data. The copy constructor retains unindexed data; assignment would not. Precise refinement remains unreachable in retained LU and is not ported. Remaining sparse diagnostics, full LU, solvers and upstream integration remain open."
+        "Floating indexed refinement uses source unsigned products and strict sparse/dense density comparison, residual Add without rounding, source traversal-order sparse correction and fixed 1e-14 cleanup. Dense correction updates dimension slots descending and rebuilds the index across all dense slots, including trailing data. The copy constructor retains unindexed data; assignment would not. Precise refinement remains unreachable in retained LU and is not ported. Remaining sparse diagnostics, full LU, solvers and upstream integration remain open.",
+        "Retained sparse resize preserves existing workspace flags/values, shortening counters and pivot queue. New int/bool entries are zero, not constructor WorkPivot=-1. Queue Resize changes only its priority/index extent, not the pair directory, including an initially empty directory. Native shrink follows source assertion erasure: headers remain while permutation/work extents shrink; debug rejects before mutation. Counts include stored zeros/duplicates and ignore active counters. Independent120-world/eight-round dense oracle and pooled/direct zero-reservation inline-one tests cover retained behavior.",
+        "Remaining-source caller audit: sparse get_non_zero_column_in_row, full-row/triangular/max/backlink/debug queue/score/print checkers have no retained consumers; triangular checker LU references are comments, and explicit instantiations alone are not callers. Sparse add_columns_at_the_end/delete_column and unadjusted remove_zero_elements helper are definition-only; fill_reachable_indices and adjusted set_row_from_work declarations lack live bodies. Sparse multiply_from_left occurs only in sparse_matrix_with_permutaions_test, whose sole dispatch is after unconditional return finalize(0) in src/test/lp.cpp:3240. These unused methods are not ported or credited as executed upstream tests. Retained right/reverse-left compositions are reached at lu.hpp:480-481,790-791; resize at lu.h:311 and count at lu.h:257. Full LU and retained original driver integration remain open; no whole-unit promotion."
       ]
     },
     {
@@ -124355,7 +124403,10 @@
         "pkg/util/lp/sparse_matrix_exact_indexed_solve.go",
         "pkg/util/lp/sparse_matrix_indexed_solve_test.go",
         "pkg/util/lp/sparse_matrix_float_refine.go",
-        "pkg/util/lp/sparse_matrix_refine_test.go"
+        "pkg/util/lp/sparse_matrix_refine_test.go",
+        "pkg/util/lp/sparse_matrix_float_extend.go",
+        "pkg/util/lp/sparse_matrix_exact_extend.go",
+        "pkg/util/lp/sparse_matrix_extend_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -124418,7 +124469,11 @@
         "TestLPSparseIndexedRefinementIndependentOracle",
         "TestLPSparseIndexedRefinementBranchBoundaryAndCopies",
         "TestLPSparseIndexedRefinementCleanupAndOrder",
-        "TestLPSparseIndexedRefinementResidualAndErrorPrefixes"
+        "TestLPSparseIndexedRefinementResidualAndErrorPrefixes",
+        "TestLPSparseExtensionIndependentBlockOracle",
+        "TestLPSparseExtensionNativeInlineOnes",
+        "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
+        "TestLPSparseExtensionPublicationErrors"
       ],
       "conditionals": [
         {
@@ -124587,6 +124642,20 @@
             "TestLPSparseIndexedRefinementCleanupAndOrder",
             "TestLPSparseIndexedRefinementResidualAndErrorPrefixes"
           ]
+        },
+        {
+          "name": "retained float/mpq LU sparse resize identity extension, stored-entry count, right and reverse-left permutation composition",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_float_extend.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_exact_extend.go"
+          ],
+          "tests": [
+            "TestLPSparseExtensionIndependentBlockOracle",
+            "TestLPSparseExtensionNativeInlineOnes",
+            "TestLPSparseExtensionBoundsShrinkAndStoppedOwner",
+            "TestLPSparseExtensionPublicationErrors"
+          ]
         }
       ],
       "ownership": [
@@ -124600,7 +124669,8 @@
         "Replacement borrows a same-manager indexed vector; matrix owns actual abs comparison locals, the w_at_i copy, set_value argument and append/swap copies, with only its new numerical receipts. Common assignments publish the column value before the row setter. Removal preserves reciprocal offsets and the source tail assignment/destruction order, then repairs a removed head maximum. Successful elements zero the caller slot at the source point; Index clears only after the full new-entry loop. Failure freezes the matrix while the vector retains its completed/partial values; close matrix before borrowed input. Ten pooled/direct campaigns observe real column-before-row, row-before-column append, completed removal and backlink-before-owning-swap prefixes; no fabricated budget event or receipt.",
         "Dense solves borrow each live source anchor through the source row/column order and preserve coefficient storage. Exact scalar product retains actual copy/multiply/result temporaries; pair scalar-left product constructs both expressions then copies X/Y into its owning product slots and subtracts X before Y. Matrix owns only new numerical receipts and lexical products; caller owns completed/partial destination values and closes them after a stopped matrix. Matrix Close preserves caller fields, with pooled/direct cell/object census and a required completed-X/old-Y failure prefix. Floating refinement copies all dense slots, solves, computes descending row residuals, solves correction and adds it descending; trailing caller slots stay unchanged.",
         "Graph traversals borrow coefficient headers without numeric copies. Left traversal marks before children; column traversal marks after children, for the retained acyclic upper-triangular workspace. Successful wrappers reset only the returned output entries, including caller prefixes; failure retains exact visitation/output prefixes. Indexed solves borrow same-manager scalar vectors; matrix owns actual anchor-first left products or coefficient-first right products and new numerical calls. Destination owns completed/partial values and its old index until rebuilding. Graph success clears visitation flags before any numerical failure. On error close matrix before borrowed destination; foreign/stopped inputs reject before graph changes and retain their original call receipts.",
-        "Floating indexed refinement copies all dense data and ordered indices into a local native Go vector, then borrows the caller destination through solve/residual/correction. No numerical ownership receipts or synthetic source allocation events are added. Errors retain the caller first-solve prefix; the temporary residual dies with the call."
+        "Floating indexed refinement copies all dense data and ordered indices into a local native Go vector, then borrows the caller destination through solve/residual/correction. No numerical ownership receipts or synthetic source allocation events are added. Errors retain the caller first-solve prefix; the temporary residual dies with the call.",
+        "Sparse extension publishes headers, queue extent, row/column permutations and work arrays before new physical diagonal entries. Native Go metadata growth has no synthetic Runtime reservations. Exact inline one uses matrix-owned lexical workspace; actual row/column numerical copies retain existing appendIndexed ownership. Stopped exact matrix rejects queries, composition and resize before mutation. Reached malformed-shape identity addition retains the new dimension and stopped workspace for Close."
       ],
       "deviations": [
         "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/active shortening, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
@@ -124613,7 +124683,9 @@
         "Floating drop tolerance applies only to new entries; existing nonzero common values are retained. Exact tolerance uses zero predicates independently of floating settings. Native typed slices replace container internals; actual project numeral copies and comparison lifetime remain. Literal duplicate old coordinates and repeated/stale/unindexed input entries retain source order and clearing behavior; zero inputs keep their stored representation. Replacement leaves pivot queue and shortened counters unchanged. Predictable errors preserve source publication prefixes; input manager/pending guards reject before mutation. Triangular solves, remaining sparse diagnostics and full LU/solver integration remain open.",
         "Source dense solves assume unit upper triangular workspace and omit diagonal division; diagonal/nontriangular inputs are not silently repaired. They retain stored duplicates/zeros, skip exact zero anchors, follow inverse permutations and expose reached bounds/mutation prefixes. Source left solve never reads the final anchor, including dimension-one empty inputs. Typed native slices replace vector copy internals; actual project numeral product and subtraction lifetimes remain. Live LU precise branches call solve_U_y and return before refinement; explicit precise refinement instantiations alone are not retained consumers and are not ported. Indexed solves/graph traversal and floating indexed refinement, remaining sparse diagnostics, full LU and solvers remain open.",
         "Native slices replace graph/vector container internals without numeric copies or universal template adapters. Stored zero terms remain structural graph edges; supplied output prefixes and repeated entries remain literal, not deduplicated. Floating drop is applied only after the full sparse solve and assigns positive zero to dropped fields; exact drop tests zero without rewriting it. Input indices select traversal reachability; absent unindexed fields stay untouched unless reached by that traversal. Left indexed products copy the y operand first, unlike dense left solves. Column recursion requires the retained upper-triangular acyclic domain; no invented cycle repair. Numeric-pair indexed/refinement explicit instantiations lack a live caller in the precise LU branch and are not credited. Floating indexed refinement, remaining sparse diagnostics, complete LU and solvers remain open.",
-        "Floating indexed refinement uses source unsigned products and strict sparse/dense density comparison, residual Add without rounding, source traversal-order sparse correction and fixed 1e-14 cleanup. Dense correction updates dimension slots descending and rebuilds the index across all dense slots, including trailing data. The copy constructor retains unindexed data; assignment would not. Precise refinement remains unreachable in retained LU and is not ported. Remaining sparse diagnostics, full LU, solvers and upstream integration remain open."
+        "Floating indexed refinement uses source unsigned products and strict sparse/dense density comparison, residual Add without rounding, source traversal-order sparse correction and fixed 1e-14 cleanup. Dense correction updates dimension slots descending and rebuilds the index across all dense slots, including trailing data. The copy constructor retains unindexed data; assignment would not. Precise refinement remains unreachable in retained LU and is not ported. Remaining sparse diagnostics, full LU, solvers and upstream integration remain open.",
+        "Retained sparse resize preserves existing workspace flags/values, shortening counters and pivot queue. New int/bool entries are zero, not constructor WorkPivot=-1. Queue Resize changes only its priority/index extent, not the pair directory, including an initially empty directory. Native shrink follows source assertion erasure: headers remain while permutation/work extents shrink; debug rejects before mutation. Counts include stored zeros/duplicates and ignore active counters. Independent120-world/eight-round dense oracle and pooled/direct zero-reservation inline-one tests cover retained behavior.",
+        "Remaining-source caller audit: sparse get_non_zero_column_in_row, full-row/triangular/max/backlink/debug queue/score/print checkers have no retained consumers; triangular checker LU references are comments, and explicit instantiations alone are not callers. Sparse add_columns_at_the_end/delete_column and unadjusted remove_zero_elements helper are definition-only; fill_reachable_indices and adjusted set_row_from_work declarations lack live bodies. Sparse multiply_from_left occurs only in sparse_matrix_with_permutaions_test, whose sole dispatch is after unconditional return finalize(0) in src/test/lp.cpp:3240. These unused methods are not ported or credited as executed upstream tests. Retained right/reverse-left compositions are reached at lu.hpp:480-481,790-791; resize at lu.h:311 and count at lu.h:257. Full LU and retained original driver integration remain open; no whole-unit promotion."
       ]
     },
     {
