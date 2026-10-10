@@ -1221,6 +1221,7 @@
         "sparse_matrix_float_solve.go",
         "sparse_rational_vector.go",
         "square_dense_exact.go",
+        "square_dense_exact_parent.go",
         "square_dense_float.go",
         "square_dense_float_apply.go",
         "square_dense_float_check.go",

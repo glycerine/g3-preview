@@ -11,7 +11,8 @@ code that has not been ported.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
-| Exact dense-block construction and pivot stages | 120 independent rational elimination worlds checked at every pivot; pooled/direct actual allocation refusals through success, partial L publication, borrowed parent and older comparison ownership; precise tiny coefficients and reached bounds/assertion prefixes | 82.4% native (197/239), 87.0% debug (208/239); gaps propagate child/cleanup errors, guard invariant-protected offsets or belong to the other profile; parent publication and tail applications remain open |
+| Exact dense-block sparse parent publication | 120 independent factorization worlds verify sparse upper and dense lower matrices, reciprocal links and row maxima; staged missing-diagonal/common/cancellation/fill tests, physical refusal campaigns and older comparison ownership | 91.5% (108/118) in native and debug/checked; gaps propagate cleanup/capture errors or guard invariant-protected predicates/mappings |
+| Exact dense-block construction and pivot stages | 120 independent rational elimination worlds checked at every pivot; pooled/direct actual allocation refusals through success, partial L publication, borrowed parent and older comparison ownership; precise tiny coefficients and reached bounds/assertion prefixes | 82.4% native (197/239), 87.0% debug (208/239); gaps propagate child/cleanup errors, guard invariant-protected offsets or belong to the other profile; tail applications remain open |
 | `int_set.h` | Original `test_int_set`; dense swap order, resizing, reached invalid-domain clear prefix, 10,000-step independent map oracle, output/error cases | 100% |
 | Four live `stacked_value.h` scalar types | Original `test_stacked_unsigned`; signed, status and strategy restoration, nested/excess/zero pops, unsigned wrap | 100% |
 | Three concrete `stacked_vector.h` element types | Original `test_stacked_vector` with strengthened assertions; 12,000 operations against independent snapshots, repeated replacements, popped tails, baseline journals and checked scope/index guards | 100% |
@@ -53,9 +54,11 @@ code that has not been ported.
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-The last complete native LP run reported **90.7%** statement coverage
-(6210/6843 existing Go statements), including sparse indexed graph traversal
-and solves, before floating indexed refinement, sparse identity extension, diagonal tails and floating dense blocks were added. The last
+The complete native LP run verified at15:28 UTC on2026-10-10 reported
+**90.1%** statement coverage (7043/7818 existing Go statements), including exact
+dense construction/pivot stages and sparse-parent publication. The full native
+module suite passed; its log is
+`/mnt/oldrog/tmp/g3-exact-dense-parent-module-native-final.log`. The last
 complete combined debug/checked run reported **91.7%** before sparse basis storage
 was added; sparse basis, elimination, pivot, active shortening, eta construction, column
 replacement and dense/indexed solve components now also pass focused debug/checked tests. Exact scoped

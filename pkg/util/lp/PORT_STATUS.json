@@ -1,8 +1,8 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 90.7,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native90.7% (6210/6843) predates indexed refinement, sparse extension, diagonal tails and floating dense blocks. Focused floating dense core90.5% native/93.2% debug, applications81.9%/83.2%, debug L check91.7% and view93.8%. Complete debug coverage predates sparse basis storage; current components are recorded in PORT_STATUS.md. Focused exact dense construction/pivot core82.4% native (197/239) and87.0% debug (208/239); exact parent publication/applications remain open.",
+  "native_statement_coverage_of_current_go_code": 90.1,
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native90.1% (7043/7818) verified2026-10-10 at15:28 UTC, including exact dense core and parent publication. Focused exact dense core82.4% native/87.0% debug, parent publication91.5% in each profile. Complete debug coverage predates sparse basis storage; current components are recorded in PORT_STATUS.md. Exact dense tail applications and full LU/solver integration remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -1486,7 +1486,9 @@
         "pkg/util/lp/square_dense_exact.go",
         "pkg/util/lp/square_dense_exact_test.go",
         "pkg/util/lp/square_dense_exact_failure_test.go",
-        "pkg/util/lp/square_dense_exact_edges_test.go"
+        "pkg/util/lp/square_dense_exact_edges_test.go",
+        "pkg/util/lp/square_dense_exact_parent.go",
+        "pkg/util/lp/square_dense_exact_parent_test.go"
       ],
       "tests": [
         "TestLPFloatDenseBlockIndependentFactorization",
@@ -1501,7 +1503,11 @@
         "TestLPExactDenseBlockLiteralCopiesAndTinyValues",
         "TestLPExactDenseBlockAllocationFailureCensus",
         "TestLPExactDenseBlockBoundsAndPublication",
-        "TestLPExactDenseBlockLeavesOlderComparisonOwned"
+        "TestLPExactDenseBlockLeavesOlderComparisonOwned",
+        "TestLPExactDenseBlockParentPublicationStages",
+        "TestLPExactDenseBlockParentAllocationFailureCensus",
+        "TestLPExactDenseBlockParentErrorPrefixes",
+        "TestLPExactDenseBlockParentLeavesOlderComparisonOwned"
       ]
     },
     {
@@ -1518,7 +1524,9 @@
         "pkg/util/lp/square_dense_exact.go",
         "pkg/util/lp/square_dense_exact_test.go",
         "pkg/util/lp/square_dense_exact_failure_test.go",
-        "pkg/util/lp/square_dense_exact_edges_test.go"
+        "pkg/util/lp/square_dense_exact_edges_test.go",
+        "pkg/util/lp/square_dense_exact_parent.go",
+        "pkg/util/lp/square_dense_exact_parent_test.go"
       ],
       "tests": [
         "TestLPFloatDenseBlockIndependentFactorization",
@@ -1533,7 +1541,11 @@
         "TestLPExactDenseBlockLiteralCopiesAndTinyValues",
         "TestLPExactDenseBlockAllocationFailureCensus",
         "TestLPExactDenseBlockBoundsAndPublication",
-        "TestLPExactDenseBlockLeavesOlderComparisonOwned"
+        "TestLPExactDenseBlockLeavesOlderComparisonOwned",
+        "TestLPExactDenseBlockParentPublicationStages",
+        "TestLPExactDenseBlockParentAllocationFailureCensus",
+        "TestLPExactDenseBlockParentErrorPrefixes",
+        "TestLPExactDenseBlockParentLeavesOlderComparisonOwned"
       ]
     },
     {
@@ -1550,7 +1562,9 @@
         "pkg/util/lp/square_dense_exact.go",
         "pkg/util/lp/square_dense_exact_test.go",
         "pkg/util/lp/square_dense_exact_failure_test.go",
-        "pkg/util/lp/square_dense_exact_edges_test.go"
+        "pkg/util/lp/square_dense_exact_edges_test.go",
+        "pkg/util/lp/square_dense_exact_parent.go",
+        "pkg/util/lp/square_dense_exact_parent_test.go"
       ],
       "tests": [
         "TestLPFloatDenseBlockIndependentFactorization",
@@ -1565,7 +1579,11 @@
         "TestLPExactDenseBlockLiteralCopiesAndTinyValues",
         "TestLPExactDenseBlockAllocationFailureCensus",
         "TestLPExactDenseBlockBoundsAndPublication",
-        "TestLPExactDenseBlockLeavesOlderComparisonOwned"
+        "TestLPExactDenseBlockLeavesOlderComparisonOwned",
+        "TestLPExactDenseBlockParentPublicationStages",
+        "TestLPExactDenseBlockParentAllocationFailureCensus",
+        "TestLPExactDenseBlockParentErrorPrefixes",
+        "TestLPExactDenseBlockParentLeavesOlderComparisonOwned"
       ]
     },
     {

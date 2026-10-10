@@ -36189,3 +36189,52 @@ within this hour, so no redundant full suite was run. Exact dense sparse-parent
 publication, scalar/pair dense/indexed tail applications, conjugation/views,
 full LU integration and remaining scaling/simplex/LAR/MPS implementation and
 retained upstream tests remain active work; no full LP solver is available.
+
+## Exact dense LU sparse-parent publication
+
+Ported retained mpq parent publication shared by rational/rational and
+rational/pair blocks: update/remove every existing row, insert missing unit
+diagonals, append new upper entries, clear upper dense slots only after completed
+publication, then calculate each row maximum. Lower dense coefficients remain
+owned and unchanged. Precise zero/drop ignores floating settings, including a
+huge drop threshold in the independent factorization tests.
+
+Dense ownership capture now surrounds only actual row assignment, by-value
+indexed_value::set_value argument/column assignment, and dense-slot clearing.
+Delegated parent RemoveElement/AddNewElement/SetMaxInRow keep their own work and
+new numerical receipts. No enclosing dense receipt duplicates a failed parent's
+invocation. Close dense before parent on failure. Real pooled/direct campaigns
+exercise common copies, swap-with-last removal, fill append and whole publication
+through first success, including row-before-column and row-only append prefixes.
+Tests distinguish a numerical copy refusal with no raw receipt from a parent's
+actual comparison receipt, and verify stopped-owner guards and complete cleanup.
+
+Extended120 independent rational elimination worlds through parent publication:
+logical unit upper matrix, retained dense lower elementary transform, arbitrary
+parent permutations, reciprocal sparse links and maximum-first row ordering are
+checked. Separate staged tests cover common tiny values, cancelled upper entries,
+missing diagonals, lower removal, fill and empty suffixes. Reached map, backlink,
+storage and delegated-add/remove error prefixes preserve literal mutations.
+Older comparison tests walk actual refusal ordinals until final maxima refuse,
+while accepting earlier copy refusal from the older caller's physical root;
+closing both owners leaves the older comparison identity untouched.
+
+Focused exact native0.803s and all dense-block combined debug/checked1.065s pass.
+Parent publication108/118 (91.5%) in each profile; exact construction/pivot core
+remains197/239 (82.4%) native and208/239 (87.0%) debug. Remaining publication
+returns propagate capture/cleanup errors or guard invariant-protected predicates
+and mappings. Both LP vets, full reference inventory/no-generics/evidence checks
+and diff checks pass. Source counts unchanged:47 partial/63 unported LP files.
+Production graph remains64 packages with unchanged edges, now listing publication.
+
+The first hourly full native run compiled the earlier older-comparison fixture
+and failed only that expectation (all other module packages passed). The fixture
+now checks the actual earlier allocator guard as well as the comparison guard;
+focused native/debug checks pass. The corrected FULL native module suite passed
+at15:28 UTC Oct10: LP160.687s,7043/7818 statements (90.1%). Evidence:
+/mnt/oldrog/tmp/g3-exact-dense-parent-module-native-final.log and matching .cover.
+This replaces the prior old90.7% native snapshot; current coverage includes all
+retained Go LP components through exact dense publication. Exact dense
+scalar/pair/indexed applications, conjugation/debug views, full LU
+integration and remaining scaling/simplex/LAR/MPS algorithms and retained tests
+remain required. Full LP port and solver remain incomplete.

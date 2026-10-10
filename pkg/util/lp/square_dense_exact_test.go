@@ -120,8 +120,57 @@ func TestLPExactDenseBlockIndependentEliminationStages(t *testing.T) {
 				}
 				lpExactVectorNamedCensus(t, h, lpExactDenseCells(m))
 			}
+			h.must(m.UpdateParent(&Settings{DropTolerance: 1e100}))
+			wantParent := make(map[IndexPair]*big.Rat)
+			for row := uint32(0); row < n; row++ {
+				pr, err := parent.AdjustRow(row)
+				h.must(err)
+				for col := uint32(0); col < n; col++ {
+					want := new(big.Rat)
+					if row < start {
+						if row == col {
+							want.SetInt64(1)
+						}
+					} else if col >= row {
+						want.Set(a[row][col])
+					}
+					pc, err := parent.AdjustColumn(col)
+					h.must(err)
+					v, err := parent.Get(row, col)
+					h.must(err)
+					lpSparseRationalCheck(t, h, v, want)
+					if want.Sign() != 0 {
+						wantParent[IndexPair{pr, pc}] = want
+					}
+					if row >= start && col >= start {
+						lower := new(big.Rat)
+						if col <= row {
+							lower.Set(e[row][col])
+						}
+						v, err := m.cell(row, col)
+						h.must(err)
+						lpSparseRationalCheck(t, h, v, lower)
+					}
+				}
+				if row >= start {
+					max := new(big.Rat)
+					for k := range parent.Rows[pr] {
+						v := &parent.Rows[pr][k].Value
+						text, err := h.m.String(v)
+						h.must(err)
+						r, _ := new(big.Rat).SetString(text)
+						r.Abs(r)
+						if k == 0 {
+							max.Set(r)
+						} else if r.Cmp(max) > 0 {
+							t.Fatal("maximum not first")
+						}
+					}
+				}
+			}
+			lpExactVectorNamedCensus(t, h, lpExactDenseCells(m))
 			h.must(m.Close())
-			lpExactVectorNamedCensus(t, h, lpSparseEtaOwningCells(parent, nil))
+			lpExactSparseCheck(t, h, parent, wantParent)
 			h.must(parent.Close())
 			lpExactVectorNamedCensus(t, h, nil)
 		})
