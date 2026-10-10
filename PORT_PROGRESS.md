@@ -37122,3 +37122,57 @@ optimization, bounds/evidence, MPS and complete original drivers stay required.
 
 Source inventory/evidence/no-generics and diff checks pass. Regenerated graph
 remains64 packages with unchanged edges and three added core production files.
+
+
+### Floating primal stage-one initialization and entering pricing — 2026-10-10
+
+Ported retained stage-one double/double primal core construction, actual basic
+infeasibility set, full/changed-basis feasibility costs and getter, post-update
+leaving cleanup, normalization/backup, objective restoration and reduced-cost
+phase switching. Complete LU init_run preparation resets counters, initializes
+infeasibility, applies actual backup/early-return policy, resizes the existing
+floating breakpoint queue, computes actual refined costs and seeds column norms.
+The new core owns concrete beta/queue/backup/list storage and inherits real
+borrowed solver vectors and owned LU. It exposes no fake Solve optimization API.
+
+Ported normal/breakpoint entering eligibility, floating steepest-edge sort,
+heading rebuild and entering-list rotation. Candidate budget decreases only
+on a record price improvement; selected sign reverses for breakpoint feasibility
+costs. Source strict epsilon comparisons, boxed midpoint arithmetic, counter
+resort cadence and IEEE division are retained. Native []uint32 plus Go sorting
+replace std::list/std::sort; C++ supplies no equal/unordered-key tie order and
+STL sorting internals are not ported. No rational sort/constructor is invented.
+
+Feasibility costs check upper before lower for fixed/boxed columns. Nonbasics
+publish positive zero and erase membership before any bound reads; basic zero
+costs negate after membership when breakpoints are disabled. Native unknown-type
+initializer retains/negates old cost while the getter returns signed zero;
+debug stops at the source assertion. Source std::max(abs(v),running) normalization
+operand order lets NaN replace then lose the maximum; NaN-last normalizes all
+costs to NaN. Repeated native backup appends; debug asserts before writes.
+Source-indeterminate scalar fields receive no initialized-default credit.
+
+150 independently enumerated22-column worlds verify3,300 cost/membership decisions,
+ascending initial set order, nonmutating getter and indexed changed-basis updates.
+Actual LU lifecycle tests switch feasibility costs back to normalized objective
+costs and independently reproduce source RNG norm values.100 rank worlds verify
+sort/inverse headings and45 choices/rotations each (4,500 choices). Targeted cases
+cover record-improvement budgets, NaN/infinite/nonpositive prices, both eligibility
+modes, strict/midpoint boundaries, signed zero, source error/publication prefixes
+and feasible-only early returns. Existing120 prepared-primal worlds now construct
+the real primal core and execute InitRun after actual sparse/forced-dense solves.
+
+Focused core/primal/presolve/solver/column/scaler/static/LU checks pass0.925s native
+and0.947s combined debug/checked. Initialization158/165 (95.8%) native,162/165
+(98.2%) debug; pricing89/99 (89.9%),99/99 (100%). Remaining initialization gaps
+propagate valid inherited boxed-bound/int-set invariants or belong to other
+assertion profiles; native pricing gaps are erased debug bound assertions.
+Both LP vets pass. Profiles: /mnt/oldrog/tmp/g3-primal-core-{native,debug}.cover.
+Three source units become partial; LP65 partial/45 unported. Standard upper-only
+constructor, Harris leaving/step, breakpoints, norm/reduced-cost updates, tableau,
+actual primal/dual/LAR optimization, exact core and full original drivers stay open.
+
+Source inventory/evidence/no-generics and diff checks pass. Regenerated graph
+remains64 packages with unchanged edges and the two new primal production files.
+The last completed full native module snapshot remains19:01 UTC89.8% LP coverage,
+predating all core additions; the next hourly native verification will refresh it.

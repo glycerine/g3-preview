@@ -121354,9 +121354,27 @@
       "path": "src/util/lp/lp_primal_core_solver.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/primal_core_float.go",
+        "pkg/util/lp/primal_price_float.go",
+        "pkg/util/lp/primal_core_float_test.go",
+        "pkg/util/lp/primal_price_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
+        "TestLPFloatPrimalCoreInitRunActualCostLifecycle",
+        "TestLPFloatPrimalCoreNormalizationSourceIEEEAndRepeat",
+        "TestLPFloatPrimalCoreCostPublicationAndGuards",
+        "TestLPFloatPrimalCoreInitializationFailurePrefixes",
+        "TestLPFloatPrimalCoreCostIEEEAndMembershipTransition",
+        "TestLPFloatPrimalPricingEligibilityIndependentCases",
+        "TestLPFloatPrimalPricingIndependentOrderAndRotation",
+        "TestLPFloatPrimalPricingBudgetAndIEEE",
+        "TestLPFloatPrimalPricingPublicationAndAssertions",
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ],
       "conditionals": [
         {
           "line": 377,
@@ -121507,17 +121525,62 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained floating stage-one constructor, infeasibility set/cost lifecycle, cost normalization/backup and restoration, complete LU init_run preparation, randomized initial column norms, entering eligibility/pricing/sort/rotation",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_core_float.go",
+            "pkg/util/lp/primal_price_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
+            "TestLPFloatPrimalCoreInitRunActualCostLifecycle",
+            "TestLPFloatPrimalCoreNormalizationSourceIEEEAndRepeat",
+            "TestLPFloatPrimalCoreCostPublicationAndGuards",
+            "TestLPFloatPrimalCoreInitializationFailurePrefixes",
+            "TestLPFloatPrimalCoreCostIEEEAndMembershipTransition",
+            "TestLPFloatPrimalPricingEligibilityIndependentCases",
+            "TestLPFloatPrimalPricingIndependentOrderAndRotation",
+            "TestLPFloatPrimalPricingBudgetAndIEEE",
+            "TestLPFloatPrimalPricingPublicationAndAssertions",
+            "TestLPFloatPrimalPreparedBasisIndependentOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order."
+      ],
+      "deviations": [
+        "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
+        "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced."
+      ]
     },
     {
       "path": "src/util/lp/lp_primal_core_solver.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/primal_core_float.go",
+        "pkg/util/lp/primal_price_float.go",
+        "pkg/util/lp/primal_core_float_test.go",
+        "pkg/util/lp/primal_price_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
+        "TestLPFloatPrimalCoreInitRunActualCostLifecycle",
+        "TestLPFloatPrimalCoreNormalizationSourceIEEEAndRepeat",
+        "TestLPFloatPrimalCoreCostPublicationAndGuards",
+        "TestLPFloatPrimalCoreInitializationFailurePrefixes",
+        "TestLPFloatPrimalCoreCostIEEEAndMembershipTransition",
+        "TestLPFloatPrimalPricingEligibilityIndependentCases",
+        "TestLPFloatPrimalPricingIndependentOrderAndRotation",
+        "TestLPFloatPrimalPricingBudgetAndIEEE",
+        "TestLPFloatPrimalPricingPublicationAndAssertions",
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ],
       "conditionals": [
         {
           "line": 547,
@@ -121796,22 +121859,94 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained floating stage-one constructor, infeasibility set/cost lifecycle, cost normalization/backup and restoration, complete LU init_run preparation, randomized initial column norms, entering eligibility/pricing/sort/rotation",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_core_float.go",
+            "pkg/util/lp/primal_price_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
+            "TestLPFloatPrimalCoreInitRunActualCostLifecycle",
+            "TestLPFloatPrimalCoreNormalizationSourceIEEEAndRepeat",
+            "TestLPFloatPrimalCoreCostPublicationAndGuards",
+            "TestLPFloatPrimalCoreInitializationFailurePrefixes",
+            "TestLPFloatPrimalCoreCostIEEEAndMembershipTransition",
+            "TestLPFloatPrimalPricingEligibilityIndependentCases",
+            "TestLPFloatPrimalPricingIndependentOrderAndRotation",
+            "TestLPFloatPrimalPricingBudgetAndIEEE",
+            "TestLPFloatPrimalPricingPublicationAndAssertions",
+            "TestLPFloatPrimalPreparedBasisIndependentOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order."
+      ],
+      "deviations": [
+        "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
+        "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced."
+      ]
     },
     {
       "path": "src/util/lp/lp_primal_core_solver_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/primal_core_float.go",
+        "pkg/util/lp/primal_price_float.go",
+        "pkg/util/lp/primal_core_float_test.go",
+        "pkg/util/lp/primal_price_float_test.go",
+        "pkg/util/lp/primal_prepare_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
+        "TestLPFloatPrimalCoreInitRunActualCostLifecycle",
+        "TestLPFloatPrimalCoreNormalizationSourceIEEEAndRepeat",
+        "TestLPFloatPrimalCoreCostPublicationAndGuards",
+        "TestLPFloatPrimalCoreInitializationFailurePrefixes",
+        "TestLPFloatPrimalCoreCostIEEEAndMembershipTransition",
+        "TestLPFloatPrimalPricingEligibilityIndependentCases",
+        "TestLPFloatPrimalPricingIndependentOrderAndRotation",
+        "TestLPFloatPrimalPricingBudgetAndIEEE",
+        "TestLPFloatPrimalPricingPublicationAndAssertions",
+        "TestLPFloatPrimalPreparedBasisIndependentOracle"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained floating stage-one constructor, infeasibility set/cost lifecycle, cost normalization/backup and restoration, complete LU init_run preparation, randomized initial column norms, entering eligibility/pricing/sort/rotation",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/lp/primal_core_float.go",
+            "pkg/util/lp/primal_price_float.go"
+          ],
+          "tests": [
+            "TestLPFloatPrimalCoreConstructionAndCostIndependentOracle",
+            "TestLPFloatPrimalCoreInitRunActualCostLifecycle",
+            "TestLPFloatPrimalCoreNormalizationSourceIEEEAndRepeat",
+            "TestLPFloatPrimalCoreCostPublicationAndGuards",
+            "TestLPFloatPrimalCoreInitializationFailurePrefixes",
+            "TestLPFloatPrimalCoreCostIEEEAndMembershipTransition",
+            "TestLPFloatPrimalPricingEligibilityIndependentCases",
+            "TestLPFloatPrimalPricingIndependentOrderAndRotation",
+            "TestLPFloatPrimalPricingBudgetAndIEEE",
+            "TestLPFloatPrimalPricingPublicationAndAssertions",
+            "TestLPFloatPrimalPreparedBasisIndependentOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Primal stage-one core owns native beta, empty concrete floating breakpoint queue, normalized cost backup and traversal slice; inherits actual borrowed solver vectors and owned floating LU/scratch. Failed base construction returns its real partial owner before derived initialization. Native []uint32 replaces the source candidate list; rotation changes only this list, while sort publishes nonbasis headings in order."
+      ],
+      "deviations": [
+        "Stage-one floating initialization/pricing only; no Solve optimization API is exposed. Standard upper-bound-only constructor, Harris leaving/step and breakpoint machinery, norm/reduced-cost updates, tableau/iteration/solve, exact instantiations and full original drivers remain open. Source-indeterminate scalar members are not credited as initialized defaults. Cost initializer preserves unknown-type native old-cost reuse; getter uses zero, and nonbasic zero returns before sign flip. Source candidate budget counts record improvements, not every beneficial column. Go standard-library sorting replaces std::sort; the source defines no equal/unordered-key tie order, and libstdc++ internals are not ported.",
+        "Source std::max(abs(v),running) operand order is preserved in normalization, including NaN replacing then losing the maximum. Basic zero costs negate only after infeasibility membership update; nonbasics publish positive zero and erase membership without inspecting bounds. Source LU init_run publication/early-return/error prefixes and literal random norm expression are retained. Null/bounds guards qualify undefined source domains; no process-global allocation adapters or fabricated numerical callbacks are introduced."
+      ]
     },
     {
       "path": "src/util/lp/lp_primal_core_solver_tableau.h",

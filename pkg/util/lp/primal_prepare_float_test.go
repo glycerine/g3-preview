@@ -135,7 +135,7 @@ func TestLPFloatPrimalPreparedBasisIndependentOracle(t *testing.T) {
 			m.Settings.DensityThreshold = math.Inf(1)
 		}
 		m.Settings.SimplexStrategy = StrategyLU
-		core, err := NewFloatCoreSolverBase(FloatCoreInputs{
+		core, err := NewFloatPrimalCoreSolver(FloatCoreInputs{
 			A: m.A, B: &m.B, X: &m.X, Costs: &m.Costs,
 			Basis: &m.Basis, NBasis: &m.NBasis, Heading: &m.Heading,
 			Settings: m.Settings, Names: m.FloatLPSolver,
@@ -161,6 +161,9 @@ func TestLPFloatPrimalPreparedBasisIndependentOracle(t *testing.T) {
 			for i := range y {
 				lpScalerNear(t, y[i], m.X[nc+i])
 			}
+		}
+		if err := core.InitRun(); err != nil {
+			t.Fatal("prepared primal run initialization", world, err)
 		}
 		if err := core.Close(); err != nil {
 			t.Fatal(err)
