@@ -34096,3 +34096,43 @@ module rerun inside the hourly interval. Manifest counts remain 2102 units/677
 APIs:62 ported,283 partial,1729 unported,two dead/deleted. The requested external
 consumer migration, internal util cycle cleanup and root subpackage split are
 still incomplete.
+
+## Native ordered model interpretation dictionaries
+
+Model constant/function/universe tables now use insdict.Dict v0.10.1 keyed by
+full AST handle identity, with concrete entries retaining actual AST/graph
+owners. Deleted local probing/tombstone/resize implementations and function/
+universe index directories. Native universe storage no longer reserves a
+simulated vector-object header. Real Model/ModelCore owner headers remain
+fallible. Function same-pointer replacement and actual graph transfer remain;
+constant replacement still acquires before retiring the old value. Copy and
+cleanup now use insertion order, with constants preceding functions and keys
+preceding values/graphs. Replacements preserve positions, while removed and
+reinserted keys move last. Historical declaration slices retain source behavior.
+
+Constant/function unregister retains detached owners until actual retirement
+finishes. Constant replacement tracks an unretired temporary if cleanup stops.
+Consumed DEC state is recorded before reporting errors across constant/function/
+universe cleanup, preventing repeated retirement of a consumed reference. The
+literal universe-update append and its stale-prefix reference effects remain;
+this change does not claim to repair or replace that source algorithm.
+
+Added an actual forty-constant/forty-function/forty-universe pipeline: native
+growth and replacement succeed with arena reservations disabled and do not
+charge the numeric budget; deletion/reinsertion then copying preserves all
+three dictionary orders, independently owned function graphs and universe values
+after source destruction. Retired the now-inapplicable registration-reservation
+campaign and moved derived constructor refusal coverage to the real owner header.
+Existing graph-copy reservation campaigns and ownership/domain guards remain.
+
+Validation: native model/tactic/SAT tactic/API passed
+(0.056s/0.028s/0.163s/0.013s). Debug model/tactic/SAT tactic passed
+(0.065s/0.027s/0.126s). Module-wide compilation, model/tactic/SAT tactic vet,
+manifest, gofmt and diff checks passed. No full native module rerun inside the
+hourly interval. Counts unchanged:2102 units/677 APIs:62 ported,283 partial,
+1729 unported,two dead/deleted. Manifest claims exclude source container
+allocation-failure geometry and do not promote whole units.
+
+Further retained collection consumers remain in proof binding/hyper-resolution,
+sequence/scoped AST reference-vector paths and other packages. Internal util
+cycles and the complete requested root subpackage split remain unfinished.

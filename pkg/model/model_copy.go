@@ -43,10 +43,9 @@ func (md *ModelCore) CopyFunctionInterpretations(source *ModelCore) error {
 	if md.manager != source.manager {
 		return ast.ErrASTHandle
 	}
-	// Original decl2finterp bucket order, distinct from declaration-vector order.
-	for _, entry := range source.Functions.Cells {
-		if entry.state == modelMapUsed && entry.index != 0 {
-			if e := md.CopyFunctionInterpretation(entry.declaration, source.functionDirectory[entry.index-1]); e != nil {
+	for d, entry := range source.Functions.All() {
+		if entry.function != nil {
+			if e := md.CopyFunctionInterpretation(d, entry.function); e != nil {
 				return e
 			}
 		}

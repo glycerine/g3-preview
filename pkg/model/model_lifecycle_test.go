@@ -19,7 +19,7 @@ func TestModelDerivedConstructorAndVirtualReferenceDestruction(t *testing.T) {
 	md, e := model.NewModel(m)
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, md.Close()) })
-	if md.CoreField.Derived != md || md.CoreField.References != 0 || len(md.CoreField.Functions.Cells) != 8 || len(md.Universes.Cells) != 8 {
+	if md.CoreField.Derived != md || md.CoreField.References != 0 || md.CoreField.Functions.Len() != 0 || md.Universes.Len() != 0 {
 		t.Fatal("source member construction")
 	}
 	n, e := md.NumUninterpretedSorts()
@@ -38,16 +38,16 @@ func TestModelDerivedConstructorAndVirtualReferenceDestruction(t *testing.T) {
 	}
 }
 
-func TestModelDerivedConstructorFinalMemberRefusalUnwinds(t *testing.T) {
+func TestModelDerivedConstructorHeaderRefusalUnwinds(t *testing.T) {
 	m := astTestManager(t)
 	before := m.BudgetField.Used()
-	// Header, constant map and function map succeed; the derived universe
-	// map's first reservation fails. This is one constructor boundary only.
-	m.BudgetField.FailAfter(3)
+	// Native dictionaries do not reserve through the numeric arena. The real
+	// model owner header remains a fallible construction boundary.
+	m.BudgetField.FailAfter(0)
 	t.Cleanup(func() { m.BudgetField.FailAfter(-1) })
 	md, e := model.NewModel(m)
 	if !errors.Is(e, arena.ErrInjectedFailure) || md != nil {
-		t.Fatal("source final member refusal", md, e)
+		t.Fatal("model owner header refusal", md, e)
 	}
 	if m.BudgetField.Used() != before {
 		t.Fatal("constructed member prefix leaked", before, m.BudgetField.Used())
@@ -171,8 +171,8 @@ func TestModelDerivedEmptyUniverseUpdateAndHashGrowth(t *testing.T) {
 	}
 	n, e := md.NumUninterpretedSorts()
 	satOK(t, e)
-	if n != 40 || len(md.Universes.Cells) <= 8 {
-		t.Fatal("replacement duplicated sort or failed hash growth", n)
+	if n != 40 || md.Universes.Len() != 40 {
+		t.Fatal("replacement duplicated sort or lost a universe", n)
 	}
 }
 
@@ -200,7 +200,7 @@ func TestModelConverterToModelOriginalAllocationAndApplication(t *testing.T) {
 		if e != nil {
 			return e
 		}
-		if idx != 0 || md.Derived == nil || md == &old.CoreField || !old.Closed || len(md.Constants.Cells) != 8 || len(md.Functions.Cells) != 8 {
+		if idx != 0 || md.Derived == nil || md == &old.CoreField || !old.Closed || md.Constants.Len() != 0 || md.Functions.Len() != 0 {
 			t.Fatal("source allocation/assignment must precede call", idx)
 		}
 		return nil

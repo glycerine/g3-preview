@@ -4,18 +4,13 @@ package model
 
 import "github.com/glycerine/g3/pkg/ast"
 
-// modelValueProc is the source lexical callback. The AST manager supplies its
-// stored sort hash, so lookup does not reenter the manager's locked public API.
+// modelValueProc borrows native universe storage while the AST manager is
+// locked. Handle identity lookup does not reenter the manager.
 type modelValueProc struct{ model *Model }
 
-func (p modelValueProc) SomeValue(s ast.ASTHandle, hash uint32) (ast.ASTHandle, error) {
-	md := p.model
-	i := md.Universes.find(s, hash)
-	if i >= 0 && md.Universes.Cells[i].index != 0 {
-		values := md.directory[md.Universes.Cells[i].index-1].values
-		if len(values) > 0 {
-			return values[0], nil
-		}
+func (p modelValueProc) SomeValue(s ast.ASTHandle, _ uint32) (ast.ASTHandle, error) {
+	if u, found := p.model.Universes.Get2(s); found && len(u.values) > 0 {
+		return u.values[0], nil
 	}
 	return ast.ASTHandle{}, nil
 }

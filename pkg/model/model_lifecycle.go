@@ -9,95 +9,18 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/insdict"
 )
 
-type modelUniverseCell struct {
-	sort        ast.ASTHandle
-	hash, index uint32
-	used        bool
-}
-type modelUniverseMap struct {
-	Cells []modelUniverseCell
-	size  uint32
-}
-
-func (t *modelUniverseMap) resize(m *ast.ASTManager, n int) error {
-	stride := uint64(reflect.TypeOf(modelUniverseCell{}).Size())
-	if n < 8 || n&(n-1) != 0 || uint64(n) > uint64(^uint(0)>>1)/stride {
-		return arena.ErrBounds
-	}
-	if e := m.Budget().Reserve(uint64(n) * stride); e != nil {
-		return e
-	}
-	next := make([]modelUniverseCell, n)
-	for _, cell := range t.Cells {
-		if cell.used {
-			i := int(cell.hash) & (n - 1)
-			for next[i].used {
-				i = (i + 1) & (n - 1)
-			}
-			next[i] = cell
-		}
-	}
-	m.Budget().Release(uint64(len(t.Cells)) * stride)
-	t.Cells = next
-	return nil
-}
-func (t *modelUniverseMap) find(sort ast.ASTHandle, hash uint32) int {
-	if len(t.Cells) == 0 {
-		return -1
-	}
-	mask := len(t.Cells) - 1
-	for i := int(hash) & mask; t.Cells[i].used; i = (i + 1) & mask {
-		if t.Cells[i].sort == sort && t.Cells[i].hash == hash {
-			return i
-		}
-	}
-	return -1
-}
-func (t *modelUniverseMap) insert(m *ast.ASTManager, sort ast.ASTHandle, hash uint32) (int, error) {
-	if len(t.Cells) == 0 {
-		if e := t.resize(m, 8); e != nil {
-			return -1, e
-		}
-	} else if uint64(t.size)*4 > uint64(len(t.Cells))*3 {
-		if len(t.Cells) > int(^uint(0)>>1)/2 {
-			return -1, arena.ErrBounds
-		}
-		if e := t.resize(m, len(t.Cells)*2); e != nil {
-			return -1, e
-		}
-	}
-	mask := len(t.Cells) - 1
-	i := int(hash) & mask
-	for t.Cells[i].used {
-		if t.Cells[i].sort == sort && t.Cells[i].hash == hash {
-			return i, nil
-		}
-		i = (i + 1) & mask
-	}
-	t.Cells[i] = modelUniverseCell{sort: sort, hash: hash, used: true}
-	t.size++
-	return i, nil
-}
-func (t *modelUniverseMap) close(m *ast.ASTManager) {
-	m.Budget().Release(uint64(len(t.Cells)) * uint64(reflect.TypeOf(modelUniverseCell{}).Size()))
-	t.Cells = nil
-	t.size = 0
-}
-
 type modelUniverse struct {
-	values     []ast.ASTHandle
-	sortOwned  bool
-	ownerBytes uint64
+	values    []ast.ASTHandle
+	sortOwned bool
 }
 type Model struct {
-	self      *Model
-	CoreField ModelCore
-	sorts     []ast.ASTHandle
-	Universes modelUniverseMap
-	// Scalar table indices resolve cold source ptr_vector<expr> owners here.
-	directory  []*modelUniverse
+	self       *Model
+	CoreField  ModelCore
+	sorts      []ast.ASTHandle
+	Universes  insdict.Dict[ast.ASTHandle, *modelUniverse]
 	ownerBytes uint64
 	Closed     bool
 }
@@ -118,21 +41,9 @@ func NewModel(m *ast.ASTManager) (md *Model, err error) {
 	md.CoreField.manager = m
 	md.CoreField.self = &md.CoreField
 	md.CoreField.Derived = md
-	defer func() {
-		if err != nil {
-			err = errors.Join(err, md.Close())
-			md = nil
-		}
-	}()
-	if err = md.CoreField.Constants.resize(m, 8); err != nil {
-		return md, err
-	}
-	if err = md.CoreField.Functions.initialize(m); err != nil {
-		return md, err
-	}
-	if err = md.Universes.resize(m, 8); err != nil {
-		return md, err
-	}
+	md.CoreField.Constants = *insdict.NewDictFunc[ast.ASTHandle, *modelConstantEntry](modelHandleHash)
+	md.CoreField.Functions = *insdict.NewDictFunc[ast.ASTHandle, *modelFunctionEntry](modelHandleHash)
+	md.Universes = *insdict.NewDictFunc[ast.ASTHandle, *modelUniverse](modelHandleHash)
 	return md, nil
 }
 func (md *Model) open() error {
@@ -144,18 +55,18 @@ func (md *Model) open() error {
 	}
 	return md.CoreField.open()
 }
-func (md *Model) sortHash(s ast.ASTHandle) (uint32, error) {
+func (md *Model) checkSort(s ast.ASTHandle) error {
 	if e := md.open(); e != nil {
-		return 0, e
+		return e
 	}
 	kind, e := md.CoreField.manager.GetKind(s)
 	if e != nil {
-		return 0, e
+		return e
 	}
 	if kind != ast.ASTSort {
-		return 0, ast.ErrASTDomain
+		return ast.ErrASTDomain
 	}
-	return md.CoreField.manager.GetHash(s)
+	return nil
 }
 func (md *Model) NumUninterpretedSorts() (uint32, error) {
 	if e := md.open(); e != nil {
@@ -173,26 +84,26 @@ func (md *Model) UninterpretedSort(i uint32) (ast.ASTHandle, error) {
 	return md.sorts[i], nil
 }
 func (md *Model) HasUninterpretedSort(s ast.ASTHandle) (bool, error) {
-	hash, e := md.sortHash(s)
+	e := md.checkSort(s)
 	if e != nil {
 		return false, e
 	}
-	i := md.Universes.find(s, hash)
-	return i >= 0 && md.Universes.Cells[i].index != 0, nil
+	_, found := md.Universes.Get2(s)
+	return found, nil
 }
 func (md *Model) Universe(s ast.ASTHandle) ([]ast.ASTHandle, error) {
-	hash, e := md.sortHash(s)
+	e := md.checkSort(s)
 	if e != nil {
 		return nil, e
 	}
-	i := md.Universes.find(s, hash)
-	if i < 0 || md.Universes.Cells[i].index == 0 {
+	u, found := md.Universes.Get2(s)
+	if !found || u == nil {
 		return nil, ast.ErrASTDomain
 	}
-	return md.directory[md.Universes.Cells[i].index-1].values, nil
+	return u.values, nil
 }
 func (md *Model) RegisterUniverse(s ast.ASTHandle, values []ast.ASTHandle) (err error) {
-	hash, e := md.sortHash(s)
+	e := md.checkSort(s)
 	if e != nil {
 		return e
 	}
@@ -206,10 +117,6 @@ func (md *Model) RegisterUniverse(s ast.ASTHandle, values []ast.ASTHandle) (err 
 		if kind != ast.ASTApp && kind != ast.ASTVar && kind != ast.ASTQuantifier {
 			return ast.ErrASTDomain
 		}
-	}
-	i, e := md.Universes.insert(m, s, hash)
-	if e != nil {
-		return e
 	}
 	acquired := 0
 	published := false
@@ -226,23 +133,17 @@ func (md *Model) RegisterUniverse(s ast.ASTHandle, values []ast.ASTHandle) (err 
 		}
 		acquired++
 	}
-	index := md.Universes.Cells[i].index
-	if index == 0 {
+	u, found := md.Universes.Get2(s)
+	if !found {
 		md.sorts = append(md.sorts, s)
 		if e = m.IncRef(s); e != nil {
 			return e
 		}
-		bytes := uint64(reflect.TypeOf(modelUniverse{}).Size())
-		if e = m.Budget().Reserve(bytes); e != nil {
-			return errors.Join(e, m.DecRef(s))
-		}
-		u := &modelUniverse{sortOwned: true, ownerBytes: bytes}
+		u = &modelUniverse{sortOwned: true}
 		u.values = append(u.values, values...)
-		md.directory = append(md.directory, u)
-		md.Universes.Cells[i].index = uint32(len(md.directory))
+		md.Universes.Set(s, u)
 		published = true
 	} else {
-		u := md.directory[index-1]
 		for _, old := range u.values {
 			if e = m.DecRef(old); e != nil {
 				return e
@@ -265,11 +166,9 @@ func (md *Model) CopyUniverseInterpretations(source *Model) error {
 	if md.CoreField.manager != source.CoreField.manager {
 		return ast.ErrASTHandle
 	}
-	for _, cell := range source.Universes.Cells {
-		if cell.used && cell.index != 0 {
-			if e := md.RegisterUniverse(cell.sort, source.directory[cell.index-1].values); e != nil {
-				return e
-			}
+	for s, u := range source.Universes.All() {
+		if e := md.RegisterUniverse(s, u.values); e != nil {
+			return e
 		}
 	}
 	return nil
@@ -282,33 +181,37 @@ func (md *Model) Close() error {
 		return nil
 	}
 	m := md.CoreField.manager
-	for i := range md.Universes.Cells {
-		cell := &md.Universes.Cells[i]
-		if !cell.used || cell.index == 0 {
-			continue
-		}
-		u := md.directory[cell.index-1]
+	for s, u := range md.Universes.All() {
 		if u.sortOwned {
-			if e := m.DecRef(cell.sort); e != nil {
+			consumed, e := m.DecRefConsumed(s)
+			if consumed {
+				u.sortOwned = false
+			}
+			if e != nil {
 				return e
 			}
-			u.sortOwned = false
+			if !consumed {
+				return ast.ErrASTPending
+			}
 		}
 		for j, v := range u.values {
 			if !v.IsNull() {
-				if e := m.DecRef(v); e != nil {
+				consumed, e := m.DecRefConsumed(v)
+				if consumed {
+					u.values[j] = ast.ASTHandle{}
+				}
+				if e != nil {
 					return e
 				}
-				u.values[j] = ast.ASTHandle{}
+				if !consumed {
+					return ast.ErrASTPending
+				}
 			}
 		}
 		u.values = nil
-		m.Budget().Release(u.ownerBytes)
-		u.ownerBytes = 0
 	}
-	md.Universes.close(m)
+	md.Universes = insdict.Dict[ast.ASTHandle, *modelUniverse]{}
 	md.sorts = nil
-	md.directory = nil
 	if e := md.CoreField.closeCoreMembers(); e != nil {
 		return e
 	}

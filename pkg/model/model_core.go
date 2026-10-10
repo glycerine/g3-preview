@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/insdict"
 )
 
 // Original constant/function interpretation ownership. The derived model
@@ -15,13 +16,11 @@ import (
 type ModelCore struct {
 	self                               *ModelCore
 	manager                            *ast.ASTManager
-	Constants                          modelConstantMap
-	Functions                          modelFunctionMap
-	functionDirectory                  []*FunctionInterpretation
-	removedFunction                    *FunctionInterpretation
+	Constants                          insdict.Dict[ast.ASTHandle, *modelConstantEntry]
+	Functions                          insdict.Dict[ast.ASTHandle, *modelFunctionEntry]
+	removedFunction                    *modelFunctionEntry
+	removedConstant                    *modelConstantEntry
 	copiedFunction                     *FunctionInterpretation
-	removedDeclaration                 ast.ASTHandle
-	removedDeclarationOwned            bool
 	functionDeclarations               []ast.ASTHandle
 	Derived                            *Model
 	declarations, ConstantDeclarations []ast.ASTHandle
@@ -43,14 +42,8 @@ func NewModelCore(m *ast.ASTManager) (md *ModelCore, err error) {
 	}
 	md = &ModelCore{manager: m, ownerBytes: amount}
 	md.self = md
-	if err = md.Constants.resize(m, 8); err != nil {
-		err = errors.Join(err, md.Close())
-		return nil, err
-	}
-	if err = md.Functions.initialize(m); err != nil {
-		err = errors.Join(err, md.Close())
-		return nil, err
-	}
+	md.Constants = *insdict.NewDictFunc[ast.ASTHandle, *modelConstantEntry](modelHandleHash)
+	md.Functions = *insdict.NewDictFunc[ast.ASTHandle, *modelFunctionEntry](modelHandleHash)
 	return md, nil
 }
 func (md *ModelCore) open() error {
@@ -63,21 +56,21 @@ func (md *ModelCore) open() error {
 	_, e := md.manager.ProofsEnabled()
 	return e
 }
-func (md *ModelCore) checkDeclaration(d ast.ASTHandle) (uint32, error) {
+func (md *ModelCore) checkDeclaration(d ast.ASTHandle) error {
 	if e := md.open(); e != nil {
-		return 0, e
+		return e
 	}
 	kind, e := md.manager.GetKind(d)
 	if e != nil {
-		return 0, e
+		return e
 	}
 	if kind != ast.ASTFuncDecl {
-		return 0, ast.ErrASTDomain
+		return ast.ErrASTDomain
 	}
-	return md.manager.GetHash(d)
+	return nil
 }
 func (md *ModelCore) RegisterConstant(d, v ast.ASTHandle) error {
-	hash, e := md.checkDeclaration(d)
+	e := md.checkDeclaration(d)
 	if e != nil {
 		return e
 	}
@@ -95,11 +88,14 @@ func (md *ModelCore) RegisterConstant(d, v ast.ASTHandle) error {
 	if kind != ast.ASTApp && kind != ast.ASTVar && kind != ast.ASTQuantifier {
 		return ast.ErrASTDomain
 	}
-	i, e := md.Constants.insertIfAbsent(md.manager, d, hash)
-	if e != nil {
-		return e
+	entry, found := md.Constants.Get2(d)
+	if !found {
+		entry = &modelConstantEntry{declaration: d}
+		md.Constants.Set(d, entry)
 	}
-	entry := &md.Constants.Cells[i]
+	if !entry.pending.IsNull() {
+		return ast.ErrASTPending
+	}
 	m := md.manager
 	if entry.value.IsNull() {
 		md.declarations = append(md.declarations, d)
@@ -117,30 +113,41 @@ func (md *ModelCore) RegisterConstant(d, v ast.ASTHandle) error {
 		if e = m.IncRef(v); e != nil {
 			return e
 		}
-		if e = m.DecRef(entry.value); e != nil {
-			return errors.Join(e, m.DecRef(v))
+		consumed, e := m.DecRefConsumed(entry.value)
+		if consumed {
+			entry.value = v
+			return e
 		}
-		entry.value = v
+		if e == nil {
+			e = ast.ErrASTPending
+		}
+		entry.pending = v
+		consumed, cleanup := m.DecRefConsumed(v)
+		if consumed {
+			entry.pending = ast.ASTHandle{}
+		}
+		return errors.Join(e, cleanup)
 	}
 	return nil
 }
 func (md *ModelCore) ConstantInterpretation(d ast.ASTHandle) (ast.ASTHandle, error) {
-	hash, e := md.checkDeclaration(d)
+	e := md.checkDeclaration(d)
 	if e != nil {
 		return ast.ASTHandle{}, e
 	}
-	i := md.Constants.find(d, hash)
-	if i < 0 {
+	entry, found := md.Constants.Get2(d)
+	if !found {
 		return ast.ASTHandle{}, nil
 	}
-	return md.Constants.Cells[i].value, nil
+	return entry.value, nil
 }
 func (md *ModelCore) HasConstantInterpretation(d ast.ASTHandle) (bool, error) {
-	hash, e := md.checkDeclaration(d)
+	e := md.checkDeclaration(d)
 	if e != nil {
 		return false, e
 	}
-	return md.Constants.find(d, hash) >= 0, nil
+	_, found := md.Constants.Get2(d)
+	return found, nil
 }
 
 // Source model_core::eval's constant branch assigns r even when the declaration
@@ -196,21 +203,19 @@ func (md *ModelCore) Constant(i uint32) (ast.ASTHandle, error) {
 	return md.ConstantDeclarations[i], nil
 }
 func (md *ModelCore) UnregisterConstant(d ast.ASTHandle) error {
-	hash, e := md.checkDeclaration(d)
+	e := md.checkDeclaration(d)
 	if e != nil {
 		return e
 	}
-	i := md.Constants.find(d, hash)
-	if i < 0 {
+	if md.removedConstant != nil {
+		return arena.ErrClosed
+	}
+	entry, found := md.Constants.Get2(d)
+	if !found || entry.value.IsNull() {
 		return nil
 	}
-	entry := md.Constants.Cells[i]
-	if entry.value.IsNull() {
-		return nil
-	}
-	if e = md.Constants.remove(md.manager, d, hash); e != nil {
-		return e
-	}
+	md.removedConstant = entry
+	md.Constants.Del(d)
 	for i, h := range md.ConstantDeclarations {
 		if h == d {
 			copy(md.ConstantDeclarations[i:], md.ConstantDeclarations[i+1:])
@@ -219,10 +224,7 @@ func (md *ModelCore) UnregisterConstant(d ast.ASTHandle) error {
 			break
 		}
 	}
-	if e = md.manager.DecRef(entry.declaration); e != nil {
-		return e
-	}
-	return md.manager.DecRef(entry.value)
+	return md.finishConstantRemoval()
 }
 func (md *ModelCore) CopyConstantInterpretations(source *ModelCore) error {
 	if e := md.open(); e != nil {
@@ -234,11 +236,9 @@ func (md *ModelCore) CopyConstantInterpretations(source *ModelCore) error {
 	if md.manager != source.manager {
 		return ast.ErrASTHandle
 	}
-	for _, entry := range source.Constants.Cells {
-		if entry.state == modelMapUsed {
-			if e := md.RegisterConstant(entry.declaration, entry.value); e != nil {
-				return e
-			}
+	for d, entry := range source.Constants.All() {
+		if e := md.RegisterConstant(d, entry.value); e != nil {
+			return e
 		}
 	}
 	return nil
@@ -277,46 +277,15 @@ func (md *ModelCore) closeCoreMembers() error {
 		return nil
 	}
 	m := md.manager
-	// Source map bucket iteration, key retirement followed by value retirement.
-	for i := range md.Constants.Cells {
-		entry := &md.Constants.Cells[i]
-		if entry.state != modelMapUsed {
-			continue
-		}
-		if entry.declarationOwned {
-			if e := m.DecRef(entry.declaration); e != nil {
-				return e
-			}
-			entry.declarationOwned = false
-		}
-		if entry.valueOwned {
-			if e := m.DecRef(entry.value); e != nil {
-				return e
-			}
-			entry.valueOwned = false
+	// Retire constants before functions, in dictionary insertion order.
+	for _, entry := range md.Constants.All() {
+		if e := md.retireConstant(entry); e != nil {
+			return e
 		}
 	}
-	// Source constants retire before function-map bucket iteration.
-	for i := range md.Functions.Cells {
-		entry := &md.Functions.Cells[i]
-		if entry.state != modelMapUsed {
-			continue
-		}
-		if entry.declarationOwned {
-			if e := m.DecRef(entry.declaration); e != nil {
-				return e
-			}
-			entry.declarationOwned = false
-		}
-		if entry.index != 0 {
-			fi := md.functionDirectory[entry.index-1]
-			if fi != nil {
-				if e := fi.Close(); e != nil {
-					return e
-				}
-				md.functionDirectory[entry.index-1] = nil
-			}
-			entry.index = 0
+	for _, entry := range md.Functions.All() {
+		if e := md.retireFunction(entry); e != nil {
+			return e
 		}
 	}
 	// A copy stopped before publication retains its lexical function owner.
@@ -327,15 +296,17 @@ func (md *ModelCore) closeCoreMembers() error {
 		md.copiedFunction = nil
 	}
 	// A stopped unregister has separately retained the removed lexical owners.
+	if e := md.finishConstantRemoval(); e != nil {
+		return e
+	}
 	if e := md.finishFunctionRemoval(); e != nil {
 		return e
 	}
-	md.functionDirectory = nil
 	md.functionDeclarations = nil
 	md.ConstantDeclarations = nil
 	md.declarations = nil
-	md.Functions.close(m)
-	md.Constants.close(m)
+	md.Functions = insdict.Dict[ast.ASTHandle, *modelFunctionEntry]{}
+	md.Constants = insdict.Dict[ast.ASTHandle, *modelConstantEntry]{}
 	m.Budget().Release(md.ownerBytes)
 	md.ownerBytes = 0
 	md.Closed = true

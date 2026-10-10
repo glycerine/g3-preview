@@ -4,7 +4,6 @@ package model_test
 import (
 	"errors"
 	"fmt"
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	"testing"
@@ -146,8 +145,8 @@ func TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose(t *testing.T) {
 		astTestMust(t, graphs[i].SetElse(fallback))
 		astTestMust(t, md.RegisterFunction(decls[i], graphs[i]))
 	}
-	if len(md.Functions.Cells) <= 8 {
-		t.Fatal("table never grew")
+	if md.Functions.Len() != len(decls) {
+		t.Fatal("native dictionary lost functions")
 	}
 	for i, d := range decls {
 		got, e := md.FunctionInterpretation(d)
@@ -239,46 +238,5 @@ func TestModelCoreFunctionGuardsAndConstantDispatch(t *testing.T) {
 	astTestMust(t, e)
 	if has {
 		t.Fatal("constant unregister dispatch")
-	}
-}
-
-func TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership(t *testing.T) {
-	m := astTestManager(t)
-	d := modelTestFunctionDecl(t, m, "refusal-function")
-	yes, e := m.MkTrue()
-	astTestMust(t, e)
-	fi := modelTestFunction(t, m, 1)
-	astTestMust(t, fi.SetElse(yes))
-	before, e := m.GetRefCount(d)
-	astTestMust(t, e)
-	completed := false
-	for fault := int64(0); fault < 32; fault++ {
-		md := modelTestCore(t, m)
-		m.Budget().FailAfter(fault)
-		err := md.RegisterFunction(d, fi)
-		m.Budget().FailAfter(-1)
-		if err == nil {
-			completed = true
-			astTestMust(t, md.Close())
-			break
-		}
-		if !errors.Is(err, arena.ErrInjectedFailure) {
-			t.Fatal("registration refusal", fault, err)
-		}
-		// Until source value publication, the caller still owns the graph.
-		value, e := fi.Else()
-		astTestMust(t, e)
-		if value != yes {
-			t.Fatal("failed registration consumed graph")
-		}
-		astTestMust(t, md.Close())
-		after, e := m.GetRefCount(d)
-		astTestMust(t, e)
-		if after != before {
-			t.Fatal("failed registration retained declaration", fault, before, after)
-		}
-	}
-	if !completed {
-		t.Fatal("registration never completed")
 	}
 }

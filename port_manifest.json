@@ -50387,7 +50387,9 @@
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_core.go",
         "pkg/model/model_value.go",
-        "pkg/model/model_copy.go"
+        "pkg/model/model_copy.go",
+        "pkg/model/model_interpretation_owners.go",
+        "pkg/model/model_native_lookup_test.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -50395,13 +50397,14 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
-        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
+        "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestModelCoreHashGrowthCopyAndIndependentOwnership",
         "TestModelSomeValuePrefersFirstUniverseAndBorrows",
         "TestModelSomeValueMissingEmptyAndBooleanFallback",
         "TestModelCopyConstantsFunctionsUniversesAndIndependentGraphs",
         "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
-        "TestModelFunctionCopyReplacementAndSelfCopy"
+        "TestModelFunctionCopyReplacementAndSelfCopy",
+        "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
       ],
       "assertions": [
         {
@@ -50417,7 +50420,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "derived construction, universe ownership/query/copy and virtual final-reference destruction (function operations unported)",
+          "name": "derived construction, universe ownership/query/copy and virtual final-reference destruction",
           "status": "partial",
           "go_target": "pkg/model/model_lifecycle.go",
           "tests": [
@@ -50426,7 +50429,8 @@
             "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
             "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
             "TestModelConverterToModelOriginalAllocationAndApplication",
-            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+            "TestModelDerivedConstructorHeaderRefusalUnwinds",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         },
         {
@@ -50434,7 +50438,8 @@
           "status": "ported",
           "go_target": "pkg/model/model_core.go",
           "tests": [
-            "TestModelCoreHashGrowthCopyAndIndependentOwnership"
+            "TestModelCoreHashGrowthCopyAndIndependentOwnership",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         },
         {
@@ -50443,7 +50448,8 @@
           "go_target": "pkg/model/model_value.go",
           "tests": [
             "TestModelSomeValuePrefersFirstUniverseAndBorrows",
-            "TestModelSomeValueMissingEmptyAndBooleanFallback"
+            "TestModelSomeValueMissingEmptyAndBooleanFallback",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         },
         {
@@ -50453,15 +50459,19 @@
           "tests": [
             "TestModelCopyConstantsFunctionsUniversesAndIndependentGraphs",
             "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
-            "TestModelFunctionCopyReplacementAndSelfCopy"
+            "TestModelFunctionCopyReplacementAndSelfCopy",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Ordered dictionary entries retain concrete constant AST references, function graph owners and universe AST references directly. Constants retire before functions; each declaration key retires before its value/graph. Native declaration slices remain borrowed. Detached unregister and failed constant replacement retain their remaining owned references for cleanup; consumed references are cleared before an error is reported."
+      ],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
         "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
-        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe hash-table migration remains separate; no container growth/refusal implementation credit is added."
+        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe dictionaries are also now native; no container growth/refusal implementation credit is added.",
+        "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. No source container allocation-failure equivalence or whole-unit promotion is claimed."
       ]
     },
     {
@@ -50472,7 +50482,9 @@
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_value.go",
-        "pkg/model/model_copy.go"
+        "pkg/model/model_copy.go",
+        "pkg/model/model_interpretation_owners.go",
+        "pkg/model/model_native_lookup_test.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -50480,12 +50492,13 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
-        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
+        "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestModelSomeValuePrefersFirstUniverseAndBorrows",
         "TestModelSomeValueMissingEmptyAndBooleanFallback",
         "TestModelCopyConstantsFunctionsUniversesAndIndependentGraphs",
         "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
-        "TestModelFunctionCopyReplacementAndSelfCopy"
+        "TestModelFunctionCopyReplacementAndSelfCopy",
+        "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
       ],
       "conditionals": [
         {
@@ -50501,7 +50514,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "derived construction, universe ownership/query/copy and virtual final-reference destruction (function operations unported)",
+          "name": "derived construction, universe ownership/query/copy and virtual final-reference destruction",
           "status": "partial",
           "go_target": "pkg/model/model_lifecycle.go",
           "tests": [
@@ -50510,7 +50523,8 @@
             "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
             "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
             "TestModelConverterToModelOriginalAllocationAndApplication",
-            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+            "TestModelDerivedConstructorHeaderRefusalUnwinds",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         },
         {
@@ -50519,7 +50533,8 @@
           "go_target": "pkg/model/model_value.go",
           "tests": [
             "TestModelSomeValuePrefersFirstUniverseAndBorrows",
-            "TestModelSomeValueMissingEmptyAndBooleanFallback"
+            "TestModelSomeValueMissingEmptyAndBooleanFallback",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         },
         {
@@ -50529,15 +50544,19 @@
           "tests": [
             "TestModelCopyConstantsFunctionsUniversesAndIndependentGraphs",
             "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
-            "TestModelFunctionCopyReplacementAndSelfCopy"
+            "TestModelFunctionCopyReplacementAndSelfCopy",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Ordered dictionary entries retain concrete constant AST references, function graph owners and universe AST references directly. Constants retire before functions; each declaration key retires before its value/graph. Native declaration slices remain borrowed. Detached unregister and failed constant replacement retain their remaining owned references for cleanup; consumed references are cleared before an error is reported."
+      ],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
         "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
-        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe hash-table migration remains separate; no container growth/refusal implementation credit is added."
+        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe dictionaries are also now native; no container growth/refusal implementation credit is added.",
+        "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. No source container allocation-failure equivalence or whole-unit promotion is claimed."
       ]
     },
     {
@@ -50584,10 +50603,10 @@
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_core.go",
-        "pkg/model/model_constant_map.go",
-        "pkg/model/model_function_map.go",
+        "pkg/model/model_interpretation_owners.go",
         "pkg/model/model_functions.go",
-        "pkg/model/model_functions_test.go"
+        "pkg/model/model_functions_test.go",
+        "pkg/model/model_native_lookup_test.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -50595,7 +50614,7 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
-        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
+        "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestModelCoreConstantRegistrationReplacementAndReferences",
         "TestModelCoreEvalDeclarationAndMissingResult",
         "TestModelCoreUnregisterPreservesLiteralSourceDeclarationVector",
@@ -50608,7 +50627,7 @@
         "TestModelCoreFunctionEvalMissingPartialAndUnregistration",
         "TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose",
         "TestModelCoreFunctionGuardsAndConstantDispatch",
-        "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership"
+        "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
       ],
       "assertions": [
         {
@@ -50637,7 +50656,8 @@
             "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
             "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
             "TestModelConverterToModelOriginalAllocationAndApplication",
-            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+            "TestModelDerivedConstructorHeaderRefusalUnwinds",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         },
         {
@@ -50652,7 +50672,8 @@
             "TestModelCoreRejectsForeignAndNonconstantDeclarations",
             "TestModelCoreFinalReferenceAndCopiedOwnerGuard",
             "TestModelCoreConstantLookupAcceptsFunctionDeclaration",
-            "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose"
+            "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         },
         {
@@ -50661,7 +50682,7 @@
           "go_target": "pkg/model/model_functions.go",
           "go_targets": [
             "pkg/model/model_core.go",
-            "pkg/model/model_function_map.go",
+            "pkg/model/model_interpretation_owners.go",
             "pkg/model/model_functions_test.go"
           ],
           "tests": [
@@ -50669,18 +50690,18 @@
             "TestModelCoreFunctionEvalMissingPartialAndUnregistration",
             "TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose",
             "TestModelCoreFunctionGuardsAndConstantDispatch",
-            "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership"
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         }
       ],
       "ownership": [
         "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value.",
-        "Function table cells hold scalar handles and indices; a charged cold directory owns FunctionInterpretation pointers. Successful registration transfers graph ownership, with identical-pointer replacement remaining live. Cold directory is prepared before source declaration-vector publication; registration refusals before graph publication retain caller ownership. Source constants retire before function table bucket iteration, with each function key retired before its graph. Interrupted unregister retains detached key/graph owners in named ModelCore fields for later owning cleanup."
+        "Ordered dictionary entries retain concrete constant AST references, function graph owners and universe AST references directly. Constants retire before functions; each declaration key retires before its value/graph. Native declaration slices remain borrowed. Detached unregister and failed constant replacement retain their remaining owned references for cleanup; consumed references are cleared before an error is reported."
       ],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, scoped get_some_value and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
-        "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion.",
-        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe hash-table migration remains separate; no container growth/refusal implementation credit is added."
+        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe dictionaries are also now native; no container growth/refusal implementation credit is added.",
+        "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. No source container allocation-failure equivalence or whole-unit promotion is claimed."
       ]
     },
     {
@@ -50691,11 +50712,11 @@
       "go_targets": [
         "pkg/model/model_lifecycle.go",
         "pkg/model/model_core.go",
-        "pkg/model/model_constant_map.go",
-        "pkg/model/model_function_map.go",
+        "pkg/model/model_interpretation_owners.go",
         "pkg/model/model_functions.go",
         "pkg/model/model_functions_test.go",
-        "pkg/model/model_value.go"
+        "pkg/model/model_value.go",
+        "pkg/model/model_native_lookup_test.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -50703,7 +50724,7 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
-        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
+        "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestModelCoreConstantRegistrationReplacementAndReferences",
         "TestModelCoreEvalDeclarationAndMissingResult",
         "TestModelCoreUnregisterPreservesLiteralSourceDeclarationVector",
@@ -50716,9 +50737,9 @@
         "TestModelCoreFunctionEvalMissingPartialAndUnregistration",
         "TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose",
         "TestModelCoreFunctionGuardsAndConstantDispatch",
-        "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership",
         "TestModelSomeValuePrefersFirstUniverseAndBorrows",
-        "TestModelSomeValueMissingEmptyAndBooleanFallback"
+        "TestModelSomeValueMissingEmptyAndBooleanFallback",
+        "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
       ],
       "conditionals": [
         {
@@ -50743,7 +50764,8 @@
             "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
             "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
             "TestModelConverterToModelOriginalAllocationAndApplication",
-            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+            "TestModelDerivedConstructorHeaderRefusalUnwinds",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         },
         {
@@ -50758,7 +50780,8 @@
             "TestModelCoreRejectsForeignAndNonconstantDeclarations",
             "TestModelCoreFinalReferenceAndCopiedOwnerGuard",
             "TestModelCoreConstantLookupAcceptsFunctionDeclaration",
-            "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose"
+            "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         },
         {
@@ -50767,7 +50790,7 @@
           "go_target": "pkg/model/model_functions.go",
           "go_targets": [
             "pkg/model/model_core.go",
-            "pkg/model/model_function_map.go",
+            "pkg/model/model_interpretation_owners.go",
             "pkg/model/model_functions_test.go"
           ],
           "tests": [
@@ -50775,7 +50798,7 @@
             "TestModelCoreFunctionEvalMissingPartialAndUnregistration",
             "TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose",
             "TestModelCoreFunctionGuardsAndConstantDispatch",
-            "TestModelCoreFunctionRegistrationRefusalsPreserveCallerOwnership"
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         },
         {
@@ -50784,19 +50807,20 @@
           "go_target": "pkg/model/model_value.go",
           "tests": [
             "TestModelSomeValuePrefersFirstUniverseAndBorrows",
-            "TestModelSomeValueMissingEmptyAndBooleanFallback"
+            "TestModelSomeValueMissingEmptyAndBooleanFallback",
+            "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
           ]
         }
       ],
       "ownership": [
         "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value.",
-        "Function table cells hold scalar handles and indices; a charged cold directory owns FunctionInterpretation pointers. Successful registration transfers graph ownership, with identical-pointer replacement remaining live. Cold directory is prepared before source declaration-vector publication; registration refusals before graph publication retain caller ownership. Source constants retire before function table bucket iteration, with each function key retired before its graph. Interrupted unregister retains detached key/graph owners in named ModelCore fields for later owning cleanup."
+        "Ordered dictionary entries retain concrete constant AST references, function graph owners and universe AST references directly. Constants retire before functions; each declaration key retires before its value/graph. Native declaration slices remain borrowed. Detached unregister and failed constant replacement retain their remaining owned references for cleanup; consumed references are cleared before an error is reported."
       ],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
-        "Function registration now implemented for concrete FunctionInterpretation; original allocator ABI/pooling, source hash-table replacement geometry and broad stopped-AST-destructor campaigns remain qualified. Cold pointer directory is separately charged Go provenance, not a native malloc equivalence claim. Explicit foreign/closed/wrong-arity guards are Go owner/domain checks. Historical m_decls intentionally survives unregister. Function-aware model converters/copy and original model evaluator remain pending; constant-only consumers retain an explicit guard. No whole-unit promotion.",
         "Derived GetSomeValue installs the original scoped callback and borrows the first universe member; missing/empty universes delegate to AST value creation. Bare ModelCore has no implementation of the source abstract value-provider method. Theory plugins and evaluator integration remain incomplete; base AST fallback qualifications apply.",
-        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe hash-table migration remains separate; no container growth/refusal implementation credit is added."
+        "Model declaration, sort and universe lists now use direct []ast.ASTHandle storage. Ordered erasure clears vacated slots; historical all-declaration entries and literal universe-update append behavior remain. Removed the unused ASTHandleVector wrapper and its wrapper-only tests after the final production caller migrated. Constant/function/universe dictionaries are also now native; no container growth/refusal implementation credit is added.",
+        "Constant/function/universe lookup now uses insdict.Dict v0.10.1 keyed by complete AST handle identity. Copy and destruction iterate in insertion order; replacement preserves order and deletion/reinsertion moves a key last. Removed source probing/tombstone/rehash emulation, index directories and universe-vector header reservations. Real AST/graph ownership and model owner-header checks remain; consumed DEC progress and detached unregister/replacement owners remain reachable for cleanup. No source container allocation-failure equivalence or whole-unit promotion is claimed."
       ]
     },
     {
@@ -74935,7 +74959,7 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
-        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
+        "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestSATBooleanModelRetainsBindingsAfterEngineAndAtomsClose",
         "TestSATBooleanModelSkipsUndefinedSourceRows",
         "TestSATBooleanModelMatchesOriginalGoalTruthTable",
@@ -74986,7 +75010,7 @@
             "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
             "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
             "TestModelConverterToModelOriginalAllocationAndApplication",
-            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+            "TestModelDerivedConstructorHeaderRefusalUnwinds"
           ]
         },
         {
@@ -97090,7 +97114,7 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
-        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
+        "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
@@ -97121,7 +97145,7 @@
             "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
             "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
             "TestModelConverterToModelOriginalAllocationAndApplication",
-            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+            "TestModelDerivedConstructorHeaderRefusalUnwinds"
           ]
         },
         {
@@ -97167,7 +97191,7 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
-        "TestModelDerivedConstructorFinalMemberRefusalUnwinds",
+        "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
@@ -97208,7 +97232,7 @@
             "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
             "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
             "TestModelConverterToModelOriginalAllocationAndApplication",
-            "TestModelDerivedConstructorFinalMemberRefusalUnwinds"
+            "TestModelDerivedConstructorHeaderRefusalUnwinds"
           ]
         },
         {
@@ -115115,7 +115139,8 @@
         "Selected Runtime32/64 and legacy char-pointer/int32 engines implement literal source action/publication order and real shared assertion transport; representation geometry is not native ABI. Source source-pointer/runtime provider/borrowed spelling lifetime qualifications remain explicit. Malformed uninitialized value and dangling DT, closed assertion provider, and host ErrorTransport reentry are Go guard-domain proofs rather than ordinary native math REDs. Registered src/test/map.cpp:23-44 exact14 ENSURE credit remains unchanged, independent tests add none. Core dump key_data ostream instantiation lacks a source-defined operator<<; no fabricated value formatting is supplied. Other entry/key/value/native/global/compiler profiles remain partial.",
         "BV trailing count-cache specialization uses concrete Go entry storage and checked AST identity handles without generics, at its rewriter consumer to avoid import cycles. It preserves selected append-only probing/growth/iteration algorithms and key reference ownership; generic map APIs, native object-pointer/sentinel/entry layout and Runtime allocator/exception/fatal ABI remain uncredited.",
         "SAT antecedents now use map[uint32]*satSolverIndexSet and concrete insdict.Dict[uint32,struct{}] sets. Map values are deep copies; duplicate replacement preserves the mapped row identity and replaces its contents. Native insertion order replaces physical bucket order. Removed source hashtable capacity, probing, tombstones, Runtime backing/pointer headers, eager inactive nested values, temporary copies and container allocation/destructor refusal states. Only actual map/frame headers remain charged. Borrowed ordered iterator views are invalidated by key changes, assignment, reset or close; duplicates preserve the view. Reset/close drops mapped sets and rejects stale borrowed rows. Cold header refusal, 257-value growth/replacement, independent 4096-operation union/assignment oracle, borrowed lifetime and retained consequence algorithms are covered. No generic C++ hashtable/map implementation credit is added.",
-        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
+        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added.",
+        "Model constant/function/universe consumers now use ordered insdict.Dict directly, with native owner entries and no source probing/rehash implementation. Their functional ordering/ownership validation is consumer evidence, not a claim to port unused hashtable templates."
       ]
     },
     {
@@ -137564,7 +137589,8 @@
       ],
       "deviations": [
         "Container probing, tombstones, capacity arithmetic, simulated storage failures and backing-only epochs are replaced by native Go collections. Iterators borrow an insertion-order view invalidated by key changes/reset/close. Consumed cleanup keys are removed before returning callback errors. SMT2 display remains open; these consumers add no C++ generic container implementation credit. See PORT_PROGRESS.md#native-sparse-marks-and-shared-occurrence-collections.",
-        "BV trailing count-cache specialization uses concrete Go entry storage and checked AST identity handles without generics, at its rewriter consumer to avoid import cycles. It preserves selected append-only probing/growth/iteration algorithms and key reference ownership; generic map APIs, native object-pointer/sentinel/entry layout and Runtime allocator/exception/fatal ABI remain uncredited."
+        "BV trailing count-cache specialization uses concrete Go entry storage and checked AST identity handles without generics, at its rewriter consumer to avoid import cycles. It preserves selected append-only probing/growth/iteration algorithms and key reference ownership; generic map APIs, native object-pointer/sentinel/entry layout and Runtime allocator/exception/fatal ABI remain uncredited.",
+        "Model constant/function/universe consumers now use ordered insdict.Dict directly, with native owner entries and no source probing/rehash implementation. Their functional ordering/ownership validation is consumer evidence, not a claim to port unused hashtable templates."
       ]
     },
     {
