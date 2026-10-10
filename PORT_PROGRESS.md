@@ -35866,3 +35866,52 @@ LU, simplex/LAR, scaling, MPS input and retained upstream-driver work remain ope
 
 Final LP vet, portcheck, graph regeneration and diff checks pass. The64-package
 production graph retains its edges and includes the new implementation files.
+
+
+## Dense sparse triangular solves and floating residual correction
+
+Implemented solve_y_U for double/mpq, solve_U_y for double/mpq/numeric_pair<mpq>,
+floating dot_product_with_row and dense double_solve_U_y. These routines assume
+unit upper triangular U and intentionally perform no diagonal division. Left
+solve visits logical rows ascending, excluding the final anchor; right solve
+visits logical columns descending. Each nonzero anchor is borrowed live through
+literal coefficient order, inverse permutations and duplicate/zero terms. Floating
+refinement copies all dense slots, solves, computes descending residuals, solves
+those corrections and adds them descending. Trailing slots remain unchanged.
+
+Exact products retain actual rational copy/multiply/result lifetimes. Pair scalar
+left multiplication constructs both coordinate expressions before product X/Y
+copies, then subtraction publishes X before Y. Matrix owns only new numerical
+calls and lexical products; caller owns its completed/partial destination fields.
+After failure close the matrix before those caller values. Actual precise LU
+branches call the direct solve and return before refinement; definition-only
+explicit precise refinement instantiations and their exact dot products are not
+credited as reached project consumers.
+
+Added220 independent unit-upper worlds from dimension0 through7, shuffled physical
+row/column permutations and entry order, tiny exact coefficients, zero anchors,
+known exact scalar/pair solutions, independently formed dense RHS and floating
+residuals. Literal tests preserve ignored nonunit diagonals, duplicate entries,
+zero-anchor early skips, the dimension-one left solve's unread input and stored
+zero times infinity producing NaN. Reached bounds tests preserve completed scalar
+and pair updates plus partial dot outputs without repairing malformed metadata.
+
+Six pooled/direct physical reservation campaigns walk through first success,
+retain actual numerical receipts and verify all stopped scalar/pair solve guards.
+The direct pair campaign requires a numerical failure after target X has its
+independently expected result while Y retains its old value. Matrix cleanup leaves
+caller-owned fields intact; named owning-cell/direct-object census and final
+manager cleanup pass after every failure and success.
+
+Focused native10.252s and combined debug/checked11.093s pass. New exact coverage
+116/125 (92.8%), floating70/72 (97.2%) in both profiles. Remaining exact statements
+propagate valid-scalar predicates or destruction errors; floating statements are an invariant-protected original-vector bound and
+propagation of an unexercised correction-solve bounds error.
+The passing complete native module snapshot is still within this hour, so no
+redundant full suite was run; its old percentage is explicitly labelled. Source
+counts remain42 partial/68 unported. Indexed graph traversal/solves and floating
+indexed refinement, remaining sparse diagnostics, full LU, solvers/scaling/MPS and
+retained upstream-driver scenarios remain required.
+
+Final LP vet, portcheck, graph regeneration and diff checks pass. The64-package
+production graph retains its edges and includes the new dense-solve files.

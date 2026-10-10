@@ -123471,7 +123471,10 @@
         "pkg/util/lp/sparse_matrix_eta_test.go",
         "pkg/util/lp/sparse_matrix_float_replace.go",
         "pkg/util/lp/sparse_matrix_exact_replace.go",
-        "pkg/util/lp/sparse_matrix_replace_test.go"
+        "pkg/util/lp/sparse_matrix_replace_test.go",
+        "pkg/util/lp/sparse_matrix_float_solve.go",
+        "pkg/util/lp/sparse_matrix_exact_solve.go",
+        "pkg/util/lp/sparse_matrix_solve_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -123519,7 +123522,11 @@
         "TestLPExactSparseColumnReplacementAllocationFailureCensus",
         "TestLPSparseColumnReplacementIEEEAndTolerance",
         "TestLPSparseColumnReplacementBoundsAndPrefixes",
-        "TestLPExactSparseColumnReplacementBorrowedOwnerGuards"
+        "TestLPExactSparseColumnReplacementBorrowedOwnerGuards",
+        "TestLPSparseDenseTriangularSolvesIndependentResiduals",
+        "TestLPSparseDenseSolveLiteralDiagonalDuplicatesAndIEEE",
+        "TestLPExactSparseDenseSolveAllocationFailureCensus",
+        "TestLPSparseDenseSolveBoundsAndPublicationPrefixes"
       ],
       "conditionals": [
         {
@@ -123698,6 +123705,20 @@
             "TestLPSparseColumnReplacementBoundsAndPrefixes",
             "TestLPExactSparseColumnReplacementBorrowedOwnerGuards"
           ]
+        },
+        {
+          "name": "retained dense unit-upper triangular solve_y_U for double/mpq, solve_U_y for double/mpq/numeric_pair<mpq>, floating row dot products and dense residual-correction double_solve_U_y",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_solve.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_float_solve.go"
+          ],
+          "tests": [
+            "TestLPSparseDenseTriangularSolvesIndependentResiduals",
+            "TestLPSparseDenseSolveLiteralDiagonalDuplicatesAndIEEE",
+            "TestLPExactSparseDenseSolveAllocationFailureCensus",
+            "TestLPSparseDenseSolveBoundsAndPublicationPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -123708,7 +123729,8 @@
         "Exact maximum owns abs/comparison locals and the actual indexed-value swap copy, with both backlink repairs before numerical swaps. Prepare resets column counters before descending row ordering, then owns each forward row iteration indexed-value copy before queue insertion. Pivot scoring owns every coefficient copied by the source local column-header copy and destroys it in vector order; dynamic native lexical slots retain partial copies on error. Selection publishes dequeued physical indices immediately, drops inactive/missing candidates, retains rejected pairs in order, recovers their current scores before publishing accepted logical indices, and leaves the last physical outputs on exhaustion/error. Older active comparison generations remain caller-owned on manager-busy refusal.",
         "Active shortening borrows row/column/eta entries without numerical copies or receipts. It removes queued row pairs and decrements active count before inverse-column lookup, retains the first empty-column counter and exits immediately, then removes current pivot-column pairs and refreshes affected active rows. Eta refresh intentionally has no active-index filter. PivotWithEta borrows coefficient/diagonal references and invokes owning matrix elimination/division sequentially; numerical failure remains solely matrix-owned, and Close preserves the independently owned eta. Stopped borrowed eta is rejected before matrix mutation.",
         "FillEtaMatrix borrows source column coefficients and returns a separately owning eta. Exact unary negation owns the reached coefficient copy until the entire eta Append expression finishes; the matrix retains this local and only its own receipts on error. Eta owns independent diagonal/member copies and all child division receipts. Close a partial returned eta before its stopped matrix. Exact zero-diagonal rejection destroys the partial eta before returning nil,false. Unit columns make no numeric copies, including ignored large upper entries. Actual older caller comparison state remains caller-owned through source-prefix failure and both new owner cleanups.",
-        "Replacement borrows a same-manager indexed vector; matrix owns actual abs comparison locals, the w_at_i copy, set_value argument and append/swap copies, with only its new numerical receipts. Common assignments publish the column value before the row setter. Removal preserves reciprocal offsets and the source tail assignment/destruction order, then repairs a removed head maximum. Successful elements zero the caller slot at the source point; Index clears only after the full new-entry loop. Failure freezes the matrix while the vector retains its completed/partial values; close matrix before borrowed input. Ten pooled/direct campaigns observe real column-before-row, row-before-column append, completed removal and backlink-before-owning-swap prefixes; no fabricated budget event or receipt."
+        "Replacement borrows a same-manager indexed vector; matrix owns actual abs comparison locals, the w_at_i copy, set_value argument and append/swap copies, with only its new numerical receipts. Common assignments publish the column value before the row setter. Removal preserves reciprocal offsets and the source tail assignment/destruction order, then repairs a removed head maximum. Successful elements zero the caller slot at the source point; Index clears only after the full new-entry loop. Failure freezes the matrix while the vector retains its completed/partial values; close matrix before borrowed input. Ten pooled/direct campaigns observe real column-before-row, row-before-column append, completed removal and backlink-before-owning-swap prefixes; no fabricated budget event or receipt.",
+        "Dense solves borrow each live source anchor through the source row/column order and preserve coefficient storage. Exact scalar product retains actual copy/multiply/result temporaries; pair scalar-left product constructs both expressions then copies X/Y into its owning product slots and subtracts X before Y. Matrix owns only new numerical receipts and lexical products; caller owns completed/partial destination values and closes them after a stopped matrix. Matrix Close preserves caller fields, with pooled/direct cell/object census and a required completed-X/old-Y failure prefix. Floating refinement copies all dense slots, solves, computes descending row residuals, solves correction and adds it descending; trailing caller slots stay unchanged."
       ],
       "deviations": [
         "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/active shortening, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
@@ -123718,7 +123740,8 @@
         "Only the retained unsigned-index threshold overload and live get_pivot_for_column path are ported; definition-only alternate threshold/debug-best-pivot templates and commented calls are excluded. Native typed storage replaces header/vector/map internals while preserving actual project numeral copies, queue ordering, strict comparison, unsigned score wrap and output publication. Source invalid metadata is a reached Go bounds guard with its actual dequeue/repair prefix. Triangular solves and complete LU/solver implementation remain open.",
         "Active shortening preserves signed score assertion/release unsigned wrap, stale queued candidates for coefficients removed by elimination, eta reinsertions and actual partial mutation prefixes. Source index errors become reached Go bounds guards. No numeric allocation is added for reference-only shortening. Triangular solves, complete LU and solvers remain open.",
         "Go tuples return the published eta/acceptance/error; callers close returned partial exact owners. As in the existing eta API, dimension metadata is available in both Go profiles, while C++ retains it only under Z3DEBUG. Unit detection is literal: an empty/upper-only column or duplicate unit diagonals can return nil,true; lower explicit zeros still construct eta. Last reached nonzero duplicate diagonal wins; zero diagonal rejects immediately. Floating strict epsilon and IEEE values remain literal; exact tiny nonzero pivots are accepted. A real older stopped comparison permits scalar copies then reaches the numeral manager invalid-slot division refusal; this actual prefix is cleaned without consuming its caller receipt and is not valid-domain arithmetic credit. Repeated-pivot tests exercise implemented pieces, not completion of the unported LU class. Triangular solves and complete solver integration remain open.",
-        "Floating drop tolerance applies only to new entries; existing nonzero common values are retained. Exact tolerance uses zero predicates independently of floating settings. Native typed slices replace container internals; actual project numeral copies and comparison lifetime remain. Literal duplicate old coordinates and repeated/stale/unindexed input entries retain source order and clearing behavior; zero inputs keep their stored representation. Replacement leaves pivot queue and shortened counters unchanged. Predictable errors preserve source publication prefixes; input manager/pending guards reject before mutation. Triangular solves, remaining sparse diagnostics and full LU/solver integration remain open."
+        "Floating drop tolerance applies only to new entries; existing nonzero common values are retained. Exact tolerance uses zero predicates independently of floating settings. Native typed slices replace container internals; actual project numeral copies and comparison lifetime remain. Literal duplicate old coordinates and repeated/stale/unindexed input entries retain source order and clearing behavior; zero inputs keep their stored representation. Replacement leaves pivot queue and shortened counters unchanged. Predictable errors preserve source publication prefixes; input manager/pending guards reject before mutation. Triangular solves, remaining sparse diagnostics and full LU/solver integration remain open.",
+        "Source dense solves assume unit upper triangular workspace and omit diagonal division; diagonal/nontriangular inputs are not silently repaired. They retain stored duplicates/zeros, skip exact zero anchors, follow inverse permutations and expose reached bounds/mutation prefixes. Source left solve never reads the final anchor, including dimension-one empty inputs. Typed native slices replace vector copy internals; actual project numeral product and subtraction lifetimes remain. Live LU precise branches call solve_U_y and return before refinement; explicit precise refinement instantiations alone are not retained consumers and are not ported. Indexed solves/graph traversal and floating indexed refinement, remaining sparse diagnostics, full LU and solvers remain open."
       ]
     },
     {
@@ -123741,7 +123764,10 @@
         "pkg/util/lp/sparse_matrix_eta_test.go",
         "pkg/util/lp/sparse_matrix_float_replace.go",
         "pkg/util/lp/sparse_matrix_exact_replace.go",
-        "pkg/util/lp/sparse_matrix_replace_test.go"
+        "pkg/util/lp/sparse_matrix_replace_test.go",
+        "pkg/util/lp/sparse_matrix_float_solve.go",
+        "pkg/util/lp/sparse_matrix_exact_solve.go",
+        "pkg/util/lp/sparse_matrix_solve_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -123789,7 +123815,11 @@
         "TestLPExactSparseColumnReplacementAllocationFailureCensus",
         "TestLPSparseColumnReplacementIEEEAndTolerance",
         "TestLPSparseColumnReplacementBoundsAndPrefixes",
-        "TestLPExactSparseColumnReplacementBorrowedOwnerGuards"
+        "TestLPExactSparseColumnReplacementBorrowedOwnerGuards",
+        "TestLPSparseDenseTriangularSolvesIndependentResiduals",
+        "TestLPSparseDenseSolveLiteralDiagonalDuplicatesAndIEEE",
+        "TestLPExactSparseDenseSolveAllocationFailureCensus",
+        "TestLPSparseDenseSolveBoundsAndPublicationPrefixes"
       ],
       "conditionals": [
         {
@@ -124152,6 +124182,20 @@
             "TestLPSparseColumnReplacementBoundsAndPrefixes",
             "TestLPExactSparseColumnReplacementBorrowedOwnerGuards"
           ]
+        },
+        {
+          "name": "retained dense unit-upper triangular solve_y_U for double/mpq, solve_U_y for double/mpq/numeric_pair<mpq>, floating row dot products and dense residual-correction double_solve_U_y",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_solve.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_float_solve.go"
+          ],
+          "tests": [
+            "TestLPSparseDenseTriangularSolvesIndependentResiduals",
+            "TestLPSparseDenseSolveLiteralDiagonalDuplicatesAndIEEE",
+            "TestLPExactSparseDenseSolveAllocationFailureCensus",
+            "TestLPSparseDenseSolveBoundsAndPublicationPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -124162,7 +124206,8 @@
         "Exact maximum owns abs/comparison locals and the actual indexed-value swap copy, with both backlink repairs before numerical swaps. Prepare resets column counters before descending row ordering, then owns each forward row iteration indexed-value copy before queue insertion. Pivot scoring owns every coefficient copied by the source local column-header copy and destroys it in vector order; dynamic native lexical slots retain partial copies on error. Selection publishes dequeued physical indices immediately, drops inactive/missing candidates, retains rejected pairs in order, recovers their current scores before publishing accepted logical indices, and leaves the last physical outputs on exhaustion/error. Older active comparison generations remain caller-owned on manager-busy refusal.",
         "Active shortening borrows row/column/eta entries without numerical copies or receipts. It removes queued row pairs and decrements active count before inverse-column lookup, retains the first empty-column counter and exits immediately, then removes current pivot-column pairs and refreshes affected active rows. Eta refresh intentionally has no active-index filter. PivotWithEta borrows coefficient/diagonal references and invokes owning matrix elimination/division sequentially; numerical failure remains solely matrix-owned, and Close preserves the independently owned eta. Stopped borrowed eta is rejected before matrix mutation.",
         "FillEtaMatrix borrows source column coefficients and returns a separately owning eta. Exact unary negation owns the reached coefficient copy until the entire eta Append expression finishes; the matrix retains this local and only its own receipts on error. Eta owns independent diagonal/member copies and all child division receipts. Close a partial returned eta before its stopped matrix. Exact zero-diagonal rejection destroys the partial eta before returning nil,false. Unit columns make no numeric copies, including ignored large upper entries. Actual older caller comparison state remains caller-owned through source-prefix failure and both new owner cleanups.",
-        "Replacement borrows a same-manager indexed vector; matrix owns actual abs comparison locals, the w_at_i copy, set_value argument and append/swap copies, with only its new numerical receipts. Common assignments publish the column value before the row setter. Removal preserves reciprocal offsets and the source tail assignment/destruction order, then repairs a removed head maximum. Successful elements zero the caller slot at the source point; Index clears only after the full new-entry loop. Failure freezes the matrix while the vector retains its completed/partial values; close matrix before borrowed input. Ten pooled/direct campaigns observe real column-before-row, row-before-column append, completed removal and backlink-before-owning-swap prefixes; no fabricated budget event or receipt."
+        "Replacement borrows a same-manager indexed vector; matrix owns actual abs comparison locals, the w_at_i copy, set_value argument and append/swap copies, with only its new numerical receipts. Common assignments publish the column value before the row setter. Removal preserves reciprocal offsets and the source tail assignment/destruction order, then repairs a removed head maximum. Successful elements zero the caller slot at the source point; Index clears only after the full new-entry loop. Failure freezes the matrix while the vector retains its completed/partial values; close matrix before borrowed input. Ten pooled/direct campaigns observe real column-before-row, row-before-column append, completed removal and backlink-before-owning-swap prefixes; no fabricated budget event or receipt.",
+        "Dense solves borrow each live source anchor through the source row/column order and preserve coefficient storage. Exact scalar product retains actual copy/multiply/result temporaries; pair scalar-left product constructs both expressions then copies X/Y into its owning product slots and subtracts X before Y. Matrix owns only new numerical receipts and lexical products; caller owns completed/partial destination values and closes them after a stopped matrix. Matrix Close preserves caller fields, with pooled/direct cell/object census and a required completed-X/old-Y failure prefix. Floating refinement copies all dense slots, solves, computes descending row residuals, solves correction and adds it descending; trailing caller slots stay unchanged."
       ],
       "deviations": [
         "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/active shortening, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
@@ -124172,7 +124217,8 @@
         "Only the retained unsigned-index threshold overload and live get_pivot_for_column path are ported; definition-only alternate threshold/debug-best-pivot templates and commented calls are excluded. Native typed storage replaces header/vector/map internals while preserving actual project numeral copies, queue ordering, strict comparison, unsigned score wrap and output publication. Source invalid metadata is a reached Go bounds guard with its actual dequeue/repair prefix. Triangular solves and complete LU/solver implementation remain open.",
         "Active shortening preserves signed score assertion/release unsigned wrap, stale queued candidates for coefficients removed by elimination, eta reinsertions and actual partial mutation prefixes. Source index errors become reached Go bounds guards. No numeric allocation is added for reference-only shortening. Triangular solves, complete LU and solvers remain open.",
         "Go tuples return the published eta/acceptance/error; callers close returned partial exact owners. As in the existing eta API, dimension metadata is available in both Go profiles, while C++ retains it only under Z3DEBUG. Unit detection is literal: an empty/upper-only column or duplicate unit diagonals can return nil,true; lower explicit zeros still construct eta. Last reached nonzero duplicate diagonal wins; zero diagonal rejects immediately. Floating strict epsilon and IEEE values remain literal; exact tiny nonzero pivots are accepted. A real older stopped comparison permits scalar copies then reaches the numeral manager invalid-slot division refusal; this actual prefix is cleaned without consuming its caller receipt and is not valid-domain arithmetic credit. Repeated-pivot tests exercise implemented pieces, not completion of the unported LU class. Triangular solves and complete solver integration remain open.",
-        "Floating drop tolerance applies only to new entries; existing nonzero common values are retained. Exact tolerance uses zero predicates independently of floating settings. Native typed slices replace container internals; actual project numeral copies and comparison lifetime remain. Literal duplicate old coordinates and repeated/stale/unindexed input entries retain source order and clearing behavior; zero inputs keep their stored representation. Replacement leaves pivot queue and shortened counters unchanged. Predictable errors preserve source publication prefixes; input manager/pending guards reject before mutation. Triangular solves, remaining sparse diagnostics and full LU/solver integration remain open."
+        "Floating drop tolerance applies only to new entries; existing nonzero common values are retained. Exact tolerance uses zero predicates independently of floating settings. Native typed slices replace container internals; actual project numeral copies and comparison lifetime remain. Literal duplicate old coordinates and repeated/stale/unindexed input entries retain source order and clearing behavior; zero inputs keep their stored representation. Replacement leaves pivot queue and shortened counters unchanged. Predictable errors preserve source publication prefixes; input manager/pending guards reject before mutation. Triangular solves, remaining sparse diagnostics and full LU/solver integration remain open.",
+        "Source dense solves assume unit upper triangular workspace and omit diagonal division; diagonal/nontriangular inputs are not silently repaired. They retain stored duplicates/zeros, skip exact zero anchors, follow inverse permutations and expose reached bounds/mutation prefixes. Source left solve never reads the final anchor, including dimension-one empty inputs. Typed native slices replace vector copy internals; actual project numeral product and subtraction lifetimes remain. Live LU precise branches call solve_U_y and return before refinement; explicit precise refinement instantiations alone are not retained consumers and are not ported. Indexed solves/graph traversal and floating indexed refinement, remaining sparse diagnostics, full LU and solvers remain open."
       ]
     },
     {
@@ -124195,7 +124241,10 @@
         "pkg/util/lp/sparse_matrix_eta_test.go",
         "pkg/util/lp/sparse_matrix_float_replace.go",
         "pkg/util/lp/sparse_matrix_exact_replace.go",
-        "pkg/util/lp/sparse_matrix_replace_test.go"
+        "pkg/util/lp/sparse_matrix_replace_test.go",
+        "pkg/util/lp/sparse_matrix_float_solve.go",
+        "pkg/util/lp/sparse_matrix_exact_solve.go",
+        "pkg/util/lp/sparse_matrix_solve_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -124243,7 +124292,11 @@
         "TestLPExactSparseColumnReplacementAllocationFailureCensus",
         "TestLPSparseColumnReplacementIEEEAndTolerance",
         "TestLPSparseColumnReplacementBoundsAndPrefixes",
-        "TestLPExactSparseColumnReplacementBorrowedOwnerGuards"
+        "TestLPExactSparseColumnReplacementBorrowedOwnerGuards",
+        "TestLPSparseDenseTriangularSolvesIndependentResiduals",
+        "TestLPSparseDenseSolveLiteralDiagonalDuplicatesAndIEEE",
+        "TestLPExactSparseDenseSolveAllocationFailureCensus",
+        "TestLPSparseDenseSolveBoundsAndPublicationPrefixes"
       ],
       "conditionals": [
         {
@@ -124368,6 +124421,20 @@
             "TestLPSparseColumnReplacementBoundsAndPrefixes",
             "TestLPExactSparseColumnReplacementBorrowedOwnerGuards"
           ]
+        },
+        {
+          "name": "retained dense unit-upper triangular solve_y_U for double/mpq, solve_U_y for double/mpq/numeric_pair<mpq>, floating row dot products and dense residual-correction double_solve_U_y",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_solve.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_float_solve.go"
+          ],
+          "tests": [
+            "TestLPSparseDenseTriangularSolvesIndependentResiduals",
+            "TestLPSparseDenseSolveLiteralDiagonalDuplicatesAndIEEE",
+            "TestLPExactSparseDenseSolveAllocationFailureCensus",
+            "TestLPSparseDenseSolveBoundsAndPublicationPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -124378,7 +124445,8 @@
         "Exact maximum owns abs/comparison locals and the actual indexed-value swap copy, with both backlink repairs before numerical swaps. Prepare resets column counters before descending row ordering, then owns each forward row iteration indexed-value copy before queue insertion. Pivot scoring owns every coefficient copied by the source local column-header copy and destroys it in vector order; dynamic native lexical slots retain partial copies on error. Selection publishes dequeued physical indices immediately, drops inactive/missing candidates, retains rejected pairs in order, recovers their current scores before publishing accepted logical indices, and leaves the last physical outputs on exhaustion/error. Older active comparison generations remain caller-owned on manager-busy refusal.",
         "Active shortening borrows row/column/eta entries without numerical copies or receipts. It removes queued row pairs and decrements active count before inverse-column lookup, retains the first empty-column counter and exits immediately, then removes current pivot-column pairs and refreshes affected active rows. Eta refresh intentionally has no active-index filter. PivotWithEta borrows coefficient/diagonal references and invokes owning matrix elimination/division sequentially; numerical failure remains solely matrix-owned, and Close preserves the independently owned eta. Stopped borrowed eta is rejected before matrix mutation.",
         "FillEtaMatrix borrows source column coefficients and returns a separately owning eta. Exact unary negation owns the reached coefficient copy until the entire eta Append expression finishes; the matrix retains this local and only its own receipts on error. Eta owns independent diagonal/member copies and all child division receipts. Close a partial returned eta before its stopped matrix. Exact zero-diagonal rejection destroys the partial eta before returning nil,false. Unit columns make no numeric copies, including ignored large upper entries. Actual older caller comparison state remains caller-owned through source-prefix failure and both new owner cleanups.",
-        "Replacement borrows a same-manager indexed vector; matrix owns actual abs comparison locals, the w_at_i copy, set_value argument and append/swap copies, with only its new numerical receipts. Common assignments publish the column value before the row setter. Removal preserves reciprocal offsets and the source tail assignment/destruction order, then repairs a removed head maximum. Successful elements zero the caller slot at the source point; Index clears only after the full new-entry loop. Failure freezes the matrix while the vector retains its completed/partial values; close matrix before borrowed input. Ten pooled/direct campaigns observe real column-before-row, row-before-column append, completed removal and backlink-before-owning-swap prefixes; no fabricated budget event or receipt."
+        "Replacement borrows a same-manager indexed vector; matrix owns actual abs comparison locals, the w_at_i copy, set_value argument and append/swap copies, with only its new numerical receipts. Common assignments publish the column value before the row setter. Removal preserves reciprocal offsets and the source tail assignment/destruction order, then repairs a removed head maximum. Successful elements zero the caller slot at the source point; Index clears only after the full new-entry loop. Failure freezes the matrix while the vector retains its completed/partial values; close matrix before borrowed input. Ten pooled/direct campaigns observe real column-before-row, row-before-column append, completed removal and backlink-before-owning-swap prefixes; no fabricated budget event or receipt.",
+        "Dense solves borrow each live source anchor through the source row/column order and preserve coefficient storage. Exact scalar product retains actual copy/multiply/result temporaries; pair scalar-left product constructs both expressions then copies X/Y into its owning product slots and subtracts X before Y. Matrix owns only new numerical receipts and lexical products; caller owns completed/partial destination values and closes them after a stopped matrix. Matrix Close preserves caller fields, with pooled/direct cell/object census and a required completed-X/old-Y failure prefix. Floating refinement copies all dense slots, solves, computes descending row residuals, solves correction and adds it descending; trailing caller slots stay unchanged."
       ],
       "deviations": [
         "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/active shortening, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
@@ -124388,7 +124456,8 @@
         "Only the retained unsigned-index threshold overload and live get_pivot_for_column path are ported; definition-only alternate threshold/debug-best-pivot templates and commented calls are excluded. Native typed storage replaces header/vector/map internals while preserving actual project numeral copies, queue ordering, strict comparison, unsigned score wrap and output publication. Source invalid metadata is a reached Go bounds guard with its actual dequeue/repair prefix. Triangular solves and complete LU/solver implementation remain open.",
         "Active shortening preserves signed score assertion/release unsigned wrap, stale queued candidates for coefficients removed by elimination, eta reinsertions and actual partial mutation prefixes. Source index errors become reached Go bounds guards. No numeric allocation is added for reference-only shortening. Triangular solves, complete LU and solvers remain open.",
         "Go tuples return the published eta/acceptance/error; callers close returned partial exact owners. As in the existing eta API, dimension metadata is available in both Go profiles, while C++ retains it only under Z3DEBUG. Unit detection is literal: an empty/upper-only column or duplicate unit diagonals can return nil,true; lower explicit zeros still construct eta. Last reached nonzero duplicate diagonal wins; zero diagonal rejects immediately. Floating strict epsilon and IEEE values remain literal; exact tiny nonzero pivots are accepted. A real older stopped comparison permits scalar copies then reaches the numeral manager invalid-slot division refusal; this actual prefix is cleaned without consuming its caller receipt and is not valid-domain arithmetic credit. Repeated-pivot tests exercise implemented pieces, not completion of the unported LU class. Triangular solves and complete solver integration remain open.",
-        "Floating drop tolerance applies only to new entries; existing nonzero common values are retained. Exact tolerance uses zero predicates independently of floating settings. Native typed slices replace container internals; actual project numeral copies and comparison lifetime remain. Literal duplicate old coordinates and repeated/stale/unindexed input entries retain source order and clearing behavior; zero inputs keep their stored representation. Replacement leaves pivot queue and shortened counters unchanged. Predictable errors preserve source publication prefixes; input manager/pending guards reject before mutation. Triangular solves, remaining sparse diagnostics and full LU/solver integration remain open."
+        "Floating drop tolerance applies only to new entries; existing nonzero common values are retained. Exact tolerance uses zero predicates independently of floating settings. Native typed slices replace container internals; actual project numeral copies and comparison lifetime remain. Literal duplicate old coordinates and repeated/stale/unindexed input entries retain source order and clearing behavior; zero inputs keep their stored representation. Replacement leaves pivot queue and shortened counters unchanged. Predictable errors preserve source publication prefixes; input manager/pending guards reject before mutation. Triangular solves, remaining sparse diagnostics and full LU/solver integration remain open.",
+        "Source dense solves assume unit upper triangular workspace and omit diagonal division; diagonal/nontriangular inputs are not silently repaired. They retain stored duplicates/zeros, skip exact zero anchors, follow inverse permutations and expose reached bounds/mutation prefixes. Source left solve never reads the final anchor, including dimension-one empty inputs. Typed native slices replace vector copy internals; actual project numeral product and subtraction lifetimes remain. Live LU precise branches call solve_U_y and return before refinement; explicit precise refinement instantiations alone are not retained consumers and are not ported. Indexed solves/graph traversal and floating indexed refinement, remaining sparse diagnostics, full LU and solvers remain open."
       ]
     },
     {
