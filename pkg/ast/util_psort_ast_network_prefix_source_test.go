@@ -40,8 +40,7 @@ func TestPsortASTNetworkUninitializedModeReachedAfterActualComparatorPrefix(t *t
 	}
 	sz, e := out.Size()
 	astTestMust(t, e)
-	trail, e := m.RefVectorSize(c.trail)
-	astTestMust(t, e)
+	trail := len(c.trail)
 	st, e := s.Stats()
 	astTestMust(t, e)
 	if sz != 2 || trail != 2 || st.CompiledVariables != 2 || st.CompiledClauses != 0 {

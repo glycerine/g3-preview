@@ -34255,3 +34255,35 @@ debug files and 15 allocator/runtime files. Retained sorting-network AST
 contexts and formatting reference storage still use custom vector wrappers.
 The external collection migration and internal cycle cleanup are incomplete;
 the complete requested util subpackage split is not ready.
+
+## Native retained sorting-network AST context storage
+
+The retained ast_ext2 context in src/test/sorting_network.cpp now owns clauses
+and trail in []ASTHandle. Actual factory results acquire references immediately
+before append. Removed reference-vector construction/backing and growth-only
+unpublished push frames/receipts. Only the concrete context header remains
+fallible here; actual AST factories/network lexical scopes retain their existing
+reservation checks. Cleanup retains reverse member order and ascending element
+order, clearing consumed reference slots before errors; SourceFinalize keeps its
+first cause, while owning Close can resume and safely handle manager teardown.
+
+Removed the obsolete unpublished-vector-growth test. Replacement integration
+checks forty cached NOTs and singleton clauses, exact owning reference deltas,
+borrowed double-NOT results, append order, copied-owner rejection, finalized
+owner guards and idempotent cleanup. Native cached factories grow both slices
+with arena reservations disabled; debug retains real well-sorted factory checks.
+Escaped native storage is released after manager Close without node callbacks.
+Updated real clause consumers/oracles to iterate slices directly. Independent
+finite/recursive clause semantics and actual network reservation campaigns remain.
+
+Validation: focused native/debug sorting-network tests passed (0.221s/0.313s).
+Full native AST/rewriter/model/tactic/SAT tactic/API passed
+(20.164s/11.826s/0.056s/0.023s/0.111s/0.013s); full debug AST passed (21.158s).
+Module-wide compilation, AST vet, manifest and diff checks passed. Counts remain
+2102 units/677 APIs:62 ported,283 partial,1729 unported,two dead/deleted.
+No source container allocation geometry or unused universal adapters are credited.
+
+Production caller audit now finds ASTRefVector only in its general bridge and
+AppArguments/rewriter adapter methods. Those unused layers should be removed
+following a complete declaration/caller audit. Formatting collection migration,
+internal util cycle cleanup and the full util subpackage split remain unfinished.

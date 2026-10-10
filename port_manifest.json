@@ -108659,9 +108659,10 @@
       ],
       "tests": [
         "TestPsortASTContextActualFactoriesClausesAndTrail",
-        "TestPsortASTContextUnpublishedClauseNativeCleanup",
         "TestPsortASTContextActualConstructorRefusalPrefixes",
-        "TestPsortASTContextNativeWideTrailAndClauseFinalization"
+        "TestPsortASTContextNativeWideTrailAndClauseFinalization",
+        "TestPsortASTContextNativeRepeatedFactoriesExactReferences",
+        "TestPsortASTContextEscapedNativeStorageAfterManagerClose"
       ],
       "assertions": [
         {
@@ -108726,9 +108727,10 @@
           "go_target": "pkg/ast/util_psort_ast_context.go",
           "tests": [
             "TestPsortASTContextActualFactoriesClausesAndTrail",
-            "TestPsortASTContextUnpublishedClauseNativeCleanup",
             "TestPsortASTContextActualConstructorRefusalPrefixes",
-            "TestPsortASTContextNativeWideTrailAndClauseFinalization"
+            "TestPsortASTContextNativeWideTrailAndClauseFinalization",
+            "TestPsortASTContextNativeRepeatedFactoriesExactReferences",
+            "TestPsortASTContextEscapedNativeStorageAfterManagerClose"
           ]
         }
       ],
@@ -108740,7 +108742,8 @@
       "deviations": [
         "Selected unsigned_ext source test_sorting1/test_sorting2/test_sorting4 runs2030 original is_sorted ENSURE instances; AST/psort_nw branches and full registered driver stdout remain open, no whole-driver credit. Concrete stateless unsigned extension preserves source mk_ite/mk_le/default0 without callbacks; source persistent appended mapping columns and reset-self-alias behavior remain literal. Other numeral/AST/psort specializations, TRACE/native ABI/global allocator/other compile profiles remain separate completion obligations. Actual closed-provider/invalid get/division-by-zero and signed TLS overflow tests are explicit Go guard-domain evidence, not ordinary native algorithm/OOM credit.",
         "Remaining SAT scalar column layout is separate from the native queue. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim.",
-        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit."
+        "Selected concrete AST Runtime/profile only; actual SMT kernel driver, native pretty/TRACE/global transport and other context/copy profiles remain separate obligations. Source-stopped destruction and explicit owning abort are distinct; pointer-free Go geometry is not native ABI credit.",
+        "Retained ast_ext2 clauses/trail now use owning []ASTHandle with INC before native append. Removed ASTRefVector construction, capacity/refusal emulation and unpublished push receipt frames. Cleanup retains reverse member/ascending element order and consumed-DEC progress; source teardown retains its first cause while owning Close can resume. Actual AST factory and network reservation campaigns and independent clause oracles remain. Forty repeated cached factories/singleton clauses verify exact reference ownership and append order; native growth needs no arena reservation, while debug retains actual factory checks. Escaped owners close after manager teardown without stale node callbacks. No source container allocation geometry is credited."
       ]
     },
     {
@@ -145556,7 +145559,6 @@
       ],
       "tests": [
         "TestPsortASTContextActualFactoriesClausesAndTrail",
-        "TestPsortASTContextUnpublishedClauseNativeCleanup",
         "TestPsortASTContextActualConstructorRefusalPrefixes",
         "TestPsortASTContextNativeWideTrailAndClauseFinalization",
         "TestPsortASTCostLiteralWrapTieAndReset",
@@ -145569,7 +145571,9 @@
         "TestPsortASTNetworkFiniteCardinalityClauseSemantics",
         "TestPsortASTNetworkEveryActualBoundReservationNamedBeforeFaultLift",
         "TestPsortASTNetworkRecursiveFamiliesIndependentClauseOracle",
-        "TestPsortASTNetworkNativeRangeFailureUnwindsFrames"
+        "TestPsortASTNetworkNativeRangeFailureUnwindsFrames",
+        "TestPsortASTContextNativeRepeatedFactoriesExactReferences",
+        "TestPsortASTContextEscapedNativeStorageAfterManagerClose"
       ],
       "conditionals": [
         {
@@ -145748,7 +145752,6 @@
           "go_target": "pkg/ast/util_psort_ast_network.go",
           "tests": [
             "TestPsortASTContextActualFactoriesClausesAndTrail",
-            "TestPsortASTContextUnpublishedClauseNativeCleanup",
             "TestPsortASTContextActualConstructorRefusalPrefixes",
             "TestPsortASTContextNativeWideTrailAndClauseFinalization",
             "TestPsortASTCostLiteralWrapTieAndReset",
@@ -145761,7 +145764,9 @@
             "TestPsortASTNetworkFiniteCardinalityClauseSemantics",
             "TestPsortASTNetworkEveryActualBoundReservationNamedBeforeFaultLift",
             "TestPsortASTNetworkRecursiveFamiliesIndependentClauseOracle",
-            "TestPsortASTNetworkNativeRangeFailureUnwindsFrames"
+            "TestPsortASTNetworkNativeRangeFailureUnwindsFrames",
+            "TestPsortASTContextNativeRepeatedFactoriesExactReferences",
+            "TestPsortASTContextEscapedNativeStorageAfterManagerClose"
           ]
         }
       ],
@@ -145775,7 +145780,8 @@
         "Selected unsigned_ext source test_sorting1/test_sorting2/test_sorting4 runs2030 original is_sorted ENSURE instances; AST psort_nw branches are covered by concrete clause and independent finite-oracle tests. Concrete stateless unsigned extension preserves source mk_ite/mk_le/default0 without callbacks; source persistent appended mapping columns and reset-self-alias behavior remain literal. Callback behavior is represented by the retained unsigned and AST contexts; Go diagnostics and allocation replace TRACE/native ABI/global allocation details. Actual closed-provider/invalid get/division-by-zero and signed TLS overflow tests are explicit Go guard-domain evidence, not ordinary native algorithm/OOM credit.",
         "Remaining SAT scalar column layout is separate from the native queue. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim.",
         "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. The retained unsigned specialization uses checked Go lifetime and diagnostic adapters.",
-        "The exported AST context preserves the complete psort algorithm; downstream SMT and tactic callers retain their own integration obligations. Literal scratch uses native []ASTHandle slices and captured spans, with no Runtime payload serialization or vector copy/growth acquisition metadata. Native frame cleanup also releases a partial range after a reached input read error. Real AST reference/registration allocations retain their separate failure and ownership checks."
+        "The exported AST context preserves the complete psort algorithm; downstream SMT and tactic callers retain their own integration obligations. Literal scratch uses native []ASTHandle slices and captured spans, with no Runtime payload serialization or vector copy/growth acquisition metadata. Native frame cleanup also releases a partial range after a reached input read error. Real AST reference/registration allocations retain their separate failure and ownership checks.",
+        "Retained ast_ext2 clauses/trail now use owning []ASTHandle with INC before native append. Removed ASTRefVector construction, capacity/refusal emulation and unpublished push receipt frames. Cleanup retains reverse member/ascending element order and consumed-DEC progress; source teardown retains its first cause while owning Close can resume. Actual AST factory and network reservation campaigns and independent clause oracles remain. Forty repeated cached factories/singleton clauses verify exact reference ownership and append order; native growth needs no arena reservation, while debug retains actual factory checks. Escaped owners close after manager teardown without stale node callbacks. No source container allocation geometry is credited."
       ]
     },
     {

@@ -2,11 +2,7 @@
 package ast
 
 import (
-	"errors"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestPsortASTContextActualFactoriesClausesAndTrail(t *testing.T) {
@@ -32,10 +28,8 @@ func TestPsortASTContextActualFactoriesClausesAndTrail(t *testing.T) {
 		t.Fatal("actual AND and OR")
 	}
 	astTestMust(t, c.Clause(0, ASTLiteralVectorSpan{}))
-	trail, e := m.RefVectorSize(c.trail)
-	astTestMust(t, e)
-	clauses, e := m.RefVectorSize(c.clauses)
-	astTestMust(t, e)
+	trail := len(c.trail)
+	clauses := len(c.clauses)
 	if trail != 5 || clauses != 1 {
 		t.Fatal("literal factory trail and independent clauses", trail, clauses)
 	}
@@ -44,70 +38,6 @@ func TestPsortASTContextActualFactoriesClausesAndTrail(t *testing.T) {
 	if _, e = m.GetRefCount(x); e == nil {
 		t.Fatal("source owned trail reference remained")
 	}
-}
-
-func TestPsortASTContextUnpublishedClauseNativeCleanup(t *testing.T) {
-	m := astTestManager(t)
-	sort, e := m.MkBoolSort()
-	astTestMust(t, e)
-	var args [32]ASTHandle
-	for i := range args {
-		args[i], e = m.MkVar(uint32(8000+i), sort)
-		astTestMust(t, e)
-	}
-	h, e := m.MkFamilyApp(0, ASTOpAnd, nil, args[:])
-	astTestMust(t, e)
-	c, e := NewPsortASTContext(m)
-	astTestMust(t, e)
-	r, e := util.NewRuntime(util.RuntimeConfig{Budget: m.BudgetField})
-	astTestMust(t, e)
-	v, e := NewASTLiteralVector(m.BudgetField)
-	astTestMust(t, e)
-	astTestMust(t, v.Push(h))
-	span, e := v.Span()
-	astTestMust(t, e)
-	external := m.BudgetField.Used() - m.Stats().AllocatedBytes - r.Stats().TotalBytes - c.header - v.header
-	graph := func() {
-		cold := external + c.header + v.header
-		for f := c.pending; f != nil; f = f.next {
-			if f.owner != c || f.receipt.owner != m || !f.receipt.acquired || f.receipt.published {
-				t.Fatal("exact owned INC frame")
-			}
-			cold += f.header
-		}
-		if m.BudgetField.Used() != m.Stats().AllocatedBytes+r.Stats().TotalBytes+cold {
-			t.Fatal("named actual owner cold graph", m.BudgetField.Used(), cold)
-		}
-	}
-	// The real cold frame succeeds, then the source reference vector expansion
-	// fails after INC, leaving the clause pointer unpublished.
-	m.BudgetField.FailAfter(1)
-	cause := c.Clause(1, span)
-	if !errors.Is(cause, arena.ErrInjectedFailure) || c.pending == nil {
-		t.Fatal("actual clause source prefix", cause)
-	}
-	refs, e := m.GetRefCount(h)
-	astTestMust(t, e)
-	if refs != 1 {
-		t.Fatal("unjoined INC", refs)
-	}
-	graph()
-	astTestMust(t, c.SourceFinalize())
-	if c.stage != 2 || c.pending == nil {
-		t.Fatal("source members must not consume unjoined INC")
-	}
-	m.BudgetField.FailAfter(0)
-	cleanup := c.Close()
-	astTestMust(t, cleanup)
-	if !c.closed || c.pending != nil {
-		t.Fatal("native cleanup did not acknowledge the acquired reference")
-	}
-	graph()
-	astTestMust(t, c.Close())
-	graph()
-	m.BudgetField.FailAfter(-1)
-	astTestMust(t, v.Close())
-	astTestMust(t, r.Close())
 }
 
 func TestPsortASTContextActualConstructorRefusalPrefixes(t *testing.T) {
@@ -120,15 +50,12 @@ func TestPsortASTContextActualConstructorRefusalPrefixes(t *testing.T) {
 		cold := external
 		if c != nil {
 			cold += c.header
-			if c.constructed != (cause == nil) {
+			if cause != nil {
 				t.Fatal("actual complete constructor publication", ordinal, cause)
 			}
 		}
 		if m.BudgetField.Used() != m.Stats().AllocatedBytes+cold {
 			t.Fatal("immediate failed child/header graph", ordinal, m.BudgetField.Used(), cold)
-		}
-		if c != nil && cause != nil && c.completed != 0 {
-			t.Fatal("completed source member unwind", ordinal, c.completed, cause)
 		}
 		m.BudgetField.FailAfter(-1)
 		if c != nil {
@@ -183,4 +110,102 @@ func TestPsortASTContextNativeWideTrailAndClauseFinalization(t *testing.T) {
 		t.Fatal("native owning closure")
 	}
 	m.BudgetField.FailAfter(-1)
+}
+
+func TestPsortASTContextNativeRepeatedFactoriesExactReferences(t *testing.T) {
+	m := astTestManager(t)
+	c, e := NewPsortASTContext(m)
+	astTestMust(t, e)
+	x, e := c.Fresh()
+	astTestMust(t, e)
+	n, e := c.Not(x)
+	astTestMust(t, e)
+	astTestMust(t, m.IncRef(x))
+	astTestMust(t, m.IncRef(n))
+	literals, e := NewASTLiteralVector(m.BudgetField)
+	astTestMust(t, e)
+	defer literals.Close()
+	astTestMust(t, literals.Push(x))
+	span, e := literals.Span()
+	astTestMust(t, e)
+	xr, e := m.GetRefCount(x)
+	astTestMust(t, e)
+	nr, e := m.GetRefCount(n)
+	astTestMust(t, e)
+	used := m.BudgetField.Used()
+	// Debug factories retain their actual well-sorted allocation checks.
+	if !ASTSourceDebug {
+		m.BudgetField.FailAfter(0)
+	}
+	for i := 0; i < 40; i++ {
+		got, e := c.Not(x)
+		astTestMust(t, e)
+		if got != n {
+			t.Fatal("cached NOT identity", got, n)
+		}
+		astTestMust(t, c.Clause(1, span))
+		got, e = c.Not(n)
+		astTestMust(t, e)
+		if got != x {
+			t.Fatal("borrowed double NOT", got, x)
+		}
+	}
+	if !ASTSourceDebug && m.BudgetField.Used() != used {
+		t.Fatal("native storage charged as source vector backing")
+	}
+	m.BudgetField.FailAfter(-1)
+	if len(c.trail) != 42 || len(c.clauses) != 40 {
+		t.Fatal("append prefix", len(c.trail), len(c.clauses))
+	}
+	for _, h := range c.trail[2:] {
+		if h != n {
+			t.Fatal("trail order")
+		}
+	}
+	for _, h := range c.clauses {
+		if h != x {
+			t.Fatal("clause order")
+		}
+	}
+	gotX, e := m.GetRefCount(x)
+	astTestMust(t, e)
+	gotN, e := m.GetRefCount(n)
+	astTestMust(t, e)
+	if gotX != xr+40 || gotN != nr+40 {
+		t.Fatal("exact owning appends and borrowed double NOT", xr, nr, gotX, gotN)
+	}
+	copied := *c
+	if e = copied.Close(); e != ErrASTHandle {
+		t.Fatal("copied owner", e)
+	}
+	astTestMust(t, c.SourceFinalize())
+	gotX, e = m.GetRefCount(x)
+	astTestMust(t, e)
+	gotN, e = m.GetRefCount(n)
+	astTestMust(t, e)
+	if gotX != xr-1 || gotN != nr-1 {
+		t.Fatal("retired context references", xr, nr, gotX, gotN)
+	}
+	if _, e = c.Fresh(); e != ErrASTPending {
+		t.Fatal("finalized context accepted new ownership", e)
+	}
+	astTestMust(t, c.Close())
+	astTestMust(t, c.Close())
+	astTestMust(t, m.DecRef(n))
+	astTestMust(t, m.DecRef(x))
+}
+
+func TestPsortASTContextEscapedNativeStorageAfterManagerClose(t *testing.T) {
+	m := astTestManager(t)
+	c, e := NewPsortASTContext(m)
+	astTestMust(t, e)
+	_, e = c.Fresh()
+	astTestMust(t, e)
+	astTestMust(t, c.Clause(0, ASTLiteralVectorSpan{}))
+	astTestMust(t, m.Close())
+	astTestMust(t, c.Close())
+	if c.trail != nil || c.clauses != nil || c.header != 0 {
+		t.Fatal("escaped native owner retained storage")
+	}
+	astTestMust(t, c.Close())
 }

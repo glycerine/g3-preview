@@ -190,11 +190,7 @@ func TestPsortASTNetworkRecursiveFamiliesIndependentClauseOracle(t *testing.T) {
 				}
 				q := psortOracleCNF{ids: map[ASTHandle]int{}}
 				rid := q.gate(t, m, result)
-				sz, e := m.RefVectorSize(c.clauses)
-				astTestMust(t, e)
-				for i := uint32(0); i < sz; i++ {
-					h, e := m.RefVectorGet(c.clauses, i)
-					astTestMust(t, e)
+				for _, h := range c.clauses {
 					id := q.gate(t, m, h)
 					q.clauses = append(q.clauses, []int{id})
 				}

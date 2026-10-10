@@ -131,11 +131,7 @@ func TestPsortASTNetworkFiniteCardinalityClauseSemantics(t *testing.T) {
 					var clauses, vars []ASTHandle
 					seen := map[ASTHandle]bool{}
 					psortOracleVariables(t, m, result, seen, &vars)
-					count, e := m.RefVectorSize(c.clauses)
-					astTestMust(t, e)
-					for i := uint32(0); i < count; i++ {
-						h, e := m.RefVectorGet(c.clauses, i)
-						astTestMust(t, e)
+					for _, h := range c.clauses {
 						clauses = append(clauses, h)
 						psortOracleVariables(t, m, h, seen, &vars)
 					}

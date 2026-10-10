@@ -30,12 +30,6 @@ func psortNamedGraph(t *testing.T, s *PsortASTNetwork, c *PsortASTContext, in, o
 			vectors = append(vectors, v)
 		}
 	}
-	for f := c.pending; f != nil; f = f.next {
-		if f.owner != c || f.receipt.self != &f.receipt || f.receipt.owner != m || !f.receipt.acquired || f.receipt.published || f.receipt.invocation == 0 || f.receipt.invocation > m.refVectorPushSerial {
-			t.Fatal("actual unpublished reference owner")
-		}
-		cold += f.header
-	}
 	astLiteralNamedGraph(t, s.budget, s.runtime, cold, vectors)
 }
 func TestPsortASTNetworkEveryActualBoundReservationNamedBeforeFaultLift(t *testing.T) {
@@ -92,7 +86,7 @@ func TestPsortASTNetworkEveryActualBoundReservationNamedBeforeFaultLift(t *testi
 						t.Fatal("success lost actual result")
 					}
 				}
-				// Owning source scopes and failed INC frames are released only after their
+				// Owning source scopes are released only after their
 				// immediate named graphs have been checked while refusal remains active.
 				m.BudgetField.FailAfter(-1)
 				astTestMust(t, s.Close())

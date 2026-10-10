@@ -1,33 +1,23 @@
-// Source: src/test/sorting_network.cpp:150-181; src/util/ref_vector.h:53,96-100.
+// Source: src/test/sorting_network.cpp:150-181.
 package ast
 
 import (
-	"errors"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// PsortASTContext is the actual ast_ext2 specialization. Manager ownership
-// remains borrowed. Only clauses, trail and acquired unpublished INC frames
-// are owned here; factory-returned zero-reference pointers stay manager-owned.
+// PsortASTContext is the retained ast_ext2 specialization. Its manager is
+// borrowed; clauses and trail own one reference per appended handle.
 type PsortASTContext struct {
-	self                              *PsortASTContext
-	manager                           *ASTManager
-	budget                            *arena.Budget
-	header                            uint64
-	clauses, trail                    ASTRefVector
-	completed                         uint8
-	constructed, closed, executing    bool
-	stage                             uint8
-	constructorCause, destructorCause error
-	pending                           *psortASTPushFrame
-}
-type psortASTPushFrame struct {
-	next    *psortASTPushFrame
-	owner   *PsortASTContext
-	header  uint64
-	receipt ASTRefVectorPushReceipt
+	self              *PsortASTContext
+	manager           *ASTManager
+	budget            *arena.Budget
+	header            uint64
+	clauses, trail    []ASTHandle
+	closed, executing bool
+	stage             uint8
+	destructorCause   error
 }
 
 func NewPsortASTContext(m *ASTManager) (*PsortASTContext, error) {
@@ -45,21 +35,7 @@ func NewPsortASTContext(m *ASTManager) (*PsortASTContext, error) {
 	}
 	c := &PsortASTContext{manager: m, budget: b, header: bytes}
 	c.self = c
-	var e error
-	c.clauses, e = m.NewRefVector()
-	if e == nil {
-		c.completed = 1
-		c.trail, e = m.NewRefVector()
-	}
-	if e == nil {
-		c.completed = 3
-		c.constructed = true
-		return c, nil
-	}
-	c.constructorCause = e
-	// Incomplete outer construction unwinds only completed source members.
-	unwind := c.finalizeMembers()
-	return c, errors.Join(e, unwind)
+	return c, nil
 }
 func (c *PsortASTContext) identity() error {
 	if c == nil || c.self != c {
@@ -77,26 +53,17 @@ func (c *PsortASTContext) open() error {
 	if e := c.identity(); e != nil {
 		return e
 	}
-	if !c.constructed || c.destructorCause != nil || c.stage != 0 {
+	if c.destructorCause != nil || c.stage != 0 {
 		return ErrASTPending
 	}
 	return nil
 }
-func (c *PsortASTContext) push(v ASTRefVector, h ASTHandle) error {
-	// Real cold frame preparation precedes INC; it owns no reference yet.
-	bytes := uint64(reflect.TypeOf(psortASTPushFrame{}).Size())
-	if e := c.budget.Reserve(bytes); e != nil {
+func (c *PsortASTContext) push(v *[]ASTHandle, h ASTHandle) error {
+	if e := c.manager.IncRef(h); e != nil {
 		return e
 	}
-	f := &psortASTPushFrame{owner: c, header: bytes, next: c.pending}
-	c.pending = f
-	e := c.manager.RefVectorPushTracked(v, h, &f.receipt)
-	if !f.receipt.acquired || f.receipt.published {
-		c.pending = f.next
-		c.budget.Release(f.header)
-		f.header = 0
-	}
-	return e
+	*v = append(*v, h)
+	return nil
 }
 func (c *PsortASTContext) False() (ASTHandle, error) {
 	if e := c.open(); e != nil {
@@ -124,7 +91,7 @@ func (c *PsortASTContext) Fresh() (ASTHandle, error) {
 	if e != nil {
 		return h, e
 	}
-	return h, c.push(c.trail, h)
+	return h, c.push(&c.trail, h)
 }
 func (c *PsortASTContext) Min(a, b ASTHandle) (ASTHandle, error) {
 	if e := c.open(); e != nil {
@@ -136,7 +103,7 @@ func (c *PsortASTContext) Min(a, b ASTHandle) (ASTHandle, error) {
 	if e != nil {
 		return h, e
 	}
-	return h, c.push(c.trail, h)
+	return h, c.push(&c.trail, h)
 }
 func (c *PsortASTContext) Max(a, b ASTHandle) (ASTHandle, error) {
 	if e := c.open(); e != nil {
@@ -148,7 +115,7 @@ func (c *PsortASTContext) Max(a, b ASTHandle) (ASTHandle, error) {
 	if e != nil {
 		return h, e
 	}
-	return h, c.push(c.trail, h)
+	return h, c.push(&c.trail, h)
 }
 func (c *PsortASTContext) Not(a ASTHandle) (ASTHandle, error) {
 	if e := c.open(); e != nil {
@@ -167,7 +134,7 @@ func (c *PsortASTContext) Not(a ASTHandle) (ASTHandle, error) {
 	if e != nil {
 		return h, e
 	}
-	return h, c.push(c.trail, h)
+	return h, c.push(&c.trail, h)
 }
 func (c *PsortASTContext) Clause(n uint32, span ASTLiteralVectorSpan) error {
 	if e := c.open(); e != nil {
@@ -179,26 +146,39 @@ func (c *PsortASTContext) Clause(n uint32, span ASTLiteralVectorSpan) error {
 	if e != nil {
 		return e
 	}
-	return c.push(c.clauses, h)
+	return c.push(&c.clauses, h)
 }
 func (c *PsortASTContext) finalizeMembers() error {
-	if c.stage == 0 {
-		if c.completed&2 != 0 {
-			if e := c.manager.DelRefVector(&c.trail); e != nil {
-				return e
+	m := c.manager
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	// Reverse member order, ascending references within each member.
+	members := [2]*[]ASTHandle{&c.trail, &c.clauses}
+	for c.stage < 2 {
+		v := members[c.stage]
+		if !m.Closed {
+			for i, h := range *v {
+				if h.IsNull() {
+					continue
+				}
+				r, e := m.internal(h)
+				if e != nil {
+					return e
+				}
+				consumed, e := m.decNode(r)
+				if consumed {
+					(*v)[i] = ASTHandle{}
+				}
+				if e != nil {
+					return e
+				}
+				if !consumed {
+					return ErrASTPending
+				}
 			}
-			c.completed &^= 2
 		}
-		c.stage = 1
-	}
-	if c.stage == 1 {
-		if c.completed&1 != 0 {
-			if e := c.manager.DelRefVector(&c.clauses); e != nil {
-				return e
-			}
-			c.completed &^= 1
-		}
-		c.stage = 2
+		*v = nil
+		c.stage++
 	}
 	return nil
 }
@@ -208,9 +188,6 @@ func (c *PsortASTContext) SourceFinalize() error {
 	}
 	if c.destructorCause != nil {
 		return c.destructorCause
-	}
-	if !c.constructed {
-		return nil
 	}
 	c.executing = true
 	defer func() { c.executing = false }()
@@ -229,27 +206,12 @@ func (c *PsortASTContext) Close() error {
 	}
 	c.executing = true
 	defer func() { c.executing = false }()
-	// Explicit owning continuation may resume the child adapter's consumed
-	// reference warning. Ordinary source teardown remains at its sticky cause.
+	// Owning cleanup resumes consumed references; source teardown retains its cause.
 	if e := c.finalizeMembers(); e != nil {
 		if c.destructorCause == nil {
 			c.destructorCause = e
 		}
 		return e
-	}
-	for c.pending != nil {
-		f := c.pending
-		if f.owner != c {
-			return ErrASTHandle
-		}
-		r := &f.receipt
-		h := ASTHandle{origin: c.manager.origin, slot: r.node.slot, generation: r.node.generation}
-		if e := c.manager.CompleteRefVectorPush(r.vector, h, r); e != nil {
-			return e
-		}
-		c.pending = f.next
-		c.budget.Release(f.header)
-		f.header = 0
 	}
 	c.budget.Release(c.header)
 	c.header = 0
