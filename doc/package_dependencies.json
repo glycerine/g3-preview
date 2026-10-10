@@ -1222,6 +1222,7 @@
         "primal_price_float.go",
         "primal_refresh_float.go",
         "primal_solve_float.go",
+        "primal_solver_float.go",
         "priority_heap.go",
         "priority_queue_exact.go",
         "priority_queue_native.go",

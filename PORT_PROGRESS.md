@@ -37350,3 +37350,39 @@ assertions; no replacement numerical callbacks fabricate those paths. Profiles:
 no-generics verification pass. LP remains66 partial/44 unported. Last full
 native90.0% snapshot remains20:03 UTC, predating these additions; no immediate
 full rerun. Graph regenerated with unchanged edges and both new production files.
+
+
+### Floating outer primal LU integration and source limitation — 2026-10-10
+
+Ported outer FindMaximalSolution / SolveWithTotalInf orchestration with actual
+presolve, assembly, scale, residual-basis preparation, core construction/Solve,
+status/iteration publication and core lifetime cleanup. External column and
+original objective reconstruction include shifts, scaling and fixed columns;
+numeric external indices choose a deterministic source unordered objective sum.
+Partial Go constructor owners close before error return without publication;
+a core whose Solve fails remains published while outer status/iteration fields
+retain their source prefix. Default tableau and exact variants, source solution
+validators/diagnostics and complete original drivers remain open.
+
+120 independent bounded low/boxed-coordinate LP worlds compare outer solutions
+with exhaustive dense vertex maxima, including shifted bounds, physical fixed
+columns/costs, actual scaling, equations and box feasibility. Actual infeasibility,
+empty/preexisting-status routes, output/clock failures, early value lookup,
+objective error prefixes and explicit Close ownership also pass.
+
+End-to-end upper-only worlds exposed a source inconsistency, verified against
+lp_primal_simplex.hpp:146-165 and column_info.h:100-102: assembly flips an upper-only
+variable but bounds retain upper_bound with zero upper value. Regression problem
+maximize -x subject to x<=3,z>=0,-x+z<=2 reproduces source status OPTIMAL at x=3,
+cost=-3; independent vertex enumeration proves optimum2 at x=-2,z=0. The port
+preserves this source behavior and records it prominently rather than silently
+correcting the algorithm or claiming upper-only correctness. Fixed columns use
+actual SetFixedValue; merely coincident bounds do not set the source fixed flag.
+
+Focused native core/primal/presolve/solver/column/scaler/static/LU checks pass
+0.857s, combined debug/checked0.891s. New outer integration54/63 (85.7%) in both
+profiles; remaining statements propagate child errors under invalid metadata.
+Profiles: /mnt/oldrog/tmp/g3-outer-{native,debug}.cover. Both LP vets and source/
+evidence/no-generics verifier pass. LP stays66 partial/44 unported. Last full
+native snapshot remains20:03 UTC90.0%, predating these additions; no immediate
+full rerun. Regenerated graph records the new production file with unchanged edges.

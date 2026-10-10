@@ -3,11 +3,12 @@ package lp
 
 import "fmt"
 
-// FloatPrimalSimplex currently supplies retained primal preparation. The core
-// optimization loop is still unported; preparation does not solve a program.
+// FloatPrimalSimplex owns the floating core and borrows its prepared vectors
+// into that core for optimization and external solution reconstruction.
 type FloatPrimalSimplex struct {
 	*FloatLPSolver
-	LowBounds []float64
+	LowBounds  []float64
+	CoreSolver *FloatPrimalCoreSolver
 }
 
 func NewFloatPrimalSimplex() (*FloatPrimalSimplex, error) {

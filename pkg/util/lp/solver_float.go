@@ -25,7 +25,7 @@ var ErrLPFixedColumn = errors.New("lp: found fixed column")
 var ErrLPSolverMissingRow = errors.New("lp: cannot find row")
 
 // FloatLPSolver implements the common floating data preparation layer. Primal
-// and dual optimization are separate, still-unported algorithms. Ordered row
+// optimization is connected by FloatPrimalSimplex; other variants remain partial. Ordered row
 // dictionaries choose insertion order for source unordered-map traversals.
 type FloatLPSolver struct {
 	A                                                             *FloatStaticMatrix
@@ -41,6 +41,7 @@ type FloatLPSolver struct {
 	ExternalRowsToCore, CoreRowsToExternal, CoreColumnsToExternal map[uint32]uint32
 	Artificials, Slacks                                           uint32
 	Status                                                        Status
+	TotalIterations                                               uint32
 	Settings                                                      *Settings
 }
 

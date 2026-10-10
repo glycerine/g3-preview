@@ -5,16 +5,24 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently66 partial source units and44 unported units. The floating stage-one core now exposes Solve; outer primal, exact, dual and LAR
-solver integration is still incomplete. A green Go coverage report does not measure the C++
-code that has not been ported.
+There are currently 66 partial source units and 44 unported units. The floating
+stage-one core exposes Solve, and outer LU primal integration is implemented.
+Source diagnostics/validators and default tableau, exact, dual and LAR variants
+remain incomplete. Go coverage does not measure unported C++ code.
+
+Known source limitation: the outer primal path flips upper-only coordinates but
+retains `ColumnUpperBound` with zero upper value. Its regression reports source
+“optimal” cost -3 where independent enumeration proves optimum2. This behavior is
+preserved for fidelity; successful low/boxed-bound tests do not establish correctness
+for that upper-only profile.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
-| Floating stage-one solve and iteration/statistics control | Two original numerical fixtures and100 independent bounded standard-form LPs compared with exhaustive dense vertex enumeration; feasible-only/infeasible/unbounded/cancellation/limit exits, seeded entering budgets, output/clock failures, IEEE and mutation guards | Solve72.6% native (61/84),78.6% debug (66/84); statistics78.3% (54/69),94.2% (65/69). Gaps include rare numerical rechecks, qualified child errors and other-profile assertions. Original upper-only constructor/default profile, outer/exact/dual/LAR solvers remain open |
-| Floating primal pivot comparison and advance orchestration | 180 independent ray/basis worlds through sparse/forced-dense LU; bound flips, feasibility-cost transitions, degenerate pivots, actual stale-LU recovery, singular refusal/rollback, drift and two-observation status transitions; mutation/output guards | Native82.0% (137/167), debug/checked90.4% (151/167). Gaps qualify child/index errors or opposite-profile assertions. Full solve/iteration/resource/statistics loop and exact/tableau advance remain open |
-| Floating primal reduced-cost refresh and steepest-edge updates | 160 independent basis-coordinate worlds with sparse/forced-dense LU, independent transposed beta solves, new-basis norms and reduced costs; drift/profitability/tolerance classification, periodic seeded reset, infeasibility-cost transitions, fixed/duplicate/IEEE and mutation guards | Native94.6% (105/111), debug/checked100% (111/111). Native gaps are erased source assertions. Floating pivot orchestration is implemented; full optimization loop and exact/tableau paths remain open |
-| Floating Harris and breakpoint leaving/step selection | 500 independent Harris bound worlds and600 signed breakpoint crossing worlds; independent hinge slope jumps, source double first-crossing behavior, queue/order/publication guards, bound flips and full floating dispatch | Harris98.5% native/100% debug; breakpoint/dispatch93.3% native (112/120),95.8% debug (115/120). Remaining gaps propagate queue errors behind valid metadata or belong to the other assertion profile. Exact/tableau paths and full optimization remain open |
+| Floating outer primal LU solve and reconstruction | 120 independent low/boxed-coordinate LP optima with fixed costs, shifts, scaling and source-equation checks; infeasibility, constructor/solve/output publication, value/cost/Close ownership and source upper-only counterexample | Native/debug85.7% (54/63). Gaps propagate child errors under invalid metadata. Upper-only source type/flip inconsistency is explicitly preserved, not credited as correct optimization; default tableau/exact variants, diagnostics and validators remain open |
+| Floating stage-one solve and iteration/statistics control | Two original numerical fixtures and100 independent bounded standard-form LPs compared with exhaustive dense vertex enumeration; feasible-only/infeasible/unbounded/cancellation/limit exits, seeded entering budgets, output/clock failures, IEEE and mutation guards | Solve72.6% native (61/84),78.6% debug (66/84); statistics78.3% (54/69),94.2% (65/69). Gaps include rare numerical rechecks, qualified child errors and other-profile assertions. Original upper-only constructor/default profile, exact/dual/LAR solvers and outer diagnostics/validators remain open |
+| Floating primal pivot comparison and advance orchestration | 180 independent ray/basis worlds through sparse/forced-dense LU; bound flips, feasibility-cost transitions, degenerate pivots, actual stale-LU recovery, singular refusal/rollback, drift and two-observation status transitions; mutation/output guards | Native82.0% (137/167), debug/checked90.4% (151/167). Gaps qualify child/index errors or opposite-profile assertions. Floating solve/iteration/resource/statistics loop is implemented; exact/tableau advance remains open |
+| Floating primal reduced-cost refresh and steepest-edge updates | 160 independent basis-coordinate worlds with sparse/forced-dense LU, independent transposed beta solves, new-basis norms and reduced costs; drift/profitability/tolerance classification, periodic seeded reset, infeasibility-cost transitions, fixed/duplicate/IEEE and mutation guards | Native94.6% (105/111), debug/checked100% (111/111). Native gaps are erased source assertions. Floating pivot orchestration is implemented; floating optimization is implemented; exact/tableau paths remain open |
+| Floating Harris and breakpoint leaving/step selection | 500 independent Harris bound worlds and600 signed breakpoint crossing worlds; independent hinge slope jumps, source double first-crossing behavior, queue/order/publication guards, bound flips and full floating dispatch | Harris98.5% native/100% debug; breakpoint/dispatch93.3% native (112/120),95.8% debug (115/120). Remaining gaps propagate queue errors behind valid metadata or belong to the other assertion profile. Floating optimization is implemented; exact/tableau paths remain open |
 | Floating primal stage-one initialization and entering pricing | 150 independent basic/nonbasic bound worlds (3,300 column decisions); real feasibility/objective cost lifecycle and seeded norms, 100 independent rank worlds with45 choices each, budget/rotation/counter rules, IEEE and publication/error prefixes; actual120 prepared-primal run initializations | Initialization95.8% native (158/165),98.2% debug (162/165); pricing89.9% (89/99),100% (99/99). Gaps guard inherited valid boxed bounds/int-set invariants or belong to debug-only bound assertions. Harris and floating breakpoint leaving/step selection are implemented; norm/price updates are implemented; optimization remains open |
 | Floating primal values, pivot rows and numerical basis/X updates | 100 independent known-solution reconstruction worlds; 120 dense independent B*d/nullspace worlds through sparse/forced-dense LU, real pivot rows, Suhl and full refactors; singular feasible-only/rollback, nonzero-step restoration, stale factors, drop-based refusal, output/borrowed-input prefixes, literal correction sign and IEEE residuals | Values95.2% native (118/124),96.0% debug (119/124); numerical updates87.8% (79/90),91.1% (82/90); pivot rows96.2% (25/26),100% (26/26). Gaps are other-profile assertions, invariant-protected child errors and final non-OK refactor after restored feasible X. Full optimization and exact core remain open |
 | Floating basis changes, reduced costs and entering-column preparation | 16,000 independent basis exchanges/restorations and trace steps; 64 known-dual matrix worlds with six refactor/entering-column rounds each, sparse/forced-dense LU, source publication prefixes, stopped children, descending/duplicate arithmetic and IEEE | Native94.8% (92/97), debug95.9% (93/97). Gaps are invariant-protected row guards and false source is_OK stub assertions; native also excludes the debug entering assertion. Numerical pivot/X update and optimization remain open |
@@ -325,3 +333,39 @@ assertions; no replacement numerical callbacks fabricate those paths. Profiles:
 no-generics verification pass. LP remains66 partial/44 unported. Last full
 native90.0% snapshot remains20:03 UTC, predating these additions; no immediate
 full rerun. Graph regenerated with unchanged edges and both new production files.
+
+
+### Floating outer primal LU integration and source limitation — 2026-10-10
+
+Ported outer FindMaximalSolution / SolveWithTotalInf orchestration with actual
+presolve, assembly, scale, residual-basis preparation, core construction/Solve,
+status/iteration publication and core lifetime cleanup. External column and
+original objective reconstruction include shifts, scaling and fixed columns;
+numeric external indices choose a deterministic source unordered objective sum.
+Partial Go constructor owners close before error return without publication;
+a core whose Solve fails remains published while outer status/iteration fields
+retain their source prefix. Default tableau and exact variants, source solution
+validators/diagnostics and complete original drivers remain open.
+
+120 independent bounded low/boxed-coordinate LP worlds compare outer solutions
+with exhaustive dense vertex maxima, including shifted bounds, physical fixed
+columns/costs, actual scaling, equations and box feasibility. Actual infeasibility,
+empty/preexisting-status routes, output/clock failures, early value lookup,
+objective error prefixes and explicit Close ownership also pass.
+
+End-to-end upper-only worlds exposed a source inconsistency, verified against
+lp_primal_simplex.hpp:146-165 and column_info.h:100-102: assembly flips an upper-only
+variable but bounds retain upper_bound with zero upper value. Regression problem
+maximize -x subject to x<=3,z>=0,-x+z<=2 reproduces source status OPTIMAL at x=3,
+cost=-3; independent vertex enumeration proves optimum2 at x=-2,z=0. The port
+preserves this source behavior and records it prominently rather than silently
+correcting the algorithm or claiming upper-only correctness. Fixed columns use
+actual SetFixedValue; merely coincident bounds do not set the source fixed flag.
+
+Focused native core/primal/presolve/solver/column/scaler/static/LU checks pass
+0.857s, combined debug/checked0.891s. New outer integration54/63 (85.7%) in both
+profiles; remaining statements propagate child errors under invalid metadata.
+Profiles: /mnt/oldrog/tmp/g3-outer-{native,debug}.cover. Both LP vets and source/
+evidence/no-generics verifier pass. LP stays66 partial/44 unported. Last full
+native snapshot remains20:03 UTC90.0%, predating these additions; no immediate
+full rerun. Regenerated graph records the new production file with unchanged edges.
