@@ -35969,3 +35969,40 @@ explicit older snapshot; current component debug checks are recorded above.
 Native log/profile: /mnt/oldrog/tmp/g3-sparse-indexed-module-native.log and.cover.
 Final LP vet, portcheck, graph regeneration and diff checks pass;64-package graph
 edges are unchanged. No redundant full suite was restarted.
+
+
+## Floating indexed residual correction
+
+Implemented retained double_solve_U_y(indexed_vector<double>) and its indexed
+residual/correction helpers. The local copy retains every dense slot and ordered
+index, unlike indexed assignment. Residuals use exact-zero Add membership changes
+without rounding. Source uint32 products and strict 120*indexSize < 32*dimension
+choose sparse correction; sparse final cleanup preserves order and uses fixed
+1e-14 rather than settings. Dense correction solves all dimension slots, adds
+descending, then rebuilds/cleans all data including trailing slots. Hidden data
+and incomplete input index behavior remain literal. No exact/pair refinement is
+added: retained precise LU returns through direct solves before refinement.
+
+Tests check240 independently computed exact inverse-polynomial solutions and
+dense residuals across dimensions0..12, shuffled row/column permutations and
+non-dyadic floating coefficients. Separate identity fixtures prove sparse/dense
+selection at3/4/5 residual entries in dimension15, strict equality taking dense,
+settings drop vs fixed cleanup, hidden-slot copy construction, trailing-slot
+scan differences, sparse index order, zero dimension and IEEE cleanup. Direct
+residual tests preserve sub-tolerance errors. Reached residual/Add/delta/dense
+correction failures preserve completed caller publication prefixes.
+
+The independent oracle also requires actual error reduction relative to a single
+solve, so omitting the correction cannot pass on residual tolerances alone.
+Focused native0.103s and combined debug/checked0.100s pass. New refinement file
+coverage32/35 (91.4%) in each profile. Remaining returns propagate sparse
+correction solve/add errors or guard a dense destination extent protected by
+the initial copy and successful dense solve. The last full native module
+90.7% snapshot predates this addition; complete debug coverage remains older.
+No solver/source-unit completion promotion:42 partial/68 unported LP files.
+Remaining sparse diagnostics, full LU, solvers/scaling/MPS and retained original
+test-driver integration remain required.
+
+Final LP vet, portcheck and diff checks pass. Dependency graph regenerated with
+64 packages and unchanged edges; its file inventory includes indexed refinement.
+The full native module suite passed less than an hour ago, so it was not repeated.

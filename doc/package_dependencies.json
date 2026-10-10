@@ -1212,6 +1212,7 @@
         "sparse_matrix_float_graph.go",
         "sparse_matrix_float_indexed_solve.go",
         "sparse_matrix_float_pivots.go",
+        "sparse_matrix_float_refine.go",
         "sparse_matrix_float_replace.go",
         "sparse_matrix_float_solve.go",
         "sparse_rational_vector.go",

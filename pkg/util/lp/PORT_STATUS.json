@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 90.7,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native LP coverage includes sparse indexed graph traversal and solves (6210/6843 statements). Last complete debug/checked coverage predates sparse basis storage; current focused component coverage is recorded in PORT_STATUS.md.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. The 90.7% complete native snapshot (6210/6843 statements) predates floating indexed refinement; its focused native/debug coverage is 91.4% (32/35). Complete debug/checked coverage predates sparse basis storage; current component results are recorded in PORT_STATUS.md.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -1145,7 +1145,9 @@
         "pkg/util/lp/sparse_matrix_exact_graph.go",
         "pkg/util/lp/sparse_matrix_float_indexed_solve.go",
         "pkg/util/lp/sparse_matrix_exact_indexed_solve.go",
-        "pkg/util/lp/sparse_matrix_indexed_solve_test.go"
+        "pkg/util/lp/sparse_matrix_indexed_solve_test.go",
+        "pkg/util/lp/sparse_matrix_float_refine.go",
+        "pkg/util/lp/sparse_matrix_refine_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1204,7 +1206,11 @@
         "TestLPSparseIndexedSolveToleranceAndHiddenInput",
         "TestLPSparseIndexedGraphBoundsAndPartialFlags",
         "TestLPSparseIndexedSolveBoundsAndPublication",
-        "TestLPExactSparseIndexedSolveBorrowedOwnerGuards"
+        "TestLPExactSparseIndexedSolveBorrowedOwnerGuards",
+        "TestLPSparseIndexedRefinementIndependentOracle",
+        "TestLPSparseIndexedRefinementBranchBoundaryAndCopies",
+        "TestLPSparseIndexedRefinementCleanupAndOrder",
+        "TestLPSparseIndexedRefinementResidualAndErrorPrefixes"
       ]
     },
     {
@@ -1233,7 +1239,9 @@
         "pkg/util/lp/sparse_matrix_exact_graph.go",
         "pkg/util/lp/sparse_matrix_float_indexed_solve.go",
         "pkg/util/lp/sparse_matrix_exact_indexed_solve.go",
-        "pkg/util/lp/sparse_matrix_indexed_solve_test.go"
+        "pkg/util/lp/sparse_matrix_indexed_solve_test.go",
+        "pkg/util/lp/sparse_matrix_float_refine.go",
+        "pkg/util/lp/sparse_matrix_refine_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1292,7 +1300,11 @@
         "TestLPSparseIndexedSolveToleranceAndHiddenInput",
         "TestLPSparseIndexedGraphBoundsAndPartialFlags",
         "TestLPSparseIndexedSolveBoundsAndPublication",
-        "TestLPExactSparseIndexedSolveBorrowedOwnerGuards"
+        "TestLPExactSparseIndexedSolveBorrowedOwnerGuards",
+        "TestLPSparseIndexedRefinementIndependentOracle",
+        "TestLPSparseIndexedRefinementBranchBoundaryAndCopies",
+        "TestLPSparseIndexedRefinementCleanupAndOrder",
+        "TestLPSparseIndexedRefinementResidualAndErrorPrefixes"
       ]
     },
     {
@@ -1321,7 +1333,9 @@
         "pkg/util/lp/sparse_matrix_exact_graph.go",
         "pkg/util/lp/sparse_matrix_float_indexed_solve.go",
         "pkg/util/lp/sparse_matrix_exact_indexed_solve.go",
-        "pkg/util/lp/sparse_matrix_indexed_solve_test.go"
+        "pkg/util/lp/sparse_matrix_indexed_solve_test.go",
+        "pkg/util/lp/sparse_matrix_float_refine.go",
+        "pkg/util/lp/sparse_matrix_refine_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1380,7 +1394,11 @@
         "TestLPSparseIndexedSolveToleranceAndHiddenInput",
         "TestLPSparseIndexedGraphBoundsAndPartialFlags",
         "TestLPSparseIndexedSolveBoundsAndPublication",
-        "TestLPExactSparseIndexedSolveBorrowedOwnerGuards"
+        "TestLPExactSparseIndexedSolveBorrowedOwnerGuards",
+        "TestLPSparseIndexedRefinementIndependentOracle",
+        "TestLPSparseIndexedRefinementBranchBoundaryAndCopies",
+        "TestLPSparseIndexedRefinementCleanupAndOrder",
+        "TestLPSparseIndexedRefinementResidualAndErrorPrefixes"
       ]
     },
     {
