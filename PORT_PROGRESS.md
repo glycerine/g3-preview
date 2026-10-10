@@ -37590,3 +37590,41 @@ No dual optimum/completion credit: dual pricing, ratio/flip/pivot optimization,
 outer stage execution/status/solution reconstruction, exact variants and full
 upstream driver integration remain open. Last full native module checkpoint
 remains21:11 UTC89.6%, predating these additions; another full run is not due.
+
+### Floating dual feasibility initialization and leaving-row pricing — 2026-10-10
+
+Ported shared floating dual reduced-cost sign tests, column dual-feasibility
+predicates and nonbasic endpoint assignment. The source uses strict fixed
+1e-5 sign thresholds independently of settings; boxed sign selection uses
+exact d<0. Fixed/free nonbasic X values remain untouched. Low/upper debug
+checks execute after X publication. Boxed/fixed low-first short circuit,
+upper-bound diagnostic/assertion/native free fallthrough and writer prefixes
+are retained. Unknown-column diagnostics preserve the type conversion stop.
+
+Dual initial basis preparation now assigns endpoints then reconstructs X_B
+through actual LU and initializes betas. Added original done() strict iteration
+limit and Optimal precedence, squared bound violation / beta edge steepness
+and leaving-row pricing for all five types. Reordered heading lookup, lower
+violation priority for malformed intervals, IEEE beta division and source
+free-column debug zero-D assertion are preserved. No incomplete optimization
+loop or callback substitute was introduced.
+
+160 independent equation worlds verify all reconstructed basic values and
+nonbasic endpoints, including deliberately unchanged fixed/free columns.
+160 independent pricing worlds exercise reordered bases and all bound types.
+Strict reduced-cost and primal tolerance neighbors, NaN/infinity/signed zero,
+beta IEEE values, low-first short circuit, diagnostic refusals, metadata
+bounds, actual closed-LU stops and assignment-before-assertion prefixes are
+covered. Shared dual code56/63 (88.9%) native,60/63 (95.2%) debug; initial/
+pricing45/51 (88.2%) native,51/51 (100%) debug. Native gaps predominantly
+are erased source assertions; shared debug gaps are opposite-profile paths.
+Profiles: /mnt/oldrog/tmp/g3-dual-initial-{native,debug}.cover.
+
+Focused native core/primal/dual/MPS/presolve/solver/column/scaler/static/LU
+checks pass1.041s; combined g3debug/g3checked1.005s. Both LP vets pass.
+Source/evidence/no-generics verification and graph regeneration run with no
+new import edges. LP remains72 partial/38 unported: these source units were
+already partial. Last full native module checkpoint21:11 UTC predates these
+additions; no immediate full rerun is due. Complete dual pricing loop,
+ratio/flip/pivot optimization, outer stage dispatch, exact variants and full
+upstream drivers remain open; no dual optimum/completion credit is claimed.
