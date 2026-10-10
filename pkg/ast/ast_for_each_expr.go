@@ -25,6 +25,8 @@ type astExprVisitEntry struct {
 	index uint32
 }
 type astExprVisitFrame struct {
+	native                           []astExprVisitEntry
+	visited                          map[ASTHandle]bool
 	inline                           [16]astExprVisitEntry
 	heap                             []astExprVisitEntry
 	size                             uint32
@@ -45,12 +47,20 @@ type astExprVisitFrame struct {
 }
 
 func (f *astExprVisitFrame) at(i uint32) *astExprVisitEntry {
+	if f.mode == 4 {
+		return &f.native[i]
+	}
 	if f.heap == nil {
 		return &f.inline[i]
 	}
 	return &f.heap[i]
 }
 func (f *astExprVisitFrame) push(m *ASTManager, n astNodeRef) error {
+	if f.mode == 4 {
+		f.native = append(f.native[:f.size], astExprVisitEntry{node: n})
+		f.size++
+		return nil
+	}
 	cap := uint64(16)
 	if f.heap != nil {
 		cap = uint64(len(f.heap))
@@ -98,6 +108,14 @@ func (f *astExprVisitFrame) mark(m *ASTManager, n astNodeRef) (bool, error) {
 	if f.mode != 2 && m.nodeAt(n.slot).rc <= 1 {
 		return false, nil
 	}
+	if f.mode == 4 {
+		h := m.external(n)
+		if f.visited[h] {
+			return true, nil
+		}
+		f.visited[h] = true
+		return false, nil
+	}
 	if f.mode == 2 || f.mode == 3 {
 		bits := &f.localBits
 		if f.expr != nil {
@@ -133,6 +151,8 @@ func (f *astExprVisitFrame) sourceFinish(m *ASTManager) error {
 	// sbuffer is the younger lexical value; its element type is POD.
 	m.BudgetField.Release(f.bytes)
 	f.heap = nil
+	f.native = nil
+	f.visited = nil
 	f.bytes = 0
 	f.size = 0
 	if f.mode == 0 {
@@ -239,6 +259,8 @@ func (m *ASTManager) cleanupExprVisitFrame() error {
 		}
 		m.BudgetField.Release(f.bytes)
 		f.heap = nil
+		f.native = nil
+		f.visited = nil
 		f.bytes = 0
 		f.size = 0
 		f.fast = nil
@@ -421,7 +443,7 @@ func (m *ASTManager) visitExprCore(root astNodeRef, skolem bool) (uint32, bool, 
 	}
 	return total, false, nil
 }
-func (m *ASTManager) runExprVisit(h ASTHandle, expr *ASTExprMark, fast *ASTFastMark1, skolem bool) (uint32, bool, error) {
+func (m *ASTManager) runExprVisit(h ASTHandle, expr *ASTExprMark, fast *ASTFastMark1, visited map[ASTHandle]bool, skolem bool) (uint32, bool, error) {
 	if e := m.lock(); e != nil {
 		return 0, false, e
 	}
@@ -453,6 +475,9 @@ func (m *ASTManager) runExprVisit(h ASTHandle, expr *ASTExprMark, fast *ASTFastM
 	if skolem {
 		mode = 3
 	}
+	if visited != nil {
+		mode = 4
+	}
 	// Source root-mark shortcut precedes lexical stack construction, even
 	// with an older source-ended acquisition retained by this owner.
 	if mode == 2 {
@@ -466,6 +491,9 @@ func (m *ASTManager) runExprVisit(h ASTHandle, expr *ASTExprMark, fast *ASTFastM
 			return 0, false, e
 		}
 	}
+	if mode == 4 && m.nodeAt(root.slot).rc > 1 && visited[h] {
+		return 0, false, nil
+	}
 	if f.invocation == ^uint64(0) {
 		return 0, false, arena.ErrBounds
 	}
@@ -473,7 +501,7 @@ func (m *ASTManager) runExprVisit(h ASTHandle, expr *ASTExprMark, fast *ASTFastM
 		return 0, false, e
 	}
 	serial := f.invocation + 1
-	*f = astExprVisitFrame{mode: mode, invocation: serial, active: true, expr: expr}
+	*f = astExprVisitFrame{mode: mode, invocation: serial, active: true, expr: expr, visited: visited}
 	if mode == 0 {
 		id, e := nextASTExprMarkIdentity()
 		if e != nil {
@@ -493,24 +521,34 @@ func (m *ASTManager) runExprVisit(h ASTHandle, expr *ASTExprMark, fast *ASTFastM
 	return total, found, errors.Join(body, source)
 }
 func (m *ASTManager) GetNumExprs(h ASTHandle) (uint32, error) {
-	n, _, e := m.runExprVisit(h, nil, nil, false)
+	n, _, e := m.runExprVisit(h, nil, nil, nil, false)
 	return n, e
 }
 func (m *ASTManager) GetNumExprsWithExprMark(h ASTHandle, v *ASTExprMark) (uint32, error) {
 	if v == nil {
 		return 0, ErrASTHandle
 	}
-	n, _, e := m.runExprVisit(h, v, nil, false)
+	n, _, e := m.runExprVisit(h, v, nil, nil, false)
 	return n, e
 }
 func (m *ASTManager) GetNumExprsWithFastMark1(h ASTHandle, v *ASTFastMark1) (uint32, error) {
 	if v == nil {
 		return 0, ErrASTHandle
 	}
-	n, _, e := m.runExprVisit(h, nil, v, false)
+	n, _, e := m.runExprVisit(h, nil, v, nil, false)
 	return n, e
 }
 func (m *ASTManager) HasSkolemFunctions(h ASTHandle) (bool, error) {
-	_, yes, e := m.runExprVisit(h, nil, nil, true)
+	_, yes, e := m.runExprVisit(h, nil, nil, nil, true)
 	return yes, e
+}
+
+// GetNumExprsWithVisited shares native membership across goal formulas. Only
+// shared nodes (reference count > 1) are deduplicated, as in the source visitor.
+func (m *ASTManager) GetNumExprsWithVisited(h ASTHandle, visited map[ASTHandle]bool) (uint32, error) {
+	if visited == nil {
+		return 0, ErrASTHandle
+	}
+	n, _, e := m.runExprVisit(h, nil, nil, visited, false)
+	return n, e
 }

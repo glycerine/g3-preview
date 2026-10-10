@@ -40,11 +40,8 @@ func BuildBooleanModel(tr *GoalTranslator, values sat.Model) (md *model.ModelCor
 			}
 		}
 	}()
-	for _, entry := range tr.Atoms.Cells {
-		if !entry.Used {
-			continue
-		}
-		value, e := values.Read(sat.BoolVar(entry.value))
+	for h, value := range tr.Atoms.All() {
+		value, e := values.Read(sat.BoolVar(value))
 		if e != nil {
 			return md, e
 		}
@@ -60,7 +57,7 @@ func BuildBooleanModel(tr *GoalTranslator, values sat.Model) (md *model.ModelCor
 		if e != nil {
 			return md, e
 		}
-		declaration, e := tr.manager.GetDecl(entry.Key)
+		declaration, e := tr.manager.GetDecl(h)
 		if e != nil {
 			return md, e
 		}

@@ -719,16 +719,8 @@ func (g *Goal) ElimRedundancies() (err error) {
 		return nil
 	}
 	m := g.manager
-	neg, err := ast.NewASTRefFastMark1(m)
-	if err != nil {
-		return err
-	}
-	defer func() { err = errors.Join(err, neg.Close()) }()
-	pos, err := ast.NewASTRefFastMark2(m)
-	if err != nil {
-		return err
-	}
-	defer func() { err = errors.Join(err, pos.Close()) }()
+	neg := make(map[ast.ASTHandle]bool)
+	pos := make(map[ast.ASTHandle]bool)
 	sz, err := g.Size()
 	if err != nil {
 		return err
@@ -755,20 +747,9 @@ func (g *Goal) ElimRedundancies() (err error) {
 		}
 		var duplicate, opposite bool
 		if not {
-			duplicate, e = neg.IsMarked(atom)
-			if e != nil {
-				return e
-			}
-			opposite, e = pos.IsMarked(atom)
+			duplicate, opposite = neg[atom], pos[atom]
 		} else {
-			duplicate, e = pos.IsMarked(atom)
-			if e != nil {
-				return e
-			}
-			opposite, e = neg.IsMarked(atom)
-		}
-		if e != nil {
-			return e
+			duplicate, opposite = pos[atom], neg[atom]
 		}
 		if duplicate {
 			continue
@@ -822,12 +803,9 @@ func (g *Goal) ElimRedundancies() (err error) {
 			return g.pushBack(falsity, pr, dep)
 		}
 		if not {
-			e = neg.Mark(atom, true)
+			neg[atom] = true
 		} else {
-			e = pos.Mark(atom, true)
-		}
-		if e != nil {
-			return e
+			pos[atom] = true
 		}
 		if i != j {
 			if e = g.move(i, j, f); e != nil {
@@ -842,11 +820,7 @@ func (g *Goal) NumExprs() (total uint32, err error) {
 	if err = g.open(); err != nil {
 		return 0, err
 	}
-	visited, err := ast.NewASTFastMark1(g.manager)
-	if err != nil {
-		return 0, err
-	}
-	defer func() { err = errors.Join(err, visited.Close()) }()
+	visited := make(map[ast.ASTHandle]bool)
 	n, err := g.Size()
 	if err != nil {
 		return 0, err
@@ -856,7 +830,7 @@ func (g *Goal) NumExprs() (total uint32, err error) {
 		if e != nil {
 			return total, e
 		}
-		count, e := g.manager.GetNumExprsWithFastMark1(h, visited)
+		count, e := g.manager.GetNumExprsWithVisited(h, visited)
 		if e != nil {
 			return total, e
 		}

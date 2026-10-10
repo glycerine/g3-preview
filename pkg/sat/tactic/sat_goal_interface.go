@@ -2,26 +2,14 @@
 // src/ast/for_each_expr.h:26-103,134-136.
 package tactic
 
-import (
-	"errors"
-
-	"github.com/glycerine/g3/pkg/ast"
-)
+import "github.com/glycerine/g3/pkg/ast"
 
 func (tr *GoalTranslator) collectInterface(formulas []ast.ASTHandle) (err error) {
 	return tr.collectInterfaceWithDependencies(formulas, nil)
 }
 func (tr *GoalTranslator) collectInterfaceWithDependencies(formulas, dependencies []ast.ASTHandle) (err error) {
-	fvisited, err := ast.NewASTFastMark2(tr.manager)
-	if err != nil {
-		return err
-	}
-	defer func() { err = errors.Join(err, fvisited.Close()) }()
-	tvisited, err := ast.NewASTFastMark1(tr.manager)
-	if err != nil {
-		return err
-	}
-	defer func() { err = errors.Join(err, tvisited.Close()) }()
+	fvisited := make(map[ast.ASTHandle]bool)
+	tvisited := make(map[ast.ASTHandle]bool)
 	for _, dependency := range dependencies {
 		if err = tr.collectGeneralInterface(dependency, tvisited); err != nil {
 			return err
@@ -31,17 +19,11 @@ func (tr *GoalTranslator) collectInterfaceWithDependencies(formulas, dependencie
 	// start while other formulas are still pending.
 	todo := GoalTranslator{solver: tr.solver}
 	for _, formula := range formulas {
-		marked, e := fvisited.IsMarked(formula)
-		if e != nil {
-			return e
-		}
-		if marked {
+		if fvisited[formula] {
 			continue
 		}
-		if e = fvisited.Mark(formula, true); e != nil {
-			return e
-		}
-		if e = todo.pushFrame(satGoalFrame{term: formula}); e != nil {
+		fvisited[formula] = true
+		if e := todo.pushFrame(satGoalFrame{term: formula}); e != nil {
 			return e
 		}
 		for len(todo.frames) != 0 {
@@ -95,14 +77,8 @@ func (tr *GoalTranslator) collectInterfaceWithDependencies(formulas, dependencie
 						if e != nil {
 							return e
 						}
-						marked, e := fvisited.IsMarked(arg)
-						if e != nil {
-							return e
-						}
-						if !marked {
-							if e = fvisited.Mark(arg, true); e != nil {
-								return e
-							}
+						if !fvisited[arg] {
+							fvisited[arg] = true
 							if e = todo.pushFrame(satGoalFrame{term: arg}); e != nil {
 								return e
 							}
@@ -119,7 +95,7 @@ func (tr *GoalTranslator) collectInterfaceWithDependencies(formulas, dependencie
 	return nil
 }
 
-func (tr *GoalTranslator) markGeneral(h ast.ASTHandle, visited *ast.ASTFastMark1) (bool, error) {
+func (tr *GoalTranslator) markGeneral(h ast.ASTHandle, visited map[ast.ASTHandle]bool) (bool, error) {
 	rc, e := tr.manager.GetRefCount(h)
 	if e != nil {
 		return false, e
@@ -127,11 +103,11 @@ func (tr *GoalTranslator) markGeneral(h ast.ASTHandle, visited *ast.ASTFastMark1
 	if rc <= 1 {
 		return false, nil
 	}
-	marked, e := visited.IsMarked(h)
-	if e != nil || marked {
-		return marked, e
+	if visited[h] {
+		return true, nil
 	}
-	return false, visited.Mark(h, true)
+	visited[h] = true
+	return false, nil
 }
 func (tr *GoalTranslator) generalChildren(h ast.ASTHandle, kind ast.ASTKind) (uint32, error) {
 	switch kind {
@@ -168,7 +144,7 @@ func (tr *GoalTranslator) generalChild(h ast.ASTHandle, kind ast.ASTKind, index 
 	}
 	return tr.manager.GetNoPattern(h, index-n-1)
 }
-func (tr *GoalTranslator) collectGeneralInterface(h ast.ASTHandle, visited *ast.ASTFastMark1) error {
+func (tr *GoalTranslator) collectGeneralInterface(h ast.ASTHandle, visited map[ast.ASTHandle]bool) error {
 	marked, e := tr.markGeneral(h, visited)
 	if e != nil || marked {
 		return e
@@ -210,14 +186,7 @@ func (tr *GoalTranslator) collectGeneralInterface(h ast.ASTHandle, visited *ast.
 			return e
 		}
 		if uninterpreted {
-			hash, e := tr.manager.GetHash(fr.term)
-			if e != nil {
-				return e
-			}
-			if e = tr.interfaces.prepare(tr.solver.Budget()); e != nil {
-				return e
-			}
-			tr.interfaces.insertPrepared(fr.term, hash, 0)
+			tr.interfaces[fr.term] = true
 		}
 		tr.frames = tr.frames[:i]
 	}

@@ -34038,3 +34038,35 @@ Remaining migration includes hyper-resolution/binding output storage, sequence/
 scoped reference-vector consumers, model constant/function lookups, goal/SAT
 interface membership and further retained consumers. Internal util cycles and
 complete root subpackage split remain unfinished.
+
+## Native goal membership and ordered SAT dictionaries
+
+Goal redundancy elimination uses borrowed native Go membership maps. Goal
+expression counting uses a concrete visited map and native traversal stack,
+sharing the existing source postorder/counting algorithm and its shared-node
+rule across formulas. Legacy explicit-mark visitor modes remain available;
+this does not claim that all AST traversals have been migrated. Real goal
+counting/deduplication and SAT interface tests preserve foreign AST marks.
+
+SAT translation cache/interface membership now uses Go maps. Atom and dependency
+lookup uses insdict.Dict v0.10.1 with explicit handle identity hashing; removed
+the local probing/growth adapter. Atom recovery, Boolean model construction,
+dependency assumptions and ownership cleanup iterate in insertion order.
+Dependency coverage checks forty discovered labels and a repeated label through
+translation, assumptions and solving. Actual atom/interpreted/dependency node
+references remain owned; cleanup removes consumed references before returning
+errors so a retry cannot decrement them twice. Model integration expectations
+now follow the dictionary's discovery order.
+
+Validation: full native AST/rewriter passed (20.357s/11.448s); final native SAT
+tactic/model/tactic/API passed (0.116s/0.056s/0.029s/0.013s). Full debug
+AST/tactic/SAT tactic passed (22.029s/0.023s/0.098s). Module-wide compilation,
+AST/tactic/SAT tactic vet, manifest, gofmt and diff checks passed. No full native
+module rerun inside the hourly interval. Counts remain 2102 units/677 APIs:
+62 ported,283 partial,1729 unported,two dead/deleted. No STL/container failure
+emulation or whole-unit implementation credit is added.
+
+Remaining work includes model constant/function lookup and declaration storage,
+proof binding/hyper-resolution and sequence/scoped reference-vector consumers,
+other retained consumers, internal util cycles and the complete root subpackage
+split. The external-consumer cleanup and requested split are not complete.

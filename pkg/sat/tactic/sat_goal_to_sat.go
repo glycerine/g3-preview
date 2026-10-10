@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/insdict"
 )
 
 var ErrSATGoalUnsupported = errors.New("operator not supported, apply simplifier before invoking translator")
@@ -33,8 +34,10 @@ type GoalTranslator struct {
 	// Borrow the AST manager's original resource limit for translation checkpoints.
 	Limit                                     *control.Reslimit
 	cooperation                               *cooperate.Cooperation
-	cache, Atoms, interfaces                  satGoalASTMap
-	dependencies                              satGoalASTMap
+	cache                                     map[ast.ASTHandle]uint32
+	Atoms                                     insdict.Dict[ast.ASTHandle, uint32]
+	interfaces                                map[ast.ASTHandle]bool
+	dependencies                              insdict.Dict[ast.ASTHandle, uint32]
 	dependencyTrail                           []ast.ASTHandle
 	frames                                    []satGoalFrame
 	results                                   []sat.Literal
@@ -69,12 +72,13 @@ func NewGoalTranslator(m *ast.ASTManager, s *sat.Solver) (tr *GoalTranslator, er
 			tr = nil
 		}
 	}()
-	// MkBoolSort is owned by the basic plugin and remains alive with the manager.
-	for _, table := range []*satGoalASTMap{&tr.cache, &tr.Atoms, &tr.interfaces} {
-		if err = table.prepare(s.Budget()); err != nil {
-			return tr, err
-		}
+	hashIdentity := func(h ast.ASTHandle) uint64 {
+		return h.Origin() ^ uint64(h.Slot())*0x9e3779b97f4a7c15 ^ uint64(h.Generation())*0xbf58476d1ce4e5b9
 	}
+	tr.Atoms = *insdict.NewDictFunc[ast.ASTHandle, uint32](hashIdentity)
+	tr.dependencies = *insdict.NewDictFunc[ast.ASTHandle, uint32](hashIdentity)
+	tr.cache = make(map[ast.ASTHandle]uint32)
+	tr.interfaces = make(map[ast.ASTHandle]bool)
 	if tr.cooperation, err = cooperate.NewCooperation(s.Budget()); err != nil {
 		return tr, err
 	}
@@ -111,25 +115,42 @@ func (tr *GoalTranslator) Close() error {
 	}
 	for len(tr.dependencyTrail) > 0 {
 		i := len(tr.dependencyTrail) - 1
-		if e := tr.manager.DecRef(tr.dependencyTrail[i]); e != nil {
+		consumed, e := tr.manager.DecRefConsumed(tr.dependencyTrail[i])
+		if consumed {
+			tr.dependencyTrail[i] = ast.ASTHandle{}
+			tr.dependencyTrail = tr.dependencyTrail[:i]
+		}
+		if e != nil {
 			return e
 		}
-		tr.dependencyTrail = tr.dependencyTrail[:i]
+		if !consumed {
+			return ast.ErrASTPending
+		}
 	}
 	for len(tr.interpreted) > 0 {
 		i := len(tr.interpreted) - 1
-		if e := tr.manager.DecRef(tr.interpreted[i]); e != nil {
+		consumed, e := tr.manager.DecRefConsumed(tr.interpreted[i])
+		if consumed {
+			tr.interpreted[i] = ast.ASTHandle{}
+			tr.interpreted = tr.interpreted[:i]
+		}
+		if e != nil {
 			return e
 		}
-		tr.interpreted = tr.interpreted[:i]
+		if !consumed {
+			return ast.ErrASTPending
+		}
 	}
-	for i := range tr.Atoms.Cells {
-		entry := &tr.Atoms.Cells[i]
-		if entry.Used {
-			if e := tr.manager.DecRef(entry.Key); e != nil {
-				return e
-			}
-			entry.Used = false
+	for h := range tr.Atoms.All() {
+		consumed, e := tr.manager.DecRefConsumed(h)
+		if consumed {
+			tr.Atoms.Del(h)
+		}
+		if e != nil {
+			return e
+		}
+		if !consumed {
+			return ast.ErrASTPending
 		}
 	}
 	if tr.cooperation != nil {
@@ -139,10 +160,10 @@ func (tr *GoalTranslator) Close() error {
 		tr.cooperation = nil
 	}
 	b := tr.solver.Budget()
-	tr.cache.close(b)
-	tr.Atoms.close(b)
-	tr.interfaces.close(b)
-	tr.dependencies.close(b)
+	tr.cache = nil
+	tr.Atoms = insdict.Dict[ast.ASTHandle, uint32]{}
+	tr.interfaces = nil
+	tr.dependencies = insdict.Dict[ast.ASTHandle, uint32]{}
 	tr.dependencyTrail = nil
 	tr.interpreted = nil
 	tr.frames = nil
@@ -177,11 +198,10 @@ func (tr *GoalTranslator) Variable(h ast.ASTHandle) (sat.BoolVar, error) {
 	if e := tr.open(); e != nil {
 		return sat.NullBoolVar, e
 	}
-	hash, e := tr.manager.GetHash(h)
-	if e != nil {
+	if _, e := tr.manager.GetKind(h); e != nil {
 		return sat.NullBoolVar, e
 	}
-	if v, found := tr.Atoms.find(h, hash); found {
+	if v, found := tr.Atoms.Get2(h); found {
 		return sat.BoolVar(v), nil
 	}
 	return sat.NullBoolVar, nil
@@ -212,11 +232,7 @@ func (tr *GoalTranslator) emit(root, sign bool, l sat.Literal) error {
 	return tr.pushResult(l)
 }
 func (tr *GoalTranslator) cached(h ast.ASTHandle, root, sign bool) (bool, error) {
-	hash, e := tr.manager.GetHash(h)
-	if e != nil {
-		return false, e
-	}
-	v, found := tr.cache.find(h, hash)
+	v, found := tr.cache[h]
 	if !found {
 		return false, nil
 	}
@@ -230,11 +246,7 @@ func (tr *GoalTranslator) convertAtom(h ast.ASTHandle, root, sign bool) error {
 	if !isBool {
 		return ast.ErrASTDomain
 	}
-	hash, e := tr.manager.GetHash(h)
-	if e != nil {
-		return e
-	}
-	value, found := tr.Atoms.find(h, hash)
+	value, found := tr.Atoms.Get2(h)
 	var l sat.Literal
 	if found {
 		l = sat.MakeLiteral(sat.BoolVar(value), false)
@@ -256,18 +268,15 @@ func (tr *GoalTranslator) convertAtom(h ast.ASTHandle, root, sign bool) error {
 			if e != nil {
 				return e
 			}
-			_, inInterface := tr.interfaces.find(h, hash)
+			inInterface := tr.interfaces[h]
 			v, e := tr.solver.MkVar(tr.defaultExternal || !uninterpreted || inInterface, true)
 			if e != nil {
-				return e
-			}
-			if e = tr.Atoms.prepare(tr.solver.Budget()); e != nil {
 				return e
 			}
 			if e = tr.manager.IncRef(h); e != nil {
 				return e
 			}
-			tr.Atoms.insertPrepared(h, hash, uint32(v))
+			tr.Atoms.Set(h, uint32(v))
 			l = sat.MakeLiteral(v, false)
 			if !uninterpreted {
 				if e = tr.retainInterpreted(h); e != nil {
@@ -332,7 +341,7 @@ func (tr *GoalTranslator) Compile(formulas []ast.ASTHandle) (err error) {
 			tr.failed = true
 		}
 	}()
-	tr.interfaces.clear()
+	clear(tr.interfaces)
 	if err = tr.collectInterface(formulas); err != nil {
 		return err
 	}
@@ -434,14 +443,7 @@ func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
 			return e
 		}
 		l = sat.MakeLiteral(v, false)
-		hash, e := tr.manager.GetHash(fr.term)
-		if e != nil {
-			return e
-		}
-		if e = tr.cache.prepare(tr.solver.Budget()); e != nil {
-			return e
-		}
-		tr.cache.insertPrepared(fr.term, hash, uint32(l))
+		tr.cache[fr.term] = uint32(l)
 	}
 	clause := tr.solver.MkClause
 	switch op {

@@ -254,7 +254,26 @@ func TestSATGoalTranslatorBooleanInterfaceAndInterpretedAtoms(t *testing.T) {
 			tr, e := NewGoalTranslator(m, s)
 			satOK(t, e)
 			t.Cleanup(func() { satOK(t, tr.Close()) })
+			one, e := ast.NewASTFastMark1(m)
+			astTestMust(t, e)
+			defer func() { astTestMust(t, one.Close()) }()
+			two, e := ast.NewASTFastMark2(m)
+			astTestMust(t, e)
+			defer func() { astTestMust(t, two.Close()) }()
+			for _, h := range []ast.ASTHandle{root, p, atom} {
+				astTestMust(t, one.Mark(h, true))
+				astTestMust(t, two.Mark(h, true))
+			}
 			satOK(t, tr.Compile([]ast.ASTHandle{root, p}))
+			for _, h := range []ast.ASTHandle{root, p, atom} {
+				a, e := one.IsMarked(h)
+				astTestMust(t, e)
+				b, e := two.IsMarked(h)
+				astTestMust(t, e)
+				if !a || !b {
+					t.Fatal("SAT interface collection changed another caller's marks")
+				}
+			}
 			v, e := tr.Variable(p)
 			satOK(t, e)
 			ext, e := s.Variables.IsExternal(v)
@@ -357,8 +376,8 @@ func TestSATGoalTranslatorAtomMapGrowthAndModel(t *testing.T) {
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, tr.Close()) })
 	satOK(t, tr.Compile(assertions))
-	if len(tr.Atoms.Cells) != 64 || tr.Atoms.size != 40 {
-		t.Fatal("source hash-table growth", len(tr.Atoms.Cells), tr.Atoms.size)
+	if tr.Atoms.Len() != 40 {
+		t.Fatal("native atom dictionary lost entries", tr.Atoms.Len())
 	}
 	got, e := s.Check(nil)
 	satOK(t, e)
@@ -375,7 +394,7 @@ func TestSATGoalTranslatorAtomMapGrowthAndModel(t *testing.T) {
 			want = lbool.True
 		}
 		if v == sat.NullBoolVar || int(v) >= len(model) || model[v] != want {
-			t.Fatal("model binding lost across source table growth", i, v)
+			t.Fatal("model binding lost across native dictionary growth", i, v)
 		}
 	}
 }

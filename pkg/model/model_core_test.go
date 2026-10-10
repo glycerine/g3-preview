@@ -376,18 +376,16 @@ func TestSATBooleanModelMatchesOriginalGoalTruthTable(t *testing.T) {
 			astTestMust(t, e)
 			t.Cleanup(func() { astTestMust(t, md.Close()) })
 			expectedOrder := make([]ast.ASTHandle, 0, 3)
-			for _, entry := range tr.Atoms.Cells {
-				if entry.Used {
-					d, e := m.GetDecl(entry.Key)
-					astTestMust(t, e)
-					expectedOrder = append(expectedOrder, d)
-				}
+			for h := range tr.Atoms.All() {
+				d, e := m.GetDecl(h)
+				astTestMust(t, e)
+				expectedOrder = append(expectedOrder, d)
 			}
 			for i, want := range expectedOrder {
 				d, e := md.Constant(uint32(i))
 				astTestMust(t, e)
 				if d != want {
-					t.Fatal("source atom-table iteration must determine model registration order", d, want)
+					t.Fatal("atom discovery order must determine model registration order", d, want)
 				}
 			}
 			satOK(t, tr.Close())

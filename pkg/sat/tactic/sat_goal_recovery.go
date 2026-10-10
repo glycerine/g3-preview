@@ -79,15 +79,12 @@ func (tr *GoalTranslator) inverseAtoms(out *satGoalLiteralExpressions) error {
 	if e := tr.open(); e != nil {
 		return e
 	}
-	for _, entry := range tr.Atoms.Cells {
-		if !entry.Used {
-			continue
-		}
-		l := sat.MakeLiteral(sat.BoolVar(entry.value), false)
-		if e := out.set(tr.manager, l.Index(), entry.Key); e != nil {
+	for h, value := range tr.Atoms.All() {
+		l := sat.MakeLiteral(sat.BoolVar(value), false)
+		if e := out.set(tr.manager, l.Index(), h); e != nil {
 			return e
 		}
-		neg, e := tr.manager.MkNot(entry.Key)
+		neg, e := tr.manager.MkNot(h)
 		if e != nil {
 			return e
 		}

@@ -143,3 +143,50 @@ func TestSATGoalDependenciesCompoundGuardOriginalFreshnessAndTruthTable(t *testi
 		})
 	}
 }
+
+func TestSATGoalDependenciesNativeDiscoveryOrderAndRepeatedLabels(t *testing.T) {
+	m := astTestManager(t)
+	s, _, _ := satSolverCheckFixture(t)
+	tr, e := NewGoalTranslator(m, s)
+	satOK(t, e)
+	defer func() { satOK(t, tr.Close()) }()
+	g := goalTestNew(t, m, false, true)
+	labels := make([]ast.ASTHandle, 40)
+	for i := range labels {
+		labels[i] = goalTestAtom(t, m, fmt.Sprintf("ordered-label-%d", i))
+		leaf, e := m.DependencyLeaf(labels[i])
+		satOK(t, e)
+		satOK(t, g.AssertWithProof(labels[i], ast.ASTHandle{}, leaf))
+	}
+	// Revisiting a label must update its assumption without changing discovery order.
+	leaf, e := m.DependencyLeaf(labels[0])
+	satOK(t, e)
+	satOK(t, g.AssertWithProof(labels[0], ast.ASTHandle{}, leaf))
+	satOK(t, tr.CompileGoal(g))
+	assumptions, e := tr.AppendDependencyAssumptions(nil)
+	satOK(t, e)
+	if len(assumptions) != len(labels) {
+		t.Fatal("duplicate label added an assumption", len(assumptions))
+	}
+	for i, h := range labels {
+		v, e := tr.Variable(h)
+		satOK(t, e)
+		if assumptions[i] != sat.MakeLiteral(v, false) {
+			t.Fatal("assumptions lost label discovery order", i, assumptions[i], v)
+		}
+	}
+	result, e := s.Check(assumptions)
+	satOK(t, e)
+	if result != lbool.True {
+		t.Fatal("consistent labels rejected", result)
+	}
+	values, e := s.AppendModel(nil)
+	satOK(t, e)
+	for _, h := range labels {
+		v, e := tr.Variable(h)
+		satOK(t, e)
+		if values[v] != lbool.True {
+			t.Fatal("ordered assumption was not enforced", v)
+		}
+	}
+}

@@ -299,11 +299,34 @@ func TestTacticGoalSourceDepthPrecisionCountsAndReferences(t *testing.T) {
 	g := goalTestNew(t, m, false, false)
 	astTestMust(t, g.Assert(f))
 	astTestMust(t, g.Assert(f))
+	one, e := ast.NewASTFastMark1(m)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, one.Close()) }()
+	two, e := ast.NewASTFastMark2(m)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, two.Close()) }()
+	for _, h := range []ast.ASTHandle{p, q, f} {
+		astTestMust(t, one.Mark(h, true))
+		astTestMust(t, two.Mark(h, true))
+	}
 	count, e := g.NumExprs()
 	astTestMust(t, e)
 	if count != 3 {
 		t.Fatal("source count must visit shared ASTs once", count)
 	}
+	astTestMust(t, g.ElimRedundancies())
+	goalTestForms(t, g, f)
+	for _, h := range []ast.ASTHandle{p, q, f} {
+		a, e := one.IsMarked(h)
+		astTestMust(t, e)
+		b, e := two.IsMarked(h)
+		astTestMust(t, e)
+		if !a || !b {
+			t.Fatal("goal operations changed another caller's marks")
+		}
+	}
+	astTestMust(t, one.Close())
+	astTestMust(t, two.Close())
 	astTestMust(t, g.SetDepth((1<<26)-1))
 	astTestMust(t, g.IncDepth())
 	if g.depth != 0 {

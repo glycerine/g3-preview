@@ -45,14 +45,7 @@ func (tr *GoalTranslator) insertGoalDependency(original, dep ast.ASTHandle, sign
 		if e = tr.retainDependency(fresh); e != nil {
 			return e
 		}
-		hash, e := m.GetHash(fresh)
-		if e != nil {
-			return e
-		}
-		if e = tr.interfaces.prepare(tr.solver.Budget()); e != nil {
-			return e
-		}
-		tr.interfaces.insertPrepared(fresh, hash, 0)
+		tr.interfaces[fresh] = true
 		iff, e := m.MkIff(fresh, dep)
 		if e != nil {
 			return e
@@ -68,14 +61,7 @@ func (tr *GoalTranslator) insertGoalDependency(original, dep ast.ASTHandle, sign
 	if sign {
 		l = l.Negated()
 	}
-	hash, e := m.GetHash(original)
-	if e != nil {
-		return e
-	}
-	if e = tr.dependencies.prepare(tr.solver.Budget()); e != nil {
-		return e
-	}
-	tr.dependencies.insertPrepared(original, hash, l.Index())
+	tr.dependencies.Set(original, l.Index())
 	tr.results = tr.results[:len(tr.results)-1]
 	return nil
 }
@@ -86,10 +72,8 @@ func (tr *GoalTranslator) AppendDependencyAssumptions(out []sat.Literal) ([]sat.
 	if e := tr.open(); e != nil {
 		return out, e
 	}
-	for _, entry := range tr.dependencies.Cells {
-		if entry.Used {
-			out = append(out, sat.Literal(entry.value))
-		}
+	for _, value := range tr.dependencies.All() {
+		out = append(out, sat.Literal(value))
 	}
 	return out, nil
 }
@@ -132,7 +116,7 @@ func (tr *GoalTranslator) CompileGoal(g *tactic.Goal) (err error) {
 		}
 		forms = append(forms, f)
 	}
-	tr.interfaces.clear()
+	clear(tr.interfaces)
 	if e = tr.collectInterfaceWithDependencies(forms, allDeps); e != nil {
 		return e
 	}
