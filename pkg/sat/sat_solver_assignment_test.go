@@ -40,25 +40,6 @@ func TestSATSolverAssignConflictStatusSourceOrder(t *testing.T) {
 		t.Fatal("first conflict retained")
 	}
 }
-func TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix(t *testing.T) {
-	s, v, b := satPropagationFixture(t, 1)
-	v.scopeLevel = 1
-	b.FailAfter(0)
-	e := s.assignCore(0, satJustification{})
-	if !satRuntimeActualRefusal(v.memory, e) {
-		t.Fatal("actual initial trail refusal", e)
-	}
-	if v.assignment[0] != lbool.True || v.level[0] != 1 || v.phase[0] != 0 || !v.assignedSinceGC[0] {
-		t.Fatal("scalar prefix")
-	}
-	n, x := v.trail.Size(v.trailRef)
-	satOK(t, x)
-	if n != 0 {
-		t.Fatal(n)
-	}
-	satPropagationAssertGraph(t, s)
-	b.FailAfter(-1)
-}
 func TestSATSolverAssignMissingExtensionAfterActualTrail(t *testing.T) {
 	s, v, _ := satPropagationFixture(t, 1)
 	satOK(t, v.setExternal(BoolVar(0), true))

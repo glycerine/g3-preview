@@ -3,7 +3,6 @@ package sat
 
 import (
 	"errors"
-	"fmt"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
@@ -11,7 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestSATSolverNativeActivityAndRuntimeTrailAccounting(t *testing.T) {
+func TestSATSolverNativeActivityAndTrailAccounting(t *testing.T) {
 	v, _, _ := satVariableStateFixture(t)
 	_, e := v.mkVar(false, true)
 	satOK(t, e)
@@ -23,8 +22,8 @@ func TestSATSolverNativeActivityAndRuntimeTrailAccounting(t *testing.T) {
 	satOK(t, v.trailPush(MakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 56+600 || v.memory.Stats().LiveBlocks != 4 {
-		t.Fatal("actual literal32 trail allocation missing", n, v.memory.Stats())
+	if n != 32+600 || v.memory.Stats().LiveBlocks != 3 {
+		t.Fatal("native trail changed Runtime allocation", n, v.memory.Stats())
 	}
 }
 
@@ -103,51 +102,44 @@ func TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow(t *testing.T) {
 	satOK(t, moved.Close())
 }
 
-func TestSATSolverRuntimeTrailLiteral32AndCapturedBacking(t *testing.T) {
+func TestSATSolverNativeTrailGrowthBoundsAndStableRoot(t *testing.T) {
 	v, _, _ := satVariableStateFixture(t)
-	literals := []Literal{0, 1, 0xfffffffe, 0xffffffff, 1025}
-	satOK(t, v.trailPush(literals[0]))
 	root := v.trailRef
-	old := v.trail.values.Raw.Block
-	for _, l := range literals[1:] {
-		satOK(t, v.trailPush(l))
+	before, raw := v.budget.Used(), v.memory.State()
+	v.budget.FailAfter(0)
+	want := make([]Literal, 4097)
+	for i := range want {
+		want[i] = Literal(uint32(i) * 0x9e3779b9)
+		satOK(t, v.trailPush(want[i]))
 	}
-	if v.trailRef != root {
-		t.Fatal("source vector object identity moved")
+	v.budget.FailAfter(-1)
+	if v.trailRef != root || v.budget.Used() != before || v.memory.State() != raw {
+		t.Fatal("native growth changed owner or allocator", v.trailRef, root)
 	}
-	if _, e := v.memory.Read(old, 8); e == nil {
-		t.Fatal("captured realloc pointer remained live")
-	}
-	n, e := v.memory.Size(v.trail.values.Raw.Block)
-	satOK(t, e)
-	if n != 28 {
-		t.Fatal("literal32 source capacity5 extent", n)
-	}
-	for i, l := range literals {
+	for i, l := range want {
 		got, e := v.trailRead(uint32(i))
 		satOK(t, e)
 		if got != l {
 			t.Fatal(i, got, l)
 		}
-		for k := uint64(0); k < 4; k++ {
-			b, e := v.memory.Read(v.trail.values.Raw.Block, 8+4*uint64(i)+k)
-			satOK(t, e)
-			if b != byte(uint32(l)>>(8*k)) {
-				t.Fatal("actual literal byte", i, k, b)
-			}
-		}
 	}
 	satOK(t, v.trail.Shrink(root, 1))
-	l, e := v.trail.Read(root, 4)
+	_, e := v.trail.Read(root, 4096)
+	bounds := error(arena.ErrBounds)
 	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATAssertion) {
-			t.Fatal(e)
-		}
-	} else {
-		satOK(t, e)
-		if l != 1025 {
-			t.Fatal(l)
-		}
+		bounds = ErrSATAssertion
+	}
+	if !errors.Is(e, bounds) {
+		t.Fatal("discarded tail must not be readable", e, bounds)
+	}
+	if e = v.trail.Shrink(root, 2); !errors.Is(e, bounds) {
+		t.Fatal("shrink cannot publish uninitialized values", e)
+	}
+	satOK(t, v.trailPush(DefaultLiteral()))
+	got, e := v.trail.Read(root, 1)
+	satOK(t, e)
+	if got != DefaultLiteral() {
+		t.Fatal(got)
 	}
 	satScalarAuditOwner(t, v)
 	copied := *v.trail
@@ -159,44 +151,28 @@ func TestSATSolverRuntimeTrailLiteral32AndCapturedBacking(t *testing.T) {
 		t.Fatal(e)
 	}
 }
-func TestSATSolverRuntimeTrailAllActualRefusalPrefixes(t *testing.T) {
-	failures, success := 0, 0
-	for ordinal := int64(0); ordinal < 32; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			s, v, b := satPropagationFixture(t, 1)
-			v.scopeLevel = 1
-			b.FailAfter(ordinal)
-			e := s.assignCore(0, satJustification{})
-			satScalarAuditRoots(t, v)
-			satPropagationAssertGraph(t, s)
-			if v.assignment[0] != lbool.True || v.level[0] != 1 || v.phase[0] != 0 || !v.assignedSinceGC[0] {
-				t.Fatal("source scalar prefix before trail")
-			}
-			n, x := v.trail.Size(v.trailRef)
-			satOK(t, x)
-			if e != nil {
-				failures++
-				if !satRuntimeActualRefusal(v.memory, e) || n != 0 {
-					t.Fatal(ordinal, e, n)
-				}
-			} else {
-				success++
-				if n != 1 {
-					t.Fatal(n)
-				}
-			}
-			b.FailAfter(-1)
-		})
-		if success != 0 {
-			break
-		}
+func TestSATSolverNativeTrailAssignmentWithoutBackingReservation(t *testing.T) {
+	s, v, b := satPropagationFixture(t, 1)
+	v.scopeLevel = 1
+	before, raw := b.Used(), v.memory.State()
+	b.FailAfter(0)
+	e := s.assignCore(0, satJustification{})
+	b.FailAfter(-1)
+	satOK(t, e)
+	if v.assignment[0] != lbool.True || v.level[0] != 1 || v.phase[0] != 0 || !v.assignedSinceGC[0] {
+		t.Fatal("source scalar assignment prefix")
 	}
-	if failures == 0 || success != 1 {
-		t.Fatal(failures, success)
+	n, e := v.trail.Size(v.trailRef)
+	satOK(t, e)
+	l, e := v.trail.Read(v.trailRef, 0)
+	satOK(t, e)
+	if n != 1 || l != 0 || b.Used() != before || v.memory.State() != raw {
+		t.Fatal("native assignment trail changed allocator", n, l)
 	}
-	t.Log("actual trail refusal horizon", failures, success)
+	satScalarAuditRoots(t, v)
+	satPropagationAssertGraph(t, s)
 }
-func TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix(t *testing.T) {
+func TestSATSolverNativeTrailDoesNotReachRuntimeTLSCheckpoint(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	todo, e := newSATSolverUintSet(b)
 	satOK(t, e)
@@ -206,17 +182,18 @@ func TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix(t *testing.T) {
 	satOK(t, e)
 	_, e = v.mkVar(false, true)
 	satOK(t, e)
-	// Reach the actual TLS checkpoint using the retained Runtime extent.
-	// Native mark slices are outside this accounting.
+	// A Runtime allocation would reach its TLS checkpoint here. Native trail
+	// growth must leave that borrowed allocator untouched.
 	prefix, e := r.Allocate(uint64(100000 - r.State().LocalSize - 8))
 	satOK(t, e)
 	satOK(t, r.SetMaxSize(1))
-	e = v.trailPush(MakeLiteral(0, true))
-	if !satRuntimeActualRefusal(r, e) || v.trail.values.Raw.Pending == (util.Block{}) || v.trail.values.Raw.Block != (util.Block{}) {
-		t.Fatal(e, r.State())
+	before := r.State()
+	satOK(t, v.trailPush(MakeLiteral(0, true)))
+	if r.State() != before {
+		t.Fatal("native trail reached Runtime", r.State(), before)
 	}
 	satScalarAuditOwner(t, v, prefix)
-	if n, e := v.trail.Size(v.trailRef); e != nil || n != 0 {
+	if n, e := v.trail.Size(v.trailRef); e != nil || n != 1 {
 		t.Fatal(n, e)
 	}
 	satOK(t, v.Close())

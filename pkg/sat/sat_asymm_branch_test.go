@@ -336,16 +336,12 @@ func TestSATAsymmDebugScopeAssertionPrecedesTrailRead(t *testing.T) {
 	}
 	a, l := satAsymmFixture(t, 3)
 	v := l.propagation.variables
-	old := v.trail.values.Raw.Block
-	// An actual released token preserves the checked unsafe read boundary.
-	dead, e := l.propagation.memory.Allocate(8)
-	satOK(t, e)
-	stale := dead
-	satOK(t, l.propagation.memory.Deallocate(&dead))
-	v.trail.values.Raw.Block = stale
+	old := v.trail.live
+	// An invalidated native trail root preserves the endangered read boundary.
+	v.trail.live = false
 	v.scopeLevel = 1
-	_, e = a.process(StoredClauseRef{})
-	v.trail.values.Raw.Block = old
+	_, e := a.process(StoredClauseRef{})
+	v.trail.live = old
 	v.scopeLevel = 0
 	if !errors.Is(e, ErrSATAssertion) {
 		t.Fatalf("scope assertion must precede endangered trail read: %v", e)

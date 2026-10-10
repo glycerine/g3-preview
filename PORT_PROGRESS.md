@@ -33148,3 +33148,33 @@ hash/table implementation credit; unit counts remain 2102 units/677 APIs:
 63 ported, 284 partial, 1727 unported and two dead/deleted. The util knot and
 complete split remain active; retained Runtime columns/trail/queue, AST storage,
 NumericTextStream consumers and internal util cycles remain.
+
+## Native ordered solver assignment trail
+
+Replaced the actual solver trail's RuntimeUintColumn with []Literal backing in
+satSolverTrail. Its constructor now borrows only Budget, charging the actual cold
+owner header. Removed Runtime word encoding, source capacity/reallocation,
+pending allocation and TLS allocator failure behavior from this consumer.
+Checked root identity survives growth/shrink; current logical bounds reject
+removed tails and invalid shrink requests. Free/Close drop values and retire
+roots, with exact idempotent cold-header refund. Assignment, extension checks,
+backtracking and GC reactivation preserve their source algorithm order.
+
+New/updated checks cover 4097 literal values, stable roots, current logical
+bounds, foreign/copied/freed/closed owners, exact header budget refusal/refund,
+uint32 literal extremes, assignment under FailAfter(0), and independence from a
+borrowed Runtime poised at its TLS allocation checkpoint. Old simulated trail
+allocation-refusal/TLS-pending fixtures now check successful native publication;
+GC reactivation tests retain deleted clauses, unit assignment, learned-vector
+compaction, frozen counters and physical owner audits with reservations disabled.
+The debug asymmetric-branch assertion-order fixture now uses an invalidated real
+trail root rather than a fabricated freed Runtime payload. Scalar owner audits
+no longer name removed trail Runtime backing. Manifest evidence and scoped notes
+now describe native trail storage without generic vector implementation credit.
+
+Validation: full native SAT passed (0.758s), full g3debug SAT passed (0.753s),
+SAT vet, manifest evidence, gofmt and diff checks passed. Counts remain 2102
+units/677 APIs: 63 ported, 284 partial, 1727 unported and two dead/deleted.
+No full native module rerun inside the hourly interval. The knot and full split
+remain active: retained justification/queue/other Runtime columns, AST reference
+storage, NumericTextStream consumers and internal util dependency cycles remain.

@@ -25,7 +25,7 @@ type satSolverVariableState struct {
 	level                                           []uint32
 	activity                                        *satSolverActivity
 	queue                                           *satVarQueue
-	trail                                           *satSolverRuntimeTrail
+	trail                                           *satSolverTrail
 	trailRef                                        satSolverLiteralListRef
 	elimTodo                                        *satSolverUintSet
 	ownerBytes                                      uint64
@@ -77,7 +77,7 @@ func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.
 		s.queue, e = newSATSolverRuntimeVarQueue(s.activity, b, raw)
 	}
 	if e == nil {
-		s.trail, s.trailRef, e = newSATSolverRuntimeTrail(b, raw)
+		s.trail, s.trailRef, e = newSATSolverTrail(b)
 	}
 	if e != nil {
 		if cleanup := s.Close(); cleanup != nil {

@@ -197,7 +197,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	}
 	s.Variables.qhead = 0
 	s.Variables.scopeLevel = 0
-	if s.Variables.trail, s.Variables.trailRef, err = newSATSolverRuntimeTrail(c.Budget, c.Runtime.memory); err != nil {
+	if s.Variables.trail, s.Variables.trailRef, err = newSATSolverTrail(c.Budget); err != nil {
 		return s, err
 	}
 	if s.params, err = c.ParamsContext.NewValue(); err != nil {

@@ -95,60 +95,47 @@ func TestSATSolverGCDynamicUsedResetAndDeletion(t *testing.T) {
 		t.Fatal("active inactivity delete")
 	}
 }
-func TestSATSolverGCRefusalRootsAndReactivationPrefix(t *testing.T) {
-	failures, success := 0, false
-	for fault := int64(0); fault < 128; fault++ {
-		t.Run(fmt.Sprint(fault), func(t *testing.T) {
-			g, s := satGCFixture(t, 6)
-			p := s.analysis.propagation
-			cfg := &p.config.state
-			cfg.GCStrategy = satGCDynPSM
-			cfg.GCSmallLBD = 1
-			cfg.GCK = 2
-			cfg.Initialized |= satConfigGCSmallLBDMask | satConfigGCKMask
-			// First old active clause is deleted, then a frozen successor reactivates and
-			// grows the actual unit-assignment trail. Source compaction end has not yet been published.
-			old := satGCClause(t, g, []Literal{6, 8, 10}, 5)
-			for i := 0; i < 2; i++ {
-				satOK(t, p.clauses.IncInactivity(old))
-			}
-			r := satGCClause(t, g, []Literal{0, 2, 4}, 5)
-			satOK(t, g.lifecycle().detachClause(r))
-			satOK(t, p.clauses.Freeze(r))
-			g.numFrozen = 1
-			satOK(t, p.assign(1, satJustification{}))
-			satOK(t, p.assign(3, satJustification{}))
-			_, e := p.propagateCore(false)
-			satOK(t, e)
-			satOK(t, p.clauses.ids.Reserve(3))
-			s.conflictsSinceGC = g.gcThreshold + 1
-			g.budget().FailAfter(fault)
-			e = g.gc()
-			if e != nil {
-				failures++
-				satProbingExpectedRefusal(t, p, e)
-			} else {
-				success = true
-				if p.clauses.IsLive(r) || p.clauses.IsLive(old) || len(g.lifecycle().learned) != 0 || g.numFrozen != 0 || g.gcClauseStat != 1 {
-					t.Fatal("source result")
-				}
-				v, err := p.variables.valueLiteral(4)
-				satOK(t, err)
-				if v != lbool.True {
-					t.Fatal("reactivated unit assignment", v)
-				}
-			}
-			satGCAudit(t, g)
-			g.budget().FailAfter(-1)
-		})
-		if success {
-			break
-		}
+func TestSATSolverGCNativeTrailReactivationWithoutBackingReservation(t *testing.T) {
+	g, s := satGCFixture(t, 6)
+	p := s.analysis.propagation
+	cfg := &p.config.state
+	cfg.GCStrategy = satGCDynPSM
+	cfg.GCSmallLBD = 1
+	cfg.GCK = 2
+	cfg.Initialized |= satConfigGCSmallLBDMask | satConfigGCKMask
+	// First old active clause is deleted, then a frozen successor reactivates and
+	// appends to the native unit-assignment trail before compaction finishes.
+	old := satGCClause(t, g, []Literal{6, 8, 10}, 5)
+	for i := 0; i < 2; i++ {
+		satOK(t, p.clauses.IncInactivity(old))
 	}
-	if failures < 1 || !success {
-		t.Fatal(failures, success)
+	r := satGCClause(t, g, []Literal{0, 2, 4}, 5)
+	satOK(t, g.lifecycle().detachClause(r))
+	satOK(t, p.clauses.Freeze(r))
+	g.numFrozen = 1
+	satOK(t, p.assign(1, satJustification{}))
+	satOK(t, p.assign(3, satJustification{}))
+	_, e := p.propagateCore(false)
+	satOK(t, e)
+	satOK(t, p.clauses.ids.Reserve(3))
+	s.conflictsSinceGC = g.gcThreshold + 1
+	before, raw := g.budget().Used(), p.variables.memory.State()
+	g.budget().FailAfter(0)
+	e = g.gc()
+	g.budget().FailAfter(-1)
+	satOK(t, e)
+	if p.clauses.IsLive(r) || p.clauses.IsLive(old) || len(g.lifecycle().learned) != 0 || g.numFrozen != 0 || g.gcClauseStat != 1 {
+		t.Fatal("source result")
 	}
-	t.Log("actual gc refusal prefixes", failures)
+	v, e := p.variables.valueLiteral(4)
+	satOK(t, e)
+	if v != lbool.True {
+		t.Fatal("reactivated unit assignment", v)
+	}
+	if p.variables.memory.State() != raw || g.budget().Used() > before {
+		t.Fatal("native trail reactivation allocated Runtime backing")
+	}
+	satGCAudit(t, g)
 }
 func TestSATSolverGCFloatDomainsAndLubyEdges(t *testing.T) {
 	want := []uint32{1, 1, 2, 1, 1, 2, 4, 1, 1, 2, 1, 1, 2, 4, 8}

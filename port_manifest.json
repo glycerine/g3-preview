@@ -70942,7 +70942,7 @@
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/sat/sat_solver_scalar_runtime_test.go",
         "pkg/sat/sat_solver_activity.go",
-        "pkg/sat/sat_solver_runtime_trail.go",
+        "pkg/sat/sat_solver_trail.go",
         "pkg/sat/sat_solver_runtime_activity_trail_test.go",
         "pkg/sat/sat_solver_runtime_justification.go",
         "pkg/sat/sat_solver_runtime_justification_test.go",
@@ -71074,7 +71074,8 @@
         "pkg/sat/sat_solver_stat_display.go",
         "pkg/sat/sat_solver_stat_display_test.go",
         "pkg/sat/sat_var_queue_runtime.go",
-        "pkg/sat/sat_var_queue_runtime_test.go"
+        "pkg/sat/sat_var_queue_runtime_test.go",
+        "pkg/sat/sat_solver_trail_test.go"
       ],
       "tests": [
         "TestSATSolverClauseCoreFiniteSimplification",
@@ -71094,7 +71095,7 @@
         "TestSATSolverVariableNativeWatchPrefixRetryAndColdGuards",
         "TestSATSolverClauseStateSourceAssignmentWidth",
         "TestSATSolverAssignConflictStatusSourceOrder",
-        "TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix",
+        "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
         "TestSATSolverAssignMissingExtensionAfterActualTrail",
         "TestSATSolverCheckpointActualResourceAndMemoryOrder",
         "TestSATSolverPropagationConcreteExceptionAndResizePrefix",
@@ -71130,12 +71131,12 @@
         "TestSATSolverScalarColumnsReachSameRuntime",
         "TestSATSolverScalarUnsignedGrowthLiteralWidths",
         "TestSATSolverScalarReverseMemberRawDestruction",
-        "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
+        "TestSATSolverNativeActivityAndTrailAccounting",
         "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
         "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
-        "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
-        "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-        "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
+        "TestSATSolverNativeTrailGrowthBoundsAndStableRoot",
+        "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
+        "TestSATSolverNativeTrailDoesNotReachRuntimeTLSCheckpoint",
         "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards",
         "TestSATSolverJustificationActualEightByteSourceAllocation",
         "TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy",
@@ -71215,7 +71216,7 @@
         "TestSATSolverGCThresholdScopeAndOwners",
         "TestSATSolverGCFrozenAllReactivationArities",
         "TestSATSolverGCDynamicUsedResetAndDeletion",
-        "TestSATSolverGCRefusalRootsAndReactivationPrefix",
+        "TestSATSolverGCNativeTrailReactivationWithoutBackingReservation",
         "TestSATSolverGCFloatDomainsAndLubyEdges",
         "TestSATSolverGCLearnedModelPreservation",
         "TestSATSolverGCSortWorkspaceRefusalAndWarmThreshold",
@@ -71409,7 +71410,8 @@
         "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards",
         "TestSATSolverNativeLevelsCurrentBorrowAndGuards",
         "TestSATSolverNativeOuterWatchGrowthAndShrink",
-        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
+        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations",
+        "TestSATSolverNativeTrailColdHeaderAndRetirement"
       ],
       "conditionals": [
         {
@@ -71881,7 +71883,7 @@
           "go_target": "pkg/sat/sat_solver_assignment.go",
           "tests": [
             "TestSATSolverAssignConflictStatusSourceOrder",
-            "TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix",
+            "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
             "TestSATSolverAssignMissingExtensionAfterActualTrail"
           ]
         },
@@ -71957,16 +71959,16 @@
           ]
         },
         {
-          "name": "Selected native []uint32 activity and remaining literal32 trail Runtime storage; source uint32 increment/decay/rescale and current native activity borrowing across queue growth/copy/move; broader solver storage remains open",
+          "name": "Selected native []uint32 activity and []Literal assignment trail; source uint32 increment/decay/rescale and current native activity borrowing across queue growth/copy/move; broader solver storage remains open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_activity.go",
           "tests": [
-            "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
+            "TestSATSolverNativeActivityAndTrailAccounting",
             "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
             "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
-            "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
-            "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-            "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
+            "TestSATSolverNativeTrailGrowthBoundsAndStableRoot",
+            "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
+            "TestSATSolverNativeTrailDoesNotReachRuntimeTLSCheckpoint",
             "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards"
           ]
         },
@@ -72177,7 +72179,7 @@
             "TestSATSolverGCThresholdScopeAndOwners",
             "TestSATSolverGCFrozenAllReactivationArities",
             "TestSATSolverGCDynamicUsedResetAndDeletion",
-            "TestSATSolverGCRefusalRootsAndReactivationPrefix",
+            "TestSATSolverGCNativeTrailReactivationWithoutBackingReservation",
             "TestSATSolverGCFloatDomainsAndLubyEdges",
             "TestSATSolverGCLearnedModelPreservation",
             "TestSATSolverGCSortWorkspaceRefusalAndWarmThreshold",
@@ -72716,7 +72718,7 @@
       ],
       "ownership": [
         "Borrowed actual assignment/level arrays and real clause allocator storage; no search owner or solver runtime.",
-        "Native typed assignments, Boolean flags, and saved polarities; remaining Runtime trail/justification/queue columns and native outer watch references and charged cold watch owners own actual children once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
+        "Native typed assignments, Boolean flags, and saved polarities; remaining Runtime justification/queue columns and native outer watch references and charged cold watch owners own actual children once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
         "Selected probing/dynamic bodies borrow real propagation/lifecycle owners and separate literalMark. Probing assigned literals and conflict assumption membership use native bool/literal slices with unique first-insertion order. Reset retains capacity and regrowth zeroes membership; finalize drops backing and permits another round. Native storage is outside Runtime accounting and does not participate in the retained strict Runtime cache-memory cutoff. Simulated growth and destructor refusals for these members are removed. Failed ordinal roots and marks are inspected before faults are disabled. No independent solver counter or assignment mirror is created.",
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
@@ -72726,7 +72728,8 @@
         "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Binary-clause pairs use native typed slices in solver, inspection and tactic recovery; output append returns the completed prefix on error. Simulated buffer allocation and destructor failures are removed. Constructor sweeps of actual retained reservations, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success.",
         "Variable/literal marks, decision eligibility, eliminated/external status, and assignment-since-GC flags use concrete Go Boolean slices. Native backing is outside arena/Runtime accounting; creation order, typed flag reads, duplicate-mark assertions, scope truncation/regrowth, solver copy, GC reset, and retained algorithm marks remain covered.",
         "SAT watches now use native []satWatched backing and a native outer slice/directory of checked list references. Actual cold outer/store headers are charged; native backing is uncharged. Iterator values borrow native backing identities: writes remain visible, current logical bounds reject discarded tails, and real backing growth/finalization/free invalidate stale borrows. Owner/generation guards preserve child lifetime across outer relocation and slot reuse. Removed payload codecs, lifetime bitmaps, simulated capacity growth/refusals and unused copy/move/fill/reverse/constructor helpers. Actual source tag/equality, propagation compaction, clause/ternary erase and stable class sorting remain.",
-        "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added."
+        "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added.",
+        "The solver assignment trail owns native []Literal backing with a stable checked root identity. Runtime word encoding, vector geometry, captured physical byte backing, pending allocations and TLS refusal simulation are removed from this consumer. Only its actual cold header remains charged. Push/Read/Shrink retain ordered literal values and enforce current logical bounds; Free/Close retire the root and drop native storage. Source assignment/backtrack order, extension-boundary prefix and GC reactivation remain tested. Growth of 4097 values, exact cold-header refusal/refund, root guards, no-reservation assignment and independence from a borrowed Runtime TLS checkpoint are covered. Remaining justification/queue/other scalar columns are separate work; no generic vector credit is added."
       ],
       "deviations": [
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
@@ -72777,7 +72780,7 @@
         "pkg/sat/sat_solver_scalar_runtime.go",
         "pkg/sat/sat_solver_scalar_runtime_test.go",
         "pkg/sat/sat_solver_activity.go",
-        "pkg/sat/sat_solver_runtime_trail.go",
+        "pkg/sat/sat_solver_trail.go",
         "pkg/sat/sat_solver_runtime_activity_trail_test.go",
         "pkg/sat/sat_solver_runtime_justification.go",
         "pkg/sat/sat_solver_runtime_justification_test.go",
@@ -72897,7 +72900,8 @@
         "pkg/sat/sat_solver_clause_iterator.go",
         "pkg/sat/sat_solver_views_test.go",
         "pkg/util/messages/messages.go",
-        "pkg/util/messages/messages_test.go"
+        "pkg/util/messages/messages_test.go",
+        "pkg/sat/sat_solver_trail_test.go"
       ],
       "tests": [
         "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
@@ -72917,7 +72921,7 @@
         "TestSATSolverClauseCoreWatchSourceAssertions",
         "TestSATSolverClauseStateSourceAssignmentWidth",
         "TestSATSolverAssignConflictStatusSourceOrder",
-        "TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix",
+        "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
         "TestSATSolverAssignMissingExtensionAfterActualTrail",
         "TestSATSolverCheckpointActualResourceAndMemoryOrder",
         "TestSATSolverPropagationConcreteExceptionAndResizePrefix",
@@ -72953,12 +72957,12 @@
         "TestSATSolverScalarColumnsReachSameRuntime",
         "TestSATSolverScalarUnsignedGrowthLiteralWidths",
         "TestSATSolverScalarReverseMemberRawDestruction",
-        "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
+        "TestSATSolverNativeActivityAndTrailAccounting",
         "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
         "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
-        "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
-        "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-        "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
+        "TestSATSolverNativeTrailGrowthBoundsAndStableRoot",
+        "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
+        "TestSATSolverNativeTrailDoesNotReachRuntimeTLSCheckpoint",
         "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards",
         "TestSATSolverJustificationActualEightByteSourceAllocation",
         "TestSATSolverJustificationProvenanceRefusalFollowsRawSourceCopy",
@@ -72996,7 +73000,7 @@
         "TestSATSolverGCThresholdScopeAndOwners",
         "TestSATSolverGCFrozenAllReactivationArities",
         "TestSATSolverGCDynamicUsedResetAndDeletion",
-        "TestSATSolverGCRefusalRootsAndReactivationPrefix",
+        "TestSATSolverGCNativeTrailReactivationWithoutBackingReservation",
         "TestSATSolverGCFloatDomainsAndLubyEdges",
         "TestSATSolverGCLearnedModelPreservation",
         "TestSATSolverGCSortWorkspaceRefusalAndWarmThreshold",
@@ -73159,7 +73163,8 @@
         "TestSATSolverNativeAssignmentCurrentBorrowAndOwnerGuards",
         "TestSATSolverNativeLevelsCurrentBorrowAndGuards",
         "TestSATSolverNativeOuterWatchGrowthAndShrink",
-        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
+        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations",
+        "TestSATSolverNativeTrailColdHeaderAndRetirement"
       ],
       "conditionals": [
         {
@@ -73215,7 +73220,7 @@
           "go_target": "pkg/sat/sat_solver_assignment.go",
           "tests": [
             "TestSATSolverAssignConflictStatusSourceOrder",
-            "TestSATSolverAssignTrailRefusalAndMissingExtensionPrefix",
+            "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
             "TestSATSolverAssignMissingExtensionAfterActualTrail"
           ]
         },
@@ -73291,16 +73296,16 @@
           ]
         },
         {
-          "name": "Selected native []uint32 activity and remaining literal32 trail Runtime storage; source uint32 increment/decay/rescale and current native activity borrowing across queue growth/copy/move; broader solver storage remains open",
+          "name": "Selected native []uint32 activity and []Literal assignment trail; source uint32 increment/decay/rescale and current native activity borrowing across queue growth/copy/move; broader solver storage remains open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_activity.go",
           "tests": [
-            "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
+            "TestSATSolverNativeActivityAndTrailAccounting",
             "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
             "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
-            "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
-            "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-            "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
+            "TestSATSolverNativeTrailGrowthBoundsAndStableRoot",
+            "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
+            "TestSATSolverNativeTrailDoesNotReachRuntimeTLSCheckpoint",
             "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards"
           ]
         },
@@ -73417,7 +73422,7 @@
             "TestSATSolverGCThresholdScopeAndOwners",
             "TestSATSolverGCFrozenAllReactivationArities",
             "TestSATSolverGCDynamicUsedResetAndDeletion",
-            "TestSATSolverGCRefusalRootsAndReactivationPrefix",
+            "TestSATSolverGCNativeTrailReactivationWithoutBackingReservation",
             "TestSATSolverGCFloatDomainsAndLubyEdges",
             "TestSATSolverGCLearnedModelPreservation",
             "TestSATSolverGCSortWorkspaceRefusalAndWarmThreshold",
@@ -73740,7 +73745,7 @@
         }
       ],
       "ownership": [
-        "Native typed assignments, Boolean flags, and saved polarities; remaining Runtime trail/justification/queue columns and native outer watch references and charged cold watch owners own actual children once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
+        "Native typed assignments, Boolean flags, and saved polarities; remaining Runtime justification/queue columns and native outer watch references and charged cold watch owners own actual children once; real activity/queue/trail, borrowed actual todo. No complete solver construction or search.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
         "Selected conflict owner charges actual cold fields once and borrows existing analysis/dynamic/probing/lifecycle/Runtime; owns actual Runtime assumption/core/literal-set members. Glue and clause consumers read captured lemma blocks directly. Constructor-read errors retain the actually allocated clause/ID in lifecycle pendingCandidate before return. Every real refusal prefix is rooted before fault disable; no host lemma copy or directory-derived owner roots.",
         "Borrow sole conflict/phase counters and actual lifecycle/Runtime. Real cold GC owner, stable merge workspace and stopped compaction cursors are charged. Owning continuation drains only disjoint actual moved prefix/source ranges, not registry snapshots; lifecycle Close drains reached GC before ordinary vectors.",
@@ -73748,7 +73753,8 @@
         "Full selected facade owns actual completed cold child headers and sole source member graph; Runtime/global parameters and resource service are real borrowed caller owners. Ordinary access requires completed members; construction borrowing is only at reached source sites. Real Runtime enum model and eager outer map plus eight nested tables retain their named scalar current/pending roots; clause IDs use native typed free-list storage. Binary-clause pairs use native typed slices in solver, inspection and tactic recovery; output append returns the completed prefix on error. Simulated buffer allocation and destructor failures are removed. Constructor sweeps of actual retained reservations, bounded binary Check5, UserGC2 all inspect immediate physical ownership before disabling fault. User clause compaction retains only actual kept/unread ranges in embedded cursor; explicit CleanupStopped acknowledges observed source destructor guard without repairing watches/counters/vectors or reclassifying invalid source continuation as success.",
         "Variable/literal marks, decision eligibility, eliminated/external status, and assignment-since-GC flags use concrete Go Boolean slices. Native backing is outside arena/Runtime accounting; creation order, typed flag reads, duplicate-mark assertions, scope truncation/regrowth, solver copy, GC reset, and retained algorithm marks remain covered.",
         "SAT watches now use native []satWatched backing and a native outer slice/directory of checked list references. Actual cold outer/store headers are charged; native backing is uncharged. Iterator values borrow native backing identities: writes remain visible, current logical bounds reject discarded tails, and real backing growth/finalization/free invalidate stale borrows. Owner/generation guards preserve child lifetime across outer relocation and slot reuse. Removed payload codecs, lifetime bitmaps, simulated capacity growth/refusals and unused copy/move/fill/reverse/constructor helpers. Actual source tag/equality, propagation compaction, clause/ternary erase and stable class sorting remain.",
-        "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added."
+        "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added.",
+        "The solver assignment trail owns native []Literal backing with a stable checked root identity. Runtime word encoding, vector geometry, captured physical byte backing, pending allocations and TLS refusal simulation are removed from this consumer. Only its actual cold header remains charged. Push/Read/Shrink retain ordered literal values and enforce current logical bounds; Free/Close retire the root and drop native storage. Source assignment/backtrack order, extension-boundary prefix and GC reactivation remain tested. Growth of 4097 values, exact cold-header refusal/refund, root guards, no-reservation assignment and independence from a borrowed Runtime TLS checkpoint are covered. Remaining justification/queue/other scalar columns are separate work; no generic vector credit is added."
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
@@ -74251,7 +74257,7 @@
       "go_targets": [
         "pkg/sat/sat_var_queue.go",
         "pkg/sat/sat_solver_activity.go",
-        "pkg/sat/sat_solver_runtime_trail.go",
+        "pkg/sat/sat_solver_trail.go",
         "pkg/sat/sat_solver_runtime_activity_trail_test.go",
         "pkg/sat/sat_var_queue_runtime.go",
         "pkg/sat/sat_var_queue_runtime_test.go"
@@ -74262,12 +74268,12 @@
         "TestSATVarQueueRealActivityPriorityEventsAndLifecycle",
         "TestSATVarQueueSourceGhostAndEmptyReset",
         "TestSATVarQueueUnsignedNegativeIndexBoundary",
-        "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
+        "TestSATSolverNativeActivityAndTrailAccounting",
         "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
         "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
-        "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
-        "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-        "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
+        "TestSATSolverNativeTrailGrowthBoundsAndStableRoot",
+        "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
+        "TestSATSolverNativeTrailDoesNotReachRuntimeTLSCheckpoint",
         "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards",
         "TestSATCaseSplitHeapConstructorRealRuntimeAccounting",
         "TestSATCaseSplitHeapSourceHeadersAndNoShadow",
@@ -74326,16 +74332,16 @@
           "tests": []
         },
         {
-          "name": "Selected native []uint32 activity and remaining literal32 trail Runtime storage; source uint32 increment/decay/rescale and current native activity borrowing across queue growth/copy/move; broader solver storage remains open",
+          "name": "Selected native []uint32 activity and []Literal assignment trail; source uint32 increment/decay/rescale and current native activity borrowing across queue growth/copy/move; broader solver storage remains open",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_activity.go",
           "tests": [
-            "TestSATSolverNativeActivityAndRuntimeTrailAccounting",
+            "TestSATSolverNativeActivityAndTrailAccounting",
             "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
             "TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow",
-            "TestSATSolverRuntimeTrailLiteral32AndCapturedBacking",
-            "TestSATSolverRuntimeTrailAllActualRefusalPrefixes",
-            "TestSATSolverRuntimeTrailTLSPendingPreservesVectorPrefix",
+            "TestSATSolverNativeTrailGrowthBoundsAndStableRoot",
+            "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
+            "TestSATSolverNativeTrailDoesNotReachRuntimeTLSCheckpoint",
             "TestSATSolverNativeActivityCurrentBorrowAfterGrowthAndColdGuards"
           ]
         },
@@ -148644,7 +148650,8 @@
         "pkg/math/polynomial/polynomial_composition.go",
         "pkg/math/polynomial/polynomial_som_monomials.go",
         "pkg/math/polynomial/polynomial_numeral_slice_test.go",
-        "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
+        "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go",
+        "pkg/sat/sat_solver_trail_test.go"
       ],
       "tests": [
         "TestParamDescrsNativeStorageAndWarmDuplicate",
@@ -148856,7 +148863,8 @@
         "TestSATSolverNativeLiteralGrowthCopyAndOracle",
         "TestSATSolverNativeLiteralColdHeaderAndLifetime",
         "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
-        "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
+        "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction",
+        "TestSATSolverNativeTrailColdHeaderAndRetirement"
       ],
       "conditionals": [
         {
@@ -149373,7 +149381,8 @@
         "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority.",
         "Retained SAT clause/wrapper/activity/binary consumers use native typed slices and native borrowed allocator maps. The unused standalone watched-vector adapter and template-only methods were deleted. Only real cold owner headers are budgeted; native backing growth is uncharged. This conversion gives no generic C++ vector implementation credit.",
         "SAT watches now use native []satWatched backing and a native outer slice/directory of checked list references. Actual cold outer/store headers are charged; native backing is uncharged. Iterator values borrow native backing identities: writes remain visible, current logical bounds reject discarded tails, and real backing growth/finalization/free invalidate stale borrows. Owner/generation guards preserve child lifetime across outer relocation and slot reuse. Removed payload codecs, lifetime bitmaps, simulated capacity growth/refusals and unused copy/move/fill/reverse/constructor helpers. Actual source tag/equality, propagation compaction, clause/ternary erase and stable class sorting remain.",
-        "Nested SAT literal collections now use native []Literal backing and a native record directory. Only actual cold store headers are charged. Clone/cross-owner copy duplicates logical values with independent native backing; source capacity geometry, arena payload/free pages and native growth refusal events are removed. Captured simplifier spans borrow native backing identities, reject real growth/free/closed lifetimes and enforce current logical bounds. Native caller spans likewise respect slice length. The model converter now owns entry and literal slices directly; this separate literal store serves the simplifier."
+        "Nested SAT literal collections now use native []Literal backing and a native record directory. Only actual cold store headers are charged. Clone/cross-owner copy duplicates logical values with independent native backing; source capacity geometry, arena payload/free pages and native growth refusal events are removed. Captured simplifier spans borrow native backing identities, reject real growth/free/closed lifetimes and enforce current logical bounds. Native caller spans likewise respect slice length. The model converter now owns entry and literal slices directly; this separate literal store serves the simplifier.",
+        "The solver assignment trail owns native []Literal backing with a stable checked root identity. Runtime word encoding, vector geometry, captured physical byte backing, pending allocations and TLS refusal simulation are removed from this consumer. Only its actual cold header remains charged. Push/Read/Shrink retain ordered literal values and enforce current logical bounds; Free/Close retire the root and drop native storage. Source assignment/backtrack order, extension-boundary prefix and GC reactivation remain tested. Growth of 4097 values, exact cold-header refusal/refund, root guards, no-reservation assignment and independence from a borrowed Runtime TLS checkpoint are covered. Remaining justification/queue/other scalar columns are separate work; no generic vector credit is added."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
