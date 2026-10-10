@@ -17,7 +17,7 @@ func (m *ASTManager) ArrayFamilyID() (FamilyID, error) {
 
 // Source: src/ast/ast.cpp:1568-1638; src/ast/array_decl_plugin.cpp:446-465.
 // MkArrayAppArguments borrows an existing argument view. Declaration inference
-// uses the original sort buffer without allocating a second argument copy.
+// uses native sort scratch without allocating a second argument copy.
 func (m *ASTManager) MkArrayAppArguments(fid FamilyID, op int32, args AppArguments) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
@@ -33,8 +33,7 @@ func (m *ASTManager) mkArrayAppArguments(fid FamilyID, op int32, ps []ASTParamet
 	if m.pluginAt(fid).kind != astArrayPlugin {
 		return ASTHandle{}, ErrASTDomain
 	}
-	var domain ASTHandleBuffer
-	defer domain.Close(m.BudgetField)
+	var domain []ASTHandle
 	for i := uint32(0); i < args.Count(); i++ {
 		h, e := args.At(i)
 		if e != nil {
@@ -48,11 +47,9 @@ func (m *ASTManager) mkArrayAppArguments(fid FamilyID, op int32, ps []ASTParamet
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		if e = domain.Push(m.BudgetField, m.external(s)); e != nil {
-			return ASTHandle{}, e
-		}
+		domain = append(domain, m.external(s))
 	}
-	d, e := m.arrayDecl(op, ps, domain.Slice(), ASTHandle{})
+	d, e := m.arrayDecl(op, ps, domain, ASTHandle{})
 	if e != nil || d.slot == 0 {
 		return ASTHandle{}, e
 	}

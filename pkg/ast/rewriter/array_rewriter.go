@@ -188,15 +188,13 @@ func (rw *ArrayRewriter) compare(n uint32, a ast.AppArguments, ao uint32, b ast.
 	}
 	return 1, nil
 }
-func (rw *ArrayRewriter) appendArgs(buffer *ast.ASTHandleBuffer, args ast.AppArguments, start, count uint32) error {
+func (rw *ArrayRewriter) appendArgs(buffer *[]ast.ASTHandle, args ast.AppArguments, start, count uint32) error {
 	for i := uint32(0); i < count; i++ {
 		h, e := args.At(start + i)
 		if e != nil {
 			return e
 		}
-		if e = buffer.Push(rw.manager.Budget(), h); e != nil {
-			return e
-		}
+		*buffer = append(*buffer, h)
 	}
 	return nil
 }
@@ -302,33 +300,29 @@ func (rw *ArrayRewriter) storeCore(args ast.AppArguments, out ast.ASTRef) (Rewri
 			}
 		}
 		if r == 1 || reorder {
-			var buffer ast.ASTHandleBuffer
-			defer buffer.Close(m.Budget())
+			var buffer []ast.ASTHandle
 			h, e := old.At(0)
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = buffer.Push(m.Budget(), h); e != nil {
-				return RewriteFailed, e
-			}
+			buffer = append(buffer, h)
 			if e = rw.appendArgs(&buffer, args, 1, n-1); e != nil {
 				return RewriteFailed, e
 			}
-			h, e = m.MkFamilyApp(rw.family, ast.ASTArrayOpStore, nil, buffer.Slice())
+			h, e = m.MkFamilyApp(rw.family, ast.ASTArrayOpStore, nil, buffer)
 			if e != nil {
 				return RewriteFailed, e
 			}
 			if r == 1 {
 				return RewriteDone, m.SetRef(out, h)
 			}
-			buffer.Reset()
-			if e = buffer.Push(m.Budget(), h); e != nil {
-				return RewriteFailed, e
-			}
+			clear(buffer)
+			buffer = buffer[:0]
+			buffer = append(buffer, h)
 			if e = rw.appendArgs(&buffer, old, 1, n-1); e != nil {
 				return RewriteFailed, e
 			}
-			h, e = m.MkFamilyApp(rw.family, ast.ASTArrayOpStore, nil, buffer.Slice())
+			h, e = m.MkFamilyApp(rw.family, ast.ASTArrayOpStore, nil, buffer)
 			if e != nil {
 				return RewriteFailed, e
 			}
@@ -405,19 +399,16 @@ func (rw *ArrayRewriter) selectCore(args ast.AppArguments, out ast.ASTRef) (Rewr
 			return RewriteDone, m.SetRef(out, v)
 		}
 		if r == -1 || rw.expandSelectStore {
-			var buffer ast.ASTHandleBuffer
-			defer buffer.Close(m.Budget())
+			var buffer []ast.ASTHandle
 			h, e := old.At(0)
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = buffer.Push(m.Budget(), h); e != nil {
-				return RewriteFailed, e
-			}
+			buffer = append(buffer, h)
 			if e = rw.appendArgs(&buffer, args, 1, n-1); e != nil {
 				return RewriteFailed, e
 			}
-			fallback, e := m.MkFamilyApp(rw.family, ast.ASTArrayOpSelect, nil, buffer.Slice())
+			fallback, e := m.MkFamilyApp(rw.family, ast.ASTArrayOpSelect, nil, buffer)
 			if e != nil {
 				return RewriteFailed, e
 			}
@@ -428,8 +419,7 @@ func (rw *ArrayRewriter) selectCore(args ast.AppArguments, out ast.ASTRef) (Rewr
 			if e != nil {
 				return RewriteFailed, e
 			}
-			var eqs ast.ASTHandleBuffer
-			defer eqs.Close(m.Budget())
+			var eqs []ast.ASTHandle
 			for i := uint32(1); i < n; i++ {
 				x, e := old.At(i)
 				if e != nil {
@@ -443,14 +433,12 @@ func (rw *ArrayRewriter) selectCore(args ast.AppArguments, out ast.ASTRef) (Rewr
 				if e != nil {
 					return RewriteFailed, e
 				}
-				if e = eqs.Push(m.Budget(), eq); e != nil {
-					return RewriteFailed, e
-				}
+				eqs = append(eqs, eq)
 			}
-			cond := eqs.Slice()[0]
+			cond := eqs[0]
 			status := Rewrite2
 			if n > 2 {
-				cond, e = m.MkAndArgs(eqs.Slice())
+				cond, e = m.MkAndArgs(eqs)
 				if e != nil {
 					return RewriteFailed, e
 				}
@@ -510,9 +498,7 @@ func (rw *ArrayRewriter) selectCore(args ast.AppArguments, out ast.ASTRef) (Rewr
 				return RewriteFailed, e
 			}
 			if fid == 0 && op == ast.ASTOpIte {
-				var a, b ast.ASTHandleVector
-				defer a.Close(m.Budget())
-				defer b.Close(m.Budget())
+				var a, b []ast.ASTHandle
 				th, e := m.GetArg(base, 1)
 				if e != nil {
 					return RewriteFailed, e
@@ -521,39 +507,31 @@ func (rw *ArrayRewriter) selectCore(args ast.AppArguments, out ast.ASTRef) (Rewr
 				if e != nil {
 					return RewriteFailed, e
 				}
-				if e = a.Push(m.Budget(), th); e != nil {
-					return RewriteFailed, e
-				}
+				a = append(a, th)
 				for i := uint32(1); i < n; i++ {
 					h, e := args.At(i)
 					if e != nil {
 						return RewriteFailed, e
 					}
-					if e = a.Push(m.Budget(), h); e != nil {
-						return RewriteFailed, e
-					}
+					a = append(a, h)
 				}
-				if e = b.Push(m.Budget(), el); e != nil {
-					return RewriteFailed, e
-				}
+				b = append(b, el)
 				for i := uint32(1); i < n; i++ {
 					h, e := args.At(i)
 					if e != nil {
 						return RewriteFailed, e
 					}
-					if e = b.Push(m.Budget(), h); e != nil {
-						return RewriteFailed, e
-					}
+					b = append(b, h)
 				}
 				c, e := m.GetArg(base, 0)
 				if e != nil {
 					return RewriteFailed, e
 				}
-				left, e := m.MkFamilyApp(rw.family, ast.ASTArrayOpSelect, nil, a.Slice())
+				left, e := m.MkFamilyApp(rw.family, ast.ASTArrayOpSelect, nil, a)
 				if e != nil {
 					return RewriteFailed, e
 				}
-				right, e := m.MkFamilyApp(rw.family, ast.ASTArrayOpSelect, nil, b.Slice())
+				right, e := m.MkFamilyApp(rw.family, ast.ASTArrayOpSelect, nil, b)
 				if e != nil {
 					return RewriteFailed, e
 				}

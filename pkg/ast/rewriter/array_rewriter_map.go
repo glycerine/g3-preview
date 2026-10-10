@@ -39,15 +39,12 @@ func (rw *ArrayRewriter) mapConst(sort, value ast.ASTHandle, out ast.ASTRef) (st
 }
 func (rw *ArrayRewriter) mapStore(f ast.ASTHandle, arrays, values []ast.ASTHandle, store ast.ASTHandle, indices uint32, out ast.ASTRef) (RewriteStatus, error) {
 	m := rw.manager
-	var next ast.ASTHandleBuffer
-	defer next.Close(m.Budget())
+	var next []ast.ASTHandle
 	h, e := m.MkArrayMap(f, ast.SliceArguments(arrays))
 	if e != nil {
 		return RewriteFailed, e
 	}
-	if e = next.Push(m.Budget(), h); e != nil {
-		return RewriteFailed, e
-	}
+	next = append(next, h)
 	old, e := m.AppArgumentView(store)
 	if e != nil {
 		return RewriteFailed, e
@@ -59,10 +56,8 @@ func (rw *ArrayRewriter) mapStore(f ast.ASTHandle, arrays, values []ast.ASTHandl
 	if e != nil {
 		return RewriteFailed, e
 	}
-	if e = next.Push(m.Budget(), h); e != nil {
-		return RewriteFailed, e
-	}
-	h, e = m.MkFamilyApp(rw.family, ast.ASTArrayOpStore, nil, next.Slice())
+	next = append(next, h)
+	h, e = m.MkFamilyApp(rw.family, ast.ASTArrayOpStore, nil, next)
 	if e != nil {
 		return RewriteFailed, e
 	}
@@ -157,9 +152,7 @@ func (rw *ArrayRewriter) mapCore(f ast.ASTHandle, args ast.AppArguments, out ast
 				}
 			}
 		}
-		var arrays, values ast.ASTHandleBuffer
-		defer arrays.Close(m.Budget())
-		defer values.Close(m.Budget())
+		var arrays, values []ast.ASTHandle
 		for i := uint32(0); i < n; i++ {
 			h, e := args.At(i)
 			if e != nil {
@@ -169,18 +162,14 @@ func (rw *ArrayRewriter) mapCore(f ast.ASTHandle, args ast.AppArguments, out ast
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = arrays.Push(m.Budget(), base); e != nil {
-				return RewriteFailed, e
-			}
+			arrays = append(arrays, base)
 			value, e := m.GetArg(h, indices+1)
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = values.Push(m.Budget(), value); e != nil {
-				return RewriteFailed, e
-			}
+			values = append(values, value)
 		}
-		return rw.mapStore(f, arrays.Slice(), values.Slice(), first, indices, out)
+		return rw.mapStore(f, arrays, values, first, indices, out)
 	}
 	if constant {
 		for i := uint32(1); i < n; i++ {
@@ -196,8 +185,7 @@ func (rw *ArrayRewriter) mapCore(f ast.ASTHandle, args ast.AppArguments, out ast
 				return RewriteFailed, nil
 			}
 		}
-		var values ast.ASTHandleBuffer
-		defer values.Close(m.Budget())
+		var values []ast.ASTHandle
 		for i := uint32(0); i < n; i++ {
 			h, e := args.At(i)
 			if e != nil {
@@ -207,11 +195,9 @@ func (rw *ArrayRewriter) mapCore(f ast.ASTHandle, args ast.AppArguments, out ast
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = values.Push(m.Budget(), v); e != nil {
-				return RewriteFailed, e
-			}
+			values = append(values, v)
 		}
-		value, e := m.MkApp(f, values.Slice())
+		value, e := m.MkApp(f, values)
 		if e != nil {
 			return RewriteFailed, e
 		}
@@ -219,8 +205,7 @@ func (rw *ArrayRewriter) mapCore(f ast.ASTHandle, args ast.AppArguments, out ast
 		if e != nil {
 			return RewriteFailed, e
 		}
-		var domain ast.ASTHandleVector
-		defer domain.Close(m.Budget())
+		var domain []ast.ASTHandle
 		arity, e := m.ArrayArity(input)
 		if e != nil {
 			return RewriteFailed, e
@@ -230,9 +215,7 @@ func (rw *ArrayRewriter) mapCore(f ast.ASTHandle, args ast.AppArguments, out ast
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = domain.Push(m.Budget(), s); e != nil {
-				return RewriteFailed, e
-			}
+			domain = append(domain, s)
 		}
 		output, e := m.NewRef(ast.ASTHandle{})
 		if e != nil {
@@ -243,7 +226,7 @@ func (rw *ArrayRewriter) mapCore(f ast.ASTHandle, args ast.AppArguments, out ast
 		if e != nil {
 			return RewriteFailed, e
 		}
-		sort, e := m.MkArraySort(ast.SliceArguments(domain.Slice()), rangeSort)
+		sort, e := m.MkArraySort(ast.SliceArguments(domain), rangeSort)
 		if e != nil {
 			return RewriteFailed, e
 		}

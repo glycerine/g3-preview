@@ -33962,3 +33962,41 @@ Production-only searches find no BV rewriter ASTHandleBuffer, ASTRefVector,
 ASTFastMark or bvConcatRefBuffer users. Array/proof/sequence/AST/tactic callers
 and internal util numeric/text/parameter cycles remain. The complete external
 native migration and requested util root split remain unfinished.
+
+## Native array rewriting, declaration and interpretation argument slices
+
+Array store/select/map/equality rules now use direct borrowed []ASTHandle
+scratch, including select-ITE branch arrays and multi-constant domain inference.
+appendArgs consumes the original checked AppArguments view into a native slice.
+Store reordering preserves source reset/reuse; equality preserves left-before-
+right traversal, duplicate constraints, select fallback/status behavior and
+actual temporary reference destruction before clearing argument/formula slices.
+No new borrowed INC is introduced and actual factories/output ownership remain.
+Array declaration normalization and array argument-view sort inference also use
+native slices without an extra input argument copy.
+
+Application coercion now owns native []ASTHandle arguments on its actual frame.
+Each real node INC precedes append; ascending consumed-DEC cursor, sticky source
+cause and manager teardown ordering remain. Removed pending acquisition used
+only by fallible buffer publication. Warm fault campaign inspects retained live
+roots instead of the retired unjoined growth guard. Model interpretation uses
+native variable/equality scratch; else peeling directly resizes/reuses an indexed
+argument slice, removing functionArgumentVector. Source OP_EQ recognition, miss
+behavior, argument defaults and reverse ITE order remain.
+
+Manifest descriptions retire inline/spill/growth-refusal credit for these
+callers. No new C++ container/STL implementation or whole-unit credit is added.
+Focused array/coercion/interpretation native checks passed (AST1.226s,
+rewriter0.018s,model0.020s). Final full native AST/rewriter/model/API/tactic/SAT
+tactic passed (20.049s/10.670s/0.057s/0.011s/0.025s/0.113s). Final full debug
+AST/model passed (21.732s/0.058s); remaining debug rewriter passed (15.144s)
+with the same three previously verified baseline exclusions. Module-wide
+compilation, AST/rewriter/model vet, manifest, gofmt and diff checks passed.
+No full native module rerun inside the hourly interval. Counts unchanged:
+2102 units/677 APIs:62 ported,283 partial,1729 unported,two dead/deleted.
+
+Production-only searches now find no ASTHandleBuffer/ASTHandleVector users in
+pkg/ast/rewriter. Proof scratch and other AST reference-vector consumers, model
+constant/function lookup collections, tactic owners and further retained callers
+remain. Internal util cycles and the complete requested root subpackage split
+are still unfinished.

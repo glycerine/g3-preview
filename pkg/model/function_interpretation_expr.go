@@ -3,33 +3,6 @@ package model
 
 import "github.com/glycerine/g3/pkg/ast"
 
-// Lexical ptr_vector<expr> used by set_else; resize completes all capacity
-// reservations before publishing the new length and default pointer suffix.
-type functionArgumentVector struct {
-	values []ast.ASTHandle
-}
-
-func (v *functionArgumentVector) resize(_ *ast.ASTManager, n uint32) error {
-	if uint64(n) > uint64(int(^uint(0)>>1)) {
-		return ast.ErrASTDomain
-	}
-	old := len(v.values)
-	newLen := int(n)
-	if newLen > cap(v.values) {
-		next := make([]ast.ASTHandle, newLen)
-		copy(next, v.values)
-		v.values = next
-	} else {
-		v.values = v.values[:newLen]
-	}
-	for i := old; i < len(v.values); i++ {
-		v.values[i] = ast.ASTHandle{}
-	}
-	return nil
-}
-func (v *functionArgumentVector) close(_ *ast.ASTManager) {
-	v.values = nil
-}
 func functionIsOp(m *ast.ASTManager, h ast.ASTHandle, op int32) (bool, error) {
 	k, e := m.GetKind(h)
 	if e != nil {
@@ -45,8 +18,9 @@ func functionIsOp(m *ast.ASTManager, h ast.ASTHandle, op int32) (bool, error) {
 	kind, e := m.GetDeclKind(h)
 	return kind == op, e
 }
-func (f *FunctionInterpretation) entryExpression(term ast.ASTHandle, args *functionArgumentVector) (bool, error) {
-	args.values = args.values[:0]
+func (f *FunctionInterpretation) entryExpression(term ast.ASTHandle, args *[]ast.ASTHandle) (bool, error) {
+	clear(*args)
+	*args = (*args)[:0]
 	yes, e := functionIsOp(f.manager, term, ast.ASTOpIte)
 	if e != nil || !yes {
 		return false, e
@@ -77,8 +51,14 @@ func (f *FunctionInterpretation) entryExpression(term ast.ASTHandle, args *funct
 			return false, e
 		}
 	}
-	if e = args.resize(f.manager, f.arity); e != nil {
-		return false, e
+	if uint64(f.arity) > uint64(int(^uint(0)>>1)) {
+		return false, ast.ErrASTDomain
+	}
+	if int(f.arity) > cap(*args) {
+		*args = make([]ast.ASTHandle, int(f.arity))
+	} else {
+		*args = (*args)[:int(f.arity)]
+		clear(*args)
 	}
 	for i := uint32(0); i < f.arity; i++ {
 		ci := cond
@@ -114,7 +94,7 @@ func (f *FunctionInterpretation) entryExpression(term ast.ASTHandle, args *funct
 				return false, e
 			}
 			if index == i {
-				args.values[i] = pair[1]
+				(*args)[i] = pair[1]
 				found = true
 				break
 			}
@@ -135,8 +115,7 @@ func (f *FunctionInterpretation) SetElse(term ast.ASTHandle) error {
 	if e := f.resetCache(); e != nil {
 		return e
 	}
-	var args functionArgumentVector
-	defer args.close(f.manager)
+	var args []ast.ASTHandle
 	for !term.IsNull() {
 		yes, e := f.entryExpression(term, &args)
 		if e != nil {
@@ -149,7 +128,7 @@ func (f *FunctionInterpretation) SetElse(term ast.ASTHandle) error {
 		if e != nil {
 			return e
 		}
-		if e = f.InsertEntry(args.values, result); e != nil {
+		if e = f.InsertEntry(args, result); e != nil {
 			return e
 		}
 		term, e = f.manager.GetArg(term, 2)
@@ -196,10 +175,9 @@ func (f *FunctionInterpretation) interpretationCore() (ast.ASTHandle, error) {
 	}
 	m := f.manager
 	r := f.fallback
-	var vars ast.ASTHandleBuffer
-	defer vars.Close(m.Budget())
+	var vars []ast.ASTHandle
 	for _, entry := range f.entries {
-		if len(vars.Slice()) == 0 {
+		if len(vars) == 0 {
 			for i := uint32(0); i < f.arity; i++ {
 				sort, e := m.GetSort(entry.args[i])
 				if e != nil {
@@ -209,29 +187,24 @@ func (f *FunctionInterpretation) interpretationCore() (ast.ASTHandle, error) {
 				if e != nil {
 					return ast.ASTHandle{}, e
 				}
-				if e = vars.Push(m.Budget(), v); e != nil {
-					return ast.ASTHandle{}, e
-				}
+				vars = append(vars, v)
 			}
 		}
-		var eqs ast.ASTHandleBuffer
+		var eqs []ast.ASTHandle
 		next, e := func() (ast.ASTHandle, error) {
-			defer eqs.Close(m.Budget())
 			for i := uint32(0); i < f.arity; i++ {
-				eq, e := m.MkEq(vars.Slice()[i], entry.args[i])
+				eq, e := m.MkEq(vars[i], entry.args[i])
 				if e != nil {
 					return ast.ASTHandle{}, e
 				}
-				if e = eqs.Push(m.Budget(), eq); e != nil {
-					return ast.ASTHandle{}, e
-				}
+				eqs = append(eqs, eq)
 			}
 			var cond ast.ASTHandle
 			var e error
 			if f.arity == 1 {
-				cond = eqs.Slice()[0]
+				cond = eqs[0]
 			} else {
-				cond, e = m.MkAndArgs(eqs.Slice())
+				cond, e = m.MkAndArgs(eqs)
 				if e != nil {
 					return ast.ASTHandle{}, e
 				}

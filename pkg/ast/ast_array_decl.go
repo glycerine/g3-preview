@@ -162,11 +162,7 @@ func (m *ASTManager) arrayDecl(k int32, ps []ASTParameter, domain []ASTHandle, r
 	if uint64(len(domain)) != expected {
 		return astNodeRef{}, ErrASTDomain
 	}
-	var normalized ASTHandleBuffer
-	defer normalized.Close(m.Budget())
-	if e = normalized.Push(m.Budget(), domain[0]); e != nil {
-		return astNodeRef{}, e
-	}
+	normalized := []ASTHandle{domain[0]}
 	count := info.count
 	if k == ASTArrayOpSelect {
 		count--
@@ -187,9 +183,7 @@ func (m *ASTManager) arrayDecl(k int32, ps []ASTParameter, domain []ASTHandle, r
 		if !compatible {
 			return astNodeRef{}, ErrASTDomain
 		}
-		if e = normalized.Push(m.Budget(), m.external(expected)); e != nil {
-			return astNodeRef{}, e
-		}
+		normalized = append(normalized, m.external(expected))
 	}
 	result := sort
 	name := p.names[0]
@@ -200,5 +194,5 @@ func (m *ASTManager) arrayDecl(k int32, ps []ASTParameter, domain []ASTHandle, r
 		}
 		name = p.names[1]
 	}
-	return m.pluginDecl(name, p.family, k, nil, normalized.Slice(), result, ASTFuncFlags{}, false)
+	return m.pluginDecl(name, p.family, k, nil, normalized, result, ASTFuncFlags{}, false)
 }

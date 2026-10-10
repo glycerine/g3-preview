@@ -12,7 +12,7 @@ import (
 // Raw constraint handles are borrowed; their child INCs belong to the manager.
 type arrayStoreEquality struct {
 	active         bool
-	formulas, args ast.ASTHandleBuffer
+	formulas, args []ast.ASTHandle
 	left, right    ast.ASTRef
 }
 
@@ -30,8 +30,8 @@ func (f *arrayStoreEquality) close(m *ast.ASTManager) error {
 			return e
 		}
 	}
-	f.args.Close(m.Budget())
-	f.formulas.Close(m.Budget())
+	f.args = nil
+	f.formulas = nil
 	*f = arrayStoreEquality{}
 	return nil
 }
@@ -97,31 +97,29 @@ func (rw *ArrayRewriter) MkEqCore(lhs, rhs ast.ASTHandle, out ast.ASTRef) (statu
 			if old.Count() < 3 {
 				return RewriteFailed, ast.ErrASTDomain
 			}
-			if e = f.args.Push(m.Budget(), lhs); e != nil {
-				return RewriteFailed, e
-			}
+			f.args = append(f.args, lhs)
 			if e = rw.appendArgs(&f.args, old, 1, old.Count()-2); e != nil {
 				return RewriteFailed, e
 			}
 			// Call the wrapper's actual core/fallback actions directly: the owner is
 			// active and a public re-entry must reject it, including accidental copies.
-			status, e := rw.selectCore(ast.SliceArguments(f.args.Slice()), f.left)
+			status, e := rw.selectCore(ast.SliceArguments(f.args), f.left)
 			if e != nil {
 				return RewriteFailed, e
 			}
 			if status == RewriteFailed {
-				if e = rw.makeFallback(ast.ASTArrayOpSelect, ast.SliceArguments(f.args.Slice()), f.left); e != nil {
+				if e = rw.makeFallback(ast.ASTArrayOpSelect, ast.SliceArguments(f.args), f.left); e != nil {
 					return RewriteFailed, e
 				}
 			}
-			// Source args[0] = rhs retains the original buffer and its spill capacity.
-			f.args.Slice()[0] = rhs
-			status, e = rw.selectCore(ast.SliceArguments(f.args.Slice()), f.right)
+			// Source args[0] = rhs retains the native slice and its capacity.
+			f.args[0] = rhs
+			status, e = rw.selectCore(ast.SliceArguments(f.args), f.right)
 			if e != nil {
 				return RewriteFailed, e
 			}
 			if status == RewriteFailed {
-				if e = rw.makeFallback(ast.ASTArrayOpSelect, ast.SliceArguments(f.args.Slice()), f.right); e != nil {
+				if e = rw.makeFallback(ast.ASTArrayOpSelect, ast.SliceArguments(f.args), f.right); e != nil {
 					return RewriteFailed, e
 				}
 			}
@@ -137,17 +135,16 @@ func (rw *ArrayRewriter) MkEqCore(lhs, rhs ast.ASTHandle, out ast.ASTRef) (statu
 			if e != nil {
 				return RewriteFailed, e
 			}
-			if e = f.formulas.Push(m.Budget(), equality); e != nil {
-				return RewriteFailed, e
-			}
+			f.formulas = append(f.formulas, equality)
 			current, e = old.At(0)
 			if e != nil {
 				return RewriteFailed, e
 			}
-			f.args.Reset()
+			clear(f.args)
+			f.args = f.args[:0]
 		}
 	}
-	h, e := m.MkAndArgs(f.formulas.Slice())
+	h, e := m.MkAndArgs(f.formulas)
 	if e != nil {
 		return RewriteFailed, e
 	}

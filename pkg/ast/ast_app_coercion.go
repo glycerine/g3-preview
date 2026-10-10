@@ -1,9 +1,8 @@
-// Source: src/ast/ast.cpp:2038-2112; src/util/ref_buffer.h:43-60.
+// Source: src/ast/ast.cpp:2038-2112.
 package ast
 
 type astAppCoercionFrame struct {
-	args        ASTHandleBuffer
-	pending     astNodeRef
+	args        []ASTHandle
 	drained     int
 	active      bool
 	sourceCause error
@@ -17,8 +16,8 @@ func (m *ASTManager) cleanupAppCoercion(own bool) error {
 	if !own && f.sourceCause != nil {
 		return f.sourceCause
 	}
-	for f.drained < len(f.args.Slice()) {
-		r, e := m.internal(f.args.Slice()[f.drained])
+	for f.drained < len(f.args) {
+		r, e := m.internal(f.args[f.drained])
 		if e != nil {
 			return e
 		}
@@ -30,19 +29,6 @@ func (m *ASTManager) cleanupAppCoercion(own bool) error {
 			if f.sourceCause == nil {
 				f.sourceCause = e
 			}
-			return e
-		}
-	}
-	f.args.Close(m.BudgetField)
-	if f.pending.slot != 0 {
-		if !own {
-			return ErrASTPending
-		}
-		consumed, e := m.decNode(f.pending)
-		if consumed {
-			f.pending = astNodeRef{}
-		}
-		if e != nil {
 			return e
 		}
 	}
@@ -148,11 +134,7 @@ func (m *ASTManager) coerceAppArguments(decl astNodeRef, args AppArguments, asso
 		if e = m.incNode(r); e != nil {
 			return AppArguments{}, e
 		}
-		f.pending = r
-		if e = f.args.Push(m.BudgetField, h); e != nil {
-			return AppArguments{}, e
-		}
-		f.pending = astNodeRef{}
+		f.args = append(f.args, h)
 	}
-	return SliceArguments(f.args.Slice()), nil
+	return SliceArguments(f.args), nil
 }

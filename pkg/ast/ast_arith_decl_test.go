@@ -192,9 +192,11 @@ func TestASTArithmeticAppCoercionEveryWarmReservation(t *testing.T) {
 				if !errors.Is(e, arena.ErrInjectedFailure) {
 					t.Fatal("warm coercion refusal", fault, e)
 				}
-				if m.appCoercion.pending.slot != 0 {
-					if e := m.cleanupAppCoercion(false); !errors.Is(e, ErrASTPending) {
-						t.Fatal("source guard for unjoined buffer INC", e)
+				for _, h := range m.appCoercion.args[m.appCoercion.drained:] {
+					refs, e := m.GetRefCount(h)
+					astTestMust(t, e)
+					if refs == 0 {
+						t.Fatal("native coercion root lost ownership")
 					}
 				}
 			}
