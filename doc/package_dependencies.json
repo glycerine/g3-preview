@@ -1171,6 +1171,7 @@
       ],
       "production_files": [
         "assert_release.go",
+        "column_info_float.go",
         "diagonal_matrix_exact.go",
         "diagonal_matrix_float.go",
         "eta_exact_expression.go",
@@ -1215,6 +1216,7 @@
         "row_eta_matrix_float.go",
         "scaler_float.go",
         "settings.go",
+        "solver_float.go",
         "sparse_float_vector.go",
         "sparse_matrix_exact.go",
         "sparse_matrix_exact_active.go",

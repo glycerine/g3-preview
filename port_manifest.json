@@ -118203,9 +118203,19 @@
       "path": "src/util/lp/column_info.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/column_info_float.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+        "TestLPFloatSolverSlackCountsNamesAndBypass",
+        "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+        "TestLPFloatSolverScaledCostAndValueGuards"
+      ],
       "assertions": [
         {
           "line": 118,
@@ -118222,9 +118232,34 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained floating column construction, type/flip/free/shift, bound setters/read guards, adjusted upper bound and asymmetric primal bound tolerances; scalar/name/index properties use native Go fields",
+          "status": "ported",
+          "go_target": "pkg/util/lp/column_info_float.go",
+          "tests": [
+            "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPFloatSolverSlackCountsNamesAndBypass",
+            "TestLPFloatSolverScaledCostAndValueGuards"
+          ]
+        },
+        {
+          "name": "retained exact column metadata and numerical ownership",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
+        "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced."
+      ],
+      "deviations": [
+        "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
+        "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
+        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested."
+      ]
     },
     {
       "path": "src/util/lp/column_namer.h",
@@ -121883,22 +121918,71 @@
       "path": "src/util/lp/lp_solver.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/column_info_float.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+        "TestLPFloatSolverSlackCountsNamesAndBypass",
+        "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+        "TestLPFloatSolverScaledCostAndValueGuards"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained floating common data preparation: external/core maps, flipped matrix assembly, shifted RHS, scale/unscale reconstruction, slack/artificial counters, scaled costs and external values (lp_solver.hpp:24-38,47-65,82-86,103-125,415-529,531-570; lp_solver.h:38-94,229-252)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_float.go",
+          "go_targets": [
+            "pkg/util/lp/column_info_float.go"
+          ],
+          "tests": [
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+            "TestLPFloatSolverSlackCountsNamesAndBypass",
+            "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+            "TestLPFloatSolverScaledCostAndValueGuards"
+          ]
+        },
+        {
+          "name": "exact common solver data preparation, presolve fixed/zero pruning, row bounds/pinning, full optimization integration and retained diagnostics",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
+        "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced."
+      ],
+      "deviations": [
+        "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
+        "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
+        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested."
+      ]
     },
     {
       "path": "src/util/lp/lp_solver.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/column_info_float.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+        "TestLPFloatSolverSlackCountsNamesAndBypass",
+        "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+        "TestLPFloatSolverScaledCostAndValueGuards"
+      ],
       "assertions": [
         {
           "line": 50,
@@ -121959,22 +122043,90 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained floating common data preparation: external/core maps, flipped matrix assembly, shifted RHS, scale/unscale reconstruction, slack/artificial counters, scaled costs and external values (lp_solver.hpp:24-38,47-65,82-86,103-125,415-529,531-570; lp_solver.h:38-94,229-252)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_float.go",
+          "go_targets": [
+            "pkg/util/lp/column_info_float.go"
+          ],
+          "tests": [
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+            "TestLPFloatSolverSlackCountsNamesAndBypass",
+            "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+            "TestLPFloatSolverScaledCostAndValueGuards"
+          ]
+        },
+        {
+          "name": "exact common solver data preparation, presolve fixed/zero pruning, row bounds/pinning, full optimization integration and retained diagnostics",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
+        "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced."
+      ],
+      "deviations": [
+        "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
+        "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
+        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested."
+      ]
     },
     {
       "path": "src/util/lp/lp_solver_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/column_info_float.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+        "TestLPFloatSolverSlackCountsNamesAndBypass",
+        "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+        "TestLPFloatSolverScaledCostAndValueGuards"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained floating common data preparation: external/core maps, flipped matrix assembly, shifted RHS, scale/unscale reconstruction, slack/artificial counters, scaled costs and external values (lp_solver.hpp:24-38,47-65,82-86,103-125,415-529,531-570; lp_solver.h:38-94,229-252)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_float.go",
+          "go_targets": [
+            "pkg/util/lp/column_info_float.go"
+          ],
+          "tests": [
+            "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+            "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+            "TestLPFloatSolverSlackCountsNamesAndBypass",
+            "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+            "TestLPFloatSolverScaledCostAndValueGuards"
+          ]
+        },
+        {
+          "name": "exact common solver data preparation, presolve fixed/zero pruning, row bounds/pinning, full optimization integration and retained diagnostics",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
+        "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced."
+      ],
+      "deviations": [
+        "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
+        "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
+        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested."
+      ]
     },
     {
       "path": "src/util/lp/lp_utils.cpp",

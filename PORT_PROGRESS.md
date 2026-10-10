@@ -36832,3 +36832,51 @@ Full native module last passed17:57 UTC, before subsequent additions; no
 within-hour repeat and no full-coverage promotion. Precise scale, solver
 scaling/unscaling, simplex/LAR, random updates, bounds/evidence, MPS and complete
 upstream drivers remain required for the active full LP goal.
+
+
+### Floating common LP solver preparation and scale restoration — 2026-10-10
+
+Ported floating lp_solver common data layer reached by primal/dual simplex
+setup: external/core row and column mapping, flipped sparse matrix assembly,
+shifted RHS, floating scaling and explicit original-matrix reconstruction,
+source slack/artificial counts, scaled costs and core-to-external values.
+Column metadata retains actual bound/type/free/flip/shift and asymmetric
+1e-7/1e-6 feasibility operations; trivial properties become native Go fields.
+Source-wide scans exclude unused adjusted-bound predicates/is_infeasible and
+equality/copy wrappers, while adjusted upper bound remains for actual simplex
+bound construction. Exact metadata/preparation and primal/dual algorithms
+remain open. Four source units become partial; LP55 partial/55 unported.
+
+Native slices/maps plus insdict ordered row/term dictionaries replace source
+unordered containers. First insertion determines selected core numbering;
+coefficient replacement preserves its position. Source null operator[] map
+entries, stale name aliases and accumulating counters are preserved. Settings
+construct normally. Unscale clears retired matrix before publishing attempted
+reconstruction, restores current scale entries, then updates RHS descending.
+A failing lower row therefore leaves successful higher updates. Source
+nonzero balance still hits NOT_IMPLEMENTED; the automatic false-result
+restoration branch cannot be manufactured through a fake scaler callback.
+The concrete core accessor is its actual floating X slice, without universal
+any-valued wrappers. Undefined pointer/index/unset-scalar domains are explicit
+Go guards/zero initialization, not native exception/equivalence claims.
+
+120 independent original systems cover all four live nonfixed bound families,
+random external/core permutations, signed coefficients and density/repetition
+policies. Mathematical transformed solutions and objective products verify
+assembly/scaling; explicit Unscale recovers every original coefficient and
+shifted RHS and retires the previous matrix. Fixed/out-of-core/absent values,
+source names, signed validity, all bound flags/tolerances/NaN, source assertions,
+fixed/zero mapping rejection, and actual public-domain errors/publication
+prefixes are checked. Existing floating scaler/static matrix regressions pass.
+Solver coverage196/203 (96.6%) native,199/203 (98.0%) debug; column metadata
+43/48 (89.6%)/48/48 (100%). Gaps are the other assertion profile, real host-clock
+failure, and reconstruction/false-balance propagation behind valid invariants.
+Full native module snapshot remains17:57 UTC before these later additions;
+no within-hour rerun. Full presolve, exact solver owners, primal/dual/LAR
+optimization, random updates, bounds/evidence, MPS and complete original drivers
+are still required for the persistent LP port goal.
+
+Final floating solver/column/scaler/static regressions pass0.233s native and
+0.244s combined debug/checked. Both vets, source inventory/evidence/no-generics
+and diff checks pass. Regenerated graph remains64 packages with unchanged
+dependencies and two additional production files.

@@ -5,12 +5,13 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently 51 partial source units and59 unported units. No complete
+There are currently 55 partial source units and55 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Floating common solver preparation and retained column metadata | 120 independent original-system worlds across shifted/flipped/boxed/free columns; external/core maps, scaled solutions/objectives, reconstruction, counters, stale name aliases, bound tolerance/IEEE and source error/publication prefixes | Solver96.6% native (196/203),98.0% debug (199/203); retained column metadata89.6% (43/48),100% (48/48). Gaps include other-profile assertions, real host-clock failure and invariant-protected reconstruction/false-balance propagation. Primal/dual optimization and exact preparation remain open |
 | Floating ratio/geometric and power-of-two scaler | 160 independent known-solution matrix worlds; diagonal-factor oracles, strict thresholds, both ordering branches, original-ratio and reps+1 fixtures, borrowed inputs, RHS/scale publication failures, zero/NaN/infinity and source log stop | Native86.9% (226/260), debug88.1% (229/260). Gaps propagate invariant-protected child errors, belong to the other assertion profile or lie beyond the source unimplemented balance stop. Precise explicit scale/full solver integration remain open |
 | Prepared X, dense T and indexed T LU solves for all three retained types | 40 independent U*R*x worlds with sparse/forced-dense factors; pair coordinates, descending append, settings/tiny/IEEE cases, U/R error prefixes, stopped/foreign caller ownership; 12 physical refusal campaigns (128 native /206 debug) | Exact100% (46/46), floating94.6% (35/37) in both profiles. Floating gaps guard bounds established by successful U/R operations |
 | Three retained factorization replacement functions and remaining upstream LU numerical scenarios | 12 independent reordered-basis worlds with sparse/forced-dense owners; nil/replacement/invalid constructor lifetimes; four pooled/direct failure campaigns (292 native /532 debug refusals), successful re-entry and146/260 actual consumed-scratch guards; original larger/holes/random fixtures and all replacements at three density policies, independent factorization and dense/indexed/refined row plus column solutions | Replacement88.2% (15/17) in both profiles; uncovered returns propagate exact-owner cleanup errors behind valid ownership invariants. All four upstream mathematical LU scenarios now pass; diagnostic printing/CLI and full solver integration stay open |
@@ -67,7 +68,7 @@ code that has not been ported.
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
 The complete native module suite passed at17:57 UTC on2026-10-10, including
-LU update, column and row-refinement code, before the subsequent dimension-extension, lifecycle, prepared-solve and scaler additions. LP passed in327.475s with
+LU update, column and row-refinement code, before the subsequent dimension-extension, lifecycle, prepared-solve, scaler and floating solver-preparation additions. LP passed in327.475s with
 **89.5%** statement coverage (**8499/9501 existing Go statements**). Other results:
 numeral92.883s, AST20.253s and polynomial33.172s. The authoritative log and full
 coverage profile are `/mnt/oldrog/tmp/g3-lu-refine-module-native.log` and
@@ -81,7 +82,7 @@ source-state repair. Existing numeral re-entry tests establish that contract.
 
 Current extension and floating/exact initial-LU regression checks pass2.419s native
 and2.911s combined debug/checked. Both LP vets pass. No within-hour full rerun
-is made for this addition; full coverage above remains a pre-extension/lifecycle/prepared/scaler snapshot.
+is made for this addition; full coverage above remains a pre-extension/lifecycle/prepared/scaler/solver snapshot.
 
 Focused refinement allocation campaigns pass4.735s native and9.284s combined
 `g3debug g3checked`; final strengthened property/guard checks pass1.324s/1.495s.
@@ -142,3 +143,10 @@ logs are `/mnt/oldrog/tmp/g3-scaler-{native,debug}.{cover,log}`. No complete
 module rerun is made within the hourly interval; the full snapshot above predates
 the scaler. The exact no-op scale entry point and caller restoration/unscaling
 remain separate open work.
+
+Floating solver preparation, column metadata, scaler and all floating static
+matrix regressions pass0.233s native/0.244s combined debug/checked. Both LP
+vets and source inventory/evidence/no-generics checks pass. Authoritative logs and
+profiles: `/mnt/oldrog/tmp/g3-solver-assembly-{native,debug}.{log,cover}`.
+No full module run is repeated inside the hourly interval. Common data
+preparation does not supply primal/dual optimization or exact solver owners.

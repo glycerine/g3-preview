@@ -2,12 +2,12 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 89.5,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Last complete native module tests passed2026-10-10 at17:57 UTC, LP327.475s with89.5% (8499/9501); this full snapshot predates dimension extension, lifecycle, prepared-solve and scaler additions. Current focused native/debug coverage and test evidence are recorded in PORT_STATUS.md: floating scaler86.9% native/88.1% debug, prepared exact100% and floating94.6%, lifecycle88.2% both, all four upstream LU mathematical scenarios pass. Complete debug coverage predates sparse basis storage. Full solver/scaling/LAR/MPS integration and complete upstream command drivers remain open.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Last complete native module tests passed2026-10-10 at17:57 UTC, LP327.475s with89.5% (8499/9501); this full snapshot predates dimension extension, lifecycle, prepared-solve, scaler and floating solver-preparation additions. Current focused native/debug coverage and test evidence are recorded in PORT_STATUS.md: floating solver96.6% native/98.0% debug, floating scaler86.9% native/88.1% debug, prepared exact100% and floating94.6%, lifecycle88.2% both, all four upstream LU mathematical scenarios pass. Complete debug coverage predates sparse basis storage. Full solver/scaling/LAR/MPS integration and complete upstream command drivers remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
     "remaining retained LU diagnostics and full solver/priority-queue lifecycle integration",
-    "precise scaling early return, full LP/LAR scaling integration and random updates",
+    "precise scaling early return, exact LP preparation, full primal/dual/LAR scaling integration and random updates",
     "primal/dual simplex and LAR solvers",
     "bounds/evidence, constraint scopes and explanations",
     "MPS input and actual upstream test-driver scenarios",
@@ -202,9 +202,19 @@
     },
     {
       "source": "src/util/lp/column_info.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/column_info_float.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+        "TestLPFloatSolverSlackCountsNamesAndBypass",
+        "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+        "TestLPFloatSolverScaledCostAndValueGuards"
+      ]
     },
     {
       "source": "src/util/lp/column_namer.h",
@@ -819,21 +829,51 @@
     },
     {
       "source": "src/util/lp/lp_solver.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/column_info_float.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+        "TestLPFloatSolverSlackCountsNamesAndBypass",
+        "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+        "TestLPFloatSolverScaledCostAndValueGuards"
+      ]
     },
     {
       "source": "src/util/lp/lp_solver.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/column_info_float.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+        "TestLPFloatSolverSlackCountsNamesAndBypass",
+        "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+        "TestLPFloatSolverScaledCostAndValueGuards"
+      ]
     },
     {
       "source": "src/util/lp/lp_solver_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/column_info_float.go",
+        "pkg/util/lp/solver_float.go",
+        "pkg/util/lp/solver_float_test.go"
+      ],
+      "tests": [
+        "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
+        "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
+        "TestLPFloatSolverSlackCountsNamesAndBypass",
+        "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
+        "TestLPFloatSolverScaledCostAndValueGuards"
+      ]
     },
     {
       "source": "src/util/lp/lp_utils.cpp",
