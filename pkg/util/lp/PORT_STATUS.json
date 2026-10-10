@@ -1,7 +1,7 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 90.0,
+  "native_statement_coverage_of_current_go_code": 90.1,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
@@ -447,27 +447,63 @@
     },
     {
       "source": "src/util/lp/iterator_on_column.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/rational_iterators.go"
+      ],
+      "tests": [
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+      ]
     },
     {
       "source": "src/util/lp/iterator_on_indexed_vector.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/rational_iterators.go"
+      ],
+      "tests": [
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+      ]
     },
     {
       "source": "src/util/lp/iterator_on_pivot_row.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/rational_iterators.go"
+      ],
+      "tests": [
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+      ]
     },
     {
       "source": "src/util/lp/iterator_on_row.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/rational_iterators.go"
+      ],
+      "tests": [
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+      ]
     },
     {
       "source": "src/util/lp/iterator_on_term_with_basis_var.h",
@@ -519,9 +555,18 @@
     },
     {
       "source": "src/util/lp/linear_combination_iterator.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/rational_iterators.go"
+      ],
+      "tests": [
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+      ]
     },
     {
       "source": "src/util/lp/lp_bound_propagator.cpp",
@@ -1118,7 +1163,8 @@
         "pkg/util/lp/static_matrix_float.go",
         "pkg/util/lp/static_matrix_exact.go",
         "pkg/util/lp/static_matrix_exact_products.go",
-        "pkg/util/lp/exact_eta_calls.go"
+        "pkg/util/lp/exact_eta_calls.go",
+        "pkg/util/lp/static_matrix_exact_scopes.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1140,7 +1186,16 @@
         "TestLPExactStaticProductsLiteralAliasesAndCopies",
         "TestLPExactStaticProductsAllocationFailureCensus",
         "TestLPExactStaticProductsBoundsAndPrefixes",
-        "TestLPExactStaticProductsOlderComparisonIdentity"
+        "TestLPExactStaticProductsOlderComparisonIdentity",
+        "TestLPExactStaticScopesIndependentDimensionOracle",
+        "TestLPExactStaticTransposeAllocationFailureCensus",
+        "TestLPExactStaticScopesLiteralStopsAndDiagnosticGaps",
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
       ]
     },
     {
@@ -1150,7 +1205,8 @@
         "pkg/util/lp/static_matrix_float.go",
         "pkg/util/lp/static_matrix_exact.go",
         "pkg/util/lp/static_matrix_exact_products.go",
-        "pkg/util/lp/exact_eta_calls.go"
+        "pkg/util/lp/exact_eta_calls.go",
+        "pkg/util/lp/static_matrix_exact_scopes.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1172,7 +1228,16 @@
         "TestLPExactStaticProductsLiteralAliasesAndCopies",
         "TestLPExactStaticProductsAllocationFailureCensus",
         "TestLPExactStaticProductsBoundsAndPrefixes",
-        "TestLPExactStaticProductsOlderComparisonIdentity"
+        "TestLPExactStaticProductsOlderComparisonIdentity",
+        "TestLPExactStaticScopesIndependentDimensionOracle",
+        "TestLPExactStaticTransposeAllocationFailureCensus",
+        "TestLPExactStaticScopesLiteralStopsAndDiagnosticGaps",
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
       ]
     },
     {
@@ -1182,7 +1247,8 @@
         "pkg/util/lp/static_matrix_float.go",
         "pkg/util/lp/static_matrix_exact.go",
         "pkg/util/lp/static_matrix_exact_products.go",
-        "pkg/util/lp/exact_eta_calls.go"
+        "pkg/util/lp/exact_eta_calls.go",
+        "pkg/util/lp/static_matrix_exact_scopes.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1204,7 +1270,16 @@
         "TestLPExactStaticProductsLiteralAliasesAndCopies",
         "TestLPExactStaticProductsAllocationFailureCensus",
         "TestLPExactStaticProductsBoundsAndPrefixes",
-        "TestLPExactStaticProductsOlderComparisonIdentity"
+        "TestLPExactStaticProductsOlderComparisonIdentity",
+        "TestLPExactStaticScopesIndependentDimensionOracle",
+        "TestLPExactStaticTransposeAllocationFailureCensus",
+        "TestLPExactStaticScopesLiteralStopsAndDiagnosticGaps",
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
       ]
     },
     {
@@ -1241,8 +1316,8 @@
     }
   ],
   "status_counts": {
-    "unported": 79,
-    "partial": 31
+    "unported": 74,
+    "partial": 36
   },
-  "combined_debug_checked_statement_coverage_of_current_go_code": 91.7
+  "combined_debug_checked_statement_coverage_of_current_go_code": 91.9
 }

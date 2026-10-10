@@ -35416,3 +35416,72 @@ full native module result remains current; no redundant module suite was run.
 Final strengthened focused debug/checked tests pass14.845s; native11.530s.
 Final LP vet, portcheck and diff checks pass. New-file coverage remains91.6%
 in both profiles; the full native module suite was not repeated.
+
+## Exact static scopes/transposition and retained precise iterators
+
+Implemented exact dimension Push/Pop, row transposition, ordered coordinate
+Domain and literal IsCorrect. Scope rollback removes appended row column tails
+before releasing actual rational values, removes appended columns, preserves old
+value changes and retains row-offset extent. Clear keeps the source scope stack;
+owning Close destroys it. Invalid tail/link and unsupported old-row/new-column
+fixtures pin reached native/debug prefixes rather than repairing source behavior.
+IsCorrect retains duplicate diagnostic text, structural value equality and the
+source tautological final column comparison; independent oracles check both
+actual backlink directions instead of trusting that diagnostic gap.
+
+Transpose retains the three reached owning coefficient copies: original row to
+actual temporary, replacement of first destination, replacement of second.
+Self assignment skips the first replacement as in source. Replaced row values
+are destroyed in ascending source row order before new owning copies. Native
+slices replace vector backing/capacity internals; safe initialized zero slots
+own partial construction without copied manager handles or invented container
+reservations. Numeric failure retains actual temporary and partial destinations
+for Close. Column repairs occur only after all copies and preserve their source
+assertion/bounds prefix. Domain uses a native coordinate map and sort, without
+porting std::set or copying numerals merely to enumerate indices.
+
+Added the actual typed RationalLinearIterator project interface and four live
+precise row/column/indexed-vector/pivot-row classes. Row and indexed Next advance
+then publish index before numeric Copy; column increments first (including
+repeated exhaustion), copies value, then publishes row. Row exhaustion tests
+equality; indexed exhaustion tests >=. Pivot emits its separate unit coefficient
+first while source Size excludes it; duplicate basis indices remain literal.
+Borrowed container references remain live, numeric output belongs to the caller,
+and only new copy-call roots/frames belong to the iterator. Pivot delegates
+remaining copy receipts to its actual indexed child. Whole-source search finds
+clone invocation only in a commented bound-analyzer block and no live vector-of-
+pairs iterator consumer, so those unused adapters were not added. No Go generics
+or any-valued callback representation was introduced.
+
+Independent fixtures cover1,400 dimension/mutation/transpose operations against
+coordinate maps and4,800 mixed Next/NextIndex/Reset/Size cursor operations, including
+large rational, zero and duplicate entries. Four transpose refusal campaigns
+cover distinct/self/empty rows, require stops in all three distinct-row copy
+stages, walk through numerical success and count named live cells/direct objects
+after actual cleanup. Four iterator copy campaigns check cursor/index publication,
+child receipt identity, pending mutation guards, numerical endpoints and owning
+cleanup. Separate tests prove index-only traversal makes no numeral reservations,
+row shrink and malformed-column/index guards, literal signed cursor overflow
+guard, source stopped-owner constructor guards, duplicate/writer diagnostics
+and accepted orphan diagnostic gap. A real older stopped comparison remains
+owned by its caller through successful inline transpose/scopes and all four
+iterators; neither Close nor numeric root capture consumes its generation.
+
+Focused checks pass native2.592s/debug-checked2.575s. Scope/transposition file
+coverage88.7% native/94.0% debug; iterator file94.8% in both profiles. Remaining
+statements propagate child/cleanup errors, source diagnostic gating or a final
+self-equality check that cannot fail for stable valid rationals. No artificial
+invalid numeric values were introduced just to cover it. LP vet and focused
+checks pass. Five newly reached iterator source units become partial:LP36
+partial/74 unported, repository62 ported/317 partial/1695 unported/two
+dead-deleted. Complete solver/driver integration remains open. Next are actual
+LAR terms and the term-with-basis iterator required by precise last-row fill,
+then remaining sparse/static/dense, LU, scaling and complete solver layers.
+
+Full LP regression passes native93.964s/debug-checked127.831s at90.1%/91.9%
+overall statement coverage. Final scope/iterator component coverage agrees with
+the focused profiles. Existing static coefficient file now includes owning scope/
+transpose cleanup and measures91.0%/92.4%; remaining new
+returns propagate actual cleanup errors. LP vet, portcheck, regenerated64-package
+graph and diff checks pass. The prior hourly full native module suite remains
+current; no redundant module-wide run was started within that hour.

@@ -119182,53 +119182,161 @@
       "path": "src/util/lp/iterator_on_column.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/rational_iterators.go"
+      ],
+      "tests": [
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained rational iterator Next/NextIndex/Reset/Size directions for row, column, indexed-vector and pivot-row consumers; typed project interface and owning numeric-call Close",
+          "status": "ported",
+          "go_target": "pkg/util/lp/rational_iterators.go",
+          "tests": [
+            "TestLPRationalIteratorsIndependentCursorOracle",
+            "TestLPRationalIteratorsCopyFailureOwnership",
+            "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+            "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+            "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer."
+      ],
+      "deviations": [
+        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."
+      ]
     },
     {
       "path": "src/util/lp/iterator_on_indexed_vector.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/rational_iterators.go"
+      ],
+      "tests": [
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained rational iterator Next/NextIndex/Reset/Size directions for row, column, indexed-vector and pivot-row consumers; typed project interface and owning numeric-call Close",
+          "status": "ported",
+          "go_target": "pkg/util/lp/rational_iterators.go",
+          "tests": [
+            "TestLPRationalIteratorsIndependentCursorOracle",
+            "TestLPRationalIteratorsCopyFailureOwnership",
+            "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+            "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+            "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer."
+      ],
+      "deviations": [
+        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."
+      ]
     },
     {
       "path": "src/util/lp/iterator_on_pivot_row.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/rational_iterators.go"
+      ],
+      "tests": [
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained rational iterator Next/NextIndex/Reset/Size directions for row, column, indexed-vector and pivot-row consumers; typed project interface and owning numeric-call Close",
+          "status": "ported",
+          "go_target": "pkg/util/lp/rational_iterators.go",
+          "tests": [
+            "TestLPRationalIteratorsIndependentCursorOracle",
+            "TestLPRationalIteratorsCopyFailureOwnership",
+            "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+            "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+            "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer."
+      ],
+      "deviations": [
+        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."
+      ]
     },
     {
       "path": "src/util/lp/iterator_on_row.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/rational_iterators.go"
+      ],
+      "tests": [
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained rational iterator Next/NextIndex/Reset/Size directions for row, column, indexed-vector and pivot-row consumers; typed project interface and owning numeric-call Close",
+          "status": "ported",
+          "go_target": "pkg/util/lp/rational_iterators.go",
+          "tests": [
+            "TestLPRationalIteratorsIndependentCursorOracle",
+            "TestLPRationalIteratorsCopyFailureOwnership",
+            "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+            "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+            "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer."
+      ],
+      "deviations": [
+        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."
+      ]
     },
     {
       "path": "src/util/lp/iterator_on_term_with_basis_var.h",
@@ -119958,14 +120066,41 @@
       "path": "src/util/lp/linear_combination_iterator.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/rational_iterators.go"
+      ],
+      "tests": [
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained rational iterator Next/NextIndex/Reset/Size directions for row, column, indexed-vector and pivot-row consumers; typed project interface and owning numeric-call Close",
+          "status": "ported",
+          "go_target": "pkg/util/lp/rational_iterators.go",
+          "tests": [
+            "TestLPRationalIteratorsIndependentCursorOracle",
+            "TestLPRationalIteratorsCopyFailureOwnership",
+            "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+            "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+            "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+          ]
+        }
+      ],
+      "ownership": [
+        "Iterator borrows the stable source container and numeral manager; caller owns copied output. Only actual newly acquired copy-call roots/frames belong to the iterator and remain for Close. Row/indexed cursors and indices publish before Copy; column cursor advances before Copy and row index publishes afterward. Pivot owns the inline basis call and delegates further copies to its indexed child without adopting that child receipt. No container allocations or generic callback layer."
+      ],
+      "deviations": [
+        "Retained precise instantiations only. Whole-source scan finds clone calls only in a commented bound-analyzer block and no live vector-of-pairs iterator consumer; those definition-only adapters are excluded. Source pivot Size excludes its emitted unit basis term; column repeated exhaustion increments its signed cursor, row/indexed exhaustion does not. Go ok is true only for completed terms, with returned index preserving reached publication prefix on error. Signed column-counter overflow and unsupported cursor/link bounds use existing explicit Go guard profile. Stable borrowed source lifetime is required; no whole bound-analyzer/random-updater/LAR integration or upstream-driver completion claim."
+      ]
     },
     {
       "path": "src/util/lp/lp_bound_propagator.cpp",
@@ -123965,7 +124100,8 @@
         "pkg/util/lp/static_matrix_float.go",
         "pkg/util/lp/static_matrix_exact.go",
         "pkg/util/lp/static_matrix_exact_products.go",
-        "pkg/util/lp/exact_eta_calls.go"
+        "pkg/util/lp/exact_eta_calls.go",
+        "pkg/util/lp/static_matrix_exact_scopes.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -123987,7 +124123,16 @@
         "TestLPExactStaticProductsLiteralAliasesAndCopies",
         "TestLPExactStaticProductsAllocationFailureCensus",
         "TestLPExactStaticProductsBoundsAndPrefixes",
-        "TestLPExactStaticProductsOlderComparisonIdentity"
+        "TestLPExactStaticProductsOlderComparisonIdentity",
+        "TestLPExactStaticScopesIndependentDimensionOracle",
+        "TestLPExactStaticTransposeAllocationFailureCensus",
+        "TestLPExactStaticScopesLiteralStopsAndDiagnosticGaps",
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
       ],
       "conditionals": [
         {
@@ -124120,16 +124265,33 @@
             "TestLPExactStaticProductsBoundsAndPrefixes",
             "TestLPExactStaticProductsOlderComparisonIdentity"
           ]
+        },
+        {
+          "name": "exact dimension push/pop, three owning row copies in transpose, reciprocal column repairs, ordered coordinate domain and literal IsCorrect diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_exact_scopes.go",
+          "tests": [
+            "TestLPExactStaticScopesIndependentDimensionOracle",
+            "TestLPExactStaticTransposeAllocationFailureCensus",
+            "TestLPExactStaticScopesLiteralStopsAndDiagnosticGaps",
+            "TestLPRationalIteratorsIndependentCursorOracle",
+            "TestLPRationalIteratorsCopyFailureOwnership",
+            "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+            "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+            "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+          ]
         }
       ],
       "ownership": [
         "Native typed row/column strips, scoped dimension snapshots and pivot offset/cancellation work replace STL storage. Matrix terms retain duplicates and explicit numerical zeros. Swap-with-tail removal repairs both cross-links in source order; pivot fills/removes exact floating zero without an invented epsilon. Offsets, dimension-only scopes, dense-vector resize prefixes and native/debug source assertions retain actual quirks. No synthetic native-container allocation accounting or numeric callbacks.",
         "Exact matrix rows own initialized rational values in a borrowed manager; native slice relocation transfers owners. Row-cell temporary and stored copies are distinct; Set publishes the column link before them, AddNewElement after them. Removal assigns scalar fields then owning tail value before repairing links and deleting the tail. Actual lexical values, newly acquired numeric roots and raw invocation generations remain owned through stopped Close; older manager calls remain borrowed.",
-        "Extraction borrows the source and delegates owning copies to the destination vector; its numeric receipts remain there. Dot products retain local sums and actual rational-product/pair-field temporaries, then copy the result to caller-owned output. Extrema capture newly acquired rational comparison generation and clean it before local values/physical roots; older callers retain their generation. Native slices preserve literal column order and retained destination values without container allocation events."
+        "Extraction borrows the source and delegates owning copies to the destination vector; its numeric receipts remain there. Dot products retain local sums and actual rational-product/pair-field temporaries, then copy the result to caller-owned output. Extrema capture newly acquired rational comparison generation and clean it before local values/physical roots; older callers retain their generation. Native slices preserve literal column order and retained destination values without container allocation events.",
+        "Transpose owns the source temporary and each actual rational row copy; stopped partial destination construction remains initialized and owned until Close. Native row directories replace container backing/capacity internals. Pop removes column tails before deleting row values in source row order and does not roll back old values or shrink row offsets. Clear preserves scope history; owning Close consumes it. IsCorrect retains source duplicate messages and its tautological column-value comparison gap."
       ],
       "deviations": [
-        "Exact dimension scopes/transpose, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
-        "Exact coefficient storage, pivot arithmetic, vector extraction/products and extrema now exist, but exact dimension scopes/transpose, precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events.",
+        "Actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
+        "Exact coefficient storage, pivot arithmetic, vector extraction/products and extrema now exist, but precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events.",
         "Completed sums/extrema are copied to initialized caller-owned out; partial local sums remain in the matrix on error, and final output-copy failures retain the actual caller mutation prefix. Pair expression arguments use existing X-before-Y Go evaluation profile. Dense extraction uses the existing vector owner Data storage while leaving Index untouched; no generic source container adapter."
       ]
     },
@@ -124142,7 +124304,8 @@
         "pkg/util/lp/static_matrix_float.go",
         "pkg/util/lp/static_matrix_exact.go",
         "pkg/util/lp/static_matrix_exact_products.go",
-        "pkg/util/lp/exact_eta_calls.go"
+        "pkg/util/lp/exact_eta_calls.go",
+        "pkg/util/lp/static_matrix_exact_scopes.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -124164,7 +124327,16 @@
         "TestLPExactStaticProductsLiteralAliasesAndCopies",
         "TestLPExactStaticProductsAllocationFailureCensus",
         "TestLPExactStaticProductsBoundsAndPrefixes",
-        "TestLPExactStaticProductsOlderComparisonIdentity"
+        "TestLPExactStaticProductsOlderComparisonIdentity",
+        "TestLPExactStaticScopesIndependentDimensionOracle",
+        "TestLPExactStaticTransposeAllocationFailureCensus",
+        "TestLPExactStaticScopesLiteralStopsAndDiagnosticGaps",
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
       ],
       "conditionals": [
         {
@@ -124301,16 +124473,33 @@
             "TestLPExactStaticProductsBoundsAndPrefixes",
             "TestLPExactStaticProductsOlderComparisonIdentity"
           ]
+        },
+        {
+          "name": "exact dimension push/pop, three owning row copies in transpose, reciprocal column repairs, ordered coordinate domain and literal IsCorrect diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_exact_scopes.go",
+          "tests": [
+            "TestLPExactStaticScopesIndependentDimensionOracle",
+            "TestLPExactStaticTransposeAllocationFailureCensus",
+            "TestLPExactStaticScopesLiteralStopsAndDiagnosticGaps",
+            "TestLPRationalIteratorsIndependentCursorOracle",
+            "TestLPRationalIteratorsCopyFailureOwnership",
+            "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+            "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+            "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+          ]
         }
       ],
       "ownership": [
         "Native typed row/column strips, scoped dimension snapshots and pivot offset/cancellation work replace STL storage. Matrix terms retain duplicates and explicit numerical zeros. Swap-with-tail removal repairs both cross-links in source order; pivot fills/removes exact floating zero without an invented epsilon. Offsets, dimension-only scopes, dense-vector resize prefixes and native/debug source assertions retain actual quirks. No synthetic native-container allocation accounting or numeric callbacks.",
         "Exact matrix rows own initialized rational values in a borrowed manager; native slice relocation transfers owners. Row-cell temporary and stored copies are distinct; Set publishes the column link before them, AddNewElement after them. Removal assigns scalar fields then owning tail value before repairing links and deleting the tail. Actual lexical values, newly acquired numeric roots and raw invocation generations remain owned through stopped Close; older manager calls remain borrowed.",
-        "Extraction borrows the source and delegates owning copies to the destination vector; its numeric receipts remain there. Dot products retain local sums and actual rational-product/pair-field temporaries, then copy the result to caller-owned output. Extrema capture newly acquired rational comparison generation and clean it before local values/physical roots; older callers retain their generation. Native slices preserve literal column order and retained destination values without container allocation events."
+        "Extraction borrows the source and delegates owning copies to the destination vector; its numeric receipts remain there. Dot products retain local sums and actual rational-product/pair-field temporaries, then copy the result to caller-owned output. Extrema capture newly acquired rational comparison generation and clean it before local values/physical roots; older callers retain their generation. Native slices preserve literal column order and retained destination values without container allocation events.",
+        "Transpose owns the source temporary and each actual rational row copy; stopped partial destination construction remains initialized and owned until Close. Native row directories replace container backing/capacity internals. Pop removes column tails before deleting row values in source row order and does not roll back old values or shrink row offsets. Clear preserves scope history; owning Close consumes it. IsCorrect retains source duplicate messages and its tautological column-value comparison gap."
       ],
       "deviations": [
-        "Exact dimension scopes/transpose, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
-        "Exact coefficient storage, pivot arithmetic, vector extraction/products and extrema now exist, but exact dimension scopes/transpose, precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events.",
+        "Actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
+        "Exact coefficient storage, pivot arithmetic, vector extraction/products and extrema now exist, but precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events.",
         "Completed sums/extrema are copied to initialized caller-owned out; partial local sums remain in the matrix on error, and final output-copy failures retain the actual caller mutation prefix. Pair expression arguments use existing X-before-Y Go evaluation profile. Dense extraction uses the existing vector owner Data storage while leaving Index untouched; no generic source container adapter."
       ]
     },
@@ -124323,7 +124512,8 @@
         "pkg/util/lp/static_matrix_float.go",
         "pkg/util/lp/static_matrix_exact.go",
         "pkg/util/lp/static_matrix_exact_products.go",
-        "pkg/util/lp/exact_eta_calls.go"
+        "pkg/util/lp/exact_eta_calls.go",
+        "pkg/util/lp/static_matrix_exact_scopes.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -124345,7 +124535,16 @@
         "TestLPExactStaticProductsLiteralAliasesAndCopies",
         "TestLPExactStaticProductsAllocationFailureCensus",
         "TestLPExactStaticProductsBoundsAndPrefixes",
-        "TestLPExactStaticProductsOlderComparisonIdentity"
+        "TestLPExactStaticProductsOlderComparisonIdentity",
+        "TestLPExactStaticScopesIndependentDimensionOracle",
+        "TestLPExactStaticTransposeAllocationFailureCensus",
+        "TestLPExactStaticScopesLiteralStopsAndDiagnosticGaps",
+        "TestLPRationalIteratorsIndependentCursorOracle",
+        "TestLPRationalIteratorsCopyFailureOwnership",
+        "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+        "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+        "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+        "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
       ],
       "conditionals": [
         {
@@ -124408,16 +124607,33 @@
             "TestLPExactStaticProductsBoundsAndPrefixes",
             "TestLPExactStaticProductsOlderComparisonIdentity"
           ]
+        },
+        {
+          "name": "exact dimension push/pop, three owning row copies in transpose, reciprocal column repairs, ordered coordinate domain and literal IsCorrect diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_exact_scopes.go",
+          "tests": [
+            "TestLPExactStaticScopesIndependentDimensionOracle",
+            "TestLPExactStaticTransposeAllocationFailureCensus",
+            "TestLPExactStaticScopesLiteralStopsAndDiagnosticGaps",
+            "TestLPRationalIteratorsIndependentCursorOracle",
+            "TestLPRationalIteratorsCopyFailureOwnership",
+            "TestLPRationalIteratorsLiveBoundsAndLiteralIndexPaths",
+            "TestLPRationalIteratorsAndScopesLeaveOlderComparisonOwned",
+            "TestLPRationalIteratorIndexOnlyNoNumeralReservations",
+            "TestLPRationalIteratorConstructorsRejectStoppedMatrix"
+          ]
         }
       ],
       "ownership": [
         "Native typed row/column strips, scoped dimension snapshots and pivot offset/cancellation work replace STL storage. Matrix terms retain duplicates and explicit numerical zeros. Swap-with-tail removal repairs both cross-links in source order; pivot fills/removes exact floating zero without an invented epsilon. Offsets, dimension-only scopes, dense-vector resize prefixes and native/debug source assertions retain actual quirks. No synthetic native-container allocation accounting or numeric callbacks.",
         "Exact matrix rows own initialized rational values in a borrowed manager; native slice relocation transfers owners. Row-cell temporary and stored copies are distinct; Set publishes the column link before them, AddNewElement after them. Removal assigns scalar fields then owning tail value before repairing links and deleting the tail. Actual lexical values, newly acquired numeric roots and raw invocation generations remain owned through stopped Close; older manager calls remain borrowed.",
-        "Extraction borrows the source and delegates owning copies to the destination vector; its numeric receipts remain there. Dot products retain local sums and actual rational-product/pair-field temporaries, then copy the result to caller-owned output. Extrema capture newly acquired rational comparison generation and clean it before local values/physical roots; older callers retain their generation. Native slices preserve literal column order and retained destination values without container allocation events."
+        "Extraction borrows the source and delegates owning copies to the destination vector; its numeric receipts remain there. Dot products retain local sums and actual rational-product/pair-field temporaries, then copy the result to caller-owned output. Extrema capture newly acquired rational comparison generation and clean it before local values/physical roots; older callers retain their generation. Native slices preserve literal column order and retained destination values without container allocation events.",
+        "Transpose owns the source temporary and each actual rational row copy; stopped partial destination construction remains initialized and owned until Close. Native row directories replace container backing/capacity internals. Pop removes column tails before deleting row values in source row order and does not roll back old values or shrink row offsets. Clear preserves scope history; owning Close consumes it. IsCorrect retains source duplicate messages and its tautological column-value comparison gap."
       ],
       "deviations": [
-        "Exact dimension scopes/transpose, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
-        "Exact coefficient storage, pivot arithmetic, vector extraction/products and extrema now exist, but exact dimension scopes/transpose, precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events.",
+        "Actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
+        "Exact coefficient storage, pivot arithmetic, vector extraction/products and extrema now exist, but precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events.",
         "Completed sums/extrema are copied to initialized caller-owned out; partial local sums remain in the matrix on error, and final output-copy failures retain the actual caller mutation prefix. Pair expression arguments use existing X-before-Y Go evaluation profile. Dense extraction uses the existing vector owner Data storage while leaving Index untouched; no generic source container adapter."
       ]
     },

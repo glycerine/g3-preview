@@ -13,13 +13,15 @@ type RationalRowCell struct {
 // pointers into rows must not be retained across mutation. Close owns stopped
 // lexical values and numerical calls as well as the published coefficients.
 type RationalStaticMatrix struct {
-	Rows        [][]RationalRowCell
-	Columns     [][]ColumnCell
-	RowOffsets  []int32
-	manager     *numeral.RationalManager
-	calls       exactEtaCalls
-	work        *IndexedRationalVector
-	becameZeros []uint32
+	Rows         [][]RationalRowCell
+	Columns      [][]ColumnCell
+	RowOffsets   []int32
+	manager      *numeral.RationalManager
+	calls        exactEtaCalls
+	work         *IndexedRationalVector
+	becameZeros  []uint32
+	stack        []staticMatrixDimensions
+	transposeRow []RationalRowCell
 }
 
 func NewRationalStaticMatrix(manager *numeral.RationalManager, rows, columns uint32) *RationalStaticMatrix {
@@ -467,8 +469,13 @@ func (m *RationalStaticMatrix) Close() error {
 		}
 		m.work = nil
 	}
+	if err := m.clearOwnedRow(&m.transposeRow); err != nil {
+		return err
+	}
 	if err := m.clearRows(); err != nil {
 		return err
 	}
+	m.stack = nil
+	m.becameZeros = nil
 	return m.calls.cleanupRoots(m.manager)
 }
