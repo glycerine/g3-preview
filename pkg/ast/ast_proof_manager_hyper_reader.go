@@ -4,7 +4,10 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func (m *ASTManager) MatchProofHyperResolve(p ASTHandle, premises ASTRefVector, conclusion ASTRef, out *ASTProofHyperOutput) (bool, error) {
+// MatchProofHyperResolve appends owning premise handles to the caller slice;
+// the caller must DecRef each appended handle. Substitution references belong
+// to out, while conclusion uses its separately supplied owning ASTRef.
+func (m *ASTManager) MatchProofHyperResolve(p ASTHandle, premises *[]ASTHandle, conclusion ASTRef, out *ASTProofHyperOutput) (bool, error) {
 	if e := m.lock(); e != nil {
 		return false, e
 	}
@@ -30,9 +33,13 @@ func (m *ASTManager) MatchProofHyperResolve(p ASTHandle, premises ASTRefVector, 
 		if e != nil {
 			return false, e
 		} // source to_app
-		if e = m.pushVector(premises, child); e != nil {
+		if premises == nil {
+			return false, ErrASTHandle
+		}
+		if e = m.incNode(child); e != nil {
 			return false, e
 		}
+		*premises = append(*premises, h)
 	}
 	if a.count == 0 {
 		return false, arena.ErrBounds
@@ -52,9 +59,7 @@ func (m *ASTManager) MatchProofHyperResolve(p ASTHandle, premises ASTRefVector, 
 	if e = out.check(m); e != nil {
 		return false, e
 	}
-	if e = out.pushSubstitution(m); e != nil {
-		return false, e
-	}
+	out.substitutions = append(out.substitutions, nil)
 	if d.info.slot == 0 {
 		return true, nil
 	}
@@ -86,12 +91,8 @@ func (m *ASTManager) MatchProofHyperResolve(p ASTHandle, premises ASTRefVector, 
 			if second.Kind != ASTParameterInt {
 				return false, ErrASTDomain
 			} // source inactive-union read is undefined
-			if e = out.pushPosition(m, ASTProofPosition{First: uint32(value.integer), Second: uint32(second.integer)}); e != nil {
-				return false, e
-			}
-			if e = out.pushSubstitution(m); e != nil {
-				return false, e
-			}
+			out.positions = append(out.positions, ASTProofPosition{First: uint32(value.integer), Second: uint32(second.integer)})
+			out.substitutions = append(out.substitutions, nil)
 			i++
 		} else {
 			if value.Kind != ASTParameterAST {
@@ -101,9 +102,11 @@ func (m *ASTManager) MatchProofHyperResolve(p ASTHandle, premises ASTRefVector, 
 			if _, e = m.requireExpr(m.external(r)); e != nil {
 				return false, e
 			}
-			if e = m.pushVector(out.substitutions[len(out.substitutions)-1], r); e != nil {
+			if e = m.incNode(r); e != nil {
 				return false, e
 			}
+			last := len(out.substitutions) - 1
+			out.substitutions[last] = append(out.substitutions[last], m.external(r))
 		}
 	}
 	return true, nil

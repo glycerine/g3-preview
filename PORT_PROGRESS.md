@@ -34223,3 +34223,35 @@ Remaining proof work includes hyper-resolution input/output reference vectors
 and their owned premise/substitution lifetimes. Retained sorting-network AST
 contexts and other collection consumers still need migration. Internal util cycles
 and the complete requested root subpackage split remain unfinished.
+
+## Native hyper-resolution premise and substitution slices
+
+Hyper-resolution builders now borrow [][]ASTHandle substitution inputs directly.
+Readers append owning premise handles to caller []ASTHandle storage and own
+substitution references in native nested slices; positions also use native
+slices. Removed source-capacity growth emulation and reference-vector push
+receipts from these paths. Actual parameter/factory ownership and the output
+owner header remain. Output cleanup retires references in ascending order and
+clears consumed slots before returning errors, allowing safe retry. Forced
+manager teardown releases escaped native storage without stale node callbacks.
+
+Source validation/publication order and malformed-parameter prefixes remain.
+Replaced growth-only refusal campaigns with native storage checks: forty
+substitution rows, repeated appends with arena reservations disabled, exact
+reference counts, outputs surviving destruction of their source proof, and
+nil/foreign output guards after already published prefixes. Retained actual
+builder reservation campaigns and ascending destruction/ID reuse checks.
+
+Validation: focused native/debug hyper-resolution checks passed (0.032s/0.030s).
+Final full native AST/rewriter/model/tactic/SAT tactic/API checks passed
+(20.311s/11.492s/0.054s/0.025s/0.107s/0.011s); full debug AST passed (21.420s).
+Module-wide compilation, AST vet, manifest and diff checks passed. Counts
+unchanged:2102 units/677 APIs:62 ported,283 partial,1729 unported,two dead/deleted.
+No allocation-refusal geometry or unused C++ container internals are credited.
+
+Fresh receiver-aware dependency analysis still finds 286 root util production
+files in 43 components, including cycles of 183 numerical files, 35 parameter/
+debug files and 15 allocator/runtime files. Retained sorting-network AST
+contexts and formatting reference storage still use custom vector wrappers.
+The external collection migration and internal cycle cleanup are incomplete;
+the complete requested util subpackage split is not ready.

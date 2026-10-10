@@ -9756,11 +9756,7 @@
         "TestASTProofHyperNativeArgumentsAndCache",
         "TestASTProofHyperMalformedTrailingPairRetainsPriorOutputs",
         "TestASTProofHyperOutputAscendingDestructionAndIDReuse",
-        "TestASTProofHyperOutputPhysicalChargesAndEscapedCleanup",
-        "TestASTProofHyperPositionPublishedBeforeNextSubstitutionFailure",
-        "TestASTProofHyperReaderAllFailurePrefixesImmediateReferences",
-        "TestASTProofHyperReaderPremiseIncrementBeforeGrowthFailure",
-        "TestASTProofHyperReaderRetainsConclusionBeforeOuterGrowth",
+        "TestASTProofHyperOutputNativeStorageAndEscapedCleanup",
         "TestASTProofHyperPremiseValidationBeforeParameterAllocation",
         "TestASTProofHyperZeroPremisesAndDebugGuardOrder",
         "TestASTProofModesReadersAndLegacyHelper",
@@ -9856,7 +9852,9 @@
         "TestASTBitVectorConcatBorrowedSuffix",
         "TestASTBitVectorAddBorrowedCommonSuffix",
         "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix",
-        "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix"
+        "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix",
+        "TestASTProofHyperNativeWideReaderExactOwnershipAndIndependentOutputs",
+        "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix"
       ],
       "conditionals": [
         {
@@ -10635,11 +10633,7 @@
             "TestASTProofHyperNativeArgumentsAndCache",
             "TestASTProofHyperMalformedTrailingPairRetainsPriorOutputs",
             "TestASTProofHyperOutputAscendingDestructionAndIDReuse",
-            "TestASTProofHyperOutputPhysicalChargesAndEscapedCleanup",
-            "TestASTProofHyperPositionPublishedBeforeNextSubstitutionFailure",
-            "TestASTProofHyperReaderAllFailurePrefixesImmediateReferences",
-            "TestASTProofHyperReaderPremiseIncrementBeforeGrowthFailure",
-            "TestASTProofHyperReaderRetainsConclusionBeforeOuterGrowth",
+            "TestASTProofHyperOutputNativeStorageAndEscapedCleanup",
             "TestASTProofHyperPremiseValidationBeforeParameterAllocation",
             "TestASTProofHyperZeroPremisesAndDebugGuardOrder",
             "TestASTProofModesReadersAndLegacyHelper",
@@ -10656,7 +10650,9 @@
             "TestASTProofUnitResolutionBooleanOracle",
             "TestASTProofUnitResolutionCountShortCircuit",
             "TestASTProofUnitResolutionLexicalScratchPeak",
-            "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix"
+            "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix",
+            "TestASTProofHyperNativeWideReaderExactOwnershipAndIndependentOutputs",
+            "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix"
           ]
         },
         {
@@ -10929,7 +10925,7 @@
         "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Additional AST ownership is tracked in the later runtime-core entry. See PORT_PROGRESS.md#audit-family-port-status-md.",
         "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See PORT_PROGRESS.md#audit-sort-size-port-status-md.",
         "First real core uses pointer-free kind/parameter/info/ref records, separately charged cold headers/pages/directories/payloads and concrete source IDs. Source registration retains actual AST and copied numeral graph; deletion and forced teardown preserve source order with charged emergency continuation adapters. Actual expression arrays retain/release live AST nodes. Ref-vector backing charges12-byte capacity/size/initialized header plus scalar entries and old/new peaks; source8-byte bound is checked separately. See PORT_PROGRESS.md#audit-ast-core-packet-md for the exact67-file/52-group frozen scope and open whole-manager obligations.",
-        "Proof rule and expanded-distinct argument scratch uses native borrowed []ASTHandle slices. Proof-owned parameter lists use []ASTParameter with ascending real parameter payload destruction; debug unit-resolution coverage uses []bool. Removed astProofArguments, astProofParameters, astProofFound and the unused ASTHandleBuffer adapter after all retained callers migrated. Actual parameter copying, AST factories, publication, canonical facts and debug coverage behavior remain. Quantifier bindings now append borrowed handles directly to Go slices; hyper-resolution owning outputs retain their separate remaining ownership qualifications. No C++ capacity/growth/refusal implementation credit remains for the migrated scratch.",
+        "Proof rule and expanded-distinct argument scratch uses native borrowed []ASTHandle slices. Proof-owned parameter lists use []ASTParameter with ascending real parameter payload destruction; debug unit-resolution coverage uses []bool. Removed astProofArguments, astProofParameters, astProofFound and the unused ASTHandleBuffer adapter after all retained callers migrated. Actual parameter copying, AST factories, publication, canonical facts and debug coverage behavior remain. Quantifier bindings now append borrowed handles directly to Go slices; hyper-resolution owning outputs now use native slices with explicit reference retirement. No C++ capacity/growth/refusal implementation credit remains for the migrated scratch.",
         "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
         "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md.",
         "Expression-array empty nonroot POP preserves the finite release unsigned size wrap; retained root SET increments the incoming AST before old physical access and never rolls it back at an invalid old pointer. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
@@ -10945,7 +10941,7 @@
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
         "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
         "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE remains open. No Go generics are used.",
-        "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper substitution outer growth precedes stable Go record allocation, an explicit charged representation adapter. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
+        "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper-resolution premise and substitution outputs now use native slices, with actual node references retained before append. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
         "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim.",
         "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
         "Empty null/root POP is guarded at source physical undefined access. Debug empty POP assertion executes before From output copy. Invalid/uninitialized old root SET returns a typed guard with the incoming source INC retained and leaves backing unchanged.",
@@ -10965,7 +10961,8 @@
         "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised.",
         "Low-level trace traversal now uses native slices and identity maps; private stack/bitmap allocation faults no longer exist. Two post-registration catch fixtures now use an actual closed output-stream guard while retaining literal table/INC ownership, source stop and later slot-generation checks. The borrowed format-child reservation sweep now requires completed native trace and verifies borrowed stream/file lifetime. The existing failed borrowed-format constructor closed-stream guard remains. These do not claim the removed lexical backing allocation refusals still occur.",
         "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations.",
-        "Quantifier instantiation decoding now accepts *[]ASTHandle and appends borrowed expression handles directly; removed ASTProofBindings and its source-vector backing/header lifecycle. The source fact assignment, debug empty-output assertion, parameter extraction order, partial malformed-parameter outputs and nonowning reference counts remain. Hyper-resolution builder uses a native argument slice; omitted unused fmls/sorts storage while preserving premise fact validation before actual parameter construction. Removed astProofRawArguments. No source container growth/refusal behavior is credited; hyper-resolution owning output/input vector migration remains separate."
+        "Quantifier instantiation decoding now accepts *[]ASTHandle and appends borrowed expression handles directly; removed ASTProofBindings and its source-vector backing/header lifecycle. The source fact assignment, debug empty-output assertion, parameter extraction order, partial malformed-parameter outputs and nonowning reference counts remain. Hyper-resolution builder uses a native argument slice; omitted unused fmls/sorts storage while preserving premise fact validation before actual parameter construction. Removed astProofRawArguments. No source container growth/refusal behavior is credited; hyper-resolution inputs and owning outputs are also native slices.",
+        "Hyper-resolution builder accepts borrowed [][]ASTHandle substitutions. Reader appends owning handles into *[]ASTHandle premises and native [][]ASTHandle substitution rows; caller owns appended premise DECs, while ASTProofHyperOutput retires its substitutions in ascending outer/inner order. Position/row growth uses Go append directly with no vector headers/backing charge or growth-only unjoined INC. Output Close records consumed slots before errors, retains unconsumed ownership for retry, and blocks new use once cleanup starts. Source parameter/position conversion order, malformed-prefix publication, conclusion ASTRef assignment and actual owner-header checks remain. Native wide decoding verifies exact published reference counts under disabled arena reservations and independent outputs after source proof destruction. No source container allocation-failure geometry is credited."
       ]
     },
     {
@@ -11135,11 +11132,7 @@
         "TestASTProofHyperNativeArgumentsAndCache",
         "TestASTProofHyperMalformedTrailingPairRetainsPriorOutputs",
         "TestASTProofHyperOutputAscendingDestructionAndIDReuse",
-        "TestASTProofHyperOutputPhysicalChargesAndEscapedCleanup",
-        "TestASTProofHyperPositionPublishedBeforeNextSubstitutionFailure",
-        "TestASTProofHyperReaderAllFailurePrefixesImmediateReferences",
-        "TestASTProofHyperReaderPremiseIncrementBeforeGrowthFailure",
-        "TestASTProofHyperReaderRetainsConclusionBeforeOuterGrowth",
+        "TestASTProofHyperOutputNativeStorageAndEscapedCleanup",
         "TestASTProofHyperPremiseValidationBeforeParameterAllocation",
         "TestASTProofHyperZeroPremisesAndDebugGuardOrder",
         "TestASTProofModesReadersAndLegacyHelper",
@@ -11269,7 +11262,9 @@
         "TestASTAppArgumentViewBorrowAndLockedFactory",
         "TestASTAppArgumentSubrangesRemainBorrowedAndBounded",
         "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix",
-        "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix"
+        "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix",
+        "TestASTProofHyperNativeWideReaderExactOwnershipAndIndependentOutputs",
+        "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix"
       ],
       "conditionals": [
         {
@@ -11785,11 +11780,7 @@
             "TestASTProofHyperNativeArgumentsAndCache",
             "TestASTProofHyperMalformedTrailingPairRetainsPriorOutputs",
             "TestASTProofHyperOutputAscendingDestructionAndIDReuse",
-            "TestASTProofHyperOutputPhysicalChargesAndEscapedCleanup",
-            "TestASTProofHyperPositionPublishedBeforeNextSubstitutionFailure",
-            "TestASTProofHyperReaderAllFailurePrefixesImmediateReferences",
-            "TestASTProofHyperReaderPremiseIncrementBeforeGrowthFailure",
-            "TestASTProofHyperReaderRetainsConclusionBeforeOuterGrowth",
+            "TestASTProofHyperOutputNativeStorageAndEscapedCleanup",
             "TestASTProofHyperPremiseValidationBeforeParameterAllocation",
             "TestASTProofHyperZeroPremisesAndDebugGuardOrder",
             "TestASTProofModesReadersAndLegacyHelper",
@@ -11806,7 +11797,9 @@
             "TestASTProofUnitResolutionBooleanOracle",
             "TestASTProofUnitResolutionCountShortCircuit",
             "TestASTProofUnitResolutionLexicalScratchPeak",
-            "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix"
+            "TestASTProofQuantReaderMalformedParameterKeepsAppendPrefix",
+            "TestASTProofHyperNativeWideReaderExactOwnershipAndIndependentOutputs",
+            "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix"
           ]
         },
         {
@@ -12075,7 +12068,7 @@
         "Concrete FamilyManager charges its real cold header, existing nested SymbolInt32Table and full names-vector capacities with old/new overlap. Borrows symbols; preserves counter/map/name failure prefixes; Close in reverse member order. Additional AST ownership is tracked in the later runtime-core entry. See PORT_PROGRESS.md#audit-family-port-status-md.",
         "Standalone SortSize is a freely copied pointer-free scalar with no separate owner/header allocation. Conversion borrows actual RationalService/OwnedRational for source IsUint64 then Uint64 actions without reservation, retained owner or numeral copy; resulting scalar outlives the owner. Caller confines operand mutation/deletion across both calls. Display uses local20 digits and one caller-owned final string. Other AST/plugin algorithms remain open. See PORT_PROGRESS.md#audit-sort-size-port-status-md.",
         "First real core uses pointer-free kind/parameter/info/ref records, separately charged cold headers/pages/directories/payloads and concrete source IDs. Source registration retains actual AST and copied numeral graph; deletion and forced teardown preserve source order with charged emergency continuation adapters. Actual expression arrays retain/release live AST nodes. Ref-vector backing charges12-byte capacity/size/initialized header plus scalar entries and old/new peaks; source8-byte bound is checked separately. See PORT_PROGRESS.md#audit-ast-core-packet-md for the exact67-file/52-group frozen scope and open whole-manager obligations.",
-        "Proof rule and expanded-distinct argument scratch uses native borrowed []ASTHandle slices. Proof-owned parameter lists use []ASTParameter with ascending real parameter payload destruction; debug unit-resolution coverage uses []bool. Removed astProofArguments, astProofParameters, astProofFound and the unused ASTHandleBuffer adapter after all retained callers migrated. Actual parameter copying, AST factories, publication, canonical facts and debug coverage behavior remain. Quantifier bindings now append borrowed handles directly to Go slices; hyper-resolution owning outputs retain their separate remaining ownership qualifications. No C++ capacity/growth/refusal implementation credit remains for the migrated scratch.",
+        "Proof rule and expanded-distinct argument scratch uses native borrowed []ASTHandle slices. Proof-owned parameter lists use []ASTParameter with ascending real parameter payload destruction; debug unit-resolution coverage uses []bool. Removed astProofArguments, astProofParameters, astProofFound and the unused ASTHandleBuffer adapter after all retained callers migrated. Actual parameter copying, AST factories, publication, canonical facts and debug coverage behavior remain. Quantifier bindings now append borrowed handles directly to Go slices; hyper-resolution owning outputs now use native slices with explicit reference retirement. No C++ capacity/growth/refusal implementation credit remains for the migrated scratch.",
         "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
         "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md.",
         "Expression-array empty nonroot POP preserves the finite release unsigned size wrap; retained root SET increments the incoming AST before old physical access and never rolls it back at an invalid old pointer. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
@@ -12091,7 +12084,7 @@
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
         "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
         "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE remains open. No Go generics are used.",
-        "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper substitution outer growth precedes stable Go record allocation, an explicit charged representation adapter. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
+        "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper-resolution premise and substitution outputs now use native slices, with actual node references retained before append. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
         "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim.",
         "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
         "Empty null/root POP is guarded at source physical undefined access. Debug empty POP assertion executes before From output copy. Invalid/uninitialized old root SET returns a typed guard with the incoming source INC retained and leaves backing unchanged.",
@@ -12105,7 +12098,8 @@
         "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies.",
         "AppArgumentView exposes borrowed application storage to the evaluator. Indexed reads validate the application handle and support factory callbacks under the manager lock without public-manager reentry; original application ownership must outlive the view.",
         "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations.",
-        "Quantifier instantiation decoding now accepts *[]ASTHandle and appends borrowed expression handles directly; removed ASTProofBindings and its source-vector backing/header lifecycle. The source fact assignment, debug empty-output assertion, parameter extraction order, partial malformed-parameter outputs and nonowning reference counts remain. Hyper-resolution builder uses a native argument slice; omitted unused fmls/sorts storage while preserving premise fact validation before actual parameter construction. Removed astProofRawArguments. No source container growth/refusal behavior is credited; hyper-resolution owning output/input vector migration remains separate."
+        "Quantifier instantiation decoding now accepts *[]ASTHandle and appends borrowed expression handles directly; removed ASTProofBindings and its source-vector backing/header lifecycle. The source fact assignment, debug empty-output assertion, parameter extraction order, partial malformed-parameter outputs and nonowning reference counts remain. Hyper-resolution builder uses a native argument slice; omitted unused fmls/sorts storage while preserving premise fact validation before actual parameter construction. Removed astProofRawArguments. No source container growth/refusal behavior is credited; hyper-resolution inputs and owning outputs are also native slices.",
+        "Hyper-resolution builder accepts borrowed [][]ASTHandle substitutions. Reader appends owning handles into *[]ASTHandle premises and native [][]ASTHandle substitution rows; caller owns appended premise DECs, while ASTProofHyperOutput retires its substitutions in ascending outer/inner order. Position/row growth uses Go append directly with no vector headers/backing charge or growth-only unjoined INC. Output Close records consumed slots before errors, retains unconsumed ownership for retry, and blocks new use once cleanup starts. Source parameter/position conversion order, malformed-prefix publication, conclusion ASTRef assignment and actual owner-header checks remain. Native wide decoding verifies exact published reference counts under disabled arena reservations and independent outputs after source proof destruction. No source container allocation-failure geometry is credited."
       ]
     },
     {

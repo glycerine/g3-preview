@@ -10,7 +10,7 @@ type ASTProofPosition struct{ First, Second uint32 }
 
 // MkProofHyperResolve validates premise facts and assembles native argument/
 // parameter slices. Inputs are borrowed; unused source scratch is omitted.
-func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHandle, positions []ASTProofPosition, substitutions []ASTRefVector) (ASTHandle, error) {
+func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHandle, positions []ASTProofPosition, substitutions [][]ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}
@@ -33,16 +33,8 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 	var params []ASTParameter
 	defer func() { m.dropProofParameters(params) }()
 	for i, v := range substitutions {
-		s, e := m.vectorState(v)
-		if e != nil {
-			return ASTHandle{}, e
-		}
-		for j := uint32(0); j < s.size; j++ {
-			r, e := m.vectorValue(s, j)
-			if e != nil {
-				return ASTHandle{}, e
-			}
-			p, e := m.newParameterAST(m.external(r))
+		for _, h := range v {
+			p, e := m.newParameterAST(h)
 			if e != nil {
 				return ASTHandle{}, e
 			}
