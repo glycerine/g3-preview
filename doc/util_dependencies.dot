@@ -37,6 +37,8 @@ digraph packages {
   "util/lp" [style=filled, fillcolor="#dceafa"];
   "util/lp" -> "util/numeral";
   "util/lp" -> "util/params";
+  "util/lp" -> "util/random";
+  "util/lp" -> "util/stopwatch";
   "util/luby" [style=filled, fillcolor="#dceafa"];
   "util/memory" [style=filled, fillcolor="#dceafa"];
   "util/memory" -> "arena";

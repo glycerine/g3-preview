@@ -5,7 +5,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently twenty partial source units and 90 unported units. No complete
+There are currently twenty-eight partial source units and 82 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
@@ -22,10 +22,12 @@ code that has not been ported.
 | Exact rational/rational and rational/pair permutation applications | All 24 size-four permutations across six dense/four retained rational sparse directions against independent exact matrix products; ordered indices including zeros; 1000-digit allocation refusals through first success; named-cell/direct-object census; stopped destination ownership and every pending mutation guard | 82.8% native / 91.5% debug; native excludes debug dense copies and exact comparison |
 | Native int/unsigned/double priority queues and int/unsigned pair queues | Original `-tbq` and strengthened pair smoke scenario; 12,000 independent map operations per type (60,000 total); exact tie/LIFO order, source mutation prefixes, extent wrap, NaN/infinity and diagnostic gaps | 85.6% scalar algorithms; 92.2% pair wrappers; index helpers 87.7/89.5% heap, 90.6/88.7% pair |
 | Exact rational/pair priority queues and strict pair relations | 5,000 operations per type against independent exact ordering; retained-priority/copy ownership, ties, exact fractions; actual new/increase/decrease/dequeue reservation campaigns; by-value argument stops, named-cell/direct-object census and older comparison identity | 86.2% queue code, 84.6% call receipts in each profile; pair arithmetic/relations file remains 100% |
+| Floating sparse coefficient lists, column/row eta matrices and actual tail interface | 2,000 independent dyadic matrix worlds across four dense/sparse directions; all 24 size-four permutation conjugations; mixed tail chains; strict configurable/fixed tolerance edges, exact index order, duplicates, signed zeros, IEEE values and reached bounds/conjugation prefixes | Eta and row eta 98.9% native / 100% debug; sparse coefficients 91.7% / 100%; interface binding 100% |
+| Settings defaults, stats, float tolerance families, random state and resource limits | All numerical/strategy defaults, source RNG golden vectors, mutable thresholds, strict CPU-time boundary, borrowed limit/error propagation and stats reset | 96.3%; uncovered constructor return propagates a real host-clock start error |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-Current package statement coverage is **89.1% native and 91.2% combined debug/checked**. Exact scoped
+Current package statement coverage is **89.8% native and 91.8% combined debug/checked**. Exact scoped
 vector allocation and rollback paths are tested; remaining uncovered statements
 include numerical child and cleanup/capture error returns, plus profile-specific
 assertion paths. The explicit

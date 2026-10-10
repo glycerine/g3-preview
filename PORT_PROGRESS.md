@@ -35046,3 +35046,57 @@ explicit guard/child error propagation; no fabricated destructor fault is used
 merely for coverage. Inventory remains20 partial/90 unported LP source units;
 complete primal/matrix integration remains open. Checkpoint39c28eb5 saved native
 queues. Full LP objective continues with matrices, eta/LU and solver integration.
+
+
+## Floating eta matrices, sparse coefficients, settings and tail polymorphism
+
+Ported double,double eta_matrix and row_eta_matrix applications, actual sparse
+coefficient storage and the floating tail_matrix interface used by LU. Native
+ordered term slices retain duplicates and explicit zeros; first-match debug
+lookup remains distinct from accumulated numerical applications. Both dense
+and sparse left/right paths preserve snapshot/reference differences, source
+mutation order, and configured sparse-left versus fixed1e-14 sparse-right drops.
+Column-diagonal assignment precedes acceptance checking, and coefficient division
+retains the source1e-12 assertion gate. Column conjugation publishes ascending
+terms; row conjugation snapshots indices and publishes descending terms.
+
+The retained settings constructor now supplies all source scalar defaults,
+mutable float tolerance families, stats/reset, strategy selection and actual
+random_gen delegation, borrowing the existing util/random implementation.
+Settings owns the source-backed CPU stopwatch/default cancellation service,
+starts it before initializing the remaining source members, supports borrowed
+resource limits and uses Go io.Writer report streams. The existing Linux watch
+uses Getrusage process CPU time at microsecond resolution; no nanosecond or STL
+stream equivalence is claimed. Clarified its prior comment now that actual LP
+resource limits consume it. Failed host clock reads are explicit Go errors.
+
+No direct active upstream eta/row-eta test scenario exists in src/test/lp.cpp.
+Independent tests cover2000 dyadic matrix worlds across four applications for
+each transformation, every24 size-four permutation conjugation, element views
+and mixed eta/permutation/row-eta tail chains. Additional source-contract worlds
+cover strict threshold boundaries and neighboring floats, cancellation and
+ordered index publication, zero/negative tolerance, signed-zero early exits,
+NaN/infinity, underflow before was_in_index, duplicate entries, native/debug
+self-entry assertions, sparse missing-index erase and actual bounds/conjugation
+prefixes. Independent matrix products use exactly representable dyadic values,
+so expected results do not rely on a loose numerical comparison.
+
+Whole-source scans find row get_diagonal_element and indexed local-to-X bodies
+uncalled; no invalid or unused template adapter was added. Exact rational
+coefficients and rational/pair eta applications, formatting, matrix/eta/LU
+integration and complete solvers remain pending. Each of eight new LP source
+units stays partial, giving28 partial/82 unported units; no whole-solver claim.
+
+Full native module suite exited0, log
+/mnt/oldrog/tmp/g3-eta-float-module-native.log: numeral87.395s, LP50.594s,
+AST18.209s, rewriter10.099s and polynomial31.306s. Subsequent final constructor-
+order checks and complete LP coverage suites pass native51.477s/debug-checked
+69.148s,89.8%/91.8% package statements. Eta and row eta98.9% native/100% debug,
+sparse coefficients91.7%/100%, tail interface binding100%, settings96.3% (one
+uncovered real clock-start error return). Native-only gaps are the unreachable
+opposite-profile assertion returns, not missing normal numerical branches.
+LP/stopwatch vet, portcheck, regenerated64-package dependency graphs and diff
+checks pass. The graph now includes LP's actual random/stopwatch imports.
+Repository ledger62 ported/309 partial/1703 unported/two dead-deleted. Previous
+checkpointe5839b68 saved exact queues. Full LP objective continues with exact eta
+ownership, sparse/static/dense matrices, factorization and solver integration.

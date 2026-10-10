@@ -1,12 +1,12 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 89.1,
+  "native_statement_coverage_of_current_go_code": 89.8,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
-    "LU/eta factorization and priority-queue solver integration",
+    "exact eta applications and LU factorization and priority-queue solver integration",
     "scaling and random updates",
     "primal/dual simplex and LAR solvers",
     "bounds/evidence, constraint scopes and explanations",
@@ -256,21 +256,48 @@
     },
     {
       "source": "src/util/lp/eta_matrix.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/eta_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatEtaIndependentMatrixProducts",
+        "TestLPFloatEtaPermutationConjugationAndTailComposition",
+        "TestLPSparseFloatVectorAndEtaLiteralStorage",
+        "TestLPFloatEtaSparseToleranceAndOrderContracts",
+        "TestLPFloatEtaBoundsAndConjugationPrefixes",
+        "TestLPFloatEtaIEEEAndAssertionProfiles"
+      ]
     },
     {
       "source": "src/util/lp/eta_matrix.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/eta_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatEtaIndependentMatrixProducts",
+        "TestLPFloatEtaPermutationConjugationAndTailComposition",
+        "TestLPSparseFloatVectorAndEtaLiteralStorage",
+        "TestLPFloatEtaSparseToleranceAndOrderContracts",
+        "TestLPFloatEtaBoundsAndConjugationPrefixes",
+        "TestLPFloatEtaIEEEAndAssertionProfiles"
+      ]
     },
     {
       "source": "src/util/lp/eta_matrix_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/eta_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatEtaIndependentMatrixProducts",
+        "TestLPFloatEtaPermutationConjugationAndTailComposition",
+        "TestLPSparseFloatVectorAndEtaLiteralStorage",
+        "TestLPFloatEtaSparseToleranceAndOrderContracts",
+        "TestLPFloatEtaBoundsAndConjugationPrefixes",
+        "TestLPFloatEtaIEEEAndAssertionProfiles"
+      ]
     },
     {
       "source": "src/util/lp/hash_helper.h",
@@ -608,11 +635,14 @@
       "source": "src/util/lp/lp_settings.h",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/types.go"
+        "pkg/util/lp/types.go",
+        "pkg/util/lp/settings.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
-        "TestLPSourceStatusFallbackAndParserAsymmetry"
+        "TestLPSourceStatusFallbackAndParserAsymmetry",
+        "TestLPSettingsDefaultsAndServices",
+        "TestLPSettingsFloatToleranceEdges"
       ]
     },
     {
@@ -861,21 +891,48 @@
     },
     {
       "source": "src/util/lp/row_eta_matrix.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/row_eta_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatEtaIndependentMatrixProducts",
+        "TestLPFloatEtaPermutationConjugationAndTailComposition",
+        "TestLPSparseFloatVectorAndEtaLiteralStorage",
+        "TestLPFloatEtaSparseToleranceAndOrderContracts",
+        "TestLPFloatEtaBoundsAndConjugationPrefixes",
+        "TestLPFloatEtaIEEEAndAssertionProfiles"
+      ]
     },
     {
       "source": "src/util/lp/row_eta_matrix.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/row_eta_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatEtaIndependentMatrixProducts",
+        "TestLPFloatEtaPermutationConjugationAndTailComposition",
+        "TestLPSparseFloatVectorAndEtaLiteralStorage",
+        "TestLPFloatEtaSparseToleranceAndOrderContracts",
+        "TestLPFloatEtaBoundsAndConjugationPrefixes",
+        "TestLPFloatEtaIEEEAndAssertionProfiles"
+      ]
     },
     {
       "source": "src/util/lp/row_eta_matrix_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/row_eta_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatEtaIndependentMatrixProducts",
+        "TestLPFloatEtaPermutationConjugationAndTailComposition",
+        "TestLPSparseFloatVectorAndEtaLiteralStorage",
+        "TestLPFloatEtaSparseToleranceAndOrderContracts",
+        "TestLPFloatEtaBoundsAndConjugationPrefixes",
+        "TestLPFloatEtaIEEEAndAssertionProfiles"
+      ]
     },
     {
       "source": "src/util/lp/scaler.h",
@@ -921,9 +978,18 @@
     },
     {
       "source": "src/util/lp/sparse_vector.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/sparse_float_vector.go"
+      ],
+      "tests": [
+        "TestLPFloatEtaIndependentMatrixProducts",
+        "TestLPFloatEtaPermutationConjugationAndTailComposition",
+        "TestLPSparseFloatVectorAndEtaLiteralStorage",
+        "TestLPFloatEtaSparseToleranceAndOrderContracts",
+        "TestLPFloatEtaBoundsAndConjugationPrefixes",
+        "TestLPFloatEtaIEEEAndAssertionProfiles"
+      ]
     },
     {
       "source": "src/util/lp/square_dense_submatrix.h",
@@ -1004,9 +1070,18 @@
     },
     {
       "source": "src/util/lp/tail_matrix.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/tail_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatEtaIndependentMatrixProducts",
+        "TestLPFloatEtaPermutationConjugationAndTailComposition",
+        "TestLPSparseFloatVectorAndEtaLiteralStorage",
+        "TestLPFloatEtaSparseToleranceAndOrderContracts",
+        "TestLPFloatEtaBoundsAndConjugationPrefixes",
+        "TestLPFloatEtaIEEEAndAssertionProfiles"
+      ]
     },
     {
       "source": "src/util/lp/test_bound_analyzer.h",
@@ -1022,8 +1097,8 @@
     }
   ],
   "status_counts": {
-    "unported": 90,
-    "partial": 20
+    "unported": 82,
+    "partial": 28
   },
-  "combined_debug_checked_statement_coverage_of_current_go_code": 91.2
+  "combined_debug_checked_statement_coverage_of_current_go_code": 91.8
 }

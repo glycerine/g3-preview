@@ -1165,10 +1165,13 @@
       "package": "util/lp",
       "imports": [
         "util/numeral",
-        "util/params"
+        "util/params",
+        "util/random",
+        "util/stopwatch"
       ],
       "production_files": [
         "assert_release.go",
+        "eta_matrix_float.go",
         "exact_priority_calls.go",
         "exact_vector_calls.go",
         "gparams_catalog_collectors.go",
@@ -1184,9 +1187,13 @@
         "priority_heap.go",
         "priority_queue_exact.go",
         "priority_queue_native.go",
+        "row_eta_matrix_float.go",
+        "settings.go",
+        "sparse_float_vector.go",
         "stacked_pair_vector.go",
         "stacked_value.go",
         "stacked_vector.go",
+        "tail_matrix_float.go",
         "types.go"
       ]
     },
