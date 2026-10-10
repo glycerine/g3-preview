@@ -12,6 +12,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -31,7 +32,7 @@ func TestMemoryFatalStandardStreamsColdGraph(t *testing.T) {
 			continue
 		}
 		smallObjectMust(t, e)
-		expected := uint64(reflect.TypeOf(MemoryStandardStreams{}).Size()) + 2*uint64(reflect.TypeOf(NumericTextStream{}).Size())
+		expected := uint64(reflect.TypeOf(MemoryStandardStreams{}).Size()) + 2*uint64(reflect.TypeOf(utext.NumericTextStream{}).Size())
 		if b.Used() != expected || s.stdout.Buffer != nil || s.StderrField.Buffer != nil {
 			t.Fatal("actual cold provider graph", b.Used(), expected)
 		}
@@ -202,7 +203,7 @@ func TestMemoryFatalBorrowedPointerRetentionAndReachedSentry(t *testing.T) {
 	// Setter stores a stale pointer without any eager pointee read.
 	smallObjectMust(t, c.ExitWhenOutOfMemory(true, region, text))
 	copy := *c
-	if e = copy.ExitWhenOutOfMemory(false, nil, GlobalParamCString{}); !errors.Is(e, ErrNumericStreamOwner) {
+	if e = copy.ExitWhenOutOfMemory(false, nil, GlobalParamCString{}); !errors.Is(e, utext.ErrNumericStreamOwner) {
 		t.Fatal(e)
 	}
 	smallObjectMust(t, c.Close())

@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // Actual integer branch's lexical ostringstream and returned std::string.
@@ -14,8 +15,8 @@ import (
 type astBVIntegerText struct {
 	self                                                 *astBVIntegerText
 	service                                              *util.RationalService
-	stream                                               *util.NumericTextStream
-	result                                               util.OwnedString
+	stream                                               *utext.NumericTextStream
+	result                                               utext.OwnedString
 	invocation                                           util.RationalServiceInvocation
 	returned, streamEnded, sourceDone, ownFalse, ownTrue bool
 	bodyCause, sourceCause, ownCause                     error
@@ -35,7 +36,7 @@ func (x *astBVIntegerText) construct(q *util.RationalService, b *arena.Budget, v
 	if !integer {
 		return util.ErrRationalNotInteger
 	}
-	x.stream, e = util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	x.stream, e = utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	if e != nil {
 		return e
 	}
@@ -46,7 +47,7 @@ func (x *astBVIntegerText) construct(q *util.RationalService, b *arena.Budget, v
 		return e
 	}
 	if e == nil {
-		e = util.CaptureNumericStreamOwnedString(&x.result, x.stream, b)
+		e = utext.CaptureNumericStreamOwnedString(&x.result, x.stream, b)
 		if e == nil {
 			x.returned = true
 		}

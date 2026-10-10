@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestArbitraryFloatBinaryStringActualCopyTransportGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
 	x := ArbitraryFloat{format: arbitraryFloatFormat(8, 40000, false), significand: NewInt(1)}
-	var out OwnedString
+	var out utext.OwnedString
 	armed, calls := false, 0
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
@@ -22,7 +23,7 @@ func TestArbitraryFloatBinaryStringActualCopyTransportGuards(t *testing.T) {
 				t.Fatal("transport must reach significand COPY", s.executing, s.tmpLive, s.bitsLive, out.Length)
 			}
 			before, used, inv := x, b.Used(), s.invocation
-			var later OwnedString
+			var later utext.OwnedString
 			for i, e := range []error{m.ToStringBinary(&x, 0, 0, &later), m.CleanupBinaryString(), m.Close(), m.SourceFinalize(), m.CleanupValue(&x), m.integer.SetInt32(&x.significand, 7), m.integer.Del(&s.tmp), m.integer.CloseChecked(), m.integer.SourceFinalize(), m.rational.CloseChecked(), m.rational.SourceFinalize()} {
 				if !errors.Is(e, ErrNumericPending) {
 					t.Fatal("binary callback guard", i, e)

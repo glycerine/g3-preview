@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestRationalSMT2StreamCopyTransportGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
 	a := Rational{Num: NewInt(-1), Den: NewInt(3)}
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	armed, calls := false, 0
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
@@ -56,7 +57,7 @@ func TestRationalSMT2StreamCopyTransportGuards(t *testing.T) {
 	}
 	serviceMust(t, r.SetMaxSize(0))
 	serviceMust(t, m.rational.CleanupSMT2Stream())
-	got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if got != "(/ " {
 		t.Fatal("borrowed prefix changed", got)
@@ -93,7 +94,7 @@ func TestRationalSMT2StreamRefusedChildDoesNotAdoptOlderCopy(t *testing.T) {
 		serviceMust(t, e)
 		v := NewInt(-1)
 		serviceMust(t, m.integer.Mul2kInPlace(&v, 4000))
-		var out OwnedStringStream
+		var out utext.OwnedStringStream
 		serviceMust(t, out.Construct(b))
 		b.FailAfter(ordinal)
 		body := m.integer.DisplaySMT2Into(&out, &v, false)
@@ -103,7 +104,7 @@ func TestRationalSMT2StreamRefusedChildDoesNotAdoptOlderCopy(t *testing.T) {
 		if matched {
 			reached = true
 			invocation, roots, tmp, used := s.invocation, m.integer.CopyAllocation.Roots, s.tmp, b.Used()
-			var later OwnedStringStream
+			var later utext.OwnedStringStream
 			serviceMust(t, later.Construct(b))
 			a := Rational{Num: NewInt(7), Den: NewInt(3)}
 			if e := m.rational.DisplaySMT2Into(&later, &a, false); !errors.Is(e, ErrNumericPending) {
@@ -116,7 +117,7 @@ func TestRationalSMT2StreamRefusedChildDoesNotAdoptOlderCopy(t *testing.T) {
 			if !s.active || s.invocation != invocation || m.integer.CopyAllocation.Roots != roots || s.tmp != tmp || b.Used() != used {
 				t.Fatal("rational cleanup changed older COPY")
 			}
-			got, e := (OwnedStringView{&later.Buffer.String, later.Buffer.String.Generation, later.Buffer.Position}).String()
+			got, e := (utext.OwnedStringView{Owner: &later.Buffer.String, Generation: later.Buffer.String.Generation, Length: later.Buffer.Position}).String()
 			serviceMust(t, e)
 			if got != "(/ " {
 				t.Fatal("refused borrowed prefix", got)

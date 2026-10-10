@@ -1,4 +1,4 @@
-package util
+package text
 
 import (
 	"errors"
@@ -14,9 +14,9 @@ func TestOwnedStringAppendIndependentLengthsAndSelf(t *testing.T) {
 			b.FailAfter(0)
 			var dst, src OwnedString
 			first, second := strings.Repeat("a", a), strings.Repeat("b", n)
-			serviceMust(t, dst.Construct(b, first))
-			serviceMust(t, src.Construct(b, second))
-			serviceMust(t, dst.Append(src.View()))
+			textMust(t, dst.Construct(b, first))
+			textMust(t, src.Construct(b, second))
+			textMust(t, dst.Append(src.View()))
 			if !dst.Matches(first+second) || !src.Matches(second) || b.Used() != 0 {
 				t.Fatal(a, n)
 			}
@@ -27,8 +27,8 @@ func TestOwnedStringAppendIndependentLengthsAndSelf(t *testing.T) {
 	for n := 0; n <= 80; n++ {
 		var s OwnedString
 		before := strings.Repeat("x", n)
-		serviceMust(t, s.Construct(nil, before))
-		serviceMust(t, s.Append(s.View()))
+		textMust(t, s.Construct(nil, before))
+		textMust(t, s.Append(s.View()))
 		if !s.Matches(before + before) {
 			t.Fatal(n)
 		}
@@ -36,16 +36,16 @@ func TestOwnedStringAppendIndependentLengthsAndSelf(t *testing.T) {
 }
 func TestOwnedStringAppendCountedBinaryAndCString(t *testing.T) {
 	var s, src OwnedString
-	serviceMust(t, s.Construct(nil, "a"))
-	serviceMust(t, src.ConstructRepeated(nil, 3, 'x'))
+	textMust(t, s.Construct(nil, "a"))
+	textMust(t, src.ConstructRepeated(nil, 3, 'x'))
 	src.Put(1, 0)
 	src.Put(2, 'z')
-	serviceMust(t, s.Append(src.View()))
-	serviceMust(t, s.AppendCString("b\x00ignored"))
+	textMust(t, s.Append(src.View()))
+	textMust(t, s.AppendCString("b\x00ignored"))
 	if !s.Matches("ax\x00zb") {
 		t.Fatal(s.External)
 	}
-	serviceMust(t, s.Append(OwnedStringView{}))
+	textMust(t, s.Append(OwnedStringView{}))
 	if ch, e := s.CStringByte(s.Length); e != nil || ch != 0 {
 		t.Fatal(ch, e)
 	}
@@ -54,8 +54,8 @@ func TestOwnedStringAppendRefusalAndRetainedReplacement(t *testing.T) {
 	// Invalid borrowed input must leave existing Go text intact; no STL pending
 	// replacement or allocator failure state is involved.
 	var s, src OwnedString
-	serviceMust(t, s.Construct(nil, strings.Repeat("a", 40)))
-	serviceMust(t, src.Construct(nil, strings.Repeat("b", 50)))
+	textMust(t, s.Construct(nil, strings.Repeat("a", 40)))
+	textMust(t, src.Construct(nil, strings.Repeat("b", 50)))
 	stale := src.View()
 	src.SourceDestroy()
 	old := s.View()
@@ -63,18 +63,18 @@ func TestOwnedStringAppendRefusalAndRetainedReplacement(t *testing.T) {
 		t.Fatal(e)
 	}
 	got, e := old.String()
-	serviceMust(t, e)
+	textMust(t, e)
 	if got != strings.Repeat("a", 40) {
 		t.Fatal(got)
 	}
-	serviceMust(t, s.AppendCString("x"))
+	textMust(t, s.AppendCString("x"))
 	if _, e = old.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
 		t.Fatal(e)
 	}
 }
 func TestOwnedStringAppendOwnerAndUnreachedReads(t *testing.T) {
 	var s OwnedString
-	serviceMust(t, s.Construct(nil, "a"))
+	textMust(t, s.Construct(nil, "a"))
 	copied := s
 	if !errors.Is(copied.AppendCString("x"), ErrOwnedStringOwner) {
 		t.Fatal("copied owner")

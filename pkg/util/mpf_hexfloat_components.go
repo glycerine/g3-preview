@@ -1,12 +1,14 @@
 // Source: src/util/mpf.cpp:1608-1619; src/util/mpf.h:294.
 package util
 
-import
+import (
 
-// ToStringHexfloatComponentsInto restores scale and strips the hidden bit,
-// then borrows the caller's ordinary MPF text context for the source return.
-// Despite its source name this overload delegates to to_string, not hex output.
-umemory "github.com/glycerine/g3/pkg/util/memory"
+	// ToStringHexfloatComponentsInto restores scale and strips the hidden bit,
+	// then borrows the caller's ordinary MPF text context for the source return.
+	// Despite its source name this overload delegates to to_string, not hex output.
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
 func (m *ArbitraryFloatManager) ToStringHexfloatComponentsInto(sign bool, exponent int64, sig *Int, ebits, sbits, rbits uint32, text ArbitraryFloatFormatTarget) (view ArbitraryFloatFormattedCString, cause error) {
 	if e := m.valueOwnerGuard(); e != nil {
@@ -20,7 +22,7 @@ func (m *ArbitraryFloatManager) ToStringHexfloatComponentsInto(sign bool, expone
 		return view, ErrNumericPending
 	}
 	if text == nil {
-		return view, ErrOwnedStringOwner
+		return view, utext.ErrOwnedStringOwner
 	}
 	*s = arbitraryFloatHexfloatComponentsScope{manager: m, invocation: s.invocation + 1, qLive: true, sigLive: true, active: true, executing: true}
 	s.hooks.Policy = s

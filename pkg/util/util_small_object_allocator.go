@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrSmallObjectOwner = umemory.ErrAllocatorOwner
@@ -26,7 +27,7 @@ type utilSmallObjectConfig struct {
 	IDPresent, IDNull    bool
 	BorrowedID           *arena.BytesRegion
 	IDRef                GlobalParamCString
-	Diagnostics, Verbose *NumericTextStream
+	Diagnostics, Verbose *utext.NumericTextStream
 	Verbosity            uint32
 	VerboseContext       *VerboseContext
 }

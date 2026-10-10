@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // These are the actual eleven scalar source members, in declaration order.
@@ -112,7 +113,7 @@ func (s *SMTArrayParams) Close() error {
 	s.closed = true
 	return nil
 }
-func (s *SMTArrayParams) Display(out *util.NumericTextStream) error {
+func (s *SMTArrayParams) Display(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}

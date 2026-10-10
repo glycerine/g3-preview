@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast/rewriter/bit_blaster"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type SMTPreprocessorState struct {
@@ -243,7 +244,7 @@ func (s *SMTPreprocessorParams) Close() error {
 	s.closed = true
 	return nil
 }
-func (s *SMTPreprocessorParams) Display(out *util.NumericTextStream) error {
+func (s *SMTPreprocessorParams) Display(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}

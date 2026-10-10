@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine(t *testing.T) {
@@ -15,7 +16,7 @@ func TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine(t *testing.T) {
 	m, e := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: b})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, m.Close()) }()
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	a, e := m.FormatString("aa")
@@ -54,7 +55,7 @@ func TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine(t *testing.T) {
 	}
 }
 
-func astFormatPrettyNamedCold(t *testing.T, m *ASTManager, g *util.GlobalParamsService, b *arena.Budget, out *util.NumericTextStream) {
+func astFormatPrettyNamedCold(t *testing.T, m *ASTManager, g *util.GlobalParamsService, b *arena.Budget, out *utext.NumericTextStream) {
 	t.Helper()
 	total := m.Stats().AllocatedBytes + g.OwnerBytes + catalogGraph(g.Config.Catalog)
 	if g.Current != nil {
@@ -86,7 +87,7 @@ func TestASTFormatPrettyEveryGetterStackAndOutputReservation(t *testing.T) {
 		paramsMust(t, e)
 		root, e := m.FormatCompose([]ASTHandle{a, line, a, line, a})
 		paramsMust(t, e)
-		out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+		out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 		paramsMust(t, e)
 		b.FailAfter(ordinal)
 		e = m.PrintFormat(out, root, c, p, g)

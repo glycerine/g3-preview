@@ -3,10 +3,10 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func satDIMACSLiteralInto(out *util.NumericTextStream, l Literal) error {
+func satDIMACSLiteralInto(out *utext.NumericTextStream, l Literal) error {
 	sign := ""
 	if l.sign() {
 		sign = "-"
@@ -16,7 +16,7 @@ func satDIMACSLiteralInto(out *util.NumericTextStream, l Literal) error {
 	}
 	return out.AppendUint32(uint32(l.variable()) + 1)
 }
-func (s *Solver) displayBinary(out *util.NumericTextStream) error {
+func (s *Solver) displayBinary(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -72,7 +72,7 @@ func (s *Solver) displayBinary(out *util.NumericTextStream) error {
 	}
 	return nil
 }
-func (s *Solver) displayUnits(out *util.NumericTextStream) error {
+func (s *Solver) displayUnits(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -106,7 +106,7 @@ func (s *Solver) displayUnits(out *util.NumericTextStream) error {
 	}
 	return nil
 }
-func (s *Solver) displayInto(out *util.NumericTextStream) error {
+func (s *Solver) displayInto(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -131,7 +131,7 @@ func (s *Solver) displayInto(out *util.NumericTextStream) error {
 	}
 	return out.AppendCString(")\n")
 }
-func (s *Solver) displayJustification(out *util.NumericTextStream, j satJustification) error {
+func (s *Solver) displayJustification(out *utext.NumericTextStream, j satJustification) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -150,7 +150,7 @@ func (s *Solver) displayJustification(out *util.NumericTextStream, j satJustific
 
 // These explicit mode branches correspond to the two literal source loop
 // bodies. Source request/read order is preserved; no output snapshot is built.
-func (s *Solver) displayHardClauses(out *util.NumericTextStream, weighted bool, weight uint32) error {
+func (s *Solver) displayHardClauses(out *utext.NumericTextStream, weighted bool, weight uint32) error {
 	for i := uint32(0); ; i++ {
 		n, e := s.Variables.trail.Size(s.Variables.trailRef)
 		if e != nil {
@@ -269,7 +269,7 @@ func (s *Solver) displayHardClauses(out *util.NumericTextStream, weighted bool, 
 	}
 	return nil
 }
-func (s *Solver) displayDIMACS(out *util.NumericTextStream) error {
+func (s *Solver) displayDIMACS(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -298,7 +298,7 @@ func (s *Solver) displayDIMACS(out *util.NumericTextStream) error {
 	}
 	return s.displayHardClauses(out, false, 0)
 }
-func (s *Solver) displayWCNF(out *util.NumericTextStream, count uint32, lits []Literal, weights []uint32) error {
+func (s *Solver) displayWCNF(out *utext.NumericTextStream, count uint32, lits []Literal, weights []uint32) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -373,7 +373,7 @@ func (s *Solver) displayWCNF(out *util.NumericTextStream, count uint32, lits []L
 	}
 	return nil // memory-only borrowed stream: source flush has no external sink.
 }
-func (s *Solver) displayWatches(out *util.NumericTextStream) error {
+func (s *Solver) displayWatches(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -401,7 +401,7 @@ func (s *Solver) displayWatches(out *util.NumericTextStream) error {
 	}
 	return nil
 }
-func (s *Solver) displayAssignment(out *util.NumericTextStream) error {
+func (s *Solver) displayAssignment(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -428,7 +428,7 @@ func (s *Solver) displayAssignment(out *util.NumericTextStream) error {
 
 // An explicit borrowed memory stream replaces source std::cout transport.
 // Unbound dispatch remains an error; no synthetic display or search result.
-func (s *Solver) bindDIMACS(out *util.NumericTextStream) error {
+func (s *Solver) bindDIMACS(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -441,7 +441,7 @@ func (s *Solver) bindDIMACS(out *util.NumericTextStream) error {
 
 // Direct source clause insertion preserves punctuation before reached size
 // reads, unlike the independently existing allocator rendering adapter.
-func (s *Solver) displaySourceClause(out *util.NumericTextStream, c StoredClauseRef) error {
+func (s *Solver) displaySourceClause(out *utext.NumericTextStream, c StoredClauseRef) error {
 	if e := out.AppendCString("("); e != nil {
 		return e
 	}

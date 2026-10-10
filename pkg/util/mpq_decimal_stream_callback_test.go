@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestRationalDecimalStreamDenominatorCopyTransportGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
 	a := Rational{Num: NewInt(-3), Den: NewInt(1)}
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	armed, calls := false, 0
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
@@ -58,7 +59,7 @@ func TestRationalDecimalStreamDenominatorCopyTransportGuards(t *testing.T) {
 	if s.sourceCursor != 0 || s.ownCursor != 4 || s.count != 3 {
 		t.Fatal("owning cleanup credited unreached ten or end label")
 	}
-	got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if got != "prefix:" {
 		t.Fatal("borrowed prefix changed", got)

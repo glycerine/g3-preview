@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // ErrSATIncompleteGrowth also guards incomplete clause-lifecycle construction.
@@ -528,7 +528,7 @@ func (m *satModelConverter) MaxVar(min uint32) (uint32, error) {
 	}
 	return result, nil
 }
-func (m *satModelConverter) DisplayInto(out *util.NumericTextStream) error {
+func (m *satModelConverter) DisplayInto(out *utext.NumericTextStream) error {
 	if e := m.open(); e != nil {
 		return e
 	}

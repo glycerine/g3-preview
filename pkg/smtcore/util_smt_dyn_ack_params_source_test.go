@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func dynAckSourceFixture(t *testing.T) (*util.ParamsContext, *util.GlobalParamsService, *util.ParamsRef, *arena.Budget) {
@@ -183,7 +184,7 @@ func TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile(t *testing.T) 
 	first := -1
 	for ordinal := int64(0); ordinal < 32; ordinal++ {
 		outBudget := arena.NewBudget(^uint64(0))
-		out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: outBudget})
+		out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: outBudget})
 		paramsMust(t, e)
 		outBudget.FailAfter(ordinal)
 		e = d.Display(out)
@@ -211,22 +212,22 @@ func TestSMTDynAckLiteralDisplayFlagsEveryOutputRefusalAndBadFile(t *testing.T) 
 	if first < 1 {
 		t.Fatal("actual output allocation horizon", first)
 	}
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
-	paramsMust(t, out.SetFloatMode(util.NumericFixedFloat))
+	paramsMust(t, out.SetFloatMode(utext.NumericFixedFloat))
 	paramsMust(t, out.SetPrecision(2))
 	paramsMust(t, d.Display(out))
 	text, e := out.String()
 	paramsMust(t, e)
 	want := "m_dack=1\nm_dack_eq=0\nm_dack_factor=0.10\nm_dack_threshold=10\nm_dack_gc=2000\nm_dack_gc_inv_decay=0.80\n"
-	if text != want || out.State().Precision != 2 || out.State().FloatMode != util.NumericFixedFloat {
+	if text != want || out.State().Precision != 2 || out.State().FloatMode != utext.NumericFixedFloat {
 		t.Fatal("borrowed stream flags", text, out.State())
 	}
 	paramsMust(t, out.Close())
 	file, e := os.CreateTemp(".", "smt-dyn-ack-file-*")
 	paramsMust(t, e)
 	defer os.Remove(file.Name())
-	actual, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
+	actual, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
 	paramsMust(t, e)
 	paramsMust(t, file.Close())
 	// The real nonthrowing file write fails on the first label; later source
@@ -337,7 +338,7 @@ func TestSMTDynAckDisplayNumericBoolShowPosSignedLongProfile(t *testing.T) {
 	d, e := NewSMTDynAckParams(c, p, g, b)
 	paramsMust(t, e)
 	defer func() { paramsMust(t, d.Close()) }()
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	paramsMust(t, out.SetShowPos(true))

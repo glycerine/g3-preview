@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrVerboseContextOwner = errors.New("g3: invalid verbosity context owner")
@@ -16,13 +17,13 @@ var ErrVerboseContextOwner = errors.New("g3: invalid verbosity context owner")
 type VerboseContext struct {
 	self       *VerboseContext
 	budget     *arena.Budget
-	stream     *NumericTextStream
+	stream     *utext.NumericTextStream
 	ownerBytes uint64
 	level      uint32
 	closed     bool
 }
 
-func NewVerboseContext(stream *NumericTextStream, b *arena.Budget) (*VerboseContext, error) {
+func NewVerboseContext(stream *utext.NumericTextStream, b *arena.Budget) (*VerboseContext, error) {
 	if stream == nil || b == nil {
 		return nil, arena.ErrConfig
 	}
@@ -56,7 +57,7 @@ func (c *VerboseContext) VerbosityLevel() (uint32, error) {
 	}
 	return c.level, nil
 }
-func (c *VerboseContext) SetVerboseStream(stream *NumericTextStream) error {
+func (c *VerboseContext) SetVerboseStream(stream *utext.NumericTextStream) error {
 	if e := c.open(); e != nil {
 		return e
 	}
@@ -66,7 +67,7 @@ func (c *VerboseContext) SetVerboseStream(stream *NumericTextStream) error {
 	c.stream = stream
 	return nil
 }
-func (c *VerboseContext) VerboseStream() (*NumericTextStream, error) {
+func (c *VerboseContext) VerboseStream() (*utext.NumericTextStream, error) {
 	if e := c.open(); e != nil {
 		return nil, e
 	}

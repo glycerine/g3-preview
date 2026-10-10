@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly(t *testing.T) {
@@ -65,7 +66,7 @@ func TestSMTParamsQIUninitializedDisplayPrefixAndCopiedOwnerGuard(t *testing.T) 
 	paramsMust(t, e)
 	defer func() { paramsMust(t, s.Close()) }()
 	sb := arena.NewBudget(1 << 20)
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	e = s.Display(out)
@@ -431,7 +432,7 @@ func TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal(t *te
 	defer func() { paramsMust(t, s.Close()) }()
 	paramsMust(t, s.qi.SetEmatching(false)) // actual explicit field assignment, not parent constructor synthesis.
 	seedBudget := arena.NewBudget(1 << 24)
-	seed, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: seedBudget})
+	seed, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: seedBudget})
 	paramsMust(t, e)
 	paramsMust(t, s.Display(seed))
 	full, e := seed.String()
@@ -444,7 +445,7 @@ func TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal(t *te
 	// concrete storage graph is checked before lifting the active refusal.
 	for ordinal := int64(0); ; ordinal++ {
 		sb := arena.NewBudget(1 << 24)
-		out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+		out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 		paramsMust(t, e)
 		sb.FailAfter(ordinal)
 		e = s.Display(out)
@@ -473,7 +474,7 @@ func TestSMTParamsAllDisplayChainsIndependentLocalOracleEveryOutputRefusal(t *te
 		}
 	}
 	sb := arena.NewBudget(1 << 24)
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	paramsMust(t, out.SetShowPos(true))
@@ -494,7 +495,7 @@ func TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead(t *testing.T) {
 	defer os.Remove(f.Name())
 	paramsMust(t, f.Close())
 	sb := arena.NewBudget(1 << 24)
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb, BorrowedFile: f})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb, BorrowedFile: f})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	e = s.Display(out)
@@ -515,7 +516,7 @@ func TestSMTParamsRealFileBadbitStillReachesQIUninitializedRead(t *testing.T) {
 func TestSMTParamsConcreteSymbolInsertionsPreserveBorrowedBytesAndNumericFlags(t *testing.T) {
 	_, g, _, _ := dynAckSourceFixture(t)
 	sb := arena.NewBudget(1 << 24)
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	plain, e := g.Symbols.Intern("QF_LIA")

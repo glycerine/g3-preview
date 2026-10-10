@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // The lexical frame lives inline in the charged manager. Its native stack and
@@ -25,7 +26,7 @@ type astLowLevelFrame struct {
 }
 type astLowLevelPrinter struct {
 	manager            *ASTManager
-	out                *util.NumericTextStream
+	out                *utext.NumericTextStream
 	root               astNodeRef
 	onlyExprs, compact bool
 	arithFamily        FamilyID
@@ -76,7 +77,7 @@ func (m *ASTManager) llFrameDestroy(owning bool) error {
 	}
 	return nil
 }
-func (m *ASTManager) lowLevelPrint(out *util.NumericTextStream, r astNodeRef, onlyExprs, compact bool) (result error) {
+func (m *ASTManager) lowLevelPrint(out *utext.NumericTextStream, r astNodeRef, onlyExprs, compact bool) (result error) {
 	f := &m.LowLevel
 	if f.Active {
 		return ErrASTPending
@@ -785,7 +786,7 @@ func (p *astLowLevelPrinter) process(r astNodeRef) error {
 	return ErrASTDomain
 }
 
-func appendASTSymbol(out *util.NumericTextStream, m *ASTManager, s usymbol.Symbol) error {
+func appendASTSymbol(out *utext.NumericTextStream, m *ASTManager, s usymbol.Symbol) error {
 	if ASTSourceDebug && s.IsMarked() {
 		return ErrASTDomain
 	}
@@ -808,7 +809,7 @@ func appendASTSymbol(out *util.NumericTextStream, m *ASTManager, s usymbol.Symbo
 
 // DisplayLowLevel is the concrete source ast_ll_pp call, borrowing the existing
 // formatter; it neither changes its flags nor owns the stream.
-func (m *ASTManager) DisplayLowLevel(out *util.NumericTextStream, h ASTHandle, onlyExprs, compact bool) error {
+func (m *ASTManager) DisplayLowLevel(out *utext.NumericTextStream, h ASTHandle, onlyExprs, compact bool) error {
 	if e := m.lock(); e != nil {
 		return e
 	}

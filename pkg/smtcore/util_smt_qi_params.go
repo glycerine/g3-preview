@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // DefaultsInitialized records the actual scalar initializer frontier after
@@ -251,7 +252,7 @@ func (s *SMTQIParams) Close() error {
 	return nil
 }
 
-func (s *SMTQIParams) Display(out *util.NumericTextStream) error {
+func (s *SMTQIParams) Display(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}

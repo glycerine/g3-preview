@@ -1,5 +1,5 @@
 // Source: src/util/memory_manager.cpp:55-72; src/util/small_object_allocator.cpp:172-242.
-package util
+package text
 
 import (
 	"errors"

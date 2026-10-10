@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func numericCharInputFixture(t *testing.T, text []byte) (*NumericCharInput, *MemoryStandardStreams, *arena.Budget, *os.File) {
@@ -169,7 +170,7 @@ func numericCharInputPhysical(t *testing.T, input *NumericCharInput, streams *Me
 	if !streams.closed {
 		want += streams.header
 	}
-	for _, out := range []*NumericTextStream{streams.stdout, streams.StderrField} {
+	for _, out := range []*utext.NumericTextStream{streams.stdout, streams.StderrField} {
 		s := out.Stats()
 		want += s.OwnerBytes + s.ScratchBytes + s.OutputOwnerBytes + s.OutputOverflowBytes
 	}
@@ -197,7 +198,7 @@ func TestNumericCharInputConstructionEveryColdReservationAndForeignCohort(t *tes
 	paramsMust(t, out.Close())
 	numericCharInputPhysical(t, base, streams, b)
 	foreign := arena.NewBudget(1 << 20)
-	foreignOut, e := NewNumericTextStream(NumericTextStreamConfig{Budget: foreign})
+	foreignOut, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: foreign})
 	paramsMust(t, e)
 	t.Cleanup(func() {
 		paramsMust(t, foreignOut.Close())

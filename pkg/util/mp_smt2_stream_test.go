@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"math/big"
 	"math/rand/v2"
 	"testing"
@@ -23,11 +24,11 @@ func TestRationalSMT2StreamLiteral(t *testing.T) {
 		serviceMust(t, m.integer.SetString(&a.Num, v.n))
 		serviceMust(t, m.integer.SetString(&a.Den, v.d))
 		before := a
-		var out OwnedStringStream
+		var out utext.OwnedStringStream
 		serviceMust(t, out.Construct(m.rational.BudgetField))
 		serviceMust(t, out.AppendCString("prefix:"))
 		serviceMust(t, m.rational.DisplaySMT2Into(&out, &a, v.decimal))
-		got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+		got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 		serviceMust(t, e)
 		if got != "prefix:"+v.want || a != before {
 			t.Fatal("literal SMT2 stream", v, out.Buffer.String)
@@ -71,14 +72,14 @@ func TestRationalSMT2StreamIndependentIntegers(t *testing.T) {
 		serviceMust(t, m.integer.SetString(&a.Num, n.String()))
 		serviceMust(t, m.integer.SetString(&a.Den, d.String()))
 		for _, decimal := range []bool{false, true} {
-			var out OwnedStringStream
+			var out utext.OwnedStringStream
 			serviceMust(t, out.Construct(b))
 			serviceMust(t, m.rational.DisplaySMT2Into(&out, &a, decimal))
 			want := numeral(n, decimal)
 			if d.Cmp(big.NewInt(1)) != 0 {
 				want = "(/ " + want + " " + numeral(d, decimal) + ")"
 			}
-			got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+			got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 			serviceMust(t, e)
 			if got != want {
 				t.Fatal("independent SMT2 syntax", i, decimal, got, want)
@@ -92,13 +93,13 @@ func TestRationalSMT2StreamIndependentIntegers(t *testing.T) {
 func TestRationalSMT2StreamAuthorityAndPreconditions(t *testing.T) {
 	m, _, b := mpfNumeralHelpersFixture(t)
 	a := Rational{Num: NewInt(-7), Den: NewInt(3)}
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	serviceMust(t, out.Construct(b))
 	initial := m.rational.smt2Stream.invocation
-	if e := m.rational.DisplaySMT2Into(nil, &a, false); !errors.Is(e, ErrOwnedStringOwner) || m.rational.smt2Stream.invocation != initial {
+	if e := m.rational.DisplaySMT2Into(nil, &a, false); !errors.Is(e, utext.ErrOwnedStringOwner) || m.rational.smt2Stream.invocation != initial {
 		t.Fatal("nil stream began parent", e)
 	}
-	if e := m.integer.DisplaySMT2Into(nil, &a.Num, false); !errors.Is(e, ErrOwnedStringOwner) || m.integer.smt2Stream.invocation != 0 {
+	if e := m.integer.DisplaySMT2Into(nil, &a.Num, false); !errors.Is(e, utext.ErrOwnedStringOwner) || m.integer.smt2Stream.invocation != 0 {
 		t.Fatal("nil stream began child", e)
 	}
 	copied := *m.rational

@@ -1,5 +1,5 @@
 // Source: src/util/mpf.cpp:1639-1654,1673,1686.
-package util
+package text
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ func TestOwnedStringRepeatedConstructorAndReverse(t *testing.T) {
 		b := arena.NewBudget(0)
 		b.FailAfter(0)
 		var s OwnedString
-		serviceMust(t, s.ConstructRepeated(b, n, '1'))
+		textMust(t, s.ConstructRepeated(b, n, '1'))
 		if s.Length != n || !s.Matches(strings.Repeat("1", int(n))) || b.Used() != 0 {
 			t.Fatal(n)
 		}
@@ -21,18 +21,18 @@ func TestOwnedStringRepeatedConstructorAndReverse(t *testing.T) {
 			s.Put(i, byte(i%251))
 		}
 		view := s.View()
-		serviceMust(t, s.Reverse())
+		textMust(t, s.Reverse())
 		for i := uint64(0); i < n; i++ {
 			ch, e := view.Byte(i)
-			serviceMust(t, e)
+			textMust(t, e)
 			if ch != byte((n-1-i)%251) {
 				t.Fatal(n, i, ch)
 			}
 		}
-		serviceMust(t, s.Reverse())
+		textMust(t, s.Reverse())
 		for i := uint64(0); i < n; i++ {
 			ch, e := view.Byte(i)
-			serviceMust(t, e)
+			textMust(t, e)
 			if ch != byte(i%251) {
 				t.Fatal(n, i, ch)
 			}
@@ -44,16 +44,16 @@ func TestOwnedStringRepeatedAllByteValues(t *testing.T) {
 	for ch := 0; ch < 256; ch++ {
 		for _, n := range []uint64{0, 1, 15, 16, 31} {
 			var s OwnedString
-			serviceMust(t, s.ConstructRepeated(nil, n, byte(ch)))
+			textMust(t, s.ConstructRepeated(nil, n, byte(ch)))
 			for i := uint64(0); i < n; i++ {
 				got, e := s.View().Byte(i)
-				serviceMust(t, e)
+				textMust(t, e)
 				if got != byte(ch) {
 					t.Fatal(ch, n, i)
 				}
 			}
 			got, e := s.CStringByte(n)
-			serviceMust(t, e)
+			textMust(t, e)
 			if got != 0 {
 				t.Fatal("terminator")
 			}
@@ -66,7 +66,7 @@ func TestOwnedStringRepeatedConstructorFailureAndAuthority(t *testing.T) {
 	if e := s.ConstructRepeated(nil, uint64(^uint(0)>>1), 'x'); !errors.Is(e, arena.ErrBounds) || s.Ready {
 		t.Fatal(e)
 	}
-	serviceMust(t, s.ConstructRepeated(nil, 120, 0))
+	textMust(t, s.ConstructRepeated(nil, 120, 0))
 	copied := s
 	if !errors.Is(copied.Reverse(), ErrOwnedStringOwner) {
 		t.Fatal("copied owner")

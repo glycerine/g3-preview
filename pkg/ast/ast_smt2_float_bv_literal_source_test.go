@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestASTSMT2FloatDefaultBitVectorFields(t *testing.T) {
@@ -18,7 +19,7 @@ func TestASTSMT2FloatDefaultBitVectorFields(t *testing.T) {
 	paramsMust(t, e)
 	_, e = m.RegisterFloatingPointPlugin()
 	paramsMust(t, e)
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	sig := util.NewInt(4)

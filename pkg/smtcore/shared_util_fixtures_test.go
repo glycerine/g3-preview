@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func paramsTestOwner(t *testing.T) (*util.ParamsContext, *usymbol.Manager, *util.RationalService) {
@@ -183,14 +184,14 @@ func paramsDecTLSNearMinimum(t *testing.T, r *umemory.Runtime) {
 		t.Fatal("actual source TLS lane", s)
 	}
 }
-func numericFileFixture(t *testing.T) (*os.File, *util.NumericTextStream, *arena.Budget) {
+func numericFileFixture(t *testing.T) (*os.File, *utext.NumericTextStream, *arena.Budget) {
 	t.Helper()
 	f, e := os.CreateTemp(".", "numeric-file-*")
 	if e != nil {
 		t.Fatal(e)
 	}
 	b := arena.NewBudget(1 << 20)
-	s, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b, BorrowedFile: f})
+	s, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b, BorrowedFile: f})
 	if e != nil {
 		t.Fatal(e)
 	}

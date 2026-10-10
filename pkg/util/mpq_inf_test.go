@@ -13,6 +13,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	uhash "github.com/glycerine/g3/pkg/util/hash"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func mpqInfFixture(t *testing.T, sync bool) (*MPQInfManager, *arena.Budget) {
@@ -447,7 +448,7 @@ func TestMPQInfOwnedFormattingSignsFractionsAndLifetime(t *testing.T) {
 		} {
 			p, b := mpqInfFixture(t, sync)
 			x := mpqInfValue(t, p, tc.first, tc.second)
-			var text OwnedString
+			var text utext.OwnedString
 			serviceMust(t, p.ToString(&x, &text))
 			got, e := text.View().String()
 			serviceMust(t, e)
@@ -470,10 +471,10 @@ func TestMPQInfOwnedFormattingSignsFractionsAndLifetime(t *testing.T) {
 }
 
 func TestMPQInfDisplayWholeStringAndFlags(t *testing.T) {
-	for _, align := range []NumericAlignment{NumericLeft, NumericRight, NumericInternal} {
+	for _, align := range []utext.NumericAlignment{utext.NumericLeft, utext.NumericRight, utext.NumericInternal} {
 		p, b := mpqInfFixture(t, false)
 		x := mpqInfValue(t, p, "3/2", "-2/3")
-		out, e := NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+		out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 		serviceMust(t, e)
 		serviceMust(t, out.SetIntegerBase(16))
 		serviceMust(t, out.SetShowBase(true))
@@ -492,7 +493,7 @@ func TestMPQInfDisplayWholeStringAndFlags(t *testing.T) {
 			padding += "_"
 		}
 		want = padding + literal
-		if align == NumericLeft {
+		if align == utext.NumericLeft {
 			want = literal + padding
 		}
 		if got != want || out.State().Width != 0 || out.State().IntegerBase != 16 || !out.State().ShowPos {
@@ -507,9 +508,9 @@ func TestMPQInfDisplayWholeStringAndFlags(t *testing.T) {
 	}
 }
 
-func mpqInfFormattingBytes(p *MPQInfManager, ret *OwnedString) uint64 {
+func mpqInfFormattingBytes(p *MPQInfManager, ret *utext.OwnedString) uint64 {
 	s := &p.format
-	strings := [5]*OwnedString{&s.number, &s.denominator, &s.display, &s.stream.Buffer.String, ret}
+	strings := [5]*utext.OwnedString{&s.number, &s.denominator, &s.display, &s.stream.Buffer.String, ret}
 	var bytes uint64
 	for _, v := range strings {
 		if v != nil {
@@ -537,11 +538,11 @@ func TestMPQInfEveryColdFormattingAndDisplayReservation(t *testing.T) {
 				}
 				x := mpqInfValue(t, p, first, second)
 				before := x // non-owning snapshot, never Del the snapshot.
-				var text OwnedString
-				var out *NumericTextStream
+				var text utext.OwnedString
+				var out *utext.NumericTextStream
 				if mode == "display" {
 					var e error
-					out, e = NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+					out, e = utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 					serviceMust(t, e)
 				}
 				b.FailAfter(ordinal)
@@ -575,7 +576,7 @@ func TestMPQInfEveryColdFormattingAndDisplayReservation(t *testing.T) {
 					if !p.format.active {
 						t.Fatal("failure dropped scope")
 					}
-					var untouched OwnedString
+					var untouched utext.OwnedString
 					if p.ToString(&x, &untouched) != e || untouched.Self != nil {
 						t.Fatal("sticky formatting replay")
 					}
@@ -650,7 +651,7 @@ func TestMPQInfFormattingIndependentRationalOracle(t *testing.T) {
 			}
 			first, second := fmt.Sprintf("%d/%d", fn, fd), fmt.Sprintf("%d/%d", en, ed)
 			x := mpqInfValue(t, p, first, second)
-			var out OwnedString
+			var out utext.OwnedString
 			serviceMust(t, p.ToString(&x, &out))
 			got, e := out.View().String()
 			serviceMust(t, e)
@@ -680,7 +681,7 @@ func TestMPQInfFormattingReadErasureAndExplicitCleanup(t *testing.T) {
 	x := mpqInfValue(t, p, "3", "0")
 	x.Second.Den = NewInt(0) // untouched poisoned denominator in zero epsilon branch.
 	b.FailAfter(0)
-	var text OwnedString
+	var text utext.OwnedString
 	serviceMust(t, p.ToString(&x, &text))
 	got, e := text.View().String()
 	serviceMust(t, e)
@@ -693,14 +694,14 @@ func TestMPQInfFormattingReadErasureAndExplicitCleanup(t *testing.T) {
 	for _, mode := range []string{"nil", "closed"} {
 		p, b := mpqInfFixture(t, false)
 		x := mpqInfValue(t, p, "123456789012345678901234567890123456789", "-2")
-		var out *NumericTextStream
+		var out *utext.NumericTextStream
 		if mode == "closed" {
-			out, e = NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+			out, e = utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 			serviceMust(t, e)
 			serviceMust(t, out.Close())
 		}
 		e = p.Display(out, &x)
-		wantError := ErrNumericStreamOwner
+		wantError := utext.ErrNumericStreamOwner
 		if mode == "closed" {
 			wantError = arena.ErrClosed
 		}
@@ -716,7 +717,7 @@ func TestMPQInfFormattingReadErasureAndExplicitCleanup(t *testing.T) {
 		if p.format.active {
 			t.Fatal("scope not joined")
 		}
-		var fresh OwnedString
+		var fresh utext.OwnedString
 		if p.ToString(&x, &fresh) != e || fresh.Self != nil {
 			t.Fatal("cleanup resumed source execution")
 		}
@@ -766,7 +767,7 @@ func TestMPQInfFormattingCloseJoinsAbandonedScope(t *testing.T) {
 		p, b := mpqInfFixture(t, false)
 		x := mpqInfValue(t, p, "123456789012345678901234567890123456789/23", "-987654321098765432109876543210987654321/19")
 		b.FailAfter(ordinal)
-		var text OwnedString
+		var text utext.OwnedString
 		e := p.ToString(&x, &text)
 		if e != nil && !numericPhysicalReservationRefusal(e) {
 			t.Fatal(ordinal, e)

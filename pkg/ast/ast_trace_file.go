@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // Actual cold file owner; its formatter is embedded, not a second heap wrapper.
@@ -18,7 +19,7 @@ type astTraceFile struct {
 	self             *astTraceFile
 	budget           *arena.Budget
 	header           uint64
-	stream           util.NumericTextStream
+	stream           utext.NumericTextStream
 	constructorCause error
 	Closed           bool
 }

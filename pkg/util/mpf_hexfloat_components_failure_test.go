@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"math/big"
 	"testing"
 )
@@ -111,7 +112,7 @@ func TestArbitraryFloatHexfloatComponentsWarmAndRefusedText(t *testing.T) {
 func TestArbitraryFloatHexfloatComponentsEntryAuthority(t *testing.T) {
 	m, _, b := mpfNumeralHelpersFixture(t)
 	sig := NewInt(12)
-	if _, e := m.ToStringHexfloatComponentsInto(false, 0, &sig, 8, 4, 0, nil); !errors.Is(e, ErrOwnedStringOwner) {
+	if _, e := m.ToStringHexfloatComponentsInto(false, 0, &sig, 8, 4, 0, nil); !errors.Is(e, utext.ErrOwnedStringOwner) {
 		t.Fatal("nil text", e)
 	}
 	text, e := NewArbitraryFloatFormatText(b)

@@ -10,10 +10,10 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func satInspectionStreamAudit(t *testing.T, s *Solver, o *util.NumericTextStream, b *arena.Budget) {
+func satInspectionStreamAudit(t *testing.T, s *Solver, o *utext.NumericTextStream, b *arena.Budget) {
 	t.Helper()
 	q := o.Stats()
 	if sum := q.OwnerBytes + q.ScratchBytes + q.OutputOwnerBytes + q.OutputOverflowBytes; sum != b.Used() {
@@ -36,7 +36,7 @@ func satInspectionLarge(t *testing.T) *Solver {
 func TestSATSolverInspectionEveryActualStreamRefusalPrefix(t *testing.T) {
 	for route := 0; route < 5; route++ {
 		t.Run(fmt.Sprint(route), func(t *testing.T) {
-			call := func(s *Solver, o *util.NumericTextStream) error {
+			call := func(s *Solver, o *utext.NumericTextStream) error {
 				switch route {
 				case 0:
 					return s.displayInto(o)

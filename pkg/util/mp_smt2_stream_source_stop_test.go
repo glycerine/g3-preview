@@ -5,13 +5,14 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"testing"
 )
 
 // The real signed-host TLS guard is reached by deallocating the temporary,
 // after all negative-branch insertions, before the older rational continuation.
 type smt2StopBeforeTemporaryDT struct {
-	inner   *OwnedStringStream
+	inner   *utext.OwnedStringStream
 	runtime *umemory.Runtime
 	lane    *umemory.Block
 	t       *testing.T
@@ -44,7 +45,7 @@ func TestRationalSMT2StreamNegativeSourceStopProtectsContinuation(t *testing.T) 
 	serviceMust(t, e)
 	a := Rational{Num: NewInt(-1), Den: NewInt(3)}
 	serviceMust(t, m.integer.Mul2kInPlace(&a.Num, 4000))
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	serviceMust(t, out.Construct(b))
 	contextTLSNearMinimum(t, r)
 	lane, e := r.Allocate(8)
@@ -55,7 +56,7 @@ func TestRationalSMT2StreamNegativeSourceStopProtectsContinuation(t *testing.T) 
 	if !errors.Is(body, arena.ErrBounds) || !stream.armed || s.sourceCause == nil || p.sourceCause != s.sourceCause || !s.tmpLive || p.childOwned {
 		t.Fatal("negative DT source stop missing", body, s.sourceCause, p.sourceCause, s.tmpLive)
 	}
-	got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if len(got) < 5 || got[len(got)-1] != ')' {
 		t.Fatal("negative branch output missing", got)
@@ -80,7 +81,7 @@ func TestRationalSMT2StreamNegativeSourceStopProtectsContinuation(t *testing.T) 
 	if s.sourceCause != cause || p.sourceCause != cause || s.tmpLive || s.active || p.active {
 		t.Fatal("owning join erased source history")
 	}
-	after, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	after, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if after != got {
 		t.Fatal("owning join changed borrowed output")

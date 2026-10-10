@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrNumericCharInputOwner = errors.New("g3: invalid formatted character input owner")
@@ -21,7 +22,7 @@ type NumericCharInputState struct {
 type NumericCharInputConfig struct {
 	Budget       *arena.Budget
 	BorrowedFile *os.File
-	Tie          *NumericTextStream
+	Tie          *utext.NumericTextStream
 }
 
 // NumericCharInput borrows its real file and tied output owner. The one-byte
@@ -31,7 +32,7 @@ type NumericCharInput struct {
 	self   *NumericCharInput
 	budget *arena.Budget
 	file   *os.File
-	tie    *NumericTextStream
+	tie    *utext.NumericTextStream
 	header uint64
 	state  NumericCharInputState
 	byte   [1]byte
@@ -39,7 +40,7 @@ type NumericCharInput struct {
 }
 
 func NewNumericCharInput(c NumericCharInputConfig) (*NumericCharInput, error) {
-	if c.Budget == nil || c.Tie != nil && (c.Tie.self != c.Tie || c.Tie.Budget != c.Budget) {
+	if c.Budget == nil || c.Tie != nil && (c.Tie.CheckIdentity() != nil || c.Tie.Budget != c.Budget) {
 		return nil, arena.ErrConfig
 	}
 	n := uint64(reflect.TypeOf(NumericCharInput{}).Size())
@@ -79,17 +80,17 @@ func (s *NumericCharInput) State() (NumericCharInputState, error) {
 	}
 	return s.state, nil
 }
-func (s *NumericCharInput) Tie() (*NumericTextStream, error) {
+func (s *NumericCharInput) Tie() (*utext.NumericTextStream, error) {
 	if e := s.open(); e != nil {
 		return nil, e
 	}
 	return s.tie, nil
 }
-func (s *NumericCharInput) SetTie(out *NumericTextStream) (*NumericTextStream, error) {
+func (s *NumericCharInput) SetTie(out *utext.NumericTextStream) (*utext.NumericTextStream, error) {
 	if e := s.open(); e != nil {
 		return nil, e
 	}
-	if out != nil && (out.self != out || out.Budget != s.budget) {
+	if out != nil && (out.CheckIdentity() != nil || out.Budget != s.budget) {
 		return nil, arena.ErrConfig
 	}
 	old := s.tie

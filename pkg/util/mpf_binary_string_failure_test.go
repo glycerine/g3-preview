@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"math/big"
 	"testing"
 )
@@ -27,7 +28,7 @@ func TestArbitraryFloatBinaryStringEveryColdReservation(t *testing.T) {
 			x := ArbitraryFloat{format: arbitraryFloatFormat(tc.eb, tc.sb, true), exponent: tc.exp}
 			serviceMust(t, m.integer.SetString(&x.significand, tc.sig))
 			before := x
-			var out OwnedString
+			var out utext.OwnedString
 			b.FailAfter(ordinal)
 			body := m.ToStringBinary(&x, tc.upper, tc.lower, &out)
 			s := &m.binaryString
@@ -43,7 +44,7 @@ func TestArbitraryFloatBinaryStringEveryColdReservation(t *testing.T) {
 				if !numericPhysicalReservationRefusal(body) {
 					t.Fatal("unexpected cold binary error", tc, ordinal, body)
 				}
-				var later OwnedString
+				var later utext.OwnedString
 				if e := m.ToStringBinary(&x, tc.upper, tc.lower, &later); !errors.Is(e, ErrNumericPending) {
 					t.Fatal("failed binary replay", e)
 				}
@@ -85,7 +86,7 @@ func TestArbitraryFloatBinaryStringEveryColdReservation(t *testing.T) {
 func TestArbitraryFloatBinaryStringWarmAndLaterCalls(t *testing.T) {
 	m, r, b := mpfNumeralHelpersFixture(t)
 	x := ArbitraryFloat{format: arbitraryFloatFormat(2, 2, false), exponent: 0, significand: NewInt(1)}
-	var first OwnedString
+	var first utext.OwnedString
 	serviceMust(t, m.ToStringBinary(&x, 0, 0, &first))
 	if !first.Matches("#b0 #b01 #b0.1") {
 		t.Fatal("small binary", first)
@@ -93,7 +94,7 @@ func TestArbitraryFloatBinaryStringWarmAndLaterCalls(t *testing.T) {
 	first.SourceDestroy()
 	used, stats := b.Used(), r.Stats()
 	b.FailAfter(0)
-	var second OwnedString
+	var second utext.OwnedString
 	serviceMust(t, m.ToStringBinary(&x, 0, 0, &second))
 	if b.Used() != used || r.Stats() != stats || !second.Matches("#b0 #b01 #b0.1") {
 		t.Fatal("warm binary allocated")
@@ -116,17 +117,17 @@ func TestArbitraryFloatBinaryStringWarmAndLaterCalls(t *testing.T) {
 func TestArbitraryFloatBinaryStringEntryAuthority(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, false), significand: NewInt(1)}
-	if e := m.ToStringBinary(&x, 0, 0, nil); !errors.Is(e, ErrOwnedStringOwner) {
+	if e := m.ToStringBinary(&x, 0, 0, nil); !errors.Is(e, utext.ErrOwnedStringOwner) {
 		t.Fatal("nil return", e)
 	}
-	var out OwnedString
+	var out utext.OwnedString
 	serviceMust(t, out.Construct(m.budget, "existing"))
-	if e := m.ToStringBinary(&x, 0, 0, &out); !errors.Is(e, ErrOwnedStringOwner) || !out.Matches("existing") {
+	if e := m.ToStringBinary(&x, 0, 0, &out); !errors.Is(e, utext.ErrOwnedStringOwner) || !out.Matches("existing") {
 		t.Fatal("live return", e)
 	}
 	out.SourceDestroy()
 	copyManager := *m
-	var later OwnedString
+	var later utext.OwnedString
 	if e := copyManager.ToStringBinary(&x, 0, 0, &later); !errors.Is(e, umemory.ErrRuntimeOwner) {
 		t.Fatal("copied manager", e)
 	}
@@ -152,7 +153,7 @@ func TestArbitraryFloatBinaryStringRefusedDivisionKeepsOlderRoots(t *testing.T) 
 		serviceMust(t, e)
 		z := m.integer
 		x := ArbitraryFloat{format: arbitraryFloatFormat(8, 3, false), exponent: -160, significand: NewInt(3)}
-		var warm OwnedString
+		var warm utext.OwnedString
 		serviceMust(t, m.ToStringBinary(&x, 0, 0, &warm))
 		warm.SourceDestroy()
 		a, b, q := NewInt(-1), NewInt(1), NewInt(0)
@@ -167,7 +168,7 @@ func TestArbitraryFloatBinaryStringRefusedDivisionKeepsOlderRoots(t *testing.T) 
 		if matched {
 			reached = true
 			roots, values, inv, used := old.Numeric, old.Values, old.Invocation, budget.Used()
-			var out OwnedString
+			var out utext.OwnedString
 			if e := m.ToStringBinary(&x, 0, 0, &out); !errors.Is(e, ErrNumericPending) {
 				t.Fatal("older division refusal", ordinal, e)
 			}

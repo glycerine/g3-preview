@@ -2,6 +2,7 @@
 package util
 
 import (
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"math/big"
 	"math/rand/v2"
 	"testing"
@@ -9,7 +10,7 @@ import (
 
 func TestRationalDecimalStreamSourceDriver(t *testing.T) {
 	m, _, b := mpfNumeralHelpersFixture(t)
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	serviceMust(t, out.Construct(b))
 	for _, tc := range []struct {
 		n, d   int32
@@ -20,7 +21,7 @@ func TestRationalDecimalStreamSourceDriver(t *testing.T) {
 		serviceMust(t, m.rational.DisplayDecimalInto(&out, &a, 10, false))
 		serviceMust(t, out.AppendCString("\n"))
 	}
-	got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if got != "1/3: 0.3333333333?\n1/4: 0.25\n" {
 		t.Fatal("source driver decimal", got)
@@ -36,11 +37,11 @@ func TestRationalDecimalStreamIndependentFinite(t *testing.T) {
 			before := a
 			for _, prec := range []uint32{0, 1, 2, 3, 10} {
 				for _, truncate := range []bool{false, true} {
-					var out OwnedStringStream
+					var out utext.OwnedStringStream
 					serviceMust(t, out.Construct(b))
 					serviceMust(t, out.AppendCString("prefix:"))
 					serviceMust(t, m.rational.DisplayDecimalInto(&out, &a, prec, truncate))
-					got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+					got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 					serviceMust(t, e)
 					want := "prefix:" + decimalOracle(new(big.Rat).SetFrac(big.NewInt(n), big.NewInt(d)), prec, truncate)
 					s := &m.rational.decimalStream
@@ -65,10 +66,10 @@ func TestRationalDecimalStreamIndependentFinite(t *testing.T) {
 		a := NewRational()
 		serviceMust(t, m.integer.SetString(&a.Num, n.String()))
 		serviceMust(t, m.integer.SetString(&a.Den, d.String()))
-		var out OwnedStringStream
+		var out utext.OwnedStringStream
 		serviceMust(t, out.Construct(b))
 		serviceMust(t, m.rational.DisplayDecimalInto(&out, &a, 12, false))
-		got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+		got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 		serviceMust(t, e)
 		want := decimalOracle(new(big.Rat).SetFrac(n, d), 12, false)
 		if got != want {
@@ -86,10 +87,10 @@ func TestRationalDecimalStreamLiteralRawNegativeDenominator(t *testing.T) {
 		want string
 	}{{7, -3, "-2.-3-3?"}, {-7, -3, "--2.-3-3?"}, {9, -3, "-3"}, {-9, -3, "--3"}} {
 		a := Rational{Num: NewInt(tc.n), Den: NewInt(tc.d)}
-		var out OwnedStringStream
+		var out utext.OwnedStringStream
 		serviceMust(t, out.Construct(b))
 		serviceMust(t, m.rational.DisplayDecimalInto(&out, &a, 2, false))
-		got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+		got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 		serviceMust(t, e)
 		if got != tc.want {
 			t.Fatal("literal unnormalized source fields", tc, got)

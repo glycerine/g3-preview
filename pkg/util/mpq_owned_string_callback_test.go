@@ -7,13 +7,14 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestRationalOwnedStringNativeDenominatorScratch(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
 	a := Rational{Num: NewInt(3), Den: NewInt(1)}
-	var out OwnedString
+	var out utext.OwnedString
 	armed, calls := false, 0
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {

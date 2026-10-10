@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSMTArithAllFortySixLiteralDefaults(t *testing.T) {
@@ -188,7 +189,7 @@ func TestSMTArithSecondDeclarationRefusalKeepsFifteenFieldPrefix(t *testing.T) {
 		t.Fatal("exact first fifteen publications, untouched last eq2ineq", got)
 	}
 	sb := arena.NewBudget(^uint64(0))
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 	paramsMust(t, e)
 	sb.FailAfter(0)
 	if e = v.Display(out); !errors.Is(e, util.ErrParamsPrecondition) {
@@ -361,7 +362,7 @@ func TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags(t *testing.T) {
 	first := -1
 	for ordinal := int64(0); ordinal < 32; ordinal++ {
 		sb := arena.NewBudget(^uint64(0))
-		out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+		out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 		paramsMust(t, e)
 		sb.FailAfter(ordinal)
 		cause := v.Display(out)
@@ -389,7 +390,7 @@ func TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags(t *testing.T) {
 	if first < 1 {
 		t.Fatal("output no reservation horizon", first)
 	}
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	paramsMust(t, out.SetShowPos(true))
 	paramsMust(t, v.Display(out))
@@ -402,7 +403,7 @@ func TestSMTArithFortySixDisplayChainsAllOutputPrefixesAndFlags(t *testing.T) {
 	file, e := os.CreateTemp(".", "smt-arith-display-*")
 	paramsMust(t, e)
 	defer os.Remove(file.Name())
-	out, e = util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
+	out, e = utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
 	paramsMust(t, e)
 	paramsMust(t, file.Close())
 	paramsMust(t, v.Display(out))

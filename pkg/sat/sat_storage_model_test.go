@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSATStoragePointerFreeOwnershipAndConstructorFailure(t *testing.T) {
@@ -171,7 +171,7 @@ func TestSATStorageSourceTextAndWidthActions(t *testing.T) {
 	a := satStore(t, nil)
 	r := satMk(t, a, satLs(0, 3), true)
 	satOK(t, a.SetRemoved(r, true))
-	s, e := util.NewNumericTextStream(util.NumericTextStreamConfig{})
+	s, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{})
 	satOK(t, e)
 	defer s.Close()
 	satOK(t, a.DisplayInto(r, s))

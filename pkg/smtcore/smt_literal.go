@@ -3,7 +3,7 @@
 package smtcore
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // SMTLiteral preserves the source signed 32-bit index and negative sentinels.
@@ -60,7 +60,7 @@ func SMTBackwardSubsumption(first, second []SMTLiteral) bool {
 // DisplayNumeric is the literal ostream insertion at smt_literal.cpp:49-59.
 // Its null output is p-1; the separate AST-aware display's null special case
 // belongs to that source method, not this insertion.
-func (l SMTLiteral) DisplayNumeric(out *util.NumericTextStream) error {
+func (l SMTLiteral) DisplayNumeric(out *utext.NumericTextStream) error {
 	if l == SMTTrueLiteral {
 		return out.AppendCString("true")
 	}

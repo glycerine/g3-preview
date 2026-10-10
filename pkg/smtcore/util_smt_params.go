@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type SMTParamsState struct {
@@ -638,7 +639,7 @@ func (s *SMTParams) Close() error {
 	s.closed = true
 	return nil
 }
-func (s *SMTParams) Display(out *util.NumericTextStream) error {
+func (s *SMTParams) Display(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ func TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ(t *testing.T)
 	sig := NewInt(1)
 	var x ArbitraryFloat
 	serviceMust(t, m.SetComponents(&x, 17, 4000, false, -160, &sig))
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	serviceMust(t, out.Construct(b))
 	contextTLSNearMinimum(t, r)
 	lane, e := r.Allocate(8)
@@ -28,7 +29,7 @@ func TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ(t *testing.T)
 	if !errors.Is(body, arena.ErrBounds) || !stream.armed || s.sourceCause == nil || s.sourceCause != child.sourceCause || s.qCursor != 0 || !s.qLive || s.formatOwned {
 		t.Fatal("younger decimal end-label DEL did not protect q", body, s.sourceCause, child.sourceCause, s.qCursor)
 	}
-	got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if got != "0.?" {
 		t.Fatal("completed decimal output missing", got)
@@ -53,7 +54,7 @@ func TestArbitraryFloatDecimalStreamChildSourceStopProtectsScopedQ(t *testing.T)
 	if s.sourceCause != cause || s.qLive || s.qCursor != 2 || s.active || child.active {
 		t.Fatal("owning join erased wrapper source history")
 	}
-	after, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	after, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if after != got {
 		t.Fatal("owning join changed borrowed output")

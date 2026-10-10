@@ -7,17 +7,17 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func satInspectionStream(t *testing.T, b *arena.Budget) *util.NumericTextStream {
+func satInspectionStream(t *testing.T, b *arena.Budget) *utext.NumericTextStream {
 	t.Helper()
-	o, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	o, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	satOK(t, e)
 	t.Cleanup(func() { b.FailAfter(-1); satOK(t, o.Close()) })
 	return o
 }
-func satInspectionText(t *testing.T, o *util.NumericTextStream, want string) {
+func satInspectionText(t *testing.T, o *utext.NumericTextStream, want string) {
 	t.Helper()
 	got, e := o.String()
 	satOK(t, e)

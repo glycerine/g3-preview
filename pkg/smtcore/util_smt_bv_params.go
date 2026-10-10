@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type SMTBVState struct {
@@ -142,7 +143,7 @@ func (s *SMTBVParams) Close() error {
 	s.closed = true
 	return nil
 }
-func (s *SMTBVParams) Display(out *util.NumericTextStream) error {
+func (s *SMTBVParams) Display(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}

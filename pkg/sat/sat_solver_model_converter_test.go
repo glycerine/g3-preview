@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func satConverterTestOwner(t *testing.T) (*satModelConverter, *arena.Budget) {
@@ -77,7 +77,7 @@ func TestSATSolverModelConverterSourceOtherUndefinedAndDisplay(t *testing.T) {
 	if !reflect.DeepEqual(vars, []BoolVar{99, 0}) {
 		t.Fatalf("source collect_vars insertion dedup %v", vars)
 	}
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{})
 	paramsMust(t, e)
 	defer out.Close()
 	paramsMust(t, c.DisplayInto(out))

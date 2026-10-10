@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestVerboseContextMutableAllocatorSelection(t *testing.T) {
@@ -33,7 +34,7 @@ func TestVerboseContextMutableAllocatorSelection(t *testing.T) {
 	if text != "(allocator-consolidate :wasted-size 0 :memory 0.00)\n(end-allocator-consolidate :wasted-size 0 :memory 0.00)\n" {
 		t.Fatal(text)
 	}
-	second, e := NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+	second, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	smallObjectMust(t, e)
 	defer second.Close()
 	smallObjectMust(t, c.SetVerboseStream(second))
@@ -98,7 +99,7 @@ func TestVerboseContextColdRefusalAndExactCharge(t *testing.T) {
 	}
 }
 
-func verboseContextPhysical(t *testing.T, rt *umemory.Runtime, b *arena.Budget, region *arena.BytesRegion, out *NumericTextStream, c *VerboseContext, a *utilSmallObjectAllocator) {
+func verboseContextPhysical(t *testing.T, rt *umemory.Runtime, b *arena.Budget, region *arena.BytesRegion, out *utext.NumericTextStream, c *VerboseContext, a *utilSmallObjectAllocator) {
 	t.Helper()
 	rs := region.Stats()
 	ds := rs.Descriptors
@@ -211,7 +212,7 @@ func TestVerboseContextWarmOutputAndNullAdapter(t *testing.T) {
 		t.Fatal("warmed chain reserved cold or Runtime storage", e)
 	}
 	b.FailAfter(-1)
-	if out.State().Precision != 2 || out.State().FloatMode != NumericFixedFloat {
+	if out.State().Precision != 2 || out.State().FloatMode != utext.NumericFixedFloat {
 		t.Fatal("source persistent manipulators", out.State())
 	}
 }

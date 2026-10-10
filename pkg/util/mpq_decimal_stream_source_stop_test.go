@@ -5,11 +5,12 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"testing"
 )
 
 type decimalStopAtQuestionMark struct {
-	inner   *OwnedStringStream
+	inner   *utext.OwnedStringStream
 	runtime *umemory.Runtime
 	lane    *umemory.Block
 	t       *testing.T
@@ -42,7 +43,7 @@ func TestRationalDecimalStreamReachedEndLabelSourceStop(t *testing.T) {
 	serviceMust(t, e)
 	a := Rational{Num: NewInt(1), Den: NewInt(1)}
 	serviceMust(t, m.integer.Mul2kInPlace(&a.Den, 4000))
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	serviceMust(t, out.Construct(b))
 	contextTLSNearMinimum(t, r)
 	lane, e := r.Allocate(8)
@@ -53,7 +54,7 @@ func TestRationalDecimalStreamReachedEndLabelSourceStop(t *testing.T) {
 	if !errors.Is(body, arena.ErrBounds) || !stream.armed || !s.bodySucceeded || s.sourceCause == nil || s.sourceCursor != 2 || s.ownCursor != 0 {
 		t.Fatal("actual d1 end-label source stop missing", body, s.sourceCursor)
 	}
-	got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if got != "0.?" {
 		t.Fatal("completed source output missing", got)
@@ -78,7 +79,7 @@ func TestRationalDecimalStreamReachedEndLabelSourceStop(t *testing.T) {
 	if s.sourceCause != cause || s.sourceCursor != 2 || s.ownCursor != 4 || s.active {
 		t.Fatal("owning cleanup erased or replayed source end label")
 	}
-	after, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	after, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if after != got {
 		t.Fatal("owning cleanup changed borrowed output")

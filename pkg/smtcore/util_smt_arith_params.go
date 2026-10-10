@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type SMTArithState struct {
@@ -249,7 +250,7 @@ func (s *SMTArithParams) Close() error {
 	s.closed = true
 	return nil
 }
-func (s *SMTArithParams) Display(out *util.NumericTextStream) error {
+func (s *SMTArithParams) Display(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}

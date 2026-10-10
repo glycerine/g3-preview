@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // Initialized is cold diagnostic metadata; unassigned scalar fields do not
@@ -179,7 +180,7 @@ func (s *SMTPatternInferenceParams) Close() error {
 	s.closed = true
 	return nil
 }
-func (s *SMTPatternInferenceParams) Display(out *util.NumericTextStream) error {
+func (s *SMTPatternInferenceParams) Display(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}

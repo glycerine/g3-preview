@@ -1,7 +1,7 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type satJustification struct {
@@ -47,7 +47,7 @@ func (j satJustification) Literal2() (Literal, error) {
 }
 func (j satJustification) ClauseOffset() satClauseOffset { o := j.locator; o.slot = j.val1; return o }
 func (j satJustification) ExternalIndex() uint32         { return j.val1 }
-func (j satJustification) DisplayInto(s *util.NumericTextStream) error {
+func (j satJustification) DisplayInto(s *utext.NumericTextStream) error {
 	switch j.Kind() {
 	case 0:
 		return s.AppendCString("none")

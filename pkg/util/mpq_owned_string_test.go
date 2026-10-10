@@ -1,7 +1,10 @@
 // Source: src/util/mpq.cpp:123-127; src/util/mpz.cpp:1432-1435.
 package util
 
-import "testing"
+import (
+	utext "github.com/glycerine/g3/pkg/util/text"
+	"testing"
+)
 
 func TestRationalOwnedStringLiteralNumerals(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
@@ -10,7 +13,7 @@ func TestRationalOwnedStringLiteralNumerals(t *testing.T) {
 		serviceMust(t, m.integer.SetString(&a.Num, tc[0]))
 		serviceMust(t, m.integer.SetString(&a.Den, tc[1]))
 		before := a
-		var out OwnedString
+		var out utext.OwnedString
 		serviceMust(t, m.rational.ToOwnedString(&a, &out))
 		got, e := out.View().String()
 		serviceMust(t, e)

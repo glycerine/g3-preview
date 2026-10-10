@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestArbitraryFloatRationalStringEveryColdReservation(t *testing.T) {
@@ -20,7 +21,7 @@ func TestArbitraryFloatRationalStringEveryColdReservation(t *testing.T) {
 				serviceMust(t, m.integer.Mul2kInPlace(&x.significand, sb-1))
 				serviceMust(t, m.integer.Dec(&x.significand))
 				before := x
-				var out OwnedString
+				var out utext.OwnedString
 				b.FailAfter(ordinal)
 				body := m.ToRationalString(&x, &out)
 				s, c := &m.rationalString, &m.rationalConversion
@@ -37,7 +38,7 @@ func TestArbitraryFloatRationalStringEveryColdReservation(t *testing.T) {
 				}
 				if body != nil {
 					reachedNumericFailure = true
-					var later OwnedString
+					var later utext.OwnedString
 					if e := m.ToRationalString(&x, &later); !errors.Is(e, ErrNumericPending) {
 						t.Fatal("stopped wrapper replay", e)
 					}
@@ -84,12 +85,12 @@ func TestArbitraryFloatRationalStringWarmAndLaterChildren(t *testing.T) {
 	m, r, b := mpfNumeralHelpersFixture(t)
 	var x ArbitraryFloat
 	serviceMust(t, m.SetDouble(&x, 8, 24, 1.5))
-	var first OwnedString
+	var first utext.OwnedString
 	serviceMust(t, m.ToRationalString(&x, &first))
 	first.SourceDestroy()
 	used, state := b.Used(), r.State()
 	b.FailAfter(0)
-	var out OwnedString
+	var out utext.OwnedString
 	serviceMust(t, m.ToRationalString(&x, &out))
 	if !out.Matches("3/2") || b.Used() != used || r.State() != state {
 		t.Fatal("warm inline wrapper allocated", b.Used(), used)
@@ -97,7 +98,7 @@ func TestArbitraryFloatRationalStringWarmAndLaterChildren(t *testing.T) {
 	b.FailAfter(-1)
 	q := NewRational()
 	serviceMust(t, m.ToRational(&x, m.rational, &q))
-	var later OwnedString
+	var later utext.OwnedString
 	serviceMust(t, m.rational.ToOwnedString(&q, &later))
 	conv, format := m.rationalConversion.invocation, m.rational.stringScope.invocation
 	serviceMust(t, m.CleanupRationalString())
@@ -131,7 +132,7 @@ func TestArbitraryFloatRationalStringRefusedChildKeepsOlderInvocation(t *testing
 		if matched {
 			reached = true
 			invocation, numeric, transferred, a, n, d, used := c.invocation, c.numeric, c.transferred, c.a, c.n, c.d, b.Used()
-			var out OwnedString
+			var out utext.OwnedString
 			if e := m.ToRationalString(&x, &out); !errors.Is(e, ErrNumericPending) {
 				t.Fatal("older child refusal", e)
 			}

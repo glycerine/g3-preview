@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSMTLiteralSignedSentinelsAndSourceOperations(t *testing.T) {
@@ -118,7 +118,7 @@ func TestSMTLiteralSourceStreamSignedNullAndBooleanConstants(t *testing.T) {
 		if e = tc.lit.DisplayNumeric(out); e == nil {
 			t.Fatal("closed stream accepted")
 		}
-		if e = tc.lit.DisplayNumeric(nil); e != util.ErrNumericStreamOwner {
+		if e = tc.lit.DisplayNumeric(nil); e != utext.ErrNumericStreamOwner {
 			t.Fatal("nil stream", e)
 		}
 	}
@@ -141,7 +141,7 @@ func TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation(t *testing.T)
 	success := false
 	for prefix := int64(0); prefix < 32; prefix++ {
 		b := arena.NewBudget(^uint64(0))
-		stream, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+		stream, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 		paramsMust(t, e)
 		l := NewSMTLiteral(1073741823, true)
 		saved := l

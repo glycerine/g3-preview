@@ -3,6 +3,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func collectSolverParamDescrs(d *util.ParamDescrs) error {
@@ -18,7 +19,7 @@ func collectSolverParamDescrs(d *util.ParamDescrs) error {
 	satProbingCollectParamDescriptions(d)
 	return collectSCCParamDescrs(d)
 }
-func satStatusUint(out *util.NumericTextStream, key string, n uint32) error {
+func satStatusUint(out *utext.NumericTextStream, key string, n uint32) error {
 	if e := out.AppendCString(key); e != nil {
 		return e
 	}
@@ -27,7 +28,7 @@ func satStatusUint(out *util.NumericTextStream, key string, n uint32) error {
 	}
 	return out.AppendCString("\n")
 }
-func (s *Solver) displayStatus(out *util.NumericTextStream) error {
+func (s *Solver) displayStatus(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -179,7 +180,7 @@ func (s *Solver) displayStatus(out *util.NumericTextStream) error {
 	if e = out.AppendCString("\n  :memory          "); e != nil {
 		return e
 	}
-	if e = out.SetFloatMode(util.NumericFixedFloat); e != nil {
+	if e = out.SetFloatMode(utext.NumericFixedFloat); e != nil {
 		return e
 	}
 	if e = out.SetPrecision(2); e != nil {

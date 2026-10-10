@@ -1,13 +1,15 @@
 // Source: src/util/mpf.cpp:1590-1606; src/util/mpf.h:292.
 package util
 
-import
+import (
 
-// ToStringRaw constructs the returned source string in fresh caller storage.
-// On failure CleanupRawString joins its actual temporaries and return slot.
-umemory "github.com/glycerine/g3/pkg/util/memory"
+	// ToStringRaw constructs the returned source string in fresh caller storage.
+	// On failure CleanupRawString joins its actual temporaries and return slot.
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
-func (m *ArbitraryFloatManager) ToStringRaw(x *ArbitraryFloat, out *OwnedString) (cause error) {
+func (m *ArbitraryFloatManager) ToStringRaw(x *ArbitraryFloat, out *utext.OwnedString) (cause error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
 	}
@@ -15,7 +17,7 @@ func (m *ArbitraryFloatManager) ToStringRaw(x *ArbitraryFloat, out *OwnedString)
 		return ErrNumericPending
 	}
 	if out == nil || out.Self != nil {
-		return ErrOwnedStringOwner
+		return utext.ErrOwnedStringOwner
 	}
 	s := &m.rawString
 	*s = arbitraryFloatRawStringScope{manager: m, out: out, active: true, executing: true}
@@ -109,9 +111,9 @@ func (m *ArbitraryFloatManager) ToStringRaw(x *ArbitraryFloat, out *OwnedString)
 
 type arbitraryFloatRawStringScope struct {
 	manager                                                                 *ArbitraryFloatManager
-	out                                                                     *OwnedString
-	number, exponent                                                        OwnedString
-	numberStream, exponentStream                                            OwnedStringStream
+	out                                                                     *utext.OwnedString
+	number, exponent                                                        utext.OwnedString
+	numberStream, exponentStream                                            utext.OwnedStringStream
 	integerBinding, naturalBinding                                          NumericCallerBinding
 	insertion                                                               NumeralInsertionReceipt
 	numberLive, exponentLive, numberStreamLive, exponentStreamLive, outLive bool
@@ -144,7 +146,7 @@ func (m *ArbitraryFloatManager) finishRawStringSource() error {
 		return e
 	}
 	for _, local := range [...]struct {
-		str  *OwnedString
+		str  *utext.OwnedString
 		live *bool
 	}{{&s.exponent, &s.exponentLive}, {&s.exponentStream.Buffer.String, &s.exponentStreamLive}, {&s.number, &s.numberLive}, {&s.numberStream.Buffer.String, &s.numberStreamLive}} {
 		if *local.live {
@@ -211,7 +213,7 @@ func (s *arbitraryFloatRawStringScope) cleanupInsertion() error {
 
 func (s *arbitraryFloatRawStringScope) storageBytes() uint64 {
 	var n uint64
-	for _, str := range [...]*OwnedString{&s.exponent, &s.exponentStream.Buffer.String, &s.number, &s.numberStream.Buffer.String, s.out} {
+	for _, str := range [...]*utext.OwnedString{&s.exponent, &s.exponentStream.Buffer.String, &s.number, &s.numberStream.Buffer.String, s.out} {
 		if str != nil {
 			n += str.StorageBytes()
 		}

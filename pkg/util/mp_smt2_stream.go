@@ -1,11 +1,13 @@
 // Source: src/util/mpz.cpp:1412-1429; src/util/mpq.cpp:142-153.
 package util
 
-import
+import (
 
-// DisplaySMT2Into borrows out for the original sequence of insertions. Any
-// emitted prefix belongs to the caller; CleanupSMT2Stream joins failed locals.
-umemory "github.com/glycerine/g3/pkg/util/memory"
+	// DisplaySMT2Into borrows out for the original sequence of insertions. Any
+	// emitted prefix belongs to the caller; CleanupSMT2Stream joins failed locals.
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
 func (m *IntegerManager) DisplaySMT2Into(out RationalSourceStream, a *Int, decimal bool) (cause error) {
 	if e := m.check(a); e != nil {
@@ -16,7 +18,7 @@ func (m *IntegerManager) DisplaySMT2Into(out RationalSourceStream, a *Int, decim
 		return ErrNumericPending
 	}
 	if out == nil {
-		return ErrOwnedStringOwner
+		return utext.ErrOwnedStringOwner
 	}
 	if s.invocation == ^uint64(0) {
 		return ErrNumericPending
@@ -185,7 +187,7 @@ func (m *RationalManager) DisplaySMT2Into(out RationalSourceStream, a *Rational,
 		return ErrNumericPending
 	}
 	if out == nil {
-		return ErrOwnedStringOwner
+		return utext.ErrOwnedStringOwner
 	}
 	if s.invocation == ^uint64(0) {
 		return ErrNumericPending

@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/control"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type SolverConfig struct {
@@ -22,8 +23,8 @@ type SolverConfig struct {
 // graph. Cold contexts break constructor cycles without supplying completed
 // source members, duplicated counters, or an alternative solver.
 type Solver struct {
-	dimacsOutput                 *util.NumericTextStream // explicit borrowed stdout transport counterpart.
-	blockedCorrectionSets        uint32                  // actual m_stats field; source has only reset/read sites.
+	dimacsOutput                 *utext.NumericTextStream // explicit borrowed stdout transport counterpart.
+	blockedCorrectionSets        uint32                   // actual m_stats field; source has only reset/read sites.
 	self                         *Solver
 	runtime                      *Runtime
 	context                      *util.ParamsContext

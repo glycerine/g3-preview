@@ -3,6 +3,7 @@ package util
 
 import (
 	"fmt"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"math/big"
 	"math/rand/v2"
 	"strconv"
@@ -35,7 +36,7 @@ func TestArbitraryFloatBinaryStringLiteralBranches(t *testing.T) {
 	} {
 		x := ArbitraryFloat{format: arbitraryFloatFormat(8, 3, tc.negative), exponent: tc.exp, significand: NewInt(tc.sig)}
 		before := x
-		var out OwnedString
+		var out utext.OwnedString
 		serviceMust(t, m.ToStringBinary(&x, tc.upper, tc.lower, &out))
 		actual, e := out.View().String()
 		serviceMust(t, e)
@@ -108,7 +109,7 @@ func TestArbitraryFloatBinaryStringIndependentBits(t *testing.T) {
 			serviceMust(t, m.integer.SetString(&x.significand, sig.String()))
 			before := x
 			for _, extra := range [][2]uint32{{0, 0}, {1, 0}, {0, 1}, {2, 3}, {30, 7}} {
-				var out OwnedString
+				var out utext.OwnedString
 				serviceMust(t, m.ToStringBinary(&x, extra[0], extra[1], &out))
 				actual, e := out.View().String()
 				serviceMust(t, e)

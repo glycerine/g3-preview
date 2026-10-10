@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func debugNotificationFixture(t *testing.T) (*DebugContext, *MemoryStandardStreams, *arena.Budget, *os.File) {
@@ -165,7 +166,7 @@ func debugNotificationPhysical(t *testing.T, d *DebugContext, streams *MemorySta
 	if !streams.closed {
 		want += streams.header
 	}
-	for _, out := range []*NumericTextStream{streams.stdout, streams.StderrField} {
+	for _, out := range []*utext.NumericTextStream{streams.stdout, streams.StderrField} {
 		h := out.Stats()
 		want += h.OwnerBytes + h.ScratchBytes + h.OutputOwnerBytes + h.OutputOverflowBytes
 	}

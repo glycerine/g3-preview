@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSMTBitBlasterLiteralPODDefaults(t *testing.T) {
@@ -28,7 +28,7 @@ func TestSMTBitBlasterAllFourScalarValuesDisplayFlagsAndOutputPrefixes(t *testin
 		p := SMTBitBlasterParams{bits&1 != 0, bits&2 != 0}
 		for show := 0; show < 2; show++ {
 			b := arena.NewBudget(^uint64(0))
-			out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+			out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 			paramsMust(t, e)
 			paramsMust(t, out.SetShowPos(show != 0))
 			paramsMust(t, p.Display(out))
@@ -51,7 +51,7 @@ func TestSMTBitBlasterAllFourScalarValuesDisplayFlagsAndOutputPrefixes(t *testin
 	first := -1
 	for ordinal := int64(0); ordinal < 16; ordinal++ {
 		b := arena.NewBudget(^uint64(0))
-		out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+		out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 		paramsMust(t, e)
 		b.FailAfter(ordinal)
 		cause := p.Display(out)
@@ -84,7 +84,7 @@ func TestSMTBitBlasterAllFourScalarValuesDisplayFlagsAndOutputPrefixes(t *testin
 	file, e := os.CreateTemp(".", "bitblaster-output-*")
 	paramsMust(t, e)
 	defer os.Remove(file.Name())
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
 	paramsMust(t, e)
 	paramsMust(t, file.Close())
 	paramsMust(t, p.Display(out))

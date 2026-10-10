@@ -1,14 +1,16 @@
 // Source: src/util/mpq.cpp:123-127; src/util/mpq.h:255; src/util/mpz.cpp:1432-1435.
 package util
 
-import
+import (
 
-// ToOwnedString follows the selected left-to-right numerator/slash/denominator
-// string sequence. Success transfers the fresh return slot to the caller.
-// Failure retains actual temporaries for CleanupOwnedString or CloseChecked.
-umemory "github.com/glycerine/g3/pkg/util/memory"
+	// ToOwnedString follows the selected left-to-right numerator/slash/denominator
+	// string sequence. Success transfers the fresh return slot to the caller.
+	// Failure retains actual temporaries for CleanupOwnedString or CloseChecked.
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
-func (m *RationalManager) ToOwnedString(a *Rational, out *OwnedString) (cause error) {
+func (m *RationalManager) ToOwnedString(a *Rational, out *utext.OwnedString) (cause error) {
 	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
@@ -16,7 +18,7 @@ func (m *RationalManager) ToOwnedString(a *Rational, out *OwnedString) (cause er
 		return ErrNumericPending
 	}
 	if out == nil || out.Self != nil {
-		return ErrOwnedStringOwner
+		return utext.ErrOwnedStringOwner
 	}
 	s := &m.stringScope
 	if s.invocation == ^uint64(0) {
@@ -85,9 +87,9 @@ func (m *RationalManager) ToOwnedString(a *Rational, out *OwnedString) (cause er
 type rationalOwnedStringScope struct {
 	invocation                                                           uint64
 	manager                                                              *RationalManager
-	out                                                                  *OwnedString
-	denominator                                                          OwnedString
-	numeratorStream, denominatorStream                                   OwnedStringStream
+	out                                                                  *utext.OwnedString
+	denominator                                                          utext.OwnedString
+	numeratorStream, denominatorStream                                   utext.OwnedStringStream
 	numeratorInsertion, denominatorInsertion                             NumeralInsertionReceipt
 	integerBinding, naturalBinding                                       NumericCallerBinding
 	outLive, denominatorLive, numeratorStreamLive, denominatorStreamLive bool
@@ -147,7 +149,7 @@ func (m *RationalManager) finishOwnedStringSource() error {
 		}
 	}
 	for _, local := range [...]struct {
-		str  *OwnedString
+		str  *utext.OwnedString
 		live *bool
 	}{{&s.denominator, &s.denominatorLive}, {&s.denominatorStream.Buffer.String, &s.denominatorStreamLive}, {&s.numeratorStream.Buffer.String, &s.numeratorStreamLive}} {
 		if *local.live {
@@ -201,7 +203,7 @@ func (m *RationalManager) CleanupOwnedString() (cause error) {
 }
 func (s *rationalOwnedStringScope) storageBytes() uint64 {
 	var n uint64
-	for _, str := range [...]*OwnedString{&s.denominator, &s.denominatorStream.Buffer.String, &s.numeratorStream.Buffer.String, s.out} {
+	for _, str := range [...]*utext.OwnedString{&s.denominator, &s.denominatorStream.Buffer.String, &s.numeratorStream.Buffer.String, s.out} {
 		if str != nil {
 			n += str.StorageBytes()
 		}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // These scalar members can be embedded once in the future actual smt_params.
@@ -168,7 +169,7 @@ func (s *SMTDynAckParams) Close() error {
 // Display preserves each source insertion and endl flush, using the selected
 // actual ostream profile. Arbitrary native locale/boolalpha remain explicit
 // stream-profile obligations rather than a preformatted whole-message path.
-func (s *SMTDynAckParams) Display(out *util.NumericTextStream) error {
+func (s *SMTDynAckParams) Display(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}

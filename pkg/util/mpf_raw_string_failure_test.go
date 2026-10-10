@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestArbitraryFloatRawStringEveryColdReservation(t *testing.T) {
@@ -20,7 +21,7 @@ func TestArbitraryFloatRawStringEveryColdReservation(t *testing.T) {
 			x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, true), exponent: tc.exp}
 			serviceMust(t, m.integer.SetString(&x.significand, tc.sig))
 			before := x
-			var out OwnedString
+			var out utext.OwnedString
 			b.FailAfter(ordinal)
 			body := m.ToStringRaw(&x, &out)
 			integerPhysicalAudit(t, m.integer, &x.significand)
@@ -35,7 +36,7 @@ func TestArbitraryFloatRawStringEveryColdReservation(t *testing.T) {
 				t.Fatal("unexpected raw string failure", tc, ordinal, body)
 			}
 			if body != nil {
-				var later OwnedString
+				var later utext.OwnedString
 				if e := m.ToStringRaw(&x, &later); !errors.Is(e, ErrNumericPending) {
 					t.Fatal("stopped raw string replay", e)
 				}
@@ -77,11 +78,11 @@ func TestArbitraryFloatRawStringEveryColdReservation(t *testing.T) {
 func TestArbitraryFloatRawStringWarmStreamReservation(t *testing.T) {
 	m, _, b := mpfNumeralHelpersFixture(t)
 	x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, false), exponent: math.MinInt64, significand: NewInt(1)}
-	var first OwnedString
+	var first utext.OwnedString
 	serviceMust(t, m.ToStringRaw(&x, &first))
 	first.SourceDestroy()
 	b.FailAfter(0)
-	var second OwnedString
+	var second utext.OwnedString
 	e := m.ToStringRaw(&x, &second)
 	// Both text buffering and returned storage are Go-managed.
 	serviceMust(t, e)

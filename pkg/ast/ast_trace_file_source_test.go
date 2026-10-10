@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func astTracePath(t *testing.T) string {
@@ -144,7 +145,7 @@ func TestASTTraceFileFailedSentryOwnedStringKeepsWidthAndReachedLifetime(t *test
 	b := arena.NewBudget(1 << 20)
 	f, e := newASTTraceFile(b, util.LiteralParamsStringView(astTracePath(t)+"/missing"))
 	paramsMust(t, e)
-	var value util.OwnedString
+	var value utext.OwnedString
 	paramsMust(t, value.Construct(b, "trace"))
 	paramsMust(t, f.stream.SetWidth(17))
 	paramsMust(t, value.AppendTo(&f.stream))
@@ -152,7 +153,7 @@ func TestASTTraceFileFailedSentryOwnedStringKeepsWidthAndReachedLifetime(t *test
 		t.Fatal("failed ostream sentry consumed std::string width")
 	}
 	value.SourceDestroy() // actual owned string DT ends the borrow domain.
-	if e = value.AppendTo(&f.stream); !errors.Is(e, util.ErrOwnedStringOwner) {
+	if e = value.AppendTo(&f.stream); !errors.Is(e, utext.ErrOwnedStringOwner) {
 		t.Fatal("failed sentry erased reached string data/length guard", e)
 	}
 	paramsMust(t, f.Close())

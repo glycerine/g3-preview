@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSATSolverReportEveryStatusStreamReservationAndStatePrefix(t *testing.T) {
@@ -43,10 +43,10 @@ func TestSATSolverReportEveryStatusStreamReservationAndStatePrefix(t *testing.T)
 			}
 			state := o.State()
 			if strings.Contains(text, "  :memory          ") {
-				if state.FloatMode != util.NumericFixedFloat || state.Precision != 2 {
+				if state.FloatMode != utext.NumericFixedFloat || state.Precision != 2 {
 					t.Fatal("reached source manipulator prefix", state, text)
 				}
-			} else if state.FloatMode != util.NumericDefaultFloat || state.Precision != 6 {
+			} else if state.FloatMode != utext.NumericDefaultFloat || state.Precision != 6 {
 				t.Fatal(state, text)
 			}
 			if e != nil {

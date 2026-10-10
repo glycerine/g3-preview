@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	uhash "github.com/glycerine/g3/pkg/util/hash"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // MPQInf is the source rational pair. Initialize with NewMPQInf and never
@@ -713,16 +714,16 @@ func (p *MPQInfManager) Floor(a *MPQInf, b *Rational) (e error) {
 // scope on failure. Successful ToString transfers that ownership to the caller.
 type mpqInfFormattingScope struct {
 	active                       bool
-	out                          *OwnedString
-	number, denominator, display OwnedString
-	stream                       OwnedStringStream
+	out                          *utext.OwnedString
+	number, denominator, display utext.OwnedString
+	stream                       utext.OwnedStringStream
 	tmp                          Rational
 	tmpLive                      bool
 }
 
 // formatInteger follows mpz.cpp:1432-1435 without the retained text assembly
 // adapter: display into the actual local output stream, copy str(), destroy it.
-func (p *MPQInfManager) formatInteger(a *Int, dst *OwnedString) error {
+func (p *MPQInfManager) formatInteger(a *Int, dst *utext.OwnedString) error {
 	s := &p.format
 	if e := s.stream.Construct(p.m.BudgetField); e != nil {
 		return e
@@ -734,7 +735,7 @@ func (p *MPQInfManager) formatInteger(a *Int, dst *OwnedString) error {
 		return e
 	}
 	s.stream.OwnAbort()
-	s.stream = OwnedStringStream{}
+	s.stream = utext.OwnedStringStream{}
 	return nil
 }
 
@@ -742,7 +743,7 @@ func (p *MPQInfManager) formatInteger(a *Int, dst *OwnedString) error {
 // the C++ concatenation operands. Numerator, slash and denominator retain their
 // distinct source lifetimes; C++'s unspecified operand evaluation order is not
 // claimed as a native allocation sequence across all compilers.
-func (p *MPQInfManager) formatRational(a *Rational, dst *OwnedString) error {
+func (p *MPQInfManager) formatRational(a *Rational, dst *utext.OwnedString) error {
 	integer, e := p.m.IsInt(a)
 	if e != nil {
 		return e
@@ -764,13 +765,13 @@ func (p *MPQInfManager) formatRational(a *Rational, dst *OwnedString) error {
 		return e
 	}
 	s.denominator.SourceDestroy()
-	s.denominator = OwnedString{}
+	s.denominator = utext.OwnedString{}
 	return nil
 }
 
 // mpq_inf.cpp:22-43. tmp is raw (not a scoped numeral); its explicit del is
 // reached only after copy, abs, conversion and append all succeed.
-func (p *MPQInfManager) formatPair(a *MPQInf, dst *OwnedString) error {
+func (p *MPQInfManager) formatPair(a *MPQInf, dst *utext.OwnedString) error {
 	s := &p.format
 	s.active = true
 	s.out = dst
@@ -791,7 +792,7 @@ func (p *MPQInfManager) formatPair(a *MPQInf, dst *OwnedString) error {
 		return e
 	}
 	s.number.SourceDestroy()
-	s.number = OwnedString{}
+	s.number = utext.OwnedString{}
 	negative, e := p.m.IsNeg(&a.Second)
 	if e != nil {
 		return e
@@ -818,7 +819,7 @@ func (p *MPQInfManager) formatPair(a *MPQInf, dst *OwnedString) error {
 		return e
 	}
 	s.number.SourceDestroy()
-	s.number = OwnedString{}
+	s.number = utext.OwnedString{}
 	if e = p.m.Del(&s.tmp); e != nil {
 		return e
 	}
@@ -830,13 +831,13 @@ func (p *MPQInfManager) formatPair(a *MPQInf, dst *OwnedString) error {
 // storage. On success the caller owns it and must SourceDestroy it. On failure
 // CleanupFormatting, CleanupValue or Close releases the retained return slot;
 // the caller must not dispose that slot before owning cleanup joins its scope.
-func (p *MPQInfManager) ToString(a *MPQInf, dst *OwnedString) (e error) {
+func (p *MPQInfManager) ToString(a *MPQInf, dst *utext.OwnedString) (e error) {
 	if e = p.begin(a); e != nil {
 		return e
 	}
 	defer p.end(&e)
 	if dst == nil || dst.Self != nil {
-		return ErrOwnedStringOwner
+		return utext.ErrOwnedStringOwner
 	}
 	if e = p.formatPair(a, dst); e != nil {
 		return e
@@ -847,7 +848,7 @@ func (p *MPQInfManager) ToString(a *MPQInf, dst *OwnedString) (e error) {
 
 // Display follows mpq_inf.h:275-277: construct the whole return string, insert
 // it once (width applies to the whole string), then destroy the temporary.
-func (p *MPQInfManager) Display(out *NumericTextStream, a *MPQInf) (e error) {
+func (p *MPQInfManager) Display(out *utext.NumericTextStream, a *MPQInf) (e error) {
 	if e = p.begin(a); e != nil {
 		return e
 	}
@@ -857,7 +858,7 @@ func (p *MPQInfManager) Display(out *NumericTextStream, a *MPQInf) (e error) {
 		return e
 	}
 	if out == nil {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if e = s.display.AppendTo(out); e != nil {
 		return e

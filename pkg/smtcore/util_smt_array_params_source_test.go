@@ -11,6 +11,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSMTArrayConstructorElevenDefaultsDoesNotUpdate(t *testing.T) {
@@ -51,7 +52,7 @@ func TestSMTArrayDisplayExactlyNineFieldsAndSignedBooleanShowPos(t *testing.T) {
 	a, e := NewSMTArrayParams(b)
 	paramsMust(t, e)
 	defer func() { paramsMust(t, a.Close()) }()
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	paramsMust(t, out.SetShowPos(true))
@@ -248,7 +249,7 @@ func TestSMTArrayGoBufferOutputAndClosedFileBadbit(t *testing.T) {
 	first := -1
 	for ordinal := int64(0); ordinal < 32; ordinal++ {
 		sb := arena.NewBudget(^uint64(0))
-		out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+		out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 		paramsMust(t, e)
 		sb.FailAfter(ordinal)
 		cause := a.Display(out)
@@ -279,7 +280,7 @@ func TestSMTArrayGoBufferOutputAndClosedFileBadbit(t *testing.T) {
 	file, e := os.CreateTemp(".", "smt-array-file-*")
 	paramsMust(t, e)
 	defer os.Remove(file.Name())
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
 	paramsMust(t, e)
 	paramsMust(t, file.Close())
 	paramsMust(t, a.Display(out))

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestRationalOwnedStringEveryColdReservation(t *testing.T) {
@@ -17,7 +18,7 @@ func TestRationalOwnedStringEveryColdReservation(t *testing.T) {
 			serviceMust(t, m.integer.SetString(&a.Num, tc[0]))
 			serviceMust(t, m.integer.SetString(&a.Den, tc[1]))
 			before := a
-			var out OwnedString
+			var out utext.OwnedString
 			b.FailAfter(ordinal)
 			body := m.rational.ToOwnedString(&a, &out)
 			integerPhysicalAudit(t, m.integer, &a.Num, &a.Den)
@@ -32,7 +33,7 @@ func TestRationalOwnedStringEveryColdReservation(t *testing.T) {
 				t.Fatal("unexpected formatting failure", tc, ordinal, body)
 			}
 			if body != nil {
-				var later OwnedString
+				var later utext.OwnedString
 				if e := m.rational.ToOwnedString(&a, &later); !errors.Is(e, ErrNumericPending) {
 					t.Fatal("stopped formatter replay", e)
 				}
@@ -75,12 +76,12 @@ func TestRationalOwnedStringEveryColdReservation(t *testing.T) {
 func TestRationalOwnedStringWarmInlineAndReturnOwnership(t *testing.T) {
 	m, r, b := mpfNumeralHelpersFixture(t)
 	a := Rational{Num: NewInt(7), Den: NewInt(3)}
-	var first OwnedString
+	var first utext.OwnedString
 	serviceMust(t, m.rational.ToOwnedString(&a, &first))
 	first.SourceDestroy()
 	used, state := b.Used(), r.State()
 	b.FailAfter(0)
-	var out OwnedString
+	var out utext.OwnedString
 	serviceMust(t, m.rational.ToOwnedString(&a, &out))
 	if !out.Matches("7/3") || b.Used() != used || r.State() != state {
 		t.Fatal("warm inline rational string allocated", b.Used(), used)
@@ -89,7 +90,7 @@ func TestRationalOwnedStringWarmInlineAndReturnOwnership(t *testing.T) {
 	b.FailAfter(-1)
 	serviceMust(t, m.integer.SetString(&a.Num, "123456789012345678901234567890"))
 	serviceMust(t, m.integer.SetString(&a.Den, "98765432109876543210987654321"))
-	out = OwnedString{}
+	out = utext.OwnedString{}
 	serviceMust(t, m.rational.ToOwnedString(&a, &out))
 	want := "123456789012345678901234567890/98765432109876543210987654321"
 	serviceMust(t, m.rational.Del(&a))

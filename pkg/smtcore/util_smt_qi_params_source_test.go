@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText(t *testing.T) {
@@ -30,7 +31,7 @@ func TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText(t *testing.T) {
 	if text != "(+ weight generation)" {
 		t.Fatal("owned default cost", text)
 	}
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	if e = v.Display(out); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("invented initialized ematching", e)
@@ -183,7 +184,7 @@ func TestSMTQIDisplayAllChainsOutputPrefixesAndNullBadbit(t *testing.T) {
 	first := -1
 	for ordinal := int64(0); ordinal < 32; ordinal++ {
 		sb := arena.NewBudget(^uint64(0))
-		out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+		out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 		paramsMust(t, e)
 		sb.FailAfter(ordinal)
 		cause := v.Display(out)
@@ -221,7 +222,7 @@ func TestSMTQIDisplayAllChainsOutputPrefixesAndNullBadbit(t *testing.T) {
 	if v.state.MBQIId.Present() {
 		t.Fatal("matching null pointer lost")
 	}
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	paramsMust(t, v.Display(out))
 	paramsMust(t, out.AppendCString("erased-after-badbit"))
@@ -430,7 +431,7 @@ func TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString(t *testing.T) {
 	paramsMust(t, e)
 	defer func() { paramsMust(t, v.Close()) }()
 	paramsMust(t, v.SetEmatching(true))
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	paramsMust(t, out.SetShowPos(true))
 	paramsMust(t, v.Display(out))
@@ -446,7 +447,7 @@ func TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString(t *testing.T) {
 	file, e := os.CreateTemp(".", "qi-output-*")
 	paramsMust(t, e)
 	defer os.Remove(file.Name())
-	out, e = util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
+	out, e = utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
 	paramsMust(t, e)
 	paramsMust(t, file.Close())
 	paramsMust(t, v.Display(out))

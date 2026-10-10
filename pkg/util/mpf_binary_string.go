@@ -1,13 +1,15 @@
 // Source: src/util/mpf.cpp:1635-1693; src/util/mpf.h:295.
 package util
 
-import
+import (
 
-// ToStringBinary follows the source text construction and repeated integer
-// division, constructing the returned string in fresh caller storage.
-umemory "github.com/glycerine/g3/pkg/util/memory"
+	// ToStringBinary follows the source text construction and repeated integer
+	// division, constructing the returned string in fresh caller storage.
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
-func (m *ArbitraryFloatManager) ToStringBinary(x *ArbitraryFloat, upperExtra, lowerExtra uint32, out *OwnedString) (cause error) {
+func (m *ArbitraryFloatManager) ToStringBinary(x *ArbitraryFloat, upperExtra, lowerExtra uint32, out *utext.OwnedString) (cause error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
 	}
@@ -16,7 +18,7 @@ func (m *ArbitraryFloatManager) ToStringBinary(x *ArbitraryFloat, upperExtra, lo
 		return ErrNumericPending
 	}
 	if out == nil || out.Self != nil {
-		return ErrOwnedStringOwner
+		return utext.ErrOwnedStringOwner
 	}
 	*s = arbitraryFloatBinaryStringScope{manager: m, invocation: s.invocation + 1, out: out, active: true, executing: true}
 	s.hooks.Policy = s
@@ -46,7 +48,7 @@ func (s *arbitraryFloatBinaryStringScope) appendExpr(text string) error {
 	return s.expr.AppendCString(text)
 }
 func (s *arbitraryFloatBinaryStringScope) beginExpr() error {
-	s.expr = OwnedString{}
+	s.expr = utext.OwnedString{}
 	e := s.expr.Construct(s.manager.budget, "")
 	s.exprLive = s.expr.Ready
 	return e
@@ -293,7 +295,7 @@ func (s *arbitraryFloatBinaryStringScope) appendBit() error {
 	return s.bits.AppendCString(bit)
 }
 func (s *arbitraryFloatBinaryStringScope) appendBits(space bool) error {
-	s.expr = OwnedString{}
+	s.expr = utext.OwnedString{}
 	e := s.expr.ConstructCStringConcat(s.manager.budget, "#b", s.bits.View())
 	s.exprLive = s.expr.Ready
 	if e != nil {
@@ -314,10 +316,10 @@ func (s *arbitraryFloatBinaryStringScope) appendBits(space bool) error {
 type arbitraryFloatBinaryStringScope struct {
 	manager                              *ArbitraryFloatManager
 	invocation                           uint64
-	out                                  *OwnedString
+	out                                  *utext.OwnedString
 	tmp                                  Int
-	bits, expr                           OwnedString
-	repeats                              [2]OwnedString
+	bits, expr                           utext.OwnedString
+	repeats                              [2]utext.OwnedString
 	repeatLive                           [2]bool
 	tmpLive, bitsLive, exprLive, outLive bool
 	hooks                                NumericInvocationHooks
@@ -458,7 +460,7 @@ func (m *ArbitraryFloatManager) CleanupBinaryString() (cause error) {
 }
 func (s *arbitraryFloatBinaryStringScope) storageBytes() uint64 {
 	var n uint64
-	for _, str := range [...]*OwnedString{&s.bits, &s.expr, &s.repeats[0], &s.repeats[1], s.out} {
+	for _, str := range [...]*utext.OwnedString{&s.bits, &s.expr, &s.repeats[0], &s.repeats[1], s.out} {
 		if str != nil {
 			n += str.StorageBytes()
 		}

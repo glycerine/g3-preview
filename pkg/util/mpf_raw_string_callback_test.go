@@ -8,13 +8,14 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestArbitraryFloatRawStringNormalClassificationTransportGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
 	x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, false), significand: NewInt(1)}
-	var out OwnedString
+	var out utext.OwnedString
 	armed, calls := false, 0
 	want := "[+ " + new(big.Int).Lsh(big.NewInt(1), 8192).String() + " 0"
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
@@ -25,7 +26,7 @@ func TestArbitraryFloatRawStringNormalClassificationTransportGuards(t *testing.T
 				t.Fatal("transport must follow number and exponent output", s.executing, s.numberStreamLive, out.Matches(want))
 			}
 			before, used := x, b.Used()
-			var later OwnedString
+			var later utext.OwnedString
 			for i, e := range []error{m.ToStringRaw(&x, &later), m.CleanupRawString(), m.Close(), m.SourceFinalize(), m.CleanupValue(&x), m.integer.SetInt32(&x.significand, 7), m.integer.CloseChecked(), m.integer.SourceFinalize(), m.rational.CloseChecked(), m.rational.SourceFinalize()} {
 				if !errors.Is(e, ErrNumericPending) {
 					t.Fatal("actual display callback guard", i, e)

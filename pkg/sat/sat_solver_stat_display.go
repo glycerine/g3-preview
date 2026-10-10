@@ -2,14 +2,14 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // The source mem_stat reads the process allocation owner before emitting text.
 // This specialization binds that read to the solver's actual shared Runtime.
 // Global verbose dispatch and external stream flushing remain separate bindings.
 
-func (s *Solver) displayMemoryStat(out *util.NumericTextStream) error {
+func (s *Solver) displayMemoryStat(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -21,7 +21,7 @@ func (s *Solver) displayMemoryStat(out *util.NumericTextStream) error {
 	if e = out.AppendCString(" :memory "); e != nil {
 		return e
 	}
-	if e = out.SetFloatMode(util.NumericFixedFloat); e != nil {
+	if e = out.SetFloatMode(utext.NumericFixedFloat); e != nil {
 		return e
 	}
 	if e = out.SetPrecision(2); e != nil {
@@ -29,7 +29,7 @@ func (s *Solver) displayMemoryStat(out *util.NumericTextStream) error {
 	}
 	return out.AppendFloat64(mem)
 }
-func (s *Solver) displayCompactStat(out *util.NumericTextStream) error {
+func (s *Solver) displayCompactStat(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}

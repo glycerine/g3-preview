@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 const satSolverChildDescriptorNames = "elim_blocked_clauses elim_blocked_clauses_at blocked_clause_limit resolution resolution.limit resolution.occ_cutoff resolution.occ_cutoff_range1 resolution.occ_cutoff_range2 resolution.occ_cutoff_range3 resolution.lit_cutoff_range1 resolution.lit_cutoff_range2 resolution.lit_cutoff_range3 resolution.cls_cutoff1 resolution.cls_cutoff2 elim_vars subsumption subsumption.limit asymm_branch asymm_branch.rounds asymm_branch.limit scc"
@@ -59,7 +59,7 @@ func TestSATSolverReportStatusActualCountsAndPersistentFormatting(t *testing.T) 
 	satOK(t, e)
 	satOK(t, s.displayStatus(o))
 	satInspectionText(t, o, satStatusExpected(4, 0, 9, 1, 1, 1, 1, 7, false, "3", mem))
-	if state := o.State(); state.FloatMode != util.NumericFixedFloat || state.Precision != 2 {
+	if state := o.State(); state.FloatMode != utext.NumericFixedFloat || state.Precision != 2 {
 		t.Fatal("source manipulators persist", state)
 	}
 	satOK(t, o.ResetText())

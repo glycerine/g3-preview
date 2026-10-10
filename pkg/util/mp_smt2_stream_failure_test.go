@@ -4,6 +4,7 @@ package util
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"strings"
 	"testing"
 )
@@ -17,7 +18,7 @@ func TestRationalSMT2StreamEveryColdReservation(t *testing.T) {
 			serviceMust(t, m.integer.SetString(&a.Num, tc[0]))
 			serviceMust(t, m.integer.SetString(&a.Den, tc[1]))
 			before := a
-			var out OwnedStringStream
+			var out utext.OwnedStringStream
 			serviceMust(t, out.Construct(b))
 			serviceMust(t, out.AppendCString("prefix:"))
 			b.FailAfter(ordinal)
@@ -28,7 +29,7 @@ func TestRationalSMT2StreamEveryColdReservation(t *testing.T) {
 			if a != before || b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+streamBytes {
 				t.Fatal("immediate SMT2 stream graph", tc, ordinal, body, b.Used(), streamBytes)
 			}
-			got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+			got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 			serviceMust(t, e)
 			if !strings.HasPrefix(got, "prefix:") {
 				t.Fatal("borrowed prefix discarded", got)
@@ -44,7 +45,7 @@ func TestRationalSMT2StreamEveryColdReservation(t *testing.T) {
 			b.FailAfter(-1)
 			serviceMust(t, m.rational.CleanupSMT2Stream())
 			serviceMust(t, m.integer.CleanupSMT2Stream())
-			if after, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String(); e != nil || after != got {
+			if after, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String(); e != nil || after != got {
 				t.Fatal("cleanup changed borrowed stream", after, e)
 			}
 			out.Buffer.OwnAbort()
@@ -82,22 +83,22 @@ func TestRationalSMT2StreamEveryColdReservation(t *testing.T) {
 func TestRationalSMT2StreamWarmAndLaterChild(t *testing.T) {
 	m, r, b := mpfNumeralHelpersFixture(t)
 	a := Rational{Num: NewInt(-7), Den: NewInt(3)}
-	var first OwnedStringStream
+	var first utext.OwnedStringStream
 	serviceMust(t, first.Construct(b))
 	serviceMust(t, m.rational.DisplaySMT2Into(&first, &a, false))
 	first.Buffer.OwnAbort()
 	used, state := b.Used(), r.State()
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	serviceMust(t, out.Construct(b))
 	b.FailAfter(0)
 	serviceMust(t, m.rational.DisplaySMT2Into(&out, &a, false))
-	got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if got != "(/ (- 7) 3)" || b.Used() != used || r.State() != state {
 		t.Fatal("warm stream allocated", got, b.Used(), used)
 	}
 	b.FailAfter(-1)
-	var later OwnedStringStream
+	var later utext.OwnedStringStream
 	serviceMust(t, later.Construct(b))
 	v := NewInt(-9)
 	serviceMust(t, m.integer.DisplaySMT2Into(&later, &v, false))
@@ -113,7 +114,7 @@ func TestRationalSMT2StreamWarmAndLaterChild(t *testing.T) {
 // An ostream exception after a complete numeral insertion must preserve the
 // prefix and source-destruct the negative temporary, without destroying out.
 type smt2FailingStream struct {
-	inner       *OwnedStringStream
+	inner       *utext.OwnedStringStream
 	calls, fail int
 	failure     error
 }
@@ -148,7 +149,7 @@ func TestRationalSMT2StreamEveryInsertionException(t *testing.T) {
 	for fail := 1; fail <= 11; fail++ {
 		m, _, b := mpfNumeralHelpersFixture(t)
 		a := Rational{Num: NewInt(-7), Den: NewInt(-3)}
-		var out OwnedStringStream
+		var out utext.OwnedStringStream
 		serviceMust(t, out.Construct(b))
 		boom := errors.New("actual ostream insertion failure")
 		stream := smt2FailingStream{inner: &out, fail: fail, failure: boom}
@@ -159,14 +160,14 @@ func TestRationalSMT2StreamEveryInsertionException(t *testing.T) {
 		if m.integer.smt2Stream.tmpLive {
 			t.Fatal("negative scoped numeral did not source-destruct", fail)
 		}
-		before, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+		before, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 		serviceMust(t, e)
 		prefixes := []string{"", "(/ ", "(/ (- ", "(/ (- 7", "(/ (- 7.0", "(/ (- 7.0)", "(/ (- 7.0) ", "(/ (- 7.0) (- ", "(/ (- 7.0) (- 3", "(/ (- 7.0) (- 3.0", "(/ (- 7.0) (- 3.0)"}
 		if before != prefixes[fail-1] {
 			t.Fatal("source insertion prefix", fail, before)
 		}
 		serviceMust(t, m.rational.CleanupSMT2Stream())
-		after, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+		after, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 		serviceMust(t, e)
 		if before != after || out.Buffer.String.Closed {
 			t.Fatal("cleanup destroyed borrowed prefix", fail)

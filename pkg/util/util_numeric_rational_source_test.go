@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestNumericRationalSourceInsertionPreservesActualFieldChains(t *testing.T) {
@@ -15,7 +16,7 @@ func TestNumericRationalSourceInsertionPreservesActualFieldChains(t *testing.T) 
 	serviceMust(t, e)
 	defer q.Del(&v)
 	b := arena.NewBudget(1 << 20)
-	out, e := NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	serviceMust(t, e)
 	defer out.Close()
 	serviceMust(t, out.SetShowPos(true))

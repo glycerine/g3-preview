@@ -14,6 +14,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags(t *testing.T) {
@@ -30,7 +31,7 @@ func TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags(t *testing.T) {
 	astTestMust(t, e)
 	astTestPin(t, m, a)
 	b := arena.NewBudget(1 << 20)
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	astTestMust(t, e)
 	defer out.Close()
 	astTestMust(t, out.SetShowPos(true))
@@ -63,7 +64,7 @@ func TestASTLowLevelPrinterNativeDeclarationIdentityMarks(t *testing.T) {
 	astTestMust(t, m.IncRef(a))
 	defer func() { astTestMust(t, m.DecRef(a)) }()
 	sb := arena.NewBudget(1 << 20)
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 	astTestMust(t, e)
 	defer out.Close()
 	astTestMust(t, m.DisplayLowLevel(out, a, true, true))
@@ -118,7 +119,7 @@ func TestASTLowLevelPrinterNativeLargeNumeralFormatting(t *testing.T) {
 	app, e := m.MkApp(decl, nil)
 	paramsMust(t, e)
 	paramsMust(t, m.IncRef(app))
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: ba})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: ba})
 	paramsMust(t, e)
 	paramsMust(t, m.DisplayLowLevel(out, app, true, true))
 	text, e := out.String()
@@ -160,7 +161,7 @@ func TestASTLowLevelPrinterNativeWideAndDeepPostorder(t *testing.T) {
 	root, e := m.MkApp(decl, args)
 	astTestMust(t, e)
 	astTestPin(t, m, root)
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: arena.NewBudget(1 << 24)})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: arena.NewBudget(1 << 24)})
 	astTestMust(t, e)
 	defer out.Close()
 	ref := func(h ASTHandle) string {
@@ -237,7 +238,7 @@ func TestASTLowLevelPrinterNativeWideAndDeepPostorder(t *testing.T) {
 	if !errors.Is(e, arena.ErrClosed) || m.LowLevel.Active || m.LowLevel.stack != nil || m.LowLevel.marks != nil {
 		t.Fatal("output failure retained native lexical traversal", e)
 	}
-	fresh, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: arena.NewBudget(1 << 24)})
+	fresh, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: arena.NewBudget(1 << 24)})
 	astTestMust(t, e)
 	defer fresh.Close()
 	astTestMust(t, m.DisplayLowLevel(fresh, chain[len(chain)-1], true, true))

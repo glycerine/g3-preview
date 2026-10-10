@@ -2,6 +2,7 @@
 package util
 
 import (
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"strconv"
 	"testing"
 )
@@ -17,7 +18,7 @@ func TestArbitraryFloatRawStringLiteralClassification(t *testing.T) {
 			x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, negative), exponent: tc.exp}
 			serviceMust(t, m.integer.SetString(&x.significand, tc.sig))
 			before := x
-			var out OwnedString
+			var out utext.OwnedString
 			serviceMust(t, m.ToStringRaw(&x, &out))
 			got, e := out.View().String()
 			serviceMust(t, e)

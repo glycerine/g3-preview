@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"strings"
 	"testing"
 )
@@ -18,7 +19,7 @@ func TestRationalDecimalStreamEveryColdReservation(t *testing.T) {
 			serviceMust(t, m.integer.SetString(&a.Num, tc[0]))
 			serviceMust(t, m.integer.SetString(&a.Den, tc[1]))
 			before := a
-			var out OwnedStringStream
+			var out utext.OwnedStringStream
 			serviceMust(t, out.Construct(b))
 			serviceMust(t, out.AppendCString("prefix:"))
 			b.FailAfter(ordinal)
@@ -29,7 +30,7 @@ func TestRationalDecimalStreamEveryColdReservation(t *testing.T) {
 			if a != before || b.Used() != m.OwnedStorageBytes()+r.Stats().TotalBytes+streamBytes {
 				t.Fatal("immediate decimal stream graph", tc, ordinal, body, b.Used(), streamBytes)
 			}
-			got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+			got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 			serviceMust(t, e)
 			if !strings.HasPrefix(got, "prefix:") {
 				t.Fatal("borrowed prefix lost", got)
@@ -47,7 +48,7 @@ func TestRationalDecimalStreamEveryColdReservation(t *testing.T) {
 			}
 			b.FailAfter(-1)
 			serviceMust(t, m.rational.CleanupDecimalStream())
-			after, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+			after, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 			serviceMust(t, e)
 			if after != got {
 				t.Fatal("cleanup changed caller output")
@@ -89,7 +90,7 @@ func TestRationalDecimalStreamEveryInsertionException(t *testing.T) {
 	for fail := 1; fail <= len(prefixes); fail++ {
 		m, _, b := mpfNumeralHelpersFixture(t)
 		a := Rational{Num: NewInt(-12501), Den: NewInt(100000)}
-		var out OwnedStringStream
+		var out utext.OwnedStringStream
 		serviceMust(t, out.Construct(b))
 		boom := errors.New("actual decimal ostream exception")
 		stream := smt2FailingStream{inner: &out, fail: fail, failure: boom}
@@ -105,13 +106,13 @@ func TestRationalDecimalStreamEveryInsertionException(t *testing.T) {
 		if s.sourceCursor != 0 || s.count != expectedCount || s.bodySucceeded {
 			t.Fatal("unreached RAW end label", fail, s.count, s.sourceCursor)
 		}
-		got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+		got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 		serviceMust(t, e)
 		if got != prefixes[fail-1] {
 			t.Fatal("exact decimal prefix", fail, got)
 		}
 		serviceMust(t, m.rational.CleanupDecimalStream())
-		after, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+		after, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 		serviceMust(t, e)
 		if after != got || s.sourceCursor != 0 || s.ownCursor != 4 {
 			t.Fatal("owning abort replayed source or destroyed output", fail)
@@ -123,22 +124,22 @@ func TestRationalDecimalStreamEveryInsertionException(t *testing.T) {
 func TestRationalDecimalStreamWarmAndLaterChild(t *testing.T) {
 	m, r, b := mpfNumeralHelpersFixture(t)
 	a := Rational{Num: NewInt(-1), Den: NewInt(3)}
-	var first OwnedStringStream
+	var first utext.OwnedStringStream
 	serviceMust(t, first.Construct(b))
 	serviceMust(t, m.rational.DisplayDecimalInto(&first, &a, 3, false))
 	first.Buffer.OwnAbort()
 	used, state := b.Used(), r.State()
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	serviceMust(t, out.Construct(b))
 	b.FailAfter(0)
 	serviceMust(t, m.rational.DisplayDecimalInto(&out, &a, 3, false))
-	got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+	got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 	serviceMust(t, e)
 	if got != "-0.333?" || b.Used() != used || r.State() != state {
 		t.Fatal("warm decimal allocated", got, b.Used(), used)
 	}
 	b.FailAfter(-1)
-	var later OwnedStringStream
+	var later utext.OwnedStringStream
 	serviceMust(t, later.Construct(b))
 	serviceMust(t, m.rational.DisplaySMT2Into(&later, &a, false))
 	invocation := m.rational.smt2Stream.invocation
@@ -153,9 +154,9 @@ func TestRationalDecimalStreamWarmAndLaterChild(t *testing.T) {
 func TestRationalDecimalStreamReachedZeroDenominatorAndAuthority(t *testing.T) {
 	m, _, b := mpfNumeralHelpersFixture(t)
 	a := Rational{Num: NewInt(-7), Den: NewInt(0)}
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	serviceMust(t, out.Construct(b))
-	if e := m.rational.DisplayDecimalInto(nil, &a, 1, false); !errors.Is(e, ErrOwnedStringOwner) || m.rational.decimalStream.invocation != 0 {
+	if e := m.rational.DisplayDecimalInto(nil, &a, 1, false); !errors.Is(e, utext.ErrOwnedStringOwner) || m.rational.decimalStream.invocation != 0 {
 		t.Fatal("nil stream began invocation", e)
 	}
 	body := m.rational.DisplayDecimalInto(&out, &a, 1, false)
@@ -194,7 +195,7 @@ func TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation(t *testing.T) {
 		if matched {
 			reached = true
 			roots, invocation := m.integer.CopyAllocation.Roots, m.integer.CopyAllocation.invocation
-			var out OwnedStringStream
+			var out utext.OwnedStringStream
 			serviceMust(t, out.Construct(b))
 			a := Rational{Num: NewInt(1), Den: NewInt(3)}
 			serviceMust(t, m.rational.DisplayDecimalInto(&out, &a, 2, false))
@@ -203,7 +204,7 @@ func TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation(t *testing.T) {
 			if m.integer.CopyAllocation.Roots != roots || m.integer.CopyAllocation.invocation != invocation || !m.integer.MatchesCopyAllocationInvocation(&receipt) || b.Used() != used {
 				t.Fatal("inline decimal adopted unrelated older COPY")
 			}
-			got, e := (OwnedStringView{&out.Buffer.String, out.Buffer.String.Generation, out.Buffer.Position}).String()
+			got, e := (utext.OwnedStringView{Owner: &out.Buffer.String, Generation: out.Buffer.String.Generation, Length: out.Buffer.Position}).String()
 			serviceMust(t, e)
 			if got != "0.33?" {
 				t.Fatal("inline decimal with older pending owner", got)

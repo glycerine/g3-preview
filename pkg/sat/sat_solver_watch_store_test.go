@@ -3,7 +3,8 @@ package sat
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"reflect"
 	"testing"
 )
@@ -80,7 +81,7 @@ func TestSATSolverWatchStoreActualWatchDisplayAndStableSort(t *testing.T) {
 			t.Fatal("sort kind/stability")
 		}
 	}
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{})
 	paramsMust(t, e)
 	defer out.Close()
 	paramsMust(t, s.DisplayInto(r, nil, out))
@@ -95,7 +96,7 @@ func TestSATSolverWatchStoreActualWatchDisplayAndStableSort(t *testing.T) {
 	paramsMust(t, e)
 	paramsMust(t, s.SetEnd(r, 0))
 	paramsMust(t, s.Push(r, cw))
-	out2, e := util.NewNumericTextStream(util.NumericTextStreamConfig{})
+	out2, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{})
 	paramsMust(t, e)
 	defer out2.Close()
 	paramsMust(t, s.DisplayInto(r, ca, out2))

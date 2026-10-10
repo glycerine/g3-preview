@@ -2,7 +2,7 @@
 package smtcore
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // SMTDatatypeParams is the concrete scalar base embedded by source smt_params.
@@ -16,7 +16,7 @@ func NewSMTDatatypeParams() SMTDatatypeParams {
 	return SMTDatatypeParams{LazySplits: 1}
 }
 
-func (p SMTDatatypeParams) Display(out *util.NumericTextStream) error {
+func (p SMTDatatypeParams) Display(out *utext.NumericTextStream) error {
 	if e := out.AppendCString("m_dt_lazy_splits="); e != nil {
 		return e
 	}

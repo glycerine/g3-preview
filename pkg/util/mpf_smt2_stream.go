@@ -1,11 +1,13 @@
 // Source: src/util/mpf.cpp:1584-1588; src/util/mpf.h:143.
 package util
 
-import
+import (
 
-// DisplaySMT2Into converts through the original scoped rational and borrows
-// the caller stream. CleanupSMT2Stream joins actual failed children and locals.
-umemory "github.com/glycerine/g3/pkg/util/memory"
+	// DisplaySMT2Into converts through the original scoped rational and borrows
+	// the caller stream. CleanupSMT2Stream joins actual failed children and locals.
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
 func (m *ArbitraryFloatManager) DisplaySMT2Into(out RationalSourceStream, x *ArbitraryFloat, decimal bool) (cause error) {
 	if e := m.valueGuard(x); e != nil {
@@ -15,7 +17,7 @@ func (m *ArbitraryFloatManager) DisplaySMT2Into(out RationalSourceStream, x *Arb
 		return ErrNumericPending
 	}
 	if out == nil {
-		return ErrOwnedStringOwner
+		return utext.ErrOwnedStringOwner
 	}
 	s := &m.smt2Stream
 	*s = arbitraryFloatSMT2StreamScope{manager: m, q: NewRational(), qLive: true, active: true, executing: true}

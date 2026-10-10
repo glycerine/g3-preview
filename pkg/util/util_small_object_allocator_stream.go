@@ -3,66 +3,25 @@
 package util
 
 import (
-	"math"
-
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // Read the actual borrowed C string at insertion time. Source strlen precedes
 // field padding; the complete string consumes width once. No copied spelling,
 // intermediate Go string, per-byte public stream calls or nested mutex locks.
-func smallObjectCStringInto(out *NumericTextStream, region *arena.BytesRegion, text GlobalParamCString) error {
-	if e := out.lock(); e != nil {
+func smallObjectCStringInto(out *utext.NumericTextStream, region *arena.BytesRegion, text GlobalParamCString) error {
+	if e := out.CheckOpen(); e != nil {
 		return e
 	}
-	defer out.mu.Unlock()
 	if !text.Present {
 		return ErrParamsStreamFailure
-	} // null ostream bad-state boundary
+	}
 	if region == nil || text.Origin != region.OwnerID() {
 		return ErrSmallObjectOwner
 	}
-	var length uint64
-	for {
-		offset := uint64(text.Offset) + length
-		if offset > math.MaxUint32 {
-			return arena.ErrBounds
-		}
-		c, e := region.Read(text.Ref, uint32(offset))
-		if e != nil {
-			return e
-		}
-		if c == 0 {
-			break
-		}
-		length++
-	}
-	if out.FileBad {
-		return nil
-	}
-	pad, e := out.fieldPadding(length)
-	if e != nil {
-		return e
-	}
-	if out.state.Alignment != NumericLeft {
-		if e = out.padding(pad); e != nil {
-			return e
-		}
-	}
-	for i := uint64(0); i < length; i++ {
-		c, e := region.Read(text.Ref, uint32(uint64(text.Offset)+i))
-		if e != nil {
-			return e
-		}
-		if e = out.emitByte(c); e != nil {
-			return e
-		}
-	}
-	if out.state.Alignment == NumericLeft {
-		return out.padding(pad)
-	}
-	return nil
+	return out.AppendCStringRegion(region, text.Ref, text.Offset)
 }
 func (b *smallObjectIOBridge) diagnostic(a *umemory.SmallAllocator) error {
 	out := b.config.Diagnostics
@@ -122,7 +81,7 @@ func (b *smallObjectIOBridge) verbose(a *umemory.SmallAllocator, end bool) error
 	if e = out.AppendCString(" :memory "); e != nil {
 		return e
 	}
-	if e = out.SetFloatMode(NumericFixedFloat); e != nil {
+	if e = out.SetFloatMode(utext.NumericFixedFloat); e != nil {
 		return e
 	}
 	if e = out.SetPrecision(2); e != nil {

@@ -2,14 +2,14 @@
 package bit_blaster
 
 import (
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // Actual inline scalar base. Disabled registration has no active update/getter.
 type SMTBitBlasterParams struct{ ExtGates, Quantifiers bool }
 
 func NewSMTBitBlasterParams() SMTBitBlasterParams { return SMTBitBlasterParams{false, false} }
-func (p SMTBitBlasterParams) Display(out *util.NumericTextStream) error {
+func (p SMTBitBlasterParams) Display(out *utext.NumericTextStream) error {
 	if e := out.AppendCString("m_bb_ext_gates="); e != nil {
 		return e
 	}

@@ -1,10 +1,14 @@
 // Source: src/smt/params/qi_params.cpp:43-64; src/util/params.cpp:928-930.
 package util
 
+import
+
 // AppendTo resolves the checked parameter input in the parameter layer before
 // passing a native value to the numeric output. Borrowed inputs remain confined
 // to this call; no parameter context is retained by the stream.
-func (v ParamsStringView) AppendTo(out *NumericTextStream) error {
+utext "github.com/glycerine/g3/pkg/util/text"
+
+func (v ParamsStringView) AppendTo(out *utext.NumericTextStream) error {
 	if e := out.CheckOpen(); e != nil {
 		return e
 	}

@@ -1,5 +1,5 @@
 // Source: src/util/memory_manager.cpp:49-72; src/util/memory_manager.h:49-71.
-package util
+package text
 
 import (
 	"errors"
@@ -38,16 +38,16 @@ func TestNumericFileStreamExactFormattingAndBorrow(t *testing.T) {
 	if s.Buffer != nil || b.Used() != uint64(reflect.TypeOf(NumericTextStream{}).Size()) {
 		t.Fatal("unused shadow output buffer", s.Stats(), b.Used())
 	}
-	smallObjectMust(t, s.SetWidth(5))
-	smallObjectMust(t, s.SetFill('_'))
-	smallObjectMust(t, s.AppendCString("A\x00ignored"))
-	smallObjectMust(t, s.SetShowPos(true))
-	smallObjectMust(t, s.AppendInt64(12))
-	smallObjectMust(t, s.AppendByte('\n'))
+	textMust(t, s.SetWidth(5))
+	textMust(t, s.SetFill('_'))
+	textMust(t, s.AppendCString("A\x00ignored"))
+	textMust(t, s.SetShowPos(true))
+	textMust(t, s.AppendInt64(12))
+	textMust(t, s.AppendByte('\n'))
 	_, e := f.Seek(0, io.SeekStart)
-	smallObjectMust(t, e)
+	textMust(t, e)
 	got, e := io.ReadAll(f)
-	smallObjectMust(t, e)
+	textMust(t, e)
 	if string(got) != "____A+12\n" {
 		t.Fatal(string(got))
 	}
@@ -61,31 +61,31 @@ func TestNumericFileStreamExactFormattingAndBorrow(t *testing.T) {
 	if e = s.ResetText(); !errors.Is(e, ErrNumericStreamFile) {
 		t.Fatal("no synthetic file reset", e)
 	}
-	smallObjectMust(t, s.Close())
+	textMust(t, s.Close())
 	if _, e = f.Write([]byte("caller")); e != nil {
 		t.Fatal("stream closed borrowed file", e)
 	}
 }
 func TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit(t *testing.T) {
 	f, s, b := numericFileFixture(t)
-	smallObjectMust(t, f.Close())
+	textMust(t, f.Close())
 	used := b.Used()
-	smallObjectMust(t, s.AppendCString("first"))
+	textMust(t, s.AppendCString("first"))
 	bad, e := s.Bad()
-	smallObjectMust(t, e)
+	textMust(t, e)
 	if !bad {
 		t.Fatal("closed physical provider must set badbit")
 	}
-	smallObjectMust(t, s.SetWidth(7))
-	smallObjectMust(t, s.AppendInt64(3))
-	smallObjectMust(t, s.AppendCString("next"))
+	textMust(t, s.SetWidth(7))
+	textMust(t, s.AppendInt64(3))
+	textMust(t, s.AppendCString("next"))
 	if s.State().Width != 7 || s.Stats().Position != 0 || used != b.Used() {
 		t.Fatal("failed sentry consumed width or reserved storage", s.State(), s.Stats())
 	}
 }
 func TestNumericFileStreamEveryColdReservation(t *testing.T) {
 	f, e := os.CreateTemp(".", "numeric-file-cold-*")
-	smallObjectMust(t, e)
+	textMust(t, e)
 	defer f.Close()
 	defer os.Remove(f.Name())
 	b := arena.NewBudget(1 << 20)
@@ -96,12 +96,12 @@ func TestNumericFileStreamEveryColdReservation(t *testing.T) {
 	}
 	b.FailAfter(1)
 	s, e = NewNumericTextStream(NumericTextStreamConfig{Budget: b, BorrowedFile: f})
-	smallObjectMust(t, e)
+	textMust(t, e)
 	if s.Buffer != nil || b.Used() != s.Stats().OwnerBytes {
 		t.Fatal("one actual cold header", s.Stats(), b.Used())
 	}
 	b.FailAfter(-1)
-	smallObjectMust(t, s.Close())
+	textMust(t, s.Close())
 	if b.Used() != 0 {
 		t.Fatal(b.Used())
 	}

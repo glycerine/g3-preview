@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestParamsStringViewReturnedPointerNoFormatCopyAndInvalidation(t *testing.T) {
@@ -134,7 +135,7 @@ func TestParamsStringViewCStringSentryNullAndStaleBeforeBadbit(t *testing.T) {
 	view, e := c.GetStringViewFallbackName(&v, &key, nil, nil)
 	paramsMust(t, e)
 	sb := arena.NewBudget(^uint64(0))
-	out, e := NewNumericTextStream(NumericTextStreamConfig{Budget: sb})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	paramsMust(t, out.SetWidth(7))

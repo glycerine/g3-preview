@@ -1,11 +1,13 @@
 // Source: src/util/mpq.cpp:156-185; src/util/mpq.h:269.
 package util
 
-import
+import (
 
-// DisplayDecimalInto borrows the caller stream and follows the original
-// unrounded Div/display/Rem loop. CleanupDecimalStream joins a failed body.
-umemory "github.com/glycerine/g3/pkg/util/memory"
+	// DisplayDecimalInto borrows the caller stream and follows the original
+	// unrounded Div/display/Rem loop. CleanupDecimalStream joins a failed body.
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
 func (m *RationalManager) DisplayDecimalInto(out RationalSourceStream, a *Rational, precision uint32, truncate bool) (cause error) {
 	if e := m.checkScalarValue(a); e != nil {
@@ -16,7 +18,7 @@ func (m *RationalManager) DisplayDecimalInto(out RationalSourceStream, a *Ration
 		return ErrNumericPending
 	}
 	if out == nil {
-		return ErrOwnedStringOwner
+		return utext.ErrOwnedStringOwner
 	}
 	if s.invocation == ^uint64(0) {
 		return ErrNumericPending

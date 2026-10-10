@@ -1,10 +1,9 @@
 package sat
 
 import (
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"math"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSATJustificationSourceAllKindsAndRawGetters(t *testing.T) {
@@ -38,7 +37,7 @@ func TestSATJustificationSourceAllKindsAndRawGetters(t *testing.T) {
 	if !c.Clause() || c.ClauseOffset() != off {
 		t.Fatal(c)
 	}
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{})
 	satOK(t, e)
 	defer out.Close()
 	for i, j := range []satJustification{none, b, ter, c, ext} {

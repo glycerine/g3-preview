@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestArbitraryFloatSMT2StreamConversionTransportGuards(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	var m *ArbitraryFloatManager
 	var x ArbitraryFloat
-	var out OwnedStringStream
+	var out utext.OwnedStringStream
 	armed, calls := false, 0
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if armed {
@@ -23,7 +24,7 @@ func TestArbitraryFloatSMT2StreamConversionTransportGuards(t *testing.T) {
 			}
 			// The caller captures the child invocation only when the child returns.
 			before, q, a, n, d, used := x, s.q, c.a, c.n, c.d, b.Used()
-			var later OwnedStringStream
+			var later utext.OwnedStringStream
 			for i, e := range []error{m.DisplaySMT2Into(&later, &x, true), m.CleanupSMT2Stream(), m.CleanupRationalConversion(), m.CleanupValue(&x), m.Del(&x), m.Close(), m.SourceFinalize(), m.integer.SetInt32(&x.significand, 7), m.integer.CloseChecked(), m.integer.SourceFinalize(), m.rational.CloseChecked(), m.rational.SourceFinalize()} {
 				if !errors.Is(e, ErrNumericPending) {
 					t.Fatal("nested conversion callback guard", i, e)

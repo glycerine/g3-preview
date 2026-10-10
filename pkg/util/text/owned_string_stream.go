@@ -1,5 +1,5 @@
 // Source: src/util/mpz.cpp:1432-1435.
-package util
+package text
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

@@ -3,7 +3,8 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"reflect"
 )
 
@@ -364,7 +365,7 @@ func (s *satSolverWatchStore) Stats() satSolverWatchStoreStats {
 	}
 	return out
 }
-func (v *satSolverWatchStore) DisplayInto(r satSolverWatchListRef, a *ClauseAllocator, s *util.NumericTextStream) error {
+func (v *satSolverWatchStore) DisplayInto(r satSolverWatchListRef, a *ClauseAllocator, s *utext.NumericTextStream) error {
 	x, e := v.record(r)
 	if e != nil {
 		return e

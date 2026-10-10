@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/idgen"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var (
@@ -624,7 +625,7 @@ func (a *ClauseAllocator) AppendLiterals(r StoredClauseRef, dst []Literal) ([]Li
 	}
 	return dst, nil
 }
-func satLiteralInto(out *util.NumericTextStream, l Literal) error {
+func satLiteralInto(out *utext.NumericTextStream, l Literal) error {
 	sign := ""
 	if l.sign() {
 		sign = "-"
@@ -634,7 +635,7 @@ func satLiteralInto(out *util.NumericTextStream, l Literal) error {
 	}
 	return out.AppendUint32(uint32(l.variable()))
 }
-func (a *ClauseAllocator) DisplayInto(r StoredClauseRef, out *util.NumericTextStream) error {
+func (a *ClauseAllocator) DisplayInto(r StoredClauseRef, out *utext.NumericTextStream) error {
 	n, e := a.Size(r)
 	if e != nil {
 		return e
@@ -905,7 +906,7 @@ func (w satClauseWrapper) ContainsVar(a *ClauseAllocator, v BoolVar) (bool, erro
 	}
 	return false, nil
 }
-func (w satClauseWrapper) DisplayInto(a *ClauseAllocator, out *util.NumericTextStream) error {
+func (w satClauseWrapper) DisplayInto(a *ClauseAllocator, out *utext.NumericTextStream) error {
 	n, e := w.Size(a)
 	if e != nil {
 		return e

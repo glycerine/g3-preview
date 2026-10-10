@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -21,7 +22,7 @@ type MemoryStandardStreamsConfig struct {
 type MemoryStandardStreams struct {
 	self                *MemoryStandardStreams
 	budget              *arena.Budget
-	stdout, StderrField *NumericTextStream
+	stdout, StderrField *utext.NumericTextStream
 	header              uint64
 	closed              bool
 }
@@ -40,12 +41,12 @@ func NewMemoryStandardStreams(c MemoryStandardStreamsConfig) (*MemoryStandardStr
 		c.Stderr = os.Stderr
 	}
 	var e error
-	s.stdout, e = NewNumericTextStream(NumericTextStreamConfig{Budget: c.Budget, BorrowedFile: c.Stdout})
+	s.stdout, e = utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.Budget, BorrowedFile: c.Stdout})
 	if e != nil {
 		c.Budget.Release(n)
 		return nil, e
 	}
-	s.StderrField, e = NewNumericTextStream(NumericTextStreamConfig{Budget: c.Budget, BorrowedFile: c.Stderr})
+	s.StderrField, e = utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.Budget, BorrowedFile: c.Stderr})
 	if e != nil {
 		s.stdout.Close()
 		c.Budget.Release(n)
@@ -55,20 +56,20 @@ func NewMemoryStandardStreams(c MemoryStandardStreamsConfig) (*MemoryStandardStr
 }
 func (s *MemoryStandardStreams) open() error {
 	if s == nil || s.self != s {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if s.closed {
 		return arena.ErrClosed
 	}
 	return nil
 }
-func (s *MemoryStandardStreams) Stdout() (*NumericTextStream, error) {
+func (s *MemoryStandardStreams) Stdout() (*utext.NumericTextStream, error) {
 	if e := s.open(); e != nil {
 		return nil, e
 	}
 	return s.stdout, nil
 }
-func (s *MemoryStandardStreams) Stderr() (*NumericTextStream, error) {
+func (s *MemoryStandardStreams) Stderr() (*utext.NumericTextStream, error) {
 	if e := s.open(); e != nil {
 		return nil, e
 	}
@@ -76,7 +77,7 @@ func (s *MemoryStandardStreams) Stderr() (*NumericTextStream, error) {
 }
 func (s *MemoryStandardStreams) Close() error {
 	if s == nil || s.self != s {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if s.closed {
 		return nil
@@ -128,7 +129,7 @@ func NewMemoryFatalContext(c MemoryFatalContextConfig) (*MemoryFatalContext, err
 }
 func (s *MemoryFatalContext) open() error {
 	if s == nil || s.self != s {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if s.closed {
 		return arena.ErrClosed
@@ -158,7 +159,7 @@ func (s *MemoryFatalContext) ExitWhenOutOfMemory(flag bool, r *arena.BytesRegion
 }
 func (s *MemoryFatalContext) Close() error {
 	if s == nil || s.self != s {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if s.closed {
 		return nil

@@ -2,11 +2,10 @@
 package smtcore
 
 import (
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"io"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/util"
 )
 
 func TestSMTDatatypeParamsSourceConstructorAndUnsignedDisplay(t *testing.T) {
@@ -72,7 +71,7 @@ func TestSMTDatatypeParamsSourceStreamFlagsAndClosedEntry(t *testing.T) {
 	if e = p.Display(out); e == nil || p != before {
 		t.Fatal("closed entry changed const value", e, p)
 	}
-	if e = p.Display(nil); e != util.ErrNumericStreamOwner || p != before {
+	if e = p.Display(nil); e != utext.ErrNumericStreamOwner || p != before {
 		t.Fatal("invalid stream entry", e, p)
 	}
 }

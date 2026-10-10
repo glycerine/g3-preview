@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	"github.com/glycerine/g3/pkg/util/idgen"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func NewASTManager(c ASTManagerConfig) (*ASTManager, error)       { return newASTManager(c, false) }
@@ -36,7 +37,7 @@ func NewSourceASTManager(c ASTManagerConfig, filename *util.ParamsStringView) (*
 	return constructSourceASTManager(c, false, borrowed, nil)
 }
 
-func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFilename, borrowedTrace *util.NumericTextStream) (*ASTManager, error) {
+func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFilename, borrowedTrace *utext.NumericTextStream) (*ASTManager, error) {
 	if c.Symbols == nil || c.Numerals == nil || c.ProofMode > ASTProofEnabled {
 		return nil, ErrASTDomain
 	}

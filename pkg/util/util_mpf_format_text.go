@@ -2,11 +2,11 @@
 package util
 
 import (
-	"bytes"
 	"math"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 // The result and counted output snapshot have independent Go-managed text.
@@ -16,13 +16,13 @@ type ArbitraryFloatFormatText struct {
 	Numeric                  ArbitraryFloatFormatInvocation
 	Self                     *ArbitraryFloatFormatText
 	budget                   *arena.Budget
-	Result, Temporary        OwnedString
+	Result, Temporary        utext.OwnedString
 	Stream                   mpfFormatStream
 	Header                   uint64
 	closed, SourceEndedField bool
 }
 type mpfFormatStream struct {
-	*NumericTextStream
+	*utext.NumericTextStream
 	owner       *ArbitraryFloatFormatText
 	ClosedField bool
 }
@@ -33,7 +33,7 @@ type mpfFormatCString struct {
 
 func NewArbitraryFloatFormatText(b *arena.Budget) (*ArbitraryFloatFormatText, error) {
 	if b == nil {
-		return nil, ErrNumericStreamConfig
+		return nil, utext.ErrNumericStreamConfig
 	}
 	n := uint64(reflect.TypeOf(ArbitraryFloatFormatText{}).Size())
 	if e := b.Reserve(n); e != nil {
@@ -56,7 +56,7 @@ func (t *ArbitraryFloatFormatText) NumericInvocation() *ArbitraryFloatFormatInvo
 }
 func (t *ArbitraryFloatFormatText) open() error {
 	if t == nil || t.Self != t {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if t.closed || t.SourceEndedField {
 		return arena.ErrClosed
@@ -74,9 +74,9 @@ func (t *ArbitraryFloatFormatText) NewArbitraryFloatFormatStream() (ArbitraryFlo
 		return nil, e
 	}
 	if t.Stream.NumericTextStream != nil {
-		return nil, ErrNumericStreamOwner
+		return nil, utext.ErrNumericStreamOwner
 	}
-	s, e := NewNumericTextStream(NumericTextStreamConfig{Budget: t.budget})
+	s, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: t.budget})
 	if e != nil {
 		return nil, e
 	}
@@ -85,13 +85,13 @@ func (t *ArbitraryFloatFormatText) NewArbitraryFloatFormatStream() (ArbitraryFlo
 }
 func (s *mpfFormatStream) SourceFinalize() error {
 	if s == nil || s.owner == nil || s.owner.Self != s.owner || &s.owner.Stream != s {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if s.ClosedField {
 		return nil
 	}
 	if s.NumericTextStream == nil {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if e := s.NumericTextStream.Close(); e != nil {
 		return e
@@ -102,22 +102,8 @@ func (s *mpfFormatStream) SourceFinalize() error {
 func (s *mpfFormatStream) Close() error { return s.SourceFinalize() }
 
 // captureStreamTemporary copies counted output, preserving embedded NULs.
-func (t *ArbitraryFloatFormatText) captureStreamTemporary(s *NumericTextStream) error {
-	return CaptureNumericStreamOwnedString(&t.Temporary, s, t.budget)
-}
-func CaptureNumericStreamOwnedString(q *OwnedString, s *NumericTextStream, b *arena.Budget) error {
-	if q == nil {
-		return ErrOwnedStringOwner
-	}
-	if e := s.lock(); e != nil {
-		return e
-	}
-	defer s.mu.Unlock()
-	if s.fileMode || s.Buffer == nil {
-		return ErrNumericStreamFile
-	}
-	data := bytes.Clone(s.Buffer.Bytes())
-	return q.initialize(b, data)
+func (t *ArbitraryFloatFormatText) captureStreamTemporary(s *utext.NumericTextStream) error {
+	return utext.CaptureNumericStreamOwnedString(&t.Temporary, s, t.budget)
 }
 func (t *ArbitraryFloatFormatText) appendTemporary() error {
 	return t.Result.Append(t.Temporary.View())
@@ -127,7 +113,7 @@ func (t *ArbitraryFloatFormatText) AppendStreamString(stream ArbitraryFloatForma
 		return e
 	}
 	if stream != &t.Stream || t.Stream.ClosedField || t.Stream.NumericTextStream == nil {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if e := t.captureStreamTemporary(t.Stream.NumericTextStream); e != nil {
 		return e
@@ -175,7 +161,7 @@ func (v mpfFormatCString) Length() (uint64, error) {
 }
 func (t *ArbitraryFloatFormatText) SourceFinalize() error {
 	if t == nil || t.Self != t {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if t.SourceEndedField {
 		return nil
@@ -184,7 +170,7 @@ func (t *ArbitraryFloatFormatText) SourceFinalize() error {
 		return e
 	}
 	if t.Stream.NumericTextStream != nil && !t.Stream.ClosedField {
-		return ErrOwnedStringOwner
+		return utext.ErrOwnedStringOwner
 	}
 	t.Result.SourceDestroy()
 	t.SourceEndedField = true
@@ -192,7 +178,7 @@ func (t *ArbitraryFloatFormatText) SourceFinalize() error {
 }
 func (t *ArbitraryFloatFormatText) Close() error {
 	if t == nil || t.Self != t {
-		return ErrNumericStreamOwner
+		return utext.ErrNumericStreamOwner
 	}
 	if t.closed {
 		return nil

@@ -15,6 +15,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/idgen"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrASTHandle = errors.New("g3: invalid AST owner, kind or lifetime")
@@ -250,7 +251,7 @@ type ASTManager struct {
 	constructorPendingFormat                                                                           *ASTManager
 	constructorPendingFile                                                                             *astTraceFile
 	TraceFile                                                                                          *astTraceFile
-	TraceStream                                                                                        *util.NumericTextStream
+	TraceStream                                                                                        *utext.NumericTextStream
 	traceOwner                                                                                         bool
 	LowLevel                                                                                           astLowLevelFrame
 	traceExecuting                                                                                     bool

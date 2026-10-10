@@ -1,4 +1,4 @@
-package util
+package text
 
 import (
 	"os"
@@ -28,5 +28,14 @@ func (s *NumericTextStream) CheckOpen() error {
 		return e
 	}
 	s.mu.Unlock()
+	return nil
+}
+
+// CheckIdentity validates the initialized owner without requiring an open file.
+// Borrowed input ties may retain a closed output and fail only when flushed.
+func (s *NumericTextStream) CheckIdentity() error {
+	if s == nil || s.self != s {
+		return ErrNumericStreamOwner
+	}
 	return nil
 }

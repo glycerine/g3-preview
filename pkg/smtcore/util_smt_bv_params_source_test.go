@@ -14,6 +14,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction(t *testing.T) {
@@ -248,7 +249,7 @@ func TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit(t *testing.T) {
 	first := -1
 	for ordinal := int64(0); ordinal < 32; ordinal++ {
 		sb := arena.NewBudget(^uint64(0))
-		out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+		out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 		paramsMust(t, e)
 		sb.FailAfter(ordinal)
 		cause := v.Display(out)
@@ -276,7 +277,7 @@ func TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit(t *testing.T) {
 	if first < 0 {
 		t.Fatal("Go buffer output did not complete", first)
 	}
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	paramsMust(t, out.SetShowPos(true))
 	paramsMust(t, v.Display(out))
@@ -290,7 +291,7 @@ func TestSMTBVSevenDisplayChainsShowPosGoBufferAndBadbit(t *testing.T) {
 	file, e := os.CreateTemp(".", "smt-bv-display-*")
 	paramsMust(t, e)
 	defer os.Remove(file.Name())
-	out, e = util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
+	out, e = utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b, BorrowedFile: file})
 	paramsMust(t, e)
 	paramsMust(t, file.Close())
 	paramsMust(t, v.Display(out))
@@ -420,7 +421,7 @@ func TestSMTBVIncompleteSecondHelperConstructorDisplayRefusesBeforeInsertion(t *
 		paramsMust(t, e)
 	}
 	sb := arena.NewBudget(^uint64(0))
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: sb})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: sb})
 	paramsMust(t, e)
 	defer func() { sb.FailAfter(-1); paramsMust(t, out.Close()) }()
 	b.FailAfter(2)

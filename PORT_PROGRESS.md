@@ -34571,3 +34571,45 @@ g3debug+g3checked compilation exposed one tag-combination-only test import,
 which is corrected. Final combined compilation and its MPF numeric-stop test
 passed (0.031s). Memory/root util/AST/polynomial/SAT vet, manifest and diff checks
 passed. No full native module rerun within the hourly interval.
+
+## Extract util/text and remove numeral/parameter back-edge
+
+Moved the Go-managed OwnedString/builders, numeric text streams, file formatting
+and concrete counted snapshot into util/text (nine production files, seven
+implementation test/helper files). The package imports stdlib and arena only.
+Actual numeral invocation state and its source integer reservation campaign
+remain at the numeral consumer; its mixed test was split without dropping checks.
+Root integration tests retain a local file-stream fixture using the public owner.
+
+CaptureNumericStreamOwnedString now resides with its actual stream/string
+storage. Debug command setup uses existing CheckOpen instead of private locks.
+Character input ties use CheckIdentity, preserving the original identity-only
+binding: a closed output can be bound, and the reached flush refuses before
+file/destination access. A new native/debug regression verifies that order and
+that an invalid tie cannot replace the prior owner. Allocator diagnostics retain
+present/origin guards and use a concrete AppendCStringRegion method for the
+same strlen/read/padding/width sequence; no callback adapter or STL port is added.
+
+Compiler-resolved audits include native, g3debug and combined g3debug+g3checked
+profiles. Direct callers import util/text without root forwarding aliases.
+External OwnedStringView literals now name fields; vet catches newly external
+positional literals. Manifest tracks actual implementation plus concrete caller
+files for tests that span those packages, without weakening evidence checks.
+Counts remain2102 units/677 APIs:62 ported,281 partial,1731 unported,two dead/deleted.
+
+Updated graph: root util has259 production files and34 dependency components.
+Private-access grouping yields a200-file numeral group and45-file parameter/
+diagnostic group, with zero numeral-to-parameter edges and16 reverse edges.
+This removes the previous255-file cyclic grouping. Reports:
+/mnt/oldrog/tmp/g3-util-package-dependencies.json,
+/mnt/oldrog/tmp/g3-util-private-boundaries.json and
+/mnt/oldrog/tmp/g3-util-text-separated-groups.json. The numeral group can now
+be extracted with its build profiles/tests; full root splitting remains open.
+
+Validation: final native text and broad root format/stream/ownership/diagnostic
+checks passed (0.019s/1.601s); matching g3debug root checks passed (1.712s).
+Full native AST/rewriter/polynomial/SMT core/SAT/tactic/API passed
+(19.461s/10.607s/30.769s/0.221s/0.535s/0.027s/0.011s). Final full g3debug
+AST/text passed (20.838s/0.028s). Combined g3debug+g3checked module compilation,
+text/root util/AST/polynomial/SMT core vet, manifest and diff checks passed.
+No full native module rerun within the hourly interval.

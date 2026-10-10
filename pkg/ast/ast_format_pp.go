@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type astFormatPPPair struct {
@@ -252,7 +253,7 @@ func (m *ASTManager) releasePPFrames() error {
 	return nil
 }
 
-func (m *ASTManager) PrintFormat(out *util.NumericTextStream, h ASTHandle, c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService) (result error) {
+func (m *ASTManager) PrintFormat(out *utext.NumericTextStream, h ASTHandle, c *util.ParamsContext, p *util.ParamsRef, g *util.GlobalParamsService) (result error) {
 	f, e := m.lockFormat()
 	if e != nil {
 		return e

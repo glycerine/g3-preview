@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 var ErrDebugNotificationBinding = errors.New("g3: assertion notification streams are unbound")
@@ -35,7 +36,7 @@ type debugNotificationText struct {
 	borrowed bool
 }
 
-func (t debugNotificationText) insert(out *NumericTextStream) error {
+func (t debugNotificationText) insert(out *utext.NumericTextStream) error {
 	if t.borrowed {
 		return smallObjectCStringInto(out, t.region, t.pointer)
 	}

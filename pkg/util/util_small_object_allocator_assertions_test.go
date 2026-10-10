@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSmallObjectAllocatorActualAssertionSwitchForeignDirect(t *testing.T) {
@@ -132,7 +133,7 @@ func TestSmallObjectAllocatorClosedAssertionOwnerDirectFreePrefix(t *testing.T) 
 	sourceSmallObjectMust(t, a.Close())
 }
 
-func smallObjectAssertionPhysical(t *testing.T, rt *umemory.Runtime, b *arena.Budget, region *arena.BytesRegion, out *NumericTextStream, debug *DebugContext, owners ...*utilSmallObjectAllocator) {
+func smallObjectAssertionPhysical(t *testing.T, rt *umemory.Runtime, b *arena.Budget, region *arena.BytesRegion, out *utext.NumericTextStream, debug *DebugContext, owners ...*utilSmallObjectAllocator) {
 	t.Helper()
 	rs := region.Stats()
 	ds := rs.Descriptors

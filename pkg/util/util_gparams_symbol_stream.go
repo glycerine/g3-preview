@@ -1,9 +1,12 @@
 // Source: src/util/symbol.h:97-110; src/smt/params/smt_params.cpp:138.
 package util
 
-import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+import (
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
-func (g *GlobalParamsService) AppendSymbolTo(out *NumericTextStream, s usymbol.Symbol) error {
+func (g *GlobalParamsService) AppendSymbolTo(out *utext.NumericTextStream, s usymbol.Symbol) error {
 	enabled, e := g.NamespaceAssertionsEnabled()
 	if e != nil {
 		return e

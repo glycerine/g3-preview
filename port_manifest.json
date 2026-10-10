@@ -112018,13 +112018,14 @@
         "pkg/util/util_debug_notification_source_test.go",
         "pkg/util/util_numeric_char_input.go",
         "pkg/util/util_numeric_char_input_source_test.go",
-        "pkg/util/util_numeric_stream_flush.go",
+        "pkg/util/text/util_numeric_stream_flush.go",
         "pkg/util/util_debug_actions.go",
         "pkg/util/util_debug_actions_host_linux.go",
         "pkg/util/util_debug_actions_host_other.go",
         "pkg/util/util_debug_actions_source_test.go",
         "pkg/util/util_debug_action_binding.go",
-        "pkg/util/util_gparams_service_ops.go"
+        "pkg/util/util_gparams_service_ops.go",
+        "pkg/util/numeric_char_input_tie_boundary_test.go"
       ],
       "tests": [
         "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
@@ -112048,7 +112049,8 @@
         "TestDebugActionConstructorEveryReservationAndBorrowedClose",
         "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
         "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
-        "TestDebugActionPromptBeforeClosedTieRead"
+        "TestDebugActionPromptBeforeClosedTieRead",
+        "TestNumericCharInputClosedTieFailsAtReachedFlush"
       ],
       "conditionals": [
         {
@@ -112186,7 +112188,8 @@
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
         "Explicit caller service namespace accounts real Runtime storage; native process-global provider identity and all core class assertion/statistics/ABI profiles remain partial. A live legacy tag table cannot silently migrate to Runtime storage. Ordinary provider and byte-region roots remain borrowed.",
-        "Cold binding Budget/self validation is a Go configuration contract separate from erased source macro payload reads. A closed provider after valid preparation remains unread in release or at a source early return; DEBUG reaches its actual flag lifetime guard. The source check_invariant function exists only in Z3DEBUG; release CheckInvariantChecked retains the explicitly inventoried inspection adapter. GNU release UNREACHABLE is guarded with a class-local typed error before provider reads, not native undefined execution. Non-power-of-two constructor C/release continuation allocates actual entries and uses literal end/begin probe traversal; invalid/malformed source count fixtures are explicit guard domains, not ordinary source math failures. Other pointer-entry specializations, HASHTABLE_STATISTICS, native ostream/ABI/global provider profiles and legacy class assertion dispatch remain open."
+        "Cold binding Budget/self validation is a Go configuration contract separate from erased source macro payload reads. A closed provider after valid preparation remains unread in release or at a source early return; DEBUG reaches its actual flag lifetime guard. The source check_invariant function exists only in Z3DEBUG; release CheckInvariantChecked retains the explicitly inventoried inspection adapter. GNU release UNREACHABLE is guarded with a class-local typed error before provider reads, not native undefined execution. Non-power-of-two constructor C/release continuation allocates actual entries and uses literal end/begin probe traversal; invalid/malformed source count fixtures are explicit guard domains, not ordinary source math failures. Other pointer-entry specializations, HASHTABLE_STATISTICS, native ostream/ABI/global provider profiles and legacy class assertion dispatch remain open.",
+        "Go-managed OwnedString/builders, numeric text streams and concrete counted snapshots now live in util/text, independent of root util/numerals/parameters. Retained callers import the actual text owner directly. Cross-package private stream access is replaced by existing CheckOpen, an identity-only tie check preserving closed-tie construction, and concrete arena-region C-string field insertion; source guard/read/width/error order remains. Formatter snapshot capture belongs with its text storage, while actual numeral invocation and source integer fault campaigns stay at their numeric consumer. No STL implementation or generic adapter credit is added."
       ]
     },
     {
@@ -112205,7 +112208,7 @@
         "pkg/util/util_debug_notification_source_test.go",
         "pkg/util/util_numeric_char_input.go",
         "pkg/util/util_numeric_char_input_source_test.go",
-        "pkg/util/util_numeric_stream_flush.go",
+        "pkg/util/text/util_numeric_stream_flush.go",
         "pkg/util/util_debug_actions.go",
         "pkg/util/util_debug_actions_host_linux.go",
         "pkg/util/util_debug_actions_host_other.go",
@@ -123168,9 +123171,9 @@
         "pkg/util/memory/runtime_size_t_entry_test.go",
         "pkg/util/util_memory_fatal_policy.go",
         "pkg/util/util_memory_fatal_policy_test.go",
-        "pkg/util/util_numeric_stream_file.go",
-        "pkg/util/util_numeric_stream_file_test.go",
-        "pkg/util/util_numeric_stream.go",
+        "pkg/util/text/util_numeric_stream_file.go",
+        "pkg/util/text/util_numeric_stream_file_test.go",
+        "pkg/util/text/util_numeric_stream.go",
         "pkg/util/memory/runtime_initialization_oom.go"
       ],
       "tests": [
@@ -123400,12 +123403,15 @@
         {
           "name": "cpp55-72 standard ostream prerequisite: concrete borrowed os.File provider, default nonthrowing badbit, selected existing C-locale formatting, reflected cold header/embedded emission byte without unused StringBuffer",
           "status": "partial",
-          "go_target": "pkg/util/util_numeric_stream_file.go",
+          "go_target": "pkg/util/text/util_numeric_stream_file.go",
           "tests": [
             "TestNumericFileStreamExactFormattingAndBorrow",
             "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
             "TestNumericFileStreamEveryColdReservation",
             "TestMemoryFatalRealExitWithActiveReservationRefusal"
+          ],
+          "go_targets": [
+            "pkg/util/util_memory_fatal_policy.go"
           ]
         },
         {
@@ -123466,7 +123472,8 @@
         "Legacy symbol/tag/prime/Params storage lacks actual source-global Runtime backing; no accounting tickets or inferred Budget malloc events.",
         "_TRACE file path/PROFILE_MEMORY/global ostream and full registered test driver remain open.",
         "Caller-confined assertion binding does not complete process-global macros, debugger notification, TRACE, or native ostream/ABI. Null-imp and closed-context cases are explicitly checked diagnostic domains.",
-        "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps."
+        "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps.",
+        "Go-managed OwnedString/builders, numeric text streams and concrete counted snapshots now live in util/text, independent of root util/numerals/parameters. Retained callers import the actual text owner directly. Cross-package private stream access is replaced by existing CheckOpen, an identity-only tie check preserving closed-tie construction, and concrete arena-region C-string field insertion; source guard/read/width/error order remains. Formatter snapshot capture belongs with its text storage, while actual numeral invocation and source integer fault campaigns stay at their numeric consumer. No STL implementation or generic adapter credit is added."
       ]
     },
     {
@@ -123487,9 +123494,9 @@
         "pkg/util/memory/runtime_size_t_entry_test.go",
         "pkg/util/util_memory_fatal_policy.go",
         "pkg/util/util_memory_fatal_policy_test.go",
-        "pkg/util/util_numeric_stream_file.go",
-        "pkg/util/util_numeric_stream_file_test.go",
-        "pkg/util/util_numeric_stream.go",
+        "pkg/util/text/util_numeric_stream_file.go",
+        "pkg/util/text/util_numeric_stream_file_test.go",
+        "pkg/util/text/util_numeric_stream.go",
         "pkg/util/memory/runtime_initialization_oom.go"
       ],
       "tests": [
@@ -123685,12 +123692,15 @@
         {
           "name": "cpp55-72 standard ostream prerequisite: concrete borrowed os.File provider, default nonthrowing badbit, selected existing C-locale formatting, reflected cold header/embedded emission byte without unused StringBuffer",
           "status": "partial",
-          "go_target": "pkg/util/util_numeric_stream_file.go",
+          "go_target": "pkg/util/text/util_numeric_stream_file.go",
           "tests": [
             "TestNumericFileStreamExactFormattingAndBorrow",
             "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
             "TestNumericFileStreamEveryColdReservation",
             "TestMemoryFatalRealExitWithActiveReservationRefusal"
+          ],
+          "go_targets": [
+            "pkg/util/util_memory_fatal_policy.go"
           ]
         },
         {
@@ -124900,14 +124910,14 @@
         "pkg/util/mpf_decimal_stream_failure_test.go",
         "pkg/util/mpf_decimal_stream_callback_test.go",
         "pkg/util/mpf_decimal_stream_source_stop_test.go",
-        "pkg/util/owned_string.go",
-        "pkg/util/owned_string_repeat_test.go",
+        "pkg/util/text/owned_string.go",
+        "pkg/util/text/owned_string_repeat_test.go",
         "pkg/util/mpf_binary_string.go",
         "pkg/util/mpf_binary_string_test.go",
         "pkg/util/mpf_binary_string_failure_test.go",
         "pkg/util/mpf_binary_string_callback_test.go",
         "pkg/util/mpf_binary_string_source_stop_test.go",
-        "pkg/util/owned_string_transfer_test.go",
+        "pkg/util/text/owned_string_transfer_test.go",
         "pkg/util/mpf_hexfloat_components.go",
         "pkg/util/mpf_hexfloat_components_test.go",
         "pkg/util/mpf_hexfloat_components_failure_test.go",
@@ -124917,7 +124927,8 @@
         "pkg/util/mpf_signed_fraction_test.go",
         "pkg/util/mpf_signed_fraction_callback_test.go",
         "pkg/util/mpf_signed_fraction_source_stop_test.go",
-        "pkg/util/mpq_signed_fraction_source.go"
+        "pkg/util/mpq_signed_fraction_source.go",
+        "pkg/util/text/owned_string_capture.go"
       ],
       "tests": [
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -125995,6 +126006,9 @@
             "TestOwnedStringReserveAndMoveAssignment",
             "TestOwnedStringCStringConcat",
             "TestOwnedStringTransferAuthorityAndBounds"
+          ],
+          "go_targets": [
+            "pkg/util/text/owned_string.go"
           ]
         },
         {
@@ -126116,7 +126130,8 @@
         "Go text migration supersedes earlier selected-STL storage claims: OwnedString is now a checked Go-managed byte-slice adapter. No inline15 storage, geometric-capacity policy, pending replacement allocation or string allocator failure emulation remains. Copy, append, reserve, move and repeated text use Go storage and standard libraries; numeric-arena graphs exclude this Go-managed memory. Every text replacement invalidates its checked views; copy results are independent, C-string interfaces provide a virtual terminator, and failed borrowed reads leave existing text intact. Revised allocation campaigns test actual project numeric/header/helper allocations rather than STL internals. Original project algorithms and numeric ownership remain porting targets; C++ standard-library behavior is not an outstanding fidelity requirement.",
         "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
         "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
-        "Native numerical text construction, assignment, CString append and prefix concatenation now take Go strings directly rather than ParamsStringView. Invalid numeric text owners/destinations use ErrOwnedStringOwner independently of parameter types. Existing checked numerical result/borrow lifetimes, first-NUL input semantics, counted output copies and actual numeric cleanup remain. This removes numeric-to-parameter dependencies without STL implementation or whole-unit credit."
+        "Native numerical text construction, assignment, CString append and prefix concatenation now take Go strings directly rather than ParamsStringView. Invalid numeric text owners/destinations use ErrOwnedStringOwner independently of parameter types. Existing checked numerical result/borrow lifetimes, first-NUL input semantics, counted output copies and actual numeric cleanup remain. This removes numeric-to-parameter dependencies without STL implementation or whole-unit credit.",
+        "Go-managed OwnedString/builders, numeric text streams and concrete counted snapshots now live in util/text, independent of root util/numerals/parameters. Retained callers import the actual text owner directly. Cross-package private stream access is replaced by existing CheckOpen, an identity-only tie check preserving closed-tie construction, and concrete arena-region C-string field insertion; source guard/read/width/error order remains. Formatter snapshot capture belongs with its text storage, while actual numeral invocation and source integer fault campaigns stay at their numeric consumer. No STL implementation or generic adapter credit is added."
       ]
     },
     {
@@ -126271,8 +126286,8 @@
         "pkg/util/mpf_binary_string_failure_test.go",
         "pkg/util/mpf_binary_string_callback_test.go",
         "pkg/util/mpf_binary_string_source_stop_test.go",
-        "pkg/util/owned_string.go",
-        "pkg/util/owned_string_transfer_test.go",
+        "pkg/util/text/owned_string.go",
+        "pkg/util/text/owned_string_transfer_test.go",
         "pkg/util/mpf_hexfloat_components.go",
         "pkg/util/mpf_hexfloat_components_test.go",
         "pkg/util/mpf_hexfloat_components_failure_test.go",
@@ -126891,6 +126906,9 @@
             "TestOwnedStringReserveAndMoveAssignment",
             "TestOwnedStringCStringConcat",
             "TestOwnedStringTransferAuthorityAndBounds"
+          ],
+          "go_targets": [
+            "pkg/util/text/owned_string.go"
           ]
         },
         {
@@ -128225,7 +128243,7 @@
         "pkg/util/mpn_source_verify.go",
         "pkg/util/mpzzp_normalize_allocation_receipt.go",
         "pkg/util/integer_divides_numeral_source_test.go",
-        "pkg/util/util_numeric_rational_source.go",
+        "pkg/util/text/util_numeric_rational_source.go",
         "pkg/util/rational_source_stream.go",
         "pkg/util/numeral_insertion_receipt.go",
         "pkg/ast/ast_low_level_printer_source_test.go",
@@ -128805,12 +128823,13 @@
         {
           "name": "Reached numeral ostream chain and lexical source stop transport (src/util/mpn.cpp:371-399)",
           "status": "partial",
-          "go_target": "pkg/util/util_numeric_rational_source.go",
+          "go_target": "pkg/util/text/util_numeric_rational_source.go",
           "tests": [
             "TestNumericRationalSourceInsertionPreservesActualFieldChains"
           ],
           "go_targets": [
-            "pkg/ast/ast_low_level_printer_source_test.go"
+            "pkg/ast/ast_low_level_printer_source_test.go",
+            "pkg/util/rational_source_stream.go"
           ]
         },
         {
@@ -129329,7 +129348,7 @@
         "pkg/util/mp_display_scope_test.go",
         "pkg/util/mpq_raw_arithmetic_scope.go",
         "pkg/util/mpq_raw_arithmetic_scope_test.go",
-        "pkg/util/util_numeric_rational_source.go",
+        "pkg/util/text/util_numeric_rational_source.go",
         "pkg/util/rational_source_stream.go",
         "pkg/util/mp_integer_output_scope.go",
         "pkg/util/numeral_insertion_receipt.go",
@@ -130060,12 +130079,13 @@
         {
           "name": "Reached numeral ostream chain and lexical source stop transport (src/util/mpq.cpp:130-141)",
           "status": "partial",
-          "go_target": "pkg/util/util_numeric_rational_source.go",
+          "go_target": "pkg/util/text/util_numeric_rational_source.go",
           "tests": [
             "TestNumericRationalSourceInsertionPreservesActualFieldChains"
           ],
           "go_targets": [
-            "pkg/ast/ast_low_level_printer_source_test.go"
+            "pkg/ast/ast_low_level_printer_source_test.go",
+            "pkg/util/rational_source_stream.go"
           ]
         },
         {
@@ -131792,10 +131812,10 @@
       "go_targets": [
         "pkg/util/mpq_inf.go",
         "pkg/util/mpq_inf_test.go",
-        "pkg/util/owned_string.go",
-        "pkg/util/owned_string_append_test.go",
-        "pkg/util/owned_string_stream.go",
-        "pkg/util/owned_string_stream_test.go"
+        "pkg/util/text/owned_string.go",
+        "pkg/util/text/owned_string_append_test.go",
+        "pkg/util/text/owned_string_stream.go",
+        "pkg/util/text/owned_string_stream_test.go"
       ],
       "tests": [
         "TestMPQInfOwnedFormattingSignsFractionsAndLifetime",
@@ -131842,10 +131862,10 @@
       "go_targets": [
         "pkg/util/mpq_inf.go",
         "pkg/util/mpq_inf_test.go",
-        "pkg/util/owned_string.go",
-        "pkg/util/owned_string_append_test.go",
-        "pkg/util/owned_string_stream.go",
-        "pkg/util/owned_string_stream_test.go"
+        "pkg/util/text/owned_string.go",
+        "pkg/util/text/owned_string_append_test.go",
+        "pkg/util/text/owned_string_stream.go",
+        "pkg/util/text/owned_string_stream_test.go"
       ],
       "tests": [
         "TestMPQInfSourceFloorQuirkAndEpsilonApproximation",
@@ -131988,7 +132008,7 @@
         "pkg/util/integer_divides_numeral_invocation.go",
         "pkg/util/integer_divides_numeral_source_test.go",
         "pkg/util/integer_divides_numeral_callback_source_test.go",
-        "pkg/util/util_numeric_rational_source.go",
+        "pkg/util/text/util_numeric_rational_source.go",
         "pkg/util/rational_source_stream.go",
         "pkg/util/numeral_insertion_receipt.go",
         "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go",
@@ -132011,8 +132031,8 @@
         "pkg/util/mpz_string_set_scope.go",
         "pkg/util/mpz_string_set_source_test.go",
         "pkg/util/mpz_string_set_callback_test.go",
-        "pkg/util/owned_string_stream.go",
-        "pkg/util/owned_string_stream_test.go"
+        "pkg/util/text/owned_string_stream.go",
+        "pkg/util/text/owned_string_stream_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -134203,12 +134223,13 @@
         {
           "name": "Reached numeral ostream chain and lexical source stop transport (src/util/mpz.cpp:1385-1410)",
           "status": "partial",
-          "go_target": "pkg/util/util_numeric_rational_source.go",
+          "go_target": "pkg/util/text/util_numeric_rational_source.go",
           "tests": [
             "TestNumericRationalSourceInsertionPreservesActualFieldChains"
           ],
           "go_targets": [
-            "pkg/ast/ast_low_level_printer_source_test.go"
+            "pkg/ast/ast_low_level_printer_source_test.go",
+            "pkg/util/rational_source_stream.go"
           ]
         },
         {
@@ -134377,7 +134398,8 @@
         "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit.",
         "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
         "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
-        "Native numeral output migration: RationalSourceStream accepts string text. The numerical producer validates its completed character invocation and copies first-NUL text before calling output. The checked numeral view is private to util; callback strings survive source cleanup and nested display. Actual character-scope cleanup, insertion receipts and source destructor failures remain. This supersedes output-facing borrowed-view claims; it adds no STL or generic template implementation credit."
+        "Native numeral output migration: RationalSourceStream accepts string text. The numerical producer validates its completed character invocation and copies first-NUL text before calling output. The checked numeral view is private to util; callback strings survive source cleanup and nested display. Actual character-scope cleanup, insertion receipts and source destructor failures remain. This supersedes output-facing borrowed-view claims; it adds no STL or generic template implementation credit.",
+        "Go-managed OwnedString/builders, numeric text streams and concrete counted snapshots now live in util/text, independent of root util/numerals/parameters. Retained callers import the actual text owner directly. Cross-package private stream access is replaced by existing CheckOpen, an identity-only tie check preserving closed-tie construction, and concrete arena-region C-string field insertion; source guard/read/width/error order remains. Formatter snapshot capture belongs with its text storage, while actual numeral invocation and source integer fault campaigns stay at their numeric consumer. No STL implementation or generic adapter credit is added."
       ]
     },
     {
@@ -134457,8 +134479,8 @@
         "pkg/util/mpz_string_set_scope.go",
         "pkg/util/mpz_string_set_source_test.go",
         "pkg/util/mpz_string_set_callback_test.go",
-        "pkg/util/owned_string_stream.go",
-        "pkg/util/owned_string_stream_test.go"
+        "pkg/util/text/owned_string_stream.go",
+        "pkg/util/text/owned_string_stream_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -138280,7 +138302,8 @@
         "Existing string getter APIs retain nullable and borrowed-view behavior. Native strings expose a virtual NUL terminator; distinct owned string lifetimes invalidate views on replacement/reset/close, while borrowed symbols keep their provider lifetime. Native pointer ABI and standalone whole Params exceptional lifetime families remain open. Getter and view tests are independent, no registered driver credit.",
         "This same-engine factoring adds no whole param_descrs lifecycle or source native ABI/registered-driver credit.",
         "Parameter-descriptor and global-parameter output APIs now accept bytes.Buffer directly, including namespace and SMT context callers. Removed custom buffer construction, closed-owner state and cleanup from this chain. Native strings and byte writes preserve source normalization, insertion order, sorted descriptor names, debug diagnostics and actual borrowed-description failure prefixes. Nil destinations use the enclosing project error domain; no STL port or new whole-unit credit is claimed.",
-        "ParamsStringView.String provides checked native text to retained SMT context/QI consumers. Its literal fast path and borrowed byte loop moved from the numeric text constructor to the parameter layer; no universal callback adapter or new C++ method completion credit is added."
+        "ParamsStringView.String provides checked native text to retained SMT context/QI consumers. Its literal fast path and borrowed byte loop moved from the numeric text constructor to the parameter layer; no universal callback adapter or new C++ method completion credit is added.",
+        "Go-managed OwnedString/builders, numeric text streams and concrete counted snapshots now live in util/text, independent of root util/numerals/parameters. Retained callers import the actual text owner directly. Cross-package private stream access is replaced by existing CheckOpen, an identity-only tie check preserving closed-tie construction, and concrete arena-region C-string field insertion; source guard/read/width/error order remains. Formatter snapshot capture belongs with its text storage, while actual numeral invocation and source integer fault campaigns stay at their numeric consumer. No STL implementation or generic adapter credit is added."
       ]
     },
     {
@@ -139563,7 +139586,7 @@
         "pkg/util/rational_service_global_binding_test.go",
         "pkg/util/util_rational_global_service.go",
         "pkg/util/util_rational_global_service_test.go",
-        "pkg/util/util_numeric_rational_source.go",
+        "pkg/util/text/util_numeric_rational_source.go",
         "pkg/util/rational_service_invocation.go",
         "pkg/util/rational_service_invocation_source_test.go",
         "pkg/util/rational_service_integer_source_test.go",
@@ -139786,12 +139809,13 @@
         {
           "name": "Same-service source insertion borrow/callback exclusion (src/util/rational.cpp:64-83; src/util/mpq.cpp:130-141)",
           "status": "partial",
-          "go_target": "pkg/util/util_numeric_rational_source.go",
+          "go_target": "pkg/util/text/util_numeric_rational_source.go",
           "tests": [
             "TestNumericRationalSourceInsertionPreservesActualFieldChains"
           ],
           "go_targets": [
-            "pkg/ast/ast_low_level_printer_source_test.go"
+            "pkg/ast/ast_low_level_printer_source_test.go",
+            "pkg/util/rational_source_stream.go"
           ]
         },
         {
@@ -143670,8 +143694,8 @@
         "pkg/util/util_small_object_allocator_assertions_test.go",
         "pkg/util/util_verbose_context.go",
         "pkg/util/util_verbose_context_test.go",
-        "pkg/util/util_numeric_stream_file.go",
-        "pkg/util/util_numeric_stream_file_test.go",
+        "pkg/util/text/util_numeric_stream_file.go",
+        "pkg/util/text/util_numeric_stream_file_test.go",
         "pkg/util/util_memory_fatal_policy_test.go",
         "pkg/util/memory/small_allocator_allocation_outcome.go",
         "pkg/util/memory/small_allocator_allocation_outcome_test.go",
@@ -143680,7 +143704,8 @@
         "pkg/math/polynomial/polynomial_monomial_factory.go",
         "pkg/math/polynomial/polynomial_monomial_allocator_invocation.go",
         "pkg/math/polynomial/polynomial_monomial_allocator_leaf_source_test.go",
-        "pkg/math/polynomial/polynomial_derivative.go"
+        "pkg/math/polynomial/polynomial_derivative.go",
+        "pkg/util/text/util_numeric_stream_region.go"
       ],
       "tests": [
         "TestSmallBytesSourceExercise",
@@ -144065,6 +144090,9 @@
             "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
             "TestNumericFileStreamEveryColdReservation",
             "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry"
+          ],
+          "go_targets": [
+            "pkg/util/text/util_numeric_stream.go"
           ]
         },
         {
@@ -144112,7 +144140,8 @@
         "File-backed diagnostics use explicit borrowed os.File service; default write failure is nonthrowing badbit. Native stream buffering/locale/exception masks/global stderr initialization remain separate.",
         "Finite-field and discriminant callers retain independent algorithm and cleanup obligations outside this allocator source unit.",
         "Monomial callers retain independent algorithm obligations outside this allocator source unit.",
-        "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps."
+        "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps.",
+        "Go-managed OwnedString/builders, numeric text streams and concrete counted snapshots now live in util/text, independent of root util/numerals/parameters. Retained callers import the actual text owner directly. Cross-package private stream access is replaced by existing CheckOpen, an identity-only tie check preserving closed-tie construction, and concrete arena-region C-string field insertion; source guard/read/width/error order remains. Formatter snapshot capture belongs with its text storage, while actual numeral invocation and source integer fault campaigns stay at their numeric consumer. No STL implementation or generic adapter credit is added."
       ]
     },
     {
@@ -144142,8 +144171,8 @@
         "pkg/util/util_small_object_allocator_assertions_test.go",
         "pkg/util/util_verbose_context.go",
         "pkg/util/util_verbose_context_test.go",
-        "pkg/util/util_numeric_stream_file.go",
-        "pkg/util/util_numeric_stream_file_test.go",
+        "pkg/util/text/util_numeric_stream_file.go",
+        "pkg/util/text/util_numeric_stream_file_test.go",
         "pkg/util/util_memory_fatal_policy_test.go",
         "pkg/util/memory/small_allocator_allocation_outcome.go",
         "pkg/util/memory/small_allocator_guarded_start_source_test.go",
@@ -144454,6 +144483,9 @@
             "TestNumericFileStreamActualWriteFailureSetsNonthrowingBadbit",
             "TestNumericFileStreamEveryColdReservation",
             "TestMemoryFatalBorrowedPointerRetentionAndReachedSentry"
+          ],
+          "go_targets": [
+            "pkg/util/text/util_numeric_stream.go"
           ]
         },
         {

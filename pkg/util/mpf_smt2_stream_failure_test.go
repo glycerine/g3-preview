@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestArbitraryFloatSMT2StreamEveryColdReservation(t *testing.T) {
@@ -20,7 +21,7 @@ func TestArbitraryFloatSMT2StreamEveryColdReservation(t *testing.T) {
 				serviceMust(t, m.integer.Mul2kInPlace(&x.significand, sb-1))
 				serviceMust(t, m.integer.Dec(&x.significand))
 				before := x
-				var out OwnedStringStream
+				var out utext.OwnedStringStream
 				serviceMust(t, out.Construct(b))
 				b.FailAfter(ordinal)
 				body := m.DisplaySMT2Into(&out, &x, true)
@@ -35,7 +36,7 @@ func TestArbitraryFloatSMT2StreamEveryColdReservation(t *testing.T) {
 				}
 				if body != nil {
 					reachedFormatFailure = reachedFormatFailure || s.format != 0
-					var later OwnedStringStream
+					var later utext.OwnedStringStream
 					serviceMust(t, later.Construct(b))
 					if e := m.DisplaySMT2Into(&later, &x, true); !errors.Is(e, ErrNumericPending) {
 						t.Fatal("stopped wrapper replay", e)
@@ -99,7 +100,7 @@ func TestArbitraryFloatSMT2StreamRefusedChildKeepsOlderInvocation(t *testing.T) 
 		if matched {
 			reached = true
 			invocation, numeric, transferred, a, n, d, used := c.invocation, c.numeric, c.transferred, c.a, c.n, c.d, b.Used()
-			var out OwnedStringStream
+			var out utext.OwnedStringStream
 			serviceMust(t, out.Construct(b))
 			if e := m.DisplaySMT2Into(&out, &x, true); !errors.Is(e, ErrNumericPending) {
 				t.Fatal("older child refusal", e)
@@ -151,13 +152,13 @@ func TestArbitraryFloatSMT2StreamRefusedFormatterKeepsOlderCopy(t *testing.T) {
 		serviceMust(t, e)
 		var x ArbitraryFloat
 		serviceMust(t, m.SetDouble(&x, 8, 24, 1.5))
-		var warm OwnedStringStream
+		var warm utext.OwnedStringStream
 		serviceMust(t, warm.Construct(b))
 		serviceMust(t, m.DisplaySMT2Into(&warm, &x, false))
 		warm.Buffer.OwnAbort()
 		a := Rational{Num: NewInt(-1), Den: NewInt(3)}
 		serviceMust(t, m.integer.Mul2kInPlace(&a.Num, 4000))
-		var older OwnedStringStream
+		var older utext.OwnedStringStream
 		serviceMust(t, older.Construct(b))
 		b.FailAfter(ordinal)
 		body := m.rational.DisplaySMT2Into(&older, &a, false)
@@ -166,7 +167,7 @@ func TestArbitraryFloatSMT2StreamRefusedFormatterKeepsOlderCopy(t *testing.T) {
 		if matched {
 			reached = true
 			oldFormat, oldCopy, roots, tmp, used := m.rational.smt2Stream.invocation, m.integer.smt2Stream.invocation, m.integer.CopyAllocation.Roots, m.integer.smt2Stream.tmp, b.Used()
-			var out OwnedStringStream
+			var out utext.OwnedStringStream
 			serviceMust(t, out.Construct(b))
 			if e := m.DisplaySMT2Into(&out, &x, false); !errors.Is(e, ErrNumericPending) {
 				t.Fatal("older formatter refusal", e)

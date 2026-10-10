@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"testing"
 )
 
@@ -51,7 +52,7 @@ func TestArbitraryFloatBinaryStringTemporarySourceStop(t *testing.T) {
 	serviceMust(t, e)
 	serviceMust(t, r.SetMaxSize(1))
 	armed = true
-	var out OwnedString
+	var out utext.OwnedString
 	body := m.ToStringBinary(&x, 0, 0, &out)
 	armed = false
 	s := &m.binaryString

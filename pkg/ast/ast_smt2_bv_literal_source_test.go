@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -27,7 +28,7 @@ func TestASTSMT2BitVectorLiteralRadixAndSignedOracle(t *testing.T) {
 	paramsMust(t, e)
 	_, e = m.RegisterBitVectorPlugin()
 	paramsMust(t, e)
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	paramsMust(t, e)
 	defer func() { paramsMust(t, out.Close()) }()
 	value, e := c.NumeralsField.NewValue()
@@ -177,7 +178,7 @@ func TestASTSMT2BitVectorLiteralEveryReachedReservation(t *testing.T) {
 				}
 				b.FailAfter(-1)
 				if body == nil {
-					out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+					out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 					paramsMust(t, e)
 					paramsMust(t, m.PrintFormat(out, format, c, p, g))
 					got, e := out.String()

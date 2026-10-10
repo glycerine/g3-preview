@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestArbitraryFloatDecimalStreamEveryColdReservation(t *testing.T) {
@@ -20,7 +21,7 @@ func TestArbitraryFloatDecimalStreamEveryColdReservation(t *testing.T) {
 				serviceMust(t, m.integer.Mul2kInPlace(&x.significand, sb-1))
 				serviceMust(t, m.integer.Dec(&x.significand))
 				before := x
-				var out OwnedStringStream
+				var out utext.OwnedStringStream
 				serviceMust(t, out.Construct(b))
 				b.FailAfter(ordinal)
 				body := m.DisplayDecimalInto(&out, &x, 12)
@@ -35,7 +36,7 @@ func TestArbitraryFloatDecimalStreamEveryColdReservation(t *testing.T) {
 				}
 				if body != nil {
 					reachedFormatFailure = reachedFormatFailure || s.format != 0
-					var later OwnedStringStream
+					var later utext.OwnedStringStream
 					serviceMust(t, later.Construct(b))
 					if e := m.DisplayDecimalInto(&later, &x, 12); !errors.Is(e, ErrNumericPending) {
 						t.Fatal("stopped wrapper replay", e)
@@ -99,7 +100,7 @@ func TestArbitraryFloatDecimalStreamRefusedChildKeepsOlderInvocation(t *testing.
 		if matched {
 			reached = true
 			invocation, numeric, transferred, a, n, d, used := c.invocation, c.numeric, c.transferred, c.a, c.n, c.d, b.Used()
-			var out OwnedStringStream
+			var out utext.OwnedStringStream
 			serviceMust(t, out.Construct(b))
 			if e := m.DisplayDecimalInto(&out, &x, 12); !errors.Is(e, ErrNumericPending) {
 				t.Fatal("older child refusal", e)
@@ -151,13 +152,13 @@ func TestArbitraryFloatDecimalStreamRefusedFormatterKeepsOlderAllocation(t *test
 		serviceMust(t, e)
 		var x ArbitraryFloat
 		serviceMust(t, m.SetDouble(&x, 8, 24, 1.5))
-		var warm OwnedStringStream
+		var warm utext.OwnedStringStream
 		serviceMust(t, warm.Construct(b))
 		serviceMust(t, m.DisplayDecimalInto(&warm, &x, 10))
 		warm.Buffer.OwnAbort()
 		a := Rational{Num: NewInt(-1), Den: NewInt(3)}
 		serviceMust(t, m.integer.Mul2kInPlace(&a.Num, 4000))
-		var older OwnedStringStream
+		var older utext.OwnedStringStream
 		serviceMust(t, older.Construct(b))
 		b.FailAfter(ordinal)
 		body := m.rational.DisplayDecimalInto(&older, &a, 10, false)
@@ -167,7 +168,7 @@ func TestArbitraryFloatDecimalStreamRefusedFormatterKeepsOlderAllocation(t *test
 		if matched {
 			reached = true
 			invocation, roots, values, used := old.invocation, old.numeric, old.values, b.Used()
-			var out OwnedStringStream
+			var out utext.OwnedStringStream
 			serviceMust(t, out.Construct(b))
 			if e := m.DisplayDecimalInto(&out, &x, 10); !errors.Is(e, ErrNumericPending) {
 				t.Fatal("older decimal formatter refusal", e)

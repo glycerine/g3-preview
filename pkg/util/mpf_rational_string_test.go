@@ -2,6 +2,7 @@
 package util
 
 import (
+	utext "github.com/glycerine/g3/pkg/util/text"
 	"math/big"
 	"math/rand/v2"
 	"testing"
@@ -33,7 +34,7 @@ func TestArbitraryFloatRationalStringIndependentDyadic(t *testing.T) {
 				if negative {
 					want.Neg(want)
 				}
-				var out OwnedString
+				var out utext.OwnedString
 				serviceMust(t, m.ToRationalString(&x, &out))
 				got, e := out.View().String()
 				serviceMust(t, e)

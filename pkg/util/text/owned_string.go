@@ -1,5 +1,5 @@
 // Source: src/smt/params/qi_params.cpp:43-64; src/util/params.cpp:928-930.
-package util
+package text
 
 import (
 	"bytes"
@@ -145,8 +145,10 @@ func (s *OwnedString) SourceDestroy() {
 	s.goBuilder = nil
 	s.Closed = true
 }
-func (s *OwnedString) OwnAbort()             { s.SourceDestroy() }
-func (s *OwnedString) View() OwnedStringView { return OwnedStringView{s, s.Generation, s.Length} }
+func (s *OwnedString) OwnAbort() { s.SourceDestroy() }
+func (s *OwnedString) View() OwnedStringView {
+	return OwnedStringView{Owner: s, Generation: s.Generation, Length: s.Length}
+}
 func (s *OwnedString) Append(v OwnedStringView) error {
 	if !s.valid() || s.goBuilder != nil {
 		return ErrOwnedStringOwner

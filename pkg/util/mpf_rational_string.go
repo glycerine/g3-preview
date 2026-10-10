@@ -1,13 +1,15 @@
 // Source: src/util/mpf.cpp:1572-1576; src/util/mpf.h:141.
 package util
 
-import
+import (
 
-// ToRationalString converts through the original scoped rational and constructs
-// a caller-owned result in fresh storage. CleanupRationalString joins failures.
-umemory "github.com/glycerine/g3/pkg/util/memory"
+	// ToRationalString converts through the original scoped rational and constructs
+	// a caller-owned result in fresh storage. CleanupRationalString joins failures.
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
-func (m *ArbitraryFloatManager) ToRationalString(x *ArbitraryFloat, out *OwnedString) (cause error) {
+func (m *ArbitraryFloatManager) ToRationalString(x *ArbitraryFloat, out *utext.OwnedString) (cause error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
 	}
@@ -15,7 +17,7 @@ func (m *ArbitraryFloatManager) ToRationalString(x *ArbitraryFloat, out *OwnedSt
 		return ErrNumericPending
 	}
 	if out == nil || out.Self != nil {
-		return ErrOwnedStringOwner
+		return utext.ErrOwnedStringOwner
 	}
 	s := &m.rationalString
 	*s = arbitraryFloatRationalStringScope{manager: m, q: NewRational(), qLive: true, out: out, active: true, executing: true}
@@ -66,7 +68,7 @@ func (m *ArbitraryFloatManager) ToRationalString(x *ArbitraryFloat, out *OwnedSt
 type arbitraryFloatRationalStringScope struct {
 	manager                                          *ArbitraryFloatManager
 	q                                                Rational
-	out                                              *OwnedString
+	out                                              *utext.OwnedString
 	conversion, format                               uint64
 	conversionOwned, formatOwned, outputOwned, qLive bool
 	qCursor                                          uint8

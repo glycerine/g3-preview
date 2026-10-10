@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestSATSolverStatDisplaySourceConditionalFields(t *testing.T) {
@@ -25,7 +25,7 @@ func TestSATSolverStatDisplaySourceConditionalFields(t *testing.T) {
 	satOK(t, e)
 	satOK(t, s.displayCompactStat(o))
 	satInspectionText(t, o, fmt.Sprintf(" :clauses 1 :learned 4294967295 :frozen 2 :gc-clause 9 :memory %.2f", float64(bytes)/(1024*1024)))
-	if o.State().FloatMode != util.NumericFixedFloat || o.State().Precision != 2 {
+	if o.State().FloatMode != utext.NumericFixedFloat || o.State().Precision != 2 {
 		t.Fatal(o.State())
 	}
 	satOK(t, o.ResetText())

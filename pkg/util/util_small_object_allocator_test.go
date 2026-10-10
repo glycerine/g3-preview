@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func sourceSmallObjectMust(t *testing.T, e error) {
@@ -20,14 +21,14 @@ func sourceSmallObjectAlloc(t *testing.T, a *utilSmallObjectAllocator, n uint64)
 	sourceSmallObjectMust(t, e)
 	return r
 }
-func smallObjectDiagnosticFixture(t *testing.T) (*umemory.Runtime, *arena.Budget, *arena.BytesRegion, *NumericTextStream) {
+func smallObjectDiagnosticFixture(t *testing.T) (*umemory.Runtime, *arena.Budget, *arena.BytesRegion, *utext.NumericTextStream) {
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	rt, e := newUtilMemoryRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	sourceSmallObjectMust(t, e)
 	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 4, Budget: b}})
 	sourceSmallObjectMust(t, e)
-	stream, e := NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+	stream, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	sourceSmallObjectMust(t, e)
 	t.Cleanup(func() {
 		b.FailAfter(-1)
@@ -136,13 +137,13 @@ func TestSmallObjectAllocatorVerboseUsesRealRuntimeAndLexicalLifetime(t *testing
 	for _, r := range refs {
 		sourceSmallObjectMust(t, a.Deallocate(1, r))
 	}
-	sourceSmallObjectMust(t, out.SetFloatMode(NumericScientificFloat))
+	sourceSmallObjectMust(t, out.SetFloatMode(utext.NumericScientificFloat))
 	sourceSmallObjectMust(t, out.SetPrecision(7))
 	sourceSmallObjectMust(t, a.Consolidate())
 	text, e := out.String()
 	sourceSmallObjectMust(t, e)
 	want := "(allocator-consolidate :wasted-size 8168 :memory 0.01)\n(end-allocator-consolidate :wasted-size 8168 :memory 0.01)\n"
-	if text != want || out.State().FloatMode != NumericFixedFloat || out.State().Precision != 2 || rt.State().GlobalSize != 8200 {
+	if text != want || out.State().FloatMode != utext.NumericFixedFloat || out.State().Precision != 2 || rt.State().GlobalSize != 8200 {
 		t.Fatal("real counter/lexical scratch/end-stream state", text, out.State(), rt.State())
 	}
 	sourceSmallObjectMust(t, a.Close())

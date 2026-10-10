@@ -23,14 +23,12 @@ func (a *DebugActionContext) hostRunCommand(command string) (int, error) {
 	if e = a.input.open(); e != nil {
 		return 0, e
 	}
-	if e = out.lock(); e != nil {
+	if e = out.CheckOpen(); e != nil {
 		return 0, e
 	}
-	out.mu.Unlock()
-	if e = errout.lock(); e != nil {
+	if e = errout.CheckOpen(); e != nil {
 		return 0, e
 	}
-	errout.mu.Unlock()
 	// /bin/sh is the concrete system() adapter. The command is literal source
 	// text; status reflects the actual child, with no injected result provider.
 	cmd := exec.Command("/bin/sh", "-c", command)

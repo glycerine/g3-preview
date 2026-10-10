@@ -2,7 +2,7 @@
 // Numeric stream platform adapter for repository C++ ostream consumers.
 // C-locale/libstdc++ AMD64 dynamic-int precision and nearest/even IEEE64 profile.
 // Go strconv is the explicit external runtime dependency, not a solver algorithm.
-package util
+package text
 
 import (
 	"bytes"

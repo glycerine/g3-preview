@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util"
+
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestPolynomialVariableDegreesActualNumericStreamFlags(t *testing.T) {
@@ -19,7 +20,7 @@ func TestPolynomialVariableDegreesActualNumericStreamFlags(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	out, e := util.NewNumericTextStream(util.NumericTextStreamConfig{Budget: b})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	if e != nil {
 		t.Fatal(e)
 	}
