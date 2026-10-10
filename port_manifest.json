@@ -9633,7 +9633,6 @@
         "pkg/ast/ast_mark_doc.go",
         "pkg/ast/ast_mark_fast.go",
         "pkg/ast/ast_mark_node.go",
-        "pkg/ast/ast_mark_scoped.go",
         "pkg/ast/ast_parameter.go",
         "pkg/ast/ast_parameter_access.go",
         "pkg/ast/ast_proof_manager.go",
@@ -9743,9 +9742,6 @@
         "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
         "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
         "TestASTMarkRefFastCallbacksAndFailurePrefix",
-        "TestASTMarkScopedLimitOrderAndPartialPop",
-        "TestASTMarkScopedMarkFailureOrderingAndRetry",
-        "TestASTMarkScopedNestedScopesAndFlagRoute",
         "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
         "TestASTMetadataIgnoredFields",
         "TestASTModelValueNameInlineAndOverflowAccounting",
@@ -10662,7 +10658,7 @@
           ]
         },
         {
-          "name": "concrete expression/declaration ID marks and fast/ref-fast/scoped marking specializations; other generic and diagnostic surfaces open",
+          "name": "concrete expression/declaration ID marks and fast/ref-fast marking specializations; other generic and diagnostic surfaces open",
           "status": "partial",
           "go_target": "pkg/ast/ast_mark.go",
           "tests": [
@@ -10678,9 +10674,6 @@
             "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
             "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
             "TestASTMarkRefFastCallbacksAndFailurePrefix",
-            "TestASTMarkScopedLimitOrderAndPartialPop",
-            "TestASTMarkScopedMarkFailureOrderingAndRetry",
-            "TestASTMarkScopedNestedScopesAndFlagRoute",
             "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
           ]
         },
@@ -10968,7 +10961,8 @@
         "DecRefConsumed exposes the existing Go deletion transport consumption result so extraction cache owners retire acquired references on later deletion failure. The original DecRef API retains its behavior. This is a checked Go ownership adapter, not an added native algorithm or whole-unit pointer/destructor/ABI audit credit.",
         "The concrete AppArguments suffix reader avoids an extra pointer-buffer copy when extraction propagation removes a complete leading concat segment. Existing family fallback domain construction is shared without changing its numerical sort/declaration/application order or existing failure-cleanup qualifications. Borrowed suffix tests check mixed-width output, hash-cons identity, domain growth and source-application expiry; propagation every-reservation campaigns cover both suffix and shortened-head paths.",
         "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised.",
-        "Low-level trace traversal now uses native slices and identity maps; private stack/bitmap allocation faults no longer exist. Two post-registration catch fixtures now use an actual closed output-stream guard while retaining literal table/INC ownership, source stop and later slot-generation checks. The borrowed format-child reservation sweep now requires completed native trace and verifies borrowed stream/file lifetime. The existing failed borrowed-format constructor closed-stream guard remains. These do not claim the removed lexical backing allocation refusals still occur."
+        "Low-level trace traversal now uses native slices and identity maps; private stack/bitmap allocation faults no longer exist. Two post-registration catch fixtures now use an actual closed output-stream guard while retaining literal table/INC ownership, source stop and later slot-generation checks. The borrowed format-child reservation sweep now requires completed native trace and verifies borrowed stream/file lifetime. The existing failed borrowed-format constructor closed-stream guard remains. These do not claim the removed lexical backing allocation refusals still occur.",
+        "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations."
       ]
     },
     {
@@ -11018,7 +11012,6 @@
         "pkg/ast/ast_mark_doc.go",
         "pkg/ast/ast_mark_fast.go",
         "pkg/ast/ast_mark_node.go",
-        "pkg/ast/ast_mark_scoped.go",
         "pkg/ast/ast_parameter.go",
         "pkg/ast/ast_parameter_access.go",
         "pkg/ast/ast_proof_manager.go",
@@ -11125,9 +11118,6 @@
         "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
         "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
         "TestASTMarkRefFastCallbacksAndFailurePrefix",
-        "TestASTMarkScopedLimitOrderAndPartialPop",
-        "TestASTMarkScopedMarkFailureOrderingAndRetry",
-        "TestASTMarkScopedNestedScopesAndFlagRoute",
         "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
         "TestASTMetadataIgnoredFields",
         "TestASTModelValueNameInlineAndOverflowAccounting",
@@ -11815,7 +11805,7 @@
           ]
         },
         {
-          "name": "concrete expression/declaration ID marks and fast/ref-fast/scoped marking specializations; other generic and diagnostic surfaces open",
+          "name": "concrete expression/declaration ID marks and fast/ref-fast marking specializations; other generic and diagnostic surfaces open",
           "status": "partial",
           "go_target": "pkg/ast/ast_mark.go",
           "tests": [
@@ -11831,9 +11821,6 @@
             "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
             "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
             "TestASTMarkRefFastCallbacksAndFailurePrefix",
-            "TestASTMarkScopedLimitOrderAndPartialPop",
-            "TestASTMarkScopedMarkFailureOrderingAndRetry",
-            "TestASTMarkScopedNestedScopesAndFlagRoute",
             "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
           ]
         },
@@ -12111,7 +12098,8 @@
         "Go distinct convenience wrappers preserve the source Bool IFF/term EQ selection and right-associated XOR expansion through the existing source application engine. Array factories remain distinct from ast_util singleton/empty shortcuts. Focused source shape and failure tests do not promote the whole AST class, generic parser/API driver, diagnostic TRACE or original AST test driver.",
         "Selected caller-confined pure Go Runtime/checked lifetime and direct-file emission profile; native global debugger/ostream locale/ABI and unselected AST/LL overloads remain open. No new registered source-driver credit.",
         "Scoped some_value_proc restoration now covers success, nested internal calls, callback errors and fallback reservation failures. Callback receives the validated sort and stored hash while manager is locked, avoiding public-manager reentry for model universe lookup. Existing base-plugin fallback is retained; unported theory-plugin get_some_value implementations remain separate dependencies.",
-        "AppArgumentView exposes borrowed application storage to the evaluator. Indexed reads validate the application handle and support factory callbacks under the manager lock without public-manager reentry; original application ownership must outlive the view."
+        "AppArgumentView exposes borrowed application storage to the evaluator. Indexed reads validate the application handle and support factory callbacks under the manager lock without public-manager reentry; original application ownership must outlive the view.",
+        "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations."
       ]
     },
     {
@@ -110860,7 +110848,6 @@
         "pkg/ast/ast_mark_doc.go",
         "pkg/ast/ast_mark_fast.go",
         "pkg/ast/ast_mark_node.go",
-        "pkg/ast/ast_mark_scoped.go",
         "pkg/util/bitset/vector.go"
       ],
       "tests": [
@@ -110876,9 +110863,6 @@
         "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
         "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
         "TestASTMarkRefFastCallbacksAndFailurePrefix",
-        "TestASTMarkScopedLimitOrderAndPartialPop",
-        "TestASTMarkScopedMarkFailureOrderingAndRetry",
-        "TestASTMarkScopedNestedScopesAndFlagRoute",
         "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
         "TestBoundedOperationOracle",
         "TestSourceAnd",
@@ -110919,7 +110903,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "concrete expression/declaration ID marks and fast/ref-fast/scoped marking specializations; other generic and diagnostic surfaces open",
+          "name": "concrete expression/declaration ID marks and fast/ref-fast marking specializations; other generic and diagnostic surfaces open",
           "status": "partial",
           "go_target": "pkg/ast/ast_mark.go",
           "tests": [
@@ -110935,9 +110919,6 @@
             "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
             "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
             "TestASTMarkRefFastCallbacksAndFailurePrefix",
-            "TestASTMarkScopedLimitOrderAndPartialPop",
-            "TestASTMarkScopedMarkFailureOrderingAndRetry",
-            "TestASTMarkScopedNestedScopesAndFlagRoute",
             "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
           ]
         },
@@ -110975,7 +110956,8 @@
         "Legacy bitset.Vector Go-slice profile remains partial and unchanged",
         "Actual global DebugContext assertion enable/tag and process-global memory wiring remain open; selected default source g3debug assertions execute",
         "inactive display #else and inactive tst1/tst2 not executed",
-        "The redundant Runtime/Block translation was deleted; native typed storage lives in util/bitset and AST mark specializations retain their own typed storage."
+        "The redundant Runtime/Block translation was deleted; native typed storage lives in util/bitset and AST mark specializations retain their own typed storage.",
+        "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations."
       ]
     },
     {
@@ -110988,7 +110970,6 @@
         "pkg/ast/ast_mark_doc.go",
         "pkg/ast/ast_mark_fast.go",
         "pkg/ast/ast_mark_node.go",
-        "pkg/ast/ast_mark_scoped.go",
         "pkg/util/bitset/vector.go"
       ],
       "tests": [
@@ -111004,9 +110985,6 @@
         "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
         "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
         "TestASTMarkRefFastCallbacksAndFailurePrefix",
-        "TestASTMarkScopedLimitOrderAndPartialPop",
-        "TestASTMarkScopedMarkFailureOrderingAndRetry",
-        "TestASTMarkScopedNestedScopesAndFlagRoute",
         "TestASTMarkUnsignedWrapPhysicalContinuationGuard",
         "TestBoundedOperationOracle",
         "TestSourceAnd",
@@ -111067,7 +111045,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "concrete expression/declaration ID marks and fast/ref-fast/scoped marking specializations; other generic and diagnostic surfaces open",
+          "name": "concrete expression/declaration ID marks and fast/ref-fast marking specializations; other generic and diagnostic surfaces open",
           "status": "partial",
           "go_target": "pkg/ast/ast_mark.go",
           "tests": [
@@ -111083,9 +111061,6 @@
             "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
             "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
             "TestASTMarkRefFastCallbacksAndFailurePrefix",
-            "TestASTMarkScopedLimitOrderAndPartialPop",
-            "TestASTMarkScopedMarkFailureOrderingAndRetry",
-            "TestASTMarkScopedNestedScopesAndFlagRoute",
             "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
           ]
         },
@@ -111123,7 +111098,8 @@
         "Legacy bitset.Vector Go-slice profile remains partial and unchanged",
         "Actual global DebugContext assertion enable/tag and process-global memory wiring remain open; selected default source g3debug assertions execute",
         "inactive display #else and inactive tst1/tst2 not executed",
-        "The redundant Runtime/Block translation was deleted; native typed storage lives in util/bitset and AST mark specializations retain their own typed storage."
+        "The redundant Runtime/Block translation was deleted; native typed storage lives in util/bitset and AST mark specializations retain their own typed storage.",
+        "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations."
       ]
     },
     {
@@ -137605,8 +137581,7 @@
         "pkg/ast/ast_mark.go",
         "pkg/ast/ast_mark_doc.go",
         "pkg/ast/ast_mark_fast.go",
-        "pkg/ast/ast_mark_node.go",
-        "pkg/ast/ast_mark_scoped.go"
+        "pkg/ast/ast_mark_node.go"
       ],
       "tests": [
         "TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau",
@@ -137621,9 +137596,6 @@
         "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
         "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
         "TestASTMarkRefFastCallbacksAndFailurePrefix",
-        "TestASTMarkScopedLimitOrderAndPartialPop",
-        "TestASTMarkScopedMarkFailureOrderingAndRetry",
-        "TestASTMarkScopedNestedScopesAndFlagRoute",
         "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
       ],
       "conditionals": [
@@ -137640,7 +137612,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "concrete expression/declaration ID marks and fast/ref-fast/scoped marking specializations; other generic and diagnostic surfaces open",
+          "name": "concrete expression/declaration ID marks and fast/ref-fast marking specializations; other generic and diagnostic surfaces open",
           "status": "partial",
           "go_target": "pkg/ast/ast_mark.go",
           "tests": [
@@ -137656,9 +137628,6 @@
             "TestASTMarkLowLevelOwnerChecksAndBooleanFalse",
             "TestASTMarkRefFastActualAscendingReleaseAndWarmOperations",
             "TestASTMarkRefFastCallbacksAndFailurePrefix",
-            "TestASTMarkScopedLimitOrderAndPartialPop",
-            "TestASTMarkScopedMarkFailureOrderingAndRetry",
-            "TestASTMarkScopedNestedScopesAndFlagRoute",
             "TestASTMarkUnsignedWrapPhysicalContinuationGuard"
           ]
         }
@@ -137667,7 +137636,8 @@
         "Real AST marks borrow manager with fully charged cold headers/inline16/backing/scope limits and source real ASTRefVector callbacks. Fast mark-before-push and ref INC-before-growth prefixes remain observable; ref reset clears all flags before ASC DEC. See PORT_PROGRESS.md#audit-ast-mark-port-status-md."
       ],
       "deviations": [
-        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code."
+        "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
+        "Removed ASTScopedMark/scoped_mark adapter and its scoped-only tests after retained-source audit: src/ and pkg C++ mirrors reference scoped_mark only in its own ast.h/ast.cpp definitions; no production Go caller exists. It is excluded as unused source functionality, not migrated or credited as a live container specialization. Shared mark constructor/header/owner checks still cover the six retained concrete mark implementations."
       ]
     },
     {

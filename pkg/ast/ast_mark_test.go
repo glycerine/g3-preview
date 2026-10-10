@@ -207,54 +207,6 @@ func TestASTMarkRefFastCallbacksAndFailurePrefix(t *testing.T) {
 	}
 	astTestMust(t, two.Reset())
 }
-func TestASTMarkScopedNestedScopesAndFlagRoute(t *testing.T) {
-	m := astTestManager(t)
-	h := markTestNodes(t, m, 3)
-	mark, e := NewASTScopedMark(m)
-	astTestMust(t, e)
-	defer mark.Close()
-	astTestMust(t, mark.Mark(h[0], true))
-	astTestMust(t, mark.PushScope())
-	astTestMust(t, mark.Mark(h[0], true))
-	astTestMust(t, mark.Mark(h[1], true))
-	astTestMust(t, mark.PushScope())
-	astTestMust(t, mark.Mark(h[2], true))
-	astTestMust(t, mark.PopScope())
-	if _, e = m.GetRefCount(h[2]); !errors.Is(e, ErrASTHandle) {
-		t.Fatal("popped scope must release actual node", e)
-	}
-	yes, e := mark.IsMarked(h[1])
-	astTestMust(t, e)
-	if !yes {
-		t.Fatal("outer scope retained")
-	}
-	astTestMust(t, mark.PopScopes(1))
-	if _, e = m.GetRefCount(h[1]); !errors.Is(e, ErrASTHandle) {
-		t.Fatal("scope release")
-	}
-	rc, e := m.GetRefCount(h[0])
-	astTestMust(t, e)
-	if rc != 1 {
-		t.Fatal("duplicate mark must not retain")
-	}
-	err := mark.Mark(h[0], false)
-	if ASTSourceDebug {
-		if !errors.Is(err, ErrASTDomain) {
-			t.Fatal("flag assertion", err)
-		}
-	} else {
-		astTestMust(t, err)
-		yes, e := mark.IsMarked(h[0])
-		astTestMust(t, e)
-		if !yes {
-			t.Fatal("release ignores false flag and marks")
-		}
-	}
-	astTestMust(t, mark.Reset())
-	if _, e = m.GetRefCount(h[0]); !errors.Is(e, ErrASTHandle) {
-		t.Fatal("reset owning stack")
-	}
-}
 func TestASTMarkLowLevelOwnerChecksAndBooleanFalse(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 1)[0]
@@ -336,62 +288,6 @@ func TestASTMarkUnsignedWrapPhysicalContinuationGuard(t *testing.T) {
 	}
 }
 
-func TestASTMarkScopedMarkFailureOrderingAndRetry(t *testing.T) {
-	m := astTestManager(t)
-	h := markTestNodes(t, m, 2)
-	mark, e := NewASTScopedMark(m)
-	astTestMust(t, e)
-	defer mark.Close()
-	// Prepare physical stack capacity using the real source null placeholders.
-	astTestMust(t, m.RefVectorResize(mark.stack, 1))
-	astTestMust(t, m.RefVectorResize(mark.stack, 0))
-	before := m.BudgetField.Used()
-	for attempt := uint32(1); attempt <= 2; attempt++ {
-		m.BudgetField.FailAfter(0)
-		err := mark.Mark(h[0], true)
-		m.BudgetField.FailAfter(-1)
-		rc, e := m.GetRefCount(h[0])
-		astTestMust(t, e)
-		n, e := m.RefVectorSize(mark.stack)
-		astTestMust(t, e)
-		yes, e := mark.IsMarked(h[0])
-		astTestMust(t, e)
-		if !errors.Is(err, arena.ErrInjectedFailure) || rc != attempt || n != attempt || yes || m.BudgetField.Used() != before {
-			t.Fatal("completed stack push precedes bitset allocation; retry is another retain", attempt, err, rc, n, yes)
-		}
-	}
-	astTestMust(t, mark.Mark(h[0], true))
-	rc, e := m.GetRefCount(h[0])
-	astTestMust(t, e)
-	if rc != 3 {
-		t.Fatal("source retry cannot silently consume prior retains", rc)
-	}
-	astTestMust(t, mark.Close())
-	if _, e = m.GetRefCount(h[0]); !errors.Is(e, ErrASTHandle) {
-		t.Fatal("Close releases only real stack entries", e)
-	}
-	first, e := NewASTScopedMark(m)
-	astTestMust(t, e)
-	defer first.Close()
-	m.BudgetField.FailAfter(0)
-	err := first.Mark(h[1], true)
-	m.BudgetField.FailAfter(-1)
-	rc, e = m.GetRefCount(h[1])
-	astTestMust(t, e)
-	n, e := m.RefVectorSize(first.stack)
-	astTestMust(t, e)
-	if !errors.Is(err, arena.ErrInjectedFailure) || rc != 1 || n != 0 {
-		t.Fatal("stack INC before growth failure", err, rc, n)
-	}
-	astTestMust(t, first.Close())
-	rc, e = m.GetRefCount(h[1])
-	astTestMust(t, e)
-	if rc != 1 {
-		t.Fatal("empty marker Close cannot consume failed push")
-	}
-	astTestMust(t, m.DecRef(h[1]))
-}
-
 func TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau(t *testing.T) {
 	m := astTestManager(t)
 	b, e := m.MkBoolSort()
@@ -471,45 +367,8 @@ func TestASTMarkFastPhysicalGrowthStaleBorrowAndEscapedCleanup(t *testing.T) {
 	}
 }
 
-func TestASTMarkScopedLimitOrderAndPartialPop(t *testing.T) {
-	m := astTestManager(t)
-	h := markTestNodes(t, m, 1)[0]
-	mark, e := NewASTScopedMark(m)
-	astTestMust(t, e)
-	defer mark.Close()
-	m.BudgetField.FailAfter(0)
-	err := mark.PushScope()
-	m.BudgetField.FailAfter(-1)
-	if !errors.Is(err, arena.ErrInjectedFailure) || len(mark.limits) != 0 {
-		t.Fatal("failed scope push publication", err)
-	}
-	astTestMust(t, mark.PushScope())
-	astTestMust(t, mark.Mark(h, true))
-	astTestMust(t, mark.PushScope())
-	astTestMust(t, mark.PushScope())
-	if cap(mark.limits) != 3 || mark.limitBytes != 12 {
-		t.Fatal("unsigned vector2→3 growth")
-	}
-	err = mark.PopScopes(4)
-	if ASTSourceDebug {
-		if !errors.Is(err, ErrASTDomain) {
-			t.Fatal(err)
-		}
-	} else {
-		if !errors.Is(err, arena.ErrBounds) {
-			t.Fatal(err)
-		}
-	}
-	if len(mark.limits) != 0 {
-		t.Fatal("completed scopes must not roll back")
-	}
-	if _, e = m.GetRefCount(h); !errors.Is(e, ErrASTHandle) {
-		t.Fatal("completed outer scope released AST", e)
-	}
-}
-
 func TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership(t *testing.T) {
-	for kind := 0; kind < 7; kind++ {
+	for kind := 0; kind < 6; kind++ {
 		for after := int64(0); after < 8; after++ {
 			m := astTestManager(t)
 			borrowed := m.BudgetField.Used() - m.Stats().AllocatedBytes
@@ -529,30 +388,24 @@ func TestASTMarkConstructorsAllFailurePrefixesImmediatePhysicalOwnership(t *test
 					err = v.Close()
 				}
 			case 2:
-				v, e := NewASTScopedMark(m)
-				err = e
-				if e == nil {
-					err = v.Close()
-				}
-			case 3:
 				v, e := NewASTFastMark1(m)
 				err = e
 				if e == nil {
 					err = v.Close()
 				}
-			case 4:
+			case 3:
 				v, e := NewASTFastMark2(m)
 				err = e
 				if e == nil {
 					err = v.Close()
 				}
-			case 5:
+			case 4:
 				v, e := NewASTRefFastMark1(m)
 				err = e
 				if e == nil {
 					err = v.Close()
 				}
-			case 6:
+			case 5:
 				v, e := NewASTRefFastMark2(m)
 				err = e
 				if e == nil {
@@ -653,7 +506,6 @@ func TestASTMarkHeaderRefusalPrecedesGoAllocation(t *testing.T) {
 	constructors := []func() error{
 		func() error { _, e := NewASTExprMark(m); return e },
 		func() error { _, e := NewASTMark(m); return e },
-		func() error { _, e := NewASTScopedMark(m); return e },
 		func() error { _, e := NewASTFastMark1(m); return e },
 		func() error { _, e := NewASTFastMark2(m); return e },
 		func() error { _, e := NewASTRefFastMark1(m); return e },

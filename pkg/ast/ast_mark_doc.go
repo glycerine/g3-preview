@@ -24,12 +24,7 @@
 // IDs use unsigned get_id()-c_first_decl_id, distinct from expression IDs.
 // Marks deliberately survive node deletion and ID reuse. No references are
 // retained by the ordinary ID map or nonref fast classes.
-// scoped_mark constructor/destructor, mark(flag)/mark(true), reset,
-// push_scope/pop_scope/pop_scope(n) -> ASTScopedMark constructor/Close, Mark,
-// Reset, PushScope/PopScope/PopScopes. Its real ASTRefVector retains references,
-// including completed entries before a later bitmap failure. Close performs
-// source reverse member destruction: limits, stack, base declaration bitmap,
-// base expression bitmap, without inventing a source Reset call.
+// scoped_mark is excluded: retained C++ sources have no consumers.
 //
 // These cold owners are caller-confined; manager mutations hold its mutex.
 // Every actual header/inline array/backing is budgeted. Copies of Go owners

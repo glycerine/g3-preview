@@ -34169,3 +34169,24 @@ wrapper tests. It is unused and should be removed rather than migrated.
 Proof hyper-resolution/bindings, retained sorting-network test consumers and
 other actual collection consumers remain before internal util cycle cleanup
 and the full requested root subpackage split.
+
+## Remove unused scoped AST marking specialization
+
+Retained-source audit of src/ and pkg C++ mirrors found scoped_mark solely in
+its own ast.h/ast.cpp declarations/definitions. Production Go likewise had no
+ASTScopedMark caller. Removed ast_mark_scoped.go and its three scoped-only tests
+instead of migrating an unused owning vector/limit stack. Shared constructor
+failure/header checks now enumerate the six remaining concrete mark owners.
+Updated the mark documentation and manifest to exclude scoped_mark credit;
+whole-unit status/counts remain unchanged.
+
+Validation: native/debug retained mark tests passed (0.023s/0.030s).
+Module-wide compilation, AST vet, manifest, gofmt and diff checks passed.
+No full native module rerun inside the hourly interval. Counts remain2102
+units/677 APIs:62 ported,283 partial,1729 unported,two dead/deleted.
+
+Sorting-network AST contexts are not dead: src/test/sorting_network.cpp contains
+retained ast_ext2/psort_nw instantiations, so their actual collection consumers
+still need migration. Proof hyper-resolution and binding storage also remain.
+The complete external-consumer migration, internal util cycles and requested
+root util subpackage split are not complete.
