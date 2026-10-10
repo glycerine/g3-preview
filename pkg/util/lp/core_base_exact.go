@@ -39,6 +39,7 @@ type PairCoreSolverBase struct {
 	ColumnsNZ, RowsNZ                       []uint32
 	manager                                 *numeral.RationalManager
 	calls                                   exactEtaCalls
+	pivotWork                               *IndexedRationalVector
 	stopped                                 bool
 }
 
@@ -74,7 +75,7 @@ func NewPairCoreSolverBase(in PairCoreInputs) (m *PairCoreSolverBase, err error)
 	return m, m.InitBasisHeadingAndNonBasicColumns()
 }
 func (m *PairCoreSolverBase) ready() error {
-	if m.stopped || m.calls.pending() {
+	if m.stopped || m.pivotWork != nil || m.calls.pending() {
 		return ErrExactVectorPending
 	}
 	return nil
@@ -349,6 +350,13 @@ func (m *PairCoreSolverBase) Close() error {
 		if err := v.Close(); err != nil {
 			return err
 		}
+	}
+	// A failed indexed add may still borrow its product input during cleanup.
+	if m.pivotWork != nil {
+		if err := m.pivotWork.Close(); err != nil {
+			return err
+		}
+		m.pivotWork = nil
 	}
 	return m.calls.cleanupRoots(m.manager)
 }

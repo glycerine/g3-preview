@@ -38256,3 +38256,71 @@ hourly full-suite repeat is due. Whole exact/LAR optimization, pivot calculation
 term substitution, scopes, explanations and upstream drivers remain unfinished.
 
 Final native module-wide test compilation and source/evidence verifier pass.
+
+
+### Exact pivot-row calculation and per-row LAR propagation — 2026-10-10
+
+Ported mpq/impq calculate_pivot_row_of_B_1 through the actual indexed PairLU
+refinement/solve entry. The precise core clears/seeds its inverse row with the
+source unit value, then delegates ownership of solve arithmetic to the LU.
+Ported exact calculate_pivot_row_when_pivot_row_of_B1_is_ready: skip indexed zero
+inverse entries, multiply each reached row coefficient, accumulate only negative-
+heading nonbasic columns with exact drop cancellation, then publish RowsNZ.
+Source product and return-value copies are concrete owning rational temporaries.
+Core capture ends before child indexed additions; failed product inputs survive
+until the indexed vector is closed. Both core entries stop on error.
+
+LARCoreSolver now clears/resizes real pivot scratch and executes this inverse/
+nonbasic sequence. Source prepared factorization and precise RowsNZ metadata
+remain required; no eager initialization is invented. Its literal native tableau
+branch copies all nonbasis row cells, despite the preceding debug assertion
+rejecting that mode. Added per-row calculate_implied_bounds_for_row dispatch:
+tableau directly analyzes its matrix row; LU calculates the actual pivot row,
+substitutes basis variables in working terms, then analyzes the pivot iterator.
+Original terms remain separate owning copies and are never substituted.
+
+Preserved a reached source inconsistency: substitute_basis_var_in_terms_for_row
+passes zero-based k to term_is_used_as_row, whose assertion requires a full term
+ID. Debug/checked rejects every nonempty term list after pivot calculation and
+before substitution/analysis. Native looks up literal k; actual external variable
+zero can therefore skip unregistered term zero. Tests distinguish this from
+correct term identity rather than adding the missing offset silently. Empty-term
+LU and tableau per-row propagation execute successfully in both profiles.
+
+100 independent triangular basis worlds choose D first and construct nonbasic
+columns B*D; inverse rows are independently solved by exact back substitution,
+then pivot rows must recover D, including sparse cancellation and permuted basis
+columns. Actual solver tests exercise full per-row dispatch, strict endpoint
+bounds, repeated strongest-bound filtering, original-copy isolation, substituted
+coefficients and literal term-offset skip/assertion profiles. Source native
+fallback, indexed zero skip, missing LU, invalid row and index/matrix/heading/
+RowsNZ metadata prefixes preserve reached publication and stopped-state guards.
+Physical campaigns enumerate pooled/direct inverse solves, product/child sparse
+accumulation and full scheduling through success; native additionally enumerates
+working-term substitution failures. Coprime1000-digit numerator/basis values
+retain actual large arithmetic; an initial common-factor fixture was replaced
+because it canceled to small rationals and could not reach bound-publication
+refusals. Model/core parents do not adopt child numeric invocations; cleanup
+checks named numeric roots.
+
+Both LP vets, native module-wide test compilation and source/evidence verifier
+pass. The64-package graph adds two production filenames, with no import edges.
+LP source counts remain83 partial/27 unported: no whole-unit promotion. Whole
+exact optimization, solve-prefix/strategy migration, model scopes, full
+propagation scheduling, explanations and original drivers remain open. The
+23:33 UTC full native checkpoint predates this work; no hourly repeat is due.
+Expanded final focused results and coverage are recorded below after completion.
+
+Expanded focused exact-core/model/dispatch/pivot suites pass166.046s native and
+180.132s g3debug/g3checked. Supplemental actual native tableau-copy refusal and
+entry/clear guards pass0.505s native/0.040s debug. Source production is unchanged
+between profiles; merged set coverage is their union, not a full-module claim.
+Core pivot53/58 (91.4%) native,54/58 (93.1%) debug. LAR pivot55/61 (90.2%) native,
+46/61 (75.4%) debug:13 statements are blocked by preceding source tableau-mode
+and term-offset assertions; two resize guards are protected by prior successful
+clearing. Other gaps qualify cleanup/prior-invariant errors and erased native
+assertions. Native adds two actual working-term substitution campaigns and two
+tableau-copy campaigns; debug rejects those paths at the source assertions.
+Logs/profiles: /mnt/oldrog/tmp/g3-lar-pivot-{native,debug}.{log,cover}, supplemental
+*-guards.{log,cover}; union profiles use *-combined.cover. Whole LP implementation
+and upstream driver/test completion remain unachieved.

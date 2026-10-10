@@ -120192,7 +120192,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/lar_core.go",
-        "pkg/util/lp/lar_model_test.go"
+        "pkg/util/lp/lar_model_test.go",
+        "pkg/util/lp/lar_pivot.go",
+        "pkg/util/lp/core_pivot_exact_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120200,7 +120202,14 @@
         "TestLARModelNestedTableauAndRowPropagation",
         "TestLARModelPhysicalFailurePrefixes",
         "TestLARModelDeferredEmptyTermsAndSourceGuards",
-        "TestLARModelLeavesOlderComparisonOwned"
+        "TestLARModelLeavesOlderComparisonOwned",
+        "TestLPPairPivotIndependentBasisRows",
+        "TestLARPivotActualRowScheduling",
+        "TestLARPivotPhysicalFailurePrefixes",
+        "TestLARPivotSourceBranchesAndMetadataGuards",
+        "TestLARPivotTermSubstitutionSourceOffset",
+        "TestLARPivotAdditionalEntryAndClearGuards",
+        "TestLARPivotNativeTableauPhysicalCopies"
       ],
       "conditionals": [
         {
@@ -120405,15 +120414,31 @@
             "TestLARModelDeferredEmptyTermsAndSourceGuards",
             "TestLARModelLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "actual LAR calculate_pivot_row scratch resize and exact inverse/nonbasic path with retained native tableau branch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_pivot.go",
+          "tests": [
+            "TestLPPairPivotIndependentBasisRows",
+            "TestLARPivotActualRowScheduling",
+            "TestLARPivotPhysicalFailurePrefixes",
+            "TestLARPivotSourceBranchesAndMetadataGuards",
+            "TestLARPivotTermSubstitutionSourceOffset",
+            "TestLARPivotAdditionalEntryAndClearGuards",
+            "TestLARPivotNativeTableauPhysicalCopies"
+          ]
         }
       ],
       "ownership": [
         "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
-        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction."
+        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction.",
+        "LAR pivot calculation delegates to the concrete precise core and existing PairLU without outer capture or eager initialization of missing factorization/RowsNZ. Stopped core/model retain actual child owners. Full row scheduling owns only its lexical row analyzer/iterator; term substitution is owned by each actual working term, preserving original copies."
       ],
       "deviations": [
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
-        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication."
+        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication.",
+        "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update."
       ]
     },
     {
@@ -120423,7 +120448,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/lar_core.go",
-        "pkg/util/lp/lar_model_test.go"
+        "pkg/util/lp/lar_model_test.go",
+        "pkg/util/lp/lar_pivot.go",
+        "pkg/util/lp/core_pivot_exact_test.go"
       ],
       "tests": [
         "TestLARModelIndependentVariableDirectories",
@@ -120431,7 +120458,14 @@
         "TestLARModelNestedTableauAndRowPropagation",
         "TestLARModelPhysicalFailurePrefixes",
         "TestLARModelDeferredEmptyTermsAndSourceGuards",
-        "TestLARModelLeavesOlderComparisonOwned"
+        "TestLARModelLeavesOlderComparisonOwned",
+        "TestLPPairPivotIndependentBasisRows",
+        "TestLARPivotActualRowScheduling",
+        "TestLARPivotPhysicalFailurePrefixes",
+        "TestLARPivotSourceBranchesAndMetadataGuards",
+        "TestLARPivotTermSubstitutionSourceOffset",
+        "TestLARPivotAdditionalEntryAndClearGuards",
+        "TestLARPivotNativeTableauPhysicalCopies"
       ],
       "assertions": [
         {
@@ -120510,15 +120544,31 @@
             "TestLARModelDeferredEmptyTermsAndSourceGuards",
             "TestLARModelLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "actual LAR calculate_pivot_row scratch resize and exact inverse/nonbasic path with retained native tableau branch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_pivot.go",
+          "tests": [
+            "TestLPPairPivotIndependentBasisRows",
+            "TestLARPivotActualRowScheduling",
+            "TestLARPivotPhysicalFailurePrefixes",
+            "TestLARPivotSourceBranchesAndMetadataGuards",
+            "TestLARPivotTermSubstitutionSourceOffset",
+            "TestLARPivotAdditionalEntryAndClearGuards",
+            "TestLARPivotNativeTableauPhysicalCopies"
+          ]
         }
       ],
       "ownership": [
         "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
-        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction."
+        "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction.",
+        "LAR pivot calculation delegates to the concrete precise core and existing PairLU without outer capture or eager initialization of missing factorization/RowsNZ. Stopped core/model retain actual child owners. Full row scheduling owns only its lexical row analyzer/iterator; term substitution is owned by each actual working term, preserving original copies."
       ],
       "deviations": [
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
-        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication."
+        "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication.",
+        "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update."
       ]
     },
     {
@@ -120562,7 +120612,9 @@
         "pkg/util/lp/lar_model_terms.go",
         "pkg/util/lp/lar_model_bounds.go",
         "pkg/util/lp/lar_model_test.go",
-        "pkg/util/lp/lar_row_dispatch.go"
+        "pkg/util/lp/lar_row_dispatch.go",
+        "pkg/util/lp/lar_pivot.go",
+        "pkg/util/lp/core_pivot_exact_test.go"
       ],
       "tests": [
         "TestLARBoundsIndependentIntervalIntersection",
@@ -120586,7 +120638,14 @@
         "TestLARRowDispatchIndependentIntervals",
         "TestLARRowDispatchGuardsAndCutoff",
         "TestLARRowDispatchPhysicalFailureOwnership",
-        "TestLARRowDispatchModeAndForeignOwner"
+        "TestLARRowDispatchModeAndForeignOwner",
+        "TestLPPairPivotIndependentBasisRows",
+        "TestLARPivotActualRowScheduling",
+        "TestLARPivotPhysicalFailurePrefixes",
+        "TestLARPivotSourceBranchesAndMetadataGuards",
+        "TestLARPivotTermSubstitutionSourceOffset",
+        "TestLARPivotAdditionalEntryAndClearGuards",
+        "TestLARPivotNativeTableauPhysicalCopies"
       ],
       "conditionals": [
         {
@@ -120980,7 +121039,7 @@
           ]
         },
         {
-          "name": "remaining whole-model constraint scopes, exact optimization, pivot-row calculation and term substitution, row scheduling and explanations",
+          "name": "remaining whole-model constraint scopes, exact optimization, whole propagation scheduling and explanations",
           "status": "unported",
           "tests": []
         },
@@ -121045,19 +121104,35 @@
             "TestLARRowDispatchPhysicalFailureOwnership",
             "TestLARRowDispatchModeAndForeignOwner"
           ]
+        },
+        {
+          "name": "calculate_implied_bounds_for_row tableau/LU dispatch, substitute_basis_var_in_terms_for_row and term_is_used_as_row source offset/assertion profiles",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_pivot.go",
+          "tests": [
+            "TestLPPairPivotIndependentBasisRows",
+            "TestLARPivotActualRowScheduling",
+            "TestLARPivotPhysicalFailurePrefixes",
+            "TestLARPivotSourceBranchesAndMetadataGuards",
+            "TestLARPivotTermSubstitutionSourceOffset",
+            "TestLARPivotAdditionalEntryAndClearGuards",
+            "TestLARPivotNativeTableauPhysicalCopies"
+          ]
         }
       ],
       "ownership": [
         "LARBounds is the owning concrete bound component with borrowed RationalManager. Status, infeasible column and witness/type state use existing typed scoped owners; exact lower/upper journals retain completed and partial values. The actual LAR core owns this component and the outer model aliases it; whole-model scope/optimization ownership remains incomplete.",
         "LARSolver owns real exact/floating model/core fields and native external/internal directories. LARCoreSolver owns the single LARBounds state; the outer solver aliases it without copying or closing twice. Scoped witness/status metadata is composed alongside the exact type/bound fields. Both actual primal cores borrow live slice headers, outer settings and column namer. Constructor/registration errors return or retain concrete partial owners until Close; source child arithmetic is never wrapped in an outer numeric receipt segment.",
         "Working and original terms are separately constructed owning copies and publish in source order. Partial unpublished term/constraint and iterator are retained separately. Constraints close in forward source order before working/original terms, then core members. Parent row/shift arithmetic owns its own exact slots/receipts; stopped matrix/iterator/bounds/constraint calls keep theirs. Parent negative/shift inputs outlive child cleanup. Older caller comparison stays the same active generation after whole-model destruction.",
-        "Solver owns the lexical row iterator and analyzer until successful completion or explicit Close after failure. Analyzer closes before iterator, and both close before matrices/terms/core. Borrowed propagator keeps ownership of published bounds and virtual-hook calls. No model-level numeric capture adopts child calls; stopped dispatch preserves numeric generations. Source zero RHS is a nonallocating initialized local value copied into the actual analyzer."
+        "Solver owns the lexical row iterator and analyzer until successful completion or explicit Close after failure. Analyzer closes before iterator, and both close before matrices/terms/core. Borrowed propagator keeps ownership of published bounds and virtual-hook calls. No model-level numeric capture adopts child calls; stopped dispatch preserves numeric generations. Source zero RHS is a nonallocating initialized local value copied into the actual analyzer.",
+        "LAR pivot calculation delegates to the concrete precise core and existing PairLU without outer capture or eager initialization of missing factorization/RowsNZ. Stopped core/model retain actual child owners. Full row scheduling owns only its lexical row analyzer/iterator; term substitution is owned by each actual working term, preserving original copies."
       ],
       "deviations": [
-        "Bound/witness state, actual model/core construction and variable/term/bound registration, and tableau/prepared-pivot row analysis are implemented. Whole-model scopes, pivot-row computation/substitution, row scheduling, explanations and optimization remain incomplete.",
+        "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
         "Full exact/LAR optimization, pricing/tableau pivot loop, strategy selection/LU-state migration, whole-model scopes, row scheduling/explanations and original LAR drivers remain incomplete. Only actual retained registration and construction algorithms are credited. Native maps/slices and existing concrete exact owners replace STL containers; no new generic arithmetic or callback adapter is introduced. Invalid external-variable throw(0) adapts to ErrBounds in native / source assertion in debug. The bound-state composition changes Go field grouping without duplicating values or ownership.",
         "Preserve source specifics: nonbasic columns append in registration order; initial registration grows exact X/bounds/costs/D/inf-set domain but not all solve scratch; floating fields grow only under LU. Working term constants feed propagation while original term constants feed constraints. New basic witness Row stores its column index. Tableau RHS grows to column count. Floating term rows store -1 at the basis and leave floating X at its initialized value; exact rows store +1 and reconstruct the exact pair value. These source profiles are not claimed as general presolve or optimization correctness. Only add_row_for_term wraps size assertions; deferred/constraint rows preserve map/witness-before-dimension-assertion publication.",
-        "Tableau cutoff is strictly row length > maximum and precedes mode assertion/propagator access. Debug mode assertions preserve iterator construction order; native erases them. Pivot dispatch consumes actual already prepared precise pivot vector and source basis, without claiming calculate_implied_bounds_for_row, automatic pivot calculation or term substitution. Invalid row and nil/foreign propagator domains return explicit typed errors. No whole-unit promotion."
+        "Tableau cutoff is strictly row length > maximum and precedes mode assertion/propagator access. Debug mode assertions preserve iterator construction order; native erases them. Pivot dispatch consumes actual already prepared precise pivot vector and source basis, without claiming calculate_implied_bounds_for_row, automatic pivot calculation or term substitution. Invalid row and nil/foreign propagator domains return explicit typed errors. No whole-unit promotion.",
+        "Source substitute_basis_var_in_terms_for_row passes zero-based k to term_is_used_as_row, which asserts is_term(k). Debug/checked rejects every nonempty term list at this assertion, after pivot calculation and before mutation/analysis. Native looks up literal k in ExternalToColumns: ordinary external variable zero can skip unregistered term zero. Preserve both profiles and original-term isolation; do not silently add the term-start offset or claim successful debug term-bearing propagation."
       ]
     },
     {
@@ -121356,7 +121431,9 @@
         "pkg/util/lp/core_dual_float.go",
         "pkg/util/lp/dual_ratio_float.go",
         "pkg/util/lp/core_base_exact.go",
-        "pkg/util/lp/core_base_exact_test.go"
+        "pkg/util/lp/core_base_exact_test.go",
+        "pkg/util/lp/core_pivot_exact.go",
+        "pkg/util/lp/core_pivot_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121418,7 +121495,13 @@
         "TestLPPairCoreIndependentLexicographicFeasibility",
         "TestLPPairCorePhysicalFailurePrefixes",
         "TestLPPairCoreSourceAssertionsAndPublication",
-        "TestLPPairCoreLeavesOlderComparisonOwned"
+        "TestLPPairCoreLeavesOlderComparisonOwned",
+        "TestLPPairPivotIndependentBasisRows",
+        "TestLARPivotActualRowScheduling",
+        "TestLARPivotPhysicalFailurePrefixes",
+        "TestLARPivotSourceBranchesAndMetadataGuards",
+        "TestLARPivotAdditionalEntryAndClearGuards",
+        "TestLARPivotNativeTableauPhysicalCopies"
       ],
       "assertions": [
         {
@@ -121649,13 +121732,27 @@
             "TestLPPairCoreSourceAssertionsAndPublication",
             "TestLPPairCoreLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "precise calculate_pivot_row_of_B_1 through actual indexed PairLU; calculate_pivot_row_when_pivot_row_of_B1_is_ready exact nonbasic accumulation, drop cancellation and RowsNZ publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_pivot_exact.go",
+          "tests": [
+            "TestLPPairPivotIndependentBasisRows",
+            "TestLARPivotActualRowScheduling",
+            "TestLARPivotPhysicalFailurePrefixes",
+            "TestLARPivotSourceBranchesAndMetadataGuards",
+            "TestLARPivotAdditionalEntryAndClearGuards",
+            "TestLARPivotNativeTableauPhysicalCopies"
+          ]
         }
       ],
       "ownership": [
         "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally.",
         "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair.",
         "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization.",
-        "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive."
+        "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive.",
+        "Precise inverse calculation delegates numeric ownership to the actual indexed PairLU. Core pivot accumulation owns source product/return-value temporaries in pivotWork and captures only their arithmetic, ending each segment before child indexed-vector addition. PivotRow retains its own stopped AddWithDropTolerance; core product inputs survive until that vector is closed. Stopped exact core guards and named numeral-root census cover actual physical failures."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -121664,7 +121761,8 @@
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
         "Native writers replace ostream; PrintColumnInfo preserves explicit output for column/bounds and actual os.Stdout for heading/X. Debug precheck changes mode before assertion, resets status only after success, and executes actual Solve. Native SASSERT operand is erased. Two-row independent worlds expose preserved source cost-refresh drift: stale reduced costs after changed infeasibility costs cause FLOATING_POINT_ERROR when the first leaving coefficient exceeds the other coefficient; no silent numerical repair or full feasibility correctness claim. Exact entry point and full LAR consumer remain open.",
-        "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard."
+        "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
+        "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update."
       ]
     },
     {
@@ -121688,7 +121786,9 @@
         "pkg/util/lp/core_dual_float.go",
         "pkg/util/lp/dual_ratio_float.go",
         "pkg/util/lp/core_base_exact.go",
-        "pkg/util/lp/core_base_exact_test.go"
+        "pkg/util/lp/core_base_exact_test.go",
+        "pkg/util/lp/core_pivot_exact.go",
+        "pkg/util/lp/core_pivot_exact_test.go"
       ],
       "tests": [
         "TestLPFloatCoreConstructionIndependentBasisOracle",
@@ -121747,7 +121847,13 @@
         "TestLPPairCoreIndependentLexicographicFeasibility",
         "TestLPPairCorePhysicalFailurePrefixes",
         "TestLPPairCoreSourceAssertionsAndPublication",
-        "TestLPPairCoreLeavesOlderComparisonOwned"
+        "TestLPPairCoreLeavesOlderComparisonOwned",
+        "TestLPPairPivotIndependentBasisRows",
+        "TestLARPivotActualRowScheduling",
+        "TestLARPivotPhysicalFailurePrefixes",
+        "TestLARPivotSourceBranchesAndMetadataGuards",
+        "TestLARPivotAdditionalEntryAndClearGuards",
+        "TestLARPivotNativeTableauPhysicalCopies"
       ],
       "conditionals": [
         {
@@ -122074,13 +122180,27 @@
             "TestLPPairCoreSourceAssertionsAndPublication",
             "TestLPPairCoreLeavesOlderComparisonOwned"
           ]
+        },
+        {
+          "name": "precise calculate_pivot_row_of_B_1 through actual indexed PairLU; calculate_pivot_row_when_pivot_row_of_B1_is_ready exact nonbasic accumulation, drop cancellation and RowsNZ publication",
+          "status": "ported",
+          "go_target": "pkg/util/lp/core_pivot_exact.go",
+          "tests": [
+            "TestLPPairPivotIndependentBasisRows",
+            "TestLARPivotActualRowScheduling",
+            "TestLARPivotPhysicalFailurePrefixes",
+            "TestLARPivotSourceBranchesAndMetadataGuards",
+            "TestLARPivotAdditionalEntryAndClearGuards",
+            "TestLARPivotNativeTableauPhysicalCopies"
+          ]
         }
       ],
       "ownership": [
         "Core borrows matrix/settings/namer and pointers to the actual native slice headers; owns indexed/dense scratch, int_set and real optional floating LU. Failed construction returns its partial owner for Close, preserving caller heading/nonbasis publication prefixes. Source destructor deletes LU; Go scratch is reclaimed normally.",
         "Basis exchanges mutate actual borrowed headings/basis/nonbasis in source order, without updating the numerical factorization. InitLU explicitly replaces its owned real LU; reduced costs use owned Y/D and SolveBd uses owned Ed/W. Tracing owns a native slice and cancels only the immediately reversed pair.",
         "Native local RHS and copied correction vectors are owned by the reconstruction call. Basic X publication, CopyXB capture and Ed/column-indexed updates follow source order. Numerical update uses actual LU/W and pivot rows; refactors destroy/replace the owned LU, failed constructors retain real partial owners. Feasible-only singular branch deletes LU and publishes nil; rollback restores actual headings, X and factorization.",
-        "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive."
+        "Exact core borrows actual input slice headers, matrix, settings, column namer and manager. It owns initialized rational/pair scratch and concrete PairLU; partial constructor results require Close. Base owns its direct comparison/cost-copy calls, while child LU calls retain their own generations and caller outputs own their published values. Derived epsilon owns source quotient expression temporaries. Destruction releases derived members, base factorization body, then reverse-order base scratch; borrowed model fields survive.",
+        "Precise inverse calculation delegates numeric ownership to the actual indexed PairLU. Core pivot accumulation owns source product/return-value temporaries in pivotWork and captures only their arithmetic, ending each segment before child indexed-vector addition. PivotRow retains its own stopped AddWithDropTolerance; core product inputs survive until that vector is closed. Stopped exact core guards and named numeral-root census cover actual physical failures."
       ],
       "deviations": [
         "Floating initialization/feasibility layer only. Exact instantiations, remaining core helpers and optimization loops, diagnostics and full original drivers remain open. Null references and out-of-bounds source accesses have explicit Go ErrBounds guards. SASSERT condition reads are erased in native profile; source boxed checks and basis inverse checks run only in debug. Source constructor repeats heading initialization after optional LU and does not populate infeasibility set.",
@@ -122088,7 +122208,8 @@
         "Floating reconstruction and numerical update only. The source subtracts its solved residual correction from X and is preserved literally, including stale-factor outcomes. Ax residual test is abs(b-dot)>refactor_tolerance*(1+0.1*abs(b)), strict with source IEEE behavior; indexed check visits only supplied rows. copy_right_side has only declaration/definition and is excluded. Exact values/core, remaining feasibility/ratio/iteration helpers and full drivers remain open. Go output errors return after completed rollback/refactor mutations but before subsequent status writes; ostream/global stream flags are not claimed. Remaining update coverage includes child-error paths protected by completed vector invariants and the final non-OK refactor after successful X restoration; no fake numerical callbacks or allocation hooks are introduced.",
         "Retained double/double advance binds actual LU, X/basis, costs, norms and pricing list; no substitute solver callbacks. Source numerical refusal remains separate from typed child/index errors. Borrowed Go writer replaces LP_OUT insertion chain for the one failure diagnostic. Preserve sign/output publication, feasibility-only early list retention, source zero-pivot comparison code1 and two-observation unbounded/infeasible status transitions. Full solve/iteration/resource/statistics orchestration and exact/tableau advance remain open.",
         "Go stage-one LU Solve binds actual numerical components and retains do-while iteration limits with <=, post-increment iteration accounting, source cost normalization and optimum recheck, feasible-only early return, borrowed cancellation errors and status transitions. Statistics use native Go writers and classic six-digit text rather than porting STL stream locale/flag internals; nil message writer is usable only behind erased print gates. Original upper-only constructor/test default tableau profile, exact/tableau solve and full outer solver integration remain open. Definition-only done() is excluded.",
-        "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard."
+        "Only the retained mpq/impq specialization is added here. No generic arithmetic adapter or epsilon/tolerance approximation is used. Precise pricing, tableau pivoting, basis update/optimization loop and full LAR model/core integration remain open. Source constructor does not initialize a feasible solution or inf-set membership; InitInfSet scans basic columns in ascending column order. Unused enter-price epsilon field/assignment is excluded consistently with prior retained-call audit. Slice/index guards transport otherwise undefined source inputs, and pending-owner guards prevent numeric call reuse. Default tableau SolveBdIndexed retains debug assertion versus erased native lazy-LU behavior; SolveYB copies basic costs before a missing-factorization guard.",
+        "Pivot calculation requires prepared source factorization, heading and precise RowsNZ metadata. No eager solve-prefix substitute is invented. Exact zero inverse entries are skipped; cancellation erases sparse membership; RowsNZ publishes only after full arithmetic. Invalid metadata returns typed errors after the actual reached prefix. LAR native tableau branch survives its rejected debug assertion, with row copying but no inverse solve or RowsNZ update."
       ]
     },
     {

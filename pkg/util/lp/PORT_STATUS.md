@@ -19,6 +19,13 @@ native/debug checks validate those changes. Coverage measures current Go code,
 not unported C++ functionality.
 Log/profile: `/mnt/oldrog/tmp/g3-lar-model-module-native.{log,cover}`.
 
+Known source limitation: term substitution passes a zero-based offset to a helper
+that asserts it is a full term ID. Debug/checked therefore rejects nonempty term
+lists after pivot calculation, before substitution or analysis. Native looks up
+the literal offset; an ordinary external variable numbered zero can skip the
+first unregistered term. Both behaviors are preserved and tested. Empty-term LU
+and tableau per-row dispatch succeed in both profiles.
+
 Known source limitation: the outer primal path flips upper-only coordinates but
 retains `ColumnUpperBound` with zero upper value. Its regression reports source
 “optimal” cost -3 where independent enumeration proves optimum2. This behavior is
@@ -46,6 +53,7 @@ from the120 independently verified bounded optima.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Exact pivot calculation and per-row calculate/substitute/analyze dispatch | 100 independent B*D basis worlds and inverse-row oracle; permuted bases/cancellation; actual model strict bounds; source offset assertion/native collision and fallback; six inverse/accumulation/scheduling physical campaigns plus two native substitution and two native tableau-copy campaigns; metadata/stopped-entry guards | Union of expanded/supplemental profiles: exact pivot91.4% native (53/58),93.1% debug (54/58); LAR pivot90.2% native (55/61),75.4% debug (46/61). Debug blocks13 statements at earlier source assertions; two remaining resize guards follow successful clearing. Full optimization/scopes/explanations remain open |
 | Solver-bound tableau and prepared pivot row analysis | 160 independent signed-coefficient interval worlds; strictness/term identity, strongest-bound repeats, row-length cutoff boundary and assertion/construction ordering; nil/foreign providers; four pooled/direct physical failure campaigns with stopped entries and borrowed propagator ownership | Dispatch87.5% native (35/40),92.5% debug/checked (37/40). Gaps are child/cleanup errors and erased assertions. Pivot computation, term substitution and full scheduling remain open |
 | Real LAR exact/floating model and variable/term/bound registration | Four strategy profiles with300 variable steps each;120 independent exact row/value/constant worlds; nested tableau and actual row propagation; deferred empty terms and source guard/publication profiles;12 pooled/direct physical failure campaigns through success; older caller comparison retained through destruction | Core74.2% (23/31) both; model74.7% native/79.0% debug (121/162,128/162); terms76.1%/81.2% (150/197,160/197); bound registration94.1% (64/68) both. Gaps mainly qualify invariant/child cleanup guards. Full LAR Solve/scopes/strategy migration and explanations remain open |
 | Exact mpq/impq core/primal construction, bounds and actual LU entry points | 100 independent basis and known-solution row/column systems;320 exact lexicographic interval worlds, basic infeasibility membership and delta signs; source assertion/publication and header-borrow profiles;16 pooled/direct physical failure campaigns through success; older caller comparison survives destruction | Base76.0% native (149/196),82.1% debug/checked (161/196); precise primal76.8% (76/99) both. Gaps mainly qualify metadata/cleanup guards, erased assertions and small-integer epsilon-construction failures. Exact pricing/tableau/Solve and full LAR integration remain open |
