@@ -279,7 +279,7 @@ func (s *SMTQIParams) Display(out *util.NumericTextStream) error {
 	if e := out.AppendCString("m_qi_cost="); e != nil {
 		return e
 	}
-	if e := out.AppendOwnedString(&s.cost); e != nil {
+	if e := s.cost.AppendTo(out); e != nil {
 		return e
 	}
 	if e := out.AppendByte('\n'); e != nil {
@@ -291,7 +291,7 @@ func (s *SMTQIParams) Display(out *util.NumericTextStream) error {
 	if e := out.AppendCString("m_qi_new_gen="); e != nil {
 		return e
 	}
-	if e := out.AppendOwnedString(&s.newGen); e != nil {
+	if e := s.newGen.AppendTo(out); e != nil {
 		return e
 	}
 	if e := out.AppendByte('\n'); e != nil {

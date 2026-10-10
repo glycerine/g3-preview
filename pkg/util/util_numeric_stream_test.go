@@ -467,3 +467,53 @@ func absNumericTest(n int) int {
 	}
 	return n
 }
+
+func TestNumericStreamNativeCountedTextAndOwnedInput(t *testing.T) {
+	b := arena.NewBudget(1 << 20)
+	s, e := NewNumericTextStream(NumericTextStreamConfig{Budget: b})
+	if e != nil {
+		t.Fatal(e)
+	}
+	defer s.Close()
+	var value OwnedString
+	if e = value.ConstructRepeated(b, 3, 'a'); e != nil {
+		t.Fatal(e)
+	}
+	defer value.SourceDestroy()
+	value.Put(1, 0)
+	value.Put(2, 'b')
+	for _, tc := range []struct {
+		alignment NumericAlignment
+		want      string
+	}{
+		{NumericRight, "__a\x00b"}, {NumericLeft, "a\x00b__"}, {NumericInternal, "__a\x00b"},
+	} {
+		if e = s.ResetText(); e != nil {
+			t.Fatal(e)
+		}
+		if e = s.SetAlignment(tc.alignment); e != nil {
+			t.Fatal(e)
+		}
+		if e = s.SetFill('_'); e != nil {
+			t.Fatal(e)
+		}
+		if e = s.SetWidth(5); e != nil {
+			t.Fatal(e)
+		}
+		if e = value.AppendTo(s); e != nil {
+			t.Fatal(e)
+		}
+		if got, e := s.String(); e != nil || got != tc.want || s.State().Width != 0 {
+			t.Fatal(got, tc.want, e, s.State())
+		}
+	}
+	if e = s.ResetText(); e != nil {
+		t.Fatal(e)
+	}
+	if e = s.AppendCString("a\x00b"); e != nil {
+		t.Fatal(e)
+	}
+	if got, e := s.String(); e != nil || got != "a" {
+		t.Fatal("CString terminator boundary", got, e)
+	}
+}

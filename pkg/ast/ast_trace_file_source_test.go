@@ -147,12 +147,12 @@ func TestASTTraceFileFailedSentryOwnedStringKeepsWidthAndReachedLifetime(t *test
 	var value util.OwnedString
 	paramsMust(t, value.Construct(b, "trace"))
 	paramsMust(t, f.stream.SetWidth(17))
-	paramsMust(t, f.stream.AppendOwnedString(&value))
+	paramsMust(t, value.AppendTo(&f.stream))
 	if f.stream.State().Width != 17 {
 		t.Fatal("failed ostream sentry consumed std::string width")
 	}
 	value.SourceDestroy() // actual owned string DT ends the borrow domain.
-	if e = f.stream.AppendOwnedString(&value); !errors.Is(e, util.ErrOwnedStringOwner) {
+	if e = value.AppendTo(&f.stream); !errors.Is(e, util.ErrOwnedStringOwner) {
 		t.Fatal("failed sentry erased reached string data/length guard", e)
 	}
 	paramsMust(t, f.Close())

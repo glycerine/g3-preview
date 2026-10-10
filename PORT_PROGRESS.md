@@ -33501,3 +33501,31 @@ full native module suite remains within the hourly interval; no rerun here.
 This removes the API package's retained ASTRefVector consumer. Model evaluation
 and AST-internal owning collections still require migration. The root util
 subpackage split remains active and unfinished.
+
+## Native counted text at the numeric stream boundary
+
+Moved checked OwnedString insertion from NumericTextStream.AppendOwnedString to
+OwnedString.AppendTo. The text owner resolves its own view and passes a counted
+native Go string to NumericTextStream.AppendString. NumericTextStream no longer
+accepts OwnedString or reads its private lifetime/storage fields. MPQInf display,
+QI parameter output and AST trace tests call the producer-side conversion.
+CString insertion retains the first-NUL boundary; counted insertion preserves
+all bytes, including embedded NUL. Both use the same whole-field padding/width
+implementation. Failed sentries still validate owner lifetime, preserve width
+and skip payload reads. No new STL implementation or generic adapter is added.
+
+Validation: focused native util/smtcore/AST passed (0.447s/0.013s/0.023s), same
+focused g3debug checks passed (0.483s/0.012s/0.019s). A counted binary-text fixture
+checks right/left/internal alignment, width reset and the independent CString
+termination boundary. Existing QI/MPQInf formatting and failed-file lifetime
+checks remain. Module-wide compilation, three-package vet, manifest evidence,
+gofmt and diff checks passed. No full native module rerun inside the hourly
+interval. Counts remain 2102 units/677 APIs: 62 ported, 283 partial,
+1729 unported, two dead/deleted.
+
+The refreshed receiver-aware audit remains at 286 files, 40 components and a
+largest coupled group of 190 files. Removing one reverse text-owner dependency
+is not enough to split the stream group: its numeral CString-view method remains
+a numerical bridge. Actual owning AST/model containers and other external
+native storage migration also remain open. Goal stays active; the complete
+util subpackage split is unfinished.

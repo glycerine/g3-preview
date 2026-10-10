@@ -858,7 +858,7 @@ func (p *MPQInfManager) Display(out *NumericTextStream, a *MPQInf) (e error) {
 	if out == nil {
 		return ErrNumericStreamOwner
 	}
-	if e = out.AppendOwnedString(&s.display); e != nil {
+	if e = s.display.AppendTo(out); e != nil {
 		return e
 	}
 	s.display.SourceDestroy()

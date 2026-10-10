@@ -295,6 +295,15 @@ func (s *NumericTextStream) AppendCString(v string) error {
 	return s.appendCString(v)
 }
 
+// AppendString inserts a counted native Go string, including embedded NUL bytes.
+func (s *NumericTextStream) AppendString(v string) error {
+	if e := s.lock(); e != nil {
+		return e
+	}
+	defer s.mu.Unlock()
+	return s.appendString(v)
+}
+
 // AppendNullableCString accepts a native optional string. A missing input
 // marks the selected file transport bad without emitting or consuming width.
 func (s *NumericTextStream) AppendNullableCString(v *string) error {
@@ -313,6 +322,10 @@ func (s *NumericTextStream) appendCString(v string) error {
 	if i := strings.IndexByte(v, 0); i >= 0 {
 		n = i
 	}
+	return s.appendString(v[:n])
+}
+func (s *NumericTextStream) appendString(v string) error {
+	n := len(v)
 	if s.FileBad || s.fileFail {
 		return nil
 	}

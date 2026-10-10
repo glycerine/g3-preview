@@ -278,39 +278,27 @@ func (s *OwnedString) Reverse() error {
 	return nil
 }
 
-func (out *NumericTextStream) AppendOwnedString(s *OwnedString) error {
-	if e := out.lock(); e != nil {
+// AppendTo resolves counted text in its owning layer. The numeric stream only
+// receives a native Go string and does not retain this owner or its view.
+func (s *OwnedString) AppendTo(out *NumericTextStream) error {
+	if e := out.CheckOpen(); e != nil {
 		return e
 	}
-	defer out.mu.Unlock()
-	if s.Self != s || s.Closed || !s.Ready {
+	if !s.valid() {
 		return ErrOwnedStringOwner
 	}
-	view := s.View()
-	n := s.Length // actual data/size fields acquired before insertion.
-	if out.FileBad || out.fileFail {
-		return nil
-	}
-	pad, e := out.fieldPadding(n)
+	// The selected failed sentry checks data/size lifetime but does not read the
+	// payload or consume width. Keep that ordering before the native conversion.
+	failed, e := out.Fail()
 	if e != nil {
 		return e
 	}
-	if out.state.Alignment != NumericLeft {
-		if e = out.padding(pad); e != nil {
-			return e
-		}
+	if failed {
+		return nil
 	}
-	for i := uint64(0); i < n; i++ {
-		ch, e := view.Byte(i)
-		if e != nil {
-			return e
-		}
-		if e = out.emitByte(ch); e != nil {
-			return e
-		}
+	text, e := s.View().String()
+	if e != nil {
+		return e
 	}
-	if out.state.Alignment == NumericLeft {
-		return out.padding(pad)
-	}
-	return nil
+	return out.AppendString(text)
 }
