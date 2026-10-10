@@ -1,7 +1,7 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 89.8,
+  "native_statement_coverage_of_current_go_code": 89.9,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
@@ -1113,21 +1113,54 @@
     },
     {
       "source": "src/util/lp/static_matrix.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/static_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatStaticMatrixIndependentMutationOracle",
+        "TestLPFloatStaticMatrixIndependentPivotOracle",
+        "TestLPFloatStaticMatrixScopesAndInitialization",
+        "TestLPFloatStaticMatrixQueriesAndColumnCopies",
+        "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
+        "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
+        "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
+        "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+      ]
     },
     {
       "source": "src/util/lp/static_matrix.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/static_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatStaticMatrixIndependentMutationOracle",
+        "TestLPFloatStaticMatrixIndependentPivotOracle",
+        "TestLPFloatStaticMatrixScopesAndInitialization",
+        "TestLPFloatStaticMatrixQueriesAndColumnCopies",
+        "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
+        "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
+        "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
+        "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+      ]
     },
     {
       "source": "src/util/lp/static_matrix_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/static_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatStaticMatrixIndependentMutationOracle",
+        "TestLPFloatStaticMatrixIndependentPivotOracle",
+        "TestLPFloatStaticMatrixScopesAndInitialization",
+        "TestLPFloatStaticMatrixQueriesAndColumnCopies",
+        "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
+        "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
+        "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
+        "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+      ]
     },
     {
       "source": "src/util/lp/tail_matrix.h",
@@ -1163,8 +1196,8 @@
     }
   ],
   "status_counts": {
-    "unported": 82,
-    "partial": 28
+    "unported": 79,
+    "partial": 31
   },
-  "combined_debug_checked_statement_coverage_of_current_go_code": 91.8
+  "combined_debug_checked_statement_coverage_of_current_go_code": 91.7
 }

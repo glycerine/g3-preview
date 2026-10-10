@@ -5,7 +5,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently twenty-eight partial source units and 82 unported units. No complete
+There are currently thirty-one partial source units and 79 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
@@ -26,11 +26,12 @@ code that has not been ported.
 | Exact rational sparse coefficient lists and division ownership | 120 arbitrary-precision list worlds against `math/big.Rat`; first-match lookup, duplicate/zero entries, tiny divisors and live divisor aliasing; real append/lookup/positive and negative divide/alias-divide refusal campaigns through first success; named-cell/direct-object census and older raw invocation identity | Coefficient storage 87.1% native / 88.7% debug; exact eta call receipts 87.5%; remaining statements propagate child/cleanup errors or the opposite-profile assertion |
 | Exact rational/rational and rational/pair column eta applications and tail bindings | 240 independent rational matrix worlds; all 24 size-four conjugations and element views; mixed permutation/eta dense/sparse chains; source duplicate/self-term/index and bounds prefixes; real coefficient, diagonal, small/large-pivot and zero-destination refusal campaigns; stopped-destination and older raw ownership | Eta 89.4% native / 89.8% debug; concrete rational expression helpers 90%; exact tail bindings 100%. Gaps include child/cleanup errors and the unreachable precise branch that drops a nonzero pivot after division by a valid finite diagonal |
 | Exact rational/rational and rational/pair row eta applications | 240 independent rational matrix worlds across dense/sparse directions and pair left; all 24 size-four conjugations/element views; mixed permutation/column/row tail chains; source snapshot/live-reference, duplicate/self-term and descending conjugation prefixes; actual reservation campaigns through numerical success, including index-before-result-copy stops; stopped-destination/older-call ownership | 91.4% native / 91.8% debug; remaining statements propagate child/cleanup errors or the opposite-profile assertion |
+| Floating static matrix storage, queries, row pivots and dimension scopes | 12,000 independent map mutations; 2,000 independent row pivots; reciprocal links, fill/cancellation, IEEE underflow, duplicates, literal offset/scoping/debug quirks and valid mutation prefixes | 90.9% native / 93.5% debug; exact static storage/arithmetic, precise iterator integration and formatting remain open |
 | Settings defaults, stats, float tolerance families, random state and resource limits | All numerical/strategy defaults, source RNG golden vectors, mutable thresholds, strict CPU-time boundary, borrowed limit/error propagation and stats reset | 96.3%; uncovered constructor return propagates a real host-clock start error |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-Current complete-package coverage runs report **89.8% native and 91.5% combined debug/checked**. Exact scoped
+Current complete-package coverage runs report **89.9% native and 91.7% combined debug/checked**. Exact scoped
 vector allocation and rollback paths are tested; remaining uncovered statements
 include numerical child and cleanup/capture error returns, plus profile-specific
 assertion paths. The explicit
@@ -42,6 +43,10 @@ applies to the current Go code only. Debug assertions use the existing explicit
 Go error profile; process-global debugger notification/stream binding is not
 claimed. Go slices and maps replace STL/container internals. Printing uses Go
 `io.Writer`, with file ownership and flushing left to its caller.
+
+Floating static row balancing reaches the source double logarithm’s unimplemented
+fatal path for nonzero terms. Go returns `ErrLPBalanceNotImplemented` at that
+point; no invented logarithm or balancing algorithm is credited.
 
 The next layers retain the full requested scope:
 

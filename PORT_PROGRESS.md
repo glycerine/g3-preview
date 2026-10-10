@@ -35263,3 +35263,40 @@ checkpoint7c6cdc6a saved exact column eta. Native static/sparse matrices are the
 next solver foundation; dense_matrix/matrix helpers are source debug-only and
 remain required for checked integration. LU, scaling, primal/dual/LAR solvers,
 MPS and remaining upstream tests retain the full objective's unfinished scope.
+
+## Floating static matrix storage, pivots and scopes
+
+Implemented retained double/double static_matrix operations using native typed
+row and column slices with reciprocal offsets. Set appends literal duplicate
+terms and skips zero before bounds; AddNewElement retains explicit zero fills.
+Column extraction preserves untouched output slots and ordered sparse indices.
+Products, scaling and extrema retain literal iteration and IEEE behavior. Domain
+uses a Go map and sorted coordinates rather than a port of std::set.
+
+Row elimination preserves exact-zero cancellation, descending removal offsets,
+swap-with-tail link repair and the source's target-row-versus-column-count debug
+assertion. Dimension scopes remove appended rows/columns without restoring old
+values or shrinking row-offset workspace. InitEmptyMatrix sizes workspace from
+the old column count; Clear preserves scope history. Tests pin these behaviors
+and reached malformed-link mutation prefixes rather than silently repairing them.
+
+Independent map fixtures exercise12,000 mutations and both backlink directions.
+Independent normalized row arithmetic covers2,000 pivots with shuffled order,
+fill, multiple cancellations and workspace reset. Additional fixtures cover
+underflow zero storage, duplicates, source IsCorrect diagnostic gaps, NaN/Inf,
+column-copy prefixes, scopes, bounds and native/debug assertion differences.
+Focused checks pass native0.180s/debug-checked0.173s; new-file statement coverage
+is90.9%/93.5%. Remaining statements are child/corrupt-link guards or profile-only
+assertions. Full LP debug/checked passes106.571s at91.7%; hourly full native module
+passes exit0, log /mnt/oldrog/tmp/g3-static-float-module-native.log, including
+LP72.595s at89.9%. LP vet and focused checks passed.
+
+Source double numeric_traits::log is NOT_IMPLEMENTED_YET and exits; row balance
+reaches that path on its first nonzero term. Go returns explicit
+ErrLPBalanceNotImplemented there. No math.Log replacement, global fatal-service
+binding or completed balance algorithm is claimed. Definition-only static
+adapters remain excluded by retained-consumer audit. Exact static types, precise
+linear-combination integration, formatting and complete sparse/LU/solver layers
+remain required. Static units become partial:31 partial/79 unported LP files;
+repository62 ported/312 partial/1700 unported/two dead-deleted. The complete LP
+implementation/test objective remains active.

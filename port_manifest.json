@@ -121261,13 +121261,16 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/types.go",
-        "pkg/util/lp/settings.go"
+        "pkg/util/lp/settings.go",
+        "pkg/util/lp/static_matrix_float.go"
       ],
       "tests": [
         "TestLPSourceEnumsAndSpellings",
         "TestLPSourceStatusFallbackAndParserAsymmetry",
         "TestLPSettingsDefaultsAndServices",
-        "TestLPSettingsFloatToleranceEdges"
+        "TestLPSettingsFloatToleranceEdges",
+        "TestLPFloatStaticMatrixIndependentPivotOracle",
+        "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards"
       ],
       "conditionals": [
         {
@@ -121312,6 +121315,15 @@
           "tests": [
             "TestLPSettingsDefaultsAndServices",
             "TestLPSettingsFloatToleranceEdges"
+          ]
+        },
+        {
+          "name": "ensure_increasing reached cancellation-offset insertion ordering inside static pivot, preserving duplicate and reverse removal ordering",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_float.go",
+          "tests": [
+            "TestLPFloatStaticMatrixIndependentPivotOracle",
+            "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards"
           ]
         }
       ],
@@ -122025,7 +122037,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/numeric_pair.go"
+        "pkg/util/lp/numeric_pair.go",
+        "pkg/util/lp/static_matrix_float.go"
       ],
       "tests": [
         "TestLPRationalPairArithmeticOracle",
@@ -122042,7 +122055,8 @@
         "TestLPPairPriorityQueueAllocationFailureCensus",
         "TestLPPairPriorityQueueOlderComparisonIdentity",
         "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
-        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+        "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes",
+        "TestLPFloatStaticMatrixQueriesAndColumnCopies"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -122075,6 +122089,14 @@
             "TestLPPairPriorityQueueOlderComparisonIdentity",
             "TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes",
             "TestLPPairPriorityQueueRetainedShrinkMutationPrefixes"
+          ]
+        },
+        {
+          "name": "actual nonzero static balance stop at double numeric_traits::log NOT_IMPLEMENTED_YET, represented by explicit Go error profile",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_float.go",
+          "tests": [
+            "TestLPFloatStaticMatrixQueriesAndColumnCopies"
           ]
         }
       ],
@@ -123938,9 +123960,20 @@
       "path": "src/util/lp/static_matrix.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/static_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatStaticMatrixIndependentMutationOracle",
+        "TestLPFloatStaticMatrixIndependentPivotOracle",
+        "TestLPFloatStaticMatrixScopesAndInitialization",
+        "TestLPFloatStaticMatrixQueriesAndColumnCopies",
+        "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
+        "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
+        "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
+        "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+      ],
       "conditionals": [
         {
           "line": 55,
@@ -124031,17 +124064,48 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained double static matrix storage, linked row/column insertion/removal, normalized row pivot, scopes, row transposition, scaling, queries and actual source balance stop",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_float.go",
+          "tests": [
+            "TestLPFloatStaticMatrixIndependentMutationOracle",
+            "TestLPFloatStaticMatrixIndependentPivotOracle",
+            "TestLPFloatStaticMatrixScopesAndInitialization",
+            "TestLPFloatStaticMatrixQueriesAndColumnCopies",
+            "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
+            "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
+            "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
+            "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed row/column strips, scoped dimension snapshots and pivot offset/cancellation work replace STL storage. Matrix terms retain duplicates and explicit numerical zeros. Swap-with-tail removal repairs both cross-links in source order; pivot fills/removes exact floating zero without an invented epsilon. Offsets, dimension-only scopes, dense-vector resize prefixes and native/debug source assertions retain actual quirks. No synthetic native-container allocation accounting or numeric callbacks."
+      ],
+      "deviations": [
+        "Exact numeral/static matrix instantiations, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed."
+      ]
     },
     {
       "path": "src/util/lp/static_matrix.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/static_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatStaticMatrixIndependentMutationOracle",
+        "TestLPFloatStaticMatrixIndependentPivotOracle",
+        "TestLPFloatStaticMatrixScopesAndInitialization",
+        "TestLPFloatStaticMatrixQueriesAndColumnCopies",
+        "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
+        "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
+        "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
+        "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+      ],
       "conditionals": [
         {
           "line": 252,
@@ -124136,17 +124200,48 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained double static matrix storage, linked row/column insertion/removal, normalized row pivot, scopes, row transposition, scaling, queries and actual source balance stop",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_float.go",
+          "tests": [
+            "TestLPFloatStaticMatrixIndependentMutationOracle",
+            "TestLPFloatStaticMatrixIndependentPivotOracle",
+            "TestLPFloatStaticMatrixScopesAndInitialization",
+            "TestLPFloatStaticMatrixQueriesAndColumnCopies",
+            "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
+            "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
+            "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
+            "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed row/column strips, scoped dimension snapshots and pivot offset/cancellation work replace STL storage. Matrix terms retain duplicates and explicit numerical zeros. Swap-with-tail removal repairs both cross-links in source order; pivot fills/removes exact floating zero without an invented epsilon. Offsets, dimension-only scopes, dense-vector resize prefixes and native/debug source assertions retain actual quirks. No synthetic native-container allocation accounting or numeric callbacks."
+      ],
+      "deviations": [
+        "Exact numeral/static matrix instantiations, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed."
+      ]
     },
     {
       "path": "src/util/lp/static_matrix_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/static_matrix_float.go"
+      ],
+      "tests": [
+        "TestLPFloatStaticMatrixIndependentMutationOracle",
+        "TestLPFloatStaticMatrixIndependentPivotOracle",
+        "TestLPFloatStaticMatrixScopesAndInitialization",
+        "TestLPFloatStaticMatrixQueriesAndColumnCopies",
+        "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
+        "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
+        "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
+        "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+      ],
       "conditionals": [
         {
           "line": 34,
@@ -124167,9 +124262,29 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained double static matrix storage, linked row/column insertion/removal, normalized row pivot, scopes, row transposition, scaling, queries and actual source balance stop",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_float.go",
+          "tests": [
+            "TestLPFloatStaticMatrixIndependentMutationOracle",
+            "TestLPFloatStaticMatrixIndependentPivotOracle",
+            "TestLPFloatStaticMatrixScopesAndInitialization",
+            "TestLPFloatStaticMatrixQueriesAndColumnCopies",
+            "TestLPFloatStaticMatrixLiteralDuplicatesAndDiagnosticGaps",
+            "TestLPFloatStaticMatrixBoundsAndVectorPrefixes",
+            "TestLPFloatStaticMatrixPivotIEEEAndLiteralGuards",
+            "TestLPFloatStaticMatrixScopeAndCrosslinkStops"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed row/column strips, scoped dimension snapshots and pivot offset/cancellation work replace STL storage. Matrix terms retain duplicates and explicit numerical zeros. Swap-with-tail removal repairs both cross-links in source order; pivot fills/removes exact floating zero without an invented epsilon. Offsets, dimension-only scopes, dense-vector resize prefixes and native/debug source assertions retain actual quirks. No synthetic native-container allocation accounting or numeric callbacks."
+      ],
+      "deviations": [
+        "Exact numeral/static matrix instantiations, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed."
+      ]
     },
     {
       "path": "src/util/lp/tail_matrix.h",
