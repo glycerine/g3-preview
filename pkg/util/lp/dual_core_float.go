@@ -12,6 +12,7 @@ type FloatDualCoreSolver struct {
 	Delta, ThetaD, ThetaP                 float64
 	BreakpointSet, FlippedBoxed, TightSet map[uint32]bool
 	EnteringBoundaryPosition              NonBasicColumnValuePosition
+	ForbiddenRows                         map[uint32]bool
 }
 
 func NewFloatDualCoreSolver(in FloatCoreInputs, canEnter *[]bool) (*FloatDualCoreSolver, error) {

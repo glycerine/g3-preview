@@ -37717,3 +37717,44 @@ new import edges. LP remains72 partial/38 unported; full pricing/iteration
 optimization, outer stage/solution dispatch, exact variants and full original
 drivers remain open. Last full module checkpoint21:11 UTC predates this work;
 another hourly run is not due yet. No whole dual optimizer completion credit.
+
+### Floating dual core Solve, iteration and row pricing — 2026-10-10
+
+Connected the complete floating dual core solve loop to actual pivot/ratio/
+basis updates. Added original leaving-row budget, RNG mutation, record-budget
+pricing with rotating offsets and forbidden rows, OneIteration, source debug
+preconditions and actual statistics/time/strict iteration/no-improvement stops.
+Budget counts record-breaking scores, not visits; zero budget still processes
+one row. Large-row percentage uses floating division/truncation before RNG;
+modulo-zero guard follows RNG. Unsupported float-to-uint domains and zero-row
+index/modulo domains return explicit bounds errors, not fabricated optima.
+Solve expects prepared X/D/betas; the outer dual two-stage driver is separate.
+
+120 bounded covering LPs with1–3 rows and2–4 structural variables reach the
+same minimum as independent exhaustive basic-vertex Gauss-Jordan enumeration.
+Tests independently verify equations, nonnegative values and dual feasibility.
+500 independent rotated/forbidden pricing worlds verify record budgets, ties,
+zero budget and selected row/displacement. Budget thresholds/RNG publication,
+source strict limits, tentative/confirmed dual-unbounded stops, actual clock
+and writer refusals and debug precondition-before-counter resets are covered.
+
+Actual negative residual tolerance reaches floating numerical failure without
+forbidding a row. A real stale LU after basis-column scaling plus dropping tiny
+reconstruction values reaches restored X and false advance, preserving the
+source forbidden-row insertion. Strict no-improvement limits stop or continue
+this actual failure. Continuing exposes a source discrepancy: OneIteration
+resets Unstable to Feasible without clearing forbidden rows; skipping the only
+infeasible row then reports Optimal with basic X=-5e-6. This regression retains
+source status/values and is separate from120 independently verified optima;
+no general dual optimization correctness claim is made.
+
+Focused native core/primal/dual/MPS/presolve/solver/column/scaler/static/LU
+checks pass1.098s; combined g3debug/g3checked1.095s. New file81/104 (77.9%)
+native,101/104 (97.1%) debug. Native excludes20 assertion-only statements;
+three remaining guards are protected by prior same-thread row/bound checks.
+Profiles: /mnt/oldrog/tmp/g3-dual-solve-{native,debug}.cover. Both LP vets pass;
+source/evidence/no-generics verification and graph regeneration run with no
+new import edges. LP remains72 partial/38 unported. Last full native module
+checkpoint21:11 UTC predates these additions; another hourly run is not due.
+Outer dual two-stage execution/status/cost/solution reconstruction, exact
+variants and complete original drivers remain open; whole LP goal unfinished.

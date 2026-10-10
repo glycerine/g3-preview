@@ -121386,7 +121386,8 @@
         "pkg/util/lp/dual_initial_float.go",
         "pkg/util/lp/dual_ratio_float.go",
         "pkg/util/lp/dual_flip_float.go",
-        "pkg/util/lp/dual_advance_float.go"
+        "pkg/util/lp/dual_advance_float.go",
+        "pkg/util/lp/dual_solve_float.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -121416,7 +121417,15 @@
         "TestLPFloatDualReducedCostDiagnosticThreshold",
         "TestLPFloatDualAdvanceReachedGuards",
         "TestLPFloatDualAdvancePublicationAndClosedChildren",
-        "TestLPFloatDualAdvanceActualNumericalRefusals"
+        "TestLPFloatDualAdvanceActualNumericalRefusals",
+        "TestLPFloatDualSolveIndependentVertices",
+        "TestLPFloatDualPricingRecordBudget",
+        "TestLPFloatDualLeavingBudgetRNGAndDomains",
+        "TestLPFloatDualSolveLimitsTimeAndUnbounded",
+        "TestLPFloatDualSolveDebugPreconditionsAndGuards",
+        "TestLPFloatDualPricingActualNumericalFailures",
+        "TestLPFloatDualSolvePreconditionPublication",
+        "TestLPFloatDualSolveActualNoImprovementStop"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -121432,7 +121441,7 @@
           ]
         },
         {
-          "name": "Remaining dual pricing/iteration/full optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "name": "Remaining exact dual core, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -121485,12 +121494,28 @@
             "TestLPFloatDualAdvancePublicationAndClosedChildren",
             "TestLPFloatDualAdvanceActualNumericalRefusals"
           ]
+        },
+        {
+          "name": "Floating dual leaving budget/RNG, ordered record-budget row pricing and forbidden rows, real OneIteration and full core Solve with source limits/statistics/time/debug gates",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solve_float.go",
+          "tests": [
+            "TestLPFloatDualSolveIndependentVertices",
+            "TestLPFloatDualPricingRecordBudget",
+            "TestLPFloatDualLeavingBudgetRNGAndDomains",
+            "TestLPFloatDualSolveLimitsTimeAndUnbounded",
+            "TestLPFloatDualSolveDebugPreconditionsAndGuards",
+            "TestLPFloatDualPricingActualNumericalFailures",
+            "TestLPFloatDualSolvePreconditionPublication",
+            "TestLPFloatDualSolveActualNoImprovementStop"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
-        "Floating dual DSE calls the source prepared U/R solve without full scaling/tail transforms. On the explicit scaled triangular B, updated beta1 is0.0517578125 while the true new inverse-row squared norm is0.2666015625. This literal source discrepancy is preserved, not corrected. Boxed runaway snap writes low even when nearer upper; free recovery assigns zero before source debug assertion. Dead restore_d and commented-out xb_minus_delta_p_pivot_column have no retained source caller and are not ported."
+        "Floating dual DSE calls the source prepared U/R solve without full scaling/tail transforms. On the explicit scaled triangular B, updated beta1 is0.0517578125 while the true new inverse-row squared norm is0.2666015625. This literal source discrepancy is preserved, not corrected. Boxed runaway snap writes low even when nearer upper; free recovery assigns zero before source debug assertion. Dead restore_d and commented-out xb_minus_delta_p_pivot_column have no retained source caller and are not ported.",
+        "Source OneIteration resets Unstable to Feasible without clearing forbidden rows. Actual stale-LU/drop refusal can forbid the only infeasible row; a later iteration reports Optimal while X remains infeasible. Regression preserves this source state transition and does not claim general dual optimization correctness. Zero-row/modulo-zero and out-of-domain floating-to-uint conversion are typed bounds errors; RNG runs before modulo-zero guard."
       ]
     },
     {
@@ -121504,7 +121529,8 @@
         "pkg/util/lp/dual_initial_float.go",
         "pkg/util/lp/dual_ratio_float.go",
         "pkg/util/lp/dual_flip_float.go",
-        "pkg/util/lp/dual_advance_float.go"
+        "pkg/util/lp/dual_advance_float.go",
+        "pkg/util/lp/dual_solve_float.go"
       ],
       "tests": [
         "TestLPFloatDualPreparationIndependentModels",
@@ -121534,7 +121560,15 @@
         "TestLPFloatDualReducedCostDiagnosticThreshold",
         "TestLPFloatDualAdvanceReachedGuards",
         "TestLPFloatDualAdvancePublicationAndClosedChildren",
-        "TestLPFloatDualAdvanceActualNumericalRefusals"
+        "TestLPFloatDualAdvanceActualNumericalRefusals",
+        "TestLPFloatDualSolveIndependentVertices",
+        "TestLPFloatDualPricingRecordBudget",
+        "TestLPFloatDualLeavingBudgetRNGAndDomains",
+        "TestLPFloatDualSolveLimitsTimeAndUnbounded",
+        "TestLPFloatDualSolveDebugPreconditionsAndGuards",
+        "TestLPFloatDualPricingActualNumericalFailures",
+        "TestLPFloatDualSolvePreconditionPublication",
+        "TestLPFloatDualSolveActualNoImprovementStop"
       ],
       "assertions": [
         {
@@ -121672,7 +121706,7 @@
           ]
         },
         {
-          "name": "Remaining dual pricing/iteration/full optimization loop, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
+          "name": "Remaining exact dual core, outer stage execution/status/solution reconstruction, exact variants and full upstream drivers",
           "status": "unported",
           "go_target": "",
           "tests": []
@@ -121725,12 +121759,28 @@
             "TestLPFloatDualAdvancePublicationAndClosedChildren",
             "TestLPFloatDualAdvanceActualNumericalRefusals"
           ]
+        },
+        {
+          "name": "Floating dual leaving budget/RNG, ordered record-budget row pricing and forbidden rows, real OneIteration and full core Solve with source limits/statistics/time/debug gates",
+          "status": "ported",
+          "go_target": "pkg/util/lp/dual_solve_float.go",
+          "tests": [
+            "TestLPFloatDualSolveIndependentVertices",
+            "TestLPFloatDualPricingRecordBudget",
+            "TestLPFloatDualLeavingBudgetRNGAndDomains",
+            "TestLPFloatDualSolveLimitsTimeAndUnbounded",
+            "TestLPFloatDualSolveDebugPreconditionsAndGuards",
+            "TestLPFloatDualPricingActualNumericalFailures",
+            "TestLPFloatDualSolvePreconditionPublication",
+            "TestLPFloatDualSolveActualNoImprovementStop"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
         "Concrete Go slices/maps preserve borrowed headers, source scalar arithmetic and publication order. Stage-one boxed structurals are excluded with zero cost/bounds, low structurals use [0,1], free structurals use [-1e4,1e4], and logical/artificial types restore for stage two. Augment does not touch X despite the source method name. Source RHS backups append without clearing. Excluded negative headings remain unchanged when eligibility rebuilds nbasis. Actual LU construction/solves, not substituted optimizer callbacks, verify basis/dual equations. Missing source map operator[] keys publish before undefined reads reach ErrBounds; native sorted external indices choose deterministic flip-cost error order. All native array/index errors qualify undefined source domains. Full dual optimization/stage dispatch and exact types remain open; no dual optimum or complete source-unit credit.",
-        "Floating dual DSE calls the source prepared U/R solve without full scaling/tail transforms. On the explicit scaled triangular B, updated beta1 is0.0517578125 while the true new inverse-row squared norm is0.2666015625. This literal source discrepancy is preserved, not corrected. Boxed runaway snap writes low even when nearer upper; free recovery assigns zero before source debug assertion. Dead restore_d and commented-out xb_minus_delta_p_pivot_column have no retained source caller and are not ported."
+        "Floating dual DSE calls the source prepared U/R solve without full scaling/tail transforms. On the explicit scaled triangular B, updated beta1 is0.0517578125 while the true new inverse-row squared norm is0.2666015625. This literal source discrepancy is preserved, not corrected. Boxed runaway snap writes low even when nearer upper; free recovery assigns zero before source debug assertion. Dead restore_d and commented-out xb_minus_delta_p_pivot_column have no retained source caller and are not ported.",
+        "Source OneIteration resets Unstable to Feasible without clearing forbidden rows. Actual stale-LU/drop refusal can forbid the only infeasible row; a later iteration reports Optimal while X remains infeasible. Regression preserves this source state transition and does not claim general dual optimization correctness. Zero-row/modulo-zero and out-of-domain floating-to-uint conversion are typed bounds errors; RNG runs before modulo-zero guard."
       ]
     },
     {

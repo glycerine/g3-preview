@@ -1187,6 +1187,7 @@
         "dual_initial_float.go",
         "dual_prepare_float.go",
         "dual_ratio_float.go",
+        "dual_solve_float.go",
         "eta_exact_expression.go",
         "eta_matrix_exact.go",
         "eta_matrix_float.go",
