@@ -11,6 +11,7 @@ code that has not been ported.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
+| Floating solver presolve, pinning and fixed/zero elimination | 100 independent exact box-corner worlds and1500 relation/RHS decisions; strict directional tolerance/IEEE/unknown/zero bounds, pin and RHS publication prefixes, deferred erasure, actual cleanup pass-count semantics, writer failures and cleanup-to-scale integration | Native97.8% (133/136), debug98.5% (134/136). Native gaps are debug-only assertion/error propagation; debug gaps guard null pointers after successful source metadata lookup. Exact presolve and complete drivers remain open |
 | Floating common solver preparation and retained column metadata | 120 independent original-system worlds across shifted/flipped/boxed/free columns; external/core maps, scaled solutions/objectives, reconstruction, counters, stale name aliases, bound tolerance/IEEE and source error/publication prefixes | Solver96.6% native (196/203),98.0% debug (199/203); retained column metadata89.6% (43/48),100% (48/48). Gaps include other-profile assertions, real host-clock failure and invariant-protected reconstruction/false-balance propagation. Primal/dual optimization and exact preparation remain open |
 | Floating ratio/geometric and power-of-two scaler | 160 independent known-solution matrix worlds; diagonal-factor oracles, strict thresholds, both ordering branches, original-ratio and reps+1 fixtures, borrowed inputs, RHS/scale publication failures, zero/NaN/infinity and source log stop | Native86.9% (226/260), debug88.1% (229/260). Gaps propagate invariant-protected child errors, belong to the other assertion profile or lie beyond the source unimplemented balance stop. Precise explicit scale/full solver integration remain open |
 | Prepared X, dense T and indexed T LU solves for all three retained types | 40 independent U*R*x worlds with sparse/forced-dense factors; pair coordinates, descending append, settings/tiny/IEEE cases, U/R error prefixes, stopped/foreign caller ownership; 12 physical refusal campaigns (128 native /206 debug) | Exact100% (46/46), floating94.6% (35/37) in both profiles. Floating gaps guard bounds established by successful U/R operations |
@@ -20,8 +21,8 @@ code that has not been ported.
 | Exact rational/pair Suhl LU column updates | 96 independent exact basis worlds with eight updates each (768 total); scalar/pair column and dense/indexed row solutions, tiny/ignored-pivot/cancellation/hidden-index cases, 21-row sparse column integration; 14 pooled/direct refusal campaigns through success (2,506 native / 5,014 debug), partial row/diagonal tails and older caller ownership | 87.7% native (265/302), 88.4% debug/checked (267/302); both public updates 94.1%. Gaps propagate valid-scalar cleanup/child errors, protect invariants or belong to the other assertion profile; full upstream drivers remain open |
 | Floating Suhl LU column updates | 64 independent basis worlds with 12 repeated nonsingular updates each through sparse/forced-dense initial factors; original four test_small_lu replacements; 241-row indexed column integration; degeneration, strict tolerance/IEEE/underflow/assertion and reached publication/error prefixes | 91.0% native (141/155), 93.5% debug/checked (145/155); remaining returns propagate invariant-protected child/bounds errors or belong to the other assertion profile. Full driver remains open |
 | LU entering-column preparation and indexed/dense column solves | 48 independent original-matrix/known-solution worlds across all three types; strict10/120 boundaries, actual sparse and dense routes, pair faster caller, alias/hidden-data/drop/order cases, first upstream prepare stage; 28 pooled/direct fault campaigns (3,765 native / 7,354 debug refusals), source/caller ownership and reached input prefixes | After prepared-stage extraction: exact column file96.1% (74/77), floating100% (23/23) both profiles; all public column methods100%. Remaining returns guard invariant-protected resize/index bounds or propagate valid-child/zero-predicate errors; source matrix/source-template functionality is not inferred from Go coverage |
-| Exact scalar/pair initial LU factorization and solves | 56 independent rational matrix worlds run sparse and forced-dense; exact factorization identity and scalar/pair column plus dense/indexed row solutions; 32 pooled/direct refusal campaigns through first success (4,595 native / 8,718 debug refusals), borrowed-source and named-cell census, failed eta/dense publication, precise tiny values, constructor/owner guards and older comparison ownership | Initial-factorization coverage snapshot before Suhl ownership additions: shared coefficient orchestration 83.9% native (115/137), 87.6% debug/checked (120/137); typed owners 87.5% (42/48), all six solve methods100% (82/82) both in the historical pre-prepared-extraction snapshot. Remaining initial statements propagate cleanup/child errors or belong to the other assertion profile; full upstream driver remains open |
-| Floating initial sparse/dense LU factorization and solves | 180 independent rectangular-source/basis worlds each run sparse and forced-dense; verify tail-product identity and known column/dense-indexed row solutions; two upstream initial-basis fixtures, singular dense prefix, malformed/stopped/closed inputs, strict tiny-pivot/drop, density-wrap and ignored unit-shortening boundaries | Current core82.3% native (107/130),85.4% debug/checked (111/130); historical pre-prepared-extraction solve orchestration80.9% (38/47) both. Remaining paths propagate child errors behind valid construction invariants or belong to the other assertion profile; full upstream driver remains open |
+| Exact scalar/pair initial LU factorization and solves | 56 independent rational matrix worlds run sparse and forced-dense; exact factorization identity and scalar/pair column plus dense/indexed row solutions; 32 pooled/direct refusal campaigns through first success (4,595 native / 8,718 debug refusals), borrowed-source and named-cell census, failed eta/dense publication, precise tiny values, constructor/owner guards and older comparison ownership | Initial-factorization coverage snapshot before Suhl ownership additions: shared coefficient orchestration 83.9% native (115/137), 87.6% debug/checked (120/137); typed owners 87.5% (42/48), current full-native exact solve file100% (74/74); historical pre-prepared-extraction debug solve snapshot100% (82/82). Remaining initial statements propagate cleanup/child errors or belong to the other assertion profile; full upstream driver remains open |
+| Floating initial sparse/dense LU factorization and solves | 180 independent rectangular-source/basis worlds each run sparse and forced-dense; verify tail-product identity and known column/dense-indexed row solutions; two upstream initial-basis fixtures, singular dense prefix, malformed/stopped/closed inputs, strict tiny-pivot/drop, density-wrap and ignored unit-shortening boundaries | Current core82.3% native (107/130),85.4% debug/checked (111/130); current full-native solve orchestration83.8% (31/37); historical pre-prepared-extraction debug80.9% (38/47). Remaining paths propagate child errors behind valid construction invariants or belong to the other assertion profile; full upstream driver remains open |
 | Exact dense scalar/pair tail applications, conjugation and diagnostics | 120 independently factored rational worlds verify five application routes after conjugation; duplicate/hidden/trailing/growth/cancellation behavior, 22 genuine-fraction allocation campaigns, actual pair X-before-Y and index-before-copy failures, stopped caller and debug-view refusal | Scalar applications 190/230 (82.6%) and pair 88/105 (83.8%) in each profile; debug L check 24/26 (92.3%), view 20/21 (95.2%); gaps propagate cleanup/child errors or guard invariant-protected mappings; native L check returns true without debug traversal |
 | Exact dense-block sparse parent publication | 120 independent factorization worlds verify sparse upper and dense lower matrices, reciprocal links and row maxima; staged missing-diagonal/common/cancellation/fill tests, physical refusal campaigns and older comparison ownership | 91.5% (108/118) in native and debug/checked; gaps propagate cleanup/capture errors or guard invariant-protected predicates/mappings |
 | Exact dense-block construction and pivot stages | 120 independent rational elimination worlds checked at every pivot; pooled/direct actual allocation refusals through success, partial L publication, borrowed parent and older comparison ownership; precise tiny coefficients and reached bounds/assertion prefixes | 82.8% native (207/250), 87.2% debug (218/250); gaps propagate child/cleanup errors, guard invariant-protected offsets or belong to the other profile; remaining solver integration and diagnostics remain open |
@@ -67,13 +68,13 @@ code that has not been ported.
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-The complete native module suite passed at17:57 UTC on2026-10-10, including
-LU update, column and row-refinement code, before the subsequent dimension-extension, lifecycle, prepared-solve, scaler and floating solver-preparation additions. LP passed in327.475s with
-**89.5%** statement coverage (**8499/9501 existing Go statements**). Other results:
-numeral92.883s, AST20.253s and polynomial33.172s. The authoritative log and full
-coverage profile are `/mnt/oldrog/tmp/g3-lu-refine-module-native.log` and
-`/mnt/oldrog/tmp/g3-lu-refine-module-native.cover`. These replace the historical
-16:04 coverage snapshot and16:39 full native run as current verification.
+The complete native module suite passed at19:01 UTC on2026-10-10, including
+all current LU, floating scaler, common solver and presolve additions. LP passed
+in330.403s with **89.8%** statement coverage (**9259/10316 existing Go statements**).
+Other results: numeral93.895s, AST20.506s and polynomial33.270s. Authoritative
+log/profile: `/mnt/oldrog/tmp/g3-presolve-module-native.log` and
+`/mnt/oldrog/tmp/g3-presolve-module-native.cover`. This replaces the historical
+17:57 native snapshot; it does not measure unported C++ algorithms.
 
 Current lifecycle/upstream numerical checks pass0.812s native/1.294s debug.
 Same-manager re-entry after a source Add/SubMul allocation refusal preserves
@@ -81,8 +82,8 @@ missing scratch and returns the real dead-slot guard; owning cleanup is not a
 source-state repair. Existing numeral re-entry tests establish that contract.
 
 Current extension and floating/exact initial-LU regression checks pass2.419s native
-and2.911s combined debug/checked. Both LP vets pass. No within-hour full rerun
-is made for this addition; full coverage above remains a pre-extension/lifecycle/prepared/scaler/solver snapshot.
+and2.911s combined debug/checked. Both LP vets pass. These focused results
+complement the current complete native module run above.
 
 Focused refinement allocation campaigns pass4.735s native and9.284s combined
 `g3debug g3checked`; final strengthened property/guard checks pass1.324s/1.495s.
@@ -125,8 +126,8 @@ not port targets.
 Focused checks (from the repository root):
 
 ```sh
-go -C pkg test ./util/lp -coverprofile=/tmp/g3-lp-native.cover
-go -C pkg test -tags 'g3debug g3checked' ./util/lp -coverprofile=/tmp/g3-lp-debug.cover
+go -C pkg test ./util/lp -run 'TestLPFloat(Presolve|Solver|ColumnInfo|Scaler|StaticMatrix)' -coverprofile=/tmp/g3-lp-native.cover
+go -C pkg test -tags 'g3debug g3checked' ./util/lp -run 'TestLPFloat(Presolve|Solver|ColumnInfo|Scaler|StaticMatrix)' -coverprofile=/tmp/g3-lp-debug.cover
 go tool cover -func=/tmp/g3-lp-native.cover
 go -C pkg vet ./util/lp
 go -C pkg run ./cmd/portcheck
@@ -135,18 +136,22 @@ go -C pkg run ./cmd/portcheck
 Prepared-solve and floating/initial-exact/entering-column integration checks pass
 25.210s native and49.067s combined debug/checked. Both LP vets pass. These are
 focused component profiles; their aggregate percentage is not full LP coverage.
-The complete native module snapshot above predates these prepared entry points.
+The complete native module snapshot above includes these prepared entry points.
 
 Floating scaler plus all floating static-matrix regressions pass0.204s native
 and0.199s combined debug/checked. Both LP vets pass. Profiles and authoritative
-logs are `/mnt/oldrog/tmp/g3-scaler-{native,debug}.{cover,log}`. No complete
-module rerun is made within the hourly interval; the full snapshot above predates
-the scaler. The exact no-op scale entry point and caller restoration/unscaling
-remain separate open work.
+logs are `/mnt/oldrog/tmp/g3-scaler-{native,debug}.{cover,log}`. The complete
+native run above includes the scaler and common floating caller restoration.
+The precise no-op entry point, exact caller preparation and complete simplex/LAR
+scaling integration remain open.
 
 Floating solver preparation, column metadata, scaler and all floating static
 matrix regressions pass0.233s native/0.244s combined debug/checked. Both LP
 vets and source inventory/evidence/no-generics checks pass. Authoritative logs and
 profiles: `/mnt/oldrog/tmp/g3-solver-assembly-{native,debug}.{log,cover}`.
-No full module run is repeated inside the hourly interval. Common data
-preparation does not supply primal/dual optimization or exact solver owners.
+The hourly full native run above includes common preparation and presolve.
+Common preparation does not supply primal/dual optimization or exact owners.
+
+Floating presolve plus solver/column/scaler/static regressions pass0.216s in
+both native and combined debug/checked profiles. Authoritative focused logs
+and coverage: `/mnt/oldrog/tmp/g3-presolve-{native,debug}.{log,cover}`.

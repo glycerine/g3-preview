@@ -1217,6 +1217,7 @@
         "scaler_float.go",
         "settings.go",
         "solver_float.go",
+        "solver_presolve_float.go",
         "sparse_float_vector.go",
         "sparse_matrix_exact.go",
         "sparse_matrix_exact_active.go",

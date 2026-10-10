@@ -36880,3 +36880,54 @@ Final floating solver/column/scaler/static regressions pass0.233s native and
 0.244s combined debug/checked. Both vets, source inventory/evidence/no-generics
 and diff checks pass. Regenerated graph remains64 packages with unchanged
 dependencies and two additional production files.
+
+
+### Floating LP presolve and fixed/zero elimination — 2026-10-10
+
+Ported retained lp_solver.hpp:168-412 floating row minima/maxima, equality and
+inequality obsolete decisions, boundary pinning, fixed/zero coefficient
+elimination, deferred obsolete-row erasure and cleanup. Actual consumers are
+primal and dual find_maximal_solution setup, prior to matrix preparation.
+Directional val_is_smaller_than_eps is t<eps, never abs(t)<eps. Zero terms
+select upper bounds in both extrema; zero pin coefficients select lower bounds.
+Equality checks minimum before maximum. Source NaN and zero-tolerance behavior
+remain literal. Native dictionaries/slices replace STL storage.
+
+100 independent boxes enumerate all corners with math/big.Rat and compare
+actual minima/maxima, then1500 relation/RHS cases verify infeasibility and
+precisely pinned coordinates. Strict tolerance boundaries, IEEE, unknown and
+zero bounds, missing metadata/constraint guards and debug/release pin prefixes
+are covered. Fixed substitution publishes RHS subtraction before deferred term
+erasure; successful earlier pins survive later error. Infeasibility returns
+before queued row deletion and fixed-term removal. Actual cleanup->matrix/RHS
+assembly->scaling->external value/objective->unscale integration is verified.
+
+Source cleanup uses d=(try_to_remove_some_rows()>0), so reporting counts
+successful passes, not removed rows. Three removed rows over two passes print
+"deleted 2 rows"; multiple rows in one pass print "deleted one row". Fixed-term
+substitution with zero removed rows ends cleanup even when it made a row empty;
+a later explicit cleanup removes that row. Both quirks are preserved rather
+than replaced by a mathematically stronger fixpoint algorithm. Writer errors
+return after mutations under the explicit Go output profile; native ostream
+badbit/global streams are not credited. Missing source-indeterminate floating
+constraint reads have qualified Go guards after actual map insertion.
+
+Focused presolve/solver/column/scaler/static checks pass0.216s native/0.216s
+combined debug/checked. New presolve coverage133/136 (97.8%) native,134/136
+(98.5%) debug. Gaps are other-profile assertions/error propagation and null
+pointer guards behind source metadata invariants. LP remains55 partial/55
+unported units. Exact common solver/presolve, primal/dual/LAR optimization,
+random updates, bounds/evidence, MPS and full upstream drivers stay open.
+The hourly full native module suite completed19:01 UTC; its authoritative
+results below replace the historical17:57 snapshot.
+
+The complete native module suite passed: LP330.403s, numeral93.895s, AST20.506s
+and polynomial33.270s. Current full LP coverage9259/10316 statements (89.8%),
+including extension/lifecycle/prepared stages, floating scaler, common solver
+and presolve. Log/profile: /mnt/oldrog/tmp/g3-presolve-module-native.{log,cover}.
+Both LP vets, source inventory/evidence/no-generics and diff checks pass. Graph
+remains64 packages with unchanged edges and the added presolve production file.
+The full native exact solve file is74/74 (100%) after prepared extraction;
+floating solve31/37 (83.8%). Other added components match their current focused
+native snapshots. This is Go statement coverage, not a completion claim for
+unported C++ code. Full debug suite is not repeated solely for aggregate coverage.

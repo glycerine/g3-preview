@@ -121922,14 +121922,22 @@
       "go_targets": [
         "pkg/util/lp/column_info_float.go",
         "pkg/util/lp/solver_float.go",
-        "pkg/util/lp/solver_float_test.go"
+        "pkg/util/lp/solver_float_test.go",
+        "pkg/util/lp/solver_presolve_float.go",
+        "pkg/util/lp/solver_presolve_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
         "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
         "TestLPFloatSolverSlackCountsNamesAndBypass",
         "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
-        "TestLPFloatSolverScaledCostAndValueGuards"
+        "TestLPFloatSolverScaledCostAndValueGuards",
+        "TestLPFloatPresolveIndependentCornerOracle",
+        "TestLPFloatPresolveDirectionalToleranceAndIEEE",
+        "TestLPFloatPresolveUnknownBoundsAndPinPrefixes",
+        "TestLPFloatPresolveCleanupPassesAndDeferredErasure",
+        "TestLPFloatPresolveInputAndWriterErrorPrefixes",
+        "TestLPFloatPresolveComposedErrorsAndPreparedProblem"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -121950,20 +121958,35 @@
           ]
         },
         {
-          "name": "exact common solver data preparation, presolve fixed/zero pruning, row bounds/pinning, full optimization integration and retained diagnostics",
+          "name": "exact common solver data preparation, full optimization integration and retained diagnostics",
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "retained floating presolve row extrema, zero/equality/inequality decisions, boundary pinning, fixed/zero term elimination, deferred row erasure and cleanup (lp_solver.hpp:168-412)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_presolve_float.go",
+          "tests": [
+            "TestLPFloatPresolveIndependentCornerOracle",
+            "TestLPFloatPresolveDirectionalToleranceAndIEEE",
+            "TestLPFloatPresolveUnknownBoundsAndPinPrefixes",
+            "TestLPFloatPresolveCleanupPassesAndDeferredErasure",
+            "TestLPFloatPresolveInputAndWriterErrorPrefixes",
+            "TestLPFloatPresolveComposedErrorsAndPreparedProblem"
+          ]
         }
       ],
       "ownership": [
         "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
-        "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced."
+        "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced.",
+        "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
         "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
-        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested."
+        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
+        "Floating presolve now supersedes earlier open-presolve notes. Independent exact box-corner extrema verify 100 randomized boxes and 1500 relation/RHS decisions; strict directional tolerance, missing/zero bounds, IEEE, source error prefixes and cleanup-to-scaling integration are tested. Cleanup preserves source d=(try_to_remove_some_rows()>0): logs count successful passes, not removed rows, and fixed-term substitution alone does not force another pass. Go writer errors return after source mutations; native ostream badbit/global binding is not claimed. Exact presolve and full simplex/LAR drivers remain open; whole source units remain partial."
       ]
     },
     {
@@ -121974,14 +121997,22 @@
       "go_targets": [
         "pkg/util/lp/column_info_float.go",
         "pkg/util/lp/solver_float.go",
-        "pkg/util/lp/solver_float_test.go"
+        "pkg/util/lp/solver_float_test.go",
+        "pkg/util/lp/solver_presolve_float.go",
+        "pkg/util/lp/solver_presolve_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
         "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
         "TestLPFloatSolverSlackCountsNamesAndBypass",
         "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
-        "TestLPFloatSolverScaledCostAndValueGuards"
+        "TestLPFloatSolverScaledCostAndValueGuards",
+        "TestLPFloatPresolveIndependentCornerOracle",
+        "TestLPFloatPresolveDirectionalToleranceAndIEEE",
+        "TestLPFloatPresolveUnknownBoundsAndPinPrefixes",
+        "TestLPFloatPresolveCleanupPassesAndDeferredErasure",
+        "TestLPFloatPresolveInputAndWriterErrorPrefixes",
+        "TestLPFloatPresolveComposedErrorsAndPreparedProblem"
       ],
       "assertions": [
         {
@@ -122060,20 +122091,35 @@
           ]
         },
         {
-          "name": "exact common solver data preparation, presolve fixed/zero pruning, row bounds/pinning, full optimization integration and retained diagnostics",
+          "name": "exact common solver data preparation, full optimization integration and retained diagnostics",
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "retained floating presolve row extrema, zero/equality/inequality decisions, boundary pinning, fixed/zero term elimination, deferred row erasure and cleanup (lp_solver.hpp:168-412)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_presolve_float.go",
+          "tests": [
+            "TestLPFloatPresolveIndependentCornerOracle",
+            "TestLPFloatPresolveDirectionalToleranceAndIEEE",
+            "TestLPFloatPresolveUnknownBoundsAndPinPrefixes",
+            "TestLPFloatPresolveCleanupPassesAndDeferredErasure",
+            "TestLPFloatPresolveInputAndWriterErrorPrefixes",
+            "TestLPFloatPresolveComposedErrorsAndPreparedProblem"
+          ]
         }
       ],
       "ownership": [
         "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
-        "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced."
+        "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced.",
+        "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
         "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
-        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested."
+        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
+        "Floating presolve now supersedes earlier open-presolve notes. Independent exact box-corner extrema verify 100 randomized boxes and 1500 relation/RHS decisions; strict directional tolerance, missing/zero bounds, IEEE, source error prefixes and cleanup-to-scaling integration are tested. Cleanup preserves source d=(try_to_remove_some_rows()>0): logs count successful passes, not removed rows, and fixed-term substitution alone does not force another pass. Go writer errors return after source mutations; native ostream badbit/global binding is not claimed. Exact presolve and full simplex/LAR drivers remain open; whole source units remain partial."
       ]
     },
     {
@@ -122084,14 +122130,22 @@
       "go_targets": [
         "pkg/util/lp/column_info_float.go",
         "pkg/util/lp/solver_float.go",
-        "pkg/util/lp/solver_float_test.go"
+        "pkg/util/lp/solver_float_test.go",
+        "pkg/util/lp/solver_presolve_float.go",
+        "pkg/util/lp/solver_presolve_float_test.go"
       ],
       "tests": [
         "TestLPFloatSolverIndependentAssemblyScalingAndRestoration",
         "TestLPFloatColumnInfoBoundStatesAndSourceTolerances",
         "TestLPFloatSolverSlackCountsNamesAndBypass",
         "TestLPFloatSolverSourceErrorsAndPublicationPrefixes",
-        "TestLPFloatSolverScaledCostAndValueGuards"
+        "TestLPFloatSolverScaledCostAndValueGuards",
+        "TestLPFloatPresolveIndependentCornerOracle",
+        "TestLPFloatPresolveDirectionalToleranceAndIEEE",
+        "TestLPFloatPresolveUnknownBoundsAndPinPrefixes",
+        "TestLPFloatPresolveCleanupPassesAndDeferredErasure",
+        "TestLPFloatPresolveInputAndWriterErrorPrefixes",
+        "TestLPFloatPresolveComposedErrorsAndPreparedProblem"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -122112,20 +122166,35 @@
           ]
         },
         {
-          "name": "exact common solver data preparation, presolve fixed/zero pruning, row bounds/pinning, full optimization integration and retained diagnostics",
+          "name": "exact common solver data preparation, full optimization integration and retained diagnostics",
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "retained floating presolve row extrema, zero/equality/inequality decisions, boundary pinning, fixed/zero term elimination, deferred row erasure and cleanup (lp_solver.hpp:168-412)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/solver_presolve_float.go",
+          "tests": [
+            "TestLPFloatPresolveIndependentCornerOracle",
+            "TestLPFloatPresolveDirectionalToleranceAndIEEE",
+            "TestLPFloatPresolveUnknownBoundsAndPinPrefixes",
+            "TestLPFloatPresolveCleanupPassesAndDeferredErasure",
+            "TestLPFloatPresolveInputAndWriterErrorPrefixes",
+            "TestLPFloatPresolveComposedErrorsAndPreparedProblem"
+          ]
         }
       ],
       "ownership": [
         "Common floating state uses native slices/maps and insertion-ordered insdict dictionaries for rows/coefficients, preserving replacement position. FloatLPSolver owns its FloatStaticMatrix and column metadata; unscale clears the retired matrix before publishing reconstruction, then restores existing scale entries and refills RHS descending. No source vector/hash/STL storage emulation or fake allocation refusals. NewSettings error propagates real host-clock failure.",
-        "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced."
+        "Source assertions use the existing debug/error profile. Missing map/pointer or invalid scalar domains outside defined C++ behavior have qualified Go bounds guards; null insertions from actual operator[] sites are retained. Unset floating scalar fields use Go zero initialization, not a claim about C++ indeterminate storage. Source get_var_value is concretely the floating X slice; no universal numerical callback adapter is introduced.",
+        "Presolve uses native temporary key slices and erases dictionary entries only after each source scan. RHS subtraction and earlier variable pins publish immediately. Infeasibility returns before queued row deletion and term elimination. No fake numerical allocation/refusal layer or generic bound callback is introduced; surviving FloatColumnInfo pointers retain identity."
       ],
       "deviations": [
         "Floating matrix preparation is reached by primal find_maximal_solution (lp_primal_simplex.hpp:176-185) and dual find_maximal_solution (lp_dual_simplex.hpp:357-359); set_scaled_cost is reached by both simplex drivers. Independent original-system solutions, shifted/flipped external values and objective products verify scaling/restoration. Complete drivers, exact ownership and source presolve remain unported.",
         "A source-wide retained-consumer scan excludes dead column equality/copy wrapper and adjusted-bound predicate/is_infeasible helpers; adjusted upper bound is retained for actual primal/dual bound setup. Native Go value properties replace trivial scalar/name/flag setters and getters. No whole-unit promotion.",
-        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested."
+        "Current floating balance returns zero for all-zero matrices or stops at the source unimplemented logarithm; automatic Scale false-result restoration is consequently invariant-protected and not faked. Explicit Unscale and its partial-publication errors are tested.",
+        "Floating presolve now supersedes earlier open-presolve notes. Independent exact box-corner extrema verify 100 randomized boxes and 1500 relation/RHS decisions; strict directional tolerance, missing/zero bounds, IEEE, source error prefixes and cleanup-to-scaling integration are tested. Cleanup preserves source d=(try_to_remove_some_rows()>0): logs count successful passes, not removed rows, and fixed-term substitution alone does not force another pass. Go writer errors return after source mutations; native ostream badbit/global binding is not claimed. Exact presolve and full simplex/LAR drivers remain open; whole source units remain partial."
       ]
     },
     {
