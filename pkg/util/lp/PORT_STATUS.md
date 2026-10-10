@@ -19,10 +19,11 @@ code that has not been ported.
 | Exact rational/pair indexed vectors | 5,000 operations against independent rational maps; exact values below floating tolerance; copy/assignment/self-assignment and bounds; real set/assign/clone/add/drop allocation refusals with named-root and direct-object census | 90.0%; remaining statements are child error propagation and the other profile assertion path |
 | Exact `stacked_vector<numeric_pair<mpq>>` | 1,600 operations against independent snapshots; big-value ownership; real append/replace/restore allocation refusals with live-cell/raw-block census; older/replacement pending-root identity | 92.8%; uncovered return paths propagate cleanup/capture errors |
 | Shared permutation index algorithms and double/double applications | Original `--test_perm`; 2,304 distinct compositions and 288 transpositions against independent dense products; all 120 size-five permutations across six dense/four sparse directions; literal alias and shrunk-domain prefixes | Index algorithms 91.2% native / 93.0% debug; floating applications 87.7% / 92.6% |
+| Exact rational/rational and rational/pair permutation applications | All 24 size-four permutations across six dense/four retained rational sparse directions against independent exact matrix products; ordered indices including zeros; 1000-digit allocation refusals through first success; named-cell/direct-object census; stopped destination ownership and every pending mutation guard | 82.8% native / 91.5% debug; native excludes debug dense copies and exact comparison |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-Current package statement coverage is **93.7% native and 94.7% combined debug/checked**. Exact scoped
+Current package statement coverage is **90.5% native and 93.8% combined debug/checked**. Exact scoped
 vector allocation and rollback paths are tested; remaining uncovered statements
 include numerical child and cleanup/capture error returns, plus profile-specific
 assertion paths. The explicit
@@ -39,7 +40,7 @@ The next layers retain the full requested scope:
 
 1. Concrete scoped vectors, actual numeral/numeric-pair types, priorities and
    indexed vectors, with independent state/ordering/arithmetic tests.
-2. Sparse/static/dense matrices, permutations, eta transformations and LU,
+2. Sparse/static/dense matrices, remaining permutation integration, eta transformations and LU,
    checked against independent matrix operations and exact residuals.
 3. Scaling, settings, random updates and primal/dual simplex, tested with feasible,
    infeasible, degenerate and unbounded programs and independent certificates.

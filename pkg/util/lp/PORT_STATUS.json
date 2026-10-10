@@ -1,11 +1,11 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 93.7,
+  "native_statement_coverage_of_current_go_code": 90.5,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions, concrete priorities",
-    "exact permutation applications; indexed/sparse/static/dense matrices and transformations",
+    "indexed/sparse/static/dense matrices and transformations",
     "priority queues and LU/eta factorization",
     "scaling and random updates",
     "primal/dual simplex and LAR solvers",
@@ -592,7 +592,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/permutation.go",
-        "pkg/util/lp/permutation_float.go"
+        "pkg/util/lp/permutation_float.go",
+        "pkg/util/lp/permutation_exact.go"
       ],
       "tests": [
         "TestLPPermutationIndependentMatrixProducts",
@@ -600,7 +601,23 @@
         "TestLPFloatPermutationIndependentDenseAndSparseProducts",
         "TestLPFloatPermutationSource",
         "TestLPPermutationGuardPrefixesAndFloatingComparisons",
-        "TestLPPermutationShrunkDomainPreservesReachedPrefixes"
+        "TestLPPermutationShrunkDomainPreservesReachedPrefixes",
+        "TestLPRationalPermutationIndependentDenseProducts",
+        "TestLPRationalPermutationDenseAllocationFailureCensus",
+        "TestLPRationalPermutationResizeAndGuardContracts",
+        "TestLPPairPermutationIndependentDenseProducts",
+        "TestLPPairPermutationDenseAllocationFailureCensus",
+        "TestLPPairPermutationResizeAndGuardContracts",
+        "TestLPRationalPermutationIndependentSparseProducts",
+        "TestLPRationalPermutationSparseAllocationFailureCensus",
+        "TestLPRationalPermutationSparseGuardAndMutationPrefixes",
+        "TestLPPairPermutationIndependentSparseProducts",
+        "TestLPPairPermutationSparseAllocationFailureCensus",
+        "TestLPPairPermutationSparseGuardAndMutationPrefixes",
+        "TestLPRationalPermutationAllDenseGuardProfiles",
+        "TestLPPairPermutationAllDenseGuardProfiles",
+        "TestLPRationalPermutationStoppedDestinationOwnership",
+        "TestLPPairPermutationStoppedDestinationOwnership"
       ]
     },
     {
@@ -608,7 +625,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/permutation.go",
-        "pkg/util/lp/permutation_float.go"
+        "pkg/util/lp/permutation_float.go",
+        "pkg/util/lp/permutation_exact.go"
       ],
       "tests": [
         "TestLPPermutationIndependentMatrixProducts",
@@ -616,7 +634,23 @@
         "TestLPFloatPermutationIndependentDenseAndSparseProducts",
         "TestLPFloatPermutationSource",
         "TestLPPermutationGuardPrefixesAndFloatingComparisons",
-        "TestLPPermutationShrunkDomainPreservesReachedPrefixes"
+        "TestLPPermutationShrunkDomainPreservesReachedPrefixes",
+        "TestLPRationalPermutationIndependentDenseProducts",
+        "TestLPRationalPermutationDenseAllocationFailureCensus",
+        "TestLPRationalPermutationResizeAndGuardContracts",
+        "TestLPPairPermutationIndependentDenseProducts",
+        "TestLPPairPermutationDenseAllocationFailureCensus",
+        "TestLPPairPermutationResizeAndGuardContracts",
+        "TestLPRationalPermutationIndependentSparseProducts",
+        "TestLPRationalPermutationSparseAllocationFailureCensus",
+        "TestLPRationalPermutationSparseGuardAndMutationPrefixes",
+        "TestLPPairPermutationIndependentSparseProducts",
+        "TestLPPairPermutationSparseAllocationFailureCensus",
+        "TestLPPairPermutationSparseGuardAndMutationPrefixes",
+        "TestLPRationalPermutationAllDenseGuardProfiles",
+        "TestLPPairPermutationAllDenseGuardProfiles",
+        "TestLPRationalPermutationStoppedDestinationOwnership",
+        "TestLPPairPermutationStoppedDestinationOwnership"
       ]
     },
     {
@@ -624,7 +658,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/permutation.go",
-        "pkg/util/lp/permutation_float.go"
+        "pkg/util/lp/permutation_float.go",
+        "pkg/util/lp/permutation_exact.go"
       ],
       "tests": [
         "TestLPPermutationIndependentMatrixProducts",
@@ -632,7 +667,23 @@
         "TestLPFloatPermutationIndependentDenseAndSparseProducts",
         "TestLPFloatPermutationSource",
         "TestLPPermutationGuardPrefixesAndFloatingComparisons",
-        "TestLPPermutationShrunkDomainPreservesReachedPrefixes"
+        "TestLPPermutationShrunkDomainPreservesReachedPrefixes",
+        "TestLPRationalPermutationIndependentDenseProducts",
+        "TestLPRationalPermutationDenseAllocationFailureCensus",
+        "TestLPRationalPermutationResizeAndGuardContracts",
+        "TestLPPairPermutationIndependentDenseProducts",
+        "TestLPPairPermutationDenseAllocationFailureCensus",
+        "TestLPPairPermutationResizeAndGuardContracts",
+        "TestLPRationalPermutationIndependentSparseProducts",
+        "TestLPRationalPermutationSparseAllocationFailureCensus",
+        "TestLPRationalPermutationSparseGuardAndMutationPrefixes",
+        "TestLPPairPermutationIndependentSparseProducts",
+        "TestLPPairPermutationSparseAllocationFailureCensus",
+        "TestLPPairPermutationSparseGuardAndMutationPrefixes",
+        "TestLPRationalPermutationAllDenseGuardProfiles",
+        "TestLPPairPermutationAllDenseGuardProfiles",
+        "TestLPRationalPermutationStoppedDestinationOwnership",
+        "TestLPPairPermutationStoppedDestinationOwnership"
       ]
     },
     {
@@ -831,5 +882,5 @@
     "unported": 96,
     "partial": 14
   },
-  "combined_debug_checked_statement_coverage_of_current_go_code": 94.7
+  "combined_debug_checked_statement_coverage_of_current_go_code": 93.8
 }

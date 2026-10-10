@@ -1176,6 +1176,7 @@
         "int_set.go",
         "numeric_pair.go",
         "permutation.go",
+        "permutation_exact.go",
         "permutation_float.go",
         "stacked_pair_vector.go",
         "stacked_value.go",

@@ -34921,3 +34921,35 @@ Full-suite log is
 /mnt/oldrog/tmp/g3-lp-permutation-module-native.log. Full LP objective remains
 active, with exact permutation buffers, priorities and matrix/LU/solver layers
 still required. Previous checkpointef795199 saved exact indexed vectors.
+
+
+## Exact rational and rational-pair permutation applications
+
+Added the retained mpq/mpq and mpq/numeric_pair<mpq> dense applications and their
+actual mpq sparse applications. Two concrete owners retain separate T/X work
+buffers with owning project numerals. All assignments deep-copy, including
+source lexical sparse copies. Exact debug ApplyRightIndexed executes the actual
+dense-copy/application and subtract/is-zero equality path without floating
+conversion. Init/Resize resize the mappings and exact buffers before publishing
+identity entries, and partial values-constructor mappings remain source zeros.
+
+Independent exact matrix products cover all24 size-four permutations through
+six dense/four sparse directions for each owner. Tests preserve unsorted index
+order and indexed zeros, fractions far below floating tolerance, large numerals,
+shrunk invalid domains, constructor prefixes and short/long vectors in both
+profiles. Actual1000-digit allocation refusals run through first success for
+every dense/sparse direction, counting named numeral cells and real direct
+objects after cleanup. Destination sparse numerical calls retain their own raw
+generations; permutation Close cannot consume a stopped destination invocation.
+Every numeric mutation rejects reuse while a failed lexical owner is retained.
+
+Full LP focused tests pass native17.198s/debug-checked20.775s,90.5%/93.8% package
+statement coverage. Exact permutation code covers82.8%/91.5%; native excludes the
+source debug dense-copy/comparison branch. Remaining uncovered statements include
+child cleanup/error returns, opposite-profile guards and invalid-domain paths;
+no synthetic numeral teardown failure or native-slice OOM was invented to raise
+coverage. LP vet, portcheck and regenerated64-package graphs pass. The source
+inventory remains14 partial/96 unported LP units: formatting and complete matrix/
+LU integration are still open, and no full solver claim is made. Checkpoint
+691a44c0 saved the shared index and floating permutation work. The full LP goal
+continues with concrete priority queues, matrices/eta/LU and the solver layers.
