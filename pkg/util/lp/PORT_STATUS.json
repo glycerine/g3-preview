@@ -1,8 +1,8 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 90.4,
-  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Last complete native LP coverage (90.4%) predates active shortening, eta construction/integration, column replacement and dense solves; last complete debug/checked coverage predates sparse basis storage. Current focused component coverage is recorded in PORT_STATUS.md.",
+  "native_statement_coverage_of_current_go_code": 90.7,
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Complete native LP coverage includes sparse indexed graph traversal and solves (6210/6843 statements). Last complete debug/checked coverage predates sparse basis storage; current focused component coverage is recorded in PORT_STATUS.md.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -1140,7 +1140,12 @@
         "pkg/util/lp/sparse_matrix_replace_test.go",
         "pkg/util/lp/sparse_matrix_float_solve.go",
         "pkg/util/lp/sparse_matrix_exact_solve.go",
-        "pkg/util/lp/sparse_matrix_solve_test.go"
+        "pkg/util/lp/sparse_matrix_solve_test.go",
+        "pkg/util/lp/sparse_matrix_float_graph.go",
+        "pkg/util/lp/sparse_matrix_exact_graph.go",
+        "pkg/util/lp/sparse_matrix_float_indexed_solve.go",
+        "pkg/util/lp/sparse_matrix_exact_indexed_solve.go",
+        "pkg/util/lp/sparse_matrix_indexed_solve_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1192,7 +1197,14 @@
         "TestLPSparseDenseTriangularSolvesIndependentResiduals",
         "TestLPSparseDenseSolveLiteralDiagonalDuplicatesAndIEEE",
         "TestLPExactSparseDenseSolveAllocationFailureCensus",
-        "TestLPSparseDenseSolveBoundsAndPublicationPrefixes"
+        "TestLPSparseDenseSolveBoundsAndPublicationPrefixes",
+        "TestLPSparseIndexedSolveIndependentNilpotentOracle",
+        "TestLPSparseIndexedGraphLiteralOrderAndFlags",
+        "TestLPExactSparseIndexedSolveAllocationFailureCensus",
+        "TestLPSparseIndexedSolveToleranceAndHiddenInput",
+        "TestLPSparseIndexedGraphBoundsAndPartialFlags",
+        "TestLPSparseIndexedSolveBoundsAndPublication",
+        "TestLPExactSparseIndexedSolveBorrowedOwnerGuards"
       ]
     },
     {
@@ -1216,7 +1228,12 @@
         "pkg/util/lp/sparse_matrix_replace_test.go",
         "pkg/util/lp/sparse_matrix_float_solve.go",
         "pkg/util/lp/sparse_matrix_exact_solve.go",
-        "pkg/util/lp/sparse_matrix_solve_test.go"
+        "pkg/util/lp/sparse_matrix_solve_test.go",
+        "pkg/util/lp/sparse_matrix_float_graph.go",
+        "pkg/util/lp/sparse_matrix_exact_graph.go",
+        "pkg/util/lp/sparse_matrix_float_indexed_solve.go",
+        "pkg/util/lp/sparse_matrix_exact_indexed_solve.go",
+        "pkg/util/lp/sparse_matrix_indexed_solve_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1268,7 +1285,14 @@
         "TestLPSparseDenseTriangularSolvesIndependentResiduals",
         "TestLPSparseDenseSolveLiteralDiagonalDuplicatesAndIEEE",
         "TestLPExactSparseDenseSolveAllocationFailureCensus",
-        "TestLPSparseDenseSolveBoundsAndPublicationPrefixes"
+        "TestLPSparseDenseSolveBoundsAndPublicationPrefixes",
+        "TestLPSparseIndexedSolveIndependentNilpotentOracle",
+        "TestLPSparseIndexedGraphLiteralOrderAndFlags",
+        "TestLPExactSparseIndexedSolveAllocationFailureCensus",
+        "TestLPSparseIndexedSolveToleranceAndHiddenInput",
+        "TestLPSparseIndexedGraphBoundsAndPartialFlags",
+        "TestLPSparseIndexedSolveBoundsAndPublication",
+        "TestLPExactSparseIndexedSolveBorrowedOwnerGuards"
       ]
     },
     {
@@ -1292,7 +1316,12 @@
         "pkg/util/lp/sparse_matrix_replace_test.go",
         "pkg/util/lp/sparse_matrix_float_solve.go",
         "pkg/util/lp/sparse_matrix_exact_solve.go",
-        "pkg/util/lp/sparse_matrix_solve_test.go"
+        "pkg/util/lp/sparse_matrix_solve_test.go",
+        "pkg/util/lp/sparse_matrix_float_graph.go",
+        "pkg/util/lp/sparse_matrix_exact_graph.go",
+        "pkg/util/lp/sparse_matrix_float_indexed_solve.go",
+        "pkg/util/lp/sparse_matrix_exact_indexed_solve.go",
+        "pkg/util/lp/sparse_matrix_indexed_solve_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1344,7 +1373,14 @@
         "TestLPSparseDenseTriangularSolvesIndependentResiduals",
         "TestLPSparseDenseSolveLiteralDiagonalDuplicatesAndIEEE",
         "TestLPExactSparseDenseSolveAllocationFailureCensus",
-        "TestLPSparseDenseSolveBoundsAndPublicationPrefixes"
+        "TestLPSparseDenseSolveBoundsAndPublicationPrefixes",
+        "TestLPSparseIndexedSolveIndependentNilpotentOracle",
+        "TestLPSparseIndexedGraphLiteralOrderAndFlags",
+        "TestLPExactSparseIndexedSolveAllocationFailureCensus",
+        "TestLPSparseIndexedSolveToleranceAndHiddenInput",
+        "TestLPSparseIndexedGraphBoundsAndPartialFlags",
+        "TestLPSparseIndexedSolveBoundsAndPublication",
+        "TestLPExactSparseIndexedSolveBorrowedOwnerGuards"
       ]
     },
     {

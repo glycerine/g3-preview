@@ -43,15 +43,17 @@ code that has not been ported.
 | Sparse-column eta construction and repeated-pivot integration | 180 independently ordered/permuted column worlds; literal duplicate/unit/zero/tiny/IEEE and publication prefixes; four physical failure campaigns with matrix/eta ownership census; 120 repeated pivot worlds checked against exact dense residuals and permutation-expansion determinants | Exact 94.1% and floating 96.7% in each profile; remaining statements propagate unreachable Append assertion or child/capture/cleanup errors |
 | Floating/exact sparse column replacement | 1,600 independent coordinate-map replacements with permutations, row maxima and reciprocal links; literal duplicate/unindexed/tolerance/IEEE inputs; ten physical failure campaigns, borrowed-owner guards and source publication prefixes | Exact 88.3%, floating 95.2% in each profile; remaining statements propagate child/cleanup errors or assert the nonempty row guaranteed by successful insertion |
 | Dense unit-upper triangular scalar/pair solves and floating residual correction | 220 independent exact RHS/solution/residual worlds with permutations, tiny/zero terms and trailing slots; literal diagonal/duplicate/IEEE and publication prefixes; six physical refusal campaigns with required pair X-before-Y stop and caller ownership census | Exact 92.8%, floating 97.2% in each profile; remaining statements propagate scalar/cleanup errors or are invariant-protected correction bounds |
+| Indexed graph traversal and floating/exact scalar triangular solves | 240 independent nilpotent inverse-polynomial worlds with sparse reachability/index membership; literal postorder/output prefixes, flag lifetimes, zero/tiny/unindexed inputs; four physical failure campaigns and borrowed-owner guards | Graphs 94.4% native / 97.2% debug each; exact solve 89.3%, floating 93.4% in both profiles; remaining statements propagate child/cleanup errors, protect index rebuild bounds or belong to the opposite assertion profile |
 | Settings defaults, stats, float tolerance families, random state and resource limits | All numerical/strategy defaults, source RNG golden vectors, mutable thresholds, strict CPU-time boundary, borrowed limit/error propagation and stats reset | 96.3%; uncovered constructor return propagates a real host-clock start error |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-The last complete native LP run reported **90.4%** statement coverage before
-active shortening, eta construction/integration, column replacement and dense solves were added; the new components pass focused
-native and debug/checked tests with coverage above. The last
+The current complete native LP run reports **90.7%** statement coverage
+(6210/6843 existing Go statements), including sparse indexed graph traversal
+and solves. The last
 complete combined debug/checked run reported **91.7%** before sparse basis storage
-was added; sparse basis, elimination, pivot and active shortening components now also pass focused debug/checked tests. Exact scoped
+was added; sparse basis, elimination, pivot, active shortening, eta construction, column
+replacement and dense/indexed solve components now also pass focused debug/checked tests. Exact scoped
 vector allocation and rollback paths are tested; remaining uncovered statements
 include numerical child and cleanup/capture error returns, plus profile-specific
 assertion paths. The explicit

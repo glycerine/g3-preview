@@ -35915,3 +35915,57 @@ retained upstream-driver scenarios remain required.
 
 Final LP vet, portcheck, graph regeneration and diff checks pass. The64-package
 production graph retains its edges and includes the new dense-solve files.
+
+
+## Indexed sparse graph traversal and triangular solves
+
+Implemented floating/exact process_index_recursively_for_y_U,
+process_column_recursively, create_graph_G and extend_and_sort_active_rows,
+plus retained scalar solve_y_U_indexed/solve_U_y_indexed_only. Left graph marks
+before child traversal; column graph marks after traversal and consumes the live
+acyclic upper-triangular workspace. Stored zero coefficients still create edges.
+Postorder retains source entry/index order and caller output prefixes; successful
+cleanup resets only returned entries, while reached index errors preserve partial
+output/flags. Preexisting processed nodes absent from output remain processed.
+No cycle repair or graph sorting/deduplication is introduced.
+
+Indexed arithmetic follows reverse postorder. Left products own the y operand
+copy first; right products own the coefficient copy first. Matrix owns numerical
+locals and only newly acquired calls; borrowed vectors retain their values/index.
+Index clears only after arithmetic finishes, then rebuilds in forward postorder.
+Floating drop applies after full solving and writes positive zero; exact drop
+only tests zero. Source is_OK returns true immediately, so literal repeated
+output indices are not rejected. Foreign/stopped input guards reject before
+mutation and preserve caller-owned numeric receipts. Graph flags are already
+reset before any numerical allocation failure.
+
+Tests cover240 worlds through dimension7 against independent dense inverse
+polynomials I-N+N^2-... for strictly upper-triangular N, independent fixed-point
+reachability, sparse membership and dependency-order constraints. Shuffled
+permutations/entry order, exact tiny values and zero/cancellation cases exercise
+both directions. Literal fixtures pin postorder, duplicates/output prefixes,
+retained preexisting flags, strict/zero tolerances and hidden unindexed data.
+Reached malformed graph errors check distinct before/after-mark failure prefixes.
+Four pooled/direct real allocation campaigns walk through first success and
+verify old-index retention, stopped guards, newly owned calls, cleared graph
+flags and named-cell/direct-object census. Separate actual stopped input and
+foreign-manager cases reject before graph work without consuming caller receipts.
+
+Graph coverage68/72 (94.4%) native and70/72 (97.2%) debug for each concrete type.
+Exact indexed solves92/103 (89.3%); floating57/61 (93.4%) in both profiles.
+Remaining statements propagate scalar/capture/cleanup errors, guard index rebuild
+bounds or belong to the opposite assertion profile. Source counts remain42
+partial/68 unported. Floating indexed refinement, remaining sparse diagnostics,
+full LU, simplex/LAR, scaling, MPS and retained upstream-driver work remain open.
+The next hourly complete native module regression runs for this checkpoint.
+
+
+Focused native4.340s and combined debug/checked4.799s pass, including strengthened
+independent floating sparse-index membership assertions. Full native module
+regression passes; LP158.538s with90.7% current statement coverage (6210/6843).
+The full native profile includes all graph/indexed solve files and agrees with
+their focused component coverage. Complete debug/checked coverage remains an
+explicit older snapshot; current component debug checks are recorded above.
+Native log/profile: /mnt/oldrog/tmp/g3-sparse-indexed-module-native.log and.cover.
+Final LP vet, portcheck, graph regeneration and diff checks pass;64-package graph
+edges are unchanged. No redundant full suite was restarted.
