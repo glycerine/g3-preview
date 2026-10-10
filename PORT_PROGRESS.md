@@ -35725,3 +35725,47 @@ native profile. Full debug/checked percentage remains explicitly dated before
 sparse storage; current focused debug/checked component coverage is recorded.
 No redundant full suite was restarted. Native log/profile are
 /mnt/oldrog/tmp/g3-sparse-pivots-module-native.log and corresponding.cover.
+
+
+## Sparse active shortening and eta-driven elimination
+
+Implemented floating/exact remove_row_from_active_pivots_and_shorten_columns,
+remove_pivot_column, update_active_pivots, shorten_active_matrix and pivot_with_eta.
+Shortening removes a queued row pair, decrements active count, checks the inverse
+column and increments the shortened counter in source order. A zero remaining
+column returns immediately with its completed prefix. Pivot-column removal visits
+current column entries only. Affected active rows receive recalculated scores;
+eta-touched rows are then refreshed without an active-row/column filter. Signed
+negative score assertions preserve release unsigned multiplication/wrap.
+
+Eta elimination borrows each coefficient and its diagonal, applies owning matrix
+row eliminations in order, divides the pivot row, and shortens only after those
+operations succeed. An empty target row returns before division/shortening.
+Numeric failure belongs solely to the matrix child operation; closing it preserves
+borrowed eta values and cells. Stopped eta owners are rejected before matrix
+mutation. Reference-only shortening makes no project numeral copies, confirmed
+with actual large coefficients under zero available allocator reservations.
+
+Independent tests cover160 incidence/queue worlds across successive logical rows
+and shuffled row/column permutations,100 exact dense elimination worlds with
+rational residual arithmetic, and literal empty-column/target, eta inactive-row
+reinsertion, signed score and reached malformed-index publication prefixes.
+Eliminated coefficients intentionally leave stale queued candidates until later
+pivot selection notices their absence; the independent expected queue retains
+those source entries rather than assuming a filtered active rectangle. Pooled
+and direct allocation-refusal campaigns walk through first success, retain only
+actual child numerical receipts, check stopped guards and preserve the borrowed
+eta's independent cells through matrix cleanup. Named-cell/direct-object census
+passes after every failure and success.
+
+All sparse-focused native tests pass33.621s; combined debug/checked pass40.922s.
+New exact file coverage97/103 (94.2%) native and99/103 (96.1%) debug; floating88/94
+(93.6%) and90/94 (95.7%). Uncovered statements propagate queue errors from
+malformed internal queue state, plus native's debug-only assertions. Existing
+last full native LP90.4% and full debug/checked91.7% are explicitly older snapshots;
+no new full-module percentage is claimed. Source counts remain42 partial/68
+unported. Sparse fill_eta_matrix/replacement, triangular solves, full LU and
+solver/MPS/upstream-driver work remain required.
+
+Final LP vet, portcheck, graph regeneration and diff checks pass. The64-package
+production graph has unchanged edges; its file inventory includes the new code.

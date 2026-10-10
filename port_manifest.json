@@ -123462,7 +123462,10 @@
         "pkg/util/lp/sparse_matrix_float_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_pivots.go",
-        "pkg/util/lp/sparse_matrix_float_pivots.go"
+        "pkg/util/lp/sparse_matrix_float_pivots.go",
+        "pkg/util/lp/sparse_matrix_float_active.go",
+        "pkg/util/lp/sparse_matrix_exact_active.go",
+        "pkg/util/lp/sparse_matrix_active_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -123486,7 +123489,16 @@
         "TestLPSparsePivotLiteralQueueAndThresholds",
         "TestLPSparsePivotBoundsAndPublicationPrefixes",
         "TestLPExactSparsePivotAllocationFailureCensus",
-        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison"
+        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPSparseActiveLiteralFailurePrefixes",
+        "TestLPSparseActiveEtaRequeuesInactiveRows",
+        "TestLPSparseActiveSignedScoreProfiles",
+        "TestLPSparseActiveEtaEliminationIndependentOracle",
+        "TestLPSparseActiveEtaEarlyEmptyTarget",
+        "TestLPExactSparseActiveEtaAllocationFailureCensus",
+        "TestLPSparseActiveBoundsAndPublicationPrefixes",
+        "TestLPExactSparseActiveBorrowedEtaPendingAndNoCopies"
       ],
       "conditionals": [
         {
@@ -123611,6 +123623,25 @@
             "TestLPExactSparsePivotAllocationFailureCensus",
             "TestLPExactSparseMaximumDoesNotAdoptOlderComparison"
           ]
+        },
+        {
+          "name": "retained floating/exact active row and pivot-column removal, shortened Markovitz counters and affected/eta-touched queue refresh; eta-driven row elimination and borrowed diagonal division",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_active.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_float_active.go"
+          ],
+          "tests": [
+            "TestLPSparseActiveShorteningIndependentOracle",
+            "TestLPSparseActiveLiteralFailurePrefixes",
+            "TestLPSparseActiveEtaRequeuesInactiveRows",
+            "TestLPSparseActiveSignedScoreProfiles",
+            "TestLPSparseActiveEtaEliminationIndependentOracle",
+            "TestLPSparseActiveEtaEarlyEmptyTarget",
+            "TestLPExactSparseActiveEtaAllocationFailureCensus",
+            "TestLPSparseActiveBoundsAndPublicationPrefixes",
+            "TestLPExactSparseActiveBorrowedEtaPendingAndNoCopies"
+          ]
         }
       ],
       "ownership": [
@@ -123618,14 +123649,16 @@
         "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned.",
         "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries.",
         "Exact AddNewElement owns three reached indexed-value copies in each direction, publishes row before column and increments count after both. Tail assignment copies the owning rational before index/other publication, repairs the matching backlink, then destroys column and row tails. Column synchronization owns the actual set_value by-value argument and destination copy. Pivot owns concrete product temporaries and insertion/copy/arithmetic receipts, retains source work-vector and mutation prefixes on failure, and skips maximum reordering for precise types. Row division borrows a live row or column divisor; Close releases only newly acquired raw/numerical receipts, lexical values and published coefficients.",
-        "Exact maximum owns abs/comparison locals and the actual indexed-value swap copy, with both backlink repairs before numerical swaps. Prepare resets column counters before descending row ordering, then owns each forward row iteration indexed-value copy before queue insertion. Pivot scoring owns every coefficient copied by the source local column-header copy and destroys it in vector order; dynamic native lexical slots retain partial copies on error. Selection publishes dequeued physical indices immediately, drops inactive/missing candidates, retains rejected pairs in order, recovers their current scores before publishing accepted logical indices, and leaves the last physical outputs on exhaustion/error. Older active comparison generations remain caller-owned on manager-busy refusal."
+        "Exact maximum owns abs/comparison locals and the actual indexed-value swap copy, with both backlink repairs before numerical swaps. Prepare resets column counters before descending row ordering, then owns each forward row iteration indexed-value copy before queue insertion. Pivot scoring owns every coefficient copied by the source local column-header copy and destroys it in vector order; dynamic native lexical slots retain partial copies on error. Selection publishes dequeued physical indices immediately, drops inactive/missing candidates, retains rejected pairs in order, recovers their current scores before publishing accepted logical indices, and leaves the last physical outputs on exhaustion/error. Older active comparison generations remain caller-owned on manager-busy refusal.",
+        "Active shortening borrows row/column/eta entries without numerical copies or receipts. It removes queued row pairs and decrements active count before inverse-column lookup, retains the first empty-column counter and exits immediately, then removes current pivot-column pairs and refreshes affected active rows. Eta refresh intentionally has no active-index filter. PivotWithEta borrows coefficient/diagonal references and invokes owning matrix elimination/division sequentially; numerical failure remains solely matrix-owned, and Close preserves the independently owned eta. Stopped borrowed eta is rejected before matrix mutation."
       ],
       "deviations": [
         "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/active shortening, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
         "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added.",
         "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution.",
         "Exact drop/zero tolerance is IsZero independent of floating settings. Duplicate cancellation offsets and source release self-pivot behavior remain literal. Debug zero divisor asserts; the reached release nonzero/zero rational case yields source 1/0 state rather than an invented early error and is not credited as valid-domain arithmetic. Failed operations freeze the owner even when no receipt was acquired before refusal. Physical fault campaigns use both default pooled and explicitly selected source debug/direct allocation profiles; no fabricated budget event or receipt. Full sparse replacement/active shortening, triangular solves, LU and solver integration remain open.",
-        "Only the retained unsigned-index threshold overload and live get_pivot_for_column path are ported; definition-only alternate threshold/debug-best-pivot templates and commented calls are excluded. Native typed storage replaces header/vector/map internals while preserving actual project numeral copies, queue ordering, strict comparison, unsigned score wrap and output publication. Source invalid metadata is a reached Go bounds guard with its actual dequeue/repair prefix. Sparse replacement, active shortening/eta pivot integration, triangular solves and complete LU/solver implementation remain open."
+        "Only the retained unsigned-index threshold overload and live get_pivot_for_column path are ported; definition-only alternate threshold/debug-best-pivot templates and commented calls are excluded. Native typed storage replaces header/vector/map internals while preserving actual project numeral copies, queue ordering, strict comparison, unsigned score wrap and output publication. Source invalid metadata is a reached Go bounds guard with its actual dequeue/repair prefix. Sparse replacement, active shortening/eta pivot integration, triangular solves and complete LU/solver implementation remain open.",
+        "Active shortening preserves signed score assertion/release unsigned wrap, stale queued candidates for coefficients removed by elimination, eta reinsertions and actual partial mutation prefixes. Source index errors become reached Go bounds guards. No numeric allocation is added for reference-only shortening. Sparse replacement/fill_eta_matrix, triangular solves, complete LU and solvers remain open."
       ]
     },
     {
@@ -123639,7 +123672,10 @@
         "pkg/util/lp/sparse_matrix_float_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_pivots.go",
-        "pkg/util/lp/sparse_matrix_float_pivots.go"
+        "pkg/util/lp/sparse_matrix_float_pivots.go",
+        "pkg/util/lp/sparse_matrix_float_active.go",
+        "pkg/util/lp/sparse_matrix_exact_active.go",
+        "pkg/util/lp/sparse_matrix_active_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -123663,7 +123699,16 @@
         "TestLPSparsePivotLiteralQueueAndThresholds",
         "TestLPSparsePivotBoundsAndPublicationPrefixes",
         "TestLPExactSparsePivotAllocationFailureCensus",
-        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison"
+        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPSparseActiveLiteralFailurePrefixes",
+        "TestLPSparseActiveEtaRequeuesInactiveRows",
+        "TestLPSparseActiveSignedScoreProfiles",
+        "TestLPSparseActiveEtaEliminationIndependentOracle",
+        "TestLPSparseActiveEtaEarlyEmptyTarget",
+        "TestLPExactSparseActiveEtaAllocationFailureCensus",
+        "TestLPSparseActiveBoundsAndPublicationPrefixes",
+        "TestLPExactSparseActiveBorrowedEtaPendingAndNoCopies"
       ],
       "conditionals": [
         {
@@ -123972,6 +124017,25 @@
             "TestLPExactSparsePivotAllocationFailureCensus",
             "TestLPExactSparseMaximumDoesNotAdoptOlderComparison"
           ]
+        },
+        {
+          "name": "retained floating/exact active row and pivot-column removal, shortened Markovitz counters and affected/eta-touched queue refresh; eta-driven row elimination and borrowed diagonal division",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_active.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_float_active.go"
+          ],
+          "tests": [
+            "TestLPSparseActiveShorteningIndependentOracle",
+            "TestLPSparseActiveLiteralFailurePrefixes",
+            "TestLPSparseActiveEtaRequeuesInactiveRows",
+            "TestLPSparseActiveSignedScoreProfiles",
+            "TestLPSparseActiveEtaEliminationIndependentOracle",
+            "TestLPSparseActiveEtaEarlyEmptyTarget",
+            "TestLPExactSparseActiveEtaAllocationFailureCensus",
+            "TestLPSparseActiveBoundsAndPublicationPrefixes",
+            "TestLPExactSparseActiveBorrowedEtaPendingAndNoCopies"
+          ]
         }
       ],
       "ownership": [
@@ -123979,14 +124043,16 @@
         "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned.",
         "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries.",
         "Exact AddNewElement owns three reached indexed-value copies in each direction, publishes row before column and increments count after both. Tail assignment copies the owning rational before index/other publication, repairs the matching backlink, then destroys column and row tails. Column synchronization owns the actual set_value by-value argument and destination copy. Pivot owns concrete product temporaries and insertion/copy/arithmetic receipts, retains source work-vector and mutation prefixes on failure, and skips maximum reordering for precise types. Row division borrows a live row or column divisor; Close releases only newly acquired raw/numerical receipts, lexical values and published coefficients.",
-        "Exact maximum owns abs/comparison locals and the actual indexed-value swap copy, with both backlink repairs before numerical swaps. Prepare resets column counters before descending row ordering, then owns each forward row iteration indexed-value copy before queue insertion. Pivot scoring owns every coefficient copied by the source local column-header copy and destroys it in vector order; dynamic native lexical slots retain partial copies on error. Selection publishes dequeued physical indices immediately, drops inactive/missing candidates, retains rejected pairs in order, recovers their current scores before publishing accepted logical indices, and leaves the last physical outputs on exhaustion/error. Older active comparison generations remain caller-owned on manager-busy refusal."
+        "Exact maximum owns abs/comparison locals and the actual indexed-value swap copy, with both backlink repairs before numerical swaps. Prepare resets column counters before descending row ordering, then owns each forward row iteration indexed-value copy before queue insertion. Pivot scoring owns every coefficient copied by the source local column-header copy and destroys it in vector order; dynamic native lexical slots retain partial copies on error. Selection publishes dequeued physical indices immediately, drops inactive/missing candidates, retains rejected pairs in order, recovers their current scores before publishing accepted logical indices, and leaves the last physical outputs on exhaustion/error. Older active comparison generations remain caller-owned on manager-busy refusal.",
+        "Active shortening borrows row/column/eta entries without numerical copies or receipts. It removes queued row pairs and decrements active count before inverse-column lookup, retains the first empty-column counter and exits immediately, then removes current pivot-column pairs and refreshes affected active rows. Eta refresh intentionally has no active-index filter. PivotWithEta borrows coefficient/diagonal references and invokes owning matrix elimination/division sequentially; numerical failure remains solely matrix-owned, and Close preserves the independently owned eta. Stopped borrowed eta is rejected before matrix mutation."
       ],
       "deviations": [
         "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/active shortening, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
         "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added.",
         "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution.",
         "Exact drop/zero tolerance is IsZero independent of floating settings. Duplicate cancellation offsets and source release self-pivot behavior remain literal. Debug zero divisor asserts; the reached release nonzero/zero rational case yields source 1/0 state rather than an invented early error and is not credited as valid-domain arithmetic. Failed operations freeze the owner even when no receipt was acquired before refusal. Physical fault campaigns use both default pooled and explicitly selected source debug/direct allocation profiles; no fabricated budget event or receipt. Full sparse replacement/active shortening, triangular solves, LU and solver integration remain open.",
-        "Only the retained unsigned-index threshold overload and live get_pivot_for_column path are ported; definition-only alternate threshold/debug-best-pivot templates and commented calls are excluded. Native typed storage replaces header/vector/map internals while preserving actual project numeral copies, queue ordering, strict comparison, unsigned score wrap and output publication. Source invalid metadata is a reached Go bounds guard with its actual dequeue/repair prefix. Sparse replacement, active shortening/eta pivot integration, triangular solves and complete LU/solver implementation remain open."
+        "Only the retained unsigned-index threshold overload and live get_pivot_for_column path are ported; definition-only alternate threshold/debug-best-pivot templates and commented calls are excluded. Native typed storage replaces header/vector/map internals while preserving actual project numeral copies, queue ordering, strict comparison, unsigned score wrap and output publication. Source invalid metadata is a reached Go bounds guard with its actual dequeue/repair prefix. Sparse replacement, active shortening/eta pivot integration, triangular solves and complete LU/solver implementation remain open.",
+        "Active shortening preserves signed score assertion/release unsigned wrap, stale queued candidates for coefficients removed by elimination, eta reinsertions and actual partial mutation prefixes. Source index errors become reached Go bounds guards. No numeric allocation is added for reference-only shortening. Sparse replacement/fill_eta_matrix, triangular solves, complete LU and solvers remain open."
       ]
     },
     {
@@ -124000,7 +124066,10 @@
         "pkg/util/lp/sparse_matrix_float_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_pivots.go",
-        "pkg/util/lp/sparse_matrix_float_pivots.go"
+        "pkg/util/lp/sparse_matrix_float_pivots.go",
+        "pkg/util/lp/sparse_matrix_float_active.go",
+        "pkg/util/lp/sparse_matrix_exact_active.go",
+        "pkg/util/lp/sparse_matrix_active_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -124024,7 +124093,16 @@
         "TestLPSparsePivotLiteralQueueAndThresholds",
         "TestLPSparsePivotBoundsAndPublicationPrefixes",
         "TestLPExactSparsePivotAllocationFailureCensus",
-        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison"
+        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPSparseActiveLiteralFailurePrefixes",
+        "TestLPSparseActiveEtaRequeuesInactiveRows",
+        "TestLPSparseActiveSignedScoreProfiles",
+        "TestLPSparseActiveEtaEliminationIndependentOracle",
+        "TestLPSparseActiveEtaEarlyEmptyTarget",
+        "TestLPExactSparseActiveEtaAllocationFailureCensus",
+        "TestLPSparseActiveBoundsAndPublicationPrefixes",
+        "TestLPExactSparseActiveBorrowedEtaPendingAndNoCopies"
       ],
       "conditionals": [
         {
@@ -124095,6 +124173,25 @@
             "TestLPExactSparsePivotAllocationFailureCensus",
             "TestLPExactSparseMaximumDoesNotAdoptOlderComparison"
           ]
+        },
+        {
+          "name": "retained floating/exact active row and pivot-column removal, shortened Markovitz counters and affected/eta-touched queue refresh; eta-driven row elimination and borrowed diagonal division",
+          "status": "ported",
+          "go_target": "pkg/util/lp/sparse_matrix_exact_active.go",
+          "go_targets": [
+            "pkg/util/lp/sparse_matrix_float_active.go"
+          ],
+          "tests": [
+            "TestLPSparseActiveShorteningIndependentOracle",
+            "TestLPSparseActiveLiteralFailurePrefixes",
+            "TestLPSparseActiveEtaRequeuesInactiveRows",
+            "TestLPSparseActiveSignedScoreProfiles",
+            "TestLPSparseActiveEtaEliminationIndependentOracle",
+            "TestLPSparseActiveEtaEarlyEmptyTarget",
+            "TestLPExactSparseActiveEtaAllocationFailureCensus",
+            "TestLPSparseActiveBoundsAndPublicationPrefixes",
+            "TestLPExactSparseActiveBorrowedEtaPendingAndNoCopies"
+          ]
         }
       ],
       "ownership": [
@@ -124102,14 +124199,16 @@
         "Exact sparse basis storage owns separate row and column coefficients. Indexed-value argument/member/stored copies use three initialized lexical slots; argument survives its full expression, member and argument are released after publication. Column publishes before row; active count increments only after both. Numerical Copy roots and stopped lexical values remain with the partial constructor result; Close releases new numerical calls, lexical values, columns then rows in ascending vector destruction order, then remaining owned roots. Borrowed static source and older raw/comparison generations remain caller-owned.",
         "Floating add publishes physical row then column. Removal copies column tail before row tail, repairs each reciprocal offset after the respective assignment, then pops column and row and decrements active count. Maximum-head reordering repairs both column offsets before the row swap. Pivot scan revisits moved tails, retains the source work vector, cleans only original target indices, insertion-sorts cancellation offsets and removes them descending. Divisor and pivot alpha are borrowed references; division reads the live divisor per coefficient and stores small results as retained positive zero entries.",
         "Exact AddNewElement owns three reached indexed-value copies in each direction, publishes row before column and increments count after both. Tail assignment copies the owning rational before index/other publication, repairs the matching backlink, then destroys column and row tails. Column synchronization owns the actual set_value by-value argument and destination copy. Pivot owns concrete product temporaries and insertion/copy/arithmetic receipts, retains source work-vector and mutation prefixes on failure, and skips maximum reordering for precise types. Row division borrows a live row or column divisor; Close releases only newly acquired raw/numerical receipts, lexical values and published coefficients.",
-        "Exact maximum owns abs/comparison locals and the actual indexed-value swap copy, with both backlink repairs before numerical swaps. Prepare resets column counters before descending row ordering, then owns each forward row iteration indexed-value copy before queue insertion. Pivot scoring owns every coefficient copied by the source local column-header copy and destroys it in vector order; dynamic native lexical slots retain partial copies on error. Selection publishes dequeued physical indices immediately, drops inactive/missing candidates, retains rejected pairs in order, recovers their current scores before publishing accepted logical indices, and leaves the last physical outputs on exhaustion/error. Older active comparison generations remain caller-owned on manager-busy refusal."
+        "Exact maximum owns abs/comparison locals and the actual indexed-value swap copy, with both backlink repairs before numerical swaps. Prepare resets column counters before descending row ordering, then owns each forward row iteration indexed-value copy before queue insertion. Pivot scoring owns every coefficient copied by the source local column-header copy and destroys it in vector order; dynamic native lexical slots retain partial copies on error. Selection publishes dequeued physical indices immediately, drops inactive/missing candidates, retains rejected pairs in order, recovers their current scores before publishing accepted logical indices, and leaves the last physical outputs on exhaustion/error. Older active comparison generations remain caller-owned on manager-busy refusal.",
+        "Active shortening borrows row/column/eta entries without numerical copies or receipts. It removes queued row pairs and decrements active count before inverse-column lookup, retains the first empty-column counter and exits immediately, then removes current pivot-column pairs and refreshes affected active rows. Eta refresh intentionally has no active-index filter. PivotWithEta borrows coefficient/diagonal references and invokes owning matrix elimination/division sequentially; numerical failure remains solely matrix-owned, and Close preserves the independently owned eta. Stopped borrowed eta is rejected before matrix mutation."
       ],
       "deviations": [
         "Floating basis storage, queries and row elimination are implemented. Remaining sparse replacement/active shortening, Markovitz selection, LU factorization and solves remain open. Native Go storage replaces source vector allocation internals; no simulated container reservations. Source invalid indices become bounds errors preserving earlier copies. The standalone test_init_U fixture is strengthened independently, but its call after the upstream unconditional return is not credited as executed driver coverage.",
         "The same concrete mpq coefficient storage serves retained rational/rational and rational/pair matrix instances; scalar/pair solve algorithms remain open. Native slice movement transfers ownership without emulating C++ vector capacity copies. Source invalid domains preserve completed copy prefixes and return typed errors; stopped owners reject further queries and swaps. No universal numeric callbacks or Go generic matrix were added.",
         "Floating source strict tolerance, IEEE, NaN-head/tie ordering, duplicate new-term publication and duplicate cancellation offsets are preserved. Self pivot asserts before mutation in debug and follows the source release continuation otherwise. Reached invalid indices/backlinks return typed bounds errors after the actual mutation prefix; no hidden workspace repair or cancellation deduplication. Eta-driven shortening, pivot selection, triangular solves and LU remain open. Independent oracle tests are not credited as previously unreachable upstream driver execution.",
         "Exact drop/zero tolerance is IsZero independent of floating settings. Duplicate cancellation offsets and source release self-pivot behavior remain literal. Debug zero divisor asserts; the reached release nonzero/zero rational case yields source 1/0 state rather than an invented early error and is not credited as valid-domain arithmetic. Failed operations freeze the owner even when no receipt was acquired before refusal. Physical fault campaigns use both default pooled and explicitly selected source debug/direct allocation profiles; no fabricated budget event or receipt. Full sparse replacement/active shortening, triangular solves, LU and solver integration remain open.",
-        "Only the retained unsigned-index threshold overload and live get_pivot_for_column path are ported; definition-only alternate threshold/debug-best-pivot templates and commented calls are excluded. Native typed storage replaces header/vector/map internals while preserving actual project numeral copies, queue ordering, strict comparison, unsigned score wrap and output publication. Source invalid metadata is a reached Go bounds guard with its actual dequeue/repair prefix. Sparse replacement, active shortening/eta pivot integration, triangular solves and complete LU/solver implementation remain open."
+        "Only the retained unsigned-index threshold overload and live get_pivot_for_column path are ported; definition-only alternate threshold/debug-best-pivot templates and commented calls are excluded. Native typed storage replaces header/vector/map internals while preserving actual project numeral copies, queue ordering, strict comparison, unsigned score wrap and output publication. Source invalid metadata is a reached Go bounds guard with its actual dequeue/repair prefix. Sparse replacement, active shortening/eta pivot integration, triangular solves and complete LU/solver implementation remain open.",
+        "Active shortening preserves signed score assertion/release unsigned wrap, stale queued candidates for coefficients removed by elimination, eta reinsertions and actual partial mutation prefixes. Source index errors become reached Go bounds guards. No numeric allocation is added for reference-only shortening. Sparse replacement/fill_eta_matrix, triangular solves, complete LU and solvers remain open."
       ]
     },
     {

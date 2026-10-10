@@ -39,13 +39,16 @@ code that has not been ported.
 | Floating sparse mutation, row elimination, maximum ordering and division | 6,000 independent map mutations and 800 dense pivot worlds; reciprocal links, shuffled permutations, exact cancellation/fill, strict tolerances, live divisor, IEEE values, duplicate publication/removal and reached bounds prefixes | 94.4% native / 95.6% debug/checked focused; remaining gaps propagate bounds errors on malformed permutation metadata or belong to the opposite assertion profile |
 | Exact sparse mutation, row elimination and live-reference division | 1,200 independent mutations; 160 independent rational pivot worlds; row/column divisor aliases, tiny exact values, reciprocal ownership census, eleven pooled/direct physical failure campaigns through success and older comparison identity | 90.0% native / 90.9% debug/checked focused; uncovered returns propagate cleanup/valid-scalar errors, guard malformed metadata, or belong to the opposite assertion profile |
 | Exact maximum ordering and floating/exact pivot preparation/selection | 120 independent rational/float queue worlds; stable maxima, minimum admissible scores, inverse permutations, strict thresholds, stale/inactive candidates, exhaustion recovery, unsigned wrap, six physical failure campaigns and older comparison identity | Exact 89.9% native / 90.4% debug; float 88.2% / 89.7%; remaining statements propagate child errors, protect malformed metadata or are opposite-profile guards |
+| Floating/exact active shortening and eta-driven sparse elimination | 160 independent incidence/queue worlds with permutations and eta refresh; 100 exact dense elimination worlds; early zero-column/empty-target exits, stale candidates, inactive eta reinsertions, signed score profiles, bounds publication prefixes and pooled/direct physical failure campaigns with borrowed eta census | Exact 94.2% native / 96.1% debug; float 93.6% / 95.7%; remaining statements propagate queue errors under malformed queue state or belong to the opposite assertion profile |
 | Settings defaults, stats, float tolerance families, random state and resource limits | All numerical/strategy defaults, source RNG golden vectors, mutable thresholds, strict CPU-time boundary, borrowed limit/error propagation and stats reset | 96.3%; uncovered constructor return propagates a real host-clock start error |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-The current complete native LP run reports **90.4%** statement coverage. The last
+The last complete native LP run reported **90.4%** statement coverage before
+active shortening/eta integration was added; the new components pass focused
+native and debug/checked tests with coverage above. The last
 complete combined debug/checked run reported **91.7%** before sparse basis storage
-was added; sparse basis, elimination and pivot components now also pass focused debug/checked tests. Exact scoped
+was added; sparse basis, elimination, pivot and active shortening components now also pass focused debug/checked tests. Exact scoped
 vector allocation and rollback paths are tested; remaining uncovered statements
 include numerical child and cleanup/capture error returns, plus profile-specific
 assertion paths. The explicit

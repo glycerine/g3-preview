@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 90.4,
-  "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms. Complete native LP coverage includes sparse pivot preparation/selection. Last complete debug/checked coverage predates sparse basis storage; current focused component coverage is recorded in PORT_STATUS.md.",
+  "coverage_warning": "Coverage applies only to existing Go statements, not unported C++ algorithms. Last complete native LP coverage (90.4%) predates active shortening/eta integration; last complete debug/checked coverage predates sparse basis storage. Current focused component coverage is recorded in PORT_STATUS.md.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -1128,7 +1128,10 @@
         "pkg/util/lp/sparse_matrix_float_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_pivots.go",
-        "pkg/util/lp/sparse_matrix_float_pivots.go"
+        "pkg/util/lp/sparse_matrix_float_pivots.go",
+        "pkg/util/lp/sparse_matrix_float_active.go",
+        "pkg/util/lp/sparse_matrix_exact_active.go",
+        "pkg/util/lp/sparse_matrix_active_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1152,7 +1155,16 @@
         "TestLPSparsePivotLiteralQueueAndThresholds",
         "TestLPSparsePivotBoundsAndPublicationPrefixes",
         "TestLPExactSparsePivotAllocationFailureCensus",
-        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison"
+        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPSparseActiveLiteralFailurePrefixes",
+        "TestLPSparseActiveEtaRequeuesInactiveRows",
+        "TestLPSparseActiveSignedScoreProfiles",
+        "TestLPSparseActiveEtaEliminationIndependentOracle",
+        "TestLPSparseActiveEtaEarlyEmptyTarget",
+        "TestLPExactSparseActiveEtaAllocationFailureCensus",
+        "TestLPSparseActiveBoundsAndPublicationPrefixes",
+        "TestLPExactSparseActiveBorrowedEtaPendingAndNoCopies"
       ]
     },
     {
@@ -1164,7 +1176,10 @@
         "pkg/util/lp/sparse_matrix_float_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_pivots.go",
-        "pkg/util/lp/sparse_matrix_float_pivots.go"
+        "pkg/util/lp/sparse_matrix_float_pivots.go",
+        "pkg/util/lp/sparse_matrix_float_active.go",
+        "pkg/util/lp/sparse_matrix_exact_active.go",
+        "pkg/util/lp/sparse_matrix_active_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1188,7 +1203,16 @@
         "TestLPSparsePivotLiteralQueueAndThresholds",
         "TestLPSparsePivotBoundsAndPublicationPrefixes",
         "TestLPExactSparsePivotAllocationFailureCensus",
-        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison"
+        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPSparseActiveLiteralFailurePrefixes",
+        "TestLPSparseActiveEtaRequeuesInactiveRows",
+        "TestLPSparseActiveSignedScoreProfiles",
+        "TestLPSparseActiveEtaEliminationIndependentOracle",
+        "TestLPSparseActiveEtaEarlyEmptyTarget",
+        "TestLPExactSparseActiveEtaAllocationFailureCensus",
+        "TestLPSparseActiveBoundsAndPublicationPrefixes",
+        "TestLPExactSparseActiveBorrowedEtaPendingAndNoCopies"
       ]
     },
     {
@@ -1200,7 +1224,10 @@
         "pkg/util/lp/sparse_matrix_float_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_elimination.go",
         "pkg/util/lp/sparse_matrix_exact_pivots.go",
-        "pkg/util/lp/sparse_matrix_float_pivots.go"
+        "pkg/util/lp/sparse_matrix_float_pivots.go",
+        "pkg/util/lp/sparse_matrix_float_active.go",
+        "pkg/util/lp/sparse_matrix_exact_active.go",
+        "pkg/util/lp/sparse_matrix_active_test.go"
       ],
       "tests": [
         "TestLPFloatSparseOriginalInitU",
@@ -1224,7 +1251,16 @@
         "TestLPSparsePivotLiteralQueueAndThresholds",
         "TestLPSparsePivotBoundsAndPublicationPrefixes",
         "TestLPExactSparsePivotAllocationFailureCensus",
-        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison"
+        "TestLPExactSparseMaximumDoesNotAdoptOlderComparison",
+        "TestLPSparseActiveShorteningIndependentOracle",
+        "TestLPSparseActiveLiteralFailurePrefixes",
+        "TestLPSparseActiveEtaRequeuesInactiveRows",
+        "TestLPSparseActiveSignedScoreProfiles",
+        "TestLPSparseActiveEtaEliminationIndependentOracle",
+        "TestLPSparseActiveEtaEarlyEmptyTarget",
+        "TestLPExactSparseActiveEtaAllocationFailureCensus",
+        "TestLPSparseActiveBoundsAndPublicationPrefixes",
+        "TestLPExactSparseActiveBorrowedEtaPendingAndNoCopies"
       ]
     },
     {
