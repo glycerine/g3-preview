@@ -3,7 +3,7 @@ package ast
 import (
 	"reflect"
 
-	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/insdict"
 )
 
 type ASTSharedOccurrencesConfig struct{ TrackAtomic, VisitQuantifiers, VisitPatterns bool }
@@ -16,15 +16,16 @@ type astSharedFrame struct {
 	node astNodeRef
 	next uint32
 }
+
+// Entries own one reference per distinct expression. Native dictionary order
+// makes iteration and destruction follow first discovery deterministically.
 type ASTSharedOccurrences struct {
-	owner         astMarkOwner
-	table         astExprIdentityTable
-	config        ASTSharedOccurrencesConfig
-	stack         []astSharedFrame
-	stackSize     uint32
-	stackBytes    uint64
-	releaseCursor uint32
-	resetPhase    uint8
+	owner        astMarkOwner
+	entries      insdict.Dict[uint64, astNodeRef]
+	config       ASTSharedOccurrencesConfig
+	stack        []astSharedFrame
+	view         *astSharedView
+	resetPending bool
 }
 
 func NewASTSharedOccurrences(m *ASTManager) (*ASTSharedOccurrences, error) {
@@ -42,40 +43,22 @@ func NewASTSharedOccurrencesWithConfig(m *ASTManager, c ASTSharedOccurrencesConf
 	}
 	s := &ASTSharedOccurrences{config: c}
 	s.owner.bind(m, bytes, id)
-	if e = s.table.init(m); e != nil {
-		s.owner.finish()
-		return nil, e
-	}
 	return s, nil
 }
-func (s *ASTSharedOccurrences) push(m *ASTManager, r astNodeRef) error {
-	if s.stackSize == uint32(len(s.stack)) {
-		n, e := astSharedFrameNextCapacity(uint64(len(s.stack)), uint64(^uint(0)>>1))
-		if e != nil {
-			return e
-		}
-		bytes := uint64(n) * uint64(reflect.TypeOf(astSharedFrame{}).Size())
-		if e = m.BudgetField.Reserve(bytes); e != nil {
-			return e
-		}
-		a := make([]astSharedFrame, n)
-		copy(a, s.stack[:s.stackSize])
-		m.BudgetField.Release(s.stackBytes)
-		s.stack = a
-		s.stackBytes = bytes
-	}
-	s.stack[s.stackSize] = astSharedFrame{node: r}
-	s.stackSize++
-	return nil
+func (s *ASTSharedOccurrences) push(r astNodeRef) {
+	s.stack = append(s.stack, astSharedFrame{node: r})
 }
+func astSharedKey(r astNodeRef) uint64 { return uint64(r.slot)<<32 | uint64(r.generation) }
 func (s *ASTSharedOccurrences) insert(m *ASTManager, r astNodeRef) error {
-	fresh, e := s.table.insert(m, r)
-	if e != nil {
+	key := astSharedKey(r)
+	if _, found := s.entries.Get2(key); found {
+		return nil
+	}
+	if e := m.incNode(r); e != nil {
 		return e
 	}
-	if fresh {
-		return m.incNode(r)
-	}
+	s.entries.Put(key, r)
+	s.view = nil
 	return nil
 }
 func (s *ASTSharedOccurrences) process(m *ASTManager, r astNodeRef, v *astSharedMarkState) (bool, error) {
@@ -97,7 +80,8 @@ func (s *ASTSharedOccurrences) process(m *ASTManager, r astNodeRef, v *astShared
 		if count == 0 {
 			return true, nil
 		}
-		return false, s.push(m, r)
+		s.push(r)
+		return false, nil
 	case ASTVar:
 		if s.config.TrackAtomic && n.rc > 1 {
 			if n.shared {
@@ -118,21 +102,22 @@ func (s *ASTSharedOccurrences) process(m *ASTManager, r astNodeRef, v *astShared
 		if !s.config.VisitQuantifiers {
 			return true, nil
 		}
-		return false, s.push(m, r)
+		s.push(r)
+		return false, nil
 	default:
 		return false, ErrASTDomain
 	}
 }
 func (s *ASTSharedOccurrences) collectLocked(m *ASTManager, r astNodeRef, v *astSharedMarkState) error {
-	if ASTSourceDebug && s.stackSize != 0 {
+	if ASTSourceDebug && len(s.stack) != 0 {
 		return ErrASTDomain
 	}
 	done, e := s.process(m, r, v)
 	if e != nil || done {
 		return e
 	}
-	for s.stackSize > 0 {
-		idx := s.stackSize - 1
+	for len(s.stack) > 0 {
+		idx := len(s.stack) - 1
 		fr := s.stack[idx]
 		if e = m.validNode(fr.node); e != nil {
 			return e
@@ -172,7 +157,7 @@ func (s *ASTSharedOccurrences) collectLocked(m *ASTManager, r astNodeRef, v *ast
 			return e
 		}
 		if fr.next == count {
-			s.stackSize--
+			s.stack = s.stack[:idx]
 			continue
 		}
 		s.stack[idx].next++
@@ -183,41 +168,22 @@ func (s *ASTSharedOccurrences) collectLocked(m *ASTManager, r astNodeRef, v *ast
 	return nil
 }
 func (s *ASTSharedOccurrences) resetLocked(m *ASTManager) error {
-	if s.resetPhase == 0 {
-		s.resetPhase = 1
-		s.releaseCursor = 0
-	}
-	if s.resetPhase == 1 {
-		for s.releaseCursor < uint32(len(s.table.entries)) {
-			r := s.table.entries[s.releaseCursor]
-			if !astExprUsed(r) {
-				s.releaseCursor++
-				continue
-			}
-			consumed, e := m.decNode(r)
-			if consumed {
-				s.releaseCursor++
-			}
-			if e != nil {
-				return e
-			}
-			if !consumed {
-				return ErrASTDomain
-			}
+	s.resetPending = true
+	s.view = nil
+	for key, r := range s.entries.All() {
+		consumed, e := m.decNode(r)
+		if consumed {
+			s.entries.Del(key)
 		}
-		s.resetPhase = 2
-	}
-	if s.resetPhase == 2 {
-		if e := s.table.reset(m); e != nil {
+		if e != nil {
 			return e
 		}
-		s.resetPhase = 3
+		if !consumed {
+			return ErrASTDomain
+		}
 	}
-	if e := s.table.reset(m); e != nil {
-		return e
-	}
-	s.resetPhase = 0
-	s.releaseCursor = 0
+	s.entries.Clear()
+	s.resetPending = false
 	return nil
 }
 func (s *ASTSharedOccurrences) Collect(h ASTHandle) (result error) {
@@ -226,7 +192,7 @@ func (s *ASTSharedOccurrences) Collect(h ASTHandle) (result error) {
 		return e
 	}
 	defer m.mu.Unlock()
-	if ASTSourceDebug && s.stackSize != 0 {
+	if ASTSourceDebug && len(s.stack) != 0 {
 		return ErrASTDomain
 	}
 	var v astSharedMarkState
@@ -256,8 +222,8 @@ func (s *ASTSharedOccurrences) CollectWithMark(h ASTHandle, v *ASTSharedOccurren
 	if v.owner.manager != m {
 		return ErrASTHandle
 	}
-	if s.resetPhase != 0 {
-		return arena.ErrBounds
+	if s.resetPending {
+		return ErrASTPending
 	}
 	r, e := m.internal(h)
 	if e != nil {
@@ -275,10 +241,10 @@ func (s *ASTSharedOccurrences) IsShared(h ASTHandle) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	_, yes, e := s.table.find(m, r)
-	return yes, e
+	_, yes := s.entries.Get2(astSharedKey(r))
+	return yes, nil
 }
-func (s *ASTSharedOccurrences) NumShared() uint32 { return s.table.size }
+func (s *ASTSharedOccurrences) NumShared() uint32 { return uint32(s.entries.Len()) }
 func (s *ASTSharedOccurrences) Reset() error {
 	m, e := s.owner.lock()
 	if e != nil {
@@ -296,13 +262,7 @@ func (s *ASTSharedOccurrences) Cleanup() error {
 	if e = s.resetLocked(m); e != nil {
 		return e
 	}
-	if e = s.table.finalize(m); e != nil {
-		return e
-	}
-	m.BudgetField.Release(s.stackBytes)
 	s.stack = nil
-	s.stackBytes = 0
-	s.stackSize = 0
 	return nil
 }
 func (s *ASTSharedOccurrences) Close() error {
@@ -317,28 +277,9 @@ func (s *ASTSharedOccurrences) Close() error {
 			return e
 		}
 	}
-	m.BudgetField.Release(s.stackBytes)
 	s.stack = nil
-	s.stackBytes = 0
-	s.table.close(m)
+	s.entries.Clear()
+	s.view = nil
 	s.owner.finish()
 	return nil
-}
-
-// Source svector<pair<expr*,unsigned>> selects the LP64 reference extent16
-// plus two unsigned32 header words. Actual Go scalar frames occupy12 bytes;
-// charge that physical stride and check its host extent independently.
-func astSharedFrameNextCapacity(old, hostMax uint64) (uint32, error) {
-	if old > uint64(^uint32(0)) {
-		return 0, arena.ErrBounds
-	}
-	n := uint32(2)
-	if old != 0 {
-		n = (3*uint32(old) + 1) >> 1
-	}
-	sourceBytes := uint64(n)*16 + 8
-	if uint64(n) <= old || sourceBytes > uint64(^uint32(0)) || uint64(n) > hostMax/uint64(reflect.TypeOf(astSharedFrame{}).Size()) {
-		return 0, arena.ErrBounds
-	}
-	return n, nil
 }

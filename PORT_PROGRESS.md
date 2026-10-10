@@ -32659,3 +32659,48 @@ under the debug direct allocator and are independent of this worklist change.
 The util knot and complete subpackage split remain unfinished. AST substitution
 and shared-occurrence collections, other retained containers, SAT vectors,
 NumericTextStream consumers and internal util dependency cycles still remain.
+
+## Native sparse marks and shared-occurrence collections
+
+Removed the concrete AST object-table emulation shared by sparse marks and
+shared-occurrence collectors. Sparse marks now use map[astNodeRef]struct{};
+queried/inserted handles are validated by the owning manager, while stored keys
+borrow nodes and can be cleared after those nodes die. Physical slot generation
+prevents an old borrowed identity from matching a later node in the same slot.
+Shared occurrences now use insdict.Dict[uint64,astNodeRef] and acquire exactly
+one actual AST reference per new key. Iteration and destruction follow discovery
+order. Reset deletes each consumed dictionary key before returning any callback
+error, keeps a pending guard for actual stopped cleanup, and retries only keys
+that still own references. Actual cold owner headers, manager borrowing and
+node shared flags remain.
+
+Traversal frames and the visited-node list are plain native slices. Removed
+simulated storage reservations, geometric capacity schedules, tombstones,
+current-hash probing/rehashing, reset/finalize replacement allocations and
+backing-only epochs. Native iterator copies share an insertion-order borrowed
+view; adding a key, reset, cleanup or close invalidates that view before it can
+return a freed node. Duplicate discovery preserves the current view and adds
+no retain. This intentionally replaces C++ backing-pointer/tombstone iterator
+behavior with checked native collection lifetime. Neither the collections nor
+their tests add C++ standard-library/container implementation credit.
+
+Native tests cover 257 keys with reservations disabled, exact retained/borrowed
+reference counts, all discovery-order iterator entries and actual destruction
+order through recycled IDs. Other coverage includes 257-node deep traversal,
+repeated deep-branch multiplicity, large visitation reset, all quantifier/pattern
+policies, independent public mark planes, foreign/stale query rejection, actual
+slot reuse with a later generation, sparse reset after borrowed nodes die,
+iterator copies/endpoints/invalidation, forced manager close and actual cold
+header refusal/copy guards. The bounded sparse identity oracle remains. Obsolete
+container-capacity/probing fault tests were replaced by corresponding native
+consumer tests; source/method evidence descriptions and names were updated.
+Statuses remain unchanged at 2102 units/677 APIs, 63 ported, 284 partial,
+1727 unported and two dead/deleted.
+
+Validation: full native AST passed after the final visitation simplification
+(27.476s); full native rewriter passed (13.182s). Focused native sparse/shared
+checks passed (0.021s), and final focused g3debug checks passed (0.020s).
+Module-wide compilation, AST/rewriter vet, manifest evidence, gofmt and diff
+checks passed. The util knot and complete subpackage split remain active:
+AST dependency/substitution collections, SAT vectors, NumericTextStream consumers
+and internal util numeric/text/parameter dependency cycles still remain.

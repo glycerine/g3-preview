@@ -105,36 +105,47 @@ func TestASTSharedOccurrencesExternalVisitedAndPlaneIndependence(t *testing.T) {
 	astTestMust(t, m.ResetNodeMark1(h, 111))
 	astTestMust(t, m.ResetNodeMark2(h, 222))
 }
-func TestASTSharedOccurrencesMarkInlineFailurePrefix(t *testing.T) {
+func TestASTSharedOccurrencesNativeVisitedGrowthAndReset(t *testing.T) {
 	m := astTestManager(t)
-	h := markTestNodes(t, m, 17)
-	visited, e := NewASTSharedOccurrencesMark(m)
+	h := markTestNodes(t, m, 257)
+	v, e := NewASTSharedOccurrencesMark(m)
 	astTestMust(t, e)
-	defer visited.Close()
+	defer v.Close()
 	before := m.BudgetField.Used()
 	m.BudgetField.FailAfter(0)
-	for _, n := range h[:16] {
-		astTestMust(t, visited.Mark(n, true))
+	for _, n := range h {
+		astTestMust(t, v.Mark(n, true))
+		astTestMust(t, v.Mark(n, true))
 	}
-	err := visited.Mark(h[16], true)
+	for _, n := range h {
+		yes, e := v.IsMarked(n)
+		astTestMust(t, e)
+		if !yes {
+			t.Fatal("missing visited key")
+		}
+	}
+	astTestMust(t, v.Reset())
+	for _, n := range h {
+		yes, e := v.IsMarked(n)
+		astTestMust(t, e)
+		if yes {
+			t.Fatal("native overflow lost reset key")
+		}
+		rc, e := m.GetRefCount(n)
+		astTestMust(t, e)
+		if rc != 0 {
+			t.Fatal("visited marker retained node", rc)
+		}
+	}
 	m.BudgetField.FailAfter(-1)
-	yes, e := visited.IsMarked(h[16])
-	astTestMust(t, e)
-	if !errors.Is(err, arena.ErrInjectedFailure) || !yes || m.BudgetField.Used() != before {
-		t.Fatal("private shared mark before overflow allocation", err, yes)
+	if m.BudgetField.Used() != before {
+		t.Fatal("native visitation charged container storage")
 	}
-	astTestMust(t, visited.Reset())
-	yes, e = visited.IsMarked(h[16])
-	astTestMust(t, e)
-	if !yes {
-		t.Fatal("unlisted failed prefix must remain")
-	}
-	astTestMust(t, visited.ResetMark(h[16]))
 }
 
-func TestASTSharedOccurrencesPhysicalBucketIterator(t *testing.T) {
+func TestASTSharedOccurrencesNativeDiscoveryOrderGrowthAndOwnership(t *testing.T) {
 	m := astTestManager(t)
-	h := markTestNodes(t, m, 12)
+	h := markTestNodes(t, m, 257)
 	pins, e := m.NewRefVectorFrom(append(append([]ASTHandle{}, h...), h...))
 	astTestMust(t, e)
 	defer m.DelRefVector(&pins)
@@ -144,9 +155,15 @@ func TestASTSharedOccurrencesPhysicalBucketIterator(t *testing.T) {
 	c, e := NewASTSharedOccurrencesWithConfig(m, ASTSharedOccurrencesConfig{TrackAtomic: true})
 	astTestMust(t, e)
 	defer c.Close()
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
 	for _, n := range h {
 		astTestMust(t, v.Mark(n, true))
 		astTestMust(t, c.CollectWithMark(n, v))
+		astTestMust(t, c.CollectWithMark(n, v))
+	}
+	if c.NumShared() != uint32(len(h)) || m.BudgetField.Used() != before {
+		t.Fatal("native owning dictionary growth")
 	}
 	it, e := c.BeginShared()
 	astTestMust(t, e)
@@ -157,17 +174,20 @@ func TestASTSharedOccurrencesPhysicalBucketIterator(t *testing.T) {
 		if done {
 			break
 		}
-		for next < len(c.table.entries) && !astExprUsed(c.table.entries[next]) {
-			next++
-		}
 		got, e := it.Value()
 		astTestMust(t, e)
-		if got != m.external(c.table.entries[next]) {
-			t.Fatal("source physical bucket order")
+		rc, e := m.GetRefCount(got)
+		astTestMust(t, e)
+		if next >= len(h) || got != h[next] || rc != 3 {
+			t.Fatal("discovery order and exact owning retain", next, got, rc)
 		}
 		next++
 		astTestMust(t, it.Next())
 	}
+	if next != len(h) {
+		t.Fatal("iterator skipped keys", next)
+	}
+	m.BudgetField.FailAfter(-1)
 	astTestMust(t, v.Reset())
 }
 
@@ -208,7 +228,7 @@ func TestASTSharedOccurrencesAllTraversalPolicies(t *testing.T) {
 	}
 }
 
-func TestASTSharedOccurrencesWarmInlineAndHeaderRefusal(t *testing.T) {
+func TestASTSharedOccurrencesNativeWarmBudgetAndHeaderRefusal(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 2)
 	sub := sharedTestApp(t, m, h[0], h[1])
@@ -217,12 +237,14 @@ func TestASTSharedOccurrencesWarmInlineAndHeaderRefusal(t *testing.T) {
 	astTestMust(t, e)
 	defer c.Close()
 	astTestMust(t, c.Collect(root))
-	if n := testing.AllocsPerRun(100, func() {
-		if e := c.Collect(root); e != nil {
-			panic(e)
-		}
-	}); n != 0 {
-		t.Fatal("local inline16 marker/frame warm operation allocated", n)
+	beforeCollect := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	for i := 0; i < 100; i++ {
+		astTestMust(t, c.Collect(root))
+	}
+	m.BudgetField.FailAfter(-1)
+	if m.BudgetField.Used() != beforeCollect {
+		t.Fatal("warm collection charged native dictionary storage")
 	}
 	before := m.BudgetField.Used()
 	m.BudgetField.FailAfter(0)
@@ -240,11 +262,11 @@ func TestASTSharedOccurrencesWarmInlineAndHeaderRefusal(t *testing.T) {
 	}
 }
 
-func TestASTSharedOccurrencesFrameFailureCursorPrefix(t *testing.T) {
+func TestASTSharedOccurrencesNativeDeepFrameTraversalAndCleanup(t *testing.T) {
 	m := astTestManager(t)
 	leaf := markTestNodes(t, m, 1)[0]
 	root := leaf
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 257; i++ {
 		root = sharedTestApp(t, m, root)
 	}
 	c, e := NewASTSharedOccurrences(m)
@@ -254,33 +276,21 @@ func TestASTSharedOccurrencesFrameFailureCursorPrefix(t *testing.T) {
 	astTestMust(t, e)
 	defer v.Close()
 	before := m.BudgetField.Used()
-	m.BudgetField.FailAfter(1)
-	e = c.CollectWithMark(root, v)
-	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || c.stackSize != 2 || len(c.stack) != 2 || c.stack[0].next != 1 || c.stack[1].next != 1 || m.BudgetField.Used() != before+24 {
-		t.Fatal("parent cursor advances before child frame allocation", e, c.stackSize, c.stack)
+	m.BudgetField.FailAfter(0)
+	astTestMust(t, c.CollectWithMark(root, v))
+	if len(c.stack) != 0 || c.NumShared() != 0 || m.BudgetField.Used() != before {
+		t.Fatal("native deep traversal")
 	}
-	// reset does not touch traversal frames. In source release an atomic
-	// process returns before draining the old stack; debug rejects nonempty.
 	astTestMust(t, c.Reset())
-	e = c.CollectWithMark(leaf, v)
-	if ASTSourceDebug {
-		if !errors.Is(e, ErrASTDomain) {
-			t.Fatal("source stack.empty diagnostic", e)
-		}
-	} else {
-		astTestMust(t, e)
-	}
-	if c.stackSize != 2 {
-		t.Fatal("reset or atomic early return silently cleared frames")
-	}
+	astTestMust(t, c.CollectWithMark(leaf, v))
 	astTestMust(t, c.Cleanup())
-	if c.stackSize != 0 || c.stack != nil || c.stackBytes != 0 {
-		t.Fatal("source stack.finalize")
+	m.BudgetField.FailAfter(-1)
+	if c.stack != nil {
+		t.Fatal("cleanup retained traversal frames")
 	}
 }
 
-func TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets(t *testing.T) {
+func TestASTSharedOccurrencesNativeResetDiscoveryOrderDestruction(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 10)
 	pins, e := m.NewRefVectorFrom(append(append([]ASTHandle{}, h...), h...))
@@ -298,13 +308,13 @@ func TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets(t *testing.T) 
 	astTestMust(t, v.Reset())             // borrowed visitation list must outlive its nodes
 	astTestMust(t, m.DelRefVector(&pins)) // leave the collector's sole retain
 	var expected []uint32
-	for _, r := range c.table.entries {
-		if astExprUsed(r) {
-			expected = append(expected, m.nodeAt(r.slot).id)
-		}
+	for _, n := range h {
+		id, e := m.GetASTID(n)
+		astTestMust(t, e)
+		expected = append(expected, id)
 	}
 	astTestMust(t, c.Reset())
-	// Each erase/recycle occurs in bucket order. The genuine source ID helper
+	// Each erase/recycle occurs in discovery order. The project ID helper
 	// returns these IDs in reverse, independently checking actual DEC callbacks.
 	b, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -314,7 +324,7 @@ func TestASTSharedOccurrencesResetDeletesAscendingPhysicalBuckets(t *testing.T) 
 		id, e := m.GetASTID(n)
 		astTestMust(t, e)
 		if id != expected[i] {
-			t.Fatal("real bucket ASC destruction/LIFO ID reuse", i, id, expected[i])
+			t.Fatal("discovery-order destruction/LIFO ID reuse", i, id, expected[i])
 		}
 	}
 }
@@ -342,11 +352,11 @@ func TestASTSharedOccurrencesNativeWideDeletionReset(t *testing.T) {
 	e = c.Reset()
 	m.BudgetField.FailAfter(-1)
 	astTestMust(t, e)
-	if m.validNode(r) == nil || m.liveNodes != before-21 || c.table.size != 0 || c.resetPhase != 0 {
-		t.Fatal("native wide deletion reset", m.liveNodes, before, c.table.size, c.resetPhase)
+	if m.validNode(r) == nil || m.liveNodes != before-21 || c.NumShared() != 0 || c.resetPending {
+		t.Fatal("native wide deletion reset", m.liveNodes, before, c.NumShared(), c.resetPending)
 	}
 	astTestMust(t, c.Reset())
-	if c.table.size != 0 || c.resetPhase != 0 || m.liveNodes != before-21 {
+	if c.NumShared() != 0 || c.resetPending || m.liveNodes != before-21 {
 		t.Fatal("retry DEC already consumed node")
 	}
 }
@@ -361,7 +371,7 @@ func TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow(t *testing.T) {
 	astTestMust(t, e)
 	it, e := c.BeginShared()
 	astTestMust(t, e)
-	charged := c.owner.ownerBytes + c.table.bytes + v.owner.ownerBytes + s.owner.ownerBytes + s.table.bytes
+	charged := c.owner.ownerBytes + v.owner.ownerBytes + s.owner.ownerBytes
 	astTestMust(t, m.Close())
 	if _, e = it.Done(); e == nil {
 		t.Fatal("iterator must reject forced closed manager lifetime")
@@ -375,7 +385,7 @@ func TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow(t *testing.T) {
 	}
 }
 
-func TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges(t *testing.T) {
+func TestASTSharedOccurrencesNativeIteratorInvalidationAndDuplicates(t *testing.T) {
 	m := astTestManager(t)
 	h := markTestNodes(t, m, 2)
 	pins, e := m.NewRefVectorFrom([]ASTHandle{h[0], h[0], h[1], h[1]})
@@ -387,81 +397,69 @@ func TestASTSharedOccurrencesIteratorSurvivesInPlaceTableChanges(t *testing.T) {
 	c, e := NewASTSharedOccurrencesWithConfig(m, ASTSharedOccurrencesConfig{TrackAtomic: true})
 	astTestMust(t, e)
 	defer c.Close()
-	astTestMust(t, v.Mark(h[0], true))
+	for _, n := range h {
+		astTestMust(t, v.Mark(n, true))
+	}
 	astTestMust(t, c.CollectWithMark(h[0], v))
 	it, e := c.BeginShared()
 	astTestMust(t, e)
 	end, e := c.EndShared()
 	astTestMust(t, e)
-	index := it.index
-	epoch := c.table.epoch
-	astTestMust(t, v.Mark(h[1], true))
-	astTestMust(t, c.CollectWithMark(h[1], v))
+	astTestMust(t, c.CollectWithMark(h[0], v))
 	got, e := it.Value()
 	astTestMust(t, e)
-	if got != h[0] || it.index != index || c.table.capacity != 8 || c.table.epoch != epoch {
-		t.Fatal("source captures existing entry pointer through insertion")
+	if got != h[0] {
+		t.Fatal("duplicate changed native view")
 	}
-	done, e := end.Done()
+	astTestMust(t, c.CollectWithMark(h[1], v))
+	if _, e := it.Value(); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("new key did not invalidate view", e)
+	}
+	if _, e := end.Done(); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("new key did not invalidate endpoint", e)
+	}
+	it, e = c.BeginShared()
 	astTestMust(t, e)
-	if !done {
-		t.Fatal("captured endpoint remains endpoint after in-place insert")
-	}
 	astTestMust(t, c.Reset())
-	done, e = it.Done()
-	astTestMust(t, e)
-	if done {
-		t.Fatal("reset does not advance captured current pointer")
-	}
-	got, e = it.Value()
-	astTestMust(t, e)
-	if !got.IsNull() {
-		t.Fatal("captured FREE slot returns source null")
-	}
-	astTestMust(t, it.Next())
-	same, e := it.Equal(end)
-	astTestMust(t, e)
-	if !same {
-		t.Fatal("Next scans cleared backing to captured endpoint")
+	if _, e := it.Value(); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("reset retained stale borrowed iterator", e)
 	}
 	astTestMust(t, v.Reset())
 }
 
-func TestASTSharedOccurrencesFrameSourceExtentAndHostBounds(t *testing.T) {
-	const hostMax = uint64(^uint64(0) >> 1)
-	for _, tc := range []struct {
-		old  uint64
-		want uint32
-	}{{0, 2}, {2, 3}, {3, 5}, {5, 8}, {178956970, 268435455}} {
-		n, e := astSharedFrameNextCapacity(tc.old, hostMax)
-		astTestMust(t, e)
-		if n != tc.want {
-			t.Fatal("source capacity schedule/LP64 extent endpoint", tc, n)
-		}
+func TestASTSharedOccurrencesNativeRepeatedDeepBranch(t *testing.T) {
+	m := astTestManager(t)
+	branch := markTestNodes(t, m, 1)[0]
+	for i := 0; i < 257; i++ {
+		branch = sharedTestApp(t, m, branch)
 	}
-	if _, e := astSharedFrameNextCapacity(178956971, hostMax); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("source pair16 extent must refuse even though actual Go frame12 fits", e)
-	}
-	if _, e := astSharedFrameNextCapacity(^uint64(0), hostMax); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("source unsigned width", e)
-	}
-	if _, e := astSharedFrameNextCapacity(uint64(^uint32(0)), hostMax); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("source unsigned capacity arithmetic wraps and fails growth", e)
-	}
-	if _, e := astSharedFrameNextCapacity(0, 23); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("actual frame12 host domain", e)
-	}
-	n, e := astSharedFrameNextCapacity(0, 24)
+	root := sharedTestApp(t, m, branch, branch)
+	c, e := NewASTSharedOccurrences(m)
 	astTestMust(t, e)
-	if n != 2 {
-		t.Fatal("actual host endpoint")
+	defer c.Close()
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	astTestMust(t, c.Collect(root))
+	yes, e := c.IsShared(branch)
+	astTestMust(t, e)
+	rc, e := m.GetRefCount(branch)
+	astTestMust(t, e)
+	if !yes || c.NumShared() != 1 || rc != 3 || len(c.stack) != 0 || m.BudgetField.Used() != before {
+		t.Fatal("deep repeated branch multiplicity", yes, rc)
 	}
+	astTestMust(t, c.Reset())
+	rc, e = m.GetRefCount(branch)
+	astTestMust(t, e)
+	if rc != 2 {
+		t.Fatal("reset lost parent retains", rc)
+	}
+	m.BudgetField.FailAfter(-1)
 }
 
-func TestASTSharedOccurrencesIteratorActualBackingLifetime(t *testing.T) {
+func TestASTSharedOccurrencesNativeIteratorCopiesEndpointsAndClose(t *testing.T) {
 	m := astTestManager(t)
-	h := markTestNodes(t, m, 8)
-	pins, e := m.NewRefVectorFrom(append(append([]ASTHandle{}, h...), h...))
+	h := markTestNodes(t, m, 1)[0]
+	pins, e := m.NewRefVectorFrom([]ASTHandle{h, h})
 	astTestMust(t, e)
 	defer m.DelRefVector(&pins)
 	v, e := NewASTSharedOccurrencesMark(m)
@@ -469,51 +467,35 @@ func TestASTSharedOccurrencesIteratorActualBackingLifetime(t *testing.T) {
 	defer v.Close()
 	c, e := NewASTSharedOccurrencesWithConfig(m, ASTSharedOccurrencesConfig{TrackAtomic: true})
 	astTestMust(t, e)
-	defer c.Close()
-	for _, n := range h {
-		astTestMust(t, v.Mark(n, true))
-	}
-	for _, n := range h[:7] {
-		astTestMust(t, c.CollectWithMark(n, v))
-	}
+	astTestMust(t, v.Mark(h, true))
+	astTestMust(t, c.CollectWithMark(h, v))
 	it, e := c.BeginShared()
 	astTestMust(t, e)
-	original, e := it.Value()
+	copy := it
+	same, e := it.Equal(copy)
 	astTestMust(t, e)
-	m.BudgetField.FailAfter(0)
-	e = c.CollectWithMark(h[7], v)
-	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal("actual growth reserve refusal", e)
+	if !same {
+		t.Fatal("copied native iterator changed view")
 	}
-	got, e := it.Value()
+	end, e := c.EndShared()
 	astTestMust(t, e)
-	if got != original {
-		t.Fatal("failed reserve leaves entry pointer alive")
+	astTestMust(t, copy.Next())
+	same, e = copy.Equal(end)
+	astTestMust(t, e)
+	if !same {
+		t.Fatal("native endpoint mismatch")
 	}
-	astTestMust(t, c.CollectWithMark(h[7], v))
-	if _, e = it.Value(); !errors.Is(e, ErrASTHandle) {
-		t.Fatal("successful relocation invalidates old backing", e)
+	if _, e := end.Value(); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("read past end", e)
 	}
-	it, e = c.BeginShared()
-	astTestMust(t, e)
-	original, e = it.Value()
-	astTestMust(t, e)
-	r, e := m.internal(original)
-	astTestMust(t, e)
-	epoch := c.table.epoch
-	astTestMust(t, c.table.erase(m, r)) // actual source base-table erase, no RC callback
-	got, e = it.Value()
-	astTestMust(t, e)
-	if c.table.epoch != epoch || got == original {
-		t.Fatal("erased current pointer remains a live slot view")
+	if e := end.Next(); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("advance past end", e)
 	}
-	// FREE yields null; DELETED yields the explicit non-node sentinel token.
-	if !got.IsNull() && (got.slot != 1 || got.generation != 0) {
-		t.Fatal("source erased slot representation", got)
-	}
-	astTestMust(t, m.DecRef(original)) // balance the erased collector-owned retain
 	astTestMust(t, v.Reset())
+	astTestMust(t, c.Close())
+	if _, e := it.Done(); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("closed owner iterator accepted", e)
+	}
 }
 
 func TestASTSparseSharedExpressionDomainsAndASTWideVisited(t *testing.T) {
@@ -553,7 +535,7 @@ func TestASTSparseSharedExpressionDomainsAndASTWideVisited(t *testing.T) {
 			t.Fatal("shared_occs_mark intentionally takes ast*, not expr*")
 		}
 	}
-	if sparse.table.size != 0 {
+	if len(sparse.entries) != 0 {
 		t.Fatal("rejected domains publish no sparse keys")
 	}
 	astTestMust(t, visited.Reset())

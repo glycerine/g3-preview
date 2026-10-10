@@ -1,12 +1,13 @@
 package ast
 
-// Iterator borrows the collector. A scalar epoch checks the Go lifetime
-// adaptation of source entry pointers invalidated by backing replacement/free.
+// A view borrows the collector's references in insertion order. The collector
+// drops its current view whenever keys change, invalidating outstanding iterators
+// before any freed key can be returned. Copies share the same view identity.
+type astSharedView struct{ nodes []astNodeRef }
 type ASTSharedOccurrencesIterator struct {
-	owner    *ASTSharedOccurrences
-	epoch    uint64
-	index    uint32
-	endpoint uint32
+	owner *ASTSharedOccurrences
+	view  *astSharedView
+	index int
 }
 
 func (s *ASTSharedOccurrences) BeginShared() (ASTSharedOccurrencesIterator, error) {
@@ -15,37 +16,34 @@ func (s *ASTSharedOccurrences) BeginShared() (ASTSharedOccurrencesIterator, erro
 		return ASTSharedOccurrencesIterator{}, e
 	}
 	defer m.mu.Unlock()
-	if s.table.pending != 0 {
-		return ASTSharedOccurrencesIterator{}, ErrASTHandle
+	if s.resetPending {
+		return ASTSharedOccurrencesIterator{}, ErrASTPending
 	}
-	it := ASTSharedOccurrencesIterator{owner: s, epoch: s.table.epoch, endpoint: s.table.capacity}
-	it.skip()
-	return it, nil
+	if s.view == nil {
+		view := &astSharedView{nodes: make([]astNodeRef, 0, s.entries.Len())}
+		for _, r := range s.entries.All() {
+			view.nodes = append(view.nodes, r)
+		}
+		s.view = view
+	}
+	return ASTSharedOccurrencesIterator{owner: s, view: s.view}, nil
 }
 func (s *ASTSharedOccurrences) EndShared() (ASTSharedOccurrencesIterator, error) {
 	it, e := s.BeginShared()
 	if e != nil {
 		return it, e
 	}
-	it.index = s.table.capacity
+	it.index = len(it.view.nodes)
 	return it, nil
 }
-func (it *ASTSharedOccurrencesIterator) skip() {
-	for it.index < it.endpoint && !astExprUsed(it.owner.table.entries[it.index]) {
-		it.index++
-	}
-}
 func (it *ASTSharedOccurrencesIterator) check() error {
-	if it == nil || it.owner == nil {
+	if it == nil || it.owner == nil || it.view == nil {
 		return ErrASTHandle
 	}
 	if e := it.owner.owner.check(); e != nil {
 		return e
 	}
-	if it.owner.owner.manager.Closed {
-		return ErrASTHandle
-	}
-	if it.epoch != it.owner.table.epoch || it.owner.table.pending != 0 {
+	if it.owner.owner.manager.Closed || it.owner.view != it.view || it.owner.resetPending {
 		return ErrASTHandle
 	}
 	return nil
@@ -54,26 +52,25 @@ func (it *ASTSharedOccurrencesIterator) Done() (bool, error) {
 	if e := it.check(); e != nil {
 		return false, e
 	}
-	return it.index == it.endpoint, nil
+	return it.index == len(it.view.nodes), nil
 }
 func (it *ASTSharedOccurrencesIterator) Value() (ASTHandle, error) {
 	if e := it.check(); e != nil {
 		return ASTHandle{}, e
 	}
-	if it.index >= it.endpoint {
+	if it.index >= len(it.view.nodes) {
 		return ASTHandle{}, ErrASTHandle
 	}
-	return it.owner.owner.manager.external(it.owner.table.entries[it.index]), nil
+	return it.owner.owner.manager.external(it.view.nodes[it.index]), nil
 }
 func (it *ASTSharedOccurrencesIterator) Next() error {
 	if e := it.check(); e != nil {
 		return e
 	}
-	if it.index >= it.endpoint {
+	if it.index >= len(it.view.nodes) {
 		return ErrASTHandle
 	}
 	it.index++
-	it.skip()
 	return nil
 }
 func (it *ASTSharedOccurrencesIterator) Equal(other ASTSharedOccurrencesIterator) (bool, error) {
@@ -83,5 +80,5 @@ func (it *ASTSharedOccurrencesIterator) Equal(other ASTSharedOccurrencesIterator
 	if e := other.check(); e != nil {
 		return false, e
 	}
-	return it.owner == other.owner && it.index == other.index, nil
+	return it.owner == other.owner && it.view == other.view && it.index == other.index, nil
 }

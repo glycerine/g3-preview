@@ -1,26 +1,10 @@
 package ast
 
-import (
-	"reflect"
+import "reflect"
 
-	"github.com/glycerine/g3/pkg/arena"
-)
+// Visitation borrows nodes; native slice growth has no object-arena charge.
+type astSharedMarkState struct{ nodes []astNodeRef }
 
-// Inline storage has no self-referential slice, allowing the local source
-// visited marker to remain on the stack. It borrows all listed nodes.
-type astSharedMarkState struct {
-	inline [16]astNodeRef
-	heap   []astNodeRef
-	size   uint32
-	bytes  uint64
-}
-
-func (s *astSharedMarkState) at(i uint32) astNodeRef {
-	if s.heap == nil {
-		return s.inline[i]
-	}
-	return s.heap[i]
-}
 func (s *astSharedMarkState) mark(m *ASTManager, r astNodeRef, flag bool) error {
 	if e := m.validNode(r); e != nil {
 		return e
@@ -34,48 +18,17 @@ func (s *astSharedMarkState) mark(m *ASTManager, r astNodeRef, flag bool) error 
 		return nil
 	}
 	n.shared = true
-	cap := uint32(16)
-	if s.heap != nil {
-		cap = uint32(len(s.heap))
-	}
-	if s.size == cap {
-		next := uint64(cap) * 2
-		bytes := next * 8
-		if next > uint64(^uint32(0)) || bytes > uint64(^uint(0)>>1) {
-			return arena.ErrBounds
-		}
-		if e := m.BudgetField.Reserve(bytes); e != nil {
-			return e
-		}
-		a := make([]astNodeRef, int(next))
-		if s.heap == nil {
-			copy(a, s.inline[:s.size])
-		} else {
-			copy(a, s.heap[:s.size])
-		}
-		m.BudgetField.Release(s.bytes)
-		s.heap = a
-		s.bytes = bytes
-	}
-	if s.heap == nil {
-		s.inline[s.size] = r
-	} else {
-		s.heap[s.size] = r
-	}
-	s.size++
+	s.nodes = append(s.nodes, r)
 	return nil
 }
 func (s *astSharedMarkState) reset(m *ASTManager) error {
-	for s.size > 0 { // source visits ASC; shift cursor only after a successful reset
-		for i := uint32(0); i < s.size; i++ {
-			r := s.at(i)
-			if e := m.validNode(r); e != nil {
-				return e
-			}
-			m.nodeAt(r.slot).shared = false
+	for _, r := range s.nodes {
+		if e := m.validNode(r); e != nil {
+			return e
 		}
-		s.size = 0
+		m.nodeAt(r.slot).shared = false
 	}
+	s.nodes = s.nodes[:0]
 	return nil
 }
 func (s *astSharedMarkState) close(m *ASTManager) error {
@@ -84,10 +37,7 @@ func (s *astSharedMarkState) close(m *ASTManager) error {
 			return e
 		}
 	}
-	m.BudgetField.Release(s.bytes)
-	s.heap = nil
-	s.bytes = 0
-	s.size = 0
+	s.nodes = nil
 	return nil
 }
 
