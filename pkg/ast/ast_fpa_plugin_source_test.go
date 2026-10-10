@@ -21,10 +21,10 @@ func TestASTFloatingPointActualConstructorRegistrationAndSorts(t *testing.T) {
 	family, e := m.RegisterFloatingPointPlugin()
 	astTestMust(t, e)
 	p := m.floatingPointPlugin
-	if p == nil || !p.published || !p.completed || p.numeric == nil || p.table.capacity != 10 || p.real.slot == 0 || p.integer.slot == 0 || p.bitvector != m.bitVectorPlugin {
+	if p == nil || !p.published || !p.completed || p.numeric == nil || len(p.table) != 0 || !p.tableReady || p.real.slot == 0 || p.integer.slot == 0 || p.bitvector != m.bitVectorPlugin {
 		t.Fatal("actual completed members/publication/set_manager", p)
 	}
-	if p.ids.Range() != 0 || p.ids.FreeLen() != 0 || p.ids.Budget() != m.BudgetField || p.values.manager != p.numeric || len(p.values.values) != 0 {
+	if p.nextID != 0 || len(p.freeIDs) != 0 || p.values.manager != p.numeric || len(p.values.values) != 0 {
 		t.Fatal("actual initially-empty ID generator and scoped MPF vector members")
 	}
 	for _, tc := range []struct {

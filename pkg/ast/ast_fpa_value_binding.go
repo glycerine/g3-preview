@@ -5,38 +5,6 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// These procedures borrow the actual receiver's concrete value slice
-// and MPF manager at each reached table call. The table stores no closures,
-// mirrored numerals, or manager inferred from a significand token.
-func (p *astFloatingPointPluginOwner) valueTableProcs() astFloatValueTableProcs {
-	return astFloatValueTableProcs{
-		hash: func(id uint32) (uint32, error) {
-			if p == nil || p.self != p || p.owner == nil || p.numeric == nil {
-				return 0, ErrASTHandle
-			}
-			value, e := p.values.at(id)
-			if e != nil {
-				return 0, e
-			}
-			return p.numeric.Hash(&value)
-		},
-		equal: func(a, b uint32) (bool, error) {
-			if p == nil || p.self != p || p.owner == nil || p.numeric == nil {
-				return false, ErrASTHandle
-			}
-			lhs, e := p.values.at(a)
-			if e != nil {
-				return false, e
-			}
-			rhs, e := p.values.at(b)
-			if e != nil {
-				return false, e
-			}
-			return p.numeric.EqCore(&lhs, &rhs)
-		},
-	}
-}
-
 // Source: src/ast/fpa_decl_plugin.cpp:52-62. No rollback is performed if
 // reserve, SET, insertion, recycling, or NUM destruction throws.
 func (p *astFloatingPointPluginOwner) mkValueID(value *util.ArbitraryFloat) (idResult uint32, err error) {
@@ -48,9 +16,16 @@ func (p *astFloatingPointPluginOwner) mkValueID(value *util.ArbitraryFloat) (idR
 	if p == nil || p.self != p || p.owner == nil || p.owner.Self != p.owner || p.owner.floatingPointPlugin != p || !p.published || p.sourceEnded {
 		return 0, ErrASTHandle
 	}
-	id := p.ids.Mk()
-	if id == ^uint32(0) {
-		return 0, ErrASTDomain
+	var id uint32
+	if n := len(p.freeIDs); n != 0 {
+		id = p.freeIDs[n-1]
+		p.freeIDs = p.freeIDs[:n-1]
+	} else {
+		id = p.nextID
+		if id == ^uint32(0) {
+			return 0, ErrASTDomain
+		}
+		p.nextID++
 	}
 	if e := p.values.reserve(id + 1); e != nil {
 		return 0, e
@@ -58,13 +33,13 @@ func (p *astFloatingPointPluginOwner) mkValueID(value *util.ArbitraryFloat) (idR
 	if e := p.values.set(id, value); e != nil {
 		return 0, e
 	}
-	canonical, _, e := p.table.insertIfAbsent(p.owner.BudgetField, p.valueTableProcs(), id)
+	canonical, e := p.internValueID(id)
 	if e != nil {
 		return 0, e
 	}
 	if canonical != id {
-		if e = p.ids.Recycle(id); e != nil {
-			return 0, e
+		if !p.outOfMemory() {
+			p.freeIDs = append(p.freeIDs, id)
 		}
 		if e = p.values.del(id); e != nil {
 			return 0, e

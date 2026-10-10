@@ -156,21 +156,21 @@ func (p *astFloatingPointPluginOwner) recycledValueID(id uint32) error {
 		return e
 	}
 	if enabled {
-		present, e := p.table.contains(p.valueTableProcs(), id)
+		_, index, e := p.findValueID(id)
 		if e != nil {
 			return e
 		}
-		if !present {
+		if index < 0 {
 			if e = p.numeralAssertionFailure(65, "m_value_table.contains(id)"); e != nil {
 				return e
 			}
 		}
 	}
-	if e = p.table.erase(p.valueTableProcs(), id); e != nil {
+	if e = p.eraseValueID(id); e != nil {
 		return e
 	}
-	if e = p.ids.Recycle(id); e != nil {
-		return e
+	if !p.outOfMemory() {
+		p.freeIDs = append(p.freeIDs, id)
 	}
 	return p.values.del(id)
 }

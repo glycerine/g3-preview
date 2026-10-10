@@ -32454,3 +32454,36 @@ vectors/runtime columns, and NumericTextStream consumers. Separate linked
 polynomial diagnostic records still need classification. Internal root-util
 numeric/text/parameter dependency cycles also remain before the remaining files
 can move into independent subpackages.
+
+## Native AST floating-point value buckets and recycled IDs
+
+The FPA plugin now owns a native map[uint32][]uint32 of borrowed canonical
+numeral IDs and a native []uint32 LIFO free list plus its next-ID counter.
+Canonicalization, assertion lookup and deletion use concrete methods bound to
+the actual plugin and numeral manager. Actual MPF Hash and EqCore determine
+identity, including sign/format collisions. Numeral copies, source destruction,
+recycling's actual out-of-memory policy and numeric copy receipts remain.
+Removed table capacity accounting, geometric/chained bucket emulation, callback
+procs and the separately charged ID-generator backing. Native containers carry
+no additional numeral ownership. The custom table erase path remains a live
+operation through declaration deletion; unused replacement, expansion, iterator,
+reset and generic table adapters were removed rather than ported. Retired tests
+only exercised that unused container implementation or simulated capacity faults.
+Existing constructor, declaration, external deletion, canonicalization, numeral
+read, actual numerical-copy refusal and ownership audits remain.
+
+New TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse creates 1028
+actual values, with four sign/format variants sharing each numeric hash. It
+checks distinct canonical IDs, duplicate canonicalization, middle-bucket deletion
+without loss of colliding values, LIFO ID reuse and unchanged numerical/object
+storage with reservations disabled. Physical numerical ownership is audited
+before teardown. Full AST passed (26.775s), focused FPA native (0.058s) and
+g3debug (0.078s), growth (0.010s), AST vet, manifest evidence, gofmt and diff
+checks passed. Manifest adds native table/growth evidence for the retained FPA
+consumer; all source/API statuses remain unchanged.
+
+The util knot/split remains active. Next native-container work includes AST
+activity and other retained AST tables, SAT storage/runtime columns and text
+consumers. Internal util numeric/text/parameter cycles still prevent the full
+remaining subpackage split. No full-module runtime suite was repeated here;
+the 23:46–23:48 UTC checkpoint remains current.

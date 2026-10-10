@@ -8,14 +8,13 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/util"
-	"github.com/glycerine/g3/pkg/util/idgen"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Source m_fm owns its distinct unsynchronized mpq; the AST and original
 // rational service remain borrowed. Empty id_gen and scoped_mpf_vector have
 // null inline storage and introduce no allocation or default numeral action.
-// Populated MPF values and their chained hash/eq operations are separate below.
+// Populated MPF values use native hash buckets with actual MPF hash/equality.
 type astFloatingPointPluginOwner struct {
 	literalPrimary                                              astFloatLiteralFrame
 	literalFrames                                               *astFloatLiteralFrame
@@ -26,9 +25,10 @@ type astFloatingPointPluginOwner struct {
 	owner                                                       *ASTManager
 	numeric                                                     *util.ArbitraryFloatManager
 	failedNumeric                                               error
-	ids                                                         idgen.Generator
+	nextID                                                      uint32
+	freeIDs                                                     []uint32
 	values                                                      astScopedFloatVector
-	table                                                       astFloatValueTable
+	table                                                       map[uint32][]uint32
 	real, integer                                               astNodeRef
 	bitvector                                                   *astBitVectorPluginOwner
 	family, arithFamily, bvFamily                               FamilyID
@@ -40,7 +40,7 @@ type astFloatingPointPluginOwner struct {
 
 func (m *ASTManager) floatingPointPluginBytes() uint64 {
 	bytes := func(p *astFloatingPointPluginOwner) uint64 {
-		n := p.header + p.literalBytes() + uint64(len(p.table.cells))*8 + uint64(p.ids.FreeCapacity())*4
+		n := p.header + p.literalBytes()
 		if p.numeric != nil {
 			n += p.numeric.OwnedStorageBytes()
 		} else {
@@ -86,25 +86,8 @@ func (m *ASTManager) registerFloatingPointPlugin() (FamilyID, error) {
 		return NullFamilyID, e
 	}
 	p.numericReady = true
-	p.ids = idgen.NewBudgeted(0, m.BudgetField, p.outOfMemory)
 	p.values.bind(p)
-	if e = p.table.construct(m.BudgetField); e != nil {
-		p.bodyCause = e
-		// The incomplete outer plugin has no destructor BODY. Only its completed
-		// members unwind in reverse declaration order. The default values and
-		// id generator have no payload, but their actual source lifetimes end.
-		if dt := p.values.destroy(false); dt != nil {
-			p.sourceCause = dt
-			return NullFamilyID, e
-		}
-		p.ids.Cleanup(0)
-		if dt := p.numeric.SourceFinalize(); dt != nil {
-			p.sourceCause = dt
-		} else {
-			p.numericReady = false
-		}
-		return NullFamilyID, e
-	}
+	p.table = make(map[uint32][]uint32)
 	p.tableReady = true
 	// These assignments are the literal constructor BODY, after all members.
 	p.real, p.integer = astNodeRef{}, astNodeRef{}
@@ -311,7 +294,7 @@ func (m *ASTManager) destroyFloatingPointMembers(own bool) error {
 			return stop(e)
 		}
 		if p.tableReady {
-			p.table.destroy(m.BudgetField)
+			p.table = nil
 			p.tableReady = false
 		}
 		if p.values.owner != nil {
@@ -319,7 +302,7 @@ func (m *ASTManager) destroyFloatingPointMembers(own bool) error {
 				return stop(e)
 			}
 		}
-		p.ids.Cleanup(0)
+		p.nextID, p.freeIDs = 0, nil
 		if p.numeric != nil {
 			var e error
 			if own {

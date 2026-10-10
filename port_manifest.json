@@ -16753,7 +16753,9 @@
         "pkg/ast/ast_fpa_numeral.go",
         "pkg/ast/ast_fpa_numeral_source_test.go",
         "pkg/ast/ast_fpa_value_binding.go",
-        "pkg/ast/ast_fpa_value_binding_source_test.go"
+        "pkg/ast/ast_fpa_value_binding_source_test.go",
+        "pkg/ast/ast_fpa_value_table.go",
+        "pkg/ast/ast_fpa_native_value_table_test.go"
       ],
       "tests": [
         "TestASTFloatingPointActualConstructorRegistrationAndSorts",
@@ -16766,7 +16768,8 @@
         "TestASTFloatingPointNumeralReadUnmatchedErasesOutput",
         "TestASTFloatingPointValueTableUsesActualMPFHashAndEquality",
         "TestASTFloatingPointValueIDLiteralCanonicalization",
-        "TestASTFloatingPointValueIDEveryActualReservationPrefix"
+        "TestASTFloatingPointValueIDEveryActualReservationPrefix",
+        "TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse"
       ],
       "assertions": [
         {

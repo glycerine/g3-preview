@@ -24,16 +24,15 @@ func TestASTFloatingPointValueTableUsesActualMPFHashAndEquality(t *testing.T) {
 	for _, n := range []*util.ArbitraryFloat{&a, &b, &c} {
 		astTestMust(t, p.values.push(n))
 	}
-	procs := p.valueTableProcs()
-	h0, e := procs.hash(0)
+	h0, e := p.numeric.Hash(&a)
 	astTestMust(t, e)
-	h1, e := procs.hash(1)
+	h1, e := p.numeric.Hash(&b)
 	astTestMust(t, e)
 	if h0 != h1 {
 		t.Fatal("source hash ignores sign", h0, h1)
 	}
 	for i, want := range []uint32{0, 1, 0} {
-		got, _, e := p.table.insertIfAbsent(m.BudgetField, procs, uint32(i))
+		got, e := p.internValueID(uint32(i))
 		astTestMust(t, e)
 		if got != want {
 			t.Fatal("actual equality instead of ID equality", i, got, want)
@@ -64,10 +63,10 @@ func TestASTFloatingPointValueIDLiteralCanonicalization(t *testing.T) {
 	if first != again {
 		t.Fatal("actual MPF canonical id", first, again)
 	}
-	if p.ids.FreeLen() != 1 || p.ids.FreeIDs()[0] == first {
-		t.Fatal("duplicate source id not recycled", p.ids.FreeIDs())
+	if len(p.freeIDs) != 1 || p.freeIDs[0] == first {
+		t.Fatal("duplicate source id not recycled", p.freeIDs)
 	}
-	duplicate := p.ids.FreeIDs()[0]
+	duplicate := p.freeIDs[0]
 	row, e := p.values.at(duplicate)
 	astTestMust(t, e)
 	words, e := p.numeric.ValueWords(&row)
@@ -109,8 +108,8 @@ func TestASTFloatingPointValueIDEveryActualReservationPrefix(t *testing.T) {
 		if m.BudgetField.Used() != base+m.Stats().AllocatedBytes+m.numerals.RuntimeOwner().Stats().TotalBytes {
 			t.Fatal("before-lift actual named cold graph", ordinal, call)
 		}
-		if p.ids.Range() != 1 {
-			t.Fatal("source ID acquisition rolled back", ordinal, p.ids.Range())
+		if p.nextID != 1 {
+			t.Fatal("source ID acquisition rolled back", ordinal, p.nextID)
 		}
 		if call == nil {
 			completed = true
