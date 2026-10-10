@@ -1199,6 +1199,7 @@
         "stacked_value.go",
         "stacked_vector.go",
         "static_matrix_exact.go",
+        "static_matrix_exact_products.go",
         "static_matrix_float.go",
         "tail_matrix_exact.go",
         "tail_matrix_float.go",

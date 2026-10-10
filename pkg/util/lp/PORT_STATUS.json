@@ -1116,7 +1116,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/static_matrix_float.go",
-        "pkg/util/lp/static_matrix_exact.go"
+        "pkg/util/lp/static_matrix_exact.go",
+        "pkg/util/lp/static_matrix_exact_products.go",
+        "pkg/util/lp/exact_eta_calls.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1133,7 +1135,12 @@
         "TestLPExactStaticMatrixAllocationFailureCensus",
         "TestLPExactStaticMatrixBoundsAndMutationPrefixes",
         "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
-        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
+        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned",
+        "TestLPExactStaticProductsIndependentRationalOracle",
+        "TestLPExactStaticProductsLiteralAliasesAndCopies",
+        "TestLPExactStaticProductsAllocationFailureCensus",
+        "TestLPExactStaticProductsBoundsAndPrefixes",
+        "TestLPExactStaticProductsOlderComparisonIdentity"
       ]
     },
     {
@@ -1141,7 +1148,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/static_matrix_float.go",
-        "pkg/util/lp/static_matrix_exact.go"
+        "pkg/util/lp/static_matrix_exact.go",
+        "pkg/util/lp/static_matrix_exact_products.go",
+        "pkg/util/lp/exact_eta_calls.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1158,7 +1167,12 @@
         "TestLPExactStaticMatrixAllocationFailureCensus",
         "TestLPExactStaticMatrixBoundsAndMutationPrefixes",
         "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
-        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
+        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned",
+        "TestLPExactStaticProductsIndependentRationalOracle",
+        "TestLPExactStaticProductsLiteralAliasesAndCopies",
+        "TestLPExactStaticProductsAllocationFailureCensus",
+        "TestLPExactStaticProductsBoundsAndPrefixes",
+        "TestLPExactStaticProductsOlderComparisonIdentity"
       ]
     },
     {
@@ -1166,7 +1180,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/static_matrix_float.go",
-        "pkg/util/lp/static_matrix_exact.go"
+        "pkg/util/lp/static_matrix_exact.go",
+        "pkg/util/lp/static_matrix_exact_products.go",
+        "pkg/util/lp/exact_eta_calls.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -1183,7 +1199,12 @@
         "TestLPExactStaticMatrixAllocationFailureCensus",
         "TestLPExactStaticMatrixBoundsAndMutationPrefixes",
         "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
-        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
+        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned",
+        "TestLPExactStaticProductsIndependentRationalOracle",
+        "TestLPExactStaticProductsLiteralAliasesAndCopies",
+        "TestLPExactStaticProductsAllocationFailureCensus",
+        "TestLPExactStaticProductsBoundsAndPrefixes",
+        "TestLPExactStaticProductsOlderComparisonIdentity"
       ]
     },
     {
@@ -1223,5 +1244,5 @@
     "unported": 79,
     "partial": 31
   },
-  "combined_debug_checked_statement_coverage_of_current_go_code": 91.8
+  "combined_debug_checked_statement_coverage_of_current_go_code": 91.7
 }

@@ -35353,3 +35353,66 @@ coverage. Final focused exact tests including older-call identity pass native
 checks pass. Prior floating static checkpoint7ac921be includes the successful
 hourly full native module suite; no redundant module-wide run was started for
 this isolated exact addition.
+
+## Exact static matrix extraction, vector products and extrema
+
+Ported retained rational row/column dot products, epsilon-pair row product,
+column addition to dense vectors, dense/indexed column extraction and all four
+absolute extrema. The concrete pair product forms scalar-left X then Y rational
+expressions, copies actual pair fields, then accumulates X before Y in the
+existing explicit Go coordinate evaluation profile. Local sums are owned by the
+matrix and copied to initialized caller outputs only after the entire loop;
+output aliases therefore do not change inputs mid-sum. Failed final result
+copies retain actual caller prefixes, while stopped local sums remain for Close.
+Column addition instead mutates destinations in literal column order, including
+live-alpha rereads after an aliased destination changes.
+
+Dense extraction uses the existing owning vector Data storage, preserving old
+retained slots, deleting truncated numerals and initializing new tail zeros.
+Zero column terms skip assignment. Index is untouched. Indexed extraction
+retains old entries and literal column index order; duplicate writes occur before
+the source debug assertion. Actual destination numeric calls remain owned by
+that vector; source matrix cleanup cannot adopt those roots or receipts.
+
+Fault campaigns found a missing ownership prerequisite in exactEtaCalls:
+comparison RAW locals were not tracked by its previous arithmetic/division
+receipt. Added capture and cleanup of only newly acquired comparison generation.
+Physical extrema stops now close those actual comparison locals before lexical
+values and physical roots. An independent older-comparison fixture starts a real
+stopped arbitrary-precision comparison, completes inline integer extrema, closes
+the matrix and proves the original generation remains with its caller. No
+manager-wide teardown, raw-frame replay or root-registry inference is used.
+
+Independent math/big.Rat fixtures cover160 shuffled sparse matrices across scalar
+and pair row products, scalar column products, four extrema, dense/indexed
+extraction and column accumulation. Additional tests pin output aliases, live
+alpha, duplicate extraction, zero/empty results, foreign destination owners,
+short-vector and malformed-link prefixes, resize-before-bounds and untouched
+outputs before return publication. Ten fresh-manager actual reservation campaigns
+walk extraction, addition, scalar/pair sums and four extrema to first success;
+every endpoint has an independent numerical oracle, every stopped owner has
+mutation guards, and cleanup is checked against named live cells/direct objects.
+Each extrema campaign must reach an actual comparison receipt. Native focused
+checks pass11.602s at91.6% new-file coverage. Shared numerical receipt changes
+are also under full LP native/debug-checked regression.
+
+Static source units remain partial: exact scopes/transpose, precise iterator fill,
+formatting and full sparse/LU/solver integration remain required. Inventory stays
+LP31 partial/79 unported; repository62 ported/312 partial/1700 unported/two
+dead-deleted. Prior exact storage checkpoint5c554492 remains the base. Complete
+LP implementation, original upstream scenarios and component test coverage remain
+the active goal.
+
+Full LP regression passes native85.453s/debug-checked120.251s at90.0%/91.7%
+overall statement coverage. New extraction/products/extrema file is91.6% in
+each profile; actual numerical-call receipt helper86.2%. Uncovered statements
+propagate child/cleanup errors or the opposite-profile assertion. Strengthened
+final focused native tests pass11.530s and require a real completed-X-before-
+failed-Y result-copy prefix. They also explicitly reject active comparison,
+division and arithmetic frames after owner cleanup. LP vet and portcheck pass;
+regenerated64-package graph retains its dependency edges. The earlier hourly
+full native module result remains current; no redundant module suite was run.
+
+Final strengthened focused debug/checked tests pass14.845s; native11.530s.
+Final LP vet, portcheck and diff checks pass. New-file coverage remains91.6%
+in both profiles; the full native module suite was not repeated.

@@ -123963,7 +123963,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/static_matrix_float.go",
-        "pkg/util/lp/static_matrix_exact.go"
+        "pkg/util/lp/static_matrix_exact.go",
+        "pkg/util/lp/static_matrix_exact_products.go",
+        "pkg/util/lp/exact_eta_calls.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -123980,7 +123982,12 @@
         "TestLPExactStaticMatrixAllocationFailureCensus",
         "TestLPExactStaticMatrixBoundsAndMutationPrefixes",
         "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
-        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
+        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned",
+        "TestLPExactStaticProductsIndependentRationalOracle",
+        "TestLPExactStaticProductsLiteralAliasesAndCopies",
+        "TestLPExactStaticProductsAllocationFailureCensus",
+        "TestLPExactStaticProductsBoundsAndPrefixes",
+        "TestLPExactStaticProductsOlderComparisonIdentity"
       ],
       "conditionals": [
         {
@@ -124101,15 +124108,29 @@
             "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
             "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
           ]
+        },
+        {
+          "name": "retained exact dense and indexed column extraction, add-column updates, rational row/column dot products, epsilon-pair row dot product and absolute row/column minima/maxima",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_exact_products.go",
+          "tests": [
+            "TestLPExactStaticProductsIndependentRationalOracle",
+            "TestLPExactStaticProductsLiteralAliasesAndCopies",
+            "TestLPExactStaticProductsAllocationFailureCensus",
+            "TestLPExactStaticProductsBoundsAndPrefixes",
+            "TestLPExactStaticProductsOlderComparisonIdentity"
+          ]
         }
       ],
       "ownership": [
         "Native typed row/column strips, scoped dimension snapshots and pivot offset/cancellation work replace STL storage. Matrix terms retain duplicates and explicit numerical zeros. Swap-with-tail removal repairs both cross-links in source order; pivot fills/removes exact floating zero without an invented epsilon. Offsets, dimension-only scopes, dense-vector resize prefixes and native/debug source assertions retain actual quirks. No synthetic native-container allocation accounting or numeric callbacks.",
-        "Exact matrix rows own initialized rational values in a borrowed manager; native slice relocation transfers owners. Row-cell temporary and stored copies are distinct; Set publishes the column link before them, AddNewElement after them. Removal assigns scalar fields then owning tail value before repairing links and deleting the tail. Actual lexical values, newly acquired numeric roots and raw invocation generations remain owned through stopped Close; older manager calls remain borrowed."
+        "Exact matrix rows own initialized rational values in a borrowed manager; native slice relocation transfers owners. Row-cell temporary and stored copies are distinct; Set publishes the column link before them, AddNewElement after them. Removal assigns scalar fields then owning tail value before repairing links and deleting the tail. Actual lexical values, newly acquired numeric roots and raw invocation generations remain owned through stopped Close; older manager calls remain borrowed.",
+        "Extraction borrows the source and delegates owning copies to the destination vector; its numeric receipts remain there. Dot products retain local sums and actual rational-product/pair-field temporaries, then copy the result to caller-owned output. Extrema capture newly acquired rational comparison generation and clean it before local values/physical roots; older callers retain their generation. Native slices preserve literal column order and retained destination values without container allocation events."
       ],
       "deviations": [
-        "Exact numeral/static matrix instantiations, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
-        "Exact coefficient storage and pivot arithmetic now exist, but exact dimension scopes/transpose, vector extraction/products/extrema, precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events."
+        "Exact dimension scopes/transpose, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
+        "Exact coefficient storage, pivot arithmetic, vector extraction/products and extrema now exist, but exact dimension scopes/transpose, precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events.",
+        "Completed sums/extrema are copied to initialized caller-owned out; partial local sums remain in the matrix on error, and final output-copy failures retain the actual caller mutation prefix. Pair expression arguments use existing X-before-Y Go evaluation profile. Dense extraction uses the existing vector owner Data storage while leaving Index untouched; no generic source container adapter."
       ]
     },
     {
@@ -124119,7 +124140,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/static_matrix_float.go",
-        "pkg/util/lp/static_matrix_exact.go"
+        "pkg/util/lp/static_matrix_exact.go",
+        "pkg/util/lp/static_matrix_exact_products.go",
+        "pkg/util/lp/exact_eta_calls.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -124136,7 +124159,12 @@
         "TestLPExactStaticMatrixAllocationFailureCensus",
         "TestLPExactStaticMatrixBoundsAndMutationPrefixes",
         "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
-        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
+        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned",
+        "TestLPExactStaticProductsIndependentRationalOracle",
+        "TestLPExactStaticProductsLiteralAliasesAndCopies",
+        "TestLPExactStaticProductsAllocationFailureCensus",
+        "TestLPExactStaticProductsBoundsAndPrefixes",
+        "TestLPExactStaticProductsOlderComparisonIdentity"
       ],
       "conditionals": [
         {
@@ -124261,15 +124289,29 @@
             "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
             "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
           ]
+        },
+        {
+          "name": "retained exact dense and indexed column extraction, add-column updates, rational row/column dot products, epsilon-pair row dot product and absolute row/column minima/maxima",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_exact_products.go",
+          "tests": [
+            "TestLPExactStaticProductsIndependentRationalOracle",
+            "TestLPExactStaticProductsLiteralAliasesAndCopies",
+            "TestLPExactStaticProductsAllocationFailureCensus",
+            "TestLPExactStaticProductsBoundsAndPrefixes",
+            "TestLPExactStaticProductsOlderComparisonIdentity"
+          ]
         }
       ],
       "ownership": [
         "Native typed row/column strips, scoped dimension snapshots and pivot offset/cancellation work replace STL storage. Matrix terms retain duplicates and explicit numerical zeros. Swap-with-tail removal repairs both cross-links in source order; pivot fills/removes exact floating zero without an invented epsilon. Offsets, dimension-only scopes, dense-vector resize prefixes and native/debug source assertions retain actual quirks. No synthetic native-container allocation accounting or numeric callbacks.",
-        "Exact matrix rows own initialized rational values in a borrowed manager; native slice relocation transfers owners. Row-cell temporary and stored copies are distinct; Set publishes the column link before them, AddNewElement after them. Removal assigns scalar fields then owning tail value before repairing links and deleting the tail. Actual lexical values, newly acquired numeric roots and raw invocation generations remain owned through stopped Close; older manager calls remain borrowed."
+        "Exact matrix rows own initialized rational values in a borrowed manager; native slice relocation transfers owners. Row-cell temporary and stored copies are distinct; Set publishes the column link before them, AddNewElement after them. Removal assigns scalar fields then owning tail value before repairing links and deleting the tail. Actual lexical values, newly acquired numeric roots and raw invocation generations remain owned through stopped Close; older manager calls remain borrowed.",
+        "Extraction borrows the source and delegates owning copies to the destination vector; its numeric receipts remain there. Dot products retain local sums and actual rational-product/pair-field temporaries, then copy the result to caller-owned output. Extrema capture newly acquired rational comparison generation and clean it before local values/physical roots; older callers retain their generation. Native slices preserve literal column order and retained destination values without container allocation events."
       ],
       "deviations": [
-        "Exact numeral/static matrix instantiations, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
-        "Exact coefficient storage and pivot arithmetic now exist, but exact dimension scopes/transpose, vector extraction/products/extrema, precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events."
+        "Exact dimension scopes/transpose, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
+        "Exact coefficient storage, pivot arithmetic, vector extraction/products and extrema now exist, but exact dimension scopes/transpose, precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events.",
+        "Completed sums/extrema are copied to initialized caller-owned out; partial local sums remain in the matrix on error, and final output-copy failures retain the actual caller mutation prefix. Pair expression arguments use existing X-before-Y Go evaluation profile. Dense extraction uses the existing vector owner Data storage while leaving Index untouched; no generic source container adapter."
       ]
     },
     {
@@ -124279,7 +124321,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/static_matrix_float.go",
-        "pkg/util/lp/static_matrix_exact.go"
+        "pkg/util/lp/static_matrix_exact.go",
+        "pkg/util/lp/static_matrix_exact_products.go",
+        "pkg/util/lp/exact_eta_calls.go"
       ],
       "tests": [
         "TestLPFloatStaticMatrixIndependentMutationOracle",
@@ -124296,7 +124340,12 @@
         "TestLPExactStaticMatrixAllocationFailureCensus",
         "TestLPExactStaticMatrixBoundsAndMutationPrefixes",
         "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
-        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
+        "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned",
+        "TestLPExactStaticProductsIndependentRationalOracle",
+        "TestLPExactStaticProductsLiteralAliasesAndCopies",
+        "TestLPExactStaticProductsAllocationFailureCensus",
+        "TestLPExactStaticProductsBoundsAndPrefixes",
+        "TestLPExactStaticProductsOlderComparisonIdentity"
       ],
       "conditionals": [
         {
@@ -124347,15 +124396,29 @@
             "TestLPExactStaticMatrixTinyPivotAndBorrowedAliases",
             "TestLPExactStaticMatrixLeavesOlderRawInvocationOwned"
           ]
+        },
+        {
+          "name": "retained exact dense and indexed column extraction, add-column updates, rational row/column dot products, epsilon-pair row dot product and absolute row/column minima/maxima",
+          "status": "ported",
+          "go_target": "pkg/util/lp/static_matrix_exact_products.go",
+          "tests": [
+            "TestLPExactStaticProductsIndependentRationalOracle",
+            "TestLPExactStaticProductsLiteralAliasesAndCopies",
+            "TestLPExactStaticProductsAllocationFailureCensus",
+            "TestLPExactStaticProductsBoundsAndPrefixes",
+            "TestLPExactStaticProductsOlderComparisonIdentity"
+          ]
         }
       ],
       "ownership": [
         "Native typed row/column strips, scoped dimension snapshots and pivot offset/cancellation work replace STL storage. Matrix terms retain duplicates and explicit numerical zeros. Swap-with-tail removal repairs both cross-links in source order; pivot fills/removes exact floating zero without an invented epsilon. Offsets, dimension-only scopes, dense-vector resize prefixes and native/debug source assertions retain actual quirks. No synthetic native-container allocation accounting or numeric callbacks.",
-        "Exact matrix rows own initialized rational values in a borrowed manager; native slice relocation transfers owners. Row-cell temporary and stored copies are distinct; Set publishes the column link before them, AddNewElement after them. Removal assigns scalar fields then owning tail value before repairing links and deleting the tail. Actual lexical values, newly acquired numeric roots and raw invocation generations remain owned through stopped Close; older manager calls remain borrowed."
+        "Exact matrix rows own initialized rational values in a borrowed manager; native slice relocation transfers owners. Row-cell temporary and stored copies are distinct; Set publishes the column link before them, AddNewElement after them. Removal assigns scalar fields then owning tail value before repairing links and deleting the tail. Actual lexical values, newly acquired numeric roots and raw invocation generations remain owned through stopped Close; older manager calls remain borrowed.",
+        "Extraction borrows the source and delegates owning copies to the destination vector; its numeric receipts remain there. Dot products retain local sums and actual rational-product/pair-field temporaries, then copy the result to caller-owned output. Extrema capture newly acquired rational comparison generation and clean it before local values/physical roots; older callers retain their generation. Native slices preserve literal column order and retained destination values without container allocation events."
       ],
       "deviations": [
-        "Exact numeral/static matrix instantiations, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
-        "Exact coefficient storage and pivot arithmetic now exist, but exact dimension scopes/transpose, vector extraction/products/extrema, precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events."
+        "Exact dimension scopes/transpose, actual precise linear-combination pivot integration and formatting remain open. Whole-source consumers reach neither the static basis-pointer constructor nor static lowest-row, forget-last-columns, cross-out-row, divide-row and unused work-vector helpers, so no such Go adapters were added. Static balance reaches source numeric_traits<double>::log NOT_IMPLEMENTED_YET for a nonzero term: the Go error profile reports that stop, without inventing logarithms or a balance norm; source global fatal/stream policy binding is not claimed.",
+        "Exact coefficient storage, pivot arithmetic, vector extraction/products and extrema now exist, but exact dimension scopes/transpose, precise linear-combination fill and formatting/solver integration remain open. No complete exact static matrix or LP solver claim. Native containers add no simulated storage allocation events.",
+        "Completed sums/extrema are copied to initialized caller-owned out; partial local sums remain in the matrix on error, and final output-copy failures retain the actual caller mutation prefix. Pair expression arguments use existing X-before-Y Go evaluation profile. Dense extraction uses the existing vector owner Data storage while leaving Index untouched; no generic source container adapter."
       ]
     },
     {
