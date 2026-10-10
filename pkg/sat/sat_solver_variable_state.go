@@ -74,7 +74,7 @@ func newSATSolverVariableState(todo *satSolverUintSet, b *arena.Budget, c arena.
 		s.activity, e = newSATSolverActivity(b)
 	}
 	if e == nil {
-		s.queue, e = newSATSolverRuntimeVarQueue(s.activity, b, raw)
+		s.queue, e = newSATSolverVarQueue(s.activity, b)
 	}
 	if e == nil {
 		s.trail, s.trailRef, e = newSATSolverTrail(b)
@@ -354,7 +354,7 @@ func (s *satSolverVariableState) Stats() satSolverVariableStats {
 	}
 	if s.queue != nil {
 		v := s.queue.Stats()
-		out.QueueBytes = v.OwnerBytes + v.ValuesBytes + v.IndicesBytes
+		out.QueueBytes = v.OwnerBytes
 	}
 	if s.trail != nil {
 		out.TrailBytes = s.trail.ownerBytes

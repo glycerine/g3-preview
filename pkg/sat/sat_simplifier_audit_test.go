@@ -53,10 +53,6 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 		add(simplifier.elimination.vars.Raw.Block)
 	}
 	add(simplifier.elimination.vars.Raw.Pending)
-	if q := simplifier.blocked.queue; q != nil && q.runtimeBacked() {
-		col(&q.runtimeValues)
-		col(&q.runtimeIndices)
-	}
 	satScalarAuditRoots(t, v, roots...)
 	want := decision.ownerBytes + g.ownerBytes + g.scratchBytes + g.cleaner.ownerBytes + c.ownerBytes + s.ownerBytes + analysis.ownerBytes + d.ownerBytes + uint64(cap(s.cache.rows))*uint64(reflect.TypeOf(satProbingCacheRow{}).Size())
 	want += l.ownerBytes + uint64(cap(l.Original)+cap(l.learned))*uint64(reflect.TypeOf(StoredClauseRef{}).Size()) + uint64(cap(l.reinit))*uint64(reflect.TypeOf(satClauseWrapper{}).Size()) + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())

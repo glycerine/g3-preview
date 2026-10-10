@@ -105,11 +105,14 @@ func TestSATLargeClauseBackendLedgerBudgetAndFaults(t *testing.T) {
 }
 
 func TestSATVarQueueIndependentMutableActivityModel(t *testing.T) {
-	a, e := NewSATActivityDomain(nil)
+	b := arena.NewBudget(^uint64(0))
+	a, e := newSATSolverActivity(b)
 	satOK(t, e)
 	defer a.Close()
-	satOK(t, a.Resize(64))
-	q, e := NewSATVarQueue(a, nil)
+	for i := 0; i < 64; i++ {
+		satOK(t, a.Push(0))
+	}
+	q, e := newSATSolverVarQueue(a, b)
 	satOK(t, e)
 	defer q.Close()
 	var live [64]bool
@@ -214,10 +217,12 @@ func TestSATStorageWarmNoAllocationsAndClosedBorrow(t *testing.T) {
 	if b.Used() != 0 {
 		t.Fatal(b.Used())
 	}
-	act, e := NewSATActivityDomain(nil)
+	act, e := newSATSolverActivity(b)
 	satOK(t, e)
-	satOK(t, act.Resize(4))
-	q, e := NewSATVarQueue(act, nil)
+	for i := 0; i < 4; i++ {
+		satOK(t, act.Push(0))
+	}
+	q, e := newSATSolverVarQueue(act, b)
 	satOK(t, e)
 	defer q.Close()
 	satOK(t, q.MkVar(0))
@@ -243,67 +248,6 @@ func TestSATStorageWarmNoAllocationsAndClosedBorrow(t *testing.T) {
 	satOK(t, q.MkVar(0))
 	if e = q.MkVar(1); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal("comparator actual borrowed owner", e)
-	}
-}
-func TestSATVarQueueConstructorCloneFailureAndMovedReset(t *testing.T) {
-	act, e := NewSATActivityDomain(nil)
-	satOK(t, e)
-	defer act.Close()
-	satOK(t, act.Resize(4))
-	success := false
-	for k := int64(0); k < 32; k++ {
-		b := arena.NewBudget(1 << 20)
-		b.FailAfter(k)
-		q, e := NewSATVarQueue(act, b)
-		if e == nil {
-			satOK(t, q.Close())
-			success = true
-		} else if !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal(k, e)
-		}
-		if b.Used() != 0 {
-			t.Fatal("constructor unwinds every completed growth", k, b.Used())
-		}
-		if success {
-			break
-		}
-	}
-	if !success {
-		t.Fatal("no success")
-	}
-	q, e := NewSATVarQueue(act, nil)
-	satOK(t, e)
-	defer q.Close()
-	satOK(t, q.MkVar(0))
-	for k := int64(0); k < 4; k++ {
-		b := arena.NewBudget(1 << 20)
-		b.FailAfter(k)
-		copy, e := q.Clone(b)
-		if e == nil {
-			copy.Close()
-		} else if !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal(k, e)
-		}
-		if b.Used() != 0 || q.Size() != 1 {
-			t.Fatal("copy constructor cleanup/source unchanged", k, b.Used())
-		}
-	}
-	m, e := q.MoveClone(nil)
-	satOK(t, e)
-	defer m.Close()
-	if q.Empty() {
-		t.Fatal("source moved vector size0 is not size1 sentinel empty")
-	}
-	if _, e = q.NextVar(); !errors.Is(e, arena.ErrBounds) && !errors.Is(e, ErrSATAssertion) {
-		t.Fatal(e)
-	}
-	satOK(t, q.Reset())
-	if !q.Empty() || len(q.values) != 1 || q.values[0] != -1 {
-		t.Fatal("source reset recreates moved sentinel")
-	}
-	satOK(t, q.MkVar(3))
-	if q.Size() != 1 {
-		t.Fatal(q.Size())
 	}
 }
 func TestSATStorageOwnerIdentityExhaustionAndOOMRecycle(t *testing.T) {

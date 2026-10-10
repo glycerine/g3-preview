@@ -3,7 +3,6 @@ package sat
 
 import (
 	"errors"
-	"fmt"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 	"testing"
@@ -122,41 +121,6 @@ func TestSATSolverNativeMkVarFirstPublicationWithoutBackingReservation(t *testin
 	satVariableAssertFirstPrefix(t, s)
 	satScalarAuditOwner(t, s)
 	satOK(t, s.checkPhysicalOwners())
-}
-
-func TestSATSolverMkVarLateHeapIndexPublicationBeforeRefusal(t *testing.T) {
-	found := false
-	for fail := int64(0); fail < 30; fail++ {
-		t.Run(fmt.Sprint(fail), func(t *testing.T) {
-			s, todo, b := satVariableStateFixture(t)
-			for i := 0; i < 4; i++ {
-				_, e := s.mkVar(false, true)
-				satOK(t, e)
-			}
-			b.FailAfter(fail)
-			v, e := s.mkVar(false, true)
-			satScalarAuditOwner(t, s)
-			if e2 := s.checkPhysicalOwners(); e2 != nil {
-				t.Fatal(e2)
-			}
-			if e != nil && !satRuntimeActualRefusal(s.memory, e) {
-				t.Fatal(e)
-			}
-			if e != nil && s.queue.Contains(4) && s.queue.Size() == 4 {
-				found = true
-				if v != 4 || s.NumVars() != 5 || satScalarTestUint(t, &s.queue.runtimeIndices, 4) != 5 || satScalarTestUintSize(t, &s.queue.runtimeValues) != 5 || todo.Contains(4) {
-					t.Fatal(v, s.Stats(), todo.Stats())
-				}
-			}
-			b.FailAfter(-1)
-		})
-		if found {
-			break
-		}
-	}
-	if !found {
-		t.Fatal("source heap index-before-push refusal not reached")
-	}
 }
 
 func TestSATSolverVariableTrailAndConcretePhysicalOwnership(t *testing.T) {

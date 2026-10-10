@@ -192,7 +192,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 		return s, err
 	}
 	s.Variables.activityInc = 128
-	if s.Variables.queue, err = newSATSolverRuntimeVarQueue(s.Variables.activity, c.Budget, c.Runtime.memory); err != nil {
+	if s.Variables.queue, err = newSATSolverVarQueue(s.Variables.activity, c.Budget); err != nil {
 		return s, err
 	}
 	s.Variables.qhead = 0
@@ -313,13 +313,6 @@ func (s *Solver) Close() error {
 func (s *Solver) CleanupStopped() error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
-	}
-	if s.closeStage == 22 && s.Variables != nil && s.Variables.queue != nil && s.Variables.queue.runtimeSourceStop != nil {
-		if e := s.Variables.queue.CleanupStopped(); e != nil {
-			return e
-		}
-		s.closeGuardAcknowledged = true
-		return s.closeMembers()
 	}
 	if s.closeSourceCause == nil {
 		return ErrSATOwner
@@ -453,10 +446,7 @@ func (s *Solver) closeMembers() error {
 		case 22:
 			if s.Variables != nil {
 				e = s.Variables.finalizeQueue()
-				if e != nil && s.Variables.queue != nil && s.Variables.queue.runtimeSourceStop != nil && s.closeSourceCause == nil {
-					s.closeSourceCause = e
-					s.closeGuardAcknowledged = false
-				}
+
 			}
 		case 23:
 			if s.Variables != nil {

@@ -16,13 +16,13 @@ func TestSATSolverNativeActivityAndTrailAccounting(t *testing.T) {
 	satOK(t, e)
 	n, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 600 || v.memory.Stats().LiveBlocks != 2 {
+	if n != 0 || v.memory.Stats().LiveBlocks != 0 {
 		t.Fatal("remaining source allocations", n, v.memory.Stats())
 	}
 	satOK(t, v.trailPush(MakeLiteral(0, true)))
 	n, e = v.memory.AllocationSize()
 	satOK(t, e)
-	if n != 600 || v.memory.Stats().LiveBlocks != 2 {
+	if n != 0 || v.memory.Stats().LiveBlocks != 0 {
 		t.Fatal("native trail changed Runtime allocation", n, v.memory.Stats())
 	}
 }
@@ -66,40 +66,6 @@ func TestSATSolverActivityIncrementDecayAndRescaleSourceOrder(t *testing.T) {
 	if got != 127 || v.activityInc != 128 {
 		t.Fatal("source wrap before threshold", got, v.activityInc)
 	}
-}
-
-func TestSATSolverNativeActivityQueueCopiesKeepConcreteBorrow(t *testing.T) {
-	v, _, _ := satVariableStateFixture(t)
-	for i := 0; i < 3; i++ {
-		_, e := v.mkVar(false, true)
-		satOK(t, e)
-	}
-	satOK(t, v.activity.Set(2, 99))
-	satOK(t, v.queue.ActivityIncreased(2))
-	copy, e := v.queue.Clone(v.budget)
-	satOK(t, e)
-	if copy.solverActivity != v.activity {
-		satOK(t, copy.Close())
-		t.Fatal("source copied comparator lost actual borrowed activity")
-	}
-	x, e := copy.NextVar()
-	satOK(t, e)
-	if x != 2 {
-		t.Fatal(x)
-	}
-	satOK(t, copy.Close())
-	moved, e := v.queue.MoveClone(v.budget)
-	satOK(t, e)
-	if moved.solverActivity != v.activity {
-		satOK(t, moved.Close())
-		t.Fatal("source moved comparator lost actual borrowed activity")
-	}
-	x, e = moved.NextVar()
-	satOK(t, e)
-	if x != 2 {
-		t.Fatal(x)
-	}
-	satOK(t, moved.Close())
 }
 
 func TestSATSolverNativeTrailGrowthBoundsAndStableRoot(t *testing.T) {

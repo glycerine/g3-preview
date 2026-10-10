@@ -2,19 +2,18 @@
 package sat
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util"
 )
 
-func TestSATSolverScalarColumnsReachSameRuntime(t *testing.T) {
+func TestSATSolverNativeVariableColumnsAvoidRuntimeAllocation(t *testing.T) {
 	v, _, _ := satVariableStateFixture(t)
 	_, e := v.mkVar(true, true)
 	satOK(t, e)
 	amount, e := v.memory.AllocationSize()
 	satOK(t, e)
-	if amount != 24+576 || v.memory.Stats().LiveBlocks != 2 {
+	if amount != 0 || v.memory.Stats().LiveBlocks != 0 {
 		t.Fatal("all actual scalar source allocations", amount, v.memory.Stats())
 	}
 }
@@ -35,16 +34,6 @@ func satScalarTestUintSize(t *testing.T, c *RuntimeUintColumn) uint32 {
 func satScalarAuditRoots(t *testing.T, v *satSolverVariableState, external ...util.Block) {
 	t.Helper()
 	roots := append([]util.Block{}, external...)
-	if v.queue != nil && v.queue.runtimeBacked() {
-		for _, c := range []*satRuntimeColumn{&v.queue.runtimeValues.Raw, &v.queue.runtimeIndices.Raw} {
-			if !c.PendingReplaces && c.Block != (util.Block{}) {
-				roots = append(roots, c.Block)
-			}
-			if c.Pending != (util.Block{}) {
-				roots = append(roots, c.Pending)
-			}
-		}
-	}
 	satRuntimeAuditBlocks(t, v.memory, roots...)
 }
 
@@ -64,26 +53,5 @@ func TestSATSolverScalarUnsignedGrowthLiteralWidths(t *testing.T) {
 		if n != test.n || b != test.bytes {
 			t.Fatal(test, n, b)
 		}
-	}
-}
-
-func TestSATSolverScalarReverseMemberRawDestruction(t *testing.T) {
-	v, _, _ := satVariableStateFixture(t)
-	_, e := v.mkVar(false, true)
-	satOK(t, e)
-	// Actual Runtime release cursors verify source reverse declaration order;
-	// other arena-only members introduce no invented Runtime release events.
-	order := []util.Block{v.queue.runtimeIndices.Raw.Block, v.queue.runtimeValues.Raw.Block}
-	satOK(t, v.Close())
-	records := testFieldBySourceName(reflect.ValueOf(v.memory).Elem(), "blocks")
-	for i, h := range order {
-		slot := testFieldBySourceName(reflect.ValueOf(h), "slot").Uint()
-		b := records.Index(int(slot - 1))
-		if testFieldBySourceName(b, "live").Bool() || testFieldBySourceName(testFieldBySourceName(b, "release"), "serial").Uint() != uint64(i+1) {
-			t.Fatal("actual destructor source order", i, testFieldBySourceName(testFieldBySourceName(b, "release"), "serial").Uint())
-		}
-	}
-	if v.memory.Stats().LiveBlocks != 0 {
-		t.Fatal("owned scalar roots retained")
 	}
 }

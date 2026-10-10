@@ -33212,3 +33212,37 @@ dead/deleted. Full native module was not rerun inside the hourly interval.
 The util knot and complete split remain active: retained queue/other Runtime
 columns, AST reference storage, NumericTextStream consumers and internal util
 numeric/text/parameter dependencies still remain.
+
+## Native solver and simplifier priority queues
+
+Consolidated the actual activity and blocked-literal priority queues onto one
+concrete project heap implementation over native []int32 values/reverse indexes.
+The source heap comparator, sentinel, move_up/down, erase_min/erase, reinsert and
+reset algorithms remain, with current native activity or actual literal-weight
+borrows. Removed duplicate Runtime implementations/access adapters, source
+capacity/payload/initialization geometry, all backing Budget charges and stopped
+source/owning destruction cursors. Solver close no longer routes nonexistent
+queue destructor failures through CleanupStopped. Only the actual cold queue
+header remains budgeted. Native growth uses append; no C++ vector internals are
+ported. Unused Clone/MoveClone and standalone activity-domain queue adapters had
+no retained production consumers and were removed rather than maintained.
+
+Retired 24 backing/template-only test groups. Retained 81 finite priority worlds,
+the independent 12000-operation mutable-activity model, current real blocked
+literal weights, source decision/RNG behavior, native owner guards and warm
+zero-allocation reset/reinsert/pop loops. A new 4097-key test checks native
+activity updates, reverse indexes, delete/reinsert and extraction against an
+independently sorted priority sequence with Budget exhausted by precisely the
+two cold headers. Cold constructor refusal/cohort checks, exact idempotent
+refund, closed owners and signed-index boundaries remain covered. No queue
+Runtime roots or shadow arrays remain in owner audits. A retained real probing
+cache TLS-refusal fixture now positions its allocation using current Runtime
+LocalSize, instead of depending on removed queue backing bytes.
+
+Validation: final full native SAT passed (0.591s), final full g3debug SAT passed
+(0.630s), module-wide compilation, SAT vet, manifest evidence, gofmt and diff
+checks passed. Counts remain 2102 units/677 APIs: 63 ported, 284 partial,
+1727 unported and two dead/deleted. No full native module rerun inside the
+hourly interval. The knot and full util split remain active: other scalar/cache
+Runtime columns, AST reference storage, NumericTextStream consumers and internal
+util numeric/text/parameter cycles still remain.
