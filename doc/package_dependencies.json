@@ -1,0 +1,1628 @@
+{
+  "build_tags": "native",
+  "edge_direction": "consumer -> dependency",
+  "scope": "local production imports; excludes test, standard-library and external edges",
+  "unresolved_external_dependencies": [],
+  "packages": [
+    {
+      "package": "ackermannization",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "api",
+      "imports": [
+        "arena",
+        "ast",
+        "tactic"
+      ],
+      "production_files": [
+        "api_context_results.go",
+        "api_goal_object.go"
+      ]
+    },
+    {
+      "package": "arena",
+      "imports": [],
+      "production_files": [
+        "budget.go",
+        "bytes_region.go",
+        "descriptor_slab.go",
+        "region.go",
+        "region32.go",
+        "region64.go",
+        "slab.go",
+        "slab32.go",
+        "slab64.go",
+        "slots.go",
+        "small_bytes.go",
+        "vectors.go",
+        "vectors32_signed.go",
+        "vectors64.go",
+        "words.go"
+      ]
+    },
+    {
+      "package": "ast",
+      "imports": [
+        "arena",
+        "util/control",
+        "util/diagnostic",
+        "util/hash",
+        "util/idgen",
+        "util/memory",
+        "util/numeral",
+        "util/params",
+        "util/symbol",
+        "util/text",
+        "util/z3exception"
+      ],
+      "production_files": [
+        "ast_activity_cache.go",
+        "ast_app_coercion.go",
+        "ast_arith_decl.go",
+        "ast_arith_names.go",
+        "ast_arith_numeral.go",
+        "ast_arith_numeral_invocation.go",
+        "ast_arith_numeral_read.go",
+        "ast_arith_plugin.go",
+        "ast_arith_values.go",
+        "ast_array_as_array.go",
+        "ast_array_callbacks.go",
+        "ast_array_cardinality.go",
+        "ast_array_decl.go",
+        "ast_array_default_ext.go",
+        "ast_array_map.go",
+        "ast_array_plugin.go",
+        "ast_array_set.go",
+        "ast_array_util.go",
+        "ast_auxiliary_plugins.go",
+        "ast_basic_plugin.go",
+        "ast_basic_plugin_finalize.go",
+        "ast_basic_plugin_kinds.go",
+        "ast_basic_plugin_proof.go",
+        "ast_builtin_names.go",
+        "ast_builtin_plugins.go",
+        "ast_builtin_plugins_user.go",
+        "ast_builtin_plugins_values.go",
+        "ast_bv_app_parameter_util.go",
+        "ast_bv_app_util.go",
+        "ast_bv_arguments.go",
+        "ast_bv_arithmetic_shift_numerals.go",
+        "ast_bv_binary_match.go",
+        "ast_bv_bit2bool_numerals.go",
+        "ast_bv_bitwise_numerals.go",
+        "ast_bv_blast_eq_numerals.go",
+        "ast_bv_boolean_bits.go",
+        "ast_bv_bv2int_numerals.go",
+        "ast_bv_coefficient.go",
+        "ast_bv_concat_comparison_numerals.go",
+        "ast_bv_concat_numerals.go",
+        "ast_bv_conversion.go",
+        "ast_bv_distinct.go",
+        "ast_bv_div0.go",
+        "ast_bv_extended_rotate_numerals.go",
+        "ast_bv_extract_bounds.go",
+        "ast_bv_extract_numerals.go",
+        "ast_bv_fixed_decl.go",
+        "ast_bv_int2bv_numerals.go",
+        "ast_bv_integer_text.go",
+        "ast_bv_inverse.go",
+        "ast_bv_ite_numerals.go",
+        "ast_bv_le_comparison_numerals.go",
+        "ast_bv_leading_zero_numerals.go",
+        "ast_bv_logical_shift_numerals.go",
+        "ast_bv_minus_one_numerals.go",
+        "ast_bv_mkbv_numerals.go",
+        "ast_bv_mul_bound_numerals.go",
+        "ast_bv_mul_eq_numerals.go",
+        "ast_bv_mul_numerals.go",
+        "ast_bv_names.go",
+        "ast_bv_negatable_numerals.go",
+        "ast_bv_normalization.go",
+        "ast_bv_not_numerals.go",
+        "ast_bv_numeral.go",
+        "ast_bv_numeral_identity.go",
+        "ast_bv_numeral_read.go",
+        "ast_bv_numeral_scope.go",
+        "ast_bv_numeral_sort.go",
+        "ast_bv_one_numeral.go",
+        "ast_bv_operation_identity.go",
+        "ast_bv_overflow_comparison_numerals.go",
+        "ast_bv_parameterized_decl.go",
+        "ast_bv_plugin.go",
+        "ast_bv_polynomial_add_numerals.go",
+        "ast_bv_polynomial_factory.go",
+        "ast_bv_polynomial_hoist.go",
+        "ast_bv_polynomial_hoist_order.go",
+        "ast_bv_polynomial_mul_numerals.go",
+        "ast_bv_polynomial_neg_numerals.go",
+        "ast_bv_polynomial_sub_literal.go",
+        "ast_bv_power_product.go",
+        "ast_bv_raw_numeral.go",
+        "ast_bv_recognizers.go",
+        "ast_bv_redand.go",
+        "ast_bv_remainder_eq_numerals.go",
+        "ast_bv_sdiv_numerals.go",
+        "ast_bv_sign_bit.go",
+        "ast_bv_sign_extend.go",
+        "ast_bv_sign_extension_numerals.go",
+        "ast_bv_size.go",
+        "ast_bv_smod_numerals.go",
+        "ast_bv_sort.go",
+        "ast_bv_srem_numerals.go",
+        "ast_bv_trailing_invocation.go",
+        "ast_bv_trailing_numeral.go",
+        "ast_bv_udiv_numerals.go",
+        "ast_bv_uint64_numeral.go",
+        "ast_bv_unsigned_numeral.go",
+        "ast_bv_urem_numerals.go",
+        "ast_bv_values.go",
+        "ast_bv_zero_bit.go",
+        "ast_core.go",
+        "ast_core_accessors.go",
+        "ast_core_allocate.go",
+        "ast_core_basic_convenience.go",
+        "ast_core_boolean_factories.go",
+        "ast_core_delete.go",
+        "ast_core_factories.go",
+        "ast_core_fresh_factories.go",
+        "ast_core_nodebug.go",
+        "ast_core_pages.go",
+        "ast_core_payload.go",
+        "ast_core_plugin_dispatch.go",
+        "ast_core_query.go",
+        "ast_core_register.go",
+        "ast_core_source_constructor.go",
+        "ast_core_source_finalize.go",
+        "ast_core_span_factories.go",
+        "ast_core_stats.go",
+        "ast_core_storage.go",
+        "ast_core_symbols.go",
+        "ast_core_teardown_pages.go",
+        "ast_core_update.go",
+        "ast_datatype_plugin.go",
+        "ast_debug_ref_count.go",
+        "ast_dependency.go",
+        "ast_dependency_api.go",
+        "ast_dependency_traversal.go",
+        "ast_expr_substitution.go",
+        "ast_expr_substitution_ops.go",
+        "ast_expr_substitution_scope.go",
+        "ast_expr_substitution_table.go",
+        "ast_family.go",
+        "ast_for_each_expr.go",
+        "ast_format.go",
+        "ast_format_buffer.go",
+        "ast_format_flat.go",
+        "ast_format_plugin.go",
+        "ast_format_pp.go",
+        "ast_fpa_numeral.go",
+        "ast_fpa_plugin.go",
+        "ast_fpa_scoped_values.go",
+        "ast_fpa_value_binding.go",
+        "ast_fpa_value_table.go",
+        "ast_info.go",
+        "ast_low_level_printer.go",
+        "ast_lt.go",
+        "ast_mark.go",
+        "ast_mark_doc.go",
+        "ast_mark_fast.go",
+        "ast_mark_node.go",
+        "ast_numeric_util_families.go",
+        "ast_package_resources.go",
+        "ast_parameter.go",
+        "ast_parameter_access.go",
+        "ast_proof_manager.go",
+        "ast_proof_manager_congruence.go",
+        "ast_proof_manager_hyper.go",
+        "ast_proof_manager_hyper_output.go",
+        "ast_proof_manager_hyper_reader.go",
+        "ast_proof_manager_match.go",
+        "ast_proof_manager_parameters.go",
+        "ast_proof_manager_reader.go",
+        "ast_proof_manager_resolution.go",
+        "ast_proof_manager_rules.go",
+        "ast_proof_manager_simple.go",
+        "ast_ref.go",
+        "ast_reg_decl_plugins.go",
+        "ast_resource_limit.go",
+        "ast_rewriter_access.go",
+        "ast_seq_plugin.go",
+        "ast_shared_occs.go",
+        "ast_shared_occs_iterator.go",
+        "ast_shared_occs_mark.go",
+        "ast_smt2_bv_literal.go",
+        "ast_smt2_float_bv_literal.go",
+        "ast_smt2_float_real.go",
+        "ast_sort_size.go",
+        "ast_sparse_mark.go",
+        "ast_table.go",
+        "ast_table_hash.go",
+        "ast_trace_acquisition.go",
+        "ast_trace_file.go",
+        "ast_trace_filename.go",
+        "ast_trace_hooks.go",
+        "ast_uninterpreted_plugin.go",
+        "gparams_catalog_collectors.go",
+        "util_ast_literal_vector.go",
+        "util_psort_ast_bounds.go",
+        "util_psort_ast_context.go",
+        "util_psort_ast_costs.go",
+        "util_psort_ast_network.go",
+        "util_psort_ast_sorting.go"
+      ]
+    },
+    {
+      "package": "ast/fpa",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "ast/normal_forms",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "ast/rewriter",
+      "imports": [
+        "ast",
+        "util/messages",
+        "util/numeral",
+        "util/params"
+      ],
+      "production_files": [
+        "array_rewriter.go",
+        "array_rewriter_eq.go",
+        "array_rewriter_map.go",
+        "array_rewriter_set.go",
+        "bool_rewriter.go",
+        "bool_rewriter_config.go",
+        "bool_rewriter_eq.go",
+        "bool_rewriter_ite.go",
+        "bool_rewriter_local.go",
+        "bool_rewriter_public.go",
+        "bv_polynomial_add_core.go",
+        "bv_polynomial_cancel.go",
+        "bv_polynomial_coefficient.go",
+        "bv_polynomial_config.go",
+        "bv_polynomial_flat_add.go",
+        "bv_polynomial_flat_mul.go",
+        "bv_polynomial_make_add.go",
+        "bv_polynomial_make_mul.go",
+        "bv_polynomial_merge.go",
+        "bv_polynomial_mul_buffers.go",
+        "bv_polynomial_mul_core.go",
+        "bv_polynomial_mul_hoist.go",
+        "bv_polynomial_neg.go",
+        "bv_polynomial_order.go",
+        "bv_polynomial_owner.go",
+        "bv_polynomial_positions.go",
+        "bv_polynomial_sort.go",
+        "bv_polynomial_sub.go",
+        "bv_rewriter_add.go",
+        "bv_rewriter_ashr.go",
+        "bv_rewriter_bit2bool.go",
+        "bv_rewriter_bitwise.go",
+        "bv_rewriter_blast_eq.go",
+        "bv_rewriter_bv2int.go",
+        "bv_rewriter_compare.go",
+        "bv_rewriter_concat.go",
+        "bv_rewriter_config.go",
+        "bv_rewriter_derived_bitwise.go",
+        "bv_rewriter_derived_extend_repeat.go",
+        "bv_rewriter_derived_rotate.go",
+        "bv_rewriter_derived_sign_extend.go",
+        "bv_rewriter_eq_concat.go",
+        "bv_rewriter_equality.go",
+        "bv_rewriter_extend_repeat.go",
+        "bv_rewriter_extended_rotate.go",
+        "bv_rewriter_extract.go",
+        "bv_rewriter_extract_propagation.go",
+        "bv_rewriter_int2bv.go",
+        "bv_rewriter_isolate.go",
+        "bv_rewriter_ite.go",
+        "bv_rewriter_leading.go",
+        "bv_rewriter_leq.go",
+        "bv_rewriter_leq_concat.go",
+        "bv_rewriter_leq_overflow.go",
+        "bv_rewriter_leq_wrappers.go",
+        "bv_rewriter_minus_one.go",
+        "bv_rewriter_mkbv.go",
+        "bv_rewriter_mul.go",
+        "bv_rewriter_mul_bounds.go",
+        "bv_rewriter_mul_eq.go",
+        "bv_rewriter_negatable.go",
+        "bv_rewriter_not.go",
+        "bv_rewriter_or.go",
+        "bv_rewriter_owner.go",
+        "bv_rewriter_redand.go",
+        "bv_rewriter_rotate.go",
+        "bv_rewriter_scalar.go",
+        "bv_rewriter_sdiv.go",
+        "bv_rewriter_shift.go",
+        "bv_rewriter_sign_extend.go",
+        "bv_rewriter_smod.go",
+        "bv_rewriter_srem.go",
+        "bv_rewriter_udiv.go",
+        "bv_rewriter_urem.go",
+        "bv_rewriter_xor.go",
+        "bv_trailing.go",
+        "bv_trailing_count.go",
+        "bv_trailing_eq.go",
+        "bv_trailing_frame.go",
+        "bv_trailing_remove.go",
+        "bv_trailing_table.go",
+        "gparams_catalog_collectors.go",
+        "mk_extract_proc.go",
+        "rewriter_configuration.go",
+        "rewriter_core.go",
+        "rewriter_engine.go",
+        "rewriter_roots.go",
+        "rewriter_types.go",
+        "traversal.go",
+        "var_shifter.go",
+        "var_substitution.go"
+      ]
+    },
+    {
+      "package": "ast/rewriter/bit_blaster",
+      "imports": [
+        "util/text"
+      ],
+      "production_files": [
+        "util_smt_bit_blaster_params.go"
+      ]
+    },
+    {
+      "package": "clibrand",
+      "imports": [],
+      "production_files": [
+        "rand.go"
+      ]
+    },
+    {
+      "package": "cmd/portcheck",
+      "imports": [
+        "portcheck"
+      ],
+      "production_files": [
+        "main.go"
+      ]
+    },
+    {
+      "package": "math/polynomial",
+      "imports": [
+        "arena",
+        "clibrand",
+        "util/hash",
+        "util/idgen",
+        "util/memory",
+        "util/numeral",
+        "util/params",
+        "util/prime",
+        "util/sexpr",
+        "util/symbol"
+      ],
+      "production_files": [
+        "algebraic_compare.go",
+        "algebraic_isolation.go",
+        "algebraic_neg_invocation.go",
+        "algebraic_query.go",
+        "algebraic_refinement.go",
+        "algebraic_root.go",
+        "algebraic_vector.go",
+        "gparams_catalog_collectors.go",
+        "integer_allocation_invocation_context.go",
+        "numeric_borrowed_guards.go",
+        "numeric_caller_bindings.go",
+        "numeric_caller_policy.go",
+        "numeric_modular_caller_guard.go",
+        "numeric_numeral_operation_guard.go",
+        "numeric_upolynomial_guards.go",
+        "numeric_utility_aliases.go",
+        "numeric_utility_call_adapters.go",
+        "polynomial_arithmetic.go",
+        "polynomial_arithmetic_invocation.go",
+        "polynomial_callbacks.go",
+        "polynomial_cell.go",
+        "polynomial_cheap_append_receipt.go",
+        "polynomial_coefficient_receipt.go",
+        "polynomial_composition.go",
+        "polynomial_constant_coefficient_receipt.go",
+        "polynomial_constant_scope.go",
+        "polynomial_constructor_unwind.go",
+        "polynomial_constructors.go",
+        "polynomial_content.go",
+        "polynomial_content_allocation_context.go",
+        "polynomial_degree_coefficient.go",
+        "polynomial_derivative.go",
+        "polynomial_derivative_allocation_context.go",
+        "polynomial_discriminant.go",
+        "polynomial_display.go",
+        "polynomial_divides.go",
+        "polynomial_divides_allocation_context.go",
+        "polynomial_divides_created.go",
+        "polynomial_divides_invocation.go",
+        "polynomial_divides_member_return.go",
+        "polynomial_equal.go",
+        "polynomial_evaluation.go",
+        "polynomial_exact_div.go",
+        "polynomial_exact_div_allocation_context.go",
+        "polynomial_factor_backend.go",
+        "polynomial_factor_callee_receipts.go",
+        "polynomial_factor_constant_invocation.go",
+        "polynomial_factor_core.go",
+        "polynomial_factor_history_allocation.go",
+        "polynomial_factor_member_set_invocation.go",
+        "polynomial_factor_min_variable.go",
+        "polynomial_factor_n_sqf.go",
+        "polynomial_factor_quadratic.go",
+        "polynomial_factor_to_numeral_vector.go",
+        "polynomial_factor_univariate.go",
+        "polynomial_factors.go",
+        "polynomial_factors_operations.go",
+        "polynomial_factory_receipt.go",
+        "polynomial_gcd.go",
+        "polynomial_gcd_cleanup.go",
+        "polynomial_gcd_cra.go",
+        "polynomial_gcd_euclid.go",
+        "polynomial_gcd_iccp_zpx.go",
+        "polynomial_gcd_modular.go",
+        "polynomial_gcd_monomial_buffer.go",
+        "polynomial_gcd_power_buffer.go",
+        "polynomial_gcd_prs.go",
+        "polynomial_gcd_random.go",
+        "polynomial_gcd_recursive.go",
+        "polynomial_gcd_scope.go",
+        "polynomial_gcd_univariate_modular.go",
+        "polynomial_gcd_zpx.go",
+        "polynomial_glex_monic.go",
+        "polynomial_global_convert.go",
+        "polynomial_iccp.go",
+        "polynomial_iccp_concrete_children.go",
+        "polynomial_iccp_constant_invocation.go",
+        "polynomial_id_gen.go",
+        "polynomial_imp.go",
+        "polynomial_imp_binding.go",
+        "polynomial_imp_cleanup.go",
+        "polynomial_imp_lifetime.go",
+        "polynomial_invocation_receipts.go",
+        "polynomial_lazard.go",
+        "polynomial_lex_raw_pointer.go",
+        "polynomial_lex_sort.go",
+        "polynomial_linear_display.go",
+        "polynomial_linear_modular.go",
+        "polynomial_linear_rational.go",
+        "polynomial_linear_storage.go",
+        "polynomial_manager.go",
+        "polynomial_mod_d.go",
+        "polynomial_monomial.go",
+        "polynomial_monomial_allocator_invocation.go",
+        "polynomial_monomial_array.go",
+        "polynomial_monomial_display.go",
+        "polynomial_monomial_factory.go",
+        "polynomial_monomial_lifetime.go",
+        "polynomial_monomial_ops.go",
+        "polynomial_monomial_order.go",
+        "polynomial_monomial_positions.go",
+        "polynomial_monomial_query.go",
+        "polynomial_monomial_rename.go",
+        "polynomial_monomial_table.go",
+        "polynomial_monomial_tmp.go",
+        "polynomial_monomial_vector.go",
+        "polynomial_neg_allocation_context.go",
+        "polynomial_neg_scope.go",
+        "polynomial_newton.go",
+        "polynomial_newton_source_finalize.go",
+        "polynomial_newton_vector.go",
+        "polynomial_normalize.go",
+        "polynomial_normalize_allocation_context.go",
+        "polynomial_ownership.go",
+        "polynomial_power.go",
+        "polynomial_power_invocation.go",
+        "polynomial_primitive_public.go",
+        "polynomial_psc.go",
+        "polynomial_psc_buffer.go",
+        "polynomial_psc_chain1.go",
+        "polynomial_psc_chain2.go",
+        "polynomial_psc_classic.go",
+        "polynomial_psc_classic_cleanup.go",
+        "polynomial_psc_cleanup.go",
+        "polynomial_psc_invocation.go",
+        "polynomial_psc_next.go",
+        "polynomial_psc_next_invocation.go",
+        "polynomial_pseudo_allocation_context.go",
+        "polynomial_pseudo_created.go",
+        "polynomial_pseudo_div.go",
+        "polynomial_pseudo_invocation.go",
+        "polynomial_quasi_resultant.go",
+        "polynomial_ref.go",
+        "polynomial_ref_vector_set.go",
+        "polynomial_rename.go",
+        "polynomial_resultant.go",
+        "polynomial_resultant_concrete_children.go",
+        "polynomial_scalar_div.go",
+        "polynomial_scalar_div_allocation_context.go",
+        "polynomial_scalar_exact_div_allocation_context.go",
+        "polynomial_scalar_exact_div_invocation.go",
+        "polynomial_scoped_zp.go",
+        "polynomial_sign.go",
+        "polynomial_skeleton.go",
+        "polynomial_skeleton_vector.go",
+        "polynomial_som.go",
+        "polynomial_som_cohort_tags.go",
+        "polynomial_som_monomials.go",
+        "polynomial_som_normalize_allocation_context.go",
+        "polynomial_som_normalize_scope.go",
+        "polynomial_som_owner.go",
+        "polynomial_som_sort.go",
+        "polynomial_som_vector.go",
+        "polynomial_source_maxima.go",
+        "polynomial_source_prefix.go",
+        "polynomial_sparse_interpolation.go",
+        "polynomial_sparse_interpolator.go",
+        "polynomial_sparse_numeric_scope.go",
+        "polynomial_sqrt.go",
+        "polynomial_sqrt_invocation.go",
+        "polynomial_square_free.go",
+        "polynomial_store.go",
+        "polynomial_subresultant_chain.go",
+        "polynomial_substitution.go",
+        "polynomial_substitution_found.go",
+        "polynomial_substitution_state.go",
+        "polynomial_to_numeral_variable.go",
+        "polynomial_to_polynomial.go",
+        "polynomial_to_polynomial_created.go",
+        "polynomial_to_polynomial_invocation.go",
+        "polynomial_translate.go",
+        "polynomial_univariate_indexed.go",
+        "polynomial_variable_degrees.go",
+        "polynomial_variable_degrees_copy.go",
+        "polynomial_variable_helpers.go",
+        "polynomial_variable_helpers_lifetime.go",
+        "polynomial_variable_helpers_scoped.go",
+        "polynomial_variable_invocation.go",
+        "polynomial_variable_recognition.go",
+        "polynomial_vars.go",
+        "sexpr_upolynomial.go",
+        "source_debug_off.go",
+        "upolynomial.go",
+        "upolynomial_binary_vector.go",
+        "upolynomial_coefficient_store.go",
+        "upolynomial_content.go",
+        "upolynomial_display.go",
+        "upolynomial_display_scope.go",
+        "upolynomial_division.go",
+        "upolynomial_division_remainder.go",
+        "upolynomial_eval.go",
+        "upolynomial_eval_binary_invocation.go",
+        "upolynomial_eval_integer_invocation.go",
+        "upolynomial_eval_rational_invocation.go",
+        "upolynomial_factor_combination.go",
+        "upolynomial_factor_core.go",
+        "upolynomial_factor_degree.go",
+        "upolynomial_factor_field.go",
+        "upolynomial_factor_frontend_allocation_context.go",
+        "upolynomial_factor_frontend_constant_invocation.go",
+        "upolynomial_factor_frontend_invocation.go",
+        "upolynomial_factor_hensel.go",
+        "upolynomial_factor_hensel_debug.go",
+        "upolynomial_factor_int32.go",
+        "upolynomial_factor_preparation_allocation_context.go",
+        "upolynomial_factor_preparation_invocation.go",
+        "upolynomial_factor_prepared_factors.go",
+        "upolynomial_factor_prime_preparation.go",
+        "upolynomial_factor_prime_preparation_allocation_context.go",
+        "upolynomial_factor_prime_preparation_invocation.go",
+        "upolynomial_factor_recombine.go",
+        "upolynomial_factor_saved_prime.go",
+        "upolynomial_factor_scope.go",
+        "upolynomial_factor_service.go",
+        "upolynomial_factor_squarefree_invocation.go",
+        "upolynomial_factors.go",
+        "upolynomial_factors_source_context.go",
+        "upolynomial_gcd.go",
+        "upolynomial_gcd_extended.go",
+        "upolynomial_gcd_modular.go",
+        "upolynomial_gcd_primes.go",
+        "upolynomial_hensel_caller_allocation_context.go",
+        "upolynomial_hensel_caller_engines.go",
+        "upolynomial_hensel_caller_guard.go",
+        "upolynomial_hensel_caller_scope.go",
+        "upolynomial_hensel_check_invocation.go",
+        "upolynomial_hensel_conditional_scope.go",
+        "upolynomial_hensel_extended_scope.go",
+        "upolynomial_hensel_pair_allocation_context.go",
+        "upolynomial_hensel_pair_invocation.go",
+        "upolynomial_isolation.go",
+        "upolynomial_knuth_invocation.go",
+        "upolynomial_mignotte_allocation_context.go",
+        "upolynomial_mignotte_invocation.go",
+        "upolynomial_modes.go",
+        "upolynomial_one_half_root_invocation.go",
+        "upolynomial_ops.go",
+        "upolynomial_prime_trial_allocation_context.go",
+        "upolynomial_prime_trial_invocation.go",
+        "upolynomial_rational_context.go",
+        "upolynomial_recombination_step_allocation_context.go",
+        "upolynomial_recombination_step_invocation.go",
+        "upolynomial_recombination_trial_allocation_context.go",
+        "upolynomial_recombination_trial_invocation.go",
+        "upolynomial_refinement.go",
+        "upolynomial_remove_one_half_invocation.go",
+        "upolynomial_root_bounds.go",
+        "upolynomial_root_upper_allocation_context.go",
+        "upolynomial_root_upper_invocation.go",
+        "upolynomial_scoped_vector_source.go",
+        "upolynomial_sequence.go",
+        "upolynomial_source_finalize.go",
+        "upolynomial_storage.go",
+        "upolynomial_store_adoption.go",
+        "upolynomial_sturm.go",
+        "upolynomial_sturm_isolation.go",
+        "upolynomial_transforms.go",
+        "upolynomial_vector.go"
+      ]
+    },
+    {
+      "package": "math/realclosure",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "model",
+      "imports": [
+        "arena",
+        "ast",
+        "ast/rewriter",
+        "util/cooperate",
+        "util/memory",
+        "util/messages",
+        "util/params"
+      ],
+      "production_files": [
+        "function_entry.go",
+        "function_interpretation.go",
+        "function_interpretation_counts.go",
+        "function_interpretation_expr.go",
+        "gparams_catalog_collectors.go",
+        "model_array_tuple_table.go",
+        "model_copy.go",
+        "model_core.go",
+        "model_evaluator.go",
+        "model_evaluator_array_equality.go",
+        "model_evaluator_array_expansion.go",
+        "model_functions.go",
+        "model_interpretation_owners.go",
+        "model_lifecycle.go",
+        "model_package_boundary.go",
+        "model_value.go"
+      ]
+    },
+    {
+      "package": "muz/base",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "nlsat",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "opt",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "parsers/util",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "pkg",
+      "imports": [],
+      "production_files": [
+        "doc.go"
+      ]
+    },
+    {
+      "package": "portcheck",
+      "imports": [],
+      "production_files": [
+        "evidence.go",
+        "manifest.go",
+        "no_generics.go"
+      ]
+    },
+    {
+      "package": "sat",
+      "imports": [
+        "arena",
+        "util/cliques",
+        "util/control",
+        "util/diagnostic",
+        "util/idgen",
+        "util/lbool",
+        "util/luby",
+        "util/memory",
+        "util/messages",
+        "util/params",
+        "util/random",
+        "util/statistics",
+        "util/stopwatch",
+        "util/symbol",
+        "util/text",
+        "util/z3exception"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go",
+        "sat_approx_set.go",
+        "sat_approx_set_source.go",
+        "sat_asymm_branch.go",
+        "sat_asymm_branch_process.go",
+        "sat_asymm_branch_storage.go",
+        "sat_clause_large.go",
+        "sat_clause_set.go",
+        "sat_clause_storage.go",
+        "sat_cleaner.go",
+        "sat_cleaner_clauses.go",
+        "sat_elim_eqs.go",
+        "sat_integrity_checker.go",
+        "sat_justification.go",
+        "sat_main_config.go",
+        "sat_main_config_descrs.go",
+        "sat_main_config_update.go",
+        "sat_package_boundary.go",
+        "sat_scc.go",
+        "sat_simplifier.go",
+        "sat_simplifier_blocked.go",
+        "sat_simplifier_blocked_queue.go",
+        "sat_simplifier_cleanup.go",
+        "sat_simplifier_duplicate_bins.go",
+        "sat_simplifier_elimination.go",
+        "sat_simplifier_params.go",
+        "sat_simplifier_reader.go",
+        "sat_simplifier_sort.go",
+        "sat_simplifier_subsumption.go",
+        "sat_simplifier_todos.go",
+        "sat_solver.go",
+        "sat_solver_activity.go",
+        "sat_solver_assignment.go",
+        "sat_solver_backtrack.go",
+        "sat_solver_binary_pair.go",
+        "sat_solver_clause_attach.go",
+        "sat_solver_clause_core.go",
+        "sat_solver_clause_iterator.go",
+        "sat_solver_clause_lifecycle.go",
+        "sat_solver_clause_use_list.go",
+        "sat_solver_clause_use_lists.go",
+        "sat_solver_conflict_analysis.go",
+        "sat_solver_conflict_assumptions.go",
+        "sat_solver_conflict_helpers.go",
+        "sat_solver_conflict_resolution.go",
+        "sat_solver_conflict_span.go",
+        "sat_solver_consequences.go",
+        "sat_solver_consequences_chunking.go",
+        "sat_solver_consequences_helpers.go",
+        "sat_solver_consequences_scope.go",
+        "sat_solver_copy.go",
+        "sat_solver_decision.go",
+        "sat_solver_display.go",
+        "sat_solver_dynamic_subsumption.go",
+        "sat_solver_find_mutexes.go",
+        "sat_solver_gc.go",
+        "sat_solver_gc_dynamic.go",
+        "sat_solver_gc_sort.go",
+        "sat_solver_index_map.go",
+        "sat_solver_index_set.go",
+        "sat_solver_index_sets.go",
+        "sat_solver_inspection.go",
+        "sat_solver_integrity.go",
+        "sat_solver_justifications.go",
+        "sat_solver_lemma_minimization.go",
+        "sat_solver_literal_rows.go",
+        "sat_solver_literal_set_storage.go",
+        "sat_solver_model.go",
+        "sat_solver_model_converter.go",
+        "sat_solver_model_span.go",
+        "sat_solver_mus.go",
+        "sat_solver_mus_set.go",
+        "sat_solver_nested_store.go",
+        "sat_solver_probing.go",
+        "sat_solver_probing_algorithm.go",
+        "sat_solver_probing_cache.go",
+        "sat_solver_probing_diagnostics.go",
+        "sat_solver_propagation.go",
+        "sat_solver_propagation_control.go",
+        "sat_solver_report_params.go",
+        "sat_solver_runtime.go",
+        "sat_solver_scalar_runtime.go",
+        "sat_solver_search.go",
+        "sat_solver_simplifier_kernel.go",
+        "sat_solver_simplifier_resolution.go",
+        "sat_solver_simplifier_subsumption.go",
+        "sat_solver_stat_display.go",
+        "sat_solver_statistics.go",
+        "sat_solver_trail.go",
+        "sat_solver_uint_set.go",
+        "sat_solver_user_scope.go",
+        "sat_solver_variable_state.go",
+        "sat_solver_variable_vectors.go",
+        "sat_solver_views.go",
+        "sat_solver_watch_lists.go",
+        "sat_solver_watch_sort.go",
+        "sat_solver_watch_store.go",
+        "sat_storage_nodebug.go",
+        "sat_storage_vector.go",
+        "sat_types.go",
+        "sat_var_queue.go",
+        "sat_watched.go"
+      ]
+    },
+    {
+      "package": "sat/tactic",
+      "imports": [
+        "arena",
+        "ast",
+        "model",
+        "sat",
+        "tactic",
+        "util/control",
+        "util/cooperate",
+        "util/lbool"
+      ],
+      "production_files": [
+        "sat_boolean_model.go",
+        "sat_goal_dependencies.go",
+        "sat_goal_interface.go",
+        "sat_goal_recovery.go",
+        "sat_goal_to_sat.go"
+      ]
+    },
+    {
+      "package": "smtcore",
+      "imports": [
+        "arena",
+        "ast",
+        "ast/rewriter/bit_blaster",
+        "util/memory",
+        "util/params",
+        "util/symbol",
+        "util/text",
+        "util/z3exception"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go",
+        "owned_string_alias.go",
+        "smt_literal.go",
+        "smt_literal_approx_set.go",
+        "source_debug_off.go",
+        "tactic_command.go",
+        "tactic_manager.go",
+        "tactic_registry_capacity.go",
+        "util_cmd_exception.go",
+        "util_context_params.go",
+        "util_context_params_ast_source.go",
+        "util_context_params_methods_source.go",
+        "util_smt_arith_params.go",
+        "util_smt_array_params.go",
+        "util_smt_bv_params.go",
+        "util_smt_context_statistics.go",
+        "util_smt_datatype_params.go",
+        "util_smt_dyn_ack_params.go",
+        "util_smt_params.go",
+        "util_smt_params_copy_source.go",
+        "util_smt_pattern_inference_params.go",
+        "util_smt_pb_params.go",
+        "util_smt_preprocessor_params.go",
+        "util_smt_qi_params.go",
+        "util_smt_str_params.go"
+      ]
+    },
+    {
+      "package": "solver",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "tactic",
+      "imports": [
+        "arena",
+        "ast",
+        "model",
+        "util/symbol"
+      ],
+      "production_files": [
+        "source_debug_off.go",
+        "tactic_extension_model.go",
+        "tactic_filter_model.go",
+        "tactic_goal.go",
+        "tactic_goal_ownership.go",
+        "tactic_model_converter.go",
+        "tactic_model_to_model.go",
+        "tactic_package_boundary.go",
+        "tactic_probe.go",
+        "tactic_stored_model.go"
+      ]
+    },
+    {
+      "package": "tactic/sls",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "tactic/smtlogics",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "test",
+      "imports": [],
+      "production_files": []
+    },
+    {
+      "package": "testoracle",
+      "imports": [],
+      "production_files": [
+        "sat.go"
+      ]
+    },
+    {
+      "package": "util/approx",
+      "imports": [],
+      "production_files": [
+        "nat.go",
+        "set.go"
+      ]
+    },
+    {
+      "package": "util/backtrack",
+      "imports": [],
+      "production_files": [
+        "trail.go",
+        "union_find.go"
+      ]
+    },
+    {
+      "package": "util/bitset",
+      "imports": [
+        "arena"
+      ],
+      "production_files": [
+        "fixed.go",
+        "hash.go",
+        "uint_set.go",
+        "vector.go"
+      ]
+    },
+    {
+      "package": "util/checkedint",
+      "imports": [],
+      "production_files": [
+        "int64.go"
+      ]
+    },
+    {
+      "package": "util/cliques",
+      "imports": [],
+      "production_files": [
+        "cliques.go"
+      ]
+    },
+    {
+      "package": "util/control",
+      "imports": [
+        "arena",
+        "util/messages"
+      ],
+      "production_files": [
+        "cancel_handler.go",
+        "errors.go",
+        "rlimit.go",
+        "scoped_ctrl_c.go",
+        "scoped_timer.go"
+      ]
+    },
+    {
+      "package": "util/cooperate",
+      "imports": [
+        "arena"
+      ],
+      "production_files": [
+        "cooperate.go",
+        "cooperate_nodebug.go"
+      ]
+    },
+    {
+      "package": "util/diagnostic",
+      "imports": [
+        "arena",
+        "util/memory",
+        "util/text",
+        "util/z3exception"
+      ],
+      "production_files": [
+        "debug_off.go",
+        "util_debug_action_binding.go",
+        "util_debug_actions.go",
+        "util_debug_actions_host_linux.go",
+        "util_debug_context.go",
+        "util_debug_macros.go",
+        "util_debug_notification.go",
+        "util_memory_fatal_policy.go",
+        "util_memory_runtime.go",
+        "util_numeric_char_input.go",
+        "util_small_object_allocator.go",
+        "util_small_object_allocator_stream.go",
+        "util_verbose_context.go"
+      ]
+    },
+    {
+      "package": "util/escaped",
+      "imports": [],
+      "production_files": [
+        "escaped.go"
+      ]
+    },
+    {
+      "package": "util/filepath",
+      "imports": [],
+      "production_files": [
+        "extension.go"
+      ]
+    },
+    {
+      "package": "util/hash",
+      "imports": [],
+      "production_files": [
+        "hash.go"
+      ]
+    },
+    {
+      "package": "util/hash/runtime",
+      "imports": [
+        "arena",
+        "util/hash",
+        "util/memory"
+      ],
+      "production_files": [
+        "runtime_bytes.go",
+        "runtime_bytes_bounded.go"
+      ]
+    },
+    {
+      "package": "util/heap",
+      "imports": [
+        "arena"
+      ],
+      "production_files": [
+        "heap.go"
+      ]
+    },
+    {
+      "package": "util/idgen",
+      "imports": [
+        "arena"
+      ],
+      "production_files": [
+        "generator.go"
+      ]
+    },
+    {
+      "package": "util/lbool",
+      "imports": [],
+      "production_files": [
+        "lbool.go"
+      ]
+    },
+    {
+      "package": "util/lp",
+      "imports": [
+        "util/params"
+      ],
+      "production_files": [
+        "assert_release.go",
+        "gparams_catalog_collectors.go",
+        "int_set.go",
+        "stacked_value.go",
+        "stacked_vector.go",
+        "types.go"
+      ]
+    },
+    {
+      "package": "util/luby",
+      "imports": [],
+      "production_files": [
+        "luby.go"
+      ]
+    },
+    {
+      "package": "util/memory",
+      "imports": [
+        "arena"
+      ],
+      "production_files": [
+        "accounting.go",
+        "allocator_io.go",
+        "construction_failure.go",
+        "failure.go",
+        "release_progress.go",
+        "runtime.go",
+        "runtime_external_allocation.go",
+        "runtime_initialization_oom.go",
+        "runtime_uint32_view.go",
+        "small_allocator.go",
+        "small_allocator_allocation_outcome.go",
+        "small_allocator_assertions.go",
+        "small_allocator_consolidate.go",
+        "small_allocator_pending_roots.go",
+        "small_allocator_pending_transfer.go",
+        "small_allocator_raw.go",
+        "tokens.go",
+        "uint32_codec.go"
+      ]
+    },
+    {
+      "package": "util/messages",
+      "imports": [],
+      "production_files": [
+        "messages.go"
+      ]
+    },
+    {
+      "package": "util/mincut",
+      "imports": [],
+      "production_files": [
+        "min_cut.go"
+      ]
+    },
+    {
+      "package": "util/natset",
+      "imports": [],
+      "production_files": [
+        "set.go"
+      ]
+    },
+    {
+      "package": "util/numeral",
+      "imports": [
+        "arena",
+        "util/hash",
+        "util/memory",
+        "util/text"
+      ],
+      "production_files": [
+        "inf_eps_rational.go",
+        "inf_int_rational.go",
+        "inf_rational.go",
+        "integer_addmul_invocation.go",
+        "integer_allocation_invocation_context.go",
+        "integer_copy_allocation_receipt.go",
+        "integer_divides_numeral_invocation.go",
+        "integer_raw_invocation.go",
+        "integer_runtime_value_receiver.go",
+        "integer_scalar_raw_source_scope.go",
+        "modular_source_lifetime.go",
+        "mp_copy.go",
+        "mp_display.go",
+        "mp_display_scope.go",
+        "mp_format.go",
+        "mp_format_output.go",
+        "mp_integer_array.go",
+        "mp_integer_output_scope.go",
+        "mp_smt2_scope.go",
+        "mp_smt2_stream.go",
+        "mpbq.go",
+        "mpbq_arithmetic.go",
+        "mpbq_debug_release.go",
+        "mpbq_display_scope.go",
+        "mpbq_format.go",
+        "mpbq_root.go",
+        "mpbq_select.go",
+        "mpbqi.go",
+        "mpbqi_format.go",
+        "mpf_add_sub.go",
+        "mpf_add_sub_scope.go",
+        "mpf_bias_exp.go",
+        "mpf_binary_string.go",
+        "mpf_comparison.go",
+        "mpf_decimal_stream.go",
+        "mpf_div.go",
+        "mpf_div_scope.go",
+        "mpf_extrema.go",
+        "mpf_fma.go",
+        "mpf_fma_scope.go",
+        "mpf_formatted_set.go",
+        "mpf_formatted_set_scope.go",
+        "mpf_hexfloat_components.go",
+        "mpf_integer_query.go",
+        "mpf_integer_sqrt_helper.go",
+        "mpf_integer_sqrt_helper_scope.go",
+        "mpf_lifecycle.go",
+        "mpf_manager.go",
+        "mpf_manager_binding.go",
+        "mpf_mul.go",
+        "mpf_mul_scope.go",
+        "mpf_numeral_helpers.go",
+        "mpf_partial_remainder.go",
+        "mpf_partial_remainder_scope.go",
+        "mpf_plain_rational_set.go",
+        "mpf_powers_runtime.go",
+        "mpf_predicates.go",
+        "mpf_printer_parts.go",
+        "mpf_rational_set.go",
+        "mpf_rational_set_allocation.go",
+        "mpf_rational_set_prev_power.go",
+        "mpf_rational_set_scope.go",
+        "mpf_rational_string.go",
+        "mpf_raw_string.go",
+        "mpf_rem.go",
+        "mpf_rem_scope.go",
+        "mpf_renormalize.go",
+        "mpf_renormalize_scope.go",
+        "mpf_round.go",
+        "mpf_round_allocation.go",
+        "mpf_round_integral.go",
+        "mpf_round_integral_scope.go",
+        "mpf_round_scope.go",
+        "mpf_round_sqrt.go",
+        "mpf_sign.go",
+        "mpf_signed_fraction.go",
+        "mpf_smt2_stream.go",
+        "mpf_special_numeral.go",
+        "mpf_sqrt.go",
+        "mpf_sqrt_scope.go",
+        "mpf_to_ieee_bv.go",
+        "mpf_to_ieee_bv_scope.go",
+        "mpf_to_mpz.go",
+        "mpf_to_mpz_scope.go",
+        "mpf_to_sbv_mpq.go",
+        "mpf_to_sbv_mpq_scope.go",
+        "mpf_value.go",
+        "mpf_value_conversion_allocation.go",
+        "mpf_value_copy_chain.go",
+        "mpf_value_copy_invocation.go",
+        "mpf_value_format.go",
+        "mpf_value_format_allocation.go",
+        "mpf_value_format_decimal.go",
+        "mpf_value_format_invocation.go",
+        "mpf_value_format_stream.go",
+        "mpf_value_ieee.go",
+        "mpf_value_input.go",
+        "mpf_value_input_invocation.go",
+        "mpf_value_runtime.go",
+        "mpf_value_to_rational.go",
+        "mpf_value_to_rational_history.go",
+        "mpf_value_to_rational_scope.go",
+        "mpff.go",
+        "mpff_arithmetic.go",
+        "mpff_convert.go",
+        "mpff_format.go",
+        "mpff_format_scope.go",
+        "mpff_limbs.go",
+        "mpff_predicates.go",
+        "mpff_ref.go",
+        "mpn.go",
+        "mpn_cstring.go",
+        "mpn_format_scope.go",
+        "mpn_indexed.go",
+        "mpn_source_finalize.go",
+        "mpn_source_verify.go",
+        "mpn_storage.go",
+        "mpq.go",
+        "mpq_bitwise.go",
+        "mpq_decimal_stream.go",
+        "mpq_inf.go",
+        "mpq_inspect.go",
+        "mpq_number_theory.go",
+        "mpq_ops.go",
+        "mpq_owned_string.go",
+        "mpq_owner_cleanup.go",
+        "mpq_parse.go",
+        "mpq_power.go",
+        "mpq_raw_arithmetic_scope.go",
+        "mpq_root.go",
+        "mpq_round.go",
+        "mpq_signed_fraction_source.go",
+        "mpq_source_finalize.go",
+        "mpz.go",
+        "mpz_allocator_backend.go",
+        "mpz_bitwise.go",
+        "mpz_constructor_unwind.go",
+        "mpz_div.go",
+        "mpz_extended_gcd_release.go",
+        "mpz_facade_extra.go",
+        "mpz_gcd.go",
+        "mpz_gcd_diagnostics_release.go",
+        "mpz_log.go",
+        "mpz_misc.go",
+        "mpz_mul.go",
+        "mpz_number_theory.go",
+        "mpz_parse.go",
+        "mpz_pending_allocation.go",
+        "mpz_power_scope.go",
+        "mpz_power_shift.go",
+        "mpz_ref_release.go",
+        "mpz_root.go",
+        "mpz_root_scope.go",
+        "mpz_slab.go",
+        "mpz_source_finalize.go",
+        "mpz_square_scope.go",
+        "mpz_string_set_scope.go",
+        "mpzzp.go",
+        "mpzzp_context_ops.go",
+        "mpzzp_nodebug.go",
+        "mpzzp_normalize_allocation_receipt.go",
+        "mpzzp_ops.go",
+        "numeral_insertion_receipt.go",
+        "numeric_allocation_cleanup.go",
+        "numeric_allocation_roots.go",
+        "numeric_call_errors.go",
+        "numeric_caller_guard.go",
+        "numeric_caller_hooks.go",
+        "numeric_caller_operations.go",
+        "numeric_caller_operations_extra.go",
+        "numeric_caller_policy.go",
+        "numeric_formatting_boundary.go",
+        "numeric_invocation_receipts.go",
+        "numeric_owner_boundaries.go",
+        "numeric_source_delete.go",
+        "numeric_storage_boundary.go",
+        "numeric_storage_stats.go",
+        "rational_buffer.go",
+        "rational_lexical_scope.go",
+        "rational_numeric_borrow.go",
+        "rational_raw_boundary.go",
+        "rational_service.go",
+        "rational_service_bitwise_binary_invocation.go",
+        "rational_service_cleanup.go",
+        "rational_service_compare_invocation.go",
+        "rational_service_extra.go",
+        "rational_service_global_binding.go",
+        "rational_service_invocation.go",
+        "rational_service_invocation_allocation.go",
+        "rational_service_one_invocation.go",
+        "rational_service_ops.go",
+        "rational_service_owned_cleanup.go",
+        "rational_service_source_finalize.go",
+        "rational_service_source_initialize.go",
+        "rational_service_zero_invocation.go",
+        "rational_source_stream.go",
+        "scoped_binary.go",
+        "scoped_binary_interval.go",
+        "scoped_fast_float.go",
+        "scoped_numeral.go",
+        "scoped_numeral_buffer.go",
+        "scoped_numeral_buffer_boundary.go",
+        "util_mpf_format_text.go",
+        "util_rational_global_service.go"
+      ]
+    },
+    {
+      "package": "util/params",
+      "imports": [
+        "arena",
+        "util/diagnostic",
+        "util/numeral",
+        "util/symbol",
+        "util/text",
+        "util/z3exception"
+      ],
+      "production_files": [
+        "util_gparams.go",
+        "util_gparams_catalog.go",
+        "util_gparams_catalog_collectors.go",
+        "util_gparams_catalog_dispatch.go",
+        "util_gparams_collector_registry.go",
+        "util_gparams_constructor_source.go",
+        "util_gparams_dictionary.go",
+        "util_gparams_display.go",
+        "util_gparams_names.go",
+        "util_gparams_nodebug.go",
+        "util_gparams_parse.go",
+        "util_gparams_service.go",
+        "util_gparams_service_ops.go",
+        "util_gparams_source_finalize.go",
+        "util_gparams_symbol_stream.go",
+        "util_gparams_values.go",
+        "util_module_params_source.go",
+        "util_param_descrs.go",
+        "util_param_descrs_stream.go",
+        "util_param_descrs_stream_nodebug.go",
+        "util_param_name.go",
+        "util_params_decrement_source.go",
+        "util_params_ref.go",
+        "util_params_reset_key_source.go",
+        "util_params_reset_source.go",
+        "util_params_set_rat_source.go",
+        "util_params_set_replacement_source.go",
+        "util_params_source_frame.go",
+        "util_params_string_stream.go",
+        "util_params_string_view.go",
+        "util_source_package_boundaries.go"
+      ]
+    },
+    {
+      "package": "util/permutation",
+      "imports": [],
+      "production_files": [
+        "apply.go",
+        "debug_off.go"
+      ]
+    },
+    {
+      "package": "util/prime",
+      "imports": [
+        "arena"
+      ],
+      "production_files": [
+        "generator.go",
+        "release.go",
+        "service.go"
+      ]
+    },
+    {
+      "package": "util/random",
+      "imports": [],
+      "production_files": [
+        "generator.go"
+      ]
+    },
+    {
+      "package": "util/sexpr",
+      "imports": [
+        "arena",
+        "util/numeral",
+        "util/symbol",
+        "util/text"
+      ],
+      "production_files": [
+        "sexpr_borrowed_nodes.go",
+        "util_sexpr.go",
+        "util_sexpr_nodebug.go"
+      ]
+    },
+    {
+      "package": "util/smallint",
+      "imports": [],
+      "production_files": [
+        "debug_off.go",
+        "infinitesimal.go",
+        "integer.go"
+      ]
+    },
+    {
+      "package": "util/smt2",
+      "imports": [
+        "arena",
+        "util/symbol",
+        "util/text"
+      ],
+      "production_files": [
+        "util_smt2_util.go"
+      ]
+    },
+    {
+      "package": "util/stack",
+      "imports": [
+        "arena"
+      ],
+      "production_files": [
+        "stack.go"
+      ]
+    },
+    {
+      "package": "util/statistics",
+      "imports": [],
+      "production_files": [
+        "statistics.go"
+      ]
+    },
+    {
+      "package": "util/stopwatch",
+      "imports": [],
+      "production_files": [
+        "clock_linux.go",
+        "stopwatch.go",
+        "timeit.go",
+        "timer.go"
+      ]
+    },
+    {
+      "package": "util/symbol",
+      "imports": [
+        "arena",
+        "util/hash"
+      ],
+      "production_files": [
+        "borrowed_input.go",
+        "bytes.go",
+        "debug_off.go",
+        "dictionary_int32.go",
+        "encoding.go",
+        "hash.go",
+        "service.go",
+        "symbol.go"
+      ]
+    },
+    {
+      "package": "util/text",
+      "imports": [
+        "arena"
+      ],
+      "production_files": [
+        "cstring_region.go",
+        "owned_string.go",
+        "owned_string_capture.go",
+        "owned_string_stream.go",
+        "string_input.go",
+        "util_numeric_file_boundary.go",
+        "util_numeric_rational_source.go",
+        "util_numeric_stream.go",
+        "util_numeric_stream_file.go",
+        "util_numeric_stream_flush.go",
+        "util_numeric_stream_region.go"
+      ]
+    },
+    {
+      "package": "util/version",
+      "imports": [],
+      "production_files": [
+        "version.go"
+      ]
+    },
+    {
+      "package": "util/z3exception",
+      "imports": [],
+      "production_files": [
+        "z3_exception.go"
+      ]
+    }
+  ]
+}
