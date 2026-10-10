@@ -249,7 +249,7 @@ func (s *satSolverClauseLifecycle) mkClauseCoreSpan(n uint32, span satSolverLite
 		p.setConflict(satJustification{}, DefaultLiteral())
 		return StoredClauseRef{}, nil
 	case 1:
-		if span.runtime == nil && span.words == nil && len(span.literals) == 0 {
+		if span.runtime == nil && span.store == nil && len(span.literals) == 0 {
 			return StoredClauseRef{}, arena.ErrBounds
 		}
 		lit, e := span.literal(0)
@@ -258,7 +258,7 @@ func (s *satSolverClauseLifecycle) mkClauseCoreSpan(n uint32, span satSolverLite
 		}
 		return StoredClauseRef{}, p.assign(lit, satJustification{})
 	case 2:
-		if span.runtime == nil && span.words == nil && len(span.literals) < 2 {
+		if span.runtime == nil && span.store == nil && len(span.literals) < 2 {
 			return StoredClauseRef{}, arena.ErrBounds
 		}
 		a, e := span.literal(0)

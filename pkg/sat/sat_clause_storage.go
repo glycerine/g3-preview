@@ -205,7 +205,7 @@ func (a *ClauseAllocator) constructSpan(r StoredClauseRef, id, n uint32, span sa
 			return e
 		}
 	}
-	if span.runtime == nil && span.words == nil && uint64(len(span.literals)) < uint64(n) {
+	if span.runtime == nil && span.store == nil && uint64(len(span.literals)) < uint64(n) {
 		return arena.ErrBounds
 	}
 	for i := uint32(0); i < n; i++ {

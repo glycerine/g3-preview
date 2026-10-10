@@ -58,7 +58,7 @@ func satCleanerAudit(t *testing.T, c *satCleaner, extra ...StoredClauseRef) {
 	want += todo.ownerBytes
 	want += a.ownerBytes + 4*uint64(a.ids.FreeCapacity()) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
 	mc := p.converter
-	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes + mc.store.directoryBytes + satWatchGraphBytes(mc.store.words.Stats())
+	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes
 	r := p.limit
 	want += uint64(reflect.TypeOf(control.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*control.Reslimit)(nil)).Size())*uint64(cap(r.Children)) + p.memory.Stats().TotalBytes
 	if want != l.budget.Used() {

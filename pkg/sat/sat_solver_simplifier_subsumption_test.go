@@ -1,10 +1,7 @@
 package sat
 
 import (
-	"errors"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/arena"
 )
 
 func satKernelMaskLiterals(mask uint32) []Literal {
@@ -106,7 +103,7 @@ func TestSATSimplifierOccurrenceChoiceCollectorsAndCompression(t *testing.T) {
 	out, e := NewSATClauseVector(a, b)
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, out.Close()) })
-	ls, e := newSATSolverLiteralStore(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}})
+	ls, e := newSATSolverLiteralStore(b)
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, ls.Close()) })
 	ref, e := ls.NewList()
@@ -147,7 +144,7 @@ func TestSATSimplifierOccurrenceChoiceCollectorsAndCompression(t *testing.T) {
 	}
 }
 
-func TestSATSimplifierCollectorPairedPublicationAndUnsignedCost(t *testing.T) {
+func TestSATSimplifierNativeCollectorPairedPublicationAndUnsignedCost(t *testing.T) {
 	k, a, u, b := satSimplifierKernelFixture(t, 2)
 	c := satMk(t, a, satLs(0, 2), false)
 	d := satMk(t, a, satLs(0, 2, 3), false)
@@ -158,7 +155,7 @@ func TestSATSimplifierCollectorPairedPublicationAndUnsignedCost(t *testing.T) {
 	t.Cleanup(func() { satOK(t, out.Close()) })
 	satOK(t, out.Push(c))
 	satOK(t, out.Shrink(0))
-	ls, e := newSATSolverLiteralStore(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}})
+	ls, e := newSATSolverLiteralStore(b)
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, ls.Close()) })
 	ref, e := ls.NewList()
@@ -166,15 +163,13 @@ func TestSATSimplifierCollectorPairedPublicationAndUnsignedCost(t *testing.T) {
 	k.subCounter = -2147483647
 	b.FailAfter(0)
 	e = k.collectSubsumed1Core(c, out, ls, ref, 0)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
+	satOK(t, e)
 	if out.Size() != 1 {
-		t.Fatal("clause published before literal refusal", out.Size())
+		t.Fatal("native clause/literal pair published", out.Size())
 	}
 	n, e2 := ls.Size(ref)
 	satOK(t, e2)
-	if n != 0 {
+	if n != 1 {
 		t.Fatal(n)
 	}
 	if k.subCounter != 2147483644 {

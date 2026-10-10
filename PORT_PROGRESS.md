@@ -33046,3 +33046,48 @@ passed. No full native module rerun inside the hourly interval. Counts remain
 The util knot and complete split remain active: other retained SAT Runtime
 columns/literal storage, AST reference/printer storage, NumericTextStream
 consumers and internal util numeric/text/parameter dependency cycles remain.
+
+## Native retained nested SAT literal storage and captured spans
+
+Compiler-resolved consumers retain literal NewList/Push/Read/Write/Shrink,
+CloneList/CopyList and free/close routes. Those now use native []Literal backing
+and a native checked record directory. Removed arena Words ownership, payload
+locators/codecs, full-capacity copying, source growth geometry, pooled backing
+charges and unused reserve/resize/physical-read/reset/capacity helpers. Only the
+actual cold store header remains budgeted. Clone and cross-owner copy duplicate
+logical values independently, including copies within a relocating directory.
+Owner/slot/generation checks and exhausted-slot retirement remain.
+
+Captured simplifier spans borrow native backing identities; actual growth/free
+invalidates them, store close yields the closed-owner guard, and shrink exposes
+only current logical values. Direct caller Go spans also use logical length,
+not spare capacity. Runtime-column spans remain separate retained consumers.
+Real stale captured-span clause construction still reaches allocator/header/ID
+publication before its actual endangered read, retaining the returned clause
+owner for cleanup. Whole named graph audits no longer charge removed literal
+pages/directories; model converter outer entry/pending storage remains separately
+charged and is still future native conversion work.
+
+New tests cover 4097 literals, a 4096-operation independent sequence model with
+cross-owner deep copies, 257 directory entries, reservations-disabled growth,
+clone survival after source free, shallow owner rejection, native span writes,
+current logical bounds, slot reuse, exact cold-header refusal/refund and warm
+zero-allocation push/shrink. Existing model reconstruction, resolution truth-table,
+SCC and solver campaigns remain. Four obsolete nested-vector backing/template
+tests and two unreachable nested-refusal copy fixtures were retired. Model
+converter tests retain real cold/outer reservation refusal and source copy/destruct
+order checks while requiring native nested insert/copy to complete without extra
+reservations. Resolution now verifies successful output (including repeated
+second-input literals), cost and mark cleanup with reservations disabled; paired
+collector publication verifies successful native clause/literal output and source
+unsigned cost. The former shortened Go-pointer fixture now checks logical bounds
+and passes its initialized array with the correct slice length. Manifest evidence
+and ownership notes were updated without generic C++ container credit.
+
+Validation: full native SAT passed (0.781s), full g3debug SAT passed (0.779s).
+Module-wide compilation, SAT vet, manifest evidence, gofmt and diff checks passed.
+The full native module was not repeated inside the hourly interval. Counts remain
+2102 units/677 APIs: 63 ported, 284 partial, 1727 unported, two dead/deleted.
+The util knot and full split remain active. Other SAT Runtime columns and model
+entry storage, retained AST reference/printer storage, NumericTextStream consumers
+and internal util numeric/text/parameter cycles remain.

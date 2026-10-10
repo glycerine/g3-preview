@@ -67,7 +67,7 @@ func (m *satModelConverter) initializeSourceStore(c arena.VectorConfig) error {
 	if m.constructed || m.store != nil || c.Descriptors.Budget != m.budget {
 		return ErrSATOwner
 	}
-	store, e := newSATSolverLiteralStore(c)
+	store, e := newSATSolverLiteralStore(m.budget)
 	if e != nil {
 		return e
 	}

@@ -1,7 +1,6 @@
 package sat
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -9,7 +8,7 @@ import (
 
 func satKernelOutput(t *testing.T, b *arena.Budget) (*satSolverLiteralStore, satSolverLiteralListRef) {
 	t.Helper()
-	s, e := newSATSolverLiteralStore(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}})
+	s, e := newSATSolverLiteralStore(b)
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, s.Close()) })
 	r, e := s.NewList()
@@ -126,45 +125,43 @@ func TestSATSimplifierResolutionIndependentBoundedTruth(t *testing.T) {
 		}
 	}
 }
-func TestSATSimplifierResolutionRefusalRetainsMarkAndOutputPrefix(t *testing.T) {
+func TestSATSimplifierNativeResolutionGrowthAndMarkCleanup(t *testing.T) {
 	k, a, _, b := satSimplifierKernelFixture(t, 4)
 	out, r := satKernelOutput(t, b)
 	k.elimCounter = 10
+	before := b.Used()
 	b.FailAfter(0)
-	_, e := k.resolve(newSATBinaryWrapper(0, 2), newSATBinaryWrapper(1, 4), 0, out, r)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	if k.elimCounter != 8 {
-		t.Fatal(k.elimCounter)
-	}
-	yes, e := k.isMarked(2)
+	yes, e := k.resolve(newSATBinaryWrapper(0, 2), newSATBinaryWrapper(1, 4), 0, out, r)
 	satOK(t, e)
-	if !yes {
-		t.Fatal("mark before refused push")
+	if !yes || k.elimCounter != 6 || b.Used() != before {
+		t.Fatal("native binary resolution", yes, k.elimCounter)
 	}
-	satKernelOutputWant(t, out, r, nil)
+	satKernelOutputWant(t, out, r, satLs(2, 4))
+	marked, e := k.isMarked(2)
+	satOK(t, e)
+	if marked {
+		t.Fatal("normal resolution kept first-input mark")
+	}
 	b.FailAfter(-1)
-	satOK(t, k.InitVisited(4))
-	satOK(t, out.Push(r, 2))
-	satOK(t, out.Push(r, 2))
 	satOK(t, out.Shrink(r, 0))
 	c1 := satMk(t, a, satLs(0, 2, 4), false)
 	c2 := satMk(t, a, satLs(1, 6, 6), false)
+	before = b.Used()
 	b.FailAfter(0)
-	// Two first-input pushes fit retained capacity; the second-input push fails.
-	_, e = k.resolve(newSATClauseWrapper(c1), newSATClauseWrapper(c2), 0, out, r)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	satKernelOutputWant(t, out, r, satLs(2, 4))
-	yes, e = k.isMarked(2)
+	yes, e = k.resolve(newSATClauseWrapper(c1), newSATClauseWrapper(c2), 0, out, r)
 	satOK(t, e)
-	if !yes {
-		t.Fatal("source error retained first mark")
+	if !yes || k.elimCounter != 0 || b.Used() != before {
+		t.Fatal("native clause resolution", yes, k.elimCounter)
+	}
+	satKernelOutputWant(t, out, r, satLs(2, 4, 6, 6))
+	marked, e = k.isMarked(2)
+	satOK(t, e)
+	if marked {
+		t.Fatal("first-input mark survived native completion")
 	}
 	b.FailAfter(-1)
 }
+
 func TestSATSimplifierResolutionDebugPivotAndWarmZeroAllocation(t *testing.T) {
 	k, _, _, b := satSimplifierKernelFixture(t, 3)
 	out, r := satKernelOutput(t, b)

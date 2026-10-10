@@ -108,7 +108,7 @@ func newSATSimplifier(l *satSolverClauseLifecycle, c *satCleaner, d *satSolverDe
 	if s.bsCS, err = NewSATClauseVector(l.propagation.clauses, l.budget); err != nil {
 		return s, err
 	}
-	if s.literalStore, err = newSATSolverLiteralStore(cfg); err != nil {
+	if s.literalStore, err = newSATSolverLiteralStore(l.budget); err != nil {
 		return s, err
 	}
 	if s.bsLS, err = s.literalStore.NewList(); err != nil {

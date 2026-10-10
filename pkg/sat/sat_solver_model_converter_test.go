@@ -101,7 +101,7 @@ func TestSATSolverModelConverterOuterGrowthDeepCopies(t *testing.T) {
 	}
 	old0 := c.entries[0].literals
 	old1 := c.entries[1].literals
-	cap0, e := c.store.Capacity(old0)
+	cap0, e := c.store.Size(old0)
 	paramsMust(t, e)
 	oldRef, e := c.EntryAt(0)
 	paramsMust(t, e)
@@ -114,10 +114,10 @@ func TestSATSolverModelConverterOuterGrowthDeepCopies(t *testing.T) {
 	if new0 == old0 {
 		t.Fatal("source copy constructor replaced by move")
 	}
-	capNew, e := c.store.Capacity(new0)
+	capNew, e := c.store.Size(new0)
 	paramsMust(t, e)
 	if capNew != cap0 {
-		t.Fatal("source nested copy capacity")
+		t.Fatal("native nested copy logical length")
 	}
 	if _, _, e = c.KindAndVar(oldRef); !errors.Is(e, arena.ErrInvalidSlot) {
 		t.Fatalf("source relocated entry reference lifetime %v", e)
@@ -125,64 +125,37 @@ func TestSATSolverModelConverterOuterGrowthDeepCopies(t *testing.T) {
 	paramsMust(t, arena.ValidateRecordType(reflect.TypeOf(satModelConversionEntry{})))
 	paramsMust(t, arena.ValidateRecordType(reflect.TypeOf(satModelConversionEntryRef{})))
 }
-func TestSATSolverModelConverterDeepCopyFailurePrefixAndResume(t *testing.T) {
-	foundPartial := false
-	for prefix := int64(0); prefix < 24; prefix++ {
-		b := arena.NewBudget(^uint64(0))
-		c, e := newSATModelConverter(arena.VectorConfig{PageSize: 4, Descriptors: arena.Config{PageSize: 2, Budget: b}})
+func TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal(t *testing.T) {
+	c, b := satConverterTestOwner(t)
+	for i := uint32(0); i < 2; i++ {
+		r, e := c.Mk(satModelElimVar, BoolVar(i))
 		paramsMust(t, e)
-		for i := uint32(0); i < 2; i++ {
-			r, e := c.Mk(satModelElimVar, BoolVar(i))
-			paramsMust(t, e)
-			paramsMust(t, c.InsertBinary(r, MakeLiteral(BoolVar(i), false), MakeLiteral(3, false)))
-			if i == 1 {
-				paramsMust(t, c.InsertBinary(r, MakeLiteral(BoolVar(i), false), MakeLiteral(3, false)))
-			}
-		}
-		// Occupy the warmed free class8 block so the second different-class
-		// copy genuinely requires a reservation after old0 was destroyed.
-		_, e = c.store.CloneList(c.entries[1].literals)
+		paramsMust(t, c.InsertBinary(r, MakeLiteral(BoolVar(i), false), 6))
+	}
+	old0, old1 := c.entries[0].literals, c.entries[1].literals
+	before := b.Used()
+	b.FailAfter(0)
+	_, e := c.Mk(satModelElimVar, 2)
+	if !errors.Is(e, arena.ErrInjectedFailure) || c.Size() != 2 || c.pending != nil || !c.store.IsLive(old0) || !c.store.IsLive(old1) || b.Used() != before {
+		t.Fatal("real outer reservation refusal changed native nested owners", e)
+	}
+	b.FailAfter(1)
+	_, e = c.Mk(satModelElimVar, 2)
+	paramsMust(t, e)
+	if c.Size() != 3 || c.pending != nil || c.store.IsLive(old0) || c.store.IsLive(old1) {
+		t.Fatal("native nested copy needed extra reservations")
+	}
+	b.FailAfter(-1)
+	for i := uint32(0); i < 2; i++ {
+		v, e := c.store.Read(c.entries[i].literals, 0)
 		paramsMust(t, e)
-		old0 := c.entries[0].literals
-		old1 := c.entries[1].literals
-		before := b.Used()
-		satConverterAssertActualCharges(t, c, b)
-		b.FailAfter(prefix)
-		_, e = c.Mk(satModelElimVar, 2)
-		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatalf("prefix %d: %v", prefix, e)
-		}
-		satConverterAssertActualCharges(t, c, b)
-		if e != nil && c.pending != nil && c.copyCursor == 1 {
-			foundPartial = true
-			if c.store.IsLive(old0) || !c.store.IsLive(old1) || !c.store.IsLive(c.entries[0].literals) {
-				t.Fatalf("ascending completed copy/destroy roots prefix %d", prefix)
-			}
-			if b.Used() < before {
-				t.Fatalf("unaccounted owned roots before teardown prefix %d", prefix)
-			}
-			r, e := c.EntryAt(1)
-			paramsMust(t, e)
-			if _, _, e = c.KindAndVar(r); !errors.Is(e, ErrSATIncompleteGrowth) {
-				t.Fatalf("undefined unconstructed access guard %v", e)
-			}
-			b.FailAfter(-1)
-			_, e = c.Mk(satModelElimVar, 2)
-			paramsMust(t, e)
-			if c.pending != nil || c.Size() != 3 || c.store.IsLive(old1) {
-				t.Fatal("documented continuation did not complete source remaining copies")
-			}
-		}
-		b.FailAfter(-1)
-		paramsMust(t, c.Close())
-		if b.Used() != 0 {
-			t.Fatalf("prefix %d cleanup actual roots %d", prefix, b.Used())
+		if v != MakeLiteral(BoolVar(i), false) {
+			t.Fatal(i, v)
 		}
 	}
-	if !foundPartial {
-		t.Fatal("sweep never exercised source first-copy success then second-copy failure")
-	}
+	satConverterAssertActualCharges(t, c, b)
 }
+
 func TestSATSolverModelConverterCopyAppendAndSourceBitFields(t *testing.T) {
 	s, _ := satConverterTestOwner(t)
 	d, _ := satConverterTestOwner(t)
@@ -226,11 +199,8 @@ func TestSATSolverModelConverterCopyAppendAndSourceBitFields(t *testing.T) {
 
 func satConverterAssertActualCharges(t *testing.T, c *satModelConverter, b *arena.Budget) {
 	t.Helper()
-	w := c.store.words.Stats()
-	d := w.Descriptors
 	want := uint64(reflect.TypeOf(satModelConverter{}).Size()) + uint64(cap(c.entries)+cap(c.pending))*uint64(reflect.TypeOf(satModelConversionEntry{}).Size())
-	want += uint64(reflect.TypeOf(satSolverLiteralStore{}).Size()) + uint64(cap(c.store.records))*uint64(reflect.TypeOf(satSolverLiteralListRecord{}).Size())
-	want += w.OwnerBytes + w.PayloadBytes + w.BlockMetadataBytes + w.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+	want += uint64(reflect.TypeOf(satSolverLiteralStore{}).Size())
 	if b.Used() != want {
 		t.Fatalf("immediate actual header/backing/root charges: %d != %d", b.Used(), want)
 	}
@@ -306,7 +276,7 @@ func TestSATSolverModelConverterActualClauseAndWrapperRoutes(t *testing.T) {
 	}
 	satConverterAssertActualCharges(t, c, b)
 }
-func TestSATSolverModelConverterConstructorAndInsertFaults(t *testing.T) {
+func TestSATSolverModelConverterColdRefusalsAndNativeInsert(t *testing.T) {
 	success := false
 	for prefix := int64(0); prefix < 8; prefix++ {
 		b := arena.NewBudget(^uint64(0))
@@ -331,28 +301,22 @@ func TestSATSolverModelConverterConstructorAndInsertFaults(t *testing.T) {
 	c, b := satConverterTestOwner(t)
 	r, e := c.Mk(satModelBlockLit, 0)
 	paramsMust(t, e)
-	// Real source pushes each literal before its delimiter. A failed later
-	// expansion retains the completed literal prefix and published capacity.
-	paramsMust(t, c.InsertLiterals(r, []Literal{MakeLiteral(0, false), MakeLiteral(1, false), MakeLiteral(2, false)}))
-	_, e = c.store.CloneList(c.entries[0].literals)
-	paramsMust(t, e)
+	paramsMust(t, c.InsertLiterals(r, []Literal{0, 2, 4}))
+	before := b.Used()
 	b.FailAfter(0)
-	e = c.InsertBinary(r, MakeLiteral(0, true), MakeLiteral(1, true))
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatalf("insert failure %v", e)
-	}
-	// Current length4/cap5: first new literal publishes, then second literal
-	// needs a fresh class8 block; the warmed block is explicitly occupied.
-	// Completed original delimiter and the new first-literal prefix stay live.
+	paramsMust(t, c.InsertBinary(r, 1, 3))
+	want := []Literal{0, 2, 4, DefaultLiteral(), 1, 3, DefaultLiteral()}
 	n, e := c.store.Size(c.entries[0].literals)
 	paramsMust(t, e)
-	if n != 5 {
-		t.Fatalf("failed append prefix%d", n)
+	if int(n) != len(want) || b.Used() != before {
+		t.Fatal("native insert reserved backing", n, b.Used(), before)
 	}
-	v, e := c.store.Read(c.entries[0].literals, 4)
-	paramsMust(t, e)
-	if v != MakeLiteral(0, true) {
-		t.Fatal("completed source first literal publication")
+	for i, l := range want {
+		v, e := c.store.Read(c.entries[0].literals, uint32(i))
+		paramsMust(t, e)
+		if v != l {
+			t.Fatal(i, v, l)
+		}
 	}
 	satConverterAssertActualCharges(t, c, b)
 	b.FailAfter(-1)
@@ -386,11 +350,14 @@ func TestSATSolverModelConverterOwnerEnumAndCloseGuards(t *testing.T) {
 	if _, e = c.Mk(satModelElimVar, 0); !errors.Is(e, arena.ErrClosed) {
 		t.Fatalf("closed before enum/storage mutation %v", e)
 	}
-	badBudget := arena.NewBudget(^uint64(0))
-	_, e = newSATModelConverter(arena.VectorConfig{PageSize: 3, Descriptors: arena.Config{Budget: badBudget}})
-	if !errors.Is(e, arena.ErrConfig) || badBudget.Used() != 0 {
-		t.Fatalf("nested invalid-config unwind %v %d", e, badBudget.Used())
+	nativeBudget := arena.NewBudget(^uint64(0))
+	native, e := newSATModelConverter(arena.VectorConfig{PageSize: 3, Descriptors: arena.Config{Budget: nativeBudget}})
+	paramsMust(t, e)
+	paramsMust(t, native.Close())
+	if nativeBudget.Used() != 0 {
+		t.Fatal("native literal store retained cold header")
 	}
+
 }
 
 func TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix(t *testing.T) {
@@ -512,12 +479,12 @@ func TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime(t *testing
 		paramsMust(t, e)
 		x, e := clone.entry(r)
 		paramsMust(t, e)
-		sc, e := src.store.Capacity(src.entries[i].literals)
+		sc, e := src.store.Size(src.entries[i].literals)
 		paramsMust(t, e)
-		cc, e := clone.store.Capacity(x.literals)
+		cc, e := clone.store.Size(x.literals)
 		paramsMust(t, e)
 		if cc != sc {
-			t.Fatal("nested capacity changed")
+			t.Fatal("native nested length changed")
 		}
 		v, e := clone.store.Read(x.literals, 0)
 		paramsMust(t, e)
@@ -571,7 +538,7 @@ func TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity(t *testing.T) 
 	satConverterAssertActualCharges(t, dst, db)
 	paramsMust(t, dst.Assign(dst))
 }
-func TestSATSolverModelConverterImplicitAssignmentFaultPrefixes(t *testing.T) {
+func TestSATSolverModelConverterNativeNestedAssignmentAndOuterRefusal(t *testing.T) {
 	src, _ := satConverterTestOwner(t)
 	for i := uint32(0); i < 3; i++ {
 		r, e := src.Mk(satModelBlockLit, BoolVar(i))
@@ -579,7 +546,7 @@ func TestSATSolverModelConverterImplicitAssignmentFaultPrefixes(t *testing.T) {
 		ls := []Literal{MakeLiteral(BoolVar(i), false), 2, 4, 6, 8, 10, 12, 14, 16}
 		paramsMust(t, src.InsertLiterals(r, ls))
 	}
-	foundPartial, foundSuccess := false, false
+	foundRefusal, foundSuccess := false, false
 	for fail := int64(0); fail < 35; fail++ {
 		b := arena.NewBudget(^uint64(0))
 		dst, e := newSATModelConverter(arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}})
@@ -604,31 +571,11 @@ func TestSATSolverModelConverterImplicitAssignmentFaultPrefixes(t *testing.T) {
 			if !errors.Is(e, arena.ErrInjectedFailure) {
 				t.Fatal(e)
 			}
-			if dst.sourceCapacity == 0 {
-				if dst.Size() != 0 {
-					t.Fatal("allocation refusal left header")
-				}
-			} else {
-				if dst.Size() != 3 || dst.sourceCapacity != 3 {
-					t.Fatal("copy_core publication shape")
-				}
-				if dst.copyCursor > 0 && dst.copyCursor < 3 {
-					foundPartial = true
-				}
-				for i := uint32(0); i < 3; i++ {
-					r, e := dst.EntryAt(i)
-					paramsMust(t, e)
-					_, v, e := dst.KindAndVar(r)
-					if i < dst.copyCursor {
-						paramsMust(t, e)
-						if uint32(v) != i {
-							t.Fatal("ascending copied prefix")
-						}
-					} else if !errors.Is(e, ErrSATIncompleteGrowth) {
-						t.Fatal("unconstructed entry guard", i, e)
-					}
-				}
+			foundRefusal = true
+			if dst.sourceCapacity != 0 || dst.Size() != 0 {
+				t.Fatal("real outer refusal published nested copy", dst.Size(), dst.sourceCapacity)
 			}
+
 		}
 		satConverterAssertActualCharges(t, dst, b)
 		paramsMust(t, dst.Close())
@@ -636,8 +583,8 @@ func TestSATSolverModelConverterImplicitAssignmentFaultPrefixes(t *testing.T) {
 			t.Fatal("assignment fault leaked", fail, b.Used())
 		}
 	}
-	if !foundPartial || !foundSuccess {
-		t.Fatalf("did not exercise finite copy prefixes/success %v/%v", foundPartial, foundSuccess)
+	if !foundRefusal || !foundSuccess {
+		t.Fatalf("did not exercise finite copy prefixes/success %v/%v", foundRefusal, foundSuccess)
 	}
 }
 
@@ -691,122 +638,7 @@ func TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign(t *testi
 		t.Fatal("closed source charged constructor", e)
 	}
 }
-func TestSATSolverModelConverterImplicitInterruptedCopyAndRestart(t *testing.T) {
-	full, _ := satConverterTestOwner(t)
-	for i := uint32(0); i < 3; i++ {
-		r, e := full.Mk(satModelBlockLit, BoolVar(i))
-		paramsMust(t, e)
-		paramsMust(t, full.InsertBinary(r, MakeLiteral(BoolVar(i), false), MakeLiteral(BoolVar(i+3), true)))
-	}
-	var partial *satModelConverter
-	var pb *arena.Budget
-	for fail := int64(0); fail < 35; fail++ {
-		b := arena.NewBudget(^uint64(0))
-		c, e := newSATModelConverter(arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}})
-		paramsMust(t, e)
-		b.FailAfter(fail)
-		e = c.Assign(full)
-		if errors.Is(e, arena.ErrInjectedFailure) && c.copyCursor > 0 && c.copyCursor < 3 {
-			partial, pb = c, b
-			break
-		}
-		paramsMust(t, c.Close())
-		if b.Used() != 0 {
-			t.Fatal("fixture retained failed owner")
-		}
-	}
-	if partial == nil {
-		t.Fatal("no interrupted constructor fixture")
-	}
-	defer func() {
-		paramsMust(t, partial.Close())
-		if pb.Used() != 0 {
-			t.Fatal("partial cleanup", pb.Used())
-		}
-	}()
-	prefix := partial.copyCursor
-	sourceBytes := pb.Used()
-	cb := arena.NewBudget(^uint64(0))
-	clone, e := partial.Clone(arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: cb}})
-	if clone != nil || !errors.Is(e, ErrSATIncompleteGrowth) || cb.Used() != 0 || pb.Used() != sourceBytes {
-		t.Fatal("late guarded source clone cleanup", e)
-	}
-	dst, db := satConverterTestOwner(t)
-	_, e = dst.Mk(satModelBlockLit, 9)
-	paramsMust(t, e)
-	old := dst.entries[0].literals
-	e = dst.Assign(partial)
-	if !errors.Is(e, ErrSATIncompleteGrowth) || dst.Size() != 3 || dst.copyCursor != prefix || dst.store.IsLive(old) {
-		t.Fatal("late guarded assignment prefix", e, dst.copyCursor)
-	}
-	satConverterAssertActualCharges(t, dst, db)
-	satConverterAssertActualCharges(t, partial, pb)
-	if _, e = partial.Mk(satModelBlockLit, 9); !errors.Is(e, ErrSATIncompleteGrowth) || pb.Used() != sourceBytes {
-		t.Fatal("unsafe partial append continuation", e)
-	}
-	pb.FailAfter(-1)
-	paramsMust(t, partial.Assign(full))
-	if partial.copying || partial.copyCursor != 0 || partial.Size() != 3 {
-		t.Fatal("explicit restart did not reconstruct whole owner")
-	}
-	satConverterAssertActualCharges(t, partial, pb)
-	paramsMust(t, dst.Reset())
-	if dst.Size() != 0 || dst.sourceCapacity != 0 {
-		t.Fatal("partial Reset did not clean prefix")
-	}
-	satConverterAssertActualCharges(t, dst, db)
-}
 
-func TestSATSolverModelConverterImplicitCopyUninitializedCapacityGuard(t *testing.T) {
-	var src *satModelConverter
-	var sb *arena.Budget
-	for fail := int64(0); fail < 25; fail++ {
-		b := arena.NewBudget(^uint64(0))
-		c, e := newSATModelConverter(arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}})
-		paramsMust(t, e)
-		r, e := c.Mk(satModelBlockLit, 0)
-		paramsMust(t, e)
-		paramsMust(t, c.InsertBinary(r, 0, 2))
-		r, e = c.Mk(satModelBlockLit, 1)
-		paramsMust(t, e)
-		paramsMust(t, c.InsertLiterals(r, []Literal{2, 4, 6, 8, 10, 12, 14, 16, 18}))
-		b.FailAfter(fail)
-		_, e = c.Mk(satModelBlockLit, 2)
-		if errors.Is(e, arena.ErrInjectedFailure) && c.pending != nil && c.copyCursor == 1 {
-			src, sb = c, b
-			break
-		}
-		paramsMust(t, c.Close())
-		if b.Used() != 0 {
-			t.Fatal("capacity fixture leaks")
-		}
-	}
-	if src == nil {
-		t.Fatal("no first-copy/unfinished-capacity source fixture")
-	}
-	defer func() {
-		paramsMust(t, src.Close())
-		if sb.Used() != 0 {
-			t.Fatal("pending source teardown")
-		}
-	}()
-	before := sb.Used()
-	b := arena.NewBudget(^uint64(0))
-	out, e := src.Clone(arena.VectorConfig{Descriptors: arena.Config{Budget: b}})
-	if out != nil || !errors.Is(e, ErrSATIncompleteGrowth) || b.Used() != 0 || sb.Used() != before {
-		t.Fatal("undefined capacity read must not copy old scalar capacity", e)
-	}
-	dst, db := satConverterTestOwner(t)
-	_, e = dst.Mk(satModelBlockLit, 9)
-	paramsMust(t, e)
-	old := dst.entries[0].literals
-	e = dst.Assign(src)
-	if !errors.Is(e, ErrSATIncompleteGrowth) || dst.Size() != 0 || dst.sourceCapacity != 0 || dst.store.IsLive(old) {
-		t.Fatal("assignment must destroy before source capacity guard", e)
-	}
-	satConverterAssertActualCharges(t, dst, db)
-	satConverterAssertActualCharges(t, src, sb)
-}
 func TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget(t *testing.T) {
 	src, b := satConverterTestOwner(t)
 	r, e := src.Mk(satModelBlockLit, 0)

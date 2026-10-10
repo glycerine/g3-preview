@@ -67,7 +67,7 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 	small := a.storage.Stats()
 	want += a.ownerBytes + 4*uint64(a.ids.FreeCapacity()) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
 	mc := p.converter
-	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes + mc.store.directoryBytes + satWatchGraphBytes(mc.store.words.Stats())
+	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes
 	r := p.limit
 	want += uint64(reflect.TypeOf(control.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*control.Reslimit)(nil)).Size())*uint64(cap(r.Children)) + p.memory.Stats().TotalBytes
 	want += simplifier.ownerBytes + satOuterUseOwnedBytes(simplifier.useList) + simplifier.kernel.ownerBytes + simplifier.kernel.backingBytes
@@ -77,7 +77,7 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 		want += stats.OwnerBytes + stats.BackingBytes + stats.BindingBytes
 	}
 	ls := simplifier.literalStore
-	want += ls.ownerBytes + ls.directoryBytes + satWatchGraphBytes(ls.words.Stats())
+	want += ls.ownerBytes
 	dummy := simplifier.dummy
 	da := dummy.owner
 	ds := da.storage.Stats()

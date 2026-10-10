@@ -86,14 +86,18 @@ func TestSATSolverLiteralSpanDiffLevelsAccessAndFailurePrefixes(t *testing.T) {
 	if got != 0 {
 		t.Fatal(got)
 	}
-	// A C pointer has no logical slice length. This initialized array remains
-	// physically available when the borrowed Go view has a shorter length.
+	// Go spans respect current logical length; callers pass the initialized array.
 	backing := [2]Literal{0, 2}
 	got, e = s.numDiffLevelsLiterals(2, backing[:0])
+	if !errors.Is(e, arena.ErrBounds) || got != 0 {
+		t.Fatal("native empty span bounds", got, e)
+	}
+	got, e = s.numDiffLevelsLiterals(2, backing[:])
 	satOK(t, e)
 	if got != 2 || s.diffLevels.data[1] != 0 || s.diffLevels.data[2] != 0 {
-		t.Fatal("initialized pointer span", got, s.diffLevels.data)
+		t.Fatal("native initialized span", got, s.diffLevels.data)
 	}
+
 }
 
 func TestSATSolverLiteralSpanDiffLevelsSourceDebugAndWarm(t *testing.T) {

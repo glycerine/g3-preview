@@ -6,14 +6,14 @@ import (
 	"github.com/glycerine/g3/pkg/util"
 )
 
-// A concrete borrowed literal pointer: either caller Go storage or a captured
-// actual Runtime payload. No copied lemma, callback, or accounting ticket.
+// A borrowed literal span over caller Go storage, native literal backing, or
+// a retained Runtime column. Captured backing is never silently rebound.
 type satSolverLiteralSpan struct {
 	literals []Literal
 	runtime  *util.Runtime
 	block    util.Block
-	words    *arena.Words
-	payload  arena.VectorRef
+	store    *satSolverLiteralStore
+	backing  *satLiteralBacking
 }
 
 func satConflictRuntimeSpan(c *RuntimeUintColumn) satSolverLiteralSpan {
@@ -26,21 +26,29 @@ func satSimplifierCapturedSpan(s *satSolverLiteralStore, r satSolverLiteralListR
 	if e != nil {
 		return satSolverLiteralSpan{}, e
 	}
-	return satSolverLiteralSpan{words: s.words, payload: rec.payload}, nil
+	return satSolverLiteralSpan{store: s, backing: rec.backing}, nil
 }
 func (s satSolverLiteralSpan) literal(i uint32) (Literal, error) {
 	if s.runtime != nil {
 		v, e := ReadRuntimeWord(s.runtime, s.block, 8+4*uint64(i))
 		return Literal(v), e
 	}
-	if s.words != nil {
-		v, e := s.words.Read(s.payload, i)
-		return Literal(v), e
+	if s.store != nil {
+		if e := s.store.open(); e != nil {
+			return 0, e
+		}
+		if s.backing == nil || !s.backing.alive {
+			return 0, arena.ErrInvalidSlot
+		}
+		if uint64(i) >= uint64(len(s.backing.data)) {
+			return 0, arena.ErrBounds
+		}
+		return s.backing.data[i], nil
 	}
-	if uint64(i) >= uint64(cap(s.literals)) {
+	if uint64(i) >= uint64(len(s.literals)) {
 		return 0, arena.ErrBounds
 	}
-	return s.literals[:cap(s.literals)][i], nil
+	return s.literals[i], nil
 }
 
 // Writes the actual captured pointer; it never rebinds to a relocated member.
@@ -48,20 +56,30 @@ func (s satSolverLiteralSpan) setLiteral(i uint32, l Literal) error {
 	if s.runtime != nil {
 		return s.runtime.WriteUint32(s.block, 8+4*uint64(i), uint32(l))
 	}
-	if s.words != nil {
-		return s.words.Write(s.payload, i, uint32(l))
+	if s.store != nil {
+		if e := s.store.open(); e != nil {
+			return e
+		}
+		if s.backing == nil || !s.backing.alive {
+			return arena.ErrInvalidSlot
+		}
+		if uint64(i) >= uint64(len(s.backing.data)) {
+			return arena.ErrBounds
+		}
+		s.backing.data[i] = l
+		return nil
 	}
-	if uint64(i) >= uint64(cap(s.literals)) {
+	if uint64(i) >= uint64(len(s.literals)) {
 		return arena.ErrBounds
 	}
-	s.literals[:cap(s.literals)][i] = l
+	s.literals[i] = l
 	return nil
 }
 
 // Concrete library sort adapter on a captured raw span. Errors occur only at
 // actual reads/writes; the source library's comparison schedule is unspecified.
 func satSortClauseSpan(s satSolverLiteralSpan, n uint32) error {
-	if s.runtime == nil && s.words == nil {
+	if s.runtime == nil && s.store == nil {
 		satSortClauseLiterals(s.literals[:n])
 		return nil
 	}

@@ -35,7 +35,10 @@ func TestSATSimplifierCapturedResolventPayload(t *testing.T) {
 		}
 	}
 	paramsMust(t, a.Delete(c))
-	paramsMust(t, s.Reserve(r, 30))
+	x, e := s.record(r)
+	paramsMust(t, e)
+	x.backing.data = x.backing.data[:len(x.backing.data):len(x.backing.data)]
+	paramsMust(t, s.Push(r, 6))
 	if _, e = span.literal(0); !errors.Is(e, arena.ErrInvalidSlot) {
 		t.Fatalf("captured growth lifetime: %v", e)
 	}

@@ -1,51 +1,54 @@
-// Concrete pointer-free payload adapter for source nested literal vectors.
+// Native literal slices for retained solver model/simplifier consumers.
 package sat
 
 import (
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/arena"
+	"reflect"
 )
 
-// Tokens are storage identities, never source Boolean variables or clause IDs.
-// Records contain no Go pointers; one cold store owns all payload/ledger pages.
 type satSolverLiteralListRef struct {
 	owner            uint64
 	slot, generation uint32
 }
-type satSolverLiteralListRecord struct {
-	payload                            arena.VectorRef
-	length, capacity, generation, next uint32
-	live, retired                      bool
+
+// Captured spans borrow this identity; growth/free retire it and release data.
+type satLiteralBacking struct {
+	data  []Literal
+	alive bool
 }
-type satSolverLiteralStore struct {
-	self                               *satSolverLiteralStore
-	words                              *arena.Words
-	budget                             *arena.Budget
-	records                            []satSolverLiteralListRecord
-	origin, ownerBytes, directoryBytes uint64
-	free                               uint32 // encoded slot+1; zero means empty.
-	closed                             bool
+type satSolverLiteralListRecord struct {
+	backing          *satLiteralBacking
+	generation, next uint32
+	live, retired    bool
 }
 
-func newSATSolverLiteralStore(c arena.VectorConfig) (*satSolverLiteralStore, error) {
-	bytes := uint64(reflect.TypeOf(satSolverLiteralStore{}).Size())
-	b := c.Descriptors.Budget
-	if e := b.Reserve(bytes); e != nil {
-		return nil, e
+func (x *satSolverLiteralListRecord) values() []Literal {
+	if x.backing == nil {
+		return nil
 	}
-	w, e := arena.NewWords(c)
-	if e != nil {
-		b.Release(bytes)
+	return x.backing.data
+}
+
+type satSolverLiteralStore struct {
+	self               *satSolverLiteralStore
+	budget             *arena.Budget
+	records            []satSolverLiteralListRecord
+	origin, ownerBytes uint64
+	free               uint32
+	closed             bool
+}
+
+func newSATSolverLiteralStore(b *arena.Budget) (*satSolverLiteralStore, error) {
+	bytes := uint64(reflect.TypeOf(satSolverLiteralStore{}).Size())
+	if e := b.Reserve(bytes); e != nil {
 		return nil, e
 	}
 	id, e := satNextOwner()
 	if e != nil {
-		w.Close()
 		b.Release(bytes)
 		return nil, e
 	}
-	s := &satSolverLiteralStore{words: w, budget: b, origin: id, ownerBytes: bytes}
+	s := &satSolverLiteralStore{budget: b, origin: id, ownerBytes: bytes}
 	s.self = s
 	return s, nil
 }
@@ -93,115 +96,37 @@ func (s *satSolverLiteralStore) NewList() (satSolverLiteralListRef, error) {
 	if uint64(len(s.records)) >= uint64(^uint32(0)) {
 		return satSolverLiteralListRef{}, arena.ErrSlotLimit
 	}
-	if len(s.records) == cap(s.records) {
-		stride := uint64(reflect.TypeOf(satSolverLiteralListRecord{}).Size())
-		n, e := satVectorNextCapacityFor(uint64(cap(s.records)), stride, stride)
-		if e != nil {
-			return satSolverLiteralListRef{}, e
-		}
-		bytes := n * stride
-		if e = s.budget.Reserve(bytes); e != nil {
-			return satSolverLiteralListRef{}, e
-		}
-		a := make([]satSolverLiteralListRecord, len(s.records), int(n))
-		copy(a, s.records)
-		s.budget.Release(s.directoryBytes)
-		s.records = a
-		s.directoryBytes = bytes
-	}
 	i := uint32(len(s.records))
 	s.records = append(s.records, satSolverLiteralListRecord{generation: 1, live: true})
 	return satSolverLiteralListRef{s.origin, i, 1}, nil
 }
+
 func (s *satSolverLiteralStore) Size(r satSolverLiteralListRef) (uint32, error) {
 	x, e := s.record(r)
 	if e != nil {
 		return 0, e
 	}
-	return x.length, nil
-}
-func (s *satSolverLiteralStore) Capacity(r satSolverLiteralListRef) (uint32, error) {
-	x, e := s.record(r)
-	if e != nil {
-		return 0, e
-	}
-	return x.capacity, nil
-}
-func (s *satSolverLiteralStore) readPhysical(r satSolverLiteralListRef, i uint32) (Literal, error) {
-	x, e := s.record(r)
-	if e != nil {
-		return 0, e
-	}
-	if i >= x.capacity {
-		return 0, arena.ErrBounds
-	}
-	v, e := s.words.Read(x.payload, i)
-	return Literal(v), e
+	return uint32(len(x.values())), nil
 }
 func (s *satSolverLiteralStore) Read(r satSolverLiteralListRef, i uint32) (Literal, error) {
 	x, e := s.record(r)
 	if e != nil {
 		return 0, e
 	}
-	if satStorageSourceDebug && i >= x.length {
-		return 0, ErrSATAssertion
+	if e = satWatchLogicalBounds(i, len(x.values())); e != nil {
+		return 0, e
 	}
-	return s.readPhysical(r, i)
+	return x.backing.data[i], nil
 }
 func (s *satSolverLiteralStore) Write(r satSolverLiteralListRef, i uint32, l Literal) error {
 	x, e := s.record(r)
 	if e != nil {
 		return e
 	}
-	if satStorageSourceDebug && i >= x.length {
-		return ErrSATAssertion
-	}
-	if i >= x.capacity {
-		return arena.ErrBounds
-	}
-	return s.words.Write(x.payload, i, uint32(l))
-}
-
-// One source capacity expansion allocates a new actual arena payload, copies
-// FULL prior capacity (trivial source reallocate), publishes that expansion,
-// then frees old payload. Later expansion failure retains completed prefixes.
-// Arena free blocks/pages remain physically owned and charged, an explicit
-// pooling adaptation; source logical capacities remain exactly 2,3,5,8,... .
-func (s *satSolverLiteralStore) Reserve(r satSolverLiteralListRef, n uint32) error {
-	x, e := s.record(r)
-	if e != nil {
+	if e = satWatchLogicalBounds(i, len(x.values())); e != nil {
 		return e
 	}
-	for n > x.capacity {
-		cap64, e := satVectorNextCapacity(uint64(x.capacity), 4)
-		if e != nil {
-			return e
-		}
-		c := uint32(cap64)
-		p, e := s.words.Allocate(c, c)
-		if e != nil {
-			return e
-		}
-		for i := uint32(0); i < x.capacity; i++ {
-			v, e := s.words.Read(x.payload, i)
-			if e != nil {
-				_ = s.words.Free(p)
-				return e
-			}
-			if e = s.words.Write(p, i, v); e != nil {
-				_ = s.words.Free(p)
-				return e
-			}
-		}
-		old := x.payload
-		x.payload = p
-		x.capacity = c
-		if old != (arena.VectorRef{}) {
-			if e = s.words.Free(old); e != nil {
-				return e
-			}
-		}
-	}
+	x.backing.data[i] = l
 	return nil
 }
 func (s *satSolverLiteralStore) Push(r satSolverLiteralListRef, l Literal) error {
@@ -209,16 +134,20 @@ func (s *satSolverLiteralStore) Push(r satSolverLiteralListRef, l Literal) error
 	if e != nil {
 		return e
 	}
-	if x.length == ^uint32(0) {
+	old := x.values()
+	if uint64(len(old)) >= uint64(^uint32(0)) {
 		return arena.ErrBounds
 	}
-	if e = s.Reserve(r, x.length+1); e != nil {
-		return e
+	next := append(old, l)
+	if x.backing == nil || cap(old) != cap(next) {
+		if x.backing != nil {
+			x.backing.alive = false
+			x.backing.data = nil
+		}
+		x.backing = &satLiteralBacking{data: next, alive: true}
+	} else {
+		x.backing.data = next
 	}
-	if e = s.words.Write(x.payload, x.length, uint32(l)); e != nil {
-		return e
-	}
-	x.length++
 	return nil
 }
 func (s *satSolverLiteralStore) Shrink(r satSolverLiteralListRef, n uint32) error {
@@ -226,72 +155,39 @@ func (s *satSolverLiteralStore) Shrink(r satSolverLiteralListRef, n uint32) erro
 	if e != nil {
 		return e
 	}
-	if satStorageSourceDebug && n > x.length {
-		return ErrSATAssertion
-	}
-	if x.capacity == 0 {
-		return nil
-	}
-	if n > x.capacity {
+	data := x.values()
+	if uint64(n) > uint64(len(data)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
 		return arena.ErrBounds
 	}
-	x.length = n
-	return nil
-}
-func (s *satSolverLiteralStore) Resize(r satSolverLiteralListRef, n uint32) error {
-	x, e := s.record(r)
-	if e != nil {
-		return e
+	clear(data[n:])
+	if x.backing != nil {
+		x.backing.data = data[:n]
 	}
-	if n <= x.length {
-		return s.Shrink(r, n)
-	}
-	if e = s.Reserve(r, n); e != nil {
-		return e
-	}
-	for i := x.length; i < n; i++ {
-		if e = s.words.Write(x.payload, i, uint32(DefaultLiteral())); e != nil {
-			return e
-		}
-	}
-	x.length = n
 	return nil
 }
 func (s *satSolverLiteralStore) CloneList(r satSolverLiteralListRef) (satSolverLiteralListRef, error) {
-	x, e := s.record(r)
+	return s.CopyList(s, r)
+}
+func (s *satSolverLiteralStore) CopyList(source *satSolverLiteralStore, r satSolverLiteralListRef) (satSolverLiteralListRef, error) {
+	if e := s.open(); e != nil {
+		return satSolverLiteralListRef{}, e
+	}
+	x, e := source.record(r)
 	if e != nil {
 		return satSolverLiteralListRef{}, e
 	}
-	original := *x // NewList may relocate descriptor directory.
+	data := append([]Literal(nil), x.values()...)
 	result, e := s.NewList()
 	if e != nil {
 		return satSolverLiteralListRef{}, e
 	}
-	if original.capacity == 0 {
-		return result, nil
-	}
-	p, e := s.words.Allocate(original.capacity, original.capacity)
-	if e != nil {
-		_ = s.Free(result)
-		return satSolverLiteralListRef{}, e
-	}
-	for i := uint32(0); i < original.length; i++ {
-		v, e := s.words.Read(original.payload, i)
-		if e != nil {
-			_ = s.words.Free(p)
-			_ = s.Free(result)
-			return satSolverLiteralListRef{}, e
-		}
-		if e = s.words.Write(p, i, v); e != nil {
-			_ = s.words.Free(p)
-			_ = s.Free(result)
-			return satSolverLiteralListRef{}, e
-		}
-	}
 	out, _ := s.record(result)
-	out.payload = p
-	out.capacity = original.capacity
-	out.length = original.length
+	if len(data) != 0 {
+		out.backing = &satLiteralBacking{data: data, alive: true}
+	}
 	return result, nil
 }
 func (s *satSolverLiteralStore) Free(r satSolverLiteralListRef) error {
@@ -299,14 +195,11 @@ func (s *satSolverLiteralStore) Free(r satSolverLiteralListRef) error {
 	if e != nil {
 		return e
 	}
-	if x.payload != (arena.VectorRef{}) {
-		if e = s.words.Free(x.payload); e != nil {
-			return e
-		}
+	if x.backing != nil {
+		x.backing.alive = false
+		x.backing.data = nil
+		x.backing = nil
 	}
-	x.payload = arena.VectorRef{}
-	x.length = 0
-	x.capacity = 0
 	x.live = false
 	if x.generation == ^uint32(0) {
 		x.retired = true
@@ -317,19 +210,7 @@ func (s *satSolverLiteralStore) Free(r satSolverLiteralListRef) error {
 	s.free = r.slot + 1
 	return nil
 }
-func (s *satSolverLiteralStore) Reset() error {
-	if e := s.open(); e != nil {
-		return e
-	}
-	for i := range s.records {
-		if s.records[i].live {
-			if e := s.Free(satSolverLiteralListRef{s.origin, uint32(i), s.records[i].generation}); e != nil {
-				return e
-			}
-		}
-	}
-	return nil
-}
+
 func (s *satSolverLiteralStore) Close() error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
@@ -337,52 +218,15 @@ func (s *satSolverLiteralStore) Close() error {
 	if s.closed {
 		return nil
 	}
-	s.words.Close()
+	for i := range s.records {
+		if b := s.records[i].backing; b != nil {
+			b.alive = false
+			b.data = nil
+		}
+	}
 	s.records = nil
-	s.budget.Release(s.directoryBytes + s.ownerBytes)
-	s.directoryBytes = 0
+	s.budget.Release(s.ownerBytes)
 	s.ownerBytes = 0
 	s.closed = true
 	return nil
-}
-
-// Cross-owner copy bridges actual words, never foreign raw arena handles.
-// It is the concrete nested literal_vector copy-constructor adapter.
-func (s *satSolverLiteralStore) CopyList(source *satSolverLiteralStore, r satSolverLiteralListRef) (satSolverLiteralListRef, error) {
-	if e := s.open(); e != nil {
-		return satSolverLiteralListRef{}, e
-	}
-	x, e := source.record(r)
-	if e != nil {
-		return satSolverLiteralListRef{}, e
-	}
-	original := *x
-	result, e := s.NewList()
-	if e != nil {
-		return satSolverLiteralListRef{}, e
-	}
-	if original.capacity == 0 {
-		return result, nil
-	}
-	p, e := s.words.Allocate(original.capacity, original.capacity)
-	if e != nil {
-		_ = s.Free(result)
-		return satSolverLiteralListRef{}, e
-	}
-	for i := uint32(0); i < original.length; i++ {
-		v, e := source.words.Read(original.payload, i)
-		if e != nil {
-			_ = s.words.Free(p)
-			_ = s.Free(result)
-			return satSolverLiteralListRef{}, e
-		}
-		if e = s.words.Write(p, i, v); e != nil {
-			_ = s.words.Free(p)
-			_ = s.Free(result)
-			return satSolverLiteralListRef{}, e
-		}
-	}
-	out, _ := s.record(result)
-	out.payload, out.capacity, out.length = p, original.capacity, original.length
-	return result, nil
 }
