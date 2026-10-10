@@ -34792,3 +34792,30 @@ Collected successful exit0 from the earlier full native module run, log
 /mnt/oldrog/tmp/g3-lp-foundation-module-full.log. No additional full run was needed
 for the isolated scoped-vector addition. Dependency-graph artifacts are saved in
 separate additive commit5a17b8b3. No source hashing or generic helpers were added.
+
+
+## Exact LP pairs and native indexed-vector algorithms
+
+Ported the actual numeric_pair<mpq> project arithmetic using existing real
+RationalManager numerals, explicit ownership and reverse field deletion. No
+math/big implementation, generic algebra layer, dead floating-pair template or
+undefined pair-times-pair/divide bodies were added. Four hundred big rational
+worlds independently verify add/subtract/scalar product/division/negation and
+aliases;625 comparisons pin lexicographic order; sign/zero/projection/formatting,
+coordinate errors and exact ten-term source accumulation are covered. Source
+sign magnitudes and raw zero-denominator division states remain unchanged.
+The source million-iteration timing benchmark is not claimed as executed.
+
+Ported concrete double/unsigned indexed vectors used by LU: stable index order,
+clear/resize/assign, dictionary/set/add/drop/cleanup/restore and source debug
+is_OK. Twelve thousand map-oracle operations plus direct contract tests pin
+source's surprising self-assignment and equality behavior, duplicate publication
+before debug assertion, release duplicate indexes, strict1e-14 drop boundaries,
+NaN/infinities and invalid-public-index prefixes. Exact numeral/indexed-pair
+instantiations and formatting remain open.
+
+Native/combined-debug LP tests pass(0.301s/0.321s),99.6% statements per profile:
+pair code100%, indexed vectors99.0%(the other profile's assertion/continuation
+path is unreachable). LP vet passes. Eleven LP units partial,99 unported. The
+full LP solver goal remains active; next owning exact vectors, priority queues,
+permutations and matrix/factorization layers, followed by solver integration.

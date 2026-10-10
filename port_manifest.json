@@ -102940,12 +102940,14 @@
       "go_targets": [
         "pkg/util/lp/int_set_test.go",
         "pkg/util/lp/stacked_value_test.go",
-        "pkg/util/lp/stacked_vector_test.go"
+        "pkg/util/lp/stacked_vector_test.go",
+        "pkg/util/lp/numeric_pair_test.go"
       ],
       "tests": [
         "TestLPIntSetSource",
         "TestLPStackedUnsignedSource",
-        "TestLPStackedVectorSource"
+        "TestLPStackedVectorSource",
+        "TestLPRationalPairSourceAccumulation"
       ],
       "conditionals": [
         {
@@ -103502,13 +103504,22 @@
           "tests": [
             "TestLPStackedVectorSource"
           ]
+        },
+        {
+          "name": "--test_mpq ten-term numeric-pair accumulation with deterministic exact expected result",
+          "status": "partial",
+          "go_target": "pkg/util/lp/numeric_pair_test.go",
+          "tests": [
+            "TestLPRationalPairSourceAccumulation"
+          ]
         }
       ],
       "ownership": [
         "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim."
       ],
       "deviations": [
-        "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller."
+        "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller.",
+        "Original test_rationals is an output/timing million-iteration loop without assertions. New unit test retains ten-term arithmetic and forty complete repetitions with exact expected result; original performance campaign and non-pair benchmark routes remain open."
       ]
     },
     {
@@ -118132,9 +118143,17 @@
       "path": "src/util/lp/indexed_vector.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/indexed_vector.go"
+      ],
+      "tests": [
+        "TestLPIndexedFloatVectorContracts",
+        "TestLPIndexedUintVectorContracts",
+        "TestLPIndexedFloatVectorIndependentSparseOracle",
+        "TestLPIndexedUintVectorIndependentSparseOracle",
+        "TestLPIndexedFloatVectorDropToleranceEdges"
+      ],
       "conditionals": [
         {
           "line": 114,
@@ -118161,17 +118180,44 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete double/unsigned dense and sparse index storage, clear/clear_all/resize, assignment, literal source equality, set/dictionary/add/drop/cleanup/restore and unconditional debug is_OK",
+          "status": "ported",
+          "go_target": "pkg/util/lp/indexed_vector.go",
+          "tests": [
+            "TestLPIndexedFloatVectorContracts",
+            "TestLPIndexedUintVectorContracts",
+            "TestLPIndexedFloatVectorIndependentSparseOracle",
+            "TestLPIndexedUintVectorIndependentSparseOracle",
+            "TestLPIndexedFloatVectorDropToleranceEdges"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native float64/uint32 slices own data and stable-order sparse indexes. Data and Index remain directly editable for actual matrix algorithms, as upstream public fields. Clear/Assign/CleanUp preserve reached bounds-error prefixes. No numeral roots or simulated STL allocation failures."
+      ],
+      "deviations": [
+        "Rational and numeric-pair indexed-vector instantiations, printers and retained full matrix/permutation consumers remain open; no whole-unit promotion.",
+        "Literal source quirks retained: Equal compares index sets and own data with itself, self assignment clears indexed data, SetValue publishes data before duplicate debug assertion and release appends duplicates, is_OK immediately returns true. Floating drop is strict 1e-14; precise unsigned drops only exact zero.",
+        "Guarded ErrBounds is a checked Go profile for invalid public indexes. No whole source permutation-driver execution credit from standalone vector tests."
+      ]
     },
     {
       "path": "src/util/lp/indexed_vector.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/indexed_vector.go"
+      ],
+      "tests": [
+        "TestLPIndexedFloatVectorContracts",
+        "TestLPIndexedUintVectorContracts",
+        "TestLPIndexedFloatVectorIndependentSparseOracle",
+        "TestLPIndexedUintVectorIndependentSparseOracle",
+        "TestLPIndexedFloatVectorDropToleranceEdges"
+      ],
       "conditionals": [
         {
           "line": 88,
@@ -118194,17 +118240,44 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete double/unsigned dense and sparse index storage, clear/clear_all/resize, assignment, literal source equality, set/dictionary/add/drop/cleanup/restore and unconditional debug is_OK",
+          "status": "ported",
+          "go_target": "pkg/util/lp/indexed_vector.go",
+          "tests": [
+            "TestLPIndexedFloatVectorContracts",
+            "TestLPIndexedUintVectorContracts",
+            "TestLPIndexedFloatVectorIndependentSparseOracle",
+            "TestLPIndexedUintVectorIndependentSparseOracle",
+            "TestLPIndexedFloatVectorDropToleranceEdges"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native float64/uint32 slices own data and stable-order sparse indexes. Data and Index remain directly editable for actual matrix algorithms, as upstream public fields. Clear/Assign/CleanUp preserve reached bounds-error prefixes. No numeral roots or simulated STL allocation failures."
+      ],
+      "deviations": [
+        "Rational and numeric-pair indexed-vector instantiations, printers and retained full matrix/permutation consumers remain open; no whole-unit promotion.",
+        "Literal source quirks retained: Equal compares index sets and own data with itself, self assignment clears indexed data, SetValue publishes data before duplicate debug assertion and release appends duplicates, is_OK immediately returns true. Floating drop is strict 1e-14; precise unsigned drops only exact zero.",
+        "Guarded ErrBounds is a checked Go profile for invalid public indexes. No whole source permutation-driver execution credit from standalone vector tests."
+      ]
     },
     {
       "path": "src/util/lp/indexed_vector_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/indexed_vector.go"
+      ],
+      "tests": [
+        "TestLPIndexedFloatVectorContracts",
+        "TestLPIndexedUintVectorContracts",
+        "TestLPIndexedFloatVectorIndependentSparseOracle",
+        "TestLPIndexedUintVectorIndependentSparseOracle",
+        "TestLPIndexedFloatVectorDropToleranceEdges"
+      ],
       "conditionals": [
         {
           "line": 35,
@@ -118217,9 +118290,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete double/unsigned dense and sparse index storage, clear/clear_all/resize, assignment, literal source equality, set/dictionary/add/drop/cleanup/restore and unconditional debug is_OK",
+          "status": "ported",
+          "go_target": "pkg/util/lp/indexed_vector.go",
+          "tests": [
+            "TestLPIndexedFloatVectorContracts",
+            "TestLPIndexedUintVectorContracts",
+            "TestLPIndexedFloatVectorIndependentSparseOracle",
+            "TestLPIndexedUintVectorIndependentSparseOracle",
+            "TestLPIndexedFloatVectorDropToleranceEdges"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native float64/uint32 slices own data and stable-order sparse indexes. Data and Index remain directly editable for actual matrix algorithms, as upstream public fields. Clear/Assign/CleanUp preserve reached bounds-error prefixes. No numeral roots or simulated STL allocation failures."
+      ],
+      "deviations": [
+        "Rational and numeric-pair indexed-vector instantiations, printers and retained full matrix/permutation consumers remain open; no whole-unit promotion.",
+        "Literal source quirks retained: Equal compares index sets and own data with itself, self assignment clears indexed data, SetValue publishes data before duplicate debug assertion and release appends duplicates, is_OK immediately returns true. Floating drop is strict 1e-14; precise unsigned drops only exact zero.",
+        "Guarded ErrBounds is a checked Go profile for invalid public indexes. No whole source permutation-driver execution credit from standalone vector tests."
+      ]
     },
     {
       "path": "src/util/lp/init_lar_solver.h",
@@ -121283,14 +121375,38 @@
       "path": "src/util/lp/numeric_pair.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/numeric_pair.go"
+      ],
+      "tests": [
+        "TestLPRationalPairArithmeticOracle",
+        "TestLPRationalPairOrderSignsAndFormatting",
+        "TestLPRationalPairCoordinateErrorPrefixes",
+        "TestLPRationalPairSourceAccumulation"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "actual numeric_pair<mpq> initialized coordinates, copy/delete, component add/subtract/scale/divide/negate, lexicographic compare/equality/sign/zero, first-coordinate floating projection and formatting",
+          "status": "ported",
+          "go_target": "pkg/util/lp/numeric_pair.go",
+          "tests": [
+            "TestLPRationalPairArithmeticOracle",
+            "TestLPRationalPairOrderSignsAndFormatting",
+            "TestLPRationalPairCoordinateErrorPrefixes",
+            "TestLPRationalPairSourceAccumulation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Pairs own two real util/numeral.Rational values in a borrowed caller-owned RationalManager. Native storage moves tokens; shallow copying is forbidden. Copy/arithmetic run X before Y, retaining completed destination prefixes. Explicit Del releases Y before X; manager outlives all values. Production uses project numerals; math/big is only an independent test oracle."
+      ],
+      "deviations": [
+        "Concrete numeric_pair<mpq> subset only. Remaining numeric traits, conversions and any reached project specializations remain open. Definition-only numeric_pair<double> and undefined pair-times-pair/pair-divided-by-pair bodies gain no invented adapters or source credit.",
+        "Existing raw numeral profile is retained: sign may return an inline numerator magnitude; scalar division by zero may retain zero denominators instead of raising an invented exception. No process-global rational service binding or full C++ constructor/allocation geometry claim."
+      ]
     },
     {
       "path": "src/util/lp/permutation_matrix.h",

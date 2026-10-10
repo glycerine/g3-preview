@@ -5,7 +5,7 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently seven partial source units and 103 unported units. No complete
+There are currently eleven partial source units and 99 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
@@ -14,8 +14,14 @@ code that has not been ported.
 | `int_set.h` | Original `test_int_set`; dense swap order, resizing, reached invalid-domain clear prefix, 10,000-step independent map oracle, output/error cases | 100% |
 | Four live `stacked_value.h` scalar types | Original `test_stacked_unsigned`; signed, status and strategy restoration, nested/excess/zero pops, unsigned wrap | 100% |
 | Three concrete `stacked_vector.h` element types | Original `test_stacked_vector` with strengthened assertions; 12,000 operations against independent snapshots, repeated replacements, popped tails, baseline journals and checked scope/index guards | 100% |
+| Exact `numeric_pair<mpq>` arithmetic | 400 arbitrary-precision worlds against `math/big.Rat`, 625 lexical comparisons, aliases, provenance/error prefixes and strengthened ten-term source accumulation | 100% |
+| Floating/unsigned indexed vectors | 12,000 operations against independent sparse maps; source equality/self-assignment/debug-prefix quirks, IEEE/tolerance edges and public-index guards | 99.0% per profile; only the opposite-profile assertion path is uncovered |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
+
+Current package statement coverage is **99.6%** in each profile. The explicit
+duplicate-index assertion branch is unreachable in release; its following
+continuation is unreachable in debug. The two profiles exercise both behaviors.
 
 Coverage is measured with native and combined `g3debug g3checked` builds. It
 applies to the current Go code only. Debug assertions use the existing explicit

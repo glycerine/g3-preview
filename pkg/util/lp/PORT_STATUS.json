@@ -1,10 +1,10 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 100.0,
+  "native_statement_coverage_of_current_go_code": 99.6,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
-    "actual numeral and numeric_pair specializations",
+    "remaining exact/floating numeric traits and conversions, owning exact scoped/indexed vectors",
     "indexed/sparse/static/dense matrices and permutations",
     "priority queues and LU/eta factorization",
     "scaling and random updates",
@@ -160,21 +160,45 @@
     },
     {
       "source": "src/util/lp/indexed_vector.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/indexed_vector.go"
+      ],
+      "tests": [
+        "TestLPIndexedFloatVectorContracts",
+        "TestLPIndexedUintVectorContracts",
+        "TestLPIndexedFloatVectorIndependentSparseOracle",
+        "TestLPIndexedUintVectorIndependentSparseOracle",
+        "TestLPIndexedFloatVectorDropToleranceEdges"
+      ]
     },
     {
       "source": "src/util/lp/indexed_vector.hpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/indexed_vector.go"
+      ],
+      "tests": [
+        "TestLPIndexedFloatVectorContracts",
+        "TestLPIndexedUintVectorContracts",
+        "TestLPIndexedFloatVectorIndependentSparseOracle",
+        "TestLPIndexedUintVectorIndependentSparseOracle",
+        "TestLPIndexedFloatVectorDropToleranceEdges"
+      ]
     },
     {
       "source": "src/util/lp/indexed_vector_instances.cpp",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/indexed_vector.go"
+      ],
+      "tests": [
+        "TestLPIndexedFloatVectorContracts",
+        "TestLPIndexedUintVectorContracts",
+        "TestLPIndexedFloatVectorIndependentSparseOracle",
+        "TestLPIndexedUintVectorIndependentSparseOracle",
+        "TestLPIndexedFloatVectorDropToleranceEdges"
+      ]
     },
     {
       "source": "src/util/lp/init_lar_solver.h",
@@ -516,9 +540,16 @@
     },
     {
       "source": "src/util/lp/numeric_pair.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/numeric_pair.go"
+      ],
+      "tests": [
+        "TestLPRationalPairArithmeticOracle",
+        "TestLPRationalPairOrderSignsAndFormatting",
+        "TestLPRationalPairCoordinateErrorPrefixes",
+        "TestLPRationalPairSourceAccumulation"
+      ]
     },
     {
       "source": "src/util/lp/permutation_matrix.h",
@@ -726,7 +757,7 @@
     }
   ],
   "status_counts": {
-    "unported": 103,
-    "partial": 7
+    "unported": 99,
+    "partial": 11
   }
 }
