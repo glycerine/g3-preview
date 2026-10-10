@@ -124306,9 +124306,20 @@
       "path": "src/util/lp/scaler.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/scaler_float.go",
+        "pkg/util/lp/scaler_test.go"
+      ],
+      "tests": [
+        "TestLPFloatScalerIndependentSolutionOracle",
+        "TestLPFloatScalerGeometricMeansAndNormalization",
+        "TestLPFloatScalerPowerOfTwoAndBorrowedInputs",
+        "TestLPFloatScalerSourceStopsAndPrefixes",
+        "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
+        "TestLPFloatScalerZeroToleranceIEEEAndResize",
+        "TestLPFloatScalerComposedFailurePrefixes"
+      ],
       "assertions": [
         {
           "line": 49,
@@ -124317,17 +124328,54 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122 and lar_core_solver.h:693-700",
+          "status": "ported",
+          "go_target": "pkg/util/lp/scaler_float.go",
+          "tests": [
+            "TestLPFloatScalerIndependentSolutionOracle",
+            "TestLPFloatScalerGeometricMeansAndNormalization",
+            "TestLPFloatScalerPowerOfTwoAndBorrowedInputs",
+            "TestLPFloatScalerSourceStopsAndPrefixes",
+            "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
+            "TestLPFloatScalerZeroToleranceIEEEAndResize",
+            "TestLPFloatScalerComposedFailurePrefixes"
+          ]
+        },
+        {
+          "name": "explicit precise scale early return and complete solver integration audit",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "FloatScaler borrows matrix, RHS and column-scale slice headers, threshold values and settings. Native Go slices replace source vector storage. Constructor preserves release resize prefixes and source debug empty-vector assertion. Row/column products publish before later RHS/column-scale bounds guards; no transactional rollback or source allocation emulation. Caller owns restoration after rejected scaling."
+      ],
+      "deviations": [
+        "Floating scale retains strict 0.01/0.1/zero thresholds, descending geometric/normalization order, ascending power scaling, original-ratio comparison, do/while postdecrement (reps+1 passes), and assigning rather than multiplying the power-column factor. Nonzero log balance propagates the existing source NOT_IMPLEMENTED stop; no mathematical logarithm is invented. Infinity or an invalid negative maximum can make source halving nonterminating: after an actual unchanged loop body Go returns ErrLPScalingStalled before matrix publication, a qualified domain guard rather than a native exception claim.",
+        "Whole-source search finds right_side_balance only in its declaration/definition; unused method is excluded. No registered source scaler test was found; new independent solution/diagonal-factor and numerical-order fixtures strengthen this component. Precise explicit scale and full LP/LAR caller orchestration are still open; no whole-unit completion claim."
+      ]
     },
     {
       "path": "src/util/lp/scaler.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/scaler_float.go",
+        "pkg/util/lp/scaler_test.go"
+      ],
+      "tests": [
+        "TestLPFloatScalerIndependentSolutionOracle",
+        "TestLPFloatScalerGeometricMeansAndNormalization",
+        "TestLPFloatScalerPowerOfTwoAndBorrowedInputs",
+        "TestLPFloatScalerSourceStopsAndPrefixes",
+        "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
+        "TestLPFloatScalerZeroToleranceIEEEAndResize",
+        "TestLPFloatScalerComposedFailurePrefixes"
+      ],
       "assertions": [
         {
           "line": 59,
@@ -124344,22 +124392,85 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122 and lar_core_solver.h:693-700",
+          "status": "ported",
+          "go_target": "pkg/util/lp/scaler_float.go",
+          "tests": [
+            "TestLPFloatScalerIndependentSolutionOracle",
+            "TestLPFloatScalerGeometricMeansAndNormalization",
+            "TestLPFloatScalerPowerOfTwoAndBorrowedInputs",
+            "TestLPFloatScalerSourceStopsAndPrefixes",
+            "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
+            "TestLPFloatScalerZeroToleranceIEEEAndResize",
+            "TestLPFloatScalerComposedFailurePrefixes"
+          ]
+        },
+        {
+          "name": "explicit precise scale early return and complete solver integration audit",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "FloatScaler borrows matrix, RHS and column-scale slice headers, threshold values and settings. Native Go slices replace source vector storage. Constructor preserves release resize prefixes and source debug empty-vector assertion. Row/column products publish before later RHS/column-scale bounds guards; no transactional rollback or source allocation emulation. Caller owns restoration after rejected scaling."
+      ],
+      "deviations": [
+        "Floating scale retains strict 0.01/0.1/zero thresholds, descending geometric/normalization order, ascending power scaling, original-ratio comparison, do/while postdecrement (reps+1 passes), and assigning rather than multiplying the power-column factor. Nonzero log balance propagates the existing source NOT_IMPLEMENTED stop; no mathematical logarithm is invented. Infinity or an invalid negative maximum can make source halving nonterminating: after an actual unchanged loop body Go returns ErrLPScalingStalled before matrix publication, a qualified domain guard rather than a native exception claim.",
+        "Whole-source search finds right_side_balance only in its declaration/definition; unused method is excluded. No registered source scaler test was found; new independent solution/diagonal-factor and numerical-order fixtures strengthen this component. Precise explicit scale and full LP/LAR caller orchestration are still open; no whole-unit completion claim."
+      ]
     },
     {
       "path": "src/util/lp/scaler_instances.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/scaler_float.go",
+        "pkg/util/lp/scaler_test.go"
+      ],
+      "tests": [
+        "TestLPFloatScalerIndependentSolutionOracle",
+        "TestLPFloatScalerGeometricMeansAndNormalization",
+        "TestLPFloatScalerPowerOfTwoAndBorrowedInputs",
+        "TestLPFloatScalerSourceStopsAndPrefixes",
+        "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
+        "TestLPFloatScalerZeroToleranceIEEEAndResize",
+        "TestLPFloatScalerComposedFailurePrefixes"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained double/double constructor, ratio/geometric scaling, max normalization and log/power-of-two paths (scaler.hpp:38-270), reached by lp_solver.hpp:118-122 and lar_core_solver.h:693-700",
+          "status": "ported",
+          "go_target": "pkg/util/lp/scaler_float.go",
+          "tests": [
+            "TestLPFloatScalerIndependentSolutionOracle",
+            "TestLPFloatScalerGeometricMeansAndNormalization",
+            "TestLPFloatScalerPowerOfTwoAndBorrowedInputs",
+            "TestLPFloatScalerSourceStopsAndPrefixes",
+            "TestLPFloatScalerOriginalRatioAndRepetitionLimit",
+            "TestLPFloatScalerZeroToleranceIEEEAndResize",
+            "TestLPFloatScalerComposedFailurePrefixes"
+          ]
+        },
+        {
+          "name": "explicit precise scale early return and complete solver integration audit",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "FloatScaler borrows matrix, RHS and column-scale slice headers, threshold values and settings. Native Go slices replace source vector storage. Constructor preserves release resize prefixes and source debug empty-vector assertion. Row/column products publish before later RHS/column-scale bounds guards; no transactional rollback or source allocation emulation. Caller owns restoration after rejected scaling."
+      ],
+      "deviations": [
+        "Floating scale retains strict 0.01/0.1/zero thresholds, descending geometric/normalization order, ascending power scaling, original-ratio comparison, do/while postdecrement (reps+1 passes), and assigning rather than multiplying the power-column factor. Nonzero log balance propagates the existing source NOT_IMPLEMENTED stop; no mathematical logarithm is invented. Infinity or an invalid negative maximum can make source halving nonterminating: after an actual unchanged loop body Go returns ErrLPScalingStalled before matrix publication, a qualified domain guard rather than a native exception claim.",
+        "Whole-source search finds right_side_balance only in its declaration/definition; unused method is excluded. No registered source scaler test was found; new independent solution/diagonal-factor and numerical-order fixtures strengthen this component. Precise explicit scale and full LP/LAR caller orchestration are still open; no whole-unit completion claim."
+      ]
     },
     {
       "path": "src/util/lp/signature_bound_evidence.h",

@@ -36794,3 +36794,41 @@ Both LP vets pass. Full native suite last passed17:57 UTC; its89.5% LP coverage
 is historical before dimension extension, lifecycle and prepared additions.
 LP remains48 partial/62 unported units. Remaining retained diagnostics, scaling,
 simplex, LAR/bounds/evidence, MPS and complete upstream drivers are still open.
+
+
+### Floating LP scaler — 2026-10-10
+
+Ported retained double/double scaler constructor and source scaler.hpp:38-270
+ratio/geometric means, row/column maxima normalization and power-of-two/log
+paths. Actual retained callers are lp_solver.hpp:118-122 and double LAR
+lar_core_solver.h:693-700. Borrowed matrix, RHS/scale slice headers, thresholds
+and settings preserve live references. Source geometric/normalization walks
+descend; power scaling ascends. Existing source nonzero logarithm fatal remains
+ErrLPBalanceNotImplemented before mutations; no replacement math is invented.
+The source-dead right_side_balance method has only declaration/definition and
+is excluded. Precise explicit no-op scale and complete caller integration stay
+open; all three scaler source units become partial, LP51 partial/59 unported.
+
+160 independently generated original problems verify transformed known solutions
+and unit maxima on every nonempty row/column. Independent diagonal products
+cover both ordering branches and equality; strict .01/.1 and zero-tolerance
+cutoffs, source original-ratio constant and zero-reps single pass are pinned.
+A five-pass numerical fixture differs from incorrectly updating the ratio
+which stops at four. Power column scales assign instead of accumulate. Tests
+verify live slice/threshold borrows, source std::min NaN order, zero/IEEE cases,
+constructor release prefix/debug assertion, public bounds and composed short
+RHS/scale failures. Matrix multiplication precedes later output bounds guards.
+A real infinite/invalid-maximum halving loop is guarded only after an unchanged
+source loop body, returning ErrLPScalingStalled before matrix publication; this
+is a qualified nonterminating-domain adapter, not a native exception claim.
+
+Scaler and all floating static-matrix regressions pass0.204s native/0.199s
+combined g3debug/g3checked. Scaler226/260 (86.9%) native,229/260 (88.1%) debug.
+Remaining returns propagate child errors behind valid matrix extents/reciprocal
+links, belong to the other assertion profile, or require getting past the
+source unimplemented nonzero log-balance stop. No fake state/allocator is used
+to inflate coverage. Logs/profiles: /mnt/oldrog/tmp/g3-scaler-{native,debug}.
+Full native module last passed17:57 UTC, before subsequent additions; no
+within-hour repeat and no full-coverage promotion. Precise scale, solver
+scaling/unscaling, simplex/LAR, random updates, bounds/evidence, MPS and complete
+upstream drivers remain required for the active full LP goal.

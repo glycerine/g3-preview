@@ -1213,6 +1213,7 @@
         "rational_iterators.go",
         "row_eta_matrix_exact.go",
         "row_eta_matrix_float.go",
+        "scaler_float.go",
         "settings.go",
         "sparse_float_vector.go",
         "sparse_matrix_exact.go",
