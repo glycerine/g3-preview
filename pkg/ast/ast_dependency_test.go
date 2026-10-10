@@ -63,27 +63,26 @@ func TestASTDependencySourceLeafJoinCallbacksAndLinearization(t *testing.T) {
 	if n, e := m.GetRefCount(a); e != nil || n != 3 {
 		t.Fatal("two actual leaf INCs plus pin", n, e)
 	}
-	out, e := m.NewExprVector()
+	var out []ASTHandle
+	out, e = m.DependencyLinearizeRaw(root, out)
 	astTestMust(t, e)
-	astTestMust(t, m.DependencyLinearizeRaw(root, out))
 	want := []ASTHandle{a, a, b} // FIFO: right leaf, left's first and second leaf.
 	for i, h := range want {
-		got, e := m.ExprVectorGet(out, uint32(i))
-		astTestMust(t, e)
+		got := out[i]
 		if got != h {
 			t.Fatal("source FIFO order", i, got, h)
 		}
 	}
-	astTestMust(t, m.ExprVectorReset(out))
-	astTestMust(t, m.ExprVectorPush(out, b))
-	astTestMust(t, m.ExprVectorPush(out, b))
-	astTestMust(t, m.DependencyLinearize(root, out))
-	if n, e := m.ExprVectorSize(out); e != nil || n != 2 {
+	out = out[:0]
+	out = append(out, b)
+	out = append(out, b)
+	out, e = m.DependencyLinearize(root, out)
+	astTestMust(t, e)
+	if n := uint32(len(out)); n != 2 {
 		t.Fatal("dedup entire output", n, e)
 	}
 	for i, h := range []ASTHandle{b, a} {
-		got, e := m.ExprVectorGet(out, uint32(i))
-		astTestMust(t, e)
+		got := out[i]
 		if got != h {
 			t.Fatal("stable compaction", i, got, h)
 		}
@@ -95,7 +94,6 @@ func TestASTDependencySourceLeafJoinCallbacksAndLinearization(t *testing.T) {
 			t.Fatal("contains source equality", h, got)
 		}
 	}
-	astTestMust(t, m.DelExprVector(&out))
 	astTestMust(t, m.DependencyInc(root))
 	astTestMust(t, m.DependencyDec(root))
 	if n, e := m.GetRefCount(a); e != nil || n != 1 {
@@ -169,18 +167,16 @@ func TestASTDependencyIndependentDAGOracleProvenanceAndWarmStorage(t *testing.T)
 	}
 	shared, e := m.DependencyJoin(root, ds[3])
 	astTestMust(t, e)
-	out, e := m.NewExprVector()
+	var out []ASTHandle
+	out, e = m.DependencyLinearize(shared, out)
 	astTestMust(t, e)
-	astTestMust(t, m.DependencyLinearize(shared, out))
-	n, e := m.ExprVectorSize(out)
-	astTestMust(t, e)
+	n := uint32(len(out))
 	if n != uint32(len(hs)) {
 		t.Fatal("independent leaf-set cardinality", n)
 	}
 	seen := map[ASTHandle]bool{}
 	for i := uint32(0); i < n; i++ {
-		h, e := m.ExprVectorGet(out, i)
-		astTestMust(t, e)
+		h := out[i]
 		if seen[h] {
 			t.Fatal("duplicate", h)
 		}
@@ -197,24 +193,22 @@ func TestASTDependencyIndependentDAGOracleProvenanceAndWarmStorage(t *testing.T)
 	if _, e := m.DependencyLeaf(astDependencyExpr(t, foreign, 5000)); !errors.Is(e, ErrASTHandle) {
 		t.Fatal("foreign leaf callback", e)
 	}
-	astTestMust(t, m.ExprVectorReset(out))
-	astTestMust(t, m.DependencyLinearizeRaw(shared, out))
+	out = out[:0]
+	out, e = m.DependencyLinearizeRaw(shared, out)
+	astTestMust(t, e)
 	baseline := m.BudgetField.Used()
 	alloc := testing.AllocsPerRun(50, func() {
 		if yes, e := m.DependencyContains(shared, hs[8]); e != nil || !yes {
 			panic("contains")
 		}
-		if e := m.ExprVectorReset(out); e != nil {
-			panic(e)
-		}
-		if e := m.DependencyLinearizeRaw(shared, out); e != nil {
+		out, e = m.DependencyLinearizeRaw(shared, out[:0])
+		if e != nil {
 			panic(e)
 		}
 	})
 	if alloc != 0 || m.BudgetField.Used() != baseline {
 		t.Fatal("warmed concrete FIFO/output scratch", alloc, m.BudgetField.Used(), baseline)
 	}
-	astTestMust(t, m.DelExprVector(&out))
 	astTestMust(t, m.DependencyInc(shared))
 	astTestMust(t, m.DependencyDec(shared))
 	if m.dependencies.live != 0 {
@@ -275,12 +269,11 @@ func TestASTDependencyNativeColdFIFOAndCompleteUnmarking(t *testing.T) {
 		astTestMust(t, e)
 	}
 	astTestMust(t, m.DependencyInc(root))
-	out, e := m.NewExprVector()
-	astTestMust(t, e)
+	var out []ASTHandle
 	for _, h := range nodes {
-		astTestMust(t, m.ExprVectorPush(out, h))
+		out = append(out, h)
 	}
-	astTestMust(t, m.ExprVectorReset(out))
+	out = out[:0]
 	before := m.BudgetField.Used()
 	m.BudgetField.FailAfter(0)
 	yes, e := m.DependencyContains(root, absent)
@@ -288,8 +281,9 @@ func TestASTDependencyNativeColdFIFOAndCompleteUnmarking(t *testing.T) {
 	if yes {
 		t.Fatal("absent value found")
 	}
-	astTestMust(t, m.DependencyLinearizeRaw(root, out))
-	if n, e := m.ExprVectorSize(out); e != nil || n != 257 {
+	out, e = m.DependencyLinearizeRaw(root, out)
+	astTestMust(t, e)
+	if n := uint32(len(out)); n != 257 {
 		t.Fatal("native FIFO cardinality", n, e)
 	}
 	for i := 0; i < 257; i++ {
@@ -300,8 +294,7 @@ func TestASTDependencyNativeColdFIFOAndCompleteUnmarking(t *testing.T) {
 		if i == 256 {
 			want = 1
 		}
-		got, e := m.ExprVectorGet(out, uint32(i))
-		astTestMust(t, e)
+		got := out[i]
 		if got != nodes[want] {
 			t.Fatal("left/right FIFO traversal order", i, got, nodes[want])
 		}
@@ -318,7 +311,6 @@ func TestASTDependencyNativeColdFIFOAndCompleteUnmarking(t *testing.T) {
 	}
 	astTestMust(t, m.DependencyDec(root))
 	m.BudgetField.FailAfter(-1)
-	astTestMust(t, m.DelExprVector(&out))
 	for _, h := range nodes {
 		rc, e := m.GetRefCount(h)
 		astTestMust(t, e)

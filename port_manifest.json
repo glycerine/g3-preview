@@ -9609,7 +9609,6 @@
         "pkg/ast/ast_dependency_array_api.go",
         "pkg/ast/ast_dependency_array_values.go",
         "pkg/ast/ast_dependency_traversal.go",
-        "pkg/ast/ast_dependency_vector.go",
         "pkg/ast/ast_expr_array.go",
         "pkg/ast/ast_expr_array_api.go",
         "pkg/ast/ast_expr_array_values.go",
@@ -9701,8 +9700,8 @@
         "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
         "TestASTDependencySourceLeafJoinCallbacksAndLinearization",
         "TestASTDependencySourceReferenceCountZeroAndWrap",
-        "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
-        "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+        "TestASTDependencyNativeStableDedupPreservesNodeMarks",
+        "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
         "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
         "TestASTEagerNormalAndFormatConstructors",
@@ -9846,7 +9845,8 @@
         "TestASTArithmeticAppCoercionEveryWarmReservation",
         "TestASTDecRefConsumedNativeWideDeletion",
         "TestASTBitVectorConcatBorrowedSuffix",
-        "TestASTBitVectorAddBorrowedCommonSuffix"
+        "TestASTBitVectorAddBorrowedCommonSuffix",
+        "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix"
       ],
       "conditionals": [
         {
@@ -10685,10 +10685,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -10718,10 +10718,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -10751,10 +10751,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -10932,7 +10932,8 @@
         "Convenience factories reach the existing application/cache/register engines without additional ownership or child cloning. Expanded distinct uses actual sixteen-inline non-owning ptr_buffer storage and ordered pair loop; its spill is released on source lexical exit without DEC of its unowned entries. Every actual reservation prefix checks complete named manager/symbol/budget graph before fault lift and successful same-owner retry.",
         "Returned unfinished placement owns only actual completed members/body file-format pointers; automatic member unwind excludes source body DT. Completed body emits EOF before reverse members. Debug info numerals remain explicit original AST ownership until owning ACK.",
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
-        "Application storage is allocated before coercion_needed. An embedded lexical inline16 owning coercion buffer records INC before each push, preserves an unjoined INC on growth failure and decrements published entries in source ascending order before closing storage. Pending cleanup prevents overwriting the buffer and is drained before plugin/member teardown by explicit manager Close. Scalar converted argument views borrow that same buffer, with no second argument-array copy; successful registration retains canonical application child ownership. Actual spill backing is separately included in manager storage accounting."
+        "Application storage is allocated before coercion_needed. An embedded lexical inline16 owning coercion buffer records INC before each push, preserves an unjoined INC on growth failure and decrements published entries in source ascending order before closing storage. Pending cleanup prevents overwriting the buffer and is drained before plugin/member teardown by explicit manager Close. Scalar converted argument views borrow that same buffer, with no second argument-array copy; successful registration retains canonical application child ownership. Actual spill backing is separately included in manager storage accounting.",
+        "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -10997,7 +10998,6 @@
         "pkg/ast/ast_dependency_array_api.go",
         "pkg/ast/ast_dependency_array_values.go",
         "pkg/ast/ast_dependency_traversal.go",
-        "pkg/ast/ast_dependency_vector.go",
         "pkg/ast/ast_expr_array.go",
         "pkg/ast/ast_expr_array_api.go",
         "pkg/ast/ast_expr_array_values.go",
@@ -11086,8 +11086,8 @@
         "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
         "TestASTDependencySourceLeafJoinCallbacksAndLinearization",
         "TestASTDependencySourceReferenceCountZeroAndWrap",
-        "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
-        "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+        "TestASTDependencyNativeStableDedupPreservesNodeMarks",
+        "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
         "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
         "TestASTEagerNormalAndFormatConstructors",
@@ -11265,7 +11265,8 @@
         "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
         "TestASTSomeValueProcFallbackReservationFailureRestores",
         "TestASTAppArgumentViewBorrowAndLockedFactory",
-        "TestASTAppArgumentSubrangesRemainBorrowedAndBounded"
+        "TestASTAppArgumentSubrangesRemainBorrowedAndBounded",
+        "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix"
       ],
       "conditionals": [
         {
@@ -11841,10 +11842,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -11874,10 +11875,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -11907,10 +11908,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -12084,7 +12085,8 @@
         "Actual dependency INC/DEC callbacks, raw scalar tokens and charged16-byte obj_ref/24-byte ref_vector/160-byte inline buffer records in existing real AST allocators. Source INC-before-growth, retained backing, captured-end append and consumed cleanup progress preserved. See PORT_PROGRESS.md#audit-ast-dependency-ref-packet-md.",
         "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; fresh-name output uses a standard bytes.Buffer, checked symbol Display and strconv before native symbol interning and fresh_id increment; acquired node/metadata belongs to actual ASTManager pages.",
         "Convenience factories reach the existing application/cache/register engines without additional ownership or child cloning. Expanded distinct uses actual sixteen-inline non-owning ptr_buffer storage and ordered pair loop; its spill is released on source lexical exit without DEC of its unowned entries. Every actual reservation prefix checks complete named manager/symbol/budget graph before fault lift and successful same-owner retry.",
-        "Inline debug map/header fields charged once; no reconstructed owner from provider census."
+        "Inline debug map/header fields charged once; no reconstructed owner from provider census.",
+        "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -12945,8 +12947,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/ast_dependency_traversal.go",
-        "pkg/ast/ast_dependency_vector.go"
+        "pkg/ast/ast_dependency_traversal.go"
       ],
       "tests": [
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -12956,10 +12957,10 @@
         "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
         "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
         "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-        "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+        "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
         "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
         "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-        "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+        "TestASTDependencyNativeStableDedupPreservesNodeMarks",
         "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
         "TestASTDependencyArrayEveryOperationFaultOwnership",
         "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -12974,7 +12975,8 @@
         "TestASTDependencyIndependentDAGOracleProvenanceAndWarmStorage",
         "TestASTDependencyNativeLIFOCallbacksWithReservationsDisabled",
         "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
-        "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation"
+        "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
+        "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix"
       ],
       "conditionals": [
         {
@@ -12990,7 +12992,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "remove_duplicates<ptr_vector<expr>> selected concrete helper",
+          "name": "Retained dependency linearization deduplicates native []ASTHandle output in first-occurrence order with a Go map; general remove_duplicates template remains open",
           "status": "partial",
           "go_target": "pkg/ast/ast_dependency_traversal.go",
           "tests": [
@@ -13001,10 +13003,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -13019,15 +13021,16 @@
             "TestASTDependencyIndependentDAGOracleProvenanceAndWarmStorage",
             "TestASTDependencyNativeLIFOCallbacksWithReservationsDisabled",
             "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
-            "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation"
+            "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
+            "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix"
           ]
         }
       ],
       "ownership": [
-        "Actual FastMark1 retain-free mark plane and stable in-place compaction across the entire preexisting output vector. Borrowed expression vector shares concrete reference-vector storage codecs without INC/DEC callbacks; charged cold FastMark owner and backing remain explicit."
+        "Caller-owned []ASTHandle output borrows expression references and supports native append/reset/reuse. Stable in-place deduplication uses a local Go map and preserves caller AST mark planes. No encoded vector header/payload, cold output owner, reference-vector codec or FastMark reservation remains in this consumer."
       ],
       "deviations": [
-        "Selected dependency linearization helper only; source unlisted FastMark1 failure remains dirty after Close. Other ast_util methods/templates/consumers and full diagnostics remain unported."
+        "Selected dependency linearization consumer only; generic remove_duplicates, other ast_util consumers and full diagnostics remain open. Go slice/map growth does not emulate C++ backing reservations or source FastMark dirty-on-allocation-failure effects. Checked invalid handles preserve completed compaction and the original output length on error."
       ]
     },
     {
@@ -74776,10 +74779,12 @@
       ],
       "ownership": [
         "Concrete AST-hash linear-probing maps; atom keys and interpreted-atom trail retain AST references; explicit Close releases charged scalar storage.",
-        "Fresh compound dependency guards retain owning trail references; dep2asm original label keys remain borrowed as in source."
+        "Fresh compound dependency guards retain owning trail references; dep2asm original label keys remain borrowed as in source.",
+        "CompileGoal dependency, formula and combined-dependency scratch use native []ASTHandle slices. DependencyLinearize returns native slice output directly; no ASTExprVector codec or ASTHandleVector adapter is used here. Dependency keys and caller goal ownership remain unchanged."
       ],
       "deviations": [
-        "Goal dependency guards and dep2asm now follow the source goal overload, including signed labels, fresh compound guards, repeated-key replacement and skip_dep. Unsupported-operator SMT2 diagnostics, wrapper parameter updates and public tactic integration remain unported. sat2goal formula recovery follows source units/binaries/originals/optional-learned order with fresh auxiliary atoms; its model-converter construction/application remains unported. Translation checkpoints borrow the AST manager's actual inline resource limit; no whole-unit or public API completion is claimed."
+        "Goal dependency guards and dep2asm now follow the source goal overload, including signed labels, fresh compound guards, repeated-key replacement and skip_dep. Unsupported-operator SMT2 diagnostics, wrapper parameter updates and public tactic integration remain unported. sat2goal formula recovery follows source units/binaries/originals/optional-learned order with fresh auxiliary atoms; its model-converter construction/application remains unported. Translation checkpoints borrow the AST manager's actual inline resource limit; no whole-unit or public API completion is claimed.",
+        "Strict memory-checkpoint tests use an explicit real caller Runtime allocation; native SAT backing no longer guarantees a positive Runtime allocation counter. The checkpoint still reads the actual Runtime counter, without fabricated slice-allocation events."
       ]
     },
     {
@@ -74901,7 +74906,8 @@
       ],
       "ownership": [],
       "deviations": [
-        "The Boolean registration fragment now constructs the original derived model with its initial constant/function/universe tables. It does not implement the SAT tactic, proof/core paths, UNKNOWN/interpreted recovery converters or public context/solver APIs."
+        "The Boolean registration fragment now constructs the original derived model with its initial constant/function/universe tables. It does not implement the SAT tactic, proof/core paths, UNKNOWN/interpreted recovery converters or public context/solver APIs.",
+        "Strict memory-checkpoint tests use an explicit real caller Runtime allocation; native SAT backing no longer guarantees a positive Runtime allocation counter. The checkpoint still reads the actual Runtime counter, without fabricated slice-allocation events."
       ]
     },
     {
@@ -96724,7 +96730,8 @@
         }
       ],
       "ownership": [
-        "Source retained expression and dependency arrays use existing AST-manager array owners. Assertions retain f/pr/dependencies through processing; false replacement protects pr/dependencies before resetting arrays; reference marks retain contradictions across compaction."
+        "Source retained expression and dependency arrays use existing AST-manager array owners. Assertions retain f/pr/dependencies through processing; false replacement protects pr/dependencies before resetting arrays; reference marks retain contradictions across compaction.",
+        "quick_process temporary negations now use a native []ASTHandle with explicit INC before append and DEC on lexical exit, matching the source expr_ref_vector ownership. This corrects the prior nonowning expression-vector borrow. Goal output acquisition still precedes temporary cleanup."
       ],
       "deviations": [
         "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and copying constructor facades remain unported. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred."
@@ -112776,8 +112783,7 @@
         "pkg/ast/ast_dependency_array.go",
         "pkg/ast/ast_dependency_array_api.go",
         "pkg/ast/ast_dependency_array_values.go",
-        "pkg/ast/ast_dependency_traversal.go",
-        "pkg/ast/ast_dependency_vector.go"
+        "pkg/ast/ast_dependency_traversal.go"
       ],
       "tests": [
         "TestASTDependencyNativeLIFOCallbacksWithReservationsDisabled",
@@ -112802,10 +112808,11 @@
         "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
         "TestASTDependencySourceLeafJoinCallbacksAndLinearization",
         "TestASTDependencySourceReferenceCountZeroAndWrap",
-        "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
-        "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+        "TestASTDependencyNativeStableDedupPreservesNodeMarks",
+        "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
         "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
-        "TestASTEagerDependencyConstructorBorrowedFieldsAreReal"
+        "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
+        "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix"
       ],
       "conditionals": [
         {
@@ -112854,10 +112861,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -112887,10 +112894,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -112920,10 +112927,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -112953,10 +112960,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -112986,10 +112993,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -113019,10 +113026,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -113052,10 +113059,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -113075,7 +113082,8 @@
         }
       ],
       "ownership": [
-        "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Project RC30 wrapping and charged leaf/join16/24 records remain; dependency FIFO/LIFO worklists and persistent-array scratch use native Go slices without container arena charges or intrusive fallback links. Actual cold manager/header/payload and persistent-array object overlaps remain charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md."
+        "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Project RC30 wrapping and charged leaf/join16/24 records remain; dependency FIFO/LIFO worklists and persistent-array scratch use native Go slices without container arena charges or intrusive fallback links. Actual cold manager/header/payload and persistent-array object overlaps remain charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
+        "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers."
       ],
       "deviations": [
         "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics."
@@ -139175,7 +139183,6 @@
         "pkg/ast/ast_dependency_array_api.go",
         "pkg/ast/ast_dependency_array_values.go",
         "pkg/ast/ast_dependency_traversal.go",
-        "pkg/ast/ast_dependency_vector.go",
         "pkg/ast/ast_parray_layout.go"
       ],
       "tests": [
@@ -139201,8 +139208,8 @@
         "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
         "TestASTDependencySourceLeafJoinCallbacksAndLinearization",
         "TestASTDependencySourceReferenceCountZeroAndWrap",
-        "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
-        "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+        "TestASTDependencyNativeStableDedupPreservesNodeMarks",
+        "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
         "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation",
         "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
         "TestASTExprArrayEmptyNonrootPopSourcePrefix",
@@ -139210,7 +139217,8 @@
         "TestASTExprArrayRetainedRootGetAndSet",
         "TestASTExprArrayRetainedSetInvalidOldPreservesIncomingIncrement",
         "TestASTExprArrayUninitializedAndFreedRetainedSlots",
-        "TestASTExprArrayUninitializedSetPreservesIncomingIncrement"
+        "TestASTExprArrayUninitializedSetPreservesIncomingIncrement",
+        "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix"
       ],
       "conditionals": [
         {
@@ -139496,10 +139504,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -139529,10 +139537,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -139562,10 +139570,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -139595,10 +139603,10 @@
             "TestASTDependencyArrayAdaptedRegisteredParrayAssertions",
             "TestASTDependencyArrayReleaseEmptyNonrootPopFinitePrefix",
             "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
-            "TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix",
+            "TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences",
             "TestASTDependencyArrayNativeDeletionConsumesAllRoots",
             "TestASTDependencyArraySourceThirtyBitReleaseCounter",
-            "TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction",
+            "TestASTDependencyNativeStableDedupPreservesNodeMarks",
             "TestASTDependencyJoinValuesFailurePublishesBothScalarRoots",
             "TestASTDependencyArrayEveryOperationFaultOwnership",
             "TestASTDependencyEmptyOwnersConstructorFailurePrefix",
@@ -139621,7 +139629,8 @@
         "Borrowed real SmallBytes allocator plus explicit shared-budget lifetime contract. Fixed pointer-free encoded cells and full-capacity value blocks including actual source size_t header charged by allocator; cold manager/scratch charged once separately. RC30, source publication/destruction order and immediate unique graph/physical quota oracles preserved. Close requires liveCells0 and never closes allocator. See PORT_PROGRESS.md#audit-parray-port-status-md.",
         "Expression-array backing has real12-byte capacity/initialized header; copies full retained capacity on growth and only logical elements on copy_values. Source debug-only logical bounds preserve retained pointers and arbitrary-index nonroot SET. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
         "Expression-array empty nonroot POP preserves the finite release unsigned size wrap; retained root SET increments the incoming AST before old physical access and never rolls it back at an invalid old pointer. See PORT_PROGRESS.md#audit-ast-expr-array-retained-status-md.",
-        "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Project RC30 wrapping and charged leaf/join16/24 records remain; dependency FIFO/LIFO worklists and persistent-array scratch use native Go slices without container arena charges or intrusive fallback links. Actual cold manager/header/payload and persistent-array object overlaps remain charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md."
+        "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Project RC30 wrapping and charged leaf/join16/24 records remain; dependency FIFO/LIFO worklists and persistent-array scratch use native Go slices without container arena charges or intrusive fallback links. Actual cold manager/header/payload and persistent-array object overlaps remain charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
+        "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers."
       ],
       "deviations": [
         "The standalone Int32PArrayManager adaptation was removed after a whole-source scan found its exact int configuration only in src/test/parray.cpp.",

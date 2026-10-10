@@ -31,33 +31,33 @@ func TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately(t *testing
 	m.BudgetField.FailAfter(-1)
 }
 
-func TestASTDependencyTraversalFailureUnmarksAndRetainsOutputPrefix(t *testing.T) {
+func TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences(t *testing.T) {
+
 	m := astTestManager(t)
 	h := astDependencyExpr(t, m, 1901)
 	leaf, e := m.DependencyLeaf(h)
 	astTestMust(t, e)
-	out, e := m.NewExprVector()
+	before := m.BudgetField.Used()
+	rc, e := m.GetRefCount(h)
 	astTestMust(t, e)
 	m.BudgetField.FailAfter(0)
-	e = m.DependencyLinearizeRaw(leaf, out)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
+	out, e := m.DependencyLinearizeRaw(leaf, []ASTHandle{h})
+	astTestMust(t, e)
+	if len(out) != 2 || out[0] != h || out[1] != h {
+		t.Fatal(out)
 	}
 	c, e := m.dependencies.node(leaf.record)
 	astTestMust(t, e)
-	if c.marked || len(m.dependencies.todo) != 0 {
-		t.Fatal("unsafe allocation mark adapter", c.marked, len(m.dependencies.todo))
+	if c.marked || len(m.dependencies.todo) != 0 || m.BudgetField.Used() != before {
+		t.Fatal("native append/traversal cleanup", c.marked, len(m.dependencies.todo))
+	}
+	if got, e := m.GetRefCount(h); e != nil || got != rc {
+		t.Fatal("output must not retain nodes", got, rc, e)
 	}
 	m.BudgetField.FailAfter(-1)
-	astTestMust(t, m.DependencyLinearizeRaw(leaf, out))
-	n, e := m.ExprVectorSize(out)
-	astTestMust(t, e)
-	if n != 1 {
-		t.Fatal(n)
-	}
-	astTestMust(t, m.DelExprVector(&out))
 	astTestMust(t, m.DependencyInc(leaf))
 	astTestMust(t, m.DependencyDec(leaf))
+
 }
 
 func TestASTDependencyArrayNativeDeletionConsumesAllRoots(t *testing.T) {
@@ -119,49 +119,37 @@ func TestASTDependencyArraySourceThirtyBitReleaseCounter(t *testing.T) {
 	}
 }
 
-func TestASTDependencyStableDedupFailurePreservesSourceDirtyMarkAndCompaction(t *testing.T) {
+func TestASTDependencyNativeStableDedupPreservesNodeMarks(t *testing.T) {
+
 	m := astTestManager(t)
-	out, e := m.NewExprVector()
-	astTestMust(t, e)
-	var hs [17]ASTHandle
+	var hs [257]ASTHandle
+	var out []ASTHandle
 	for i := range hs {
 		hs[i] = astDependencyExpr(t, m, uint32(2100+i))
-		astTestMust(t, m.ExprVectorPush(out, hs[i]))
-		if i == 0 {
-			astTestMust(t, m.ExprVectorPush(out, hs[i]))
+		out = append(out, hs[i], hs[i])
+	}
+	// A caller's mark plane belongs to that caller, independently of deduplication.
+	mark, e := newASTFastMark1Locked(m)
+	astTestMust(t, e)
+	astTestMust(t, mark.markLocked(m, hs[16], true))
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	out, e = m.DependencyLinearize(ASTDependency{}, out)
+	astTestMust(t, e)
+	if len(out) != len(hs) || m.BudgetField.Used() != before {
+		t.Fatal(len(out), m.BudgetField.Used(), before)
+	}
+	for i, h := range out {
+		if h != hs[i] {
+			t.Fatal("first-occurrence order", i, h, hs[i])
 		}
 	}
-	physical := m.allocator.Stats().Live
-	m.BudgetField.FailAfter(1) // real cold FastMark owner succeeds; inline16 overflow refuses.
-	e = m.DependencyLinearize(ASTDependency{}, out)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
+	if marked, e := mark.nodeMarkedLocked(m, hs[16]); e != nil || !marked {
+		t.Fatal("borrowed caller mark lost", marked, e)
 	}
-	if m.allocator.Stats().Live != physical {
-		t.Fatal("lost output/owner allocation")
-	}
-	if n, e := m.ExprVectorSize(out); e != nil || n != 18 {
-		t.Fatal("size publishes after all compaction", n, e)
-	}
-	for i := 0; i < 16; i++ {
-		x, e := m.ExprVectorGet(out, uint32(i))
-		astTestMust(t, e)
-		if x != hs[i] {
-			t.Fatal("completed source set(j) prefix", i, x)
-		}
-		if m.nodeAt(hs[i].slot).mark1 {
-			t.Fatal("listed mark not reset", i)
-		}
-	}
-	last := m.nodeAt(hs[16].slot)
-	if !last.mark1 {
-		t.Fatal("source unlisted mark-before-buffer-push prefix was silently repaired")
-	}
-	owner := last.markOwner1
 	m.BudgetField.FailAfter(-1)
-	// Explicit caller recovery, rather than an invented wrapper rollback.
-	astTestMust(t, m.ResetNodeMark1(hs[16], owner))
-	astTestMust(t, m.DelExprVector(&out))
+	astTestMust(t, mark.closeLocked(m))
+
 }
 
 func TestASTDependencyJoinValuesFailurePublishesBothScalarRoots(t *testing.T) {
@@ -450,4 +438,31 @@ func TestASTDependencyArrayRetainedFreedGetReturnsRawToken(t *testing.T) {
 		}
 	}
 	astTestMust(t, m.DependencyArrayDel(&a))
+}
+
+func TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix(t *testing.T) {
+	m := astTestManager(t)
+	foreign := astTestManager(t)
+	a := astDependencyExpr(t, m, 2600)
+	b := astDependencyExpr(t, m, 2601)
+	bad := astDependencyExpr(t, foreign, 2602)
+	sort, e := m.MkBoolSort()
+	astTestMust(t, e)
+	stale, e := m.MkVar(2603, sort)
+	astTestMust(t, e)
+	pin, e := m.NewRef(stale)
+	astTestMust(t, e)
+	astTestMust(t, m.DelRef(&pin))
+	for _, tc := range []struct {
+		value ASTHandle
+		want  error
+	}{
+		{bad, ErrASTHandle}, {stale, ErrASTHandle}, {sort, ErrASTDomain},
+	} {
+		out := []ASTHandle{a, a, b, tc.value}
+		out, e = m.DependencyLinearize(ASTDependency{}, out)
+		if !errors.Is(e, tc.want) || len(out) != 4 || out[0] != a || out[1] != b || out[3] != tc.value {
+			t.Fatal("checked input retains completed compaction and original length", out, e)
+		}
+	}
 }

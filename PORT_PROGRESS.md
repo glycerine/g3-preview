@@ -33429,3 +33429,51 @@ AST reference vectors still retain Runtime-backed payloads. This SAT change does
 not change util's root file graph: the last receiver-aware placement audit still
 has 286 files, 40 components and a largest coupled group of 190 files. The knot
 is not resolved, and the complete root util split is not yet ready.
+
+## Native dependency linearization output and callers
+
+DependencyLinearizeRaw and DependencyLinearize now accept/return caller-owned
+[]ASTHandle output, including completed appends on checked errors. The actual
+FIFO dependency traversal and dependency-mark cleanup remain. Stable deduplication
+uses a Go map and keeps first-occurrence order across the entire preexisting
+output; it no longer borrows AST node mark bits or reserves FastMark storage.
+Removed ast_dependency_vector.go and its nonowning ASTExprVector owner, Runtime
+payload/header codecs, wrapper construction/get/push/reset/delete operations.
+SAT CompileGoal uses native dependency/formula/combined-dependency slices directly,
+removing the ASTHandleVector adapter from that path too. No generic C++ vector,
+remove_duplicates or STL implementation credit is added.
+
+Goal quick_process also used that nonowning wrapper for temporary negations.
+Inspection of src/tactic/goal.cpp:149,179-180 shows an owning expr_ref_vector there.
+Its native temporary slice now explicitly acquires each newly made negation and
+releases each on lexical exit; goal output acquisition still precedes cleanup.
+
+Converted output allocation/dirty-mark refusal fixtures to native growth with
+Runtime reservations disabled and preservation of a separate caller mark plane.
+Retained FIFO order, independent DAG/set oracle, warm zero-allocation raw output,
+expression reference counts and real goal/dependency translation results. Added
+checked foreign/stale/non-expression output coverage: completed compaction and
+original output length remain visible on error. The slice boundary explicitly
+validates expression kinds, replacing the guard previously supplied by Push.
+
+The full SAT tactic run exposed two strict memory-checkpoint fixtures assuming
+positive Runtime allocations from solver backing. Both failures reproduce on
+committed dbf8f23 in /mnt/oldrog/tmp/g3-dependency-output-baseline. Fixtures now
+create an actual caller Runtime allocation before checking the strict zero limit;
+no Budget or native-slice allocation is fabricated as a Runtime event. Native and
+g3debug full tactic/SAT tactic suites pass with the retained source checkpoints.
+
+Validation: focused native/g3debug AST dependency and tactic consumers passed;
+full native module suite passed (AST27.199s, SAT0.516s, SAT tactic0.123s,
+util95.874s), logged in /mnt/oldrog/tmp/g3-native-dependency-output-module-full.log.
+A final expression-kind guard was added after that full run, followed by final
+full native AST and focused g3debug consumer checks. Three-package vet, manifest,
+gofmt and diff checks passed. Counts remain 2102 units/677 APIs: 62 ported,
+283 partial, 1729 unported, two dead/deleted.
+
+This removes one retained consumer of the reference-vector codec; actual owning
+ASTRefVector, ASTDependencyRefVector and inline buffer specializations still need
+native migration. Root util production files did not change: the last stricter
+receiver-aware placement audit still has 286 files, 40 components and a largest
+190-file coupled group. The complete caller migration and util subpackage split
+remain active and unfinished.

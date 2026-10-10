@@ -304,6 +304,11 @@ func TestSATGoalTranslatorCancellationAndMemoryParams(t *testing.T) {
 			astTestPin(t, m, h)
 			s, c, params := satSolverCheckFixture(t)
 			if !cancel {
+				// Native solver slices do not allocate in the Runtime domain. Exercise
+				// its actual strict memory counter with an explicit caller allocation.
+				block, e := s.RuntimeOwner().Allocate(1)
+				satOK(t, e)
+				defer func() { satOK(t, s.RuntimeOwner().Deallocate(&block)) }()
 				name := "max_memory"
 				satOK(t, c.SetUIntName(&params, &name, 0))
 				satOK(t, s.UpdateParams(&params))

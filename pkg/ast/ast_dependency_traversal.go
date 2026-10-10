@@ -19,7 +19,7 @@ func (d *astDependencyManager) unmarkTodo() error {
 	d.todo = d.todo[:0]
 	return first
 }
-func (d *astDependencyManager) traverse(root arena.SmallBytesRef, target astNodeRef, out *ASTExprVector) (bool, error) {
+func (d *astDependencyManager) traverse(root arena.SmallBytesRef, target astNodeRef, out *[]ASTHandle) (bool, error) {
 	if dependencyNull(root) {
 		return false, nil
 	}
@@ -33,7 +33,7 @@ func (d *astDependencyManager) traverse(root arena.SmallBytesRef, target astNode
 		return false, e
 	}
 	d.todo = append(d.todo, root)
-	// Clear every visited dependency mark even if actual output publication fails.
+	// Clear every visited dependency mark on success and checked traversal errors.
 	defer d.unmarkTodo()
 	for q := 0; q < len(d.todo); q++ {
 		c, e := d.node(d.todo[q])
@@ -42,9 +42,7 @@ func (d *astDependencyManager) traverse(root arena.SmallBytesRef, target astNode
 		}
 		if c.leaf {
 			if out != nil {
-				if e = d.owner.exprVectorPush(*out, c.value); e != nil {
-					return false, e
-				}
+				*out = append(*out, d.owner.external(c.value))
 			} else if c.value == target {
 				return true, nil
 			}
@@ -84,75 +82,49 @@ func (m *ASTManager) DependencyContains(d ASTDependency, h ASTHandle) (bool, err
 	}
 	return m.dependencies.traverse(r, v, nil)
 }
-func (m *ASTManager) DependencyLinearizeRaw(d ASTDependency, v ASTExprVector) error {
+
+// DependencyLinearizeRaw appends leaf expressions in traversal order. The caller
+// owns the slice; its handles borrow the dependency's expression references.
+// On error, the returned slice contains every completed output append.
+func (m *ASTManager) DependencyLinearizeRaw(d ASTDependency, out []ASTHandle) ([]ASTHandle, error) {
 	if e := m.lock(); e != nil {
-		return e
+		return out, e
 	}
 	defer m.mu.Unlock()
 	r, e := m.dependencies.valid(d)
 	if e != nil {
-		return e
+		return out, e
 	}
-	if _, e = m.vectorState(v.codec()); e != nil {
-		return e
-	}
-	_, e = m.dependencies.traverse(r, astNodeRef{}, &v)
-	return e
+	_, e = m.dependencies.traverse(r, astNodeRef{}, &out)
+	return out, e
 }
-func (m *ASTManager) DependencyLinearize(d ASTDependency, v ASTExprVector) error {
+
+// DependencyLinearize appends reachable leaves and removes duplicates from the
+// entire output, retaining each expression's first occurrence. It owns no AST
+// references and does not modify the expressions' shared mark bits.
+func (m *ASTManager) DependencyLinearize(d ASTDependency, out []ASTHandle) ([]ASTHandle, error) {
 	if e := m.lock(); e != nil {
-		return e
+		return out, e
 	}
 	defer m.mu.Unlock()
 	r, e := m.dependencies.valid(d)
 	if e != nil {
-		return e
+		return out, e
 	}
-	if _, e = m.vectorState(v.codec()); e != nil {
-		return e
+	if _, e = m.dependencies.traverse(r, astNodeRef{}, &out); e != nil {
+		return out, e
 	}
-	if _, e = m.dependencies.traverse(r, astNodeRef{}, &v); e != nil {
-		return e
-	}
-	// ast_util.h compacts in place after marking each previously unseen value.
-	// Failed mark publication retains earlier set(j) writes and original size.
-	mark, e := newASTFastMark1Locked(m)
-	if e != nil {
-		return e
-	}
-	defer mark.closeLocked(m)
-	s, e := m.vectorState(v.codec())
-	if e != nil {
-		return e
-	}
-	j := uint32(0)
-	for i := uint32(0); i < s.size; i++ {
-		x, e := m.vectorValue(s, i)
-		if e != nil {
-			return e
+	seen := make(map[ASTHandle]struct{}, len(out))
+	j := 0
+	for _, h := range out {
+		if _, e = m.requireExpr(h); e != nil {
+			return out, e
 		}
-		h := m.external(x)
-		seen, e := mark.nodeMarkedLocked(m, h)
-		if e != nil {
-			return e
-		}
-		if !seen {
-			if e = mark.markLocked(m, h, true); e != nil {
-				return e
-			}
-			if i != j {
-				if e = m.vectorPut(s, j, x); e != nil {
-					return e
-				}
-			}
+		if _, found := seen[h]; !found {
+			seen[h] = struct{}{}
+			out[j] = h
 			j++
 		}
 	}
-	s.size = j
-	if s.capacity != 0 {
-		if e = m.vectorPutWord(s.payload, 4, j); e != nil {
-			return e
-		}
-	}
-	return m.storeVector(v.codec(), s)
+	return out[:j], nil
 }

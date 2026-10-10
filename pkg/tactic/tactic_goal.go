@@ -354,11 +354,12 @@ func (g *Goal) quickProcess(saveFirst bool, f ast.ASTHandle, d ast.ASTDependency
 	}
 	var todo tacticGoalTodo
 	defer todo.close(m)
-	tmp, err := m.NewExprVector()
-	if err != nil {
-		return out, err
-	}
-	defer func() { err = errors.Join(err, m.DelExprVector(&tmp)) }()
+	var tmp []ast.ASTHandle
+	defer func() {
+		for _, h := range tmp {
+			err = errors.Join(err, m.DecRef(h))
+		}
+	}()
 	if err = todo.push(m, tacticGoalPolarity{f, true}); err != nil {
 		return out, err
 	}
@@ -408,9 +409,10 @@ func (g *Goal) quickProcess(saveFirst bool, f ast.ASTHandle, d ast.ASTDependency
 				if err != nil {
 					return out, err
 				}
-				if err = m.ExprVectorPush(tmp, curr); err != nil {
+				if err = m.IncRef(curr); err != nil {
 					return out, err
 				}
+				tmp = append(tmp, curr)
 			}
 			if saveFirst {
 				// The source assigns its expr_ref here, before later formulas

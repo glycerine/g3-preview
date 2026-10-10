@@ -148,12 +148,9 @@ func TestTacticGoalRedundanciesProofAndDependency(t *testing.T) {
 			proofTestFact(t, m, pr, f)
 			dep, e := g.Dependency(0)
 			astTestMust(t, e)
-			v, e := m.NewExprVector()
+			v, e := m.DependencyLinearize(dep, nil)
 			astTestMust(t, e)
-			defer func() { astTestMust(t, m.DelExprVector(&v)) }()
-			astTestMust(t, m.DependencyLinearize(dep, v))
-			size, e := m.ExprVectorSize(v)
-			astTestMust(t, e)
+			size := len(v)
 			if size != 2 {
 				t.Fatal("source contradiction core must join both premises", size)
 			}

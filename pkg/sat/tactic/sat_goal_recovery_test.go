@@ -180,6 +180,10 @@ func TestSATGoalRecoveryFreshUnitsLearnedAndCheckpoints(t *testing.T) {
 		t.Fatal("missing source cancellation", e)
 	}
 	m.Limit.ResetCancel()
+	// The checkpoint reads actual Runtime allocations, excluding native slices.
+	block, e := s.RuntimeOwner().Allocate(1)
+	satOK(t, e)
+	defer func() { satOK(t, s.RuntimeOwner().Deallocate(&block)) }()
 	if e = recoverSATGoalFormulas(tr, g, false, 0); e == nil || !strings.Contains(e.Error(), "memory") {
 		t.Fatal("missing source memory checkpoint", e)
 	}

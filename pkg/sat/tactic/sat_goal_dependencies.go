@@ -109,14 +109,7 @@ func (tr *GoalTranslator) CompileGoal(g *tactic.Goal) (err error) {
 		}
 	}()
 	m := tr.manager
-	deps, e := m.NewExprVector()
-	if e != nil {
-		return e
-	}
-	defer func() { err = errors.Join(err, m.DelExprVector(&deps)) }()
-	var forms, allDeps ast.ASTHandleVector
-	defer forms.Close(m.Budget())
-	defer allDeps.Close(m.Budget())
+	var deps, forms, allDeps []ast.ASTHandle
 	size, e := g.Size()
 	if e != nil {
 		return e
@@ -127,36 +120,20 @@ func (tr *GoalTranslator) CompileGoal(g *tactic.Goal) (err error) {
 			return e
 		}
 		if !d.IsNull() {
-			if e = m.ExprVectorReset(deps); e != nil {
-				return e
-			}
-			if e = m.DependencyLinearize(d, deps); e != nil {
-				return e
-			}
-			n, e := m.ExprVectorSize(deps)
+			deps, e = m.DependencyLinearize(d, deps[:0])
 			if e != nil {
 				return e
 			}
-			for j := uint32(0); j < n; j++ {
-				h, e := m.ExprVectorGet(deps, j)
-				if e != nil {
-					return e
-				}
-				if e = allDeps.Push(m.Budget(), h); e != nil {
-					return e
-				}
-			}
+			allDeps = append(allDeps, deps...)
 		}
 		f, e := g.Form(i)
 		if e != nil {
 			return e
 		}
-		if e = forms.Push(m.Budget(), f); e != nil {
-			return e
-		}
+		forms = append(forms, f)
 	}
 	tr.interfaces.clear()
-	if e = tr.collectInterfaceWithDependencies(forms.Slice(), allDeps.Slice()); e != nil {
+	if e = tr.collectInterfaceWithDependencies(forms, allDeps); e != nil {
 		return e
 	}
 	var fmls satGoalLiteralExpressions
@@ -172,10 +149,8 @@ func (tr *GoalTranslator) CompileGoal(g *tactic.Goal) (err error) {
 		}
 		skip := false
 		if !d.IsNull() {
-			if e = m.ExprVectorReset(deps); e != nil {
-				return e
-			}
-			if e = m.DependencyLinearize(d, deps); e != nil {
+			deps, e = m.DependencyLinearize(d, deps[:0])
+			if e != nil {
 				return e
 			}
 			if e = fmls.resize(m, 0); e != nil {
@@ -187,15 +162,7 @@ func (tr *GoalTranslator) CompileGoal(g *tactic.Goal) (err error) {
 			if e = fmls.set(m, 0, f); e != nil {
 				return e
 			}
-			n, e := m.ExprVectorSize(deps)
-			if e != nil {
-				return e
-			}
-			for j := uint32(0); j < n; j++ {
-				original, e := m.ExprVectorGet(deps, j)
-				if e != nil {
-					return e
-				}
+			for _, original := range deps {
 				sign, inner, e := m.IsNot(original)
 				if e != nil {
 					return e
