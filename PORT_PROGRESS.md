@@ -37386,3 +37386,32 @@ Profiles: /mnt/oldrog/tmp/g3-outer-{native,debug}.cover. Both LP vets and source
 evidence/no-generics verifier pass. LP stays66 partial/44 unported. Last full
 native snapshot remains20:03 UTC90.0%, predating these additions; no immediate
 full rerun. Regenerated graph records the new production file with unchanged edges.
+
+
+### Floating named solution feasibility validators — 2026-10-10
+
+Ported lp_primal_simplex.hpp:271-358 and the inline complete-feasibility
+short circuit: named column bounds, original external row values, relation
+tolerances and collection checks. Native string-keyed solution maps and
+insertion-ordered coefficient dictionaries replace C++ unordered containers.
+Column indices sort for deterministic missing-name diagnostics. Shared native
+classic-six-digit formatting serves statistics and optional row diagnostics.
+Go writer errors expose reached sum/publication prefixes; missing constraint
+operator[] publishes its key then guards source indeterminate field reads.
+Fixed-flag-only bounds do not enforce a value, and row IEEE comparisons can
+accept NaN, preserving the source predicates. Declaration-only get_array_from_map
+has no definition or retained caller and is excluded.
+
+200 independently calculated dense row systems, exact/Nextafter tolerance
+boundaries, all relations, IEEE inputs, missing names/metadata, zero coefficients,
+writer refusals and key publication are covered. The120 actual solved outer
+models now additionally pass the named feasibility validator. Focused native
+and combined debug/checked core/primal/presolve/solver/column/scaler/static/LU
+checks pass. New validators76/78 statements (97.4%) in each profile; gaps are
+opposite-profile assertion/guard branches. Profiles:
+/mnt/oldrog/tmp/g3-validate-{native,debug}.cover. Extracted formatter leaves
+statistics56/71 (78.9%) native and67/71 (94.4%) debug. Both LP vets and
+source/evidence/no-generics verification pass. LP stays66 partial/44 unported:
+concrete primal instances were already partial. Full native90.0% snapshot
+remains20:03 UTC and predates these additions. Exact/default-tableau/dual/LAR
+solvers and complete upstream drivers remain open.

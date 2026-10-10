@@ -78,6 +78,15 @@ func TestLPFloatPrimalOuterIndependentVertices(t *testing.T) {
 			values[j], err = m.GetColumnValue(external)
 			lpStaticMust(t, err)
 		}
+		solution := make(map[string]float64)
+		for j, external := range []uint32{10, 11, 99} {
+			name := string(rune('a' + j))
+			m.Columns[external].Name = name
+			solution[name] = values[j]
+		}
+		if ok, err := m.SolutionIsFeasible(solution); err != nil || !ok {
+			t.Fatal(world, ok, err, solution)
+		}
 		for i, v := range originalA {
 			sum := 0.0
 			for j, x := range values {

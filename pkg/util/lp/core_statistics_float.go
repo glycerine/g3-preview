@@ -80,19 +80,7 @@ func (m *FloatCoreSolverBase) PrintStatistics(prefix *string, cost float64, out 
 			return err
 		}
 	}
-	formatted := strconv.FormatFloat(cost, 'g', 6, 64)
-	if math.IsInf(cost, 1) {
-		formatted = "inf"
-	}
-	if math.IsInf(cost, -1) {
-		formatted = "-inf"
-	}
-	if math.IsNaN(cost) {
-		formatted = "nan"
-		if math.Signbit(cost) {
-			formatted = "-nan"
-		}
-	}
+	formatted := floatLPNumberText(cost)
 	if _, err := fmt.Fprintf(out, "iterations = %d, cost = %s, nonzeros = ", m.TotalIterations-1, formatted); err != nil {
 		return err
 	}
@@ -112,6 +100,23 @@ func (m *FloatCoreSolverBase) PrintStatistics(prefix *string, cost float64, out 
 	}
 	_, err := fmt.Fprintf(out, "%d\n", n)
 	return err
+}
+
+func floatLPNumberText(cost float64) string {
+	formatted := strconv.FormatFloat(cost, 'g', 6, 64)
+	if math.IsInf(cost, 1) {
+		formatted = "inf"
+	}
+	if math.IsInf(cost, -1) {
+		formatted = "-inf"
+	}
+	if math.IsNaN(cost) {
+		formatted = "nan"
+		if math.Signbit(cost) {
+			formatted = "-nan"
+		}
+	}
+	return formatted
 }
 
 func (m *FloatCoreSolverBase) PrintStatisticsWithIterationsAndNonzeroesAndCostAndCheckTimeOver(prefix *string, out io.Writer) (bool, error) {
