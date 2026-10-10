@@ -118145,14 +118145,24 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/indexed_vector.go"
+        "pkg/util/lp/indexed_vector.go",
+        "pkg/util/lp/indexed_exact_vector.go",
+        "pkg/util/lp/exact_vector_calls.go"
       ],
       "tests": [
         "TestLPIndexedFloatVectorContracts",
         "TestLPIndexedUintVectorContracts",
         "TestLPIndexedFloatVectorIndependentSparseOracle",
         "TestLPIndexedUintVectorIndependentSparseOracle",
-        "TestLPIndexedFloatVectorDropToleranceEdges"
+        "TestLPIndexedFloatVectorDropToleranceEdges",
+        "TestLPIndexedRationalVectorExactContracts",
+        "TestLPIndexedRationalVectorExactCopyOwnership",
+        "TestLPIndexedRationalVectorExactSparseOracle",
+        "TestLPIndexedRationalVectorAllocationFailureCensus",
+        "TestLPIndexedPairVectorExactContracts",
+        "TestLPIndexedPairVectorExactCopyOwnership",
+        "TestLPIndexedPairVectorExactSparseOracle",
+        "TestLPIndexedPairVectorAllocationFailureCensus"
       ],
       "conditionals": [
         {
@@ -118192,13 +118202,29 @@
             "TestLPIndexedUintVectorIndependentSparseOracle",
             "TestLPIndexedFloatVectorDropToleranceEdges"
           ]
+        },
+        {
+          "name": "actual mpq and numeric_pair<mpq> owning indexed vectors: initialized dense slots, clear/resize, copy constructor versus assignment, set/add/drop/cleanup/restore, exact zero and explicit destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/indexed_exact_vector.go",
+          "tests": [
+            "TestLPIndexedRationalVectorExactContracts",
+            "TestLPIndexedRationalVectorExactCopyOwnership",
+            "TestLPIndexedRationalVectorExactSparseOracle",
+            "TestLPIndexedRationalVectorAllocationFailureCensus",
+            "TestLPIndexedPairVectorExactContracts",
+            "TestLPIndexedPairVectorExactCopyOwnership",
+            "TestLPIndexedPairVectorExactSparseOracle",
+            "TestLPIndexedPairVectorAllocationFailureCensus"
+          ]
         }
       ],
       "ownership": [
-        "Native float64/uint32 slices own data and stable-order sparse indexes. Data and Index remain directly editable for actual matrix algorithms, as upstream public fields. Clear/Assign/CleanUp preserve reached bounds-error prefixes. No numeral roots or simulated STL allocation failures."
+        "Native float64/uint32 slices own data and stable-order sparse indexes. Data and Index remain directly editable for actual matrix algorithms, as upstream public fields. Clear/Assign/CleanUp preserve reached bounds-error prefixes. No numeral roots or simulated STL allocation failures.",
+        "Exact indexed vectors own every initialized dense numeral slot. Clone returns the partially constructed owning vector on errors; Assign preserves source publication order and self assignment. Only numeric allocation roots and raw arithmetic generations acquired by concrete vector calls are captured; identity-checked cleanup excludes unrelated manager calls. Borrowed manager outlives vector Close; native index/data slice growth is not budget-simulated."
       ],
       "deviations": [
-        "Rational and numeric-pair indexed-vector instantiations, printers and retained full matrix/permutation consumers remain open; no whole-unit promotion.",
+        "All four retained numeral kinds now have concrete indexed-vector implementations. Exact dictionary/equality helpers without retained template consumers were not added. Printers, complete matrix/LU integration and teardown/transport stop profiles remain open; no whole-unit promotion.",
         "Literal source quirks retained: Equal compares index sets and own data with itself, self assignment clears indexed data, SetValue publishes data before duplicate debug assertion and release appends duplicates, is_OK immediately returns true. Floating drop is strict 1e-14; precise unsigned drops only exact zero.",
         "Guarded ErrBounds is a checked Go profile for invalid public indexes. No whole source permutation-driver execution credit from standalone vector tests."
       ]
@@ -118209,14 +118235,24 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/indexed_vector.go"
+        "pkg/util/lp/indexed_vector.go",
+        "pkg/util/lp/indexed_exact_vector.go",
+        "pkg/util/lp/exact_vector_calls.go"
       ],
       "tests": [
         "TestLPIndexedFloatVectorContracts",
         "TestLPIndexedUintVectorContracts",
         "TestLPIndexedFloatVectorIndependentSparseOracle",
         "TestLPIndexedUintVectorIndependentSparseOracle",
-        "TestLPIndexedFloatVectorDropToleranceEdges"
+        "TestLPIndexedFloatVectorDropToleranceEdges",
+        "TestLPIndexedRationalVectorExactContracts",
+        "TestLPIndexedRationalVectorExactCopyOwnership",
+        "TestLPIndexedRationalVectorExactSparseOracle",
+        "TestLPIndexedRationalVectorAllocationFailureCensus",
+        "TestLPIndexedPairVectorExactContracts",
+        "TestLPIndexedPairVectorExactCopyOwnership",
+        "TestLPIndexedPairVectorExactSparseOracle",
+        "TestLPIndexedPairVectorAllocationFailureCensus"
       ],
       "conditionals": [
         {
@@ -118252,13 +118288,29 @@
             "TestLPIndexedUintVectorIndependentSparseOracle",
             "TestLPIndexedFloatVectorDropToleranceEdges"
           ]
+        },
+        {
+          "name": "actual mpq and numeric_pair<mpq> owning indexed vectors: initialized dense slots, clear/resize, copy constructor versus assignment, set/add/drop/cleanup/restore, exact zero and explicit destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/indexed_exact_vector.go",
+          "tests": [
+            "TestLPIndexedRationalVectorExactContracts",
+            "TestLPIndexedRationalVectorExactCopyOwnership",
+            "TestLPIndexedRationalVectorExactSparseOracle",
+            "TestLPIndexedRationalVectorAllocationFailureCensus",
+            "TestLPIndexedPairVectorExactContracts",
+            "TestLPIndexedPairVectorExactCopyOwnership",
+            "TestLPIndexedPairVectorExactSparseOracle",
+            "TestLPIndexedPairVectorAllocationFailureCensus"
+          ]
         }
       ],
       "ownership": [
-        "Native float64/uint32 slices own data and stable-order sparse indexes. Data and Index remain directly editable for actual matrix algorithms, as upstream public fields. Clear/Assign/CleanUp preserve reached bounds-error prefixes. No numeral roots or simulated STL allocation failures."
+        "Native float64/uint32 slices own data and stable-order sparse indexes. Data and Index remain directly editable for actual matrix algorithms, as upstream public fields. Clear/Assign/CleanUp preserve reached bounds-error prefixes. No numeral roots or simulated STL allocation failures.",
+        "Exact indexed vectors own every initialized dense numeral slot. Clone returns the partially constructed owning vector on errors; Assign preserves source publication order and self assignment. Only numeric allocation roots and raw arithmetic generations acquired by concrete vector calls are captured; identity-checked cleanup excludes unrelated manager calls. Borrowed manager outlives vector Close; native index/data slice growth is not budget-simulated."
       ],
       "deviations": [
-        "Rational and numeric-pair indexed-vector instantiations, printers and retained full matrix/permutation consumers remain open; no whole-unit promotion.",
+        "All four retained numeral kinds now have concrete indexed-vector implementations. Exact dictionary/equality helpers without retained template consumers were not added. Printers, complete matrix/LU integration and teardown/transport stop profiles remain open; no whole-unit promotion.",
         "Literal source quirks retained: Equal compares index sets and own data with itself, self assignment clears indexed data, SetValue publishes data before duplicate debug assertion and release appends duplicates, is_OK immediately returns true. Floating drop is strict 1e-14; precise unsigned drops only exact zero.",
         "Guarded ErrBounds is a checked Go profile for invalid public indexes. No whole source permutation-driver execution credit from standalone vector tests."
       ]
@@ -118269,14 +118321,24 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/indexed_vector.go"
+        "pkg/util/lp/indexed_vector.go",
+        "pkg/util/lp/indexed_exact_vector.go",
+        "pkg/util/lp/exact_vector_calls.go"
       ],
       "tests": [
         "TestLPIndexedFloatVectorContracts",
         "TestLPIndexedUintVectorContracts",
         "TestLPIndexedFloatVectorIndependentSparseOracle",
         "TestLPIndexedUintVectorIndependentSparseOracle",
-        "TestLPIndexedFloatVectorDropToleranceEdges"
+        "TestLPIndexedFloatVectorDropToleranceEdges",
+        "TestLPIndexedRationalVectorExactContracts",
+        "TestLPIndexedRationalVectorExactCopyOwnership",
+        "TestLPIndexedRationalVectorExactSparseOracle",
+        "TestLPIndexedRationalVectorAllocationFailureCensus",
+        "TestLPIndexedPairVectorExactContracts",
+        "TestLPIndexedPairVectorExactCopyOwnership",
+        "TestLPIndexedPairVectorExactSparseOracle",
+        "TestLPIndexedPairVectorAllocationFailureCensus"
       ],
       "conditionals": [
         {
@@ -118302,13 +118364,29 @@
             "TestLPIndexedUintVectorIndependentSparseOracle",
             "TestLPIndexedFloatVectorDropToleranceEdges"
           ]
+        },
+        {
+          "name": "actual mpq and numeric_pair<mpq> owning indexed vectors: initialized dense slots, clear/resize, copy constructor versus assignment, set/add/drop/cleanup/restore, exact zero and explicit destruction",
+          "status": "ported",
+          "go_target": "pkg/util/lp/indexed_exact_vector.go",
+          "tests": [
+            "TestLPIndexedRationalVectorExactContracts",
+            "TestLPIndexedRationalVectorExactCopyOwnership",
+            "TestLPIndexedRationalVectorExactSparseOracle",
+            "TestLPIndexedRationalVectorAllocationFailureCensus",
+            "TestLPIndexedPairVectorExactContracts",
+            "TestLPIndexedPairVectorExactCopyOwnership",
+            "TestLPIndexedPairVectorExactSparseOracle",
+            "TestLPIndexedPairVectorAllocationFailureCensus"
+          ]
         }
       ],
       "ownership": [
-        "Native float64/uint32 slices own data and stable-order sparse indexes. Data and Index remain directly editable for actual matrix algorithms, as upstream public fields. Clear/Assign/CleanUp preserve reached bounds-error prefixes. No numeral roots or simulated STL allocation failures."
+        "Native float64/uint32 slices own data and stable-order sparse indexes. Data and Index remain directly editable for actual matrix algorithms, as upstream public fields. Clear/Assign/CleanUp preserve reached bounds-error prefixes. No numeral roots or simulated STL allocation failures.",
+        "Exact indexed vectors own every initialized dense numeral slot. Clone returns the partially constructed owning vector on errors; Assign preserves source publication order and self assignment. Only numeric allocation roots and raw arithmetic generations acquired by concrete vector calls are captured; identity-checked cleanup excludes unrelated manager calls. Borrowed manager outlives vector Close; native index/data slice growth is not budget-simulated."
       ],
       "deviations": [
-        "Rational and numeric-pair indexed-vector instantiations, printers and retained full matrix/permutation consumers remain open; no whole-unit promotion.",
+        "All four retained numeral kinds now have concrete indexed-vector implementations. Exact dictionary/equality helpers without retained template consumers were not added. Printers, complete matrix/LU integration and teardown/transport stop profiles remain open; no whole-unit promotion.",
         "Literal source quirks retained: Equal compares index sets and own data with itself, self assignment clears indexed data, SetValue publishes data before duplicate debug assertion and release appends duplicates, is_OK immediately returns true. Floating drop is strict 1e-14; precise unsigned drops only exact zero.",
         "Guarded ErrBounds is a checked Go profile for invalid public indexes. No whole source permutation-driver execution credit from standalone vector tests."
       ]

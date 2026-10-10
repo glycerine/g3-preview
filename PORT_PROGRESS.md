@@ -34852,3 +34852,36 @@ inflate coverage. All eleven LP source units remain partial,99 unported; complet
 solver/matrix/unit-test integration still ahead. This continues the full active
 LP goal, with no scope reduction. Additive checkpoint994aa663 saved pair and
 indexed-vector algorithms; this checkpoint adds exact scoped ownership.
+
+
+## Complete retained exact indexed-vector specializations
+
+Added concrete indexed_vector<mpq> and indexed_vector<numeric_pair<mpq>> storage
+and algorithms needed by actual LU/static/sparse/eta consumers. Every dense slot
+owns initialized project numerals. Clone copies every dense slot, including
+unindexed values; Assign clears old indexed values before copying the index,
+resizing and copying indexed values, retaining source self-assignment behavior.
+Exact add/drop ignores floating epsilon; zero assignments and ordered index
+removal remain source-distinct actions. Unused exact dictionary/equality
+instantiations were not added merely to represent definitions.
+
+Five thousand operations against independent math/big.Rat sparse maps, direct
+copy/assignment/bounds/debug-prefix checks, tiny exact fractions and big-value
+lifetime tests pass. Real reservation campaigns run set/assign/clone/add/drop
+through every reached refusal to the first success, retain partially constructed
+clone owners, and check manager raw frames are consumed. A failed growth can
+legitimately destroy an older reusable scratch cell, so the census counts current
+named manager fields, test operands and surviving vector slots rather than
+assuming a fixed global count. It also compares direct backing objects against
+those actual named cells and rejects any pending allocation roots. No registry
+scan is used to infer ownership.
+
+Vector calls retain only newly acquired physical roots and raw arithmetic
+generations in the existing numerical ownership APIs. Cleanup excludes older or
+replaced unrelated invocations and never simulates native Go slice OOM.
+Full LP focused tests native8.737s/combined-debug10.478s,95.4% statement coverage;
+exact indexed implementation90.0%, actual call-receipt helper100%. Uncovered child
+error propagation/teardown profiles remain explicit, not filled with fabricated
+ordinary OOM fixtures. LP vet passed. Full solver goal remains active and the
+source inventory remains eleven partial/99 unported units. Next: permutations,
+concrete priorities and matrix/factorization algorithms.

@@ -16,13 +16,15 @@ code that has not been ported.
 | Three concrete `stacked_vector.h` element types | Original `test_stacked_vector` with strengthened assertions; 12,000 operations against independent snapshots, repeated replacements, popped tails, baseline journals and checked scope/index guards | 100% |
 | Exact `numeric_pair<mpq>` arithmetic | 400 arbitrary-precision worlds against `math/big.Rat`, 625 lexical comparisons, aliases, missing-cell error prefixes and strengthened ten-term source accumulation | 100% |
 | Floating/unsigned indexed vectors | 12,000 operations against independent sparse maps; source equality/self-assignment/debug-prefix quirks, IEEE/tolerance edges and public-index guards | 99.0% per profile; only the opposite-profile assertion path is uncovered |
+| Exact rational/pair indexed vectors | 5,000 operations against independent rational maps; exact values below floating tolerance; copy/assignment/self-assignment and bounds; real set/assign/clone/add/drop allocation refusals with named-root and direct-object census | 90.0%; remaining statements are child error propagation and the other profile assertion path |
 | Exact `stacked_vector<numeric_pair<mpq>>` | 1,600 operations against independent snapshots; big-value ownership; real append/replace/restore allocation refusals with live-cell/raw-block census; older/replacement pending-root identity | 92.8%; uncovered return paths propagate cleanup/capture errors |
 | Settings enum values and three formatting/parsing functions | All column/status cases, source missing cases, parser/output asymmetry, native/debug assertion profiles | 100% |
 | Existing LP parameter collector | All five exact keys/kinds/defaults/descriptions/module names; each reached conflicting-kind error prefix; native backing under disabled Runtime reservations | 100% |
 
-Current package statement coverage is **98.4%** in each profile. Exact scoped
+Current package statement coverage is **95.4%** in each profile. Exact scoped
 vector allocation and rollback paths are tested; remaining uncovered statements
-are cleanup/capture error returns, plus the profile-specific assertion path. The explicit
+include numerical child and cleanup/capture error returns, plus profile-specific
+assertion paths. The explicit
 duplicate-index assertion branch is unreachable in release; its following
 continuation is unreachable in debug. The two profiles exercise both behaviors.
 

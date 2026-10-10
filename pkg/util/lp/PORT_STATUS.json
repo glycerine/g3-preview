@@ -1,10 +1,10 @@
 {
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
-  "native_statement_coverage_of_current_go_code": 98.4,
+  "native_statement_coverage_of_current_go_code": 95.4,
   "coverage_warning": "Coverage applies only to existing Go statements, not the unported C++ algorithms.",
   "remaining_work": [
-    "remaining exact/floating numeric traits and conversions, owning exact indexed vectors",
+    "remaining exact/floating numeric traits and conversions, concrete priorities",
     "indexed/sparse/static/dense matrices and permutations",
     "priority queues and LU/eta factorization",
     "scaling and random updates",
@@ -162,42 +162,72 @@
       "source": "src/util/lp/indexed_vector.h",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/indexed_vector.go"
+        "pkg/util/lp/indexed_vector.go",
+        "pkg/util/lp/indexed_exact_vector.go",
+        "pkg/util/lp/exact_vector_calls.go"
       ],
       "tests": [
         "TestLPIndexedFloatVectorContracts",
         "TestLPIndexedUintVectorContracts",
         "TestLPIndexedFloatVectorIndependentSparseOracle",
         "TestLPIndexedUintVectorIndependentSparseOracle",
-        "TestLPIndexedFloatVectorDropToleranceEdges"
+        "TestLPIndexedFloatVectorDropToleranceEdges",
+        "TestLPIndexedRationalVectorExactContracts",
+        "TestLPIndexedRationalVectorExactCopyOwnership",
+        "TestLPIndexedRationalVectorExactSparseOracle",
+        "TestLPIndexedRationalVectorAllocationFailureCensus",
+        "TestLPIndexedPairVectorExactContracts",
+        "TestLPIndexedPairVectorExactCopyOwnership",
+        "TestLPIndexedPairVectorExactSparseOracle",
+        "TestLPIndexedPairVectorAllocationFailureCensus"
       ]
     },
     {
       "source": "src/util/lp/indexed_vector.hpp",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/indexed_vector.go"
+        "pkg/util/lp/indexed_vector.go",
+        "pkg/util/lp/indexed_exact_vector.go",
+        "pkg/util/lp/exact_vector_calls.go"
       ],
       "tests": [
         "TestLPIndexedFloatVectorContracts",
         "TestLPIndexedUintVectorContracts",
         "TestLPIndexedFloatVectorIndependentSparseOracle",
         "TestLPIndexedUintVectorIndependentSparseOracle",
-        "TestLPIndexedFloatVectorDropToleranceEdges"
+        "TestLPIndexedFloatVectorDropToleranceEdges",
+        "TestLPIndexedRationalVectorExactContracts",
+        "TestLPIndexedRationalVectorExactCopyOwnership",
+        "TestLPIndexedRationalVectorExactSparseOracle",
+        "TestLPIndexedRationalVectorAllocationFailureCensus",
+        "TestLPIndexedPairVectorExactContracts",
+        "TestLPIndexedPairVectorExactCopyOwnership",
+        "TestLPIndexedPairVectorExactSparseOracle",
+        "TestLPIndexedPairVectorAllocationFailureCensus"
       ]
     },
     {
       "source": "src/util/lp/indexed_vector_instances.cpp",
       "status": "partial",
       "go_targets": [
-        "pkg/util/lp/indexed_vector.go"
+        "pkg/util/lp/indexed_vector.go",
+        "pkg/util/lp/indexed_exact_vector.go",
+        "pkg/util/lp/exact_vector_calls.go"
       ],
       "tests": [
         "TestLPIndexedFloatVectorContracts",
         "TestLPIndexedUintVectorContracts",
         "TestLPIndexedFloatVectorIndependentSparseOracle",
         "TestLPIndexedUintVectorIndependentSparseOracle",
-        "TestLPIndexedFloatVectorDropToleranceEdges"
+        "TestLPIndexedFloatVectorDropToleranceEdges",
+        "TestLPIndexedRationalVectorExactContracts",
+        "TestLPIndexedRationalVectorExactCopyOwnership",
+        "TestLPIndexedRationalVectorExactSparseOracle",
+        "TestLPIndexedRationalVectorAllocationFailureCensus",
+        "TestLPIndexedPairVectorExactContracts",
+        "TestLPIndexedPairVectorExactCopyOwnership",
+        "TestLPIndexedPairVectorExactSparseOracle",
+        "TestLPIndexedPairVectorAllocationFailureCensus"
       ]
     },
     {
