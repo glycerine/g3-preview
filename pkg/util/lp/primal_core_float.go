@@ -10,6 +10,7 @@ type FloatPrimalCoreSolver struct {
 	*FloatCoreSolverBase
 	Beta                                         *IndexedFloatVector
 	BreakpointQueue                              *FloatPriorityQueue
+	Breakpoints                                  []FloatBreakpoint
 	EpsilonOfReducedCost, ConvertedHarrisEpsilon float64
 	CostsBackup                                  []float64
 	ColumnNormUpdateCounter, BlandModeThreshold  uint32

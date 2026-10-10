@@ -5,13 +5,14 @@ files, including ignored-by-default `.hpp` implementation bodies. See
 [PORT_STATUS.json](PORT_STATUS.json) for every source file's current targets and
 tests; `port_manifest.json` remains the repository-wide source ledger.
 
-There are currently 65 partial source units and45 unported units. No complete
+There are currently66 partial source units and44 unported units. No complete
 LP solver is available yet. A green Go coverage report does not measure the C++
 code that has not been ported.
 
 | Component implemented so far | Verification | Statement coverage |
 | --- | --- | --- |
-| Floating primal stage-one initialization and entering pricing | 150 independent basic/nonbasic bound worlds (3,300 column decisions); real feasibility/objective cost lifecycle and seeded norms, 100 independent rank worlds with45 choices each, budget/rotation/counter rules, IEEE and publication/error prefixes; actual120 prepared-primal run initializations | Initialization95.8% native (158/165),98.2% debug (162/165); pricing89.9% (89/99),100% (99/99). Gaps guard inherited valid boxed bounds/int-set invariants or belong to debug-only bound assertions. Harris leaving/step, breakpoints, norm/price updates and optimization remain open |
+| Floating Harris and breakpoint leaving/step selection | 500 independent Harris bound worlds and600 signed breakpoint crossing worlds; independent hinge slope jumps, source double first-crossing behavior, queue/order/publication guards, bound flips and full floating dispatch | Harris98.5% native/100% debug; breakpoint/dispatch93.3% native (112/120),95.8% debug (115/120). Remaining gaps propagate queue errors behind valid metadata or belong to the other assertion profile. Exact/tableau paths and full optimization remain open |
+| Floating primal stage-one initialization and entering pricing | 150 independent basic/nonbasic bound worlds (3,300 column decisions); real feasibility/objective cost lifecycle and seeded norms, 100 independent rank worlds with45 choices each, budget/rotation/counter rules, IEEE and publication/error prefixes; actual120 prepared-primal run initializations | Initialization95.8% native (158/165),98.2% debug (162/165); pricing89.9% (89/99),100% (99/99). Gaps guard inherited valid boxed bounds/int-set invariants or belong to debug-only bound assertions. Harris and floating breakpoint leaving/step selection are implemented; norm/price updates and optimization remain open |
 | Floating primal values, pivot rows and numerical basis/X updates | 100 independent known-solution reconstruction worlds; 120 dense independent B*d/nullspace worlds through sparse/forced-dense LU, real pivot rows, Suhl and full refactors; singular feasible-only/rollback, nonzero-step restoration, stale factors, drop-based refusal, output/borrowed-input prefixes, literal correction sign and IEEE residuals | Values95.2% native (118/124),96.0% debug (119/124); numerical updates87.8% (79/90),91.1% (82/90); pivot rows96.2% (25/26),100% (26/26). Gaps are other-profile assertions, invariant-protected child errors and final non-OK refactor after restored feasible X. Full optimization and exact core remain open |
 | Floating basis changes, reduced costs and entering-column preparation | 16,000 independent basis exchanges/restorations and trace steps; 64 known-dual matrix worlds with six refactor/entering-column rounds each, sparse/forced-dense LU, source publication prefixes, stopped children, descending/duplicate arithmetic and IEEE | Native94.8% (92/97), debug95.9% (93/97). Gaps are invariant-protected row guards and false source is_OK stub assertions; native also excludes the debug entering assertion. Numerical pivot/X update and optimization remain open |
 | Floating core construction, basis headings and feasibility | 160 independent reordered diagonal bases with actual optional LU and replacement; 41,665 exact dyadic rational tolerance comparisons, all column types/IEEE/strict boundaries, cached infeasibility updates, debug/release publication guards; actual 120-world prepared-primal integration | Native88.8% (135/152), debug97.4% (148/152). Remaining debug gaps guard enormous int-set extents, valid heading invariants and other-profile short-basis domains. Exact core, pivots, reduced costs and optimization remain open |
@@ -196,3 +197,31 @@ unported. The20:03 full native90.0% aggregate predates this Harris addition.
 Native and combined debug/checked LP vet, source inventory/evidence/no-generics
 verification and diff checks pass. Regenerated graph stays64 packages with
 unchanged edges and the new Harris production file recorded.
+
+
+### Floating breakpoint selection and full leaving/step dispatch — 2026-10-10
+
+Ported concrete double breakpoint records, strict sign/exact-zero gates,
+row-bound and entering boxed full-span construction, queue lifecycle, slope
+changes and double first-crossing selection. Connected actual breakpoint and
+Harris/entering-flip/unlimited routes through FindLeavingAndT. Preserved signed
+breakpoint deltas, index-before-queue append publication, fixed-bound double
+slope jump except at zero, cached global infeasibility dispatch and the source
+double behavior that always stops at the first dequeued breakpoint, even if
+slope remains beneficial. Exact randomized multi-breakpoint continuation,
+tableau/precise leaving paths, diagnostic printing and optimization remain open.
+
+600 independent movement-ray/half-space crossing worlds check ordered records,
+nearest absolute distance, signed steps, zero crossings and boxed entering span.
+Independent hinge slope jumps cover fixed/low/upper and both signs. Integration
+checks actual Harris basic pivot, entering flip, unbounded direction and flagged
+infeasible breakpoint selection. IEEE and reached invalid extent/heading/queue
+checks retain earlier record/queue mutation and output prefixes. Native focused
+core/primal/presolve/solver/column/scaler/static/LU tests pass0.845s; combined
+debug/checked pass0.926s. New code112/120 (93.3%) native,115/120 (95.8%) debug;
+gaps propagate queue errors under inconsistent metadata or are opposite-profile
+assertions. Profiles: /mnt/oldrog/tmp/g3-breakpoint-{native,debug}.cover.
+Both LP vets pass. One source unit becomes partial: LP66 partial/44 unported.
+The20:03 full native module90.0% aggregate predates Harris/breakpoint additions;
+no immediate full rerun is needed. Source/evidence/no-generics and diff checks
+pass; graph regenerated with unchanged edges and the new production file.

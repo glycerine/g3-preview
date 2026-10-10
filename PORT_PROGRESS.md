@@ -37225,3 +37225,31 @@ unported. The20:03 full native90.0% aggregate predates this Harris addition.
 Native and combined debug/checked LP vet, source inventory/evidence/no-generics
 verification and diff checks pass. Regenerated graph stays64 packages with
 unchanged edges and the new Harris production file recorded.
+
+
+### Floating breakpoint selection and full leaving/step dispatch — 2026-10-10
+
+Ported concrete double breakpoint records, strict sign/exact-zero gates,
+row-bound and entering boxed full-span construction, queue lifecycle, slope
+changes and double first-crossing selection. Connected actual breakpoint and
+Harris/entering-flip/unlimited routes through FindLeavingAndT. Preserved signed
+breakpoint deltas, index-before-queue append publication, fixed-bound double
+slope jump except at zero, cached global infeasibility dispatch and the source
+double behavior that always stops at the first dequeued breakpoint, even if
+slope remains beneficial. Exact randomized multi-breakpoint continuation,
+tableau/precise leaving paths, diagnostic printing and optimization remain open.
+
+600 independent movement-ray/half-space crossing worlds check ordered records,
+nearest absolute distance, signed steps, zero crossings and boxed entering span.
+Independent hinge slope jumps cover fixed/low/upper and both signs. Integration
+checks actual Harris basic pivot, entering flip, unbounded direction and flagged
+infeasible breakpoint selection. IEEE and reached invalid extent/heading/queue
+checks retain earlier record/queue mutation and output prefixes. Native focused
+core/primal/presolve/solver/column/scaler/static/LU tests pass0.845s; combined
+debug/checked pass0.926s. New code112/120 (93.3%) native,115/120 (95.8%) debug;
+gaps propagate queue errors under inconsistent metadata or are opposite-profile
+assertions. Profiles: /mnt/oldrog/tmp/g3-breakpoint-{native,debug}.cover.
+Both LP vets pass. One source unit becomes partial: LP66 partial/44 unported.
+The20:03 full native module90.0% aggregate predates Harris/breakpoint additions;
+no immediate full rerun is needed. Source/evidence/no-generics and diff checks
+pass; graph regenerated with unchanged edges and the new production file.
