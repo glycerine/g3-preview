@@ -2,7 +2,7 @@
   "scope": "Complete retained src/util/lp implementation and upstream tests; incomplete",
   "source_files": 110,
   "native_statement_coverage_of_current_go_code": 89.8,
-  "coverage_warning": "Latest full native module checkpoint passed 2026-10-10 at 22:14 UTC: LP 326.657s, 89.8% (12347/13752). Log/profile: /mnt/oldrog/tmp/g3-mps-dual-module-native.{log,cover}. This includes floating dual outer and MPS primal/dual integration and predates implied_bound.go and lar_constraints.go. Implied-bound focused native and combined g3debug/g3checked checks cover 53/58 statements (91.4%); remaining guards qualify invocation cleanup errors or earlier pending-state checks. Exact rational ownership, 160 independent big.Rat/evidence worlds, source member publication and physical construction/assignment refusal campaigns are tested. Coverage measures existing Go statements, not unported C++ functionality. Component table and per-source units retain the evidence for older layers. Full exact/tableau/LAR solvers, bounds/constraints/explanations and original command drivers remain incomplete. Owning variable/term/general LAR constraints subsequently pass 120 independent exact-copy/borrow worlds, seven physical refusal campaigns through success, constructor/export prefixes and stopped-term/foreign-manager guards. Native and combined debug/checked constraint file 77/83 statements (92.8%); witness record and relation stream file 10/10 (100%). Full constraint/bound/explanation and exact LAR solver integration remains open.",
+  "coverage_warning": "Latest full native module checkpoint passed 2026-10-10 at 22:14 UTC: LP 326.657s, 89.8% (12347/13752). Log/profile: /mnt/oldrog/tmp/g3-mps-dual-module-native.{log,cover}. This includes floating dual outer and MPS primal/dual integration and predates implied-bound, owning-constraint and LAR bound-update additions. Implied-bound focused native and combined g3debug/g3checked checks cover 53/58 statements (91.4%); remaining guards qualify invocation cleanup errors or earlier pending-state checks. Exact rational ownership, 160 independent big.Rat/evidence worlds, source member publication and physical construction/assignment refusal campaigns are tested. Coverage measures existing Go statements, not unported C++ functionality. Component table and per-source units retain the evidence for older layers. Full exact/tableau/LAR solvers, bounds/constraints/explanations and original command drivers remain incomplete. Owning variable/term/general LAR constraints subsequently pass 120 independent exact-copy/borrow worlds, seven physical refusal campaigns through success, constructor/export prefixes and stopped-term/foreign-manager guards. Native and combined debug/checked constraint file 77/83 statements (92.8%); witness record and relation stream file 10/10 (100%). Full constraint/bound/explanation and exact LAR solver integration remains open. LAR bound dispatch and all five source column-type updates subsequently pass 300 independent exact interval worlds, explicit conflict/publication and debug profiles, scoped-owner/alias and multi-column checks, plus 30 pooled/direct physical allocation refusal campaigns through success. Bound updates cover 293/364 statements (80.5%) native and 312/364 (85.7%) combined debug/checked; scoped witness specialization covers 31/31 (100%) in both. Native excludes covered debug assertion statements; remaining gaps mostly qualify child errors and prior invariants. Full external variable/term registration, matrix/basis, whole-solver scopes and propagation/optimization remain open.",
   "remaining_work": [
     "remaining exact/floating numeric traits and conversions",
     "indexed/sparse/static/dense matrices and transformations",
@@ -492,9 +492,21 @@
     },
     {
       "source": "src/util/lp/init_lar_solver.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lar_bounds.go",
+        "pkg/util/lp/lar_bounds_test.go",
+        "pkg/util/lp/stacked_lar_witness.go"
+      ],
+      "tests": [
+        "TestLARBoundsIndependentIntervalIntersection",
+        "TestLARBoundsSourceConflictPublication",
+        "TestLARBoundsPhysicalUpdateRefusals",
+        "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+        "TestLARBoundsExistingScopedOwnersAndAlias",
+        "TestLARBoundsDebugInvariantProfiles",
+        "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+      ]
     },
     {
       "source": "src/util/lp/int_set.h",
@@ -634,9 +646,21 @@
     },
     {
       "source": "src/util/lp/lar_solver.h",
-      "status": "unported",
-      "go_targets": [],
-      "tests": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lar_bounds.go",
+        "pkg/util/lp/lar_bounds_test.go",
+        "pkg/util/lp/stacked_lar_witness.go"
+      ],
+      "tests": [
+        "TestLARBoundsIndependentIntervalIntersection",
+        "TestLARBoundsSourceConflictPublication",
+        "TestLARBoundsPhysicalUpdateRefusals",
+        "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+        "TestLARBoundsExistingScopedOwnersAndAlias",
+        "TestLARBoundsDebugInvariantProfiles",
+        "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+      ]
     },
     {
       "source": "src/util/lp/lar_term.h",
@@ -2640,7 +2664,10 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/stacked_vector.go",
-        "pkg/util/lp/stacked_pair_vector.go"
+        "pkg/util/lp/stacked_pair_vector.go",
+        "pkg/util/lp/stacked_lar_witness.go",
+        "pkg/util/lp/lar_bounds.go",
+        "pkg/util/lp/lar_bounds_test.go"
       ],
       "tests": [
         "TestLPStackedVectorSource",
@@ -2650,7 +2677,9 @@
         "TestLPStackedPairVectorIndependentSnapshots",
         "TestLPStackedPairVectorBigOwnership",
         "TestLPStackedPairVectorAllocationFailureOwnership",
-        "TestLPStackedPairVectorPendingAllocationIdentity"
+        "TestLPStackedPairVectorPendingAllocationIdentity",
+        "TestLARBoundWitnessStackIndependentSnapshots",
+        "TestLARBoundsExistingScopedOwnersAndAlias"
       ]
     },
     {
@@ -2858,8 +2887,8 @@
     }
   ],
   "status_counts": {
-    "unported": 34,
-    "partial": 76
+    "unported": 32,
+    "partial": 78
   },
   "combined_debug_checked_statement_coverage_of_current_go_code": 91.7
 }

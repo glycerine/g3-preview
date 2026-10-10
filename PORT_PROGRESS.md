@@ -37914,3 +37914,55 @@ new import edges. LP remains76 partial/34 unported; global2103 units/677 APIs,
 checkpoint remains22:14 UTC (89.8%,12347/13752), predating implied-bound and
 constraint additions; another hourly full run is not yet due. The full LP
 implementation/test goal remains unfinished.
+
+### LAR exact bound updates and scoped witness state — 2026-10-10
+
+Implemented update_column_type_and_bound and all five source column branches
+in the concrete LARBounds owner. It owns actual StackedPairVector lower/upper
+values and journals, scoped column types/status/infeasible index, native changed
+columns and the new concrete scoped ul_pair witness vector. Bound construction
+preserves numeric_pair's independently copied by-value parameter/result and
+parameter destruction before assignment. Exact pair comparison retains source
+lexicographic epsilon and structural equality gates. Child vectors and the
+outer owner retain actual partial values/copy/allocation/arithmetic receipts;
+Close cleans stopped calls and destroys upper before lower bound storage.
+AppendFreeColumn initializes bound fields only, not complete source registration.
+
+Source publication is explicit. Equality assignments store upper before lower;
+witness and changed-set ordering follow each source branch. A conflicting upper
+bound on a low-only column retains low-only type; a conflicting lower bound on
+an upper-only column changes to boxed first. Contradictory equality can publish
+only a witness without changing actual bound values. Boxed upper conflict sets
+Infeasible then debug-asserts before recording the infeasible column. Fixed
+strict endpoints use the original <=/>= predicates. Unknown free-column relation
+in native mode still inserts the changed column after its erased assertion.
+Existing infeasible status permits subsequent source bound updates without
+resetting status; unrelated column state and weaker-bound witnesses survive.
+
+300 independent big.Rat open/closed interval worlds check ordinary tightening,
+strict equality contradictions, fixed/boxed transitions, redundant bounds and
+strongest witnesses. Explicit conflict tables check original metadata/prefix
+asymmetries separately. Real scoped owners restore actual bound values and
+witnesses after aliased-RHS updates and a fixed conflict; whole LAR matrix/basis/
+constraint-stack push/pop is not claimed.1600 independent witness snapshot
+steps cover append, no-op replacement, nested/multi-pop and removed-column
+history. Unknown relations, cross-field metadata and source debug invariants
+are covered.30 pooled/direct physical allocation campaigns enumerate all three
+relation families across five column types through success; every failure
+requires stopped guards, actual partial cleanup and exact named live-root census.
+
+Final focused native bounds/witness/constraint/implied checks pass30.279s;
+combined g3debug/g3checked37.788s. Bound file293/364 (80.5%) native and312/364
+(85.7%) debug; witness vector31/31 (100%) in both. Native omits19 covered debug
+statements; remaining gaps predominantly qualify child errors or earlier same-
+thread invariants. Profiles: /mnt/oldrog/tmp/g3-lar-bounds-{native,debug}.cover.
+Both LP vets, source/evidence/no-generics verifier and native module-wide test
+compilation pass. Graph adds two production filenames without import edges.
+
+init_lar_solver.h and lar_solver.h now have concrete partial bound/witness
+evidence; full constructors and variable/term/constraint registration, matrix/
+basis, whole-solver scopes, propagation and exact LAR optimization remain open.
+LP78 partial/32 unported; global2103 units/677 APIs,62 ported/359 partial/
+1654 unported/two dead-deleted. Full native module checkpoint remains22:14 UTC,
+89.8% (12347/13752), predating current LAR additions; hourly repeat is not due.
+The complete implementation/test/coverage goal remains unfinished.

@@ -119363,9 +119363,21 @@
       "path": "src/util/lp/init_lar_solver.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lar_bounds.go",
+        "pkg/util/lp/lar_bounds_test.go",
+        "pkg/util/lp/stacked_lar_witness.go"
+      ],
+      "tests": [
+        "TestLARBoundsIndependentIntervalIntersection",
+        "TestLARBoundsSourceConflictPublication",
+        "TestLARBoundsPhysicalUpdateRefusals",
+        "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+        "TestLARBoundsExistingScopedOwnersAndAlias",
+        "TestLARBoundsDebugInvariantProfiles",
+        "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+      ],
       "assertions": [
         {
           "line": 29,
@@ -119518,9 +119530,105 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "update_column_type_and_bound concrete dispatch",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bounds.go",
+          "tests": [
+            "TestLARBoundsIndependentIntervalIntersection",
+            "TestLARBoundsSourceConflictPublication",
+            "TestLARBoundsPhysicalUpdateRefusals",
+            "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+            "TestLARBoundsExistingScopedOwnersAndAlias",
+            "TestLARBoundsDebugInvariantProfiles",
+            "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+          ]
+        },
+        {
+          "name": "update_free_column_type_and_bound",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bounds.go",
+          "tests": [
+            "TestLARBoundsIndependentIntervalIntersection",
+            "TestLARBoundsSourceConflictPublication",
+            "TestLARBoundsPhysicalUpdateRefusals",
+            "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+            "TestLARBoundsExistingScopedOwnersAndAlias",
+            "TestLARBoundsDebugInvariantProfiles",
+            "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+          ]
+        },
+        {
+          "name": "update_upper_bound_column_type_and_bound",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bounds.go",
+          "tests": [
+            "TestLARBoundsIndependentIntervalIntersection",
+            "TestLARBoundsSourceConflictPublication",
+            "TestLARBoundsPhysicalUpdateRefusals",
+            "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+            "TestLARBoundsExistingScopedOwnersAndAlias",
+            "TestLARBoundsDebugInvariantProfiles",
+            "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+          ]
+        },
+        {
+          "name": "update_low_bound_column_type_and_bound",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bounds.go",
+          "tests": [
+            "TestLARBoundsIndependentIntervalIntersection",
+            "TestLARBoundsSourceConflictPublication",
+            "TestLARBoundsPhysicalUpdateRefusals",
+            "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+            "TestLARBoundsExistingScopedOwnersAndAlias",
+            "TestLARBoundsDebugInvariantProfiles",
+            "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+          ]
+        },
+        {
+          "name": "update_boxed_column_type_and_bound",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bounds.go",
+          "tests": [
+            "TestLARBoundsIndependentIntervalIntersection",
+            "TestLARBoundsSourceConflictPublication",
+            "TestLARBoundsPhysicalUpdateRefusals",
+            "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+            "TestLARBoundsExistingScopedOwnersAndAlias",
+            "TestLARBoundsDebugInvariantProfiles",
+            "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+          ]
+        },
+        {
+          "name": "update_fixed_column_type_and_bound",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bounds.go",
+          "tests": [
+            "TestLARBoundsIndependentIntervalIntersection",
+            "TestLARBoundsSourceConflictPublication",
+            "TestLARBoundsPhysicalUpdateRefusals",
+            "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+            "TestLARBoundsExistingScopedOwnersAndAlias",
+            "TestLARBoundsDebugInvariantProfiles",
+            "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+          ]
+        },
+        {
+          "name": "remaining external-variable/term registration, matrix/basis construction and strategy initialization",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Concrete LARBounds owns actual StackedPairVector lower/upper values and replacement snapshots in a borrowed RationalManager, plus native column types, witness journals, status, infeasible-column state and changed-column set. Numeric-pair by-value constructor parameter and result are independently copied, the parameter dies before assignment, and partial temporaries/invocation receipts survive until explicit Close. Child bound-vector copies retain their own physical allocation roots."
+      ],
+      "deviations": [
+        "All five bound update branches and dispatch preserve source epsilon signs, strict/structural pair comparison, assignment/witness/change/status order and source conflict asymmetries. This implements the bound component, not a complete LAR solver. Full add_var/add_var_bound, matrix/basis, constraint publication/scopes and optimization remain unported.",
+        "AppendFreeColumn initializes only the source bound fields, with witness/type/change-domain and low/upper publication; it does not claim complete source variable registration. Existing native scoped owners are exercised directly, without claiming whole-solver push/pop.",
+        "Source boxed-upper conflict sets Infeasible then debug-asserts before recording the infeasible column; low-only conflicting upper bound retains low-only type, while upper-only conflicting lower bound first changes to boxed. Contradictory equality can update only a witness without changing stored bounds. These transitions are explicit regressions, not corrected interval metadata."
+      ]
     },
     {
       "path": "src/util/lp/int_set.h",
@@ -120195,9 +120303,21 @@
       "path": "src/util/lp/lar_solver.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/lar_bounds.go",
+        "pkg/util/lp/lar_bounds_test.go",
+        "pkg/util/lp/stacked_lar_witness.go"
+      ],
+      "tests": [
+        "TestLARBoundsIndependentIntervalIntersection",
+        "TestLARBoundsSourceConflictPublication",
+        "TestLARBoundsPhysicalUpdateRefusals",
+        "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+        "TestLARBoundsExistingScopedOwnersAndAlias",
+        "TestLARBoundsDebugInvariantProfiles",
+        "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+      ],
       "conditionals": [
         {
           "line": 1159,
@@ -120560,9 +120680,47 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "set_low_bound_witness and set_upper_bound_witness over concrete scoped ul_pair records",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bounds.go",
+          "tests": [
+            "TestLARBoundsIndependentIntervalIntersection",
+            "TestLARBoundsSourceConflictPublication",
+            "TestLARBoundsPhysicalUpdateRefusals",
+            "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+            "TestLARBoundsExistingScopedOwnersAndAlias",
+            "TestLARBoundsDebugInvariantProfiles",
+            "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+          ]
+        },
+        {
+          "name": "bound component initial Optimal status and -1 infeasible-column state, independently owned bound fields",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_bounds.go",
+          "tests": [
+            "TestLARBoundsIndependentIntervalIntersection",
+            "TestLARBoundsSourceConflictPublication",
+            "TestLARBoundsPhysicalUpdateRefusals",
+            "TestLARBoundsUnknownRelationsAndMetadataPrefixes",
+            "TestLARBoundsExistingScopedOwnersAndAlias",
+            "TestLARBoundsDebugInvariantProfiles",
+            "TestLARBoundsMultipleColumnsAndExistingInfeasibility"
+          ]
+        },
+        {
+          "name": "remaining full LAR constructor/lifecycle, constraint scopes, term/matrix/basis integration, solve, propagation and explanations",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "LARBounds is the owning concrete bound component with borrowed RationalManager. Status, infeasible column and witness/type state use the actual existing typed scoped owners; exact lower/upper journals retain completed and partial values. Full solver, term, matrix and constraint ownership remains open."
+      ],
+      "deviations": [
+        "Only source bound/witness state and its concrete update consumers are implemented. No full LAR constructor, AddVar/AddConstraint, scope, propagation or optimization completion is claimed."
+      ]
     },
     {
       "path": "src/util/lp/lar_term.h",
@@ -128746,7 +128904,10 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/lp/stacked_vector.go",
-        "pkg/util/lp/stacked_pair_vector.go"
+        "pkg/util/lp/stacked_pair_vector.go",
+        "pkg/util/lp/stacked_lar_witness.go",
+        "pkg/util/lp/lar_bounds.go",
+        "pkg/util/lp/lar_bounds_test.go"
       ],
       "tests": [
         "TestLPStackedVectorSource",
@@ -128756,7 +128917,9 @@
         "TestLPStackedPairVectorIndependentSnapshots",
         "TestLPStackedPairVectorBigOwnership",
         "TestLPStackedPairVectorAllocationFailureOwnership",
-        "TestLPStackedPairVectorPendingAllocationIdentity"
+        "TestLPStackedPairVectorPendingAllocationIdentity",
+        "TestLARBoundWitnessStackIndependentSnapshots",
+        "TestLARBoundsExistingScopedOwnersAndAlias"
       ],
       "assertions": [
         {
@@ -128808,11 +128971,21 @@
             "TestLPStackedPairVectorAllocationFailureOwnership",
             "TestLPStackedPairVectorPendingAllocationIdentity"
           ]
+        },
+        {
+          "name": "live ul_pair specialization with native values/replacement history, scope snapshots, tail removal and reverse restoration",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_lar_witness.go",
+          "tests": [
+            "TestLARBoundWitnessStackIndependentSnapshots",
+            "TestLARBoundsExistingScopedOwnersAndAlias"
+          ]
         }
       ],
       "ownership": [
         "Native typed slices own values and change journals. Values borrows read-only backing; callers must use Set to preserve rollback. No numeral ownership or STL internals are claimed.",
-        "Exact scoped vectors own RationalPair values and replacement snapshots. An incomplete lexical copy stays in the actual pending field. CaptureNumericAllocationRoots/After records only newly acquired physical numeric/allocator roots; identity-checked cleanup excludes older/replaced pending allocations. Values and At borrow read-only numerals; Set is required for rollback. Close precedes borrowed manager closure and retains its cursor on errors."
+        "Exact scoped vectors own RationalPair values and replacement snapshots. An incomplete lexical copy stays in the actual pending field. CaptureNumericAllocationRoots/After records only newly acquired physical numeric/allocator roots; identity-checked cleanup excludes older/replaced pending allocations. Values and At borrow read-only numerals; Set is required for rollback. Close precedes borrowed manager closure and retains its cursor on errors.",
+        "Concrete StackedLARWitnessVector owns pointer-free witness values and native replacement/scope slices. Repeated identical assignment adds no journal; pop truncates values then restores retained entries in reverse order, ignoring removed columns."
       ],
       "deviations": [
         "All four live element types now have concrete vector implementations; no whole source unit promotion before complete solver integration and source-profile audit. ErrBounds/ErrScope guard source-undefined accesses and zero/excess pops. Native backing has no simulated Runtime reservation failures. Actual numeral allocations can fail and retain explicit owning cleanup receipts; process-global allocation callback/stream bindings and teardown-stop profiles remain open."
