@@ -33091,3 +33091,35 @@ The full native module was not repeated inside the hourly interval. Counts remai
 The util knot and full split remain active. Other SAT Runtime columns and model
 entry storage, retained AST reference/printer storage, NumericTextStream consumers
 and internal util numeric/text/parameter cycles remain.
+
+
+## Power-loss recovery: native SAT model-converter entries
+
+Recovered the unfinished conversion of model-converter entries and literal
+sequences to direct native Go slices. Removed simulated outer capacity,
+pending relocation/copy cursors, nested-store indirection and backing charges.
+The actual cold header remains budgeted and owner identity initializes at the
+declared member construction stage. Checked entry indexes survive native growth
+and retire on Reset/Close. The live project Copy operation duplicates literal
+values independently and captures the original source count for finite self-copy.
+The retained goal2sat source calls explicit Copy/CollectVars; unused implicit
+Clone/Assign wrappers and their template-only tests were removed without credit.
+Project model reconstruction, source bitfields, insertion checks and traversal
+order remain. Whole-graph budget fixtures now account for the actual header.
+
+Tests cover 4097 entries, stable entry references across growth and Copy,
+independent nested copies, finite self-copy, reset invalidation, exact cold-header
+refund and model reconstruction after closing the source. Manifest tests and
+ownership notes describe this native consumer without C++ vector implementation
+credit. Recovered completed full native module log contains all 57 package results
+and no failures (SAT 0.707s, util 95.939s); recovered full debug SAT passed (0.740s).
+SAT vet and manifest evidence checks passed. Counts remain 2102 units/677 APIs:
+63 ported, 284 partial, 1727 unported and two dead/deleted.
+
+A refreshed compiler-resolved dependency audit still finds 287 root util
+production files, 104 strongly connected components and a largest component of
+164 files. The knot is unresolved and a complete subpackage split is not ready.
+Retained external SAT Runtime columns, AST reference/printer storage and
+NumericTextStream consumers still need idiomatic conversion. Internal util
+numeric/text/parameter cycles also need to be broken; external conversion alone
+does not remove those internal dependencies.

@@ -159,7 +159,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 		return s, err
 	}
 	s.model.Bind(c.Runtime.memory)
-	if err = s.converter.initializeSourceStore(vc); err != nil {
+	if err = s.converter.initializeSource(); err != nil {
 		return s, err
 	}
 	if s.simplifier, err = newSATSimplifier(s.Lifecycle, s.cleaner, s.decision, &c.Params); err != nil {

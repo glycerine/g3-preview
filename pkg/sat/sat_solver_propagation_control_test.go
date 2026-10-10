@@ -24,7 +24,7 @@ func satPropagationFixtureWithBudget(t *testing.T, n uint32, b *arena.Budget) (*
 	}
 	a, e := NewSATClauseAllocator(satClauseAllocatorConfig{Storage: arena.SmallBytesConfig{Descriptors: arena.Config{Budget: b}}})
 	satOK(t, e)
-	mc, e := newSATModelConverter(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}})
+	mc, e := newSATModelConverter(b)
 	satOK(t, e)
 	r, e := control.NewReslimit(b)
 	satOK(t, e)
@@ -88,7 +88,7 @@ func satPropagationAssertGraph(t *testing.T, s *satSolverPropagationState) {
 	small := a.storage.Stats()
 	want += a.ownerBytes + 4*uint64(a.ids.FreeCapacity()) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
 	mc := s.converter
-	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes
+	want += mc.ownerBytes
 	r := s.limit
 	want += uint64(reflect.TypeOf(control.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*control.Reslimit)(nil)).Size())*uint64(cap(r.Children))
 	want += s.memory.Stats().TotalBytes

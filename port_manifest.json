@@ -68699,7 +68699,6 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/sat/sat_solver_nested_store.go",
         "pkg/sat/sat_solver_model_converter.go",
         "pkg/sat/sat_solver_uint_set.go"
       ],
@@ -68709,22 +68708,14 @@
         "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
         "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
         "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
-        "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
         "TestSATSolverModelConverterIndependentChainModels",
-        "TestSATSolverModelConverterOuterGrowthDeepCopies",
         "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
         "TestSATSolverModelConverterReversePatchAndBlockedFlip",
-        "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-        "TestSATSolverModelConverterSelfCopyRelocationBoundary",
         "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-        "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
-        "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
-        "TestSATSolverModelConverterNativeNestedAssignmentAndOuterRefusal",
-        "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
-        "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
-        "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy",
         "TestSATSolverNativeLiteralGrowthCopyAndOracle",
-        "TestSATSolverNativeLiteralColdHeaderAndLifetime"
+        "TestSATSolverNativeLiteralColdHeaderAndLifetime",
+        "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+        "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
       ],
       "assertions": [
         {
@@ -68806,16 +68797,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -68825,16 +68814,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -68844,16 +68831,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -68866,14 +68851,12 @@
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterIndependentChainModels",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay"
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -68883,16 +68866,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -68902,16 +68883,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -68921,16 +68900,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -68940,16 +68917,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -68959,16 +68934,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -68978,16 +68951,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -68997,16 +68968,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69016,16 +68985,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69035,16 +69002,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69054,42 +69019,23 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
-          ]
-        },
-        {
-          "name": "model_converter implicit copy constructor/assignment",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_solver_model_converter.go",
-          "tests": [
-            "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
-            "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
-            "TestSATSolverModelConverterNativeNestedAssignmentAndOuterRefusal",
-            "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
-            "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
-            "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy",
-            "TestSATSolverNativeLiteralGrowthCopyAndOracle",
-            "TestSATSolverNativeLiteralColdHeaderAndLifetime"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         }
       ],
       "ownership": [
-        "Nested SAT literal collections now use native []Literal backing and a native record directory. Only actual cold store headers are charged. Clone/cross-owner copy duplicates logical values with independent native backing; source capacity geometry, arena payload/free pages and native growth refusal events are removed. Captured simplifier spans borrow native backing identities, reject real growth/free/closed lifetimes and enforce current logical bounds. Native caller spans likewise respect slice length. Model converter outer entry storage and its actual outer reservations remain separate retained work. Existing model outer growth still copies/destroys nested lists in order; CollectVars uses the native SAT integer set.",
-        "Model class-copy retains separately charged exact-capacity outer entry storage and independent native nested literal values. Assignment destroys destination entries before the real outer reservation/copy; native nested copies require no additional budget reservations. Retained owner/reference/cleanup guards remain. Outer entry storage still requires native conversion.",
-        "Nested SAT literal collections now use native []Literal backing and a native record directory. Only actual cold store headers are charged. Clone/cross-owner copy duplicates logical values with independent native backing; source capacity geometry, arena payload/free pages and native growth refusal events are removed. Captured simplifier spans borrow native backing identities, reject real growth/free/closed lifetimes and enforce current logical bounds. Native caller spans likewise respect slice length. Model converter outer entry storage and its actual outer reservations remain separate retained work."
+        "Model entries and their literal sequences use direct native Go slices. Only the actual cold converter header is budgeted; native growth, insert and explicit project Copy do not create simulated allocation refusals. Explicit Copy duplicates literal values independently, captures the original source length and supports finite self-copy. Checked index references survive native growth and retire on Reset or Close; CollectVars uses the native SAT integer set.",
+        "Source member initialization retains its declared construction stage and checked owner identity. No retained source consumer requires implicit model-converter Clone/Assign; unused wrappers and their emulated vector lifetime machinery were removed. Retained project model reconstruction, insertion checks, bitfields and traversal order remain."
       ],
       "deviations": [
-        "Pointers become scalar owner/slot/generation identities. Charged pending old-directory/cursor permits explicit Go continuation after source-undefined interrupted construction; unconstructed/dangling accesses fail at their actual boundary. Source TRACE diagnostics and downstream actual solver integration remain open. Explicit Clone/Assign now preserve actual implicit class-copy actions; see PORT_PROGRESS.md#audit-sat-model-copy-port-status-md. Display uses actual NumericTextStream with caller-owned output. No generics; whole-unit audit flags remain false.",
-        "Native literal slices expose current logical values, not retained C++ spare slots. Removed reserve/resize/physical-read/reset helpers have no retained production consumers. Native clone/copy/insert no longer fail on simulated nested backing allocations; actual cold/outer reservations remain tested."
+        "Native slices replace C++ vector capacity, relocation and interrupted-copy emulation. Explicit project Copy is retained for goal2sat; unused implicit copy constructor/assignment receives no implementation credit. Display still uses NumericTextStream. TRACE diagnostics and complete downstream integration remain open; whole-unit audit flags remain false."
       ]
     },
     {
@@ -69098,7 +69044,6 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/sat/sat_solver_nested_store.go",
         "pkg/sat/sat_solver_model_converter.go",
         "pkg/sat/sat_solver_uint_set.go"
       ],
@@ -69108,22 +69053,14 @@
         "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
         "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
         "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
-        "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
         "TestSATSolverModelConverterIndependentChainModels",
-        "TestSATSolverModelConverterOuterGrowthDeepCopies",
         "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
         "TestSATSolverModelConverterReversePatchAndBlockedFlip",
-        "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-        "TestSATSolverModelConverterSelfCopyRelocationBoundary",
         "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-        "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
-        "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
-        "TestSATSolverModelConverterNativeNestedAssignmentAndOuterRefusal",
-        "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
-        "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
-        "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy",
         "TestSATSolverNativeLiteralGrowthCopyAndOracle",
-        "TestSATSolverNativeLiteralColdHeaderAndLifetime"
+        "TestSATSolverNativeLiteralColdHeaderAndLifetime",
+        "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+        "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
       ],
       "conditionals": [
         {
@@ -69145,16 +69082,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69164,16 +69099,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69183,16 +69116,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69205,14 +69136,12 @@
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterIndependentChainModels",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay"
+            "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69222,16 +69151,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69241,16 +69168,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69260,16 +69185,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69279,16 +69202,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69298,16 +69219,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69317,16 +69236,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69336,16 +69253,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69355,16 +69270,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69374,16 +69287,14 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -69393,42 +69304,23 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
-            "TestSATSolverModelConverterActualCollectVars"
-          ]
-        },
-        {
-          "name": "model_converter implicit copy constructor/assignment",
-          "status": "ported",
-          "go_target": "pkg/sat/sat_solver_model_converter.go",
-          "tests": [
-            "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
-            "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
-            "TestSATSolverModelConverterNativeNestedAssignmentAndOuterRefusal",
-            "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
-            "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
-            "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy",
-            "TestSATSolverNativeLiteralGrowthCopyAndOracle",
-            "TestSATSolverNativeLiteralColdHeaderAndLifetime"
+            "TestSATSolverModelConverterActualCollectVars",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         }
       ],
       "ownership": [
-        "Nested SAT literal collections now use native []Literal backing and a native record directory. Only actual cold store headers are charged. Clone/cross-owner copy duplicates logical values with independent native backing; source capacity geometry, arena payload/free pages and native growth refusal events are removed. Captured simplifier spans borrow native backing identities, reject real growth/free/closed lifetimes and enforce current logical bounds. Native caller spans likewise respect slice length. Model converter outer entry storage and its actual outer reservations remain separate retained work. Existing model outer growth still copies/destroys nested lists in order; CollectVars uses the native SAT integer set.",
-        "Model class-copy retains separately charged exact-capacity outer entry storage and independent native nested literal values. Assignment destroys destination entries before the real outer reservation/copy; native nested copies require no additional budget reservations. Retained owner/reference/cleanup guards remain. Outer entry storage still requires native conversion.",
-        "Nested SAT literal collections now use native []Literal backing and a native record directory. Only actual cold store headers are charged. Clone/cross-owner copy duplicates logical values with independent native backing; source capacity geometry, arena payload/free pages and native growth refusal events are removed. Captured simplifier spans borrow native backing identities, reject real growth/free/closed lifetimes and enforce current logical bounds. Native caller spans likewise respect slice length. Model converter outer entry storage and its actual outer reservations remain separate retained work."
+        "Model entries and their literal sequences use direct native Go slices. Only the actual cold converter header is budgeted; native growth, insert and explicit project Copy do not create simulated allocation refusals. Explicit Copy duplicates literal values independently, captures the original source length and supports finite self-copy. Checked index references survive native growth and retire on Reset or Close; CollectVars uses the native SAT integer set.",
+        "Source member initialization retains its declared construction stage and checked owner identity. No retained source consumer requires implicit model-converter Clone/Assign; unused wrappers and their emulated vector lifetime machinery were removed. Retained project model reconstruction, insertion checks, bitfields and traversal order remain."
       ],
       "deviations": [
-        "Pointers become scalar owner/slot/generation identities. Charged pending old-directory/cursor permits explicit Go continuation after source-undefined interrupted construction; unconstructed/dangling accesses fail at their actual boundary. Source TRACE diagnostics and downstream actual solver integration remain open. Explicit Clone/Assign now preserve actual implicit class-copy actions; see PORT_PROGRESS.md#audit-sat-model-copy-port-status-md. Display uses actual NumericTextStream with caller-owned output. No generics; whole-unit audit flags remain false.",
-        "Native literal slices expose current logical values, not retained C++ spare slots. Removed reserve/resize/physical-read/reset helpers have no retained production consumers. Native clone/copy/insert no longer fail on simulated nested backing allocations; actual cold/outer reservations remain tested."
+        "Native slices replace C++ vector capacity, relocation and interrupted-copy emulation. Explicit project Copy is retained for goal2sat; unused implicit copy constructor/assignment receives no implementation credit. Display still uses NumericTextStream. TRACE diagnostics and complete downstream integration remain open; whole-unit audit flags remain false."
       ]
     },
     {
@@ -148801,13 +148693,9 @@
         "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
         "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
         "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
-        "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
         "TestSATSolverModelConverterIndependentChainModels",
-        "TestSATSolverModelConverterOuterGrowthDeepCopies",
         "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
         "TestSATSolverModelConverterReversePatchAndBlockedFlip",
-        "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-        "TestSATSolverModelConverterSelfCopyRelocationBoundary",
         "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
         "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
         "TestSATSolverWatchStoreOwnerLedgerRetirement",
@@ -148834,12 +148722,6 @@
         "TestASTSparseMarkNativeColdHeaderRefusalAndCopyGuard",
         "TestASTSparseMarkNativeResetAndCloseAfterBorrowedNodesDie",
         "TestASTSparseSharedExpressionDomainsAndASTWideVisited",
-        "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
-        "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
-        "TestSATSolverModelConverterNativeNestedAssignmentAndOuterRefusal",
-        "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
-        "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
-        "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy",
         "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
@@ -149004,7 +148886,9 @@
         "TestSATSolverNativeWatchIteratorLifetimes",
         "TestSATSolverNativeWatchColdHeaderAndWarmIterator",
         "TestSATSolverNativeLiteralGrowthCopyAndOracle",
-        "TestSATSolverNativeLiteralColdHeaderAndLifetime"
+        "TestSATSolverNativeLiteralColdHeaderAndLifetime",
+        "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+        "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
       ],
       "conditionals": [
         {
@@ -149146,18 +149030,16 @@
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
-            "TestSATSolverModelConverterOuterGrowthDeepCopies",
-            "TestSATSolverModelConverterNativeNestedCopyAndOuterRefusal",
             "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
             "TestSATSolverModelConverterIndependentChainModels",
             "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
             "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
             "TestSATSolverModelConverterOwnerEnumAndCloseGuards",
-            "TestSATSolverModelConverterSelfCopyCapturedEndAndInvalidationPrefix",
-            "TestSATSolverModelConverterSelfCopyRelocationBoundary",
             "TestSATSolverModelConverterActualCollectVars",
             "TestSATSolverNativeLiteralGrowthCopyAndOracle",
-            "TestSATSolverNativeLiteralColdHeaderAndLifetime"
+            "TestSATSolverNativeLiteralColdHeaderAndLifetime",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -149205,14 +149087,10 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_model_converter.go",
           "tests": [
-            "TestSATSolverModelConverterImplicitCloneExactCapacityAndLifetime",
-            "TestSATSolverModelConverterImplicitCopyEmptyRetainedCapacity",
-            "TestSATSolverModelConverterNativeNestedAssignmentAndOuterRefusal",
-            "TestSATSolverModelConverterImplicitCloneFailureUnwindAndSelfAssign",
-            "TestSATSolverModelConverterImplicitCloneSharedBorrowedBudget",
-            "TestSATSolverModelConverterImplicitAssignmentAscendingDestroyAndCopy",
             "TestSATSolverNativeLiteralGrowthCopyAndOracle",
-            "TestSATSolverNativeLiteralColdHeaderAndLifetime"
+            "TestSATSolverNativeLiteralColdHeaderAndLifetime",
+            "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
           ]
         },
         {
@@ -149485,10 +149363,10 @@
       "ownership": [
         "Descriptor entries use insdict insertion order and native Go name slices; immutable nullable metadata uses Go strings with explicit presence bits. Copy shares immutable strings independently of owner lifetime. Only actual owner headers are budgeted; dictionary, names, text, and display scratch are Go-managed. See PORT_PROGRESS.md#audit-param-descrs-port-status-md.",
         "SAT vector headers/backing/lifetime metadata use actual host widths, real 2-to-(3n+1)/2 growth and old/new peaks. Trivial reallocation copies retained capacity, watched erase/destroy lifetime is distinguished. Value iterators do not allocate cold wrappers. Source impossible constructors/equality overloads are not fabricated; aliases and raw pointer adapters are in PORT_PROGRESS.md#audit-sat-storage-port-status-md.",
-        "Nested SAT literal collections now use native []Literal backing and a native record directory. Only actual cold store headers are charged. Clone/cross-owner copy duplicates logical values with independent native backing; source capacity geometry, arena payload/free pages and native growth refusal events are removed. Captured simplifier spans borrow native backing identities, reject real growth/free/closed lifetimes and enforce current logical bounds. Native caller spans likewise respect slice length. Model converter outer entry storage and its actual outer reservations remain separate retained work.",
+        "Nested SAT literal collections now use native []Literal backing and a native record directory. Only actual cold store headers are charged. Clone/cross-owner copy duplicates logical values with independent native backing; source capacity geometry, arena payload/free pages and native growth refusal events are removed. Captured simplifier spans borrow native backing identities, reject real growth/free/closed lifetimes and enforce current logical bounds. Native caller spans likewise respect slice length. The model converter now owns entry and literal slices directly; this separate literal store serves the simplifier.",
         "SAT watches now use native []satWatched backing and a native outer slice/directory of checked list references. Actual cold outer/store headers are charged; native backing is uncharged. Iterator values borrow native backing identities: writes remain visible, current logical bounds reject discarded tails, and real backing growth/finalization/free invalidate stale borrows. Owner/generation guards preserve child lifetime across outer relocation and slot reuse. Removed payload codecs, lifetime bitmaps, simulated capacity growth/refusals and unused copy/move/fill/reverse/constructor helpers. Actual source tag/equality, propagation compaction, clause/ternary erase and stable class sorting remain.",
         "Sparse marks use a native Go map of borrowed slot/generation identities. Shared occurrences use insdict.Dict with one owned reference per key and discovery-order iteration/destruction. Visitation and traversal use native slices; actual cold headers and node shared flags remain. See PORT_PROGRESS.md#native-sparse-marks-and-shared-occurrence-collections.",
-        "Model class-copy retains separately charged exact-capacity outer entry storage and independent native nested literal values. Assignment destroys destination entries before the real outer reservation/copy; native nested copies require no additional budget reservations. Retained owner/reference/cleanup guards remain. Outer entry storage still requires native conversion.",
+        "Model entries and their literal sequences use direct native Go slices. Only the actual cold converter header is budgeted; native growth, insert and explicit project Copy do not create simulated allocation refusals. Explicit Copy duplicates literal values independently, captures the original source length and supports finite self-copy. Checked index references survive native growth and retire on Reset or Close; CollectVars uses the native SAT integer set.",
         "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output, manager cells and allocator-backed limbs before fault disabling. See PORT_PROGRESS.md#audit-upolynomial-root-isolation-packet-md; allocator/backend integration remains open.",
         "Assignment bytes and initialization state are owned solely by the borrowed real Runtime, with source vector capacity/size headers and explicit block/pending tokens; enclosing variable owner charges embedded metadata. Variable graph Stats exclude borrowed runtime, which physical audits add exactly once. Runtime must outlive variable/propagation owners, which require the same actual Runtime identity.",
         "MonomialPositions charges its actual cold header once and owns one real unsigned32 Runtime vector. Manager/monomials are borrowed. SourceFinalize frees only published member bytes; owning CloseChecked additionally drains actual unreturned pending malloc and physically short ILP32 changed-token blocks without counter repair.",
@@ -149527,7 +149405,7 @@
         "No lexical polynomial_ref or NUM is constructed by psc_chain1. Exact concrete Subchain tuple is captured only at actual guarded begin; false completes its real reference suffix, true aborts unjoined roots. Caller SET transfers Coeff factory only at successful incoming INC before old DEC callbacks. Size/index/phase are scalar diagnostics, not ownership authority.",
         "Retained SAT clause/wrapper/activity/binary consumers use native typed slices and native borrowed allocator maps. The unused standalone watched-vector adapter and template-only methods were deleted. Only real cold owner headers are budgeted; native backing growth is uncharged. This conversion gives no generic C++ vector implementation credit.",
         "SAT watches now use native []satWatched backing and a native outer slice/directory of checked list references. Actual cold outer/store headers are charged; native backing is uncharged. Iterator values borrow native backing identities: writes remain visible, current logical bounds reject discarded tails, and real backing growth/finalization/free invalidate stale borrows. Owner/generation guards preserve child lifetime across outer relocation and slot reuse. Removed payload codecs, lifetime bitmaps, simulated capacity growth/refusals and unused copy/move/fill/reverse/constructor helpers. Actual source tag/equality, propagation compaction, clause/ternary erase and stable class sorting remain.",
-        "Nested SAT literal collections now use native []Literal backing and a native record directory. Only actual cold store headers are charged. Clone/cross-owner copy duplicates logical values with independent native backing; source capacity geometry, arena payload/free pages and native growth refusal events are removed. Captured simplifier spans borrow native backing identities, reject real growth/free/closed lifetimes and enforce current logical bounds. Native caller spans likewise respect slice length. Model converter outer entry storage and its actual outer reservations remain separate retained work."
+        "Nested SAT literal collections now use native []Literal backing and a native record directory. Only actual cold store headers are charged. Clone/cross-owner copy duplicates logical values with independent native backing; source capacity geometry, arena payload/free pages and native growth refusal events are removed. Captured simplifier spans borrow native backing identities, reject real growth/free/closed lifetimes and enforce current logical bounds. Native caller spans likewise respect slice length. The model converter now owns entry and literal slices directly; this separate literal store serves the simplifier."
       ],
       "deviations": [
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",

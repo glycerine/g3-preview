@@ -55,8 +55,8 @@ func TestSATSolverConverterColdBorrowBeforeSourceConstruction(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	m, e := newSATColdModelConverter(b)
 	satOK(t, e)
-	if m.store != nil {
-		t.Fatal("future source store constructed early")
+	if m.constructed {
+		t.Fatal("source model member initialized early")
 	}
 	satOK(t, m.constructionBorrow())
 	if e = m.open(); !errors.Is(e, arena.ErrClosed) {
@@ -66,7 +66,7 @@ func TestSATSolverConverterColdBorrowBeforeSourceConstruction(t *testing.T) {
 	if e = copied.constructionBorrow(); !errors.Is(e, ErrSATOwner) {
 		t.Fatal(e)
 	}
-	satOK(t, m.initializeSourceStore(arena.VectorConfig{Descriptors: arena.Config{Budget: b}}))
+	satOK(t, m.initializeSource())
 	satOK(t, m.open())
 	satOK(t, m.Close())
 	if b.Used() != 0 {

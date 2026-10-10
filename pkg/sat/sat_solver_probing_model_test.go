@@ -64,7 +64,7 @@ func satProbingAudit(t *testing.T, s *satSolverProbing, analysis *satSolverConfl
 	small := a.storage.Stats()
 	want += a.ownerBytes + 4*uint64(a.ids.FreeCapacity()) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
 	mc := p.converter
-	want += mc.ownerBytes + mc.entryBytes + mc.pendingBytes + mc.store.ownerBytes
+	want += mc.ownerBytes
 	r := p.limit
 	want += uint64(reflect.TypeOf(control.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*control.Reslimit)(nil)).Size())*uint64(cap(r.Children))
 	want += p.memory.Stats().TotalBytes
@@ -318,7 +318,7 @@ func TestSATSolverProbingTLSPostAllocationPendingCache(t *testing.T) {
 	satOK(t, e)
 	allocator, e := NewSATClauseAllocator(satClauseAllocatorConfig{Storage: arena.SmallBytesConfig{Descriptors: arena.Config{Budget: b}}})
 	satOK(t, e)
-	converter, e := newSATModelConverter(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{Budget: b}})
+	converter, e := newSATModelConverter(b)
 	satOK(t, e)
 	limit, e := control.NewReslimit(b)
 	satOK(t, e)
