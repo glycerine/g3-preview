@@ -34408,3 +34408,27 @@ their own bridge implementations; audit those before removal. Goal forms/proofs
 and dependencies still use retained ASTExprArray/ASTDependencyArray owners and
 need native slice migration. The remaining consumer cleanup, internal util
 package boundaries and complete root util subpackage split remain unfinished.
+
+## Remove unused dependency reference adapters
+
+Caller audit found the scalar ASTDependencyRef and its vector/buffer adapters
+used exclusively by their own Go bridge implementations and tests. Removed
+12 files and 30 bridge-only tests. Actual dependency DAG operations and live
+goal array owners remain; retained C++ expr_dependency_ref uses are not dead.
+The substitution dependency pointer conversion remains as a concrete helper.
+
+With no payload consumer left, removed the separate ASTManager vectorAllocator
+from construction, statistics and teardown. Reserved its old constructor bit
+position to preserve remaining diagnostics. Substitution tests retain real
+allocator, ownership and refcount assertions; only unrelated empty-allocator
+observations were removed. Manifest removes bridge API claims without adding
+generic container or whole-unit completion credit.
+
+Validation: focused dependency/substitution/constructor tests passed (0.113s).
+Full native AST/rewriter/model/tactic/SAT tactic/API passed
+(18.579s/10.489s/0.055s/0.023s/0.111s/0.013s); full debug AST passed (18.608s).
+Module-wide compilation, AST vet and manifest checks passed. Counts remain
+2102 units/677 APIs:62 ported,283 partial,1729 unported,two dead/deleted.
+No full native module rerun after the previous hourly run. Goal forms/proofs
+and dependencies remain the next live native-slice migration; internal util
+boundaries and the complete root util split are still unfinished.

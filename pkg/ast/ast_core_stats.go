@@ -51,10 +51,6 @@ func (m *ASTManager) Stats() ASTManagerStats {
 		a := m.allocator.Stats()
 		s.AllocatedBytes += a.OwnerBytes + a.PayloadBytes + a.MetadataBytes + a.DirectoryBytes
 	}
-	if m.vectorAllocator != nil {
-		a := m.vectorAllocator.Stats()
-		s.AllocatedBytes += a.OwnerBytes + a.PayloadBytes + a.MetadataBytes + a.DirectoryBytes
-	}
 	if m.families != nil {
 		f := m.families.Stats()
 		s.AllocatedBytes += f.OwnerBytes

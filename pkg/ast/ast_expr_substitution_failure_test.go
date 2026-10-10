@@ -93,7 +93,7 @@ func TestASTExprSubstitutionConstructorEveryReservationPrefix(t *testing.T) {
 	for fail := int64(0); fail < 80; fail++ {
 		m := astTestManager(t)
 		astTestMust(t, m.ToggleProofMode(ASTProofEnabled))
-		cells, payload := m.allocator.Stats().Live, m.vectorAllocator.Stats().Live
+		cells := m.allocator.Stats().Live
 		m.BudgetField.FailAfter(fail)
 		s, e := m.NewExprSubstitutionPolicy(true, true)
 		m.BudgetField.FailAfter(-1)
@@ -108,8 +108,8 @@ func TestASTExprSubstitutionConstructorEveryReservationPrefix(t *testing.T) {
 			success = true
 			astTestMust(t, m.DelExprSubstitution(&s))
 		}
-		if m.allocator.Stats().Live != cells || m.vectorAllocator.Stats().Live != payload {
-			t.Fatal("constructor immediate owned graph", fail, m.allocator.Stats().Live, cells, m.vectorAllocator.Stats().Live, payload)
+		if m.allocator.Stats().Live != cells {
+			t.Fatal("constructor immediate owned graph", fail, m.allocator.Stats().Live, cells)
 		}
 		if success {
 			break
@@ -162,7 +162,7 @@ func TestASTExprSubstitutionNativeOwnerIdentityAndBorrowedProvenance(t *testing.
 
 func TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction(t *testing.T) {
 	m := astTestManager(t)
-	base, payload := m.allocator.Stats().Live, m.vectorAllocator.Stats().Live
+	base := m.allocator.Stats().Live
 	s, e := m.NewExprSubstitutionPolicy(false, true)
 	if ASTSourceDebug {
 		if !errors.Is(e, ErrASTDomain) || s != (ASTExprSubstitution{}) {
@@ -172,7 +172,7 @@ func TestASTExprSubstitutionExplicitProofGuardRunsAfterPrimaryConstruction(t *te
 		astTestMust(t, e)
 		astTestMust(t, m.DelExprSubstitution(&s))
 	}
-	if m.allocator.Stats().Live != base || m.vectorAllocator.Stats().Live != payload {
+	if m.allocator.Stats().Live != base {
 		t.Fatal("explicit ctor cleanup")
 	}
 	m.BudgetField.FailAfter(0)
@@ -198,7 +198,6 @@ func TestASTExprSubstitutionNativeSparseResetReleasesDependencyRoots(t *testing.
 	for i := 0; i < 95; i++ {
 		astTestMust(t, m.ExprSubstitutionErase(s, keys[i]))
 	}
-	live := m.vectorAllocator.Stats().Live
 	m.BudgetField.FailAfter(0)
 	e = m.ExprSubstitutionReset(s)
 	m.BudgetField.FailAfter(-1)
@@ -207,9 +206,6 @@ func TestASTExprSubstitutionNativeSparseResetReleasesDependencyRoots(t *testing.
 	astTestMust(t, e)
 	if rc != 1 {
 		t.Fatal("native reset must release all core references", rc)
-	}
-	if m.vectorAllocator.Stats().Live != live {
-		t.Fatal("native reset changed unrelated vector storage")
 	}
 	astTestMust(t, m.ExprSubstitutionReset(s))
 	astTestMust(t, m.DelExprSubstitution(&s))
@@ -415,7 +411,7 @@ func TestASTScopedExprSubstitutionConstructorEveryReservationPrefix(t *testing.T
 		m := astTestManager(t)
 		s, e := m.NewExprSubstitution()
 		astTestMust(t, e)
-		cells, payload := m.allocator.Stats().Live, m.vectorAllocator.Stats().Live
+		cells := m.allocator.Stats().Live
 		m.BudgetField.FailAfter(fail)
 		scope, e := m.NewScopedExprSubstitution(s)
 		m.BudgetField.FailAfter(-1)
@@ -427,7 +423,7 @@ func TestASTScopedExprSubstitutionConstructorEveryReservationPrefix(t *testing.T
 			success = true
 			astTestMust(t, m.DelScopedExprSubstitution(&scope))
 		}
-		if m.allocator.Stats().Live != cells || m.vectorAllocator.Stats().Live != payload {
+		if m.allocator.Stats().Live != cells {
 			t.Fatal("scope actual constructor unwind before Close", fail)
 		}
 		astTestMust(t, m.DelExprSubstitution(&s))

@@ -8,7 +8,7 @@ import (
 const (
 	astCtorAllocator uint32 = 1 << iota
 	astCtorFamilies
-	astCtorVectorAllocator
+	_ // retired unused reference-vector allocator bit
 	astCtorArrays
 	astCtorTable
 	astCtorIDGenerators
@@ -193,10 +193,6 @@ func (m *ASTManager) abortConstructionCore() error {
 	m.releaseAuxiliaryPluginHistory()
 	m.releaseDatatypePluginHistory()
 	m.destroyPluginBacking()
-	if m.vectorAllocator != nil {
-		m.vectorAllocator.Close()
-		m.vectorAllocator = nil
-	}
 	m.releaseTraceAcquisitionHistory()
 	m.releasePages()
 	m.BudgetField.Release(m.ownerBytes)

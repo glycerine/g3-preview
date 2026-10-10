@@ -243,7 +243,6 @@ type ASTManager struct {
 	families                                                                                           *FamilyManager
 	Limit                                                                                              control.Reslimit // source inline member, charged in the ASTManager header
 	allocator                                                                                          *arena.SmallBytes
-	vectorAllocator                                                                                    *arena.SmallBytes
 	Format                                                                                             *ASTManager
 	proofMode                                                                                          ASTProofMode
 	coercions, Closed, closing, debugNondeterminism                                                    bool

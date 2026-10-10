@@ -68,10 +68,6 @@ func (m *ASTManager) closeSourceOwnedStorageCore() error {
 			}
 		}
 	}
-	if m.vectorAllocator != nil {
-		m.vectorAllocator.Close()
-		m.vectorAllocator = nil
-	}
 	m.releaseTraceAcquisitionHistory()
 	m.releaseExprVisitHistory()
 	m.releaseFormatPluginHeaders()

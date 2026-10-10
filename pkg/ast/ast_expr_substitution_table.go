@@ -1,6 +1,8 @@
 // Native typed collection keys; only queried AST identities are dereferenced.
 package ast
 
+import "github.com/glycerine/g3/pkg/arena"
+
 func (m *ASTManager) substKey(key astNodeRef) (uint64, error) {
 	if e := m.validNode(key); e != nil {
 		return 0, e
@@ -41,5 +43,9 @@ func (m *ASTManager) substDependency(r astNodeRef) ASTDependency {
 	if r.slot == 0 {
 		return ASTDependency{}
 	}
-	return ASTDependency{m.origin, dependencyRefPointer(r)}
+	return ASTDependency{m.origin, substDependencyPointer(r)}
+}
+
+func substDependencyPointer(r astNodeRef) arena.SmallBytesRef {
+	return arena.SmallBytesRef{Slot: arena.Slot(r.slot), Generation: arena.Generation(r.generation)}
 }
