@@ -34725,3 +34725,44 @@ AST/tactic checks passed (1.258s/cached/20.855s/0.025s). Module-wide g3checked
 and combined g3debug+g3checked compilation, all util plus AST/polynomial/
 SMT core/SAT vet, manifest and diff checks passed. Final pure/nested package
 import audit passed for all36 utility packages.
+
+## Begin complete util/lp implementation and test port
+
+New active objective: port retained src/util/lp implementation and upstream tests,
+then strengthen component coverage through the complete solver. This is not
+completed by the prior utility reorganization. Inventory includes all110 files,
+including .hpp bodies omitted by default rg ignore rules:24,630 source lines.
+Only the parameter collector existed initially. PORT_STATUS.json now lists every
+source file, current evidence and remaining work; PORT_STATUS.md explains scope,
+coverage limits and source test-driver reachability. Six LP units are partial,
+104 unported; no complete LP/simplex/LAR solver claim is made.
+
+Implemented int_set's inverse/dense membership, swap-with-last erase, literal
+resize/growth/clear and Go output. Original test_int_set assertions plus an
+independent10,000-operation map oracle cover membership, duplicate/absent paths,
+exact member order, resize, output refusal and reached undefined-domain guards.
+Implemented actual stacked scalar unsigned/int32/status/strategy instantiations
+without generics; ported original test_stacked_unsigned and added nested, zero,
+excess-pop and unsigned-wrap cases. Added exact column/strategy/status enum
+values and source's three formatting/parsing bodies. Tests pin omitted output
+cases and intentionally asymmetric accepted parser vocabulary in native/debug
+profiles, rather than silently correcting the upstream behavior.
+
+Existing LP parameter collector now has exact independent schema checks, every
+reached kind-collision error prefix and native-container operation with Runtime
+reservations disabled. The initial refusal experiment established that native
+maps/slices make no Runtime reservations; it was replaced with that observable
+invariant and actual source-precondition prefixes, not invented allocation faults.
+All current LP Go functions are100% statement covered in native and combined
+source-debug/checked builds (0.023s/0.021s). LP vet and manifest validation passed.
+Coverage says nothing about the still-unported source algorithms. Initial use of
+stdlib slices.Equal in a test was rejected by the no-generics checker and replaced
+with reflect.DeepEqual; manifest validation now honors the existing restriction.
+
+The user's separate9fc0644d dependency upgrade is preserved. insdict v0.14.5 is
+available in /home/jaten/go/pkg/mod, so LP checks use that existing module cache,
+with GOCACHE/GOTMPDIR in /mnt/oldrog/tmp. Full native module verification is
+running in /mnt/oldrog/tmp/g3-lp-foundation-module-full.log. Pre-existing untracked
+dependency-graph artifacts from the preceding task remain separate from this LP
+implementation commit. Next: concrete scoped vectors, numeric pairs and indexed
+matrix primitives, followed by the complete requested solver and driver scope.

@@ -102936,9 +102936,15 @@
       "path": "src/test/lp.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/int_set_test.go",
+        "pkg/util/lp/stacked_value_test.go"
+      ],
+      "tests": [
+        "TestLPIntSetSource",
+        "TestLPStackedUnsignedSource"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -103477,9 +103483,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "test_int_set (--test_int_set) and test_stacked_unsigned via test_stacked (--smap)",
+          "status": "ported",
+          "go_target": "pkg/util/lp/int_set_test.go",
+          "tests": [
+            "TestLPIntSetSource",
+            "TestLPStackedUnsignedSource"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim."
+      ],
+      "deviations": [
+        "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller."
+      ]
     },
     {
       "path": "src/test/main.cpp",
@@ -118358,9 +118378,17 @@
       "path": "src/util/lp/int_set.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/int_set.go"
+      ],
+      "tests": [
+        "TestLPIntSetSource",
+        "TestLPIntSetDenseOrderResizeAndGuards",
+        "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
+        "TestLPIntSetIndependentFiniteMembership",
+        "TestLPIntSetPrintOrderAndWriterFailure"
+      ],
       "assertions": [
         {
           "line": 38,
@@ -118369,9 +118397,50 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "constructors, contains, insert and last-member replacement erase",
+          "status": "ported",
+          "go_target": "pkg/util/lp/int_set.go",
+          "tests": [
+            "TestLPIntSetSource",
+            "TestLPIntSetDenseOrderResizeAndGuards",
+            "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
+            "TestLPIntSetIndependentFiniteMembership",
+            "TestLPIntSetPrintOrderAndWriterFailure"
+          ]
+        },
+        {
+          "name": "domain-only resize and growth, size/data_size/empty, borrowed dense traversal and clear",
+          "status": "ported",
+          "go_target": "pkg/util/lp/int_set.go",
+          "tests": [
+            "TestLPIntSetSource",
+            "TestLPIntSetDenseOrderResizeAndGuards",
+            "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
+            "TestLPIntSetIndependentFiniteMembership",
+            "TestLPIntSetPrintOrderAndWriterFailure"
+          ]
+        },
+        {
+          "name": "unsigned-space-newline print via Go io.Writer",
+          "status": "ported",
+          "go_target": "pkg/util/lp/int_set.go",
+          "tests": [
+            "TestLPIntSetSource",
+            "TestLPIntSetDenseOrderResizeAndGuards",
+            "TestLPIntSetShrinkRetainsSourceIndexAndReachedClearPrefix",
+            "TestLPIntSetIndependentFiniteMembership",
+            "TestLPIntSetPrintOrderAndWriterFailure"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim."
+      ],
+      "deviations": [
+        "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller."
+      ]
     },
     {
       "path": "src/util/lp/iterator_on_column.h",
@@ -119763,12 +119832,30 @@
       "path": "src/util/lp/lp_params.pyg",
       "component": "util",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/gparams_catalog_collectors_test.go",
+        "pkg/util/lp/gparams_catalog_collectors.go"
+      ],
+      "tests": [
+        "TestLPParameterCatalogSchema",
+        "TestLPParameterCatalogReachedFailurePrefixes",
+        "TestLPParameterCatalogNativeStorageIgnoresRuntimeReservationFault"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "independent five-parameter catalog schema, every reached kind-collision prefix and native backing under Runtime refusal",
+          "status": "ported",
+          "go_target": "pkg/util/lp/gparams_catalog_collectors.go",
+          "tests": [
+            "TestLPParameterCatalogSchema",
+            "TestLPParameterCatalogReachedFailurePrefixes",
+            "TestLPParameterCatalogNativeStorageIgnoresRuntimeReservationFault"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -120435,9 +120522,14 @@
       "path": "src/util/lp/lp_settings.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/types.go"
+      ],
+      "tests": [
+        "TestLPSourceEnumsAndSpellings",
+        "TestLPSourceStatusFallbackAndParserAsymmetry"
+      ],
       "conditionals": [
         {
           "line": 315,
@@ -120464,17 +120556,38 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "column_type, simplex_strategy_enum and lp_status source values",
+          "status": "ported",
+          "go_target": "pkg/util/lp/types.go",
+          "tests": [
+            "TestLPSourceEnumsAndSpellings",
+            "TestLPSourceStatusFallbackAndParserAsymmetry"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim."
+      ],
+      "deviations": [
+        "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller."
+      ]
     },
     {
       "path": "src/util/lp/lp_settings.hpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/types.go",
+        "pkg/util/lp/assert_debug.go",
+        "pkg/util/lp/assert_release.go"
+      ],
+      "tests": [
+        "TestLPSourceEnumsAndSpellings",
+        "TestLPSourceStatusFallbackAndParserAsymmetry"
+      ],
       "conditionals": [
         {
           "line": 122,
@@ -120501,9 +120614,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "column_type_to_string, lp_status_to_string, lp_status_from_string exact source vocabulary and release/debug fallback",
+          "status": "ported",
+          "go_target": "pkg/util/lp/types.go",
+          "tests": [
+            "TestLPSourceEnumsAndSpellings",
+            "TestLPSourceStatusFallbackAndParserAsymmetry"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim."
+      ],
+      "deviations": [
+        "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller."
+      ]
     },
     {
       "path": "src/util/lp/lp_settings_instances.cpp",
@@ -122441,14 +122568,33 @@
       "path": "src/util/lp/stacked_value.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/lp/stacked_value.go"
+      ],
+      "tests": [
+        "TestLPStackedUnsignedSource",
+        "TestLPStackedSignedStatusAndStrategy"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete unsigned/int32/lp_status/simplex_strategy value snapshots, direct scalar mutation, push/stack_size and saturating pop",
+          "status": "ported",
+          "go_target": "pkg/util/lp/stacked_value.go",
+          "tests": [
+            "TestLPStackedUnsignedSource",
+            "TestLPStackedSignedStatusAndStrategy"
+          ]
+        }
+      ],
+      "ownership": [
+        "Native typed Go slices own membership positions/snapshots; no STL or simulated vector allocation port. Current scalar/enum operations hold no numeral roots. No complete solver or process-global debug/stream claim."
+      ],
+      "deviations": [
+        "Initial LP foundation port only. Full 110-file LP implementation, other scalar/matrix/solver contracts and complete upstream test driver remain open; see pkg/util/lp/PORT_STATUS.json. Checked Go guards cover reached source-undefined extents; io.Writer formatting delegates file ownership/flush to the caller."
+      ]
     },
     {
       "path": "src/util/lp/stacked_vector.h",
