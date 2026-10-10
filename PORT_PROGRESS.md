@@ -36715,3 +36715,53 @@ UTC; no within-hour repeat. The full LP89.5% coverage snapshot predates extensio
 LP stays48 partial/62 unported units. Next finish remaining retained LU scenarios
 and lifecycle integration, followed by scaling, simplex, LAR/bounds/evidence,
 MPS and complete upstream test drivers required by the full active goal.
+
+
+### LU factorization replacement and remaining upstream numerical scenarios — 2026-10-10
+
+Ported retained init_factorization lu.hpp:936-944 for all three explicit types
+(lu_instances.cpp:39-41). Concrete pointer slots destroy the previous owner
+before constructing the replacement; on explicit Go constructor error they
+retain the attempted partial owner for Close. Borrowed source/settings/caller
+values stay independent. This exposes defined owning cleanup rather than a
+dangling deleted C++ pointer on constructor failure; it does not transactionally
+retain old factors or rebuild numeral manager scratch.
+
+Twelve independent rational basis worlds construct through nil slots, exercise
+actual row/column solutions, replace sparse/dense owners with reversed basis
+orders, check old-owner closed guards and verify invalid constructor attempts
+retain stopped new owners. Four pooled/direct allocation walks reach first
+success:292 native/532 debug refusals, maximum133. Each failed attempted owner
+is replaced again after disabling reservation refusal, then all owning cells
+and borrowed source values are checked. Source Add/SubMul failures can consume
+Tmp[0] before a failed replacement allocation; CleanupRaw owns the invocation
+without repairing the source-invalid pointer.146 native/260 debug re-entry
+cases verify the real dead-slot error AND a missing actual manager scratch
+root. This matches numeral TestIntegerRawExecutingOwnerRefusesFinalizeAndClose;
+no numerical retry promise or fake scratch reconstruction is introduced. An
+initial fixture used Set to overwrite an existing diagonal, but source Set
+appends; it was corrected to edit the actual borrowed coefficient, as source
+operator() would. The source append semantics remain unchanged.
+
+Ported remaining --test_lu mathematical scenarios from lp.cpp:318-510: cyclic
+square larger matrix with9-for0 replacement; holes matrix with8-for0 replacement;
+default random_gen(seed0) six-by-twelve matrix with8-for3 and11-for0 replacements.
+The random fixture pins all12 first-row draws and uses the retained generator,
+not C rand or a substitute Go RNG. All run density0.7 plus forced sparse/dense
+policies. Independent original-basis products verify tail factorization identity,
+known column and dense/indexed row solutions and residual-refined rows before
+and after every update. Together with the prior small-LU/two-row extension,
+all four upstream numerical scenarios are represented. CLI parsing, diagnostic
+streams and full registered driver execution remain open. The source indexed-X
+solve body asserts unimplemented and is not credited as an algorithm.
+
+Focused native/debug lifecycle and scenario checks pass0.812s/1.294s. New lifecycle
+file coverage15/17 (88.2%) both profiles; remaining returns propagate exact-owner
+cleanup errors under broken ownership invariants. Both vets, ledger inventory,
+executable evidence/no-generics and diff checks pass; graph remains64 packages
+with unchanged dependencies and the new production file. Full native module
+last passed17:57 UTC; no within-hour rerun. Its89.5% LP coverage snapshot predates
+extension/lifecycle additions. LP stays48 partial/62 unported units. Next audit
+remaining prepared-solve entry points/debug diagnostics, then scaling, simplex,
+LAR constraints/bounds/evidence and MPS plus complete upstream drivers. The full
+LP port goal remains active and incomplete.

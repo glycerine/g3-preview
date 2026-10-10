@@ -1193,6 +1193,7 @@
         "lu_extend_float.go",
         "lu_float.go",
         "lu_float_solve.go",
+        "lu_lifecycle.go",
         "lu_refine_exact.go",
         "lu_refine_float.go",
         "lu_state.go",
